@@ -1,0 +1,438 @@
+{
+ "module": {
+  "slug": "personal-data",
+  "title": "Personal data",
+  "category": "data"
+ },
+ "lesson": {
+  "id": "data-in-care",
+  "title": "Data in your care",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "what-is",
+      "say": "Names, ID documents, addresses and phone numbers of citizens and colleagues are personal data, trusted to you for work.",
+      "mood": "talk",
+      "visual": {
+       "kind": "illustration",
+       "id": "badge-id"
+      }
+     },
+     {
+      "id": "law",
+      "say": "In Azerbaijan, personal data is protected by law. Use it only for a lawful purpose and only as much as needed.",
+      "mood": "think",
+      "visual": {
+       "kind": "illustration",
+       "id": "lock"
+      }
+     },
+     {
+      "id": "need-to-know",
+      "say": "The rule is simple: if your work does not need it, do not look, ask or share.",
+      "mood": "talk",
+      "visual": {
+       "kind": "illustration",
+       "id": "eye"
+      }
+     },
+     {
+      "id": "id-photos",
+      "say": "Do not send photos of ID cards through messaging apps. Such photos stay on phones for years and leak.",
+      "mood": "alert",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "phone-lock"
+      }
+     }
+    ]
+   },
+   {
+    "type": "swipe",
+    "id": "request-check",
+    "prompt": "Which requests are fine?",
+    "cards": [
+     {
+      "id": "fake-police",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "+994 50 000 22 90"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hello, I'm from the police. Send me Rashad Aliyev's registered address and phone, it's urgent."
+          }
+         ]
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Authorities request data through official channels, not by message from a personal number."
+     },
+     {
+      "id": "hr-system",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "HR department"
+         }
+        ],
+        "address": [
+         {
+          "text": "kadrlar@rxagentlik.az"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Leave request"
+        }
+       ],
+       "time": "11:02",
+       "body": [
+        [
+         {
+          "text": "Please sign your request in the internal document system. No extra documents needed."
+         }
+        ]
+       ]
+      },
+      "verdict": "safe",
+      "explain": "The domain is correct, it points to the internal system and asks for no extra data."
+     },
+     {
+      "id": "curious-colleague",
+      "artifact": {
+       "kind": "chat",
+       "app": "telegram",
+       "contact": [
+        {
+         "text": "Elvin, colleague"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "My neighbour applied to us. What's in his file? Send me a photo, I'm curious."
+          }
+         ]
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Curiosity is not a work need. If the job does not require it, the file is not shared."
+     },
+     {
+      "id": "personal-email",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Leyla Həsənova"
+         }
+        ],
+        "address": [
+         {
+          "text": "leyla.hasanova@rxagentlik.az"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "The list"
+        }
+       ],
+       "time": "11:02",
+       "body": [
+        [
+         {
+          "text": "Send all the department's ID codes and phones to my personal email, I'll work from home: leyla.h.1990@mail.example"
+         }
+        ]
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Even for a known colleague, personal data must not go to a personal mailbox. It stays in work systems."
+     },
+     {
+      "id": "portal-sms",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "DovletPortal"
+        }
+       ],
+       "time": "15:30",
+       "messages": [
+        [
+         {
+          "text": "Your application has been received. You can see the result in your account on the portal."
+         }
+        ]
+       ]
+      },
+      "verdict": "safe",
+      "explain": "There is no link and nothing is requested. It only informs you."
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "id-photo-chat",
+    "prompt": "Find the risks in this chat.",
+    "artifact": {
+     "kind": "chat",
+     "app": "whatsapp",
+     "contact": [
+      {
+       "text": "Sabina, HR "
+      },
+      {
+       "text": "+994 77 000 19 55",
+       "spot": "number"
+      }
+     ],
+     "messages": [
+      {
+       "from": "them",
+       "body": [
+        {
+         "text": "Hi! Your records are being updated. "
+        },
+        {
+         "text": "Send photos of both sides of your ID here.",
+         "spot": "id-photo"
+        }
+       ],
+       "time": "16:10"
+      },
+      {
+       "from": "them",
+       "body": [
+        {
+         "text": "By 5 pm, or your salary will be delayed.",
+         "spot": "threat"
+        }
+       ],
+       "time": "16:10"
+      },
+      {
+       "from": "me",
+       "body": [
+        {
+         "text": "Why is HR writing on WhatsApp?"
+        }
+       ],
+       "time": "16:12"
+      },
+      {
+       "from": "them",
+       "body": [
+        {
+         "text": "The system is down, this is faster.",
+         "spot": "excuse"
+        }
+       ],
+       "time": "16:12"
+      }
+     ]
+    },
+    "spots": [
+     {
+      "id": "number",
+      "label": "Personal number",
+      "explain": "Someone writes as HR from an unknown personal number."
+     },
+     {
+      "id": "id-photo",
+      "label": "ID photo",
+      "explain": "With an ID photo, a scammer can open loans or accounts in your name."
+     },
+     {
+      "id": "threat",
+      "label": "Salary threat",
+      "explain": "Threatening your salary is meant to rush you past checks."
+     },
+     {
+      "id": "excuse",
+      "label": "Excuse",
+      "explain": "The system is down is an excuse to skip the official route. Call HR yourself."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "scenario",
+    "id": "citizen-call",
+    "title": "A citizen calls",
+    "start": "call",
+    "nodes": [
+     {
+      "id": "call",
+      "text": "Hello, my brother's application is with you. He is ill, please give me his phone and address so I can help him.",
+      "speaker": "Caller",
+      "voice": "older-woman",
+      "channel": "phone",
+      "manner": "worried",
+      "spoken": "Hello, my brother's application is with you. <breath> He is ill, please give me his phone and address so I can help him.",
+      "character": "citizen",
+      "choices": [
+       {
+        "label": "I feel sorry for him and give the details",
+        "outcome": "compromised",
+        "feedback": "You do not know who is calling. The data is now in a stranger's hands."
+       },
+       {
+        "label": "Ask for the brother's ID code to verify the caller",
+        "outcome": "risky",
+        "feedback": "An ID code is not a secret. Knowing it proves nothing."
+       },
+       {
+        "label": "Explain that I cannot share it by phone",
+        "next": "pressure",
+        "feedback": "Right. Be polite but firm."
+       }
+      ]
+     },
+     {
+      "id": "pressure",
+      "text": "What kind of person are you? He is ill!",
+      "speaker": "Caller",
+      "voice": "older-woman",
+      "channel": "phone",
+      "manner": "worried",
+      "spoken": "What kind of person are you? <short pause> He is ill!",
+      "character": "citizen",
+      "choices": [
+       {
+        "label": "Make an exception under pressure",
+        "outcome": "compromised",
+        "feedback": "Emotional pressure is the most common trick."
+       },
+       {
+        "label": "Explain the official route: the brother himself or a representative with power of attorney can apply",
+        "next": "after",
+        "feedback": "Great. You showed the way and protected the data."
+       }
+      ]
+     },
+     {
+      "id": "after",
+      "text": "The call is over. What now?",
+      "choices": [
+       {
+        "label": "Report the call to my manager and the security team",
+        "outcome": "safe",
+        "feedback": "Well done. The same person may call your colleagues."
+       },
+       {
+        "label": "Nothing, I gave nothing away",
+        "outcome": "risky",
+        "feedback": "You held firm, but reporting helps your colleagues be ready."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "principles",
+    "prompt": "Match each principle with its meaning.",
+    "pairs": [
+     {
+      "id": "purpose",
+      "left": "Purpose",
+      "right": "Use only for a clear, lawful task"
+     },
+     {
+      "id": "minimum",
+      "left": "Minimum",
+      "right": "Collect no more than needed"
+     },
+     {
+      "id": "need-to-know",
+      "left": "Need to know",
+      "right": "Only people whose work requires it may look"
+     },
+     {
+      "id": "confidential",
+      "left": "Confidentiality",
+      "right": "Never give it to third parties without a legal basis"
+     }
+    ],
+    "explain": "These principles help protect citizens' data in everyday work."
+   },
+   {
+    "type": "choice",
+    "id": "send-way",
+    "question": {
+     "prompt": "How may you send a citizen's document to a colleague?",
+     "options": [
+      {
+       "id": "whatsapp",
+       "label": "Photograph it and send by personal WhatsApp",
+       "correct": false,
+       "feedback": "The photo stays on phones and out of control."
+      },
+      {
+       "id": "internal",
+       "label": "Through the internal document system, only to the person who needs it",
+       "correct": true,
+       "feedback": "Correct. Access is limited and controlled."
+      },
+      {
+       "id": "private-mail",
+       "label": "Via personal email, to be quick",
+       "correct": false,
+       "feedback": "Personal email is outside the organisation's protection."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    "explain": "Personal data should never leave the organisation's approved systems."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Use personal data only when work requires it, and only as much as needed.",
+     "Never send ID photos or lists through messengers.",
+     "Point phone callers to the official request route."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 33,
+ "narrationTotalMs": 150945
+}

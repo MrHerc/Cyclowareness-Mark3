@@ -1,0 +1,536 @@
+{
+ "module": {
+  "slug": "clicked-now-what",
+  "title": "Clicked: now what?",
+  "category": "incident"
+ },
+ "lesson": {
+  "id": "opened-file-sent-wrong",
+  "title": "Files and wrong recipients",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "b1",
+      "say": "Opened a suspicious file or sent data to the wrong person? Stay calm, the steps are short.",
+      "mood": "talk",
+      "gesture": "nod",
+      "visual": {
+       "kind": "illustration",
+       "id": "download"
+      }
+     },
+     {
+      "id": "b2",
+      "say": "Opened the file? Turn off Wi-Fi and unplug the cable. Leave the computer on unless your procedure says otherwise.",
+      "mood": "alert",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "wifi"
+      }
+     },
+     {
+      "id": "b3",
+      "say": "Do not delete the file or the email: specialists learn from them what the attack did.",
+      "mood": "think",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "file",
+        "name": [
+         {
+          "text": "Akt_imzala"
+         },
+         {
+          "text": ".docm",
+          "spot": "ext"
+         }
+        ],
+        "type": "doc",
+        "size": "84 KB",
+        "source": [
+         {
+          "text": "n.ismayilov@tender-akt.example.net"
+         }
+        ]
+       }
+      },
+      "highlight": "ext"
+     },
+     {
+      "id": "b4",
+      "say": "Report by phone, not from the infected computer. And never hide data sent to the wrong person.",
+      "mood": "talk",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "phone-lock"
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "file-opened",
+    "environment": "desktop",
+    "title": "You opened the file",
+    "intro": "You opened the \"Akt_imzala\" attachment and allowed macros. Now strange things are happening.",
+    "steps": [
+     {
+      "id": "av-alert",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "qoruyucu",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Threat detected"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "A malicious macro was found in Akt_imzala.docm. Cleanup did not finish."
+         }
+        ]
+       ],
+       "buttons": [
+        "Close",
+        "Details"
+       ]
+      },
+      "say": "Your antivirus raises an alert.",
+      "actions": [
+       {
+        "id": "disconnect",
+        "label": "Turn off Wi-Fi, unplug the cable",
+        "kind": "disconnect",
+        "outcome": "safe",
+        "feedback": "Right. Off the network, the computer cannot spread the damage or send data out."
+       },
+       {
+        "id": "keep-working",
+        "label": "Close and keep working",
+        "kind": "cancel",
+        "outcome": "compromised",
+        "feedback": "The cleanup did not finish, so the program may still run. Every minute helps it spread."
+       },
+       {
+        "id": "delete",
+        "label": "Delete the file",
+        "kind": "delete",
+        "outcome": "risky",
+        "feedback": "Deleting destroys evidence and does not stop what already ran. Disconnect first."
+       }
+      ]
+     },
+     {
+      "id": "fake-helper",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "texkomek-24",
+       "app": "TexKömək 24",
+       "title": [
+        {
+         "text": "Your computer is infected"
+        }
+       ],
+       "body": [
+        {
+         "text": "Give TexKömək 24 remote access to clean it now."
+        }
+       ],
+       "time": "10:07"
+      },
+      "say": "A notification offers help.",
+      "actions": [
+       {
+        "id": "allow",
+        "label": "Allow remote access",
+        "kind": "allow",
+        "outcome": "compromised",
+        "feedback": "Remote access for an unknown app hands the attacker the whole computer. Help comes only from your own technical support."
+       },
+       {
+        "id": "deny",
+        "label": "Decline",
+        "kind": "deny",
+        "outcome": "safe",
+        "feedback": "Right. Do not try to clean it yourself; wait for security."
+       }
+      ]
+     },
+     {
+      "id": "keep-evidence",
+      "artifact": {
+       "kind": "file",
+       "name": [
+        {
+         "text": "Akt_imzala.docm"
+        }
+       ],
+       "type": "doc",
+       "size": "84 KB",
+       "source": [
+        {
+         "text": "Downloads"
+        }
+       ]
+      },
+      "say": "The file is still in Downloads.",
+      "actions": [
+       {
+        "id": "reopen",
+        "label": "Open again",
+        "kind": "open",
+        "outcome": "compromised",
+        "feedback": "Every open can run the macro again. Leave the file alone."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "risky",
+        "feedback": "Security needs the file to find out what it did. Do not delete it."
+       },
+       {
+        "id": "leave",
+        "label": "Leave it as it is",
+        "kind": "ignore",
+        "outcome": "safe",
+        "feedback": "Right. The file is evidence; security will examine it safely."
+       }
+      ]
+     },
+     {
+      "id": "reconnect",
+      "artifact": {
+       "kind": "dialog",
+       "tone": "system",
+       "title": [
+        {
+         "text": "No network connection"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Wi-Fi is off. Do you want to reconnect?"
+         }
+        ]
+       ],
+       "buttons": [
+        "Stay offline",
+        "Connect"
+       ]
+      },
+      "say": "You want to check your mail, but there is no network.",
+      "actions": [
+       {
+        "id": "connect",
+        "label": "Connect",
+        "kind": "connect",
+        "outcome": "risky",
+        "feedback": "Stay offline until security says so: the program could encrypt your files or spread."
+       },
+       {
+        "id": "stay",
+        "label": "Stay offline",
+        "kind": "disconnect",
+        "outcome": "safe",
+        "feedback": "Right. Now call security from your phone and tell them what you opened."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "power-off",
+    "question": {
+     "prompt": "The computer is infected and offline. Should you shut it down?",
+     "options": [
+      {
+       "id": "leave-on",
+       "label": "No, I leave it on unless our procedure says otherwise",
+       "correct": true,
+       "feedback": "Right. Traces in memory matter to the specialists."
+      },
+      {
+       "id": "shut",
+       "label": "Yes, I shut it down at once",
+       "correct": false,
+       "feedback": "Shutting down wipes traces in memory. Disconnecting already stops the spread."
+      },
+      {
+       "id": "keep-working",
+       "label": "No, I keep working on it",
+       "correct": false,
+       "feedback": "Working on an infected computer puts your passwords and files at risk."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    "explain": "Disconnect, leave it on, report by phone. If your organisation's procedure differs, follow it."
+   },
+   {
+    "type": "order",
+    "id": "after-file",
+    "prompt": "You opened a suspicious file. Put the steps in order.",
+    "items": [
+     {
+      "id": "isolate",
+      "label": "Disconnect the computer from the network"
+     },
+     {
+      "id": "call",
+      "label": "Call security from your phone"
+     },
+     {
+      "id": "tell",
+      "label": "Say exactly what you opened and when"
+     },
+     {
+      "id": "passwords",
+      "label": "Change your passwords from another, clean device"
+     }
+    ],
+    "explain": "Never change passwords on the infected computer: the program could read the new ones too."
+   },
+   {
+    "type": "scenario",
+    "id": "wrong-recipient",
+    "title": "Wrong recipient",
+    "start": "sent",
+    "nodes": [
+     {
+      "id": "sent",
+      "text": "You sent the list to an outside address with the same name instead of your colleague Kamran. It holds citizens' names and phone numbers.",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "email",
+        "brandRef": "idare",
+        "from": {
+         "name": [
+          {
+           "text": "You"
+          }
+         ],
+         "address": [
+          {
+           "text": "r.mammadli@idare.example"
+          }
+         ]
+        },
+        "to": "kamran.h@poct-mail.example",
+        "subject": [
+         {
+          "text": "Citizen requests: list"
+         }
+        ],
+        "time": "15:20",
+        "body": [
+         [
+          {
+           "text": "Kamran, the list is attached."
+          }
+         ]
+        ],
+        "attachments": [
+         {
+          "name": [
+           {
+            "text": "Muracietler_sentyabr.xlsx"
+           }
+          ],
+          "size": "240 KB"
+         }
+        ]
+       }
+      },
+      "choices": [
+       {
+        "label": "I tell my manager and security right away",
+        "next": "advice",
+        "feedback": "Right. If personal data has leaked, the organisation must know in time."
+       },
+       {
+        "label": "I tell nobody, maybe they won't open it",
+        "outcome": "compromised",
+        "feedback": "If the leak stays hidden, the organisation cannot do anything to protect the citizens."
+       },
+       {
+        "label": "I just ask the recipient to delete it, that's all",
+        "outcome": "risky",
+        "feedback": "Asking helps, but the organisation still needs to know about the leak."
+       }
+      ]
+     },
+     {
+      "id": "advice",
+      "text": "Write politely to the recipient, ask them to delete the file and confirm it.",
+      "speaker": "Security team",
+      "voice": "man-3",
+      "channel": "phone",
+      "manner": "natural",
+      "spoken": "Write politely to the recipient, <breath> ask them to delete the file and confirm it.",
+      "choices": [
+       {
+        "label": "I write and forward the reply to the specialist",
+        "outcome": "safe",
+        "feedback": "Great. The written confirmation records that the leak was contained."
+       },
+       {
+        "label": "I resend the file to Kamran and forget it",
+        "outcome": "risky",
+        "feedback": "Sending it to the right person is good, but the copy at the wrong address remains."
+       },
+       {
+        "label": "I delete my sent email so no trace remains",
+        "outcome": "risky",
+        "feedback": "The sent email shows what went where and when. Keep it."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "swipe",
+    "id": "colleague-reactions",
+    "prompt": "Did your colleague do the right thing?",
+    "cards": [
+     {
+      "id": "farid",
+      "artifact": {
+       "kind": "chat",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Fərid"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "I opened a strange file. I turned off Wi-Fi and I'm calling security now."
+          }
+         ],
+         "time": "10:15"
+        }
+       ]
+      },
+      "verdict": "safe",
+      "explain": "Right: disconnect first, then report by phone."
+     },
+     {
+      "id": "leyla",
+      "artifact": {
+       "kind": "chat",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Leyla"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "I opened the file, then deleted it. Nobody will know."
+          }
+         ],
+         "time": "11:02"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Deleting destroys the trail, and hiding gives the attack time."
+     },
+     {
+      "id": "elvin",
+      "artifact": {
+       "kind": "chat",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Elvin"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "A virus popped up, so I downloaded a free cleaner from the internet."
+          }
+         ],
+         "time": "12:30"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Installing tools yourself can wipe traces and bring in new malware."
+     },
+     {
+      "id": "narmin",
+      "artifact": {
+       "kind": "chat",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Nərmin"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "I sent a document to an outside address by mistake. I told my manager and security right away."
+          }
+         ],
+         "time": "15:45"
+        }
+       ]
+      },
+      "verdict": "safe",
+      "explain": "Right. A quick report limits the damage."
+     }
+    ]
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Opened a bad file? Disconnect, leave it on unless your procedure says otherwise, report by phone.",
+     "Do not delete the file or the email, and do not try to clean up yourself.",
+     "Sent something to the wrong person? Do not hide it: tell your manager and security at once."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 40,
+ "narrationTotalMs": 192345
+}

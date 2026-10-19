@@ -1,0 +1,510 @@
+{
+ "id": "in-person-pretexting",
+ "title": "In person tricks",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l3-tutor",
+   "beats": [
+    {
+     "id": "l3-b1",
+     "say": "A scammer is not always on a screen. Sometimes they stand at the door, holding a box.",
+     "mood": "talk",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "l3-b2",
+     "say": "Do not hold the door for someone without a pass. Politely send them to reception.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "l3-b3",
+     "say": "A so-called technician may wear a uniform and rush you. Check the visit with IT support yourself.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     },
+     "checkpoint": {
+      "prompt": "An unexpected technician arrives. What do you do?",
+      "options": [
+       {
+        "id": "let-in",
+        "label": "He has a uniform, I let him in",
+        "correct": false,
+        "feedback": "Anyone can wear a uniform. Ask IT support about the visit yourself."
+       },
+       {
+        "id": "check",
+        "label": "I call IT support myself to check",
+        "correct": true,
+        "feedback": "Right. Check an unexpected visit through the official channel."
+       }
+      ]
+     }
+    },
+    {
+     "id": "l3-b5",
+     "say": "One habit for every case: stop, check, report. Verify the official way and tell security your doubts.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "flag"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "visitor-at-door",
+   "environment": "phone",
+   "title": "Technician at the door",
+   "intro": "You are at work in the morning. Messages arrive about a visitor who wants to get into the building.",
+   "steps": [
+    {
+     "id": "no-badge",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "IT Support (new)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hi, I have come to fix your printer and I am at the entrance. I left my pass at home, can you come down and open the door?"
+         }
+        ],
+        "time": "09:12"
+       }
+      ]
+     },
+     "say": "An unknown technician, and no pass.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Coming, I will open it",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Letting someone in without a pass opens the door to anyone. Send them to reception."
+      },
+      {
+       "id": "verify",
+       "label": "I call the official IT support number",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Right. Check an unexpected technician's visit yourself through the official channel."
+      }
+     ]
+    },
+    {
+     "id": "reception",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "idare",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Reception"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "A technician called Orkhan is at reception and gives your name. No visit is booked. Shall we let him in?"
+         }
+        ],
+        "time": "09:15"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "let-in",
+       "label": "Let him in, I called him",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "You did not call him. Now a stranger walks freely in the building under your name."
+      },
+      {
+       "id": "wait",
+       "label": "He waits at reception until I check",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Right. A visitor registers at reception and is not left alone until checked."
+      }
+     ]
+    },
+    {
+     "id": "boss-pressure",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Kamran Aliyev (new number)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "I called the technician. Take him to the server room yourself. I am in a meeting, do not call."
+         }
+        ],
+        "time": "09:17"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "escort",
+       "label": "OK, I will take him",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "The boss's name and the 'do not call' rule are there to stop you checking. Strangers never enter the server room."
+      },
+      {
+       "id": "verify",
+       "label": "I call my boss on the known number",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Great. Always check a boss writing from a new number on the old, known one."
+      },
+      {
+       "id": "block",
+       "label": "Block and report",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Right. Then tell your boss and the security team."
+      }
+     ]
+    },
+    {
+     "id": "real-it",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "IT Support"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "We have not sent any technician to you today. Good thing you wrote; security is on its way to reception."
+         }
+        ],
+        "time": "09:20"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "thanks",
+       "label": "Thanks, I will tell reception too",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Right. You stopped, checked and reported: all three steps."
+      },
+      {
+       "id": "go-down",
+       "label": "I will go down and talk to him myself",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Do not confront a suspicious person alone. The security team will handle it."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l3-hotspot-email",
+   "prompt": "Find the suspicious parts of this email.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "idare-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Facilities team",
+       "reveal": "texnik@servis-idare.test"
+      }
+     ],
+     "address": [
+      {
+       "text": "texnik@servis-idare.test",
+       "spot": "outside-address"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "URGENT: ",
+      "spot": "urgent-subject"
+     },
+     {
+      "text": "repair in the server room"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Hello,"
+      }
+     ],
+     [
+      {
+       "text": "Today at 15:00 technician Orkhan will check the air conditioning in the server room."
+      }
+     ],
+     [
+      {
+       "text": "We are running late, so "
+      },
+      {
+       "text": "let him in unescorted",
+       "spot": "unescorted"
+      },
+      {
+       "text": "."
+      }
+     ],
+     [
+      {
+       "text": "Please "
+      },
+      {
+       "text": "do not forward this email",
+       "spot": "no-forward"
+      },
+      {
+       "text": "."
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "outside-address",
+     "label": "Outside address",
+     "explain": "An internal team writes from the organisation's own mail. This address is from another domain."
+    },
+    {
+     "id": "urgent-subject",
+     "label": "Urgency",
+     "explain": "Urgency in capital letters pushes you to act without checking."
+    },
+    {
+     "id": "unescorted",
+     "label": "Entry without escort",
+     "explain": "A visitor is always escorted, especially in the server room."
+    },
+    {
+     "id": "no-forward",
+     "label": "Request to keep it hidden",
+     "explain": "Asking you to tell no one is meant to stop anyone from checking."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "l3-choice-tailgate",
+   "question": {
+    "prompt": "A man with his hands full of boxes wants to follow you in without a pass.",
+    "options": [
+     {
+      "id": "hold-door",
+      "label": "I hold the door, his hands are full",
+      "correct": false,
+      "feedback": "Being polite is good, but a stranger gets in without any check."
+     },
+     {
+      "id": "send-reception",
+      "label": "I politely send him to reception",
+      "correct": true,
+      "feedback": "Correct. Reception will check him and take him to the right person."
+     },
+     {
+      "id": "ask-and-let",
+      "label": "I ask who he is and let him in",
+      "correct": false,
+      "feedback": "You cannot check his answer. Let reception or security decide."
+     }
+    ]
+   },
+   "explain": "Following someone in is the simplest physical attack. Everyone uses their own pass, guests go through reception."
+  },
+  {
+   "type": "swipe",
+   "id": "l3-swipe",
+   "prompt": "Safe or trap?",
+   "cards": [
+    {
+     "id": "no-badge-door",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Technical support (new)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hi, I came to look at your printer. I left my pass at home, can you come down and open the door?"
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "You should not let in someone without a pass. Send them to reception."
+    },
+    {
+     "id": "planned-maintenance",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "Technical support"
+        }
+       ],
+       "address": [
+        {
+         "text": "support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Planned work on Saturday"
+       }
+      ],
+      "time": "11:05",
+      "body": [
+       [
+        {
+         "text": "Mail will be unavailable on Saturday from 10:00 to 12:00. No action is needed from you."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "It asks for no link, password or access. It is just a notice."
+    },
+    {
+     "id": "found-usb",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Samir (colleague)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "I found a flash drive labelled Salaries 2026 in the hallway. Shall we open it on your computer?"
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A found flash drive can carry malware. Do not open it, hand it to your security team."
+    },
+    {
+     "id": "guest-at-reception",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "idare",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Reception"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Your guest Mr Tural has signed in at reception and has a visitor pass. He is waiting for you."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "The guest is signed in and waiting. Meet them yourself and escort them."
+    },
+    {
+     "id": "menu-qr",
+     "artifact": {
+      "kind": "qr",
+      "brandRef": "idare-fake",
+      "caption": [
+       {
+        "text": "Canteen menu: scan and sign in with your work password"
+       }
+      ],
+      "destination": [
+       {
+        "text": "menyu-idare.test/login"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "You do not need a work password to see a menu. A QR code like this is there to steal it."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "l3-recap",
+   "points": [
+    "Send anyone without a pass to reception",
+    "Never plug a found flash drive into a computer",
+    "Always: stop, check, report"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

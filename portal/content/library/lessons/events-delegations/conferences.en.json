@@ -1,0 +1,455 @@
+{
+ "id": "conferences",
+ "title": "Conferences and delegations",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Conferences and official meetings are for making contacts. But someone there may also be collecting information.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "A gifted flash drive, power bank or headset must not go into your work computer. It may carry malware.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Your badge shows your name, position and a QR code. Keep it out of photos and hide it outside.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "kontakto",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Kontakto: new post"
+        }
+       ],
+       "messages": [
+        {
+         "from": "me",
+         "body": [
+          {
+           "text": "At the forum! "
+          },
+          {
+           "text": "Photo with my badge",
+           "spot": "badge"
+          }
+         ],
+         "time": "10:15"
+        }
+       ]
+      }
+     },
+     "highlight": "badge"
+    },
+    {
+     "id": "b4",
+     "say": "Show every gifted device to technical support first. They will check it and decide.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "after-forum",
+   "environment": "desktop",
+   "title": "After the forum",
+   "intro": "You are back from the forum. There are gifts on your desk and new mail in your inbox.",
+   "steps": [
+    {
+     "id": "gift-usb",
+     "label": "A gift from the visiting delegation",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-nordvale",
+      "name": [
+       {
+        "text": "Cooperation_presentation.pdf"
+       }
+      ],
+      "type": "lnk",
+      "size": "2 KB",
+      "source": [
+       {
+        "text": "USB: NORDVALE (E:)"
+       }
+      ]
+     },
+     "say": "The delegation gave you their presentation on a flash drive.",
+     "actions": [
+      {
+       "id": "plug",
+       "label": "Plug into computer",
+       "kind": "plug-in",
+       "outcome": "risky",
+       "feedback": "You do not know what is on a gifted device. Technical support must check it first."
+      },
+      {
+       "id": "hand-over",
+       "label": "Hand to technical support",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Correct. Technical support checks the device on a separate computer and passes the file on if needed.",
+       "next": "partner-mail"
+      }
+     ]
+    },
+    {
+     "id": "usb-file",
+     "label": "There is one file on the drive",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-nordvale",
+      "name": [
+       {
+        "text": "Cooperation_presentation.pdf"
+       }
+      ],
+      "type": "lnk",
+      "size": "2 KB",
+      "source": [
+       {
+        "text": "USB: NORDVALE (E:)"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "This is not a PDF but a shortcut. Opening it can run a hidden command."
+      },
+      {
+       "id": "eject",
+       "label": "Eject device",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Right decision. Eject the device without opening the file and give it to technical support."
+      }
+     ]
+    },
+    {
+     "id": "partner-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "nc-nordvale",
+      "from": {
+       "name": [
+        {
+         "text": "Stefan Morgan"
+        }
+       ],
+       "address": [
+        {
+         "text": "s.morgan.nordvale@mail.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Thank you for our meeting"
+       }
+      ],
+      "time": "10:24",
+      "body": [
+       [
+        {
+         "text": "Dear colleague, I was very glad to meet you at the forum."
+        }
+       ],
+       [
+        {
+         "text": "To plan our next meeting, could you send me a list of your department's staff with their positions and phone numbers?"
+        }
+       ],
+       [
+        {
+         "text": "Your manager's schedule for next week would also help."
+        }
+       ]
+      ]
+     },
+     "say": "A guest you met at the forum writes to you.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Send the list and schedule",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "A staff list and a manager's schedule are a map for the next attack. Such data goes out only through official channels, with approval."
+      },
+      {
+       "id": "forward",
+       "label": "Forward to manager and security",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Correct. The mail came from a personal address, and requests from outside parties go through official channels."
+      },
+      {
+       "id": "official",
+       "label": "Reply: Please send an official request",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Good. An official request is checked and answered by someone authorised."
+      }
+     ]
+    },
+    {
+     "id": "bt-pair",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Bluetooth: pairing request"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "\"Forum Headset\" wants to connect to this computer."
+        }
+       ],
+       [
+        {
+         "text": "Code: 482 913"
+        }
+       ]
+      ],
+      "buttons": [
+       "Decline",
+       "Pair"
+      ]
+     },
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Decline",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Correct. Never accept a pairing request you did not start yourself."
+      },
+      {
+       "id": "allow",
+       "label": "Pair",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "An unknown device can pose as a keyboard and type commands. Decline requests like this."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "forum-post",
+   "prompt": "Find what this post should not reveal.",
+   "artifact": {
+    "kind": "chat",
+    "brandRef": "kontakto",
+    "app": "generic",
+    "contact": [
+     {
+      "text": "Kontakto: new post"
+     }
+    ],
+    "messages": [
+     {
+      "from": "me",
+      "body": [
+       {
+        "text": "At the RəqəmYol Forum! "
+       },
+       {
+        "text": "Photo with my badge.",
+        "spot": "badge"
+       },
+       {
+        "text": " Tomorrow at 10:00 "
+       },
+       {
+        "text": "our delegation meets in the ministry's building 3.",
+        "spot": "schedule"
+       },
+       {
+        "text": " Right now "
+       },
+       {
+        "text": "I am at Lumera Hotel, room 512",
+        "spot": "room"
+       },
+       {
+        "text": ", see you tomorrow!"
+       }
+      ],
+      "time": "21:40"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "badge",
+     "label": "Badge",
+     "explain": "The badge shows name, position and an entry QR code. It can be used to forge a badge or to target you."
+    },
+    {
+     "id": "schedule",
+     "label": "Meeting time and place",
+     "explain": "A delegation's time and place are security information. Even after the meeting, keep it general."
+    },
+    {
+     "id": "room",
+     "label": "Hotel room",
+     "explain": "A room number shows who is staying where. Never share it anywhere."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "choice",
+   "id": "gift-tablet",
+   "question": {
+    "prompt": "The visiting delegation gives you a tablet as a gift. What do you do?",
+    "options": [
+     {
+      "id": "register",
+      "label": "Tell my manager and give it to technical support to check",
+      "correct": true,
+      "feedback": "Correct. A gifted device is checked under your organisation's rules and joins the work network only with approval."
+     },
+     {
+      "id": "work-mail",
+      "label": "Set up my work mail on it right away",
+      "correct": false,
+      "feedback": "An unchecked device may carry spyware. Open work accounts only on your organisation's devices."
+     },
+     {
+      "id": "home",
+      "label": "Take it home for personal use",
+      "correct": false,
+      "feedback": "The device could open a way into your home network and personal accounts too. Have it checked first."
+     },
+     {
+      "id": "office-wifi",
+      "label": "Connect it to the office Wi-Fi to test it",
+      "correct": false,
+      "feedback": "Connecting an unchecked device to the work network opens a path to internal systems."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "handshake"
+    }
+   },
+   "explain": "Until it is checked, a gifted device is a stranger's device. Tell your manager and give it to technical support."
+  },
+  {
+   "type": "scenario",
+   "id": "delegation-visit",
+   "title": "Delegation in the office",
+   "start": "slides",
+   "nodes": [
+    {
+     "id": "slides",
+     "text": "My presentation is on a flash drive. Shall we plug it into your computer?",
+     "speaker": "Guest (at the meeting)",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "My presentation is on a flash drive. <breath> Shall we plug it into your computer?",
+     "character": "guest",
+     "choices": [
+      {
+       "label": "Let us open it on the separate computer technical support prepared",
+       "next": "wifi",
+       "feedback": "Correct. The guest's files never touch the work computer or network."
+      },
+      {
+       "label": "Go ahead, time is short",
+       "outcome": "risky",
+       "feedback": "An outside flash drive can bring malware onto a work computer. Use a separate computer for guests."
+      }
+     ]
+    },
+    {
+     "id": "wifi",
+     "text": "One more thing, what is the office Wi-Fi password? I need to check my mail.",
+     "speaker": "Guest",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "One more thing, uh, what is the office Wi-Fi password? I need to check my mail.",
+     "character": "guest",
+     "choices": [
+      {
+       "label": "I give access to the guest network",
+       "next": "walk",
+       "feedback": "Correct. The guest network is kept apart from internal systems."
+      },
+      {
+       "label": "I tell the work network password",
+       "outcome": "risky",
+       "feedback": "The work network carries internal systems. Guests get only the guest network."
+      }
+     ]
+    },
+    {
+     "id": "walk",
+     "text": "Don't worry, I will look around the office myself.",
+     "speaker": "Guest (during the break)",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Don't worry, <breath> I will look around the office myself.",
+     "character": "guest",
+     "choices": [
+      {
+       "label": "I escort the guest",
+       "outcome": "safe",
+       "feedback": "Excellent. Guests always move around the office with an escort."
+      },
+      {
+       "label": "Let them wander, they are our guest",
+       "outcome": "risky",
+       "feedback": "An unescorted guest can see open offices and documents on desks."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Hand gifted devices to technical support without plugging them in.",
+    "Do not share your badge, room number or schedule.",
+    "Guests get a separate computer, the guest network and an escort."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

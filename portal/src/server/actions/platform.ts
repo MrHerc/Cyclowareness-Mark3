@@ -1,0 +1,166 @@
+"use server";
+
+import { and, eq, inArray } from "drizzle-orm";
+import { refresh } from "next/cache";
+import { z } from "zod";
+import { db, t } from "../db";
+import { actionViewer } from "../auth/viewer";
+import { issueAccountLink } from "../auth/links";
+import { domainProofFound, domainProofRecord, normaliseHost } from "../auth/domain-proof";
+import { audit } from "../services/audit";
+import { env } from "../env";
+import { DEFAULT_BRANDING, PLAN_FEATURES, defaultSettings, type Feature } from "../../lib/tenant-defaults";
+import { LOCALES } from "../../i18n/config";
+
+/**
+ * Platform operator console (/super). Only super admins; every change is written to the
+ * audit log of the organisation it touches.
+ */
+
+type Result = { ok: boolean; error?: string };
+const uuid = z.string().uuid();
+const ALL_FEATURES = Object.values(PLAN_FEATURES).flat() as Feature[];
+
+const tenantSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  slug: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .regex(/^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])$/),
+  plan: z.enum(t.PLANS),
+  locale: z.enum(LOCALES),
+  adminName: z.string().trim().min(2).max(120),
+  adminEmail: z.email().max(254),
+});
+
+export async function createTenantAction(input: z.infer<typeof tenantSchema>): Promise<Result & { link?: string }> {
+  const v = await actionViewer("platform.manage");
+  const p = tenantSchema.safeParse(input);
+  if (!p.success) return { ok: false, error: "invalid" };
+  const d = p.data;
+  const email = d.adminEmail.toLowerCase();
+  const [slugTaken] = await db().select({ id: t.tenants.id }).from(t.tenants).where(eq(t.tenants.slug, d.slug));
+  const [emailTaken] = await db().select({ id: t.users.id }).from(t.users).where(eq(t.users.email, email));
+  if (slugTaken || emailTaken) return { ok: false, error: "taken" };
+  const [tenant] = await db()
+    .insert(t.tenants)
+    .values({ slug: d.slug, name: d.name, plan: d.plan, branding: { ...DEFAULT_BRANDING, senderName: d.name }, settings: defaultSettings(d.locale) })
+    .returning({ id: t.tenants.id });
+  const [admin] = await db()
+    .insert(t.users)
+    .values({ tenantId: tenant.id, email, name: d.adminName, role: "tenant_admin", status: "invited", locale: d.locale })
+    .returning({ id: t.users.id });
+  const link = await issueAccountLink(admin.id, "invite");
+  await audit(db(), { tenantId: tenant.id, actorId: v.user.id, action: "tenant.created", targetType: "tenant", targetId: tenant.id, meta: { name: d.name, plan: d.plan, by: v.user.email } });
+  refresh();
+  return { ok: true, link };
+}
+
+export async function setTenantPlanAction(tenantId: string, plan: string): Promise<Result> {
+  const v = await actionViewer("platform.manage");
+  const p = z.enum(t.PLANS).safeParse(plan);
+  if (!uuid.safeParse(tenantId).success || !p.success) return { ok: false };
+  await db().update(t.tenants).set({ plan: p.data }).where(eq(t.tenants.id, tenantId));
+  await audit(db(), { tenantId, actorId: v.user.id, action: "tenant.changed", targetType: "tenant", targetId: tenantId, meta: { plan: p.data, by: v.user.email } });
+  refresh();
+  return { ok: true };
+}
+
+/** "default" removes the override so the feature follows the plan again. */
+export async function setTenantFeatureAction(tenantId: string, feature: string, state: "default" | "on" | "off"): Promise<Result> {
+  const v = await actionViewer("platform.manage");
+  if (!uuid.safeParse(tenantId).success || !ALL_FEATURES.includes(feature as Feature) || !["default", "on", "off"].includes(state)) return { ok: false };
+  const [tenant] = await db().select({ features: t.tenants.features }).from(t.tenants).where(eq(t.tenants.id, tenantId));
+  if (!tenant) return { ok: false };
+  const features = { ...tenant.features };
+  if (state === "default") delete features[feature];
+  else features[feature] = state === "on";
+  await db().update(t.tenants).set({ features }).where(eq(t.tenants.id, tenantId));
+  await audit(db(), { tenantId, actorId: v.user.id, action: "tenant.changed", targetType: "tenant", targetId: tenantId, meta: { feature, state, by: v.user.email } });
+  refresh();
+  return { ok: true };
+}
+
+export async function renameTenantAction(tenantId: string, name: string): Promise<Result> {
+  const v = await actionViewer("platform.manage");
+  const p = z.string().trim().min(2).max(120).safeParse(name);
+  if (!uuid.safeParse(tenantId).success || !p.success) return { ok: false, error: "invalid" };
+  const [tenant] = await db().select({ name: t.tenants.name }).from(t.tenants).where(eq(t.tenants.id, tenantId));
+  if (!tenant) return { ok: false };
+  await db().update(t.tenants).set({ name: p.data }).where(eq(t.tenants.id, tenantId));
+  await audit(db(), { tenantId, actorId: v.user.id, action: "tenant.changed", targetType: "tenant", targetId: tenantId, meta: { name: p.data, from: tenant.name, by: v.user.email } });
+  refresh();
+  return { ok: true };
+}
+
+/**
+ * Domain proof done by the operator, for organisations whose DNS team cannot publish the TXT
+ * record (common for government domains). `force` records the proof although the record is
+ * missing; the daily re-check then leaves that proof alone.
+ */
+export async function verifyTenantDomainAction(tenantId: string, domain: string, force = false): Promise<Result & { verified?: boolean; found?: boolean }> {
+  const v = await actionViewer("platform.manage");
+  const host = normaliseHost(domain);
+  if (!uuid.safeParse(tenantId).success || !host) return { ok: false, error: "invalid" };
+  const [tenant] = await db().select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenantId));
+  if (!tenant) return { ok: false };
+  const found = await domainProofFound(host, domainProofRecord(tenantId, env.secret));
+  const verified = found || force;
+  const now = new Date();
+  const settings = structuredClone(tenant.settings);
+  delete settings.identity.domainCheckFailingSince;
+  if (verified) settings.identity.domainCheckedAt = now.toISOString();
+  else delete settings.identity.domainCheckedAt;
+  if (!found && force) settings.identity.domainProofForced = true;
+  else delete settings.identity.domainProofForced;
+  await db()
+    .update(t.tenants)
+    .set({ domain: host, domainVerifiedAt: verified ? now : null, settings })
+    .where(eq(t.tenants.id, tenantId));
+  await audit(db(), {
+    tenantId,
+    actorId: v.user.id,
+    action: verified ? "domain.verified" : "domain.rechecked",
+    targetType: "tenant",
+    targetId: tenantId,
+    meta: { domain: host, found, byOperator: true, forced: !found && force, by: v.user.email },
+  });
+  refresh();
+  return { ok: true, verified, found };
+}
+
+/** One-time password link for an administrator of another organisation (support access). */
+export async function adminLinkAction(tenantId: string, userId: string): Promise<Result & { link?: string }> {
+  const v = await actionViewer("platform.manage");
+  if (!uuid.safeParse(tenantId).success || !uuid.safeParse(userId).success) return { ok: false };
+  const [u] = await db()
+    .select({ id: t.users.id, email: t.users.email })
+    .from(t.users)
+    .where(and(eq(t.users.id, userId), eq(t.users.tenantId, tenantId), eq(t.users.role, "tenant_admin"), inArray(t.users.status, ["active", "invited"])));
+  if (!u) return { ok: false };
+  const link = await issueAccountLink(u.id, "reset");
+  await audit(db(), { tenantId, actorId: v.user.id, action: "platform.admin_link", targetType: "user", targetId: u.id, meta: { email: u.email, by: v.user.email } });
+  return { ok: true, link };
+}
+
+/* ───────── demo requests ───────── */
+
+export async function setDemoStatusAction(id: string, status: string): Promise<Result> {
+  const v = await actionViewer("platform.manage");
+  const p = z.enum(["new", "contacted", "won", "lost"]).safeParse(status);
+  if (!uuid.safeParse(id).success || !p.success) return { ok: false };
+  await db().update(t.demoRequests).set({ status: p.data }).where(eq(t.demoRequests.id, id));
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "demo.status", targetType: "demo_request", targetId: id, meta: { status: p.data } });
+  refresh();
+  return { ok: true };
+}
+
+export async function deleteDemoAction(id: string): Promise<Result> {
+  const v = await actionViewer("platform.manage");
+  if (!uuid.safeParse(id).success) return { ok: false };
+  await db().delete(t.demoRequests).where(eq(t.demoRequests.id, id));
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "demo.deleted", targetType: "demo_request", targetId: id });
+  refresh();
+  return { ok: true };
+}

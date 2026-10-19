@@ -1,0 +1,323 @@
+{
+ "id": "left-and-found",
+ "title": "Left and found",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "usb",
+     "say": "A flash drive found in a corridor is no gift. Never plug it in, hand it to security.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "shoulder",
+     "say": "Someone may be watching your screen and keyboard from behind. Look around when you type a password.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "laptop",
+     "say": "Never leave a laptop alone in a car or cafe. It is a thief's easiest prize.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     }
+    },
+    {
+     "id": "check",
+     "say": "Check your desk before you leave: papers locked away, devices locked, prints collected.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "desk-pc",
+   "environment": "desktop",
+   "title": "At your desk",
+   "intro": "You are at your desk. Decide about a found flash drive, a print job and leaving your seat.",
+   "steps": [
+    {
+     "id": "usb-found",
+     "label": "Found by the lift",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Ixtisar_siyahisi_2026.xlsx"
+       }
+      ],
+      "type": "lnk",
+      "size": "3 KB",
+      "source": [
+       {
+        "text": "USB: ARXIV (F:)"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "plug",
+       "label": "Plug it in and look",
+       "kind": "plug-in",
+       "outcome": "risky",
+       "feedback": "The file name is bait for your curiosity. Do not plug in a found flash drive."
+      },
+      {
+       "id": "hand-in",
+       "label": "Hand it to security",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right. Never plug in a found device, give it to the specialists.",
+       "next": "print-done"
+      }
+     ]
+    },
+    {
+     "id": "usb-file",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Ixtisar_siyahisi_2026.xlsx"
+       }
+      ],
+      "type": "lnk",
+      "size": "3 KB",
+      "source": [
+       {
+        "text": "USB: ARXIV (F:)"
+       }
+      ]
+     },
+     "say": "Look at the file's real type.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "This is not a spreadsheet but a shortcut. Opening it runs a hidden command."
+      },
+      {
+       "id": "eject",
+       "label": "Eject the device",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "The right call. Eject it without opening anything and hand it to security."
+      }
+     ]
+    },
+    {
+     "id": "print-done",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "db-cap-xidmeti",
+      "app": "Print service",
+      "title": [
+       {
+        "text": "Your document has printed"
+       }
+      ],
+      "body": [
+       {
+        "text": "Vetendas_muracietleri.pdf, shared printer, 3rd floor"
+       }
+      ],
+      "time": "11:20"
+     },
+     "actions": [
+      {
+       "id": "collect",
+       "label": "I go and collect it now",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Right. Anyone passing a shared printer can read what is left there."
+      },
+      {
+       "id": "later",
+       "label": "I will collect it this evening",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Citizens' data will sit on the printer for hours. Collect prints at once."
+      }
+     ]
+    },
+    {
+     "id": "leave-desk",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Citizens' data is open on screen"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "The computer will lock itself in 15 minutes."
+        }
+       ]
+      ],
+      "buttons": [
+       "Lock the screen",
+       "Leave it"
+      ]
+     },
+     "say": "You get up to go to the printer.",
+     "actions": [
+      {
+       "id": "lock",
+       "label": "Lock the screen",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Right. The Windows key plus L locks the screen in a second."
+      },
+      {
+       "id": "leave",
+       "label": "Leave it, I will be back in two minutes",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Two minutes is enough for someone to read or send the data."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "cafe-laptop",
+   "title": "Laptop in a cafe",
+   "start": "cafe",
+   "nodes": [
+    {
+     "id": "cafe",
+     "text": "You are working on your work laptop in a cafe. You need to go to the counter for your order.",
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     },
+     "choices": [
+      {
+       "label": "I leave it open, it is only a minute",
+       "outcome": "compromised",
+       "feedback": "A minute is enough to steal it, and an open screen exposes the data."
+      },
+      {
+       "label": "I ask the person at the next table to watch it",
+       "outcome": "risky",
+       "feedback": "A stranger is not your device's guard. Take the laptop with you."
+      },
+      {
+       "label": "I close the laptop and take it with me",
+       "next": "neighbour",
+       "feedback": "Correct. The device should always stay with you."
+      }
+     ]
+    },
+    {
+     "id": "neighbour",
+     "text": "Excuse me, I saw on your screen that you work at the agency. What is your manager's name? I have business there.",
+     "speaker": "Man at the next table",
+     "voice": "man-2",
+     "channel": "in-person",
+     "spoken": "Excuse me, I saw on your screen that you work at the agency. <breath> What is your manager's name? I have business there.",
+     "choices": [
+      {
+       "label": "I give my manager's name and extension",
+       "outcome": "risky",
+       "feedback": "Do not give internal details to a stranger. They become bait for a later call or email."
+      },
+      {
+       "label": "I point him to the reception number on the official site",
+       "outcome": "safe",
+       "feedback": "Polite and with no internal details, well done. Also keep your screen away from others."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "found-usb",
+   "prompt": "You found a flash drive in the corridor. Put the steps in order.",
+   "items": [
+    {
+     "id": "no-plug",
+     "label": "Do not plug it into any computer"
+    },
+    {
+     "id": "note",
+     "label": "Note where and when you found it"
+    },
+    {
+     "id": "hand-in",
+     "label": "Hand it to the security team"
+    },
+    {
+     "id": "warn",
+     "label": "Tell colleagues not to plug in similar drives"
+    }
+   ],
+   "explain": "A found device is evidence: hand it in as it is, unopened."
+  },
+  {
+   "type": "match",
+   "id": "left-behind",
+   "prompt": "Match each situation with the right step.",
+   "pairs": [
+    {
+     "id": "car",
+     "left": "The laptop is on the car seat",
+     "right": "Take it with you"
+    },
+    {
+     "id": "draft",
+     "left": "A confidential draft page",
+     "right": "Destroy it in the shredder"
+    },
+    {
+     "id": "watcher",
+     "left": "Someone is looking at your screen",
+     "right": "Turn the screen away or lock it"
+    },
+    {
+     "id": "badge-desk",
+     "left": "Your badge is lying on the desk",
+     "right": "Keep it on you at all times"
+    }
+   ],
+   "explain": "Anything left unattended is an opportunity for an attacker."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Never plug in a found flash drive, hand it to security.",
+    "Lock the screen when you get up, collect prints at once.",
+    "Never leave laptops or papers unattended."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,548 @@
+{
+ "module": {
+  "slug": "online-shopping-scams",
+  "title": "Online shopping scams",
+  "category": "social"
+ },
+ "lesson": {
+  "id": "fake-shops",
+  "title": "Fake shop",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "fs-tutor",
+    "beats": [
+     {
+      "id": "fs-b1",
+      "say": "Hello! In this lesson you will learn to spot fake shops on social media.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "social"
+      }
+     },
+     {
+      "id": "fs-b2",
+      "say": "Look at this ad: an expensive air conditioner for only 299 manat, today only, paid in advance.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "notification",
+        "brandRef": "kontakto",
+        "app": "Kontakto",
+        "title": [
+         {
+          "text": "Sponsored: Serin Klimat Sale"
+         }
+        ],
+        "body": [
+         {
+          "text": "Air conditioner for just 299 AZN, not 1,199! "
+         },
+         {
+          "text": "Today only, 100% prepayment.",
+          "spot": "prepay"
+         }
+        ],
+        "time": "13:05"
+       }
+      },
+      "highlight": "prepay"
+     },
+     {
+      "id": "fs-b3",
+      "say": "The scammer takes the money first, then closes the page and disappears.",
+      "mood": "think",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "hook"
+      }
+     },
+     {
+      "id": "fs-b4",
+      "say": "The rule is simple: never prepay an unknown page, and pay on delivery whenever you can.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "swipe",
+    "id": "fs-swipe",
+    "prompt": "Which shop offer is safe and which is a threat?",
+    "cards": [
+     {
+      "id": "rush",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2e-serin-klimat-fake",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Serin Klimat Sale"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "The offer ends today, only 3 left. Payment by card to card only, 100% in advance."
+          }
+         ],
+         "time": "13:12"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Pressure plus card to card prepayment only is the main sign of a fake shop. That money is very hard to get back."
+     },
+     {
+      "id": "official",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "kontakto",
+       "app": "Kontakto",
+       "title": [
+        {
+         "text": "Serin Klimat, since 2014"
+        }
+       ],
+       "body": [
+        {
+         "text": "Air conditioner 1,149 AZN. Pay on delivery, cash or card. Shop and service centre in Narimanov."
+        }
+       ],
+       "time": "10:20"
+      },
+      "verdict": "safe",
+      "explain": "A realistic price, a page that is years old and payment on delivery. You see the goods first and pay after."
+     },
+     {
+      "id": "lookalike",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "w2e-serin-klimat-fake",
+       "url": [
+        {
+         "text": "https://serin-klimat-endirim.example.net/kampaniya"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "This is not the shop's official site. An extra word added to the name and a strange domain mark a fake page."
+     },
+     {
+      "id": "cod",
+      "artifact": {
+       "kind": "chat",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Laman Handmade"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hi! I send orders with CevikKargo, you pay the courier when it arrives."
+          }
+         ],
+         "time": "11:47"
+        }
+       ]
+      },
+      "verdict": "safe",
+      "explain": "Paying on delivery protects you. You never pay before you see the goods."
+     },
+     {
+      "id": "new-page",
+      "artifact": {
+       "kind": "chat",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Phone Outlet Baku"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Our page is new but we have 20k followers. We closed comments to stop spam. Send a 50 AZN deposit."
+          }
+         ],
+         "time": "16:30"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A new page, closed comments and a deposit request together are a serious warning. Followers can be bought."
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "fs-sim",
+    "environment": "phone",
+    "title": "Air conditioner offer",
+    "intro": "You saw a cheap air conditioner ad on Kontakto. Decide step by step on your phone.",
+    "steps": [
+     {
+      "id": "ad",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "kontakto",
+       "app": "Kontakto",
+       "title": [
+        {
+         "text": "Sponsored: Serin Klimat Sale"
+        }
+       ],
+       "body": [
+        {
+         "text": "Air conditioner for just 299 AZN, not 1,199! Today only, 100% prepayment."
+        }
+       ],
+       "time": "13:05"
+      },
+      "say": "The ad is very tempting. Looking is fine.",
+      "actions": [
+       {
+        "id": "open",
+        "label": "Open the ad",
+        "kind": "open",
+        "outcome": "safe",
+        "feedback": "Looking is not dangerous. The real decision comes before you pay."
+       },
+       {
+        "id": "hide",
+        "label": "Hide ad",
+        "kind": "ignore",
+        "outcome": "safe",
+        "feedback": "Good choice. A price that is far too low is often bait.",
+        "next": "real-shop"
+       }
+      ]
+     },
+     {
+      "id": "prepay",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2e-serin-klimat-fake",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Serin Klimat Sale"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hi! The offer ends today at 18:00."
+          }
+         ],
+         "time": "13:12"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Send your name and address and transfer 299 AZN to this card: **** **** **** 0000. Delivery tomorrow."
+          }
+         ],
+         "time": "13:12"
+        }
+       ]
+      },
+      "say": "The seller asks for prepayment straight away.",
+      "actions": [
+       {
+        "id": "ask-cod",
+        "label": "Can I pay on delivery?",
+        "kind": "reply",
+        "outcome": "safe",
+        "feedback": "Good question. A real shop usually agrees to payment on delivery."
+       },
+       {
+        "id": "pay",
+        "label": "Transfer 299 AZN now",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "The money went to a stranger's card. A prepayment is very hard to get back.",
+        "next": "gone"
+       },
+       {
+        "id": "report",
+        "label": "Report page",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Well done. The page you reported cannot fool other buyers.",
+        "next": "real-shop"
+       }
+      ]
+     },
+     {
+      "id": "deposit",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2e-serin-klimat-fake",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Serin Klimat Sale"
+        }
+       ],
+       "messages": [
+        {
+         "from": "me",
+         "body": [
+          {
+           "text": "Can I pay on delivery?"
+          }
+         ],
+         "time": "13:14"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "No payment on delivery at the sale price. Send at least a 50 AZN deposit and pay the rest to the courier."
+          }
+         ],
+         "time": "13:15"
+        }
+       ]
+      },
+      "say": "Here comes the excuse: now it wants a deposit.",
+      "actions": [
+       {
+        "id": "pay-deposit",
+        "label": "Send 50 AZN deposit",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "A deposit is a prepayment too. The fake shop takes it and vanishes."
+       },
+       {
+        "id": "check",
+        "label": "Find the shop's official page myself",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Right. Checking the official page and buyer reviews takes a few minutes.",
+        "next": "real-shop"
+       },
+       {
+        "id": "block",
+        "label": "Block",
+        "kind": "block",
+        "outcome": "safe",
+        "feedback": "Good. A stranger who will not sell without prepayment is not worth the talk.",
+        "next": "real-shop"
+       }
+      ]
+     },
+     {
+      "id": "gone",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "kontakto",
+       "app": "Kontakto",
+       "title": [
+        {
+         "text": "Chat unavailable"
+        }
+       ],
+       "body": [
+        {
+         "text": "Serin Klimat Sale was deleted or has blocked you."
+        }
+       ],
+       "time": "09:30"
+      },
+      "say": "The next day no air conditioner came, and the page is gone.",
+      "actions": [
+       {
+        "id": "bank",
+        "label": "Call the bank on the number on the card",
+        "kind": "call-back",
+        "outcome": "safe",
+        "feedback": "Right. If the bank hears quickly, it can try to stop the transfer."
+       },
+       {
+        "id": "evidence",
+        "label": "Save screenshots, tell the police",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Good step. The chat and the transfer receipt are evidence for the police."
+       },
+       {
+        "id": "wait",
+        "label": "Wait a few days",
+        "kind": "ignore",
+        "outcome": "risky",
+        "feedback": "Every hour counts. Waiting lowers the chance of getting the money back."
+       }
+      ]
+     },
+     {
+      "id": "real-shop",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2e-serin-klimat",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Serin Klimat"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hello! This is our only official page. Air conditioner 1,149 AZN, pay on delivery in cash or by card."
+          }
+         ],
+         "time": "14:02"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Any page asking for prepayment in our name is not ours."
+          }
+         ],
+         "time": "14:02"
+        }
+       ]
+      },
+      "say": "This is the shop's official page.",
+      "actions": [
+       {
+        "id": "order",
+        "label": "Order with payment on delivery",
+        "kind": "reply",
+        "outcome": "safe",
+        "feedback": "Great choice. You pay after you see and check the goods."
+       },
+       {
+        "id": "tell",
+        "label": "Show the shop the fake page",
+        "kind": "forward",
+        "outcome": "safe",
+        "feedback": "Good. The shop can report the fake page and get it taken down."
+       },
+       {
+        "id": "back",
+        "label": "Go back to the cheap page",
+        "kind": "open",
+        "outcome": "risky",
+        "feedback": "Going back to the fake page puts your money at risk. Stay with the official shop."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "fs-match",
+    "prompt": "Match each sign with what it means.",
+    "pairs": [
+     {
+      "id": "age",
+      "left": "Page opened a week ago",
+      "right": "Fake shops open fast and close fast"
+     },
+     {
+      "id": "reviews",
+      "left": "Comments are turned off",
+      "right": "Unhappy buyers are silenced"
+     },
+     {
+      "id": "card",
+      "left": "Card to card prepayment only",
+      "right": "The money is very hard to recover"
+     },
+     {
+      "id": "price",
+      "left": "Price is a third of the market",
+      "right": "Bait to make you rush"
+     }
+    ],
+    "explain": "One sign is enough to stop. Check the shop on its official site and in buyer reviews."
+   },
+   {
+    "type": "choice",
+    "id": "fs-choice",
+    "question": {
+     "prompt": "You are buying from an online shop you do not know. What is the safest way to pay?",
+     "options": [
+      {
+       "id": "cod",
+       "label": "Pay on delivery, when you get the goods",
+       "correct": true,
+       "feedback": "Right. You never pay before you see the goods, so a fake shop gets nothing."
+      },
+      {
+       "id": "card",
+       "label": "Transfer to the seller's personal card",
+       "correct": false,
+       "feedback": "A transfer to a personal card cannot be reversed. That is exactly what scammers want."
+      },
+      {
+       "id": "half",
+       "label": "Send half as a deposit",
+       "correct": false,
+       "feedback": "A deposit is a prepayment too. The fake shop takes it and vanishes."
+      },
+      {
+       "id": "crypto",
+       "label": "Pay with cryptocurrency",
+       "correct": false,
+       "feedback": "Nobody can reverse a crypto transfer. If a shop asks for it, walk away."
+      }
+     ]
+    },
+    "explain": "If prepayment is required, pay only an official shop you have known for a long time. When in doubt, do not buy."
+   },
+   {
+    "type": "recap",
+    "id": "fs-recap",
+    "points": [
+     "Never prepay a page you do not know.",
+     "Pay on delivery when you can: see the goods first, then pay.",
+     "Check the page's age and reviews, and do not trust a price that is far too low."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "selling-safely",
+  "title": "When you sell"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 38,
+ "narrationTotalMs": 196371
+}

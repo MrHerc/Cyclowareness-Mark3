@@ -1,0 +1,411 @@
+{
+ "id": "search-results",
+ "title": "Search results",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sr-tutor",
+   "beats": [
+    {
+     "id": "sr-b1",
+     "say": "Hi! Many people reach official sites by searching, not by typing the address. Scammers know this too.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "sr-b2",
+     "say": "They buy ads to appear at the very top. Such a result has a small word next to it: Sponsored.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2c-tapan",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Tapan: citizen portal certificate"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Sponsored",
+          "spot": "ad-label"
+         },
+         {
+          "text": "  vetendasportal-gov.example"
+         }
+        ],
+        [
+         {
+          "text": "Vatandash Portal: get your certificate in 5 minutes"
+         }
+        ],
+        [
+         {
+          "text": "vetendasportal.gov.az"
+         }
+        ],
+        [
+         {
+          "text": "Vatandash Portal: online certificates"
+         }
+        ]
+       ],
+       "buttons": [
+        "Search"
+       ]
+      }
+     },
+     "highlight": "ad-label"
+    },
+    {
+     "id": "sr-b3",
+     "say": "A fake site looks very much like the real one: one letter different, an extra word, or another ending.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "sr-b4",
+     "say": "Check the official address once and bookmark it. Then always open it from there.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "sr-hotspot",
+   "prompt": "Find the dangerous spots in the search results.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2c-tapan",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Tapan: citizen portal certificate"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Sponsored",
+       "spot": "ad-label"
+      },
+      {
+       "text": "  "
+      },
+      {
+       "text": "vetendasportal-gov.example",
+       "spot": "lookalike"
+      }
+     ],
+     [
+      {
+       "text": "Official site. Get your certificate in 5 minutes",
+       "spot": "fake-official"
+      }
+     ],
+     [
+      {
+       "text": "Sponsored  "
+      },
+      {
+       "text": "vetendaspotral.example.info",
+       "spot": "typo"
+      }
+     ],
+     [
+      {
+       "text": "Vatandash Portal: sign-in and certificates"
+      }
+     ],
+     [
+      {
+       "text": "vetendasportal.gov.az"
+      }
+     ],
+     [
+      {
+       "text": "Vatandash Portal: online certificates"
+      }
+     ]
+    ],
+    "buttons": [
+     "Search"
+    ]
+   },
+   "spots": [
+    {
+     "id": "ad-label",
+     "label": "Ad label",
+     "explain": "This result was paid to be at the top. Scammers can buy ads too, so never use an ad to sign in."
+    },
+    {
+     "id": "lookalike",
+     "label": "Extra word",
+     "explain": "The word gov was added to the address, but the ending is different. The official portal's address ends in gov.az."
+    },
+    {
+     "id": "fake-official",
+     "label": "Fake official label",
+     "explain": "Anyone can write the words official site. The end of the address shows what is official, not the text."
+    },
+    {
+     "id": "typo",
+     "label": "Letter swap",
+     "explain": "Two letters in the word portal have swapped places. It is hard to notice when you are in a hurry."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "sr-choice",
+   "question": {
+    "prompt": "You sign in to the citizen portal often. What is the safest way?",
+    "options": [
+     {
+      "id": "bookmark",
+      "label": "I check the official address once and bookmark it",
+      "correct": true,
+      "feedback": "Right. A bookmark opens the same address every time, and ads drop out of the picture."
+     },
+     {
+      "id": "first-result",
+      "label": "I search every time and press the first result",
+      "correct": false,
+      "feedback": "The first result may be an ad. Scammers count on exactly this habit."
+     },
+     {
+      "id": "sms-link",
+      "label": "I use the link that came by SMS",
+      "correct": false,
+      "feedback": "Anyone can send a link by SMS. Open the official site yourself."
+     }
+    ]
+   },
+   "explain": "Bookmark the sites you use often. Then search results and ads cannot fool you."
+  },
+  {
+   "type": "simulation",
+   "id": "sr-sim",
+   "environment": "browser",
+   "title": "Downloading a program",
+   "intro": "You have an online meeting tomorrow and need to download the Gorush app. You start with a search.",
+   "steps": [
+    {
+     "id": "results",
+     "label": "Download Gorush: search results",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tapan",
+      "url": [
+       {
+        "text": "https://tapan.example/axtar?q=gorus+yukle",
+        "reveal": "tapan.example"
+       }
+      ]
+     },
+     "say": "At the top is an ad, and below it is the app's own site.",
+     "actions": [
+      {
+       "id": "ad",
+       "label": "Sponsored: gorus-app-download.example.net",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "The ad took you to a different site. It is not too late: look at the address.",
+       "next": "fake-site"
+      },
+      {
+       "id": "organic",
+       "label": "gorus.example: official site",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Right. You skipped the ad and opened the app's own site.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "fake-site",
+     "label": "Gorush: free download",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-gorus-fake",
+      "url": [
+       {
+        "text": "https://gorus-app-download.example.net/yukle",
+        "reveal": "gorus-app-download.example.net"
+       }
+      ]
+     },
+     "say": "The page looks a lot like the real site. Look at the address.",
+     "actions": [
+      {
+       "id": "download",
+       "label": "Download",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "This site does not belong to the app's maker. An installer from here cannot be trusted.",
+       "next": "fake-file"
+      },
+      {
+       "id": "leave",
+       "label": "Close the tab",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "The address was not the app's own site. Go to the official site yourself.",
+       "next": "real-site"
+      },
+      {
+       "id": "check",
+       "label": "Check the address",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "The name looks similar, but the domain is different. Do not trust this site.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "fake-file",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "w2c-gorus-fake",
+      "name": [
+       {
+        "text": "GorusSetup_2026.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "84 MB",
+      "source": [
+       {
+        "text": "gorus-app-download.example.net"
+       }
+      ]
+     },
+     "say": "The file has downloaded. Will you open it?",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Along with the app, this installer sets up a program that steals passwords. Never open a file from a fake site.",
+       "next": "after-bad"
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Right. Delete the file, tell technical support, and get the app from the official site.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "after-bad",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "qoruyucu",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Qoruyucu: suspicious program"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "GorusSetup_2026.exe tried to read the passwords saved in your browser."
+        }
+       ]
+      ],
+      "buttons": [
+       "Quarantine",
+       "Close"
+      ]
+     },
+     "say": "The antivirus found something. Act fast now.",
+     "actions": [
+      {
+       "id": "isolate",
+       "label": "Disconnect from the network and call technical support",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Right. Unless your procedure says otherwise, disconnect the computer without shutting it down and call at once."
+      },
+      {
+       "id": "ignore",
+       "label": "Close and keep working",
+       "kind": "cancel",
+       "outcome": "compromised",
+       "feedback": "The program keeps running and can send out your passwords. Report it right away."
+      }
+     ]
+    },
+    {
+     "id": "real-site",
+     "label": "Gorush: download for your computer",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "gorus",
+      "url": [
+       {
+        "text": "https://gorus.example/yukle",
+        "reveal": "gorus.example"
+       }
+      ]
+     },
+     "say": "This is the app's own site.",
+     "actions": [
+      {
+       "id": "ask-it",
+       "label": "Ask technical support to install it",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "That is the best way. On a work computer, technical support installs programs.",
+       "next": "results"
+      },
+      {
+       "id": "download",
+       "label": "Download",
+       "kind": "install",
+       "outcome": "safe",
+       "feedback": "Right, this is the official site. On a work computer, check your technical support rules first.",
+       "next": "results"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "sr-recap",
+   "points": [
+    "To sign in, use a bookmark, not an ad",
+    "Read the end of the address and compare it with the official one",
+    "Get programs only from the official site or from technical support"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

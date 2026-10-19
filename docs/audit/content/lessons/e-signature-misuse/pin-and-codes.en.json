@@ -1,0 +1,551 @@
+{
+ "module": {
+  "slug": "e-signature-misuse",
+  "title": "E-signature",
+  "category": "identity"
+ },
+ "lesson": {
+  "id": "pin-and-codes",
+  "title": "PINs and codes",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "l1-tutor",
+    "beats": [
+     {
+      "id": "l1-b1",
+      "say": "Mobile ID and e-signature are your digital signature. A document signed with your PIN counts as signed by you.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "key"
+      }
+     },
+     {
+      "id": "l1-b2",
+      "say": "Scammers call saying \"your certificate is expiring\" and ask for your PIN or SMS code.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "call",
+        "brandRef": "mohurid-fake",
+        "caller": [
+         {
+          "text": "MöhürID Support",
+          "spot": "caller-name"
+         }
+        ],
+        "number": [
+         {
+          "text": "+994 12 000 77 40"
+         }
+        ],
+        "label": "Support"
+       }
+      },
+      "highlight": "caller-name"
+     },
+     {
+      "id": "l1-b3",
+      "say": "Your PIN and SMS codes are never told to anyone: not support, not colleagues, not your manager.",
+      "mood": "think",
+      "gesture": "shake",
+      "visual": {
+       "kind": "illustration",
+       "id": "lock"
+      }
+     },
+     {
+      "id": "l1-b4",
+      "say": "If your certificate needs renewing, you do it yourself on the official website or at a service centre.",
+      "mood": "happy",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "certificate"
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "l1-sim",
+    "environment": "call",
+    "title": "Certificate call",
+    "intro": "Someone calls claiming to be signature service support. Read what they say and choose your answer.",
+    "steps": [
+     {
+      "id": "ring",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "mohurid-fake",
+       "caller": [
+        {
+         "text": "MöhürID Support"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 77 40"
+        }
+       ],
+       "label": "Support",
+       "voice": "young-man"
+      },
+      "actions": [
+       {
+        "id": "answer",
+        "label": "Answer",
+        "kind": "answer",
+        "outcome": "safe",
+        "feedback": "Answering is not dangerous. What matters is what you say."
+       },
+       {
+        "id": "decline",
+        "label": "Decline",
+        "kind": "decline",
+        "outcome": "safe",
+        "feedback": "That works too. If you are worried, call the service's official number yourself.",
+        "next": "after"
+       }
+      ]
+     },
+     {
+      "id": "expire",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "mohurid-fake",
+       "caller": [
+        {
+         "text": "MöhürID Support"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 77 40"
+        }
+       ],
+       "label": "Support",
+       "voice": "young-man"
+      },
+      "say": "Hello, this is MöhürID support. Your mobile signature certificate, excuse me, expires today and will be blocked unless you renew it.",
+      "spoken": "Hello, <breath> this is MöhürID support. Your mobile signature certificate <cough> excuse me, expires today and will be blocked unless you renew it.",
+      "actions": [
+       {
+        "id": "comply",
+        "label": "How do I renew it?",
+        "kind": "reply",
+        "outcome": "risky",
+        "feedback": "The caller starts steering the process. Check the certificate date yourself on the official website."
+       },
+       {
+        "id": "verify",
+        "label": "I will call the official number myself",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Right. Find the service's number on its official website yourself.",
+        "next": "after"
+       },
+       {
+        "id": "hang",
+        "label": "Hang up",
+        "kind": "hang-up",
+        "outcome": "safe",
+        "feedback": "Good decision. You can end a call that rushes you.",
+        "next": "after"
+       }
+      ]
+     },
+     {
+      "id": "sms-code",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "mohurid-fake",
+       "caller": [
+        {
+         "text": "MöhürID Support"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 77 40"
+        }
+       ],
+       "label": "Support",
+       "voice": "young-man"
+      },
+      "say": "You will get an SMS for the renewal. Read me the code and I will enter it in the system for you.",
+      "spoken": "You will get an SMS for the renewal. <breath> Read me the code and I will enter it in the system for you.",
+      "actions": [
+       {
+        "id": "share",
+        "label": "I read out the code",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "With this code they sign in as you. A code is for your screen only."
+       },
+       {
+        "id": "keep",
+        "label": "I do not share codes with anyone",
+        "kind": "keep-private",
+        "outcome": "safe",
+        "feedback": "Right. Real support never asks for a code."
+       },
+       {
+        "id": "hang",
+        "label": "Hang up",
+        "kind": "hang-up",
+        "outcome": "safe",
+        "feedback": "Right. Hang up as soon as a code is requested.",
+        "next": "after"
+       }
+      ]
+     },
+     {
+      "id": "pin-sign",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "mohurid-fake",
+       "caller": [
+        {
+         "text": "MöhürID Support"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 77 40"
+        }
+       ],
+       "label": "Support",
+       "voice": "young-man"
+      },
+      "say": "The code did not work. A request will now appear on your phone, enter your PIN and confirm it.",
+      "spoken": "The code did not work. <sigh> A request will now appear on your phone, enter your PIN and confirm it.",
+      "actions": [
+       {
+        "id": "confirm",
+        "label": "I enter my PIN and confirm",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "That was not a renewal, you signed a document they prepared. Call the signature service's official number at once."
+       },
+       {
+        "id": "deny",
+        "label": "I reject the request",
+        "kind": "deny",
+        "outcome": "safe",
+        "feedback": "Right. Never confirm a request you did not start yourself."
+       },
+       {
+        "id": "hang",
+        "label": "Hang up",
+        "kind": "hang-up",
+        "outcome": "safe",
+        "feedback": "Right. Hang up and reject the request."
+       }
+      ]
+     },
+     {
+      "id": "after",
+      "label": "The call has ended. What now?",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "mohurid-fake",
+       "caller": [
+        {
+         "text": "MöhürID Support"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 77 40"
+        }
+       ],
+       "label": "Support",
+       "voice": "young-man"
+      },
+      "actions": [
+       {
+        "id": "callback",
+        "label": "Call the service's official number",
+        "kind": "call-back",
+        "outcome": "safe",
+        "feedback": "Right. Official support can tell you the real state of your certificate."
+       },
+       {
+        "id": "report",
+        "label": "Tell the security team",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Well done. Such calls usually reach several colleagues."
+       },
+       {
+        "id": "ignore",
+        "label": "Do nothing",
+        "kind": "ignore",
+        "outcome": "risky",
+        "feedback": "The caller will try again. Reporting protects your colleagues."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "l1-hotspot",
+    "prompt": "Find the traps in this message.",
+    "artifact": {
+     "kind": "sms",
+     "brandRef": "mohurid-fake",
+     "sender": [
+      {
+       "text": "MohurID"
+      }
+     ],
+     "time": "08:55",
+     "messages": [
+      [
+       {
+        "text": "Your mobile signature certificate "
+       },
+       {
+        "text": "expires today at 18:00",
+        "spot": "deadline"
+       },
+       {
+        "text": ". To renew, "
+       },
+       {
+        "text": "enter your PIN",
+        "spot": "pin"
+       },
+       {
+        "text": " at "
+       },
+       {
+        "text": "mohurid-yenile.test",
+        "spot": "link"
+       },
+       {
+        "text": ". "
+       },
+       {
+        "text": "Otherwise your signature will be revoked.",
+        "spot": "threat"
+       }
+      ]
+     ]
+    },
+    "spots": [
+     {
+      "id": "deadline",
+      "label": "Expires today",
+      "explain": "Urgency leaves no time to check. You can see the certificate date yourself on the official website."
+     },
+     {
+      "id": "link",
+      "label": "Unknown address",
+      "explain": "This is not the service's official website. Type the official address yourself."
+     },
+     {
+      "id": "pin",
+      "label": "PIN request",
+      "explain": "A PIN is never typed into a website to \"renew\". It only confirms a sign-in or signature you started."
+     },
+     {
+      "id": "threat",
+      "label": "Revocation threat",
+      "explain": "Scare tactics are a common scam method. If worried, call the official number."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "swipe",
+    "id": "l1-swipe",
+    "prompt": "Is this message safe or dangerous?",
+    "cards": [
+     {
+      "id": "own-code",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "mohurid",
+       "sender": [
+        {
+         "text": "MohurID"
+        }
+       ],
+       "time": "09:10",
+       "messages": [
+        [
+         {
+          "text": "Confirmation code: 482913. Do not share this code. If you did not send this request, reject it."
+         }
+        ]
+       ]
+      },
+      "verdict": "safe",
+      "explain": "A normal message when you sign in yourself. No link, and it reminds you to keep the code secret."
+     },
+     {
+      "id": "renew-link",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "mohurid-fake",
+       "sender": [
+        {
+         "text": "MohurID"
+        }
+       ],
+       "time": "09:42",
+       "messages": [
+        [
+         {
+          "text": "Your certificate is blocked. Restore it here: mohurid-yenile.test"
+         }
+        ]
+       ]
+      },
+      "verdict": "threat",
+      "explain": "The link does not go to the service's official website. Open the official site yourself to check."
+     },
+     {
+      "id": "colleague-pin",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Elvin (Finance)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "I am on leave. My PIN is 4471, sign these documents for me."
+          }
+         ]
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Signing with someone else's PIN means signing in their name. Authority is delegated the official way."
+     },
+     {
+      "id": "hr-reminder",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "idare",
+       "from": {
+        "name": [
+         {
+          "text": "HR Department"
+         }
+        ],
+        "address": [
+         {
+          "text": "kadr@idare.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Your certificate expires in 30 days"
+        }
+       ],
+       "time": "10:15",
+       "body": [
+        [
+         {
+          "text": "To renew, sign in to the signature service's official website yourself or visit a service centre."
+         }
+        ]
+       ]
+      },
+      "verdict": "safe",
+      "explain": "No link, PIN or code is requested. You renew yourself through the official route."
+     },
+     {
+      "id": "unexpected-request",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "mohurid",
+       "app": "MöhürID",
+       "title": [
+        {
+         "text": "Signature request"
+        }
+       ],
+       "body": [
+        {
+         "text": "Etibarname_tam_selahiyyet.pdf is waiting for your signature"
+        }
+       ],
+       "time": "10:31"
+      },
+      "verdict": "threat",
+      "explain": "You did not start this request. Reject it and tell the security team."
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "l1-choice",
+    "question": {
+     "prompt": "A colleague off sick asks you to sign an urgent document with their PIN.",
+     "options": [
+      {
+       "id": "do",
+       "label": "I sign it, they gave permission",
+       "correct": false,
+       "feedback": "An e-signature is for its owner alone. Signing with their PIN breaks the rules."
+      },
+      {
+       "id": "refuse",
+       "label": "I refuse and ask my manager to delegate authority officially",
+       "correct": true,
+       "feedback": "Right. The institution delegates authority to a stand-in the official way."
+      },
+      {
+       "id": "keep",
+       "label": "I write the PIN down in case I need it",
+       "correct": false,
+       "feedback": "Keeping someone else's PIN is risky too. A PIN stays with its owner."
+      }
+     ]
+    },
+    "explain": "The PIN is the signature itself. You never give it away and never take someone else's."
+   },
+   {
+    "type": "recap",
+    "id": "l1-recap",
+    "points": [
+     "Never tell anyone your PIN or SMS code, support included.",
+     "Renew your certificate only on the official website or at a service centre.",
+     "Reject and report any signature request you did not start."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "unexpected-signing",
+  "title": "Unexpected signing"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 39,
+ "narrationTotalMs": 209782
+}

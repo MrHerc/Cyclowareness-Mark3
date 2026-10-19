@@ -1,0 +1,481 @@
+{
+ "module": {
+  "slug": "password-managers-work",
+  "title": "Password managers at work",
+  "category": "identity"
+ },
+ "lesson": {
+  "id": "why-a-manager",
+  "title": "Why a password manager",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "b1",
+      "say": "Every account needs its own long password. Nobody can remember them all.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "key"
+      }
+     },
+     {
+      "id": "b2",
+      "say": "Never reuse a password: when one site leaks, attackers try it on all your accounts.",
+      "mood": "alert",
+      "gesture": "shake",
+      "visual": {
+       "kind": "illustration",
+       "id": "eye"
+      }
+     },
+     {
+      "id": "b3",
+      "say": "The organisation's password manager creates a strong password per account and stores it in an encrypted vault.",
+      "mood": "talk",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "dialog",
+        "brandRef": "parolseyf",
+        "tone": "app",
+        "title": [
+         {
+          "text": "Password created"
+         }
+        ],
+        "body": [
+         [
+          {
+           "text": "28 characters, random",
+           "spot": "gen"
+          }
+         ]
+        ],
+        "buttons": [
+         "Save"
+        ]
+       }
+      },
+      "highlight": "gen"
+     },
+     {
+      "id": "b4",
+      "say": "You remember just one long master password and protect the vault with two-step verification.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "mfa-phone"
+      }
+     }
+    ]
+   },
+   {
+    "type": "swipe",
+    "id": "where-passwords-live",
+    "prompt": "Is this a safe place for a password?",
+    "cards": [
+     {
+      "id": "excel",
+      "artifact": {
+       "kind": "file",
+       "name": [
+        {
+         "text": "Parollar_hamisi.xlsx"
+        }
+       ],
+       "type": "xls",
+       "size": "18 KB",
+       "source": [
+        {
+         "text": "Desktop"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "The file is not encrypted: anyone who gets into the computer sees every password at once."
+     },
+     {
+      "id": "vault",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "parolseyf",
+       "app": "ParolSeyf",
+       "title": [
+        {
+         "text": "Login saved to vault"
+        }
+       ],
+       "body": [
+        {
+         "text": "portal.idare.example"
+        }
+       ],
+       "time": "09:05"
+      },
+      "verdict": "safe",
+      "explain": "The password sits in the encrypted vault and opens only with your master password."
+     },
+     {
+      "id": "saved-messages",
+      "artifact": {
+       "kind": "chat",
+       "app": "telegram",
+       "contact": [
+        {
+         "text": "Saved messages"
+        }
+       ],
+       "messages": [
+        {
+         "from": "me",
+         "body": [
+          {
+           "text": "Mail password: Aysel1990"
+          }
+         ],
+         "time": "08:31"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A messenger is not a vault. If the phone is lost or the account taken over, the passwords go too."
+     },
+     {
+      "id": "shared-vault",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "parolseyf",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Shared vault: Press office"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "3 members. Website admin panel, social media account."
+         }
+        ]
+       ],
+       "buttons": [
+        "Close"
+       ]
+      },
+      "verdict": "safe",
+      "explain": "The team shares passwords in an encrypted vault, and access can be removed at any time."
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "password-requests",
+    "environment": "phone",
+    "title": "Password requests",
+    "intro": "Today several people ask you for passwords. Answer each one on your phone.",
+    "steps": [
+     {
+      "id": "colleague-asks",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Səbinə Hüseynova"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hi! Could you type the website admin panel password here? I'm posting today's news."
+          }
+         ],
+         "time": "10:12"
+        }
+       ]
+      },
+      "say": "She is your colleague and really needs access.",
+      "actions": [
+       {
+        "id": "type",
+        "label": "Type the password",
+        "kind": "share",
+        "outcome": "risky",
+        "feedback": "The password stays in the chat and can leak if a phone is lost. Share it from the vault."
+       },
+       {
+        "id": "vault",
+        "label": "I'll share it with you in the vault",
+        "kind": "reply",
+        "outcome": "safe",
+        "feedback": "Right. In the vault the password stays encrypted, and access can be removed when needed."
+       },
+       {
+        "id": "sms",
+        "label": "I'll send it by SMS",
+        "kind": "reply",
+        "outcome": "risky",
+        "feedback": "SMS is not encrypted either and stays on the phone. Share passwords only through the vault."
+       }
+      ]
+     },
+     {
+      "id": "fake-share-mail",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "parolseyf-fake",
+       "from": {
+        "name": [
+         {
+          "text": "ParolSeyf"
+         }
+        ],
+        "address": [
+         {
+          "text": "no-reply@parolseyf-share.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Elnur Kərimov shared a vault with you"
+        }
+       ],
+       "time": "11:40",
+       "body": [
+        [
+         {
+          "text": "Sign in to view the \"Finance\" vault: "
+         },
+         {
+          "text": "parolseyf-share.example.net/seyf",
+          "link": {
+           "label": "parolseyf-share.example.net/seyf",
+           "href": "https://parolseyf-share.example.net/seyf"
+          }
+         }
+        ]
+       ]
+      },
+      "say": "You were not expecting a share.",
+      "actions": [
+       {
+        "id": "click",
+        "label": "Open link",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "A real share shows up inside the ParolSeyf app itself. This link is hunting for your master password."
+       },
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right: the address is not ParolSeyf's. Open the app yourself to check for shares."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "risky",
+        "feedback": "You are safe, but colleagues may get the same mail. Report it."
+       }
+      ]
+     },
+     {
+      "id": "fake-support",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "parolseyf-fake",
+       "app": "telegram",
+       "contact": [
+        {
+         "text": "ParolSeyf Support"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "We found an error in your vault. To restore it, type your master password and the code you receive here."
+          }
+         ],
+         "time": "14:03"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "send",
+        "label": "Type the master password",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "The master password unlocks every password you have. No support team ever asks for it."
+       },
+       {
+        "id": "block",
+        "label": "Block",
+        "kind": "block",
+        "outcome": "safe",
+        "feedback": "Right. Nobody, not even technical support, asks for your master password or code."
+       },
+       {
+        "id": "report",
+        "label": "Report",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Great. Tell security as well so they can warn colleagues."
+       }
+      ]
+     },
+     {
+      "id": "reused-alert",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "parolseyf",
+       "tone": "app",
+       "title": [
+        {
+         "text": "This password is used on 3 accounts"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "The same password is saved for İşPoçt, the office portal and the Kontakto page."
+         }
+        ]
+       ],
+       "buttons": [
+        "Later",
+        "Change passwords"
+       ]
+      },
+      "say": "ParolSeyf has checked your passwords.",
+      "actions": [
+       {
+        "id": "update",
+        "label": "Change passwords",
+        "kind": "update",
+        "outcome": "safe",
+        "feedback": "Right. The generator makes a separate password for each account, so one leak opens nothing else."
+       },
+       {
+        "id": "later",
+        "label": "Later",
+        "kind": "later",
+        "outcome": "risky",
+        "feedback": "A reused password is a weakness attackers love. One leak would open all three accounts."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "password",
+    "id": "master-password",
+    "prompt": "Create a master password: a long phrase of at least 15 characters.",
+    "targetScore": 4,
+    "tips": [
+     "Join four or five random words with spaces",
+     "Use this password nowhere else",
+     "Avoid names, birthdays and famous quotes"
+    ]
+   },
+   {
+    "type": "match",
+    "id": "manager-terms",
+    "prompt": "Match each term with its meaning.",
+    "pairs": [
+     {
+      "id": "vault",
+      "left": "Vault",
+      "right": "Encrypted store for your passwords"
+     },
+     {
+      "id": "master",
+      "left": "Master password",
+      "right": "The one password that opens the vault"
+     },
+     {
+      "id": "generator",
+      "left": "Generator",
+      "right": "Creates long, random passwords"
+     },
+     {
+      "id": "shared",
+      "left": "Shared vault",
+      "right": "Lets a team share passwords safely"
+     }
+    ],
+    "explain": "The manager remembers the passwords; you only guard the master password."
+   },
+   {
+    "type": "choice",
+    "id": "shared-account",
+    "question": {
+     "prompt": "Three people in your department run the same social media account. How should they share the password?",
+     "options": [
+      {
+       "id": "own",
+       "label": "Separate logins if possible, otherwise a shared vault",
+       "correct": true,
+       "feedback": "Right. When someone leaves the team, their access is removed in one step."
+      },
+      {
+       "id": "group-chat",
+       "label": "Post the password in the team chat",
+       "correct": false,
+       "feedback": "A password posted in a group chat stays there for years, and new members see it too."
+      },
+      {
+       "id": "note",
+       "label": "Write it on a sticky note on the monitor",
+       "correct": false,
+       "feedback": "Anyone who walks in can see the password and take a photo."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    "explain": "Even for a shared account, the password lives in the vault, not in chats or on paper."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "A separate password for every account: the manager creates and remembers it.",
+     "Share passwords in a shared vault, never in a chat.",
+     "Never tell anyone your master password, and protect the vault with two-step verification."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "autofill-right-site",
+  "title": "When autofill stays silent"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 33,
+ "narrationTotalMs": 173466
+}

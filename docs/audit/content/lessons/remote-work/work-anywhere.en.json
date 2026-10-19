@@ -1,0 +1,382 @@
+{
+ "module": {
+  "slug": "remote-work",
+  "title": "Remote work",
+  "category": "work"
+ },
+ "lesson": {
+  "id": "work-anywhere",
+  "title": "Wherever you work",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "protection-stays",
+      "say": "When you work from home or a cafe, the office's protection does not come with you. You have to build it yourself.",
+      "mood": "talk",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     },
+     {
+      "id": "vpn",
+      "say": "Connect to work systems only through your organisation's VPN. Free VPN apps can pass your data to others.",
+      "mood": "talk",
+      "visual": {
+       "kind": "illustration",
+       "id": "vpn"
+      }
+     },
+     {
+      "id": "open-wifi",
+      "say": "Anyone can fake the name of an open cafe network. If you can, use your phone's hotspot instead.",
+      "mood": "think",
+      "visual": {
+       "kind": "illustration",
+       "id": "wifi"
+      }
+     },
+     {
+      "id": "shoulder",
+      "say": "People behind you can see your screen and typed password. Sit with your back to a wall and use a privacy filter.",
+      "mood": "alert",
+      "visual": {
+       "kind": "illustration",
+       "id": "eye"
+      }
+     },
+     {
+      "id": "family",
+      "say": "The work laptop is not for the family. A game someone at home downloads can bring malware with it.",
+      "mood": "talk",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "download"
+      }
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "cafe-networks",
+    "prompt": "Which networks in this cafe are suspicious?",
+    "artifact": {
+     "kind": "wifi",
+     "networks": [
+      {
+       "ssid": [
+        {
+         "text": "Cinar_Pulsuz_WiFi",
+         "spot": "twin"
+        }
+       ],
+       "secured": false,
+       "signal": 4
+      },
+      {
+       "ssid": [
+        {
+         "text": "Cinar-Cayxana"
+        }
+       ],
+       "secured": true,
+       "signal": 3
+      },
+      {
+       "ssid": [
+        {
+         "text": "Free_Internet_BAKU",
+         "spot": "free"
+        }
+       ],
+       "secured": false,
+       "signal": 4
+      },
+      {
+       "ssid": [
+        {
+         "text": "RXAgentlik-Staff",
+         "spot": "staff"
+        }
+       ],
+       "secured": false,
+       "signal": 2
+      },
+      {
+       "ssid": [
+        {
+         "text": "Aynur's phone"
+        }
+       ],
+       "secured": true,
+       "signal": 4
+      }
+     ]
+    },
+    "spots": [
+     {
+      "id": "twin",
+      "label": "Look-alike name",
+      "explain": "An open network that mimics the cafe's name. It has no password and may be fake. Ask staff for the real one."
+     },
+     {
+      "id": "free",
+      "label": "Unknown owner",
+      "explain": "An open network with no known owner can send you to a fake login page."
+     },
+     {
+      "id": "staff",
+      "label": "Your organisation's name",
+      "explain": "Your organisation's network cannot be in a cafe. This one was set up to fool you."
+     }
+    ],
+    "minToFind": 2
+   },
+   {
+    "type": "swipe",
+    "id": "home-setup",
+    "prompt": "Which of these is safe for working from home?",
+    "cards": [
+     {
+      "id": "default-router",
+      "artifact": {
+       "kind": "login",
+       "brand": "HomeRouter",
+       "url": [
+        {
+         "text": "http://192.168.1.1"
+        }
+       ],
+       "fields": [
+        "Username: admin",
+        "Password: admin"
+       ],
+       "button": "Sign in"
+      },
+      "verdict": "threat",
+      "explain": "Factory passwords are public knowledge. Change the router password now."
+     },
+     {
+      "id": "share-password",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Tural, colleague"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "I can't get into the system from home. Tell me your password, just for a minute."
+          }
+         ]
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A password is never shared, not even with a colleague. Suggest he contacts tech support."
+     },
+     {
+      "id": "vpn-update",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "IT Support"
+         }
+        ],
+        "address": [
+         {
+          "text": "it@rxagentlik.az"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "New VPN app version"
+        }
+       ],
+       "time": "08:30",
+       "body": [
+        [
+         {
+          "text": "The update will install on your work computer automatically. Do not download anything."
+         }
+        ]
+       ]
+      },
+      "verdict": "safe",
+      "explain": "The domain is correct and you are not asked to download anything."
+     },
+     {
+      "id": "free-vpn",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://super-free-vpn.top/download"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "An unknown free VPN can read your traffic. Use only the organisation's VPN for work."
+     },
+     {
+      "id": "home-wifi",
+      "artifact": {
+       "kind": "wifi",
+       "networks": [
+        {
+         "ssid": [
+          {
+           "text": "Ev_5G"
+          }
+         ],
+         "secured": true,
+         "signal": 4
+        }
+       ]
+      },
+      "verdict": "safe",
+      "explain": "A password protected home network. If the router password was changed too, it is a good start."
+     }
+    ]
+   },
+   {
+    "type": "scenario",
+    "id": "home-and-cafe",
+    "title": "At home and in a cafe",
+    "start": "evening",
+    "nodes": [
+     {
+      "id": "evening",
+      "text": "Can I install a game on your work laptop? Mine is too slow.",
+      "speaker": "Family member",
+      "voice": "young-man",
+      "channel": "in-person",
+      "manner": "natural",
+      "spoken": "Can I install a game on your work laptop? <short pause> Mine is too slow.",
+      "visual": {
+       "kind": "illustration",
+       "id": "download"
+      },
+      "choices": [
+       {
+        "label": "Fine, just for an hour",
+        "outcome": "compromised",
+        "feedback": "Malware came with the game and your work accounts are now at risk."
+       },
+       {
+        "label": "No, the work laptop is for work only",
+        "next": "cafe",
+        "feedback": "Right. Calmly explain why."
+       }
+      ]
+     },
+     {
+      "id": "cafe",
+      "text": "Next day you are working in a cafe. You need to go to the counter to order, and your laptop is open.",
+      "choices": [
+       {
+        "label": "Leave it open, it's only two minutes",
+        "outcome": "risky",
+        "feedback": "Two minutes is enough to look, plug in a drive or take the laptop."
+       },
+       {
+        "label": "Lock the screen and take the laptop with me",
+        "next": "call",
+        "feedback": "Great habit."
+       }
+      ]
+     },
+     {
+      "id": "call",
+      "text": "Back at your table, your manager calls and asks for figures from a confidential project. People are sitting nearby.",
+      "choices": [
+       {
+        "label": "Say the figures out loud",
+        "outcome": "risky",
+        "feedback": "People nearby can hear. Confidential talk does not happen in public."
+       },
+       {
+        "label": "Say I will call back from a quiet place",
+        "outcome": "safe",
+        "feedback": "Well done. Have confidential calls only where no one can overhear."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "home-router",
+    "question": {
+     "prompt": "Which steps matter for your home router?",
+     "options": [
+      {
+       "id": "admin-password",
+       "label": "Change the factory admin password",
+       "correct": true,
+       "feedback": "Anyone can look up a factory password."
+      },
+      {
+       "id": "firmware",
+       "label": "Update the router's firmware",
+       "correct": true,
+       "feedback": "Updates close known holes."
+      },
+      {
+       "id": "encryption",
+       "label": "Choose WPA3 or WPA2 encryption",
+       "correct": true,
+       "feedback": "It protects your network from eavesdropping."
+      },
+      {
+       "id": "no-password",
+       "label": "Leave Wi-Fi without a password for speed",
+       "correct": false,
+       "feedback": "Anyone could join, and it does not make it faster."
+      }
+     ],
+     "multi": true,
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    "explain": "The router is your home's door to the internet. A factory password and old firmware leave it open."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Connect to work systems only through the organisation's VPN.",
+     "Use your phone's hotspot instead of open Wi-Fi.",
+     "Do not share the work laptop with family, and lock the screen."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 31,
+ "narrationTotalMs": 153303
+}

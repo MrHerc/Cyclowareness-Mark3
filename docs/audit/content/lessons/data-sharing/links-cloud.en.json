@@ -1,0 +1,462 @@
+{
+ "module": {
+  "slug": "data-sharing",
+  "title": "Sharing data safely",
+  "category": "data"
+ },
+ "lesson": {
+  "id": "links-cloud",
+  "title": "Links and cloud folders",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "b1",
+      "say": "Cloud folders are handy, but one wrong setting can open a file to the whole internet.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "cloud"
+      }
+     },
+     {
+      "id": "b2",
+      "say": "With anyone with the link, if the link is passed on, strangers can open the file too.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "url",
+        "brandRef": "rxagentlik-disk",
+        "url": [
+         {
+          "text": "https://disk.rxagentlik.az/qovluq/budce-2027?paylasim="
+         },
+         {
+          "text": "hamiya-acik",
+          "spot": "public"
+         }
+        ]
+       }
+      },
+      "highlight": "public"
+     },
+     {
+      "id": "b3",
+      "say": "The right way: named people only, view-only access and an end date.",
+      "mood": "talk",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "lock"
+      }
+     },
+     {
+      "id": "b4",
+      "say": "Do not upload work files to a personal cloud account. There the organisation cannot protect or recover them.",
+      "mood": "think",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "folder"
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "share-folder",
+    "environment": "browser",
+    "title": "Share the file",
+    "intro": "You need to send the draft budget to an outside partner. Set up the sharing yourself on the cloud drive.",
+    "steps": [
+     {
+      "id": "file-page",
+      "label": "Draft budget 2027.xlsx",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "rxagentlik-disk",
+       "url": [
+        {
+         "text": "https://disk.rxagentlik.az/fayllar/Budce_layihesi_2027.xlsx",
+         "reveal": "rxagentlik.az"
+        }
+       ]
+      },
+      "say": "How do you share the file?",
+      "actions": [
+       {
+        "id": "share",
+        "label": "Share",
+        "kind": "share",
+        "outcome": "safe",
+        "feedback": "Good, the file stays on the work drive. Now look at the sharing settings."
+       },
+       {
+        "id": "personal",
+        "label": "Move to my personal cloud",
+        "kind": "open",
+        "outcome": "risky",
+        "feedback": "A personal account is outside the organisation's control. Work files stay on the work drive."
+       }
+      ]
+     },
+     {
+      "id": "who-can-open",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "rxagentlik-disk",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Share: Draft budget 2027.xlsx"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Who can open it?"
+         }
+        ]
+       ],
+       "buttons": [
+        "Anyone with the link",
+        "Named people only"
+       ]
+      },
+      "actions": [
+       {
+        "id": "named",
+        "label": "Named people only",
+        "kind": "keep-private",
+        "outcome": "safe",
+        "feedback": "Correct. The file opens only for the people you choose."
+       },
+       {
+        "id": "anyone",
+        "label": "Anyone with the link",
+        "kind": "share",
+        "outcome": "risky",
+        "feedback": "The link can be forwarded or end up in the wrong place. Then anyone can open the file."
+       }
+      ]
+     },
+     {
+      "id": "rights",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "rxagentlik-disk",
+       "tone": "app",
+       "title": [
+        {
+         "text": "To whom and how?"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Recipient: e.rzayev@merkez-konsalting.example"
+         }
+        ],
+        [
+         {
+          "text": "Access: view or edit"
+         }
+        ],
+        [
+         {
+          "text": "Expires: in 7 days or never"
+         }
+        ]
+       ],
+       "buttons": [
+        "Edit, no end date",
+        "View, 7 days"
+       ]
+      },
+      "actions": [
+       {
+        "id": "view",
+        "label": "View, 7 days",
+        "kind": "keep-private",
+        "outcome": "safe",
+        "feedback": "Excellent. The partner can see the file, not change it, and access ends in a week."
+       },
+       {
+        "id": "edit",
+        "label": "Edit, no end date",
+        "kind": "share",
+        "outcome": "risky",
+        "feedback": "The partner does not need to edit, and open-ended access stays open for years."
+       }
+      ]
+     },
+     {
+      "id": "fake-share",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "rxagentlik-disk-fake",
+       "brand": "RXAgentlik Disk",
+       "url": [
+        {
+         "text": "https://rxagentlik-disk.example.net/giris",
+         "reveal": "rxagentlik-disk.example.net"
+        }
+       ],
+       "fields": [
+        "Email",
+        "Password"
+       ],
+       "button": "Sign in"
+      },
+      "say": "An hour later a shared file page opens. Check the address.",
+      "actions": [
+       {
+        "id": "login",
+        "label": "Sign in",
+        "kind": "enter-credentials",
+        "outcome": "compromised",
+        "feedback": "The domain is not your work drive. A shared file is the excuse to steal the password."
+       },
+       {
+        "id": "close",
+        "label": "Close the tab",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. Open shared files only at disk.rxagentlik.az."
+       },
+       {
+        "id": "report",
+        "label": "Report the site",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Excellent. Reporting the fake page protects colleagues too."
+       }
+      ]
+     },
+     {
+      "id": "old-links",
+      "label": "My shares: 4 files are open to anyone",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "rxagentlik-disk",
+       "url": [
+        {
+         "text": "https://disk.rxagentlik.az/paylasimlar",
+         "reveal": "rxagentlik.az"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "close-links",
+        "label": "Close the open links",
+        "kind": "keep-private",
+        "outcome": "safe",
+        "feedback": "Correct. Closing shares you no longer need is the simplest protection."
+       },
+       {
+        "id": "later",
+        "label": "Later",
+        "kind": "later",
+        "outcome": "risky",
+        "feedback": "Every link left open is a new risk every day."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "swipe",
+    "id": "link-settings",
+    "prompt": "Is this sharing setting safe?",
+    "cards": [
+     {
+      "id": "anyone-forever",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "rxagentlik-disk",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Sharing setting"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Salary table: anyone with the link, edit, no end date"
+         }
+        ]
+       ],
+       "buttons": [
+        "Done"
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A confidential file open to anyone with no end date. Once the link spreads, there is no undo."
+     },
+     {
+      "id": "named-week",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "rxagentlik-disk",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Sharing setting"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Project report: 2 people, view, 7 days"
+         }
+        ]
+       ],
+       "buttons": [
+        "Done"
+       ]
+      },
+      "verdict": "safe",
+      "explain": "Narrow access, view only and an end date. The right setting."
+     },
+     {
+      "id": "whole-org",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "rxagentlik-disk",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Sharing setting"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "HR list: everyone in the organisation"
+         }
+        ]
+       ],
+       "buttons": [
+        "Done"
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A confidential document is not for the whole organisation, only for named people."
+     },
+     {
+      "id": "public-ad",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "rxagentlik-disk",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Sharing setting"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Job advert: anyone with the link"
+         }
+        ]
+       ],
+       "buttons": [
+        "Done"
+       ]
+      },
+      "verdict": "safe",
+      "explain": "It is public and already on the website. An open link is fine here."
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "who-needs-what",
+    "prompt": "Find the right setting for each need.",
+    "pairs": [
+     {
+      "id": "partner",
+      "left": "A partner needs to read a document",
+      "right": "View, by name, 7 days"
+     },
+     {
+      "id": "coauthor",
+      "left": "A colleague co-writes the document",
+      "right": "Edit, only that person"
+     },
+     {
+      "id": "public",
+      "left": "A notice published on the website",
+      "right": "Open link for anyone"
+     }
+    ],
+    "explain": "Keep sharing as narrow as possible: who, with what rights, for how long."
+   },
+   {
+    "type": "choice",
+    "id": "personal-cloud",
+    "question": {
+     "prompt": "Can you upload a confidential file to your personal cloud to work from home?",
+     "options": [
+      {
+       "id": "strong",
+       "label": "Yes, my password is strong",
+       "correct": false,
+       "feedback": "A strong password does not put the file back under the organisation's control."
+      },
+      {
+       "id": "work",
+       "label": "No, I use the work drive or a way the organisation allows",
+       "correct": true,
+       "feedback": "Correct. On the work drive the file is protected and can be recovered."
+      },
+      {
+       "id": "delete-later",
+       "label": "Yes, I will delete it later",
+       "correct": false,
+       "feedback": "A deleted file often stays in the bin and on other devices."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    "explain": "Work files stay in work systems. If unsure, ask technical support."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Never use anyone with the link for confidential files.",
+     "Share by name, view only and with an end date.",
+     "Close old shares regularly."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "wrong-recipient",
+  "title": "Wrong recipient"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 31,
+ "narrationTotalMs": 153552
+}

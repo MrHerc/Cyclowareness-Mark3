@@ -1,0 +1,558 @@
+{
+ "id": "drag-test",
+ "title": "Drag the window",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "dt-tutor",
+   "beats": [
+    {
+     "id": "dt-b1",
+     "say": "Hi! Some sites open a small window to sign you in. Today you will learn to spot a fake one.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "dt-b2",
+     "say": "A scammer draws that window inside the page, like a picture. Even its address bar looks right.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "IshPocht: sign in"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "https://poct.idare.example/giris",
+          "spot": "fake-bar"
+         }
+        ],
+        [
+         {
+          "text": "Sign in with your work email to view the document."
+         }
+        ]
+       ],
+       "buttons": [
+        "Sign in",
+        "Cancel"
+       ]
+      }
+     },
+     "highlight": "fake-bar"
+    },
+    {
+     "id": "dt-b3",
+     "say": "The test is simple: grab the window and drag it outside the browser. A fake one cannot leave the page.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "dt-b4",
+     "say": "If your password manager does not fill in the password, stop. Type the address in a new tab yourself.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "dt-swipe",
+   "prompt": "Which sign-in window can you trust?",
+   "cards": [
+    {
+     "id": "edge-cut",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht: sign in"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "You dragged the window aside."
+        }
+       ],
+       [
+        {
+         "text": "It reached the edge of the page and was cut off."
+        }
+       ]
+      ],
+      "buttons": [
+       "Sign in"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A real window leaves the browser and goes anywhere on the screen. If it gets cut off, it is a picture drawn inside the page."
+    },
+    {
+     "id": "moves-out",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht: sign in"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "You dragged the window aside: it left the browser and moved onto the desktop."
+        }
+       ],
+       [
+        {
+         "text": "ParolSeyf offered the password by itself."
+        }
+       ]
+      ],
+      "buttons": [
+       "Sign in"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "The window moves apart from the browser, and the password manager recognises the site. These are signs of a real window."
+    },
+    {
+     "id": "no-fill",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "No saved password found for this site."
+        }
+       ],
+       [
+        {
+         "text": "Address written in the window: poct.idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Close"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A password manager checks the real address of the site, not the text in the window. If it finds no password, the site is a different one."
+    },
+    {
+     "id": "moves-along",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht: sign in"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "You dragged the browser itself aside."
+        }
+       ],
+       [
+        {
+         "text": "The sign-in window moved along with it."
+        }
+       ]
+      ],
+      "buttons": [
+       "Sign in"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A real window stays where it is. If it moves together with the browser, it is part of the page."
+    },
+    {
+     "id": "own-tab",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "app",
+      "title": [
+       {
+        "text": "New tab: poct.idare.example"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "You typed the address yourself."
+        }
+       ],
+       [
+        {
+         "text": "The password manager filled in the password."
+        }
+       ]
+      ],
+      "buttons": [
+       "Sign in"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "When you type the address yourself, a fake window has no way in. This is the most reliable way."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "dt-sim",
+   "environment": "browser",
+   "title": "Tender document",
+   "intro": "A supplier sent a link to a tender document. The site wants you to sign in to show it. Go carefully.",
+   "steps": [
+    {
+     "id": "doc-page",
+     "label": "Tender document: office furniture purchase",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tender-baza",
+      "url": [
+       {
+        "text": "https://tender-baza.example.net/sened/4471"
+       }
+      ]
+     },
+     "say": "The document is locked. The site offers sign-in with your work account.",
+     "actions": [
+      {
+       "id": "open-login",
+       "label": "Sign in with IshPocht",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Pressing the button is not dangerous yet. The real test is the window that opens now."
+      },
+      {
+       "id": "check-address",
+       "label": "Check the address",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "This is the tender site, not your work mail. Watch the sign-in window that opens next very closely."
+      },
+      {
+       "id": "close-tab",
+       "label": "Close the tab",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "A careful choice. Open your mail yourself, and ask the supplier for the document another way.",
+       "next": "own-tab"
+      }
+     ]
+    },
+    {
+     "id": "popup",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht: sign in"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "https://poct.idare.example/giris"
+        }
+       ],
+       [
+        {
+         "text": "Sign in with your work email to view the document."
+        }
+       ],
+       [
+        {
+         "text": "Email: aysel.quliyeva@idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Sign in",
+       "Cancel"
+      ]
+     },
+     "say": "The window shows the right address. But that proves nothing yet.",
+     "actions": [
+      {
+       "id": "drag",
+       "label": "Drag the window outside the browser",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "The right test. Let us see whether the window can leave the browser."
+      },
+      {
+       "id": "autofill",
+       "label": "Fill with ParolSeyf",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Good idea. The password manager checks the real address of the site.",
+       "next": "pm-check"
+      },
+      {
+       "id": "type-pass",
+       "label": "Type the password and sign in",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "The address bar in the window was only a picture. Your password went to the owner of the tender site.",
+       "next": "leaked"
+      },
+      {
+       "id": "cancel",
+       "label": "Cancel",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Good. Never type a password into a window you are not sure about.",
+       "next": "own-tab"
+      }
+     ]
+    },
+    {
+     "id": "drag-result",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht: sign in"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "The window reached the edge of the page and was cut off."
+        }
+       ],
+       [
+        {
+         "text": "It did not leave the browser."
+        }
+       ]
+      ],
+      "buttons": [
+       "Sign in",
+       "Cancel"
+      ]
+     },
+     "say": "The window was cut off at the page edge. A real window never does that.",
+     "actions": [
+      {
+       "id": "close-it",
+       "label": "Close the window and the tab",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Right. A window that cannot leave the page is fake, so type nothing into it.",
+       "next": "own-tab"
+      },
+      {
+       "id": "type-anyway",
+       "label": "Sign in anyway",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "You had already seen that the window was fake. Your password went to the scammer.",
+       "next": "leaked"
+      },
+      {
+       "id": "report",
+       "label": "Report the site to technical support",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Technical support can block the site and protect your colleagues too.",
+       "next": "own-tab"
+      }
+     ]
+    },
+    {
+     "id": "pm-check",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "No saved password for tender-baza.example.net."
+        }
+       ]
+      ],
+      "buttons": [
+       "Type manually",
+       "Close"
+      ]
+     },
+     "say": "The password manager found no password for this site.",
+     "actions": [
+      {
+       "id": "type-manual",
+       "label": "Type the password manually",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "The password manager was right: this site is not your mail. The password you typed went to the scammer.",
+       "next": "leaked"
+      },
+      {
+       "id": "stop",
+       "label": "Stop and close the window",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Right. When the password manager does not fill in, stopping is the best move."
+      }
+     ]
+    },
+    {
+     "id": "own-tab",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "IshPocht",
+      "url": [
+       {
+        "text": "https://poct.idare.example/giris"
+       }
+      ],
+      "fields": [
+       "Work email",
+       "Password"
+      ],
+      "button": "Sign in"
+     },
+     "say": "You typed the address in a new tab. The password manager filled in the password.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Sign in",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Right. When you type the address yourself, a fake window has no way in.",
+       "next": "doc-page"
+      },
+      {
+       "id": "check",
+       "label": "Check the address",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "This is your real work mail, and the password manager recognised it. Signing in is safe.",
+       "next": "doc-page"
+      }
+     ]
+    },
+    {
+     "id": "leaked",
+     "label": "Document not found",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tender-baza",
+      "url": [
+       {
+        "text": "https://tender-baza.example.net/sened/4471"
+       }
+      ]
+     },
+     "say": "The password is gone and the document never opened. Act fast now.",
+     "actions": [
+      {
+       "id": "change-report",
+       "label": "Change the password and call technical support",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Right. Change the password in a new tab, and let technical support close all open sessions."
+      },
+      {
+       "id": "retry",
+       "label": "Sign in again",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "The site collects your password a second time. It is a trap for passwords, not a document."
+      },
+      {
+       "id": "ignore",
+       "label": "Do nothing",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "The scammer can already open your mail with that password. Change it and report it right away."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "dt-order",
+   "prompt": "Put the steps in order when a sign-in window looks suspicious.",
+   "items": [
+    {
+     "id": "drag",
+     "label": "Drag the window outside the browser"
+    },
+    {
+     "id": "close",
+     "label": "If it cannot leave, close the window and the tab"
+    },
+    {
+     "id": "own-tab",
+     "label": "Type the address in a new tab and sign in there"
+    },
+    {
+     "id": "report",
+     "label": "Report the site to technical support"
+    }
+   ],
+   "explain": "First test, then close, then type the address yourself. Report the site so your colleagues are protected too."
+  },
+  {
+   "type": "recap",
+   "id": "dt-recap",
+   "points": [
+    "Drag a sign-in window outside the browser: a fake one cannot leave",
+    "If the password manager does not fill in, stop",
+    "When in doubt, type the address in a new tab yourself"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

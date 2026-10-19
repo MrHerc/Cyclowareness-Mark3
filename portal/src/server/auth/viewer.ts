@@ -1,0 +1,167 @@
+import "server-only";
+import { cache } from "react";
+import { notFound, redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
+import { db, t } from "../db";
+import type { Role, TenantBranding, TenantSettings } from "../db/schema";
+import { can, isPrivileged, PERMISSION_FEATURE, type Permission } from "./permissions";
+import { invalidateSession, readSessionToken, renewedExpiry, sessionIdFromToken, shouldRenew } from "./session";
+import { currentPath } from "../request";
+import { featuresFor, type Feature } from "../../lib/tenant-defaults";
+
+/** Data access layer: the only way pages and actions learn who is asking. */
+export type Viewer = {
+  sessionId: string;
+  twoFactorVerified: boolean;
+  user: {
+    id: string;
+    tenantId: string;
+    name: string;
+    email: string;
+    phone: string | null;
+    role: Role;
+    jobTitle: string | null;
+    departmentId: string | null;
+    locale: string;
+    avatarUrl: string | null;
+    xp: number;
+    streakCurrent: number;
+    streakLongest: number;
+    streakLastDay: string | null;
+    streakFreezes: number;
+    riskScore: number;
+    soundOn: boolean;
+    motion: "full" | "calm" | "still";
+    timerPref: "standard" | "more" | "off";
+    tourDone: boolean;
+    totpEnabled: boolean;
+    deletionRequestedAt: Date | null;
+    createdAt: Date;
+  };
+  tenant: {
+    id: string;
+    slug: string;
+    name: string;
+    plan: "essentials" | "professional" | "enterprise_hrm";
+    branding: TenantBranding;
+    settings: TenantSettings;
+    features: Set<Feature>;
+  };
+};
+
+const SEEN_THROTTLE_MS = 5 * 60_000;
+
+export const getSession = cache(async (): Promise<Viewer | null> => {
+  const token = await readSessionToken();
+  if (!token || token.length > 100) return null;
+  const id = sessionIdFromToken(token);
+  const [row] = await db()
+    .select({ session: t.sessions, user: t.users, tenant: t.tenants })
+    .from(t.sessions)
+    .innerJoin(t.users, eq(t.users.id, t.sessions.userId))
+    .innerJoin(t.tenants, eq(t.tenants.id, t.sessions.tenantId))
+    .where(eq(t.sessions.id, id));
+  if (!row) return null;
+  const { session, user, tenant } = row;
+  if (session.expiresAt.getTime() < Date.now()) {
+    await invalidateSession(id);
+    return null;
+  }
+  if (user.status !== "active") return null;
+
+  const now = new Date();
+  if (now.getTime() - session.lastSeenAt.getTime() > SEEN_THROTTLE_MS || shouldRenew(session.expiresAt)) {
+    await db()
+      .update(t.sessions)
+      .set({ lastSeenAt: now, ...(shouldRenew(session.expiresAt) ? { expiresAt: renewedExpiry() } : {}) })
+      .where(eq(t.sessions.id, id));
+    await db().update(t.users).set({ lastActiveAt: now }).where(eq(t.users.id, user.id));
+  }
+
+  return {
+    sessionId: id,
+    twoFactorVerified: session.twoFactorVerified,
+    user: {
+      id: user.id,
+      tenantId: user.tenantId,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      jobTitle: user.jobTitle,
+      departmentId: user.departmentId,
+      locale: user.locale,
+      avatarUrl: user.avatarUrl,
+      xp: user.xp,
+      streakCurrent: user.streakCurrent,
+      streakLongest: user.streakLongest,
+      streakLastDay: user.streakLastDay,
+      streakFreezes: user.streakFreezes,
+      riskScore: user.riskScore,
+      soundOn: user.soundOn,
+      motion: user.motion,
+      timerPref: user.timerPref,
+      tourDone: user.tourDone,
+      totpEnabled: user.totpEnabled,
+      deletionRequestedAt: user.deletionRequestedAt,
+      createdAt: user.createdAt,
+    },
+    tenant: {
+      id: tenant.id,
+      slug: tenant.slug,
+      name: tenant.name,
+      plan: tenant.plan,
+      branding: tenant.branding,
+      settings: tenant.settings,
+      features: featuresFor(tenant.plan, tenant.features),
+    },
+  };
+});
+
+/** Signed in and past two-step verification, or null. */
+export const getViewer = cache(async (): Promise<Viewer | null> => {
+  const v = await getSession();
+  if (!v) return null;
+  if (v.user.totpEnabled && !v.twoFactorVerified) return null;
+  return v;
+});
+
+export async function requireViewer(): Promise<Viewer> {
+  const v = await getSession();
+  if (!v) redirect(`/sign-in?next=${encodeURIComponent(await currentPath())}`);
+  if (v.user.totpEnabled && !v.twoFactorVerified) redirect("/sign-in/verify");
+  return v;
+}
+
+export function hasFeature(v: Viewer, feature: Feature): boolean {
+  return v.tenant.features.has(feature);
+}
+
+export function allowed(v: Viewer, permission: Permission): boolean {
+  const feature = PERMISSION_FEATURE[permission];
+  return can(v.user.role, permission) && (!feature || v.tenant.features.has(feature));
+}
+
+/** For admin pages: permission + plan feature + the tenant's "admins use 2FA" rule. */
+export async function requirePermission(permission: Permission): Promise<Viewer> {
+  const v = await requireViewer();
+  if (!allowed(v, permission)) notFound();
+  if (v.tenant.settings.identity.requireAdmin2fa && isPrivileged(v.user.role) && !v.user.totpEnabled) {
+    redirect("/profile?section=security&required=1");
+  }
+  return v;
+}
+
+export async function requireFeature(feature: Feature): Promise<Viewer> {
+  const v = await requireViewer();
+  if (!hasFeature(v, feature)) notFound();
+  return v;
+}
+
+/** For server actions: same checks, but throws instead of redirecting. */
+export async function actionViewer(permission?: Permission): Promise<Viewer> {
+  const v = await getViewer();
+  if (!v) throw new Error("UNAUTHENTICATED");
+  if (permission && !allowed(v, permission)) throw new Error("FORBIDDEN");
+  return v;
+}

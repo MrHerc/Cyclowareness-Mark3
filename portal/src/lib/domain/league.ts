@@ -1,0 +1,49 @@
+/** Department league: score = 60 % assigned completion + 40 % simulation reporting. */
+
+export type DepartmentStats = {
+  id: string;
+  name: string;
+  learners: number;
+  completion: number; // 0–100
+  reportRate: number; // 0–100
+};
+
+export type LeagueRow = DepartmentStats & { place: number; points: number; toNext: number | null };
+
+export function leagueScore(completion: number, reportRate: number): number {
+  return Math.round(completion * 0.6 + reportRate * 0.4);
+}
+
+export function rankLeague(rows: DepartmentStats[]): LeagueRow[] {
+  const scored = rows
+    .filter((r) => r.learners > 0)
+    .map((r) => ({ ...r, points: leagueScore(r.completion, r.reportRate) }))
+    .sort((a, b) => b.points - a.points || b.completion - a.completion || a.name.localeCompare(b.name));
+  return scored.map((r, i) => ({
+    ...r,
+    place: i + 1,
+    toNext: i === 0 ? null : Math.max(1, scored[i - 1].points - r.points),
+  }));
+}
+
+/** Days left in the month, counting today. */
+export function daysLeftInMonth(now: Date): number {
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  return end.getDate() - now.getDate() + 1;
+}
+
+export type LeagueTrend = "up" | "down" | "same";
+
+export type LeagueRowWithTrend = LeagueRow & { trend: LeagueTrend };
+
+/** Movement since an earlier ranking: a smaller place number is "up". A department without an earlier place is "same". */
+export function leagueTrend(place: number, previousPlace: number | null | undefined): LeagueTrend {
+  if (previousPlace == null || previousPlace === place) return "same";
+  return place < previousPlace ? "up" : "down";
+}
+
+/** Adds the trend of every row against the places in `previous` (same ids). */
+export function withTrend(rows: LeagueRow[], previous: LeagueRow[]): LeagueRowWithTrend[] {
+  const before = new Map(previous.map((r) => [r.id, r.place]));
+  return rows.map((r) => ({ ...r, trend: leagueTrend(r.place, before.get(r.id)) }));
+}

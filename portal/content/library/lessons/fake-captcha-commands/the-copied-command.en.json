@@ -1,0 +1,335 @@
+{
+ "id": "the-copied-command",
+ "title": "The Copied Command",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fc2-tutor",
+   "beats": [
+    {
+     "id": "fc2-b1",
+     "say": "This time a fake page tells you to copy a text and paste it into the Run box.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    },
+    {
+     "id": "fc2-b2",
+     "say": "That text is really a hidden command, and when it runs it installs harmful software.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "ransomware"
+     }
+    },
+    {
+     "id": "fc2-b3",
+     "say": "Never paste any text a site tells you to copy into the Run box.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "fc2-b4",
+     "say": "If you already did, disconnect and tell tech support right away.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "fc2-sim",
+   "environment": "desktop",
+   "title": "The Run box",
+   "intro": "A page said a document will not open and led you here. Choose the right step each time.",
+   "steps": [
+    {
+     "id": "run-box",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Run"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "The text the site copied has been pasted into the box:"
+        }
+       ],
+       [
+        {
+         "text": "[unknown text copied by the site]"
+        }
+       ]
+      ],
+      "buttons": [
+       "Cancel",
+       "OK"
+      ]
+     },
+     "say": "The Run box is open, and it holds an unknown text the site copied.",
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Cancel and close",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Correct. Cancelling stops the text from running, then tell tech support what happened."
+      },
+      {
+       "id": "run",
+       "label": "Run it with OK",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "The command ran and installed harmful software in the background. Never run anything in a box like this."
+      },
+      {
+       "id": "report",
+       "label": "Report to tech support",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Good choice. Tech support can work out what happened."
+      }
+     ]
+    },
+    {
+     "id": "script-window",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Unknown script"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "An unknown script is trying to run. Continue?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Stop",
+       "Continue"
+      ]
+     },
+     "say": "Now an unknown window opens and asks for permission to continue.",
+     "actions": [
+      {
+       "id": "stop",
+       "label": "Stop",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Correct. Stopping a script you did not expect prevents the harm."
+      },
+      {
+       "id": "continue",
+       "label": "Continue",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "The script continued and installed harmful software. Do not allow an unknown script."
+      }
+     ]
+    },
+    {
+     "id": "real-update",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sistem-yenileme",
+      "tone": "system",
+      "title": [
+       {
+        "text": "A system update is ready"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Do you want to apply the update now?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Later",
+       "Update"
+      ]
+     },
+     "say": "This is the system's own update window.",
+     "actions": [
+      {
+       "id": "update",
+       "label": "Update",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Correct. The system's own update is safe and never asks you for a command."
+      },
+      {
+       "id": "later",
+       "label": "Later",
+       "kind": "later",
+       "outcome": "safe",
+       "feedback": "That is fine too. You can apply the update at a convenient time."
+      },
+      {
+       "id": "report",
+       "label": "Report as suspicious",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "There is no need. This is the system's ordinary update notice."
+      }
+     ]
+    },
+    {
+     "id": "beacon",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "it-tehlukesizlik",
+      "app": "IT Security",
+      "title": [
+       {
+        "text": "Unusual network activity"
+       }
+      ],
+      "body": [
+       {
+        "text": "Your computer is sending data to an unknown server."
+       }
+      ],
+      "time": "14:20"
+     },
+     "say": "A notice says the computer is connecting to an unknown address.",
+     "actions": [
+      {
+       "id": "disconnect",
+       "label": "Cut the internet",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Correct. Cutting the connection stops the data from leaving."
+      },
+      {
+       "id": "report",
+       "label": "Report to tech support",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Great. Now tech support can check and clean the computer."
+      },
+      {
+       "id": "ignore",
+       "label": "Close it and keep working",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "The software keeps sending data. Never ignore a notice like this."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "fc2-order",
+   "prompt": "You ran the command a site gave you. Put the steps in order.",
+   "items": [
+    {
+     "id": "disconnect",
+     "label": "Unplug the cable or turn off Wi-Fi"
+    },
+    {
+     "id": "report",
+     "label": "Call tech support right away"
+    },
+    {
+     "id": "tell",
+     "label": "Say what you pasted and where"
+    },
+    {
+     "id": "password",
+     "label": "Change passwords from another, clean device"
+    }
+   ],
+   "explain": "First cut the connection, then call right away. Unless your procedure says otherwise, do not turn the computer off."
+  },
+  {
+   "type": "choice",
+   "id": "fc2-choice",
+   "question": {
+    "prompt": "A site tells you to copy a text and paste it into the Run box. What do you do?",
+    "options": [
+     {
+      "id": "refuse",
+      "label": "I do not, and I close the page",
+      "correct": true,
+      "feedback": "Correct. No site asks you to run a command, so this is a trap."
+     },
+     {
+      "id": "paste",
+      "label": "I paste it so I can continue",
+      "correct": false,
+      "feedback": "That text is a hidden command and it installs harmful software. Never paste it."
+     },
+     {
+      "id": "official",
+      "label": "I paste it if the site looks official",
+      "correct": false,
+      "feedback": "An official look is easy to fake. The rule is simple: never run such a text."
+     }
+    ]
+   },
+   "explain": "The text a site tells you to copy is a hidden command. Do not paste it, close the page."
+  },
+  {
+   "type": "match",
+   "id": "fc2-match",
+   "prompt": "Match each situation to the right response.",
+   "pairs": [
+    {
+     "id": "robot",
+     "left": "A check asks you to press keys",
+     "right": "It is fake, close the page"
+    },
+    {
+     "id": "pdf",
+     "left": "A document will not open, run a command",
+     "right": "Same trap, do not do it"
+    },
+    {
+     "id": "real",
+     "left": "A real check",
+     "right": "Pick pictures or tick a box"
+    },
+    {
+     "id": "done",
+     "left": "You already ran the command",
+     "right": "Disconnect and report"
+    }
+   ],
+   "explain": "Every page that asks for a command is fake. If you already ran it, disconnect and tell tech support."
+  },
+  {
+   "type": "recap",
+   "id": "fc2-recap",
+   "points": [
+    "Never paste a text from a site into the Run box",
+    "Every page that asks for a command is fake",
+    "If you did it, disconnect and tell tech support"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

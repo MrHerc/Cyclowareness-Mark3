@@ -1,0 +1,442 @@
+{
+ "id": "lost-phone",
+ "title": "Lost phone",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "c-tutor",
+   "beats": [
+    {
+     "id": "c-b1",
+     "say": "A phone can be lost or stolen. Let us protect it in advance and learn what to do.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "c-b2",
+     "say": "First: a screen lock. A six-digit or longer PIN, plus fingerprint or face recognition.",
+     "mood": "think",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     },
+     "checkpoint": {
+      "prompt": "Is a birth year a good PIN?",
+      "options": [
+       {
+        "id": "yes",
+        "label": "Yes, it is easy to remember",
+        "correct": false,
+        "feedback": "A birth year is easy to find, often right on social media."
+       },
+       {
+        "id": "no",
+        "label": "No, I choose a random PIN",
+        "correct": true,
+        "feedback": "Right. Pick a random PIN of at least six digits."
+       }
+      ]
+     }
+    },
+    {
+     "id": "c-b4",
+     "say": "Second: backups. If photos and contacts are in the cloud, losing the phone means losing only the device.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    {
+     "id": "c-b5",
+     "say": "Phone lost? Act fast: lock it remotely, tell your organisation at once, wipe it if needed.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "lost-phone-flow",
+   "environment": "phone",
+   "title": "Phone lost",
+   "intro": "In the evening you left your work phone in a taxi. Act step by step from a colleague's phone.",
+   "steps": [
+    {
+     "id": "locate",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "cihaz-tapici",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Work phone"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Last seen: Narimanov district, 5 minutes ago."
+        }
+       ],
+       [
+        {
+         "text": "The phone is moving."
+        }
+       ]
+      ],
+      "buttons": [
+       "Lock",
+       "Erase data",
+       "Wait"
+      ]
+     },
+     "say": "The find service shows the phone on the map.",
+     "actions": [
+      {
+       "id": "lock",
+       "label": "Lock and show a message",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Right. Locking takes a minute and keeps strangers out of the phone."
+      },
+      {
+       "id": "wipe",
+       "label": "Erase now",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Erasing is the last step: afterwards the phone cannot be found on the map. Lock it first."
+      },
+      {
+       "id": "wait",
+       "label": "Wait until morning",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Every hour gives a thief more time. Lock the phone now."
+      }
+     ]
+    },
+    {
+     "id": "tell-it",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "IT Support"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hello! IT support, how can we help?"
+         }
+        ],
+        "time": "21:08"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "My work phone is lost, lock my account",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Right. Once support locks your work account, no one can open the mail on the phone."
+      },
+      {
+       "id": "tomorrow",
+       "label": "I will tell them tomorrow at work",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Work mail is open on that phone. Telling your organisation at once stops most of the harm."
+      }
+     ]
+    },
+    {
+     "id": "sim-block",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "kehkesan-mobil",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Block SIM card"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "+994 55 000 18 40"
+        }
+       ],
+       [
+        {
+         "text": "A blocked number receives no SMS codes."
+        }
+       ]
+      ],
+      "buttons": [
+       "Block",
+       "Cancel"
+      ]
+     },
+     "say": "Now you are in your operator's app.",
+     "actions": [
+      {
+       "id": "block",
+       "label": "Block",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Right. With the SIM blocked, a thief cannot get SMS codes to recover your accounts."
+      },
+      {
+       "id": "cancel",
+       "label": "Cancel",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "If the SIM stays active, SMS codes keep arriving on the stolen phone."
+      }
+     ]
+    },
+    {
+     "id": "found-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "cihaz-tapici-fake",
+      "sender": [
+       {
+        "text": "+994 70 000 45 67"
+       }
+      ],
+      "time": "21:30",
+      "messages": [
+       [
+        {
+         "text": "Your lost phone has been found. Sign in to see where it is: "
+        },
+        {
+         "text": "cihaz-tapildi.test",
+         "link": {
+          "label": "cihaz-tapildi.test",
+          "href": "https://cihaz-tapildi.test/giris"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Half an hour later, this text arrives.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open the link",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "After a theft, texts like this aim to steal the account password, which can unlock the phone."
+      },
+      {
+       "id": "block",
+       "label": "Block and report",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Right. Check the phone's location only in the find service yourself."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "c-order",
+   "prompt": "Your phone is gone. Put the steps in order.",
+   "items": [
+    {
+     "id": "lock-remote",
+     "label": "Lock the phone with the find my phone service"
+    },
+    {
+     "id": "tell-support",
+     "label": "Tell your organisation's technical support at once"
+    },
+    {
+     "id": "block-sim",
+     "label": "Call your mobile operator to block the SIM card"
+    },
+    {
+     "id": "change-passwords",
+     "label": "Change important passwords from another device"
+    },
+    {
+     "id": "wipe",
+     "label": "If it will not be found, erase it remotely"
+    }
+   ],
+   "explain": "Lock and report first, then protect the SIM and passwords. Erase last, as an erased phone is harder to find. If your organisation's procedure sets another order, follow it."
+  },
+  {
+   "type": "swipe",
+   "id": "c-swipe",
+   "prompt": "Safe or trap?",
+   "cards": [
+    {
+     "id": "support-locked",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Technical support"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "We have logged your lost phone and paused your work account. Come to the office for a new password."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "No link or code is asked, you are invited to the office in person. This is the right procedure."
+    },
+    {
+     "id": "finder-passcode",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "+44 7700 900654"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "I found your phone. Write me the screen lock code so I can check you are the owner."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Returning a phone does not need the lock code. Do not give it, arrange the handover through the police."
+    },
+    {
+     "id": "update-reminder",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Technical support"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Reminder: a new system update for phones is out. Install it from Settings."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "There is no link, it sends you to your phone's own Settings. That is exactly where updates are installed."
+    },
+    {
+     "id": "cloud-full",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "buludxidmet-fake",
+      "sender": [
+       {
+        "text": "BuludXidmet"
+       }
+      ],
+      "time": "19:12",
+      "messages": [
+       [
+        {
+         "text": "Your cloud storage is full and your photos will be deleted today. Pay here: "
+        },
+        {
+         "text": "bulud-yaddas.test"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A real warning shows up inside the app itself. Do not pay through a link, open the app yourself."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "c-choice-lock",
+   "question": {
+    "prompt": "Which screen locks are strong?",
+    "options": [
+     {
+      "id": "none",
+      "label": "No lock",
+      "correct": false,
+      "feedback": "Anyone who finds an unlocked phone sees everything."
+     },
+     {
+      "id": "birth-year",
+      "label": "Your birth year",
+      "correct": false,
+      "feedback": "A birth year is easy to find, often it is on social media."
+     },
+     {
+      "id": "random-pin",
+      "label": "A random PIN of at least six digits",
+      "correct": true,
+      "feedback": "Correct. A long random PIN is hard to guess."
+     },
+     {
+      "id": "bio-pin",
+      "label": "Fingerprint or face, plus a strong PIN",
+      "correct": true,
+      "feedback": "Correct. It is convenient and the backup PIN is strong too."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "A lock is the first protection when a phone is lost. A fingerprint is handy, but the main PIN must still be strong."
+  },
+  {
+   "type": "recap",
+   "id": "c-recap",
+   "points": [
+    "A strong screen lock and automatic updates",
+    "Turn on backup and find my phone in advance",
+    "Phone gone: lock, report, erase if needed"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

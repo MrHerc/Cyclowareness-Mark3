@@ -1,0 +1,351 @@
+{
+ "module": {
+  "slug": "search-ads-lookalikes",
+  "title": "Fake sites in search",
+  "category": "devices"
+ },
+ "lesson": {
+  "id": "lookalike-domains",
+  "title": "Look-alike addresses",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "ld-tutor",
+    "beats": [
+     {
+      "id": "ld-b1",
+      "say": "On a phone the address bar is short, and most of the address is hidden. Scammers count on that.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "phone-lock"
+      }
+     },
+     {
+      "id": "ld-b2",
+      "say": "Look at this address: the official name comes first, but the real owner of the site is the part at the end.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "url",
+        "url": [
+         {
+          "text": "https://vetendasportal.gov."
+         },
+         {
+          "text": "az-arayis.example",
+          "spot": "real-owner"
+         },
+         {
+          "text": "/giris"
+         }
+        ]
+       }
+      },
+      "highlight": "real-owner"
+     },
+     {
+      "id": "ld-b3",
+      "say": "There are other tricks too: letters swap places, a word is added, a similar digit replaces a letter.",
+      "mood": "think",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "eye"
+      }
+     },
+     {
+      "id": "ld-b4",
+      "say": "On a suspicious address type nothing, close the page and tell technical support.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "ld-match",
+    "prompt": "Match each fake address with the official one it imitates.",
+    "pairs": [
+     {
+      "id": "gov",
+      "left": "vetendasportal.gov.az-arayis.example",
+      "right": "vetendasportal.gov.az"
+     },
+     {
+      "id": "sahil",
+      "left": "sahi1bank.example.info",
+      "right": "sahilbank.az"
+     },
+     {
+      "id": "ulduz",
+      "left": "ulduzbnak.example",
+      "right": "ulduzbank.az"
+     },
+     {
+      "id": "mail",
+      "left": "idare-poct-giris.example.info",
+      "right": "poct.idare.example"
+     }
+    ],
+    "explain": "The difference is small: the official name placed in front, a digit, two swapped letters or an extra word. Always read the address from the end."
+   },
+   {
+    "type": "simulation",
+    "id": "ld-sim",
+    "environment": "phone",
+    "title": "A certificate on the phone",
+    "intro": "You want to get a certificate on your phone. At every step, read the address to the very end.",
+    "steps": [
+     {
+      "id": "search-ad",
+      "label": "Sponsored: Vatandash Portal, official site",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "w2c-tapan",
+       "url": [
+        {
+         "text": "https://tapan.example/axtar?q=vetendas+portali+arayis",
+         "reveal": "tapan.example"
+        }
+       ]
+      },
+      "say": "The first search result is an ad.",
+      "actions": [
+       {
+        "id": "ad",
+        "label": "Open the ad",
+        "kind": "click-link",
+        "outcome": "risky",
+        "feedback": "The ad took you to a different site. Now read the address carefully.",
+        "next": "fake-login"
+       },
+       {
+        "id": "official",
+        "label": "Open the vetendasportal.gov.az result",
+        "kind": "click-link",
+        "outcome": "safe",
+        "feedback": "Right. You skipped the ad and chose the result whose address ends in gov.az.",
+        "next": "real-login"
+       }
+      ]
+     },
+     {
+      "id": "fake-login",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "w2c-vetendas-portal-fake",
+       "brand": "Vatandash Portal",
+       "url": [
+        {
+         "text": "https://vetendasportal.gov.az-arayis.example/giris",
+         "reveal": "az-arayis.example"
+        }
+       ],
+       "fields": [
+        "FIN code",
+        "Password"
+       ],
+       "button": "Sign in"
+      },
+      "say": "On a phone only the start of the address shows. Read it to the end.",
+      "actions": [
+       {
+        "id": "login",
+        "label": "Sign in",
+        "kind": "enter-credentials",
+        "outcome": "compromised",
+        "feedback": "The address started with gov.az but did not end with it. Your FIN code and password went to the scammer."
+       },
+       {
+        "id": "close",
+        "label": "Close the page",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right. The real owner of a site is at the end of the address, and this one did not end in gov.az.",
+        "next": "real-login"
+       }
+      ]
+     },
+     {
+      "id": "new-login",
+      "label": "10:16 Vatandash Portal",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2c-vetendas-portal",
+       "app": "Vatandash Portal",
+       "title": [
+        {
+         "text": "New sign-in"
+        }
+       ],
+       "body": [
+        {
+         "text": "Someone signed in to your account from an unknown device."
+        }
+       ],
+       "time": "10:16"
+      },
+      "say": "A minute later this notification arrived.",
+      "actions": [
+       {
+        "id": "fix",
+        "label": "I open the portal myself and change the password",
+        "kind": "open",
+        "outcome": "safe",
+        "feedback": "Right. Open the portal from your bookmark, change the password and sign out of all devices."
+       },
+       {
+        "id": "later",
+        "label": "I will look later",
+        "kind": "later",
+        "outcome": "risky",
+        "feedback": "The scammer is already in your account. Every minute counts."
+       }
+      ]
+     },
+     {
+      "id": "real-login",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "w2c-vetendas-portal",
+       "brand": "Vatandash Portal",
+       "url": [
+        {
+         "text": "https://vetendasportal.gov.az/giris",
+         "reveal": "vetendasportal.gov.az"
+        }
+       ],
+       "fields": [
+        "FIN code",
+        "Password"
+       ],
+       "button": "Sign in"
+      },
+      "say": "This address ends in gov.az.",
+      "actions": [
+       {
+        "id": "login",
+        "label": "Sign in",
+        "kind": "enter-credentials",
+        "outcome": "safe",
+        "feedback": "Right, this is the official portal itself. Now bookmark it."
+       },
+       {
+        "id": "check",
+        "label": "Check the address",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "A great habit. The domain ends in gov.az, with no extra word in front."
+       }
+      ]
+     },
+     {
+      "id": "bank-sms",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "sahilbank-fake",
+       "sender": [
+        {
+         "text": "SahilBank"
+        }
+       ],
+       "time": "19:42",
+       "messages": [
+        [
+         {
+          "text": "Your card is temporarily blocked. To unblock: "
+         },
+         {
+          "text": "sahilbank.az-kart.example/ac",
+          "link": {
+           "label": "sahilbank.az-kart.example/ac",
+           "href": "https://sahilbank.az-kart.example/ac"
+          }
+         }
+        ]
+       ]
+      },
+      "say": "In the evening an SMS arrives in the bank's name.",
+      "actions": [
+       {
+        "id": "open",
+        "label": "Open the link",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "The address starts with the bank's name, but the owner is the part at the end. Open the bank's app yourself."
+       },
+       {
+        "id": "report",
+        "label": "Report as spam",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. Check your card in the bank's app or on the number on the back of the card."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "safe",
+        "feedback": "That works. If in doubt, call the bank yourself on the number on the back of your card."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "order",
+    "id": "ld-order",
+    "prompt": "Put the steps for checking an address on a phone in order.",
+    "items": [
+     {
+      "id": "tap",
+      "label": "Tap the address bar to see the full address"
+     },
+     {
+      "id": "end",
+      "label": "Find the last part of the domain"
+     },
+     {
+      "id": "compare",
+      "label": "Compare it letter by letter with the official address"
+     },
+     {
+      "id": "leave",
+      "label": "If anything differs, close it without typing"
+     }
+    ],
+    "explain": "On a phone the end of the address is often hidden, so open it fully first. If the official name is not at the end, the site is fake."
+   },
+   {
+    "type": "recap",
+    "id": "ld-recap",
+    "points": [
+     "On a phone, open the full address and read it from the end",
+     "Even if the official name comes first, the real owner is the part at the end",
+     "If you typed a password, change it on the official site and report it"
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 26,
+ "narrationTotalMs": 146721
+}

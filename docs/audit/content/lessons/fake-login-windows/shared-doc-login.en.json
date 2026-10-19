@@ -1,0 +1,571 @@
+{
+ "module": {
+  "slug": "fake-login-windows",
+  "title": "Fake login windows",
+  "category": "identity"
+ },
+ "lesson": {
+  "id": "shared-doc-login",
+  "title": "A shared document",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "sd-tutor",
+    "beats": [
+     {
+      "id": "sd-b1",
+      "say": "A fake sign-in window often starts with an email: a document was shared with you, sign in to view it.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "inbox"
+      }
+     },
+     {
+      "id": "sd-b2",
+      "say": "The button offers sign-in with a familiar account. The window that opens is drawn inside the site.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "email",
+        "brandRef": "buludxidmet-fake",
+        "from": {
+         "name": [
+          {
+           "text": "BuludXidmet"
+          }
+         ],
+         "address": [
+          {
+           "text": "paylasim@buludxidmet-share.example.net"
+          }
+         ]
+        },
+        "subject": [
+         {
+          "text": "Kamran Aliyev shared a document with you"
+         }
+        ],
+        "time": "09:47",
+        "body": [
+         [
+          {
+           "text": "Kamran Aliyev shared \"Tender_teklifi_2026.pdf\" with you."
+          }
+         ],
+         [
+          {
+           "text": "To view it: "
+          },
+          {
+           "text": "Sign in with IshPocht",
+           "spot": "signin-btn",
+           "link": {
+            "label": "Sign in with IshPocht",
+            "href": "https://buludxidmet-share.example.net/view?id=88213"
+           }
+          }
+         ]
+        ]
+       }
+      },
+      "highlight": "signin-btn"
+     },
+     {
+      "id": "sd-b3",
+      "say": "An email threatening to shut down your office's social media page is the same trap.",
+      "mood": "think",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "social"
+      }
+     },
+     {
+      "id": "sd-b4",
+      "say": "The rule: do not sign in through the button in the email. Open the site yourself.",
+      "mood": "happy",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "sd-choice",
+    "question": {
+     "prompt": "You got this email. What do you do?",
+     "options": [
+      {
+       "id": "signin",
+       "label": "I press the button and sign in with my IshPocht account",
+       "correct": false,
+       "feedback": "The button takes you to a site you do not know. The sign-in window there may be fake."
+      },
+      {
+       "id": "ask-colleague",
+       "label": "I call Kamran on the number I know and ask",
+       "correct": true,
+       "feedback": "Right. If the document is real, Kamran will share it again in your office's own system."
+      },
+      {
+       "id": "forward",
+       "label": "I forward it to colleagues so they can look too",
+       "correct": false,
+       "feedback": "Then the trap reaches others as well. Send a suspicious email only to technical support."
+      }
+     ],
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "buludxidmet-fake",
+       "from": {
+        "name": [
+         {
+          "text": "BuludXidmet"
+         }
+        ],
+        "address": [
+         {
+          "text": "paylasim@buludxidmet-share.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Kamran Aliyev shared a document with you"
+        }
+       ],
+       "time": "09:47",
+       "body": [
+        [
+         {
+          "text": "Kamran Aliyev shared \"Tender_teklifi_2026.pdf\" with you."
+         }
+        ],
+        [
+         {
+          "text": "To view it: "
+         },
+         {
+          "text": "Sign in with IshPocht",
+          "link": {
+           "label": "Sign in with IshPocht",
+           "href": "https://buludxidmet-share.example.net/view?id=88213"
+          }
+         }
+        ],
+        [
+         {
+          "text": "The link is valid for 24 hours."
+         }
+        ]
+       ]
+      }
+     }
+    },
+    "explain": "If the document is real, you will see it when you open the site yourself. You never need the sign-in button in the email."
+   },
+   {
+    "type": "simulation",
+    "id": "sd-sim",
+    "environment": "inbox",
+    "title": "Your work mail",
+    "intro": "Four emails are waiting in your morning mail. Open each one and pick the right action.",
+    "steps": [
+     {
+      "id": "real-share",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "buludxidmet",
+       "from": {
+        "name": [
+         {
+          "text": "BuludXidmet"
+         }
+        ],
+        "address": [
+         {
+          "text": "bildiris@buludxidmet.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Narmin Hasanova shared a file with you"
+        }
+       ],
+       "time": "08:55",
+       "body": [
+        [
+         {
+          "text": "Narmin Hasanova shared \"Budce_2027.xlsx\" with you."
+         }
+        ],
+        [
+         {
+          "text": "Note: the budget table we discussed this morning."
+         }
+        ],
+        [
+         {
+          "text": "Open file",
+          "link": {
+           "label": "Open file",
+           "href": "https://buludxidmet.example/idare/budce-2027"
+          }
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "open",
+        "label": "Open file",
+        "kind": "click-link",
+        "outcome": "safe",
+        "feedback": "You expected this file, and the link goes to the service's own address. It is fine to open."
+       },
+       {
+        "id": "safe",
+        "label": "Mark as safe",
+        "kind": "mark-safe",
+        "outcome": "safe",
+        "feedback": "Right. A known colleague, an expected file and the service's own address."
+       },
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "risky",
+        "feedback": "Caution is good, but there are no warning signs here. Narmin told you about this file this morning."
+       }
+      ]
+     },
+     {
+      "id": "fake-share",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "buludxidmet-fake",
+       "from": {
+        "name": [
+         {
+          "text": "BuludXidmet"
+         }
+        ],
+        "address": [
+         {
+          "text": "paylasim@buludxidmet-share.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Kamran Aliyev shared a document with you"
+        }
+       ],
+       "time": "09:47",
+       "body": [
+        [
+         {
+          "text": "Kamran Aliyev shared \"Tender_teklifi_2026.pdf\" with you."
+         }
+        ],
+        [
+         {
+          "text": "To view it: "
+         },
+         {
+          "text": "Sign in with IshPocht",
+          "link": {
+           "label": "Sign in with IshPocht",
+           "href": "https://buludxidmet-share.example.net/view?id=88213"
+          }
+         }
+        ],
+        [
+         {
+          "text": "The link is valid for 24 hours."
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. A different domain and a sign-in button that led to a fake window."
+       },
+       {
+        "id": "click",
+        "label": "Sign in with IshPocht",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "The page would have drawn an IshPocht window and asked for your password. Do not touch buttons like this."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "safe",
+        "feedback": "Deleting works too. If you report it, technical support can warn your colleagues."
+       }
+      ]
+     },
+     {
+      "id": "copyright",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "w2c-kontakto-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Kontakto Legal Centre"
+         }
+        ],
+        "address": [
+         {
+          "text": "huquq@kontakto-support.example.info"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Your page will be removed within 24 hours"
+        }
+       ],
+       "time": "10:12",
+       "body": [
+        [
+         {
+          "text": "A copyright violation was found on your office's official page."
+         }
+        ],
+        [
+         {
+          "text": "To appeal, sign in as the page administrator: "
+         },
+         {
+          "text": "Appeal",
+          "link": {
+           "label": "Appeal",
+           "href": "https://kontakto-support.example.info/etiraz"
+          }
+         }
+        ],
+        [
+         {
+          "text": "Without a reply, the page will be closed for good."
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. A real warning would also appear inside the social network's own app."
+       },
+       {
+        "id": "click",
+        "label": "Appeal",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "The appeal page drew a Kontakto window and collected the password and the code. Your office's page would go to the scammer."
+       },
+       {
+        "id": "reply",
+        "label": "Reply: this is a mistake",
+        "kind": "reply",
+        "outcome": "risky",
+        "feedback": "The scammer reads the reply and sends a new link. Report the email instead."
+       }
+      ]
+     },
+     {
+      "id": "it-notice",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "it-destek",
+       "from": {
+        "name": [
+         {
+          "text": "IT Support"
+         }
+        ],
+        "address": [
+         {
+          "text": "destek@idare.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Mail server update tonight"
+        }
+       ],
+       "time": "11:30",
+       "body": [
+        [
+         {
+          "text": "Today between 19:00 and 20:00, work mail may be unavailable for a few minutes."
+         }
+        ],
+        [
+         {
+          "text": "No action is needed from you."
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "safe",
+        "label": "Mark as safe",
+        "kind": "mark-safe",
+        "outcome": "safe",
+        "feedback": "Right. It comes from an internal address, with no link and no request for a password."
+       },
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "risky",
+        "feedback": "This email has no link and asks for nothing. Notices like this are normal work."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "safe",
+        "feedback": "That is fine, the email only informs you. There is no danger."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "sd-hotspot",
+    "prompt": "Find the signs that this sign-in window is fake.",
+    "artifact": {
+     "kind": "dialog",
+     "brandRef": "w2c-kontakto-fake",
+     "tone": "app",
+     "title": [
+      {
+       "text": "Kontakto: sign in"
+      }
+     ],
+     "body": [
+      [
+       {
+        "text": "Browser address bar: "
+       },
+       {
+        "text": "kontakto-support.example.info/etiraz",
+        "spot": "real-address"
+       }
+      ],
+      [
+       {
+        "text": "Address in the window: "
+       },
+       {
+        "text": "https://kontakto.example/login",
+        "spot": "painted-bar"
+       }
+      ],
+      [
+       {
+        "text": "Phone or email, password"
+       }
+      ],
+      [
+       {
+        "text": "Also enter the code you got by SMS",
+        "spot": "code"
+       }
+      ],
+      [
+       {
+        "text": "The window does not move past the edge of the page",
+        "spot": "no-drag"
+       }
+      ],
+      [
+       {
+        "text": "2 hours 59 minutes left to appeal",
+        "spot": "timer"
+       }
+      ]
+     ],
+     "buttons": [
+      "Sign in"
+     ]
+    },
+    "spots": [
+     {
+      "id": "real-address",
+      "label": "Real address",
+      "explain": "The browser's own address bar shows a different site. Look at that, not at the text inside the window."
+     },
+     {
+      "id": "painted-bar",
+      "label": "Painted address",
+      "explain": "This address bar is part of the window's picture. The scammer can write anything there."
+     },
+     {
+      "id": "code",
+      "label": "Verification code",
+      "explain": "They want the code to get past two-step verification. Never type a code into a window like this."
+     },
+     {
+      "id": "no-drag",
+      "label": "Window stuck",
+      "explain": "A real window can be dragged outside the browser. This one stays stuck inside the page."
+     },
+     {
+      "id": "timer",
+      "label": "Pressure",
+      "explain": "The countdown is there to make you sign in without checking."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "recap",
+    "id": "sd-recap",
+    "points": [
+     "Find a shared document by opening the site yourself",
+     "An email threatening to close your page is a trap",
+     "If you typed your password, change it now and tell technical support"
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 29,
+ "narrationTotalMs": 161691
+}

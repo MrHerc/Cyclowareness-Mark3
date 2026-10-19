@@ -1,0 +1,389 @@
+{
+ "id": "the-support-call",
+ "title": "The Support Call",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ts2-tutor",
+   "beats": [
+    {
+     "id": "ts2-b1",
+     "say": "This time the scam comes by phone: a fake bank security team calls you.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "ts2-b2",
+     "say": "They say your card is stolen and you must move money to a safe account.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "ts2-b3",
+     "say": "There is no such safe account, and no bank asks you to install an app.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "ts2-b4",
+     "say": "End the call and dial the number on the back of your card yourself.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ts2-scenario",
+   "title": "A call from the bank",
+   "start": "claim",
+   "nodes": [
+    {
+     "id": "claim",
+     "text": "There is a suspicious payment on your card. We must move the money to a safe account.",
+     "speaker": "SahilBank security",
+     "voice": "man-2",
+     "channel": "phone",
+     "spoken": "There is a suspicious payment on your card. <breath> We must move the money to a safe account.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "sahilbank-fake",
+       "caller": [
+        {
+         "text": "SahilBank security"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 54 30"
+        }
+       ],
+       "label": "Mobile"
+      }
+     },
+     "choices": [
+      {
+       "label": "I end the call and dial the number on the back of my card myself",
+       "next": "verify",
+       "feedback": "Correct. The only way to check is to find the number yourself and call."
+      },
+      {
+       "label": "I give my card details so they can check",
+       "outcome": "compromised",
+       "feedback": "A real bank does not ask for your card number or code. With this they empty your account."
+      },
+      {
+       "label": "I install the app they ask for",
+       "outcome": "compromised",
+       "feedback": "The app hands them your phone. A bank never asks you to install such an app."
+      }
+     ]
+    },
+    {
+     "id": "verify",
+     "text": "We did not send any such warning.",
+     "speaker": "Bank operator (number on the back of your card)",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "We did not send <breath> any such warning.",
+     "choices": [
+      {
+       "label": "I report the call and the suspicious number",
+       "outcome": "safe",
+       "feedback": "Great. The bank can now watch your account and warn others too."
+      },
+      {
+       "label": "I do not worry, it was probably a mistake",
+       "outcome": "risky",
+       "feedback": "The scammer may call again. Telling the bank what happened protects you."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ts2-sim-call",
+   "environment": "call",
+   "title": "The fake support call",
+   "intro": "A call comes in from your bank. Read what the caller says and choose your answer each time.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "SahilBank security"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-3"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Answer",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Answering itself is not dangerous. What matters is that you give nothing away."
+      },
+      {
+       "id": "decline",
+       "label": "Decline",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "That works too. Then call the number on the back of your card yourself.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pitch",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "SahilBank security"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-3"
+     },
+     "say": "Hello, this is Tural from SahilBank security. Twelve hundred manat, excuse me, was taken from your card.",
+     "spoken": "Hello, <breath> this is Tural from SahilBank security. Twelve hundred manat <cough> excuse me, was taken from your card.",
+     "actions": [
+      {
+       "id": "listen",
+       "label": "I listen but say nothing",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Good. You may listen, as long as you give no information."
+      },
+      {
+       "id": "hang",
+       "label": "End the call",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Right choice. A bank does not call like this, so ending it is correct.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "ask-code",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "SahilBank security"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-3"
+     },
+     "say": "A code just arrived on your phone to confirm. Please read that code to me.",
+     "spoken": "A code just arrived on your phone to confirm. <breath> Please read that code to me.",
+     "actions": [
+      {
+       "id": "refuse",
+       "label": "I do not read the code",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Correct. The code that arrives is the key to your account, never tell it to anyone."
+      },
+      {
+       "id": "read",
+       "label": "I read the code",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "The moment you read it out, they get into your account. A bank never asks for this code.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "install",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "SahilBank security"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-3"
+     },
+     "say": "So I can help you, please install the UzaqMasa app and let me connect.",
+     "spoken": "So I can help you, uh, please install the UzaqMasa app and <breath> let me connect.",
+     "actions": [
+      {
+       "id": "refuse",
+       "label": "I do not install the app",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Correct. You never install a remote access app because a caller asks you to."
+      },
+      {
+       "id": "install",
+       "label": "Install the app",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Now the caller sees your screen and controls your phone. Never install such an app.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "The call has ended. What do you do now?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "SahilBank security"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-3"
+     },
+     "actions": [
+      {
+       "id": "call-card",
+       "label": "Call the number on the back of the card",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Correct. The bank will confirm the call was fake and check your account."
+      },
+      {
+       "id": "redial",
+       "label": "Call back the number that called",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "That number goes to the scammer again. Only take the number from your card."
+      },
+      {
+       "id": "ignore",
+       "label": "Do nothing",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "The scammer may try again. To be safe, call the bank yourself."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "ts2-order",
+   "prompt": "Put the steps in order when a call like this claims to be the bank.",
+   "items": [
+    {
+     "id": "hang",
+     "label": "End the call"
+    },
+    {
+     "id": "find",
+     "label": "Find the number on the back of your card"
+    },
+    {
+     "id": "call",
+     "label": "Call that number yourself"
+    },
+    {
+     "id": "tell",
+     "label": "Tell the bank what happened"
+    }
+   ],
+   "explain": "This is the only way to check: end the call and dial the number you found yourself."
+  },
+  {
+   "type": "choice",
+   "id": "ts2-choice",
+   "question": {
+    "prompt": "You already installed the help app the caller asked for. What do you do now?",
+    "options": [
+     {
+      "id": "disconnect",
+      "label": "I disconnect, tell tech support and call the bank myself",
+      "correct": true,
+      "feedback": "Correct. Disconnecting stops the connection, then asking for help is the right move."
+     },
+     {
+      "id": "keep",
+      "label": "I keep the app, maybe I will need it",
+      "correct": false,
+      "feedback": "While the app stays, they control your phone. Disconnect and remove it at once."
+     },
+     {
+      "id": "wait",
+      "label": "I wait, since nothing happened",
+      "correct": false,
+      "feedback": "Waiting adds to the harm. The sooner you report it, the more you can save."
+     }
+    ]
+   },
+   "explain": "If the app is already there, disconnect at once, tell tech support and call the bank on the number on your card."
+  },
+  {
+   "type": "recap",
+   "id": "ts2-recap",
+   "points": [
+    "There is no such thing as a safe account",
+    "Do not install an app because a caller asks",
+    "End the call and dial the number on your card yourself"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

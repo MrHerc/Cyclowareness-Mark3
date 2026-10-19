@@ -1,0 +1,480 @@
+{
+ "module": {
+  "slug": "fake-payment-links",
+  "title": "Fake payment links",
+  "category": "social"
+ },
+ "lesson": {
+  "id": "parcel-fee",
+  "title": "Parcel fee",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "pf-tutor",
+    "beats": [
+     {
+      "id": "pf-b1",
+      "say": "Hello! Today we will see how a tiny payment link turns into a big loss.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "phone-lock"
+      }
+     },
+     {
+      "id": "pf-b2",
+      "say": "The fee is only one manat twenty. The scammer is after your card details, not the fee.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "sms",
+        "brandRef": "w2d-tezkuryer-fake",
+        "sender": [
+         {
+          "text": "+994 51 000 83 17"
+         }
+        ],
+        "time": "10:47",
+        "messages": [
+         [
+          {
+           "text": "TezKuryer: your parcel is held at customs. "
+          },
+          {
+           "text": "Pay a 1.20 AZN fee: ",
+           "spot": "fee"
+          },
+          {
+           "text": "tezkuryer-gomruk.example.net/odenis",
+           "link": {
+            "label": "tezkuryer-gomruk.example.net/odenis",
+            "href": "https://tezkuryer-gomruk.example.net/odenis"
+           }
+          }
+         ]
+        ]
+       }
+      },
+      "highlight": "fee"
+     },
+     {
+      "id": "pf-b3",
+      "say": "Parcel, fine or benefit: whatever it is, never pay through a link in a text message.",
+      "mood": "think",
+      "gesture": "shake",
+      "visual": {
+       "kind": "illustration",
+       "id": "hook"
+      }
+     },
+     {
+      "id": "pf-b4",
+      "say": "Instead, open the official app or portal yourself and check there.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "pf-hotspot",
+    "prompt": "Find the signs of fraud in this text message.",
+    "artifact": {
+     "kind": "sms",
+     "brandRef": "w2d-tezkuryer-fake",
+     "sender": [
+      {
+       "text": "+994 51 000 83 17",
+       "spot": "sender"
+      }
+     ],
+     "time": "10:47",
+     "messages": [
+      [
+       {
+        "text": "TezKuryer: your parcel TZ48120577AZ is held at customs. "
+       },
+       {
+        "text": "A customs fee of 1.20 AZN",
+        "spot": "small-fee"
+       },
+       {
+        "text": " must be paid."
+       }
+      ],
+      [
+       {
+        "text": "Pay here: "
+       },
+       {
+        "text": "tezkuryer-gomruk.example.net/odenis",
+        "spot": "link",
+        "link": {
+         "label": "tezkuryer-gomruk.example.net/odenis",
+         "href": "https://tezkuryer-gomruk.example.net/odenis"
+        }
+       }
+      ],
+      [
+       {
+        "text": "If not paid within 24 hours, the parcel goes back to the sender.",
+        "spot": "deadline"
+       }
+      ]
+     ]
+    },
+    "spots": [
+     {
+      "id": "sender",
+      "label": "An ordinary mobile number",
+      "explain": "Company texts usually arrive under a name. A name can be faked too, so never rely on this sign alone."
+     },
+     {
+      "id": "small-fee",
+      "label": "A tiny amount",
+      "explain": "A tiny amount lowers your guard. The real target is your card number, the code on the back and the SMS code."
+     },
+     {
+      "id": "link",
+      "label": "Fake address",
+      "explain": "This is not the courier's official site, extra words were added to the name. Do not tap it, open the official app yourself."
+     },
+     {
+      "id": "deadline",
+      "label": "Rushing you",
+      "explain": "The deadline is there to stop you thinking. A real courier gives you time to check."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "simulation",
+    "id": "pf-sim",
+    "environment": "phone",
+    "title": "Messages through the day",
+    "intro": "Several messages reach your phone during the day. Choose the right response to each.",
+    "steps": [
+     {
+      "id": "redeliver-sms",
+      "label": "10:47 New text",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "w2d-tezkuryer-fake",
+       "sender": [
+        {
+         "text": "+994 51 000 83 17"
+        }
+       ],
+       "time": "10:47",
+       "messages": [
+        [
+         {
+          "text": "TezKuryer: our courier could not find you. Pay 0.90 AZN for a new delivery: "
+         },
+         {
+          "text": "tezkuryer-catdirilma.example.net/odenis",
+          "link": {
+           "label": "tezkuryer-catdirilma.example.net/odenis",
+           "href": "https://tezkuryer-catdirilma.example.net/odenis"
+          }
+         }
+        ]
+       ]
+      },
+      "say": "A familiar courier name and a small amount.",
+      "actions": [
+       {
+        "id": "open-link",
+        "label": "Open the link",
+        "kind": "click-link",
+        "outcome": "risky",
+        "feedback": "The page looks like the courier's site, but the address is fake. Now see what it asks for.",
+        "next": "bank-code"
+       },
+       {
+        "id": "report",
+        "label": "Report as spam",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. Report the text, then check the parcel in the official app.",
+        "next": "real-app"
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "safe",
+        "feedback": "Good. If you expect a parcel, check it in the official app.",
+        "next": "real-app"
+       }
+      ]
+     },
+     {
+      "id": "bank-code",
+      "label": "The page asked for card details and the SMS code",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "sahilbank",
+       "sender": [
+        {
+         "text": "SahilBank"
+        }
+       ],
+       "time": "10:49",
+       "messages": [
+        [
+         {
+          "text": "Code: 518204. Payment 412.00 AZN, TZK GLOBAL PAY. Never share this code."
+         }
+        ]
+       ]
+      },
+      "say": "Your bank sent a code. Look at the amount.",
+      "actions": [
+       {
+        "id": "type-code",
+        "label": "Type the code on the site",
+        "kind": "reply",
+        "outcome": "compromised",
+        "feedback": "With this code you approve four hundred twelve manat, not one. Call the bank now on the number on the back of your card."
+       },
+       {
+        "id": "call-bank",
+        "label": "Call the bank on the card's number",
+        "kind": "call-back",
+        "outcome": "safe",
+        "feedback": "Right. The amount next to the code is far higher than the page said, so have the card blocked now."
+       },
+       {
+        "id": "ignore",
+        "label": "Do not type the code anywhere",
+        "kind": "ignore",
+        "outcome": "safe",
+        "feedback": "Good, the payment did not go through. But your card details are already on that site, so call the bank and block the card."
+       }
+      ]
+     },
+     {
+      "id": "real-app",
+      "label": "Official TezKuryer app",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2d-tezkuryer",
+       "app": "TezKuryer",
+       "title": [
+        {
+         "text": "TZ77015342AZ: on its way"
+        }
+       ],
+       "body": [
+        {
+         "text": "Delivery on 4 October. No extra payment is needed."
+        }
+       ],
+       "time": "11:05"
+      },
+      "say": "This notification comes from the official app.",
+      "actions": [
+       {
+        "id": "open",
+        "label": "Open in the app",
+        "kind": "open",
+        "outcome": "safe",
+        "feedback": "Right. The official app shows no extra fee, so the text was fake."
+       },
+       {
+        "id": "later",
+        "label": "Look later",
+        "kind": "ignore",
+        "outcome": "safe",
+        "feedback": "That is fine. If a fee were due, you would see it in the official app too."
+       }
+      ]
+     },
+     {
+      "id": "fine-sms",
+      "label": "13:20 New text",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "w2d-yol-nezaret-fake",
+       "sender": [
+        {
+         "text": "YolNezaret"
+        }
+       ],
+       "time": "13:20",
+       "messages": [
+        [
+         {
+          "text": "You were fined 80 AZN for speeding. Pay today for 50% off: "
+         },
+         {
+          "text": "yolnezaret-cerime.example.net/endirim",
+          "link": {
+           "label": "yolnezaret-cerime.example.net/endirim",
+           "href": "https://yolnezaret-cerime.example.net/endirim"
+          }
+         }
+        ]
+       ]
+      },
+      "say": "Now a fine. Watch the discount.",
+      "actions": [
+       {
+        "id": "pay",
+        "label": "Pay with the discount",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "The discount is there to rush you. The page behind the link collects card details."
+       },
+       {
+        "id": "verify",
+        "label": "I will check fines on the portal myself",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Right. If the fine is real, it will be on the official portal."
+       },
+       {
+        "id": "report",
+        "label": "Report as spam",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Good. If you are unsure, call the police on 102 and ask."
+       }
+      ]
+     },
+     {
+      "id": "aunt-chat",
+      "label": "16:02 Aunt Sabina",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Aunt Sabina"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "The neighbour sent this link, they are giving family support, today is the last day."
+          }
+         ],
+         "time": "16:01"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "ailedestek-qeydiyyat.example.net",
+           "link": {
+            "label": "ailedestek-qeydiyyat.example.net",
+            "href": "https://ailedestek-qeydiyyat.example.net"
+           }
+          }
+         ],
+         "time": "16:01"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Should I enter my card details?"
+          }
+         ],
+         "time": "16:02"
+        }
+       ]
+      },
+      "say": "A relative asks for advice.",
+      "actions": [
+       {
+        "id": "advise-stop",
+        "label": "Don't, let's check the official portal together",
+        "kind": "reply",
+        "outcome": "safe",
+        "feedback": "Great. State benefits never need registration through a link, and you can check them on the official portal."
+       },
+       {
+        "id": "advise-go",
+        "label": "Hurry, it's the last day",
+        "kind": "reply",
+        "outcome": "compromised",
+        "feedback": "The last day trick worked. The page will steal her card details, so she must call her bank now."
+       },
+       {
+        "id": "open-it",
+        "label": "Let me open the link",
+        "kind": "click-link",
+        "outcome": "risky",
+        "feedback": "Opening it to check is risky too. The address is not the official portal anyway."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "pf-choice",
+    "question": {
+     "prompt": "You already typed your card details on a fake page. What comes first?",
+     "options": [
+      {
+       "id": "call-bank",
+       "label": "Call the bank on the number on the back of the card and block it",
+       "correct": true,
+       "feedback": "Right. The sooner the card is blocked, the less you lose."
+      },
+      {
+       "id": "wait",
+       "label": "Wait to see if money leaves the account",
+       "correct": false,
+       "feedback": "Waiting gives the scammer time. Once the money is gone, it may be too late."
+      },
+      {
+       "id": "reply-sms",
+       "label": "Reply to the text and ask for the money back",
+       "correct": false,
+       "feedback": "The scammer will not return it and will ask for a new code instead. Cut contact."
+      }
+     ]
+    },
+    "explain": "Then report it to the police on 102 and keep the message as evidence."
+   },
+   {
+    "type": "recap",
+    "id": "pf-recap",
+    "points": [
+     "Parcel, fine or benefit: never pay through a link in a text.",
+     "Open the official app or portal yourself to check.",
+     "Typed card details? Call the bank now, then the police on 102."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "check-the-page",
+  "title": "Check the page"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 35,
+ "narrationTotalMs": 185125
+}

@@ -1,0 +1,361 @@
+{
+ "module": {
+  "slug": "meeting-security",
+  "title": "Meeting security",
+  "category": "work"
+ },
+ "lesson": {
+  "id": "deepfake-meeting",
+  "title": "Fake participant",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "dm-tutor",
+    "beats": [
+     {
+      "id": "dm-b1",
+      "say": "Today AI can imitate a familiar face and voice in a video call.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "deepfake"
+      }
+     },
+     {
+      "id": "dm-b2",
+      "say": "Urgent money, secrecy and a request outside normal rules: together they are an alarm.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "dialog",
+        "brandRef": "gorus",
+        "tone": "app",
+        "title": [
+         {
+          "text": "Rəşad Məmmədov (Director)"
+         }
+        ],
+        "body": [
+         [
+          {
+           "text": "Camera on, the voice lags a little behind the lips."
+          }
+         ],
+         [
+          {
+           "text": "\"Transfer 46,000 manat to a new account by 15:00 today. This is confidential, tell no one.\"",
+           "spot": "urgent"
+          }
+         ]
+        ],
+        "buttons": [
+         "Unmute",
+         "Leave"
+        ]
+       }
+      },
+      "highlight": "urgent"
+     },
+     {
+      "id": "dm-b3",
+      "say": "The picture can look flawless. So judge the request, not the face.",
+      "mood": "think",
+      "gesture": "shrug",
+      "visual": {
+       "kind": "illustration",
+       "id": "mask"
+      }
+     },
+     {
+      "id": "dm-b4",
+      "say": "Leave the meeting and call that person yourself on a number you already know.",
+      "mood": "happy",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "mfa-phone"
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "dm-sim",
+    "environment": "desktop",
+    "title": "Urgent meeting",
+    "intro": "An urgent meeting invite came from the director and you joined. Look at what is asked and decide.",
+    "steps": [
+     {
+      "id": "the-ask",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "gorus",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Rəşad Məmmədov (Director)"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Camera on, the voice lags a little behind the lips."
+         }
+        ],
+        [
+         {
+          "text": "\"Transfer 46,000 manat to a new account by 15:00 today. This is confidential, tell no one.\"",
+          "spot": "urgent"
+         }
+        ]
+       ],
+       "buttons": [
+        "Unmute",
+        "Leave"
+       ]
+      },
+      "say": "The director is on camera and the voice sounds familiar.",
+      "actions": [
+       {
+        "id": "pay",
+        "label": "OK, I will transfer it now",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "The video was fake and the money went to a scammer. A familiar face does not confirm a payment request."
+       },
+       {
+        "id": "verify",
+        "label": "I will confirm by calling you on the number I know",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Right. A second channel exposes the fake quickly."
+       },
+       {
+        "id": "wave-test",
+        "label": "Please wave at the camera",
+        "kind": "verify",
+        "outcome": "risky",
+        "feedback": "Such tests are no longer reliable, a fake video can wave too. Check on a separate channel."
+       }
+      ]
+     },
+     {
+      "id": "pressure",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "gorus",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Meeting chat"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Rəşad Məmmədov: Do not call, my phone is not with me.",
+          "spot": "no-call"
+         }
+        ],
+        [
+         {
+          "text": "Sevda Kərimli (chief accountant): I am here too, everything is in order."
+         }
+        ]
+       ],
+       "buttons": [
+        "Send"
+       ]
+      },
+      "say": "Now another familiar person confirms it too.",
+      "actions": [
+       {
+        "id": "pay",
+        "label": "If everyone agrees, I will transfer",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "Every participant in the meeting can be fake. In such attacks the whole meeting is sometimes faked."
+       },
+       {
+        "id": "leave",
+        "label": "Leave the meeting and hold the payment",
+        "kind": "hang-up",
+        "outcome": "safe",
+        "feedback": "Right. \"Do not call\" is the best reason to call."
+       }
+      ]
+     },
+     {
+      "id": "new-number",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "sohbet",
+       "app": "Söhbət",
+       "title": [
+        {
+         "text": "+994 50 000 64 27"
+        }
+       ],
+       "body": [
+        {
+         "text": "Rəşad Məmmədov: This is my new number. Is the transfer done?"
+        }
+       ],
+       "time": "14:22"
+      },
+      "say": "After the meeting a message arrives.",
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report to the security team",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right, the scammer is pushing on another channel. Keep the message, it is evidence."
+       },
+       {
+        "id": "reply",
+        "label": "Reply: not yet, doing it now",
+        "kind": "reply",
+        "outcome": "risky",
+        "feedback": "A new number is checked only via the old one you know. This is the scammer's number."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "scenario",
+    "id": "dm-scenario",
+    "title": "The check call",
+    "start": "n1",
+    "nodes": [
+     {
+      "id": "n1",
+      "text": "Mr Rashad is in Ganja today, in sessions all day. He has not set up any meeting.",
+      "speaker": "Assistant Aygün Rəhimova (internal number)",
+      "voice": "woman-2",
+      "channel": "phone",
+      "manner": "natural",
+      "spoken": "Mr Rashad is in Ganja today, <breath> in sessions all day. He has not set up any meeting.",
+      "choices": [
+       {
+        "label": "I tell security and finance right away",
+        "next": "n2",
+        "feedback": "Right. The attacker may target other staff too."
+       },
+       {
+        "label": "He probably forgot, I make the transfer",
+        "outcome": "compromised",
+        "feedback": "The assistant confirmed there was no meeting. The money would have gone to a scammer."
+       }
+      ]
+     },
+     {
+      "id": "n2",
+      "text": "Thank you. Did you keep the invite, the meeting chat and the message?",
+      "speaker": "Security team",
+      "voice": "man-3",
+      "channel": "phone",
+      "manner": "natural",
+      "spoken": "Thank you. <breath> Did you keep the invite, the meeting chat and the message?",
+      "choices": [
+       {
+        "label": "I kept everything and am sending it to you",
+        "outcome": "safe",
+        "feedback": "Great. This evidence helps the inquiry and warns others."
+       },
+       {
+        "label": "I deleted it all because I felt embarrassed",
+        "outcome": "risky",
+        "feedback": "Without evidence the inquiry is harder. Next time delete nothing, there is no shame in this."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "dm-choice",
+    "question": {
+     "prompt": "What is the most reliable way to check the \"director\" from the meeting?",
+     "options": [
+      {
+       "id": "known",
+       "label": "Leave and call the number I already know for him",
+       "correct": true,
+       "feedback": "Right. The scammer does not control that channel."
+      },
+      {
+       "id": "question",
+       "label": "Ask him a personal question in the meeting",
+       "correct": false,
+       "feedback": "The answer may be on social media, or he may dodge. A separate channel is more reliable."
+      },
+      {
+       "id": "quality",
+       "label": "Look closely at the video quality",
+       "correct": false,
+       "feedback": "Modern fake video is very convincing. Do not rely on the picture."
+      },
+      {
+       "id": "reply-invite",
+       "label": "Reply to the invite email",
+       "correct": false,
+       "feedback": "The reply would go back to the scammer. Choose the channel yourself."
+      }
+     ]
+    },
+    "explain": "A second channel is one you choose and already know: the internal number, the number in your contacts, or in person."
+   },
+   {
+    "type": "order",
+    "id": "dm-order",
+    "prompt": "Urgent money is requested in a meeting. Put the steps in order.",
+    "items": [
+     {
+      "id": "hold",
+      "label": "Do not make the payment"
+     },
+     {
+      "id": "leave",
+      "label": "Leave the meeting"
+     },
+     {
+      "id": "call",
+      "label": "Call on a number you know yourself"
+     },
+     {
+      "id": "report",
+      "label": "Report to security and keep the evidence"
+     }
+    ],
+    "explain": "First hold the money, then check and report. Urgency never outranks checking."
+   },
+   {
+    "type": "recap",
+    "id": "dm-recap",
+    "points": [
+     "A familiar face and voice are not proof",
+     "Urgent money plus secrecy means stop",
+     "Call back yourself on a number you know"
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 30,
+ "narrationTotalMs": 154934
+}

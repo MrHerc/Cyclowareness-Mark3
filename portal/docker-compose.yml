@@ -1,0 +1,62 @@
+# Production-style stack: PostgreSQL 16 + the portal image.
+#   1. cp .env.example .env   and set APP_SECRET (32+ random characters), APP_URL, TRUST_PROXY=1 behind a proxy
+#   2. docker compose up -d --build
+#   3. (optional, wipes the database) docker compose --profile tools run --rm seed
+# Values come from .env (both as interpolation source and env_file); DATABASE_URL always points at "db".
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: portal
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-portal}
+      POSTGRES_DB: portal
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U portal -d portal"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgres://portal:${POSTGRES_PASSWORD:-portal}@db:5432/portal
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      APP_SECRET: ${APP_SECRET:?set APP_SECRET in .env (32+ random characters)}
+      JOBS_ENABLED: ${JOBS_ENABLED:-1}
+      # 1 when nginx, Caddy or Traefik terminates TLS in front and sets X-Forwarded-For.
+      TRUST_PROXY: ${TRUST_PROXY:-0}
+    ports:
+      - "3000:3000"
+
+  # Demo organisation loader. Built from the builder stage because the seed is TypeScript and uses
+  # the app's own services. It truncates every table first, so never point it at real data.
+  seed:
+    profiles: [tools]
+    build:
+      context: .
+      target: builder
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgres://portal:${POSTGRES_PASSWORD:-portal}@db:5432/portal
+      APP_URL: ${APP_URL:-http://localhost:3000}
+      APP_SECRET: ${APP_SECRET:?set APP_SECRET in .env (32+ random characters)}
+    command: ["npx", "tsx", "scripts/seed.ts"]
+
+volumes:
+  pgdata:

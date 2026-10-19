@@ -1,0 +1,400 @@
+{
+ "module": {
+  "slug": "physical-security",
+  "title": "Physical security",
+  "category": "physical"
+ },
+ "lesson": {
+  "id": "badge-sense",
+  "title": "Your access badge",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "key",
+      "say": "Your badge is a key to the building. Never lend it, not even to a colleague.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "badge-id"
+      }
+     },
+     {
+      "id": "photos",
+      "say": "Do not post photos showing your badge. A photo makes it easier to fake one.",
+      "mood": "alert",
+      "gesture": "shake",
+      "visual": {
+       "kind": "illustration",
+       "id": "social"
+      }
+     },
+     {
+      "id": "uniform",
+      "say": "An attacker can arrive dressed as a technician, courier or inspector. A uniform is not ID.",
+      "mood": "think",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "mask"
+      }
+     },
+     {
+      "id": "lost",
+      "say": "Lost your badge? Report it at once so it gets blocked. Hide it when you leave the building.",
+      "mood": "happy",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "lock"
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "badge-phone",
+    "environment": "phone",
+    "title": "Badge messages",
+    "intro": "During the day, messages about your badge reach your phone. Answer each one the right way.",
+    "steps": [
+     {
+      "id": "borrow",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Elnur Hüseynov"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hi, I left my badge at home. Leave yours at the guard post, I will return it tonight."
+          }
+         ],
+         "time": "08:52"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "lend",
+        "label": "OK, I will leave it",
+        "kind": "share",
+        "outcome": "risky",
+        "feedback": "Every entry made with your badge is logged in your name. Never lend it."
+       },
+       {
+        "id": "decline",
+        "label": "No, get a temporary badge at the post",
+        "kind": "keep-private",
+        "outcome": "safe",
+        "feedback": "Right. The guard post checks ID and issues a temporary badge."
+       }
+      ]
+     },
+     {
+      "id": "tagged",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "kontakto",
+       "app": "Kontakto",
+       "title": [
+        {
+         "text": "Gulnar tagged you in a photo"
+        }
+       ],
+       "body": [
+        {
+         "text": "“First day with the team!” 24 likes"
+        }
+       ],
+       "time": "13:15"
+      },
+      "say": "Your badge is clearly visible in the photo.",
+      "actions": [
+       {
+        "id": "ask-remove",
+        "label": "Ask Gulnar to change the photo",
+        "kind": "reply",
+        "outcome": "safe",
+        "feedback": "Right. A photo of the badge can help someone fake it or get into the building."
+       },
+       {
+        "id": "like",
+        "label": "Like it and move on",
+        "kind": "ignore",
+        "outcome": "risky",
+        "feedback": "The photo is public and shows the badge design and your name. Do not share badge photos."
+       }
+      ]
+     },
+     {
+      "id": "recon-sms",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "db-alov-servis-fake",
+       "sender": [
+        {
+         "text": "AlovServis"
+        }
+       ],
+       "time": "15:30",
+       "messages": [
+        [
+         {
+          "text": "We are coming tomorrow to check the fire extinguishers. Which floor is the server room on and when do the guards change?"
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "answer",
+        "label": "Reply: 3rd floor, 20:00",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "This is reconnaissance for an attack. Do not give out details about the building."
+       },
+       {
+        "id": "report",
+        "label": "Report to the security team",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. A real contractor does not ask you this by text message."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "risky",
+        "feedback": "You gave nothing away, which is good. But reporting it protects your colleagues too."
+       }
+      ]
+     },
+     {
+      "id": "badge-phish",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "idare-fake",
+       "sender": [
+        {
+         "text": "Idare"
+        }
+       ],
+       "time": "17:05",
+       "messages": [
+        [
+         {
+          "text": "Your access badge is expiring. Update your details so it is not blocked: "
+         },
+         {
+          "text": "kart-yenile.example.net",
+          "link": {
+           "label": "kart-yenile.example.net",
+           "href": "https://kart-yenile.example.net"
+          }
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "open",
+        "label": "Open the link",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "The link leads to a fake page that wants your work password. Only the guard post renews badges."
+       },
+       {
+        "id": "report",
+        "label": "Report as phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. Sort out badge matters in person at the guard post."
+       },
+       {
+        "id": "block",
+        "label": "Block",
+        "kind": "block",
+        "outcome": "safe",
+        "feedback": "Good. Even better, tell the security team as well."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "scenario",
+    "id": "uniform",
+    "title": "The visitor in uniform",
+    "start": "door",
+    "nodes": [
+     {
+      "id": "door",
+      "text": "Hello, we are from Alov Servis, checking the fire extinguishers. Open the server room, there is one in there too.",
+      "speaker": "Man in uniform",
+      "voice": "man",
+      "channel": "in-person",
+      "spoken": "Hello, we are from Alov Servis, checking the fire extinguishers. <breath> Open the server room, there is one in there too.",
+      "visual": {
+       "kind": "illustration",
+       "id": "badge-id"
+      },
+      "choices": [
+       {
+        "label": "I open the server room",
+        "outcome": "compromised",
+        "feedback": "A uniform and a toolbox are not ID. Nobody enters the server room unchecked."
+       },
+       {
+        "label": "I ask for the visitor badge and the job order",
+        "next": "paper",
+        "feedback": "Good. Let us see what he shows."
+       },
+       {
+        "label": "I call the guards",
+        "next": "guard",
+        "feedback": "Correct. Let the guards decide."
+       }
+      ]
+     },
+     {
+      "id": "paper",
+      "text": "The papers are in the van. We come every month, don't you recognise me?",
+      "speaker": "Man in uniform",
+      "voice": "man",
+      "channel": "in-person",
+      "spoken": "The papers are in the van. <short pause> We come every month, don't you recognise me?",
+      "choices": [
+       {
+        "label": "Oh yes, go ahead",
+        "outcome": "compromised",
+        "feedback": "Feeling familiar is part of the trick. No visitor badge, no entry."
+       },
+       {
+        "label": "I call the guards",
+        "next": "guard",
+        "feedback": "Correct. Let the guards decide."
+       }
+      ]
+     },
+     {
+      "id": "guard",
+      "text": "No check with Alov Servis is planned this month. The man has walked towards the exit.",
+      "speaker": "Guard",
+      "voice": "older-man",
+      "channel": "in-person",
+      "manner": "firm",
+      "spoken": "No check with Alov Servis is planned this month. <breath> The man has walked towards the exit.",
+      "character": "guard",
+      "choices": [
+       {
+        "label": "I write to the security team with a description",
+        "outcome": "safe",
+        "feedback": "Great. They will check the cameras and warn the other entrances."
+       },
+       {
+        "label": "He left, so there is no problem",
+        "outcome": "risky",
+        "feedback": "He can come back another day or through another door. Reporting matters."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "badge-rules",
+    "prompt": "Match each situation with the right step.",
+    "pairs": [
+     {
+      "id": "lend",
+      "left": "A colleague asks for your badge",
+      "right": "Send them to the guard post"
+     },
+     {
+      "id": "photo",
+      "left": "A team photo is being taken",
+      "right": "Hide the badge first"
+     },
+     {
+      "id": "outside",
+      "left": "You go shopping after work",
+      "right": "Put the badge in your bag"
+     },
+     {
+      "id": "no-badge",
+      "left": "A uniformed technician has no visitor badge",
+      "right": "Call the guards"
+     }
+    ],
+    "explain": "Your badge is your identity. Use it only in the building and only yourself."
+   },
+   {
+    "type": "choice",
+    "id": "why-hide",
+    "question": {
+     "prompt": "Why hide your badge outside the building?",
+     "options": [
+      {
+       "id": "dirt",
+       "label": "So it does not get dirty",
+       "correct": false,
+       "feedback": "The reason is security, not tidiness."
+      },
+      {
+       "id": "target",
+       "label": "It shows your name and workplace, and it can be stolen",
+       "correct": true,
+       "feedback": "Right: a visible badge tells an attacker whom to approach. Some badges can even be copied up close."
+      },
+      {
+       "id": "rule",
+       "label": "It is just the rule",
+       "correct": false,
+       "feedback": "There is a reason: the badge protects you and the building."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    "explain": "Wear the badge visibly inside and hide it when you leave."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Never lend your badge or post photos of it.",
+     "A uniform is not ID: no visitor badge, no entry.",
+     "Lost your badge? Report it at once."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "left-and-found",
+  "title": "Left and found"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 33,
+ "narrationTotalMs": 150445
+}

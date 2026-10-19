@@ -1,0 +1,393 @@
+{
+ "id": "sharing-official-documents",
+ "title": "Sharing documents",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l2-tutor",
+   "beats": [
+    {
+     "id": "l2-b1",
+     "say": "Official documents travel only through official channels: work email or the document management system.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "l2-b2",
+     "say": "Personal messengers and personal email are outside the institution's control. A document there can get lost or leak.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Nərmin Hüseynova (personal)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "me",
+         "body": [
+          {
+           "text": "Emr_layihesi_2027.pdf",
+           "spot": "doc"
+          }
+         ],
+         "time": "19:42"
+        }
+       ]
+      }
+     },
+     "highlight": "doc"
+    },
+    {
+     "id": "l2-b3",
+     "say": "Read the recipient before you send. Autocomplete can pick a similar name that belongs to someone else.",
+     "mood": "think",
+     "gesture": "point-down",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Send now?"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "To: "
+         },
+         {
+          "text": "aysel.mamedova@poct-mail.example",
+          "spot": "recipient"
+         }
+        ],
+        [
+         {
+          "text": "Attachment: Kadr_siyahisi.xlsx"
+         }
+        ]
+       ],
+       "buttons": [
+        "Cancel",
+        "Send"
+       ]
+      }
+     },
+     "highlight": "recipient"
+    },
+    {
+     "id": "l2-b4",
+     "say": "When in doubt, do not send, ask. If a document went to the wrong place, report it at once.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l2-hotspot",
+   "prompt": "Find the mistakes in this email before it is sent.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "ispoct",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Ready to send"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "To: "
+      },
+      {
+       "text": "rauf.huseynov@poct-mail.example",
+       "spot": "personal-address"
+      }
+     ],
+     [
+      {
+       "text": "Cc: "
+      },
+      {
+       "text": "All staff (212 people)",
+       "spot": "too-many"
+      }
+     ],
+     [
+      {
+       "text": "Attachment: "
+      },
+      {
+       "text": "Vetendas_muracietleri_FIN.xlsx",
+       "spot": "personal-data"
+      }
+     ],
+     [
+      {
+       "text": "Text: If the file does not open, "
+      },
+      {
+       "text": "password: Baki2026",
+       "spot": "password"
+      }
+     ]
+    ],
+    "buttons": [
+     "Edit",
+     "Send"
+    ]
+   },
+   "spots": [
+    {
+     "id": "personal-address",
+     "label": "Personal email address",
+     "explain": "Official documents go to a work address or the document system. Personal email is outside the institution's control."
+    },
+    {
+     "id": "too-many",
+     "label": "Copy to everyone",
+     "explain": "Not all 212 people need this file. Choose only those who do."
+    },
+    {
+     "id": "personal-data",
+     "label": "Citizens' ID numbers",
+     "explain": "A file with personal data goes only to whoever works with it, ideally staying in the system."
+    },
+    {
+     "id": "password",
+     "label": "Password in the same email",
+     "explain": "Sending the password with the file cancels the protection. Give the password through another channel."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "l2-sim",
+   "environment": "phone",
+   "title": "Out of the office",
+   "intro": "You are out of the office and work messages arrive. Choose the right step for each.",
+   "steps": [
+    {
+     "id": "manager-whatsapp",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Nərmin Hüseynova"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hi, I am out of the office. Send the draft order to my WhatsApp, I will look at it here."
+         }
+        ],
+        "time": "18:10"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "share",
+       "label": "Send the file on WhatsApp",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "In a personal messenger the document leaves the institution's control. Managers have an official channel too."
+      },
+      {
+       "id": "reply",
+       "label": "I will send it in SənədAxını",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Right. The document stays in the official system and your manager can open it there."
+      }
+     ]
+    },
+    {
+     "id": "old-colleague",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Nazim (former colleague)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Is your new order out? Send me a photo, I will not tell anyone."
+         }
+        ],
+        "time": "18:25"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "keep",
+       "label": "You will see it on the website once published",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Right. An unpublished document does not leave the institution."
+      },
+      {
+       "id": "share",
+       "label": "Take a photo and send it",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "The photo is no longer under your control. It can be spread anywhere."
+      }
+     ]
+    },
+    {
+     "id": "wrong-recipient",
+     "label": "You meant to write to your colleague Aysel Məmmədova",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "İşPoçt",
+      "title": [
+       {
+        "text": "Email sent"
+       }
+      ],
+      "body": [
+       {
+        "text": "To: aysel.mamedova@poct-mail.example. Attachment: Kadr_siyahisi.xlsx"
+       }
+      ],
+      "time": "18:40"
+     },
+     "say": "Look carefully at the recipient's address.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Tell your manager and the security team",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right. Reporting fast buys time to limit the damage."
+      },
+      {
+       "id": "ignore",
+       "label": "Nobody will notice, forget it",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "The file is at an outside address. Hiding it makes the damage worse, reporting protects."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "l2-choice",
+   "question": {
+    "prompt": "How can you take an official document home to work on it?",
+    "options": [
+     {
+      "id": "personal-mail",
+      "label": "I email it to my personal address",
+      "correct": false,
+      "feedback": "Personal email is outside the institution's control. The document stays there and can leak."
+     },
+     {
+      "id": "usb",
+      "label": "I copy it to my own USB stick",
+      "correct": false,
+      "feedback": "USB sticks are easily lost. Do not carry official documents without your institution's permission."
+     },
+     {
+      "id": "approved",
+      "label": "The way the institution allows: work laptop or VPN",
+      "correct": true,
+      "feedback": "Right. The approved route protects the document and keeps it under control."
+     }
+    ]
+   },
+   "explain": "Working from home follows the institution's rules. If there is no approved route, the document stays in the office."
+  },
+  {
+   "type": "scenario",
+   "id": "l2-scenario",
+   "title": "Shared printer",
+   "start": "p1",
+   "nodes": [
+    {
+     "id": "p1",
+     "text": "You sent a confidential report to the shared printer in the corridor. Right then your phone rings.",
+     "choices": [
+      {
+       "label": "I take the call and go to the printer later",
+       "next": "p2",
+       "outcome": "risky",
+       "feedback": "The paper sits in the printer and anyone passing by can see it."
+      },
+      {
+       "label": "I collect the paper first",
+       "next": "p2",
+       "outcome": "safe",
+       "feedback": "Right. If the printer offers PIN release printing, use it."
+      }
+     ]
+    },
+    {
+     "id": "p2",
+     "text": "Someone else's labelled document is also left in the printer.",
+     "choices": [
+      {
+       "label": "I read it to find out whose it is",
+       "outcome": "risky",
+       "feedback": "There is no need to read it. Hand it to the security team or the head of department."
+      },
+      {
+       "label": "I throw it in the bin",
+       "outcome": "risky",
+       "feedback": "Paper is easy to take from an ordinary bin. Labelled paper is destroyed in a shredder."
+      },
+      {
+       "label": "I hand it, unread, to the security team",
+       "outcome": "safe",
+       "feedback": "Right. The document returns to its owner and nobody reads it."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "l2-recap",
+   "points": [
+    "Official documents go through official channels, not personal messengers or email.",
+    "Check the recipient and attachment before sending, report mistakes at once.",
+    "Do not leave labelled paper in the printer or throw it in an ordinary bin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

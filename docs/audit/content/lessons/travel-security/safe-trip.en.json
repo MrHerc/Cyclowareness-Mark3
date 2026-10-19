@@ -1,0 +1,432 @@
+{
+ "module": {
+  "slug": "travel-security",
+  "title": "Travel Security",
+  "category": "work"
+ },
+ "lesson": {
+  "id": "safe-trip",
+  "title": "Safe Trip",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "b1",
+      "say": "On a trip your devices face more risk than at home: unknown networks, unknown hands and moments of rush.",
+      "mood": "talk",
+      "visual": {
+       "kind": "illustration",
+       "id": "travel"
+      }
+     },
+     {
+      "id": "b2",
+      "say": "Before you leave, remove work data you will not need. If possible, use a separate travel device from your organisation.",
+      "mood": "think",
+      "visual": {
+       "kind": "illustration",
+       "id": "phone-lock"
+      }
+     },
+     {
+      "id": "b3",
+      "say": "Hotel and conference network names are easy to fake. For work, always switch on your organisation's secure connection, the VPN.",
+      "mood": "alert",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "wifi",
+        "networks": [
+         {
+          "ssid": [
+           {
+            "text": "Lumera_Guest"
+           }
+          ],
+          "secured": true,
+          "signal": 3
+         },
+         {
+          "ssid": [
+           {
+            "text": "Lumera_Guest_FREE",
+            "spot": "twin"
+           }
+          ],
+          "secured": false,
+          "signal": 4
+         },
+         {
+          "ssid": [
+           {
+            "text": "Lumera_Lobby_Free_WiFi",
+            "spot": "open-lookalike"
+           }
+          ],
+          "secured": false,
+          "signal": 4
+         },
+         {
+          "ssid": [
+           {
+            "text": "Forum2026_Free",
+            "spot": "conf-open"
+           }
+          ],
+          "secured": false,
+          "signal": 3
+         }
+        ]
+       }
+      },
+      "highlight": "twin"
+     },
+     {
+      "id": "b4",
+      "say": "Avoid public USB charging ports at the airport. Use your own adapter in a wall socket, or your own power bank.",
+      "mood": "alert",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "usb"
+      }
+     },
+     {
+      "id": "b5",
+      "say": "When you are back, have support check the device, and change the passwords of accounts you used on the trip.",
+      "mood": "happy",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "border",
+    "question": {
+     "prompt": "At the border your laptop was taken away for a while. What now?",
+     "options": [
+      {
+       "id": "nothing",
+       "label": "Nothing, they gave it back",
+       "correct": false,
+       "feedback": "If the device was out of your sight, you cannot know what was done to it."
+      },
+      {
+       "id": "report",
+       "label": "I stay out of work accounts and tell the security team",
+       "correct": true,
+       "feedback": "Correct. Do not use it for work until a specialist has checked it."
+      },
+      {
+       "id": "reset",
+       "label": "I reset the device myself",
+       "correct": false,
+       "feedback": "A reset wipes the evidence. Let a specialist decide."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     }
+    },
+    "explain": "A device that left your sight can no longer be trusted. That is why you travel with as little data as possible."
+   },
+   {
+    "type": "hotspot",
+    "id": "hotel-wifi",
+    "prompt": "Find the risky networks.",
+    "artifact": {
+     "kind": "wifi",
+     "networks": [
+      {
+       "ssid": [
+        {
+         "text": "Lumera_Guest"
+        }
+       ],
+       "secured": true,
+       "signal": 3
+      },
+      {
+       "ssid": [
+        {
+         "text": "Lumera_Guest_FREE",
+         "spot": "twin"
+        }
+       ],
+       "secured": false,
+       "signal": 4
+      },
+      {
+       "ssid": [
+        {
+         "text": "Lumera_Lobby_Free_WiFi",
+         "spot": "open-lookalike"
+        }
+       ],
+       "secured": false,
+       "signal": 4
+      },
+      {
+       "ssid": [
+        {
+         "text": "Forum2026_Free",
+         "spot": "conf-open"
+        }
+       ],
+       "secured": false,
+       "signal": 3
+      }
+     ]
+    },
+    "spots": [
+     {
+      "id": "twin",
+      "label": "Evil twin",
+      "explain": "It copies the real hotel network name but has no password. Attackers set up twins like this."
+     },
+     {
+      "id": "open-lookalike",
+      "label": "Free lobby network",
+      "explain": "Having the hotel name in it proves nothing. Ask at reception for the exact name."
+     },
+     {
+      "id": "conf-open",
+      "label": "Open conference network",
+      "explain": "Traffic on an open network is not encrypted. If you must connect, share your phone's mobile data instead."
+     }
+    ],
+    "minToFind": 2
+   },
+   {
+    "type": "swipe",
+    "id": "on-the-road",
+    "prompt": "On the road: safe or a trap?",
+    "cards": [
+     {
+      "id": "conf-qr",
+      "artifact": {
+       "kind": "qr",
+       "caption": [
+        {
+         "text": "Scan to download the forum materials"
+        }
+       ],
+       "destination": [
+        {
+         "text": "forum2026-materials.example.net/app.apk"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "An .apk file installs an app on your phone. You do not need an app for slides, check the official site."
+     },
+     {
+      "id": "booking-ok",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Lumera Hotel"
+         }
+        ],
+        "address": [
+         {
+          "text": "reservations@lumera-hotel.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Your booking is confirmed"
+        }
+       ],
+       "time": "18:22",
+       "body": [
+        [
+         {
+          "text": "Check-in is after 14:00. Payment is made at reception."
+         }
+        ]
+       ]
+      },
+      "verdict": "safe",
+      "explain": "The hotel's own domain, no link, no payment request. A normal confirmation."
+     },
+     {
+      "id": "booking-scam",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Lumera Hotel"
+         }
+        ],
+        "address": [
+         {
+          "text": "billing@lumera-hotels-pay.example.info"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Your booking will be cancelled"
+        }
+       ],
+       "time": "23:51",
+       "body": [
+        [
+         {
+          "text": "Confirm your card details within 2 hours:"
+         }
+        ],
+        [
+         {
+          "text": "lumera-hotels-pay.example.info/card"
+         }
+        ]
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A different domain and an urgent payment demand. Call the hotel yourself to check the booking."
+     },
+     {
+      "id": "room-info",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "Lumera Hotel"
+        }
+       ],
+       "time": "15:03",
+       "messages": [
+        [
+         {
+          "text": "Welcome! Breakfast is 07:00 to 10:30 on the ground floor."
+         }
+        ]
+       ]
+      },
+      "verdict": "safe",
+      "explain": "No link and no request, just information."
+     },
+     {
+      "id": "passport-chat",
+      "artifact": {
+       "kind": "chat",
+       "app": "telegram",
+       "contact": [
+        {
+         "text": "Forum Organising Committee"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Dear delegate, to finish registration, send a photo of your passport and your room number here."
+          }
+         ],
+         "time": "08:10"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Passports are collected on the official registration page, not in an anonymous chat. A room number reveals where you are."
+     }
+    ]
+   },
+   {
+    "type": "scenario",
+    "id": "conference",
+    "title": "At the Conference",
+    "start": "coffee",
+    "nodes": [
+     {
+      "id": "coffee",
+      "text": "Your talk was great! Could you copy the slides to this flash drive?",
+      "speaker": "Attendee (coffee break)",
+      "voice": "young-man",
+      "channel": "in-person",
+      "spoken": "Your talk was great! <breath> Could you copy the slides to this flash drive?",
+      "choices": [
+       {
+        "label": "I politely decline and offer to send them officially",
+        "next": "lobby",
+        "feedback": "Good choice. The stranger's drive never touches your laptop."
+       },
+       {
+        "label": "I plug the drive into my laptop",
+        "outcome": "compromised",
+        "feedback": "A stranger's drive can carry malware. Your laptop and work data are now at risk."
+       }
+      ]
+     },
+     {
+      "id": "lobby",
+      "text": "That evening he approaches you again in the hotel lobby and asks about your organisation's plans for next year.",
+      "choices": [
+       {
+        "label": "I talk only about what is already public",
+        "next": "room",
+        "feedback": "Correct. A pleasant chat can also be a way to collect information."
+       },
+       {
+        "label": "I share details, it is not that secret",
+        "outcome": "risky",
+        "feedback": "Small details add up to a big picture. Keep non-public matters to yourself."
+       }
+      ]
+     },
+     {
+      "id": "room",
+      "text": "You are going out to dinner. Where does the laptop stay?",
+      "choices": [
+       {
+        "label": "I take it with me, or switch it off and lock it in the safe",
+        "outcome": "safe",
+        "feedback": "Well done. A device that is off, encrypted and in your control is best protected."
+       },
+       {
+        "label": "On the desk, the screen is locked",
+        "outcome": "risky",
+        "feedback": "A screen lock helps, but anyone entering the room can tamper with the device."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Travel with minimum data, get the device checked on return.",
+     "VPN on unknown networks, your own charger in public.",
+     "Never leave devices unattended or plug in strangers' drives."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 30,
+ "narrationTotalMs": 166230
+}

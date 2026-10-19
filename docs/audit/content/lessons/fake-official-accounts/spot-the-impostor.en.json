@@ -1,0 +1,539 @@
+{
+ "module": {
+  "slug": "fake-official-accounts",
+  "title": "Fake official accounts",
+  "category": "social"
+ },
+ "lesson": {
+  "id": "spot-the-impostor",
+  "title": "Spot the impostor",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "b1",
+      "say": "Scammers open fake pages and channels in the name of ministries and officials.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "social"
+      }
+     },
+     {
+      "id": "b2",
+      "say": "Look at the address, not the name: an extra letter, word or number gives a fake away.",
+      "mood": "think",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "url",
+        "brandRef": "nd-sxn-fake",
+        "url": [
+         {
+          "text": "https://kontakto.example/"
+         },
+         {
+          "text": "sxn.rasmi.az2",
+          "spot": "handle"
+         }
+        ]
+       }
+      },
+      "highlight": "handle"
+     },
+     {
+      "id": "b3",
+      "say": "A fake account rushes you and asks for money, card details or a click.",
+      "mood": "alert",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "mask"
+      }
+     },
+     {
+      "id": "b4",
+      "say": "When in doubt, open the organisation's website yourself and check its list of official accounts.",
+      "mood": "happy",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "official-messages",
+    "environment": "phone",
+    "title": "Messages in an official name",
+    "intro": "Messages arrive on your phone in a ministry's name. Choose the right step for each.",
+    "steps": [
+     {
+      "id": "aid-channel",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "nd-sxn-fake",
+       "app": "telegram",
+       "contact": [
+        {
+         "text": "Ministry of Social Services | Official"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Dear citizen! Every family is granted a one-off state payment of 300 AZN."
+          }
+         ],
+         "time": "10:02"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "To receive it, enter your card details today: "
+          },
+          {
+           "text": "sxn-yardim.example.net/qeydiyyat",
+           "link": {
+            "label": "sxn-yardim.example.net/qeydiyyat",
+            "href": "https://sxn-yardim.example.net/qeydiyyat"
+           }
+          }
+         ],
+         "time": "10:02"
+        }
+       ]
+      },
+      "say": "The channel name looks official. But where does the link go?",
+      "actions": [
+       {
+        "id": "click",
+        "label": "Open link",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "This page steals card details. A ministry does not ask for your full card details by message to pay aid."
+       },
+       {
+        "id": "report",
+        "label": "Report channel",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. The address is not the ministry's site, and a report gets the channel closed faster."
+       },
+       {
+        "id": "block",
+        "label": "Block",
+        "kind": "block",
+        "outcome": "safe",
+        "feedback": "Good, the channel cannot reach you again. Report it too so others are protected."
+       },
+       {
+        "id": "share",
+        "label": "Send to family group",
+        "kind": "share",
+        "outcome": "risky",
+        "feedback": "Sharing an unchecked message sends your family into the trap too. Check the official site first."
+       }
+      ]
+     },
+     {
+      "id": "real-sms",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "nd-sxn",
+       "sender": [
+        {
+         "text": "SXN"
+        }
+       ],
+       "time": "11:30",
+       "messages": [
+        [
+         {
+          "text": "Your application 2026-118 has been received. You can see its status in your personal account on sxn.example."
+         }
+        ]
+       ]
+      },
+      "say": "Last week you sent an application to the ministry.",
+      "actions": [
+       {
+        "id": "safe",
+        "label": "Mark as safe",
+        "kind": "mark-safe",
+        "outcome": "safe",
+        "feedback": "Right. It matches the application you made, has no link and asks for nothing."
+       },
+       {
+        "id": "report",
+        "label": "Report",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Caution is fine, but this one is genuine: it asks for nothing and lets you open the site yourself."
+       }
+      ]
+     },
+     {
+      "id": "boss-new-number",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Head of Office (new number)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hello. This is my new number. I'm in a meeting and can't call."
+          }
+         ],
+         "time": "12:15"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Send me a copy of this morning's official letter here, urgently."
+          }
+         ],
+         "time": "12:16"
+        }
+       ]
+      },
+      "say": "A familiar title, but a number you do not know.",
+      "actions": [
+       {
+        "id": "send",
+        "label": "Send the letter",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "An official document went to an unknown number. Scammers often write in a manager's name like this."
+       },
+       {
+        "id": "verify",
+        "label": "Call the manager's known number",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Well done. Always check a new number through a channel you already know."
+       },
+       {
+        "id": "report",
+        "label": "Report and block",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. Tell security as well: colleagues may get the same message."
+       },
+       {
+        "id": "ask",
+        "label": "Who is this?",
+        "kind": "reply",
+        "outcome": "risky",
+        "feedback": "Replying keeps the chat going, and the scammer has a convincing answer ready. Check by phone."
+       }
+      ]
+     },
+     {
+      "id": "giveaway-page",
+      "label": "Ministry of Social Services: 1000 free laptops! Sign-up fee 5 AZN",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "nd-sxn-fake",
+       "url": [
+        {
+         "text": "https://kontakto.example/sxn.resmi.official"
+        }
+       ]
+      },
+      "say": "A friend shared this page.",
+      "actions": [
+       {
+        "id": "join",
+        "label": "Take part",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "A state body never charges a fee for a prize. This fake page collects card details."
+       },
+       {
+        "id": "report",
+        "label": "Report page",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. The extra word in the address gives it away, and a report gets it removed."
+       },
+       {
+        "id": "verify",
+        "label": "Check on the ministry's site",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Great habit. If the site has no such contest, report the page."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "fake-channel-signs",
+    "prompt": "Tap the signs of a fake channel.",
+    "artifact": {
+     "kind": "chat",
+     "brandRef": "nd-sxn-fake",
+     "app": "telegram",
+     "contact": [
+      {
+       "text": "Ministry of Social Services"
+      },
+      {
+       "text": " @sxn_rasmi",
+       "spot": "handle"
+      }
+     ],
+     "messages": [
+      {
+       "from": "them",
+       "body": [
+        {
+         "text": "Today is the last day! ",
+         "spot": "urgent"
+        },
+        {
+         "text": "For your compensation payment, "
+        },
+        {
+         "text": "pay a 5 AZN registration fee",
+         "spot": "fee"
+        },
+        {
+         "text": ": "
+        },
+        {
+         "text": "sxn-kompensasiya.example.net",
+         "spot": "link",
+         "link": {
+          "label": "sxn-kompensasiya.example.net",
+          "href": "https://sxn-kompensasiya.example.net"
+         }
+        }
+       ],
+       "time": "16:40"
+      },
+      {
+       "from": "them",
+       "body": [
+        {
+         "text": "Comments are closed, no questions please.",
+         "spot": "no-questions"
+        }
+       ],
+       "time": "16:41"
+      }
+     ]
+    },
+    "spots": [
+     {
+      "id": "handle",
+      "label": "Handle",
+      "explain": "The official handle is @sxn_resmi. One letter has been changed here."
+     },
+     {
+      "id": "urgent",
+      "label": "Rush",
+      "explain": "Scammers rush you so you have no time to think."
+     },
+     {
+      "id": "fee",
+      "label": "Fee request",
+      "explain": "You never have to pay to receive a state payment."
+     },
+     {
+      "id": "link",
+      "label": "Link",
+      "explain": "The domain is not the ministry's sxn.example."
+     },
+     {
+      "id": "no-questions",
+      "label": "Closed comments",
+      "explain": "Closing comments silences people who would warn others."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "swipe",
+    "id": "real-or-fake",
+    "prompt": "Official or fake?",
+    "cards": [
+     {
+      "id": "official-list",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "nd-sxn",
+       "url": [
+        {
+         "text": "https://sxn.example/elaqe/sosial-sebekeler"
+        }
+       ]
+      },
+      "verdict": "safe",
+      "explain": "This is the ministry's own site. Take the list of official accounts from a page like this."
+     },
+     {
+      "id": "extra-word",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "nd-sxn-fake",
+       "url": [
+        {
+         "text": "https://kontakto.example/sxn.resmi.official"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "The extra word at the end is a typical sign of a fake. The official address is sxn.resmi."
+     },
+     {
+      "id": "job-fee",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "nd-sxn-fake",
+       "app": "telegram",
+       "contact": [
+        {
+         "text": "Ministry of Social Services | HR"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Booking a job interview costs 20 AZN. Your place is held after payment."
+          }
+         ],
+         "time": "13:05"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A state body does not ask for money by message for an interview or application."
+     },
+     {
+      "id": "post-to-site",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "kontakto",
+       "app": "Kontakto",
+       "title": [
+        {
+         "text": "Ministry of Social Services"
+        }
+       ],
+       "body": [
+        {
+         "text": "Reception hours have changed. Details on sxn.example."
+        }
+       ],
+       "time": "09:10"
+      },
+      "verdict": "safe",
+      "explain": "It asks for nothing and points to the official site. Still confirm details on the site itself."
+     }
+    ]
+   },
+   {
+    "type": "order",
+    "id": "verify-account",
+    "prompt": "How do you check an account is official? Put the steps in order.",
+    "items": [
+     {
+      "id": "open-site",
+      "label": "Type the organisation's website into the browser yourself"
+     },
+     {
+      "id": "find-list",
+      "label": "Find the links to its official accounts on the site"
+     },
+     {
+      "id": "compare",
+      "label": "Compare the account address letter by letter"
+     },
+     {
+      "id": "report",
+      "label": "If it does not match, report the account to the platform"
+     }
+    ],
+    "explain": "Always start the check from the organisation's own site, never from a link in the message."
+   },
+   {
+    "type": "choice",
+    "id": "badge",
+    "question": {
+     "prompt": "The account has a verification badge next to its name. Does that prove it is official?",
+     "options": [
+      {
+       "id": "yes",
+       "label": "Yes, the badge is a guarantee",
+       "correct": false,
+       "feedback": "On some platforms a badge can be bought, and fakes also put a badge symbol inside the name."
+      },
+      {
+       "id": "followers",
+       "label": "Yes, if it has many followers",
+       "correct": false,
+       "feedback": "Followers can be bought, and an old page can simply be renamed."
+      },
+      {
+       "id": "site",
+       "label": "No, I check it against the link on the organisation's site",
+       "correct": true,
+       "feedback": "Right. The link on the organisation's own site is the most reliable check."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    "explain": "Badges, followers and a neat logo can be faked. The organisation's own site cannot."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Check the account address, not the name: one letter can differ.",
+     "Official bodies do not ask for card details, fees or urgent payments by message.",
+     "When in doubt, open the site yourself and report the fake account."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "stop-fake-news",
+  "title": "Stop fake news"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 41,
+ "narrationTotalMs": 208725
+}

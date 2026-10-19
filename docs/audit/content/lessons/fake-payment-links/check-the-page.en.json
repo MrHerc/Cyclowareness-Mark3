@@ -1,0 +1,401 @@
+{
+ "module": {
+  "slug": "fake-payment-links",
+  "title": "Fake payment links",
+  "category": "social"
+ },
+ "lesson": {
+  "id": "check-the-page",
+  "title": "Check the page",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "cp-tutor",
+    "beats": [
+     {
+      "id": "cp-b1",
+      "say": "A fake payment page can be an exact copy of the real one.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "browser"
+      }
+     },
+     {
+      "id": "cp-b2",
+      "say": "Logo, colours and buttons are the same. The difference is in the address bar and in what it asks for.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "login",
+        "brandRef": "e-xidmet-fake",
+        "brand": "e-Xidmət Portalı",
+        "url": [
+         {
+          "text": "https://"
+         },
+         {
+          "text": "e-xidmet-cerime.example.net",
+          "spot": "domain"
+         },
+         {
+          "text": "/odenis"
+         }
+        ],
+        "fields": [
+         "Card number",
+         "Expiry date",
+         "CVV",
+         "SMS code"
+        ],
+        "button": "Pay: 40 AZN"
+       }
+      },
+      "highlight": "domain"
+     },
+     {
+      "id": "cp-b3",
+      "say": "The padlock proves nothing either: most fake sites have one.",
+      "mood": "think",
+      "gesture": "shrug",
+      "visual": {
+       "kind": "illustration",
+       "id": "lock"
+      }
+     },
+     {
+      "id": "cp-b4",
+      "say": "The safest way: open the portal from your bookmark or type the address yourself.",
+      "mood": "happy",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "swipe",
+    "id": "cp-swipe",
+    "prompt": "Is this page genuine or fake?",
+    "cards": [
+     {
+      "id": "real-fines",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "e-xidmet",
+       "brand": "e-Xidmət Portalı",
+       "url": [
+        {
+         "text": "https://e-xidmet.example/cerimeler"
+        }
+       ],
+       "fields": [
+        "Personal ID code",
+        "Password"
+       ],
+       "button": "Sign in"
+      },
+      "verdict": "safe",
+      "explain": "This is the portal's own domain and you opened it yourself. This is where to check fines."
+     },
+     {
+      "id": "fake-discount",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "e-xidmet-fake",
+       "brand": "e-Xidmət Portalı",
+       "url": [
+        {
+         "text": "https://e-xidmet-endirim.example.net/cerime"
+        }
+       ],
+       "fields": [
+        "Card number",
+        "Expiry date",
+        "CVV",
+        "SMS code"
+       ],
+       "button": "Pay with 50% off"
+      },
+      "verdict": "threat",
+      "explain": "The domain is different and the page wants everything at once: card, code and SMS code. It is a theft form."
+     },
+     {
+      "id": "app-notice",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "e-xidmet",
+       "app": "e-Xidmət",
+       "title": [
+        {
+         "text": "New notice"
+        }
+       ],
+       "body": [
+        {
+         "text": "1 fine is registered in your name. Details: Fines section in the app."
+        }
+       ],
+       "time": "09:15"
+      },
+      "verdict": "safe",
+      "explain": "The notice is inside the official app and has no link. Check and pay the fine right there in the app."
+     },
+     {
+      "id": "fake-benefit",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "e-xidmet-fake",
+       "brand": "Family support",
+       "url": [
+        {
+         "text": "https://ailedestek-qeydiyyat.example.net"
+        }
+       ],
+       "fields": [
+        "Full name",
+        "Personal ID code",
+        "Card number",
+        "CVV"
+       ],
+       "button": "Get the benefit"
+      },
+      "verdict": "threat",
+      "explain": "Receiving money never needs the code on the back of your card. State benefits do not need registration through a link."
+     },
+     {
+      "id": "fake-gateway",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "w2d-manatpay-fake",
+       "brand": "ManatPay",
+       "url": [
+        {
+         "text": "https://manatpay-secure.example.net/3ds"
+        }
+       ],
+       "fields": [
+        "Card number",
+        "CVV",
+        "SMS code",
+        "Card PIN"
+       ],
+       "button": "Confirm"
+      },
+      "verdict": "threat",
+      "explain": "No payment page ever asks for your card PIN. The PIN is only for cash machines and card terminals."
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "cp-sim",
+    "environment": "browser",
+    "title": "The fine link",
+    "intro": "A friend sent you a fine link and you opened it. Make the right call at each step in the browser.",
+    "steps": [
+     {
+      "id": "fake-fine-page",
+      "label": "Unpaid fine: 80 AZN. 50% off today",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "e-xidmet-fake",
+       "url": [
+        {
+         "text": "https://",
+         "reveal": "e-xidmet-cerime.example.net"
+        },
+        {
+         "text": "e-xidmet-cerime.example.net"
+        },
+        {
+         "text": "/odenis"
+        }
+       ]
+      },
+      "say": "Look at the address bar.",
+      "actions": [
+       {
+        "id": "pay",
+        "label": "Pay with the discount",
+        "kind": "click-link",
+        "outcome": "risky",
+        "feedback": "The discount is there to rush you. Now see what the page asks for."
+       },
+       {
+        "id": "close",
+        "label": "Close the tab",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right, this is not the portal's own domain. Now open the portal yourself.",
+        "next": "real-portal"
+       }
+      ]
+     },
+     {
+      "id": "card-form",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "e-xidmet-fake",
+       "brand": "e-Xidmət Portalı",
+       "url": [
+        {
+         "text": "https://e-xidmet-cerime.example.net",
+         "reveal": "e-xidmet-cerime.example.net"
+        }
+       ],
+       "fields": [
+        "Card number",
+        "Expiry date",
+        "CVV",
+        "SMS code"
+       ],
+       "button": "Pay: 40 AZN"
+      },
+      "say": "The page wants the card and the SMS code together.",
+      "actions": [
+       {
+        "id": "submit",
+        "label": "Pay: 40 AZN",
+        "kind": "enter-credentials",
+        "outcome": "compromised",
+        "feedback": "Your card details went to scammers. Call the bank now on the number on your card."
+       },
+       {
+        "id": "close",
+        "label": "Close the tab",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Good call. You typed nothing, now check the fine on the official portal."
+       }
+      ]
+     },
+     {
+      "id": "real-portal",
+      "label": "Fines: no active fines",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "e-xidmet",
+       "url": [
+        {
+         "text": "https://e-xidmet.example/cerimeler",
+         "reveal": "e-xidmet.example"
+        }
+       ]
+      },
+      "say": "You opened the portal from your bookmark.",
+      "actions": [
+       {
+        "id": "open",
+        "label": "View fines",
+        "kind": "open",
+        "outcome": "safe",
+        "feedback": "Right. The official portal shows no fine, so the link was fake."
+       },
+       {
+        "id": "tell-friend",
+        "label": "Tell your friend",
+        "kind": "share",
+        "outcome": "safe",
+        "feedback": "Great. Tell the friend who sent it not to type anything there."
+       }
+      ]
+     },
+     {
+      "id": "benefit-page",
+      "label": "Family support: registration ends today",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "e-xidmet-fake",
+       "url": [
+        {
+         "text": "https://ailedestek-qeydiyyat.example.net",
+         "reveal": "ailedestek-qeydiyyat.example.net"
+        }
+       ]
+      },
+      "say": "This time a neighbour sent you a benefit link.",
+      "actions": [
+       {
+        "id": "register",
+        "label": "Register",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "This form collects card details. State benefits never need registration through a link."
+       },
+       {
+        "id": "close",
+        "label": "Close the tab",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right. Check any benefit only on the official portal."
+       },
+       {
+        "id": "report",
+        "label": "Report the fake site",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Great. Reporting helps get the fake site blocked for others too."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "cp-match",
+    "prompt": "Match what the page asks for with what it means.",
+    "pairs": [
+     {
+      "id": "pin",
+      "left": "Card PIN",
+      "right": "No payment page ever asks for it"
+     },
+     {
+      "id": "sms-code",
+      "left": "SMS code from your bank",
+      "right": "Approves a payment: read the amount first"
+     },
+     {
+      "id": "benefit-cvv",
+      "left": "Card back code to receive a benefit",
+      "right": "Not needed to receive money"
+     },
+     {
+      "id": "discount",
+      "left": "A discount if you pay today",
+      "right": "Rushing you to pay without checking"
+     }
+    ],
+    "explain": "If you are unsure, do not pay. Check the official portal yourself or call the police on 102."
+   },
+   {
+    "type": "recap",
+    "id": "cp-recap",
+    "points": [
+     "Read the address bar: logo and padlock prove nothing.",
+     "A page asking for your PIN, or a card code for a benefit, is fake.",
+     "When unsure: ETX 1654 or police 102."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 27,
+ "narrationTotalMs": 131382
+}

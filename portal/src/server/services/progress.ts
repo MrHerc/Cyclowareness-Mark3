@@ -1,0 +1,181 @@
+/**
+ * Learning progress: XP, streaks, lesson and module completion, attestations and certificates.
+ * Every function takes the database explicitly so the seed can replay history with past dates.
+ */
+import { encodeBase32LowerCaseNoPadding } from "@oslojs/encoding";
+import { and, asc, count, eq, inArray, sql } from "drizzle-orm";
+import type { DB } from "../db/client";
+import * as t from "../db/schema";
+import { dayKey, lessonXp, nextStreak } from "../../lib/domain/gamification";
+
+export function randomToken(bytes = 20): string {
+  const buf = new Uint8Array(bytes);
+  crypto.getRandomValues(buf);
+  return encodeBase32LowerCaseNoPadding(buf);
+}
+
+export async function awardXp(
+  db: DB,
+  p: { tenantId: string; userId: string; amount: number; reason: string; ref?: string; at?: Date },
+): Promise<void> {
+  const at = p.at ?? new Date();
+  await db.insert(t.xpEvents).values({ tenantId: p.tenantId, userId: p.userId, amount: p.amount, reason: p.reason, ref: p.ref ?? null, at });
+  const [u] = await db
+    .select({ cur: t.users.streakCurrent, longest: t.users.streakLongest, last: t.users.streakLastDay, freezes: t.users.streakFreezes })
+    .from(t.users)
+    .where(eq(t.users.id, p.userId));
+  if (!u) return;
+  const day = dayKey(at);
+  // Replayed history (seed) can arrive out of order; never move the streak backwards.
+  const streak =
+    u.last && u.last > day ? { current: u.cur, longest: u.longest, lastDay: u.last, freezes: u.freezes } : nextStreak({ current: u.cur, longest: u.longest, lastDay: u.last }, day, u.freezes);
+  await db
+    .update(t.users)
+    .set({
+      xp: sql`${t.users.xp} + ${p.amount}`,
+      streakCurrent: streak.current,
+      streakLongest: streak.longest,
+      streakLastDay: streak.lastDay,
+      streakFreezes: streak.freezes,
+      lastActiveAt: sql`greatest(coalesce(${t.users.lastActiveAt}, ${at.toISOString()}::timestamptz), ${at.toISOString()}::timestamptz)`,
+    })
+    .where(eq(t.users.id, p.userId));
+}
+
+export type LessonCompletion = {
+  xpAwarded: number;
+  firstTime: boolean;
+  moduleStatus: "in_progress" | "awaiting_attestation" | "completed";
+  percent: number;
+};
+
+export async function completeLesson(
+  db: DB,
+  p: { tenantId: string; userId: string; lessonId: string; secondsSpent?: number; at?: Date },
+): Promise<LessonCompletion> {
+  const at = p.at ?? new Date();
+  const [lesson] = await db
+    .select({ id: t.lessons.id, moduleId: t.lessons.moduleId, key: t.lessons.key, position: t.lessons.position })
+    .from(t.lessons)
+    .where(eq(t.lessons.id, p.lessonId));
+  if (!lesson) throw new Error("Lesson not found");
+  const [mod] = await db.select({ xp: t.modules.xp }).from(t.modules).where(eq(t.modules.id, lesson.moduleId));
+  const siblings = await db.select({ id: t.lessons.id }).from(t.lessons).where(eq(t.lessons.moduleId, lesson.moduleId)).orderBy(asc(t.lessons.position));
+
+  const [existing] = await db
+    .select()
+    .from(t.lessonProgress)
+    .where(and(eq(t.lessonProgress.userId, p.userId), eq(t.lessonProgress.lessonId, p.lessonId)));
+  const firstTime = !existing?.completedAt;
+  const xp = firstTime ? lessonXp(mod.xp, siblings.length, lesson.position) : 0;
+
+  await db
+    .insert(t.lessonProgress)
+    .values({ userId: p.userId, lessonId: p.lessonId, completedAt: at, xpAwarded: xp, attempts: 1, secondsSpent: p.secondsSpent ?? 0 })
+    .onConflictDoUpdate({
+      target: [t.lessonProgress.userId, t.lessonProgress.lessonId],
+      set: {
+        completedAt: sql`coalesce(${t.lessonProgress.completedAt}, ${at.toISOString()}::timestamptz)`,
+        xpAwarded: sql`${t.lessonProgress.xpAwarded} + ${xp}`,
+        attempts: sql`${t.lessonProgress.attempts} + 1`,
+        secondsSpent: sql`${t.lessonProgress.secondsSpent} + ${p.secondsSpent ?? 0}`,
+      },
+    });
+  if (xp > 0) await awardXp(db, { tenantId: p.tenantId, userId: p.userId, amount: xp, reason: "lesson", ref: p.lessonId, at });
+
+  const [{ done }] = await db
+    .select({ done: count() })
+    .from(t.lessonProgress)
+    .where(
+      and(
+        eq(t.lessonProgress.userId, p.userId),
+        inArray(
+          t.lessonProgress.lessonId,
+          siblings.map((s) => s.id),
+        ),
+        sql`${t.lessonProgress.completedAt} is not null`,
+      ),
+    );
+  const percent = Math.round((Number(done) / siblings.length) * 100);
+  const [mp] = await db
+    .select({ status: t.moduleProgress.status })
+    .from(t.moduleProgress)
+    .where(and(eq(t.moduleProgress.userId, p.userId), eq(t.moduleProgress.moduleId, lesson.moduleId)));
+  const status: LessonCompletion["moduleStatus"] =
+    mp?.status === "completed" ? "completed" : percent >= 100 ? "awaiting_attestation" : "in_progress";
+  await db
+    .insert(t.moduleProgress)
+    .values({ userId: p.userId, moduleId: lesson.moduleId, status, percent, lastLessonKey: lesson.key, startedAt: at })
+    .onConflictDoUpdate({
+      target: [t.moduleProgress.userId, t.moduleProgress.moduleId],
+      set: { status, percent, lastLessonKey: lesson.key },
+    });
+  return { xpAwarded: xp, firstTime, moduleStatus: status, percent };
+}
+
+/** Marks the start of a module (Home "Continue" card) without completing anything. */
+export async function touchModule(db: DB, p: { userId: string; moduleId: string; lessonKey: string; at?: Date }) {
+  await db
+    .insert(t.moduleProgress)
+    .values({ userId: p.userId, moduleId: p.moduleId, status: "in_progress", percent: 0, lastLessonKey: p.lessonKey, startedAt: p.at ?? new Date() })
+    .onConflictDoUpdate({ target: [t.moduleProgress.userId, t.moduleProgress.moduleId], set: { lastLessonKey: p.lessonKey } });
+}
+
+async function nextSerial(db: DB, tenantId: string, at: Date): Promise<string> {
+  const [tenant] = await db.select({ slug: t.tenants.slug }).from(t.tenants).where(eq(t.tenants.id, tenantId));
+  const [{ n }] = await db.select({ n: count() }).from(t.certificates).where(eq(t.certificates.tenantId, tenantId));
+  return `${tenant.slug.toUpperCase()}-${at.getFullYear()}-${String(Number(n) + 1).padStart(6, "0")}`;
+}
+
+export async function issueCertificate(
+  db: DB,
+  p: { tenantId: string; userId: string; moduleId?: string; pathId?: string; at?: Date },
+): Promise<{ serial: string; publicToken: string }> {
+  const at = p.at ?? new Date();
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const serial = await nextSerial(db, p.tenantId, at);
+    const publicToken = randomToken(16);
+    try {
+      await db.insert(t.certificates).values({
+        tenantId: p.tenantId,
+        userId: p.userId,
+        moduleId: p.moduleId ?? null,
+        pathId: p.pathId ?? null,
+        serial: attempt === 0 ? serial : `${serial}-${attempt}`,
+        publicToken,
+        issuedAt: at,
+      });
+      return { serial, publicToken };
+    } catch (error) {
+      if (attempt === 4) throw error;
+    }
+  }
+  throw new Error("unreachable");
+}
+
+/**
+ * The learner confirms the module after its last lesson. Only then it counts as completed:
+ * the attestation text is stored verbatim, a certificate is issued and linked risks close.
+ */
+export async function attestModule(
+  db: DB,
+  p: { tenantId: string; userId: string; moduleId: string; text: string; locale: string; at?: Date },
+): Promise<{ publicToken: string } | null> {
+  const at = p.at ?? new Date();
+  const [mp] = await db
+    .select({ status: t.moduleProgress.status })
+    .from(t.moduleProgress)
+    .where(and(eq(t.moduleProgress.userId, p.userId), eq(t.moduleProgress.moduleId, p.moduleId)));
+  if (!mp || mp.status !== "awaiting_attestation") return null;
+  await db.insert(t.attestations).values({ tenantId: p.tenantId, userId: p.userId, moduleId: p.moduleId, text: p.text, locale: p.locale, at });
+  await db
+    .update(t.moduleProgress)
+    .set({ status: "completed", completedAt: at, percent: 100 })
+    .where(and(eq(t.moduleProgress.userId, p.userId), eq(t.moduleProgress.moduleId, p.moduleId)));
+  const cert = await issueCertificate(db, { tenantId: p.tenantId, userId: p.userId, moduleId: p.moduleId, at });
+  await db
+    .update(t.behaviorRisks)
+    .set({ status: "closed", closedAt: at })
+    .where(and(eq(t.behaviorRisks.userId, p.userId), eq(t.behaviorRisks.moduleId, p.moduleId), eq(t.behaviorRisks.status, "open")));
+  return { publicToken: cert.publicToken };
+}

@@ -1,0 +1,549 @@
+{
+ "id": "wrong-recipient",
+ "title": "Wrong recipient",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Email sent to the wrong person is one of the most common leaks. Haste and autocomplete are the usual cause.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "The same name appears twice: one is the work address, the other a personal or outside one. Check the domain.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "app",
+       "title": [
+        {
+         "text": "To: Leyla"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Leyla Həsənova, leyla.hasanova@rxagentlik.az"
+         }
+        ],
+        [
+         {
+          "text": "Leyla Həsənova, "
+         },
+         {
+          "text": "leyla.hasanova85@poct.example",
+          "spot": "external"
+         }
+        ]
+       ],
+       "buttons": [
+        "Select"
+       ]
+      }
+     },
+     "highlight": "external"
+    },
+    {
+     "id": "b3",
+     "say": "Do not rely on recall after sending: it usually fails for outside addresses.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Before sending, check three things: the recipient, the attachment and the names in copy.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "before-send",
+   "environment": "inbox",
+   "title": "Before you send",
+   "intro": "Three drafts are waiting to be sent, and one reply came from outside. Check each one.",
+   "steps": [
+    {
+     "id": "autocomplete",
+     "label": "Draft",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "You"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "Leyla Həsənova <leyla.hasanova85@poct.example>",
+      "subject": [
+       {
+        "text": "List of applications"
+       }
+      ],
+      "time": "11:38",
+      "body": [
+       [
+        {
+         "text": "Leyla, the list you asked for is attached."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Muracietler_2026.xlsx"
+         }
+        ],
+        "size": "310 KB"
+       }
+      ]
+     },
+     "say": "Read the recipient's domain to the end.",
+     "actions": [
+      {
+       "id": "fix",
+       "label": "Check and fix the recipient",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Correct, the name matched but the domain did not. The work address ends in rxagentlik.az."
+      },
+      {
+       "id": "send",
+       "label": "Send",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "The recipient was a personal mailbox. A confidential list left the organisation."
+      }
+     ]
+    },
+    {
+     "id": "reply-all",
+     "label": "Draft",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "You"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "layihe-qrupu@rxagentlik.az, e.rzayev@merkez-konsalting.example",
+      "subject": [
+       {
+        "text": "Re: The partner's price offer"
+       }
+      ],
+      "time": "12:05",
+      "body": [
+       [
+        {
+         "text": "Colleagues, Merkez Konsalting's offer looks expensive, let us talk to another company too."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "remove",
+       "label": "Remove the outside address",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Correct. Reply all keeps every earlier recipient, outsiders included."
+      },
+      {
+       "id": "send",
+       "label": "Send",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "The partner is on the list. The internal discussion would have reached them too."
+      }
+     ]
+    },
+    {
+     "id": "correct-draft",
+     "label": "Draft",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "You"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "kadrlar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Leave application"
+       }
+      ],
+      "time": "12:20",
+      "body": [
+       [
+        {
+         "text": "Hello, my leave application is attached."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Erize.pdf"
+         }
+        ],
+        "size": "52 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "send",
+       "label": "Send",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "All in order: an internal address, the right file, no extra recipients."
+      },
+      {
+       "id": "check",
+       "label": "Check again",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Checking never hurts. This email was right and can go."
+      }
+     ]
+    },
+    {
+     "id": "partner-notice",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "merkez-konsalting",
+      "from": {
+       "name": [
+        {
+         "text": "Elçin Rzayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "e.rzayev@merkez-konsalting.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Did this reach me by mistake?"
+       }
+      ],
+      "time": "13:10",
+      "body": [
+       [
+        {
+         "text": "Hello, yesterday your department sent me the staff salary table. Probably a mistake. What should I do?"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Forward to the security team",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Correct. A misdirected email is an incident, the specialist will tell you what to do."
+      },
+      {
+       "id": "reply",
+       "label": "Reply: please delete it",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Asking for deletion is right, but tell the security team first."
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "The leak does not go away. Report it so specialists can follow up."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "recall",
+   "question": {
+    "prompt": "An email went to the wrong address and you recalled it. Is that enough?",
+    "options": [
+     {
+      "id": "enough",
+      "label": "Yes, the email will be removed",
+      "correct": false,
+      "feedback": "Recall usually fails for outside addresses and the email may already be read."
+     },
+     {
+      "id": "report",
+      "label": "No, I still report to the security team at once",
+      "correct": true,
+      "feedback": "Correct. Recall may fail, reporting is a must."
+     },
+     {
+      "id": "wait",
+      "label": "I wait, maybe they will not open it",
+      "correct": false,
+      "feedback": "Waiting does not reduce the harm. Reporting fast gives more options."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "inbox"
+    }
+   },
+   "explain": "If you sent it wrong, do not hide it: tell your manager and the security team at once."
+  },
+  {
+   "type": "swipe",
+   "id": "recipient-check",
+   "prompt": "Is this recipient list right?",
+   "cards": [
+    {
+     "id": "hr",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "You"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "kadrlar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Request for a certificate"
+       }
+      ],
+      "time": "14:00",
+      "body": [
+       [
+        {
+         "text": "Hello, I need an employment certificate."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "An internal address, the right department, no extra recipients."
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "You"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "Rəşad Əliyev <reshad.aliyev@rxagentlik-az.com>",
+      "subject": [
+       {
+        "text": "Budget table"
+       }
+      ],
+      "time": "14:12",
+      "body": [
+       [
+        {
+         "text": "Rashad, the table is attached."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Budce_2027.xlsx"
+         }
+        ],
+        "size": "180 KB"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "rxagentlik-az.com is not your domain. Autocomplete offered an old or fake address."
+    },
+    {
+     "id": "all-staff",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "You"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "butun-emekdaslar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "A colleague's medical note"
+       }
+      ],
+      "time": "14:30",
+      "body": [
+       [
+        {
+         "text": "The note is attached."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Arayis.pdf"
+         }
+        ],
+        "size": "96 KB"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A personal document must not go to all staff. Send it only to the person who needs it."
+    },
+    {
+     "id": "no-bcc",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "You"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "40 partners, all in the To field",
+      "subject": [
+       {
+        "text": "Holiday greetings"
+       }
+      ],
+      "time": "15:00",
+      "body": [
+       [
+        {
+         "text": "Dear partners, happy holidays!"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "In a mass email, put addresses in Bcc so recipients do not see each other."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "address-fields",
+   "prompt": "Put each recipient in the right field.",
+   "pairs": [
+    {
+     "id": "to",
+     "left": "Main recipient, a reply is expected",
+     "right": "To"
+    },
+    {
+     "id": "cc",
+     "left": "A colleague kept informed",
+     "right": "Cc"
+    },
+    {
+     "id": "bcc",
+     "left": "Many recipients who do not know each other",
+     "right": "Bcc"
+    }
+   ],
+   "explain": "The right field keeps outsiders from seeing addresses they do not need."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Before sending, read the recipient's domain to the end.",
+    "Check reply all and any outside addresses in copy.",
+    "If it went wrong, do not rely on recall, report at once."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

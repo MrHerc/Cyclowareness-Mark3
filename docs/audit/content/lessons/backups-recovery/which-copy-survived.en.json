@@ -1,0 +1,446 @@
+{
+ "module": {
+  "slug": "backups-recovery",
+  "title": "Backup and recovery",
+  "category": "data"
+ },
+ "lesson": {
+  "id": "which-copy-survived",
+  "title": "Which copy survived?",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "br1-tutor",
+    "beats": [
+     {
+      "id": "br1-b1",
+      "say": "Hello! The archive department keeps ten years of documents. Today you learn how to keep their copies the right way.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "folder"
+      }
+     },
+     {
+      "id": "br1-b2",
+      "say": "Ransomware encrypts more than the computer. It also locks the flash drive plugged into it and the network folder.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "dialog",
+        "tone": "warning",
+        "title": [
+         {
+          "text": "Your files are encrypted"
+         }
+        ],
+        "body": [
+         [
+          {
+           "text": "The Documents folder is locked."
+          }
+         ],
+         [
+          {
+           "text": "Connected drives and the network folder are locked too.",
+           "spot": "connected"
+          }
+         ]
+        ],
+        "buttons": [
+         "Pay"
+        ]
+       }
+      },
+      "highlight": "connected"
+     },
+     {
+      "id": "br1-b3",
+      "say": "The rule: three copies, two kinds of media, one somewhere else. At least one must be fully off the network.",
+      "mood": "think",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "stat",
+       "value": "3-2-1",
+       "label": "3 copies, 2 kinds of media, 1 copy off-site"
+      }
+     },
+     {
+      "id": "br1-b4",
+      "say": "And remember: an untested copy can turn out empty when you need it. Test a restore from time to time.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "br1-choice",
+    "question": {
+     "prompt": "A ransom note is on the screen. Which copy most likely survived?",
+     "options": [
+      {
+       "id": "usb",
+       "label": "The flash drive left plugged into the computer",
+       "correct": false,
+       "feedback": "A connected drive is like part of the computer. Ransomware encrypts it too."
+      },
+      {
+       "id": "sync",
+       "label": "The cloud folder that syncs automatically",
+       "correct": false,
+       "feedback": "Syncing copies the encrypted files to the cloud too. Older versions sometimes remain, but you cannot count on it."
+      },
+      {
+       "id": "network",
+       "label": "The department's network folder",
+       "correct": false,
+       "feedback": "If the computer can reach the network folder, so can the ransomware."
+      },
+      {
+       "id": "offline",
+       "label": "The disk unplugged on Friday and locked in the safe",
+       "correct": true,
+       "feedback": "Correct. A disk cut off from the computer and the network stays out of reach during an attack."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "ransomware"
+     }
+    },
+    "explain": "The copy that survives an attack is the one off the network. That is why one copy is always unplugged and kept apart."
+   },
+   {
+    "type": "simulation",
+    "id": "br1-sim",
+    "environment": "desktop",
+    "title": "Archive department",
+    "intro": "You work in the archive department. From Friday evening to Monday, make the right call in every window.",
+    "steps": [
+     {
+      "id": "backup-done",
+      "label": "Friday, 17:40",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2f-ehtiyat-komekcisi",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Weekly backup is ready"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "ARXIV-DISK: ten years of documents, 212 GB. You can remove the disk now."
+         }
+        ]
+       ],
+       "buttons": [
+        "Eject disk",
+        "Keep connected"
+       ]
+      },
+      "say": "The weekly backup is ready.",
+      "actions": [
+       {
+        "id": "eject",
+        "label": "Eject disk",
+        "kind": "eject",
+        "outcome": "safe",
+        "feedback": "Correct. An ejected disk cannot be encrypted in the next attack."
+       },
+       {
+        "id": "keep",
+        "label": "Keep connected",
+        "kind": "later",
+        "outcome": "risky",
+        "feedback": "A connected disk can be encrypted along with the computer. Eject it as soon as the backup ends."
+       }
+      ]
+     },
+     {
+      "id": "restore-test",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2f-ehtiyat-komekcisi",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Restore check"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Restore one folder from the latest copy as a test?"
+         }
+        ]
+       ],
+       "buttons": [
+        "Test restore",
+        "Skip"
+       ]
+      },
+      "actions": [
+       {
+        "id": "test",
+        "label": "Test restore",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Well done. Only a copy that opens is a real copy."
+       },
+       {
+        "id": "skip",
+        "label": "Skip",
+        "kind": "later",
+        "outcome": "risky",
+        "feedback": "The copy may be broken, and you would find out at the worst moment. Test restores regularly."
+       }
+      ]
+     },
+     {
+      "id": "personal-cloud",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "buludxidmet",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Upload the folder to your personal account?"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Arxiv_2016_2026: 212 GB. Account: sevda.k@poct-mail.example.net"
+         }
+        ]
+       ],
+       "buttons": [
+        "Upload",
+        "Decline"
+       ]
+      },
+      "actions": [
+       {
+        "id": "upload",
+        "label": "Upload",
+        "kind": "share",
+        "outcome": "risky",
+        "feedback": "Work documents belong only where your office has approved. A personal cloud does not protect the copy and can leak the data."
+       },
+       {
+        "id": "decline",
+        "label": "Decline",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. If an extra copy is needed, technical support creates it in an approved place."
+       }
+      ]
+     },
+     {
+      "id": "ransom-monday",
+      "label": "Monday, 09:05",
+      "artifact": {
+       "kind": "dialog",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Your files are encrypted"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "The network folder and connected drives are locked. Pay within 72 hours for the key."
+         }
+        ]
+       ],
+       "buttons": [
+        "Pay",
+        "Close"
+       ]
+      },
+      "say": "On Monday morning, this message is on the screen.",
+      "actions": [
+       {
+        "id": "isolate",
+        "label": "Unplug cable, turn off Wi-Fi",
+        "kind": "disconnect",
+        "outcome": "safe",
+        "feedback": "Correct. Cut it off from the network without shutting it down, and call technical support right away."
+       },
+       {
+        "id": "pay",
+        "label": "Pay",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "Paying does not guarantee the files come back. Recovery will come from the copy you kept apart."
+       }
+      ]
+     },
+     {
+      "id": "sync-alert",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "buludxidmet",
+       "app": "BuludXidmət",
+       "title": [
+        {
+         "text": "1,240 files changed"
+        }
+       ],
+       "body": [
+        {
+         "text": "The department folder was synced to the cloud."
+        }
+       ],
+       "time": "09:07"
+      },
+      "actions": [
+       {
+        "id": "report",
+        "label": "Tell technical support",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Correct, syncing copied the encrypted files too. A specialist will restore the older versions."
+       },
+       {
+        "id": "restore-self",
+        "label": "Restore from the cloud myself",
+        "kind": "open",
+        "outcome": "risky",
+        "feedback": "Files restored onto an infected computer can be encrypted again. Specialists restore on a clean computer."
+       }
+      ]
+     },
+     {
+      "id": "offline-disk",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "it-tehlukesizlik",
+       "app": "IT Security",
+       "title": [
+        {
+         "text": "Bring the disk from the safe"
+        }
+       ],
+       "body": [
+        {
+         "text": "Do not plug ARXIV-DISK in anywhere. We will restore together on a clean computer."
+        }
+       ],
+       "time": "10:30"
+      },
+      "actions": [
+       {
+        "id": "hand-over",
+        "label": "I hand the disk to the specialist",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Well done. The restore will happen on a cleaned computer, under a specialist's control."
+       },
+       {
+        "id": "plug",
+        "label": "I plug the disk into this computer myself",
+        "kind": "plug-in",
+        "outcome": "compromised",
+        "feedback": "The last copy can get encrypted on an infected computer. Give the disk only to the specialist."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "br1-match",
+    "prompt": "Match each part of the rule with its meaning.",
+    "pairs": [
+     {
+      "id": "three",
+      "left": "3 copies",
+      "right": "The original file and two backups"
+     },
+     {
+      "id": "two",
+      "left": "2 kinds of media",
+      "right": "For example, an external disk and an approved cloud"
+     },
+     {
+      "id": "one",
+      "left": "1 copy off-site",
+      "right": "In another building and off the network"
+     },
+     {
+      "id": "test",
+      "left": "Restore test",
+      "right": "Checking regularly that the copy opens"
+     }
+    ],
+    "explain": "With three copies, two media and one copy off-site, if one is lost another remains. A restore test proves the copy works."
+   },
+   {
+    "type": "choice",
+    "id": "br1-work-files",
+    "question": {
+     "prompt": "Where do you keep important work documents?",
+     "options": [
+      {
+       "id": "approved",
+       "label": "In my office's approved folder",
+       "correct": true,
+       "feedback": "Correct. Technical support makes and checks the copies there."
+      },
+      {
+       "id": "desktop-usb",
+       "label": "On the desktop, and I copy them to my own flash drive in the evening",
+       "correct": false,
+       "feedback": "A personal flash drive can get lost or infected. Nobody checks a copy like that."
+      },
+      {
+       "id": "personal-cloud",
+       "label": "In my personal cloud account, it is handy",
+       "correct": false,
+       "feedback": "In a personal account, a work document leaves your office's control. That is also a data leak."
+      }
+     ]
+    },
+    "explain": "Technical support protects and restores the copy of a file kept in an approved place. A work file kept elsewhere is neither protected nor restored."
+   },
+   {
+    "type": "recap",
+    "id": "br1-recap",
+    "points": [
+     "Three copies, two media, one off-site.",
+     "Keep at least one copy off the network.",
+     "Test restores regularly."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "phone-backup",
+  "title": "Phone backup"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 33,
+ "narrationTotalMs": 196117
+}

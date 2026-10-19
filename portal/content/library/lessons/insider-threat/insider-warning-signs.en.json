@@ -1,0 +1,403 @@
+{
+ "id": "insider-warning-signs",
+ "title": "Warning signs",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "iw-tutor",
+   "beats": [
+    {
+     "id": "iw-b1",
+     "say": "Sometimes someone inside wants to take data on purpose. Knowing the signs matters.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "iw-b2",
+     "say": "Asking for someone else's password and interest in files outside one's job are serious warning signs.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "sohbet",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Tural Həsənov"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "They closed my access. "
+          },
+          {
+           "text": "Give me your password, I will grab a few folders from the archive.",
+           "spot": "ask-pass"
+          }
+         ],
+         "time": "18:47"
+        }
+       ]
+      }
+     },
+     "highlight": "ask-pass"
+    },
+    {
+     "id": "iw-b3",
+     "say": "But do not investigate yourself, accuse or spread rumours. One sign is not proof of guilt.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "iw-b4",
+     "say": "Report what you saw to the security team in confidence. Specialists will check the rest.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "iw-sim",
+   "environment": "phone",
+   "title": "Messages from colleagues",
+   "intro": "It is evening and messages from colleagues arrive on your phone. Choose the right reply to each.",
+   "steps": [
+    {
+     "id": "ask-password",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Tural Həsənov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hi, they closed my access by mistake."
+         }
+        ],
+        "time": "18:45"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Give me your password, I will take the project folders from the archive and return it tomorrow."
+         }
+        ],
+        "time": "18:47"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "give",
+       "label": "Send the password",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Everything done with your password is logged in your name. Never give it to anyone, colleagues included."
+      },
+      {
+       "id": "refuse",
+       "label": "I cannot give my password, contact IT support",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Right. If access was closed, only IT and the manager can sort it out."
+      }
+     ]
+    },
+    {
+     "id": "ask-usb",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Tural Həsənov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Fine. Then copy the folders to a USB stick, I will pick it up tonight."
+         }
+        ],
+        "time": "18:52"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "I will need them at my new job."
+         }
+        ],
+        "time": "18:52"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "copy",
+       "label": "OK, I will copy them",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Your organisation's data does not go to another job. Copying it makes you part of the leak."
+      },
+      {
+       "id": "no",
+       "label": "No, I cannot do that",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Right, a calm short no is enough. Now tell the security team."
+      }
+     ]
+    },
+    {
+     "id": "group-gossip",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Department group"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Leyla: I saw Tural in the archive at night. Let's check his computer and then tell everyone."
+         }
+        ],
+        "time": "19:10"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "join",
+       "label": "Agreed, let's check",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Checking on your own can spoil evidence and damage an innocent person."
+      },
+      {
+       "id": "channel",
+       "label": "Not in the group. Let's report what we saw to security in confidence",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Right. The facts go to the right channel and no rumour starts."
+      }
+     ]
+    },
+    {
+     "id": "security-reply",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Security team"
+        }
+       ],
+       "address": [
+        {
+         "text": "tehlukesizlik@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Your report is registered"
+       }
+      ],
+      "time": "19:40",
+      "body": [
+       [
+        {
+         "text": "Thank you. Please do not discuss this with colleagues, we will contact you if needed."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "ok",
+       "label": "Reply: understood",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Right. Confidentiality protects both the inquiry and your colleague."
+      },
+      {
+       "id": "spread",
+       "label": "Forward to the department group",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Spreading the report harms the inquiry and can unfairly hurt your colleague."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "iw-signs",
+   "question": {
+    "prompt": "Which ones are serious warning signs?",
+    "options": [
+     {
+      "id": "access",
+      "label": "Asking for access to systems outside one's job",
+      "correct": true,
+      "feedback": "Right. Interest in access that is not needed deserves attention."
+     },
+     {
+      "id": "password",
+      "label": "Asking for someone else's password",
+      "correct": true,
+      "feedback": "Right. Someone with proper access does not need another person's password."
+     },
+     {
+      "id": "mass-copy",
+      "label": "Copying many files to a personal USB stick or mail",
+      "correct": true,
+      "feedback": "Right. Data leaving the organisation is the clearest sign."
+     },
+     {
+      "id": "late",
+      "label": "Sometimes working late",
+      "correct": false,
+      "feedback": "On its own this is normal: many people work late. One sign is no reason to accuse."
+     },
+     {
+      "id": "questions",
+      "label": "Asking many questions in meetings",
+      "correct": false,
+      "feedback": "That is interest in the work, not a threat."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "A sign is not an accusation, it is a reason to report. Specialists decide."
+  },
+  {
+   "type": "scenario",
+   "id": "iw-scenario",
+   "title": "What did you see?",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "For a week Kamal has copied secret project files to a personal flash drive every evening. Once he said: \"Nobody values me here.\"",
+     "choices": [
+      {
+       "label": "I report what I saw to security in confidence",
+       "next": "n2",
+       "feedback": "Right. You pass on facts, specialists draw conclusions."
+      },
+      {
+       "label": "I ask him directly: why are you taking the files?",
+       "outcome": "risky",
+       "feedback": "An accusation causes conflict and may lead to traces being wiped. Leave it to specialists."
+      },
+      {
+       "label": "I search his desk myself in the evening",
+       "outcome": "risky",
+       "feedback": "Searching on your own can break the rules and spoil evidence."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Thank you. Please write down what you saw, when and where.",
+     "speaker": "Security team",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Thank you. <breath> Please write down what you saw, when and where.",
+     "choices": [
+      {
+       "label": "I write only what I saw, with dates and times",
+       "outcome": "safe",
+       "feedback": "Great. Precise facts are the basis of a fair check."
+      },
+      {
+       "label": "I also add my opinions about his character",
+       "outcome": "risky",
+       "feedback": "Guesswork can lead to an unfair result. Write only the facts you saw."
+      },
+      {
+       "label": "I tell colleagues to keep away from him",
+       "outcome": "risky",
+       "feedback": "That is a rumour and can unfairly hurt your colleague. Only the security team should know."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "iw-order",
+   "prompt": "You notice suspicious behaviour. Put the steps in order.",
+   "items": [
+    {
+     "id": "calm",
+     "label": "Stay calm and accuse no one"
+    },
+    {
+     "id": "note",
+     "label": "Note what you saw, with date and time"
+    },
+    {
+     "id": "report",
+     "label": "Report to the security team in confidence"
+    },
+    {
+     "id": "quiet",
+     "label": "Afterwards, do not discuss it with others"
+    }
+   ],
+   "explain": "You pass on the facts, the inquiry and decision belong to specialists. If your organisation names another channel, use it."
+  },
+  {
+   "type": "recap",
+   "id": "iw-recap",
+   "points": [
+    "Never hand over your password or work data",
+    "Do not accuse and do not investigate yourself",
+    "Report the facts to security in confidence"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

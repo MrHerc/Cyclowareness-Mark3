@@ -1,0 +1,478 @@
+{
+ "id": "phone-backup",
+ "title": "Phone backup",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "br2-tutor",
+   "beats": [
+    {
+     "id": "br2-b1",
+     "say": "When a phone is lost, the biggest loss is often family photos. Protecting them takes a few minutes.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "br2-b2",
+     "say": "If you have seen a notification like this, the photos from recent months have no copy.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2f-telefon-ayarlari",
+       "app": "Settings",
+       "title": [
+        {
+         "text": "Backup is off"
+        }
+       ],
+       "body": [
+        {
+         "text": "Last backup: 143 days ago",
+         "spot": "days"
+        }
+       ],
+       "time": "21:10"
+      }
+     },
+     "highlight": "days"
+    },
+    {
+     "id": "br2-b3",
+     "say": "But careful: a message saying your storage is full and photos will be deleted is a favourite scam.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "buludxidmet-fake",
+       "sender": [
+        {
+         "text": "BuludXidmet"
+        }
+       ],
+       "time": "10:02",
+       "messages": [
+        [
+         {
+          "text": "Your storage is full. Your photos will be deleted in 24 hours."
+         }
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "id": "br2-b4",
+     "say": "Turn on backup in the phone's own settings, then restore one photo to check it works.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "br2-order",
+   "prompt": "Set up a backup on your phone. Put the steps in order.",
+   "items": [
+    {
+     "id": "turn-on",
+     "label": "Turn on automatic backup in Settings"
+    },
+    {
+     "id": "first-run",
+     "label": "Connect to Wi-Fi and a charger, wait for the first backup"
+    },
+    {
+     "id": "check-date",
+     "label": "Check that the last backup date is today"
+    },
+    {
+     "id": "test-restore",
+     "label": "Open one photo on another device to test the restore"
+    }
+   ],
+   "explain": "A backup only helps when it works, so check the date and restore one photo. Protect the cloud account with two-step verification too."
+  },
+  {
+   "type": "hotspot",
+   "id": "br2-hotspot",
+   "prompt": "Find the signs of a scam in this message.",
+   "artifact": {
+    "kind": "sms",
+    "brandRef": "buludxidmet-fake",
+    "sender": [
+     {
+      "text": "BuludXidmet"
+     }
+    ],
+    "time": "10:02",
+    "messages": [
+     [
+      {
+       "text": "Your storage is 100% full.",
+       "spot": "full"
+      }
+     ],
+     [
+      {
+       "text": "All your photos will be deleted within 24 hours.",
+       "spot": "deadline"
+      }
+     ],
+     [
+      {
+       "text": "Upgrade your plan for just 1.99 AZN: ",
+       "spot": "small-fee"
+      },
+      {
+       "text": "buludxidmet-plan.example.info",
+       "spot": "link"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "full",
+     "label": "Storage full",
+     "explain": "When storage is full, new backups stop, but old photos are not deleted at once. Check storage yourself in the phone's settings."
+    },
+    {
+     "id": "deadline",
+     "label": "Deadline",
+     "explain": "Fear and a deadline push you to pay without thinking."
+    },
+    {
+     "id": "small-fee",
+     "label": "Small amount",
+     "explain": "A small amount lowers your guard. The real goal is your card details."
+    },
+    {
+     "id": "link",
+     "label": "Strange domain",
+     "explain": "This is not the cloud service's domain. Change your plan only in the phone's settings."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "br2-sim",
+   "environment": "phone",
+   "title": "Where are your photos?",
+   "intro": "There are a few notifications on your phone. For each one, choose the step that protects your photos.",
+   "steps": [
+    {
+     "id": "backup-off",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-telefon-ayarlari",
+      "app": "Settings",
+      "title": [
+       {
+        "text": "Backup is off"
+       }
+      ],
+      "body": [
+       {
+        "text": "Last backup: 143 days ago. Turn it on now?"
+       }
+      ],
+      "time": "21:10"
+     },
+     "actions": [
+      {
+       "id": "turn-on",
+       "label": "Turn on backup",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Correct. From now on, photos are copied automatically every night."
+      },
+      {
+       "id": "later",
+       "label": "Later",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "If the phone is lost today, five months of photos go with it. Turn on backup now."
+      }
+     ]
+    },
+    {
+     "id": "storage-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "buludxidmet-fake",
+      "sender": [
+       {
+        "text": "BuludXidmet"
+       }
+      ],
+      "time": "10:02",
+      "messages": [
+       [
+        {
+         "text": "Your storage is full. Your photos will be deleted in 24 hours. Upgrade your plan: "
+        },
+        {
+         "text": "buludxidmet-plan.example.info",
+         "link": {
+          "label": "buludxidmet-plan.example.info",
+          "href": "https://buludxidmet-plan.example.info/odenis"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "In the morning, a message like this arrives.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Open link",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "The link does not go to the cloud service's site. Check storage only in the phone's settings.",
+       "next": "card-page"
+      },
+      {
+       "id": "report",
+       "label": "Report as spam",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Well done. This is a fake: a real service does not threaten to delete your photos in a day.",
+       "next": "free-app"
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Correct. Check your storage yourself in the settings.",
+       "next": "free-app"
+      }
+     ]
+    },
+    {
+     "id": "card-page",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "buludxidmet-fake",
+      "brand": "BuludXidmət",
+      "url": [
+       {
+        "text": "https://buludxidmet-plan.example.info/odenis"
+       }
+      ],
+      "fields": [
+       "Card number",
+       "Expiry date",
+       "CVV"
+      ],
+      "button": "Pay 1.99 AZN"
+     },
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Pay 1.99 AZN",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Your card details went to the fraudster. Call the bank on the number on the back of the card right away and block it."
+      },
+      {
+       "id": "close",
+       "label": "Close page",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Good thing you stopped. Check your storage plan only in the phone's settings."
+      }
+     ]
+    },
+    {
+     "id": "free-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2f-foto-ehtiyat",
+      "app": "Foto Ehtiyat Pulsuz",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Photos and videos"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Contacts"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "SMS messages"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Call log"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "You found a free backup app in the store.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Deny",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Correct, a photo backup needs no access to texts or contacts. The phone's own backup is enough."
+      },
+      {
+       "id": "allow",
+       "label": "Allow",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "With text message access, the app can read your bank codes. Delete an app like this right away."
+      }
+     ]
+    },
+    {
+     "id": "lost-phone",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-telefon-ayarlari",
+      "app": "Settings",
+      "title": [
+       {
+        "text": "Restore from backup?"
+       }
+      ],
+      "body": [
+       {
+        "text": "Last backup: yesterday 02:10. Photos: 4,812"
+       }
+      ],
+      "time": "19:45"
+     },
+     "say": "A month later, the phone is lost on the metro. You sign in on a new phone.",
+     "actions": [
+      {
+       "id": "restore",
+       "label": "Restore",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Well done. Because backup was on, the family photos are all there."
+      },
+      {
+       "id": "fresh",
+       "label": "Set up as a new phone",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Then the photos will not come to the new phone. Restore from the backup."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "br2-scenario",
+   "title": "The phone is lost",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "In the evening you lost your phone on the metro. What do you do first when you get home?",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     },
+     "choices": [
+      {
+       "label": "I lock the phone from another device and check where it is",
+       "next": "n2",
+       "feedback": "Correct. Locking stops the finder from reaching your photos and accounts."
+      },
+      {
+       "label": "I wait till morning, maybe someone will call",
+       "outcome": "risky",
+       "feedback": "On an unlocked phone your accounts are at risk. Lock it right away."
+      },
+      {
+       "label": "I post my number and address on social media",
+       "outcome": "risky",
+       "feedback": "Personal details give fraudsters a new chance. Lock the phone first."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "The phone was not found. The next day a text arrives: \"Your phone was found, sign in to see it\".",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "+994 50 000 64 18"
+        }
+       ],
+       "time": "11:20",
+       "messages": [
+        [
+         {
+          "text": "Your phone was found. Sign in to your account to see where it is: cihaz-tap.example.info"
+         }
+        ]
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "I open the link and sign in",
+       "outcome": "compromised",
+       "feedback": "This trap hunts people who lost a phone. Your account password goes straight to the fraudster."
+      },
+      {
+       "label": "I do not open it, I restore the new phone from backup",
+       "outcome": "safe",
+       "feedback": "Well done. The photos are safe in the backup, and a message like this cannot be trusted."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "br2-recap",
+   "points": [
+    "Turn on automatic backup on your phone.",
+    "Restore one photo to check it.",
+    "\"Storage full\"? Check settings, not the link."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

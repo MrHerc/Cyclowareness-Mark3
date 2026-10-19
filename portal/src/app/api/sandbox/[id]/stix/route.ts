@@ -1,0 +1,22 @@
+import { and, eq } from "drizzle-orm";
+import { getViewer, allowed } from "@/server/auth/viewer";
+import { db, t } from "@/server/db";
+import { toStix } from "@/server/sandbox/analyze";
+
+/** STIX 2.1 bundle of one sandbox analysis. Analysts get any; employees only their own. */
+export async function GET(_: Request, { params }: RouteContext<"/api/sandbox/[id]/stix">) {
+  const v = await getViewer();
+  if (!v) return new Response("Unauthorized", { status: 401 });
+  const { id } = await params;
+  if (!/^[0-9a-f-]{36}$/.test(id)) return new Response("Not found", { status: 404 });
+  const [a] = await db().select().from(t.sandboxAnalyses).where(and(eq(t.sandboxAnalyses.id, id), eq(t.sandboxAnalyses.tenantId, v.tenant.id)));
+  if (!a || (a.submittedBy !== v.user.id && !allowed(v, "secops.read"))) return new Response("Not found", { status: 404 });
+  const bundle = toStix(a, a.createdAt, `SB-${a.number}`);
+  return new Response(JSON.stringify(bundle, null, 2), {
+    headers: {
+      "content-type": "application/stix+json; charset=utf-8",
+      "content-disposition": `attachment; filename="SB-${a.number}.stix.json"`,
+      "cache-control": "no-store",
+    },
+  });
+}

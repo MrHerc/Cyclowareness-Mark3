@@ -1,0 +1,419 @@
+{
+ "module": {
+  "slug": "tech-support-scams",
+  "title": "Fake Tech Support",
+  "category": "social"
+ },
+ "lesson": {
+  "id": "popup-panic",
+  "title": "Panic on Screen",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "ts1-tutor",
+    "beats": [
+     {
+      "id": "ts1-b1",
+      "say": "Hello! Today we will spot the scary warnings that pop up on your screen.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "browser"
+      }
+     },
+     {
+      "id": "ts1-b2",
+      "say": "A window like this wants to scare you into calling a number.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2a-sistem-muhafize",
+        "tone": "warning",
+        "title": [
+         {
+          "text": "Your computer is blocked"
+         }
+        ],
+        "body": [
+         [
+          {
+           "text": "The system found four viruses.",
+           "spot": "virus"
+          }
+         ],
+         [
+          {
+           "text": "Support line: +994 12 000 70 05",
+           "spot": "phone"
+          }
+         ]
+        ],
+        "buttons": [
+         "Call now"
+        ]
+       }
+      },
+      "highlight": "phone"
+     },
+     {
+      "id": "ts1-b3",
+      "say": "A real warning never gives you a phone number and never rushes you.",
+      "mood": "think",
+      "gesture": "shake",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     },
+     {
+      "id": "ts1-b4",
+      "say": "The rule is simple: do not call, close the window, force quit the browser if needed.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "browser"
+      }
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "ts1-hotspot",
+    "prompt": "Find the signs that this window is a trick.",
+    "artifact": {
+     "kind": "dialog",
+     "brandRef": "w2a-sistem-muhafize",
+     "tone": "warning",
+     "title": [
+      {
+       "text": "Warning: your computer is blocked"
+      }
+     ],
+     "body": [
+      [
+       {
+        "text": "The system found four viruses and your personal data is at risk."
+       }
+      ],
+      [
+       {
+        "text": "Do not close this window or all your files will be deleted.",
+        "spot": "dont-close"
+       }
+      ],
+      [
+       {
+        "text": "Call the support line now: +994 12 000 70 05",
+        "spot": "phone"
+       }
+      ],
+      [
+       {
+        "text": "Time left: 04:58",
+        "spot": "timer"
+       }
+      ]
+     ],
+     "buttons": [
+      "Call now"
+     ]
+    },
+    "spots": [
+     {
+      "id": "dont-close",
+      "label": "No closing allowed",
+      "explain": "A real system never forbids you to close a window. This is fear, meant to keep you there."
+     },
+     {
+      "id": "phone",
+      "label": "Phone number",
+      "explain": "An operating system never shows a support number on screen. This number belongs to the scammer."
+     },
+     {
+      "id": "timer",
+      "label": "Countdown",
+      "explain": "The timer is there to rush you. A warning that gives no time to think is fake."
+     }
+    ],
+    "minToFind": 2
+   },
+   {
+    "type": "simulation",
+    "id": "ts1-sim",
+    "environment": "browser",
+    "title": "While reading the news",
+    "intro": "You are reading a news site and windows suddenly pop up. Choose the right step for each one.",
+    "steps": [
+     {
+      "id": "popup-appears",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-sistem-muhafize",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Threat detected"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "There is malware on your computer. Call support now: +994 12 000 70 05"
+         }
+        ]
+       ],
+       "buttons": [
+        "Call now",
+        "Scan"
+       ]
+      },
+      "say": "A red warning just opened.",
+      "actions": [
+       {
+        "id": "close",
+        "label": "Close the window",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. Simply closing a window like this is the right answer."
+       },
+       {
+        "id": "call",
+        "label": "Call the number shown",
+        "kind": "call-back",
+        "outcome": "compromised",
+        "feedback": "The fake agent will scare you even more. Never call this number."
+       },
+       {
+        "id": "scan",
+        "label": "Press the Scan button",
+        "kind": "click-link",
+        "outcome": "risky",
+        "feedback": "That button opens another fake page. Do not touch anything in the window."
+       }
+      ]
+     },
+     {
+      "id": "fullscreen-lock",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-sistem-muhafize",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Screen locked"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Do not turn off the computer. If you close this without support, your data will be lost."
+         }
+        ]
+       ],
+       "buttons": [
+        "Call support"
+       ]
+      },
+      "say": "Now the screen is full and it is making a sound.",
+      "actions": [
+       {
+        "id": "force-quit",
+        "label": "Force quit the browser",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. When you force the browser to close, this fake screen disappears too."
+       },
+       {
+        "id": "call",
+        "label": "Call support",
+        "kind": "call-back",
+        "outcome": "compromised",
+        "feedback": "The sound and full screen are only there to scare you. If you call, they will try to control your device."
+       }
+      ]
+     },
+     {
+      "id": "real-update",
+      "artifact": {
+       "kind": "dialog",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Browser ready to update"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Restart the browser to apply the changes."
+         }
+        ]
+       ],
+       "buttons": [
+        "Later",
+        "Update"
+       ]
+      },
+      "say": "This is the browser's own quiet notice.",
+      "actions": [
+       {
+        "id": "update",
+        "label": "Update",
+        "kind": "update",
+        "outcome": "safe",
+        "feedback": "Correct. A real update is calm, gives no number and does not rush you."
+       },
+       {
+        "id": "later",
+        "label": "Later",
+        "kind": "later",
+        "outcome": "safe",
+        "feedback": "That is fine too. You can update whenever you like, there is no danger."
+       },
+       {
+        "id": "call",
+        "label": "Call support just in case",
+        "kind": "call-back",
+        "outcome": "risky",
+        "feedback": "There is no need. A simple update notice does not require calling anyone."
+       }
+      ]
+     },
+     {
+      "id": "popup-returns",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-sistem-muhafize",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "The threat continues"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "The problem is not solved. Call now for help."
+         }
+        ]
+       ],
+       "buttons": [
+        "Call now"
+       ]
+      },
+      "say": "You closed it, but the window came back.",
+      "actions": [
+       {
+        "id": "close-all",
+        "label": "Close the whole browser",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. When you close the browser fully, these pages go away too."
+       },
+       {
+        "id": "report",
+        "label": "Tell tech support",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Good step. You can call your own tech support and ask about it."
+       },
+       {
+        "id": "call",
+        "label": "Call the number",
+        "kind": "call-back",
+        "outcome": "compromised",
+        "feedback": "The window coming back is part of the trick. Do not call that number."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "ts1-match",
+    "prompt": "Match each sign to the right response.",
+    "pairs": [
+     {
+      "id": "fullscreen",
+      "left": "A window filling the whole screen",
+      "right": "Force quit the browser"
+     },
+     {
+      "id": "phone",
+      "left": "A support number on the screen",
+      "right": "A real warning gives no number"
+     },
+     {
+      "id": "timer",
+      "left": "A countdown clock",
+      "right": "The rush is a lie"
+     },
+     {
+      "id": "sound",
+      "left": "An alarm and a beep",
+      "right": "It is there to scare you"
+     }
+    ],
+    "explain": "All of these signs exist to scare you. Stay calm and close the window."
+   },
+   {
+    "type": "choice",
+    "id": "ts1-choice",
+    "question": {
+     "prompt": "A window pops up and tells you to call a number. What is the first step?",
+     "options": [
+      {
+       "id": "close",
+       "label": "I close the window and force quit the browser if needed",
+       "correct": true,
+       "feedback": "Correct. A warning like this is harmless and disappears when you close it."
+      },
+      {
+       "id": "call",
+       "label": "To be safe, I call the number shown",
+       "correct": false,
+       "feedback": "That number belongs to the scammer. If you call, they will try to control your device."
+      },
+      {
+       "id": "restart",
+       "label": "I turn the computer off right away",
+       "correct": false,
+       "feedback": "There is no need. Closing the window or the browser is enough."
+      }
+     ]
+    },
+    "explain": "The scary window wants to pull you into a call. Do not call, just close it."
+   },
+   {
+    "type": "recap",
+    "id": "ts1-recap",
+    "points": [
+     "Do not trust a scary window that pops up out of nowhere",
+     "Never call the number it shows",
+     "Close the window, force quit the browser if needed"
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "the-support-call",
+  "title": "The Support Call"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 32,
+ "narrationTotalMs": 147942
+}

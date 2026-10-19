@@ -1,0 +1,474 @@
+{
+ "id": "safe-video-calls",
+ "title": "Safe video calls",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "vc-tutor",
+   "beats": [
+    {
+     "id": "vc-b1",
+     "say": "Hello! Two questions matter in a video call: who is listening, and what is on your screen?",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "vc-b2",
+     "say": "If you see a name or number you do not know, ask the host. Confidential talk must wait.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "gorus",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Participants (6)"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Rəşad Məmmədov (host)"
+         }
+        ],
+        [
+         {
+          "text": "Leyla Rzayeva"
+         }
+        ],
+        [
+         {
+          "text": "Kamal Nəbiyev"
+         }
+        ],
+        [
+         {
+          "text": "iPhone (guest)",
+          "spot": "unknown"
+         }
+        ],
+        [
+         {
+          "text": "Dialled in: +994 70 000 55 12",
+          "spot": "dial-in"
+         }
+        ],
+        [
+         {
+          "text": "Guest 4821: recording the meeting",
+          "spot": "recording"
+         }
+        ]
+       ],
+       "buttons": [
+        "Close"
+       ]
+      }
+     },
+     "highlight": "unknown"
+    },
+    {
+     "id": "vc-b3",
+     "say": "When you share your whole screen, open tabs and incoming notifications are visible to everyone.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "vc-b4",
+     "say": "Turn on the waiting room, share only the window you need, and silence notifications.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "vc-sim",
+   "environment": "desktop",
+   "title": "The meeting starts",
+   "intro": "You are hosting this meeting. Admit the participants and share your presentation.",
+   "steps": [
+    {
+     "id": "lobby-unknown",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Waiting room"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Wants to join: iPhone"
+        }
+       ],
+       [
+        {
+         "text": "Not on the invite list"
+        }
+       ]
+      ],
+      "buttons": [
+       "Admit",
+       "Deny"
+      ]
+     },
+     "say": "Someone is in the waiting room.",
+     "actions": [
+      {
+       "id": "admit",
+       "label": "Admit",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "You admitted someone without knowing who. A stranger may hear a confidential talk."
+      },
+      {
+       "id": "deny",
+       "label": "Deny",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Right. That is exactly what the waiting room is for."
+      },
+      {
+       "id": "ask",
+       "label": "Ask them to give their name",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Good move. If they give a name that is on the invite list, admit them."
+      }
+     ]
+    },
+    {
+     "id": "lobby-known",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Waiting room"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Wants to join: Leyla Rzayeva"
+        }
+       ],
+       [
+        {
+         "text": "On the invite list"
+        }
+       ]
+      ],
+      "buttons": [
+       "Admit",
+       "Deny"
+      ]
+     },
+     "actions": [
+      {
+       "id": "admit",
+       "label": "Admit",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Right. Leyla is invited and her name is on the list."
+      },
+      {
+       "id": "deny",
+       "label": "Deny",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "Leyla is invited. Needless caution also stops the work."
+      }
+     ]
+    },
+    {
+     "id": "share-pick",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "What do you want to share?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Entire screen"
+        }
+       ],
+       [
+        {
+         "text": "Window: Teqdimat_oktyabr.pptx"
+        }
+       ],
+       [
+        {
+         "text": "Open browser tab: Salary table 2026",
+         "spot": "tab"
+        }
+       ]
+      ],
+      "buttons": [
+       "Share"
+      ]
+     },
+     "say": "Choose what to share.",
+     "actions": [
+      {
+       "id": "whole",
+       "label": "Share entire screen",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Now everyone sees your open tabs, mail and notifications. The salary table is on screen too."
+      },
+      {
+       "id": "window",
+       "label": "Share only the presentation window",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Right. Participants see only what they need."
+      }
+     ]
+    },
+    {
+     "id": "popup",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "IshPocht",
+      "title": [
+       {
+        "text": "HR department"
+       }
+      ],
+      "body": [
+       {
+        "text": "Staff cuts list (confidential) attached"
+       }
+      ],
+      "time": "10:14"
+     },
+     "say": "A new email arrived while you were sharing.",
+     "actions": [
+      {
+       "id": "pause",
+       "label": "Pause sharing and silence notifications",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Right: with the whole screen shared, everyone sees such a pop-up. Do not disturb mode prevents it."
+      },
+      {
+       "id": "go-on",
+       "label": "Carry on",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "If the whole screen is shared, everyone sees the confidential subject. Silence notifications before sharing."
+      }
+     ]
+    },
+    {
+     "id": "recording",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Meeting ended"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "The meeting recording is ready."
+        }
+       ],
+       [
+        {
+         "text": "Sharing: anyone with the link can view",
+         "spot": "link"
+        }
+       ]
+      ],
+      "buttons": [
+       "Copy link",
+       "Change access"
+      ]
+     },
+     "actions": [
+      {
+       "id": "public",
+       "label": "Send the link to the general group",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "The recording holds a confidential discussion. As the link spreads, you lose control."
+      },
+      {
+       "id": "limit",
+       "label": "Limit access to participants",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Right. Only those who need the recording should see it."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vc-hotspot",
+   "prompt": "What looks suspicious in the participant list?",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "gorus",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Participants (6)"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Rəşad Məmmədov (host)"
+      }
+     ],
+     [
+      {
+       "text": "Leyla Rzayeva"
+      }
+     ],
+     [
+      {
+       "text": "Kamal Nəbiyev"
+      }
+     ],
+     [
+      {
+       "text": "iPhone (guest)",
+       "spot": "unknown"
+      }
+     ],
+     [
+      {
+       "text": "Dialled in: +994 70 000 55 12",
+       "spot": "dial-in"
+      }
+     ],
+     [
+      {
+       "text": "Guest 4821: recording the meeting",
+       "spot": "recording"
+      }
+     ]
+    ],
+    "buttons": [
+     "Close"
+    ]
+   },
+   "spots": [
+    {
+     "id": "unknown",
+     "label": "Unnamed device",
+     "explain": "\"iPhone\" is not a name. If you do not know who it is, ask the host."
+    },
+    {
+     "id": "dial-in",
+     "label": "Unknown number",
+     "explain": "If a dialled in number is not familiar, check who it is."
+    },
+    {
+     "id": "recording",
+     "label": "Unapproved recording",
+     "explain": "A guest is recording. The host should stop it and ask why."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "order",
+   "id": "vc-order",
+   "prompt": "Prepare for a confidential meeting. Put the steps in order.",
+   "items": [
+    {
+     "id": "lobby",
+     "label": "Turn on the waiting room and meeting passcode"
+    },
+    {
+     "id": "tabs",
+     "label": "Close tabs and files you do not need"
+    },
+    {
+     "id": "dnd",
+     "label": "Silence notifications"
+    },
+    {
+     "id": "window",
+     "label": "Share only the presentation window"
+    }
+   ],
+   "explain": "First control who can join, then what they can see."
+  },
+  {
+   "type": "choice",
+   "id": "vc-choice",
+   "question": {
+    "prompt": "Someone you do not know is in the meeting, and the host does not know them either. What do you do?",
+    "options": [
+     {
+      "id": "remove",
+      "label": "Ask the host to remove them, then carry on",
+      "correct": true,
+      "feedback": "Right. Once the outsider is out, the discussion can continue."
+     },
+     {
+      "id": "ignore",
+      "label": "I ignore it, someone probably joined by phone",
+      "correct": false,
+      "feedback": "\"Probably\" is not enough. An outsider may hear a confidential talk."
+     },
+     {
+      "id": "leave",
+      "label": "I quietly leave the meeting",
+      "correct": false,
+      "feedback": "Even if you leave, others stay. Tell the host so everyone is protected."
+     }
+    ]
+   },
+   "explain": "If you do not know who is listening, do not discuss confidential matters."
+  },
+  {
+   "type": "recap",
+   "id": "vc-recap",
+   "points": [
+    "Admit only participants you know",
+    "Share a window, not your whole screen",
+    "Silence notifications before sharing"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

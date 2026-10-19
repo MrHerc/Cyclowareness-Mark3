@@ -1,0 +1,387 @@
+{
+ "module": {
+  "slug": "passwords-mfa",
+  "title": "Passwords and sign-in safety",
+  "category": "identity"
+ },
+ "lesson": {
+  "id": "passphrases",
+  "title": "Passphrases",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "long-beats-complex",
+    "beats": [
+     {
+      "id": "short",
+      "say": "This looks complex, but a name, a year and an exclamation mark are the first pattern attackers try.",
+      "mood": "think",
+      "gesture": "shrug",
+      "visual": {
+       "kind": "stat",
+       "value": "Aynur1985!",
+       "label": "Looks complex, easy to crack"
+      }
+     },
+     {
+      "id": "phrase",
+      "say": "Better: a passphrase of four or more random words. Long, easy to remember and very hard to guess.",
+      "mood": "happy",
+      "gesture": "nod",
+      "visual": {
+       "kind": "stat",
+       "value": "violet brick ocean clock",
+       "label": "Just an example, make your own"
+      },
+      "stage": "back"
+     },
+     {
+      "id": "length",
+      "say": "Length beats complexity. Aim for at least fifteen characters; spaces or hyphens between words are fine.",
+      "mood": "talk",
+      "gesture": "recite",
+      "visual": {
+       "kind": "stat",
+       "value": "15+",
+       "label": "characters, recommended minimum"
+      },
+      "checkpoint": {
+       "prompt": "Which password is stronger?",
+       "options": [
+        {
+         "id": "swaps",
+         "label": "Pa$$w0rd2026",
+         "correct": false,
+         "feedback": "Letter swaps are well known to cracking tools."
+        },
+        {
+         "id": "words",
+         "label": "camel lantern lemon cloud",
+         "correct": true,
+         "feedback": "Right. Four random words are long and unpredictable."
+        }
+       ]
+      }
+     },
+     {
+      "id": "stuffing",
+      "say": "When one site leaks, attackers try that password on other sites. So every account needs its own.",
+      "mood": "alert",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "alarm"
+      }
+     }
+    ]
+   },
+   {
+    "type": "password",
+    "id": "make-passphrase",
+    "prompt": "Create a passphrase of your own.",
+    "targetScore": 4,
+    "tips": [
+     "Do not type your real password here, this is practice.",
+     "Pick four or more random words.",
+     "Avoid song lyrics, poems and proverbs.",
+     "Leave out names, dates and your workplace."
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "leak-alert",
+    "prompt": "Find the signs of a fake in this leak alert.",
+    "artifact": {
+     "kind": "email",
+     "brandRef": "xidmet-agentliyi-fake",
+     "from": {
+      "name": [
+       {
+        "text": "Security Center",
+        "reveal": "security@xidmetagentliyi-az.com"
+       }
+      ],
+      "address": [
+       {
+        "text": "security@"
+       },
+       {
+        "text": "xidmetagentliyi-az.com",
+        "spot": "sender-domain"
+       }
+      ]
+     },
+     "to": "a.hasanova@xidmetagentliyi.az",
+     "subject": [
+      {
+       "text": "Your password was found in a leak"
+      }
+     ],
+     "time": "08:47",
+     "body": [
+      [
+       {
+        "text": "Dear user,",
+        "spot": "greeting"
+       }
+      ],
+      [
+       {
+        "text": "Your password was found in a leaked database online."
+       }
+      ],
+      [
+       {
+        "text": "To protect your account, "
+       },
+       {
+        "text": "enter your old and new password in this form.",
+        "spot": "old-password"
+       }
+      ],
+      [
+       {
+        "text": "Open the form",
+        "spot": "link",
+        "link": {
+         "label": "Open the form",
+         "href": "https://parol-yenile.info/forma"
+        }
+       }
+      ],
+      [
+       {
+        "text": "If you do not act within one hour, the account will be deleted.",
+        "spot": "urgency"
+       }
+      ]
+     ]
+    },
+    "spots": [
+     {
+      "id": "sender-domain",
+      "label": "Fake domain",
+      "explain": "The agency's domain is xidmetagentliyi.az, with no -az.com at the end."
+     },
+     {
+      "id": "greeting",
+      "label": "Generic greeting",
+      "explain": "Your own security team would write to you by name."
+     },
+     {
+      "id": "old-password",
+      "label": "Asks for old password",
+      "explain": "A real service does not ask you to type your old password into a form from an email. Change it yourself on the site you know."
+     },
+     {
+      "id": "link",
+      "label": "Foreign link",
+      "explain": "The link goes to another domain, not the agency's site."
+     },
+     {
+      "id": "urgency",
+      "label": "One-hour threat",
+      "explain": "A short deadline and a threat push you to act without thinking."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "simulation",
+    "id": "reset-page",
+    "environment": "browser",
+    "title": "Reset your password",
+    "intro": "After a leak warning, a password reset page opens in the browser. Read the address and decide.",
+    "steps": [
+     {
+      "id": "leak-page",
+      "label": "Your password was found in a leak",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "xidmet-agentliyi-fake",
+       "url": [
+        {
+         "text": "https://",
+         "reveal": "hesab-yoxla.info"
+        },
+        {
+         "text": "hesab-yoxla.info",
+         "spot": "real-domain"
+        },
+        {
+         "text": "/sizma"
+        }
+       ]
+      },
+      "say": "The page scares you and rushes you. Whose address is it?",
+      "actions": [
+       {
+        "id": "reset-here",
+        "label": "Reset password here",
+        "kind": "click-link",
+        "outcome": "risky",
+        "feedback": "After a leak warning, do not follow the link. Change the password on a site you open yourself."
+       },
+       {
+        "id": "close",
+        "label": "Close tab, I will open the portal myself",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right: hesab-yoxla.info is not the agency's site. Open the portal yourself from a bookmark.",
+        "next": "real-reset"
+       }
+      ]
+     },
+     {
+      "id": "fake-reset",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "xidmet-agentliyi-fake",
+       "brand": "Xidmət Agentliyi",
+       "url": [
+        {
+         "text": "https://",
+         "reveal": "parol-yenile.info"
+        },
+        {
+         "text": "parol-yenile.info",
+         "spot": "real-domain"
+        },
+        {
+         "text": "/agentlik"
+        }
+       ],
+       "fields": [
+        "Email",
+        "Old password",
+        "New password"
+       ],
+       "button": "Reset password"
+      },
+      "say": "The form wants your old password too. Check the address.",
+      "actions": [
+       {
+        "id": "submit",
+        "label": "Reset password",
+        "kind": "enter-credentials",
+        "outcome": "compromised",
+        "feedback": "A fake form that asks for the old password steals it. Change it on the official portal now and report it."
+       },
+       {
+        "id": "close",
+        "label": "Close tab",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right. parol-yenile.info is not the agency's domain, so type nothing here."
+       },
+       {
+        "id": "report",
+        "label": "Report site",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Great. Reporting the fake site helps get it blocked for others too."
+       }
+      ]
+     },
+     {
+      "id": "real-reset",
+      "label": "You opened the portal yourself",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "xidmet-agentliyi",
+       "brand": "Xidmət Agentliyi",
+       "url": [
+        {
+         "text": "https://portal.xidmetagentliyi.az/profil/parol",
+         "reveal": "xidmetagentliyi.az"
+        }
+       ],
+       "fields": [
+        "Old password",
+        "New passphrase"
+       ],
+       "button": "Change"
+      },
+      "say": "This is the agency's own portal. What do you do now?",
+      "actions": [
+       {
+        "id": "change",
+        "label": "Change password",
+        "kind": "enter-credentials",
+        "outcome": "safe",
+        "feedback": "Right, you changed it on the official portal. Make the new one a long phrase used nowhere else."
+       },
+       {
+        "id": "later",
+        "label": "I will change it later",
+        "kind": "later",
+        "outcome": "risky",
+        "feedback": "If the password leaked, someone may already be trying it. Change it on the official portal now."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "true-rules",
+    "question": {
+     "prompt": "Which rules are true?",
+     "options": [
+      {
+       "id": "length",
+       "label": "Length matters more than complexity",
+       "correct": true,
+       "feedback": "Right. A long password is far harder to crack."
+      },
+      {
+       "id": "unique",
+       "label": "A separate password for every account",
+       "correct": true,
+       "feedback": "Right. Then one leak puts only one account at risk."
+      },
+      {
+       "id": "monthly",
+       "label": "Change your password every month",
+       "correct": false,
+       "feedback": "Changing without a reason often leads to weak, similar passwords. Change it at once if you suspect a leak."
+      },
+      {
+       "id": "birth-year",
+       "label": "A birth year helps you remember",
+       "correct": false,
+       "feedback": "A birth year is easy to find, and attackers try it first."
+      }
+     ],
+     "multi": true
+    },
+    "explain": "Current advice: long, unique passwords, changed at once after a leak. If your organisation's rules differ, follow them."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "A long passphrase beats a short complex password.",
+     "A separate password for every account.",
+     "After a leak, change the password at once."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "password-manager",
+  "title": "Password manager"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 31,
+ "narrationTotalMs": 168778
+}

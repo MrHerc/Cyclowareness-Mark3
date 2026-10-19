@@ -1,0 +1,416 @@
+{
+ "id": "chat-safely",
+ "title": "Chat Safely",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Messengers are handy. But a work file sent to a personal account leaves your organisation's control, sometimes for years.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "A familiar name on a new number may really be a scammer. Check by calling the old number you already know.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "+994 50 000 47 09",
+         "spot": "unknown-number"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hello, Narmina. It is Elchin Gasimov. "
+          },
+          {
+           "text": "This is my new number, I lost the old one.",
+           "spot": "new-number"
+          }
+         ],
+         "time": "09:12"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "The director urgently needs a report. "
+          },
+          {
+           "text": "Send the finance spreadsheet right here.",
+           "spot": "work-file"
+          }
+         ],
+         "time": "09:13"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "I am in a meeting, I cannot talk, just text.",
+           "spot": "no-call"
+          }
+         ],
+         "time": "09:13"
+        }
+       ]
+      }
+     },
+     "highlight": "new-number"
+    },
+    {
+     "id": "b3",
+     "say": "Disappearing messages help, but the other person can still take a screenshot. Keep sensitive information out of messengers altogether.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "For work, use the tool your organisation approved. Not sure which one? Ask your technical support team.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "new-number-chat",
+   "prompt": "What is suspicious in this chat?",
+   "artifact": {
+    "kind": "chat",
+    "app": "whatsapp",
+    "contact": [
+     {
+      "text": "+994 50 000 47 09",
+      "spot": "unknown-number"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Hello, Narmina. It is Elchin Gasimov. "
+       },
+       {
+        "text": "This is my new number, I lost the old one.",
+        "spot": "new-number"
+       }
+      ],
+      "time": "09:12"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "The director urgently needs a report. "
+       },
+       {
+        "text": "Send the finance spreadsheet right here.",
+        "spot": "work-file"
+       }
+      ],
+      "time": "09:13"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "I am in a meeting, I cannot talk, just text.",
+        "spot": "no-call"
+       }
+      ],
+      "time": "09:13"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "unknown-number",
+     "label": "Unsaved number",
+     "explain": "No name, only a number. The only proof of who it is comes from the sender."
+    },
+    {
+     "id": "new-number",
+     "label": "The new number story",
+     "explain": "This is the most common opener. Call the old number to check."
+    },
+    {
+     "id": "work-file",
+     "label": "Work file into a messenger",
+     "explain": "Finance documents go only through an approved work channel."
+    },
+    {
+     "id": "no-call",
+     "label": "Avoids a call",
+     "explain": "A scammer does not want you to hear the voice. Be wary of any request that refuses a call."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "verify",
+   "question": {
+    "prompt": "How do you check it is really Elchin?",
+    "options": [
+     {
+      "id": "call-new",
+      "label": "I call the new number",
+      "correct": false,
+      "feedback": "That number belongs to the scammer. They can answer themselves or with a faked voice."
+     },
+     {
+      "id": "call-known",
+      "label": "I call his old number or office line",
+      "correct": true,
+      "feedback": "Correct. A channel you already know is the most reliable check."
+     },
+     {
+      "id": "photo",
+      "label": "I look at the profile photo",
+      "correct": false,
+      "feedback": "Copying a photo from the internet takes a minute."
+     },
+     {
+      "id": "ask-detail",
+      "label": "I ask him for the office address",
+      "correct": false,
+      "feedback": "That is public information. Anyone can answer it."
+     }
+    ]
+   },
+   "explain": "Always verify through a channel you already know: the old number, the office line, or in person."
+  },
+  {
+   "type": "swipe",
+   "id": "what-goes-where",
+   "prompt": "Is this message safe or risky?",
+   "cards": [
+    {
+     "id": "family-group",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Family group · 38 members"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Budget draft 2027, final.xlsx"
+         }
+        ],
+        "time": "22:40"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A work file landed in the family group. Mistakes like this happen most when we rush."
+    },
+    {
+     "id": "vpn-password",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Department chat · 214 members"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Remote access password: Baki2026! Everyone use it."
+         }
+        ],
+        "time": "13:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A shared password posted in a large group. Lose one phone and access opens for everyone."
+    },
+    {
+     "id": "internal-link",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Samir Babayev · internal work chat"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "I uploaded the final report to the internal system, please look there."
+         }
+        ],
+        "time": "10:30"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "The file itself is not sent, it stays in the internal system. That is the right way."
+    },
+    {
+     "id": "meeting-time",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Meeting group"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Tomorrow's meeting moved to 10."
+         }
+        ],
+        "time": "18:02"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Nothing sensitive, just a reminder. Keep documents and figures in the approved channel."
+    },
+    {
+     "id": "id-photo",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Accounts Office"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "To check your salary, send photos of both sides of your ID card."
+         }
+        ],
+        "time": "11:48"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "The accounts office already has your details. An ID photo is used to open fake accounts."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "wrong-group",
+   "title": "Wrong Group",
+   "start": "sent",
+   "nodes": [
+    {
+     "id": "sent",
+     "text": "You accidentally sent the staff phone list to a neighbourhood group of 300 people. Two minutes have passed.",
+     "choices": [
+      {
+       "label": "I delete it for everyone and tell my manager now",
+       "next": "manager",
+       "feedback": "A good start. Deleting slows the spread, reporting limits the damage."
+      },
+      {
+       "label": "I quietly delete it, surely no one saw",
+       "outcome": "risky",
+       "feedback": "Someone may already have downloaded it. If you stay silent, no one can act in time."
+      },
+      {
+       "label": "I do nothing, it is too late anyway",
+       "outcome": "compromised",
+       "feedback": "The file stays in the group and spreads. It is not too late, act now."
+      }
+     ]
+    },
+    {
+     "id": "manager",
+     "text": "What exactly was in the file?",
+     "speaker": "Manager",
+     "voice": "older-man",
+     "channel": "phone",
+     "manner": "firm",
+     "spoken": "<breath> What exactly was in the file?",
+     "choices": [
+      {
+       "label": "I say exactly: names and mobile numbers of 120 staff",
+       "next": "reply",
+       "feedback": "An honest, precise answer speeds up the response."
+      },
+      {
+       "label": "I play it down: just an unimportant table",
+       "outcome": "risky",
+       "feedback": "A team that does not know what leaked cannot decide well. Your colleagues will not be ready for scam calls."
+      }
+     ]
+    },
+    {
+     "id": "reply",
+     "text": "Someone in the group writes: I opened the file, interesting. What do you do?",
+     "choices": [
+      {
+       "label": "I politely ask him to delete it and tell my manager",
+       "outcome": "safe",
+       "feedback": "Well done. You tried to stop the spread and reported everything openly."
+      },
+      {
+       "label": "I argue with him and make threats",
+       "outcome": "risky",
+       "feedback": "Threats raise tension and make the file more interesting. Ask politely and let the organisation handle the rest."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Send work files only through the approved tool.",
+    "Check a new number through a channel you already know.",
+    "If you send to the wrong place, delete and report at once."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

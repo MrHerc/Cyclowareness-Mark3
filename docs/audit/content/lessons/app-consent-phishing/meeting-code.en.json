@@ -1,0 +1,469 @@
+{
+ "module": {
+  "slug": "app-consent-phishing",
+  "title": "The \"Allow\" trap",
+  "category": "identity"
+ },
+ "lesson": {
+  "id": "meeting-code",
+  "title": "Meeting code",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "ac2-tutor",
+    "beats": [
+     {
+      "id": "ac2-b1",
+      "say": "Hello! Now let us look at an invitation from an international forum and a meeting code.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "handshake"
+      }
+     },
+     {
+      "id": "ac2-b2",
+      "say": "The fraudster sends you a code and your office's real sign-in page.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "chat",
+        "brandRef": "w2b-nordvale-fake",
+        "app": "generic",
+        "contact": [
+         {
+          "text": "Leyla K. | Nordvale Council"
+         }
+        ],
+        "messages": [
+         {
+          "from": "them",
+          "body": [
+           {
+            "text": "To join the meeting, enter this code: "
+           },
+           {
+            "text": "QK7-MN4P",
+            "spot": "code"
+           }
+          ],
+          "time": "10:04"
+         }
+        ]
+       }
+      },
+      "highlight": "code"
+     },
+     {
+      "id": "ac2-b3",
+      "say": "If you enter the code, her device gets into your account as you, with no need for your password.",
+      "mood": "think",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "mfa-phone"
+      }
+     },
+     {
+      "id": "ac2-b4",
+      "say": "The rule: if you did not start the sign-in yourself, never enter a code anywhere.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "scenario",
+    "id": "ac2-scenario",
+    "title": "Forum invitation",
+    "start": "invite",
+    "nodes": [
+     {
+      "id": "invite",
+      "text": "Hello! We would like you to speak at our forum in Vienna in November. Are you interested?",
+      "speaker": "Leyla, Nordvale Council (new message)",
+      "voice": "young-woman",
+      "channel": "message",
+      "spoken": "Hello! <breath> We would like you to speak at our forum in Vienna in November. Are you interested?",
+      "character": "leyla",
+      "choices": [
+       {
+        "label": "Thank you. Please send the official invitation to my work mail so I can clear it with management",
+        "next": "code",
+        "feedback": "Correct. An official invitation comes through an official channel, and you can check it."
+       },
+       {
+        "label": "Very interesting! What should I do?",
+        "next": "code",
+        "feedback": "Interest is natural. But it is better to move a talk with a stranger to an official channel."
+       }
+      ]
+     },
+     {
+      "id": "code",
+      "text": "Great! Let us have a short online meeting tomorrow. To join, enter this code on your office's sign-in page: QK7-MN4P.",
+      "speaker": "Leyla, Nordvale Council",
+      "voice": "young-woman",
+      "channel": "message",
+      "spoken": "Great! Let us have a short online meeting tomorrow. <breath> To join, enter this code on your office's sign-in page: QK7-MN4P.",
+      "character": "leyla",
+      "choices": [
+       {
+        "label": "I did not start this sign-in, so I am not entering the code anywhere",
+        "next": "pressure",
+        "feedback": "Correct. If a code reaches you in a message, the sign-in belongs to someone else."
+       },
+       {
+        "label": "The page is my office's, so it is safe. I enter it",
+        "outcome": "compromised",
+        "feedback": "The page was real, but the fraudster started the sign-in. Now her device is in your mailbox."
+       }
+      ]
+     },
+     {
+      "id": "pressure",
+      "text": "We are short on time, and your ministry has agreed. Just enter the code, it takes two minutes.",
+      "speaker": "Leyla, Nordvale Council",
+      "voice": "young-woman",
+      "channel": "message",
+      "spoken": "We are short on time, uh, and your ministry has agreed. Just enter the code, it takes two minutes.",
+      "character": "leyla",
+      "choices": [
+       {
+        "label": "I will find the number on the forum's official site and call myself, and I will tell technical support",
+        "outcome": "safe",
+        "feedback": "Well done. A real organiser welcomes the check, and a fraudster disappears."
+       },
+       {
+        "label": "All right, I will enter it",
+        "outcome": "compromised",
+        "feedback": "Pressure is part of the trap. As soon as you enter the code, your account opens to the fraudster's device."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "ac2-sim",
+    "environment": "phone",
+    "title": "Invitation on your phone",
+    "intro": "Messages in the forum's name arrive on your phone. Open each one and choose the right step.",
+    "steps": [
+     {
+      "id": "code-chat",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2b-nordvale-fake",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Leyla K. | Nordvale Council"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hello! Your panel at the Vienna forum is confirmed."
+          }
+         ],
+         "time": "10:02"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Code to join the meeting: QK7-MN4P"
+          }
+         ],
+         "time": "10:03"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Enter the code on this page: "
+          },
+          {
+           "text": "giris.idare.example/cihaz",
+           "link": {
+            "label": "giris.idare.example/cihaz",
+            "href": "https://giris.idare.example/cihaz"
+           }
+          }
+         ],
+         "time": "10:03"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Correct. If you did not start the sign-in, a code sent in a message is a trap.",
+        "next": "slides"
+       },
+       {
+        "id": "official",
+        "label": "Please send the official invitation to my work mail",
+        "kind": "reply",
+        "outcome": "safe",
+        "feedback": "Good answer. A real organiser can do that, a fraudster will dodge it.",
+        "next": "slides"
+       },
+       {
+        "id": "open-page",
+        "label": "Open the page",
+        "kind": "click-link",
+        "outcome": "risky",
+        "feedback": "The page is real, but someone else started this sign-in. Watch the next screen closely."
+       }
+      ]
+     },
+     {
+      "id": "device-confirm",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Are you signing in on another device?"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Code: QK7-MN4P"
+         }
+        ],
+        [
+         {
+          "text": "If you did not start this sign-in yourself, do not continue."
+         }
+        ]
+       ],
+       "buttons": [
+        "Continue",
+        "Cancel"
+       ]
+      },
+      "say": "The page opened. As soon as you enter the code, this question appears.",
+      "actions": [
+       {
+        "id": "continue",
+        "label": "Continue",
+        "kind": "allow",
+        "outcome": "compromised",
+        "feedback": "The fraudster's device is now in your account. Call technical support at once."
+       },
+       {
+        "id": "cancel",
+        "label": "Cancel",
+        "kind": "deny",
+        "outcome": "safe",
+        "feedback": "Correct. The page itself warned you: you did not start this sign-in."
+       }
+      ]
+     },
+     {
+      "id": "slides",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "w2b-nordvale-slides",
+       "app": "Nordvale Slides",
+       "permissions": [
+        {
+         "label": [
+          {
+           "text": "See your profile"
+          }
+         ],
+         "needed": true
+        },
+        {
+         "label": [
+          {
+           "text": "Read and send your mail"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "Keep access when you are not there"
+          }
+         ],
+         "needed": false
+        }
+       ]
+      },
+      "say": "Now the organiser sent a link to the slides. It asks for permission too.",
+      "actions": [
+       {
+        "id": "deny",
+        "label": "Deny",
+        "kind": "deny",
+        "outcome": "safe",
+        "feedback": "Correct. Viewing slides does not need your mail."
+       },
+       {
+        "id": "allow",
+        "label": "Allow",
+        "kind": "allow",
+        "outcome": "compromised",
+        "feedback": "This app now reads your mail. Ask technical support to revoke the permission."
+       }
+      ]
+     },
+     {
+      "id": "tell-support",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "it-destek",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Technical support"
+        }
+       ],
+       "messages": [
+        {
+         "from": "me",
+         "body": [
+          {
+           "text": "I got a code and a permission request in a forum's name."
+          }
+         ],
+         "time": "10:20"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Thank you! Did you enter the code or allow anything?"
+          }
+         ],
+         "time": "10:21"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "yes",
+        "label": "Yes, I entered it by mistake",
+        "kind": "reply",
+        "outcome": "safe",
+        "feedback": "Telling them right away is the right thing. A specialist will close the sign-in and the permission."
+       },
+       {
+        "id": "no",
+        "label": "No, I entered nothing",
+        "kind": "reply",
+        "outcome": "safe",
+        "feedback": "Well done. A specialist will warn your other colleagues too."
+       },
+       {
+        "id": "silent",
+        "label": "Do not answer",
+        "kind": "ignore",
+        "outcome": "risky",
+        "feedback": "Anyone can make a mistake, but hiding it makes the damage worse. An honest answer saves time."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "ac2-match",
+    "prompt": "Match each situation with the right step.",
+    "pairs": [
+     {
+      "id": "code-message",
+      "left": "Someone sent you a code in a message",
+      "right": "Enter it nowhere and report it"
+     },
+     {
+      "id": "own-tv",
+      "left": "You started the sign-in on a TV yourself",
+      "right": "You can enter the code from the screen"
+     },
+     {
+      "id": "unknown-app",
+      "left": "An unknown app asks for lasting access",
+      "right": "Deny it"
+     },
+     {
+      "id": "mistake",
+      "left": "You entered a code or allowed an app by mistake",
+      "right": "Call technical support at once"
+     }
+    ],
+    "explain": "A code is safe only when it comes from a device where you started the sign-in yourself. In every other case, stop and report."
+   },
+   {
+    "type": "choice",
+    "id": "ac2-choice",
+    "question": {
+     "prompt": "The organiser says: \"The page belongs to your own office, do not worry.\" Is that a reason to enter the code?",
+     "options": [
+      {
+       "id": "no",
+       "label": "No. The page is real, but someone else started the sign-in",
+       "correct": true,
+       "feedback": "Correct. In this trap the page and the code are real, only the person who started the sign-in is fake."
+      },
+      {
+       "id": "real-address",
+       "label": "Yes, if the address is real there is no danger",
+       "correct": false,
+       "feedback": "Checking the address protects a password, not a code. The code goes to the device of whoever started the sign-in."
+      },
+      {
+       "id": "famous",
+       "label": "Yes, if the organiser is from a well known forum",
+       "correct": false,
+       "feedback": "Anyone can type a well known name. Check the forum on its official site."
+      }
+     ]
+    },
+    "explain": "A code hands a key to the device that started the sign-in. If you did not start it, do not enter the code."
+   },
+   {
+    "type": "recap",
+    "id": "ac2-recap",
+    "points": [
+     "Never enter a code you got in a message on any sign-in page",
+     "Even on a real page, check who started the sign-in",
+     "If you made a mistake, tell technical support at once"
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 34,
+ "narrationTotalMs": 194378
+}

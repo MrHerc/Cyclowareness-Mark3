@@ -1,0 +1,437 @@
+{
+ "module": {
+  "slug": "password-managers-work",
+  "title": "Password managers at work",
+  "category": "identity"
+ },
+ "lesson": {
+  "id": "autofill-right-site",
+  "title": "When autofill stays silent",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "b1",
+      "say": "A password manager spots a fake site better than you: it checks the address letter by letter.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "browser"
+      }
+     },
+     {
+      "id": "b2",
+      "say": "If the address differs even slightly, the manager offers no password. That is your warning sign.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "url",
+        "brandRef": "idare-fake",
+        "url": [
+         {
+          "text": "https://portal."
+         },
+         {
+          "text": "idare-giris.example.net",
+          "spot": "lookalike"
+         },
+         {
+          "text": "/giris"
+         }
+        ]
+       }
+      },
+      "highlight": "lookalike"
+     },
+     {
+      "id": "b3",
+      "say": "Do not copy the password from the vault and paste it yourself. Check the address first.",
+      "mood": "think",
+      "gesture": "shake",
+      "visual": {
+       "kind": "illustration",
+       "id": "key"
+      }
+     },
+     {
+      "id": "b4",
+      "say": "Reject any approval request you did not expect: it means someone knows your password.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "mfa-phone"
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "autofill-check",
+    "environment": "browser",
+    "title": "Test the autofill",
+    "intro": "ParolSeyf runs in your browser. On every page, watch what it offers and check the address.",
+    "steps": [
+     {
+      "id": "real-portal",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "idare",
+       "brand": "Office portal",
+       "url": [
+        {
+         "text": "https://portal.idare.example/giris",
+         "reveal": "idare.example"
+        }
+       ],
+       "fields": [
+        "Username",
+        "Password"
+       ],
+       "button": "Sign in"
+      },
+      "say": "ParolSeyf offers your login. Check the address.",
+      "actions": [
+       {
+        "id": "fill",
+        "label": "Fill with ParolSeyf",
+        "kind": "enter-credentials",
+        "outcome": "safe",
+        "feedback": "Right. The address matches the saved login, which is why the manager offered it."
+       },
+       {
+        "id": "close",
+        "label": "Close tab",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Caution is fine, but this is the real office portal and the manager recognised it."
+       }
+      ]
+     },
+     {
+      "id": "lookalike",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "idare-fake",
+       "brand": "Office portal",
+       "url": [
+        {
+         "text": "https://portal.idare-giris.example.net/giris",
+         "reveal": "idare-giris.example.net"
+        }
+       ],
+       "fields": [
+        "Username",
+        "Password"
+       ],
+       "button": "Sign in"
+      },
+      "say": "A link in an email opened this page. ParolSeyf stays silent.",
+      "actions": [
+       {
+        "id": "type",
+        "label": "Type the password by hand",
+        "kind": "enter-credentials",
+        "outcome": "compromised",
+        "feedback": "The manager stayed silent because this is a fake site. Change the password on the real portal now and report it.",
+        "next": "fake-vault"
+       },
+       {
+        "id": "search",
+        "label": "Find it in ParolSeyf and fill",
+        "kind": "allow",
+        "outcome": "risky",
+        "feedback": "The manager does not recognise this site, and there is a reason. Read the address before going on."
+       },
+       {
+        "id": "close",
+        "label": "Close tab",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right. The domain was idare-giris.example.net, not the office portal.",
+        "next": "fake-vault"
+       },
+       {
+        "id": "report",
+        "label": "Report site",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Great. Your report protects colleagues from the same link.",
+        "next": "fake-vault"
+       }
+      ]
+     },
+     {
+      "id": "mismatch",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "parolseyf",
+       "tone": "system",
+       "title": [
+        {
+         "text": "ParolSeyf: site does not match"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Saved address: portal.idare.example"
+         }
+        ],
+        [
+         {
+          "text": "This page: portal.idare-giris.example.net"
+         }
+        ]
+       ],
+       "buttons": [
+        "Cancel",
+        "Fill anyway"
+       ]
+      },
+      "actions": [
+       {
+        "id": "cancel",
+        "label": "Cancel",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right, the manager caught the difference for you. Close the page and report it."
+       },
+       {
+        "id": "fill",
+        "label": "Fill anyway",
+        "kind": "allow",
+        "outcome": "compromised",
+        "feedback": "Skipping the warning handed your password to a fake site. Change it now and report it."
+       }
+      ]
+     },
+     {
+      "id": "fake-vault",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "parolseyf-fake",
+       "brand": "ParolSeyf",
+       "url": [
+        {
+         "text": "https://parolseyf-giris.example.net/seyf",
+         "reveal": "parolseyf-giris.example.net"
+        }
+       ],
+       "fields": [
+        "Email",
+        "Master password"
+       ],
+       "button": "Open vault"
+      },
+      "say": "A link in an email takes you to a vault sign-in.",
+      "actions": [
+       {
+        "id": "type",
+        "label": "Open vault",
+        "kind": "enter-credentials",
+        "outcome": "compromised",
+        "feedback": "Type the master password only in the ParolSeyf app itself. This site wanted your whole vault."
+       },
+       {
+        "id": "close",
+        "label": "Close tab",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right. Open the vault by starting the app yourself, never through a link."
+       },
+       {
+        "id": "report",
+        "label": "Report site",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Great. This site may have been sent to several people."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "vault-lure",
+    "prompt": "Tap the signs that this email is fake.",
+    "artifact": {
+     "kind": "email",
+     "brandRef": "parolseyf-fake",
+     "from": {
+      "name": [
+       {
+        "text": "ParolSeyf"
+       }
+      ],
+      "address": [
+       {
+        "text": "security@parolseyf-alert.example.net",
+        "spot": "sender"
+       }
+      ]
+     },
+     "subject": [
+      {
+       "text": "Your vault will be deleted in 24 hours",
+       "spot": "deadline"
+      }
+     ],
+     "time": "07:58",
+     "body": [
+      [
+       {
+        "text": "For a security update, "
+       },
+       {
+        "text": "confirm your master password",
+        "spot": "ask-master"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "Confirm: "
+       },
+       {
+        "text": "parolseyf-alert.example.net/tesdiq",
+        "spot": "link",
+        "link": {
+         "label": "parolseyf-alert.example.net/tesdiq",
+         "href": "https://parolseyf-alert.example.net/tesdiq"
+        }
+       }
+      ]
+     ]
+    },
+    "spots": [
+     {
+      "id": "sender",
+      "label": "Sender",
+      "explain": "The address is a look-alike, not ParolSeyf's domain."
+     },
+     {
+      "id": "deadline",
+      "label": "Deadline",
+      "explain": "A 24-hour threat is there to stop you thinking."
+     },
+     {
+      "id": "ask-master",
+      "label": "Master password request",
+      "explain": "No service asks you to confirm your master password by email."
+     },
+     {
+      "id": "link",
+      "label": "Link",
+      "explain": "The link goes to a fake domain. Open the vault from the app yourself."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "choice",
+    "id": "unexpected-push",
+    "question": {
+     "prompt": "At night ParolSeyf asks you to approve a sign-in, but you are not signing in. What do you do?",
+     "options": [
+      {
+       "id": "deny",
+       "label": "I deny it and report it to security",
+       "correct": true,
+       "feedback": "Right. Someone knows your master password: change it now and let security check the sessions."
+      },
+      {
+       "id": "approve",
+       "label": "I approve so the requests stop",
+       "correct": false,
+       "feedback": "This is push bombing. One approval lets the attacker into the vault."
+      },
+      {
+       "id": "ignore",
+       "label": "I ignore it and look in the morning",
+       "correct": false,
+       "feedback": "The request stays open, and someone already has your master password. Deny and report it now."
+      }
+     ],
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "parolseyf",
+       "app": "ParolSeyf",
+       "title": [
+        {
+         "text": "Approve sign-in?"
+        }
+       ],
+       "body": [
+        {
+         "text": "New device: Windows, 23:47"
+        }
+       ],
+       "time": "23:47"
+      }
+     }
+    },
+    "explain": "An unexpected approval request means your password has leaked. Deny, report, change."
+   },
+   {
+    "type": "match",
+    "id": "autofill-rules",
+    "prompt": "Match each situation with the right step.",
+    "pairs": [
+     {
+      "id": "silent",
+      "left": "The manager offers no password",
+      "right": "Check the address, do not copy the password"
+     },
+     {
+      "id": "link",
+      "left": "An email link asks you to open the vault",
+      "right": "Open the app yourself"
+     },
+     {
+      "id": "shared-pc",
+      "left": "You are on someone else's computer",
+      "right": "Do not open your vault there"
+     },
+     {
+      "id": "push",
+      "left": "An approval request you did not expect",
+      "right": "Deny it and report it"
+     }
+    ],
+    "explain": "The manager checks the address; you stop the moment it goes quiet."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "If the manager offers no password, stop and check the address.",
+     "Type the master password only in the manager's own app, never via a link.",
+     "Deny approval requests you did not expect, and report them."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 32,
+ "narrationTotalMs": 162503
+}

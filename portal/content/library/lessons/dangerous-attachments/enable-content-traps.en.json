@@ -1,0 +1,468 @@
+{
+ "id": "enable-content-traps",
+ "title": "Editing and macro traps",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ec-tutor",
+   "beats": [
+    {
+     "id": "ec-b1",
+     "say": "A document from the internet first opens in Protected View, read only. That is your shield.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "ec-b2",
+     "say": "If a blank page shows text like this, stop. A real document does not ask you to press buttons.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "senedyaz",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Protected View: this file came from the internet"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "The document is blank, only a picture shows:"
+         }
+        ],
+        [
+         {
+          "text": "\"To see the text, click Enable Editing, then Enable Content.\"",
+          "spot": "lure"
+         }
+        ]
+       ],
+       "buttons": [
+        "Enable Editing",
+        "Close"
+       ]
+      }
+     },
+     "highlight": "lure"
+    },
+    {
+     "id": "ec-b3",
+     "say": "A macro is a hidden command inside a document. It can install malware on the computer.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "ec-b4",
+     "say": "Also never accept an offer to download a special viewer from a website to open a document.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ec-sim-doc",
+   "environment": "desktop",
+   "title": "Opening a document",
+   "intro": "You opened an attachment called tender terms. Read each window and decide at every step.",
+   "steps": [
+    {
+     "id": "protected-view",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedyaz",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Protected View: this file came from the internet"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "The document is blank, only a picture shows:"
+        }
+       ],
+       [
+        {
+         "text": "\"To see the text, click Enable Editing, then Enable Content.\"",
+         "spot": "lure"
+        }
+       ]
+      ],
+      "buttons": [
+       "Enable Editing",
+       "Close"
+      ]
+     },
+     "say": "The document is blank and wants a click.",
+     "actions": [
+      {
+       "id": "enable",
+       "label": "Enable Editing",
+       "kind": "enable-content",
+       "outcome": "risky",
+       "feedback": "You left Protected View. That mode exists to guard against files like this."
+      },
+      {
+       "id": "close",
+       "label": "Close the document",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Right. A blank page asking for a click is a trap.",
+       "next": "it-alert"
+      },
+      {
+       "id": "report",
+       "label": "Report to IT security",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Great. You reported it without enabling editing.",
+       "next": "it-alert"
+      }
+     ]
+    },
+    {
+     "id": "macro-blocked",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedyaz",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Security risk: macros blocked"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Macros in this document are blocked because the file came from the internet."
+        }
+       ],
+       [
+        {
+         "text": "The document says: \"Unblock the file in its properties and allow macros.\"",
+         "spot": "unblock"
+        }
+       ]
+      ],
+      "buttons": [
+       "Learn more",
+       "Close"
+      ]
+     },
+     "say": "The app blocked the macros. The document asks you to unblock them.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Unblock and allow macros",
+       "kind": "enable-content",
+       "outcome": "compromised",
+       "feedback": "The hidden macro ran and installed malware. Disconnect and call IT security now."
+      },
+      {
+       "id": "close",
+       "label": "Close the document",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "You stopped in time. The app protected you and you did not bypass it."
+      }
+     ]
+    },
+    {
+     "id": "it-alert",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "it-destek",
+      "app": "IT Support",
+      "title": [
+       {
+        "text": "Alert: fake tender documents"
+       }
+      ],
+      "body": [
+       {
+        "text": "Malicious \"tender terms\" documents are spreading. If you got one, report it."
+       }
+      ],
+      "time": "11:02"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Report the email",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right. Your report helps IT remove the email from every mailbox."
+      },
+      {
+       "id": "ignore",
+       "label": "Ignore",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "You closed the file, but the email is still there. Report it so colleagues do not open it."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ec-sim-viewer",
+   "environment": "browser",
+   "title": "Fake PDF viewer",
+   "intro": "A link in an email offers a program to open the document. What do you do?",
+   "steps": [
+    {
+     "id": "viewer-page",
+     "label": "Update Sənəd Oxu to view this document",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "senedoxu-fake",
+      "url": [
+       {
+        "text": "https://senedoxu-yenile.example.net/bax"
+       }
+      ]
+     },
+     "say": "Look at the address bar.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Download and install",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "The fake viewer is malware. Your browser can open PDF files by itself."
+      },
+      {
+       "id": "close",
+       "label": "Close tab",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Right. Programs are installed only by IT or your organisation's software centre."
+      },
+      {
+       "id": "report",
+       "label": "Report site",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Great. Reporting the site protects your colleagues too."
+      }
+     ]
+    },
+    {
+     "id": "viewer-download",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "senedoxu-fake",
+      "name": [
+       {
+        "text": "SenedOxu_Yenileme.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "5,7 MB",
+      "source": [
+       {
+        "text": "senedoxu-yenile.example.net"
+       }
+      ]
+     },
+     "say": "A download started by itself. Check the file type.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "This is a program from a fake site. Opening it infects the computer."
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Right. Delete a download you did not ask for without opening it."
+      },
+      {
+       "id": "report",
+       "label": "Report to IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Great. IT can block this site for everyone."
+      }
+     ]
+    },
+    {
+     "id": "portal-pdf",
+     "label": "Telimat_2026.pdf",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "idare",
+      "url": [
+       {
+        "text": "https://portal.idare.example/senedler/telimat-2026.pdf"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open document",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Right. Internal portal, the file opens in the browser, nothing to install."
+      },
+      {
+       "id": "report",
+       "label": "Report site",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "This is your organisation's own portal and it asks for no install. Save reports for suspicious cases."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ec-hotspot",
+   "prompt": "Find the signs of a trap in this email.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "docusfera-fake",
+    "from": {
+     "name": [
+      {
+       "text": "DocuSfera"
+      }
+     ],
+     "address": [
+      {
+       "text": "imza@docusfera-sened.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Contract awaiting signature"
+     }
+    ],
+    "time": "15:47",
+    "body": [
+     [
+      {
+       "text": "The document was made in an older format."
+      }
+     ],
+     [
+      {
+       "text": "To view it, enable editing first, then enable content.",
+       "spot": "enable"
+      }
+     ],
+     [
+      {
+       "text": "If it does not open, update your viewer here: ",
+       "spot": "viewer"
+      },
+      {
+       "text": "Get Sənəd Oxu",
+       "spot": "viewer",
+       "link": {
+        "label": "Sənəd Oxu",
+        "href": "https://senedoxu-yenile.example.net/yukle"
+       }
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Muqavile_imza.xlsm",
+        "spot": "macro"
+       }
+      ],
+      "size": "210 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Different domain",
+     "explain": "It uses the signing service name, but the domain is different. Report it."
+    },
+    {
+     "id": "enable",
+     "label": "Request to enable",
+     "explain": "A real document can be read without enabling editing or macros."
+    },
+    {
+     "id": "macro",
+     "label": "Macro file",
+     "explain": "An Office file ending in \"m\" (xlsm, docm) can carry macros."
+    },
+    {
+     "id": "viewer",
+     "label": "Program download link",
+     "explain": "Needing a special program for a document is a sign of a fake viewer."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "ec-order",
+   "prompt": "A document asks for macros. Put the steps in order.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Do not press any button"
+    },
+    {
+     "id": "close",
+     "label": "Close the document"
+    },
+    {
+     "id": "report",
+     "label": "Report the email to IT security"
+    },
+    {
+     "id": "verify",
+     "label": "If expected, ask the sender on a number you know"
+    }
+   ],
+   "explain": "First stop and close, then report. Check with the sender only on a number you already know."
+  },
+  {
+   "type": "recap",
+   "id": "ec-recap",
+   "points": [
+    "A blank document asking for a click is a trap",
+    "Do not enable editing or macros: close and report",
+    "Never download a program from a site to open a document"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

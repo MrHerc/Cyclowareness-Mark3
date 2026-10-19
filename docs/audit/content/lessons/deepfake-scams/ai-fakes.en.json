@@ -1,0 +1,464 @@
+{
+ "module": {
+  "slug": "deepfake-scams",
+  "title": "Deepfake scams",
+  "category": "ai-threats"
+ },
+ "lesson": {
+  "id": "ai-fakes",
+  "title": "AI images and news",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "seconds",
+      "say": "AI can create real-looking pictures, videos and news in seconds.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "social"
+      }
+     },
+     {
+      "id": "celebrity",
+      "say": "Investment ads with a fake video of a famous person are a very common scam.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "email",
+        "brandRef": "db-bulvar-xeber-fake",
+        "from": {
+         "name": [
+          {
+           "text": "BulvarXəbər"
+          }
+         ],
+         "address": [
+          {
+           "text": "xeber@"
+          },
+          {
+           "text": "bulvar-xeber.example.net",
+           "spot": "domain"
+          }
+         ]
+        },
+        "subject": [
+         {
+          "text": "Sensation: famous presenter reveals the secret on air",
+          "spot": "sensation"
+         }
+        ],
+        "time": "08:05",
+        "body": [
+         [
+          {
+           "text": "The presenter put 250 manat into a new platform and now earns 3000 a month.",
+           "spot": "promise"
+          }
+         ],
+         [
+          {
+           "text": "The banks are hiding this from you!",
+           "spot": "secret"
+          }
+         ],
+         [
+          {
+           "text": "Places are limited, sign up today only: ",
+           "spot": "rush"
+          },
+          {
+           "text": "neftinvest.example.net",
+           "link": {
+            "label": "neftinvest.example.net",
+            "href": "https://neftinvest.example.net/qeydiyyat"
+           }
+          }
+         ]
+        ]
+       }
+      },
+      "highlight": "promise"
+     },
+     {
+      "id": "details",
+      "say": "Fingers, lettering and light are sometimes wrong, but you cannot always spot it.",
+      "mood": "think",
+      "gesture": "shrug",
+      "visual": {
+       "kind": "illustration",
+       "id": "eye"
+      }
+     },
+     {
+      "id": "rule",
+      "say": "Check the news on the official site, and never trust a promise of big profits.",
+      "mood": "happy",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "browser"
+      }
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "fake-ad",
+    "prompt": "Find the warning signs in this email.",
+    "artifact": {
+     "kind": "email",
+     "brandRef": "db-bulvar-xeber-fake",
+     "from": {
+      "name": [
+       {
+        "text": "BulvarXəbər"
+       }
+      ],
+      "address": [
+       {
+        "text": "xeber@"
+       },
+       {
+        "text": "bulvar-xeber.example.net",
+        "spot": "domain"
+       }
+      ]
+     },
+     "subject": [
+      {
+       "text": "Sensation: famous presenter reveals the secret on air",
+       "spot": "sensation"
+      }
+     ],
+     "time": "08:05",
+     "body": [
+      [
+       {
+        "text": "The presenter put 250 manat into a new platform and now earns 3000 a month.",
+        "spot": "promise"
+       }
+      ],
+      [
+       {
+        "text": "The banks are hiding this from you!",
+        "spot": "secret"
+       }
+      ],
+      [
+       {
+        "text": "Places are limited, sign up today only: ",
+        "spot": "rush"
+       },
+       {
+        "text": "neftinvest.example.net",
+        "link": {
+         "label": "neftinvest.example.net",
+         "href": "https://neftinvest.example.net/qeydiyyat"
+        }
+       }
+      ]
+     ]
+    },
+    "spots": [
+     {
+      "id": "domain",
+      "label": "Fake domain",
+      "explain": "The news site's real address is different. Read the address to the end."
+     },
+     {
+      "id": "sensation",
+      "label": "Sensational headline",
+      "explain": "Sensation is there to make you click on emotion."
+     },
+     {
+      "id": "promise",
+      "label": "Promise of big profit",
+      "explain": "No legitimate investment promises guaranteed big returns."
+     },
+     {
+      "id": "secret",
+      "label": "Hidden secret",
+      "explain": "The hidden secret story pulls you away from official sources."
+     },
+     {
+      "id": "rush",
+      "label": "Today only",
+      "explain": "Rush leaves no time to think and check."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "simulation",
+    "id": "invest-browser",
+    "environment": "browser",
+    "title": "Behind the ad",
+    "intro": "Say you opened the link in the ad. Make the right call at every step on the site.",
+    "steps": [
+     {
+      "id": "fake-article",
+      "label": "Presenter reveals the secret on air: 3000 a month",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "db-bulvar-xeber-fake",
+       "url": [
+        {
+         "text": "https://",
+         "reveal": "bulvar-xeber.example.net"
+        },
+        {
+         "text": "bulvar-xeber.example.net",
+         "spot": "domain"
+        },
+        {
+         "text": "/neftinvest"
+        }
+       ]
+      },
+      "say": "The video talks just like the presenter.",
+      "actions": [
+       {
+        "id": "register",
+        "label": "Watch the video and sign up",
+        "kind": "click-link",
+        "outcome": "risky",
+        "feedback": "The video was made with AI; the presenter never said this. The page leads to a scam platform."
+       },
+       {
+        "id": "close",
+        "label": "Close the tab",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right. A big profit promise and a fake domain are enough.",
+        "next": "real-news"
+       }
+      ]
+     },
+     {
+      "id": "invest-form",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "db-neftinvest",
+       "brand": "NeftInvest Pro",
+       "url": [
+        {
+         "text": "https://neftinvest.example.net/qeydiyyat",
+         "reveal": "neftinvest.example.net"
+        }
+       ],
+       "fields": [
+        "Full name",
+        "Phone",
+        "Card number",
+        "CVV"
+       ],
+       "button": "Invest 250 manat"
+      },
+      "actions": [
+       {
+        "id": "pay",
+        "label": "Invest 250 manat",
+        "kind": "enter-credentials",
+        "outcome": "compromised",
+        "feedback": "Your card details went to scammers and the money will not return. Call your bank now and block the card."
+       },
+       {
+        "id": "close",
+        "label": "Close the tab",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right. Card details never go to a platform you do not know."
+       }
+      ]
+     },
+     {
+      "id": "real-news",
+      "label": "Presenter: the ad using my name is fake",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "db-bulvar-xeber",
+       "url": [
+        {
+         "text": "https://bulvar-xeber.example/xeberler/saxta-reklam",
+         "reveal": "bulvar-xeber.example"
+        }
+       ]
+      },
+      "say": "This is the news site's real address.",
+      "actions": [
+       {
+        "id": "read",
+        "label": "Read the article",
+        "kind": "open",
+        "outcome": "safe",
+        "feedback": "Right. Checking a doubtful story on the official source is the most reliable way."
+       },
+       {
+        "id": "share",
+        "label": "Share with family",
+        "kind": "share",
+        "outcome": "safe",
+        "feedback": "Good idea. Sharing the official denial protects others too."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "swipe",
+    "id": "believe-or-check",
+    "prompt": "Can you trust this, or is it dangerous?",
+    "cards": [
+     {
+      "id": "weather",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "db-bulvar-xeber",
+       "app": "BulvarXəbər",
+       "title": [
+        {
+         "text": "Rain expected in Baku tomorrow"
+        }
+       ],
+       "body": [
+        {
+         "text": "Temperatures of 14 to 18 degrees."
+        }
+       ],
+       "time": "07:30"
+      },
+      "verdict": "safe",
+      "explain": "An ordinary story that asks for nothing."
+     },
+     {
+      "id": "aid-link",
+      "artifact": {
+       "kind": "chat",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Neighbourhood group"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Every family gets 500 manat of aid, sign up here: "
+          },
+          {
+           "text": "yardim-az.example.net",
+           "link": {
+            "label": "yardim-az.example.net",
+            "href": "https://yardim-az.example.net"
+           }
+          }
+         ],
+         "time": "19:20"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "State aid goes through the official portal, not a link in a group chat."
+     },
+     {
+      "id": "crypto-star",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "kontakto",
+       "app": "Kontakto",
+       "title": [
+        {
+         "text": "Sponsored"
+        }
+       ],
+       "body": [
+        {
+         "text": "Famous footballer is giving money away: enter your card details to get the gift."
+        }
+       ],
+       "time": "21:00"
+      },
+      "verdict": "threat",
+      "explain": "Free money in a celebrity's name is a classic scam. The picture and video may be AI-made."
+     },
+     {
+      "id": "portal",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "e-xidmet",
+       "app": "e-Xidmət",
+       "title": [
+        {
+         "text": "Your application status changed"
+        }
+       ],
+       "body": [
+        {
+         "text": "Details are in your personal account on the portal."
+        }
+       ],
+       "time": "10:45"
+      },
+      "verdict": "safe",
+      "explain": "No link or payment is asked; it points you to the official portal."
+     }
+    ]
+   },
+   {
+    "type": "order",
+    "id": "check-news",
+    "prompt": "You see shocking news. Put the checks in order.",
+    "items": [
+     {
+      "id": "pause",
+      "label": "Pause, do not share right away"
+     },
+     {
+      "id": "source",
+      "label": "Look at the source and the site address"
+     },
+     {
+      "id": "official",
+      "label": "Look for the story on the official site or a trusted source"
+     },
+     {
+      "id": "decide",
+      "label": "Share only if confirmed, report it if fake"
+     }
+    ],
+    "explain": "First hold the emotion, then check. Sharing comes last."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Real-looking pictures and videos can be AI-made.",
+     "Promises of big profit or free money are scams.",
+     "Check news on an official source before sharing."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 27,
+ "narrationTotalMs": 121681
+}

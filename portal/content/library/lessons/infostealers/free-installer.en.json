@@ -1,0 +1,511 @@
+{
+ "id": "free-installer",
+ "title": "Free software",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "is1-tutor",
+   "beats": [
+    {
+     "id": "is1-b1",
+     "say": "Hello! Today we learn to spot infostealers, programs that hide inside free software.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    },
+    {
+     "id": "is1-b2",
+     "say": "In just two months, three hundred ninety four thousand computers infected with one such program were found.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "394,000",
+      "label": "infected computers found in two months"
+     }
+    },
+    {
+     "id": "is1-b3",
+     "say": "It arrives as free software, a game mod or an activator, and takes passwords, cards and sessions.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "file",
+       "name": [
+        {
+         "text": "SenedYaz_Pro_Activator.zip",
+         "spot": "activator"
+        }
+       ],
+       "type": "zip",
+       "size": "38 MB",
+       "source": [
+        {
+         "text": "Downloads"
+        }
+       ]
+      }
+     },
+     "highlight": "activator"
+    },
+    {
+     "id": "is1-b4",
+     "say": "The rule is simple: install software only from the official source or through technical support.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "is1-hotspot",
+   "prompt": "Find the warning signs in this post.",
+   "artifact": {
+    "kind": "chat",
+    "brandRef": "w2b-pulsuz-proqramlar",
+    "app": "generic",
+    "contact": [
+     {
+      "text": "Pulsuz Proqramlar | channel"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "SenedYaz Pro 2026, full version, with activator, FREE",
+        "spot": "cracked"
+       }
+      ],
+      "time": "21:40"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Download: "
+       },
+       {
+        "text": "pulsuz-proqram-yukle.example/senedyaz",
+        "spot": "link",
+        "link": {
+         "label": "pulsuz-proqram-yukle.example/senedyaz",
+         "href": "https://pulsuz-proqram-yukle.example/senedyaz"
+        }
+       }
+      ],
+      "time": "21:40"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Archive password: 2026",
+        "spot": "zip-password"
+       }
+      ],
+      "time": "21:41"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Turn off your antivirus before installing, or it will show a false warning.",
+        "spot": "av-off"
+       }
+      ],
+      "time": "21:41"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "12,400 people downloaded it, everyone is happy!",
+        "spot": "proof"
+       }
+      ],
+      "time": "21:42"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "cracked",
+     "label": "Paid software for free",
+     "explain": "A free full version of paid software is the most common bait. The activator itself is often the malware."
+    },
+    {
+     "id": "link",
+     "label": "Not the official site",
+     "explain": "This is not the software's official site. Nobody knows who put the file there."
+    },
+    {
+     "id": "zip-password",
+     "label": "Password-protected archive",
+     "explain": "Antivirus cannot look inside a password-protected archive. That is exactly why criminals add a password."
+    },
+    {
+     "id": "av-off",
+     "label": "Turn off antivirus",
+     "explain": "A program that wants protection turned off is afraid of it. This is the clearest signal."
+    },
+    {
+     "id": "proof",
+     "label": "Made-up numbers",
+     "explain": "Anyone can write any number in a channel. A download count is no proof of safety."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "is1-sim",
+   "environment": "desktop",
+   "title": "The home computer",
+   "intro": "Your family uses this computer, and you use it for work mail. Decide at every step.",
+   "steps": [
+    {
+     "id": "activator-zip",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "w2b-pulsuz-proqramlar",
+      "name": [
+       {
+        "text": "SenedYaz_Pro_Activator.zip"
+       }
+      ],
+      "type": "zip",
+      "size": "38 MB",
+      "source": [
+       {
+        "text": "Downloads"
+       }
+      ]
+     },
+     "say": "The archive from the channel is already downloaded.",
+     "actions": [
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Correct. Deleting a file like this is the safest step, get the software the official way."
+      },
+      {
+       "id": "open",
+       "label": "Open and run",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "As soon as the activator runs, it sends passwords and sessions out within seconds. Antivirus may notice too late."
+      },
+      {
+       "id": "scan",
+       "label": "Scan with antivirus",
+       "kind": "scan",
+       "outcome": "risky",
+       "feedback": "Antivirus cannot see inside a password-protected archive. Even if the scan says clean, do not trust this file."
+      }
+     ]
+    },
+    {
+     "id": "game-mod",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "BlokDunyasi_Mod_Pulsuz.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "2.1 MB",
+      "source": [
+       {
+        "text": "Downloads"
+       }
+      ]
+     },
+     "say": "Your daughter has downloaded a mod for a game.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "This file goes for the browser, not the game. It takes saved passwords and your work mail session."
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Right. Get game add-ons only from the game's official store."
+      },
+      {
+       "id": "store",
+       "label": "Check the official store with your daughter",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Well done. Explaining the reason to a child protects the next time too."
+      }
+     ]
+    },
+    {
+     "id": "codec-warning",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "qoruyucu",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Your computer was protected"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "A program from an unknown publisher was not started."
+        }
+       ],
+       [
+        {
+         "text": "File: Video_Kodek_Setup.exe"
+        }
+       ],
+       [
+        {
+         "text": "Publisher: Unknown"
+        }
+       ]
+      ],
+      "buttons": [
+       "Don't run",
+       "Run anyway"
+      ]
+     },
+     "say": "A film site asked you to install a codec to watch the video.",
+     "actions": [
+      {
+       "id": "dont-run",
+       "label": "Don't run",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Correct. A site that needs a program to play a video is a trap, watch it somewhere else.",
+       "next": "save-password"
+      },
+      {
+       "id": "run",
+       "label": "Run anyway",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "The system warned you, but you made the call. Now the installer will try to switch off your protection."
+      }
+     ]
+    },
+    {
+     "id": "av-disable",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "qoruyucu",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Qoruyucu Antivirus"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Video_Kodek_Setup.exe wants to turn off real-time protection."
+        }
+       ]
+      ],
+      "buttons": [
+       "Turn off",
+       "Keep protection on"
+      ]
+     },
+     "say": "The installer asks for a new permission.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Turn off",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Protection is off and the stealer runs freely. Disconnect the computer and tell technical support."
+      },
+      {
+       "id": "deny",
+       "label": "Keep protection on",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Good call, but the program has already run. Tell technical support and change your work passwords from another device."
+      }
+     ]
+    },
+    {
+     "id": "save-password",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "db-xezri-brauzer",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Save password?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "poct.idare.example"
+        }
+       ],
+       [
+        {
+         "text": "User: n.quliyeva@idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Save",
+       "Never"
+      ]
+     },
+     "say": "Now you sign in to work mail on this computer.",
+     "actions": [
+      {
+       "id": "never",
+       "label": "Never",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Correct. A work password saved on a family computer is a stealer's first target."
+      },
+      {
+       "id": "save",
+       "label": "Save",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Children install programs on this computer too. A stealer would take the work password saved here first."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "is1-choice",
+   "question": {
+    "prompt": "You need paid software for work. What is the safest way?",
+    "options": [
+     {
+      "id": "it",
+      "label": "I ask technical support or the office software centre",
+      "correct": true,
+      "feedback": "Correct. Licensed software is safe and it gets updates."
+     },
+     {
+      "id": "forum",
+      "label": "I download the version with an activator from a forum",
+      "correct": false,
+      "feedback": "Activators are the most common way to get infected. Your passwords pay for the free software."
+     },
+     {
+      "id": "portable",
+      "label": "I download a portable version from a file sharing site",
+      "correct": false,
+      "feedback": "You do not know who uploaded the file. A portable version carries the same danger."
+     }
+    ]
+   },
+   "explain": "Software comes only from the official source. On a work computer, technical support does the installing."
+  },
+  {
+   "type": "scenario",
+   "id": "is1-scenario",
+   "title": "The game mod",
+   "start": "ask",
+   "nodes": [
+    {
+     "id": "ask",
+     "text": "Can I download this mod? It is free, I just need to switch off the antivirus for a minute.",
+     "speaker": "Aysel (your daughter)",
+     "voice": "young-woman",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Can I download this mod? <breath> It is free, I just need to switch off the antivirus for a minute.",
+     "character": "aysel",
+     "choices": [
+      {
+       "label": "No. A program that wants protection off is dangerous, let us look in the official store",
+       "next": "store",
+       "feedback": "Correct. Explaining the reason works better than a ban."
+      },
+      {
+       "label": "All right, but be quick",
+       "next": "black-window",
+       "feedback": "A minute is enough. A stealer does its work in seconds."
+      }
+     ]
+    },
+    {
+     "id": "store",
+     "text": "The store does not have that mod! All my friends download it from a forum.",
+     "speaker": "Aysel (your daughter)",
+     "voice": "young-woman",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "The store does not have that mod! <short pause> All my friends download it from a forum.",
+     "character": "aysel",
+     "choices": [
+      {
+       "label": "My work mail is on this computer too. Let us make you your own account, and only use the official store",
+       "outcome": "safe",
+       "feedback": "Well done. A separate account and the official store protect both your family and your work."
+      },
+      {
+       "label": "Then just this once",
+       "outcome": "compromised",
+       "feedback": "Once is enough. A stealer takes passwords and sessions in seconds."
+      }
+     ]
+    },
+    {
+     "id": "black-window",
+     "text": "The mod did not work. A black window flashed on the screen and closed.",
+     "choices": [
+      {
+       "label": "I cut the internet, tell technical support and change my work passwords from another device",
+       "outcome": "safe",
+       "feedback": "Correct. If you act fast, the stolen sessions become useless."
+      },
+      {
+       "label": "Nothing happened, I will delete the mod",
+       "outcome": "risky",
+       "feedback": "Deleting is not enough, the data is already gone. Change passwords from a clean device and tell technical support."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "is1-recap",
+   "points": [
+    "Activators, free full versions and game cheats are the most common bait",
+    "Never install a program that asks you to turn off protection",
+    "Do not save work passwords on a family computer"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,493 @@
+{
+ "module": {
+  "slug": "messenger-hijack",
+  "title": "Messenger Account Hijack",
+  "category": "identity"
+ },
+ "lesson": {
+  "id": "device-and-votes",
+  "title": "Devices and Votes",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "mh2-tutor",
+    "beats": [
+     {
+      "id": "mh2-b1",
+      "say": "There is also a quiet way to steal an account: a voting link and a hidden linked device.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "social"
+      }
+     },
+     {
+      "id": "mh2-b2",
+      "say": "If you see a notice like this, your account is open on another device too.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "notification",
+        "brandRef": "sohbet",
+        "app": "Söhbət",
+        "title": [
+         {
+          "text": "New device linked",
+          "spot": "device"
+         }
+        ],
+        "body": [
+         {
+          "text": "Computer, Ganja. If this was not you, check your linked devices."
+         }
+        ],
+        "time": "21:14"
+       }
+      },
+      "highlight": "device"
+     },
+     {
+      "id": "mh2-b3",
+      "say": "Do not trust a page that wants your messenger login before you can vote.",
+      "mood": "think",
+      "gesture": "shake",
+      "visual": {
+       "kind": "illustration",
+       "id": "browser"
+      }
+     },
+     {
+      "id": "mh2-b4",
+      "say": "Turn on two-step verification and check your linked devices from time to time.",
+      "mood": "happy",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "lock"
+      }
+     }
+    ]
+   },
+   {
+    "type": "swipe",
+    "id": "mh2-swipe",
+    "prompt": "Is each notice safe or a threat?",
+    "cards": [
+     {
+      "id": "unasked-code",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "sohbet",
+       "sender": [
+        {
+         "text": "Söhbət"
+        }
+       ],
+       "time": "23:40",
+       "messages": [
+        [
+         {
+          "text": "Your Söhbət code: 418 205. Do not share this code with anyone."
+         }
+        ]
+       ]
+      },
+      "verdict": "threat",
+      "explain": "If you did not ask for it, someone is trying to log in with your number. Give the code to no one."
+     },
+     {
+      "id": "linked",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "sohbet",
+       "app": "Söhbət",
+       "title": [
+        {
+         "text": "New device linked"
+        }
+       ],
+       "body": [
+        {
+         "text": "Computer, Ganja, 21:14"
+        }
+       ],
+       "time": "21:14"
+      },
+      "verdict": "threat",
+      "explain": "If you did not link it, someone is reading your chats. Remove it from linked devices right away."
+     },
+     {
+      "id": "vote-link",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "sohbet",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Sevinc Əliyeva"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "My daughter is in a drawing contest, please vote: "
+          },
+          {
+           "text": "balaca-ressam.example.org/ses",
+           "link": {
+            "label": "balaca-ressam.example.org/ses",
+            "href": "https://balaca-ressam.example.org/ses"
+           }
+          }
+         ],
+         "time": "19:05"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Voting links are a favourite way to steal accounts. Even if someone you know sends one, do not log in on that page."
+     },
+     {
+      "id": "pin-on",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "sohbet",
+       "app": "Söhbət",
+       "title": [
+        {
+         "text": "Two-step verification turned on"
+        }
+       ],
+       "body": [
+        {
+         "text": "You set up extra protection for your account."
+        }
+       ],
+       "time": "12:30"
+      },
+      "verdict": "safe",
+      "explain": "This confirms a step you took yourself. Two-step verification protects the account from code theft."
+     },
+     {
+      "id": "meeting",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "sohbet",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Department group"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Kamran Əhmədov: Tomorrow's meeting is at ten, in room two fourteen."
+          }
+         ],
+         "time": "17:48"
+        }
+       ]
+      },
+      "verdict": "safe",
+      "explain": "This is an ordinary work message. It asks for no code, no money and no link."
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "mh2-sim",
+    "environment": "browser",
+    "title": "The drawing contest",
+    "intro": "Someone you know asks for votes in a children's drawing contest. Choose the right step on each page.",
+    "steps": [
+     {
+      "id": "vote-page",
+      "label": "Vote for Leyla's drawing",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "w2a-balaca-ressam",
+       "url": [
+        {
+         "text": "https://balaca-ressam.example.org/ses"
+        }
+       ]
+      },
+      "say": "The page looks lovely and has a Vote button.",
+      "actions": [
+       {
+        "id": "vote",
+        "label": "Vote",
+        "kind": "click-link",
+        "outcome": "risky",
+        "feedback": "The vote button takes you to a login page. You have lost nothing yet, but be careful."
+       },
+       {
+        "id": "close",
+        "label": "Close the page",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. Closing an unknown page that wants an account for a vote is the safest step.",
+        "next": "devices"
+       }
+      ]
+     },
+     {
+      "id": "login",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "w2a-sohbet-fake",
+       "brand": "Söhbət",
+       "url": [
+        {
+         "text": "https://sohbet-giris.example.org"
+        }
+       ],
+       "fields": [
+        "Phone number"
+       ],
+       "button": "Get code"
+      },
+      "say": "It wants you to log in with Söhbət to vote.",
+      "actions": [
+       {
+        "id": "enter",
+        "label": "Enter the number",
+        "kind": "enter-credentials",
+        "outcome": "risky",
+        "feedback": "With your number the thief requests a code in your name. On the next step they will ask for that code."
+       },
+       {
+        "id": "close",
+        "label": "Close the page",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. The address is not Söhbət's own, so this is a fake login page.",
+        "next": "devices"
+       }
+      ]
+     },
+     {
+      "id": "code",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-sohbet-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Enter the code"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Type the six-digit Söhbət code sent to your phone."
+         }
+        ]
+       ],
+       "buttons": [
+        "Confirm",
+        "Cancel"
+       ]
+      },
+      "say": "Now it asks you to type the code from your phone on this page.",
+      "actions": [
+       {
+        "id": "enter",
+        "label": "Type the code",
+        "kind": "enter-credentials",
+        "outcome": "compromised",
+        "feedback": "The moment you typed it, your account opened on the thief's phone. A Söhbət code is never typed on a website."
+       },
+       {
+        "id": "cancel",
+        "label": "Cancel",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. The code is only needed inside the Söhbət app itself, never on a page.",
+        "next": "devices"
+       }
+      ]
+     },
+     {
+      "id": "pairing",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-sohbet-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Confirm your vote"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Open Linked devices in the Söhbət app and enter this code:"
+         }
+        ],
+        [
+         {
+          "text": "[code given by the page]"
+         }
+        ]
+       ],
+       "buttons": [
+        "Done",
+        "Cancel"
+       ]
+      },
+      "say": "The page asks for something new: linking a device in the app.",
+      "actions": [
+       {
+        "id": "pair",
+        "label": "Link the device",
+        "kind": "allow",
+        "outcome": "compromised",
+        "feedback": "You linked the thief's computer to your account. Now they see all your chats."
+       },
+       {
+        "id": "cancel",
+        "label": "Cancel",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. Voting never requires linking a device."
+       }
+      ]
+     },
+     {
+      "id": "devices",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "sohbet",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Linked devices"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Computer, Ganja. Last active: two minutes ago."
+         }
+        ],
+        [
+         {
+          "text": "Did you link this device?"
+         }
+        ]
+       ],
+       "buttons": [
+        "Log out",
+        "Keep"
+       ]
+      },
+      "say": "Just in case, you check linked devices in Söhbət's own settings.",
+      "actions": [
+       {
+        "id": "logout",
+        "label": "Log out",
+        "kind": "disconnect",
+        "outcome": "safe",
+        "feedback": "Correct. Once you log out a device you do not know, it no longer sees your messages."
+       },
+       {
+        "id": "keep",
+        "label": "Keep",
+        "kind": "ignore",
+        "outcome": "compromised",
+        "feedback": "You did not link this device. If you keep it, someone will go on reading your chats."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "mh2-choice",
+    "question": {
+     "prompt": "What protects your Söhbət account best against code theft?",
+     "options": [
+      {
+       "id": "two-step",
+       "label": "Turning on two-step verification",
+       "correct": true,
+       "feedback": "Correct. Even if the code is stolen, no one gets in without the secret digits you set."
+      },
+      {
+       "id": "photo",
+       "label": "Hiding your profile photo",
+       "correct": false,
+       "feedback": "Photo privacy is good, but it does not protect the account. Two-step verification does."
+      },
+      {
+       "id": "delete-chats",
+       "label": "Deleting chats often",
+       "correct": false,
+       "feedback": "This does not stop a thief from getting in. Turn on two-step verification."
+      }
+     ]
+    },
+    "explain": "Two-step verification puts a second lock on your account. Only you know it."
+   },
+   {
+    "type": "match",
+    "id": "mh2-match",
+    "prompt": "Match each situation to the right step.",
+    "pairs": [
+     {
+      "id": "code",
+      "left": "A code you did not ask for",
+      "right": "Give it to no one"
+     },
+     {
+      "id": "device",
+      "left": "A new device notice",
+      "right": "Remove it from linked devices"
+     },
+     {
+      "id": "vote",
+      "left": "A login to vote",
+      "right": "Close the page"
+     },
+     {
+      "id": "money",
+      "left": "A friend asks for money",
+      "right": "Check with a normal call"
+     }
+    ],
+    "explain": "The code, devices and links are the doors to your account. Control each one yourself and open none to others."
+   },
+   {
+    "type": "recap",
+    "id": "mh2-recap",
+    "points": [
+     "Do not log in with Söhbət to vote",
+     "On a new device notice, check linked devices",
+     "Turn on two-step verification"
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 34,
+ "narrationTotalMs": 181397
+}

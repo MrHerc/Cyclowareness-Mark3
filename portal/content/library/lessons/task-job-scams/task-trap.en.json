@@ -1,0 +1,499 @@
+{
+ "id": "task-trap",
+ "title": "The task trap",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "tt-tutor",
+   "beats": [
+    {
+     "id": "tt-b1",
+     "say": "Hello! Today we look at job offers that promise easy money from home.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "tt-b2",
+     "say": "The task is simple: like, review, send a screenshot. And the pay is suspiciously high.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2d-nergiz-market-fake",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Nargiz Market HR | Aynur"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hello! Work from home: like products and write reviews."
+          }
+         ],
+         "time": "09:12"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Earn 40-120 AZN a day",
+           "spot": "pay"
+          }
+         ],
+         "time": "09:12"
+        }
+       ]
+      }
+     },
+     "highlight": "pay"
+    },
+    {
+     "id": "tt-b3",
+     "say": "They really do pay the first five manat. It is bait for a big payment later.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "tt-b4",
+     "say": "The rule: if you must pay to start or to withdraw earnings, it is a scam.",
+     "mood": "happy",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "tt-sim",
+   "environment": "phone",
+   "title": "Work from home",
+   "intro": "A job offer arrives from an unknown number. Choose your reply to each message.",
+   "steps": [
+    {
+     "id": "offer",
+     "label": "09:12 New message",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Nargiz Market HR | Aynur"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hello! We got your number from your profile on a job site."
+         }
+        ],
+        "time": "09:12"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Work from home: 1-2 hours a day, 40-120 AZN. Interested?"
+         }
+        ],
+        "time": "09:12"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "interested",
+       "label": "Yes, tell me more",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Showing interest is not a loss yet, but this chat leads to a payment. Watch every step."
+      },
+      {
+       "id": "block",
+       "label": "Block and report",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Right. An unexpected offer with sky high pay is warning enough.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "first-task",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Nargiz Market HR | Aynur"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "First task: give these 3 products 5 stars and send a screenshot."
+         }
+        ],
+        "time": "09:20"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "1.70 AZN per task."
+         }
+        ],
+        "time": "09:20"
+       }
+      ]
+     },
+     "say": "Here is the first task.",
+     "actions": [
+      {
+       "id": "do-it",
+       "label": "Doing it, sending the screenshot",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Fake reviews mislead other buyers. It is also the first rung of the scam."
+      },
+      {
+       "id": "refuse",
+       "label": "No fake reviews, I block them",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Right. Being paid to like and review is a well known sign of this scam.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "first-pay",
+     "label": "10:03 SahilBank",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "10:03",
+      "messages": [
+       [
+        {
+         "text": "Incoming to your card: 5.10 AZN. Balance: 63.40 AZN."
+        }
+       ]
+      ]
+     },
+     "say": "Money really did arrive on your card.",
+     "actions": [
+      {
+       "id": "trust",
+       "label": "Money came, so the job is real",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "A small payout is there to win your trust. The scammer takes back many times more later."
+      },
+      {
+       "id": "bait",
+       "label": "It is bait. I stop here",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Right. The first payout is bait, the next step is asking you for money.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "vip-task",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Nargiz Market VIP group"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Congratulations, you reached VIP level!"
+         }
+        ],
+        "time": "10:40"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "VIP task: deposit 50 AZN, get 130 AZN back in 30 minutes."
+         }
+        ],
+        "time": "10:41"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Everyone in the group earns, look, 47 people got paid today."
+         }
+        ],
+        "time": "10:41"
+       }
+      ]
+     },
+     "say": "Now they moved you to a Telegram group.",
+     "actions": [
+      {
+       "id": "deposit",
+       "label": "I deposit 50 AZN",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "That money will not come back. The winners in the group are the scammers themselves."
+      },
+      {
+       "id": "leave",
+       "label": "Leave and report the group",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Right. If you must deposit money to work, it is not a job but a scam.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "negative",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Nargiz Market VIP group"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "System error: your balance is now -86 AZN."
+         }
+        ],
+        "time": "11:15"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Pay 86 AZN or your 214 AZN earnings will be deleted."
+         }
+        ],
+        "time": "11:15"
+       }
+      ]
+     },
+     "say": "After you paid, the balance suddenly went negative.",
+     "actions": [
+      {
+       "id": "pay-more",
+       "label": "I pay the 86 AZN too",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "There will be a new reason after every payment. Stop and report it to your bank and the police on 102."
+      },
+      {
+       "id": "stop",
+       "label": "I do not pay, I block and report",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Right, paying to release earnings is the last rung of the scam. Keep the chat as evidence."
+      }
+     ]
+    },
+    {
+     "id": "end",
+     "label": "IshBazar: new vacancy",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2d-isbazar",
+      "app": "IshBazar",
+      "title": [
+       {
+        "text": "Khazar Logistics: operator"
+       }
+      ],
+      "body": [
+       {
+        "text": "Interview at the office, salary 850 AZN. Apply on the site."
+       }
+      ],
+      "time": "12:30"
+     },
+     "say": "And this is a real vacancy.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "View the vacancy",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Right. A real vacancy names the company, has an interview and a real salary, and never asks you to pay."
+      },
+      {
+       "id": "later",
+       "label": "Look later",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "That is fine. A real job ad does not vanish, you can check it calmly."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "tt-scenario",
+   "title": "Leyla already paid",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "I put 120 manat into the tasks. Now they want a 15 percent tax to withdraw. Should I pay?",
+     "speaker": "Leyla, your relative (on the phone)",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "I put 120 manat into the tasks. <breath> Now they want a 15 percent tax to withdraw. Should I pay?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Don't pay, it is the same scam going on",
+       "next": "id-photo",
+       "feedback": "Right. A tax or fee to withdraw earnings is a sign of fraud."
+      },
+      {
+       "label": "Pay, or the 120 manat is lost too",
+       "outcome": "compromised",
+       "feedback": "That only grows the loss. After the tax there will be a new excuse."
+      }
+     ]
+    },
+    {
+     "id": "id-photo",
+     "text": "I also sent them a photo of my ID card to register. Is that a problem?",
+     "speaker": "Leyla",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "I also sent them a photo of my ID card to register. <breath> Is that a problem?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Yes, let's tell the bank and the police about it too",
+       "next": "steps",
+       "feedback": "Right. An ID photo can be used to open accounts or loans in your name."
+      },
+      {
+       "label": "No, a photo is useless to them",
+       "next": "steps",
+       "outcome": "risky",
+       "feedback": "On the contrary, an ID photo can be used to open fake accounts in her name. Report that too."
+      }
+     ]
+    },
+    {
+     "id": "steps",
+     "text": "So what do I do now?",
+     "speaker": "Leyla",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "<breath> So what do I do now?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Call your bank, report to the police on 102, keep the chat",
+       "outcome": "safe",
+       "feedback": "Great. The bank may try to stop the transfer, and the chat is evidence for the police."
+      },
+      {
+       "label": "Delete everything and forget it",
+       "outcome": "risky",
+       "feedback": "Deleting the chat destroys the evidence. There is no shame in it, just report it."
+      },
+      {
+       "label": "Write to the channel that promises to get money back",
+       "outcome": "compromised",
+       "feedback": "Those who promise to recover money are often the same scammers. Do not pay them anything."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "tt-match",
+   "prompt": "Match the phrase in the offer with what it really means.",
+   "pairs": [
+    {
+     "id": "easy",
+     "left": "1 hour a day, 120 AZN",
+     "right": "Bait: real work does not pay like this"
+    },
+    {
+     "id": "deposit",
+     "left": "Deposit for a VIP task",
+     "right": "Taking your money directly"
+    },
+    {
+     "id": "tax",
+     "left": "Tax to withdraw earnings",
+     "right": "The next payment trap"
+    },
+    {
+     "id": "group",
+     "left": "Everyone in the group is earning",
+     "right": "Planted members and fake reviews"
+    }
+   ],
+   "explain": "Whatever the payment is called, if you pay to work, it is not a job."
+  },
+  {
+   "type": "recap",
+   "id": "tt-recap",
+   "points": [
+    "A job paying you to like and review is a scam.",
+    "The first small payout is bait; deposits and withdrawal taxes are the trap.",
+    "Already paid? Bank, police 102, keep the chat."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

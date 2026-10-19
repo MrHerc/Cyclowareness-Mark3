@@ -1,0 +1,392 @@
+{
+ "module": {
+  "slug": "software-updates",
+  "title": "Software Updates",
+  "category": "devices"
+ },
+ "lesson": {
+  "id": "update-safely",
+  "title": "Update Safely",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "b1",
+      "say": "Updates are not just new buttons. Most of them close security holes that attackers already know about.",
+      "mood": "talk",
+      "visual": {
+       "kind": "illustration",
+       "id": "update"
+      }
+     },
+     {
+      "id": "b2",
+      "say": "As soon as a hole is announced, attackers start hunting for devices that are not updated. Every day of delay adds risk.",
+      "mood": "alert",
+      "visual": {
+       "kind": "illustration",
+       "id": "ransomware"
+      }
+     },
+     {
+      "id": "b3",
+      "say": "A pop-up saying your browser is outdated, download now, is a trap. Browsers update from their own settings.",
+      "mood": "think",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "url",
+        "url": [
+         {
+          "text": "https://"
+         },
+         {
+          "text": "brauzer-yenilenme-tecili.example.net",
+          "spot": "fake-domain"
+         },
+         {
+          "text": "/update.exe"
+         }
+        ]
+       }
+      },
+      "highlight": "fake-domain"
+     },
+     {
+      "id": "b4",
+      "say": "Real updates come from the device settings or the official app store. When in doubt, go there yourself and check.",
+      "mood": "happy",
+      "visual": {
+       "kind": "illustration",
+       "id": "phone-lock"
+      }
+     },
+     {
+      "id": "b5",
+      "say": "Do not put off the restart after an update. Often the protection only takes effect once the device restarts.",
+      "mood": "talk",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "swipe",
+    "id": "real-or-fake",
+    "prompt": "Real update or a trap?",
+    "cards": [
+     {
+      "id": "sms-virus",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "Service"
+        }
+       ],
+       "time": "07:55",
+       "messages": [
+        [
+         {
+          "text": "Virus detected on your phone! Download the security update: fix-phone.example.info/app.apk"
+         }
+        ]
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Your phone does not send updates by SMS. This link installs a malicious app."
+     },
+     {
+      "id": "planned-update",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Technical support"
+         }
+        ],
+        "address": [
+         {
+          "text": "it-support@idare.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Planned update tonight"
+        }
+       ],
+       "time": "14:10",
+       "body": [
+        [
+         {
+          "text": "After 19:00 today, work computers will update automatically."
+         }
+        ],
+        [
+         {
+          "text": "Leave your computer on and just save your work. You do not need to download anything."
+         }
+        ]
+       ]
+      },
+      "verdict": "safe",
+      "explain": "No link, no file, nothing to download. It only informs you."
+     },
+     {
+      "id": "player-update",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://video-pleyer-yenile.example.net/pleyer_setup.exe"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A site that says update your player to watch a video is a classic trap. Browsers play video on their own."
+     },
+     {
+      "id": "zip-update",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "System Center"
+         }
+        ],
+        "address": [
+         {
+          "text": "noreply@system-update-center.example.info"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Your licence is expiring! Update required"
+        }
+       ],
+       "time": "09:03",
+       "body": [
+        [
+         {
+          "text": "Install the attached update today."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Update_KB5039.zip"
+          }
+         ],
+         "size": "1.8 MB"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Updates do not arrive as email attachments. The archive may hide malware."
+     },
+     {
+      "id": "remote-helper",
+      "artifact": {
+       "kind": "chat",
+       "app": "telegram",
+       "contact": [
+        {
+         "text": "Tech support (official)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "To update your computer remotely, install this program and send me the code on your screen."
+          }
+         ],
+         "time": "16:20"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A remote-control program gives the attacker full access to your computer. Call support yourself on a number you know."
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "fake-update-email",
+    "prompt": "Find the signs of a fake update email.",
+    "artifact": {
+     "kind": "email",
+     "from": {
+      "name": [
+       {
+        "text": "Office Update Service"
+       }
+      ],
+      "address": [
+       {
+        "text": "security-update@"
+       },
+       {
+        "text": "idare-example.info",
+        "spot": "domain"
+       }
+      ]
+     },
+     "to": "you",
+     "subject": [
+      {
+       "text": "URGENT: ",
+       "spot": "urgency"
+      },
+      {
+       "text": "Your computer will be blocked within 24 hours"
+      }
+     ],
+     "time": "08:47",
+     "body": [
+      [
+       {
+        "text": "Dear colleague,"
+       }
+      ],
+      [
+       {
+        "text": "A critical update is missing on your computer. Open and install the attached file."
+       }
+      ],
+      [
+       {
+        "text": "Turn off your antivirus while installing.",
+        "spot": "disable-av"
+       }
+      ]
+     ],
+     "attachments": [
+      {
+       "name": [
+        {
+         "text": "Yenilenme_Tecili.exe",
+         "spot": "exe"
+        }
+       ],
+       "size": "2.1 MB"
+      }
+     ]
+    },
+    "spots": [
+     {
+      "id": "domain",
+      "label": "Wrong domain",
+      "explain": "Your organisation uses idare.example. This is a different domain written with a hyphen."
+     },
+     {
+      "id": "urgency",
+      "label": "Urgency and threats",
+      "explain": "The threat of blocking is meant to make you act without thinking."
+     },
+     {
+      "id": "disable-av",
+      "label": "Turn off antivirus",
+      "explain": "No real update asks you to switch off protection. This clears the way for malware."
+     },
+     {
+      "id": "exe",
+      "label": "Executable file",
+      "explain": "An .exe file runs a program the moment you open it. Updates do not arrive this way."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "order",
+    "id": "update-steps",
+    "prompt": "Put the update steps in the right order.",
+    "items": [
+     {
+      "id": "save",
+      "label": "Save your work"
+     },
+     {
+      "id": "settings",
+      "label": "Start the update from Settings"
+     },
+     {
+      "id": "restart",
+      "label": "Restart the device"
+     },
+     {
+      "id": "check",
+      "label": "Check that everything works"
+     }
+    ],
+    "explain": "Saving protects your work, and the restart completes the update."
+   },
+   {
+    "type": "choice",
+    "id": "old-device",
+    "question": {
+     "prompt": "Your old phone no longer gets updates. What now?",
+     "options": [
+      {
+       "id": "antivirus",
+       "label": "Install antivirus and keep using it",
+       "correct": false,
+       "feedback": "Antivirus does not fix holes in the system itself."
+      },
+      {
+       "id": "move",
+       "label": "Remove work accounts and move to a supported device",
+       "correct": true,
+       "feedback": "Correct. A device out of support will not get fixes for new holes."
+      },
+      {
+       "id": "nothing",
+       "label": "Nothing, it still works fine",
+       "correct": false,
+       "feedback": "Working well does not mean safe. New holes will stay open."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    "explain": "Keep no work accounts or data on a device out of support. Fully reset it before you sell it."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Install updates without delay, then restart.",
+     "Update only from Settings or the official store.",
+     "Keep no work data on unsupported devices."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 24,
+ "narrationTotalMs": 130426
+}

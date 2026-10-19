@@ -1,0 +1,394 @@
+{
+ "module": {
+  "slug": "cloud-accounts",
+  "title": "Cloud Accounts",
+  "category": "data"
+ },
+ "lesson": {
+  "id": "share-with-care",
+  "title": "Share With Care",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "b1",
+      "say": "The cloud is handy: files open from anywhere. But a link shared the wrong way also opens from anywhere.",
+      "mood": "talk",
+      "visual": {
+       "kind": "illustration",
+       "id": "cloud"
+      }
+     },
+     {
+      "id": "b2",
+      "say": "When you create a link, check three things: who can open it, whether they can edit, and until when it stays open.",
+      "mood": "think",
+      "visual": {
+       "kind": "illustration",
+       "id": "folder"
+      }
+     },
+     {
+      "id": "b3",
+      "say": "Sometimes there is no password at all, just allow the app. One tap can hand the attacker a key to your account.",
+      "mood": "alert",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "email",
+        "from": {
+         "name": [
+          {
+           "text": "DocuSfera"
+          }
+         ],
+         "address": [
+          {
+           "text": "no-reply@docusfera-share.example.net"
+          }
+         ]
+        },
+        "subject": [
+         {
+          "text": "Leyla Guliyeva shared a document with you"
+         }
+        ],
+        "time": "10:41",
+        "body": [
+         [
+          {
+           "text": "Document: Quarterly budget, final"
+          }
+         ],
+         [
+          {
+           "text": "To open it, allow the DocuSfera Viewer app to access your account.",
+           "spot": "grant"
+          }
+         ]
+        ]
+       }
+      },
+      "highlight": "grant"
+     },
+     {
+      "id": "b4",
+      "say": "If you allowed it, changing your password may not be enough. Ask technical support to revoke the app at once.",
+      "mood": "alert",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "key"
+      }
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "consent-prompt",
+    "prompt": "Find what this app asks for beyond its job.",
+    "artifact": {
+     "kind": "permission",
+     "app": "PDF Merger Pro",
+     "permissions": [
+      {
+       "label": [
+        {
+         "text": "See your name and email address"
+        }
+       ],
+       "needed": true
+      },
+      {
+       "label": [
+        {
+         "text": "Read, send and delete your emails",
+         "spot": "mail"
+        }
+       ],
+       "needed": false
+      },
+      {
+       "label": [
+        {
+         "text": "Full access to all your files",
+         "spot": "files"
+        }
+       ],
+       "needed": false
+      },
+      {
+       "label": [
+        {
+         "text": "Manage your contacts",
+         "spot": "contacts"
+        }
+       ],
+       "needed": false
+      },
+      {
+       "label": [
+        {
+         "text": "Keep access even when you are not using it",
+         "spot": "offline"
+        }
+       ],
+       "needed": false
+      }
+     ]
+    },
+    "spots": [
+     {
+      "id": "mail",
+      "label": "Full mailbox access",
+      "explain": "Merging PDFs does not need your mail. With this, someone can send emails in your name."
+     },
+     {
+      "id": "files",
+      "label": "All files",
+      "explain": "The app needs only the file you pick, not your whole cloud."
+     },
+     {
+      "id": "contacts",
+      "label": "Contacts",
+      "explain": "Your contact list becomes the target list for the next phishing wave."
+     },
+     {
+      "id": "offline",
+      "label": "Standing access",
+      "explain": "The app can keep getting in after you leave. Changing your password does not always cut this off."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "choice",
+    "id": "link-settings",
+    "question": {
+     "prompt": "You send a report to two colleagues to read. Which link?",
+     "options": [
+      {
+       "id": "anyone-edit",
+       "label": "Anyone with the link, can edit",
+       "correct": false,
+       "feedback": "If the link leaks, anyone can open and change the file."
+      },
+      {
+       "id": "two-view",
+       "label": "Only the two colleagues, view only, with an expiry date",
+       "correct": true,
+       "feedback": "Correct. Minimum access, minimum risk."
+      },
+      {
+       "id": "org-edit",
+       "label": "Everyone in the organisation, can edit",
+       "correct": false,
+       "feedback": "Hundreds of people who do not need it could open and change it."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    "explain": "Give the least access: named people, only the rights they need, and an end date."
+   },
+   {
+    "type": "swipe",
+    "id": "cloud-cards",
+    "prompt": "Is this share safe or risky?",
+    "cards": [
+     {
+      "id": "expected-share",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "DocuSfera"
+         }
+        ],
+        "address": [
+         {
+          "text": "no-reply@docusfera.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Samir Babayev shared the file Quarterly report with you"
+        }
+       ],
+       "time": "09:15",
+       "body": [
+        [
+         {
+          "text": "Samir: here is the report we discussed yesterday."
+         }
+        ]
+       ]
+      },
+      "verdict": "safe",
+      "explain": "A known colleague, an expected file, the service's own domain. Still check the address bar when it opens."
+     },
+     {
+      "id": "salary-files",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "DocuSfera"
+         }
+        ],
+        "address": [
+         {
+          "text": "share@docusfera-files.example.info"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "3 files sent to you: Salary increase 2027.pdf"
+        }
+       ],
+       "time": "16:58",
+       "body": [
+        [
+         {
+          "text": "Files will be deleted in 24 hours. Confirm your email password to view them."
+         }
+        ]
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Wrong domain, a tempting topic, time pressure and a password request. A classic trap."
+     },
+     {
+      "id": "open-link",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://docusfera.example/s/Hx82kQ?access=anyone&role=editor"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "This link lets anyone edit. Change the access level before you send it."
+     },
+     {
+      "id": "personal-cloud",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Gunay (team)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "I uploaded the documents to my personal cloud so I can work from home."
+          }
+         ],
+         "time": "18:40"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A personal cloud is outside your organisation's control. Keep work files only in the approved service."
+     },
+     {
+      "id": "cleanup-notice",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Technical support"
+         }
+        ],
+        "address": [
+         {
+          "text": "it-support@idare.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Old open links will be closed"
+        }
+       ],
+       "time": "11:00",
+       "body": [
+        [
+         {
+          "text": "On Friday, open links older than 90 days will close automatically. No action is needed from you."
+         }
+        ]
+       ]
+      },
+      "verdict": "safe",
+      "explain": "Correct address, no link, no request. This is a useful clean-up."
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "access-levels",
+    "prompt": "Match each access level to what it means.",
+    "pairs": [
+     {
+      "id": "viewer",
+      "left": "Viewer",
+      "right": "Can only read"
+     },
+     {
+      "id": "commenter",
+      "left": "Commenter",
+      "right": "Reads and leaves notes"
+     },
+     {
+      "id": "editor",
+      "left": "Editor",
+      "right": "Can change the file"
+     },
+     {
+      "id": "anyone",
+      "left": "Anyone with the link",
+      "right": "Outsiders can open it too"
+     }
+    ],
+    "explain": "Edit rights nobody needs raise the risk of mistakes or harmful changes."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Share links with named people and only the rights needed.",
+     "Never let an unknown app into your account.",
+     "Keep work files out of personal clouds."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 23,
+ "narrationTotalMs": 123171
+}

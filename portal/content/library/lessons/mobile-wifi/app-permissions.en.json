@@ -1,0 +1,601 @@
+{
+ "id": "app-permissions",
+ "title": "App permissions",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "a-tutor",
+   "beats": [
+    {
+     "id": "a-b1",
+     "say": "Your phone holds work mail, messages and banking. When installing an app, check what you allow.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "a-b3",
+     "say": "Why would a torch app read your messages? With this permission, it can see your bank codes too.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "fener-pro",
+       "app": "Torch Pro",
+       "permissions": [
+        {
+         "label": [
+          {
+           "text": "Flashlight"
+          }
+         ],
+         "needed": true
+        },
+        {
+         "label": [
+          {
+           "text": "Contacts",
+           "spot": "contacts"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "Text messages",
+           "spot": "sms"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "Precise location",
+           "spot": "location"
+          }
+         ],
+         "needed": false
+        }
+       ]
+      }
+     },
+     "highlight": "sms",
+     "checkpoint": {
+      "prompt": "A calculator asks for your contacts. What do you do?",
+      "options": [
+       {
+        "id": "allow",
+        "label": "I allow it",
+        "correct": false,
+        "feedback": "A calculator does not need contacts. This may be an attempt to collect your data."
+       },
+       {
+        "id": "deny",
+        "label": "I deny it and delete the app",
+        "correct": true,
+        "feedback": "Correct. An app that asks for access it does not need is best deleted."
+       }
+      ]
+     }
+    },
+    {
+     "id": "a-b4",
+     "say": "Accessibility is the strongest permission: it reads your screen and taps for you. Trust few apps with it.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "a-b5",
+     "say": "Simple rule: a permission must fit the app's job. Maps need location, calculators do not.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "app-install",
+   "environment": "phone",
+   "title": "A free editor",
+   "intro": "You want a photo editor. See what your phone shows you and decide at every step.",
+   "steps": [
+    {
+     "id": "offer",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Deals group"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "FotoRedaktor Plus Pro costs money in the store, get it free here: "
+         },
+         {
+          "text": "fotoredaktor-pro.test/app.apk",
+          "link": {
+           "label": "fotoredaktor-pro.test/app.apk",
+           "href": "https://fotoredaktor-pro.test/app.apk"
+          }
+         }
+        ],
+        "time": "13:05"
+       }
+      ]
+     },
+     "say": "Someone shared a free app file in a group.",
+     "actions": [
+      {
+       "id": "download",
+       "label": "Download the file",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "A paid app offered for free is a familiar bait. Such files often hide malware."
+      },
+      {
+       "id": "block",
+       "label": "Block and report",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Right. Install apps only from your phone's official store.",
+       "next": "store-app"
+      }
+     ]
+    },
+    {
+     "id": "unknown-source",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Unknown source"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "For your security, your phone does not allow installing unknown apps from this source."
+        }
+       ]
+      ],
+      "buttons": [
+       "Settings",
+       "Cancel"
+      ]
+     },
+     "actions": [
+      {
+       "id": "settings",
+       "label": "Allow in Settings",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "This protection exists for files like this. Turning it off opens the phone to malicious apps."
+      },
+      {
+       "id": "cancel",
+       "label": "Cancel",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Right. Installing from unknown sources should stay switched off."
+      }
+     ]
+    },
+    {
+     "id": "fake-apk",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "fotoredaktor-plus-fake",
+      "name": [
+       {
+        "text": "FotoRedaktor_Plus_Pro.apk"
+       }
+      ],
+      "type": "apk",
+      "size": "18 MB",
+      "source": [
+       {
+        "text": "Telegram: Deals group"
+       }
+      ]
+     },
+     "say": "The icon looks familiar. Read the name closely.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Install",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "This is a clone of the store app: the name differs by one space. It can read your SMS codes."
+      },
+      {
+       "id": "cancel",
+       "label": "Cancel",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Right. Do not install an .apk from a message; find the app in the official store."
+      }
+     ]
+    },
+    {
+     "id": "store-app",
+     "label": "Installed from the official store",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "fotoredaktor-plus",
+      "app": "Foto Redaktor Plus",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Photos and videos"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Contacts"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "SMS messages"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Even the store app asks for too much.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Allow",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "A photo editor needs no contacts or SMS. SMS access lets an app read bank codes."
+      },
+      {
+       "id": "deny",
+       "label": "Don't allow",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Right. Give only what the feature needs: here, just photos."
+      }
+     ]
+    },
+    {
+     "id": "fake-antivirus",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "qoruyucu-fake",
+      "app": "Qoruyucu Antivirus",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Accessibility: control the screen"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "An antivirus wants to control your screen.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Allow",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "With this, an app reads the screen and taps for you. Banking trojans ask for exactly this."
+      },
+      {
+       "id": "deny",
+       "label": "Don't allow",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Right. Delete and report an app that wants screen control in the name of antivirus."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "a-hotspot",
+   "prompt": "Find the permissions this app does not need.",
+   "artifact": {
+    "kind": "permission",
+    "brandRef": "fotoredaktor-plus",
+    "app": "Photo Editor Plus",
+    "permissions": [
+     {
+      "label": [
+       {
+        "text": "Photos and videos",
+        "reveal": "Reads the photos and videos stored on this phone"
+       }
+      ],
+      "needed": true
+     },
+     {
+      "label": [
+       {
+        "text": "Camera",
+        "reveal": "Takes photos and records video"
+       }
+      ],
+      "needed": true
+     },
+     {
+      "label": [
+       {
+        "text": "Contacts",
+        "spot": "contacts",
+        "reveal": "Reads your contact list: names, numbers, e-mail addresses"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Send and read text messages",
+        "spot": "sms",
+        "reveal": "Reads every text message on the phone and sends new ones"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Accessibility: control the screen",
+        "spot": "accessibility",
+        "reveal": "Sees everything on the screen and taps for you in other apps"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Call history",
+        "spot": "call-log",
+        "reveal": "Reads the list of your calls: who, when and for how long"
+       }
+      ],
+      "needed": false
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "contacts",
+     "label": "Contacts",
+     "explain": "Editing photos does not need your contacts."
+    },
+    {
+     "id": "sms",
+     "label": "Text message access",
+     "explain": "With text access an app can read your bank and login codes."
+    },
+    {
+     "id": "accessibility",
+     "label": "Screen control",
+     "explain": "This lets an app read the screen and tap for you. It is exactly what harmful apps ask for."
+    },
+    {
+     "id": "call-log",
+     "label": "Call history",
+     "explain": "A photo editor has no need to know who you call."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "a-swipe",
+   "prompt": "Safe or threat?",
+   "cards": [
+    {
+     "id": "bank-apk",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank-fake",
+      "sender": [
+       {
+        "text": "+994 55 000 11 22"
+       }
+      ],
+      "time": "13:02",
+      "messages": [
+       [
+        {
+         "text": "SahilBank has a new app. Download it here: "
+        },
+        {
+         "text": "sahilbank-app.test/SahilBank.apk"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A bank app is in the official store. An install file sent by link may be harmful."
+    },
+    {
+     "id": "map-location",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "xerite-app",
+      "app": "Maps",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Location (only while using the app)"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "A map needs your location to guide you. Allowing it only while in use is a smart choice."
+    },
+    {
+     "id": "torch-mic",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "fener-pro",
+      "app": "Torch",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Contacts"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Microphone"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A flashlight needs neither contacts nor a microphone."
+    },
+    {
+     "id": "video-call",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "videozeng-app",
+      "app": "Video call",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Camera"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Microphone"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "A video call really does need the camera and microphone."
+    },
+    {
+     "id": "discount-apk",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Discount channel"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Install the discount app from this file. Allow unknown sources in settings."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Allowing unknown sources weakens your phone's protection. Do not trust a message that asks for it."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "a-choice-store",
+   "question": {
+    "prompt": "Where is it safe to install apps from?",
+    "options": [
+     {
+      "id": "official-store",
+      "label": "Your phone's official app store",
+      "correct": true,
+      "feedback": "Correct. The official store checks apps and greatly lowers the risk."
+     },
+     {
+      "id": "sms-link",
+      "label": "From a link in a message",
+      "correct": false,
+      "feedback": "A link in a message can lead to a fake app."
+     },
+     {
+      "id": "cracked",
+      "label": "A free cracked version from a forum",
+      "correct": false,
+      "feedback": "Cracked versions often carry malware."
+     },
+     {
+      "id": "work-portal",
+      "label": "Your organisation's approved app catalogue",
+      "correct": true,
+      "feedback": "Correct. A catalogue managed by your organisation is also an official source."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "An official store is no full guarantee, but it cuts the risk a lot. Also look at the reviews and permissions."
+  },
+  {
+   "type": "recap",
+   "id": "a-recap",
+   "points": [
+    "Install apps only from the official store",
+    "A permission must fit the app's job",
+    "Be extra careful with text and accessibility access"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

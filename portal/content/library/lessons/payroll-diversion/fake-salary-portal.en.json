@@ -1,0 +1,505 @@
+{
+ "id": "fake-salary-portal",
+ "title": "Fake salary portal",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pd2-tutor",
+   "beats": [
+    {
+     "id": "pd2-b1",
+     "say": "Now you are a regular employee, and you want to see your payslip.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "pd2-b2",
+     "say": "The top search result is often an ad. Fraudsters place fake portals there as ads.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "w2f-kadr-kabineti-fake",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "kadr-kabineti-giris.example.net",
+         "spot": "ad-domain"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "ad-domain"
+    },
+    {
+     "id": "pd2-b3",
+     "say": "The fake page looks just like the real one. Type your password, and your account and then your salary account can change.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "w2f-kadr-kabineti-fake",
+       "brand": "Kadr Kabineti",
+       "url": [
+        {
+         "text": "https://kadr-kabineti-giris.example.net/giris"
+        }
+       ],
+       "fields": [
+        "Work email",
+        "Password"
+       ],
+       "button": "Sign in"
+      }
+     }
+    },
+    {
+     "id": "pd2-b4",
+     "say": "Type the portal address yourself or open it from a bookmark. And keep two-step verification on.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "pd2-choice",
+   "question": {
+    "prompt": "You searched for \"kadr kabineti\". How do you get in?",
+    "options": [
+     {
+      "id": "ad",
+      "label": "Ad: Kadr Kabineti, official sign-in (kadr-kabineti-giris.example.net)",
+      "correct": false,
+      "feedback": "Ad space is bought, so a fake site can sit at the very top. This domain is not your office's domain."
+     },
+     {
+      "id": "lookalike",
+      "label": "kadr-kabineti.example.org: payslip",
+      "correct": false,
+      "feedback": "The name looks similar, but the domain is not your office's. A look-alike name is the most common trick."
+     },
+     {
+      "id": "typed",
+      "label": "I type it myself: kabinet.seherxidmetleri.example",
+      "correct": true,
+      "feedback": "Correct. An address you type or saved as a bookmark does not depend on ads."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-tapinti",
+      "url": [
+       {
+        "text": "https://axtar.example/?q=kadr+kabineti"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "Fraudsters use search ads to push fake portals to the top. Check the portal address once and save it as a bookmark."
+  },
+  {
+   "type": "simulation",
+   "id": "pd2-sim",
+   "environment": "browser",
+   "title": "Payslip",
+   "intro": "You opened the browser to see your payslip. Watch the address bar and make the right call at every step.",
+   "steps": [
+    {
+     "id": "search",
+     "label": "Ad: Kadr Kabineti, official payslip sign-in",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-tapinti",
+      "url": [
+       {
+        "text": "https://axtar.example/?q=kadr+kabineti",
+        "reveal": "axtar.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "ad",
+       "label": "Open the ad result",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "This ad leads to a fake portal. Your office's domain is not in the address bar.",
+       "next": "fake-login"
+      },
+      {
+       "id": "bookmark",
+       "label": "Open Kadr Kabineti from bookmarks",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Correct. A bookmark always takes you to the real address.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kadr-kabineti-giris.example.net/giris",
+        "reveal": "kadr-kabineti-giris.example.net"
+       }
+      ],
+      "fields": [
+       "Work email",
+       "Password"
+      ],
+      "button": "Sign in"
+     },
+     "say": "Look at the address bar.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Sign in",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Your password went to the fraudster. Change it on the real portal right away and call human resources."
+      },
+      {
+       "id": "close",
+       "label": "Close tab",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Right, the domain is not your office's. Open the portal from your bookmarks.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-code",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kadr-kabineti-giris.example.net/tesdiq",
+        "reveal": "kadr-kabineti-giris.example.net"
+       }
+      ],
+      "fields": [
+       "SMS code"
+      ],
+      "button": "Confirm"
+     },
+     "say": "Now the site asks for the code sent to your phone.",
+     "actions": [
+      {
+       "id": "code",
+       "label": "Confirm",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "With the code, the fraudster gets fully into your account. Only type a code on the real site, when you are the one signing in."
+      },
+      {
+       "id": "close",
+       "label": "Close tab",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Good thing you stopped. Now change your password on the real portal and tell human resources."
+      }
+     ]
+    },
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kabinet.seherxidmetleri.example/giris",
+        "reveal": "seherxidmetleri.example"
+       }
+      ],
+      "fields": [
+       "Work email",
+       "Password"
+      ],
+      "button": "Sign in"
+     },
+     "say": "This is your office's own address.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Sign in",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Correct. The domain belongs to your office and you opened the page yourself."
+      },
+      {
+       "id": "close",
+       "label": "Close tab",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "This is the real portal. Once you have checked the address, signing in is safe."
+      }
+     ]
+    },
+    {
+     "id": "mfa-offer",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-kadr-kabineti",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Two-step verification is off"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Turn it on now to protect your account. Your phone will confirm every sign-in."
+        }
+       ]
+      ],
+      "buttons": [
+       "Turn on",
+       "Later"
+      ]
+     },
+     "actions": [
+      {
+       "id": "enable",
+       "label": "Turn on",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Well done. Even if your password is stolen, the second step blocks a stranger."
+      },
+      {
+       "id": "later",
+       "label": "Later",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Without two-step verification, one password opens everything. Turn it on today."
+      }
+     ]
+    },
+    {
+     "id": "bank-details",
+     "label": "Your bank details: last changed 14.03.2025 by human resources",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-kadr-kabineti",
+      "url": [
+       {
+        "text": "https://kabinet.seherxidmetleri.example/rekvizitler",
+        "reveal": "seherxidmetleri.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "check",
+       "label": "Check the account",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Good habit. If you see a change you did not make, call human resources right away."
+      },
+      {
+       "id": "skip",
+       "label": "Leave without looking",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "If a stranger changed it, you would only find out on payday. A quick look takes seconds."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "pd2-swipe",
+   "prompt": "Safe or scam?",
+   "cards": [
+    {
+     "id": "boss-gift-cards",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Sabina Aliyeva, manager"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "I am in a meeting and cannot call. Quickly buy five 100 manat BonusMarket cards and send me the codes here. I will pay you back."
+         }
+        ],
+        "time": "11:02"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A gift card code is like cash and never comes back. Call your manager on a number you know to check."
+    },
+    {
+     "id": "salary-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "09:00",
+      "messages": [
+       [
+        {
+         "text": "Salary of 1,240.00 AZN credited to your card. Balance: 1,386.50 AZN."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "There is no link and it asks for nothing. This is a normal information message."
+    },
+    {
+     "id": "fake-hr-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "sender": [
+       {
+        "text": "KadrKabinet"
+       }
+      ],
+      "time": "08:41",
+      "messages": [
+       [
+        {
+         "text": "Your salary is on hold. Update your bank details: "
+        },
+        {
+         "text": "kadr-kabinet.example.info/yenile",
+         "link": {
+          "label": "kadr-kabinet.example.info/yenile",
+          "href": "https://kadr-kabinet.example.info/yenile"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Human resources never restores a salary through a text message link. Open the portal yourself or call the team."
+    },
+    {
+     "id": "payslip-ready",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-kadr-kabineti",
+      "app": "Kadr Kabineti",
+      "title": [
+       {
+        "text": "September payslip is ready"
+       }
+      ],
+      "body": [
+       {
+        "text": "See the Salary section in the portal."
+       }
+      ],
+      "time": "10:15"
+     },
+     "verdict": "safe",
+     "explain": "This notification has no link and points you to the portal you know. Open it from your bookmarks."
+    },
+    {
+     "id": "colleague-code",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Gunel, accounting"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "You will get a code from Kadr Kabineti, tell it to me so I can fix the payroll sheet."
+         }
+        ],
+        "time": "13:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A sign-in code is for you alone. Whoever gets your code gets into your account."
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "pd2-order",
+   "prompt": "You typed your password on a fake portal. Put the steps in order.",
+   "items": [
+    {
+     "id": "change-password",
+     "label": "Change the password on the real portal now"
+    },
+    {
+     "id": "call",
+     "label": "Call human resources and the security team"
+    },
+    {
+     "id": "check-details",
+     "label": "Check bank details and recent sign-ins together"
+    },
+    {
+     "id": "enable-mfa",
+     "label": "Turn on two-step verification"
+    }
+   ],
+   "explain": "First change the password, then call so any bank detail change is stopped. If you also typed a code, be sure to say so."
+  },
+  {
+   "type": "recap",
+   "id": "pd2-recap",
+   "points": [
+    "Open the portal from a bookmark, not from search.",
+    "Keep two-step verification on.",
+    "Check gift card and code requests by phone."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

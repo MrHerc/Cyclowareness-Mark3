@@ -1,0 +1,441 @@
+{
+ "module": {
+  "slug": "browser-extensions",
+  "title": "Risky browser extensions",
+  "category": "devices"
+ },
+ "lesson": {
+  "id": "update-turns",
+  "title": "The extension that changed",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "ut-tutor",
+    "beats": [
+     {
+      "id": "ut-b1",
+      "say": "An extension can work honestly for years. Then its owner changes, and one update turns it into a spy.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "update"
+      }
+     },
+     {
+      "id": "ut-b2",
+      "say": "Updates like this reached millions of browsers automatically. Users noticed nothing.",
+      "mood": "alert",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "stat",
+       "value": "4.3 million",
+       "label": "devices where long-trusted extensions turned into spyware in 2025"
+      }
+     },
+     {
+      "id": "ut-b3",
+      "say": "Watch out if an extension suddenly wants new permissions, your search engine changed, or ads multiplied.",
+      "mood": "think",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2c-pdf-ustasi",
+        "tone": "app",
+        "title": [
+         {
+          "text": "PDF Ustası was turned off"
+         }
+        ],
+        "body": [
+         [
+          {
+           "text": "The new version asks for more permissions:"
+          }
+         ],
+         [
+          {
+           "text": "Read and change all your data on all websites",
+           "spot": "new-perm"
+          }
+         ]
+        ],
+        "buttons": [
+         "Accept permissions",
+         "Remove extension"
+        ]
+       }
+      },
+      "highlight": "new-perm"
+     },
+     {
+      "id": "ut-b4",
+      "say": "When that happens, remove the extension, tell technical support, and change the passwords they name.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "scenario",
+    "id": "ut-scenario",
+    "title": "PDF Ustası changed",
+    "start": "n1",
+    "nodes": [
+     {
+      "id": "n1",
+      "text": "You open the browser in the morning. A note in the corner says: PDF Ustası was turned off because it wants new permissions.",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2c-pdf-ustasi",
+        "tone": "app",
+        "title": [
+         {
+          "text": "PDF Ustası was turned off"
+         }
+        ],
+        "body": [
+         [
+          {
+           "text": "The new version asks for more permissions."
+          }
+         ]
+        ],
+        "buttons": [
+         "See permissions",
+         "Remove extension"
+        ]
+       }
+      },
+      "choices": [
+       {
+        "label": "I accept the permissions, I have used it for a year",
+        "next": "n2-bad",
+        "outcome": "compromised",
+        "feedback": "Old trust does not make a new permission safe. This update may have turned the extension into a spy."
+       },
+       {
+        "label": "First I look at which permissions it wants",
+        "next": "n2",
+        "outcome": "safe",
+        "feedback": "Right. New permissions show what the extension now wants to do."
+       }
+      ]
+     },
+     {
+      "id": "n2",
+      "text": "New permissions: read and change data on all websites, read what you copy. Opening a PDF needs none of this.",
+      "choices": [
+       {
+        "label": "I remove the extension and write to technical support",
+        "next": "n3",
+        "outcome": "safe",
+        "feedback": "Right. Technical support will check for this extension on other computers too."
+       },
+       {
+        "label": "I leave it turned off and look later",
+        "next": "n3",
+        "outcome": "risky",
+        "feedback": "A turned-off extension is still in the browser and comes back with one click. Removing it is safer."
+       }
+      ]
+     },
+     {
+      "id": "n2-bad",
+      "text": "A week later your search engine has changed by itself, and unknown ads appear on websites.",
+      "choices": [
+       {
+        "label": "I remove the extension and call technical support",
+        "next": "n3",
+        "outcome": "safe",
+        "feedback": "Late, but the right move. Technical support will check what leaked."
+       },
+       {
+        "label": "I get used to the ads",
+        "outcome": "compromised",
+        "feedback": "The extension still sees every page you open. The ads are a sign that it is working."
+       }
+      ]
+     },
+     {
+      "id": "n3",
+      "text": "Thank you. This extension collected data on all websites. Change your work mail and portal passwords, and we will close the open sessions.",
+      "speaker": "Ayten, technical support",
+      "voice": "woman-2",
+      "channel": "phone",
+      "manner": "natural",
+      "spoken": "Thank you. <breath> This extension collected data on all websites. Change your work mail and portal passwords, and we will close the open sessions.",
+      "choices": [
+       {
+        "label": "I change the passwords now",
+        "outcome": "safe",
+        "feedback": "Excellent. Whatever the extension collected is now out of date."
+       },
+       {
+        "label": "I removed the extension, that is enough",
+        "outcome": "risky",
+        "feedback": "The extension is gone, but the data it collected is with the scammer. The passwords must be changed."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "ut-sim",
+    "environment": "desktop",
+    "title": "Work computer",
+    "intro": "Strange things are happening on your work computer. Answer each warning the right way.",
+    "steps": [
+     {
+      "id": "ad-tab",
+      "label": "Congratulations! You won a phone",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://endirim-kupon.example.info/hediyye",
+         "reveal": "endirim-kupon.example.info"
+        }
+       ]
+      },
+      "say": "The browser opened a new tab by itself.",
+      "actions": [
+       {
+        "id": "claim",
+        "label": "Claim the prize",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "A tab that opens by itself with a prize is a trap. The page would have asked for your card details."
+       },
+       {
+        "id": "close",
+        "label": "Close the tab",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right. Tabs that open by themselves are often the work of a harmful extension, so let us find the cause."
+       }
+      ]
+     },
+     {
+      "id": "search-changed",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "db-xezri-brauzer",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Your search engine was changed"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Your searches now go to axtar-tez.example.info."
+         }
+        ],
+        [
+         {
+          "text": "Changed by: the Kupon Tapan extension"
+         }
+        ]
+       ],
+       "buttons": [
+        "Keep the change",
+        "Change it back"
+       ]
+      },
+      "say": "The browser says your search setting was changed.",
+      "actions": [
+       {
+        "id": "keep",
+        "label": "Keep the change",
+        "kind": "mark-safe",
+        "outcome": "risky",
+        "feedback": "Your searches now go to a stranger's site, which sees everything you type. Change it back."
+       },
+       {
+        "id": "restore",
+        "label": "Change it back",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right. Now let us look at the extension that did it."
+       }
+      ]
+     },
+     {
+      "id": "ext-list",
+      "label": "Extensions: Kupon Tapan, Ekran Şəkli, Qısa Qeyd",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "db-xezri-brauzer",
+       "url": [
+        {
+         "text": "https://magaza.xezri.example/elavelerim",
+         "reveal": "xezri.example"
+        }
+       ]
+      },
+      "say": "The list has an extension you never installed.",
+      "actions": [
+       {
+        "id": "remove",
+        "label": "Remove Kupon Tapan",
+        "kind": "delete",
+        "outcome": "safe",
+        "feedback": "Right. An extension you do not recognise should not stay in your browser."
+       },
+       {
+        "id": "keep",
+        "label": "Keep them all",
+        "kind": "ignore",
+        "outcome": "risky",
+        "feedback": "Kupon Tapan changed your search and opens tabs. Keeping it leaves your data open to it."
+       }
+      ]
+     },
+     {
+      "id": "bundle-file",
+      "artifact": {
+       "kind": "file",
+       "brandRef": "w2c-kupon-tapan",
+       "name": [
+        {
+         "text": "Pulsuz_PDF_Cevirici_setup.exe"
+        }
+       ],
+       "type": "exe",
+       "size": "6.2 MB",
+       "source": [
+        {
+         "text": "pulsuz-pdf-cevir.example.info"
+        }
+       ]
+      },
+      "say": "Your Downloads folder shows where the extension came from.",
+      "actions": [
+       {
+        "id": "open",
+        "label": "Open",
+        "kind": "open",
+        "outcome": "compromised",
+        "feedback": "This free converter installed the extension in secret. Open it again and the extension comes back."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "safe",
+        "feedback": "Right. This file came with a free program and installed the extension without asking."
+       }
+      ]
+     },
+     {
+      "id": "av-alert",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "qoruyucu",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Qoruyucu: threat found"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "The Kupon Tapan extension was sending browser data to an unknown server."
+         }
+        ],
+        [
+         {
+          "text": "The extension was removed."
+         }
+        ]
+       ],
+       "buttons": [
+        "Tell technical support",
+        "Close"
+       ]
+      },
+      "say": "The antivirus found something too.",
+      "actions": [
+       {
+        "id": "report",
+        "label": "Tell technical support",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. Technical support will check what leaked and help you change passwords."
+       },
+       {
+        "id": "close",
+        "label": "Close",
+        "kind": "cancel",
+        "outcome": "risky",
+        "feedback": "The extension is gone, but the data it collected has already left. Be sure to report it."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "ut-match",
+    "prompt": "Match each permission with what it makes possible.",
+    "pairs": [
+     {
+      "id": "all-sites",
+      "left": "Read and change data on all websites",
+      "right": "Read your mail, change a payment page"
+     },
+     {
+      "id": "clipboard",
+      "left": "Read what you copy",
+      "right": "See a password or card number you copied"
+     },
+     {
+      "id": "history",
+      "left": "Read browsing history",
+      "right": "Know which sites you visit"
+     },
+     {
+      "id": "downloads",
+      "left": "Manage downloads",
+      "right": "Download files in your name"
+     }
+    ],
+    "explain": "Every permission is a power. Do not give an extension a power its job does not need."
+   },
+   {
+    "type": "recap",
+    "id": "ut-recap",
+    "points": [
+     "Remove an extension that wants new permissions after an update",
+     "A search engine that changed by itself, new ads and tabs are warning signs",
+     "Remove it, tell technical support, change your passwords"
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 35,
+ "narrationTotalMs": 197354
+}

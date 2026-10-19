@@ -1,0 +1,535 @@
+{
+ "module": {
+  "slug": "fake-captcha-commands",
+  "title": "Fake CAPTCHA",
+  "category": "devices"
+ },
+ "lesson": {
+  "id": "robot-check-trap",
+  "title": "The Robot Check",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "fc1-tutor",
+    "beats": [
+     {
+      "id": "fc1-b1",
+      "say": "Hello! Today we will spot fake pages that pretend to be a robot check.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "browser"
+      }
+     },
+     {
+      "id": "fc1-b2",
+      "say": "A page like this gives three steps: press keys, paste a text, confirm.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2a-xezer-forum-fake",
+        "tone": "app",
+        "title": [
+         {
+          "text": "Confirm you are human"
+         }
+        ],
+        "body": [
+         [
+          {
+           "text": "1. Press the keys shown together."
+          }
+         ],
+         [
+          {
+           "text": "2. Paste the copied text.",
+           "spot": "paste"
+          }
+         ],
+         [
+          {
+           "text": "3. Press Enter."
+          }
+         ]
+        ],
+        "buttons": [
+         "I am not a robot"
+        ]
+       }
+      },
+      "highlight": "paste"
+     },
+     {
+      "id": "fc1-b3",
+      "say": "A real check never asks you to type a command on your keyboard.",
+      "mood": "think",
+      "gesture": "shake",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     },
+     {
+      "id": "fc1-b4",
+      "say": "The rule: whatever a site tells you to type, do not, and close the page.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "browser"
+      }
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "fc1-hotspot",
+    "prompt": "Find the warning signs on this check page.",
+    "artifact": {
+     "kind": "dialog",
+     "brandRef": "w2a-xezer-forum-fake",
+     "tone": "app",
+     "title": [
+      {
+       "text": "Confirm you are human"
+      }
+     ],
+     "body": [
+      [
+       {
+        "text": "To continue, complete the steps below:"
+       }
+      ],
+      [
+       {
+        "text": "1. Press the keys on your keyboard that open a window.",
+        "spot": "keys"
+       }
+      ],
+      [
+       {
+        "text": "2. Paste the copied text into the box.",
+        "spot": "paste"
+       }
+      ],
+      [
+       {
+        "text": "3. Confirm with the Enter key.",
+        "spot": "enter"
+       }
+      ],
+      [
+       {
+        "text": "This check is needed to detect bots.",
+        "spot": "excuse"
+       }
+      ]
+     ],
+     "buttons": [
+      "I am not a robot"
+     ]
+    },
+    "spots": [
+     {
+      "id": "keys",
+      "label": "Pressing keys",
+      "explain": "A real check never asks you to press keyboard keys. This is how a hidden command gets run."
+     },
+     {
+      "id": "paste",
+      "label": "Pasting",
+      "explain": "The text you paste is really a hidden command. Never paste what a site tells you to."
+     },
+     {
+      "id": "enter",
+      "label": "The confirm key",
+      "explain": "When you confirm, the command runs and harmful software is installed. Do not take this step."
+     },
+     {
+      "id": "excuse",
+      "label": "A fake excuse",
+      "explain": "Detecting bots is the excuse. A real check asks you to pick pictures or tick a box."
+     }
+    ],
+    "minToFind": 2
+   },
+   {
+    "type": "simulation",
+    "id": "fc1-sim",
+    "environment": "browser",
+    "title": "On the forum site",
+    "intro": "On a conference site you meet several checks. Choose the right step for each one.",
+    "steps": [
+     {
+      "id": "clickfix",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-xezer-forum-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Confirm you are human"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "To continue, press the keys shown and paste the text."
+         }
+        ]
+       ],
+       "buttons": [
+        "Start",
+        "Close"
+       ]
+      },
+      "say": "The page tells you to press keys and paste.",
+      "actions": [
+       {
+        "id": "close",
+        "label": "Close the page",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. A check that asks you to type a command is fake, so closing it is the right step."
+       },
+       {
+        "id": "do",
+        "label": "Follow the steps",
+        "kind": "install",
+        "outcome": "compromised",
+        "feedback": "The hidden command you pasted installed harmful software. Never follow steps like these."
+       },
+       {
+        "id": "report",
+        "label": "Report to tech support",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Good step. Showing this page to tech support protects your colleagues too."
+       }
+      ]
+     },
+     {
+      "id": "real-captcha",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-xezer-forum",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Select the pictures"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "To show you are not a robot, select the pictures with traffic lights."
+         }
+        ]
+       ],
+       "buttons": [
+        "Confirm",
+        "Refresh"
+       ]
+      },
+      "say": "This is an ordinary picture check.",
+      "actions": [
+       {
+        "id": "complete",
+        "label": "Select the pictures and confirm",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Correct. This is what a real check looks like: pick pictures or tick a box."
+       },
+       {
+        "id": "close",
+        "label": "Close the page",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "That is fine too. If you do not want to continue, you can just close it."
+       },
+       {
+        "id": "report",
+        "label": "Report as an attack",
+        "kind": "report",
+        "outcome": "risky",
+        "feedback": "This check is safe, so there is no need to report it. Only checks that ask for commands are fake."
+       }
+      ]
+     },
+     {
+      "id": "fix-pdf",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "senedoxu-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "The document will not open"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "The PDF could not be shown. To fix it, copy and run the command below."
+         }
+        ],
+        [
+         {
+          "text": "[unknown text copied by the site]"
+         }
+        ]
+       ],
+       "buttons": [
+        "Fix",
+        "Close"
+       ]
+      },
+      "say": "This page gives you a command to open a document.",
+      "actions": [
+       {
+        "id": "close",
+        "label": "Close the page",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. A page that says a document will not open is the same trap, so close it."
+       },
+       {
+        "id": "fix",
+        "label": "Run the command",
+        "kind": "install",
+        "outcome": "compromised",
+        "feedback": "This command installed harmful software on the computer. Do not trust a page that says a document will not open."
+       },
+       {
+        "id": "report",
+        "label": "Report to tech support",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Good choice. Tech support can check the page and warn others."
+       }
+      ]
+     },
+     {
+      "id": "fix-meeting",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-gorus-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Meeting error"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "To join the meeting, run this command, then refresh the page."
+         }
+        ]
+       ],
+       "buttons": [
+        "Run the command",
+        "Close"
+       ]
+      },
+      "say": "Now it says the meeting app has an error.",
+      "actions": [
+       {
+        "id": "close",
+        "label": "Close the page",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. A meeting app never asks you to run a command, so this is a trap too."
+       },
+       {
+        "id": "fix",
+        "label": "Run the command",
+        "kind": "install",
+        "outcome": "compromised",
+        "feedback": "The command started harmful software. Any command that claims to fix an error is the same trick."
+       },
+       {
+        "id": "report",
+        "label": "Report to tech support",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Great. Reporting fake error pages like this to tech support helps everyone."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "swipe",
+    "id": "fc1-swipe",
+    "prompt": "Is each check real or a trap?",
+    "cards": [
+     {
+      "id": "image-captcha",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-xezer-forum",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Tick the box"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Tick the I am not a robot box and continue."
+         }
+        ]
+       ],
+       "buttons": [
+        "Continue"
+       ]
+      },
+      "verdict": "safe",
+      "explain": "This is an ordinary check. Ticking a box or picking pictures is safe."
+     },
+     {
+      "id": "keystroke-captcha",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-xezer-forum-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Complete the check"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Press the keys that open a window and paste the text."
+         }
+        ]
+       ],
+       "buttons": [
+        "Start"
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A check that asks you to type a command is fake. Close the page."
+     },
+     {
+      "id": "letters-captcha",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-xezer-forum",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Type the letters"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Type the letters from the picture into the box below."
+         }
+        ]
+       ],
+       "buttons": [
+        "Confirm"
+       ]
+      },
+      "verdict": "safe",
+      "explain": "This is an ordinary check. Typing the letters from a picture starts nothing on your computer."
+     },
+     {
+      "id": "paste-run",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "senedoxu-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "To continue"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Copy this text and paste it into the Run box."
+         }
+        ]
+       ],
+       "buttons": [
+        "Copy"
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Never run a text a site tells you to copy. It is a hidden command."
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "fc1-choice",
+    "question": {
+     "prompt": "What can a real robot check ask of you? Select all that apply.",
+     "options": [
+      {
+       "id": "tick",
+       "label": "Tick a box",
+       "correct": true,
+       "feedback": "Correct. Ticking a box is an ordinary check and it is safe."
+      },
+      {
+       "id": "images",
+       "label": "Pick pictures",
+       "correct": true,
+       "feedback": "Correct. Picking pictures is another kind of real check."
+      },
+      {
+       "id": "letters",
+       "label": "Type the letters from a picture",
+       "correct": true,
+       "feedback": "Correct. Typing letters starts nothing on your computer."
+      },
+      {
+       "id": "keys",
+       "label": "Press keys and paste a text",
+       "correct": false,
+       "feedback": "This is the trap. A real check never sends you to your computer's own windows."
+      }
+     ],
+     "multi": true
+    },
+    "explain": "A real check stays inside the page. A check that sends you to press keys and paste a text is fake."
+   },
+   {
+    "type": "recap",
+    "id": "fc1-recap",
+    "points": [
+     "A real check never asks you to type a command",
+     "Never paste a text a site tells you to",
+     "Close such a page and report it to tech support"
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "the-copied-command",
+  "title": "The Copied Command"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 38,
+ "narrationTotalMs": 189965
+}

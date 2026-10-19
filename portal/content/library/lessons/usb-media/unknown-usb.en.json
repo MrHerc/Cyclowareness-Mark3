@@ -1,0 +1,281 @@
+{
+ "id": "unknown-usb",
+ "title": "Unknown flash drive",
+ "minutes": 2,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "curiosity",
+     "say": "A found flash drive makes people curious. That is exactly what attackers count on.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "plug-is-enough",
+     "say": "Plugging it in can be enough. Some devices pretend to be a keyboard and type commands by themselves.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "hand-over",
+     "say": "So never plug in a found drive. Hand it over to the security team.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "approved",
+     "say": "At work, use only drives issued or approved by your tech support team.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "charging",
+     "say": "In public places, charge with your own adapter from a wall socket. If your phone asks to trust a device, decline.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "courier-sms",
+   "prompt": "Find the warning signs in this message.",
+   "artifact": {
+    "kind": "sms",
+    "sender": [
+     {
+      "text": "+994 51 000 77 63",
+      "spot": "number"
+     }
+    ],
+    "time": "09:48",
+    "messages": [
+     [
+      {
+       "text": "Hello, I'm Nigar, the director's new assistant."
+      }
+     ],
+     [
+      {
+       "text": "We left a flash drive on your desk, "
+      },
+      {
+       "text": "it's the director's presentation.",
+       "spot": "authority"
+      }
+     ],
+     [
+      {
+       "text": "Please plug it in and open the file now, ",
+       "spot": "action"
+      },
+      {
+       "text": "the meeting starts in 10 minutes.",
+       "spot": "urgent"
+      }
+     ],
+     [
+      {
+       "text": "Don't tell anyone, it's a surprise.",
+       "spot": "secret"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "number",
+     "label": "Unknown number",
+     "explain": "A work task arrives from a personal number you do not know."
+    },
+    {
+     "id": "authority",
+     "label": "The director's name",
+     "explain": "The director is mentioned so you rush and skip checks."
+    },
+    {
+     "id": "action",
+     "label": "Plug in and open",
+     "explain": "Being asked to plug in an unknown drive is the main danger."
+    },
+    {
+     "id": "urgent",
+     "label": "Time pressure",
+     "explain": "Ten minutes leaves you no time to think."
+    },
+    {
+     "id": "secret",
+     "label": "Secrecy",
+     "explain": "Asking for secrecy stops you from checking."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "scenario",
+   "id": "car-park-drive",
+   "title": "Drive in the car park",
+   "start": "found",
+   "nodes": [
+    {
+     "id": "found",
+     "text": "In the morning you find a flash drive in the car park labelled Salaries 2026, confidential.",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     },
+     "choices": [
+      {
+       "label": "Plug it into my work computer to see what it is",
+       "outcome": "compromised",
+       "feedback": "The drive launched malware. The confidential label was there to tempt you."
+      },
+      {
+       "label": "Check it on my home computer",
+       "outcome": "risky",
+       "feedback": "Your home device can be infected too, and it may hold your work accounts."
+      },
+      {
+       "label": "Take it to the security team",
+       "next": "colleague",
+       "feedback": "The right choice."
+      }
+     ]
+    },
+    {
+     "id": "colleague",
+     "text": "Give it to me, I'll look. I have antivirus on my computer.",
+     "speaker": "Tural, a colleague",
+     "voice": "man-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Give it to me, I'll look. <breath> I have antivirus on my computer.",
+     "choices": [
+      {
+       "label": "Hand it over, the antivirus will protect him",
+       "outcome": "risky",
+       "feedback": "Antivirus does not catch every attack, especially devices acting as a keyboard."
+      },
+      {
+       "label": "Politely refuse and hand it in",
+       "next": "security",
+       "feedback": "Well done. The rule is the same for everyone."
+      }
+     ]
+    },
+    {
+     "id": "security",
+     "text": "Thank you. We check devices like this separately, on a computer isolated from the network.",
+     "speaker": "Security team",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Thank you. <breath> We check devices like this separately, on a computer isolated from the network.",
+     "choices": [
+      {
+       "label": "Tell them where and when I found it",
+       "outcome": "safe",
+       "feedback": "Great. That helps them look for more drives."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "airport-charging",
+   "question": {
+    "prompt": "Your phone is dying at the airport. Which options are safe?",
+    "options": [
+     {
+      "id": "own-adapter",
+      "label": "Plug my own adapter into a wall socket",
+      "correct": true,
+      "feedback": "The simplest and safest way."
+     },
+     {
+      "id": "power-bank",
+      "label": "Charge from my own power bank",
+      "correct": true,
+      "feedback": "Great, no unknown device involved."
+     },
+     {
+      "id": "strangers-cable",
+      "label": "Use a cable a stranger lends me",
+      "correct": false,
+      "feedback": "A stranger's cable can hide a device inside."
+     },
+     {
+      "id": "trust-yes",
+      "label": "Tap Yes when asked to trust the device",
+      "correct": false,
+      "feedback": "That gives the device access to your data. Charging does not need trust."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "phone-lock"
+    }
+   },
+   "explain": "Attacks through public USB ports are rare, but protection is easy: your own adapter and no trust."
+  },
+  {
+   "type": "match",
+   "id": "media-rules",
+   "prompt": "Match each situation with the right step.",
+   "pairs": [
+    {
+     "id": "gift-drive",
+     "left": "A free drive from a conference",
+     "right": "Have tech support check it first"
+    },
+    {
+     "id": "carry-files",
+     "left": "You need to take work files home",
+     "right": "Use approved media or the approved cloud"
+    },
+    {
+     "id": "courier",
+     "left": "A courier brings a drive for the director",
+     "right": "Hand it to the security team"
+    },
+    {
+     "id": "lost",
+     "left": "You lost your work flash drive",
+     "right": "Report it at once"
+    }
+   ],
+   "explain": "Unknown media never gets plugged in, and work data travels only by approved means."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Never plug in a found or unknown drive, hand it in.",
+    "Use only approved media at work.",
+    "Charge with your own adapter and never trust unknown devices."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

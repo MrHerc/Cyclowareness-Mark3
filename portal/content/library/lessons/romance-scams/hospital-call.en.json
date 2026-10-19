@@ -1,0 +1,509 @@
+{
+ "id": "hospital-call",
+ "title": "Call from a hospital",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "hc-tutor",
+   "beats": [
+    {
+     "id": "hc-b1",
+     "say": "This time the scammer calls and claims to be a doctor at a hospital abroad.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "hc-b2",
+     "say": "She says your online friend has had an accident and urgently needs money for surgery.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2e-nordhaven-klinika",
+       "caller": [
+        {
+         "text": "Nordhaven Clinic"
+        }
+       ],
+       "number": [
+        {
+         "text": "+44 7700 900 418",
+         "spot": "number"
+        }
+       ],
+       "label": "International"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "hc-b3",
+     "say": "Urgency, fear and secrecy: when all three come together, you are facing a scam.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "hc-b4",
+     "say": "End the call, find the number yourself and talk to your family before sending any money.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "hc-choice",
+   "question": {
+    "prompt": "The caller says your friend is in hospital and money is needed today. What is your first step?",
+    "options": [
+     {
+      "id": "hang-up",
+      "label": "End the call and find the hospital's number myself",
+      "correct": true,
+      "feedback": "Right. Calling a number you found yourself exposes the fake doctor at once."
+     },
+     {
+      "id": "pay",
+      "label": "Send the money fast and ask later",
+      "correct": false,
+      "feedback": "Money you send does not come back. The urgency is created exactly for this."
+     },
+     {
+      "id": "card",
+      "label": "Give my card details so they can take it",
+      "correct": false,
+      "feedback": "With your card details they can take as much as they like. Never give card details on the phone."
+     },
+     {
+      "id": "secret",
+      "label": "Promise to tell no one",
+      "correct": false,
+      "feedback": "Secrecy helps the scammer. Your family sees the situation with a cool head."
+     }
+    ]
+   },
+   "explain": "An urgent demand for money on the phone, especially in crypto, is a sign of a scam. End the call and check it yourself."
+  },
+  {
+   "type": "simulation",
+   "id": "hc-sim",
+   "environment": "call",
+   "title": "A night call",
+   "intro": "At one in the morning a call comes from abroad. Read what the caller says and choose your answer.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "International",
+      "voice": "woman"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Answer",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Answering is not dangerous. What matters is what you say."
+      },
+      {
+       "id": "decline",
+       "label": "Decline",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "That works too. If you are worried, check the number yourself later.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "doctor",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "International",
+      "voice": "woman"
+     },
+     "say": "Doctor Helena Mart, Nordhaven Clinic, speaking. Kamran Aliyev had an accident and named you as his next of kin.",
+     "spoken": "Doctor Helena Mart, <breath> Nordhaven Clinic, speaking. Kamran Aliyev had an accident, and named you as his next of kin.",
+     "actions": [
+      {
+       "id": "video",
+       "label": "I want a video call with Kamran",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "A good check. A scammer will always find a reason why a video call is impossible."
+      },
+      {
+       "id": "panic",
+       "label": "What do you need? I will help",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "The shock is understandable, but this question opens the door to a money demand. Check first."
+      },
+      {
+       "id": "hang-up",
+       "label": "End call",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "A good decision. You can find the clinic's number yourself and call it.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "demand",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "International",
+      "voice": "woman"
+     },
+     "say": "He is unconscious. The surgery needs an advance of four thousand eight hundred manat today, his insurance does not cover it.",
+     "spoken": "He is unconscious. <breath> The surgery needs an advance of four thousand eight hundred manat today, his insurance, uh, does not cover it.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "I will send it, give me the details",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "The money went to the scammer. Always check an urgent money demand on the phone yourself."
+      },
+      {
+       "id": "card",
+       "label": "Let me give my card details",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "With your card details they can take as much as they like. Never say them on the phone."
+      },
+      {
+       "id": "check",
+       "label": "I will find the clinic's number and call it",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Right. A number you found yourself does not lead back to the scammer."
+      }
+     ]
+    },
+    {
+     "id": "push",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "International",
+      "voice": "woman"
+     },
+     "say": "There is no time! Crypto is fine too, I will text you the address. Do not tell anyone about this.",
+     "spoken": "There is no time! <breath> Crypto is fine too, I will text you the address. Do not tell anyone about this.",
+     "actions": [
+      {
+       "id": "crypto",
+       "label": "I will pay in crypto",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Nobody can reverse a crypto transfer. An urgent crypto demand on the phone is a sign of a scam."
+      },
+      {
+       "id": "sister",
+       "label": "I need to talk to my sister first",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Well done. A scammer fears your family, because they see through the trick."
+      },
+      {
+       "id": "hang-up",
+       "label": "End call",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Right. Crypto, pressure and secrecy together mean a scam."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "International",
+      "voice": "woman"
+     },
+     "actions": [
+      {
+       "id": "call-back",
+       "label": "Call this number back",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "This number belongs to the scammer, who will tell the same story. Find the number yourself."
+      },
+      {
+       "id": "family",
+       "label": "Tell my family",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Right. Talking to your family takes the pressure off at once."
+      },
+      {
+       "id": "block",
+       "label": "Block number",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Good. Block the number and report the dating profile on the platform too."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "hc-swipe",
+   "prompt": "Which message is normal and which is a warning?",
+   "cards": [
+    {
+     "id": "video-date",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Elchin"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Shall we video call tonight at 8? Then we can meet at a cafe on Saturday."
+         }
+        ],
+        "time": "18:20"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Offering a video call and a meeting in a public place is normal. That is exactly what a scammer avoids."
+    },
+    {
+     "id": "visa",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Mark Leon"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "To come and see you I need money for the visa, 600 AZN. I will pay it back as soon as I arrive, I promise."
+         }
+        ],
+        "time": "23:10"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Someone you have never met asking for ticket, visa or customs money is a classic scam."
+    },
+    {
+     "id": "withdraw-fee",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2e-kriptonova",
+      "app": "KriptoNova",
+      "title": [
+       {
+        "text": "Your profit: 2,340 AZN"
+       }
+      ],
+      "body": [
+       {
+        "text": "Pay 15% tax first to withdraw your money."
+       }
+      ],
+      "time": "09:05"
+     },
+     "verdict": "threat",
+     "explain": "A platform that wants a payment before you can withdraw is fake. The profit figure is made up."
+    },
+    {
+     "id": "report-done",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2e-gorusek",
+      "app": "Görüşək",
+      "title": [
+       {
+        "text": "Your report was reviewed"
+       }
+      ],
+      "body": [
+       {
+        "text": "The profile you reported was fake and has been closed. Thank you."
+       }
+      ],
+      "time": "14:30"
+     },
+     "verdict": "safe",
+     "explain": "This is a normal platform notice and asks for nothing. Reporting a fake profile protects others."
+    },
+    {
+     "id": "secret",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Kamran Aliyev"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Do not tell your family, they will not understand us. This is just our secret."
+         }
+        ],
+        "time": "22:45"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Someone who wants to cut you off from your family is hiding something. A request for secrecy is a warning."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "hc-scenario",
+   "title": "Your sister asks",
+   "start": "sister",
+   "nodes": [
+    {
+     "id": "sister",
+     "text": "You look worried. What happened, is someone bothering you?",
+     "speaker": "Nigar (your sister)",
+     "voice": "woman-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "You look worried. <breath> What happened, is someone bothering you?",
+     "character": "nigar",
+     "choices": [
+      {
+       "label": "I tell her everything and show her the chat",
+       "next": "search",
+       "feedback": "Right. Talking about it takes power away from the scammer."
+      },
+      {
+       "label": "Nothing, Kamran asked me not to tell anyone",
+       "outcome": "risky",
+       "feedback": "Secrecy helps the scammer. Talking to someone close is the strongest protection."
+      }
+     ]
+    },
+    {
+     "id": "search",
+     "text": "Let's reverse image search Kamran's photo together. Look, the photo turns up under another name, on a foreign model's page!",
+     "speaker": "Nigar (your sister)",
+     "voice": "woman-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Let's reverse image search Kamran's photo together. <breath> Look, the photo turns up under another name, on a foreign model's page!",
+     "character": "nigar",
+     "choices": [
+      {
+       "label": "I report and block the profile and never send money again",
+       "outcome": "safe",
+       "feedback": "Well done. You protected yourself and other people too."
+      },
+      {
+       "label": "Maybe someone stole his photo, I will keep chatting",
+       "outcome": "risky",
+       "feedback": "Fake profiles are built on stolen photos. Trust what the check showed."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "hc-recap",
+   "points": [
+    "If an urgent money demand comes by phone, end the call and find the number yourself.",
+    "Crypto, pressure and secrecy together mean a scam.",
+    "Talk to your family before sending money, and report the fake profile."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

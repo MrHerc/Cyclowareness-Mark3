@@ -1,0 +1,526 @@
+{
+ "id": "consent-screen",
+ "title": "Permission screen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac1-tutor",
+   "beats": [
+    {
+     "id": "ac1-b1",
+     "say": "Hello! Today we learn a trap that asks for permission instead of a password.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "ac1-b2",
+     "say": "The app says: to view the document, allow me to read your mail and send mail as you.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "w2b-dokubaxis",
+       "app": "DokuBaxış Viewer",
+       "permissions": [
+        {
+         "label": [
+          {
+           "text": "See your profile"
+          }
+         ],
+         "needed": true
+        },
+        {
+         "label": [
+          {
+           "text": "Read your mail and send mail as you",
+           "spot": "mail"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "Keep access when you are not there"
+          }
+         ],
+         "needed": false
+        }
+       ]
+      }
+     },
+     "highlight": "mail"
+    },
+    {
+     "id": "ac1-b3",
+     "say": "One click, and the app is in your mailbox. Even if you change your password, the permission stays.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "ac1-b4",
+     "say": "The rule: read the app name and the permissions, and never allow an app you do not know.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ac1-hotspot",
+   "prompt": "Find the requests this app does not need.",
+   "artifact": {
+    "kind": "permission",
+    "brandRef": "w2b-dokubaxis",
+    "app": "DokuBaxış Viewer",
+    "permissions": [
+     {
+      "label": [
+       {
+        "text": "See your profile"
+       }
+      ],
+      "needed": true
+     },
+     {
+      "label": [
+       {
+        "text": "Read your mail and send mail as you",
+        "spot": "mail"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Read and change all your files",
+        "spot": "files"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "See your contacts",
+        "spot": "contacts"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Keep access when you are not there",
+        "spot": "offline"
+       }
+      ],
+      "needed": false
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "mail",
+     "label": "Mail and sending",
+     "explain": "Viewing a document needs no mail access. With this permission the app can send phishing in your name."
+    },
+    {
+     "id": "files",
+     "label": "All files",
+     "explain": "An app that shows one document does not need all your files. This is for stealing data."
+    },
+    {
+     "id": "contacts",
+     "label": "Contacts",
+     "explain": "Your contact list is the target list for the next attack. A document does not need it."
+    },
+    {
+     "id": "offline",
+     "label": "Lasting access",
+     "explain": "This means the app stays in your account after you sign out and even after a password change."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "ac1-swipe",
+   "prompt": "Which permission request is normal and which is a trap? Swipe.",
+   "cards": [
+    {
+     "id": "meeting-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "gorus",
+      "app": "Görüş",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "See your calendar"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "See your profile"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Görüş is the office's known app, and it asks only for what its job needs."
+    },
+    {
+     "id": "greeting-card",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-bayram-tebriki",
+      "app": "Bayram Təbriki",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "See your contacts"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Send mail as you"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A greeting card needs neither your contacts nor the right to send mail. This is for spreading phishing in your name."
+    },
+    {
+     "id": "salary-calc",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-maas-kalkulyatoru",
+      "app": "Maaş Kalkulyatoru",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Read your mail"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Keep access when you are not there"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A calculator does not need your mail. Lasting access keeps the app inside your account."
+    },
+    {
+     "id": "editor",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "senedyaz",
+      "app": "SənədYaz",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Open and save the file you choose"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "The known editor asks only for the file you choose. That permission fits its job."
+    },
+    {
+     "id": "pdf-tool",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "pdf-birlesdirici",
+      "app": "PDF Birləşdirici Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Read and change all your files"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Read and send your mail"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Merging files needs neither mail nor all your files. Do not allow an app like this."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac1-sim",
+   "environment": "browser",
+   "title": "Shared budget document",
+   "intro": "A budget document was shared with you in your colleague Nigar's name. You opened the link, now decide on each screen.",
+   "steps": [
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "İşPoçt",
+      "url": [
+       {
+        "text": "https://giris.idare.example/icaze"
+       }
+      ],
+      "fields": [
+       "Email",
+       "Password"
+      ],
+      "button": "Sign in"
+     },
+     "say": "Look at the address: this is the office's real sign-in page.",
+     "actions": [
+      {
+       "id": "sign-in",
+       "label": "Sign in",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "The address is real, so the password does not go to a criminal. The trap is in the next window."
+      },
+      {
+       "id": "close",
+       "label": "Close the tab",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "That is safe too. But suppose you signed in: let us look at the next window."
+      }
+     ]
+    },
+    {
+     "id": "consent",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-dokubaxis",
+      "app": "DokuBaxış Viewer",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "See your profile"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Read your mail and send mail as you"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Read and change all your files"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Keep access when you are not there"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Before the document opened, this window appeared.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Deny",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Correct. Viewing a document needs no mail, no access to all files and no lasting access.",
+       "next": "known-app"
+      },
+      {
+       "id": "allow",
+       "label": "Allow",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "The app now reads your mail and writes as you. Changing your password does not stop it."
+      }
+     ]
+    },
+    {
+     "id": "connected-apps",
+     "label": "Connected apps: DokuBaxış Viewer, lasting access to mail and files",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/tetbiqler"
+       }
+      ]
+     },
+     "say": "The next day you look at your account.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Report to technical support so they revoke it",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Correct. Only revoking the permission removes the app, and a specialist will check for traces too."
+      },
+      {
+       "id": "password-only",
+       "label": "Only change the password",
+       "kind": "update",
+       "outcome": "risky",
+       "feedback": "The password changes, but the app keeps its permission. Technical support has to revoke it."
+      },
+      {
+       "id": "leave",
+       "label": "Leave it",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "The app will keep reading your mail every day. Report it today."
+      }
+     ]
+    },
+    {
+     "id": "known-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "idare-komekci",
+      "app": "İdarə Köməkçisi",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "See your profile"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "See your calendar"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "say": "Now the office's own assistant app asks for permission.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Allow",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Right. A known work app asks only for what its job needs."
+      },
+      {
+       "id": "deny",
+       "label": "Deny",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "Caution is understandable, but this app is known and asks for little. When in doubt, ask technical support."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ac1-choice",
+   "question": {
+    "prompt": "Which permissions are the most dangerous? Choose all that apply.",
+    "options": [
+     {
+      "id": "send",
+      "label": "Send mail as you",
+      "correct": true,
+      "feedback": "Correct. With this permission the app sends phishing to your colleagues in your name."
+     },
+     {
+      "id": "offline",
+      "label": "Keep access when you are not there",
+      "correct": true,
+      "feedback": "Correct. It means the app stays in your account after you sign out."
+     },
+     {
+      "id": "profile",
+      "label": "See your name and profile photo",
+      "correct": false,
+      "feedback": "This is a small permission that a normal sign-in needs."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Mail, files and lasting access are the biggest permissions. Never give them to an app you do not know."
+  },
+  {
+   "type": "recap",
+   "id": "ac1-recap",
+   "points": [
+    "On a permission screen, read the app name and the permissions",
+    "Do not give an unknown app access to mail, files or lasting access",
+    "If you allowed it by mistake, have technical support revoke it"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,320 @@
+{
+ "id": "web-traps",
+ "title": "Web traps",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "padlock",
+     "say": "The padlock in the address bar says one thing: the connection is encrypted. It does not say who runs the site.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "read-domain",
+     "say": "Most scam sites have a padlock too. So read the domain itself.",
+     "mood": "think",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "sahilbank-giris.info",
+         "spot": "domain"
+        },
+        {
+         "text": "/login"
+        }
+       ]
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "search-ads",
+     "say": "The top search result can be an ad. Scammers buy ads using the names of well known sites.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "fake-update",
+     "say": "If a website says your browser is outdated and offers an update download, it is a trap. Browsers update themselves.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "warnings",
+     "say": "If your browser shows a red warning, go back. It stops you to protect you.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-portal",
+   "prompt": "Find the suspicious parts of this login page.",
+   "artifact": {
+    "kind": "login",
+    "brand": "DövlətPortal",
+    "url": [
+     {
+      "text": "https://",
+      "spot": "padlock"
+     },
+     {
+      "text": "dovletportal-az",
+      "spot": "lookalike"
+     },
+     {
+      "text": ".online",
+      "spot": "tld"
+     },
+     {
+      "text": "/giris"
+     }
+    ],
+    "fields": [
+     "Personal ID code",
+     "Password"
+    ],
+    "button": "Sign in"
+   },
+   "spots": [
+    {
+     "id": "padlock",
+     "label": "Padlock",
+     "explain": "There is a padlock, but that only means encryption. It does not prove the site is real."
+    },
+    {
+     "id": "lookalike",
+     "label": "Look-alike name",
+     "explain": "A dash and az were added to the official name. It is a look-alike fake domain."
+    },
+    {
+     "id": "tld",
+     "label": "Wrong ending",
+     "explain": "The domain ends in .online. The official portal is at dovletportal.az."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "swipe",
+   "id": "click-or-not",
+   "prompt": "Which links are safe to open?",
+   "cards": [
+    {
+     "id": "free-download",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://free-download-pdf.top/Sened_pulsuz.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A program file from a free download site is often malicious. Get software through tech support."
+    },
+    {
+     "id": "official",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://dovletportal.az/xidmetler/arayis"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "The domain is the official portal itself: dovletportal.az. No extra words or dashes."
+    },
+    {
+     "id": "subdomain-trick",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://sahilbank.az.hesab-yoxla.info/login"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "The real domain is the last part: hesab-yoxla.info. The sahilbank.az in front is just bait."
+    },
+    {
+     "id": "update-exe",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://brauzer-yenile.top/update.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Browser updates are not downloaded from websites. The browser updates itself."
+    },
+    {
+     "id": "bank-path",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://www.sahilbank.az/az/kartlar"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "The domain is sahilbank.az. The rest is just the page path."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "padlock-meaning",
+   "question": {
+    "prompt": "There is a padlock in the address bar. What does it mean?",
+    "options": [
+     {
+      "id": "safe-site",
+      "label": "The site is checked and safe",
+      "correct": false,
+      "feedback": "No. Fake sites get a padlock easily too."
+     },
+     {
+      "id": "encrypted",
+      "label": "The connection between you and the site is encrypted",
+      "correct": true,
+      "feedback": "Correct. But the site can still be fake."
+     },
+     {
+      "id": "state-approved",
+      "label": "The site is approved by the state",
+      "correct": false,
+      "feedback": "The padlock is not any kind of state approval."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://"
+       },
+       {
+        "text": "sahilbank-giris.info",
+        "spot": "domain"
+       },
+       {
+        "text": "/login"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "The padlock is needed but not enough. Always read the domain itself."
+  },
+  {
+   "type": "scenario",
+   "id": "sudden-popup",
+   "title": "Sudden pop-up",
+   "start": "popup",
+   "nodes": [
+    {
+     "id": "popup",
+     "text": "You are reading a news site. Suddenly a red window fills the screen: your computer is infected, call +994 12 000 04 19. An alarm sounds.",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     },
+     "choices": [
+      {
+       "label": "Call the number",
+       "next": "operator",
+       "feedback": "This is a fake tech support scam. Let us see what happens."
+      },
+      {
+       "label": "Click the Clean button",
+       "outcome": "compromised",
+       "feedback": "The button downloaded malware. Do not click anything in such a window."
+      },
+      {
+       "label": "Close the tab, or the whole browser if needed",
+       "next": "restore",
+       "feedback": "Right. That window is just a web page, your computer is not infected."
+      }
+     ]
+    },
+    {
+     "id": "operator",
+     "text": "We need to connect to your computer remotely. Install this program and read me the code on screen.",
+     "speaker": "Operator",
+     "voice": "man",
+     "channel": "phone",
+     "spoken": "We need to connect to your computer remotely. <breath> Install this program and read me the code on screen.",
+     "choices": [
+      {
+       "label": "Install the program",
+       "outcome": "compromised",
+       "feedback": "The scammer now has full access to your computer. Disconnect it and report at once."
+      },
+      {
+       "label": "Hang up and tell tech support",
+       "outcome": "risky",
+       "feedback": "You stopped in time. But never call a number from a window like that."
+      }
+     ]
+    },
+    {
+     "id": "restore",
+     "text": "You reopen the browser. It offers to restore your previous tabs.",
+     "choices": [
+      {
+       "label": "Do not restore, and send tech support a short note",
+       "outcome": "safe",
+       "feedback": "Well done. The window installed nothing and tech support knows."
+      },
+      {
+       "label": "Restore the tabs",
+       "outcome": "risky",
+       "feedback": "The same fake window may open again. Skip the restore."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "The padlock only means encryption: read the domain.",
+    "Trust bookmarks or addresses you type, not ads.",
+    "Pop-ups saying update now or you are infected are traps."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

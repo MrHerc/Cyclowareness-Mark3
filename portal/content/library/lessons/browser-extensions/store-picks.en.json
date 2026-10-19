@@ -1,0 +1,462 @@
+{
+ "id": "store-picks",
+ "title": "Picking in the store",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sp-tutor",
+   "beats": [
+    {
+     "id": "sp-b1",
+     "say": "Hi! A browser extension is a small program. It can see and change the pages you open.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "sp-b2",
+     "say": "The widest permission is this one: read and change all your data on all websites.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "w2c-pulsuz-vpn",
+       "app": "Pulsuz VPN Sürət",
+       "permissions": [
+        {
+         "label": [
+          {
+           "text": "Read and change all your data on all websites",
+           "spot": "all-sites"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "Manage your proxy settings"
+          }
+         ],
+         "needed": true
+        }
+       ]
+      }
+     },
+     "highlight": "all-sites"
+    },
+    {
+     "id": "sp-b3",
+     "say": "An extension can be honest today and turn into a spy tomorrow with one update.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "sp-b4",
+     "say": "Install only what you need, only from the official store. On a work computer, only what technical support approves.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "sp-swipe",
+   "prompt": "Would you install this extension or decline it?",
+   "cards": [
+    {
+     "id": "free-vpn",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-pulsuz-vpn",
+      "app": "Pulsuz VPN Sürət",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Read and change all your data on all websites"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Read your browsing history"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Manage your proxy settings"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A free VPN extension sees all your traffic and often earns its money from your data. For work, use only the VPN your office provides."
+    },
+    {
+     "id": "weather",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-hava",
+      "app": "Hava Bu Gün",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Show the weather forecast for Baku"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Read and change all your data on all websites"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Read data you copy and paste"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A weather forecast does not need your pages or what you copy. If the permission is bigger than the job, decline."
+    },
+    {
+     "id": "screenshot",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-ekran-sekli",
+      "app": "Ekran Şəkli",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "See only the open page when you press the button"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Save images to the Downloads folder"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "The permissions fit the job and only work when you press the button. An extension like this adds no real risk."
+    },
+    {
+     "id": "outside-store",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://pulsuz-elaveler.example.info/pdf-ustasi-pro.zip"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "An extension from outside the store has passed no checks at all. Install extensions only from the browser's official store."
+    },
+    {
+     "id": "notes",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-qisa-qeyd",
+      "app": "Qısa Qeyd",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Store your notes in this browser"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "The extension does not touch your sites and keeps notes only in the browser's own storage. The risk is low."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "sp-choice",
+   "question": {
+    "prompt": "An extension you needed only once is still in your browser. What do you do?",
+    "options": [
+     {
+      "id": "remove",
+      "label": "I remove it and reinstall it if I ever need it",
+      "correct": true,
+      "feedback": "Right. An extension you do not use gives you nothing, but its risk stays."
+     },
+     {
+      "id": "disable",
+      "label": "I just turn it off",
+      "correct": false,
+      "feedback": "Turning it off helps, but a forgotten extension comes back with one click. If you do not need it, remove it."
+     },
+     {
+      "id": "keep",
+      "label": "I keep it, maybe I will need it some day",
+      "correct": false,
+      "feedback": "The extension can change owners, and an update can turn it into a spy. Do not keep what you do not need."
+     }
+    ]
+   },
+   "explain": "Every extension is a door into your pages. Fewer extensions means less risk."
+  },
+  {
+   "type": "simulation",
+   "id": "sp-sim",
+   "environment": "browser",
+   "title": "Extension store",
+   "intro": "You want an extension that shows exchange rates quickly. Pick what to do at each step.",
+   "steps": [
+    {
+     "id": "copy-store",
+     "label": "Mezenne Pro: free download",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-xezri-brauzer-fake",
+      "url": [
+       {
+        "text": "https://xezri-elaveler.example.info/mezenne-pro",
+        "reveal": "xezri-elaveler.example.info"
+       }
+      ]
+     },
+     "say": "The first page in the search looks like the store.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Download the extension",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "This is not the official store but a copy of it. Anything from here has passed no checks."
+      },
+      {
+       "id": "check",
+       "label": "Check the address",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "This domain is not the store's own address. Open the store from the browser menu."
+      },
+      {
+       "id": "close",
+       "label": "Close the tab",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Right. Install extensions only from the browser's own store."
+      }
+     ]
+    },
+    {
+     "id": "store-page",
+     "label": "Mezenne Pro: 4.1 stars, 80 thousand users",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-xezri-brauzer",
+      "url": [
+       {
+        "text": "https://magaza.xezri.example/elave/mezenne-pro",
+        "reveal": "xezri.example"
+       }
+      ]
+     },
+     "say": "Now you are in the official store. Before installing, the browser will show the permissions.",
+     "actions": [
+      {
+       "id": "add",
+       "label": "Add to browser",
+       "kind": "install",
+       "outcome": "safe",
+       "feedback": "The official store is a good start. Now read the permissions carefully."
+      },
+      {
+       "id": "skip",
+       "label": "Not needed",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "That is a good choice too. You can see the rates on your bank's site.",
+       "next": "installed"
+      }
+     ]
+    },
+    {
+     "id": "perms",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-mezenne-pro",
+      "app": "Məzənnə Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Show currency exchange rates"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Read and change all your data on all websites"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "See your tabs and browsing history"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Does showing exchange rates need these permissions?",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Add extension",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Exchange rates need neither all websites nor your history. A permission this wide opens the way to spying."
+      },
+      {
+       "id": "deny",
+       "label": "Decline",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Right. If the permission does not fit the job, do not install it."
+      }
+     ]
+    },
+    {
+     "id": "installed",
+     "label": "Installed extensions: 7, unused in the last six months: 4",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-xezri-brauzer",
+      "url": [
+       {
+        "text": "https://magaza.xezri.example/elavelerim",
+        "reveal": "xezri.example"
+       }
+      ]
+     },
+     "say": "Your browser also has old extensions. What do you do with them?",
+     "actions": [
+      {
+       "id": "remove-unused",
+       "label": "Remove the four unused extensions",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Excellent. Each removed extension closes one door into your pages."
+      },
+      {
+       "id": "keep-all",
+       "label": "Keep them all",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Unused extensions still update and can still see your pages. Remove what you do not need."
+      }
+     ]
+    },
+    {
+     "id": "malware-flag",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "db-xezri-brauzer",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Hava Bu Gün was turned off"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Malware was found in this extension."
+        }
+       ],
+       [
+        {
+         "text": "It has also been removed from the store."
+        }
+       ]
+      ],
+      "buttons": [
+       "Turn back on",
+       "Remove"
+      ]
+     },
+     "say": "The browser turned one of the extensions off by itself.",
+     "actions": [
+      {
+       "id": "remove-report",
+       "label": "Remove it and tell technical support",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right. Technical support will check what the extension collected and help you change passwords."
+      },
+      {
+       "id": "enable",
+       "label": "Turn back on",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "The browser did not turn it off for nothing. Turned back on, the extension keeps collecting data."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "sp-recap",
+   "points": [
+    "Install an extension only when you need it, and only from the official store",
+    "Be careful with any extension that wants data on all websites",
+    "Remove the extensions you do not use"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

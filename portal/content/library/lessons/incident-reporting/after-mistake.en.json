@@ -1,0 +1,387 @@
+{
+ "id": "after-mistake",
+ "title": "After a mistake",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Everyone slips: taps a link, reads out a code. What matters is the next five minutes.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Do not hide it and do not try to fix it alone. A silent mistake gives the attacker time.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Be honest: what you tapped, what you typed, what you said. The specialist needs to know.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Then specialists lock the account and check the device. The aim is to stop the harm, not to find someone to blame.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "gave-code",
+   "title": "You read out the code",
+   "start": "call-ended",
+   "nodes": [
+    {
+     "id": "call-ended",
+     "text": "The caller said he was technical support and you read out the code sent to your phone. After the call you had doubts.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Technical support"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 50 000 38 17"
+        }
+       ],
+       "label": "Mobile"
+      }
+     },
+     "choices": [
+      {
+       "label": "I call the support number I know at once",
+       "next": "honest",
+       "feedback": "Correct. Every minute counts, the attacker may already be signing in."
+      },
+      {
+       "label": "I am embarrassed and tell nobody",
+       "outcome": "compromised",
+       "feedback": "The attacker is now in your account and nobody knows. Silence makes it worse."
+      },
+      {
+       "label": "I change the password myself, that is enough",
+       "outcome": "risky",
+       "feedback": "A good step, but not enough. The attacker may stay in an open session that a specialist must end."
+      }
+     ]
+    },
+    {
+     "id": "honest",
+     "text": "When did you give the code and what else did the caller want?",
+     "speaker": "Security team",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "firm",
+     "spoken": "When did you give the code <breath> and what else did the caller want?",
+     "choices": [
+      {
+       "label": "I tell everything as it was, including the code",
+       "next": "manager",
+       "feedback": "Correct. With honest details the specialist knows exactly what to lock."
+      },
+      {
+       "label": "I say there was just a call, I gave no code",
+       "outcome": "risky",
+       "feedback": "With half the story the specialist does not know the account was taken. Honesty saves time."
+      }
+     ]
+    },
+    {
+     "id": "manager",
+     "text": "The specialist ended all sessions and asked you to set a new password. Your manager asks: what happened?",
+     "choices": [
+      {
+       "label": "I explain openly so the team is warned too",
+       "outcome": "safe",
+       "feedback": "Excellent. Your story protects colleagues from the same call."
+      },
+      {
+       "label": "I say nothing happened",
+       "outcome": "risky",
+       "feedback": "The same call may reach your colleagues. Speaking up protects them."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "next-day-inbox",
+   "environment": "inbox",
+   "title": "The next day",
+   "intro": "Yesterday you opened a fake link and reported it. Today three emails are waiting in your inbox.",
+   "steps": [
+    {
+     "id": "ticket",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik",
+      "from": {
+       "name": [
+        {
+         "text": "IT Security"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Your report: INC-2026-0412"
+       }
+      ],
+      "time": "08:20",
+      "body": [
+       [
+        {
+         "text": "Thank you for reporting. All open sessions on your account have been ended."
+        }
+       ],
+       [
+        {
+         "text": "Today, change your password on the organisation's portal. We send no link: open the portal yourself."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Mark as safe",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Correct. The address is your organisation's, there is no link and nothing is asked."
+      },
+      {
+       "id": "report",
+       "label": "Report as phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Caution is good, but this one is genuine: your organisation's address and no link."
+      }
+     ]
+    },
+    {
+     "id": "second-trap",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik-fake",
+      "from": {
+       "name": [
+        {
+         "text": "IT Security"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare-secure.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Urgent: your account was hacked"
+       }
+      ],
+      "time": "09:02",
+      "body": [
+       [
+        {
+         "text": "After yesterday's incident, confirm your account again within one hour."
+        }
+       ],
+       [
+        {
+         "text": "Confirm: "
+        },
+        {
+         "text": "idare-secure.example.net/yoxla",
+         "link": {
+          "label": "idare-secure.example.net/yoxla",
+          "href": "https://idare-secure.example.net/yoxla"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Attackers sometimes write a second time.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Report as phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Correct, the address is not your organisation's domain. Attackers often come back to the same person."
+      },
+      {
+       "id": "click",
+       "label": "Open the link",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "That was a second trap. The real team asked you to change the password on the portal yourself."
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "You are safe, but this email shows the attack is still going on. Report it."
+      }
+     ]
+    },
+    {
+     "id": "colleague",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Nigar Quliyeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "n.quliyeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "A strange email came from you"
+       }
+      ],
+      "time": "09:40",
+      "body": [
+       [
+        {
+         "text": "Hello, last night an email called \"Invoice\" came from your address with a link in it. Did you send it?"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Forward to the security team",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Correct. If the attacker wrote to others from your account, specialists must know."
+      },
+      {
+       "id": "reply",
+       "label": "Reply: not me, do not open it",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Good, you warned your colleague. Forward it to the security team as well."
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Your colleague may open the link and the specialist will not know the attack spread."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "what-happens-next",
+   "prompt": "What usually happens after you report? Put it in order.",
+   "items": [
+    {
+     "id": "report",
+     "label": "You report it"
+    },
+    {
+     "id": "lock",
+     "label": "The specialist locks the account and ends sessions"
+    },
+    {
+     "id": "check",
+     "label": "The computer and mailbox are checked"
+    },
+    {
+     "id": "back",
+     "label": "You set a new password and get back to work"
+    }
+   ],
+   "explain": "This is the normal routine. The sooner you report, the shorter it is."
+  },
+  {
+   "type": "choice",
+   "id": "fear-of-blame",
+   "question": {
+    "prompt": "A colleague says: \"If I report it, I will be told off.\" What do you answer?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Reporting fast limits the harm, hiding it makes it bigger",
+      "correct": true,
+      "feedback": "Correct. Fast, honest information is the most valuable help for specialists."
+     },
+     {
+      "id": "hide",
+      "label": "You are right, let nobody know",
+      "correct": false,
+      "feedback": "A hidden mistake grows and can harm the whole organisation."
+     },
+     {
+      "id": "fix",
+      "label": "Try to fix it yourself first",
+      "correct": false,
+      "feedback": "Fixing it alone can destroy traces and lose time."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "handshake"
+    }
+   },
+   "explain": "Silence, not the mistake, makes the danger grow."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "If you slipped, report it at once and honestly.",
+    "Watch the next emails: the attacker may write again.",
+    "The aim is to stop the harm, not to find someone to blame."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,566 @@
+{
+ "id": "sms-messenger-scams",
+ "title": "Text and chat scams",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l2-tutor",
+   "beats": [
+    {
+     "id": "l2-b1",
+     "say": "Now messages: SMS, WhatsApp and Telegram. Scammers pose as a courier, a prize or someone close.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "l2-b2",
+     "say": "Courier texts with a tiny fee are common. The link opens a fake page that steals card details.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "suretkargo-fake",
+       "sender": [
+        {
+         "text": "SuretKargo"
+        }
+       ],
+       "time": "09:14",
+       "messages": [
+        [
+         {
+          "text": "Your parcel is held at the depot, the address is incomplete. "
+         },
+         {
+          "text": "Pay 1.20 AZN within 24 hours: ",
+          "spot": "small-fee"
+         },
+         {
+          "text": "suretkargo-pay.test/odenis",
+          "spot": "fake-link"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "fake-link",
+     "checkpoint": {
+      "prompt": "A courier text asks for a 1.20 AZN fee. What do you do?",
+      "options": [
+       {
+        "id": "pay",
+        "label": "I pay via the link, it is a small sum",
+        "correct": false,
+        "feedback": "The small sum is bait: the page steals card details."
+       },
+       {
+        "id": "app",
+        "label": "I check the parcel in the courier's official app",
+        "correct": true,
+        "feedback": "Right. Open the official app yourself, not the link in the text."
+       }
+      ]
+     }
+    },
+    {
+     "id": "l2-b4",
+     "say": "The most dangerous is a code request. With it, they move your account to their phone.",
+     "mood": "alert",
+     "gesture": "point-down",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Leyla (work)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hi, I typed your number by mistake. You will get a 6 digit code, can you send it to me?",
+           "spot": "code-ask"
+          }
+         ]
+        }
+       ]
+      }
+     },
+     "highlight": "code-ask"
+    },
+    {
+     "id": "l2-b5",
+     "say": "Protection is simple: never send the code, and turn on two step verification in your messenger.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "new-number",
+   "environment": "phone",
+   "title": "New number",
+   "intro": "In the evening, a WhatsApp message arrives from an unknown number. The sender says she is your daughter.",
+   "steps": [
+    {
+     "id": "hello",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "+44 7700 900456"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hi Mum! It's me, Aysel. My phone broke, this is my new number."
+         }
+        ],
+        "time": "19:42"
+       }
+      ]
+     },
+     "say": "The number is new, the name is familiar.",
+     "actions": [
+      {
+       "id": "reply",
+       "label": "Hi, sweetheart! What happened?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Nothing is lost yet, but this is exactly how the scam starts. Check the old number first."
+      },
+      {
+       "id": "verify",
+       "label": "Call Aysel's old number",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Great check. Always confirm a new number using a familiar name through another channel.",
+       "next": "real-aysel"
+      }
+     ]
+    },
+    {
+     "id": "money",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "+44 7700 900456"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "I urgently need 300 manat, send it to this card. I will pay you back tomorrow."
+         }
+        ],
+        "time": "19:44"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "I can't call, the microphone is broken."
+         }
+        ],
+        "time": "19:44"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "pay",
+       "label": "I send the money",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "The money went to the scammer's card. The 'cannot call' excuse is there to stop you checking."
+      },
+      {
+       "id": "ask",
+       "label": "I ask something only she would know",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "A good check. But the surest way is to call the old number yourself."
+      },
+      {
+       "id": "verify",
+       "label": "I call her old number",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Right. Check a new number asking for money through the old, familiar one.",
+       "next": "real-aysel"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "+44 7700 900456"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Also, a six-digit code is coming to you, send it to me. I am moving WhatsApp to my new phone."
+         }
+        ],
+        "time": "19:47"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "send",
+       "label": "I send the code",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "This code opens your own account. Whoever gets it takes over your WhatsApp and writes as you."
+      },
+      {
+       "id": "keep",
+       "label": "I give the code to no one",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Right. Never give a verification code to anyone, not even family."
+      },
+      {
+       "id": "block",
+       "label": "Block and report",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Great. Block a new number that asks for a code, then call the old number."
+      }
+     ]
+    },
+    {
+     "id": "real-aysel",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Aysel"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Mum, my phone is fine, I have not written to anyone! It is a scam."
+         }
+        ],
+        "time": "19:50"
+       }
+      ]
+     },
+     "say": "This is Aysel's old, familiar number.",
+     "actions": [
+      {
+       "id": "warn",
+       "label": "Warn everyone in the family group",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Right. The scammer will send the same story to your relatives."
+      },
+      {
+       "id": "ignore",
+       "label": "Do nothing",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "The fake number is still active. Block it and warn your family."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l2-hotspot-prize",
+   "prompt": "Find the traps in this message.",
+   "artifact": {
+    "kind": "sms",
+    "sender": [
+     {
+      "text": "+994 51 000 77 88",
+      "spot": "unknown-number",
+      "reveal": "Not in your contacts"
+     }
+    ],
+    "time": "10:42",
+    "messages": [
+     [
+      {
+       "text": "Congratulations! You have "
+      },
+      {
+       "text": "won a new smartphone",
+       "spot": "prize"
+      },
+      {
+       "text": ". To get your prize, "
+      },
+      {
+       "text": "by 18:00 today",
+       "spot": "deadline"
+      },
+      {
+       "text": " "
+      },
+      {
+       "text": "pay a 4.99 AZN delivery fee: ",
+       "spot": "fee"
+      },
+      {
+       "text": "bonus-hediyye.test/al",
+       "spot": "link"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "unknown-number",
+     "label": "A number you do not know",
+     "explain": "Prize draws are not announced from a private number. But even a familiar name can be faked."
+    },
+    {
+     "id": "prize",
+     "label": "A prize in a draw you never entered",
+     "explain": "You cannot win a contest you never entered."
+    },
+    {
+     "id": "deadline",
+     "label": "Time pressure",
+     "explain": "A short deadline is there to make you act without thinking."
+    },
+    {
+     "id": "fee",
+     "label": "A fee for a prize",
+     "explain": "The small fee is an excuse to get your card details."
+    },
+    {
+     "id": "link",
+     "label": "Unknown link",
+     "explain": "This address belongs to no known organisation. Do not tap links like this."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "l2-swipe",
+   "prompt": "Safe or scam?",
+   "cards": [
+    {
+     "id": "courier-link",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "suretkargo-fake",
+      "sender": [
+       {
+        "text": "SuretKargo"
+       }
+      ],
+      "time": "08:03",
+      "messages": [
+       [
+        {
+         "text": "We could not deliver your parcel. Update your address: "
+        },
+        {
+         "text": "suretkargo.delivery-az.test"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "The link does not lead to the courier's own site. Check the tracking number on the official site yourself."
+    },
+    {
+     "id": "bank-otp",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "12:20",
+      "messages": [
+       [
+        {
+         "text": "Code: 551920. It confirms your online payment. Do not share this code with anyone."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "A normal code text that arrives when you pay online yourself. No link, and it reminds you not to share."
+    },
+    {
+     "id": "friend-code",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Kanan"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hi! A code went to your number by mistake, please send it to me."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "This is an account takeover. The code would move your account to their phone."
+    },
+    {
+     "id": "meeting-moved",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Nigar (Finance)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Tomorrow's meeting moved to 11, same room."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "No link, no code, no request for money. A normal work message."
+    },
+    {
+     "id": "child-new-number",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "+44 7700 900789"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hi, it is me, my phone broke and this is my new number. Send 250 manat to my card, it is urgent."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A new number and an urgent request for money. Call your relative on their old number to check."
+    },
+    {
+     "id": "egov-status",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "e-xidmet",
+      "sender": [
+       {
+        "text": "e-Xidmet"
+       }
+      ],
+      "time": "15:37",
+      "messages": [
+       [
+        {
+         "text": "Your application has been received. You can see the result in your personal account on the official portal."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "It asks for no link click or payment. You open the portal yourself from the address you know."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "l2-choice-code",
+   "question": {
+    "prompt": "A friend on WhatsApp asks for the code you received. What do you do?",
+    "options": [
+     {
+      "id": "send",
+      "label": "I send it, they are my friend",
+      "correct": false,
+      "feedback": "Your friend's account may already be stolen. The code would hand them your account too."
+     },
+     {
+      "id": "call-friend",
+      "label": "I do not send it and call my friend to warn them",
+      "correct": true,
+      "feedback": "Correct. Often the friend's account has been taken over and the scammer writes in their name."
+     },
+     {
+      "id": "ignore",
+      "label": "I ignore it and forget about it",
+      "correct": false,
+      "feedback": "Good that you kept the code. But warn your friend, their account may be stolen."
+     }
+    ]
+   },
+   "explain": "This is how takeovers spread: a stolen account asks friends for codes. A code is never sent to anyone."
+  },
+  {
+   "type": "recap",
+   "id": "l2-recap",
+   "points": [
+    "Do not tap courier or prize links",
+    "Check a new number asking for money by calling the old one",
+    "Never send a code, turn on two step verification"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

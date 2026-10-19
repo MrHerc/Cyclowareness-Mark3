@@ -1,0 +1,569 @@
+{
+ "id": "phone-rules",
+ "title": "Work phone rules",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Your work phone is a piece of your organisation in your pocket. It holds work mail, documents and contacts.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "The management profile protects the phone. If it is lost, technical support can lock it and erase work data.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "nc-iscihaz",
+       "app": "İşCihaz",
+       "title": [
+        {
+         "text": "Phone protected"
+        }
+       ],
+       "body": [
+        {
+         "text": "This device is managed under your organisation's security rules."
+        }
+       ],
+       "time": "09:00"
+      }
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Never install a profile from a message link. A fake profile can hand your phone to an attacker.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "it-destek-fake",
+       "sender": [
+        {
+         "text": "IT-Support"
+        }
+       ],
+       "time": "11:42",
+       "messages": [
+        [
+         {
+          "text": "Your profile is expiring. Install a new one: "
+         },
+         {
+          "text": "iscihaz-profil.example.net",
+          "spot": "link"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "link"
+    },
+    {
+     "id": "b4",
+     "say": "Install apps only from the official store or your organisation's device app, and check every permission.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "new-phone",
+   "environment": "phone",
+   "title": "Your new work phone",
+   "intro": "You have just been given a new work phone. Look at each notification and make the right call.",
+   "steps": [
+    {
+     "id": "enroll",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-iscihaz",
+      "app": "İşCihaz",
+      "title": [
+       {
+        "text": "Finish enrolment"
+       }
+      ],
+      "body": [
+       {
+        "text": "Technical support has prepared your device. Finish enrolment to get work mail."
+       }
+      ],
+      "time": "09:05"
+     },
+     "say": "Technical support installed this app themselves.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open notification",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Correct. Enrolling through your organisation's own app is the safest way."
+      },
+      {
+       "id": "later",
+       "label": "Later",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "A phone that is not enrolled is not protected. Do it on day one."
+      }
+     ]
+    },
+    {
+     "id": "profile-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "it-destek-fake",
+      "sender": [
+       {
+        "text": "IT-Support"
+       }
+      ],
+      "time": "11:42",
+      "messages": [
+       [
+        {
+         "text": "Dear colleague, your MDM profile expires today. Install the new profile so your phone is not blocked: "
+        },
+        {
+         "text": "iscihaz-profil.example.net/new",
+         "link": {
+          "label": "iscihaz-profil.example.net/new",
+          "href": "https://iscihaz-profil.example.net/new"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Check the sender and the link address.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Open link",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "That is not your organisation's domain. Profiles only come from the İşCihaz app or technical support.",
+       "next": "profile-install"
+      },
+      {
+       "id": "report",
+       "label": "Report",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Correct. Your report lets technical support warn everyone else too.",
+       "next": "qr-permission"
+      },
+      {
+       "id": "block",
+       "label": "Block",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Good. Tell technical support as well so your colleagues are warned.",
+       "next": "qr-permission"
+      }
+     ]
+    },
+    {
+     "id": "profile-install",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-iscihaz-fake",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Install profile?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "iscihaz-profil.example.net wants to install a configuration profile."
+        }
+       ],
+       [
+        {
+         "text": "The profile will add a certificate, VPN and mail settings."
+        }
+       ]
+      ],
+      "buttons": [
+       "Decline",
+       "Allow"
+      ]
+     },
+     "say": "The site wants to load a profile onto your phone.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Decline",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Correct. A profile like this can route all your internet traffic through the attacker's server."
+      },
+      {
+       "id": "allow",
+       "label": "Allow",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "A fake profile hands control of the phone to a stranger. Call technical support right away."
+      }
+     ]
+    },
+    {
+     "id": "qr-permission",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-qr-oxuyucu",
+      "app": "QR Oxuyucu",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Camera"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Contacts"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Precise location"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Accessibility: control the screen"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "What does a QR reader really need?",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Allow",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "A QR reader only needs the camera. Accessibility lets an app read the screen and tap for you."
+      },
+      {
+       "id": "deny",
+       "label": "Don't allow",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Correct. Grant only what the feature needs, here just the camera."
+      }
+     ]
+    },
+    {
+     "id": "chat-apk",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "sohbet",
+      "name": [
+       {
+        "text": "Shift_schedule.apk"
+       }
+      ],
+      "type": "apk",
+      "size": "5.4 MB",
+      "source": [
+       {
+        "text": "Söhbət: Rashad Mammadov"
+       }
+      ]
+     },
+     "say": "A colleague sent you a file in the messenger.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Install",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "A shift schedule should never be an install file. An .apk sent in a chat brings malware onto the phone."
+      },
+      {
+       "id": "cancel",
+       "label": "Cancel",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Correct. Your colleague's account may be hijacked, so tell technical support."
+      }
+     ]
+    },
+    {
+     "id": "os-update",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sistem-yenileme",
+      "tone": "system",
+      "title": [
+       {
+        "text": "System update"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "A security update is ready. The phone will restart for about 10 minutes."
+        }
+       ]
+      ],
+      "buttons": [
+       "Later",
+       "Update now"
+      ]
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "Update now",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Correct. Updates close gaps that attackers already know about."
+      },
+      {
+       "id": "later",
+       "label": "Later",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Every day of delay leaves the gap open. Update tonight at the latest."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "app-asks",
+   "prompt": "Is this request safe on a work phone, or a threat?",
+   "cards": [
+    {
+     "id": "map-location",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-yolxerite",
+      "app": "YolXəritə",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Location: only while the app is open"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "A map needs location, and only while it is open. The permission fits the job."
+    },
+    {
+     "id": "game-sms",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-super-oyunlar",
+      "app": "Super Oyunlar",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Read SMS messages"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Contacts"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A game needs neither SMS nor contacts. SMS access lets it read your sign-in codes."
+    },
+    {
+     "id": "battery-access",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-batareya",
+      "app": "Batareya Qoruyucu",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Accessibility: control the screen"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Display over other apps"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Saving battery does not require controlling the screen. These are exactly the permissions banking trojans ask for."
+    },
+    {
+     "id": "lock-notice",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-iscihaz",
+      "app": "İşCihaz",
+      "title": [
+       {
+        "text": "Screen lock required"
+       }
+      ],
+      "body": [
+       {
+        "text": "Set a PIN of at least 6 digits to use work mail."
+       }
+      ],
+      "time": "09:20"
+     },
+     "verdict": "safe",
+     "explain": "This is your organisation's own app and it sends no link. A strong screen lock is the first defence if the phone is lost."
+    },
+    {
+     "id": "torch-notifications",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "fener-pro",
+      "app": "Fənər Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Notification access"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A torch does not need to read notifications. With this access it can see incoming codes and messages."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "permission-power",
+   "prompt": "Match each permission with what it allows.",
+   "pairs": [
+    {
+     "id": "sms",
+     "left": "Read SMS",
+     "right": "See bank and sign-in codes"
+    },
+    {
+     "id": "accessibility",
+     "left": "Accessibility",
+     "right": "Read the screen and tap for you"
+    },
+    {
+     "id": "notifications",
+     "left": "Notification access",
+     "right": "Read messenger messages"
+    },
+    {
+     "id": "unknown-sources",
+     "left": "Install unknown apps",
+     "right": "Install software from outside the store"
+    }
+   ],
+   "explain": "These four permissions are the most powerful. Give them only to apps technical support has approved."
+  },
+  {
+   "type": "choice",
+   "id": "slow-phone",
+   "question": {
+    "prompt": "A friend says to remove the management profile from your slow work phone. What do you do?",
+    "options": [
+     {
+      "id": "support",
+      "label": "Keep the profile and contact technical support",
+      "correct": true,
+      "feedback": "Correct. The profile is the phone's protection, and support will fix the problem."
+     },
+     {
+      "id": "remove",
+      "label": "Remove the profile to speed the phone up",
+      "correct": false,
+      "feedback": "Without the profile a lost phone cannot be locked remotely. Work mail usually stops too."
+     },
+     {
+      "id": "reset",
+      "label": "Reset the phone to factory settings",
+      "correct": false,
+      "feedback": "This wipes the profile and work data without technical support knowing. Talk to them first."
+     },
+     {
+      "id": "friend",
+      "label": "Give it to a tech-savvy friend to fix",
+      "correct": false,
+      "feedback": "The phone holds work data. Hand it only to technical support."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "phone-lock"
+    }
+   },
+   "explain": "The management profile guards your work phone. Only technical support changes it."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Profiles and work apps come only from the İşCihaz app or technical support.",
+    "Permissions must fit the app's job. SMS and Accessibility are the most dangerous.",
+    "Screen lock and updates are your phone's first defence."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

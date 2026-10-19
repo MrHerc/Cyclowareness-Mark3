@@ -1,0 +1,415 @@
+{
+ "module": {
+  "slug": "physical-security",
+  "title": "Physical security",
+  "category": "physical"
+ },
+ "lesson": {
+  "id": "office-guard",
+  "title": "Guarding the office",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "no-computer",
+      "say": "An attacker does not always need a computer. A document left on a desk or an unlocked screen is enough.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "desk"
+      }
+     },
+     {
+      "id": "lock-screen",
+      "say": "Lock your screen whenever you stand up. On a Windows computer, press the Windows key and the letter L together.",
+      "mood": "talk",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "lock"
+      }
+     },
+     {
+      "id": "tailgating",
+      "say": "If a stranger tries to follow you through a secured door, politely ask them to use their own badge.",
+      "mood": "think",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "badge-id"
+      }
+     },
+     {
+      "id": "visitors",
+      "say": "Visitors sign in, wear a visitor badge and are always escorted in the building.",
+      "mood": "happy",
+      "gesture": "nod",
+      "visual": {
+       "kind": "illustration",
+       "id": "handshake"
+      }
+     }
+    ]
+   },
+   {
+    "type": "scenario",
+    "id": "tailgate",
+    "title": "Someone behind you",
+    "start": "door",
+    "nodes": [
+     {
+      "id": "door",
+      "text": "Could you hold the door, please? My hands are full. My badge is in my bag, I'm here to fix the printer.",
+      "speaker": "Unknown man",
+      "voice": "young-man-2",
+      "channel": "in-person",
+      "spoken": "Could you hold the door, please? My hands are full. <breath> My badge is in my bag, I'm here to fix the printer.",
+      "visual": {
+       "kind": "illustration",
+       "id": "badge-id"
+      },
+      "choices": [
+       {
+        "label": "Hold the door, his hands are full",
+        "outcome": "compromised",
+        "feedback": "An unverified person got in. Attackers count on exactly this politeness."
+       },
+       {
+        "label": "Offer to hold the boxes so he can find his badge",
+        "next": "no-badge",
+        "feedback": "Polite and correct."
+       },
+       {
+        "label": "Let the door close and walk away silently",
+        "outcome": "risky",
+        "feedback": "He did not get in, but someone else may open the door. Telling security is better."
+       }
+      ]
+     },
+     {
+      "id": "no-badge",
+      "text": "Looks like, I left it at home. I'm in a hurry, your boss is waiting for me.",
+      "speaker": "Unknown man",
+      "voice": "young-man-2",
+      "channel": "in-person",
+      "spoken": "Looks like, uh, I left it at home. I'm in a hurry, your boss is waiting for me.",
+      "choices": [
+       {
+        "label": "Fine, go ahead",
+        "outcome": "compromised",
+        "feedback": "Naming the boss and rushing you is the oldest trick. No badge, no entry."
+       },
+       {
+        "label": "Walk him to the security desk",
+        "next": "guard",
+        "feedback": "Right. They can issue a visitor badge or turn him away."
+       }
+      ]
+     },
+     {
+      "id": "guard",
+      "text": "No printer repair is booked for today. Good thing you brought him here.",
+      "speaker": "Security guard",
+      "voice": "older-man",
+      "channel": "in-person",
+      "manner": "firm",
+      "spoken": "No printer repair is booked for today. <breath> Good thing you brought him here.",
+      "character": "guard",
+      "choices": [
+       {
+        "label": "Also send a short note to the security team",
+        "outcome": "safe",
+        "feedback": "Well done. They will review cameras and check other entrances."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "reception-call",
+    "environment": "call",
+    "title": "Call from reception",
+    "intro": "The reception desk is calling you. Decide what to do about a visitor you did not expect.",
+    "steps": [
+     {
+      "id": "ring",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Reception desk"
+        }
+       ],
+       "number": [
+        {
+         "text": "Extension 115"
+        }
+       ],
+       "label": "Work phone",
+       "voice": "woman-2"
+      },
+      "actions": [
+       {
+        "id": "answer",
+        "label": "Answer",
+        "kind": "answer",
+        "outcome": "safe",
+        "feedback": "Answer it. You decide about the visitor."
+       },
+       {
+        "id": "decline",
+        "label": "Decline",
+        "kind": "decline",
+        "outcome": "risky",
+        "feedback": "The desk gets no answer and may let the visitor through unchecked. Take such calls.",
+        "next": "after"
+       }
+      ]
+     },
+     {
+      "id": "visitor",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Reception desk"
+        }
+       ],
+       "number": [
+        {
+         "text": "Extension 115"
+        }
+       ],
+       "label": "Work phone",
+       "voice": "woman-2"
+      },
+      "say": "Hello, there is an air conditioning technician here. He says you, excuse me, called him. Shall I send him up?",
+      "spoken": "Hello, <breath> there is an, uh, air conditioning technician here. He says you <cough> excuse me, called him. Shall I send him up?",
+      "actions": [
+       {
+        "id": "send-up",
+        "label": "Yes, send him up",
+        "kind": "reply",
+        "outcome": "risky",
+        "feedback": "An unchecked person will walk the building alone. Check the job order first."
+       },
+       {
+        "id": "hold",
+        "label": "I did not call anyone, keep him at the desk",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Right. An unexpected visitor does not get in without a check."
+       },
+       {
+        "id": "come-down",
+        "label": "I will come down and see",
+        "kind": "reply",
+        "outcome": "safe",
+        "feedback": "Good. Meet the visitor at the desk and do not leave him alone."
+       }
+      ]
+     },
+     {
+      "id": "name-drop",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Reception desk"
+        }
+       ],
+       "number": [
+        {
+         "text": "Extension 115"
+        }
+       ],
+       "label": "Work phone",
+       "voice": "woman-2"
+      },
+      "say": "He says Mr Kamran approved it. He only needs five minutes in the server room.",
+      "spoken": "He says <breath> Mr Kamran approved it. He only needs five minutes in the server room.",
+      "actions": [
+       {
+        "id": "let-in",
+        "label": "Then let him in",
+        "kind": "reply",
+        "outcome": "compromised",
+        "feedback": "Unchecked access to the server room is a serious threat. A manager's name is not permission."
+       },
+       {
+        "id": "check-order",
+        "label": "I check the order with facilities",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Right. Check the order through official channels, not the visitor's word."
+       },
+       {
+        "id": "call-boss",
+        "label": "I will call Mr Kamran myself",
+        "kind": "hang-up",
+        "outcome": "safe",
+        "feedback": "Good. Call your manager on the number you know and ask.",
+        "next": "after"
+       }
+      ]
+     },
+     {
+      "id": "after",
+      "label": "The call has ended. Facilities say no technician was booked today.",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Reception desk"
+        }
+       ],
+       "number": [
+        {
+         "text": "Extension 115"
+        }
+       ],
+       "label": "Work phone",
+       "voice": "woman-2"
+      },
+      "actions": [
+       {
+        "id": "report",
+        "label": "Tell the guards and the security team",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Great. The guards will hold the person and the cameras will be checked."
+       },
+       {
+        "id": "ignore",
+        "label": "Do nothing",
+        "kind": "ignore",
+        "outcome": "risky",
+        "feedback": "The fake technician may try another entrance. Reporting protects the building."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "clean-desk",
+    "question": {
+     "prompt": "You are going to lunch. What must not stay on your desk?",
+     "options": [
+      {
+       "id": "sticky-note",
+       "label": "A sticky note with a password",
+       "correct": true,
+       "feedback": "A password should never sit on paper in plain sight."
+      },
+      {
+       "id": "citizen-file",
+       "label": "A folder with a citizen's application",
+       "correct": true,
+       "feedback": "Put confidential files in a locked cabinet."
+      },
+      {
+       "id": "phone",
+       "label": "An unlocked work phone",
+       "correct": true,
+       "feedback": "An unlocked phone opens the door to your accounts."
+      },
+      {
+       "id": "cup",
+       "label": "An empty coffee cup",
+       "correct": false,
+       "feedback": "That is not a risk. Just tidy it up."
+      }
+     ],
+     "multi": true,
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    "explain": "Clean desk rule: when you leave, papers, media and devices are locked away."
+   },
+   {
+    "type": "match",
+    "id": "situations",
+    "prompt": "Match each situation with the right reaction.",
+    "pairs": [
+     {
+      "id": "stranger",
+      "left": "A stranger without a badge in the corridor",
+      "right": "Politely ask and guide them to security"
+     },
+     {
+      "id": "printer",
+      "left": "Someone else's confidential printout",
+      "right": "Return it to the owner without reading"
+     },
+     {
+      "id": "lost-badge",
+      "left": "You lost your access badge",
+      "right": "Report it at once so it gets blocked"
+     },
+     {
+      "id": "open-screen",
+      "left": "A colleague left their screen unlocked",
+      "right": "Lock it and remind them"
+     }
+    ],
+    "explain": "Physical security is everyone's job. A small step prevents a big leak."
+   },
+   {
+    "type": "order",
+    "id": "visitor-flow",
+    "prompt": "Put a visitor's arrival in order.",
+    "items": [
+     {
+      "id": "sign-in",
+      "label": "The visitor signs in at reception"
+     },
+     {
+      "id": "badge",
+      "label": "Gets a visitor badge and wears it visibly"
+     },
+     {
+      "id": "escort",
+      "label": "The host meets and escorts them"
+     },
+     {
+      "id": "return",
+      "label": "The badge is returned on the way out"
+     }
+    ],
+    "explain": "A visitor is never left alone in the building and hands the badge back on leaving."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Lock your screen when you stand up and keep papers locked away.",
+     "Do not let strangers follow you in, send them to security.",
+     "Collect prints at once and destroy confidential paper properly."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "badge-sense",
+  "title": "Your access badge"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 37,
+ "narrationTotalMs": 176291
+}

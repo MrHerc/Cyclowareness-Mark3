@@ -1,0 +1,433 @@
+{
+ "id": "admin-hygiene",
+ "title": "Admin Hygiene",
+ "minutes": 4,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "An admin account is the key attackers want most. With a single admin account they can reach the whole network.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Use a normal account for daily work and a separate one for administration. Never read email or browse as admin.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Keep passwords and keys out of code, chats and tickets. They linger there for years. Use a secrets vault instead.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "telegram",
+       "contact": [
+        {
+         "text": "Infrastructure team · 46 members"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Connect to the database like this for testing: "
+          },
+          {
+           "text": "DB_PASSWORD=Pr0d!Baza2026",
+           "spot": "secret"
+          }
+         ],
+         "time": "23:14"
+        }
+       ]
+      }
+     },
+     "highlight": "secret"
+    },
+    {
+     "id": "b4",
+     "say": "Fake support callers often ask you to install a remote-control tool. Then they open the system with your hands.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Vendor support"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 01 23"
+        }
+       ],
+       "label": "Unknown"
+      }
+     }
+    },
+    {
+     "id": "b5",
+     "say": "For admin panels, remote access and cloud consoles, turn on phishing-resistant multi-factor sign-in, such as a physical security key.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "admin-phish",
+   "prompt": "Find the signs of phishing aimed at admins.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Cloud Console Notice"
+      }
+     ],
+     "address": [
+      {
+       "text": "alerts@"
+      },
+      {
+       "text": "cloudconsole-admin.example.info",
+       "spot": "domain"
+      }
+     ]
+    },
+    "to": "admin@idare.example",
+    "subject": [
+     {
+      "text": "Critical: your admin account will be suspended in 2 hours",
+      "spot": "urgency"
+     }
+    ],
+    "time": "06:12",
+    "body": [
+     [
+      {
+       "text": "Dear administrator,"
+      }
+     ],
+     [
+      {
+       "text": "Re-register multi-factor sign-in for your tenant."
+      }
+     ],
+     [
+      {
+       "text": "Sign in to the console: "
+      },
+      {
+       "text": "console-login.example.info/admin",
+       "spot": "link"
+      }
+     ],
+     [
+      {
+       "text": "Then read the confirmation code to the support agent who calls you.",
+       "spot": "code-share"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Wrong domain",
+     "explain": "Provider notices come from the provider's own domain. Always open the console from your own bookmark."
+    },
+    {
+     "id": "urgency",
+     "label": "Suspension threat",
+     "explain": "A two-hour deadline is there to leave no time to check."
+    },
+    {
+     "id": "link",
+     "label": "Fake sign-in page",
+     "explain": "This page can relay your password and code in real time. Ordinary codes do not stop that."
+    },
+    {
+     "id": "code-share",
+     "label": "Reading a code to someone",
+     "explain": "Real support never asks for your confirmation code. Saying it hands over the account."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "remote-support",
+   "question": {
+    "prompt": "Vendor support calls and wants remote access to a server. What do you do?",
+    "options": [
+     {
+      "id": "call-back",
+      "label": "I hang up and call the number in the contract",
+      "correct": true,
+      "feedback": "Correct. Verify through a channel you know, then grant access only through the approved tool."
+     },
+     {
+      "id": "install",
+      "label": "I install the tool they name and read out the code",
+      "correct": false,
+      "feedback": "That gives the caller full access to the system. Remote-control tools are abused in attacks exactly this way."
+     },
+     {
+      "id": "watch",
+      "label": "I allow it but watch the screen",
+      "correct": false,
+      "feedback": "Watching is not enough. A backdoor takes seconds to plant."
+     }
+    ]
+   },
+   "explain": "An unexpected remote access request is always verified on a known channel and granted only through the approved tool."
+  },
+  {
+   "type": "swipe",
+   "id": "secrets",
+   "prompt": "Is this a safe practice?",
+   "cards": [
+    {
+     "id": "ticket-password",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Ticket 4821"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "I put the server password in the comments so the next shift can see it."
+         }
+        ],
+        "time": "02:30"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Many people see tickets and they stay in the archive. Rotate the password and move it to the vault."
+    },
+    {
+     "id": "vault-share",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "DevOps group"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "I added the key to the secrets vault and gave you read access."
+         }
+        ],
+        "time": "11:20"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "The key itself is not in the chat, only access in the vault. That is the right way."
+    },
+    {
+     "id": "env-in-repo",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://git.idare.example/infra/deploy/-/blob/main/.env"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "The .env file was committed to the repository. Keys stay in history, so deleting the file is not enough. Rotate them now."
+    },
+    {
+     "id": "keys-issued",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Security team"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Security keys for admin accounts"
+       }
+      ],
+      "time": "15:00",
+      "body": [
+       [
+        {
+         "text": "From Monday, admin panel sign-in requires a physical key. Collect yours in person from room 305."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "No link, nothing to download or type, the key is handed over in person. This change makes you safer."
+    },
+    {
+     "id": "shared-admin",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Kamran (network)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "I am off on holiday, here is my admin password, use it if needed."
+         }
+        ],
+        "time": "18:55"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "With a shared admin account no one can tell who did what. The stand-in should get temporary rights on their own account."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "right-account",
+   "prompt": "Match each task to the right account.",
+   "pairs": [
+    {
+     "id": "mail",
+     "left": "Reading email",
+     "right": "Normal daily account"
+    },
+    {
+     "id": "config",
+     "left": "Server configuration",
+     "right": "Separate admin account"
+    },
+    {
+     "id": "script",
+     "left": "Automated script",
+     "right": "Least-privilege service account"
+    },
+    {
+     "id": "emergency",
+     "left": "Emergency access",
+     "right": "Vaulted, monitored account"
+    }
+   ],
+   "explain": "Give each task only the rights it needs. The less an admin account is used, the smaller the target."
+  },
+  {
+   "type": "scenario",
+   "id": "night-prompt",
+   "title": "Night Prompt",
+   "start": "prompt",
+   "nodes": [
+    {
+     "id": "prompt",
+     "text": "It is 02:00. Your phone shows a sign-in approval request for your admin account, and you were asleep.",
+     "choices": [
+      {
+       "label": "I deny it and alert the security team",
+       "next": "reuse",
+       "feedback": "Right. An unexpected prompt means someone knows your password."
+      },
+      {
+       "label": "I approve it so the prompts stop",
+       "outcome": "compromised",
+       "feedback": "The attacker is in the admin panel. This is called a push bombing attack."
+      }
+     ]
+    },
+    {
+     "id": "reuse",
+     "text": "Have you used this password anywhere else?",
+     "speaker": "Security team",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Have you used this password <short pause> anywhere else?",
+     "choices": [
+      {
+       "label": "Yes, on a personal account too. I will change both",
+       "next": "harden",
+       "feedback": "An honest answer. Passwords leaked from other sites are often tried exactly like this."
+      },
+      {
+       "label": "I am embarrassed and say nothing",
+       "outcome": "risky",
+       "feedback": "The team cannot find the source of the leak. Honesty speeds up the investigation."
+      }
+     ]
+    },
+    {
+     "id": "harden",
+     "text": "The password is changed. What is next?",
+     "choices": [
+      {
+       "label": "I end active sessions and move the account to a physical key",
+       "outcome": "safe",
+       "feedback": "Excellent. Ending sessions cuts any open access, and a physical key resists phishing."
+      },
+      {
+       "label": "All good, I get back to work",
+       "outcome": "risky",
+       "feedback": "Open sessions and tokens may still be alive. Close them too."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Admin work on an admin account, daily work on a normal one.",
+    "Keep secrets out of code and chats, rotate any leak at once.",
+    "Verify unexpected remote access requests on a known channel."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

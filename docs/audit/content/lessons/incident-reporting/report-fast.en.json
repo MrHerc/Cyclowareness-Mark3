@@ -1,0 +1,471 @@
+{
+ "module": {
+  "slug": "incident-reporting",
+  "title": "Report Incidents",
+  "category": "incident"
+ },
+ "lesson": {
+  "id": "report-fast",
+  "title": "Fast and Calm",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "b1",
+      "say": "An incident is not only a big attack. A tapped suspicious link, a lost phone or a misdirected email count too.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "alarm"
+      }
+     },
+     {
+      "id": "b2",
+      "say": "Everyone makes mistakes. Reporting quickly stops a problem from growing. The sooner you speak up, the smaller the damage.",
+      "mood": "happy",
+      "gesture": "nod",
+      "visual": {
+       "kind": "illustration",
+       "id": "handshake"
+      }
+     },
+     {
+      "id": "b3",
+      "say": "Do not investigate on your own and delete nothing. The suspicious email, message or file is evidence for the specialist.",
+      "mood": "alert",
+      "gesture": "shake",
+      "visual": {
+       "kind": "illustration",
+       "id": "eye"
+      }
+     },
+     {
+      "id": "b5",
+      "say": "When you report, keep it short: what happened, when, on which device, and what you have already done.",
+      "mood": "talk",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "inbox"
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "report-button",
+    "environment": "inbox",
+    "title": "The Report button",
+    "intro": "Two suspicious emails are in your inbox. Open each one and pick the right step.",
+    "steps": [
+     {
+      "id": "quota",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "ispoct-fake",
+       "from": {
+        "name": [
+         {
+          "text": "IshPocht Administrator"
+         }
+        ],
+        "address": [
+         {
+          "text": "admin@ispoct-mail.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Your mailbox is 98% full"
+        }
+       ],
+       "time": "08:47",
+       "body": [
+        [
+         {
+          "text": "If you do not add space, new emails will be deleted in 24 hours."
+         }
+        ],
+        [
+         {
+          "text": "To add space: "
+         },
+         {
+          "text": "ispoct-mail.example.net/kvota",
+          "link": {
+           "label": "ispoct-mail.example.net/kvota",
+           "href": "https://ispoct-mail.example.net/kvota"
+          }
+         }
+        ]
+       ]
+      },
+      "say": "Look at the sender's address.",
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report as phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Correct. Your report lets specialists remove the same email from everyone else's inbox."
+       },
+       {
+        "id": "click",
+        "label": "Open the link",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "The address was not your organisation's domain. Mailbox space is never added through a link."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "risky",
+        "feedback": "You are safe, but colleagues are still targets and the evidence is gone. Report instead of deleting."
+       },
+       {
+        "id": "forward",
+        "label": "Forward to colleagues",
+        "kind": "forward",
+        "outcome": "risky",
+        "feedback": "Forwarding spreads the threat. If there is no Report button, forward it only to the security team."
+       }
+      ]
+     },
+     {
+      "id": "password-reply",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "it-destek-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Technical support"
+         }
+        ],
+        "address": [
+         {
+          "text": "support@idare-helpdesk.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Account check"
+        }
+       ],
+       "time": "09:15",
+       "body": [
+        [
+         {
+          "text": "The system is being updated. To keep your account open, reply to this email with your username and password."
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report as phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Correct, real technical support never asks for your password. Reporting warns colleagues too."
+       },
+       {
+        "id": "reply",
+        "label": "Reply with password",
+        "kind": "reply",
+        "outcome": "compromised",
+        "feedback": "Your password went to the attacker. If this happens, change it at once and report it."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "risky",
+        "feedback": "You did not give your password, but someone else might. If you report it, specialists protect everyone."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "swipe",
+    "id": "is-it-incident",
+    "prompt": "Should this be reported? Threat or normal?",
+    "cards": [
+     {
+      "id": "wrong-recipient",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "idare",
+       "from": {
+        "name": [
+         {
+          "text": "You"
+         }
+        ],
+        "address": [
+         {
+          "text": "l.aliyeva@idare.example"
+         }
+        ]
+       },
+       "to": "kamran.aliyev.1990@mail.example",
+       "subject": [
+        {
+         "text": "Staff list"
+        }
+       ],
+       "time": "10:02",
+       "body": [
+        [
+         {
+          "text": "The list you asked for is attached."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "isciler_siyahisi.xlsx"
+          }
+         ],
+         "size": "240 KB"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "The list went to a personal address outside the organisation. That is a data leak, report it now."
+     },
+     {
+      "id": "unasked-code",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "ispoct",
+       "sender": [
+        {
+         "text": "IshPocht"
+        }
+       ],
+       "time": "03:17",
+       "messages": [
+        [
+         {
+          "text": "Your sign-in code: 482913. Do not share it with anyone."
+         }
+        ]
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A code you did not ask for means someone knows your password. Change it and report."
+     },
+     {
+      "id": "training-mail",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "it-destek",
+       "from": {
+        "name": [
+         {
+          "text": "Technical support"
+         }
+        ],
+        "address": [
+         {
+          "text": "it-support@idare.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Security training on Friday"
+        }
+       ],
+       "time": "12:30",
+       "body": [
+        [
+         {
+          "text": "A short training takes place on Friday at 11:00 in the main hall. No registration needed."
+         }
+        ]
+       ]
+      },
+      "verdict": "safe",
+      "explain": "Correct address, no link, no request. This is a normal notice."
+     },
+     {
+      "id": "clicked-link",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Tural (colleague)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Yesterday I opened the link in that email, but I did not type anything. It is probably fine, right?"
+          }
+         ],
+         "time": "09:20"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Opening the link alone can tell the attacker things or start a download. Let a specialist decide, it must be reported."
+     },
+     {
+      "id": "lost-phone",
+      "artifact": {
+       "kind": "chat",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Leyla (team)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "I left my work phone in a taxi. I will look for it tomorrow, it is not urgent."
+          }
+         ],
+         "time": "19:45"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A lost work phone is an urgent incident. Support can lock or wipe it remotely."
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "first-step",
+    "question": {
+     "prompt": "You typed your password on a fake page. First step?",
+     "options": [
+      {
+       "id": "report",
+       "label": "Report it at once and change the password",
+       "correct": true,
+       "feedback": "Correct. Every minute counts. These two steps shut the attacker out."
+      },
+      {
+       "id": "silent",
+       "label": "I tell no one because I feel embarrassed",
+       "correct": false,
+       "feedback": "Silence gives the attacker time. Reporting protects you and the organisation."
+      },
+      {
+       "id": "delete",
+       "label": "I delete the email so no trace is left",
+       "correct": false,
+       "feedback": "The email is evidence. Delete it and specialists cannot see who else was targeted."
+      },
+      {
+       "id": "recheck",
+       "label": "I open the link again to check",
+       "correct": false,
+       "feedback": "Opening it again adds risk. Leave the investigation to specialists."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    "explain": "Report fast, keep the evidence, leave the investigation to specialists."
+   },
+   {
+    "type": "order",
+    "id": "strange-program",
+    "prompt": "A strange program is running on your computer. Order the steps.",
+    "items": [
+     {
+      "id": "stop",
+      "label": "Stop what you are doing"
+     },
+     {
+      "id": "disconnect",
+      "label": "Disconnect from the network, do not switch off"
+     },
+     {
+      "id": "call",
+      "label": "Call technical support by phone"
+     },
+     {
+      "id": "note",
+      "label": "Write down briefly what you saw"
+     }
+    ],
+    "explain": "Disconnecting stops the spread, while switching off can wipe traces in memory. If your organisation's procedure says otherwise, follow it. Report by phone."
+   },
+   {
+    "type": "match",
+    "id": "good-report",
+    "prompt": "Match each question to its answer in the report.",
+    "pairs": [
+     {
+      "id": "what",
+      "left": "What happened?",
+      "right": "I typed my password on a fake page"
+     },
+     {
+      "id": "when",
+      "left": "When?",
+      "right": "Today at 09:40"
+     },
+     {
+      "id": "where",
+      "left": "On which device?",
+      "right": "Work computer, in the mail app"
+     },
+     {
+      "id": "done",
+      "left": "What did you do?",
+      "right": "Changed the password, kept the email"
+     }
+    ],
+    "explain": "A short, precise report saves the specialist time."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "If in doubt, report at once. Mistakes are not shameful.",
+     "Do not investigate yourself and delete nothing.",
+     "Keep it short: what, when, where, what you did."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "first-minutes",
+  "title": "The first minutes"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 30,
+ "narrationTotalMs": 174630
+}

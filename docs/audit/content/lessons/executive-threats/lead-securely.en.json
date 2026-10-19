@@ -1,0 +1,631 @@
+{
+ "module": {
+  "slug": "executive-threats",
+  "title": "Threats to Leaders",
+  "category": "ai-threats"
+ },
+ "lesson": {
+  "id": "lead-securely",
+  "title": "Leading Securely",
+  "minutes": 4,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "b1",
+      "say": "Attackers pick leaders on purpose. One signature or one call from you can move large sums and big decisions.",
+      "mood": "think",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "ceo"
+      }
+     },
+     {
+      "id": "b2",
+      "say": "This is called whaling. The email is tailored to your role and speeches, so it looks very convincing.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "email",
+        "from": {
+         "name": [
+          {
+           "text": "International Cooperation Fund"
+          }
+         ],
+         "address": [
+          {
+           "text": "director@"
+          },
+          {
+           "text": "intl-cooperation-fund.example.net",
+           "spot": "domain"
+          }
+         ]
+        },
+        "to": "Anar Hasanov",
+        "subject": [
+         {
+          "text": "For you personally: keynote invitation"
+         }
+        ],
+        "time": "08:05",
+        "body": [
+         [
+          {
+           "text": "Dear Mr Hasanov,"
+          }
+         ],
+         [
+          {
+           "text": "We watched your TV interview last week and would like you as our keynote speaker.",
+           "spot": "public-info"
+          }
+         ],
+         [
+          {
+           "text": "To see the programme, sign in with your work account: "
+          },
+          {
+           "text": "forum-portal.example.net/login",
+           "spot": "login-link"
+          }
+         ],
+         [
+          {
+           "text": "The invitation is confidential, please do not share it with your assistant.",
+           "spot": "bypass"
+          }
+         ]
+        ]
+       }
+      },
+      "highlight": "public-info"
+     },
+     {
+      "id": "b3",
+      "say": "Artificial intelligence can copy your voice from a short recording. A call from you to your deputy may be fake.",
+      "mood": "alert",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "deepfake"
+      }
+     },
+     {
+      "id": "b4",
+      "say": "Your assistant is a target too. Agree that money or data requests are checked on a second channel, even from you.",
+      "mood": "talk",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "handshake"
+      }
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "whaling-email",
+    "prompt": "Find the signs of a whaling email.",
+    "artifact": {
+     "kind": "email",
+     "from": {
+      "name": [
+       {
+        "text": "International Cooperation Fund"
+       }
+      ],
+      "address": [
+       {
+        "text": "director@"
+       },
+       {
+        "text": "intl-cooperation-fund.example.net",
+        "spot": "domain"
+       }
+      ]
+     },
+     "to": "Anar Hasanov",
+     "subject": [
+      {
+       "text": "For you personally: keynote invitation"
+      }
+     ],
+     "time": "08:05",
+     "body": [
+      [
+       {
+        "text": "Dear Mr Hasanov,"
+       }
+      ],
+      [
+       {
+        "text": "We watched your TV interview last week and would like you as our keynote speaker.",
+        "spot": "public-info"
+       }
+      ],
+      [
+       {
+        "text": "To see the programme, sign in with your work account: "
+       },
+       {
+        "text": "forum-portal.example.net/login",
+        "spot": "login-link"
+       }
+      ],
+      [
+       {
+        "text": "The invitation is confidential, please do not share it with your assistant.",
+        "spot": "bypass"
+       }
+      ]
+     ]
+    },
+    "spots": [
+     {
+      "id": "domain",
+      "label": "Unknown domain",
+      "explain": "Anyone can register an official-sounding name. Look the organisation up yourself and check."
+     },
+     {
+      "id": "public-info",
+      "label": "Trust built on public info",
+      "explain": "Your interview is public. Mentioning it does not prove they know you."
+     },
+     {
+      "id": "login-link",
+      "label": "Work account sign-in",
+      "explain": "You do not need a work password to read an invitation. This is meant to steal a leader's account."
+     },
+     {
+      "id": "bypass",
+      "label": "Cut out the assistant",
+      "explain": "Your assistant is your line of checks. Be wary of any email that wants them left out."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "scenario",
+    "id": "voice-call",
+    "title": "A Familiar Voice",
+    "start": "call",
+    "nodes": [
+     {
+      "id": "call",
+      "text": "Approve the payment to our partner tonight, I will send the papers later.",
+      "speaker": "The minister's voice (20:00)",
+      "voice": "older-man",
+      "channel": "phone",
+      "spoken": "Approve the payment to our partner tonight, <breath> I will send the papers later.",
+      "character": "minister",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "call",
+        "caller": [
+         {
+          "text": "Unknown number"
+         }
+        ],
+        "number": [
+         {
+          "text": "+994 70 000 22 65"
+         }
+        ],
+        "label": "Mobile"
+       }
+      },
+      "choices": [
+       {
+        "label": "I hang up and call the minister's known number myself",
+        "next": "check",
+        "feedback": "Right. A voice can be faked, a known number is a reliable check."
+       },
+       {
+        "label": "The voice is familiar, I approve the payment",
+        "outcome": "compromised",
+        "feedback": "A familiar voice is no longer proof. The money went to a fraudster's account."
+       }
+      ]
+     },
+     {
+      "id": "check",
+      "text": "The minister is on a plane and has called no one.",
+      "speaker": "The minister's assistant",
+      "voice": "man-3",
+      "channel": "phone",
+      "manner": "natural",
+      "spoken": "The minister is on a plane <breath> and has called no one.",
+      "character": "assistant",
+      "choices": [
+       {
+        "label": "I report it to security at once and warn finance",
+        "next": "morning",
+        "feedback": "Correct. The attacker may now try another colleague."
+       },
+       {
+        "label": "Nothing, I did not pay anyway",
+        "outcome": "risky",
+        "feedback": "You were safe, but your deputy may be next. Reporting protects everyone."
+       }
+      ]
+     },
+     {
+      "id": "morning",
+      "text": "In the morning your team asks: how do we talk about this?",
+      "choices": [
+       {
+        "label": "I speak openly and confirm the check rule for everyone",
+        "outcome": "safe",
+        "feedback": "Excellent. When the leader talks openly, the team takes the rule seriously."
+       },
+       {
+        "label": "We keep it quiet, it hurts our reputation",
+        "outcome": "risky",
+        "feedback": "Silence leaves others unprotected. Openness builds trust."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "swipe",
+    "id": "assistant-requests",
+    "prompt": "Is this request to your assistant safe?",
+    "cards": [
+     {
+      "id": "gift-cards",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Anar Hasanov (director)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "I am in a meeting, cannot call. Buy 10 gift cards today and send photos of the codes here."
+          }
+         ],
+         "time": "13:12"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Gift card codes are like cash and cannot be recovered. Avoiding a call is another sign."
+     },
+     {
+      "id": "agenda",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "idare",
+       "from": {
+        "name": [
+         {
+          "text": "Anar Hasanov"
+         }
+        ],
+        "address": [
+         {
+          "text": "a.hasanov@idare.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Agenda for tomorrow's meeting"
+        }
+       ],
+       "time": "17:30",
+       "body": [
+        [
+         {
+          "text": "The agenda is attached. The meeting is on the third floor."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Gundelik.pdf"
+          }
+         ],
+         "size": "96 KB"
+        }
+       ]
+      },
+      "verdict": "safe",
+      "explain": "Correct domain, expected topic, no request for money or data."
+     },
+     {
+      "id": "calendar",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "+994 55 000 19 04"
+        }
+       ],
+       "time": "21:48",
+       "messages": [
+        [
+         {
+          "text": "It is your director, new number. Send me my calendar and where tomorrow's meetings are."
+         }
+        ]
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A leader's calendar reveals where they will be. Check a new number through a known channel."
+     },
+     {
+      "id": "second-signature",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "idare-maliyye",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Finance · internal system"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "The payment request was created in the internal system and awaits a second signature, as the rules require."
+          }
+         ],
+         "time": "10:05"
+        }
+       ]
+      },
+      "verdict": "safe",
+      "explain": "The request runs through the official system and needs a second signature. That is the right process."
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "evening-payment",
+    "environment": "desktop",
+    "title": "An evening payment",
+    "intro": "It is 19:52. An urgent payment is waiting for your approval in the finance system.",
+    "steps": [
+     {
+      "id": "approve",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "idare-maliyye",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Payment approval: 48,000 AZN"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Payee: Qafqaz Terefdash LLC, new bank account"
+         }
+        ],
+        [
+         {
+          "text": "Note: the minister asked by phone, pay tonight, documents later."
+         }
+        ]
+       ],
+       "buttons": [
+        "Hold",
+        "Approve"
+       ]
+      },
+      "say": "Look at the payee and the note.",
+      "actions": [
+       {
+        "id": "hold",
+        "label": "Hold and verify",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Correct. An urgent payment to a new account is always checked on a channel you know."
+       },
+       {
+        "id": "approve",
+        "label": "Approve",
+        "kind": "allow",
+        "outcome": "compromised",
+        "feedback": "A new account, urgency and documents later are signs of fraud. The money went to a fake account."
+       }
+      ]
+     },
+     {
+      "id": "which-number",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "idare-maliyye",
+       "tone": "app",
+       "title": [
+        {
+         "text": "How do you verify the instruction?"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "The note gives a contact number: +994 50 000 71 30"
+         }
+        ]
+       ],
+       "buttons": [
+        "Number in note",
+        "Number I know"
+       ]
+      },
+      "actions": [
+       {
+        "id": "known",
+        "label": "Call the minister's assistant on the number I know",
+        "kind": "call-back",
+        "outcome": "safe",
+        "feedback": "Correct. A number you already know exposes a fake instruction at once."
+       },
+       {
+        "id": "note",
+        "label": "Call the number in the note",
+        "kind": "call-back",
+        "outcome": "compromised",
+        "feedback": "The number in the note belongs to the attacker, who will \"confirm\" the order."
+       }
+      ]
+     },
+     {
+      "id": "confirmed-fake",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "it-tehlukesizlik",
+       "tone": "system",
+       "title": [
+        {
+         "text": "The instruction was fake"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "The assistant says the minister gave no such order."
+         }
+        ]
+       ],
+       "buttons": [
+        "Cancel",
+        "Report"
+       ]
+      },
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report to the security team",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Excellent. The attacker will try another signatory next, your report warns everyone."
+       },
+       {
+        "id": "cancel",
+        "label": "Cancel the payment and move on",
+        "kind": "cancel",
+        "outcome": "risky",
+        "feedback": "Stopping it is good, but the attacker will try someone else. Report it."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "first-hour",
+    "question": {
+     "prompt": "What should a leader do in the first hour of an incident?",
+     "options": [
+      {
+       "id": "call-team",
+       "label": "Bring in the security team at once",
+       "correct": true,
+       "feedback": "Correct. The sooner specialists start, the less damage."
+      },
+      {
+       "id": "separate-channel",
+       "label": "Pick a way to talk outside work email",
+       "correct": true,
+       "feedback": "Correct. The attacker may be reading email, so use phones or a separate channel."
+      },
+      {
+       "id": "approve-isolation",
+       "label": "Approve isolating systems as soon as specialists advise it",
+       "correct": true,
+       "feedback": "Correct. A fast decision from the top stops the spread."
+      },
+      {
+       "id": "hide",
+       "label": "Hide the incident to protect reputation",
+       "correct": false,
+       "feedback": "Hiding it causes bigger harm later and can break reporting obligations."
+      },
+      {
+       "id": "pay-fast",
+       "label": "Answer the ransom demand quickly",
+       "correct": false,
+       "feedback": "Any contact with attackers is decided together with specialists and lawyers."
+      }
+     ],
+     "multi": true,
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    "explain": "In the first hour a leader speeds up decisions and backs the team."
+   },
+   {
+    "type": "order",
+    "id": "payment-check",
+    "prompt": "Check an urgent payment request in the right order.",
+    "items": [
+     {
+      "id": "pause",
+      "label": "Pause the request"
+     },
+     {
+      "id": "call-back",
+      "label": "Call back on a number you know"
+     },
+     {
+      "id": "second",
+      "label": "Get a second person's approval"
+     },
+     {
+      "id": "execute",
+      "label": "Only then carry it out"
+     }
+    ],
+    "explain": "Urgency is the attacker's main weapon. A few minutes of checking prevent a big loss."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "However senior the request, check it on a second channel.",
+     "Agree the check rule with your assistant in advance.",
+     "In an incident, decide calmly, openly and fast."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "whaling-board",
+  "title": "Whaling"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 3,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 41,
+ "narrationTotalMs": 212383
+}

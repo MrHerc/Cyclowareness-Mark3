@@ -1,0 +1,719 @@
+{
+ "id": "vendor-bank-change",
+ "title": "New bank details",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "vb-tutor",
+   "beats": [
+    {
+     "id": "vb-b1",
+     "say": "Hello! Today we learn to spot fake payment requests sent in a known supplier's name.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "vb-b2",
+     "say": "This is the most dangerous sentence: our bank details changed, pay the next invoice to the new account.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "ofistechizat-fake",
+       "from": {
+        "name": [
+         {
+          "text": "OfisTechizat LLC Accounts"
+         }
+        ],
+        "address": [
+         {
+          "text": "muhasibat@ofistechizat-az.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Our bank details have changed"
+        }
+       ],
+       "time": "10:42",
+       "body": [
+        [
+         {
+          "text": "Dear partner,"
+         }
+        ],
+        [
+         {
+          "text": "Due to an audit we have moved our account to UlduzBank."
+         }
+        ],
+        [
+         {
+          "text": "Please pay the September invoice (14,860 manat) to the new account: ",
+          "spot": "new-iban"
+         },
+         {
+          "text": "AZ00ULDZ00000000400520007731",
+          "spot": "new-iban"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "new-iban"
+    },
+    {
+     "id": "vb-b3",
+     "say": "Such an email can even come from the supplier's real address, because their mailbox can be hijacked.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "vb-b4",
+     "say": "The rule is simple: call a number you already know, never the one in the email.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vb-hotspot",
+   "prompt": "Find the warning signs in this email.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "ofistechizat-fake",
+    "from": {
+     "name": [
+      {
+       "text": "OfisTechizat LLC Accounts"
+      }
+     ],
+     "address": [
+      {
+       "text": "muhasibat@ofistechizat-az.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Our bank details have changed"
+     }
+    ],
+    "time": "10:42",
+    "body": [
+     [
+      {
+       "text": "Dear partner,"
+      }
+     ],
+     [
+      {
+       "text": "Due to an audit we have moved our account to UlduzBank."
+      }
+     ],
+     [
+      {
+       "text": "Please pay the September invoice (14,860 manat) to the new account: ",
+       "spot": "new-iban"
+      },
+      {
+       "text": "AZ00ULDZ00000000400520007731",
+       "spot": "new-iban"
+      }
+     ],
+     [
+      {
+       "text": "Payment is due today by 16:00, the old account is being closed.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "For questions call only this number: +994 50 000 72 19",
+       "spot": "phone"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Different domain",
+     "explain": "The supplier's address was ofistechizat.example. The extra \"-az\" and other ending make it a look-alike."
+    },
+    {
+     "id": "new-iban",
+     "label": "New account number",
+     "explain": "Changed bank details are the whole goal of this scam. Money sent there is hard to get back."
+    },
+    {
+     "id": "urgency",
+     "label": "Time pressure",
+     "explain": "A deadline pushes you to pay without checking. A real partner gives you time to verify."
+    },
+    {
+     "id": "phone",
+     "label": "Number in the email",
+     "explain": "If you call this number, the scammer answers. Take the number from the contract instead."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "vb-sim-inbox",
+   "environment": "inbox",
+   "title": "Accounts mailbox",
+   "intro": "You handle payments. Open four emails and choose the right step for each.",
+   "steps": [
+    {
+     "id": "invoice-normal",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat",
+      "from": {
+       "name": [
+        {
+         "text": "OfisTechizat LLC"
+        }
+       ],
+       "address": [
+        {
+         "text": "satis@ofistechizat.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "September invoice"
+       }
+      ],
+      "time": "09:15",
+      "body": [
+       [
+        {
+         "text": "Hello, the September invoice is attached."
+        }
+       ],
+       [
+        {
+         "text": "Payment as usual to the account in our contract. Regards, Sabina Karimova"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Invoice_2026_09.pdf"
+         }
+        ],
+        "size": "180 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open attachment",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "Known address, an expected PDF invoice and the account does not change. This is normal mail."
+      },
+      {
+       "id": "safe",
+       "label": "Mark as safe",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Right. There is no new account and no time pressure here."
+      },
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Caution is good, but there are no signs here. You can pay an expected invoice to the contract account."
+      }
+     ]
+    },
+    {
+     "id": "bank-change-fake",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat-fake",
+      "from": {
+       "name": [
+        {
+         "text": "OfisTechizat LLC Accounts"
+        }
+       ],
+       "address": [
+        {
+         "text": "muhasibat@ofistechizat-az.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Our bank details have changed"
+       }
+      ],
+      "time": "10:42",
+      "body": [
+       [
+        {
+         "text": "Dear partner,"
+        }
+       ],
+       [
+        {
+         "text": "Due to an audit we have moved our account to UlduzBank."
+        }
+       ],
+       [
+        {
+         "text": "Please pay the September invoice (14,860 manat) to the new account: ",
+         "spot": "new-iban"
+        },
+        {
+         "text": "AZ00ULDZ00000000400520007731",
+         "spot": "new-iban"
+        }
+       ],
+       [
+        {
+         "text": "Payment is due today by 16:00, the old account is being closed.",
+         "spot": "urgency"
+        }
+       ],
+       [
+        {
+         "text": "For questions call only this number: +994 50 000 72 19",
+         "spot": "phone"
+        }
+       ]
+      ]
+     },
+     "say": "Look at the sender's domain.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right: look-alike domain, new account and a deadline. No button? Forward it to IT security."
+      },
+      {
+       "id": "confirm",
+       "label": "Reply: we accept the new account",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "The payment would go to the scammer. Never accept new bank details by email alone."
+      },
+      {
+       "id": "ask",
+       "label": "Reply: is this true?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "The scammer will reply and say yes. Only a number you already know can verify it."
+      }
+     ]
+    },
+    {
+     "id": "bank-change-real-box",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat",
+      "from": {
+       "name": [
+        {
+         "text": "Sabina Karimova"
+        }
+       ],
+       "address": [
+        {
+         "text": "satis@ofistechizat.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: September invoice"
+       }
+      ],
+      "time": "11:20",
+      "body": [
+       [
+        {
+         "text": "Sorry, we forgot to mention it."
+        }
+       ],
+       [
+        {
+         "text": "Please pay this invoice to our new account: AZ00ULDZ00000000400520007731"
+        }
+       ],
+       [
+        {
+         "text": "To confirm, call me on this number: +994 55 000 31 84"
+        }
+       ]
+      ]
+     },
+     "say": "The address is real. Still be careful.",
+     "actions": [
+      {
+       "id": "verify",
+       "label": "Call the number in the contract",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Right. A mailbox can be hijacked, but the number in your contract reaches the real supplier."
+      },
+      {
+       "id": "call-mail",
+       "label": "Call the number in the email",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "That number belongs to the scammer, who will confirm everything. Use your own records."
+      },
+      {
+       "id": "safe",
+       "label": "Mark as safe",
+       "kind": "mark-safe",
+       "outcome": "compromised",
+       "feedback": "The address is real, but the mailbox was hijacked. Always check new bank details separately."
+      },
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Good step. Security can also warn the supplier."
+      }
+     ]
+    },
+    {
+     "id": "boss-urgent",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Anar Huseynov"
+        }
+       ],
+       "address": [
+        {
+         "text": "anar.huseynov@idare-mail.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Urgent: Kur Tikinti advance"
+       }
+      ],
+      "time": "12:05",
+      "body": [
+       [
+        {
+         "text": "Pay Kur Tikinti's advance today to their new account, they send the details tomorrow."
+        }
+       ],
+       [
+        {
+         "text": "I am in a meeting, do not call. Anar"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right. The name is the boss's, but the domain is not idare.example, and \"do not call\" is a warning sign."
+      },
+      {
+       "id": "verify",
+       "label": "Call the boss on a known number",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Great. Even if the boss is in a meeting, a one minute check prevents a big loss."
+      },
+      {
+       "id": "pay",
+       "label": "Reply: we pay today",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "The money would go to the scammer. Pressure and secrecy are reasons to stop the payment."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "vb-sim-call",
+   "environment": "call",
+   "title": "Call from the supplier",
+   "intro": "Soon a call comes in the supplier's name. Read what the caller says and choose your answer.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-2"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Answer",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Answering is not dangerous. What you say next matters."
+      },
+      {
+       "id": "decline",
+       "label": "Decline",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "That is fine too. Later call the supplier yourself on the contract number.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pitch",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-2"
+     },
+     "say": "Hello, Zaur Guliyev from OfisTechizat. Did you get our new details? If you do not pay today, your order stops.",
+     "spoken": "Hello, <breath> Zaur Guliyev from OfisTechizat. Did you get our new details? If you do not pay today, uh, your order stops.",
+     "actions": [
+      {
+       "id": "agree",
+       "label": "Fine, we pay the new account today",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "The call is part of the trap, built to back up the email. The caller's number proves nothing."
+      },
+      {
+       "id": "own-check",
+       "label": "We will check the change our own way",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Right. A real supplier understands a verification check."
+      },
+      {
+       "id": "hang",
+       "label": "Hang up",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Good choice. Now call the contract number yourself.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-2"
+     },
+     "say": "Your manager agreed, I spoke to him. Send me a photo of the payment order so I can check it.",
+     "spoken": "Your manager agreed, I spoke to him. <breath> Send me a photo of the payment order so I can check it.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "I send the photo",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "A payment order holds account and signature details. Scammers use them to forge new documents."
+      },
+      {
+       "id": "verify",
+       "label": "I will call my manager myself",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Great. Only the manager can confirm \"the manager agreed\"."
+      },
+      {
+       "id": "hang",
+       "label": "Hang up",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Right. When pressure grows, ending the call is the best answer."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "The call ended. What now?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-2"
+     },
+     "actions": [
+      {
+       "id": "contract",
+       "label": "Call the number in the contract",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Right. The real supplier will say nothing changed, and you report the scam."
+      },
+      {
+       "id": "redial",
+       "label": "Call back the number that called",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "That number goes to the scammer. Verify only with a number from your own records."
+      },
+      {
+       "id": "ignore",
+       "label": "Do nothing",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "The scammer will try another colleague. Tell security."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "vb-order",
+   "prompt": "Put the steps in order when new bank details arrive.",
+   "items": [
+    {
+     "id": "pause",
+     "label": "Hold the payment"
+    },
+    {
+     "id": "known-number",
+     "label": "Take the number from the contract or past records"
+    },
+    {
+     "id": "call",
+     "label": "Call and ask about the change"
+    },
+    {
+     "id": "second",
+     "label": "Have a second colleague approve it"
+    },
+    {
+     "id": "update",
+     "label": "Only then update the details"
+    }
+   ],
+   "explain": "Bank details change only after a check on a known number and approval by a second colleague."
+  },
+  {
+   "type": "choice",
+   "id": "vb-choice",
+   "question": {
+    "prompt": "You already sent the money to the new account. What comes first?",
+    "options": [
+     {
+      "id": "call-bank",
+      "label": "Call my bank at once to stop the transfer, and tell security",
+      "correct": true,
+      "feedback": "Right. The sooner the bank knows, the better the chance to stop the money."
+     },
+     {
+      "id": "wait",
+      "label": "Wait for the supplier to answer",
+      "correct": false,
+      "feedback": "Every hour moves the money further away. Waiting loses time."
+     },
+     {
+      "id": "email-again",
+      "label": "Email the same address and ask for it back",
+      "correct": false,
+      "feedback": "The scammer reads that mailbox. Only the bank can stop the money."
+     }
+    ]
+   },
+   "explain": "With a wrong transfer, time decides: first the bank, then security. Keep the emails as evidence."
+  },
+  {
+   "type": "recap",
+   "id": "vb-recap",
+   "points": [
+    "When bank details change, hold the payment",
+    "Call a number you know, not the one in the email",
+    "Already paid? Call the bank and security at once"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

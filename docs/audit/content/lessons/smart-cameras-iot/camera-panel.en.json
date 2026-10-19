@@ -1,0 +1,422 @@
+{
+ "module": {
+  "slug": "smart-cameras-iot",
+  "title": "Smart devices and cameras",
+  "category": "devices"
+ },
+ "lesson": {
+  "id": "camera-panel",
+  "title": "The camera panel",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "sc1-tutor",
+    "beats": [
+     {
+      "id": "sc1-b1",
+      "say": "Hello! Cameras are handy at home and at work. But if the password was never changed, a stranger can watch too.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "eye"
+      }
+     },
+     {
+      "id": "sc1-b2",
+      "say": "Most new cameras ship with a default password. Lists of these passwords are open to anyone online.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2f-baxiskam",
+        "tone": "system",
+        "title": [
+         {
+          "text": "BaxışKam: first sign-in"
+         }
+        ],
+        "body": [
+         [
+          {
+           "text": "Username: admin"
+          }
+         ],
+         [
+          {
+           "text": "Password: admin",
+           "spot": "default-pass"
+          }
+         ]
+        ],
+        "buttons": [
+         "Sign in"
+        ]
+       }
+      },
+      "highlight": "default-pass"
+     },
+     {
+      "id": "sc1-b3",
+      "say": "In 2025, unauthorised access to home and office cameras was found in Azerbaijan, with footage uploaded to foreign sites.",
+      "mood": "think",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "stat",
+       "value": "2025",
+       "label": "Unauthorised access to home and office cameras found"
+      }
+     },
+     {
+      "id": "sc1-b4",
+      "say": "Three steps are enough: change the password, update the firmware, and close open access from the internet.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "password",
+    "id": "sc1-password",
+    "prompt": "Create a new password for the camera panel.",
+    "targetScore": 4,
+    "tips": [
+     "Do not type your real password here, this is practice.",
+     "Pick a phrase of four random words.",
+     "Do not reuse your Wi-Fi or email password.",
+     "Keep the password in a password manager."
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "sc1-sim",
+    "environment": "browser",
+    "title": "Setting up the camera",
+    "intro": "You are setting up a new camera. Look at every window in the panel and choose the right button.",
+    "steps": [
+     {
+      "id": "first-login",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "w2f-baxiskam",
+       "brand": "BaxışKam",
+       "url": [
+        {
+         "text": "http://192.168.1.64/login"
+        }
+       ],
+       "fields": [
+        "Username",
+        "Password"
+       ],
+       "button": "Sign in"
+      },
+      "say": "You are signing in to the camera panel for the first time.",
+      "actions": [
+       {
+        "id": "login",
+        "label": "Sign in",
+        "kind": "enter-credentials",
+        "outcome": "safe",
+        "feedback": "Correct, this is the camera's own address on your home network. Change the password right after the first sign-in."
+       },
+       {
+        "id": "close",
+        "label": "Close tab",
+        "kind": "cancel",
+        "outcome": "risky",
+        "feedback": "Without signing in, you cannot change the default password. The camera stays open to everyone."
+       }
+      ]
+     },
+     {
+      "id": "change-default",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2f-baxiskam",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Default password in use"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Change the password now for your security."
+         }
+        ]
+       ],
+       "buttons": [
+        "Change password",
+        "Remind me later"
+       ]
+      },
+      "actions": [
+       {
+        "id": "change",
+        "label": "Change password",
+        "kind": "update",
+        "outcome": "safe",
+        "feedback": "Well done. Changing the default password is the single most important step for a camera."
+       },
+       {
+        "id": "later",
+        "label": "Remind me later",
+        "kind": "later",
+        "outcome": "compromised",
+        "feedback": "Getting in with a default password takes no skill at all. Automated tools search for such cameras all the time."
+       }
+      ]
+     },
+     {
+      "id": "firmware",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2f-baxiskam",
+       "tone": "app",
+       "title": [
+        {
+         "text": "New firmware: 5.2.8"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Security holes have been fixed. The update takes about three minutes."
+         }
+        ]
+       ],
+       "buttons": [
+        "Update",
+        "Later"
+       ]
+      },
+      "actions": [
+       {
+        "id": "update",
+        "label": "Update",
+        "kind": "update",
+        "outcome": "safe",
+        "feedback": "Correct. Attackers know the holes in old firmware very well."
+       },
+       {
+        "id": "later",
+        "label": "Later",
+        "kind": "later",
+        "outcome": "risky",
+        "feedback": "Without the update, known holes stay open. Update it today."
+       }
+      ]
+     },
+     {
+      "id": "remote-access",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2f-baxiskam",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Remote access"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Turn on UPnP and port forwarding to watch the camera directly from the internet?"
+         }
+        ]
+       ],
+       "buttons": [
+        "Keep on",
+        "Turn off"
+       ]
+      },
+      "say": "Now the camera offers direct access from the internet.",
+      "actions": [
+       {
+        "id": "open-port",
+        "label": "Keep on",
+        "kind": "allow",
+        "outcome": "risky",
+        "feedback": "With an open port, the camera is visible to the whole internet. Attackers find such open devices easily with special search tools."
+       },
+       {
+        "id": "off",
+        "label": "Turn off",
+        "kind": "deny",
+        "outcome": "safe",
+        "feedback": "Right. If you need to watch remotely, use the maker's official app instead of opening a port."
+       }
+      ]
+     },
+     {
+      "id": "public-link",
+      "label": "Create a public link for the live stream? Anyone with the link will be able to watch.",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "w2f-baxiskam",
+       "url": [
+        {
+         "text": "http://192.168.1.64/paylas"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "share",
+        "label": "Create link",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "Once the link spreads, you will never know who is watching. Add family members in the app with their own accounts."
+       },
+       {
+        "id": "private",
+        "label": "Do not create a public link",
+        "kind": "keep-private",
+        "outcome": "safe",
+        "feedback": "Correct. Only people close to you, signed in with their own accounts, should see the picture."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "sc1-hotspot",
+    "prompt": "Find the risky settings in the video recorder's status window.",
+    "artifact": {
+     "kind": "dialog",
+     "brandRef": "w2f-baxiskam",
+     "tone": "system",
+     "title": [
+      {
+       "text": "District office entrance: video recorder"
+      }
+     ],
+     "body": [
+      [
+       {
+        "text": "Model: BX-DVR 8"
+       }
+      ],
+      [
+       {
+        "text": "User: admin, password: default",
+        "spot": "default"
+       }
+      ],
+      [
+       {
+        "text": "Firmware: 2019, no updates",
+        "spot": "old-firmware"
+       }
+      ],
+      [
+       {
+        "text": "Port forwarding: on, 8000",
+        "spot": "open-port"
+       }
+      ],
+      [
+       {
+        "text": "Camera 3: HR room, facing computer screens",
+        "spot": "screens"
+       }
+      ],
+      [
+       {
+        "text": "Date and time: correct"
+       }
+      ]
+     ],
+     "buttons": [
+      "Close"
+     ]
+    },
+    "spots": [
+     {
+      "id": "default",
+      "label": "Default password",
+      "explain": "Attackers take default passwords from ready-made lists. Changing it is the first job."
+     },
+     {
+      "id": "old-firmware",
+      "label": "Old firmware",
+      "explain": "A device left without updates for seven years has known holes. If no updates come out, the device must be replaced."
+     },
+     {
+      "id": "open-port",
+      "label": "Open port",
+      "explain": "An open port shows the recorder to the whole internet. If it is not needed, close it."
+     },
+     {
+      "id": "screens",
+      "label": "Camera facing screens",
+      "explain": "This camera films work screens and documents. If the footage is stolen, confidential data goes with it."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "choice",
+    "id": "sc1-choice",
+    "question": {
+     "prompt": "A colleague brought a Wi-Fi camera from home and wants to connect it at work. What do you say?",
+     "options": [
+      {
+       "id": "it-approved",
+       "label": "Technical support must approve it and connect it",
+       "correct": true,
+       "feedback": "Correct. Only approved devices go on the work network."
+      },
+      {
+       "id": "password-enough",
+       "label": "Fine, if they change the password",
+       "correct": false,
+       "feedback": "The password matters, but an unchecked device can open a door into the work network. Technical support decides."
+      },
+      {
+       "id": "guest-quiet",
+       "label": "Put it on guest Wi-Fi, nobody will know",
+       "correct": false,
+       "feedback": "A device connected without telling anyone is a risk for the office. Every camera goes through technical support."
+      }
+     ]
+    },
+    "explain": "At work, only technical support connects cameras and smart devices. A forgotten device stays without updates for years."
+   },
+   {
+    "type": "recap",
+    "id": "sc1-recap",
+    "points": [
+     "Change the default password on day one.",
+     "Update the firmware, close open ports.",
+     "At work, approved devices only."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "home-network",
+  "title": "Home network"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 29,
+ "narrationTotalMs": 176635
+}

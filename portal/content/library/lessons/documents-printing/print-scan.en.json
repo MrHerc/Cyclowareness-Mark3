@@ -1,0 +1,446 @@
+{
+ "id": "print-scan",
+ "title": "Printers and scanners",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "A page forgotten in the printer is the simplest leak. Anyone walking down the corridor can take it.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Before you send, check which printer is selected and whether secure print is on.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "nc-capmerkezi",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Print"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Printer: "
+         },
+         {
+          "text": "Corridor-2 (shared)",
+          "spot": "printer"
+         }
+        ],
+        [
+         {
+          "text": "Secure print: "
+         },
+         {
+          "text": "off",
+          "spot": "secure"
+         }
+        ]
+       ],
+       "buttons": [
+        "Cancel",
+        "Print"
+       ]
+      }
+     },
+     "highlight": "secure"
+    },
+    {
+     "id": "b3",
+     "say": "Secure print releases pages only when you tap your card or type a PIN at the printer.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Mail from the scanner needs care too. Attackers often send phishing dressed up as a scanned document.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "print-day",
+   "environment": "desktop",
+   "title": "Printing day",
+   "intro": "Today you are printing several documents. Look at the windows that open and decide.",
+   "steps": [
+    {
+     "id": "salary-print",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-capmerkezi",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Print: Salary_table_October.xlsx"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Printer: Corridor-2 (shared)"
+        }
+       ],
+       [
+        {
+         "text": "Secure print: off"
+        }
+       ],
+       [
+        {
+         "text": "Copies: 1"
+        }
+       ]
+      ],
+      "buttons": [
+       "Print directly",
+       "Send with secure print"
+      ]
+     },
+     "say": "This document contains staff salaries.",
+     "actions": [
+      {
+       "id": "secure",
+       "label": "Send with secure print",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Correct. The document waits in the queue and comes out only when you are at the printer."
+      },
+      {
+       "id": "direct",
+       "label": "Print directly",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "The page will sit in the shared corridor waiting for you. If you are delayed, someone else may see it."
+      }
+     ]
+    },
+    {
+     "id": "paper-out",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-capmerkezi",
+      "app": "Çap Mərkəzi",
+      "title": [
+       {
+        "text": "Corridor-2: out of paper"
+       }
+      ],
+      "body": [
+       {
+        "text": "Business_trip_list.pdf is queued. It will print as soon as paper is loaded."
+       }
+      ],
+      "time": "11:20"
+     },
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Cancel print",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Correct. Once paper is loaded the page would come out without you, so resend it with secure print."
+      },
+      {
+       "id": "ignore",
+       "label": "Dismiss",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Whoever loads the paper will also pick up the list. Cancel the job still in the queue."
+      }
+     ]
+    },
+    {
+     "id": "driver-popup",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-drayver",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Printer driver out of date"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Download Drayver Yeniləyici to keep printing."
+        }
+       ],
+       [
+        {
+         "text": "printer-drayver.example.info"
+        }
+       ]
+      ],
+      "buttons": [
+       "Close",
+       "Download now"
+      ]
+     },
+     "say": "A website offers you printer software.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Download now",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "A website cannot check the driver on your computer. Downloads like this are usually malware."
+      },
+      {
+       "id": "cancel",
+       "label": "Close",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Correct. Only technical support installs printer drivers."
+      },
+      {
+       "id": "report",
+       "label": "Report to technical support",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Technical support will check where this window came from."
+      }
+     ]
+    },
+    {
+     "id": "scan-folder",
+     "label": "Shared folder: Scans",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-capmerkezi",
+      "name": [
+       {
+        "text": "Scan_passports_0410.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "3.2 MB",
+      "source": [
+       {
+        "text": "Shared folder: Scanner, 3rd floor"
+       }
+      ]
+     },
+     "say": "The passport copies you scanned landed in a shared folder.",
+     "actions": [
+      {
+       "id": "move",
+       "label": "Move to my folder",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Correct. Move the file to your own folder so it does not stay in the shared one."
+      },
+      {
+       "id": "leave",
+       "label": "Leave it there",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "The whole floor can open this folder. Passport copies are personal data."
+      },
+      {
+       "id": "share",
+       "label": "Send the link to the department",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Personal data goes only to the person who needs it. Do not send it to the whole department."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "scan-mail",
+   "prompt": "Find the suspicious parts of this mail that claims to come from the scanner.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "nc-capmerkezi-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Scanner, 3rd floor"
+      }
+     ],
+     "address": [
+      {
+       "text": "scan@idare-skan.example.net",
+       "spot": "sender"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Scanned document: 4 pages"
+     }
+    ],
+    "time": "14:03",
+    "body": [
+     [
+      {
+       "text": "Dear user,"
+      }
+     ],
+     [
+      {
+       "text": "A document was scanned for you. "
+      },
+      {
+       "text": "If you do not view it within 24 hours it will be deleted.",
+       "spot": "urgent"
+      }
+     ],
+     [
+      {
+       "text": "View document",
+       "spot": "link",
+       "link": {
+        "label": "View document",
+        "href": "https://idare-skan.example.net/view"
+       }
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Scan_0410.pdf"
+       },
+       {
+        "text": ".html",
+        "spot": "ext"
+       }
+      ],
+      "size": "12 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Sender domain",
+     "explain": "Your scanner sends from idare.example. This domain looks similar but is different."
+    },
+    {
+     "id": "urgent",
+     "label": "Time pressure",
+     "explain": "A scanner does not rush you. Time pressure is a classic phishing sign."
+    },
+    {
+     "id": "link",
+     "label": "Outside link",
+     "explain": "The link leads to a site outside your organisation, where a password will be asked for."
+    },
+    {
+     "id": "ext",
+     "label": "File extension",
+     "explain": "An .html file is a web page, not a document. Opening it can show a fake sign-in form."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "found-print",
+   "question": {
+    "prompt": "You find someone else's salary table in the printer. What do you do?",
+    "options": [
+     {
+      "id": "owner",
+      "label": "Give it, unread, to the owner or a manager",
+      "correct": true,
+      "feedback": "Correct. The document goes back to the right hands, and the owner will be more careful next time."
+     },
+     {
+      "id": "leave",
+      "label": "Leave it, the owner will come",
+      "correct": false,
+      "feedback": "Everyone who comes after you can see it. Do not leave pages in the printer."
+     },
+     {
+      "id": "bin",
+      "label": "Throw it in the nearest bin",
+      "correct": false,
+      "feedback": "A page in an ordinary bin is easy to pick out. Confidential paper goes to the shredder."
+     },
+     {
+      "id": "photo",
+      "label": "Post a photo to the team chat: whose is this?",
+      "correct": false,
+      "feedback": "That spreads salary data to even more people. Quietly hand the page to its owner."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "desk"
+    }
+   },
+   "explain": "A page left in the printer is a leak. Return it to the owner, or to a manager if the owner is unknown."
+  },
+  {
+   "type": "match",
+   "id": "right-move",
+   "prompt": "Match each situation with the right move.",
+   "pairs": [
+    {
+     "id": "paper",
+     "left": "Out of paper, document queued",
+     "right": "Cancel the print job"
+    },
+    {
+     "id": "driver",
+     "left": "A site offers printer software",
+     "right": "Contact technical support"
+    },
+    {
+     "id": "scan",
+     "left": "Scan landed in a shared folder",
+     "right": "Move it to your own folder"
+    },
+    {
+     "id": "secret",
+     "left": "You must print a confidential file",
+     "right": "Use secure print"
+    }
+   ],
+   "explain": "Small habits stop leaks while printing."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Send confidential files with secure print and collect them at once.",
+    "Only technical support installs printer software.",
+    "In scanner mail, check the sender and the file extension."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

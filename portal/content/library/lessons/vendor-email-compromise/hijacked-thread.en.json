@@ -1,0 +1,709 @@
+{
+ "id": "hijacked-thread",
+ "title": "Hijacked thread",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ht-tutor",
+   "beats": [
+    {
+     "id": "ht-b1",
+     "say": "When a scammer gets into a partner's mailbox, they reply in your old thread. Subject and signature look familiar.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "ht-b2",
+     "say": "A password protected archive is a warning sign. The password hides the file from antivirus checks.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "kur-tikinti",
+       "from": {
+        "name": [
+         {
+          "text": "Elchin Babayev"
+         }
+        ],
+        "address": [
+         {
+          "text": "layihe@kur-tikinti.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "RE: Contract 47/2026"
+        }
+       ],
+       "time": "14:10",
+       "body": [
+        [
+         {
+          "text": "Dear partner,"
+         }
+        ],
+        [
+         {
+          "text": "the final contract is in the archive. "
+         },
+         {
+          "text": "Archive password: 4417",
+          "spot": "zip-pass"
+         }
+        ],
+        [
+         {
+          "text": "If you do not sign today, the price changes."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Contract_final.zip"
+          }
+         ],
+         "size": "1,2 MB"
+        }
+       ]
+      }
+     },
+     "highlight": "zip-pass"
+    },
+    {
+     "id": "ht-b3",
+     "say": "Even in a familiar thread, do not rush to open an unexpected attachment or urgent request.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "ht-b4",
+     "say": "If in doubt, call the partner on a number you know and ask if they sent the file.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ht-hotspot",
+   "prompt": "Find what changed in this reply.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "kur-tikinti",
+    "from": {
+     "name": [
+      {
+       "text": "Elchin Babayev"
+      }
+     ],
+     "address": [
+      {
+       "text": "layihe@kur-tikinti.example"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "RE: RE: Contract 47/2026"
+     }
+    ],
+    "time": "15:02",
+    "body": [
+     [
+      {
+       "text": "Dear partner,",
+       "spot": "greeting"
+      }
+     ],
+     [
+      {
+       "text": "the final contract and payment schedule are attached. "
+      },
+      {
+       "text": "Sign in with your work email to open it.",
+       "spot": "login"
+      }
+     ],
+     [
+      {
+       "text": "Sign it today by 15:00.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "> Hi. I will send the revised draft on Monday, no rush. Elchin"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Contract_47_sign.html",
+        "spot": "html"
+       }
+      ],
+      "size": "12 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "greeting",
+     "label": "Changed tone",
+     "explain": "He used to write \"Hi\", now \"Dear partner\". A sudden change of tone suggests someone else is writing."
+    },
+    {
+     "id": "html",
+     "label": "HTML attachment",
+     "explain": "Contracts come as PDF or Word. An HTML attachment usually opens a fake sign-in page."
+    },
+    {
+     "id": "login",
+     "label": "Sign-in request",
+     "explain": "Opening an attachment never needs your password. A file that asks for it wants to steal it."
+    },
+    {
+     "id": "urgency",
+     "label": "Sudden rush",
+     "explain": "The earlier mail said \"no rush\". A sudden deadline is a scammer's tool."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "ht-sim-inbox",
+   "environment": "inbox",
+   "title": "Project thread",
+   "intro": "You have a long thread with Kur Tikinti. Check the new replies: which are real and which come from a hijacked mailbox?",
+   "steps": [
+    {
+     "id": "thread-genuine",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: Contract 47/2026"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Hi. We took your comments into account, the revised draft is attached."
+        }
+       ],
+       [
+        {
+         "text": "Call me if you have questions. Elchin"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Contract_47_revised.pdf"
+         }
+        ],
+        "size": "340 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open attachment",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "An expected PDF, the usual tone, no pressure. This is normal work mail."
+      },
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "There is no warning sign here. The file is expected and fits the thread."
+      }
+     ]
+    },
+    {
+     "id": "thread-zip",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: Contract 47/2026: urgent"
+       }
+      ],
+      "time": "14:10",
+      "body": [
+       [
+        {
+         "text": "Dear partner,"
+        }
+       ],
+       [
+        {
+         "text": "the final contract is in the archive. "
+        },
+        {
+         "text": "Archive password: 4417",
+         "spot": "zip-pass"
+        }
+       ],
+       [
+        {
+         "text": "If you do not sign today, the price changes."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Contract_final.zip"
+         }
+        ],
+        "size": "1,2 MB"
+       }
+      ]
+     },
+     "say": "Look at the archive and the password.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open attachment",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Malware can hide in a password protected archive, because antivirus cannot look inside."
+      },
+      {
+       "id": "verify",
+       "label": "Call Elchin on a known number",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Great. If Elchin did not send it, his mailbox is hijacked and he needs to know."
+      },
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right: sudden rush, protected archive and a new tone. Reporting protects the team too."
+      },
+      {
+       "id": "reply",
+       "label": "Reply: is this you?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "The reply goes to the hijacked mailbox and the scammer says yes. Call instead."
+      }
+     ]
+    },
+    {
+     "id": "thread-html",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: Payment schedule"
+       }
+      ],
+      "time": "14:35",
+      "body": [
+       [
+        {
+         "text": "The schedule is in a protected file. Open it and sign in with your work email."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Payment_schedule.html"
+         }
+        ],
+        "size": "9 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open attachment",
+       "kind": "open-attachment",
+       "outcome": "risky",
+       "feedback": "The HTML file opens a fake sign-in page in the browser. You typed nothing yet, close it."
+      },
+      {
+       "id": "login",
+       "label": "Sign in",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "The scammer now has your password. Change it now and tell security."
+      },
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right. A payment schedule needs no password, and an HTML attachment is a typical trap."
+      }
+     ]
+    },
+    {
+     "id": "thread-account",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: Advance payment"
+       }
+      ],
+      "time": "15:20",
+      "body": [
+       [
+        {
+         "text": "This time pay the advance to our partner company's account, details attached."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Bank_details.pdf"
+         }
+        ],
+        "size": "64 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "verify",
+       "label": "Call a known number to check",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Right. A request to pay another company is confirmed only by phone."
+      },
+      {
+       "id": "accept",
+       "label": "Reply: we accept the details",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "The advance would go to the scammer. A familiar thread does not prove a new account."
+      },
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Good step. Two suspicious mails in one thread is a serious signal."
+      }
+     ]
+    },
+    {
+     "id": "legal-genuine",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Legal department"
+        }
+       ],
+       "address": [
+        {
+         "text": "huquq@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Our notes on contract 47"
+       }
+      ],
+      "time": "16:00",
+      "body": [
+       [
+        {
+         "text": "Hi, we suggest a change to clause 5. Let us discuss it at tomorrow's meeting."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "reply",
+       "label": "Reply",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "An internal address, no attachment or link, nothing asked. This is normal mail."
+      },
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "This mail shows no signs. Save reports for suspicious mail."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "ht-swipe",
+   "prompt": "Safe or threat?",
+   "cards": [
+    {
+     "id": "pdf-expected",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Contract_47_revised.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "340 KB",
+      "source": [
+       {
+        "text": "Elchin Babayev, expected reply"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "An expected document, a normal format and a known sender. Fine to open."
+    },
+    {
+     "id": "zip-pass",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Payment_order.zip"
+       }
+      ],
+      "type": "zip",
+      "size": "1,1 MB",
+      "source": [
+       {
+        "text": "layihe@kur-tikinti.example, password: 4417"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A password protected archive hides from antivirus. Call the sender and ask."
+    },
+    {
+     "id": "html-sign",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Contract_sign.html"
+       }
+      ],
+      "type": "html",
+      "size": "11 KB",
+      "source": [
+       {
+        "text": "RE: Contract 47/2026"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A contract is never an HTML file. Such a file opens a fake sign-in page."
+    },
+    {
+     "id": "act-internal",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [
+       {
+        "text": "Handover_September.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "210 KB",
+      "source": [
+       {
+        "text": "huquq@idare.example, agreed yesterday"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "From an internal department, agreed in advance. No warning sign."
+    },
+    {
+     "id": "double-ext",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Invoice_47.pdf.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "2,3 MB",
+      "source": [
+       {
+        "text": "RE: Contract 47/2026"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "The real type is .exe, a program. An invoice is never a program."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ht-scenario",
+   "title": "You opened the archive",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "You opened the protected archive. There was no contract inside, just a strange file, and the screen went dark for a moment.",
+     "choices": [
+      {
+       "label": "Disconnect from the network and call security",
+       "next": "n2",
+       "feedback": "Right. Disconnecting stops the spread, and the call brings in the team."
+      },
+      {
+       "label": "Shut the computer down at once",
+       "next": "n2",
+       "feedback": "Shutting down can erase evidence in memory. Unless your procedure says otherwise, leave it on and disconnect it."
+      },
+      {
+       "label": "Tell no one, probably nothing happened",
+       "outcome": "compromised",
+       "feedback": "Malware works quietly and can spread across the network. Reporting a mistake fast is not shameful, it saves the day."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Thank you. Is the email still in your mailbox? And did you tell Kur Tikinti?",
+     "speaker": "Security team",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Thank you. <breath> Is the email still in your mailbox? And did you tell Kur Tikinti?",
+     "choices": [
+      {
+       "label": "I kept the email, and I call Elchin on a known number",
+       "outcome": "safe",
+       "feedback": "Great. The email is evidence, and the partner must learn their mailbox was hijacked."
+      },
+      {
+       "label": "I deleted the email to leave no trace",
+       "outcome": "risky",
+       "feedback": "The email is needed for the investigation. Next time keep it and follow security's instructions."
+      },
+      {
+       "label": "I reply to Elchin in the same thread",
+       "outcome": "risky",
+       "feedback": "The scammer reads that mailbox. Tell the partner by phone."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "ht-recap",
+   "points": [
+    "A familiar thread can be hijacked too",
+    "Before opening a protected archive or HTML file, call and check",
+    "If you opened it, disconnect and report at once"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,346 @@
+{
+ "id": "dispose-clean-desk",
+ "title": "Disposal and clean desk",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "A page in the bin and a document left on the desk are ready-made information for an attacker.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Tearing a page by hand is not enough. Putting the pieces back together is easy.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Confidential paper goes to the shredder, and old flash drives and laptops go to technical support.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "When you leave your desk, lock the screen and put documents in a locked cabinet.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "before-you-leave",
+   "environment": "desktop",
+   "title": "Before you leave your desk",
+   "intro": "You leave your desk several times a day. Look at the windows that open and decide.",
+   "steps": [
+    {
+     "id": "lock-screen",
+     "label": "You are off to a 15 minute meeting",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Screen lock"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Your computer will be unattended for 15 minutes. Lock it now?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Later",
+       "Lock"
+      ]
+     },
+     "actions": [
+      {
+       "id": "lock",
+       "label": "Lock",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Correct. On an unlocked screen anyone can write from your mailbox or take files."
+      },
+      {
+       "id": "later",
+       "label": "Later",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "A few minutes are enough. Lock the screen every time you stand up."
+      }
+     ]
+    },
+    {
+     "id": "old-usb",
+     "label": "You want to throw away an old flash drive",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Format flash drive (E:)?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Quick format: file space will be marked as free."
+        }
+       ]
+      ],
+      "buttons": [
+       "Cancel",
+       "Format"
+      ]
+     },
+     "say": "The drive holds old staff lists.",
+     "actions": [
+      {
+       "id": "hand-over",
+       "label": "Eject and give to technical support",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Correct. Technical support wipes the drive fully or destroys it."
+      },
+      {
+       "id": "quick-format",
+       "label": "Quick format and bin it",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "A quick format does not erase files, it only hides them. Ordinary software can recover them."
+      }
+     ]
+    },
+    {
+     "id": "laptop-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Sabina Huseynova"
+        }
+       ],
+       "address": [
+        {
+         "text": "s.huseynova@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Old laptop"
+       }
+      ],
+      "time": "16:12",
+      "body": [
+       [
+        {
+         "text": "Hi, can I give my old work laptop to a relative? I deleted the files and emptied the recycle bin."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "no",
+       "label": "Reply: No, hand it to technical support",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Correct. A work device belongs to the organisation, and technical support cleans the disk."
+      },
+      {
+       "id": "yes",
+       "label": "Reply: Fine, the files are deleted",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Emptying the recycle bin does not clean the disk. Deleted files can be recovered with special software."
+      }
+     ]
+    },
+    {
+     "id": "queued-print",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-capmerkezi",
+      "app": "Çap Mərkəzi",
+      "title": [
+       {
+        "text": "Secure print: 3 documents"
+       }
+      ],
+      "body": [
+       {
+        "text": "3 documents are queued in your name. If not collected, they will be deleted at 18:00."
+       }
+      ],
+      "time": "17:30"
+     },
+     "actions": [
+      {
+       "id": "collect",
+       "label": "Go to the printer and collect",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Correct. Collect what you need, and let the queue delete what you do not."
+      },
+      {
+       "id": "print-all",
+       "label": "Send them all to print directly",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Direct printing drops pages in the tray without waiting for you. Secure print exists for exactly this."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "how-to-dispose",
+   "prompt": "Match each item with the right way to dispose of it.",
+   "pairs": [
+    {
+     "id": "id-copy",
+     "left": "Copy of an ID card",
+     "right": "Shredder"
+    },
+    {
+     "id": "draft",
+     "left": "Draft of a confidential project",
+     "right": "Locked confidential waste box"
+    },
+    {
+     "id": "laptop",
+     "left": "Old work laptop",
+     "right": "Hand over to technical support"
+    },
+    {
+     "id": "flyer",
+     "left": "Event advertising leaflet",
+     "right": "Ordinary paper recycling"
+    }
+   ],
+   "explain": "Confidential paper never goes in the ordinary bin. Devices are wiped and destroyed only by technical support."
+  },
+  {
+   "type": "scenario",
+   "id": "clean-desk",
+   "title": "A ten minute break",
+   "start": "leave",
+   "nodes": [
+    {
+     "id": "leave",
+     "text": "You step out for tea. A contract folder is on the desk and a sticky note with a password is on the monitor.",
+     "choices": [
+      {
+       "label": "I lock the folder in the cabinet and take the note",
+       "next": "visitor",
+       "feedback": "Correct. Ten minutes is plenty of time to take a photo."
+      },
+      {
+       "label": "I will be quick, leave it",
+       "outcome": "risky",
+       "feedback": "A visitor, courier or repair worker may come in. Put the document away, and never keep a password on a sticky note."
+      }
+     ]
+    },
+    {
+     "id": "visitor",
+     "text": "I have a meeting with your manager. May I look at the document in this folder?",
+     "speaker": "Visitor (at your desk)",
+     "voice": "man-2",
+     "channel": "in-person",
+     "spoken": "I have a meeting with your manager. <breath> May I look at the document in this folder?",
+     "choices": [
+      {
+       "label": "I politely refuse and call my manager",
+       "outcome": "safe",
+       "feedback": "Excellent. Only someone authorised sees the document."
+      },
+      {
+       "label": "I show it, he is the manager's guest",
+       "outcome": "risky",
+       "feedback": "His identity and rights have not been checked. Confirm with your manager first."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "shredder",
+   "question": {
+    "prompt": "Which method destroys confidential paper most reliably?",
+    "options": [
+     {
+      "id": "cross-cut",
+      "label": "A shredder that cuts into small particles",
+      "correct": true,
+      "feedback": "Correct. Putting tiny particles back together is practically impossible."
+     },
+     {
+      "id": "strip-cut",
+      "label": "A shredder that cuts long strips",
+      "correct": false,
+      "feedback": "Strips can be lined up to rebuild the page. Choose a shredder that cuts small pieces."
+     },
+     {
+      "id": "tear",
+      "label": "Tearing it into four by hand",
+      "correct": false,
+      "feedback": "Taping four pieces together takes a minute. Confidential paper goes to the shredder."
+     },
+     {
+      "id": "bin",
+      "label": "Into the ordinary bin, face down",
+      "correct": false,
+      "feedback": "Rubbish leaves the building, and out there anyone can open it."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "folder"
+    }
+   },
+   "explain": "For confidential paper, use a shredder that cuts small particles or a confidential waste box."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Confidential paper goes to the shredder, and devices go to technical support.",
+    "Deleting and quick formatting do not erase data.",
+    "When you leave your desk, lock the screen and put documents away."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

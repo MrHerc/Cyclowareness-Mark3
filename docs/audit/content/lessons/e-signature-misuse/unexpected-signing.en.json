@@ -1,0 +1,465 @@
+{
+ "module": {
+  "slug": "e-signature-misuse",
+  "title": "E-signature",
+  "category": "identity"
+ },
+ "lesson": {
+  "id": "unexpected-signing",
+  "title": "Unexpected signing",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "l2-tutor",
+    "beats": [
+     {
+      "id": "l2-b1",
+      "say": "When a signature request arrives, first ask yourself: did I start this request?",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "certificate"
+      }
+     },
+     {
+      "id": "l2-b2",
+      "say": "The request shows the document name and the service asking. Reject a request you did not expect.",
+      "mood": "think",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "notification",
+        "brandRef": "mohurid",
+        "app": "MöhürID",
+        "title": [
+         {
+          "text": "Signature request"
+         }
+        ],
+        "body": [
+         {
+          "text": "Document: "
+         },
+         {
+          "text": "Etibarname_tam_selahiyyet.pdf",
+          "spot": "doc"
+         },
+         {
+          "text": ". Service: imza-xidmet.test"
+         }
+        ],
+        "time": "07:58"
+       }
+      },
+      "highlight": "doc"
+     },
+     {
+      "id": "l2-b3",
+      "say": "Do not sign without reading. The name, amount and recipient must match what you expect.",
+      "mood": "alert",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "eye"
+      }
+     },
+     {
+      "id": "l2-b4",
+      "say": "When in doubt, do not sign, and tell the security team. A signature is hard to take back.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "l2-sim",
+    "environment": "phone",
+    "title": "Signature requests",
+    "intro": "During the day, signature requests arrive on your phone. Check each one and decide.",
+    "steps": [
+     {
+      "id": "unexpected",
+      "label": "You were not about to sign anything",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "mohurid",
+       "app": "MöhürID",
+       "title": [
+        {
+         "text": "Signature request"
+        }
+       ],
+       "body": [
+        {
+         "text": "Document: Etibarname_avtomobil.pdf. Service: Bulud Notariat"
+        }
+       ],
+       "time": "07:58"
+      },
+      "actions": [
+       {
+        "id": "open",
+        "label": "Open and sign",
+        "kind": "open",
+        "outcome": "compromised",
+        "feedback": "You signed a power of attorney someone else prepared. Call the signature service and the security team at once."
+       },
+       {
+        "id": "deny",
+        "label": "Reject",
+        "kind": "deny",
+        "outcome": "safe",
+        "feedback": "Right. A request you did not start means someone is trying to use your name."
+       },
+       {
+        "id": "report",
+        "label": "Tell the security team",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Well done. Rejecting and reporting stops the attack in time."
+       }
+      ]
+     },
+     {
+      "id": "rush-colleague",
+      "artifact": {
+       "kind": "chat",
+       "app": "telegram",
+       "contact": [
+        {
+         "text": "Elvin (Procurement)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "I sent you a contract in SənədAxını. No time to read it, just sign quickly, the boss is waiting."
+          }
+         ],
+         "time": "10:20"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "read",
+        "label": "I read the document first",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Right. Being rushed is no reason to skip reading, the signature is your responsibility."
+       },
+       {
+        "id": "rush",
+        "label": "Fine, I sign without reading",
+        "kind": "reply",
+        "outcome": "risky",
+        "feedback": "An unread document may have a changed amount or recipient."
+       }
+      ]
+     },
+     {
+      "id": "fake-portal-mail",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "senedaxini-fake",
+       "from": {
+        "name": [
+         {
+          "text": "SənədAxını"
+         }
+        ],
+        "address": [
+         {
+          "text": "noreply@senedaxini-imza.test"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Your signature is pending: Qebul_akti.pdf"
+        }
+       ],
+       "time": "12:05",
+       "body": [
+        [
+         {
+          "text": "To sign the document, "
+         },
+         {
+          "text": "sign in",
+          "link": {
+           "label": "sign in",
+           "href": "https://senedaxini-imza.test/login"
+          }
+         },
+         {
+          "text": "."
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "click",
+        "label": "Sign in",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "A fake sign-in page took your password. Change it now and tell the security team."
+       },
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. The domain is not SənədAxını's, open the system yourself."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "safe",
+        "feedback": "Safe. But if you report it, others are protected too."
+       }
+      ]
+     },
+     {
+      "id": "own-request",
+      "label": "You just started signing your leave request on the portal",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "mohurid",
+       "app": "MöhürID",
+       "title": [
+        {
+         "text": "Signature request"
+        }
+       ],
+       "body": [
+        {
+         "text": "Document: Mezuniyyet_erizesi.pdf. Service: SənədAxını"
+        }
+       ],
+       "time": "14:30"
+      },
+      "actions": [
+       {
+        "id": "open",
+        "label": "Open and sign",
+        "kind": "open",
+        "outcome": "safe",
+        "feedback": "Right. You started this request and the document and service are what you expect."
+       },
+       {
+        "id": "deny",
+        "label": "Reject",
+        "kind": "deny",
+        "outcome": "risky",
+        "feedback": "Not needed: the request was yours and everything matches. Checking does not mean rejecting everything."
+       }
+      ]
+     },
+     {
+      "id": "mismatch",
+      "label": "You ordered an employment certificate on the portal",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "mohurid",
+       "app": "MöhürID",
+       "title": [
+        {
+         "text": "Signature request"
+        }
+       ],
+       "body": [
+        {
+         "text": "Document: Etibarname_bank_hesabi.pdf. Service: imza-xidmet.test"
+        }
+       ],
+       "time": "16:12"
+      },
+      "say": "Compare the document name with what you expect.",
+      "actions": [
+       {
+        "id": "open",
+        "label": "Open and sign",
+        "kind": "open",
+        "outcome": "compromised",
+        "feedback": "This was a bank power of attorney, not your certificate. If the name does not match, do not sign."
+       },
+       {
+        "id": "deny",
+        "label": "Reject",
+        "kind": "deny",
+        "outcome": "safe",
+        "feedback": "Right. Neither the document nor the service is what you expect, so reject and report it."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "l2-hotspot",
+    "prompt": "Before signing, find what is wrong with this request.",
+    "artifact": {
+     "kind": "dialog",
+     "brandRef": "mohurid",
+     "tone": "app",
+     "title": [
+      {
+       "text": "Confirm signing"
+      }
+     ],
+     "body": [
+      [
+       {
+        "text": "Document: "
+       },
+       {
+        "text": "Power of attorney: full authority over all bank accounts",
+        "spot": "doc"
+       }
+      ],
+      [
+       {
+        "text": "In favour of: "
+       },
+       {
+        "text": "Hüseyn Məmmədli",
+        "spot": "person"
+       }
+      ],
+      [
+       {
+        "text": "Term: "
+       },
+       {
+        "text": "3 years",
+        "spot": "term"
+       }
+      ],
+      [
+       {
+        "text": "Requested by: "
+       },
+       {
+        "text": "imza-xidmet.test",
+        "spot": "source"
+       }
+      ]
+     ],
+     "buttons": [
+      "Reject",
+      "Enter PIN"
+     ]
+    },
+    "spots": [
+     {
+      "id": "doc",
+      "label": "Full authority",
+      "explain": "This document gives someone wide rights over your accounts. Such a document should never arrive unexpectedly."
+     },
+     {
+      "id": "person",
+      "label": "Someone you do not know",
+      "explain": "If you do not know who receives the authority, do not sign."
+     },
+     {
+      "id": "term",
+      "label": "Long term",
+      "explain": "A three year power of attorney lets the damage go on for a long time."
+     },
+     {
+      "id": "source",
+      "label": "Unknown service",
+      "explain": "The request comes from an unknown website, not an official system you know."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "order",
+    "id": "l2-order",
+    "prompt": "Put the steps before signing in order.",
+    "items": [
+     {
+      "id": "started",
+      "label": "Check that you started the request"
+     },
+     {
+      "id": "read",
+      "label": "Open and read the document"
+     },
+     {
+      "id": "details",
+      "label": "Check the name, amount and recipient"
+     },
+     {
+      "id": "pin",
+      "label": "Only then enter your PIN"
+     }
+    ],
+    "explain": "If any step does not match, stop and reject. Report a suspicious request to the security team."
+   },
+   {
+    "type": "choice",
+    "id": "l2-choice",
+    "question": {
+     "prompt": "You signed a suspicious document by mistake. What is the first step?",
+     "options": [
+      {
+       "id": "hide",
+       "label": "I tell no one, maybe nothing happens",
+       "correct": false,
+       "feedback": "The signature is valid and can be used. Hiding it makes the damage worse."
+      },
+      {
+       "id": "report",
+       "label": "I call the signature service and the security team at once",
+       "correct": true,
+       "feedback": "Right. The service can suspend the certificate, and the security team looks into the consequences."
+      },
+      {
+       "id": "pin",
+       "label": "I only change my PIN",
+       "correct": false,
+       "feedback": "Useful, but the signed document is still valid. Report it first."
+      }
+     ]
+    },
+    "explain": "With a wrong signature, time matters. Reporting fast gives a chance to stop the document being used."
+   },
+   {
+    "type": "recap",
+    "id": "l2-recap",
+    "points": [
+     "Confirm a signature request only if you started it yourself.",
+     "Read the document: name, amount and recipient must match what you expect.",
+     "If you signed by mistake, tell the signature service and the security team at once."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 31,
+ "narrationTotalMs": 167715
+}

@@ -1,0 +1,411 @@
+{
+ "id": "stop-fake-news",
+ "title": "Stop fake news",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Fake news often looks like an official decision and spreads fast in group chats.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "No source, no date, it rushes you and asks you to send it to everyone.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Department group"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Forwarded. ",
+           "spot": "fwd"
+          },
+          {
+           "text": "All salary cards change from tomorrow! "
+          },
+          {
+           "text": "Send to everyone!",
+           "spot": "share-all"
+          }
+         ],
+         "time": "08:40"
+        }
+       ]
+      }
+     },
+     "highlight": "fwd"
+    },
+    {
+     "id": "b3",
+     "say": "Before sharing, check the news on the organisation's site and in reliable news outlets.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "If it is fake, report it to the platform and post a short correction in the group.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "flag"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "group-news",
+   "environment": "phone",
+   "title": "News in your chats",
+   "intro": "News arrives in your work and family chats. What do you do with each?",
+   "steps": [
+    {
+     "id": "salary-card",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Department group"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Forwarded. Urgent! From tomorrow civil servants' salary cards are being replaced. Update your details so the old card is not blocked: "
+         },
+         {
+          "text": "maas-kart-yeni.example.net",
+          "link": {
+           "label": "maas-kart-yeni.example.net",
+           "href": "https://maas-kart-yeni.example.net"
+          }
+         }
+        ],
+        "time": "08:45"
+       }
+      ]
+     },
+     "say": "A colleague posted it, but no source is given.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Open link",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "This page harvests card details. Accounting announces salary card changes through official channels."
+      },
+      {
+       "id": "verify",
+       "label": "Ask accounting",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Right. Check an internal decision with an internal source, on a number you know."
+      },
+      {
+       "id": "warn",
+       "label": "Reply: unverified, do not open the link",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Good, you protected your colleagues. Show the message to security as well."
+      },
+      {
+       "id": "share",
+       "label": "Send to family group",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Spreading unchecked news pulls others into the trap."
+      }
+     ]
+    },
+    {
+     "id": "news-site",
+     "label": "Official: all utility debts written off, registration ends today",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-gundem24-fake",
+      "url": [
+       {
+        "text": "https://gundem24-az.example.net/xeber/borclar-silinir"
+       }
+      ]
+     },
+     "say": "It looks like a familiar news site. Check the address.",
+     "actions": [
+      {
+       "id": "register",
+       "label": "Register",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Gündəm24's address is gundem24.example; this is a clone. The form collects personal data."
+      },
+      {
+       "id": "share",
+       "label": "Share",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "You would be spreading a cloned site. Check the address and source before sharing."
+      },
+      {
+       "id": "verify",
+       "label": "Check the official site",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Right. A decision like this would be on the organisation's own site."
+      },
+      {
+       "id": "close",
+       "label": "Close tab",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Good. The address was not Gündəm24's real domain."
+      }
+     ]
+    },
+    {
+     "id": "relatives-ask",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Family group"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Anyone here working in a state office? They say the internet in Baku will be cut for three days from tomorrow. True?"
+         }
+        ],
+        "time": "19:20"
+       }
+      ]
+     },
+     "say": "Your relatives trust you.",
+     "actions": [
+      {
+       "id": "confirm",
+       "label": "Probably true, get ready",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "A state employee's word gives news weight. Do not confirm what you do not know."
+      },
+      {
+       "id": "check",
+       "label": "I don't know, I'll check an official source and write back",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Right. An honest \"I don't know\" stops a false story."
+      },
+      {
+       "id": "forward",
+       "label": "Forward to other groups",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "You would carry the false story to even more people."
+      }
+     ]
+    },
+    {
+     "id": "fake-office-page",
+     "label": "Ministry of Social Services: 50 vacancies. Application fee 10 AZN",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn-fake",
+      "url": [
+       {
+        "text": "https://kontakto.example/sxn.nazirlik.vakansiya"
+       }
+      ]
+     },
+     "say": "This page was opened in your own ministry's name.",
+     "actions": [
+      {
+       "id": "apply",
+       "label": "Apply",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "The ministry charges no application fee. The fake page collects people's money and data."
+      },
+      {
+       "id": "report",
+       "label": "Report to platform",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right. Tell the press office too so it can publish an official warning."
+      },
+      {
+       "id": "press",
+       "label": "Tell the press office",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Great. Report the page to the platform too so it is removed faster."
+      },
+      {
+       "id": "skip",
+       "label": "Skip it, not my job",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "The fake page cheats people in your office's name. Reporting takes a minute."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "check-tools",
+   "prompt": "Match each doubt with the right check.",
+   "pairs": [
+    {
+     "id": "no-source",
+     "left": "The story names no source",
+     "right": "Search the organisation's official site"
+    },
+    {
+     "id": "old-photo",
+     "left": "The photo looks familiar and old",
+     "right": "Run a reverse image search"
+    },
+    {
+     "id": "site-address",
+     "left": "The site looks like a familiar news site",
+     "right": "Compare the address with the real domain"
+    },
+    {
+     "id": "fear",
+     "left": "The story scares and rushes you",
+     "right": "Pause and check before sharing"
+    }
+   ],
+   "explain": "A few seconds of checking can stop a false story from reaching thousands."
+  },
+  {
+   "type": "scenario",
+   "id": "shared-by-mistake",
+   "title": "You shared it by mistake",
+   "start": "shared",
+   "nodes": [
+    {
+     "id": "shared",
+     "text": "This morning you posted the \"salary cards are changing\" story in the family group. At noon you learned it is fake.",
+     "choices": [
+      {
+       "label": "I delete it and post a correction",
+       "next": "relative",
+       "feedback": "Right. A correction stops those who already saw it."
+      },
+      {
+       "label": "I delete it quietly",
+       "outcome": "risky",
+       "feedback": "People who saw it may already be passing it on. A short correction breaks the chain."
+      },
+      {
+       "label": "I do nothing, it's too late",
+       "outcome": "risky",
+       "feedback": "It is not too late: a correction still stops the spread."
+      }
+     ]
+    },
+    {
+     "id": "relative",
+     "text": "I opened that link and typed in my card details. What do I do now?",
+     "speaker": "Your relative",
+     "voice": "young-man",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "I opened that link and typed in my card details. <breath> What do I do now?",
+     "choices": [
+      {
+       "label": "Call the bank on the number on your card now and block the card",
+       "outcome": "safe",
+       "feedback": "Right. The sooner the card is blocked, the lower the risk of losing money."
+      },
+      {
+       "label": "Don't worry, maybe nothing will happen",
+       "outcome": "compromised",
+       "feedback": "Scammers often use card details right away."
+      },
+      {
+       "label": "Delete what you typed on the site",
+       "outcome": "risky",
+       "feedback": "The details are already with the scammer. Only the bank can block the card."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "speak-for-office",
+   "question": {
+    "prompt": "A journalist messages you: \"Can you comment on your ministry's decision?\" What do you do?",
+    "options": [
+     {
+      "id": "press",
+      "label": "I refer them to the press office",
+      "correct": true,
+      "feedback": "Right. Only the press office speaks for the organisation."
+     },
+     {
+      "id": "guess",
+      "label": "I say what I know",
+      "correct": false,
+      "feedback": "A half-informed comment can become new false news, and the \"journalist\" may be fake too."
+     },
+     {
+      "id": "doc",
+      "label": "I send a photo of the internal document",
+      "correct": false,
+      "feedback": "Internal documents must not be shared, and a photo can spread without context."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "social"
+    }
+   },
+   "explain": "Official comments come from the press office. That protects you and the organisation."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Check the source on the organisation's own site before sharing.",
+    "Do not confirm news you are unsure of; the press office speaks for the organisation.",
+    "Report fake pages and news; if you shared by mistake, post a correction."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

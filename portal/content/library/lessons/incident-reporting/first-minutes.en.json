@@ -1,0 +1,386 @@
+{
+ "id": "first-minutes",
+ "title": "The first minutes",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "The first minutes matter most. The attacker is in a hurry, so you need to be faster.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Stop when something looks wrong: a sign-in you do not know, a window that opens itself, missing files.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "ispoct",
+       "app": "İşPoçt",
+       "title": [
+        {
+         "text": "Sign-in from a new device"
+        }
+       ],
+       "body": [
+        {
+         "text": "Someone signed in to your account from "
+        },
+        {
+         "text": "Ganja on an unknown device",
+         "spot": "place"
+        },
+        {
+         "text": " at 03:12."
+        }
+       ],
+       "time": "08:31"
+      }
+     },
+     "highlight": "place"
+    },
+    {
+     "id": "b3",
+     "say": "In an emergency, call technical support or the security team. The email can wait until later.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "If you suspect the computer, do not report from it. The attacker may read the mail, so phone instead.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "strange-morning",
+   "environment": "desktop",
+   "title": "A strange morning",
+   "intro": "You start your computer in the morning and notice a few strange things. How do you react to each?",
+   "steps": [
+    {
+     "id": "new-login",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "İşPoçt",
+      "title": [
+       {
+        "text": "Sign-in from a new device"
+       }
+      ],
+      "body": [
+       {
+        "text": "Someone signed in to your account from Ganja on an unknown device at 03:12."
+       }
+      ],
+      "time": "08:31"
+     },
+     "say": "If this sign-in was not you, what do you do?",
+     "actions": [
+      {
+       "id": "report",
+       "label": "It was not me: report",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Correct, an unknown sign-in means someone has your password. Reporting fast saves the account."
+      },
+      {
+       "id": "ignore",
+       "label": "Dismiss",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "The attacker is still in your account and gaining time. Report a notice like this at once."
+      }
+     ]
+    },
+    {
+     "id": "remote-request",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "texkomek-24",
+      "tone": "app",
+      "title": [
+       {
+        "text": "TexKomek 24 wants to connect"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "An operator wants to see your screen and control your computer."
+        }
+       ]
+      ],
+      "buttons": [
+       "Decline",
+       "Allow"
+      ]
+     },
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Decline",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Correct, you did not ask for support. Report an unexpected request like this too."
+      },
+      {
+       "id": "allow",
+       "label": "Allow",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "The remote person now controls your computer. Never allow support you did not call yourself."
+      },
+      {
+       "id": "report",
+       "label": "Decline and report",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. An unexpected remote access request must be reported at once."
+      }
+     ]
+    },
+    {
+     "id": "encrypted",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Your files are encrypted"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Pay within 72 hours to get your files back. If you switch off the computer, the files will be deleted."
+        }
+       ]
+      ],
+      "buttons": [
+       "Payment page"
+      ]
+     },
+     "say": "A ransom demand is on screen. Your first step?",
+     "actions": [
+      {
+       "id": "disconnect",
+       "label": "Unplug the cable, turn off Wi-Fi",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Correct, going offline stops the spread. Leave the computer on and call at once."
+      },
+      {
+       "id": "shutdown",
+       "label": "Switch off the computer",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Switching off can erase traces in memory. Unless your procedure says otherwise, go offline and leave it on."
+      },
+      {
+       "id": "pay",
+       "label": "Open the payment page",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Paying does not guarantee your files back. Never pay, leave the decision to specialists."
+      }
+     ]
+    },
+    {
+     "id": "call-line",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "it-tehlukesizlik",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Security line"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Urgent incident: +994 12 000 15 15"
+        }
+       ],
+       [
+        {
+         "text": "Not urgent: the Report button or security@idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Later",
+       "Call"
+      ]
+     },
+     "actions": [
+      {
+       "id": "call",
+       "label": "Call now",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Correct. Report an urgent incident by phone: the specialist tells you what to do right away."
+      },
+      {
+       "id": "later",
+       "label": "Email tomorrow",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Encryption spreads and every minute counts. This mailbox may not be safe any more either."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "who-to-tell",
+   "question": {
+    "prompt": "A stranger signed in to your account. Who do you tell?",
+    "options": [
+     {
+      "id": "security",
+      "label": "Technical support or the security team",
+      "correct": true,
+      "feedback": "Correct. Only they can lock and check the account."
+     },
+     {
+      "id": "manager",
+      "label": "My manager as well",
+      "correct": true,
+      "feedback": "Correct. Your manager helps organise the work but does not replace the specialist."
+     },
+     {
+      "id": "colleagues",
+      "label": "Only colleagues in my department",
+      "correct": false,
+      "feedback": "Colleagues cannot lock the account, so time is lost."
+     },
+     {
+      "id": "social",
+      "label": "I post it on social media so everyone knows",
+      "correct": false,
+      "feedback": "Posting about an incident helps the attacker and other scammers."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "badge-id"
+    }
+   },
+   "explain": "The specialist fixes it, your manager is informed, nobody else is needed."
+  },
+  {
+   "type": "match",
+   "id": "how-to-report",
+   "prompt": "Pick the way to report each situation.",
+   "pairs": [
+    {
+     "id": "phish",
+     "left": "A suspicious email arrived",
+     "right": "Send it with the Report button"
+    },
+    {
+     "id": "ransom",
+     "left": "A ransom demand is on screen",
+     "right": "Go offline and phone"
+    },
+    {
+     "id": "phone",
+     "left": "The work phone is lost",
+     "right": "Call at once so they can lock it remotely"
+    },
+    {
+     "id": "misdirect",
+     "left": "A file went to the wrong person",
+     "right": "Tell your manager and the security team"
+    }
+   ],
+   "explain": "For urgent or spreading cases, phone. Report the rest with the Report button or by email."
+  },
+  {
+   "type": "scenario",
+   "id": "colleague-says-wait",
+   "title": "Should we wait?",
+   "start": "window",
+   "nodes": [
+    {
+     "id": "window",
+     "text": "Do not worry, it is probably an update. Do not make a fuss.",
+     "speaker": "Tural (colleague), looking at the strange window",
+     "voice": "man-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Do not worry, uh, it is probably an update. Do not make a fuss.",
+     "choices": [
+      {
+       "label": "I still call technical support",
+       "next": "specialist",
+       "feedback": "Correct. A false alarm is no problem, a late report is."
+      },
+      {
+       "label": "I wait, maybe it goes away",
+       "outcome": "risky",
+       "feedback": "Waiting gives the attacker time. If in doubt, call."
+      }
+     ]
+    },
+    {
+     "id": "specialist",
+     "text": "What did you see and what did you do?",
+     "speaker": "Technical support",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "What did you see <short pause> and what did you do?",
+     "choices": [
+      {
+       "label": "I keep it short: what, when, which computer, what I did",
+       "outcome": "safe",
+       "feedback": "Excellent. With exact details the specialist can start right away."
+      },
+      {
+       "label": "I closed the window, I do not remember",
+       "outcome": "risky",
+       "feedback": "Every detail helps. Next time take a photo of the screen with your phone."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "When something looks wrong, stop and report at once.",
+    "In an emergency, phone. Do not report from a suspect computer.",
+    "A false alarm is fine, a delay is dangerous."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

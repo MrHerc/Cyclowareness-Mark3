@@ -1,0 +1,371 @@
+{
+ "module": {
+  "slug": "infostealers",
+  "title": "Infostealers",
+  "category": "devices"
+ },
+ "lesson": {
+  "id": "stolen-session",
+  "title": "Stolen session",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "is2-tutor",
+    "beats": [
+     {
+      "id": "is2-b1",
+      "say": "Hello! In the morning you see that your work mail sent forty emails abroad during the night.",
+      "mood": "alert",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "inbox"
+      }
+     },
+     {
+      "id": "is2-b2",
+      "say": "Nobody had your password. A program stole your sign-in session, the cookie, from the browser.",
+      "mood": "think",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "notification",
+        "brandRef": "ispoct",
+        "app": "İşPoçt",
+        "title": [
+         {
+          "text": "New sign-in"
+         }
+        ],
+        "body": [
+         {
+          "text": "Amsterdam, 03:05, unknown browser",
+          "spot": "location"
+         }
+        ],
+        "time": "03:05"
+       }
+      },
+      "highlight": "location"
+     },
+     {
+      "id": "is2-b3",
+      "say": "The cookie tells the site you are already signed in, so it asks for no password and no code.",
+      "mood": "talk",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "key"
+      }
+     },
+     {
+      "id": "is2-b4",
+      "say": "Three things help: a clean device, signing out of all sessions, and technical support.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "is2-match",
+    "prompt": "What does each stolen item let a criminal do? Match them.",
+    "pairs": [
+     {
+      "id": "cookie",
+      "left": "Browser sign-in session",
+      "right": "Get into the account without password or code"
+     },
+     {
+      "id": "saved",
+      "left": "Passwords saved in the browser",
+      "right": "Get into your accounts on other sites"
+     },
+     {
+      "id": "card",
+      "left": "Autofill card details",
+      "right": "Pay online in your name"
+     },
+     {
+      "id": "messenger",
+      "left": "Messaging app session",
+      "right": "Read your chats and write as you"
+     }
+    ],
+    "explain": "A stealer takes all of these at once. So change every password, not just one, and close the sessions."
+   },
+   {
+    "type": "simulation",
+    "id": "is2-sim",
+    "environment": "browser",
+    "title": "On a clean work computer",
+    "intro": "You are on your work computer, and it is clean. Open your mail and choose the right step on each screen.",
+    "steps": [
+     {
+      "id": "sent-folder",
+      "label": "Sent: tonight at 03:12, 40 emails to unknown addresses",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "ispoct",
+       "url": [
+        {
+         "text": "https://poct.idare.example/gonderilenler"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "call-it",
+        "label": "Call technical support",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Correct. A specialist can protect the account right away and see what was sent."
+       },
+       {
+        "id": "delete",
+        "label": "Delete the emails",
+        "kind": "delete",
+        "outcome": "risky",
+        "feedback": "Deleting does not bring back sent emails, but it destroys evidence. Tell technical support first."
+       },
+       {
+        "id": "later",
+        "label": "Close it, look later",
+        "kind": "ignore",
+        "outcome": "compromised",
+        "feedback": "The attacker is still in the account and keeps writing. Every minute counts."
+       }
+      ]
+     },
+     {
+      "id": "new-login",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Sign-in from a new device"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Windows, unknown browser"
+         }
+        ],
+        [
+         {
+          "text": "Amsterdam, today 03:05"
+         }
+        ],
+        [
+         {
+          "text": "Was this you?"
+         }
+        ]
+       ],
+       "buttons": [
+        "This was not me",
+        "This was me"
+       ]
+      },
+      "actions": [
+       {
+        "id": "not-me",
+        "label": "This was not me",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Correct. The system marks the sign-in as suspicious, and technical support will see it."
+       },
+       {
+        "id": "me",
+        "label": "This was me",
+        "kind": "mark-safe",
+        "outcome": "compromised",
+        "feedback": "You just confirmed the attacker's sign-in. Now the system treats them as you."
+       }
+      ]
+     },
+     {
+      "id": "change-password",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "ispoct",
+       "brand": "İşPoçt",
+       "url": [
+        {
+         "text": "https://hesab.idare.example/parol"
+        }
+       ],
+       "fields": [
+        "Current password",
+        "New password",
+        "Repeat new password"
+       ],
+       "button": "Change password"
+      },
+      "say": "The address is real and the computer is clean.",
+      "actions": [
+       {
+        "id": "change",
+        "label": "Change password",
+        "kind": "enter-credentials",
+        "outcome": "safe",
+        "feedback": "Correct. Type a new password only on a clean device, or the program takes that one too."
+       },
+       {
+        "id": "skip",
+        "label": "Later",
+        "kind": "cancel",
+        "outcome": "risky",
+        "feedback": "The old password may be stolen. Change it now, from this clean computer."
+       }
+      ]
+     },
+     {
+      "id": "sessions",
+      "label": "Active sessions: 3 devices. Sign out of all of them?",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "ispoct",
+       "url": [
+        {
+         "text": "https://hesab.idare.example/sessiyalar"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "sign-out-all",
+        "label": "Sign out of all devices",
+        "kind": "click-link",
+        "outcome": "safe",
+        "feedback": "Well done. The stolen cookie no longer works, and the attacker would have to sign in again."
+       },
+       {
+        "id": "later",
+        "label": "Later",
+        "kind": "later",
+        "outcome": "risky",
+        "feedback": "Changing the password does not always close an open session. The attacker may still be inside."
+       }
+      ]
+     },
+     {
+      "id": "forward-rule",
+      "label": "New rule, 03:07: forward all mail to arxiv@poct-yedek.example",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "ispoct",
+       "url": [
+        {
+         "text": "https://poct.idare.example/qaydalar"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "show-it",
+        "label": "Show the rule to technical support",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Correct. Even after the attacker left, this rule kept sending your mail to them."
+       },
+       {
+        "id": "leave",
+        "label": "Leave it",
+        "kind": "ignore",
+        "outcome": "compromised",
+        "feedback": "This is a hidden forward. Every new email you get will go to the attacker."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "is2-choice",
+    "question": {
+     "prompt": "How did the attacker get into the mail without your password or code?",
+     "options": [
+      {
+       "id": "cookie",
+       "label": "With a session stolen from the browser",
+       "correct": true,
+       "feedback": "Correct. The session shows the sign-in is already done, so no code is asked."
+      },
+      {
+       "id": "guess",
+       "label": "By guessing the password",
+       "correct": false,
+       "feedback": "Then the system would have asked for a code. Here neither a password nor a code was needed."
+      },
+      {
+       "id": "server",
+       "label": "The mail server was hacked",
+       "correct": false,
+       "feedback": "The server is fine. What was stolen was the session in your browser."
+      }
+     ]
+    },
+    "explain": "When a cookie is stolen, two-step verification does not help either. So do not let a stealer onto your computer."
+   },
+   {
+    "type": "order",
+    "id": "is2-order",
+    "prompt": "If a computer is infected, put the steps in order.",
+    "items": [
+     {
+      "id": "isolate",
+      "label": "Disconnect the infected computer from the network"
+     },
+     {
+      "id": "report",
+      "label": "Tell technical support at once"
+     },
+     {
+      "id": "passwords",
+      "label": "Change passwords from a clean device"
+     },
+     {
+      "id": "sessions",
+      "label": "Sign out of all sessions"
+     },
+     {
+      "id": "rebuild",
+      "label": "Let technical support rebuild the computer"
+     }
+    ],
+    "explain": "If you change a password on the infected computer, the program takes the new one too. The computer counts as clean only after a rebuild."
+   },
+   {
+    "type": "recap",
+    "id": "is2-recap",
+    "points": [
+     "A stolen session gives access without password or code",
+     "Change passwords from a clean device, then sign out of all sessions",
+     "Let technical support rebuild the infected computer"
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 27,
+ "narrationTotalMs": 150000
+}

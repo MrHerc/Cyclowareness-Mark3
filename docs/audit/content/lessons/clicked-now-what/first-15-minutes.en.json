@@ -1,0 +1,344 @@
+{
+ "module": {
+  "slug": "clicked-now-what",
+  "title": "Clicked: now what?",
+  "category": "incident"
+ },
+ "lesson": {
+  "id": "first-15-minutes",
+  "title": "The first 15 minutes",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "b1",
+      "say": "Clicked a link or typed your password? It can happen to anyone.",
+      "mood": "talk",
+      "gesture": "nod",
+      "visual": {
+       "kind": "illustration",
+       "id": "hook"
+      }
+     },
+     {
+      "id": "b2",
+      "say": "The first fifteen minutes matter most: stolen passwords are often used right away.",
+      "mood": "alert",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "stat",
+       "value": "15",
+       "label": "minutes that matter most"
+      }
+     },
+     {
+      "id": "b3",
+      "say": "Change the password on the real site, tell security and keep the email.",
+      "mood": "talk",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "lock"
+      }
+     },
+     {
+      "id": "b4",
+      "say": "Do not hide it. Silence gives the attacker time; an honest report protects everyone.",
+      "mood": "think",
+      "gesture": "shake",
+      "visual": {
+       "kind": "illustration",
+       "id": "mask"
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "after-the-click",
+    "environment": "desktop",
+    "title": "You typed your password",
+    "intro": "You typed your mail password on a fake page and have just realised it. The next steps are yours.",
+    "steps": [
+     {
+      "id": "retry-trap",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct-fake",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Sign-in failed"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Wrong password. Try again or use another password."
+         }
+        ]
+       ],
+       "buttons": [
+        "Close",
+        "Try again"
+       ]
+      },
+      "say": "The page shows an error.",
+      "actions": [
+       {
+        "id": "retry",
+        "label": "Try again",
+        "kind": "enter-credentials",
+        "outcome": "compromised",
+        "feedback": "Fake sites show an error so you type the password again, sometimes a different one too."
+       },
+       {
+        "id": "close",
+        "label": "Close",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Right, type nothing more. Close the page and move to the next step."
+       }
+      ]
+     },
+     {
+      "id": "the-email",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "ispoct-fake",
+       "from": {
+        "name": [
+         {
+          "text": "İşPoçt Admin"
+         }
+        ],
+        "address": [
+         {
+          "text": "admin@ispoct-mail.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Your mailbox is 98% full"
+        }
+       ],
+       "time": "09:41",
+       "body": [
+        [
+         {
+          "text": "Increase your storage so mail is not deleted: "
+         },
+         {
+          "text": "ispoct-mail.example.net/yer",
+          "link": {
+           "label": "ispoct-mail.example.net/yer",
+           "href": "https://ispoct-mail.example.net/yer"
+          }
+         }
+        ]
+       ]
+      },
+      "say": "The email is still in your inbox.",
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. Your report lets security remove the email from other inboxes too."
+       },
+       {
+        "id": "forward",
+        "label": "Forward to security",
+        "kind": "forward",
+        "outcome": "safe",
+        "feedback": "Good. Do this if there is no report button, then call them too."
+       },
+       {
+        "id": "delete",
+        "label": "Delete it so nobody sees",
+        "kind": "delete",
+        "outcome": "risky",
+        "feedback": "The email is evidence. Deleted, it cannot help security trace the attack."
+       }
+      ]
+     },
+     {
+      "id": "change-password",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "ispoct",
+       "brand": "İşPoçt",
+       "url": [
+        {
+         "text": "https://poct.idare.example/parol"
+        }
+       ],
+       "fields": [
+        "Current password",
+        "New password"
+       ],
+       "button": "Change password"
+      },
+      "say": "You typed the address yourself. Change the password.",
+      "actions": [
+       {
+        "id": "change",
+        "label": "Change password",
+        "kind": "enter-credentials",
+        "outcome": "safe",
+        "feedback": "Right, the site is genuine. The new password must not resemble the old one."
+       },
+       {
+        "id": "later",
+        "label": "I'll change it tomorrow",
+        "kind": "later",
+        "outcome": "risky",
+        "feedback": "Stolen passwords are used fast. Waiting gives the attacker time."
+       }
+      ]
+     },
+     {
+      "id": "reused",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "parolseyf",
+       "tone": "app",
+       "title": [
+        {
+         "text": "This password is used elsewhere"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Your old mail password is also used on the office portal and the Kontakto page."
+         }
+        ]
+       ],
+       "buttons": [
+        "Later",
+        "Change all"
+       ]
+      },
+      "actions": [
+       {
+        "id": "update",
+        "label": "Change all",
+        "kind": "update",
+        "outcome": "safe",
+        "feedback": "Right. Attackers try a stolen password on other sites too."
+       },
+       {
+        "id": "later",
+        "label": "Later",
+        "kind": "later",
+        "outcome": "risky",
+        "feedback": "Every account with the same password is now exposed. Change them all today."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "mistake-first-step",
+    "prompt": "Match each mistake with the first step.",
+    "pairs": [
+     {
+      "id": "clicked",
+      "left": "I clicked, but typed nothing",
+      "right": "Close the page and report the email"
+     },
+     {
+      "id": "password",
+      "left": "I typed my password on a fake page",
+      "right": "Change it on the real site and report"
+     },
+     {
+      "id": "code",
+      "left": "I gave a caller my verification code",
+      "right": "Call security right away"
+     },
+     {
+      "id": "card",
+      "left": "I typed my card details",
+      "right": "Call the bank on the number on your card"
+     }
+    ],
+    "explain": "Report it every time: specialists check for traces you cannot see."
+   },
+   {
+    "type": "choice",
+    "id": "approved-push",
+    "question": {
+     "prompt": "A sign-in request came to your phone and you tapped \"Approve\" by mistake. What now?",
+     "options": [
+      {
+       "id": "report",
+       "label": "I call security right away and change my password",
+       "correct": true,
+       "feedback": "Right. You let the attacker in; security will throw them out by ending the sessions."
+      },
+      {
+       "id": "nothing",
+       "label": "Nothing, it was only once",
+       "correct": false,
+       "feedback": "One approval is enough: the attacker is already in your account."
+      },
+      {
+       "id": "phone-off",
+       "label": "I switch off the phone",
+       "correct": false,
+       "feedback": "Turning off the phone does not remove the attacker. They are already in."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    "explain": "A mistaken approval and a code given away need the same urgent step: report at once."
+   },
+   {
+    "type": "password",
+    "id": "new-password",
+    "prompt": "Create a new password to replace the stolen one: nothing like the old one.",
+    "targetScore": 4,
+    "tips": [
+     "Do not just tweak the old one: Aysel2027 instead of Aysel2026 will not do",
+     "Join four random words with spaces",
+     "Save the new password in the password manager"
+    ]
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Type nothing more: close the page and keep the email.",
+     "Change the password on the real site, and wherever else you used it.",
+     "Gave a code or tapped approve? Call security right away."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "opened-file-sent-wrong",
+  "title": "Files and wrong recipients"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 26,
+ "narrationTotalMs": 123562
+}

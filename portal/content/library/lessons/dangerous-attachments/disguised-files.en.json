@@ -1,0 +1,512 @@
+{
+ "id": "disguised-files",
+ "title": "Disguised files",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "df-tutor",
+   "beats": [
+    {
+     "id": "df-b1",
+     "say": "Hello! A file name can lie. Today we learn to see what an attachment really is.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "df-b2",
+     "say": "This file looks like a PDF. But the very end of the name says exe, so it is a program.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "file",
+       "name": [
+        {
+         "text": "Qerar_2026.pdf"
+        },
+        {
+         "text": ".exe",
+         "spot": "ext"
+        }
+       ],
+       "type": "exe",
+       "size": "1,8 MB",
+       "source": [
+        {
+         "text": "Email attachment"
+        }
+       ]
+      }
+     },
+     "highlight": "ext"
+    },
+    {
+     "id": "df-b3",
+     "say": "Archives, disk images and shortcut files can also hide a program inside.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    },
+    {
+     "id": "df-b4",
+     "say": "The rule is simple: check the type before opening an unexpected file, and report if in doubt.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "df-sim-files",
+   "environment": "desktop",
+   "title": "Downloads folder",
+   "intro": "Look at the files you downloaded from email. Show extensions and choose what to do with each.",
+   "steps": [
+    {
+     "id": "decree-exe",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Qerar_2026.pdf.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "1,8 MB",
+      "source": [
+       {
+        "text": "Downloads: qerar@nazirlik-sened.example.net"
+       }
+      ]
+     },
+     "say": "Show extensions. What does the end of the name say?",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "This is not a document, it is a program. It can install malware the moment it opens."
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Right. A real decree is never a program."
+      },
+      {
+       "id": "report",
+       "label": "Report to IT security",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Great. Security can remove the same email from everyone else's mailbox too."
+      }
+     ]
+    },
+    {
+     "id": "report-iso",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Hesabat_sentyabr.iso"
+       }
+      ],
+      "type": "iso",
+      "size": "4,2 MB",
+      "source": [
+       {
+        "text": "Downloads: hesabat@audit-xidmet.example.net"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "An ISO file opens like a disc and can hold a program. Reports are not sent as disk images."
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Right. Do not open a disk image you did not expect."
+      },
+      {
+       "id": "report",
+       "label": "Report to IT security",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Great. An ISO posing as a report is a typical attack."
+      }
+     ]
+    },
+    {
+     "id": "photos-lnk",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Tedbir_fotolari"
+       }
+      ],
+      "type": "lnk",
+      "size": "3 KB",
+      "source": [
+       {
+        "text": "Downloads: extracted from an archive"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "It was a shortcut and it ran a hidden command. Photos are never 3 KB."
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Right. A shortcut (.lnk) posing as photos is a trap."
+      },
+      {
+       "id": "report",
+       "label": "Report to IT security",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Great. Reporting without opening is the safest way."
+      }
+     ]
+    },
+    {
+     "id": "leave-pdf",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [
+       {
+        "text": "Mezuniyyet_qrafiki.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "220 KB",
+      "source": [
+       {
+        "text": "Downloads: kadrlar@idare.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Right. An expected PDF from an internal address is fine to open."
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "This file is safe: a real PDF from a known sender. Not every file needs deleting."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "df-hotspot",
+   "prompt": "Find the warning signs in this email.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "e-xidmet-fake",
+    "from": {
+     "name": [
+      {
+       "text": "e-Xidmət Portal"
+      }
+     ],
+     "address": [
+      {
+       "text": "bildiris@e-xidmet-gov.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Fine notice"
+     }
+    ],
+    "time": "09:31",
+    "body": [
+     [
+      {
+       "text": "An administrative fine has been issued in your name. Details are attached."
+      }
+     ],
+     [
+      {
+       "text": "Archive password: 2026",
+       "spot": "zip"
+      }
+     ],
+     [
+      {
+       "text": "If not paid within 3 days, the amount doubles.",
+       "spot": "urgency"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Cerime_bildirisi.zip",
+        "spot": "zip"
+       }
+      ],
+      "size": "860 KB"
+     },
+     {
+      "name": [
+       {
+        "text": "Odenis_qebzi.html",
+        "spot": "html"
+       }
+      ],
+      "size": "14 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Fake domain",
+     "explain": "The address adds \"-gov\" and a different ending. Check the official portal domain yourself."
+    },
+    {
+     "id": "zip",
+     "label": "Password protected archive",
+     "explain": "The password stops antivirus from looking inside. Official notices are not sent like this."
+    },
+    {
+     "id": "html",
+     "label": "HTML attachment",
+     "explain": "An HTML attachment opens a fake payment or sign-in page in the browser."
+    },
+    {
+     "id": "urgency",
+     "label": "Threat and rush",
+     "explain": "Fear is meant to make you open it without checking. Check fines only on the official portal."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "df-swipe",
+   "prompt": "Safe or threat?",
+   "cards": [
+    {
+     "id": "manual-pdf",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [
+       {
+        "text": "Telimat_2026.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "310 KB",
+      "source": [
+       {
+        "text": "it@idare.example, expected guide"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Internal address, expected document, ordinary PDF. Fine to open."
+    },
+    {
+     "id": "salary-lnk",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Maas_cedveli.xlsx.lnk"
+       }
+      ],
+      "type": "lnk",
+      "size": "2 KB",
+      "source": [
+       {
+        "text": "Unknown sender"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A shortcut wearing a spreadsheet name. Opening it can run a hidden command."
+    },
+    {
+     "id": "order-img",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "cevikkargo-fake",
+      "name": [
+       {
+        "text": "Sifaris_1873.img"
+       }
+      ],
+      "type": "img",
+      "size": "3,6 MB",
+      "source": [
+       {
+        "text": "sifaris@cevik-kargo.example.net"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "IMG is a disk image. Order details are never sent this way."
+    },
+    {
+     "id": "slides-ppt",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "ofistechizat",
+      "name": [
+       {
+        "text": "Teqdimat_oktyabr.pptx"
+       }
+      ],
+      "type": "ppt",
+      "size": "2,1 MB",
+      "source": [
+       {
+        "text": "Səbinə Kərimova, agreed for the meeting"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "An agreed presentation in a normal format. No warning signs."
+    },
+    {
+     "id": "invoice-html",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "ofistechizat-fake",
+      "name": [
+       {
+        "text": "Faktura_oktyabr.html"
+       }
+      ],
+      "type": "html",
+      "size": "9 KB",
+      "source": [
+       {
+        "text": "faktura@ofistechizat-az.example.net"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Invoices are not HTML files. This one from a look-alike domain opens a sign-in page."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "df-match",
+   "prompt": "Match each file type to its risk.",
+   "pairs": [
+    {
+     "id": "exe",
+     "left": ".exe",
+     "right": "A program that runs when opened"
+    },
+    {
+     "id": "lnk",
+     "left": ".lnk",
+     "right": "A shortcut that can run a hidden command"
+    },
+    {
+     "id": "iso",
+     "left": ".iso",
+     "right": "A disk image that can hide a program"
+    },
+    {
+     "id": "html",
+     "left": ".html",
+     "right": "Can open a fake sign-in page in the browser"
+    },
+    {
+     "id": "zip",
+     "left": ".zip (with password)",
+     "right": "Antivirus cannot look inside"
+    }
+   ],
+   "explain": "These types are rare in work email. If you did not expect one, do not open it and report it."
+  },
+  {
+   "type": "choice",
+   "id": "df-choice",
+   "question": {
+    "prompt": "A colleague says: \"I opened the file and nothing happened.\" What do you advise?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Disconnect from the network and call IT security right away",
+      "correct": true,
+      "feedback": "Right. Malware often runs silently, and reporting fast limits the damage."
+     },
+     {
+      "id": "wait",
+      "label": "Wait and report if something happens",
+      "correct": false,
+      "feedback": "\"Nothing happened\" is often a false impression. Waiting gives the attacker time."
+     },
+     {
+      "id": "shutdown",
+      "label": "Shut the computer down right away",
+      "correct": false,
+      "feedback": "Shutting down can erase evidence in memory. Unless your procedure says otherwise, leave it on, disconnect and report."
+     }
+    ]
+   },
+   "explain": "An opened suspicious file is an incident: disconnect, keep the computer on, report at once."
+  },
+  {
+   "type": "recap",
+   "id": "df-recap",
+   "points": [
+    "Look at the very end of the name: the real type",
+    "Do not open unexpected archives, ISO, shortcuts or HTML",
+    "Opened it? Disconnect and report at once"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

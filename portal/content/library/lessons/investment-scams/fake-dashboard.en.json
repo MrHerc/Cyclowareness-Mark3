@@ -1,0 +1,462 @@
+{
+ "id": "fake-dashboard",
+ "title": "The fake profit dashboard",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fd-tutor",
+   "beats": [
+    {
+     "id": "fd-b1",
+     "say": "After you deposit, the platform shows you a nice chart and a growing balance.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "fd-b2",
+     "say": "On a fake platform these numbers are just text on a screen, with no money behind them.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2d-bakutrade",
+       "tone": "app",
+       "title": [
+        {
+         "text": "BakuTrade Pro | "
+        },
+        {
+         "text": "Balance: 12,480 AZN (+312%)",
+         "spot": "balance"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "To withdraw, first pay 15% income tax: 1,870 AZN",
+          "spot": "fee"
+         }
+        ]
+       ],
+       "buttons": [
+        "Pay the tax",
+        "Close"
+       ]
+      }
+     },
+     "highlight": "balance"
+    },
+    {
+     "id": "fd-b3",
+     "say": "When you try to withdraw, they ask for tax, a fee or insurance. That is the final stage of the scam.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2d-bakutrade",
+       "tone": "app",
+       "title": [
+        {
+         "text": "BakuTrade Pro | "
+        },
+        {
+         "text": "Balance: 12,480 AZN (+312%)",
+         "spot": "balance"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "To withdraw, first pay 15% income tax: 1,870 AZN",
+          "spot": "fee"
+         }
+        ]
+       ],
+       "buttons": [
+        "Pay the tax",
+        "Close"
+       ]
+      }
+     },
+     "highlight": "fee"
+    },
+    {
+     "id": "fd-b4",
+     "say": "If a withdrawal needs a payment first, stop and do not send a single manat more.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fd-hotspot",
+   "prompt": "Find the signs of fraud on this dashboard.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2d-bakutrade",
+    "tone": "app",
+    "title": [
+     {
+      "text": "BakuTrade Pro | "
+     },
+     {
+      "text": "Balance: 12,480 AZN (+312%)",
+      "spot": "balance"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Guaranteed daily return: 3%",
+       "spot": "guarantee"
+      }
+     ],
+     [
+      {
+       "text": "To withdraw, first pay 15% income tax: 1,870 AZN",
+       "spot": "fee"
+      }
+     ],
+     [
+      {
+       "text": "Licence: International Financial Commission, No 00417",
+       "spot": "licence"
+      }
+     ],
+     [
+      {
+       "text": "Offer ends in 2 hours. Contact your manager in the messenger.",
+       "spot": "rush"
+      }
+     ]
+    ],
+    "buttons": [
+     "Pay the tax",
+     "Close"
+    ]
+   },
+   "spots": [
+    {
+     "id": "balance",
+     "label": "Miracle growth",
+     "explain": "Quadrupling in a few months almost never happens in a real market. Anyone can type a number on a screen."
+    },
+    {
+     "id": "guarantee",
+     "label": "Guaranteed returns",
+     "explain": "Investment returns cannot be guaranteed. The word itself is a warning."
+    },
+    {
+     "id": "fee",
+     "label": "Pay to withdraw",
+     "explain": "A real platform does not ask you to send new money to release yours. Pay it and another excuse will follow."
+    },
+    {
+     "id": "licence",
+     "label": "Fake licence",
+     "explain": "Such a body may not even exist, and a foreign licence gives no right here anyway. Look at the Central Bank's list."
+    },
+    {
+     "id": "rush",
+     "label": "Rushing you",
+     "explain": "The deadline is there so you have no time to think or ask anyone."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "fd-sim",
+   "environment": "browser",
+   "title": "Withdrawing the money",
+   "intro": "Your balance on the platform has grown and you want to withdraw. Decide at each step.",
+   "steps": [
+    {
+     "id": "dashboard",
+     "label": "Your balance: 12,480 AZN. Upgrade to VIP",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2d-bakutrade",
+      "url": [
+       {
+        "text": "https://bakutrade-pro.example.net/panel"
+       }
+      ]
+     },
+     "say": "The balance has grown. Now try to withdraw.",
+     "actions": [
+      {
+       "id": "withdraw",
+       "label": "Withdraw",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Trying to withdraw does no harm. See what they ask for on the next screen."
+      },
+      {
+       "id": "vip",
+       "label": "Add 500 AZN, go VIP",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "The balance on screen is not real, and new money will be lost too. Stop."
+      }
+     ]
+    },
+    {
+     "id": "fee",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2d-bakutrade",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Withdrawal on hold"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "A 15% income tax is required to withdraw: 1,870 AZN."
+        }
+       ],
+       [
+        {
+         "text": "If the tax is not paid, funds will be frozen in 48 hours."
+        }
+       ]
+      ],
+      "buttons": [
+       "Pay the tax",
+       "Cancel"
+      ]
+     },
+     "say": "They want a tax before the withdrawal.",
+     "actions": [
+      {
+       "id": "pay-tax",
+       "label": "Pay the tax",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "After the tax they will ask for insurance, then a commission. The balance will never come out."
+      },
+      {
+       "id": "cancel",
+       "label": "Cancel",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Right. Being asked to pay to withdraw shows the platform is fake."
+      }
+     ]
+    },
+    {
+     "id": "recovery-page",
+     "label": "We recover lost investments in 30 days",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2d-fond-berpa",
+      "url": [
+       {
+        "text": "https://fondberpa-huquq.example.net"
+       }
+      ]
+     },
+     "say": "A few days later this ad appears.",
+     "actions": [
+      {
+       "id": "apply",
+       "label": "Apply",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "A promise to recover money can be a second trap. See what they ask for next."
+      },
+      {
+       "id": "close",
+       "label": "Close the tab",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Right. A service that promises to get your money back is often a second scam.",
+       "next": "report-site"
+      }
+     ]
+    },
+    {
+     "id": "recovery-form",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2d-fond-berpa",
+      "brand": "FondBərpa",
+      "url": [
+       {
+        "text": "https://fondberpa-huquq.example.net/muraciet"
+       }
+      ],
+      "fields": [
+       "Full name",
+       "Phone",
+       "Card number",
+       "CVV"
+      ],
+      "button": "Pay 300 AZN and start"
+     },
+     "say": "To get money back, they want a payment up front too.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Pay 300 AZN and start",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "This is the second scam, sometimes run by the same gang. Block the card and tell the police."
+      },
+      {
+       "id": "close",
+       "label": "Close the tab",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Good call. To trace the money, go to your bank and the police, and that costs nothing."
+      }
+     ]
+    },
+    {
+     "id": "report-site",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Report this site"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Report bakutrade-pro.example.net as a fraudulent site?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Report",
+       "Later"
+      ]
+     },
+     "say": "The browser offers to report the site.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Report",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Great, reporting helps block the site for others. Contact the police on 102 as well."
+      },
+      {
+       "id": "later",
+       "label": "Later",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Not reporting lets the scammers find new victims. Take a minute and report it."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "fd-scenario",
+   "title": "The investor group",
+   "start": "group",
+   "nodes": [
+    {
+     "id": "group",
+     "text": "Look, I put in 400 manat and today it is 1,200. Join us.",
+     "speaker": "Gunay, your colleague (group \"Smart Investors\")",
+     "voice": "woman",
+     "channel": "message",
+     "manner": "natural",
+     "spoken": "Look, I put in 400 manat and today it is 1,200. <breath> Join us.",
+     "character": "gunay",
+     "choices": [
+      {
+       "label": "Let's check the licence in the Central Bank's list first",
+       "next": "pressure",
+       "feedback": "Right. Even a friend's tip does not make a platform legal."
+      },
+      {
+       "label": "If Gunay is earning, I am in",
+       "outcome": "compromised",
+       "feedback": "The profit on Gunay's screen may be fake too. Scammers pull people in through people they know."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Forget the list, we have a foreign licence. Only 3 places left!",
+     "speaker": "Group admin",
+     "voice": "man-2",
+     "channel": "message",
+     "spoken": "Forget the list, <breath> we have a foreign licence. Only 3 places left!",
+     "choices": [
+      {
+       "label": "A foreign licence gives no right here, I am out",
+       "next": "warn",
+       "feedback": "Right. The Central Bank has warned that a foreign licence gives no right to operate here."
+      },
+      {
+       "label": "Join fast before the places run out",
+       "outcome": "compromised",
+       "feedback": "Limited places are there to rush you. Pressure like this is itself a sign of fraud."
+      }
+     ]
+    },
+    {
+     "id": "warn",
+     "text": "What about my 400 manat? I want to withdraw, and they say I must pay a tax.",
+     "speaker": "Gunay",
+     "voice": "woman",
+     "channel": "message",
+     "manner": "worried",
+     "spoken": "What about my 400 manat? I want to withdraw, <short pause> and they say I must pay a tax.",
+     "character": "gunay",
+     "choices": [
+      {
+       "label": "Pay nothing, call your bank, report it on 102",
+       "outcome": "safe",
+       "feedback": "Great. Reporting in time stops the loss and protects others."
+      },
+      {
+       "label": "Pay the tax, then the money will come",
+       "outcome": "compromised",
+       "feedback": "After the tax there will be a new excuse. The loss will only grow."
+      },
+      {
+       "label": "Ask in the group, the admins will help",
+       "outcome": "risky",
+       "feedback": "The admins are the scammers themselves. They will only ask for another payment."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "fd-recap",
+   "points": [
+    "Profit on a screen is not money: if withdrawing needs a payment, stop.",
+    "A service promising to recover your money is a second scam.",
+    "Check the licence and report fraud to the police on 102."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

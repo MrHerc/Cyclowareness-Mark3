@@ -1,0 +1,521 @@
+{
+ "id": "fake-legal-notices",
+ "title": "Fake notices",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l1-tutor",
+   "beats": [
+    {
+     "id": "l1-b1",
+     "say": "Criminal case, court summons, tax debt. Words like these frighten people, and scammers count on that.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "l1-b2",
+     "say": "Such emails also reach state institution addresses. The attachment often hides malware.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "istintaq-buro-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Central Investigation Bureau"
+         }
+        ],
+        "address": [
+         {
+          "text": "bildiris@istintaq-buro-gov.test"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Notice of a criminal case"
+        }
+       ],
+       "time": "08:47",
+       "body": [
+        [
+         {
+          "text": "Your name appears in a criminal case. The materials are attached."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Is_materiallari.zip",
+           "spot": "archive"
+          }
+         ],
+         "size": "312 KB"
+        }
+       ]
+      }
+     },
+     "highlight": "archive"
+    },
+    {
+     "id": "l1-b3",
+     "say": "Others demand an immediate payment for a debt or fine, through a link.",
+     "mood": "think",
+     "gesture": "point-right",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "vergi-nezaret-fake",
+       "sender": [
+        {
+         "text": "VergiNezaret"
+        }
+       ],
+       "time": "09:15",
+       "messages": [
+        [
+         {
+          "text": "Your tax debt is 186.40 AZN. Pay today: "
+         },
+         {
+          "text": "vergi-borc-odenis.test",
+          "spot": "pay-link"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "pay-link"
+    },
+    {
+     "id": "l1-b4",
+     "say": "Check the notice yourself, using the number on the agency's official website or its official portal.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l1-hotspot",
+   "prompt": "Find the signs of fraud in this notice.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "istintaq-buro-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Central Investigation Bureau"
+      }
+     ],
+     "address": [
+      {
+       "text": "bildiris@"
+      },
+      {
+       "text": "istintaq-buro-gov.test",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Notice of criminal case No. 2026/4471"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Dear citizen,",
+       "spot": "generic"
+      }
+     ],
+     [
+      {
+       "text": "you are named as a suspect in a criminal case. "
+      },
+      {
+       "text": "If you do not reply within 24 hours, an arrest order will be issued.",
+       "spot": "threat"
+      }
+     ],
+     [
+      {
+       "text": "Open the attachment to read the case materials."
+      }
+     ],
+     [
+      {
+       "text": "Do not tell anyone about this email.",
+       "spot": "secrecy"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Is_materiallari.zip",
+        "spot": "archive"
+       }
+      ],
+      "size": "312 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Fake domain",
+     "explain": "The domain looks official but is not. Open the agency's website yourself and compare."
+    },
+    {
+     "id": "generic",
+     "label": "Generic greeting",
+     "explain": "A real notice addressed to you carries your name, not \"dear citizen\"."
+    },
+    {
+     "id": "threat",
+     "label": "Arrest threat and 24 hours",
+     "explain": "Fear and a short deadline push you to act without thinking."
+    },
+    {
+     "id": "secrecy",
+     "label": "Do not tell anyone",
+     "explain": "They want to cut you off from help. Instead, tell the security team at once."
+    },
+    {
+     "id": "archive",
+     "label": "Archive file",
+     "explain": "An archive can carry malware. Do not open an archive you did not expect."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "l1-sim",
+   "environment": "inbox",
+   "title": "Frightening mail",
+   "intro": "Your mailbox has four emails in the name of official bodies. Check each one and decide.",
+   "steps": [
+    {
+     "id": "m1",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "istintaq-buro-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Central Investigation Bureau"
+        }
+       ],
+       "address": [
+        {
+         "text": "bildiris@istintaq-buro-gov.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Notice of a criminal case"
+       }
+      ],
+      "time": "08:47",
+      "body": [
+       [
+        {
+         "text": "Your name appears in a criminal case. Read the attached materials within 24 hours."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Is_materiallari.zip"
+         }
+        ],
+        "size": "312 KB"
+       }
+      ]
+     },
+     "say": "Look at the sender's domain.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right. Fake domain, threat and archive: reporting protects your colleagues too."
+      },
+      {
+       "id": "open",
+       "label": "Open attachment",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "The file in the archive launched malware. Disconnect the computer from the network and report it at once."
+      },
+      {
+       "id": "reply",
+       "label": "Reply",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "A reply tells the scammer your address is live. More threats will follow."
+      }
+     ]
+    },
+    {
+     "id": "m2",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "adalet-mehkemesi-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Capital Justice Court"
+        }
+       ],
+       "address": [
+        {
+         "text": "cagiris@mehkeme-cagiris.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Court summons"
+       }
+      ],
+      "time": "09:30",
+      "body": [
+       [
+        {
+         "text": "You must appear in court tomorrow at 10:00. "
+        },
+        {
+         "text": "Download the summons here",
+         "link": {
+          "label": "Download the summons here",
+          "href": "https://mehkeme-cagiris.test/vereqe"
+         }
+        },
+        {
+         "text": "."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "click",
+       "label": "Download summons",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "The link downloaded a malicious file. The summons should have been checked using the court's official number."
+      },
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right. Report a summons from a foreign domain and call the court yourself if needed."
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Safe. But if you report it, your colleagues are protected too."
+      }
+     ]
+    },
+    {
+     "id": "m3",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "vergi-nezaret-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Tax Control Centre"
+        }
+       ],
+       "address": [
+        {
+         "text": "info@vergi-borc-odenis.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Final warning: tax debt 186.40 AZN"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "If you do not pay today, your bank accounts will be frozen. "
+        },
+        {
+         "text": "Pay online",
+         "link": {
+          "label": "Pay online",
+          "href": "https://vergi-borc-odenis.test/pay"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "click",
+       "label": "Pay online",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "The fake payment page took your card details. Call your bank now and block the card."
+      },
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right. Check any debt only by signing in to the official portal yourself."
+      }
+     ]
+    },
+    {
+     "id": "m4",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Legal Department"
+        }
+       ],
+       "address": [
+        {
+         "text": "huquq@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Warning: fake court notices"
+       }
+      ],
+      "time": "10:40",
+      "body": [
+       [
+        {
+         "text": "This week staff are receiving fake \"criminal case\" emails. Do not open attachments, report such emails as phishing."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Mark as safe",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Right. A warning from your own legal department, with no link or attachment."
+      },
+      {
+       "id": "report",
+       "label": "Report phishing",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Not every email is a threat. This is a useful warning from your own institution."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "l1-choice",
+   "question": {
+    "prompt": "The email says the case will be closed if you pay half the fine today.",
+    "options": [
+     {
+      "id": "pay",
+      "label": "I pay so it does not get worse",
+      "correct": false,
+      "feedback": "Official bodies do not \"close\" cases for a payment by link. The money goes straight to the scammer."
+     },
+     {
+      "id": "call-letter",
+      "label": "I call the number in the email to ask",
+      "correct": false,
+      "feedback": "That number belongs to the scammer. They will only frighten you more."
+     },
+     {
+      "id": "verify",
+      "label": "I find the agency's number on its official website and call",
+      "correct": true,
+      "feedback": "Right. When you find the contact yourself, a fake notice is exposed at once."
+     }
+    ]
+   },
+   "explain": "Threats, urgency and a payment demand together mean fraud. Report the email to the security team as well."
+  },
+  {
+   "type": "match",
+   "id": "l1-match",
+   "prompt": "Match each trick with its purpose.",
+   "pairs": [
+    {
+     "id": "arrest",
+     "left": "Threat of arrest or a criminal case",
+     "right": "Use fear to leave no time to think"
+    },
+    {
+     "id": "secret",
+     "left": "\"Do not tell anyone\"",
+     "right": "Keep you from asking for advice"
+    },
+    {
+     "id": "fee",
+     "left": "\"Pay today to close the case\"",
+     "right": "Take your money directly"
+    },
+    {
+     "id": "archive",
+     "left": "An archive or link attached",
+     "right": "Install malware on your computer"
+    }
+   ],
+   "explain": "However serious the threat sounds, the steps are the same: stop, check through an official channel, report."
+  },
+  {
+   "type": "recap",
+   "id": "l1-recap",
+   "points": [
+    "Threats, urgency and payment demands are signs of a fake notice.",
+    "Do not open unexpected attachments or links, report the email as phishing.",
+    "Check a notice yourself using the number on the agency's official website."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

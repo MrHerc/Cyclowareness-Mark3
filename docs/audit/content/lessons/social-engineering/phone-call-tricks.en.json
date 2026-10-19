@@ -1,0 +1,574 @@
+{
+ "module": {
+  "slug": "social-engineering",
+  "title": "Social engineering",
+  "category": "social"
+ },
+ "lesson": {
+  "id": "phone-call-tricks",
+  "title": "Phone call tricks",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "l1-tutor",
+    "beats": [
+     {
+      "id": "l1-b1",
+      "say": "Hello! I am your security helper. Today you will learn to spot scams that come by phone.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "mask"
+      }
+     },
+     {
+      "id": "l1-b2",
+      "say": "The screen shows the bank's name, but a caller's name and number are easy to fake.",
+      "mood": "think",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "call",
+        "brandRef": "sahilbank",
+        "caller": [
+         {
+          "text": "SahilBank",
+          "spot": "caller-name"
+         }
+        ],
+        "number": [
+         {
+          "text": "+994 12 000 00 00",
+          "spot": "caller-number"
+         }
+        ],
+        "label": "Incoming call"
+       }
+      },
+      "highlight": "caller-name"
+     },
+     {
+      "id": "l1-b3",
+      "say": "Scammers rush you: your card is blocked, money is leaving. Fear and haste are their main weapons.",
+      "mood": "alert",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "alarm"
+      },
+      "checkpoint": {
+       "prompt": "The caller asks for your text message code. What do you do?",
+       "options": [
+        {
+         "id": "say-code",
+         "label": "I read out the code",
+         "correct": false,
+         "feedback": "This code can open your account or approve a payment. A bank never asks for it."
+        },
+        {
+         "id": "call-back",
+         "label": "I hang up and call the bank myself",
+         "correct": true,
+         "feedback": "Correct. This check completely breaks the scammer's plan."
+        }
+       ]
+      }
+     },
+     {
+      "id": "l1-b5",
+      "say": "Golden rule: hang up and call the official number yourself, from your card or the official website.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "phone-lock"
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "bank-vishing",
+    "environment": "call",
+    "title": "A call from the bank",
+    "intro": "The screen shows your bank's name. Listen to the caller and choose your answer at each step.",
+    "steps": [
+     {
+      "id": "ring",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "sahilbank",
+       "caller": [
+        {
+         "text": "SahilBank"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 00 00"
+        }
+       ],
+       "label": "Bank",
+       "voice": "man"
+      },
+      "actions": [
+       {
+        "id": "answer",
+        "label": "Answer",
+        "kind": "answer",
+        "outcome": "safe",
+        "feedback": "Answering is not dangerous. What matters is what you say."
+       },
+       {
+        "id": "decline",
+        "label": "Decline",
+        "kind": "decline",
+        "outcome": "safe",
+        "feedback": "That works too. If worried, call the number on the back of your card yourself.",
+        "next": "after"
+       }
+      ]
+     },
+     {
+      "id": "alarm",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "sahilbank",
+       "caller": [
+        {
+         "text": "SahilBank"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 00 00"
+        }
+       ],
+       "label": "Bank",
+       "voice": "man"
+      },
+      "say": "Hello, this is Fuad Mammadov from SahilBank security. Someone is trying to take 1,200 manat from your card right now.",
+      "spoken": "Hello, <breath> this is Fuad Mammadov from SahilBank security. Someone is trying to, uh, take 1,200 manat from your card right now.",
+      "actions": [
+       {
+        "id": "card",
+        "label": "I give the last card digits",
+        "kind": "share",
+        "outcome": "risky",
+        "feedback": "Your bank already knows you and does not need this. Every detail makes the scammer more convincing."
+       },
+       {
+        "id": "keep",
+        "label": "I share no card details by phone",
+        "kind": "keep-private",
+        "outcome": "safe",
+        "feedback": "Right. Never give card details on an incoming call; the name and number can be faked."
+       }
+      ]
+     },
+     {
+      "id": "code",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "sahilbank",
+       "caller": [
+        {
+         "text": "SahilBank"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 00 00"
+        }
+       ],
+       "label": "Bank",
+       "voice": "man"
+      },
+      "say": "You have five minutes to stop it. Read me the code that just came to your phone, and tell no one.",
+      "spoken": "You have five minutes to stop it. <breath> Read me the code that just came to your phone, and tell no one.",
+      "actions": [
+       {
+        "id": "share",
+        "label": "I read out the code",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "The SMS code approves a payment. Reading it out means you send the money yourself."
+       },
+       {
+        "id": "hang",
+        "label": "Hang up",
+        "kind": "hang-up",
+        "outcome": "safe",
+        "feedback": "Right. No bank asks for an SMS code by phone.",
+        "next": "after"
+       }
+      ]
+     },
+     {
+      "id": "safe-account",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "sahilbank",
+       "caller": [
+        {
+         "text": "SahilBank"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 00 00"
+        }
+       ],
+       "label": "Bank",
+       "voice": "man"
+      },
+      "say": "Then move your money to a safe account to protect it. I am sending the details by SMS now.",
+      "spoken": "Then, uh, move your money to a safe account to protect it. <breath> I am sending the details by SMS now.",
+      "actions": [
+       {
+        "id": "transfer",
+        "label": "I move the money to the safe account",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "There is no safe account: it belongs to the scammer. A bank never asks you to move money."
+       },
+       {
+        "id": "hang",
+        "label": "Hang up",
+        "kind": "hang-up",
+        "outcome": "safe",
+        "feedback": "Great decision. Asking you to move money is the scam's final step."
+       }
+      ]
+     },
+     {
+      "id": "after",
+      "label": "The call has ended. What do you do now?",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "sahilbank",
+       "caller": [
+        {
+         "text": "SahilBank"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 00 00"
+        }
+       ],
+       "label": "Bank",
+       "voice": "man"
+      },
+      "actions": [
+       {
+        "id": "callback",
+        "label": "Call the number on the card",
+        "kind": "call-back",
+        "outcome": "safe",
+        "feedback": "Right. Dial the official number yourself, ideally from another phone, so the line cannot stay open."
+       },
+       {
+        "id": "redial",
+        "label": "Call back the incoming number",
+        "kind": "call-back",
+        "outcome": "risky",
+        "feedback": "The number can be faked. Take the number from your card or the bank's official website."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "l1-choice-spoof",
+    "question": {
+     "prompt": "The screen shows the bank's official number. Is the call real?",
+     "options": [
+      {
+       "id": "yes-number",
+       "label": "Yes, if the number is right, the call is real",
+       "correct": false,
+       "feedback": "A number can be faked. The number on the screen is not proof."
+      },
+      {
+       "id": "call-back",
+       "label": "I cannot tell, so I call back myself",
+       "correct": true,
+       "feedback": "Correct. Dial the official number yourself, ideally from another phone, so the scammer cannot keep the line open."
+      },
+      {
+       "id": "ask-name",
+       "label": "I ask for their name, that is enough",
+       "correct": false,
+       "feedback": "A scammer can give any name. A name is not a check."
+      }
+     ],
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "SahilBank"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 00 00"
+        }
+       ],
+       "label": "Incoming call"
+      }
+     }
+    },
+    "explain": "A caller's name and number can be fake. The safest way is to hang up and call the official number yourself."
+   },
+   {
+    "type": "swipe",
+    "id": "l1-swipe",
+    "prompt": "Safe or scam?",
+    "cards": [
+     {
+      "id": "police-safe-account",
+      "artifact": {
+       "kind": "chat",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Call: +994 12 000 11 22"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "This is the police. A loan was opened in your name. Move your money to a safe account now."
+          }
+         ]
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "The police never ask you to move money to a safe account. This is a well known scam."
+     },
+     {
+      "id": "bank-call-back",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "sahilbank",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Call: SahilBank"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "We saw a suspicious payment on your card. Do not tell us anything, call the number on the back of your card."
+          }
+         ]
+        }
+       ]
+      },
+      "verdict": "safe",
+      "explain": "It asks for nothing and sends you to the official number. Call the number on your card to check."
+     },
+     {
+      "id": "support-password",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "it-destek-fake",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Call: Technical support"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Your mailbox has a virus. Tell me your password and I will clean it remotely."
+          }
+         ]
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Technical support does not need your password. Never tell it to anyone."
+     },
+     {
+      "id": "support-planned",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "it-destek",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Call: Technical support"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "I am calling about the request you opened yesterday. We will update your computer tomorrow, you do not need to do anything."
+          }
+         ]
+        }
+       ]
+      },
+      "verdict": "safe",
+      "explain": "You opened the request yourself and nothing is asked of you. This is a normal work call."
+     },
+     {
+      "id": "remote-app",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "sahilbank",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Call: SahilBank"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "To protect your account, install this app so I can see your screen."
+          }
+         ]
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A remote control app hands them your whole phone. A bank never asks for this."
+     }
+    ]
+   },
+   {
+    "type": "scenario",
+    "id": "l1-scenario",
+    "title": "A support call",
+    "start": "n1",
+    "nodes": [
+     {
+      "id": "n1",
+      "text": "Hello, this is Elvin from technical support. Your account is being blocked, we need to confirm your password now.",
+      "speaker": "Caller",
+      "voice": "man-3",
+      "channel": "phone",
+      "spoken": "Hello, this is Elvin from technical support. <breath> Your account is being blocked, we need to confirm your password now.",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "call",
+        "brandRef": "it-destek-fake",
+        "caller": [
+         {
+          "text": "Technical support"
+         }
+        ],
+        "number": [
+         {
+          "text": "+994 12 000 33 44"
+         }
+        ],
+        "label": "Incoming call"
+       }
+      },
+      "choices": [
+       {
+        "label": "I tell my password",
+        "outcome": "compromised",
+        "feedback": "Someone else now has your password. Change it at once and report it to support on the official number."
+       },
+       {
+        "label": "I ask who they are",
+        "next": "n2",
+        "feedback": "A good start, but do not fully trust the answer."
+       },
+       {
+        "label": "I hang up and call support myself",
+        "outcome": "safe",
+        "feedback": "Excellent. Real technical support never asks for your password."
+       }
+      ]
+     },
+     {
+      "id": "n2",
+      "text": "I am Elvin Hasanov, third floor. Hurry, the account will be deleted in five minutes. At least install this program.",
+      "speaker": "Caller",
+      "voice": "man-3",
+      "channel": "phone",
+      "spoken": "I am Elvin Hasanov, third floor. Hurry, uh, the account will be deleted in five minutes. At least install this program.",
+      "choices": [
+       {
+        "label": "I install the program",
+        "next": "n3",
+        "feedback": "With a remote control program, he can see and control your computer."
+       },
+       {
+        "label": "I say I will call back myself",
+        "outcome": "safe",
+        "feedback": "The right call. Rushing is a warning sign, and calling back is the best check."
+       }
+      ]
+     },
+     {
+      "id": "n3",
+      "text": "An unknown program opens and the cursor moves on its own.",
+      "choices": [
+       {
+        "label": "I disconnect and call support",
+        "outcome": "risky",
+        "feedback": "The right reaction. Reporting fast limits the damage."
+       },
+       {
+        "label": "I feel embarrassed and tell no one",
+        "outcome": "compromised",
+        "feedback": "Silence gives the attacker time. Reporting is nothing to be ashamed of, it protects everyone."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "recap",
+    "id": "l1-recap",
+    "points": [
+     "A caller's name and number can be fake",
+     "Never tell anyone a code, PIN or password",
+     "Hang up and call the official number yourself"
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "sms-messenger-scams",
+  "title": "Text and chat scams"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 42,
+ "narrationTotalMs": 226684
+}

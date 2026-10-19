@@ -1,0 +1,422 @@
+{
+ "module": {
+  "slug": "sim-swap-otp",
+  "title": "SIM swap and OTP",
+  "category": "identity"
+ },
+ "lesson": {
+  "id": "sim-renewal-call",
+  "title": "SIM renewal call",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "ss2-tutor",
+    "beats": [
+     {
+      "id": "ss2-b1",
+      "say": "Hello! Now let us look at a call in the operator's name: an offer to renew your SIM for free.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "phone-lock"
+      }
+     },
+     {
+      "id": "ss2-b2",
+      "say": "The screen can show the operator's name and a familiar number. Both can be faked.",
+      "mood": "think",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "call",
+        "brandRef": "w2b-sahiltel-fake",
+        "caller": [
+         {
+          "text": "SahilTel Customer Service"
+         }
+        ],
+        "number": [
+         {
+          "text": "+994 12 000 44 10",
+          "spot": "number"
+         }
+        ],
+        "label": "Baku"
+       }
+      },
+      "highlight": "number"
+     },
+     {
+      "id": "ss2-b3",
+      "say": "Never tell a code you receive to a caller, even one who says they are the operator, bank or police.",
+      "mood": "alert",
+      "gesture": "shake",
+      "visual": {
+       "kind": "illustration",
+       "id": "mfa-phone"
+      }
+     },
+     {
+      "id": "ss2-b4",
+      "say": "If your operator offers an account PIN, set one. It makes a SIM swap harder.",
+      "mood": "happy",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "lock"
+      }
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "ss2-choice",
+    "question": {
+     "prompt": "A caller from the operator says: we are renewing your SIM, read me the code. What do you do?",
+     "options": [
+      {
+       "id": "hang-up",
+       "label": "I hang up and call the operator's official number myself",
+       "correct": true,
+       "feedback": "Correct. When you call the official number yourself, you know who you are talking to."
+      },
+      {
+       "id": "read-code",
+       "label": "The number is the operator's, so I read the code",
+       "correct": false,
+       "feedback": "The number on the screen can be faked. This code moves your number onto someone else's card."
+      },
+      {
+       "id": "ask-id",
+       "label": "I ask for the caller's name and staff number",
+       "correct": false,
+       "feedback": "A criminal can make up a name and a number. The only real check is a call you make yourself."
+      }
+     ],
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2b-sahiltel-fake",
+       "caller": [
+        {
+         "text": "SahilTel Customer Service"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 44 10"
+        }
+       ],
+       "label": "Baku"
+      }
+     }
+    },
+    "explain": "A call that asks for a code is the most dangerous call. Hang up and call the operator yourself."
+   },
+   {
+    "type": "simulation",
+    "id": "ss2-sim",
+    "environment": "call",
+    "title": "Call from SahilTel",
+    "intro": "Your phone is ringing. Read what the caller says and choose your answer.",
+    "steps": [
+     {
+      "id": "ring",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2b-sahiltel-fake",
+       "caller": [
+        {
+         "text": "SahilTel Customer Service"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 44 10"
+        }
+       ],
+       "label": "Baku",
+       "voice": "young-woman"
+      },
+      "actions": [
+       {
+        "id": "answer",
+        "label": "Answer",
+        "kind": "answer",
+        "outcome": "safe",
+        "feedback": "Answering is not dangerous. What matters is that you give no code."
+       },
+       {
+        "id": "decline",
+        "label": "Decline",
+        "kind": "decline",
+        "outcome": "safe",
+        "feedback": "That works too. If you are worried, call the operator yourself.",
+        "next": "after"
+       }
+      ]
+     },
+     {
+      "id": "offer",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2b-sahiltel-fake",
+       "caller": [
+        {
+         "text": "SahilTel Customer Service"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 44 10"
+        }
+       ],
+       "label": "Baku",
+       "voice": "young-woman"
+      },
+      "say": "Hello, this is Gunel from SahilTel. Old SIM cards, excuse me, are being switched off this month, so we are renewing yours for free.",
+      "spoken": "Hello, <breath> this is Gunel from SahilTel. Old SIM cards <cough> excuse me, are being switched off this month, so we are renewing yours for free.",
+      "actions": [
+       {
+        "id": "go-on",
+        "label": "All right, what should I do?",
+        "kind": "reply",
+        "outcome": "risky",
+        "feedback": "You have lost nothing yet, but the talk is heading for a code. Be careful."
+       },
+       {
+        "id": "own-call",
+        "label": "I will call the operator's official number myself",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Correct. If a renewal is real, the official line will confirm it.",
+        "next": "after"
+       },
+       {
+        "id": "hang",
+        "label": "End call",
+        "kind": "hang-up",
+        "outcome": "safe",
+        "feedback": "Good decision. Check any offer you did not expect on the official line.",
+        "next": "after"
+       }
+      ]
+     },
+     {
+      "id": "code",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2b-sahiltel-fake",
+       "caller": [
+        {
+         "text": "SahilTel Customer Service"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 44 10"
+        }
+       ],
+       "label": "Baku",
+       "voice": "young-woman"
+      },
+      "say": "You just got a six digit code on your phone. Read it to me so the new card can be activated.",
+      "spoken": "You just got a six digit code on your phone. <breath> Read it to me so the new card can be activated.",
+      "actions": [
+       {
+        "id": "read",
+        "label": "I read the code",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "With this code your number moves to the criminal's card. From now on bank codes go to them."
+       },
+       {
+        "id": "refuse",
+        "label": "I do not tell the code to anyone",
+        "kind": "keep-private",
+        "outcome": "safe",
+        "feedback": "Correct. The code is for you alone, whoever asks for it."
+       },
+       {
+        "id": "hang",
+        "label": "End call",
+        "kind": "hang-up",
+        "outcome": "safe",
+        "feedback": "Well done. Ending a call that asks for a code is the best answer.",
+        "next": "after"
+       }
+      ]
+     },
+     {
+      "id": "pressure",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2b-sahiltel-fake",
+       "caller": [
+        {
+         "text": "SahilTel Customer Service"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 44 10"
+        }
+       ],
+       "label": "Baku",
+       "voice": "young-woman"
+      },
+      "say": "If you do not tell me the code, your number will be switched off tonight. This is the standard procedure, we are short on time.",
+      "spoken": "If you do not tell me the code, <breath> your number will be switched off tonight. This is, uh, the standard procedure, we are short on time.",
+      "actions": [
+       {
+        "id": "give-in",
+        "label": "Fine, I will tell you the code",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "The threat is there to rush you. If you give the code, your number goes to the criminal tonight."
+       },
+       {
+        "id": "office",
+        "label": "If needed, I will come to your office myself",
+        "kind": "keep-private",
+        "outcome": "safe",
+        "feedback": "Good answer. If a new SIM is ever needed, you can change it yourself at the operator's office."
+       },
+       {
+        "id": "hang",
+        "label": "End call",
+        "kind": "hang-up",
+        "outcome": "safe",
+        "feedback": "Right. When the pressure grows, end the conversation."
+       }
+      ]
+     },
+     {
+      "id": "after",
+      "label": "The call has ended. What do you do now?",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2b-sahiltel-fake",
+       "caller": [
+        {
+         "text": "SahilTel Customer Service"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 44 10"
+        }
+       ],
+       "label": "Baku",
+       "voice": "young-woman"
+      },
+      "actions": [
+       {
+        "id": "official",
+        "label": "Call the operator's official number",
+        "kind": "call-back",
+        "outcome": "safe",
+        "feedback": "Correct. Report the call and ask whether you can set an account PIN."
+       },
+       {
+        "id": "redial",
+        "label": "Call back the number that called",
+        "kind": "call-back",
+        "outcome": "risky",
+        "feedback": "That number may lead to the criminal. Take the number from the operator's official website."
+       },
+       {
+        "id": "nothing",
+        "label": "Do nothing",
+        "kind": "ignore",
+        "outcome": "risky",
+        "feedback": "The criminal will try again another way. Telling the operator protects your number."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "ss2-match",
+    "prompt": "Match each situation with the right step.",
+    "pairs": [
+     {
+      "id": "asks-code",
+      "left": "A caller asks for a code",
+      "right": "Do not say it, end the call"
+     },
+     {
+      "id": "no-service",
+      "left": "Your phone suddenly shows No service",
+      "right": "Call the operator from another phone"
+     },
+     {
+      "id": "pin-offer",
+      "left": "Your operator offers an account PIN",
+      "right": "Set it and tell no one"
+     },
+     {
+      "id": "sms-only",
+      "left": "A key account is protected only by SMS codes",
+      "right": "Switch to an authenticator app or a passkey"
+     }
+    ],
+    "explain": "Never tell a code to anyone, act fast when your number dies, and do not let key accounts depend on SMS alone."
+   },
+   {
+    "type": "choice",
+    "id": "ss2-choice-code",
+    "question": {
+     "prompt": "When is it fine to tell someone a code sent to your phone?",
+     "options": [
+      {
+       "id": "never",
+       "label": "Never: I only type it into a site or app I opened myself",
+       "correct": true,
+       "feedback": "Correct. A code is like your signature and must stay in your hands only."
+      },
+      {
+       "id": "knows-me",
+       "label": "If the caller knows my name and personal ID number",
+       "correct": false,
+       "feedback": "Those details may have leaked. Anyone who knows you and still asks for the code is a fraudster."
+      },
+      {
+       "id": "family",
+       "label": "If a relative asks for it in a message",
+       "correct": false,
+       "feedback": "Your relative's account may be taken over too. Call them yourself with a normal phone call."
+      }
+     ]
+    },
+    "explain": "Banks and government bodies do not ask for SMS codes. Whoever asks for the code, end the conversation."
+   },
+   {
+    "type": "recap",
+    "id": "ss2-recap",
+    "points": [
+     "Never tell anyone a code you receive, whoever is calling",
+     "End a suspicious call and call the operator's official number yourself",
+     "If your operator offers an account PIN, set one"
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 35,
+ "narrationTotalMs": 194878
+}

@@ -1,0 +1,410 @@
+{
+ "module": {
+  "slug": "data-sharing",
+  "title": "Sharing data safely",
+  "category": "data"
+ },
+ "lesson": {
+  "id": "classify-and-share",
+  "title": "Classify and share",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "levels",
+      "say": "Every document has a level: public, internal or confidential. The level tells you who may see it.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "folder"
+      }
+     },
+     {
+      "id": "public-internal",
+      "say": "Public means anyone, like a notice on the website. Internal means staff only.",
+      "mood": "talk",
+      "gesture": "nod",
+      "visual": {
+       "kind": "illustration",
+       "id": "eye"
+      }
+     },
+     {
+      "id": "confidential",
+      "say": "Confidential is for named people only. If it leaks, people and the organisation are seriously harmed.",
+      "mood": "think",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "lock"
+      }
+     },
+     {
+      "id": "public-link",
+      "say": "A link open to anyone exposes the file to the whole internet. Share with named people and set an end date.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "url",
+        "brandRef": "rxagentlik-disk",
+        "url": [
+         {
+          "text": "https://disk.rxagentlik.az/s/8Kq2Lm?access="
+         },
+         {
+          "text": "anyone",
+          "spot": "public"
+         }
+        ]
+       }
+      },
+      "highlight": "public"
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "share-requests",
+    "environment": "phone",
+    "title": "Sharing requests",
+    "intro": "Three requests reached your phone. Decide by the document's level: do you share or not?",
+    "steps": [
+     {
+      "id": "phone-book",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Nigar (former colleague)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hi! I need it at my new job: could you send me the internal phone book?"
+          }
+         ],
+         "time": "10:14"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "keep",
+        "label": "It is internal, I cannot send it",
+        "kind": "keep-private",
+        "outcome": "safe",
+        "feedback": "Correct. Internal documents are for staff only, and a former colleague is now an outsider."
+       },
+       {
+        "id": "share",
+        "label": "I send the file",
+        "kind": "share",
+        "outcome": "risky",
+        "feedback": "The phone book is internal. Outside, it is a ready list of phishing targets."
+       }
+      ]
+     },
+     {
+      "id": "job-ad",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "merkez-konsalting",
+       "from": {
+        "name": [
+         {
+          "text": "Elçin Rzayev"
+         }
+        ],
+        "address": [
+         {
+          "text": "e.rzayev@merkez-konsalting.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Job advert"
+        }
+       ],
+       "time": "11:02",
+       "body": [
+        [
+         {
+          "text": "Hello, could you send the job advert from your website? We would like to share it with our students."
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "share",
+        "label": "I send the advert",
+        "kind": "share",
+        "outcome": "safe",
+        "feedback": "Correct. A job advert is public and already on the website."
+       },
+       {
+        "id": "keep",
+        "label": "I send nothing",
+        "kind": "keep-private",
+        "outcome": "safe",
+        "feedback": "Safe, but a public document needs no hiding. Sending the website link is enough."
+       }
+      ]
+     },
+     {
+      "id": "applications",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "+994 55 000 63 21"
+        }
+       ],
+       "time": "12:30",
+       "messages": [
+        [
+         {
+          "text": "Hello, I am a journalist. If you send the list of citizen applications, we will never mention your name."
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "keep",
+        "label": "I refuse and refer them to the press office",
+        "kind": "keep-private",
+        "outcome": "safe",
+        "feedback": "Correct. Applications are confidential and only the press office talks to the media."
+       },
+       {
+        "id": "share",
+        "label": "I send the list",
+        "kind": "share",
+        "outcome": "compromised",
+        "feedback": "A confidential list has left the organisation. This is a leak of citizens' personal data."
+       },
+       {
+        "id": "report",
+        "label": "Report",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Good. Report a request like this to the security team and your manager too."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "classify",
+    "prompt": "Match each document with its level.",
+    "pairs": [
+     {
+      "id": "job-ad",
+      "left": "A job ad published on the website",
+      "right": "Public"
+     },
+     {
+      "id": "phone-book",
+      "left": "The internal phone directory",
+      "right": "Internal"
+     },
+     {
+      "id": "applications",
+      "left": "The list of citizen applications",
+      "right": "Confidential"
+     }
+    ],
+    "explain": "When in doubt, pick the higher level and ask the document's owner."
+   },
+   {
+    "type": "hotspot",
+    "id": "misdelivered",
+    "prompt": "This email reached you by mistake. Find the sharing errors.",
+    "artifact": {
+     "kind": "email",
+     "brandRef": "rxagentlik",
+     "from": {
+      "name": [
+       {
+        "text": "Rəşad Əliyev"
+       }
+      ],
+      "address": [
+       {
+        "text": "reshad.aliyev@rxagentlik.az"
+       }
+      ]
+     },
+     "to": "aynur.mammadova@rxagentlik.az",
+     "subject": [
+      {
+       "text": "Applications list"
+      }
+     ],
+     "time": "11:40",
+     "body": [
+      [
+       {
+        "text": "Hello Leyla,",
+        "spot": "greeting"
+       }
+      ],
+      [
+       {
+        "text": "Attached is the "
+       },
+       {
+        "text": "full list of citizen applications with ID codes",
+        "spot": "full-list"
+       },
+       {
+        "text": "."
+       }
+      ],
+      [
+       {
+        "text": "I also uploaded it to the cloud, "
+       },
+       {
+        "text": "anyone with the link can open it.",
+        "spot": "anyone"
+       }
+      ],
+      [
+       {
+        "text": "Archive password: Muraciet2026",
+        "spot": "password"
+       }
+      ]
+     ],
+     "attachments": [
+      {
+       "name": [
+        {
+         "text": "Muracietler_tam.zip"
+        }
+       ],
+       "size": "2.4 MB"
+      }
+     ]
+    },
+    "spots": [
+     {
+      "id": "greeting",
+      "label": "Wrong recipient",
+      "explain": "The email is written to Leyla but reached you. That is an autocomplete mistake."
+     },
+     {
+      "id": "full-list",
+      "label": "Too much data",
+      "explain": "The task did not need the full list with ID codes. Send only what is needed."
+     },
+     {
+      "id": "anyone",
+      "label": "Open link",
+      "explain": "A confidential file must never have an open link. Anyone who gets the link can open it."
+     },
+     {
+      "id": "password",
+      "label": "Password in the same email",
+      "explain": "A password in the same email as the file protects nothing. Send it by another channel."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "order",
+    "id": "sent-wrong",
+    "prompt": "You sent a confidential file to the wrong person. Put the steps in order.",
+    "items": [
+     {
+      "id": "close-link",
+      "label": "Close the sharing link at once"
+     },
+     {
+      "id": "report",
+      "label": "Tell your manager and the security team"
+     },
+     {
+      "id": "ask-delete",
+      "label": "As they advise, ask the recipient to delete the file"
+     },
+     {
+      "id": "record",
+      "label": "Write down what went to whom and when"
+     }
+    ],
+    "explain": "Anyone can make this mistake. Reporting fast reduces the harm, hiding it makes it worse."
+   },
+   {
+    "type": "choice",
+    "id": "link-setting",
+    "question": {
+     "prompt": "You are sending a project file to an external partner. Which setting is right?",
+     "options": [
+      {
+       "id": "anyone",
+       "label": "Anyone with the link, no expiry",
+       "correct": false,
+       "feedback": "The link can be forwarded and anyone could open the file."
+      },
+      {
+       "id": "named",
+       "label": "Only the named person, for 7 days",
+       "correct": true,
+       "feedback": "Correct. Access is narrow and time limited."
+      },
+      {
+       "id": "personal-cloud",
+       "label": "Upload to my personal cloud and send a link",
+       "correct": false,
+       "feedback": "A personal account is outside the organisation's control."
+      }
+     ],
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    "explain": "Keep sharing as narrow as possible: who, for how long and with what rights."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Before sending, check the document's level and the recipient.",
+     "Limit links by name and time, send passwords separately.",
+     "If you sent it wrong, do not hide it, report at once."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "links-cloud",
+  "title": "Links and cloud folders"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 27,
+ "narrationTotalMs": 146150
+}

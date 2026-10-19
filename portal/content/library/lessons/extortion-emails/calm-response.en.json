@@ -1,0 +1,424 @@
+{
+ "id": "calm-response",
+ "title": "A calm response",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "cr-tutor",
+   "beats": [
+    {
+     "id": "cr-b1",
+     "say": "An extortion email has arrived. Now let us practise the right steps in order.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "cr-b2",
+     "say": "The first two rules: do not pay and do not reply. A reply makes you a new target.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "cr-b3",
+     "say": "If you still use the password from the email, change it and turn on two-step verification.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Change password"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Old password"
+         }
+        ],
+        [
+         {
+          "text": "New password: at least 15 characters",
+          "spot": "new"
+         }
+        ]
+       ],
+       "buttons": [
+        "Cancel",
+        "Change"
+       ]
+      }
+     },
+     "highlight": "new"
+    },
+    {
+     "id": "cr-b4",
+     "say": "If it came to work mail, report it to the security team. You are not to blame.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "cr-order",
+   "prompt": "You received an extortion email. Put the steps in order.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Do not pay and do not reply"
+    },
+    {
+     "id": "report",
+     "label": "Report the email to the security team"
+    },
+    {
+     "id": "change",
+     "label": "Change the password from the email everywhere"
+    },
+    {
+     "id": "mfa",
+     "label": "Turn on two-step verification"
+    }
+   ],
+   "explain": "First stop, then report and change the password. Two-step verification protects the account even if an old password leaks."
+  },
+  {
+   "type": "simulation",
+   "id": "cr-sim",
+   "environment": "desktop",
+   "title": "Morning, work computer",
+   "intro": "An extortion email notification pops up on your work computer. Choose the right move at every step.",
+   "steps": [
+    {
+     "id": "toast",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "IshPocht",
+      "title": [
+       {
+        "text": "Your password: Gunes2019. You have 48 hours"
+       }
+      ],
+      "body": [
+       {
+        "text": "I have videos recorded with your camera. Send bitcoin or everyone will see them."
+       }
+      ],
+      "time": "09:12"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Report",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right. Reporting without paying or replying is the best first step.",
+       "next": "password"
+      },
+      {
+       "id": "reply",
+       "label": "Reply: show me proof",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "You replied, and the scammer at once sent a file called proof."
+      },
+      {
+       "id": "pay",
+       "label": "Copy the bitcoin address and pay",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "The money is gone and will not come back. People who pay usually get a new demand.",
+       "next": "password"
+      }
+     ]
+    },
+    {
+     "id": "proof",
+     "label": "Downloads",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Subut_video.zip"
+       }
+      ],
+      "type": "zip",
+      "size": "1.2 MB",
+      "source": [
+       {
+        "text": "Anonymous: reply email"
+       }
+      ]
+     },
+     "say": "A reply came: supposedly proof.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Open",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "This is not proof, it is malware. Never open files from an extortion email."
+      },
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Right. Do not open the file, and report the email to the security team."
+      },
+      {
+       "id": "scan",
+       "label": "Scan with antivirus",
+       "kind": "scan",
+       "outcome": "safe",
+       "feedback": "A good habit, but there is no need to keep this file. Delete it and report."
+      }
+     ]
+    },
+    {
+     "id": "password",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Change password"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "The password in the email was found in an old data leak."
+        }
+       ],
+       [
+        {
+         "text": "New password: at least 15 characters, not used on other sites."
+        }
+       ]
+      ],
+      "buttons": [
+       "Later",
+       "Change password"
+      ]
+     },
+     "say": "This password is still used on some of your accounts.",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Change password",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Well done. The leaked password no longer opens this account, so change it on your other accounts too."
+      },
+      {
+       "id": "later",
+       "label": "Later",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Leaked passwords are tried again and again to open accounts. Do not put the change off."
+      }
+     ]
+    },
+    {
+     "id": "two-step",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Two-step verification"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ask for the approval app on your phone at sign in, as well as the password?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Not now",
+       "Turn on"
+      ]
+     },
+     "actions": [
+      {
+       "id": "enable",
+       "label": "Turn on",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Right. Even if the password leaks, the second step protects the account."
+      },
+      {
+       "id": "skip",
+       "label": "Not now",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Without two-step verification one password opens everything. Turn it on today."
+      }
+     ]
+    },
+    {
+     "id": "second-threat",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "IshPocht",
+      "title": [
+       {
+        "text": "Last 24 hours!"
+       }
+      ],
+      "body": [
+       {
+        "text": "No payment received. The videos go out tomorrow."
+       }
+      ],
+      "time": "08:30"
+     },
+     "say": "A day later a new threat arrived.",
+     "actions": [
+      {
+       "id": "delete",
+       "label": "Delete",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Right. A repeated threat is a bluff too, so do not pay and do not reply."
+      },
+      {
+       "id": "report",
+       "label": "Report",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Well done. The security team can block the new emails as well."
+      },
+      {
+       "id": "bargain",
+       "label": "Reply: give me some time",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Negotiating gives the scammer hope. Do not reply, and report it."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "cr-scenario",
+   "title": "A worried colleague",
+   "start": "panic",
+   "nodes": [
+    {
+     "id": "panic",
+     "text": "Look, an extortion email came to my personal mail, and it shows my old password!",
+     "speaker": "Narmin (your colleague) shows her phone",
+     "voice": "woman",
+     "channel": "in-person",
+     "manner": "worried",
+     "spoken": "Look, <breath> an extortion email came to my personal mail, and it shows my old password!",
+     "character": "narmin",
+     "choices": [
+      {
+       "label": "Stay calm, it is a mass bluff. Do not pay and do not reply",
+       "next": "reuse",
+       "feedback": "Right. Calm, clear advice takes the panic down at once."
+      },
+      {
+       "label": "Maybe pay half so they leave you alone",
+       "outcome": "compromised",
+       "feedback": "People who pay get new demands. Money does not stop the threat."
+      },
+      {
+       "label": "Reply and ask for proof",
+       "outcome": "risky",
+       "feedback": "A reply shows the address is active and brings more emails."
+      }
+     ]
+    },
+    {
+     "id": "reuse",
+     "text": "I still use that password on several sites, what should I do?",
+     "speaker": "Narmin (your colleague)",
+     "voice": "woman",
+     "channel": "in-person",
+     "manner": "worried",
+     "spoken": "I still use that password on several sites, uh, what should I do?",
+     "character": "narmin",
+     "choices": [
+      {
+       "label": "Change it everywhere, use a different password for each site and turn on two-step verification",
+       "outcome": "safe",
+       "feedback": "Well done. Separate passwords stop one leak from spreading to every account."
+      },
+      {
+       "label": "Change only this mailbox password, the rest does not matter",
+       "outcome": "risky",
+       "feedback": "The same password will be tried on other sites too. Change them all."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "cr-choice",
+   "question": {
+    "prompt": "A teenage relative says someone is threatening to publish private videos of them and wants money. What should be done?",
+    "options": [
+     {
+      "id": "police",
+      "label": "Never pay, go to the police",
+      "correct": true,
+      "feedback": "Right. Never pay, go to the police."
+     },
+     {
+      "id": "pay",
+      "label": "Pay once so it ends",
+      "correct": false,
+      "feedback": "Paying does not stop the threat. Never pay, go to the police."
+     },
+     {
+      "id": "hide",
+      "label": "Keep it secret and tell no one",
+      "correct": false,
+      "feedback": "Secrecy helps the person making threats. Never pay, go to the police."
+     }
+    ]
+   },
+   "explain": "If a child or teenager is being threatened, never pay. Go to the police at once."
+  },
+  {
+   "type": "recap",
+   "id": "cr-recap",
+   "points": [
+    "Do not pay, do not reply and do not open files from the email.",
+    "Change the leaked password everywhere and turn on two-step verification.",
+    "If a child is threatened, never pay and go to the police."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

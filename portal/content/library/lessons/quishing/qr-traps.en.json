@@ -1,0 +1,417 @@
+{
+ "id": "qr-traps",
+ "title": "QR traps",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "hidden-link",
+     "say": "Hi! A QR code is just a hidden link. You cannot tell where it leads by looking at it.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "qr"
+     }
+    },
+    {
+     "id": "stickers",
+     "say": "Scammers put their own QR stickers on parking meters, menus and posters.",
+     "mood": "think",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "qr",
+       "caption": [
+        {
+         "text": "ShaharPark. Scan to pay"
+        }
+       ],
+       "destination": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "seherpark-odenis.info",
+         "spot": "domain"
+        },
+        {
+         "text": "/pay"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "check-domain",
+     "say": "When your phone reads the code, it shows the address. Before opening, check the domain: does it really belong to that organisation?",
+     "mood": "talk",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "qr",
+       "caption": [
+        {
+         "text": "ShaharPark. Scan to pay"
+        }
+       ],
+       "destination": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "seherpark-odenis.info",
+         "spot": "domain"
+        },
+        {
+         "text": "/pay"
+        }
+       ]
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "email-qr",
+     "say": "A QR code in an email can be a trap too. If the page asks for your password or card, stop.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "scan-or-not",
+   "prompt": "Which QR codes are safe to open?",
+   "cards": [
+    {
+     "id": "parking-fine",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Parking meter. You have a fine, scan and pay"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://seherpark-cerime.info/pay"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Fines are not collected through stickers. Check fines only on the official portal or app."
+    },
+    {
+     "id": "cafe-menu",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Chinar Tea House. Menu"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://cinar-cayxana.az/menyu"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "The domain matches the cafe's name and the page only shows a menu. Nothing is requested."
+    },
+    {
+     "id": "mfa-email",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Your account verification expires. Scan to renew"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://rxagentlik-login.info/verify"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "An email with a QR code to verify your account is a classic trap. Open the portal yourself from a bookmark."
+    },
+    {
+     "id": "certificate-check",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "DovletPortal certificate. Check it is genuine"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://dovletportal.az/yoxla/7F3K2"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "The code leads to the issuing portal's own address and asks for no data."
+    },
+    {
+     "id": "free-wifi",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Free Wi-Fi. Scan to connect"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://free-wifi-baku.top/login?card=1"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Free internet never needs your card. An unknown domain plus a card request is a trap."
+    },
+    {
+     "id": "donation",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Help children. Scan to donate"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://qisalt.info/x7Qa"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "A shortened link hides the real address. Donate only on the charity's official website."
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "email-qr",
+   "prompt": "Find the suspicious parts of this email.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "IT Support"
+      }
+     ],
+     "address": [
+      {
+       "text": "it-destek@rxagentlik-support.info",
+       "spot": "sender"
+      }
+     ]
+    },
+    "to": "aynur.mammadova@rxagentlik.az",
+    "subject": [
+     {
+      "text": "URGENT: ",
+      "spot": "urgent"
+     },
+     {
+      "text": "renew your two-step verification"
+     }
+    ],
+    "time": "09:12",
+    "body": [
+     [
+      {
+       "text": "Dear colleague,"
+      }
+     ],
+     [
+      {
+       "text": "Our security system is being updated. "
+      },
+      {
+       "text": "If you do not confirm within 24 hours, your account will be blocked.",
+       "spot": "threat"
+      }
+     ],
+     [
+      {
+       "text": "Scan the QR code below with your phone.",
+       "spot": "qr"
+      }
+     ],
+     [
+      {
+       "text": "Regards, IT Support"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Foreign domain",
+     "explain": "The sender's domain is not ours: it is not rxagentlik.az."
+    },
+    {
+     "id": "urgent",
+     "label": "Urgency",
+     "explain": "The word urgent pushes you to act without thinking."
+    },
+    {
+     "id": "threat",
+     "label": "Threat",
+     "explain": "The blocking threat is there to pressure you. Real support rarely writes like this."
+    },
+    {
+     "id": "qr",
+     "label": "QR code",
+     "explain": "The QR code hides the link from the mail filter and moves you to a less protected phone."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "fine-notice",
+   "question": {
+    "prompt": "There is a fine notice with a QR code on your windscreen. What do you do?",
+    "options": [
+     {
+      "id": "scan-pay",
+      "label": "Scan it and pay right away",
+      "correct": false,
+      "feedback": "A fake page can steal your card details."
+     },
+     {
+      "id": "official",
+      "label": "Check the fine myself on the official portal",
+      "correct": true,
+      "feedback": "Correct. If the fine is real, it will be there."
+     },
+     {
+      "id": "call-number",
+      "label": "Call the number on the notice",
+      "correct": false,
+      "feedback": "The number may belong to the scammers too."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Fine notice. Pay within 3 days"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://seherpark-cerime.info/odenis"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "Do not trust any contact on the notice. Open the official channel yourself."
+  },
+  {
+   "type": "scenario",
+   "id": "payment-sticker",
+   "title": "Payment sticker",
+   "start": "counter",
+   "nodes": [
+    {
+     "id": "counter",
+     "text": "At the cafe counter there is a QR sticker for quick payment. It is stuck on slightly crooked.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "qr",
+       "caption": [
+        {
+         "text": "Quick payment"
+        }
+       ],
+       "destination": [
+        {
+         "text": "https://sahilpay-odenis.top/p/1942"
+        }
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "Scan it and check the address first",
+       "next": "address",
+       "feedback": "Good start. Checking the address matters."
+      },
+      {
+       "label": "Scan it and pay right away",
+       "outcome": "compromised",
+       "feedback": "The address was fake. Your card details went to scammers."
+      },
+      {
+       "label": "Ask the cashier if the sticker is theirs",
+       "next": "cashier",
+       "feedback": "Great idea. Asking is the simplest check."
+      }
+     ]
+    },
+    {
+     "id": "address",
+     "text": "Your phone shows the address: sahilpay-odenis.top. The cafe's name is nowhere.",
+     "choices": [
+      {
+       "label": "Pay anyway, I am in a hurry",
+       "outcome": "compromised",
+       "feedback": "The rushed payment went to a scammer. The odd address was warning enough."
+      },
+      {
+       "label": "Do not open it and tell the cashier",
+       "next": "cashier",
+       "feedback": "The right call."
+      }
+     ]
+    },
+    {
+     "id": "cashier",
+     "text": "That is not our sticker! Please pay by card at the terminal.",
+     "speaker": "Cashier",
+     "voice": "young-woman",
+     "channel": "in-person",
+     "manner": "firm",
+     "spoken": "That is not our sticker! <short pause> Please pay by card at the terminal.",
+     "choices": [
+      {
+       "label": "Pay at the terminal",
+       "outcome": "safe",
+       "feedback": "Well done. You protected yourself and the next customers."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "A QR code is a hidden link: check the address before opening.",
+    "Pay fines and bills only through official channels.",
+    "Never enter a password or card on a page opened by a QR code."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

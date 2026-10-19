@@ -1,0 +1,527 @@
+{
+ "id": "voice-clones",
+ "title": "Cloned voices",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "few-seconds",
+     "say": "Artificial intelligence can copy a person's voice from a short recording, sometimes only a few seconds long.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "the-ask",
+     "say": "A scammer calls in the voice of your boss or a relative and urgently asks for money, a code or a document.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Kamran Babayev"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 70 000 18 42",
+         "spot": "number"
+        }
+       ],
+       "label": "Mobile"
+      }
+     }
+    },
+    {
+     "id": "spoofed-number",
+     "say": "The number can be faked too. The name and number on your screen are not proof.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Kamran Babayev"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 70 000 18 42",
+         "spot": "number"
+        }
+       ],
+       "label": "Mobile"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "code-word",
+     "say": "Agree on a secret check word with your family and your team. A fake voice will not know it.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "boss-call",
+   "title": "Call from the boss",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "Hi, I am in a meeting and cannot talk long. We must urgently transfer 18,000 manat to a contractor. Tell no one, I will explain later.",
+     "speaker": "Kamran Babayev's voice",
+     "voice": "older-man",
+     "channel": "phone",
+     "spoken": "Hi, <breath> I am in a meeting and cannot talk long. We must urgently transfer 18,000 manat to a contractor. Tell no one, uh, I will explain later.",
+     "character": "kamran",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Kamran Babayev"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 70 000 18 42",
+         "spot": "number"
+        }
+       ],
+       "label": "Mobile"
+      }
+     },
+     "choices": [
+      {
+       "label": "Do it right away",
+       "outcome": "compromised",
+       "feedback": "The money went to a scammer. Urgency plus secrecy is the strongest warning sign."
+      },
+      {
+       "label": "Ask for the check word",
+       "next": "pressure",
+       "feedback": "Good idea. Let us see how he answers."
+      },
+      {
+       "label": "Say I will call him back myself",
+       "next": "callback",
+       "feedback": "Right. Call a number you already know."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "What word? I have no time! Don't you recognise me?",
+     "speaker": "Kamran Babayev's voice",
+     "voice": "older-man",
+     "channel": "phone",
+     "spoken": "What word? I have no time! <short pause> Don't you recognise me?",
+     "character": "kamran",
+     "choices": [
+      {
+       "label": "Apologise and transfer",
+       "outcome": "compromised",
+       "feedback": "Pressure is the scammer's main tool. A real boss understands a check."
+      },
+      {
+       "label": "Hang up and call back myself",
+       "next": "callback",
+       "feedback": "Right. No word, no deal."
+      }
+     ]
+    },
+    {
+     "id": "callback",
+     "text": "No, I never called you.",
+     "speaker": "Kamran Babayev (number from your contacts)",
+     "voice": "older-man",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "No, <breath> I never called you.",
+     "character": "kamran",
+     "choices": [
+      {
+       "label": "Report it to the security team",
+       "outcome": "safe",
+       "feedback": "Well done. They will warn your colleagues too."
+      },
+      {
+       "label": "Tell no one, no money was lost",
+       "outcome": "risky",
+       "feedback": "The scammer will try someone else. Reporting protects everyone."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "voice-message",
+   "prompt": "Find the warning signs in this chat.",
+   "artifact": {
+    "kind": "chat",
+    "app": "whatsapp",
+    "contact": [
+     {
+      "text": "+994 55 000 40 17"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Hi, it's me, Elvin. "
+       },
+       {
+        "text": "My phone broke, this is my new number.",
+        "spot": "new-number"
+       }
+      ],
+      "time": "21:04"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "It's me, Elvin. Can you hear me? I am in trouble, I urgently need your help.",
+        "spot": "voice"
+       }
+      ],
+      "time": "21:04",
+      "voice": "young-man",
+      "manner": "natural",
+      "spoken": "It's me, Elvin. <breath> Can you hear me? I am in trouble, I urgently need your help."
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "I urgently need 600 manat, today.",
+        "spot": "urgent"
+       },
+       {
+        "text": " "
+       },
+       {
+        "text": "Please don't tell anyone at home.",
+        "spot": "secret"
+       }
+      ],
+      "time": "21:05"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Send it to this card, it's my friend's.",
+        "spot": "card"
+       }
+      ],
+      "time": "21:05"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "new-number",
+     "label": "New number",
+     "explain": "The new number story stops you from calling the old number to check."
+    },
+    {
+     "id": "voice",
+     "label": "Voice message",
+     "explain": "The voice may sound familiar and still be fake. A short recording is enough to copy it."
+    },
+    {
+     "id": "urgent",
+     "label": "Urgent money",
+     "explain": "An urgent request for money is the core sign of a scam."
+    },
+    {
+     "id": "secret",
+     "label": "Secrecy",
+     "explain": "Asking you to tell no one is meant to stop you checking."
+    },
+    {
+     "id": "card",
+     "label": "Someone else's card",
+     "explain": "The money goes to someone else's card. That hides the trail."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "relative-call",
+   "environment": "call",
+   "title": "An evening call",
+   "intro": "An unknown number calls in the evening. The voice sounds very familiar. What do you do?",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Unknown number"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 73 26"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "child"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Answer",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Answering is not dangerous. What matters is what you do next."
+      },
+      {
+       "id": "decline",
+       "label": "Decline",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "That is fine too. If you are worried, call your relative yourself on the number you know.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "plea",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Unknown number"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 73 26"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "child"
+     },
+     "say": "Hello, it's me, Narmin! There was an accident and the police are holding me. I need 900 manat now, don't tell the family!",
+     "spoken": "Hello, <breath> it's me, Narmin! There was an accident and the police are, uh, holding me. I need 900 manat now, <breath> don't tell the family!",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Where do I send it?",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Agreeing at once is exactly what the scammer needs. Check first."
+      },
+      {
+       "id": "code-word",
+       "label": "What is our code word?",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Right. A cloned voice will not know the word you agreed on."
+      },
+      {
+       "id": "hang-up",
+       "label": "Hang up and call back myself",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Correct. Call Narmin on the old number you know.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Unknown number"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 73 26"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "child"
+     },
+     "say": "What word? I'm crying and you ask about a word! The police are waiting, hurry!",
+     "spoken": "What word? <breath> I'm crying and you ask about a word! The police are waiting, <breath> hurry!",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Fine, I am sending the money",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "The money went to a scammer. Tears and rush are there to make you skip the check."
+      },
+      {
+       "id": "hang-up",
+       "label": "Hang up",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Right. No code word, no conversation."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "The call has ended. What now?",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Unknown number"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 73 26"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "child"
+     },
+     "actions": [
+      {
+       "id": "call-back",
+       "label": "Call Narmin's old number",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Right: Narmin is at home and nothing happened. Warn the family too."
+      },
+      {
+       "id": "ignore",
+       "label": "Do nothing",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "The scammer may call again or try another relative. Tell the family."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "verify-steps",
+   "prompt": "Put the steps after a suspicious call in order.",
+   "items": [
+    {
+     "id": "hang-up",
+     "label": "Hang up without promising anything"
+    },
+    {
+     "id": "call-known",
+     "label": "Call the number in your contacts yourself"
+    },
+    {
+     "id": "confirm",
+     "label": "Ask whether the request is real"
+    },
+    {
+     "id": "report",
+     "label": "Report it to the security team"
+    }
+   ],
+   "explain": "The proof is not on the screen. It is in the second call that you start yourself."
+  },
+  {
+   "type": "match",
+   "id": "tricks",
+   "prompt": "Match each trick with the right response.",
+   "pairs": [
+    {
+     "id": "boss-voice",
+     "left": "Urgent transfer in the boss's voice",
+     "right": "Call back on a known number"
+    },
+    {
+     "id": "new-number",
+     "left": "A relative's new number",
+     "right": "Call the old number to check"
+    },
+    {
+     "id": "video-face",
+     "left": "A familiar face on a video call",
+     "right": "Ask for the check word"
+    },
+    {
+     "id": "keep-secret",
+     "left": "A request to keep it secret",
+     "right": "Always tell a second person"
+    }
+   ],
+   "explain": "Every trick has a simple check. Make it a habit."
+  },
+  {
+   "type": "choice",
+   "id": "exec-video",
+   "question": {
+    "prompt": "On a video call, the director asks you to send a confidential report to a personal email. What do you do?",
+    "options": [
+     {
+      "id": "send",
+      "label": "Send it, I can see him on screen",
+      "correct": false,
+      "feedback": "The image can be fake. A face is not proof."
+     },
+     {
+      "id": "verify",
+      "label": "Get separate confirmation through an official channel",
+      "correct": true,
+      "feedback": "Correct. Confidential files go only through official channels, after confirmation."
+     },
+     {
+      "id": "wave",
+      "label": "Ask him to wave his hand in front of the camera",
+      "correct": false,
+      "feedback": "It may trip up some fakes, but it is not a reliable check."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "ceo"
+    }
+   },
+   "explain": "However real it looks, check an unusual request through another channel."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "A familiar voice, face or number is not proof.",
+    "Hang up and call back on a number you know.",
+    "Agree on a check word with family and team."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

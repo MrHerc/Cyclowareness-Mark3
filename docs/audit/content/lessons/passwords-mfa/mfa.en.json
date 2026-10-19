@@ -1,0 +1,421 @@
+{
+ "module": {
+  "slug": "passwords-mfa",
+  "title": "Passwords and sign-in safety",
+  "category": "identity"
+ },
+ "lesson": {
+  "id": "mfa",
+  "title": "Two-step verification",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "second-step",
+    "beats": [
+     {
+      "id": "why",
+      "say": "Even if your password is stolen, a second step can protect the account. This is called two-step verification.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "mfa-phone"
+      }
+     },
+     {
+      "id": "best",
+      "say": "The strongest are passkeys and security keys. They do not work on fake sites.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "key"
+      }
+     },
+     {
+      "id": "code",
+      "say": "The code is only for you. Anyone asking for it, even as your bank, is a scammer.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "sms",
+        "brandRef": "ulduzbank",
+        "sender": [
+         {
+          "text": "UlduzBank"
+         }
+        ],
+        "time": "14:02",
+        "messages": [
+         [
+          {
+           "text": "Login code: 482 913. "
+          },
+          {
+           "text": "Do not share this code with anyone, not even bank staff.",
+           "spot": "code-warning"
+          }
+         ]
+        ]
+       }
+      },
+      "highlight": "code-warning"
+     },
+     {
+      "id": "prompts",
+      "say": "If approval requests you did not expect keep coming, someone is trying to sign in with your password.",
+      "mood": "alert",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "alarm"
+      },
+      "checkpoint": {
+       "prompt": "What do you do with an unexpected request?",
+       "options": [
+        {
+         "id": "approve",
+         "label": "Approve it so it stops",
+         "correct": false,
+         "feedback": "If you approve, the attacker gets in."
+        },
+        {
+         "id": "deny",
+         "label": "Deny it and change my password",
+         "correct": true,
+         "feedback": "Right. Then tell IT security too."
+        }
+       ]
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "night-push",
+    "environment": "phone",
+    "title": "Night requests",
+    "intro": "It is two at night and you are asleep. Your phone keeps asking you to approve a sign-in.",
+    "steps": [
+     {
+      "id": "push-1",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "tesdiqleyici",
+       "app": "Təsdiqləyici",
+       "title": [
+        {
+         "text": "Approve sign-in?"
+        }
+       ],
+       "body": [
+        {
+         "text": "Xidmət Agentliyi portal. Windows computer."
+        }
+       ],
+       "time": "02:14"
+      },
+      "say": "You are not signing in anywhere.",
+      "actions": [
+       {
+        "id": "approve",
+        "label": "Approve",
+        "kind": "allow",
+        "outcome": "compromised",
+        "feedback": "You are not signing in, so this is someone else. Approving lets the person with your password in."
+       },
+       {
+        "id": "deny",
+        "label": "Deny",
+        "kind": "deny",
+        "outcome": "safe",
+        "feedback": "Right. Always deny a request you did not expect."
+       }
+      ]
+     },
+     {
+      "id": "push-5",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "tesdiqleyici",
+       "app": "Təsdiqləyici",
+       "title": [
+        {
+         "text": "Approve sign-in?"
+        }
+       ],
+       "body": [
+        {
+         "text": "Fifth request. Windows computer."
+        }
+       ],
+       "time": "02:16"
+      },
+      "say": "The requests keep coming.",
+      "actions": [
+       {
+        "id": "approve",
+        "label": "Approve so it stops",
+        "kind": "allow",
+        "outcome": "compromised",
+        "feedback": "Push bombing counts on exactly this: that you get tired and approve. Approving opens the account."
+       },
+       {
+        "id": "deny",
+        "label": "Deny",
+        "kind": "deny",
+        "outcome": "safe",
+        "feedback": "Right. Repeated requests mean someone knows your password."
+       },
+       {
+        "id": "report",
+        "label": "This is not me, report",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Great. Reporting shows the attack to the security team at once."
+       }
+      ]
+     },
+     {
+      "id": "fake-it-chat",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "it-destek-fake",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "IT Support"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hi, a night check is running. Approve the last request so your account is not blocked."
+          }
+         ],
+         "time": "02:17"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "agree",
+        "label": "OK, I will approve",
+        "kind": "reply",
+        "outcome": "compromised",
+        "feedback": "IT support never asks you to approve a request. This is the second half of the attack."
+       },
+       {
+        "id": "block",
+        "label": "Block and report",
+        "kind": "block",
+        "outcome": "safe",
+        "feedback": "Right. An unknown number writing at night is not support, it is the attacker."
+       }
+      ]
+     },
+     {
+      "id": "change-now",
+      "label": "You opened the portal yourself",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "xidmet-agentliyi",
+       "brand": "Xidmət Agentliyi",
+       "url": [
+        {
+         "text": "https://portal.xidmetagentliyi.az/profil/parol"
+        }
+       ],
+       "fields": [
+        "Old password",
+        "New passphrase"
+       ],
+       "button": "Change"
+      },
+      "say": "Your password is stolen. What now?",
+      "actions": [
+       {
+        "id": "change",
+        "label": "Change password now",
+        "kind": "enter-credentials",
+        "outcome": "safe",
+        "feedback": "Right. Then tell the security team so they sign out all open sessions."
+       },
+       {
+        "id": "later",
+        "label": "I will look in the morning",
+        "kind": "later",
+        "outcome": "risky",
+        "feedback": "The attacker knows your password and will try again. Change it now."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "strongest-factor",
+    "question": {
+     "prompt": "Which second step resists phishing best?",
+     "options": [
+      {
+       "id": "sms",
+       "label": "SMS code",
+       "correct": false,
+       "feedback": "A fake site can ask for the code, and your SIM can be moved to someone else."
+      },
+      {
+       "id": "app",
+       "label": "Authenticator app",
+       "correct": false,
+       "feedback": "Better than SMS, but you can still type the code into a fake site."
+      },
+      {
+       "id": "key",
+       "label": "Passkey or security key",
+       "correct": true,
+       "feedback": "Right. A key only works with the genuine site."
+      },
+      {
+       "id": "email",
+       "label": "Code sent by email",
+       "correct": false,
+       "feedback": "If your email is taken over, so is the code."
+      }
+     ]
+    },
+    "explain": "Any second step is better than a password alone. Choose a key when you can."
+   },
+   {
+    "type": "hotspot",
+    "id": "code-request",
+    "prompt": "Find the danger in these messages.",
+    "artifact": {
+     "kind": "chat",
+     "app": "whatsapp",
+     "contact": [
+      {
+       "text": "+994 50 000 26 43",
+       "spot": "unknown-number",
+       "reveal": "Not in your contacts"
+      }
+     ],
+     "messages": [
+      {
+       "from": "them",
+       "body": [
+        {
+         "text": "Hi Aynur! It is Nigar, this is my new number."
+        }
+       ],
+       "time": "20:31"
+      },
+      {
+       "from": "them",
+       "body": [
+        {
+         "text": "I sent a code to your number by mistake.",
+         "spot": "mistake"
+        }
+       ],
+       "time": "20:31"
+      },
+      {
+       "from": "them",
+       "body": [
+        {
+         "text": "Please send me the six-digit code you just got.",
+         "spot": "ask-code"
+        }
+       ],
+       "time": "20:32"
+      },
+      {
+       "from": "them",
+       "body": [
+        {
+         "text": "Hurry, it expires in two minutes.",
+         "spot": "urgency"
+        }
+       ],
+       "time": "20:32"
+      }
+     ]
+    },
+    "spots": [
+     {
+      "id": "unknown-number",
+      "label": "Unknown number",
+      "explain": "A familiar name, but a new number. Call your friend's old number to check."
+     },
+     {
+      "id": "mistake",
+      "label": "\"Sent by mistake\"",
+      "explain": "A code does not reach your number by mistake. Someone is trying to get into your account."
+     },
+     {
+      "id": "ask-code",
+      "label": "Code request",
+      "explain": "If you give this code, the scammer takes over your account and writes to your friends as you."
+     },
+     {
+      "id": "urgency",
+      "label": "Rush",
+      "explain": "Little time leaves no room to think. Never send a code to anyone."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "order",
+    "id": "setup-authenticator",
+    "prompt": "Put the steps to set up an authenticator app in order.",
+    "items": [
+     {
+      "id": "turn-on",
+      "label": "Turn on two-step verification in your account settings"
+     },
+     {
+      "id": "scan",
+      "label": "Scan the QR code on screen with the app"
+     },
+     {
+      "id": "enter-code",
+      "label": "Enter the code the app shows"
+     },
+     {
+      "id": "backup",
+      "label": "Keep the backup codes somewhere safe"
+     }
+    ],
+    "explain": "Backup codes help you get back in if you lose your phone."
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "When you can, choose a passkey or an authenticator app.",
+     "Never tell or send a code to anyone.",
+     "Deny unexpected requests, change your password, report."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 33,
+ "narrationTotalMs": 150980
+}

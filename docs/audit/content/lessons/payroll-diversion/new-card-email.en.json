@@ -1,0 +1,652 @@
+{
+ "module": {
+  "slug": "payroll-diversion",
+  "title": "Payroll diversion",
+  "category": "work"
+ },
+ "lesson": {
+  "id": "new-card-email",
+  "title": "A new card number",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "pd1-tutor",
+    "beats": [
+     {
+      "id": "pd1-b1",
+      "say": "Hello! Today you work in human resources, and tomorrow is payday.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "badge-id"
+      }
+     },
+     {
+      "id": "pd1-b2",
+      "say": "An email arrives in an employee's name: my card changed, pay my salary into a new account.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "email",
+        "from": {
+         "name": [
+          {
+           "text": "Leyla Mammadova"
+          }
+         ],
+         "address": [
+          {
+           "text": "leyla.mammadova.88@poct-mail.example.net"
+          }
+         ]
+        },
+        "subject": [
+         {
+          "text": "Urgent: my salary card changed"
+         }
+        ],
+        "time": "16:40",
+        "body": [
+         [
+          {
+           "text": "Hello, I lost my old card and the bank closed it."
+          }
+         ],
+         [
+          {
+           "text": "Please pay tomorrow's salary into this account: "
+          },
+          {
+           "text": "AZ00SAHL00000000000000004417",
+           "spot": "new-account"
+          }
+         ]
+        ]
+       }
+      },
+      "highlight": "new-account"
+     },
+     {
+      "id": "pd1-b3",
+      "say": "The name is familiar, but the address is a personal mailbox. A fraudster wants the salary in their own account.",
+      "mood": "think",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "hook"
+      }
+     },
+     {
+      "id": "pd1-b4",
+      "say": "The rule is simple: never change bank details because of an email. Call the employee on a number you already know.",
+      "mood": "happy",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "pd1-hotspot",
+    "prompt": "Find the warning signs in this email.",
+    "artifact": {
+     "kind": "email",
+     "from": {
+      "name": [
+       {
+        "text": "Leyla Mammadova"
+       }
+      ],
+      "address": [
+       {
+        "text": "leyla.mammadova.88@poct-mail.example.net",
+        "spot": "personal-address"
+       }
+      ]
+     },
+     "to": "kadr@seherxidmetleri.example",
+     "subject": [
+      {
+       "text": "Urgent: my salary card changed"
+      }
+     ],
+     "time": "16:40",
+     "body": [
+      [
+       {
+        "text": "Dear HR team,"
+       }
+      ],
+      [
+       {
+        "text": "I lost my old card and the bank closed it."
+       }
+      ],
+      [
+       {
+        "text": "Please pay tomorrow's salary into my new account: ",
+        "spot": "new-account"
+       },
+       {
+        "text": "AZ00SAHL00000000000000004417",
+        "spot": "new-account"
+       }
+      ],
+      [
+       {
+        "text": "I am not at work today and my phone is broken. Only reply here.",
+        "spot": "no-call"
+       }
+      ],
+      [
+       {
+        "text": "Please do it by tomorrow morning, I have to pay my rent.",
+        "spot": "urgency"
+       }
+      ],
+      [
+       {
+        "text": "Leyla Mammadova, Utilities Department"
+       }
+      ]
+     ]
+    },
+    "spots": [
+     {
+      "id": "personal-address",
+      "label": "Personal email address",
+      "explain": "Employees usually write from their work address. Anyone can open a personal mailbox under any name."
+     },
+     {
+      "id": "new-account",
+      "label": "New account",
+      "explain": "This is the real goal of the email. Once the salary lands there, getting it back is hard."
+     },
+     {
+      "id": "no-call",
+      "label": "No way to call",
+      "explain": "This line is there to stop you checking. That is exactly why you call the employee on a number you know."
+     },
+     {
+      "id": "urgency",
+      "label": "Pressure",
+      "explain": "Pressure right before payday is a normal part of this scam. A call takes only a few minutes."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "simulation",
+    "id": "pd1-sim",
+    "environment": "inbox",
+    "title": "HR mailbox",
+    "intro": "It is the day before payday. Open the five emails and choose the right step for each one.",
+    "steps": [
+     {
+      "id": "fake-colleague",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "w2f-seher-xidmetleri",
+       "from": {
+        "name": [
+         {
+          "text": "Kamran Aliyev"
+         }
+        ],
+        "address": [
+         {
+          "text": "k.aliyev@seherxidmetleri-mail.example.net"
+         }
+        ]
+       },
+       "to": "kadr@seherxidmetleri.example",
+       "subject": [
+        {
+         "text": "Updating my salary account"
+        }
+       ],
+       "time": "09:12",
+       "body": [
+        [
+         {
+          "text": "Hello, I have switched banks."
+         }
+        ],
+        [
+         {
+          "text": "Please pay the September salary into this account: AZ00ULDZ00000000000000007731"
+         }
+        ],
+        [
+         {
+          "text": "I will bring the form later. Kamran Aliyev, Transport Unit"
+         }
+        ]
+       ]
+      },
+      "say": "Look at the sender's domain.",
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Correct. The domain is not your office's domain, it has an extra word added."
+       },
+       {
+        "id": "verify",
+        "label": "Call Kamran on a number I know",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Well done. Kamran will say he never wrote it, and you will report the email."
+       },
+       {
+        "id": "change",
+        "label": "Reply: account updated",
+        "kind": "reply",
+        "outcome": "compromised",
+        "feedback": "The salary would go to the fraudster. Never accept a bank detail change by email."
+       }
+      ]
+     },
+     {
+      "id": "system-request",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "w2f-kadr-kabineti",
+       "from": {
+        "name": [
+         {
+          "text": "Kadr Kabineti"
+         }
+        ],
+        "address": [
+         {
+          "text": "noreply@kabinet.seherxidmetleri.example"
+         }
+        ]
+       },
+       "to": "kadr@seherxidmetleri.example",
+       "subject": [
+        {
+         "text": "New request: bank detail change, Ayten Huseynova"
+        }
+       ],
+       "time": "10:05",
+       "body": [
+        [
+         {
+          "text": "The employee sent this request in Kadr Kabineti, signed in with two-step verification."
+         }
+        ],
+        [
+         {
+          "text": "Review the request in the system: "
+         },
+         {
+          "text": "View request",
+          "link": {
+           "label": "View request",
+           "href": "https://kabinet.seherxidmetleri.example/sorgular/2187"
+          }
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "open",
+        "label": "View request",
+        "kind": "click-link",
+        "outcome": "safe",
+        "feedback": "Correct. The address is your office's own domain and the request came from inside the system."
+       },
+       {
+        "id": "safe",
+        "label": "Mark as safe",
+        "kind": "mark-safe",
+        "outcome": "safe",
+        "feedback": "Right. A request from the official system is the proper channel."
+       },
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "risky",
+        "feedback": "Caution is good, but this is your office's own system. Bank detail changes should arrive exactly this way."
+       }
+      ]
+     },
+     {
+      "id": "portal-phish",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "w2f-kadr-kabineti-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Kadr Kabineti"
+         }
+        ],
+        "address": [
+         {
+          "text": "kabinet@kadr-kabineti.example.net"
+         }
+        ]
+       },
+       "to": "kadr@seherxidmetleri.example",
+       "subject": [
+        {
+         "text": "Your password expires today"
+        }
+       ],
+       "time": "11:30",
+       "body": [
+        [
+         {
+          "text": "Your access to the payroll sheet will be closed today."
+         }
+        ],
+        [
+         {
+          "text": "To keep access: "
+         },
+         {
+          "text": "Renew password",
+          "link": {
+           "label": "Renew password",
+           "href": "https://kadr-kabineti-giris.example.net/yenile"
+          }
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "The link does not go to your office's domain. If there is no report button, forward the email to the security team."
+       },
+       {
+        "id": "click",
+        "label": "Renew password",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "This is a fake portal. With an HR account, a fraudster can change everyone's bank details."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "safe",
+        "feedback": "Not bad. But if you report it, your colleagues are protected too."
+       }
+      ]
+     },
+     {
+      "id": "payroll-sheet",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "w2f-seher-xidmetleri",
+       "from": {
+        "name": [
+         {
+          "text": "Sabina Gasimova"
+         }
+        ],
+        "address": [
+         {
+          "text": "s.qasimova@seherxidmetleri.example"
+         }
+        ]
+       },
+       "to": "kadr@seherxidmetleri.example",
+       "subject": [
+        {
+         "text": "September payroll: final check"
+        }
+       ],
+       "time": "12:15",
+       "body": [
+        [
+         {
+          "text": "Hello, the sheet is attached. Please review it by 15:00. Sabina, Finance"
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Maas_cedveli_2026_09.xlsx"
+          }
+         ],
+         "size": "96 KB"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "open",
+        "label": "Open attachment",
+        "kind": "open-attachment",
+        "outcome": "safe",
+        "feedback": "Correct. A known colleague, your office's domain and an expected sheet."
+       },
+       {
+        "id": "forward",
+        "label": "Send to my personal email",
+        "kind": "forward",
+        "outcome": "risky",
+        "feedback": "The sheet holds everyone's personal data. Do not send work files to a personal mailbox."
+       },
+       {
+        "id": "safe",
+        "label": "Mark as safe",
+        "kind": "mark-safe",
+        "outcome": "safe",
+        "feedback": "Right. There is no new account and no pressure here."
+       }
+      ]
+     },
+     {
+      "id": "real-address-odd",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "w2f-seher-xidmetleri",
+       "from": {
+        "name": [
+         {
+          "text": "Narmin Safarova"
+         }
+        ],
+        "address": [
+         {
+          "text": "n.seferova@seherxidmetleri.example"
+         }
+        ]
+       },
+       "to": "kadr@seherxidmetleri.example",
+       "subject": [
+        {
+         "text": "New account"
+        }
+       ],
+       "time": "14:48",
+       "body": [
+        [
+         {
+          "text": "Pay my salary into this account: AZ00SAHL00000000000000009260"
+         }
+        ],
+        [
+         {
+          "text": "Do not call, I am in meetings all day."
+         }
+        ]
+       ]
+      },
+      "say": "The address is real. Stay alert anyway.",
+      "actions": [
+       {
+        "id": "verify",
+        "label": "Call her internal number",
+        "kind": "verify",
+        "outcome": "safe",
+        "feedback": "Correct. A mailbox can be taken over, but the real Narmin answers the number you know."
+       },
+       {
+        "id": "ask",
+        "label": "Reply: is this real?",
+        "kind": "reply",
+        "outcome": "risky",
+        "feedback": "If the mailbox is taken over, the fraudster writes the reply. Only a call is a real check."
+       },
+       {
+        "id": "safe",
+        "label": "Mark as safe",
+        "kind": "mark-safe",
+        "outcome": "compromised",
+        "feedback": "The address is real, but the account may be taken over. Always confirm bank detail changes by phone."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "match",
+    "id": "pd1-match",
+    "prompt": "Match each request with the right way to check it.",
+    "pairs": [
+     {
+      "id": "mail-account",
+      "left": "New bank account in an email",
+      "right": "Call the employee on a number you know"
+     },
+     {
+      "id": "system-request",
+      "left": "Request in Kadr Kabineti",
+      "right": "Review it in the system, call if in doubt"
+     },
+     {
+      "id": "password-link",
+      "left": "Password renewal link",
+      "right": "Type the portal address yourself"
+     },
+     {
+      "id": "phone-request",
+      "left": "Employee calls to change the account",
+      "right": "Ask them to send it through Kadr Kabineti"
+     }
+    ],
+    "explain": "Every change is confirmed inside the system or through a channel you choose. A number or link in the email is not a check."
+   },
+   {
+    "type": "scenario",
+    "id": "pd1-scenario",
+    "title": "The salary did not arrive",
+    "start": "n1",
+    "nodes": [
+     {
+      "id": "n1",
+      "text": "Hello, my salary did not reach my card today. I never asked to change my account!",
+      "speaker": "Leyla Mammadova",
+      "voice": "young-woman",
+      "channel": "phone",
+      "manner": "worried",
+      "spoken": "Hello, my salary did not reach my card today. <breath> I never asked to change my account!",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "call",
+        "brandRef": "w2f-seher-xidmetleri",
+        "caller": [
+         {
+          "text": "Leyla Mammadova"
+         }
+        ],
+        "number": [
+         {
+          "text": "Internal 4107"
+         }
+        ],
+        "label": "Internal call"
+       }
+      },
+      "choices": [
+       {
+        "label": "Accounting calls the bank, and I report it to the security team",
+        "next": "n2",
+        "feedback": "Correct. The sooner you report it, the better the chance of getting the money back."
+       },
+       {
+        "label": "I quietly switch the account back",
+        "outcome": "risky",
+        "feedback": "The mistake must be fixed, but not hidden. The bank can try to stop the transfer, and the security team traces what happened."
+       },
+       {
+        "label": "I tell her she wrote the email herself",
+        "outcome": "risky",
+        "feedback": "Leyla did not write that email. What matters is stopping the damage, not finding someone to blame."
+       }
+      ]
+     },
+     {
+      "id": "n2",
+      "text": "Do not delete the email, forward it to me. Were there any other bank detail changes this week?",
+      "speaker": "Fidan Rzayeva, security team",
+      "voice": "woman",
+      "channel": "phone",
+      "manner": "firm",
+      "spoken": "Do not delete the email, forward it to me. <breath> Were there any other bank detail changes this week?",
+      "choices": [
+       {
+        "label": "I forward the email and check every change made this week",
+        "outcome": "safe",
+        "feedback": "Well done. Fraudsters usually write in the names of several employees."
+       },
+       {
+        "label": "I already deleted it, it is not needed",
+        "outcome": "risky",
+        "feedback": "The email is evidence. If you deleted it, restore it from deleted items and forward it."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "recap",
+    "id": "pd1-recap",
+    "points": [
+     "Bank details never change by email.",
+     "Call the employee on a number you know.",
+     "If in doubt, hold the payment and report it."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "fake-salary-portal",
+  "title": "Fake salary portal"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 37,
+ "narrationTotalMs": 213426
+}

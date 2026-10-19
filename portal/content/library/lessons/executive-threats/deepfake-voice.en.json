@@ -1,0 +1,366 @@
+{
+ "id": "deepfake-voice",
+ "title": "A leader's fake voice",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Artificial intelligence can copy a leader's voice from a short recording. Speeches and interviews are enough.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "The name and number on screen can be faked too. A familiar-looking call is not proof.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Saadat Mammadli"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 50 000 47 12",
+         "spot": "number"
+        }
+       ],
+       "label": "Mobile"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "b3",
+     "say": "Agree a check phrase in advance. If the caller does not know it, end the call.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "The safest way: hang up and call the person yourself on the number you know.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "cloned-call",
+   "environment": "call",
+   "title": "The deputy's voice",
+   "intro": "It is eight in the evening. Your phone rings and the deputy's name is on the screen.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Saadat Mammadli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "older-woman"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Answer",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Answering is not dangerous. What matters is what you do next."
+      },
+      {
+       "id": "decline",
+       "label": "Decline",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "That works too. If you are worried, call the deputy yourself on the number you know.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "request",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Saadat Mammadli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "older-woman"
+     },
+     "say": "Hi, it is me, Saadat. I am ill and hoarse. Transfer seventy-five thousand manat to a partner tonight, urgently.",
+     "spoken": "Hi, it is me, Saadat. <throat-clearing> I am ill and hoarse. Transfer seventy-five thousand manat to a partner, uh, tonight, urgently.",
+     "actions": [
+      {
+       "id": "phrase",
+       "label": "Please say our check phrase",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Correct. A phrase you agreed on is a stronger check than a voice."
+      },
+      {
+       "id": "pay",
+       "label": "All right, I will transfer now",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "A familiar voice is no longer proof. This one was made by artificial intelligence and the money is gone."
+      },
+      {
+       "id": "hang",
+       "label": "Hang up, I will call back myself",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Good call. Now ring the deputy on the number you know.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Saadat Mammadli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "older-woman"
+     },
+     "say": "What phrase? I have no time, the minister is waiting! I will send the papers tomorrow, transfer it now.",
+     "spoken": "What phrase? <breath> I have no time, the minister is waiting! I will send the papers tomorrow, transfer it now.",
+     "actions": [
+      {
+       "id": "hang",
+       "label": "Hang up",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Correct. A caller who does not know the phrase and pushes you is fake."
+      },
+      {
+       "id": "pay",
+       "label": "All right, I will transfer",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Pressure is a sign of dodging the check. The money may never come back."
+      },
+      {
+       "id": "details",
+       "label": "Send me the account number",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Keeping the talk going gives the attacker more chances. Hang up."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "The call has ended. What now?",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Saadat Mammadli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "older-woman"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "Call the deputy's number from the phone book",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Correct. A number you dial yourself exposes the fake call at once."
+      },
+      {
+       "id": "report",
+       "label": "Report to the security team",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Your report warns finance and colleagues about the same call."
+      },
+      {
+       "id": "ignore",
+       "label": "Do nothing",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "The attacker may now call another colleague. Check and report."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "check-phrase",
+   "question": {
+    "prompt": "Which makes a good check phrase?",
+    "options": [
+     {
+      "id": "secret",
+      "label": "A word written nowhere that only we two know",
+      "correct": true,
+      "feedback": "Correct. A word that is not online cannot be copied."
+     },
+     {
+      "id": "birthday",
+      "label": "The deputy's date of birth",
+      "correct": false,
+      "feedback": "A date of birth can be found online."
+     },
+     {
+      "id": "office",
+      "label": "The organisation's name and room number",
+      "correct": false,
+      "feedback": "Many people know this, so it is no check."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "key"
+    }
+   },
+   "explain": "Agree the phrase in person and never send it by email or message."
+  },
+  {
+   "type": "match",
+   "id": "voice-signs",
+   "prompt": "Match each fact with what it means.",
+   "pairs": [
+    {
+     "id": "voice",
+     "left": "The voice is familiar",
+     "right": "No proof, it can be copied"
+    },
+    {
+     "id": "caller-id",
+     "left": "A familiar name on screen",
+     "right": "The number can be faked too"
+    },
+    {
+     "id": "urgent",
+     "left": "Urgent and secret",
+     "right": "An attempt to skip the check"
+    },
+    {
+     "id": "phrase",
+     "left": "The check phrase is right",
+     "right": "The most reliable voice check"
+    }
+   ],
+   "explain": "Trust the agreed rule, not the voice or the name on screen."
+  },
+  {
+   "type": "scenario",
+   "id": "video-call",
+   "title": "A video call",
+   "start": "screen",
+   "nodes": [
+    {
+     "id": "screen",
+     "text": "Send the partner the advance tonight.",
+     "speaker": "The minister (video call, the sound breaks up)",
+     "voice": "older-man",
+     "channel": "video",
+     "spoken": "Send the partner the advance <short pause> tonight.",
+     "character": "minister",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     },
+     "choices": [
+      {
+       "label": "I end the call and ring the assistant on the number I know",
+       "next": "assistant",
+       "feedback": "Correct. Video can be faked too, a second channel is still the rule."
+      },
+      {
+       "label": "I can see his face, so it is real",
+       "outcome": "compromised",
+       "feedback": "Artificial intelligence can fake video as well. A picture alone is no proof."
+      }
+     ]
+    },
+    {
+     "id": "assistant",
+     "text": "The minister is travelling and called nobody.",
+     "speaker": "The minister's assistant",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "The minister is travelling <breath> and called nobody.",
+     "character": "assistant",
+     "choices": [
+      {
+       "label": "I report to the security team and note the time and account name",
+       "outcome": "safe",
+       "feedback": "Excellent. These notes help specialists trace the attack."
+      },
+      {
+       "label": "No money left, so I tell nobody",
+       "outcome": "risky",
+       "feedback": "The next target may be the deputy or finance. Reporting protects everyone."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "A familiar voice, face or name is no proof.",
+    "Ask for the check phrase, hang up and call back yourself.",
+    "Report a fake call to the security team at once."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

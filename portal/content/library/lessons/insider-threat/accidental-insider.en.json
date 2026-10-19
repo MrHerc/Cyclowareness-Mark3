@@ -1,0 +1,481 @@
+{
+ "id": "accidental-insider",
+ "title": "Careless mistakes",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ai-tutor",
+   "beats": [
+    {
+     "id": "ai-b1",
+     "say": "Hello! Many data leaks start not with bad intent but with an ordinary mistake.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "ai-b2",
+     "say": "Autocomplete can pick the wrong address. Look at the recipient once more before sending.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "system",
+       "title": [
+        {
+         "text": "External recipient"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "This email is going outside the organisation: "
+         },
+         {
+          "text": "rauf.aliyev@kur-tikinti.example",
+          "spot": "wrong"
+         }
+        ],
+        [
+         {
+          "text": "Attachment: Maas_cedveli_2026.xlsx"
+         }
+        ]
+       ],
+       "buttons": [
+        "Send anyway",
+        "Cancel"
+       ]
+      }
+     },
+     "highlight": "wrong"
+    },
+    {
+     "id": "ai-b3",
+     "say": "Do not upload work files to a personal cloud or to apps your organisation has not approved.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    {
+     "id": "ai-b4",
+     "say": "If you made a mistake, do not hide it. Reporting fast limits the harm, hiding makes it worse.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ai-sim",
+   "environment": "desktop",
+   "title": "An ordinary workday",
+   "intro": "Several requests came in today. For each one, choose how to keep the data safe.",
+   "steps": [
+    {
+     "id": "personal-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Nigar Əliyeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "nigar.aliyeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "List for the report"
+       }
+      ],
+      "time": "09:20",
+      "body": [
+       [
+        {
+         "text": "Hi, I will work from home tonight."
+        }
+       ],
+       [
+        {
+         "text": "Please send the staff list (ID numbers, phones) to my personal mail: nigar.84@poctam.example"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Send the list to her personal mail",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Personal data left your organisation's control. A personal mailbox is not protected and can leak."
+      },
+      {
+       "id": "reply",
+       "label": "Reply: I cannot send it to personal mail",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Right. Working from home goes through approved tools, such as work mail over the VPN."
+      }
+     ]
+    },
+    {
+     "id": "shadow-it",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "fayldasi",
+      "tone": "app",
+      "title": [
+       {
+        "text": "FaylDaşı: free file transfer"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Layihe_smeta.xlsx (2.4 GB) uploaded."
+        }
+       ],
+       [
+        {
+         "text": "Anyone with the link can download the file.",
+         "spot": "public"
+        }
+       ]
+      ],
+      "buttons": [
+       "Copy link",
+       "Cancel"
+      ]
+     },
+     "say": "The file was too big for email, so you found a free site.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Copy the link and send it to the partner",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Whoever gets the link can open the file. Your organisation has no control over this service."
+      },
+      {
+       "id": "cancel",
+       "label": "Cancel and ask IT for the approved way",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Right. IT support will show you the approved way to send a large file safely."
+      }
+     ]
+    },
+    {
+     "id": "wrong-recipient",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "system",
+      "title": [
+       {
+        "text": "External recipient"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "This email is going outside the organisation: "
+        },
+        {
+         "text": "rauf.aliyev@kur-tikinti.example",
+         "spot": "wrong"
+        }
+       ],
+       [
+        {
+         "text": "Attachment: Maas_cedveli_2026.xlsx"
+        }
+       ]
+      ],
+      "buttons": [
+       "Send anyway",
+       "Cancel"
+      ]
+     },
+     "say": "You are sending the salary table to Rauf. Check the address.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Send anyway",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "The salary table went to an outside company. That is a personal data leak."
+      },
+      {
+       "id": "cancel",
+       "label": "Cancel and check the recipient",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Right. Your colleague is Rauf Əlizadə, but autocomplete picked Rauf Əliyev at a partner company."
+      }
+     ]
+    },
+    {
+     "id": "sent-wrong",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "IshPocht",
+      "title": [
+       {
+        "text": "Email sent"
+       }
+      ],
+      "body": [
+       {
+        "text": "Quarterly report: aysel.quliyeva@poctam.example (personal address)"
+       }
+      ],
+      "time": "16:41"
+     },
+     "say": "Another email has already gone to the wrong address.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Tell the security team now",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Right. The sooner you report, the better the chance to recall it and limit the harm."
+      },
+      {
+       "id": "ask",
+       "label": "Write to the recipient: please delete it",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Asking is good but not enough. Tell security first, they will say what to do next."
+      },
+      {
+       "id": "hide",
+       "label": "Tell no one",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "A hidden mistake grows. Reporting is the professional thing to do."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "ai-swipe",
+   "prompt": "Safe or risk?",
+   "cards": [
+    {
+     "id": "badge-photo",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Your post is live"
+       }
+      ],
+      "body": [
+       {
+        "text": "\"My first day!\" The photo shows your badge and an internal system on screen."
+       }
+      ],
+      "time": "12:10"
+     },
+     "verdict": "threat",
+     "explain": "A badge and a work screen give attackers what they need to fake a card and pick targets."
+    },
+    {
+     "id": "portal-share",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Leyla Rzayeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "leyla.rzayeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Estimate shared"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "I shared the file on the internal portal with our department only."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "An approved internal place and limited access. This is the right way to share."
+    },
+    {
+     "id": "group-password",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Office group (34 people)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "The shared system password: Arxiv#2026"
+         }
+        ],
+        "time": "09:02"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "In a group a password reaches many people, sometimes outsiders. Passwords are never shared."
+    },
+    {
+     "id": "personal-cloud",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "buludxidmet",
+      "name": [
+       {
+        "text": "Layihe_budce_2027.xlsx"
+       }
+      ],
+      "type": "xls",
+      "size": "1,4 MB",
+      "source": [
+       {
+        "text": "Personal cloud folder: anyone with the link can view"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "In a personal cloud a work file leaves your organisation's control, and an open link lets anyone in."
+    },
+    {
+     "id": "locked-screen",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "idare",
+      "app": "İdarə",
+      "title": [
+       {
+        "text": "Screen locked"
+       }
+      ],
+      "body": [
+       {
+        "text": "You locked the screen when you left your desk."
+       }
+      ],
+      "time": "13:00"
+     },
+     "verdict": "safe",
+     "explain": "Right. A locked screen stops anyone acting in your name."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ai-match",
+   "prompt": "Match each risk with the right habit.",
+   "pairs": [
+    {
+     "id": "autocomplete",
+     "left": "Autocomplete",
+     "right": "Check the recipient before sending"
+    },
+    {
+     "id": "cloud",
+     "left": "Personal cloud and free sites",
+     "right": "Only approved sharing tools"
+    },
+    {
+     "id": "photo",
+     "left": "Posting photos from the office",
+     "right": "No screens, badges or papers in the frame"
+    },
+    {
+     "id": "sent",
+     "left": "An email sent to the wrong person",
+     "right": "Tell the security team at once"
+    }
+   ],
+   "explain": "These habits prevent most careless leaks."
+  },
+  {
+   "type": "choice",
+   "id": "ai-choice",
+   "question": {
+    "prompt": "A colleague says: \"This free app speeds up work, install it, do not tell IT.\" What do you do?",
+    "options": [
+     {
+      "id": "ask-it",
+      "label": "I ask IT about this or an approved alternative",
+      "correct": true,
+      "feedback": "Right. IT can check whether it is safe or give you an approved alternative."
+     },
+     {
+      "id": "install",
+      "label": "I install it, everyone uses it",
+      "correct": false,
+      "feedback": "An unchecked app can send work data outside. \"Everyone uses it\" does not mean safe."
+     },
+     {
+      "id": "home-pc",
+      "label": "I copy the files to my personal laptop and work there",
+      "correct": false,
+      "feedback": "This is shadow IT too: the data moves to an unprotected device."
+     }
+    ]
+   },
+   "explain": "Apps and devices your organisation has not approved are called shadow IT. If you need something, ask IT for an approved way."
+  },
+  {
+   "type": "recap",
+   "id": "ai-recap",
+   "points": [
+    "Check the recipient before you send",
+    "Keep work files only in approved systems",
+    "Made a mistake? Report it at once"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

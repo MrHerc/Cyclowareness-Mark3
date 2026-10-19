@@ -1,0 +1,487 @@
+{
+ "module": {
+  "slug": "events-delegations",
+  "title": "Events and delegations",
+  "category": "work"
+ },
+ "lesson": {
+  "id": "event-wifi-charging",
+  "title": "Event Wi-Fi and charging",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "intro",
+    "beats": [
+     {
+      "id": "b1",
+      "say": "At events, hundreds of people join one network. An attacker can set up another with the same name.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "wifi"
+      }
+     },
+     {
+      "id": "b2",
+      "say": "An open, strong network with a similar name may be a trap. Ask registration for the right name.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "wifi",
+        "networks": [
+         {
+          "ssid": [
+           {
+            "text": "ReqemYol-Forum"
+           }
+          ],
+          "secured": true,
+          "signal": 3
+         },
+         {
+          "ssid": [
+           {
+            "text": "ReqemYol-Forum-FREE",
+            "spot": "twin"
+           }
+          ],
+          "secured": false,
+          "signal": 4
+         }
+        ]
+       }
+      },
+      "highlight": "twin"
+     },
+     {
+      "id": "b3",
+      "say": "For work, use mobile data or your organisation's VPN. Never type your work password on a Wi-Fi sign-in page.",
+      "mood": "talk",
+      "gesture": "recite",
+      "visual": {
+       "kind": "illustration",
+       "id": "vpn"
+      }
+     },
+     {
+      "id": "b4",
+      "say": "Instead of a public charging station, plug your own adapter into a socket or use your own power bank.",
+      "mood": "think",
+      "gesture": "lean-in",
+      "visual": {
+       "kind": "illustration",
+       "id": "usb"
+      }
+     }
+    ]
+   },
+   {
+    "type": "simulation",
+    "id": "forum-wifi",
+    "environment": "browser",
+    "title": "The forum Wi-Fi",
+    "intro": "At the forum you joined an open network and the browser opened. Choose the right step on each page.",
+    "steps": [
+     {
+      "id": "portal-login",
+      "label": "ReqemYol-Forum-FREE",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "nc-reqemyol-fake",
+       "brand": "RəqəmYol Forum Wi-Fi",
+       "url": [
+        {
+         "text": "http://wifi-reqemyol-forum.example.net/login"
+        }
+       ],
+       "fields": [
+        "Work email",
+        "Work email password"
+       ],
+       "button": "Connect to internet"
+      },
+      "say": "What is this Wi-Fi page asking for?",
+      "actions": [
+       {
+        "id": "login",
+        "label": "Connect to internet",
+        "kind": "enter-credentials",
+        "outcome": "compromised",
+        "feedback": "A Wi-Fi page never needs your work password. Whoever runs this open network now sees it."
+       },
+       {
+        "id": "close",
+        "label": "Close tab",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. Leave the network and ask the registration desk for the right name."
+       },
+       {
+        "id": "disconnect",
+        "label": "Leave network",
+        "kind": "disconnect",
+        "outcome": "safe",
+        "feedback": "Excellent. Leaving an unknown open network is the fastest protection."
+       }
+      ]
+     },
+     {
+      "id": "cert-warning",
+      "artifact": {
+       "kind": "dialog",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Your connection is not secure"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "The certificate for poct.idare.example is not valid."
+         }
+        ],
+        [
+         {
+          "text": "Someone may be trying to read your data."
+         }
+        ]
+       ],
+       "buttons": [
+        "Go back",
+        "Continue anyway"
+       ]
+      },
+      "say": "You open work mail and the browser shows a warning.",
+      "actions": [
+       {
+        "id": "back",
+        "label": "Go back",
+        "kind": "cancel",
+        "outcome": "safe",
+        "feedback": "Correct. This warning can mean someone is in the middle of your connection, so switch to mobile data."
+       },
+       {
+        "id": "proceed",
+        "label": "Continue anyway",
+        "kind": "open",
+        "outcome": "compromised",
+        "feedback": "Skipping the warning can hand your password to whoever sits in the middle. Go back and change networks."
+       }
+      ]
+     },
+     {
+      "id": "setup-download",
+      "artifact": {
+       "kind": "file",
+       "brandRef": "nc-reqemyol-fake",
+       "name": [
+        {
+         "text": "ReqemYol_WiFi_Setup.exe"
+        }
+       ],
+       "type": "exe",
+       "size": "4.1 MB",
+       "source": [
+        {
+         "text": "wifi-reqemyol-forum.example.net"
+        }
+       ]
+      },
+      "say": "The page offers software for the Wi-Fi.",
+      "actions": [
+       {
+        "id": "open",
+        "label": "Open file",
+        "kind": "open",
+        "outcome": "compromised",
+        "feedback": "Joining Wi-Fi needs no software. This file installs malware on the computer."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "safe",
+        "feedback": "Correct. An event network never requires you to install software."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "network-list",
+    "prompt": "Which networks at the event look suspicious? Find them.",
+    "artifact": {
+     "kind": "wifi",
+     "networks": [
+      {
+       "ssid": [
+        {
+         "text": "ReqemYol-Forum"
+        }
+       ],
+       "secured": true,
+       "signal": 3
+      },
+      {
+       "ssid": [
+        {
+         "text": "ReqemYol-Forum-FREE",
+         "spot": "free"
+        }
+       ],
+       "secured": false,
+       "signal": 4
+      },
+      {
+       "ssid": [
+        {
+         "text": "ReqemYol_Forum",
+         "spot": "twin"
+        }
+       ],
+       "secured": false,
+       "signal": 4
+      },
+      {
+       "ssid": [
+        {
+         "text": "Pulsuz_Sarj_WiFi",
+         "spot": "charge"
+        }
+       ],
+       "secured": false,
+       "signal": 2
+      },
+      {
+       "ssid": [
+        {
+         "text": "Lumera-Guest"
+        }
+       ],
+       "secured": true,
+       "signal": 1
+      }
+     ]
+    },
+    "spots": [
+     {
+      "id": "free",
+      "label": "FREE added",
+      "explain": "The network is open and FREE was added to the name. The official name is given at the registration desk."
+     },
+     {
+      "id": "twin",
+      "label": "Look-alike name",
+      "explain": "The name is almost the official one, only one character differs. This may be an evil twin."
+     },
+     {
+      "id": "charge",
+      "label": "Tempting name",
+      "explain": "An open network with a free offer is a classic sign of a trap."
+     }
+    ],
+    "minToFind": 2
+   },
+   {
+    "type": "choice",
+    "id": "charging",
+    "question": {
+     "prompt": "Your phone is at 5 percent and the hall has a public USB charging station. What do you do?",
+     "options": [
+      {
+       "id": "own-adapter",
+       "label": "Plug my own adapter into a wall socket",
+       "correct": true,
+       "feedback": "Correct. A socket delivers only power, not data."
+      },
+      {
+       "id": "powerbank",
+       "label": "Charge from my own power bank",
+       "correct": true,
+       "feedback": "Right. Your own power bank stays under your control."
+      },
+      {
+       "id": "trust",
+       "label": "Connect to the station and tap Trust",
+       "correct": false,
+       "feedback": "Trusting gives the device access to your phone's data. Charging does not need it."
+      },
+      {
+       "id": "stranger-cable",
+       "label": "Borrow the cable of the guest next to me",
+       "correct": false,
+       "feedback": "An unknown cable can hide a chip inside. Carry your own cable and adapter."
+      }
+     ],
+     "multi": true,
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    "explain": "Your own adapter in a socket or your own power bank is the safest. If the phone asks, do not trust."
+   },
+   {
+    "type": "swipe",
+    "id": "event-messages",
+    "prompt": "Things that arrive during the event. Safe, or a threat?",
+    "cards": [
+     {
+      "id": "badge-sms",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "nc-reqemyol",
+       "sender": [
+        {
+         "text": "ReqemYol"
+        }
+       ],
+       "time": "08:30",
+       "messages": [
+        [
+         {
+          "text": "Your badge is ready. Bring your ID card to the registration desk."
+         }
+        ]
+       ]
+      },
+      "verdict": "safe",
+      "explain": "No link, nothing to pay and nothing to type. This is a normal reminder."
+     },
+     {
+      "id": "cert-mail",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "nc-reqemyol-fake",
+       "from": {
+        "name": [
+         {
+          "text": "RəqəmYol Forum"
+         }
+        ],
+        "address": [
+         {
+          "text": "sertifikat@reqemyol-forum.example.info"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Your attendance certificate"
+        }
+       ],
+       "time": "17:05",
+       "body": [
+        [
+         {
+          "text": "Sign in with your work email to download the certificate: "
+         },
+         {
+          "text": "reqemyol-forum.example.info/certificate",
+          "link": {
+           "label": "reqemyol-forum.example.info/certificate",
+           "href": "https://reqemyol-forum.example.info/certificate"
+          }
+         }
+        ]
+       ]
+      },
+      "verdict": "threat",
+      "explain": "The official site is reqemyol-forum.example, and this is a different domain. A certificate never needs your work password."
+     },
+     {
+      "id": "qr-table",
+      "artifact": {
+       "kind": "qr",
+       "caption": [
+        {
+         "text": "Sticker on the table: scan for free Wi-Fi"
+        }
+       ],
+       "destination": [
+        {
+         "text": "http://wifi-giris.example.info/connect"
+        }
+       ]
+      },
+      "verdict": "threat",
+      "explain": "Anyone can put up a sticker, and the address is not the forum's. Ask the registration desk for the network name."
+     },
+     {
+      "id": "session-note",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "nc-reqemyol",
+       "app": "RəqəmYol Forum",
+       "title": [
+        {
+         "text": "Session starts in 15 minutes"
+        }
+       ],
+       "body": [
+        {
+         "text": "Cybersecurity panel, Hall B."
+        }
+       ],
+       "time": "13:45"
+      },
+      "verdict": "safe",
+      "explain": "This comes from the app you installed from the official store. No link and no request."
+     },
+     {
+      "id": "trust-prompt",
+      "artifact": {
+       "kind": "dialog",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Trust this device?"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "The connected device wants access to your phone's files."
+         }
+        ]
+       ],
+       "buttons": [
+        "Don't trust",
+        "Trust"
+       ]
+      },
+      "verdict": "threat",
+      "explain": "A charging station should not ask for your files. Choose Don't trust and charging carries on."
+     }
+    ]
+   },
+   {
+    "type": "recap",
+    "id": "recap",
+    "points": [
+     "Ask the registration desk for the network name, and use mobile data or VPN for work.",
+     "Never type your work password on a Wi-Fi page or skip a certificate warning.",
+     "Charge with your own adapter in a socket or your own power bank."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": null,
+ "isLastLesson": true,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 2,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 32,
+ "narrationTotalMs": 178317
+}

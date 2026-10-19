@@ -1,0 +1,531 @@
+{
+ "module": {
+  "slug": "extortion-emails",
+  "title": "Extortion emails",
+  "category": "email"
+ },
+ "lesson": {
+  "id": "bluff-letter",
+  "title": "A bluff email",
+  "minutes": 3,
+  "scenes": [
+   {
+    "type": "tutor",
+    "id": "bl-tutor",
+    "beats": [
+     {
+      "id": "bl-b1",
+      "say": "Hello! Sometimes a frightening email arrives: I hacked your camera, pay or I will publish your private videos.",
+      "mood": "talk",
+      "gesture": "wave",
+      "visual": {
+       "kind": "illustration",
+       "id": "eye"
+      }
+     },
+     {
+      "id": "bl-b2",
+      "say": "The email even shows an old password of yours. It usually comes from a data leak years ago.",
+      "mood": "alert",
+      "gesture": "point-left",
+      "visual": {
+       "kind": "artifact",
+       "artifact": {
+        "kind": "email",
+        "from": {
+         "name": [
+          {
+           "text": "Anonymous"
+          }
+         ],
+         "address": [
+          {
+           "text": "anonim.7781@mail-relay.example.net"
+          }
+         ]
+        },
+        "to": "you@idare.example",
+        "subject": [
+         {
+          "text": "Your password: "
+         },
+         {
+          "text": "Gunes2019",
+          "spot": "password"
+         },
+         {
+          "text": ". You have 48 hours"
+         }
+        ],
+        "time": "08:47",
+        "body": [
+         [
+          {
+           "text": "I got into your device and recorded private videos with your camera."
+          }
+         ]
+        ]
+       }
+      },
+      "highlight": "password"
+     },
+     {
+      "id": "bl-b3",
+      "say": "Emails like this go to thousands of people at once. There is no video from your camera.",
+      "mood": "think",
+      "gesture": "shrug",
+      "visual": {
+       "kind": "illustration",
+       "id": "inbox"
+      }
+     },
+     {
+      "id": "bl-b4",
+      "say": "The rule: do not pay or reply, change the password, and report work mail to security.",
+      "mood": "happy",
+      "gesture": "shield-up",
+      "visual": {
+       "kind": "illustration",
+       "id": "shield"
+      }
+     }
+    ]
+   },
+   {
+    "type": "hotspot",
+    "id": "bl-hotspot",
+    "prompt": "Find the scammer's tricks in this email.",
+    "artifact": {
+     "kind": "email",
+     "from": {
+      "name": [
+       {
+        "text": "Anonymous"
+       }
+      ],
+      "address": [
+       {
+        "text": "anonim.7781@mail-relay.example.net"
+       }
+      ]
+     },
+     "to": "you@idare.example",
+     "subject": [
+      {
+       "text": "Your password: "
+      },
+      {
+       "text": "Gunes2019",
+       "spot": "password"
+      },
+      {
+       "text": ". You have 48 hours"
+      }
+     ],
+     "time": "08:47",
+     "body": [
+      [
+       {
+        "text": "I got into your device and recorded private videos with your camera.",
+        "spot": "camera"
+       }
+      ],
+      [
+       {
+        "text": "As proof I am writing your password. If you do not want the videos published, send bitcoin worth 1,500 AZN to:"
+       }
+      ],
+      [
+       {
+        "text": "bc1q000000000000000000000000000000demo",
+        "spot": "btc"
+       }
+      ],
+      [
+       {
+        "text": "You have 48 hours to pay. Do not show this email to anyone.",
+        "spot": "timer"
+       }
+      ]
+     ]
+    },
+    "spots": [
+     {
+      "id": "password",
+      "label": "Old password",
+      "explain": "This password comes from an old data leak. It does not prove a hack, but change it everywhere you still use it."
+     },
+     {
+      "id": "camera",
+      "label": "Camera claim",
+      "explain": "This is a bluff. The same text goes to thousands of addresses and there is no video."
+     },
+     {
+      "id": "btc",
+      "label": "Bitcoin address",
+      "explain": "A crypto payment cannot be reversed. If you pay, a new demand will follow."
+     },
+     {
+      "id": "timer",
+      "label": "48 hours",
+      "explain": "The deadline is there to scare you and stop you thinking. Do not pay and do not reply."
+     }
+    ],
+    "minToFind": 3
+   },
+   {
+    "type": "match",
+    "id": "bl-match",
+    "prompt": "Match each claim in the email with the truth.",
+    "pairs": [
+     {
+      "id": "camera",
+      "left": "I hacked your camera",
+      "right": "No proof, the text is sent in bulk"
+     },
+     {
+      "id": "password",
+      "left": "Here is your password",
+      "right": "Taken from an old data leak"
+     },
+     {
+      "id": "house",
+      "left": "A photo of your house is attached",
+      "right": "Address from a leak, photo from a public map"
+     },
+     {
+      "id": "timer",
+      "left": "You have 48 hours",
+      "right": "A fake deadline to scare you"
+     }
+    ],
+    "explain": "Everything the scammer knows is public or leaked data. It was put together to frighten you."
+   },
+   {
+    "type": "simulation",
+    "id": "bl-sim",
+    "environment": "inbox",
+    "title": "Your work mail",
+    "intro": "You open your work mailbox at the ministry. Choose the right move for each of the four emails.",
+    "steps": [
+     {
+      "id": "sextortion",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Anonymous"
+         }
+        ],
+        "address": [
+         {
+          "text": "anonim.7781@mail-relay.example.net"
+         }
+        ]
+       },
+       "to": "you@idare.example",
+       "subject": [
+        {
+         "text": "Your password: Gunes2019. You have 48 hours"
+        }
+       ],
+       "time": "08:47",
+       "body": [
+        [
+         {
+          "text": "I got into your device and recorded private videos with your camera."
+         }
+        ],
+        [
+         {
+          "text": "If you do not want the videos published, send bitcoin worth 1,500 AZN to: bc1q000000000000000000000000000000demo"
+         }
+        ],
+        [
+         {
+          "text": "You have 48 hours to pay."
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. The security team can remove the same email from other colleagues' mailboxes too."
+       },
+       {
+        "id": "reply",
+        "label": "Reply: show me proof",
+        "kind": "reply",
+        "outcome": "risky",
+        "feedback": "A reply shows that your address is active and brings more emails. Do not reply."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "safe",
+        "feedback": "Deleting is fine. In work mail, though, reporting it first is better."
+       }
+      ]
+     },
+     {
+      "id": "house-photo",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "The Watcher"
+         }
+        ],
+        "address": [
+         {
+          "text": "watcher.0042@anon-post.example.net"
+         }
+        ]
+       },
+       "to": "you@idare.example",
+       "subject": [
+        {
+         "text": "Do you see the photo of your house?"
+        }
+       ],
+       "time": "09:05",
+       "body": [
+        [
+         {
+          "text": "This is your house. I know your address and your password."
+         }
+        ],
+        [
+         {
+          "text": "Send 1,500 AZN in bitcoin, or the videos will be published."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "ev_unvan.jpg"
+          }
+         ],
+         "size": "212 KB"
+        }
+       ]
+      },
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Right. The house photo comes from a public map, so this is a mass bluff too."
+       },
+       {
+        "id": "open",
+        "label": "Open photo",
+        "kind": "open-attachment",
+        "outcome": "risky",
+        "feedback": "The photo is meant to scare you more. Do not open a suspicious attachment, report the email."
+       },
+       {
+        "id": "promise",
+        "label": "Reply: I will pay",
+        "kind": "reply",
+        "outcome": "compromised",
+        "feedback": "Paying or promising to pay brings new demands. Do not pay and do not reply."
+       }
+      ]
+     },
+     {
+      "id": "security-notice",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "it-tehlukesizlik",
+       "from": {
+        "name": [
+         {
+          "text": "IT Security"
+         }
+        ],
+        "address": [
+         {
+          "text": "security@idare.example"
+         }
+        ]
+       },
+       "to": "you@idare.example",
+       "subject": [
+        {
+         "text": "Warning: extortion emails"
+        }
+       ],
+       "time": "09:20",
+       "body": [
+        [
+         {
+          "text": "Today some colleagues received extortion emails showing an old password."
+         }
+        ],
+        [
+         {
+          "text": "Do not pay and do not reply. Send the email with the Report button."
+         }
+        ],
+        [
+         {
+          "text": "If you still use that password, change it."
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "safe",
+        "label": "Mark as safe",
+        "kind": "mark-safe",
+        "outcome": "safe",
+        "feedback": "Right. This email asks for nothing, it only repeats the right rules."
+       },
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "risky",
+        "feedback": "Caution is good, but this email comes from your organisation's own address and asks for nothing."
+       }
+      ]
+     },
+     {
+      "id": "fake-reset",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "it-tehlukesizlik-fake",
+       "from": {
+        "name": [
+         {
+          "text": "IT Security"
+         }
+        ],
+        "address": [
+         {
+          "text": "security@idare-support.example.net"
+         }
+        ]
+       },
+       "to": "you@idare.example",
+       "subject": [
+        {
+         "text": "Your account is hacked: change your password now"
+        }
+       ],
+       "time": "09:34",
+       "body": [
+        [
+         {
+          "text": "Received an extortion email? Your account is in danger."
+         }
+        ],
+        [
+         {
+          "text": "Change your password here",
+          "link": {
+           "label": "Change your password here",
+           "href": "https://idare-support.example.net/parol"
+          }
+         }
+        ],
+        [
+         {
+          "text": "If you do not change it within 30 minutes, the account will be locked."
+         }
+        ]
+       ]
+      },
+      "actions": [
+       {
+        "id": "report",
+        "label": "Report phishing",
+        "kind": "report",
+        "outcome": "safe",
+        "feedback": "Well done. This is a second trap that feeds on fear, and the domain is not your organisation's."
+       },
+       {
+        "id": "click",
+        "label": "Open link",
+        "kind": "click-link",
+        "outcome": "compromised",
+        "feedback": "The fake page would have stolen your password. Change it only in the official system you open yourself."
+       },
+       {
+        "id": "delete",
+        "label": "Delete",
+        "kind": "delete",
+        "outcome": "safe",
+        "feedback": "Deleting is fine. If you report it, other colleagues are protected too."
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "choice",
+    "id": "bl-choice",
+    "question": {
+     "prompt": "An extortion email shows a map photo of your house and your address. What does it mean?",
+     "options": [
+      {
+       "id": "public",
+       "label": "The address came from a leak, the photo from a public map",
+       "correct": true,
+       "feedback": "Right. Knowing your address does not mean your camera was hacked."
+      },
+      {
+       "id": "real",
+       "label": "They really are watching, so I have to pay",
+       "correct": false,
+       "feedback": "Paying ends nothing, it brings a new demand. Report the email."
+      },
+      {
+       "id": "ask",
+       "label": "I should reply and ask who they are",
+       "correct": false,
+       "feedback": "A reply shows your address is active. The scammer will send more emails."
+      }
+     ]
+    },
+    "explain": "The scammer combines public and leaked data to create fear. Do not pay or reply, and if you feel in danger, contact the police."
+   },
+   {
+    "type": "recap",
+    "id": "bl-recap",
+    "points": [
+     "A mass email saying I hacked your camera is a bluff: do not pay, do not reply.",
+     "If you still use the old password from the email, change it everywhere.",
+     "In work mail, report such an email to the security team."
+    ],
+    "mood": "celebrate"
+   }
+  ]
+ },
+ "nextLesson": {
+  "id": "calm-response",
+  "title": "A calm response"
+ },
+ "isLastLesson": false,
+ "locale": "en",
+ "userId": "da355075-30d7-492f-a9d5-fba88d657c88",
+ "timeLimitsEnabled": true,
+ "difficulty": 1,
+ "timerPreference": "standard",
+ "contentRevision": "$undefined",
+ "appBuild": "73dade9955fdb7418d647f02c02b94673053cf66",
+ "narrationClipCount": 29,
+ "narrationTotalMs": 164974
+}
