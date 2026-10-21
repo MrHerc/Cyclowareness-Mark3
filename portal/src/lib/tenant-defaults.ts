@@ -90,6 +90,38 @@ export function defaultSettings(locale = "az"): TenantSettings {
   };
 }
 
+type Group = Record<string, unknown>;
+const group = (v: unknown): Group => (v && typeof v === "object" && !Array.isArray(v) ? (v as Group) : {});
+
+/**
+ * Stored settings over the current defaults, group by group. A tenant row written by an older
+ * release (or with a group missing) then reads like a complete one: a key added later gets its
+ * default instead of undefined. Values that are optional by design (identity.sso, identity.ldap,
+ * notification templates, the integration targets) are kept exactly as stored.
+ */
+export function withDefaults(raw: unknown): TenantSettings {
+  const r = group(raw) as Partial<TenantSettings> & Group;
+  const d = defaultSettings(typeof r.defaultLocale === "string" && r.defaultLocale ? r.defaultLocale : "az");
+  const integrations = group(r.integrations);
+  return {
+    ...r,
+    defaultLocale: d.defaultLocale,
+    locales: Array.isArray(r.locales) && r.locales.length ? r.locales.filter((l): l is string => typeof l === "string") : d.locales,
+    protection: { ...d.protection, ...group(r.protection) },
+    learning: { ...d.learning, ...group(r.learning) },
+    attestationText: { ...d.attestationText, ...group(r.attestationText) } as Record<string, string>,
+    certificate: { ...d.certificate, ...group(r.certificate) },
+    notifications: { ...d.notifications, ...group(r.notifications) },
+    identity: { ...d.identity, ...group(r.identity) },
+    email: { ...d.email, ...group(r.email) },
+    integrations: {
+      ...d.integrations,
+      ...integrations,
+      webhookEvents: Array.isArray(integrations.webhookEvents) ? integrations.webhookEvents.filter((e): e is string => typeof e === "string") : [],
+    },
+  } as TenantSettings;
+}
+
 /** Plans (docs/business pricing): each adds to the one before. */
 export const PLAN_FEATURES = {
   essentials: ["learning", "league", "certificates", "policies", "campaigns", "reports", "lab", "paths", "support", "feedback", "live_sessions"],

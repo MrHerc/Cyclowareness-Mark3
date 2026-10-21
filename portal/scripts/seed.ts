@@ -22,12 +22,30 @@ import { hashPassword } from "../src/server/auth/password";
 import { analyzeFile, analyzeUrl } from "../src/server/sandbox/analyze";
 import { TEMPLATE_BY_KEY } from "../src/lib/campaigns/templates";
 import { DEFAULT_ATTESTATION, defaultSettings } from "../src/lib/tenant-defaults";
+import { departmentKey } from "../src/lib/departments";
 import { REPORT_BONUS_XP, LAB_XP, dayKey } from "../src/lib/domain/gamification";
 import { DEMO_DOMAIN, DEPARTMENTS, PEOPLE, emailFor, mulberry32, type DeptKey, type SeedPerson } from "./seed-data";
 
-if (process.env.NODE_ENV === "production" && process.env.ALLOW_SEED !== "1") {
-  console.error("Refusing to seed in production. Set ALLOW_SEED=1 if you really mean it.");
+// The seed TRUNCATES EVERY TABLE. Only the local embedded database is seeded without asking: any
+// DATABASE_URL (a real PostgreSQL, wherever NODE_ENV points) needs an explicit ALLOW_SEED=1.
+if ((process.env.DATABASE_URL || process.env.NODE_ENV === "production") && process.env.ALLOW_SEED !== "1") {
+  console.error(
+    "Refusing to seed: it deletes every row of the target database and loads the demo organisation.\n" +
+      "DATABASE_URL (or NODE_ENV=production) is set. Set ALLOW_SEED=1 only for a fresh or throwaway database.",
+  );
   process.exit(1);
+}
+
+/** Host and database name of DATABASE_URL, never the credentials. */
+function seedTarget(): string {
+  const url = process.env.DATABASE_URL;
+  if (!url) return "embedded database (.data/pg)";
+  try {
+    const u = new URL(url);
+    return `postgres ${u.hostname}${u.port ? `:${u.port}` : ""}${u.pathname}`;
+  } catch {
+    return "postgres (DATABASE_URL)";
+  }
 }
 
 /** Demo password for every seeded account. Override with SEED_PASSWORD. */
@@ -53,7 +71,7 @@ type Mod = { id: string; slug: string; category: string; xp: number; lessons: Le
 
 async function main() {
   const { db, close, driver } = createDb();
-  console.log(`Seeding (${driver})…`);
+  console.log(`Seeding (${driver}) ${seedTarget()}: every table is emptied first…`);
   await truncateAll(db);
 
   const lib = await syncLibrary(db);
@@ -95,8 +113,8 @@ async function main() {
   });
 
   /* ───────── demo organisation ───────── */
-  // The real wordmark (drop it in as public/brand/safarov-industries-wordmark.png) wins over the SVG stand-in.
-  const logoCandidates = ["safarov-industries-wordmark.png", "safarov-industries.svg"];
+  // The organisation's wordmark (transparent PNG); without the file the demo tenant shows its initial.
+  const logoCandidates = ["safarov-industries-wordmark.png"];
   const logoName = logoCandidates.find((f) => fs.existsSync(path.join(process.cwd(), "public", "brand", f)));
   const settings = defaultSettings("az");
   settings.email = { enabled: false, helpdesk: `helpdesk@${DEMO_DOMAIN}` };
@@ -120,7 +138,7 @@ async function main() {
   for (const d of DEPARTMENTS) {
     const [row] = await db
       .insert(t.departments)
-      .values({ tenantId, name: d.name, parentId: d.parent ? deptIds.get(d.parent)! : null, createdAt: daysAgo(58) })
+      .values({ tenantId, name: d.name, nameKey: departmentKey(d.name), parentId: d.parent ? deptIds.get(d.parent)! : null, createdAt: daysAgo(58) })
       .returning();
     deptIds.set(d.key, row.id);
   }

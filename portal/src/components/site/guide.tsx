@@ -163,14 +163,25 @@ export function GuideProvider({ lang, memoryDays, children }: { lang: string; me
         timer.current = window.setTimeout(next, Math.max(1600, shown.length * 55));
         return;
       }
+      // The queue moves on exactly once: when the line was spoken, after the reading time when the
+      // engine failed (unsupported voice, busy audio, blocked), or from a safety timer when the engine
+      // reports neither, so a chapter waiting for the queue (the phone call) can never get stuck.
+      const reading = Math.max(1600, shown.length * 55);
+      let settled = false;
+      const advance = (delay: number) => {
+        if (settled || my !== run.current) return;
+        settled = true;
+        clearTimer();
+        timer.current = window.setTimeout(next, delay);
+      };
+      clearTimer();
+      timer.current = window.setTimeout(() => advance(0), reading * 2 + 3000);
       nSpeak(text, {
         voice: line.voice === "caller" ? "man" : "tutor",
         lang: q.opts.lang,
         onWord: (i) => my === run.current && setCaption({ line, word: i }),
-        onEnd: () => {
-          clearTimer();
-          timer.current = window.setTimeout(next, 250);
-        },
+        onEnd: () => advance(250),
+        onError: () => advance(reading),
       });
     },
     [activated, supported, nSpeak],

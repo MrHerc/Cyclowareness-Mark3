@@ -1,3 +1,4 @@
+import { isUuid } from "@/lib/ids";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
@@ -13,7 +14,7 @@ import { numericDate } from "@/lib/time";
 import { SignForm } from "./sign-form";
 
 async function load(id: string, tenantId: string) {
-  if (!/^[0-9a-f-]{36}$/.test(id)) return null;
+  if (!isUuid(id)) return null;
   const [policy] = await db()
     .select()
     .from(t.policies)
@@ -109,7 +110,7 @@ export default async function PolicyReader({ params, searchParams }: PageProps<"
                   .filter((h) => h.level === 2)
                   .map((h) => (
                     <li key={h.id}>
-                      <a href={`#${h.id}`} className="block rounded-md px-2 py-1 text-ink-muted hover:bg-sunken hover:text-ink">
+                      <a href={`#${h.id}`} className="flex items-center rounded-md px-2 py-1 text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:min-h-11">
                         {h.text}
                       </a>
                     </li>

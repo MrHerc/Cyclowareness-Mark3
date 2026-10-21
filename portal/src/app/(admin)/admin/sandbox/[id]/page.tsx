@@ -1,13 +1,13 @@
-import { notFound } from "next/navigation";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Download, FlaskConical, Siren } from "lucide-react";
-import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
+import { allowed, hasFeature } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
 import { peopleById } from "@/server/queries/secops";
 import { ButtonAnchor, ButtonLink } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/layout";
 import { AnalysisResult } from "@/components/sandbox/sandbox-panel";
+import { analysisForPage } from "./analysis";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.nav");
@@ -15,12 +15,7 @@ export async function generateMetadata() {
 }
 
 export default async function SandboxAnalysisPage({ params }: PageProps<"/admin/sandbox/[id]">) {
-  const v = await requirePermission("secops.read");
-  if (!hasFeature(v, "sandbox")) notFound();
-  const { id } = await params;
-  if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
-  const [a] = await db().select().from(t.sandboxAnalyses).where(and(eq(t.sandboxAnalyses.id, id), eq(t.sandboxAnalyses.tenantId, v.tenant.id)));
-  if (!a) notFound();
+  const { v, a } = await analysisForPage((await params).id);
   const [tr, tn, format] = await Promise.all([getTranslations("secops.sandbox"), getTranslations("admin.nav"), getFormatter()]);
   const [incident] = a.incidentId ? await db().select({ id: t.incidents.id, number: t.incidents.number }).from(t.incidents).where(eq(t.incidents.id, a.incidentId)) : [];
   const people = await peopleById(v.tenant.id, [a.submittedBy]);

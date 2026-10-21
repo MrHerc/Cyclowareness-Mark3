@@ -5,15 +5,17 @@
   "scripts": {
     "dev": "next dev --webpack",
     "build": "next build --webpack",
-    "start": "next start",
+    "postbuild": "node -e \"require('fs').rmSync('.next/standalone/.data',{recursive:true,force:true})\" && node scripts/check-build.mjs",
+    "start": "node scripts/start-standalone.mjs",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed.ts",
     "db:reset": "node -e \"require('fs').rmSync('.data/pg',{recursive:true,force:true})\" && npm run db:migrate && npm run db:seed",
     "content:sync": "tsx scripts/sync-content.ts",
+    "jobs": "tsx --conditions=react-server scripts/jobs.ts",
     "setup": "npm run db:migrate && npm run db:seed"
   },
   "dependencies": {

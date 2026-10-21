@@ -1,18 +1,19 @@
 "use client";
 
-import { useRef, useState, useSyncExternalStore, useTransition } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Award, Check, ChevronRight, Clock, Headphones, Home, MessageCircleQuestion, MessageSquareWarning, Mic, MoreHorizontal, RotateCcw, Volume2, VolumeX, X, Zap } from "lucide-react";
 import type { Brand, Scene } from "@/lib/content/types";
 import { Mascot } from "@/components/mascot/mascot";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { Segmented, Textarea } from "@/components/ui/field";
-import { SubmitButton } from "@/components/ui/submit-button";
+import { Segmented } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
+import { ProblemForm } from "@/components/learner/problem-form";
 import { BrandsProvider } from "./artifacts";
+import { answerIdsOf, lessonStateKey, parseLesson, serializeLesson, type SavedLesson } from "./resume";
 import { useNarrator } from "./narrator";
 import { TutorPanel } from "./tutor-panel";
 import {
@@ -30,10 +31,12 @@ import {
   type PlayerAnswer,
   type SceneEnv,
 } from "./scenes";
-import { attestModuleAction, completeLessonAction, reportProblemAction, startLessonAction, type LessonResult } from "@/server/actions/learning";
+import { attestModuleAction, completeLessonAction, startLessonAction, type LessonResult } from "@/server/actions/learning";
 import { setPreferencesAction } from "@/server/actions/preferences";
 
 export type PlayerProps = {
+  /** The signed-in learner: the saved lesson position is kept per learner. */
+  viewerId: string;
   slug: string;
   moduleTitle: string;
   topic: string;
@@ -83,14 +86,49 @@ function subscribeSpeed(fn: () => void) {
   return () => void speedListeners.delete(fn);
 }
 
+/**
+ * The lesson position and result live in this tab's sessionStorage (see resume.ts), read as an
+ * external store so the server render and hydration agree on a fresh intro. Only this component
+ * writes the entry, and it re-reads it on every render, so no change notifications are needed.
+ */
+const noSubscribe = () => () => {};
+function readSaved(key: string): string | null {
+  try {
+    return sessionStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+function writeSaved(key: string, value: string) {
+  try {
+    sessionStorage.setItem(key, value);
+  } catch {
+    /* storage full or unavailable: the lesson still works, it just cannot resume after a reload */
+  }
+}
+
+/**
+ * The done screen is tied to its history entry by "?done=1" (the result itself is in
+ * sessionStorage), so reloading it shows the result again while opening the lesson anew shows
+ * the intro. Native history calls keep the Next.js router in sync without a server round trip.
+ */
+function setDoneParam(on: boolean) {
+  const url = new URL(window.location.href);
+  if (on) url.searchParams.set("done", "1");
+  else url.searchParams.delete("done");
+  window.history.replaceState(null, "", url.pathname + url.search + url.hash);
+}
+
 export function LessonPlayer(p: PlayerProps) {
   const t = useTranslations("player");
   const tc = useTranslations("common");
   const locale = useLocale();
-  const router = useRouter();
+  const doneParam = useSearchParams().get("done") === "1";
   const [phase, setPhase] = useState<"intro" | "playing" | "done">("intro");
   const [index, setIndex] = useState(0);
   const [inner, setInner] = useState(0);
+  // The in-scene position a resumed lesson reopens at; it applies to the first scene shown only.
+  const [resumeInner, setResumeInner] = useState<number | null>(null);
   const [soundOn, setSoundOn] = useState(p.soundOn);
   const speed = useSyncExternalStore(subscribeSpeed, readSpeed, () => 1);
   const [motion, setMotion] = useState(p.motion);
@@ -104,24 +142,48 @@ export function LessonPlayer(p: PlayerProps) {
 
   const scenes = p.lesson.scenes;
   const scene = scenes[index];
-  const progress = phase === "done" ? 1 : phase === "intro" ? 0 : (index + Math.min(inner, 0.95)) / scenes.length;
+  const sceneIds = useMemo(() => scenes.map((s) => s.id), [scenes]);
+  const answerIds = useMemo(() => answerIdsOf(scenes), [scenes]);
+  const storageKey = lessonStateKey(p.viewerId, p.slug, p.lesson.key);
+  const savedRaw = useSyncExternalStore(noSubscribe, () => readSaved(storageKey), () => null);
+  const saved = useMemo(() => parseLesson(savedRaw, sceneIds, answerIds), [savedRaw, sceneIds, answerIds]);
+  // A lesson left part-way offers to continue; one finished in this history entry shows its result.
+  const resumable = phase === "intro" && saved?.kind === "playing" && (saved.index > 0 || saved.inner > 0 || saved.answers.length > 0) ? saved : null;
+  const restoredDone = phase === "intro" && doneParam && saved?.kind === "done" ? saved : null;
+  const progress = phase === "done" || restoredDone ? 1 : phase === "intro" ? 0 : (index + Math.min(inner, 0.95)) / scenes.length;
 
-  const begin = () => {
-    started.current = Date.now();
+  const save = (state: SavedLesson) => writeSaved(storageKey, serializeLesson(state, sceneIds));
+  const savePosition = (at: number, within = 0) => save({ kind: "playing", index: at, inner: within, answers: answers.current, elapsedMs: Date.now() - started.current });
+
+  const begin = (from: Extract<SavedLesson, { kind: "playing" }> | null) => {
+    const at = from?.index ?? 0;
+    answers.current = from ? [...from.answers] : [];
+    started.current = Date.now() - (from?.elapsedMs ?? 0);
+    setIndex(at);
+    setInner(from?.inner ?? 0);
+    setResumeInner(from?.inner || null);
     setPhase("playing");
+    savePosition(at, from?.inner ?? 0);
+    if (doneParam) setDoneParam(false);
     void startLessonAction(p.slug, p.lesson.key);
   };
 
   const nextScene = () => {
     narrator.stop();
     setInner(0);
-    if (index + 1 < scenes.length) setIndex(index + 1);
+    setResumeInner(null);
+    if (index + 1 < scenes.length) {
+      setIndex(index + 1);
+      savePosition(index + 1);
+    }
   };
 
   const previousScene = () => {
     narrator.stop();
     setInner(0);
+    setResumeInner(null);
     setIndex(index - 1);
+    savePosition(index - 1);
   };
 
   const finish = async () => {
@@ -138,9 +200,13 @@ export function LessonPlayer(p: PlayerProps) {
         toast(t("tutor.error"), "error");
         return;
       }
+      // No router.refresh() here: every link on the done screen leads to a freshly rendered page,
+      // and a refresh that fell back to a full reload would drop this screen (XP, attestation
+      // prompt). The result is saved as well, so reloading this history entry shows it again.
+      save({ kind: "done", result: res, token: null });
+      setDoneParam(true);
       setResult(res);
       setPhase("done");
-      router.refresh();
     } catch {
       // A rejected action (offline, server error) must not leave the recap stuck on "Saving".
       toast(t("tutor.error"), "error");
@@ -157,10 +223,16 @@ export function LessonPlayer(p: PlayerProps) {
     timer: p.timeLimitSeconds,
     onAnswer: (a) => {
       // Going back and replaying a scene must not record the same answer twice.
-      if (!answers.current.some((x) => x.sceneId === a.sceneId && (x.itemId ?? null) === (a.itemId ?? null))) answers.current.push(a);
+      if (answers.current.some((x) => x.sceneId === a.sceneId && (x.itemId ?? null) === (a.itemId ?? null))) return;
+      answers.current.push(a);
+      savePosition(index, inner);
     },
     onDone: nextScene,
-    onProgress: setInner,
+    onProgress: (fraction) => {
+      setInner(fraction);
+      savePosition(index, fraction);
+    },
+    resumeProgress: resumeInner ?? undefined,
   };
 
   const toggleSound = () => {
@@ -201,7 +273,7 @@ export function LessonPlayer(p: PlayerProps) {
         </header>
 
         <main id="main" className="protected mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 pt-6 sm:px-6 lg:pt-10">
-          {phase === "intro" ? (
+          {phase === "intro" && !restoredDone ? (
             <div className="grid flex-1 place-items-center pb-16 text-center">
               <div className="animate-reveal">
                 <Mascot mood="happy" gesture="wave" gestureKey="intro" className="mx-auto size-52 animate-float sm:size-64" topic={p.topic as never} still={motion === "still"} />
@@ -219,9 +291,21 @@ export function LessonPlayer(p: PlayerProps) {
                     </span>
                   ) : null}
                 </div>
-                <Button size="lg" className="mt-8 min-w-56" onClick={begin} icon={p.completedBefore ? <RotateCcw /> : undefined}>
-                  {p.completedBefore ? t("review") : t("start")}
-                </Button>
+                {resumable ? (
+                  <div className="mt-8 flex flex-col items-center gap-3">
+                    <Button size="lg" className="min-w-56" onClick={() => begin(resumable)} iconRight={<ChevronRight />}>
+                      {t("continue")}
+                    </Button>
+                    <p className="text-caption font-semibold text-ink-muted">{t("step", { current: resumable.index + 1, total: scenes.length })}</p>
+                    <Button variant="secondary" onClick={() => begin(null)} icon={<RotateCcw />}>
+                      {t("startOver")}
+                    </Button>
+                  </div>
+                ) : (
+                  <Button size="lg" className="mt-8 min-w-56" onClick={() => begin(null)} icon={p.completedBefore ? <RotateCcw /> : undefined}>
+                    {p.completedBefore ? t("review") : t("start")}
+                  </Button>
+                )}
                 {soundOn ? (
                   <p className="mx-auto mt-4 flex items-center justify-center gap-2 text-caption font-semibold text-ink-muted">
                     <Headphones className="size-4" />
@@ -250,7 +334,16 @@ export function LessonPlayer(p: PlayerProps) {
               {scene.type === "recap" ? <RecapScene scene={scene} env={env} saving={saving} onFinish={finish} /> : null}
             </div>
           ) : (
-            <DoneScreen p={p} result={result} still={motion === "still"} />
+            <DoneScreen
+              p={p}
+              result={result ?? restoredDone?.result ?? null}
+              initialToken={restoredDone?.token ?? null}
+              still={motion === "still"}
+              onAttested={(token) => {
+                const r = result ?? restoredDone?.result;
+                if (r) save({ kind: "done", result: { ...r, moduleStatus: "completed" }, token });
+              }}
+            />
           )}
         </main>
 
@@ -264,7 +357,7 @@ export function LessonPlayer(p: PlayerProps) {
               void setPreferencesAction({ motion: m });
             }}
           />
-          <ProblemForm context={`lesson:${p.slug}/${p.lesson.key}${scene ? `#${scene.id}` : ""}`} onSent={() => setOptionsOpen(false)} />
+          <ProblemSection context={`lesson:${p.slug}/${p.lesson.key}${scene ? `#${scene.id}` : ""}`} onSent={() => setOptionsOpen(false)} />
         </Dialog>
         <TutorPanel open={tutorOpen} onClose={() => setTutorOpen(false)} slug={p.slug} lessonKey={p.lesson.key} sceneId={phase === "playing" ? scene.id : null} speak={(text) => narrator.speak(text, { lang: locale })} voice={p.tutorVoice !== false} />
       </div>
@@ -293,17 +386,10 @@ function OptionsMotion({ value, onChange }: { value: "full" | "calm" | "still"; 
   );
 }
 
-function ProblemForm({ context, onSent }: { context: string; onSent: () => void }) {
+function ProblemSection({ context, onSent }: { context: string; onSent: () => void }) {
   const t = useTranslations("learner.problem");
   const tp = useTranslations("player");
   const [open, setOpen] = useState(false);
-  const action = async (data: FormData) => {
-    if ((await reportProblemAction(undefined, data)).ok) {
-      toast(t("sent"));
-      setOpen(false);
-      onSent();
-    }
-  };
   if (!open) {
     return (
       <Button variant="secondary" size="lg" className="mt-6 w-full" icon={<MessageSquareWarning />} onClick={() => setOpen(true)}>
@@ -312,23 +398,27 @@ function ProblemForm({ context, onSent }: { context: string; onSent: () => void 
     );
   }
   return (
-    <form action={action} className="mt-6 grid gap-3">
+    <div className="mt-6 grid gap-3">
       <p className="text-body-sm font-semibold">{t("title")}</p>
       <p className="text-caption text-ink-muted">{t("description")}</p>
-      <input type="hidden" name="context" value={context} />
-      <Textarea name="message" aria-label={t("message")} placeholder={t("message")} required minLength={3} maxLength={4000} />
-      <SubmitButton>{t("submit")}</SubmitButton>
-    </form>
+      <ProblemForm
+        context={context}
+        onSent={() => {
+          setOpen(false);
+          onSent();
+        }}
+      />
+    </div>
   );
 }
 
-function DoneScreen({ p, result, still }: { p: PlayerProps; result: LessonResult | null; still: boolean }) {
+function DoneScreen({ p, result, initialToken, still, onAttested }: { p: PlayerProps; result: LessonResult | null; initialToken: string | null; still: boolean; onAttested: (token: string | null) => void }) {
   const t = useTranslations("player.done");
   const ta = useTranslations("learner.attest");
   const router = useRouter();
   const [confirmed, setConfirmed] = useState(false);
   const [checked, setChecked] = useState(false);
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(initialToken);
   const [pending, start] = useTransition();
   const awaiting = result?.moduleStatus === "awaiting_attestation" && !confirmed;
 
@@ -365,6 +455,8 @@ function DoneScreen({ p, result, still }: { p: PlayerProps; result: LessonResult
                   if (res.ok) {
                     setConfirmed(true);
                     setToken(res.token ?? null);
+                    // Saved before the refresh below, so a reload keeps the certificate link.
+                    onAttested(res.token ?? null);
                     toast(ta("done"));
                     router.refresh();
                   } else toast(ta("error"), "error");

@@ -1,22 +1,15 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { and, eq, isNull, or } from "drizzle-orm";
-import { z } from "zod";
 import { db, t } from "@/server/db";
 import { allowed, getViewer } from "@/server/auth/viewer";
 import { rateLimit } from "@/server/rate-limit";
 import { sha256Hex } from "@/server/crypto";
-import { lessonContext, offlineAnswer, tutorSystemPrompt } from "@/server/tutor";
+import { sameOrigin } from "@/server/request";
+import { readBodyCapped } from "@/server/request-body";
+import { TUTOR_BODY_LIMIT, lessonContext, offlineAnswer, tutorRequestSchema, tutorSystemPrompt } from "@/server/tutor";
 import { env } from "@/server/env";
 import { pick } from "@/i18n/config";
 import type { Scene } from "@/lib/content/types";
-
-const bodySchema = z.object({
-  slug: z.string().max(100),
-  lessonKey: z.string().max(100),
-  sceneId: z.string().max(100).nullish(),
-  question: z.string().trim().min(2).max(500),
-  locale: z.enum(["az", "en", "ru"]),
-});
 
 let client: Anthropic | null = null;
 
@@ -25,14 +18,21 @@ let client: Anthropic | null = null;
  * nothing that identifies the learner. Answers are cached per lesson, scene and question.
  */
 export async function POST(request: Request) {
-  const origin = request.headers.get("origin");
-  if (origin && new URL(origin).host !== request.headers.get("host")) return new Response("Forbidden", { status: 403 });
+  // Same-origin only; a malformed or "null" Origin header is refused rather than thrown on.
+  if (!sameOrigin(request)) return new Response("Forbidden", { status: 403 });
   const v = await getViewer();
   if (!v) return new Response("Unauthorized", { status: 401 });
   if (!v.tenant.features.has("ai_tutor")) return new Response("Not available", { status: 404 });
-  if (!rateLimit(`tutor:${v.user.id}`, 20, 10 * 60_000).ok) return new Response("Too many questions", { status: 429 });
+  if (!(await rateLimit(`tutor:${v.user.id}`, 20, 10 * 60_000)).ok) return new Response("Too many questions", { status: 429 });
 
-  const parsed = bodySchema.safeParse(await request.json().catch(() => null));
+  // An aborted upload reads as an empty body and fails validation below.
+  const raw = await readBodyCapped(request, TUTOR_BODY_LIMIT).catch(() => "");
+  if (raw === null) return new Response("Payload too large", { status: 413 });
+  let json: unknown = null;
+  try {
+    json = JSON.parse(raw);
+  } catch {}
+  const parsed = tutorRequestSchema.safeParse(json);
   if (!parsed.success) return new Response("Bad request", { status: 400 });
   const { slug, lessonKey, sceneId, question, locale } = parsed.data;
 

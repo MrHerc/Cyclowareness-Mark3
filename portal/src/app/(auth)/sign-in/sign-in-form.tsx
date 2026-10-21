@@ -2,12 +2,25 @@
 
 import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
+import { unstable_rethrow } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ArrowLeft, Building2, Eye, EyeOff, Smartphone } from "lucide-react";
 import { checkEmailAction, signInAction, type AuthState } from "@/server/actions/auth";
 import { Field, Input } from "@/components/ui/field";
 import { ButtonAnchor } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
+
+/**
+ * A failure before the server answers (offline, a dropped connection, a restart or deploy) rejects the action, and
+ * useActionState would rethrow it into the error boundary. It becomes the translated "try again" error on the form instead,
+ * with what was typed; the redirect after a successful sign-in still goes through.
+ */
+function orGeneric(run: Promise<AuthState>, fallback: NonNullable<AuthState>): Promise<AuthState> {
+  return run.catch((error: unknown): AuthState => {
+    unstable_rethrow(error);
+    return { ...fallback, error: "generic" };
+  });
+}
 
 export function SignInForm({ next, notice, alertText }: { next: string; notice?: string; alertText?: string }) {
   const t = useTranslations("auth");
@@ -19,12 +32,12 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
   const [seenPw, setSeenPw] = useState<AuthState>(undefined);
   // The stage moves in the submit path, as soon as a result is known.
   const [pwState, pwAction] = useActionState<AuthState, FormData>(async (prev, data) => {
-    const res = await signInAction(prev, data);
+    const res = await orGeneric(signInAction(prev, data), { step: "password", email: String(data.get("email") ?? "") });
     if (res?.step === "email") setStage("email");
     return res;
   }, undefined);
   const [emailState, emailAction] = useActionState<AuthState, FormData>(async (prev, data) => {
-    const res = await checkEmailAction(prev, data);
+    const res = await orGeneric(checkEmailAction(prev, data), { email: String(data.get("email") ?? "").trim() });
     if (res?.step === "password" && res.email) {
       setEmail(res.email);
       setSeenPw(pwState);
@@ -54,7 +67,7 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
               type="button"
               onClick={() => setStage("email")}
               aria-label={t("changeEmail")}
-              className="mb-3 inline-flex items-center gap-1.5 rounded-pill bg-sunken px-3 py-1.5 text-caption font-semibold text-ink-muted hover:text-ink"
+              className="mb-3 inline-flex items-center gap-1.5 rounded-pill bg-sunken px-3 py-1.5 text-caption font-semibold text-ink-muted hover:text-ink pointer-coarse:min-h-11"
             >
               <ArrowLeft className="size-4" />
               <span className="max-w-56 truncate">{email}</span>
@@ -86,7 +99,7 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
               inputMode="email"
               autoComplete="username"
               autoFocus
-              defaultValue={email || emailState?.email}
+              defaultValue={emailState?.email ?? email}
               placeholder={t("emailPlaceholder")}
               aria-invalid={!!errorText}
               aria-describedby={errorText ? "email-error" : undefined}
@@ -94,7 +107,10 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
             />
           </Field>
           <SubmitButton size="lg">{t("next")}</SubmitButton>
-          <Link href={`/sign-in/phone?next=${encodeURIComponent(next)}`} className="inline-flex items-center justify-center gap-2 text-caption font-semibold text-brand-600 hover:underline">
+          <Link
+            href={`/sign-in/phone?next=${encodeURIComponent(next)}`}
+            className="inline-flex items-center justify-center gap-2 text-caption font-semibold text-brand-600 hover:underline pointer-coarse:-my-3 pointer-coarse:min-h-11"
+          >
             <Smartphone className="size-4" />
             {t("withPhone")}
           </Link>
@@ -106,7 +122,7 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
               type="button"
               onClick={() => setStage("email")}
               aria-label={t("changeEmail")}
-              className="mb-3 inline-flex items-center gap-1.5 rounded-pill bg-sunken px-3 py-1.5 text-caption font-semibold text-ink-muted hover:text-ink"
+              className="mb-3 inline-flex items-center gap-1.5 rounded-pill bg-sunken px-3 py-1.5 text-caption font-semibold text-ink-muted hover:text-ink pointer-coarse:min-h-11"
             >
               <ArrowLeft className="size-4" />
               <span className="max-w-56 truncate">{email}</span>
@@ -133,14 +149,14 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
                 type="button"
                 onClick={() => setShow((s) => !s)}
                 aria-label={show ? t("hidePassword") : t("showPassword")}
-                className="absolute top-1/2 right-1.5 grid size-9 -translate-y-1/2 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink"
+                className="absolute top-1/2 right-1.5 grid size-9 -translate-y-1/2 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:right-0.5 pointer-coarse:size-11"
               >
                 {show ? <EyeOff className="size-4.5" /> : <Eye className="size-4.5" />}
               </button>
             </div>
           </Field>
           <SubmitButton size="lg">{t("signIn")}</SubmitButton>
-          <Link href="/sign-in/forgot" className="text-center text-caption font-semibold text-brand-600 hover:underline">
+          <Link href="/sign-in/forgot" className="inline-flex items-center justify-center text-caption font-semibold text-brand-600 hover:underline pointer-coarse:-my-3 pointer-coarse:min-h-11">
             {t("forgotLink")}
           </Link>
         </form>

@@ -1,9 +1,6 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import { Award, Check, ChevronRight, Lock, Repeat, Route, Users } from "lucide-react";
-import { requireFeature } from "@/server/auth/viewer";
-import { getPaths } from "@/server/queries/paths";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/layout";
 import { Pill } from "@/components/ui/pill";
@@ -11,21 +8,20 @@ import { ProgressBar } from "@/components/ui/progress";
 import { ButtonLink } from "@/components/ui/button";
 import { moduleIcon } from "@/components/learner/module-icon";
 import { cn } from "@/lib/cn";
+import { pathForPage } from "./path";
 
 export async function generateMetadata({ params }: PageProps<"/paths/[key]">) {
-  const { key } = await params;
-  const v = await requireFeature("paths");
-  const p = (await getPaths(v, await getLocale())).find((x) => x.key === key);
-  return { title: p?.title ?? "" };
+  const { p } = await pathForPage((await params).key);
+  return { title: p.title };
 }
 
 export default async function PathPage({ params }: PageProps<"/paths/[key]">) {
-  const { key } = await params;
-  const v = await requireFeature("paths");
-  const locale = await getLocale();
-  const [tr, tc] = await Promise.all([getTranslations("learner.paths"), getTranslations("common")]);
-  const p = (await getPaths(v, locale)).find((x) => x.key === key);
-  if (!p) notFound();
+  const [{ p }, tr, tc, tl] = await Promise.all([
+    pathForPage((await params).key),
+    getTranslations("learner.paths"),
+    getTranslations("common"),
+    getTranslations("learner.learn"),
+  ]);
   const firstOpen = p.modules.find((m) => m.status !== "completed");
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -49,7 +45,7 @@ export default async function PathPage({ params }: PageProps<"/paths/[key]">) {
                       {i + 1}. {tc(`categories.${m.category}`)}
                     </p>
                     <p className="text-body-sm font-semibold">{m.title}</p>
-                    <ProgressBar value={m.percent} size="sm" tone={done ? "safe" : "reward"} className="mt-2 max-w-48" />
+                    <ProgressBar value={m.percent} size="sm" tone={done ? "safe" : "reward"} className="mt-2 max-w-48" label={tl("moduleProgress", { title: m.title })} />
                   </div>
                   <ChevronRight className="size-5 text-ink-subtle" />
                 </Link>
@@ -61,7 +57,7 @@ export default async function PathPage({ params }: PageProps<"/paths/[key]">) {
       <aside className="grid content-start gap-4 lg:sticky lg:top-[calc(var(--topbar-height)+1.5rem)] lg:self-start">
         <Card className="p-5">
           <p className="text-caption font-semibold text-ink-muted">{tr("progress", { done: p.done, total: p.modules.length })}</p>
-          <ProgressBar value={p.modules.length ? (p.done / p.modules.length) * 100 : 0} className="mt-2" />
+          <ProgressBar decorative value={p.modules.length ? (p.done / p.modules.length) * 100 : 0} className="mt-2" />
           {firstOpen ? (
             <ButtonLink href={`/learn/${firstOpen.slug}`} className="mt-4 w-full">
               {tc("continue")}

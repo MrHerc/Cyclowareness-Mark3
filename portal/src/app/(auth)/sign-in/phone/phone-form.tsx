@@ -2,16 +2,31 @@
 
 import { useActionState } from "react";
 import Link from "next/link";
+import { unstable_rethrow } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Mail } from "lucide-react";
 import { requestPhoneCodeAction, verifyPhoneCodeAction, type AuthState } from "@/server/actions/auth";
 import { Field, Input } from "@/components/ui/field";
 import { SubmitButton } from "@/components/ui/submit-button";
 
+/**
+ * A failure before the server answers (offline, a dropped connection, a restart or deploy) rejects the action, and
+ * useActionState would rethrow it into the error boundary. It becomes the translated "try again" error on the form instead,
+ * with the number kept; the redirect after a successful sign-in still goes through.
+ */
+function orGeneric(run: Promise<AuthState>, fallback: NonNullable<AuthState>): Promise<AuthState> {
+  return run.catch((error: unknown): AuthState => {
+    unstable_rethrow(error);
+    return { ...fallback, error: "generic" };
+  });
+}
+const sendCode = (prev: AuthState, data: FormData) => orGeneric(requestPhoneCodeAction(prev, data), { step: "phone", phone: String(data.get("phone") ?? "").trim() });
+const verifyCode = (prev: AuthState, data: FormData) => orGeneric(verifyPhoneCodeAction(prev, data), { step: "code", phone: String(data.get("phone") ?? "") });
+
 export function PhoneForm({ next }: { next: string }) {
   const t = useTranslations("auth");
-  const [sendState, send] = useActionState<AuthState, FormData>(requestPhoneCodeAction, undefined);
-  const [codeState, verify] = useActionState<AuthState, FormData>(verifyPhoneCodeAction, undefined);
+  const [sendState, send] = useActionState<AuthState, FormData>(sendCode, undefined);
+  const [codeState, verify] = useActionState<AuthState, FormData>(verifyCode, undefined);
   const phone = codeState?.phone ?? sendState?.phone;
   const stage = sendState?.step === "code" && codeState?.step !== "phone" ? "code" : "phone";
   const err = (stage === "code" ? codeState?.error : sendState?.error) ?? null;
@@ -55,7 +70,10 @@ export function PhoneForm({ next }: { next: string }) {
           <SubmitButton size="lg">{t("phone.verify")}</SubmitButton>
         </form>
       )}
-      <Link href={`/sign-in?next=${encodeURIComponent(next)}`} className="mt-5 flex items-center justify-center gap-2 text-caption font-semibold text-brand-600 hover:underline">
+      <Link
+        href={`/sign-in?next=${encodeURIComponent(next)}`}
+        className="mt-5 flex items-center justify-center gap-2 text-caption font-semibold text-brand-600 hover:underline pointer-coarse:mt-2 pointer-coarse:-mb-3 pointer-coarse:min-h-11"
+      >
         <Mail className="size-4" />
         {t("withEmail")}
       </Link>

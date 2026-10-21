@@ -38,8 +38,8 @@ export function ssoStartUrl(slug: string): string {
 /**
  * Single sign-on only for a proven domain with SSO switched on. Administrators and the other
  * privileged roles always use their password and two-step code. Unknown people on such a domain
- * go to the provider only when it may create them; everyone else sees the password step, so the
- * answer does not tell whether an account exists.
+ * go to the provider too (the callback refuses them unless it may create them), so the answer
+ * does not tell whether an account exists.
  */
 export function decideSignInStep(email: string, tenant: SsoTenant | null, person: SsoPerson | null): SignInStep {
   const password: SignInStep = { step: "password" };
@@ -50,6 +50,6 @@ export function decideSignInStep(email: string, tenant: SsoTenant | null, person
   if (person) {
     if (person.tenantId !== tenant.id || isPrivileged(person.role)) return password;
     if (person.status !== "active" && person.status !== "invited") return password;
-  } else if (!tenant.autoCreate) return password;
+  }
   return { step: "sso", url: ssoStartUrl(tenant.slug) };
 }

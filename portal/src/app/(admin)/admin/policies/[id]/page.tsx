@@ -1,9 +1,8 @@
-import { notFound } from "next/navigation";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { and, count, desc, eq, inArray } from "drizzle-orm";
 import { CheckCircle2, Circle, Download } from "lucide-react";
 import { db, t } from "@/server/db";
-import { allowed, requirePermission } from "@/server/auth/viewer";
+import { allowed } from "@/server/auth/viewer";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { PageHeader, TabsNav } from "@/components/ui/layout";
 import { Pill } from "@/components/ui/pill";
@@ -11,13 +10,11 @@ import { ProgressBar } from "@/components/ui/progress";
 import { ButtonAnchor, ButtonLink } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { PolicyHeaderActions, VersionEditor } from "@/components/admin/policy-client";
+import { policyForPage } from "./policy";
 
 export default async function PolicyAdminPage({ params, searchParams }: PageProps<"/admin/policies/[id]">) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
-  const v = await requirePermission("policies.read");
-  if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
-  const [policy] = await db().select().from(t.policies).where(and(eq(t.policies.id, id), eq(t.policies.tenantId, v.tenant.id)));
-  if (!policy) notFound();
+  const { v, policy } = await policyForPage(id);
   const [tr, tc, format] = await Promise.all([getTranslations("admin.policies"), getTranslations("common"), getFormatter()]);
   const tab = sp.tab === "signoffs" ? "signoffs" : "versions";
   const versions = await db().select().from(t.policyVersions).where(eq(t.policyVersions.policyId, id)).orderBy(desc(t.policyVersions.version));
@@ -42,7 +39,7 @@ export default async function PolicyAdminPage({ params, searchParams }: PageProp
   const canWrite = allowed(v, "policies.write");
 
   return (
-    <div className="grid gap-5">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
       <PageHeader
         title={policy.title}
         subtitle={tr("created", { date: format.dateTime(policy.createdAt, { dateStyle: "medium" }) })}
@@ -87,7 +84,7 @@ export default async function PolicyAdminPage({ params, searchParams }: PageProp
                     {ver.summary ? <p className="mt-1 text-caption text-ink-muted">{ver.summary}</p> : null}
                     <div className="mt-3 flex items-center gap-2">
                       <span className="shrink-0 text-tab text-ink-muted">{tr("signedOf", { signed, total: people.length })}</span>
-                      <ProgressBar value={pct} size="sm" />
+                      <ProgressBar decorative value={pct} size="sm" />
                       <span className="shrink-0 text-tab font-bold tabular-nums">{pct}%</span>
                     </div>
                     <div className="mt-3 flex gap-2">
@@ -126,19 +123,19 @@ export default async function PolicyAdminPage({ params, searchParams }: PageProp
                 .map((p) => {
                   const s = signedBy.get(p.id);
                   return (
-                    <li key={p.id} className="flex items-center gap-3 py-2.5">
-                      <Avatar name={p.name} src={p.avatarUrl} size="sm" />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-body-sm font-semibold">{p.name}</span>
-                        <span className="block text-tab text-ink-subtle">{p.email}</span>
+                    <li key={p.id} className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1 py-2.5 sm:grid-cols-[auto_minmax(0,1fr)_auto]">
+                      <Avatar name={p.name} src={p.avatarUrl} size="sm" className="row-span-2 sm:row-span-1" />
+                      <span className="min-w-0">
+                        <span className="block truncate text-body-sm font-semibold" title={p.name}>{p.name}</span>
+                        <span className="block truncate text-tab text-ink-subtle" title={p.email}>{p.email}</span>
                       </span>
                       {s ? (
-                        <span className="inline-flex items-center gap-1.5 text-caption text-safe-700">
+                        <span className="col-start-2 inline-flex items-center gap-1.5 whitespace-nowrap text-caption text-safe-700 sm:col-start-3">
                           <CheckCircle2 className="size-4" />
                           {format.dateTime(s.signedAt, { dateStyle: "medium", timeStyle: "short" })}
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 text-caption text-ink-subtle">
+                        <span className="col-start-2 inline-flex items-center gap-1.5 whitespace-nowrap text-caption text-ink-subtle sm:col-start-3">
                           <Circle className="size-4" />
                           {tr("notSigned")}
                         </span>

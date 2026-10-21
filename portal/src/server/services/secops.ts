@@ -4,13 +4,11 @@ import * as t from "../db/schema";
 import type { LoopStage } from "../db/schema";
 import { audit } from "./audit";
 import { emitEvent } from "./events";
-import { notifyUsers } from "./notify";
+import { notifyUsers, type Localized } from "./notify";
 import { recomputeRisk } from "./risk";
-import { nextNumber } from "./threats";
+import { insertNumbered } from "./threats";
 import { pick } from "../../i18n/config";
-
-const DAY = 86_400_000;
-const isoDay = (d: Date) => d.toISOString().slice(0, 10);
+import { bakuDayPlus, todayInBaku } from "../../lib/time";
 
 /* ───────── closed loops ───────── */
 
@@ -66,7 +64,11 @@ export async function closeLoop(db: DB, p: { tenantId: string; loopId: string; a
 /**
  * Gives specific people one module because of a real event (incident, approved material).
  * It shows up under "My open risks" with a due date and closes when they finish the module.
- * People who already have an open risk from the same source are skipped.
+ * People who already have an open risk from the same source are skipped, and so are people who
+ * already completed the module: their risk could never close. `title` may depend on the
+ * person's language (it is stored per person and used in their notification). The emails join the
+ * outbox and the job runner's mail step sends them, so neither a request nor the tick waits for the
+ * mail server once per person.
  */
 export async function targetTraining(
   db: DB,
@@ -76,7 +78,7 @@ export async function targetTraining(
     moduleId: string;
     severity: (typeof t.SEVERITY)[number];
     kind: (typeof t.behaviorRisks.$inferInsert)["kind"];
-    title: string;
+    title: Localized;
     sourceRef: string;
     dueDate?: string | null;
     note?: { title: string; body: string } | null;
@@ -86,21 +88,29 @@ export async function targetTraining(
   const [mod] = await db.select({ slug: t.modules.slug, title: t.modules.title }).from(t.modules).where(eq(t.modules.id, p.moduleId));
   if (!mod) return [];
   const people = await db
-    .select({ id: t.users.id })
+    .select({ id: t.users.id, locale: t.users.locale })
     .from(t.users)
     .where(and(eq(t.users.tenantId, p.tenantId), inArray(t.users.id, p.userIds), eq(t.users.status, "active")));
+  if (!people.length) return [];
   const existing = await db
     .select({ userId: t.behaviorRisks.userId })
     .from(t.behaviorRisks)
     .where(and(eq(t.behaviorRisks.tenantId, p.tenantId), eq(t.behaviorRisks.sourceRef, p.sourceRef), eq(t.behaviorRisks.status, "open")));
-  const skip = new Set(existing.map((e) => e.userId));
-  const targets = people.map((u) => u.id).filter((id) => !skip.has(id));
+  const completed = await db
+    .select({ userId: t.moduleProgress.userId })
+    .from(t.moduleProgress)
+    .where(and(eq(t.moduleProgress.moduleId, p.moduleId), inArray(t.moduleProgress.userId, people.map((u) => u.id)), eq(t.moduleProgress.status, "completed")));
+  const skip = new Set([...existing, ...completed].map((e) => e.userId));
+  const targetPeople = people.filter((u) => !skip.has(u.id));
+  const targets = targetPeople.map((u) => u.id);
   if (!targets.length) return [];
-  const due = p.dueDate ?? isoDay(new Date(Date.now() + 7 * DAY));
-  await db.insert(t.behaviorRisks).values(targets.map((userId) => ({ tenantId: p.tenantId, userId, kind: p.kind, severity: p.severity, title: p.title.slice(0, 300), sourceRef: p.sourceRef, moduleId: p.moduleId, dueDate: due })));
-  const [tenant] = await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, p.tenantId));
-  const moduleTitle = pick(mod.title, tenant.settings.defaultLocale);
-  await notifyUsers(db, p.tenantId, targets, "assignment", { module: moduleTitle, dueDate: due, link: `/learn/${mod.slug}`, reason: p.title }, { title: p.note?.title ?? moduleTitle, body: p.note?.body.slice(0, 280) ?? p.title, href: `/learn/${mod.slug}` });
+  const due = p.dueDate ?? bakuDayPlus(7);
+  const titleFor = (locale: string) => (typeof p.title === "function" ? p.title(locale) : p.title);
+  await db.insert(t.behaviorRisks).values(targetPeople.map((u) => ({ tenantId: p.tenantId, userId: u.id, kind: p.kind, severity: p.severity, title: titleFor(u.locale).slice(0, 300), sourceRef: p.sourceRef, moduleId: p.moduleId, dueDate: due })));
+  // Module title and reason in each person's own language.
+  const moduleTitle = (locale: string) => pick(mod.title, locale);
+  const note = p.note;
+  await notifyUsers(db, p.tenantId, targets, "assignment", { module: moduleTitle, dueDate: due, link: `/learn/${mod.slug}`, reason: titleFor }, { title: note?.title ?? moduleTitle, body: note ? note.body.slice(0, 280) : titleFor, href: `/learn/${mod.slug}` }, { defer: true });
   await recomputeRisk(db, p.tenantId, targets);
   return targets;
 }
@@ -140,40 +150,36 @@ export async function createIncident(
     targetUserIds?: string[];
   },
 ): Promise<{ id: string; number: number }> {
-  for (let attempt = 0; ; attempt++) {
-    const number = await nextNumber(db, t.incidents, p.tenantId, 20);
-    try {
-      const [row] = await db
-        .insert(t.incidents)
-        .values({
-          tenantId: p.tenantId,
-          number,
-          title: p.title.slice(0, 300),
-          description: p.description?.slice(0, 8000) ?? null,
-          severity: p.severity,
-          source: p.source,
-          confidential: !!p.confidential,
-          live: !!p.live,
-          iocs: p.iocs ?? [],
-          mitre: p.mitre ?? [],
-          sandboxId: p.sandboxId ?? null,
-          reportId: p.reportId ?? null,
-          trainingModuleId: p.trainingModuleId ?? null,
-          minScore: p.minScore ?? null,
-          dueDate: p.dueDate ?? null,
-          targetUserIds: p.targetUserIds ?? [],
-          createdBy: p.actorId,
-        })
-        .returning({ id: t.incidents.id });
-      if (p.sandboxId) await db.update(t.sandboxAnalyses).set({ incidentId: row.id }).where(and(eq(t.sandboxAnalyses.id, p.sandboxId), eq(t.sandboxAnalyses.tenantId, p.tenantId)));
-      await audit(db, { tenantId: p.tenantId, actorId: p.actorId, action: "incident.created", targetType: "incident", targetId: row.id, meta: { number: `IR-${number}`, severity: p.severity } });
-      // Confidential incidents never leave the platform with details.
-      await emitEvent(db, p.tenantId, "incident.created", p.confidential ? { number: `IR-${number}`, severity: p.severity, confidential: true } : { number: `IR-${number}`, title: p.title, severity: p.severity, source: p.source, iocs: p.iocs ?? [], mitre: p.mitre ?? [] });
-      return { id: row.id, number };
-    } catch (error) {
-      if (attempt >= 3) throw error;
-    }
-  }
+  const { number, row } = await insertNumbered(db, t.incidents, p.tenantId, 20, async (number) => {
+    const [inserted] = await db
+      .insert(t.incidents)
+      .values({
+        tenantId: p.tenantId,
+        number,
+        title: p.title.slice(0, 300),
+        description: p.description?.slice(0, 8000) ?? null,
+        severity: p.severity,
+        source: p.source,
+        confidential: !!p.confidential,
+        live: !!p.live,
+        iocs: p.iocs ?? [],
+        mitre: p.mitre ?? [],
+        sandboxId: p.sandboxId ?? null,
+        reportId: p.reportId ?? null,
+        trainingModuleId: p.trainingModuleId ?? null,
+        minScore: p.minScore ?? null,
+        dueDate: p.dueDate ?? null,
+        targetUserIds: p.targetUserIds ?? [],
+        createdBy: p.actorId,
+      })
+      .returning({ id: t.incidents.id });
+    return inserted;
+  });
+  if (p.sandboxId) await db.update(t.sandboxAnalyses).set({ incidentId: row.id }).where(and(eq(t.sandboxAnalyses.id, p.sandboxId), eq(t.sandboxAnalyses.tenantId, p.tenantId)));
+  await audit(db, { tenantId: p.tenantId, actorId: p.actorId, action: "incident.created", targetType: "incident", targetId: row.id, meta: { number: `IR-${number}`, severity: p.severity } });
+  // Confidential incidents never leave the platform with details.
+  await emitEvent(db, p.tenantId, "incident.created", p.confidential ? { number: `IR-${number}`, severity: p.severity, confidential: true } : { number: `IR-${number}`, title: p.title, severity: p.severity, source: p.source, iocs: p.iocs ?? [], mitre: p.mitre ?? [] });
+  return { id: row.id, number };
 }
 
 /** Assigns the incident's training module to its target people (the "auto-training" step). */
@@ -198,7 +204,7 @@ export async function assignIncidentTraining(db: DB, p: { tenantId: string; inci
     // Confidential incidents show a neutral title to the people being trained.
     title: inc.confidential ? `IR-${inc.number}` : `IR-${inc.number}: ${inc.title}`,
     sourceRef: `IR-${inc.number}`,
-    dueDate: inc.dueDate && inc.dueDate >= isoDay(new Date()) ? inc.dueDate : null,
+    dueDate: inc.dueDate && inc.dueDate >= todayInBaku() ? inc.dueDate : null,
   });
   await db.update(t.incidents).set({ autoTrainingAt: new Date() }).where(eq(t.incidents.id, inc.id));
   if (assigned.length) {

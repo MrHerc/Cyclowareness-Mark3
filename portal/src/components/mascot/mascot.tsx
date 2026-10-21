@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useSyncExternalStore } from "react";
-import { Alignment, Fit, Layout, RuntimeLoader, useRive, type StateMachineInput } from "@rive-app/react-canvas";
+import { Alignment, DeprecationKeys, Fit, Layout, Rive, RuntimeLoader, useRive, type StateMachineInput } from "@rive-app/react-canvas";
 import { cn } from "@/lib/cn";
 import {
   ACT_INDEX,
@@ -20,8 +20,12 @@ import {
   type MascotTravelDir,
 } from "./mapping";
 
-// The runtime is served from our own origin (CSP: no third-party scripts or wasm).
+// The runtime is served from our own origin (CSP: no third-party scripts or wasm). The fallback build
+// (for browsers without wasm SIMD) must be local too, or the runtime would try the CDN and be blocked.
 RuntimeLoader.setWasmUrl("/rive/rive.wasm");
+RuntimeLoader.setWasmFallbackUrl("/rive/rive_fallback.wasm");
+// mascot.riv drives its state machine with classic inputs (no data-binding view models), so this notice is expected.
+Rive.suppressDeprecationWarnings = [DeprecationKeys.stateMachineInputs];
 
 const SM = "Main";
 
@@ -113,7 +117,7 @@ export function Mascot({
   const { rive, RiveComponent } = useRive({
     src: "/rive/mascot.riv",
     artboard: "Mascot",
-    stateMachines: SM,
+    stateMachine: SM,
     autoplay: true,
     layout: new Layout({ fit: Fit.Contain, alignment: Alignment.Center }),
   });

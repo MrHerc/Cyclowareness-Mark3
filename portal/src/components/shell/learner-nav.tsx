@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { BookOpen, FlaskConical, Home, LayoutGrid, LifeBuoy, Radio, ShieldCheck, TrendingUp, Trophy, User, Route } from "lucide-react";
+import { BookOpen, FlaskConical, Home, LayoutGrid, LifeBuoy, Loader2, Radio, ShieldCheck, TrendingUp, Trophy, User, Route } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 type Item = { href: string; key: "home" | "learn" | "paths" | "lab" | "league" | "progress" | "security" | "profile" | "sessions" | "help"; icon: typeof Home };
@@ -34,6 +34,24 @@ function isActive(pathname: string, href: string) {
   return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 }
 
+/**
+ * The learner area has no shared loading.tsx: that Suspense boundary would stream the shell with HTTP 200
+ * before a page's feature and id checks run, so their notFound() could no longer answer 404. Each route
+ * carries its own loading.tsx instead, below a layout that runs those checks first; the clicked item shows
+ * that the navigation is under way until that layout has answered and the skeleton arrives.
+ */
+function PendingMark() {
+  const { pending } = useLinkStatus();
+  return pending ? <Loader2 aria-hidden className="size-4 shrink-0 animate-spin text-ink-subtle" /> : null;
+}
+
+/** The tab's icon, replaced by a spinner while its navigation is pending. */
+function TabIcon({ icon: Icon, active }: { icon: typeof Home; active: boolean }) {
+  const { pending } = useLinkStatus();
+  if (pending) return <Loader2 aria-hidden className="size-5 animate-spin text-ink-subtle" />;
+  return <Icon className={cn("size-5", active ? "text-brand-600" : "text-ink-subtle")} strokeWidth={active ? 2.25 : 2} />;
+}
+
 export function RailNav({ showAdmin, hidden = [] }: { showAdmin: boolean; hidden?: string[] }) {
   const pathname = usePathname();
   const t = useTranslations("common.nav");
@@ -50,21 +68,23 @@ export function RailNav({ showAdmin, hidden = [] }: { showAdmin: boolean; hidden
             active ? "bg-brand-50 text-brand-700" : "text-ink-muted hover:bg-sunken hover:text-ink",
           )}
         >
-          <i.icon className={cn("size-5", active ? "text-brand-600" : "text-ink-subtle")} strokeWidth={active ? 2.25 : 2} />
-          {t(i.key)}
+          <i.icon className={cn("size-5 shrink-0", active ? "text-brand-600" : "text-ink-subtle")} strokeWidth={active ? 2.25 : 2} />
+          <span className="min-w-0 flex-1 truncate">{t(i.key)}</span>
+          <PendingMark />
         </Link>
       </li>
     );
   };
   return (
-    <nav aria-label={t("main")} className="flex min-h-0 flex-1 flex-col">
+    <nav aria-label={t("main")} className="flex flex-1 flex-col">
       <ul className="grid gap-1">{PRIMARY.filter((i) => !hidden.includes(i.key)).map(link)}</ul>
       <ul className="mt-4 grid gap-1 border-t border-line pt-4">{SECONDARY.filter((i) => !hidden.includes(i.key)).map(link)}</ul>
       {showAdmin ? (
         <div className="mt-auto pt-4">
           <Link href="/admin" className="flex h-11 items-center gap-3 rounded-pill px-4 text-body-sm font-semibold text-ink-muted hover:bg-sunken hover:text-ink">
-            <LayoutGrid className="size-5 text-ink-subtle" />
-            {t("admin")}
+            <LayoutGrid className="size-5 shrink-0 text-ink-subtle" />
+            <span className="min-w-0 flex-1 truncate">{t("admin")}</span>
+            <PendingMark />
           </Link>
         </div>
       ) : null}
@@ -88,7 +108,7 @@ export function TabBar({ hidden = [] }: { hidden?: string[] }) {
             <li key={i.href}>
               <Link href={i.href} data-tour={`nav-${i.key}`} aria-current={active ? "page" : undefined} className="flex h-full flex-col items-center justify-center gap-1">
                 <span className={cn("grid h-8 w-14 place-items-center rounded-pill transition-colors", active && "bg-brand-50")}>
-                  <i.icon className={cn("size-5", active ? "text-brand-600" : "text-ink-subtle")} strokeWidth={active ? 2.25 : 2} />
+                  <TabIcon icon={i.icon} active={active} />
                 </span>
                 <span className={cn("text-tab-sm font-semibold", active ? "text-brand-700" : "text-ink-muted")}>{t(i.key)}</span>
               </Link>
@@ -99,4 +119,3 @@ export function TabBar({ hidden = [] }: { hidden?: string[] }) {
     </nav>
   );
 }
-

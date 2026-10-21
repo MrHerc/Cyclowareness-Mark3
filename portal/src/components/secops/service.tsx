@@ -8,31 +8,41 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
+import { bakuParts, fromBakuLocalInput, fromBakuParts, toBakuLocalInput } from "@/lib/baku-clock";
 
 /* ───────── live sessions ───────── */
 
 export type SessionDraft = { id: string | null; title: string; description: string; startsAt: string; durationMin: number; location: string; host: string; capacity: number | null };
-
-/** `datetime-local` value in the browser's time zone. */
-function toLocalInput(iso: string): string {
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
 
 export function SessionEditor({ initial }: { initial: SessionDraft | null }) {
   const t = useTranslations("secops.sessions");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
+  // The start is entered in Baku time, the zone sessions are listed in, not the browser's: a new one
+  // defaults to 11:00 Baku a week from now.
   const fresh = (): SessionDraft => {
-    const d = new Date(Date.now() + 7 * 86_400_000);
-    d.setHours(11, 0, 0, 0);
-    return { id: null, title: "", description: "", startsAt: d.toISOString(), durationMin: 45, location: "", host: "", capacity: null };
+    const startsAt = fromBakuParts(bakuParts(Date.now() + 7 * 86_400_000).date, "11:00")!;
+    return { id: null, title: "", description: "", startsAt: startsAt.toISOString(), durationMin: 45, location: "", host: "", capacity: null };
   };
   const [f, setF] = useState<SessionDraft>(() => initial ?? fresh());
-  const [local, setLocal] = useState(toLocalInput(f.startsAt));
-  const valid = f.title.trim().length >= 3 && f.location.trim().length >= 2 && f.host.trim().length >= 2 && !Number.isNaN(new Date(local).getTime());
+  const [local, setLocal] = useState(() => toBakuLocalInput(f.startsAt));
+  const startsAt = fromBakuLocalInput(local);
+  // Number inputs are kept as typed, so an out-of-range value is shown and explained instead of silently replaced.
+  const [dur, setDur] = useState(String(f.durationMin));
+  const [cap, setCap] = useState(f.capacity === null ? "" : String(f.capacity));
+  /** Field the server refused (it validates the same rules), until that field is edited. */
+  const [serverField, setServerField] = useState<string | null>(null);
+  const durationMin = Number(dur);
+  const capacity = cap.trim() === "" ? null : Number(cap);
+  const durationError = !(dur.trim() !== "" && Number.isInteger(durationMin) && durationMin >= 5 && durationMin <= 480) || serverField === "durationMin" ? t("form.durationRange") : null;
+  const capacityError = (capacity !== null && !(Number.isInteger(capacity) && capacity >= 1 && capacity <= 100_000)) || serverField === "capacity" ? t("form.capacityRange") : null;
+  const fieldError = (name: string) => (serverField === name ? t("form.fieldInvalid") : null);
+  const invalid = (error: string | null, id: string) => (error ? { "aria-invalid": true, "aria-describedby": `${id}-error` } : {});
+  const edit = (name: string) => {
+    if (serverField === name) setServerField(null);
+  };
+  const valid = f.title.trim().length >= 3 && f.location.trim().length >= 2 && f.host.trim().length >= 2 && !!startsAt && !durationError && !capacityError;
   return (
     <>
       {initial ? (
@@ -58,14 +68,20 @@ export function SessionEditor({ initial }: { initial: SessionDraft | null }) {
               disabled={pending || !valid}
               onClick={() =>
                 start(async () => {
-                  const res = await saveSessionAction({ ...f, startsAt: new Date(local).toISOString() });
-                  if (!res.ok) return toast(tc("errors.invalid"), "error");
+                  const res = await saveSessionAction({ ...f, durationMin, capacity, startsAt: startsAt!.toISOString() });
+                  if (!res.ok) {
+                    setServerField(res.field ?? null);
+                    return toast(tc("errors.invalid"), "error");
+                  }
                   toast(t("saved"));
                   setOpen(false);
+                  setServerField(null);
                   if (!initial) {
                     const next = fresh();
                     setF(next);
-                    setLocal(toLocalInput(next.startsAt));
+                    setLocal(toBakuLocalInput(next.startsAt));
+                    setDur(String(next.durationMin));
+                    setCap("");
                   }
                 })
               }
@@ -76,29 +92,29 @@ export function SessionEditor({ initial }: { initial: SessionDraft | null }) {
         }
       >
         <div className="grid gap-4">
-          <Field label={t("form.title")} htmlFor="s-title">
-            <Input id="s-title" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} maxLength={200} />
+          <Field label={t("form.title")} htmlFor="s-title" error={fieldError("title")}>
+            <Input id="s-title" value={f.title} onChange={(e) => { edit("title"); setF({ ...f, title: e.target.value }); }} maxLength={200} {...invalid(fieldError("title"), "s-title")} />
           </Field>
-          <Field label={t("form.description")} htmlFor="s-desc">
-            <Textarea id="s-desc" value={f.description} onChange={(e) => setF({ ...f, description: e.target.value })} maxLength={2000} />
+          <Field label={t("form.description")} htmlFor="s-desc" error={fieldError("description")}>
+            <Textarea id="s-desc" value={f.description} onChange={(e) => { edit("description"); setF({ ...f, description: e.target.value }); }} maxLength={2000} {...invalid(fieldError("description"), "s-desc")} />
           </Field>
           <div className="grid gap-4 sm:grid-cols-3">
-            <Field label={t("form.startsAt")} htmlFor="s-start">
-              <Input id="s-start" type="datetime-local" value={local} onChange={(e) => setLocal(e.target.value)} />
+            <Field label={t("form.startsAt")} htmlFor="s-start" hint={tc("time.bakuZone")} error={fieldError("startsAt")}>
+              <Input id="s-start" type="datetime-local" value={local} onChange={(e) => { edit("startsAt"); setLocal(e.target.value); }} aria-describedby="s-start-hint" {...invalid(fieldError("startsAt"), "s-start")} />
             </Field>
-            <Field label={t("form.duration")} htmlFor="s-dur">
-              <Input id="s-dur" type="number" min={5} max={480} value={f.durationMin} onChange={(e) => setF({ ...f, durationMin: Number(e.target.value) || 45 })} />
+            <Field label={t("form.duration")} htmlFor="s-dur" error={durationError}>
+              <Input id="s-dur" type="number" min={5} max={480} step={1} value={dur} onChange={(e) => { edit("durationMin"); setDur(e.target.value); }} {...invalid(durationError, "s-dur")} />
             </Field>
-            <Field label={t("form.capacity")} htmlFor="s-cap">
-              <Input id="s-cap" type="number" min={1} value={f.capacity ?? ""} onChange={(e) => setF({ ...f, capacity: e.target.value ? Number(e.target.value) : null })} />
+            <Field label={t("form.capacity")} htmlFor="s-cap" error={capacityError}>
+              <Input id="s-cap" type="number" min={1} max={100_000} step={1} value={cap} onChange={(e) => { edit("capacity"); setCap(e.target.value); }} {...invalid(capacityError, "s-cap")} />
             </Field>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label={t("form.location")} htmlFor="s-loc">
-              <Input id="s-loc" value={f.location} onChange={(e) => setF({ ...f, location: e.target.value })} maxLength={300} />
+            <Field label={t("form.location")} htmlFor="s-loc" error={fieldError("location")}>
+              <Input id="s-loc" value={f.location} onChange={(e) => { edit("location"); setF({ ...f, location: e.target.value }); }} maxLength={300} {...invalid(fieldError("location"), "s-loc")} />
             </Field>
-            <Field label={t("form.host")} htmlFor="s-host">
-              <Input id="s-host" value={f.host} onChange={(e) => setF({ ...f, host: e.target.value })} maxLength={120} />
+            <Field label={t("form.host")} htmlFor="s-host" error={fieldError("host")}>
+              <Input id="s-host" value={f.host} onChange={(e) => { edit("host"); setF({ ...f, host: e.target.value }); }} maxLength={120} {...invalid(fieldError("host"), "s-host")} />
             </Field>
           </div>
         </div>

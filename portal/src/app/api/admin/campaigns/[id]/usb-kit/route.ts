@@ -1,7 +1,8 @@
+import { isUuid } from "@/lib/ids";
 import { and, asc, eq } from "drizzle-orm";
 import { db, t } from "@/server/db";
-import { allowed, getViewer } from "@/server/auth/viewer";
-import { env } from "@/server/env";
+import { apiViewer } from "@/server/auth/viewer";
+import { appUrl } from "@/server/env";
 import { toCsv } from "@/lib/csv";
 
 /**
@@ -10,9 +11,9 @@ import { toCsv } from "@/lib/csv";
  */
 export async function GET(_: Request, { params }: RouteContext<"/api/admin/campaigns/[id]/usb-kit">) {
   const { id } = await params;
-  const v = await getViewer();
-  if (!v || !allowed(v, "campaigns.write")) return new Response("Forbidden", { status: 403 });
-  if (!/^[0-9a-f-]{36}$/.test(id)) return new Response("Not found", { status: 404 });
+  const v = await apiViewer("campaigns.write");
+  if (v instanceof Response) return v;
+  if (!isUuid(id)) return new Response("Not found", { status: 404 });
   const [c] = await db().select().from(t.campaigns).where(and(eq(t.campaigns.id, id), eq(t.campaigns.tenantId, v.tenant.id)));
   if (!c || c.channel !== "usb") return new Response("Not found", { status: 404 });
   const rows = await db()
@@ -21,7 +22,7 @@ export async function GET(_: Request, { params }: RouteContext<"/api/admin/campa
     .innerJoin(t.users, eq(t.users.id, t.campaignRecipients.userId))
     .where(eq(t.campaignRecipients.campaignId, c.id))
     .orderBy(asc(t.users.name));
-  const base = env.APP_URL.replace(/\/$/, "");
+  const base = appUrl();
   const beacon = (token: string) => `<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${base}/t/${token}"><a href="${base}/t/${token}">Iclas_teqdimati</a>`;
   const csv = toCsv(
     ["drive", "label_for", "file_name", "file_contents"],

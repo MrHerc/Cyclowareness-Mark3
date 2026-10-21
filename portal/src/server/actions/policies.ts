@@ -2,22 +2,37 @@
 
 import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { refresh } from "next/cache";
+import { unstable_rethrow } from "next/navigation";
 import { db, t } from "../db";
 import { actionViewer } from "../auth/viewer";
 import { verifyPassword } from "../auth/password";
 import { audit } from "../services/audit";
 import { clientIp } from "../request";
 import { rateLimit } from "../rate-limit";
+import { isUuid } from "../../lib/ids";
 
 export type SignState = { ok?: boolean; error?: "agree" | "password" | "rateLimited" | "generic" } | undefined;
 
 /** Signing a policy version requires ticking the statement and the account password. */
-export async function signPolicyAction(_: SignState, form: FormData): Promise<SignState> {
+export async function signPolicyAction(prev: SignState, form: FormData): Promise<SignState> {
+  // A failure (database unavailable) answers with the generic error so the sign-off page stays, instead of the error
+  // boundary; redirect() and notFound() still pass through.
+  try {
+    return await signPolicy(prev, form);
+  } catch (error) {
+    unstable_rethrow(error);
+    console.error("[policies] sign failed", error);
+    return { error: "generic" };
+  }
+}
+
+async function signPolicy(_: SignState, form: FormData): Promise<SignState> {
   const v = await actionViewer();
   const versionId = String(form.get("versionId") ?? "");
   const password = String(form.get("password") ?? "");
+  if (!isUuid(versionId)) return { error: "generic" };
   if (form.get("agree") !== "on") return { error: "agree" };
-  if (!rateLimit(`sign:${v.user.id}`, 10, 15 * 60_000).ok) return { error: "rateLimited" };
+  if (!(await rateLimit(`sign:${v.user.id}`, 10, 15 * 60_000)).ok) return { error: "rateLimited" };
   const [version] = await db()
     .select({
       id: t.policyVersions.id,

@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { coarseHitArea } from "@/components/ui/button";
 
 const control =
   "w-full rounded-md border border-line-strong bg-surface px-3.5 text-body-sm text-ink placeholder:text-ink-disabled transition-[border-color,box-shadow] duration-(--duration-fast) hover:border-line-control focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100 disabled:bg-sunken disabled:text-ink-disabled aria-invalid:border-risk-500 aria-invalid:focus:ring-risk-100";
@@ -70,9 +71,10 @@ export function Field({
   );
 }
 
+/** The 20 px box is tapped through its label, which reaches 44 px on coarse pointers without changing the layout. */
 export function Checkbox({ className, label, description, ...props }: ComponentProps<"input"> & { label: ReactNode; description?: ReactNode }) {
   return (
-    <label className={cn("flex cursor-pointer items-start gap-3 text-body-sm", className)}>
+    <label className={cn("flex cursor-pointer items-start gap-3 text-body-sm", coarseHitArea, className)}>
       <input
         type="checkbox"
         className={"mt-0.5 size-5 shrink-0 cursor-pointer appearance-none rounded-xs border-2 border-line-control bg-surface bg-center bg-no-repeat transition-colors checked:border-brand-600 checked:bg-brand-600 checked:bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E\")] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"}
@@ -89,7 +91,7 @@ export function Checkbox({ className, label, description, ...props }: ComponentP
 /** Accessible on/off switch backed by a real checkbox (works without JavaScript inside forms). */
 export function Switch({ className, label, description, ...props }: ComponentProps<"input"> & { label: ReactNode; description?: ReactNode }) {
   return (
-    <label className={cn("flex cursor-pointer items-start justify-between gap-4", className)}>
+    <label className={cn("flex cursor-pointer items-start justify-between gap-4 pointer-coarse:min-h-11", className)}>
       <span className="grid gap-0.5">
         <span className="text-body-sm font-semibold text-ink">{label}</span>
         {description ? <span className="text-caption text-ink-muted">{description}</span> : null}
@@ -103,7 +105,11 @@ export function Switch({ className, label, description, ...props }: ComponentPro
   );
 }
 
-/** Segmented control from radio inputs (Cyclowareness "Full | Calm | Still"). */
+/**
+ * Segmented control from radio inputs (Cyclowareness "Full | Calm | Still"). Options wrap onto a
+ * second row when the labels do not fit (three Russian motion labels at 320 px), instead of
+ * running past the viewport; with `fullWidth` they share each row.
+ */
 export function Segmented({
   name,
   options,
@@ -126,7 +132,7 @@ export function Segmented({
   ariaLabel?: string;
 }) {
   return (
-    <div role="radiogroup" aria-label={ariaLabel} className={cn("inline-flex rounded-pill bg-sunken p-1", fullWidth && "flex w-full", className)}>
+    <div role="radiogroup" aria-label={ariaLabel} className={cn("inline-flex max-w-full flex-wrap rounded-pill bg-sunken p-1", fullWidth && "flex w-full", className)}>
       {options.map((o) => (
         <label key={o.value} className={cn("relative", fullWidth && "flex-1")}>
           <input
@@ -139,7 +145,8 @@ export function Segmented({
           <span
             className={cn(
               "flex cursor-pointer items-center justify-center gap-1.5 rounded-pill font-semibold text-ink-muted transition-all duration-(--duration-fast) peer-checked:bg-surface peer-checked:text-ink peer-checked:shadow-xs peer-focus-visible:outline-2 peer-focus-visible:outline-brand-600 hover:text-ink",
-              { sm: "h-8 px-3 text-tab", md: "h-9 px-4 text-caption", lg: "h-12 px-5 text-body" }[size],
+              // Like the small buttons, the 32 and 36 px segments grow to the 44 px touch target on coarse pointers.
+              { sm: "h-8 px-3 text-tab pointer-coarse:h-11", md: "h-9 px-4 text-caption pointer-coarse:h-11", lg: "h-12 px-5 text-body" }[size],
             )}
           >
             {o.label}

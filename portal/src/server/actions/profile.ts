@@ -1,6 +1,7 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { refresh } from "next/cache";
 import QRCode from "qrcode";
 import { db, t } from "../db";
@@ -14,7 +15,7 @@ import { clientIp } from "../request";
 import { rateLimit } from "../rate-limit";
 
 async function checkPassword(userId: string, password: string): Promise<boolean> {
-  if (!rateLimit(`pw-confirm:${userId}`, 10, 15 * 60_000).ok) return false;
+  if (!(await rateLimit(`pw-confirm:${userId}`, 10, 15 * 60_000)).ok) return false;
   const [u] = await db().select({ hash: t.users.passwordHash }).from(t.users).where(eq(t.users.id, userId));
   return verifyPassword(u?.hash ?? null, password);
 }
@@ -94,7 +95,8 @@ export async function requestDeletionAction(): Promise<{ ok: boolean }> {
     .from(t.users)
     .where(and(eq(t.users.tenantId, v.tenant.id), eq(t.users.role, "tenant_admin"), eq(t.users.status, "active")));
   if (admins.length) {
-    await db().insert(t.notifications).values(admins.map((a) => ({ tenantId: v.tenant.id, userId: a.id, kind: "deletion", title: v.user.name, body: "Account deletion requested", href: `/admin/users/${v.user.id}` })));
+    const tr = await getTranslations({ locale: v.tenant.settings.defaultLocale, namespace: "admin.person" });
+    await db().insert(t.notifications).values(admins.map((a) => ({ tenantId: v.tenant.id, userId: a.id, kind: "deletion", title: v.user.name, body: tr("deletionRequestedBody"), href: `/admin/users/${v.user.id}` })));
   }
   refresh();
   return { ok: true };

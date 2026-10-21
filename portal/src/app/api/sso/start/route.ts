@@ -2,10 +2,11 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db, t } from "@/server/db";
-import { env } from "@/server/env";
+import { appUrl, env } from "@/server/env";
 import { allowed, getSession } from "@/server/auth/viewer";
 import { SSO_STATE_COOKIE, codeChallenge, discover, randomValue, sealState } from "@/server/auth/oidc";
-import { featuresFor } from "@/lib/tenant-defaults";
+import { TENANT_SLUG_RE } from "@/server/services/tenants";
+import { featuresFor, withDefaults } from "@/lib/tenant-defaults";
 
 /**
  * Starts single sign-on for an organisation: /api/sso/start?tenant={slug}.
@@ -18,9 +19,11 @@ export async function GET(request: Request) {
   const test = url.searchParams.get("test") === "1";
   const failed = test ? "/admin/settings?tab=identity&ssoTest=failed" : "/sign-in?error=sso";
 
-  const [tenant] = slug
+  // Anything that is not a slug (empty, too long, a NUL byte the database rejects) is no organisation.
+  const [row] = TENANT_SLUG_RE.test(slug)
     ? await db().select({ slug: t.tenants.slug, plan: t.tenants.plan, features: t.tenants.features, settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.slug, slug))
     : [];
+  const tenant = row ? { ...row, settings: withDefaults(row.settings) } : undefined;
   if (test) {
     const v = await getSession();
     if (!v || !tenant || v.tenant.slug !== tenant.slug || !allowed(v, "settings.write")) redirect("/sign-in");
@@ -38,7 +41,7 @@ export async function GET(request: Request) {
     const auth = new URL(provider.authorizationEndpoint);
     auth.searchParams.set("response_type", "code");
     auth.searchParams.set("client_id", sso.clientId);
-    auth.searchParams.set("redirect_uri", `${env.APP_URL.replace(/\/$/, "")}/api/sso/callback/${tenant.slug}`);
+    auth.searchParams.set("redirect_uri", `${appUrl()}/api/sso/callback/${tenant.slug}`);
     auth.searchParams.set("scope", "openid email profile");
     auth.searchParams.set("state", state);
     auth.searchParams.set("nonce", nonce);

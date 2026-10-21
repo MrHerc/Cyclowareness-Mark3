@@ -41,8 +41,9 @@ export function parseCsv(input: string): string[][] {
 function cell(v: unknown): string {
   if (v === null || v === undefined) return "";
   let s = v instanceof Date ? v.toISOString() : String(v);
-  // Neutralise spreadsheet formulas (CSV injection).
-  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`;
+  // Neutralise spreadsheet formulas (CSV injection). An international phone number (+ and digits
+  // only) cannot call anything, and the apostrophe would end up in the number when the file comes back.
+  if (/^[=+\-@\t\r]/.test(s) && !/^\+\d{8,15}$/.test(s)) s = `'${s}`;
   return /[",\n\r;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 

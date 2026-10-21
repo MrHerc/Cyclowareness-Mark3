@@ -4,8 +4,10 @@ import { and, eq } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { db, t } from "../db";
-import { actionViewer } from "../auth/viewer";
+import { actionViewer, allowed } from "../auth/viewer";
+import { isUuid } from "../../lib/ids";
 import { audit } from "../services/audit";
+import { scopeDepartmentIds } from "../queries/admin";
 import { REPORT_KINDS } from "../db/schema";
 
 const scheduleSchema = z
@@ -30,6 +32,14 @@ export async function saveScheduleAction(input: { kind: string; format: string; 
       .filter(Boolean),
   });
   if (!p.success) return { ok: false };
+  if (p.data.kind === "secops" && !allowed(v, "secops.read")) return { ok: false };
+  // The department must be the organisation's own; a scoped role schedules only for its own departments.
+  const scope = await scopeDepartmentIds(v);
+  if (scope && (!p.data.departmentId || !scope.has(p.data.departmentId))) return { ok: false };
+  if (p.data.departmentId) {
+    const [d] = await db().select({ id: t.departments.id }).from(t.departments).where(and(eq(t.departments.id, p.data.departmentId), eq(t.departments.tenantId, v.tenant.id)));
+    if (!d) return { ok: false };
+  }
   const [row] = await db().insert(t.reportSchedules).values({ tenantId: v.tenant.id, ...p.data, createdBy: v.user.id }).returning({ id: t.reportSchedules.id });
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "report.schedule_created", targetType: "report_schedule", targetId: row.id, meta: { kind: p.data.kind, frequency: p.data.frequency, day: p.data.day } });
   refresh();
@@ -38,7 +48,14 @@ export async function saveScheduleAction(input: { kind: string; format: string; 
 
 export async function removeScheduleAction(id: string): Promise<{ ok: boolean }> {
   const v = await actionViewer("reports.read");
-  await db().delete(t.reportSchedules).where(and(eq(t.reportSchedules.id, id), eq(t.reportSchedules.tenantId, v.tenant.id)));
+  if (!isUuid(id)) return { ok: false };
+  // Scoped roles remove only their own schedules; administrators any of the organisation's.
+  const own = allowed(v, "settings.write") ? undefined : eq(t.reportSchedules.createdBy, v.user.id);
+  const removed = await db()
+    .delete(t.reportSchedules)
+    .where(and(eq(t.reportSchedules.id, id), eq(t.reportSchedules.tenantId, v.tenant.id), own))
+    .returning({ id: t.reportSchedules.id });
+  if (!removed.length) return { ok: false };
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "report.schedule_removed", targetType: "report_schedule", targetId: id });
   refresh();
   return { ok: true };

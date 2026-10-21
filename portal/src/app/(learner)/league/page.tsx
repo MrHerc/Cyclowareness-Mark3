@@ -59,7 +59,7 @@ export default async function LeaguePage() {
                       </span>
                       <div
                         className={cn(
-                          "mt-2 grid w-full place-items-start justify-center rounded-t-xl pt-3 text-title font-bold",
+                          "mt-2 flex w-full items-start justify-center rounded-t-xl pt-3 text-title font-bold",
                           first ? "h-36 bg-brand-600 text-brand-on" : r.place === 2 ? "h-28 bg-brand-100 text-brand-700" : "h-20 bg-brand-100 text-brand-700",
                           r.id === mine?.id && "ring-4 ring-reward-400",
                         )}
@@ -86,7 +86,7 @@ export default async function LeaguePage() {
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-body-sm font-semibold">{r.name}</p>
                           <p className="text-tab text-ink-subtle">{me ? t("yourDepartment") : tc("units.learners", { count: r.learners })}</p>
-                          <ProgressBar value={r.points} tone={me ? "reward" : "brand"} size="sm" className="mt-2" />
+                          <ProgressBar decorative value={r.points} tone={me ? "reward" : "brand"} size="sm" className="mt-2" />
                         </div>
                         <span className="text-title-sm font-bold tabular-nums">{r.points}</span>
                         <TrendMark trend={r.trend} label={t(`trend_${r.trend}`)} />

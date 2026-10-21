@@ -1,18 +1,24 @@
 import { cn } from "@/lib/cn";
 
+/**
+ * Every bar needs an accessible name: pass `label`, or `decorative` when visible text right next to it
+ * already states the value (the bar is then hidden from assistive tech instead of announced twice).
+ */
+type BarName = { label: string; decorative?: never } | { decorative: true; label?: never };
+
 export function ProgressBar({
   value,
   tone = "brand",
   className,
   label,
+  decorative,
   size = "md",
 }: {
   value: number;
   tone?: "brand" | "reward" | "safe" | "risk" | "warn" | "white";
   className?: string;
-  label?: string;
   size?: "sm" | "md" | "lg";
-}) {
+} & BarName) {
   const v = Math.max(0, Math.min(100, value));
   const fill = {
     brand: "bg-brand-600",
@@ -25,11 +31,7 @@ export function ProgressBar({
   const track = tone === "white" ? "bg-white/25" : "bg-sunken";
   return (
     <div
-      role="progressbar"
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={Math.round(v)}
-      aria-label={label}
+      {...(decorative ? { "aria-hidden": true } : { role: "progressbar", "aria-valuemin": 0, "aria-valuemax": 100, "aria-valuenow": Math.round(v), "aria-label": label })}
       className={cn("w-full overflow-hidden rounded-pill", track, size === "sm" ? "h-1.5" : size === "lg" ? "h-3" : "h-2", className)}
     >
       <div className={cn("h-full rounded-pill transition-[width] duration-(--duration-slow) ease-(--ease-out-expo)", fill)} style={{ width: `${v}%` }} />
@@ -53,7 +55,8 @@ export function Ring({
   tone?: "reward" | "brand" | "white" | "safe";
   children?: React.ReactNode;
   className?: string;
-  label?: string;
+  /** Required: the ring is an image (role="img") and must be named. */
+  label: string;
 }) {
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;

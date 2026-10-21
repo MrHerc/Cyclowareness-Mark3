@@ -1,29 +1,44 @@
 "use server";
 
-import { and, eq, inArray, ne } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, ne, sql } from "drizzle-orm";
 import { refresh } from "next/cache";
+import { unstable_rethrow } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { db, t } from "../db";
+import { isUniqueViolation } from "../db/errors";
 import { actionViewer, type Viewer } from "../auth/viewer";
+import { isUuid } from "../../lib/ids";
 import { ASSIGNABLE_ROLES } from "../auth/permissions";
+import { emailDomain } from "../auth/sso-routing";
 import { issueAccountLink } from "../auth/links";
 import { invalidateUserSessions } from "../auth/session";
 import { audit } from "../services/audit";
 import { notifyUsers } from "../services/notify";
-import { resolveAssignments } from "../services/assignments";
+import { coveringAssignments, departmentClosure, gainsCoverage, resolveAssignments } from "../services/assignments";
 import { recomputeRisk } from "../services/risk";
 import { scopeDepartmentIds } from "../queries/admin";
 import { clientIp } from "../request";
 import { parseCsv } from "../../lib/csv";
+import { cleanPhone, PHONE_PATTERN } from "../../lib/phone";
+import { departmentKey } from "../../lib/departments";
 import { LOCALES } from "../../i18n/config";
 import type { Role } from "../db/schema";
 import { pick } from "../../i18n/config";
 
 async function target(v: Viewer, userId: string) {
+  // The id reaches a uuid column: anything else is no person (instead of a database error).
+  if (!isUuid(userId)) return null;
   const [u] = await db().select().from(t.users).where(and(eq(t.users.id, userId), eq(t.users.tenantId, v.tenant.id), ne(t.users.status, "deleted")));
   return u ?? null;
 }
+
+/** Optional phone, written as people type it (+994 50 123 45 67, as the CSV import accepts) and stored as +994501234567. */
+const phoneSchema = z
+  .string()
+  .transform(cleanPhone)
+  .pipe(z.string().regex(PHONE_PATTERN).or(z.literal("")))
+  .optional();
 
 const personSchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -31,38 +46,98 @@ const personSchema = z.object({
   role: z.enum(ASSIGNABLE_ROLES as [Role, ...Role[]]),
   departmentId: z.string().uuid().or(z.literal("")).optional(),
   jobTitle: z.string().trim().max(120).optional(),
-  phone: z
-    .string()
-    .trim()
-    .max(20)
-    .regex(/^(\+\d{8,15})?$/)
-    .optional(),
+  phone: phoneSchema,
   locale: z.enum(LOCALES).default("az"),
 });
 
-export type PersonState = { ok?: boolean; error?: string; name?: string } | undefined;
+/** `fields`: the inputs the server rejected (zod paths), so the form marks exactly those. */
+export type PersonState = { ok?: boolean; error?: string; name?: string; fields?: string[] } | undefined;
+
+/** Phone numbers sign people in, so a number can belong to one account only (across organisations). */
+async function phoneTaken(phone: string, exceptUserId?: string): Promise<boolean> {
+  const rows = await db().select({ id: t.users.id }).from(t.users).where(and(eq(t.users.phone, phone), ne(t.users.status, "deleted"))).limit(2);
+  return rows.some((r) => r.id !== exceptUserId);
+}
+
+/** Domains other organisations have proven: their addresses cannot be claimed here (that would block them from adding their own people). */
+async function foreignVerifiedDomains(tenantId: string): Promise<Set<string>> {
+  const rows = await db()
+    .select({ domain: t.tenants.domain })
+    .from(t.tenants)
+    .where(and(ne(t.tenants.id, tenantId), isNotNull(t.tenants.domainVerifiedAt), isNotNull(t.tenants.domain)));
+  return new Set(rows.map((r) => r.domain!.toLowerCase()));
+}
+
+/** Values go to the database in batches of this size (an import holds up to 5,000 rows). */
+const LOOKUP_BATCH = 500;
+
+/** Which of these addresses already belong to an account: any organisation, deleted ones included, as the unique index spans them all. */
+async function takenEmails(emails: string[]): Promise<Set<string>> {
+  const wanted = [...new Set(emails.filter(Boolean))];
+  const taken = new Set<string>();
+  for (let i = 0; i < wanted.length; i += LOOKUP_BATCH) {
+    const rows = await db().select({ email: t.users.email }).from(t.users).where(inArray(t.users.email, wanted.slice(i, i + LOOKUP_BATCH)));
+    for (const r of rows) taken.add(r.email);
+  }
+  return taken;
+}
+
+/** Which of these numbers already belong to a live account (see phoneTaken). */
+async function takenPhones(phones: string[]): Promise<Set<string>> {
+  const wanted = [...new Set(phones.filter(Boolean))];
+  const taken = new Set<string>();
+  for (let i = 0; i < wanted.length; i += LOOKUP_BATCH) {
+    const rows = await db()
+      .select({ phone: t.users.phone })
+      .from(t.users)
+      .where(and(inArray(t.users.phone, wanted.slice(i, i + LOOKUP_BATCH)), ne(t.users.status, "deleted")));
+    for (const r of rows) taken.add(r.phone!);
+  }
+  return taken;
+}
 
 export async function addPersonAction(_: PersonState, form: FormData): Promise<PersonState> {
   const v = await actionViewer("people.write");
   const p = personSchema.safeParse(Object.fromEntries(form));
-  if (!p.success) return { error: "invalid" };
+  if (!p.success) {
+    const fields = [...new Set(p.error.issues.map((i) => String(i.path[0] ?? "")).filter(Boolean))];
+    // A wrong phone number gets its own message (expected format); the rest are marked as invalid.
+    return { error: fields.length === 1 && fields[0] === "phone" ? "invalidPhone" : "invalid", fields };
+  }
   if (p.data.role === "tenant_admin" && v.user.role !== "tenant_admin" && v.user.role !== "super_admin") return { error: "invalid" };
   const [exists] = await db().select({ id: t.users.id }).from(t.users).where(eq(t.users.email, p.data.email));
   if (exists) return { error: "emailTaken" };
-  const [row] = await db()
-    .insert(t.users)
-    .values({
-      tenantId: v.tenant.id,
-      name: p.data.name,
-      email: p.data.email,
-      role: p.data.role,
-      status: "invited",
-      departmentId: p.data.departmentId || null,
-      jobTitle: p.data.jobTitle || null,
-      phone: p.data.phone || null,
-      locale: p.data.locale,
-    })
-    .returning({ id: t.users.id });
+  if ((await foreignVerifiedDomains(v.tenant.id)).has(emailDomain(p.data.email) ?? "")) return { error: "foreignDomain" };
+  if (p.data.phone && (await phoneTaken(p.data.phone))) return { error: "phoneTaken" };
+  if (p.data.departmentId) {
+    const [dept] = await db().select({ id: t.departments.id }).from(t.departments).where(and(eq(t.departments.id, p.data.departmentId), eq(t.departments.tenantId, v.tenant.id)));
+    if (!dept) return { error: "invalid", fields: ["departmentId"] };
+  }
+  let row: { id: string };
+  try {
+    [row] = await db()
+      .insert(t.users)
+      .values({
+        tenantId: v.tenant.id,
+        name: p.data.name,
+        email: p.data.email,
+        role: p.data.role,
+        status: "invited",
+        departmentId: p.data.departmentId || null,
+        jobTitle: p.data.jobTitle || null,
+        phone: p.data.phone || null,
+        locale: p.data.locale,
+      })
+      .returning({ id: t.users.id });
+  } catch (error) {
+    // The checks above can race with a concurrent add; the unique indexes decide.
+    if (isUniqueViolation(error, "users_email_idx")) return { error: "emailTaken" };
+    if (isUniqueViolation(error, "users_phone_active_idx")) return { error: "phoneTaken" };
+    // Any other failure keeps the dialog open with a notice instead of replacing it with the error page.
+    unstable_rethrow(error);
+    console.error("[people] adding a person failed", error);
+    return { error: "generic" };
+  }
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.added", targetType: "user", targetId: row.id, ip: await clientIp(), meta: { email: p.data.email, role: p.data.role } });
   if (v.tenant.settings.email.enabled) await emailInvite(v.tenant.id, row.id);
   refresh();
@@ -79,10 +154,12 @@ async function emailInvite(tenantId: string, userId: string, defer = false): Pro
 export async function emailInvitesAction(userIds: string[]): Promise<{ ok: boolean; count: number }> {
   const v = await actionViewer("people.write");
   if (!v.tenant.settings.email.enabled) return { ok: false, count: 0 };
+  const ids = Array.isArray(userIds) ? userIds.filter(isUuid).slice(0, 5000) : [];
+  if (!ids.length) return { ok: false, count: 0 };
   const people = await db()
     .select({ id: t.users.id })
     .from(t.users)
-    .where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, userIds.slice(0, 5000)), eq(t.users.status, "invited"), ne(t.users.role, "super_admin")));
+    .where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, ids), eq(t.users.status, "invited"), ne(t.users.role, "super_admin")));
   let count = 0;
   for (const u of people) count += await emailInvite(v.tenant.id, u.id, true);
   if (count) await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "people.invites_emailed", ip: await clientIp(), meta: { count } });
@@ -92,6 +169,7 @@ export async function emailInvitesAction(userIds: string[]): Promise<{ ok: boole
 
 export async function createLinkAction(userId: string, kind: "invite" | "reset"): Promise<{ ok: boolean; url?: string }> {
   const v = await actionViewer("people.write");
+  if (kind !== "invite" && kind !== "reset") return { ok: false };
   const u = await target(v, userId);
   if (!u) return { ok: false };
   const url = await issueAccountLink(u.id, kind);
@@ -102,21 +180,30 @@ export async function createLinkAction(userId: string, kind: "invite" | "reset")
 const updateSchema = z.object({
   name: z.string().trim().min(2).max(120),
   jobTitle: z.string().trim().max(120).optional(),
-  phone: z
-    .string()
-    .trim()
-    .max(20)
-    .regex(/^(\+\d{8,15})?$/)
-    .optional(),
+  phone: phoneSchema,
   locale: z.enum(LOCALES),
 });
 
-export async function updatePersonAction(userId: string, input: z.infer<typeof updateSchema>): Promise<{ ok: boolean }> {
+/** `error` and `fields` as for adding a person, so the dialog marks the rejected input. */
+export type UpdatePersonResult = { ok: boolean; error?: "invalid" | "invalidPhone" | "phoneTaken"; fields?: string[] };
+
+export async function updatePersonAction(userId: string, input: z.input<typeof updateSchema>): Promise<UpdatePersonResult> {
   const v = await actionViewer("people.write");
   const u = await target(v, userId);
+  if (!u) return { ok: false, error: "invalid" };
   const p = updateSchema.safeParse(input);
-  if (!u || !p.success) return { ok: false };
-  await db().update(t.users).set({ name: p.data.name, jobTitle: p.data.jobTitle || null, phone: p.data.phone || null, locale: p.data.locale }).where(eq(t.users.id, u.id));
+  if (!p.success) {
+    const fields = [...new Set(p.error.issues.map((i) => String(i.path[0] ?? "")).filter(Boolean))];
+    return { ok: false, error: fields.length === 1 && fields[0] === "phone" ? "invalidPhone" : "invalid", fields };
+  }
+  if (p.data.phone && (await phoneTaken(p.data.phone, u.id))) return { ok: false, error: "phoneTaken", fields: ["phone"] };
+  try {
+    await db().update(t.users).set({ name: p.data.name, jobTitle: p.data.jobTitle || null, phone: p.data.phone || null, locale: p.data.locale }).where(eq(t.users.id, u.id));
+  } catch (error) {
+    // The check above can race with another save; the unique index decides.
+    if (isUniqueViolation(error, "users_phone_active_idx")) return { ok: false, error: "phoneTaken", fields: ["phone"] };
+    throw error;
+  }
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.changed", targetType: "user", targetId: u.id });
   refresh();
   return { ok: true };
@@ -151,12 +238,31 @@ export async function resetTwoFactorAction(userId: string): Promise<{ ok: boolea
 
 export async function moveDepartmentAction(userIds: string[], departmentId: string | null): Promise<{ ok: boolean }> {
   const v = await actionViewer("people.write");
+  if (departmentId !== null && !isUuid(departmentId)) return { ok: false };
   if (departmentId) {
     const [d] = await db().select({ id: t.departments.id }).from(t.departments).where(and(eq(t.departments.id, departmentId), eq(t.departments.tenantId, v.tenant.id)));
     if (!d) return { ok: false };
   }
-  const ids = userIds.slice(0, 5000);
-  await db().update(t.users).set({ departmentId }).where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, ids)));
+  const ids = Array.isArray(userIds) ? userIds.filter(isUuid).slice(0, 5000) : [];
+  if (!ids.length) return { ok: false };
+  // Reminders for department assignments count from the department date, so it moves only for people
+  // the move puts under a department assignment that did not cover them before (see assignedSince).
+  const [departments, assignments, people] = await Promise.all([
+    db().select({ id: t.departments.id, parentId: t.departments.parentId }).from(t.departments).where(eq(t.departments.tenantId, v.tenant.id)),
+    db()
+      .select({ id: t.assignments.id, scope: t.assignments.scope, departmentId: t.assignments.departmentId })
+      .from(t.assignments)
+      .where(and(eq(t.assignments.tenantId, v.tenant.id), eq(t.assignments.scope, "department"))),
+    db().select({ id: t.users.id, departmentId: t.users.departmentId }).from(t.users).where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, ids))),
+  ]);
+  const closure = departmentClosure(departments);
+  const after = coveringAssignments(assignments, closure, departmentId);
+  const gained = people.filter((p) => p.departmentId !== departmentId && gainsCoverage(coveringAssignments(assignments, closure, p.departmentId), after)).map((p) => p.id);
+  await db().transaction(async (tx) => {
+    const changing = and(eq(t.users.tenantId, v.tenant.id), sql`${t.users.departmentId} is distinct from ${departmentId}`);
+    if (gained.length) await tx.update(t.users).set({ departmentId, departmentChangedAt: new Date() }).where(and(changing, inArray(t.users.id, gained)));
+    await tx.update(t.users).set({ departmentId }).where(and(changing, inArray(t.users.id, ids)));
+  });
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.moved", meta: { count: ids.length, departmentId } });
   await recomputeRisk(db(), v.tenant.id, ids);
   refresh();
@@ -165,9 +271,22 @@ export async function moveDepartmentAction(userIds: string[], departmentId: stri
 
 export async function setStatusAction(userIds: string[], status: "active" | "suspended"): Promise<{ ok: boolean }> {
   const v = await actionViewer("people.write");
-  const ids = userIds.filter((id) => id !== v.user.id).slice(0, 5000);
+  if (status !== "active" && status !== "suspended") return { ok: false };
+  const ids = userIds.filter((id) => id !== v.user.id && isUuid(id)).slice(0, 5000);
   if (!ids.length) return { ok: false };
-  await db().update(t.users).set({ status }).where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, ids), ne(t.users.status, "deleted")));
+  await db()
+    .update(t.users)
+    // An account that was never activated (still invited, or suspended before it accepted its invite: no
+    // activation date and no password) starts its reminder clock now, as accepting the invite does.
+    .set(
+      status === "active"
+        ? {
+            status,
+            activatedAt: sql`case when ${t.users.status} = 'invited' or (${t.users.status} = 'suspended' and ${t.users.activatedAt} is null and ${t.users.passwordHash} is null) then now() else ${t.users.activatedAt} end`,
+          }
+        : { status },
+    )
+    .where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, ids), ne(t.users.status, "deleted")));
   if (status === "suspended") for (const id of ids) await invalidateUserSessions(id);
   for (const id of ids) await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: status === "suspended" ? "person.suspended" : "person.reactivated", targetType: "user", targetId: id });
   refresh();
@@ -176,12 +295,19 @@ export async function setStatusAction(userIds: string[], status: "active" | "sus
 
 /** Deletion anonymises the person: learning history stays for reports, identity is removed. */
 async function anonymise(v: Viewer, userId: string, action: "person.deleted" | "person.deletion_approved") {
-  await db()
-    .update(t.users)
-    .set({ name: "—", email: `deleted+${userId}@invalid.local`, phone: null, jobTitle: null, avatarUrl: null, passwordHash: null, totpSecret: null, totpEnabled: false, totpRecovery: null, status: "deleted", deletionRequestedAt: null, managerId: null })
-    .where(eq(t.users.id, userId));
-  await invalidateUserSessions(userId);
-  await db().delete(t.authTokens).where(eq(t.authTokens.userId, userId));
+  // All or nothing: a deleted person must not stay a department head or manager, or keep sign-in links.
+  await db().transaction(async (tx) => {
+    await tx
+      .update(t.users)
+      .set({ name: "—", email: `deleted+${userId}@invalid.local`, phone: null, jobTitle: null, avatarUrl: null, passwordHash: null, totpSecret: null, totpEnabled: false, totpRecovery: null, status: "deleted", deletionRequestedAt: null, managerId: null })
+      .where(eq(t.users.id, userId));
+    // Nobody is managed or headed by a deleted person: manager alerts would otherwise go nowhere.
+    await tx.update(t.departments).set({ headUserId: null }).where(and(eq(t.departments.headUserId, userId), eq(t.departments.tenantId, v.tenant.id)));
+    await tx.update(t.users).set({ managerId: null }).where(and(eq(t.users.managerId, userId), eq(t.users.tenantId, v.tenant.id)));
+    // Signed out everywhere (as invalidateUserSessions does), in the same transaction.
+    await tx.delete(t.sessions).where(eq(t.sessions.userId, userId));
+    await tx.delete(t.authTokens).where(eq(t.authTokens.userId, userId));
+  });
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action, targetType: "user", targetId: userId, ip: await clientIp() });
 }
 
@@ -210,11 +336,13 @@ export async function decideDeletionAction(userId: string, approve: boolean): Pr
 /** Reminds the selected people about assigned modules they haven't finished. */
 export async function remindPeopleAction(userIds: string[]): Promise<{ count: number }> {
   const v = await actionViewer("assignments.read");
+  const ids = Array.isArray(userIds) ? userIds.filter(isUuid).slice(0, 5000) : [];
+  if (!ids.length) return { count: 0 };
   const scope = await scopeDepartmentIds(v);
   const users = await db()
     .select({ id: t.users.id, departmentId: t.users.departmentId, locale: t.users.locale })
     .from(t.users)
-    .where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, userIds.slice(0, 5000)), eq(t.users.status, "active")));
+    .where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, ids), eq(t.users.status, "active")));
   const allowedUsers = users.filter((u) => !scope || (u.departmentId && scope.has(u.departmentId)));
   const assigned = await resolveAssignments(db(), v.tenant.id, allowedUsers.map((u) => u.id));
   const mods = await db().select({ id: t.modules.id, slug: t.modules.slug, title: t.modules.title }).from(t.modules);
@@ -232,7 +360,7 @@ export async function remindPeopleAction(userIds: string[]): Promise<{ count: nu
     if (!pending.length) continue;
     const first = modMap.get(pending[0].moduleId);
     if (!first) continue;
-    count += await notifyUsers(db(), v.tenant.id, [u.id], "reminder", { module: pick(first.title, u.locale), dueDate: pending[0].due ?? undefined, link: `/learn/${first.slug}` }, { title: pick(first.title, u.locale), href: `/learn/${first.slug}` });
+    count += await notifyUsers(db(), v.tenant.id, [u.id], "reminder", { module: pick(first.title, u.locale), dueDate: pending[0].due ?? undefined, link: `/learn/${first.slug}` }, { title: pick(first.title, u.locale), href: `/learn/${first.slug}` }, { defer: true });
   }
   refresh();
   return { count };
@@ -254,6 +382,16 @@ const ROLE_ALIASES: Record<string, Role> = {
 
 export type ImportPreview = { ok: boolean; rows: number; problems: { line: number; problem: string }[]; newDepartments: string[]; imported?: number; error?: string };
 
+/** A unique index refused one row of a commit: the whole import rolls back and the row is reported like a preview problem. */
+class ImportConflict extends Error {
+  constructor(
+    readonly line: number,
+    readonly problem: "exists" | "phoneTaken" | "departmentTaken",
+  ) {
+    super(`import conflict on line ${line}: ${problem}`);
+  }
+}
+
 /** CSV import in two steps: "check" validates everything, "commit" writes only a clean file. */
 export async function importPeopleAction(csv: string, commit: boolean): Promise<ImportPreview> {
   const v = await actionViewer("people.write");
@@ -265,16 +403,34 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
   if (col("name") < 0 || col("email") < 0) return { ok: false, rows: 0, problems: [{ line: 1, problem: "header" }], newDepartments: [] };
   if (table.length > 5001) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "tooMany" };
 
-  const departments = await db().select().from(t.departments).where(eq(t.departments.tenantId, v.tenant.id));
-  const deptByName = new Map(departments.map((d) => [d.name.trim().toLowerCase(), d.id]));
-  const existing = new Set((await db().select({ email: t.users.email }).from(t.users)).map((u) => u.email));
+  const cell = (r: string[], n: string) => (col(n) >= 0 ? (r[col(n)] ?? "").trim() : "");
+  const body = table.slice(1);
+  // Only the file's own addresses and numbers are looked up (not every account on the platform).
+  const [departments, existing, phones, foreign] = await Promise.all([
+    db().select().from(t.departments).where(eq(t.departments.tenantId, v.tenant.id)),
+    takenEmails(body.map((r) => cell(r, "email").toLowerCase())),
+    takenPhones(body.map((r) => cleanPhone(cell(r, "phone")))),
+    foreignVerifiedDomains(v.tenant.id),
+  ]);
+  // Matched by departmentKey() of the current names. The stored name_key is the key as it was computed when the
+  // name was saved, so should departmentKey() ever fold more, two older names could match one spelling: such a
+  // row is refused rather than put in either of them.
+  const deptMatches = new Map<string, string[]>();
+  for (const d of departments) {
+    const key = departmentKey(d.name);
+    deptMatches.set(key, [...(deptMatches.get(key) ?? []), d.id]);
+  }
+  const deptByName = new Map([...deptMatches].filter(([, ids]) => ids.length === 1).map(([key, [id]]) => [key, id]));
   const seen = new Set<string>();
   const problems: { line: number; problem: string }[] = [];
-  const newDepartments = new Set<string>();
-  const rows: { name: string; email: string; department: string; jobTitle: string; role: Role; manager: string; phone: string }[] = [];
-  table.slice(1).forEach((r, i) => {
+  // Keyed by departmentKey(); the first spelling in the file becomes the new department's name, and its line
+  // is the one reported should someone add that department before the import is committed.
+  const newDepartments = new Map<string, { name: string; line: number }>();
+  const newDepartmentNames = () => [...newDepartments.values()].map((d) => d.name);
+  const rows: { line: number; name: string; email: string; department: string; jobTitle: string; role: Role; manager: string; phone: string }[] = [];
+  body.forEach((r, i) => {
     const line = i + 2;
-    const get = (n: string) => (col(n) >= 0 ? (r[col(n)] ?? "").trim() : "");
+    const get = (n: string) => cell(r, n);
     const name = get("name");
     const email = get("email").toLowerCase();
     const roleRaw = get("role").toLowerCase();
@@ -283,47 +439,83 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
     if (!z.email().safeParse(email).success) problems.push({ line, problem: "email" });
     else if (seen.has(email)) problems.push({ line, problem: "duplicate" });
     else if (existing.has(email)) problems.push({ line, problem: "exists" });
+    else if (foreign.has(emailDomain(email) ?? "")) problems.push({ line, problem: "foreignDomain" });
     seen.add(email);
     const role = roleRaw ? ROLE_ALIASES[roleRaw] : "learner";
     if (!role) problems.push({ line, problem: "role" });
-    if (department && !deptByName.has(department.toLowerCase())) newDepartments.add(department);
-    rows.push({ name, email, department, jobTitle: get("job_title"), role: role ?? "learner", manager: get("manager_email").toLowerCase(), phone: get("phone") });
+    // Optional, but a number that is given must be usable for phone sign-in and SMS: +994501234567.
+    const phone = cleanPhone(get("phone"));
+    if (phone && !PHONE_PATTERN.test(phone)) problems.push({ line, problem: "phone" });
+    else if (phone) {
+      if (phones.has(phone)) problems.push({ line, problem: "phoneTaken" });
+      phones.add(phone);
+    }
+    const key = departmentKey(department);
+    if (department && (deptMatches.get(key)?.length ?? 0) > 1) problems.push({ line, problem: "departmentAmbiguous" });
+    else if (department && !deptByName.has(key) && !newDepartments.has(key)) newDepartments.set(key, { name: department, line });
+    rows.push({ line, name, email, department, jobTitle: get("job_title"), role: role ?? "learner", manager: get("manager_email").toLowerCase(), phone });
   });
-  if (!commit || problems.length) return { ok: problems.length === 0, rows: rows.length, problems: problems.slice(0, 200), newDepartments: [...newDepartments] };
+  if (!commit || problems.length) return { ok: problems.length === 0, rows: rows.length, problems: problems.slice(0, 200), newDepartments: newDepartmentNames() };
 
-  for (const name of newDepartments) {
-    const [d] = await db().insert(t.departments).values({ tenantId: v.tenant.id, name }).returning({ id: t.departments.id });
-    deptByName.set(name.toLowerCase(), d.id);
-    await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "department.created", targetType: "department", targetId: d.id, meta: { name, via: "import" } });
-  }
-  const created: { id: string; email: string; manager: string }[] = [];
-  for (const r of rows) {
-    const [u] = await db()
-      .insert(t.users)
-      .values({
-        tenantId: v.tenant.id,
-        name: r.name,
-        email: r.email,
-        role: r.role === "tenant_admin" && v.user.role !== "tenant_admin" ? "learner" : r.role,
-        status: "invited",
-        departmentId: r.department ? deptByName.get(r.department.toLowerCase()) ?? null : null,
-        jobTitle: r.jobTitle || null,
-        phone: /^\+\d{8,15}$/.test(r.phone) ? r.phone : null,
-        locale: v.tenant.settings.defaultLocale,
-      })
-      .returning({ id: t.users.id });
-    created.push({ id: u.id, email: r.email, manager: r.manager });
-  }
-  const all = await db().select({ id: t.users.id, email: t.users.email }).from(t.users).where(eq(t.users.tenantId, v.tenant.id));
-  const byEmail = new Map(all.map((u) => [u.email, u.id]));
-  for (const c of created) {
-    const mid = c.manager ? byEmail.get(c.manager) : undefined;
-    if (mid) await db().update(t.users).set({ managerId: mid }).where(eq(t.users.id, c.id));
+  // All or nothing: a file lands completely or not at all, so a conflict halfway (someone added one of
+  // these addresses meanwhile) leaves no partial import and no orphan departments behind.
+  let created: { id: string }[];
+  try {
+    created = await db().transaction(async (tx) => {
+      for (const [key, { name, line }] of newDepartments) {
+        let d: { id: string };
+        try {
+          [d] = await tx.insert(t.departments).values({ tenantId: v.tenant.id, name, nameKey: key }).returning({ id: t.departments.id });
+        } catch (error) {
+          // Someone added this department since the check (by hand or by another import); the unique index decides.
+          if (isUniqueViolation(error, "departments_tenant_name_key_idx")) throw new ImportConflict(line, "departmentTaken");
+          throw error;
+        }
+        deptByName.set(key, d.id);
+        await audit(tx, { tenantId: v.tenant.id, actorId: v.user.id, action: "department.created", targetType: "department", targetId: d.id, meta: { name, via: "import" } });
+      }
+      const inserted: { id: string; manager: string }[] = [];
+      for (const r of rows) {
+        let u: { id: string };
+        try {
+          [u] = await tx
+            .insert(t.users)
+            .values({
+              tenantId: v.tenant.id,
+              name: r.name,
+              email: r.email,
+              role: r.role === "tenant_admin" && v.user.role !== "tenant_admin" ? "learner" : r.role,
+              status: "invited",
+              departmentId: r.department ? deptByName.get(departmentKey(r.department)) ?? null : null,
+              jobTitle: r.jobTitle || null,
+              phone: r.phone || null,
+              locale: v.tenant.settings.defaultLocale,
+            })
+            .returning({ id: t.users.id });
+        } catch (error) {
+          // The checks above can race with a concurrent add or import; the unique indexes decide.
+          if (isUniqueViolation(error, "users_email_idx")) throw new ImportConflict(r.line, "exists");
+          if (isUniqueViolation(error, "users_phone_active_idx")) throw new ImportConflict(r.line, "phoneTaken");
+          throw error;
+        }
+        inserted.push({ id: u.id, manager: r.manager });
+      }
+      const all = await tx.select({ id: t.users.id, email: t.users.email }).from(t.users).where(eq(t.users.tenantId, v.tenant.id));
+      const byEmail = new Map(all.map((u) => [u.email, u.id]));
+      for (const c of inserted) {
+        const mid = c.manager ? byEmail.get(c.manager) : undefined;
+        if (mid) await tx.update(t.users).set({ managerId: mid }).where(eq(t.users.id, c.id));
+      }
+      return inserted;
+    });
+  } catch (error) {
+    if (error instanceof ImportConflict) return { ok: false, rows: rows.length, problems: [{ line: error.line, problem: error.problem }], newDepartments: newDepartmentNames() };
+    throw error;
   }
   // Same promise as Add person: everyone imported gets their invitation once sending is on.
   let emailed = 0;
   if (v.tenant.settings.email.enabled) for (const c of created) emailed += await emailInvite(v.tenant.id, c.id, true);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "people.imported", ip: await clientIp(), meta: { count: created.length, emailed } });
   refresh();
-  return { ok: true, rows: rows.length, problems: [], newDepartments: [...newDepartments], imported: created.length };
+  return { ok: true, rows: rows.length, problems: [], newDepartments: newDepartmentNames(), imported: created.length };
 }

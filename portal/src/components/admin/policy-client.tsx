@@ -109,14 +109,16 @@ export function VersionEditor({ policyId, nextVersion, initial }: { policyId: st
 export function PolicyHeaderActions({ policyId, archived, versionId }: { policyId: string; archived: boolean; versionId: string | null }) {
   const t = useTranslations("admin.policies");
   const [pending, start] = useTransition();
+  // Long labels ("Remind people who haven't signed") wrap inside the button on narrow phones instead of widening the page.
+  const fit = "h-auto min-h-11 max-w-full whitespace-normal py-2.5 text-start";
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex max-w-full flex-wrap gap-2">
       {versionId ? (
-        <Button variant="secondary" icon={<Bell />} disabled={pending} onClick={() => start(async () => toast(t("reminded", { count: (await remindPolicyAction(versionId)).count })))}>
+        <Button variant="secondary" className={fit} icon={<Bell />} disabled={pending} onClick={() => start(async () => toast(t("reminded", { count: (await remindPolicyAction(versionId)).count })))}>
           {t("remind")}
         </Button>
       ) : null}
-      <Button variant="secondary" icon={archived ? <ArchiveRestore /> : <Archive />} disabled={pending} onClick={() => start(async () => void (await archivePolicyAction(policyId, !archived)))}>
+      <Button variant="secondary" className={fit} icon={archived ? <ArchiveRestore /> : <Archive />} disabled={pending} onClick={() => start(async () => void (await archivePolicyAction(policyId, !archived)))}>
         {archived ? t("restore") : t("archive")}
       </Button>
     </div>

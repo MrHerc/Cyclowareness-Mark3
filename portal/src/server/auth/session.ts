@@ -65,7 +65,8 @@ export async function setSessionCookie(token: string, expiresAt: Date): Promise<
 }
 
 export async function clearSessionCookie(): Promise<void> {
-  (await cookies()).delete(SESSION_COOKIE);
+  // A __Host- cookie is only deleted when the deletion carries the same Secure and Path attributes.
+  (await cookies()).delete({ name: SESSION_COOKIE, path: "/", secure: process.env.NODE_ENV === "production", httpOnly: true, sameSite: "lax" });
 }
 
 export async function readSessionToken(): Promise<string | null> {

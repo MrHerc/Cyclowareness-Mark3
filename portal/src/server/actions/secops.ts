@@ -5,10 +5,10 @@ import { refresh } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { db, t } from "../db";
-import { actionViewer, type Viewer } from "../auth/viewer";
+import { actionViewer, allowed, type Viewer } from "../auth/viewer";
 import { audit } from "../services/audit";
 import { advanceLoop, assignIncidentTraining, closeLoop, createIncident, createLoop, targetTraining } from "../services/secops";
-import { nextNumber } from "../services/threats";
+import { insertNumbered } from "../services/threats";
 import { analyzeUrl } from "../sandbox/analyze";
 import { emitEvent } from "../services/events";
 import { departmentClosure } from "../services/assignments";
@@ -16,10 +16,14 @@ import { aiEnabled, draftLesson, lessonDraftSchema, type LessonDraft } from "../
 import { rateLimit } from "../rate-limit";
 import { LOCALES, pick } from "../../i18n/config";
 import { AUDIENCES, CATEGORIES } from "../../lib/domain/catalog";
+import { parseDay } from "../../lib/day";
+import { isForeignKeyViolation } from "../db/errors";
 
 const uuid = z.string().uuid();
 const severity = z.enum(t.SEVERITY);
-type Result = { ok: boolean; error?: string };
+/** A real calendar day: 2026-02-31 would make the date column throw. */
+const day = z.string().refine((s) => parseDay(s) !== null);
+type Result = { ok: boolean; error?: string; field?: string };
 
 /* ───────── threat intake ───────── */
 
@@ -78,23 +82,19 @@ export async function analyzeReportUrlAction(id: string): Promise<Result & { num
   const v = await actionViewer("secops.write");
   const r = await ownReport(v, id);
   if (!r?.url || !v.tenant.features.has("sandbox")) return { ok: false };
-  if (!rateLimit(`sandbox:${v.user.id}`, 30, 10 * 60_000).ok) return { ok: false, error: "rateLimited" };
+  if (!(await rateLimit(`sandbox:${v.user.id}`, 30, 10 * 60_000)).ok) return { ok: false, error: "rateLimited" };
   const a = analyzeUrl(r.url);
-  for (let attempt = 0; ; attempt++) {
-    const number = await nextNumber(db(), t.sandboxAnalyses, v.tenant.id, 500);
-    try {
-      const [row] = await db()
-        .insert(t.sandboxAnalyses)
-        .values({ tenantId: v.tenant.id, number, kind: a.kind, objectName: a.objectName, sha256: a.sha256, sizeBytes: a.sizeBytes, verdict: a.verdict, score: a.score, findings: a.findings, iocs: a.iocs, mitre: a.mitre, submittedBy: v.user.id })
-        .returning({ id: t.sandboxAnalyses.id });
-      await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "sandbox.analyzed", targetType: "sandbox", targetId: row.id, meta: { number: `SB-${number}`, verdict: a.verdict } });
-      if (a.verdict === "malicious") await emitEvent(db(), v.tenant.id, "sandbox.malicious", { number: `SB-${number}`, kind: a.kind, iocs: a.iocs });
-      refresh();
-      return { ok: true, number, verdict: a.verdict };
-    } catch (error) {
-      if (attempt >= 3) throw error;
-    }
-  }
+  const { number, row } = await insertNumbered(db(), t.sandboxAnalyses, v.tenant.id, 500, async (number) => {
+    const [inserted] = await db()
+      .insert(t.sandboxAnalyses)
+      .values({ tenantId: v.tenant.id, number, kind: a.kind, objectName: a.objectName, sha256: a.sha256, sizeBytes: a.sizeBytes, verdict: a.verdict, score: a.score, findings: a.findings, iocs: a.iocs, mitre: a.mitre, submittedBy: v.user.id })
+      .returning({ id: t.sandboxAnalyses.id });
+    return inserted;
+  });
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "sandbox.analyzed", targetType: "sandbox", targetId: row.id, meta: { number: `SB-${number}`, verdict: a.verdict } });
+  if (a.verdict === "malicious") await emitEvent(db(), v.tenant.id, "sandbox.malicious", { number: `SB-${number}`, kind: a.kind, iocs: a.iocs });
+  refresh();
+  return { ok: true, number, verdict: a.verdict };
 }
 
 /* ───────── closed loops ───────── */
@@ -270,7 +270,7 @@ const incidentSchema = z.object({
   mitre: z.string().max(500),
   moduleId: uuid.nullable(),
   minScore: z.number().int().min(0).max(100).nullable(),
-  dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
+  dueDate: day.nullable(),
   departmentId: uuid.nullable(),
   userIds: z.array(uuid).max(5000),
   sandboxId: uuid.nullable(),
@@ -356,7 +356,7 @@ export async function updateIncidentAction(id: string, input: z.infer<typeof inc
 const trainingSchema = z.object({
   moduleId: uuid.nullable(),
   minScore: z.number().int().min(0).max(100).nullable(),
-  dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable(),
+  dueDate: day.nullable(),
   departmentId: uuid.nullable(),
   userIds: z.array(uuid).max(5000),
 });
@@ -400,6 +400,8 @@ export async function setIntelStatusAction(id: string, status: "reviewed" | "dis
   if (!uuid.safeParse(id).success || (status !== "reviewed" && status !== "dismissed")) return { ok: false };
   const [item] = await db().select().from(t.intelItems).where(and(eq(t.intelItems.id, id), eq(t.intelItems.tenantId, v.tenant.id)));
   if (!item || item.status === "converted") return { ok: false };
+  // Reading the feed is not triage: reviewing or dismissing takes the team's own write permission.
+  if (!allowed(v, item.kind === "policy" ? "policies.write" : "secops.write")) return { ok: false };
   await db().update(t.intelItems).set({ status }).where(eq(t.intelItems.id, item.id));
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: status === "dismissed" ? "intel.dismissed" : "intel.reviewed", targetType: "intel", targetId: item.id });
   refresh();
@@ -408,7 +410,8 @@ export async function setIntelStatusAction(id: string, status: "reviewed" | "dis
 
 /** Threat item → closed loop + support material waiting in the approval gate. */
 export async function convertThreatIntelAction(id: string, input: { moduleId: string | null; departmentId: string | null }): Promise<Result & { loopId?: string }> {
-  const v = await actionViewer("intel.read");
+  // Converting creates SecOps work (a loop and approval material), so it needs the SecOps permission, not just the feed.
+  const v = await actionViewer("secops.write");
   if (!v.tenant.features.has("closed_loops") || !v.tenant.features.has("approvals")) return { ok: false };
   if (!uuid.safeParse(id).success || (input.moduleId && !uuid.safeParse(input.moduleId).success) || (input.departmentId && !uuid.safeParse(input.departmentId).success)) return { ok: false };
   const [item] = await db().select().from(t.intelItems).where(and(eq(t.intelItems.id, id), eq(t.intelItems.tenantId, v.tenant.id), eq(t.intelItems.kind, "threat")));
@@ -428,7 +431,7 @@ export async function convertThreatIntelAction(id: string, input: { moduleId: st
 
 /** Policy item → policy draft to complete and publish for sign-off. */
 export async function convertPolicyIntelAction(id: string): Promise<Result & { policyId?: string }> {
-  const v = await actionViewer("intel.read");
+  const v = await actionViewer("policies.write");
   if (!uuid.safeParse(id).success || !v.tenant.features.has("policies")) return { ok: false };
   const [item] = await db().select().from(t.intelItems).where(and(eq(t.intelItems.id, id), eq(t.intelItems.tenantId, v.tenant.id), eq(t.intelItems.kind, "policy")));
   if (!item || item.status === "converted") return { ok: false };
@@ -446,7 +449,7 @@ export async function draftLessonAction(topic: string, locale: string): Promise<
   const v = await actionViewer("studio.write");
   const text = topic.trim();
   if (text.length < 5) return { ok: false, error: "failed" };
-  if (!rateLimit(`ai-draft:${v.user.id}`, 20, 60 * 60_000).ok) return { ok: false, error: "rateLimited" };
+  if (!(await rateLimit(`ai-draft:${v.user.id}`, 20, 60 * 60_000)).ok) return { ok: false, error: "rateLimited" };
   const lang = (LOCALES as readonly string[]).includes(locale) ? locale : v.tenant.settings.defaultLocale;
   try {
     const draft = await draftLesson(text, lang);
@@ -521,11 +524,32 @@ export async function setModuleStatusAction(id: string, status: "published" | "d
   return { ok: true };
 }
 
+/**
+ * Only a module nobody has started can be deleted: certificates (and their public links),
+ * attestations and progress are compliance evidence. A module that open targeted training (a
+ * risk that closes when the person finishes it) or an incident's training points to is in use too:
+ * deleting it would leave risks nobody can close. A module in use can be unpublished instead.
+ * Its assignments are removed with it.
+ */
 export async function deleteModuleAction(id: string): Promise<Result> {
   const v = await actionViewer("studio.write");
   const m = await ownModule(v, id);
   if (!m) return { ok: false };
-  await db().delete(t.modules).where(eq(t.modules.id, m.id));
+  const [cert, attestation, progress, risk, incident] = await Promise.all([
+    db().select({ id: t.certificates.id }).from(t.certificates).where(eq(t.certificates.moduleId, m.id)).limit(1),
+    db().select({ id: t.attestations.id }).from(t.attestations).where(eq(t.attestations.moduleId, m.id)).limit(1),
+    db().select({ userId: t.moduleProgress.userId }).from(t.moduleProgress).where(eq(t.moduleProgress.moduleId, m.id)).limit(1),
+    db().select({ id: t.behaviorRisks.id }).from(t.behaviorRisks).where(and(eq(t.behaviorRisks.moduleId, m.id), eq(t.behaviorRisks.status, "open"))).limit(1),
+    db().select({ id: t.incidents.id }).from(t.incidents).where(eq(t.incidents.trainingModuleId, m.id)).limit(1),
+  ]);
+  if (cert.length || attestation.length || progress.length || risk.length || incident.length) return { ok: false, error: "in_use" };
+  try {
+    await db().delete(t.modules).where(eq(t.modules.id, m.id));
+  } catch (e) {
+    // A certificate or attestation recorded since the check above: their foreign keys keep the module.
+    if (isForeignKeyViolation(e)) return { ok: false, error: "in_use" };
+    throw e;
+  }
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "module.deleted", targetType: "module", targetId: m.id, meta: { title: pick(m.title, v.tenant.settings.defaultLocale) } });
   refresh();
   return { ok: true };
@@ -580,9 +604,14 @@ export async function savePathAction(input: z.infer<typeof pathSchema>): Promise
   return { ok: true, id: row.id };
 }
 
+/** A path with issued path certificates is kept (they are compliance evidence with public links). */
 export async function deletePathAction(id: string): Promise<Result> {
   const v = await actionViewer("paths.write");
   if (!uuid.safeParse(id).success) return { ok: false };
+  const [own] = await db().select({ id: t.learningPaths.id }).from(t.learningPaths).where(and(eq(t.learningPaths.id, id), eq(t.learningPaths.tenantId, v.tenant.id)));
+  if (!own) return { ok: false };
+  const [cert] = await db().select({ id: t.certificates.id }).from(t.certificates).where(eq(t.certificates.pathId, own.id)).limit(1);
+  if (cert) return { ok: false, error: "in_use" };
   const deleted = await db()
     .delete(t.learningPaths)
     .where(and(eq(t.learningPaths.id, id), eq(t.learningPaths.tenantId, v.tenant.id)))
@@ -609,7 +638,8 @@ const sessionSchema = z.object({
 export async function saveSessionAction(input: z.infer<typeof sessionSchema>): Promise<Result> {
   const v = await actionViewer("sessions.write");
   const p = sessionSchema.safeParse(input);
-  if (!p.success) return { ok: false, error: "invalid" };
+  // The first rejected field, so the dialog can mark that input.
+  if (!p.success) return { ok: false, error: "invalid", field: String(p.error.issues[0]?.path[0] ?? "") || undefined };
   const { id, ...d } = p.data;
   const values = { ...d, description: d.description || null, startsAt: new Date(d.startsAt) };
   if (id) {

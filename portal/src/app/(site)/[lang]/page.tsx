@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
 import { ChevronDown, Globe } from "lucide-react";
 import { BrandMark } from "@/components/brand";
+import { textLinkClass } from "@/components/ui/button";
 import { ForgetButton, LandingTour } from "@/components/site/landing-tour";
 import { countryOptions, loadLanding, loadSiteData } from "@/server/landing";
-import { LOCALE_NAMES, SITE_LOCALES, isLocale, isSiteLocale, type SiteLocale } from "@/i18n/config";
+import { LOCALE_NAMES, SITE_LOCALES, isSiteLocale, type SiteLocale } from "@/i18n/config";
 
 export const dynamicParams = false;
 
@@ -42,7 +42,6 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
   const { lang } = await params;
   if (!isSiteLocale(lang)) notFound();
   const [{ copy, guide, fallback }, site] = await Promise.all([loadLanding(lang as SiteLocale), loadSiteData()]);
-  const legal = await getTranslations({ locale: isLocale(lang) ? lang : "en", namespace: "site.legal" });
   const hasContact = !!(site.contact.email || site.contact.phone);
 
   return (
@@ -51,19 +50,21 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
         {copy.tour.chapters.hero}
       </a>
       <header className="sticky top-0 z-20 border-b border-transparent bg-canvas/85 backdrop-blur supports-[backdrop-filter]:bg-canvas/70">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 pt-[calc(var(--safe-top)+0.75rem)] pb-3 sm:px-8">
-          <BrandMark href={`/${lang}`} label={copy.ui.home} />
-          <div className="flex items-center gap-2">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 pt-[calc(var(--safe-top)+0.75rem)] pb-3 sm:gap-4 sm:px-8">
+          {/* The actions never shrink; the brand gives way instead. Its wordmark wraps onto a second line that h-8 clips
+              whenever it no longer fits beside them (a long sign-in label on a 320 px phone), leaving the shield. */}
+          <BrandMark href={`/${lang}`} label={copy.ui.home} className="h-8 min-w-0 flex-wrap overflow-hidden" />
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <details className="relative">
-              <summary className="flex h-10 cursor-pointer list-none items-center gap-2 rounded-pill px-3 text-caption font-semibold hover:bg-sunken [&::-webkit-details-marker]:hidden" aria-label={copy.ui.language}>
+              <summary className="flex h-10 cursor-pointer list-none items-center gap-1.5 rounded-pill px-2.5 text-caption font-semibold hover:bg-sunken sm:gap-2 sm:px-3 pointer-coarse:h-11 [&::-webkit-details-marker]:hidden" aria-label={copy.ui.language}>
                 <Globe className="size-4" />
                 {lang.toUpperCase()}
-                <ChevronDown className="size-3.5 text-ink-subtle" />
+                <ChevronDown className="hidden size-3.5 text-ink-subtle sm:block" />
               </summary>
               <ul className="absolute right-0 mt-2 grid w-48 gap-0.5 rounded-xl bg-surface p-1.5 shadow-overlay ring-1 ring-line">
                 {SITE_LOCALES.map((l) => (
                   <li key={l}>
-                    <a href={`/${l}`} hrefLang={l} lang={l} aria-current={l === lang ? "page" : undefined} className="flex items-center justify-between rounded-md px-3 py-2 text-caption hover:bg-sunken aria-[current=page]:font-bold">
+                    <a href={`/${l}`} hrefLang={l} lang={l} aria-current={l === lang ? "page" : undefined} className="flex items-center justify-between rounded-md px-3 py-2 text-caption hover:bg-sunken aria-[current=page]:font-bold pointer-coarse:min-h-11">
                       {LOCALE_NAMES[l]}
                       <span className="text-tab text-ink-subtle">{l.toUpperCase()}</span>
                     </a>
@@ -71,7 +72,7 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
                 ))}
               </ul>
             </details>
-            <Link href="/sign-in" className="h-10 content-center rounded-pill px-4 text-caption font-semibold text-ink hover:bg-sunken">
+            <Link href="/sign-in" className="h-10 content-center rounded-pill px-3 text-caption font-semibold whitespace-nowrap text-ink hover:bg-sunken sm:px-4 pointer-coarse:h-11">
               {copy.ui.signIn}
             </Link>
           </div>
@@ -81,7 +82,7 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
       {fallback ? <p className="mx-auto max-w-6xl px-4 pt-3 text-caption text-ink-muted sm:px-8">{copy.ui.fallbackNote}</p> : null}
 
       <main id="main" lang={lang}>
-        <LandingTour copy={copy} guide={guide} lang={lang} countries={countryOptions(lang)} privacyLabel={legal("privacy")} />
+        <LandingTour copy={copy} guide={guide} lang={lang} countries={countryOptions(lang)} privacyLabel={copy.ui.privacy} />
 
         <section aria-labelledby="faq-title" className="px-4 py-20 sm:px-8">
           <div className="mx-auto max-w-3xl">
@@ -153,12 +154,12 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
                     <dt className="font-semibold text-ink">{copy.ui.contactLabel}</dt>
                     <dd className="flex flex-wrap gap-x-3 text-ink-muted">
                       {site.contact.email ? (
-                        <a href={`mailto:${site.contact.email}`} className="hover:text-ink">
+                        <a href={`mailto:${site.contact.email}`} className={textLinkClass("hover:text-ink")}>
                           {site.contact.email}
                         </a>
                       ) : null}
                       {site.contact.phone ? (
-                        <a href={`tel:${site.contact.phone.replace(/[^\d+]/g, "")}`} className="hover:text-ink">
+                        <a href={`tel:${site.contact.phone.replace(/[^\d+]/g, "")}`} className={textLinkClass("hover:text-ink")}>
                           {site.contact.phone}
                         </a>
                       ) : null}
@@ -170,7 +171,7 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
                     <dt className="font-semibold text-ink">{copy.ui.socialLabel}</dt>
                     <dd className="flex flex-wrap gap-x-3 text-ink-muted">
                       {site.social.map((s) => (
-                        <a key={s.url} href={s.url} target="_blank" rel="noopener" className="hover:text-ink">
+                        <a key={s.url} href={s.url} target="_blank" rel="noopener" className={textLinkClass("hover:text-ink")}>
                           {s.name}
                         </a>
                       ))}
@@ -187,11 +188,11 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
             ) : null}
           </div>
           <nav className="flex flex-wrap items-center gap-4 text-caption">
-            <Link href="/legal/privacy" className="text-ink-muted hover:text-ink">
-              {legal("privacy")}
+            <Link href="/legal/privacy" className={textLinkClass("text-ink-muted hover:text-ink")}>
+              {copy.ui.privacy}
             </Link>
-            <Link href="/legal/terms" className="text-ink-muted hover:text-ink">
-              {legal("terms")}
+            <Link href="/legal/terms" className={textLinkClass("text-ink-muted hover:text-ink")}>
+              {copy.ui.terms}
             </Link>
             <ForgetButton label={copy.ui.forget} done={copy.ui.forgotten} />
           </nav>

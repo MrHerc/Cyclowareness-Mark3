@@ -1,0 +1,750 @@
+<title>AI Sel ördək</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/*
+  AI Sel — the Cyclowareness mascot. Definitive white duck ("round plush" direction).
+  Self-contained: inline CSS + JS, hand-built SVG (viewBox 0 0 320 320), no libraries, no raster.
+  The drawing sits in a static translate(8 14) scale(.95) frame so the tuft stays inside the box.
+  Only transform and opacity animate. Every instance is a standalone <svg> with its own <defs>.
+
+  PART TREE (class = part; id = same name on the main instance, "-N" suffix on the others)
+    shadow                        floor shadow (outside the figure; shrinks on hop)
+    figure                        everything that leaves the floor: hop, lean-in, poke squash
+      feet > foot-l, foot-r       orange webbed feet (slide together when sad/worried)
+      breath                      breathing scale 1 -> 1.02
+        torso                     mood posture: translate / rotate / scaleY
+          tail                    3-feather fan behind the body; hidden at rest, fades in and wags on wiggle
+          body                    plush ellipse, warm rim, belly, neck-shade (the head's shadow), badge
+            badge                 indigo shield: badge-glow, badge-ping, badge-ring, badge-shield, badge-check
+          head-nod > head-gest    talking nods / one-shot head gestures (nod, shake, poke-head ...)
+            head                  mood tilt + look tilt
+              tuft                chunky 3-lobe feather curl (sways), drawn behind the head circle
+              face                gaze parallax
+                cheek-l/r         blush
+                eye-l/r           eye-open[clip: sclera, pupil-l/r(iris, iris-ring, highlight x2), eye-ring, lid-b, lid-t] + lash-line (blink) + smile-eye (^ arc)
+                brow-l/r          ink brows, each with its own height and angle
+                beak              beak-bottom(mouth cavity, tongue, lower bill) under beak-top(upper bill)
+                tear              sad
+          wing-l / wing-r         mitten wings = hands; finger-l/r (leading feather that extends to point), wing-spark (present)
+          sparks, confetti, zz    celebrate / excited / sleepy layers
+
+  JOINTS (viewBox units). transform-box is view-box everywhere; each animated part sits in a plain
+  positioning <g transform="translate(joint)"> and rotates about its local 0,0, so pivots never drift:
+    floor (figure/breath/torso) 160,300 · shadow 160,309 · foot-l 131,287 · foot-r 189,287 · tail root 112,222
+    neck (head-nod/head-gest/head) 160,198 · head centre 160,118 · tuft base 160,30 · eyes 126,114 / 194,114
+    brows 126,74 / 194,74 · beak hinge 160,144 · lower bill 160,163 · shoulders wing-l 98,212 / wing-r 222,212
+    fingers: wing-local ∓19,44 · badge 160,262.  (Gotcha for porters: never put a CSS transform on an element
+    that also has an SVG transform attribute; CSS wins and the attribute is dropped.)
+
+  MOOD ENGINE: a .mood-* class on the root sets custom properties; every part's rest transform reads them:
+    --lid-t/--lid-b (0..1 lid cover) --shut (0..1 closed ^ eyes) --eye-s --pupil-s · --bl/--br brow angle, --bly/--bry brow lift
+    --open (0..1 beak) --beak-s --beak-x/y --cheek · --wl/--wr wing angle, --wlx/--wly/--wrx/--wry shoulder shift
+    --tx/--ty/--trot/--tsy torso · --head-rot/--head-x/--head-y · --tuft-rot --feet-in · --badge-s --ring --tear --spark --confetti --zz
+  Gestures are one-shot .g-<name> classes (main keyframes named g-<name>, removed on animationend); every gesture keyframe
+  starts and ends at the live mood value, so gestures layer over moods. Talking is .talking + data-talk (3 irregular
+  beak patterns swapped at random on each iteration, so the rhythm never repeats like a metronome).
+
+  API (window.duck and every createDuck(container, {size, follow, focusable, blink}) instance):
+    setMood(m)       idle|talk|happy|think|alert|sad|celebrate|surprised|proud|curious|worried|excited|sleepy|laughing
+    setTalking(bool) beak talks in an irregular rhythm + tiny head nods
+    play(g)          wave|nod|shake|cheer|point-left|point-right|point-up|point-down|hop|shrug|lean-in|bow|ponder|present|shield-up
+                     (+ idle extras wiggle, preen)
+    lookAt(x, y)     0..1 page coordinates; pupils move, head tilts toward the point. Pointer/touch follow is on by default.
+    poke('head'|'body')  squash-and-stretch + "Qaq!" bubble (~700 ms); clicking/tapping the duck pokes it
+    setStill(bool)   stops every animation except blinking (forced on under prefers-reduced-motion)
+    setSize(px) · setBlink(bool) (off = no blinks, for static renders) · el, host, mood, gesture, still, talking · destroy()
+*/
+  :root{
+    --brand:#4f46e5; --accent:#ff7a1a; --ink:#16123a; --canvas:#f7f6fb; --surface:#fff; --safe:#22a05c; --risk:#e5484d;
+    --text:#16123a; --muted:#6b6790; --line:rgba(22,18,58,.12); --card-shadow:0 10px 32px rgba(22,18,58,.08);
+    --duck-line-base:rgba(22,18,58,.17); --eye-line:rgba(22,18,58,.22); --lash:rgba(22,18,58,.5);
+    --duck-mid:#fbfaff; --duck-shade:#e2ddf0; --floor:#16123a; --bubble-shadow:rgba(22,18,58,.14);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme=light]){
+      --canvas:#0f0d22; --surface:#1b1838; --text:#f2f0fa; --muted:#a39fc6; --line:rgba(255,255,255,.1);
+      --card-shadow:0 10px 32px rgba(0,0,0,.4); --duck-line-base:rgba(22,18,58,.3); --duck-shade:#d6d1ea; --floor:#000;
+      --bubble-shadow:rgba(0,0,0,.4); color-scheme:dark;
+    }
+  }
+  :root[data-theme=dark]{
+    --canvas:#0f0d22; --surface:#1b1838; --text:#f2f0fa; --muted:#a39fc6; --line:rgba(255,255,255,.1);
+    --card-shadow:0 10px 32px rgba(0,0,0,.4); --duck-line-base:rgba(22,18,58,.3); --duck-shade:#d6d1ea; --floor:#000;
+    --bubble-shadow:rgba(0,0,0,.4); color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--canvas);color:var(--text);font-family:Geologica,system-ui,-apple-system,"Segoe UI",sans-serif;
+    padding:24px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px));overflow-x:hidden}
+  h1{font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.02em;margin:0 0 4px}
+  h1 span{color:var(--brand)}
+  .sub{margin:0 0 20px;color:var(--muted);font-size:15px;max-width:62ch}
+  main{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,1fr);gap:24px;max-width:1100px;margin:0 auto}
+  @media (max-width:860px){main{grid-template-columns:minmax(0,1fr)}}
+  header,#sizes,footer{max-width:1100px;margin-left:auto;margin-right:auto}
+
+  #stage{position:relative;min-height:460px;border-radius:28px;border:1px solid var(--line);overflow:hidden;
+    background:radial-gradient(120% 90% at 50% 15%,var(--surface),var(--canvas));box-shadow:var(--card-shadow);
+    display:grid;place-items:center;padding:40px 16px 24px}
+  .caption{text-align:center;margin:12px 0 0;color:var(--muted);font-weight:600;font-size:14px}
+
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:18px 18px 8px;box-shadow:var(--card-shadow)}
+  .panel h3{margin:0 0 8px;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .group{margin-bottom:16px}
+  .btns{display:flex;flex-wrap:wrap;gap:6px}
+  .btn{font:600 13px/1 inherit;font-family:inherit;color:var(--text);background:var(--canvas);border:1px solid var(--line);
+    border-radius:999px;padding:8px 12px;cursor:pointer;transition:background .15s,color .15s,transform .15s}
+  .btn:hover{transform:translateY(-1px)}
+  .btn.active{background:var(--brand);color:#fff;border-color:transparent}
+  .btn.accent{background:var(--accent);color:#fff;border-color:transparent;font-weight:800}
+  .toggles{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center}
+  .toggle{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:14px;cursor:pointer}
+  .toggle input{width:18px;height:18px;accent-color:var(--brand);margin:0}
+  .range{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
+  .range input{flex:1;min-width:0;accent-color:var(--brand)}
+  .range output{min-width:52px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+  :is(.btn,.toggle input,.range input,.duck):focus-visible{outline:3px solid var(--brand);outline-offset:3px}
+
+  #sizes{margin-top:28px}
+  #sizes h2{font-size:18px;font-weight:800;margin:0 0 12px}
+  #sizes h3{font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 0 10px}
+  .sizes-row,.ctx-row{display:flex;flex-wrap:wrap;gap:14px}
+  .size-card,.ctx-card{flex:1 1 150px;background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px 12px 12px;
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:10px;box-shadow:var(--card-shadow);min-width:0}
+  .size-card .slot{height:104px;display:grid;place-items:center}
+  :is(.size-card,.ctx-card) b{font-size:13px;color:var(--muted);font-weight:600}
+  .ctx-card{min-height:150px}
+  .ctx-card.ink{background:#16123a} .ctx-card.ink b{color:#c9c5e6}
+  .ctx-card.wide{flex:2 1 280px}
+  .app-icon{width:76px;height:76px;border-radius:22px;background:linear-gradient(160deg,#6d64ff,#4f46e5);display:grid;place-items:center;
+    box-shadow:0 8px 20px rgba(79,70,229,.3)}
+  .notif{display:flex;align-items:center;gap:12px;text-align:left;width:100%;max-width:320px;padding:10px 12px;border-radius:14px;background:var(--canvas)}
+  .avatar{flex:none;width:44px;height:44px;border-radius:50%;background:#e8e6ff;overflow:hidden;position:relative}
+  .avatar>div{position:absolute;left:-8px;top:1px}
+  .notif strong{display:block;font-size:14px} .notif small{color:var(--muted);font-size:12px}
+  footer{margin-top:28px;color:var(--muted);font-size:13px}
+
+  /* ==================== DUCK ==================== */
+  .duck{
+    position:relative;width:calc(var(--size)*1px);height:calc(var(--size)*1px);cursor:pointer;user-select:none;
+    -webkit-user-select:none;touch-action:manipulation;border-radius:50%;-webkit-tap-highlight-color:transparent;
+    --size:320; --look-x:0; --look-y:0; --gaze-x:0; --gaze-y:0;
+    --lx:clamp(-1,calc(var(--look-x) + var(--gaze-x)),1); --ly:clamp(-1,calc(var(--look-y) + var(--gaze-y)),1);
+    --head-rot:0deg; --head-x:0px; --head-y:0px;
+    --lid-t:0; --lid-b:0; --shut:0; --eye-s:1; --pupil-s:1; --eye-boost:1;
+    --bl:0deg; --br:0deg; --bly:0px; --bry:0px;
+    --open:0; --beak-s:1; --beak-x:0px; --beak-y:0px; --beak-boost:1; --cheek:.55;
+    --wl:-8deg; --wr:8deg; --wlx:0px; --wly:0px; --wrx:0px; --wry:0px;
+    --tx:0px; --ty:0px; --trot:0deg; --tsy:1; --tail-rot:0deg; --tuft-rot:0deg; --feet-in:0px;
+    --badge-s:1; --ring:0; --tear:0; --zz:0; --spark:0; --confetti:0; --neck-a:.15;
+    --line-w:2px; --duck-line:var(--duck-line-base);
+    --torso-t:translate(var(--tx),var(--ty)) rotate(var(--trot)) scaleY(var(--tsy));
+    --wl-t:translate(var(--wlx),var(--wly)) rotate(var(--wl));
+    --wr-t:translate(var(--wrx),var(--wry)) rotate(var(--wr));
+  }
+  .duck svg{display:block;width:100%;height:100%;overflow:visible}
+  :where(.duck svg *){transform-box:view-box;transform-origin:0 0} /* zero specificity: the joint rules below win */
+
+  /* paint (gradient fills are attributes, so each instance uses its own defs) */
+  .plush{stroke:var(--duck-line);stroke-width:var(--line-w);stroke-linejoin:round}
+  .rim,.belly,.neck-shade{pointer-events:none}
+  .foot path{stroke:rgba(22,18,58,.18);stroke-width:var(--line-w);stroke-linejoin:round}
+  .eye-ring{fill:none;stroke:var(--eye-line);stroke-width:var(--line-w)}
+  .iris{fill:var(--ink)} .iris-ring{fill:none;stroke:var(--brand);stroke-width:3;opacity:.3} .highlight{fill:#fff} .highlight-2{opacity:.9}
+  .lid{stroke:var(--lash);stroke-width:3}
+  .smile-eye{fill:none;stroke:var(--ink);stroke-width:6.5;stroke-linecap:round}
+  .lash-line{fill:none;stroke:var(--ink);stroke-width:4.5;stroke-linecap:round;opacity:0;transition:opacity 60ms}
+  .duck.blink .lash-line{opacity:calc(1 - var(--shut))}
+  .brow{opacity:.85} .brow path{fill:none;stroke:var(--ink);stroke-width:6;stroke-linecap:round}
+  .bill{stroke:rgba(120,50,0,.2);stroke-width:1.5;stroke-linejoin:round}
+  .mouth{fill:#3a1630} .tongue{fill:#ff8a9e}
+  .gloss{fill:#fff;opacity:.32} .nostril{fill:var(--ink);opacity:.18}
+  .cheek{opacity:var(--cheek);transition:opacity .3s}
+  .badge-shield{fill:var(--brand)}
+  .badge-check{fill:none;stroke:#fff;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .badge-glow{opacity:0}
+  .badge-ring,.badge-ping{fill:none;stroke:var(--brand);stroke-width:2.5}
+  .badge-ring{opacity:calc(var(--ring)*.55);transition:opacity .3s} .badge-ping{opacity:0}
+  .tear{fill:#8f89f5;stroke:rgba(79,70,229,.35);stroke-width:1;opacity:var(--tear);transition:opacity .3s}
+  .spark{opacity:var(--spark);transition:opacity .3s} .spark.a{fill:var(--accent)} .spark.b{fill:var(--brand)}
+  .wing-spark{fill:var(--accent);opacity:0}
+  .confetti{opacity:var(--confetti);transition:opacity .3s}
+  .cf1,.cf5{fill:var(--accent)} .cf2,.cf4{fill:var(--brand)} .cf3{fill:#8f88ff} .cf6{fill:#ff9d55}
+  .zz{fill:var(--brand);font-weight:800;opacity:var(--zz);transition:opacity .3s}
+  .s-mid{stop-color:var(--duck-mid)} .s-shade{stop-color:var(--duck-shade)} .s-shadow{stop-color:var(--floor)}
+  .s-neck{stop-color:#16123a;stop-opacity:var(--neck-a)}
+
+  /* small instances: crisp outlines, a stronger head shadow so head and body never merge, bolder face */
+  .duck.is-small{--line-w:1.25px;--duck-line:rgba(22,18,58,.44);--eye-line:rgba(22,18,58,.42);--neck-a:.34}
+  .duck.is-small :is(.plush,.eye-ring,.foot path){vector-effect:non-scaling-stroke}
+    .duck.is-small .detail{display:none}
+  .duck.is-small .brow path{stroke-width:9} .duck.is-small .smile-eye{stroke-width:9} .duck.is-small .lash-line{stroke-width:7}
+  .duck.is-small svg{transform:scale(1.12);transform-origin:50% 94%}
+  .duck.is-tiny{--eye-boost:1.08;--beak-boost:1.07;--line-w:1.4px;--duck-line:rgba(22,18,58,.5);--neck-a:.4}
+  .duck.is-tiny :is(.iris-ring,.highlight-2,.badge-check,.bubble){display:none}
+  .duck.is-tiny .brow path{stroke-width:11} .duck.is-tiny .smile-eye{stroke-width:11}
+
+  /* rig: rest transforms read the mood variables */
+  .figure,.breath,.torso{transform-origin:160px 300px}
+  .shadow{transform-origin:160px 309px}
+  .breath{animation:breathe 3.4s ease-in-out infinite}
+  .torso{transform:var(--torso-t);transition:transform .35s cubic-bezier(.2,.8,.2,1.1)}
+  .tail{transform:rotate(var(--tail-rot));opacity:0}
+  .foot{transition:transform .3s} .foot-l{transform:translateX(var(--feet-in))} .foot-r{transform:translateX(calc(var(--feet-in)*-1))}
+  .wing{transition:transform .38s cubic-bezier(.3,1.3,.5,1)}
+  .wing-l{transform:var(--wl-t)} .wing-r{transform:var(--wr-t)}
+  .finger{transform:scaleY(0)}
+  .head-nod,.head-gest{transform-origin:160px 198px}
+  .head{transform-origin:0 80px; /* local = neck 160,198 */
+    transform:translate(calc(var(--head-x) + var(--lx)*4px),calc(var(--head-y) + var(--ly)*3px)) rotate(calc(var(--head-rot) + var(--lx)*5deg));
+    transition:transform .3s cubic-bezier(.2,.8,.2,1.15)}
+  .face{transform:translate(calc(var(--lx)*5px),calc(var(--ly)*4px));transition:transform .14s ease-out}
+  .eye{transform:scale(calc(var(--eye-s)*var(--eye-boost)));transition:transform .25s}
+  .eye-open{opacity:calc(1 - var(--shut));transition:opacity .2s}
+  .smile-eye{opacity:var(--shut);transition:opacity .2s}
+  .pupil{transform:translate(calc(var(--lx)*7px),calc(var(--ly)*6px)) scale(var(--pupil-s));transition:transform .14s ease-out}
+  .lid{transition:transform .22s ease}
+  .lid-t{transform:translateY(calc(var(--lid-t)*58px))}
+  .lid-b{transform:translateY(calc(var(--lid-b)*-58px))}
+  .duck.blink .lid-t{transform:translateY(58px);transition-duration:60ms}
+  .duck.blink .lid-b{transform:translateY(-12px);transition-duration:60ms}
+  .brow{transition:transform .25s}
+  .brow-l{transform:translateY(var(--bly)) rotate(var(--bl))}
+  .brow-r{transform:translateY(var(--bry)) rotate(var(--br))}
+  .beak{transform:translate(var(--beak-x),var(--beak-y)) scale(calc(var(--beak-s)*var(--beak-boost)));transition:transform .25s}
+  .beak-bottom{transform:translateY(calc(var(--open)*15px));transition:transform .18s}
+  .beak-top{transform:translateY(calc(var(--open)*-2.5px));transition:transform .18s}
+  .tuft{transform:rotate(var(--tuft-rot));animation:sway 4.2s ease-in-out infinite}
+  .badge{transform:scale(var(--badge-s));transition:transform .3s}
+  .duck.glance :is(.pupil,.face,.head){transition-duration:.55s}
+  /* still / reduced motion: every animation and transition off except the eyelids (blinking stays) */
+  .duck.still svg *:not(.lid):not(.lash-line),.duck.still .bubble{animation:none!important;transition:none!important}
+  @media (prefers-reduced-motion:reduce){.duck svg *:not(.lid):not(.lash-line),.duck .bubble{animation:none!important;transition:none!important}}
+
+  /* talking: three irregular patterns, swapped by JS on every iteration */
+  .duck.talking .beak-bottom{animation:talk-a-b var(--talk-d,1.5s) ease-in-out infinite}
+  .duck.talking .beak-top{animation:talk-a-t var(--talk-d,1.5s) ease-in-out infinite}
+  .duck.talking[data-talk=b] .beak-bottom{animation-name:talk-b-b} .duck.talking[data-talk=b] .beak-top{animation-name:talk-b-t}
+  .duck.talking[data-talk=c] .beak-bottom{animation-name:talk-c-b} .duck.talking[data-talk=c] .beak-top{animation-name:talk-c-t}
+  .duck.talking .head-nod{animation:talk-nod 2.3s ease-in-out infinite}
+
+  /* ---------- moods ---------- */
+  .mood-talk{--bly:-3px;--bry:-3px;--open:.2;--cheek:.7;--head-rot:-3deg;--lid-b:.12;--wr:-34deg;--wrx:2px;--wry:-2px}
+  .mood-happy{--lid-b:.45;--bly:-5px;--bry:-5px;--open:.45;--beak-s:1.06;--cheek:1;--head-rot:5deg;--wl:16deg;--wr:-16deg;--pupil-s:1.04}
+  .mood-think{--lid-t:.26;--bl:8deg;--bly:2px;--br:6deg;--bry:-9px;--gaze-x:.6;--gaze-y:-.85;--beak-s:.9;--beak-x:5px;--head-rot:-7deg;--cheek:.4;
+    --wr:-150deg;--wrx:-30px;--wry:-6px}
+  .mood-alert{--eye-s:1.08;--pupil-s:.8;--bly:-7px;--bry:-7px;--bl:3deg;--br:-3deg;--cheek:.25;--beak-s:.94;--open:.08;--ty:-4px;--tsy:1.02;
+    --head-y:-4px;--wl:26deg;--wr:-26deg;--tuft-rot:-6deg;--badge-s:1.2;--ring:1}
+  .mood-alert .badge{animation:badge-pulse 1.2s ease-in-out infinite} .mood-alert .badge-ping{animation:ping 1.2s ease-out infinite}
+  .mood-sad{--bl:-16deg;--br:16deg;--bly:-2px;--bry:-2px;--lid-t:.42;--gaze-y:.6;--pupil-s:1.06;--cheek:.3;--beak-y:3px;--beak-s:.88;
+    --head-rot:4deg;--head-y:10px;--ty:5px;--tsy:.97;--wl:-2deg;--wr:2deg;--wlx:4px;--wrx:-4px;--wly:6px;--wry:6px;--feet-in:7px;--tear:1;--tuft-rot:22deg}
+  .mood-sad .tear{animation:drip 2.6s ease-in infinite}
+  .mood-celebrate{--shut:1;--lid-b:.5;--bly:-7px;--bry:-7px;--open:1;--beak-s:1.1;--cheek:1;--wl:165deg;--wr:-165deg;--head-y:-4px;--spark:1;--confetti:1}
+  .mood-surprised{--eye-s:1.15;--pupil-s:.7;--bly:-11px;--bry:-11px;--bl:-4deg;--br:4deg;--open:.85;--beak-s:.84;--cheek:.45;--head-y:-6px;--tsy:1.02;
+    --wl:42deg;--wr:-42deg;--tuft-rot:-4deg}
+  .mood-proud{--lid-t:.1;--lid-b:.36;--bly:-3px;--bry:-3px;--bl:4deg;--br:-4deg;--open:.15;--beak-s:1.04;--cheek:.85;--head-rot:-4deg;--head-y:-6px;
+    --tsy:1.04;--ty:-2px;--wl:24deg;--wr:-24deg;--badge-s:1.25;--ring:.75;--tuft-rot:-5deg}
+  .mood-proud .badge{animation:badge-pulse 2.4s ease-in-out infinite}
+  .mood-curious{--head-rot:12deg;--bry:-10px;--br:8deg;--eye-s:1.06;--pupil-s:1.15;--open:.3;--beak-s:.9;--cheek:.7;--gaze-x:-.35;--gaze-y:-.3;
+    --trot:3deg;--wl:18deg;--tuft-rot:14deg}
+  .mood-worried{--bl:-12deg;--br:12deg;--bly:-6px;--bry:-6px;--lid-t:.06;--eye-s:1.05;--pupil-s:.8;--gaze-x:-.35;--beak-s:.82;--beak-y:2px;--cheek:.35;
+    --head-rot:-3deg;--head-y:4px;--wl:-72deg;--wr:72deg;--wlx:8px;--wrx:-8px;--wly:2px;--wry:2px;--feet-in:4px}
+  .mood-worried .wing-l{animation:tremble-l .5s ease-in-out infinite} .mood-worried .wing-r{animation:tremble-r .5s ease-in-out infinite}
+  .mood-excited{--eye-s:1.1;--pupil-s:1.2;--bly:-9px;--bry:-9px;--open:.85;--beak-s:1.06;--cheek:1;--wl:125deg;--wr:-125deg;--head-y:-4px;--spark:1;--tuft-rot:-6deg}
+  .mood-excited .wing-l{animation:flap-l .36s ease-in-out infinite} .mood-excited .wing-r{animation:flap-r .36s ease-in-out infinite}
+  .mood-sleepy{--lid-t:.64;--bl:-6deg;--br:6deg;--bly:3px;--bry:3px;--open:.05;--beak-s:.9;--cheek:.5;--head-rot:8deg;--head-y:7px;--zz:1;
+    --wl:-2deg;--wr:2deg;--gaze-y:.4;--tuft-rot:16deg;--ty:3px}
+  .mood-sleepy .torso{animation:doze 4.5s ease-in-out infinite} .mood-sleepy .zz{animation:zfloat 2.4s ease-in-out infinite}
+  .mood-laughing{--shut:1;--lid-b:.5;--bly:-6px;--bry:-6px;--open:1;--beak-s:1.12;--cheek:1;--head-rot:-6deg;--head-y:-7px;--wl:38deg;--wr:-38deg;--tuft-rot:-8deg}
+  .mood-laughing .torso{animation:giggle .45s ease-in-out infinite}
+  :is(.mood-celebrate,.mood-excited) .figure{animation:bounce 1.1s ease-in-out infinite}
+  .mood-excited .figure{animation-duration:.72s}
+  :is(.mood-celebrate,.mood-excited) .spark{animation:twinkle 1.4s ease-in-out infinite}
+  .mood-celebrate .cf{animation:cf-rise 1.6s ease-out infinite}
+  .s2,.cf2{animation-delay:-.5s!important} .s3,.cf3{animation-delay:-.9s!important} .s4,.cf4{animation-delay:-.25s!important}
+  .cf5{animation-delay:-1.2s!important} .cf6{animation-delay:-.7s!important}
+
+  /* ---------- gestures (one-shot; the main animation is named g-<gesture>) ---------- */
+  .g-wave{--lid-b:.35;--open:.35;--cheek:.9} .g-wave .wing-r{animation:g-wave 1.2s ease-in-out} .g-wave .head-gest{animation:wave-head 1.2s ease-in-out} .g-wave .torso{animation:wave-lean 1.2s ease-in-out}
+  .g-nod .head-gest{animation:g-nod .8s ease-in-out}
+  .g-shake .head-gest{animation:g-shake .8s ease-in-out}
+  .g-cheer{--shut:1;--lid-b:.5;--open:.95;--cheek:1;--confetti:1}
+  .g-cheer .wing-r{animation:g-cheer 1.1s ease-in-out} .g-cheer .wing-l{animation:cheer-l 1.1s ease-in-out}
+  .g-cheer .figure{animation:cheer-fig 1.1s ease-in-out} .g-cheer .shadow{animation:cheer-sh 1.1s ease-in-out} .g-cheer .cf{animation:cf-burst 1.05s ease-out both}
+  .g-cheer :is(.cf2,.cf5){animation-delay:.05s!important} .g-cheer :is(.cf3,.cf6){animation-delay:0s!important} .g-cheer .cf4{animation-delay:.03s!important}
+  .g-point-left{--gaze-x:-1;--gaze-y:-.1} .g-point-left .wing-l{animation:g-point-left 1s ease-in-out}
+  .g-point-left .finger-l{animation:finger 1s ease-in-out} .g-point-left .head-gest{animation:look-l 1s ease-in-out}
+  .g-point-right{--gaze-x:1;--gaze-y:-.1} .g-point-right .wing-r{animation:g-point-right 1s ease-in-out}
+  .g-point-right .finger-r{animation:finger 1s ease-in-out} .g-point-right .head-gest{animation:look-r 1s ease-in-out}
+  .g-point-up{--gaze-x:.35;--gaze-y:-1;--bly:-5px;--bry:-5px} .g-point-up .wing-r{animation:g-point-up 1s ease-in-out}
+  .g-point-up .finger-r{animation:finger 1s ease-in-out} .g-point-up .head-gest{animation:look-u 1s ease-in-out}
+  .g-point-down{--gaze-x:.45;--gaze-y:1} .g-point-down .wing-r{animation:g-point-down 1s ease-in-out}
+  .g-point-down .finger-r{animation:finger 1s ease-in-out} .g-point-down .head-gest{animation:look-d 1s ease-in-out}
+  .g-hop{--lid-b:.3;--open:.4} .g-hop .figure{animation:g-hop .8s cubic-bezier(.4,0,.6,1)} .g-hop .shadow{animation:hop-sh .8s ease-in-out}
+  .g-shrug{--bly:-9px;--bry:-9px;--bl:-6deg;--br:6deg;--beak-s:.85;--open:.1}
+  .g-shrug .wing-r{animation:g-shrug 1s ease-in-out} .g-shrug .wing-l{animation:shrug-l 1s ease-in-out} .g-shrug .head-gest{animation:shrug-head 1s ease-in-out}
+  .g-lean-in{--eye-s:1.06;--pupil-s:1.1} .g-lean-in .figure{animation:g-lean-in 1s ease-in-out} .g-lean-in .head-gest{animation:lean-head 1s ease-in-out}
+  .g-bow{--lid-t:.8;--open:0} .g-bow .torso{animation:g-bow 1.2s ease-in-out} .g-bow .head-gest{animation:bow-head 1.2s ease-in-out}
+  .g-bow .wing-r{animation:bow-wr 1.2s ease-in-out} .g-bow .wing-l{animation:bow-wl 1.2s ease-in-out}
+  .g-ponder{--gaze-x:.5;--gaze-y:-.9;--bl:6deg;--br:8deg;--bry:-8px;--lid-t:.2}
+  .g-ponder .wing-r{animation:g-ponder 1.2s ease-in-out} .g-ponder .head-gest{animation:ponder-head 1.2s ease-in-out}
+  .g-present{--gaze-x:.85;--gaze-y:.35;--lid-b:.3;--open:.3;--cheek:.9;--bly:-4px;--bry:-4px}
+  .g-present .wing-r{animation:g-present 1.1s ease-in-out} .g-present .wing-l{animation:present-l 1.1s ease-in-out}
+  .g-present .head-gest{animation:present-head 1.1s ease-in-out} .g-present .wing-spark{animation:present-spark 1.1s ease-in-out}
+  .g-shield-up{--bl:6deg;--br:-6deg;--bly:-3px;--bry:-3px;--ring:1} .g-shield-up .badge{animation:g-shield-up 1.1s ease-in-out}
+  .g-shield-up .badge-glow{animation:shield-glow 1.1s ease-out} .g-shield-up .wing-l{animation:shield-wl 1.1s ease-in-out} .g-shield-up .wing-r{animation:shield-wr 1.1s ease-in-out}
+  .g-wiggle .torso{animation:g-wiggle .9s ease-in-out} .g-wiggle .tail{animation:wag .9s ease-in-out}
+  .g-preen{--lid-t:.45} .g-preen .head-gest{animation:g-preen 1.2s ease-in-out} .g-preen .wing-l{animation:preen-w 1.2s ease-in-out}
+  /* poke: body = tickled (wide eyes), head = bonk (^ ^ eyes); both quack */
+  .poke-body .figure{animation:poke-body 1s ease-in-out}
+  .poke-head .head-gest{animation:poke-head .9s cubic-bezier(.3,1.3,.5,1)}
+  :is(.poke-body,.poke-head){--open:.9;--bly:-8px;--bry:-8px;--cheek:1}
+  .poke-body{--pupil-s:.62;--eye-s:1.1;--shut:0;--lid-t:0;--lid-b:0} .poke-head{--shut:1}
+
+  .bubble{position:absolute;left:68%;top:-4%;transform:scale(.5) translateY(10px);opacity:0;transform-origin:20% 100%;
+    transition:transform .2s cubic-bezier(.3,1.6,.5,1),opacity .15s;font-size:clamp(11px,calc(var(--size)*.09px),34px);font-weight:800;line-height:1.1;
+    color:var(--ink);background:#fff;padding:.28em .62em;border-radius:1em;box-shadow:0 6px 18px var(--bubble-shadow);white-space:nowrap;pointer-events:none}
+  .bubble::after{content:"";position:absolute;left:.7em;bottom:-.3em;width:.6em;height:.6em;background:#fff;transform:rotate(45deg);border-radius:.1em}
+  .bubble.show{transform:none;opacity:1}
+
+  /* ---------- keyframes ---------- */
+  @keyframes breathe{0%,100%{transform:scale(1,1)}50%{transform:scale(1.012,1.02)}}
+  @keyframes sway{0%,100%{transform:rotate(calc(var(--tuft-rot) - 5deg))}50%{transform:rotate(calc(var(--tuft-rot) + 6deg))}}
+  @keyframes talk-a-b{0%{transform:translateY(1.5px)}10%{transform:translateY(13px)}16%{transform:translateY(12px)}24%{transform:translateY(3px)}34%{transform:translateY(10.5px)}
+    44%{transform:translateY(1px)}55%{transform:translateY(8.5px)}63%{transform:translateY(2px)}75%{transform:translateY(14.5px)}87%{transform:translateY(4px)}100%{transform:translateY(1.5px)}}
+  @keyframes talk-a-t{0%{transform:translateY(-.25px)}10%{transform:translateY(-2.2px)}16%{transform:translateY(-2px)}24%{transform:translateY(-.5px)}34%{transform:translateY(-1.75px)}
+    44%{transform:translateY(-.15px)}55%{transform:translateY(-1.4px)}63%{transform:translateY(-.35px)}75%{transform:translateY(-2.4px)}87%{transform:translateY(-.65px)}100%{transform:translateY(-.25px)}}
+  @keyframes talk-b-b{0%{transform:translateY(1.5px)}9%{transform:translateY(9px)}18%{transform:translateY(2px)}27%{transform:translateY(12px)}33%{transform:translateY(11px)}
+    42%{transform:translateY(2.5px)}52%{transform:translateY(14px)}64%{transform:translateY(3px)}72%{transform:translateY(7px)}81%{transform:translateY(1px)}90%{transform:translateY(10px)}100%{transform:translateY(1.5px)}}
+  @keyframes talk-b-t{0%{transform:translateY(-.25px)}9%{transform:translateY(-1.5px)}18%{transform:translateY(-.35px)}27%{transform:translateY(-2px)}33%{transform:translateY(-1.8px)}
+    42%{transform:translateY(-.4px)}52%{transform:translateY(-2.3px)}64%{transform:translateY(-.5px)}72%{transform:translateY(-1.2px)}81%{transform:translateY(-.15px)}90%{transform:translateY(-1.7px)}100%{transform:translateY(-.25px)}}
+  @keyframes talk-c-b{0%{transform:translateY(1.5px)}12%{transform:translateY(11px)}22%{transform:translateY(4px)}30%{transform:translateY(13.5px)}41%{transform:translateY(1.5px)}
+    47%{transform:translateY(6px)}58%{transform:translateY(1px)}70%{transform:translateY(12px)}78%{transform:translateY(9.5px)}89%{transform:translateY(2.5px)}100%{transform:translateY(1.5px)}}
+  @keyframes talk-c-t{0%{transform:translateY(-.25px)}12%{transform:translateY(-1.8px)}22%{transform:translateY(-.65px)}30%{transform:translateY(-2.25px)}41%{transform:translateY(-.25px)}
+    47%{transform:translateY(-1px)}58%{transform:translateY(-.15px)}70%{transform:translateY(-2px)}78%{transform:translateY(-1.6px)}89%{transform:translateY(-.4px)}100%{transform:translateY(-.25px)}}
+  @keyframes talk-nod{0%,100%{transform:translateY(0) rotate(0)}30%{transform:translateY(2.5px) rotate(1.2deg)}55%{transform:translateY(-1px) rotate(-.6deg)}80%{transform:translateY(1.5px) rotate(.8deg)}}
+  @keyframes bounce{0%,100%{transform:translateY(0) scale(1.03,.97)}50%{transform:translateY(-14px) scale(.98,1.03)}}
+  @keyframes giggle{0%,100%{transform:var(--torso-t) rotate(-2.5deg) translateY(0)}50%{transform:var(--torso-t) rotate(2.5deg) translateY(-3px)}}
+  @keyframes doze{0%,100%{transform:var(--torso-t) rotate(0) translateY(0)}50%{transform:var(--torso-t) rotate(1.6deg) translateY(2px)}}
+  @keyframes tremble-l{0%,100%{transform:var(--wl-t)}50%{transform:translate(var(--wlx),calc(var(--wly) - 2px)) rotate(calc(var(--wl) + 5deg))}}
+  @keyframes tremble-r{0%,100%{transform:var(--wr-t)}50%{transform:translate(var(--wrx),calc(var(--wry) - 2px)) rotate(calc(var(--wr) - 5deg))}}
+  @keyframes flap-l{0%,100%{transform:var(--wl-t)}50%{transform:translate(var(--wlx),var(--wly)) rotate(calc(var(--wl) + 18deg))}}
+  @keyframes flap-r{0%,100%{transform:var(--wr-t)}50%{transform:translate(var(--wrx),var(--wry)) rotate(calc(var(--wr) - 18deg))}}
+  @keyframes badge-pulse{0%,100%{transform:scale(var(--badge-s))}50%{transform:scale(calc(var(--badge-s)*1.13))}}
+  @keyframes ping{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.65);opacity:0}}
+  @keyframes twinkle{0%,100%{transform:scale(.6) rotate(0)}50%{transform:scale(1.15) rotate(20deg)}}
+  @keyframes cf-rise{0%{transform:translateY(16px) rotate(0) scale(.5);opacity:0}25%{opacity:1}100%{transform:translateY(-42px) rotate(220deg) scale(1);opacity:0}}
+  @keyframes cf-burst{0%{transform:translateY(18px) rotate(0) scale(.4);opacity:0}14%{opacity:1}72%{opacity:1}100%{transform:translateY(-46px) rotate(240deg) scale(1);opacity:0}}
+  @keyframes zfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  @keyframes drip{0%{transform:translateY(0) scale(.7);opacity:0}20%{transform:translateY(0) scale(1);opacity:1}75%{transform:translateY(12px) scale(1);opacity:1}100%{transform:translateY(18px) scale(.9);opacity:0}}
+  @keyframes g-wave{0%,100%{transform:var(--wr-t)}14%{transform:translate(22px,-50px) rotate(-138deg)}29%{transform:translate(22px,-50px) rotate(-112deg)}
+    44%{transform:translate(22px,-50px) rotate(-146deg)}59%{transform:translate(22px,-50px) rotate(-114deg)}74%{transform:translate(22px,-50px) rotate(-142deg)}88%{transform:translate(22px,-50px) rotate(-122deg)}}
+  @keyframes wave-lean{0%,100%{transform:var(--torso-t) rotate(0)}18%,82%{transform:var(--torso-t) rotate(-3deg)}}
+  @keyframes wave-head{0%,100%{transform:translateX(0) rotate(0)}20%,80%{transform:translateX(-4px) rotate(-7deg)}}
+  @keyframes g-nod{0%,100%{transform:translateY(0) scaleY(1)}28%{transform:translateY(12px) scaleY(.93)}44%{transform:translateY(-2px) scaleY(1.01)}60%{transform:translateY(11px) scaleY(.94)}80%{transform:translateY(-1px) scaleY(1)}}
+  @keyframes g-shake{0%,100%{transform:translateX(0) rotate(0)}14%{transform:translateX(-8px) rotate(-6deg)}32%{transform:translateX(9px) rotate(7deg)}55%{transform:translateX(-9px) rotate(-7deg)}76%{transform:translateX(5px) rotate(4deg)}}
+  @keyframes g-cheer{0%,100%{transform:var(--wr-t)}18%{transform:translate(4px,-8px) rotate(-160deg)}36%{transform:translate(4px,-8px) rotate(-135deg)}54%{transform:translate(4px,-8px) rotate(-162deg)}72%{transform:translate(4px,-8px) rotate(-138deg)}}
+  @keyframes cheer-l{0%,100%{transform:var(--wl-t)}18%{transform:translate(-4px,-8px) rotate(160deg)}36%{transform:translate(-4px,-8px) rotate(135deg)}54%{transform:translate(-4px,-8px) rotate(162deg)}72%{transform:translate(-4px,-8px) rotate(138deg)}}
+  @keyframes cheer-fig{0%,100%{transform:translateY(0) scale(1,1)}14%{transform:translateY(0) scale(1.06,.92)}32%{transform:translateY(-26px) scale(.97,1.05)}50%{transform:translateY(0) scale(1.06,.94)}
+    66%{transform:translateY(-14px) scale(.99,1.02)}82%{transform:translateY(0) scale(1.03,.97)}}
+  @keyframes cheer-sh{0%,100%{transform:scale(1);opacity:1}32%{transform:scale(.78);opacity:.5}50%{transform:scale(1);opacity:1}66%{transform:scale(.88);opacity:.7}}
+  @keyframes finger{0%,14%{transform:scaleY(0)}32%,70%{transform:scaleY(1)}88%,100%{transform:scaleY(0)}}
+  @keyframes g-point-left{0%,100%{transform:var(--wl-t)}22%,78%{transform:translate(-4px,-10px) rotate(80deg)}}
+  @keyframes g-point-right{0%,100%{transform:var(--wr-t)}22%,78%{transform:translate(4px,-10px) rotate(-80deg)}}
+  @keyframes g-point-up{0%,100%{transform:var(--wr-t)}22%,78%{transform:translate(4px,-14px) rotate(-122deg)}}
+  @keyframes g-point-down{0%,100%{transform:var(--wr-t)}22%,78%{transform:translate(8px,-6px) rotate(-24deg)}}
+  @keyframes look-l{0%,100%{transform:translateX(0) rotate(0)}22%,78%{transform:translateX(-6px) rotate(-8deg)}}
+  @keyframes look-r{0%,100%{transform:translateX(0) rotate(0)}22%,78%{transform:translateX(6px) rotate(8deg)}}
+  @keyframes look-u{0%,100%{transform:translateY(0) rotate(0)}22%,78%{transform:translateY(-5px) rotate(-5deg)}}
+  @keyframes look-d{0%,100%{transform:translateY(0) rotate(0)}22%,78%{transform:translateY(8px) rotate(5deg)}}
+  @keyframes g-hop{0%,100%{transform:translateY(0) scale(1,1)}18%{transform:translateY(0) scale(1.08,.9)}45%{transform:translateY(-38px) scale(.96,1.06)}70%{transform:translateY(0) scale(1.1,.92)}85%{transform:translateY(0) scale(.98,1.02)}}
+  @keyframes hop-sh{0%,100%{transform:scale(1);opacity:1}45%{transform:scale(.72);opacity:.45}}
+  @keyframes g-shrug{0%,100%{transform:var(--wr-t)}25%,75%{transform:translate(4px,-6px) rotate(-82deg)}}
+  @keyframes shrug-l{0%,100%{transform:var(--wl-t)}25%,75%{transform:translate(-4px,-6px) rotate(82deg)}}
+  @keyframes shrug-head{0%,100%{transform:translateY(0) rotate(0)}25%,75%{transform:translateY(4px) rotate(8deg)}}
+  @keyframes g-lean-in{0%,100%{transform:translateY(0) scale(1)}30%,70%{transform:translateY(4px) scale(1.1)}}
+  @keyframes lean-head{0%,100%{transform:translateY(0) scale(1)}30%,70%{transform:translateY(6px) scale(1.04)}}
+  @keyframes g-bow{0%,100%{transform:var(--torso-t) scaleY(1)}30%,65%{transform:var(--torso-t) scaleY(.9)}}
+  @keyframes bow-head{0%,100%{transform:translateY(0) scaleY(1)}30%,65%{transform:translateY(22px) scaleY(.9)}}
+  @keyframes bow-wr{0%,100%{transform:var(--wr-t)}30%,65%{transform:translate(0px,0px) rotate(50deg)}}
+  @keyframes bow-wl{0%,100%{transform:var(--wl-t)}30%,65%{transform:translate(0px,0px) rotate(-50deg)}}
+  @keyframes g-ponder{0%,100%{transform:var(--wr-t)}25%{transform:translate(-30px,-6px) rotate(-150deg)}40%{transform:translate(-30px,-6px) rotate(-140deg)}
+    55%{transform:translate(-30px,-6px) rotate(-152deg)}70%{transform:translate(-30px,-6px) rotate(-142deg)}82%{transform:translate(-30px,-6px) rotate(-150deg)}}
+  @keyframes ponder-head{0%,100%{transform:translateY(0) rotate(0)}25%,82%{transform:translateY(-2px) rotate(-8deg)}}
+  @keyframes g-present{0%,100%{transform:var(--wr-t)}25%,80%{transform:translate(8px,-8px) rotate(-50deg)}}
+  @keyframes present-l{0%,100%{transform:var(--wl-t)}25%,80%{transform:translate(-4px,-4px) rotate(40deg)}}
+  @keyframes present-head{0%,100%{transform:translate(0,0) rotate(0)}25%,80%{transform:translate(4px,5px) rotate(8deg)}}
+  @keyframes present-spark{0%,22%{transform:scale(0) rotate(0);opacity:0}40%{transform:scale(1.25) rotate(30deg);opacity:1}72%{transform:scale(.9) rotate(70deg);opacity:1}88%,100%{transform:scale(0) rotate(90deg);opacity:0}}
+  @keyframes g-shield-up{0%,100%{transform:scale(var(--badge-s)) translateY(0)}30%,70%{transform:scale(2.1) translateY(-4px)}}
+  @keyframes shield-glow{0%,100%{opacity:0;transform:scale(1)}30%{opacity:1;transform:scale(2.2)}70%{opacity:.6;transform:scale(2.5)}}
+  @keyframes shield-wl{0%,100%{transform:var(--wl-t)}30%,70%{transform:translate(0px,0px) rotate(-55deg)}}
+  @keyframes shield-wr{0%,100%{transform:var(--wr-t)}30%,70%{transform:translate(0px,0px) rotate(55deg)}}
+  @keyframes g-wiggle{0%,100%{transform:var(--torso-t) rotate(0)}18%{transform:var(--torso-t) rotate(-4deg)}40%{transform:var(--torso-t) rotate(4deg)}
+    62%{transform:var(--torso-t) rotate(-3.5deg)}82%{transform:var(--torso-t) rotate(3deg)}}
+  @keyframes wag{0%,100%{transform:rotate(var(--tail-rot));opacity:0}14%{transform:rotate(-14deg);opacity:1}34%{transform:rotate(14deg)}54%{transform:rotate(-12deg)}74%{transform:rotate(10deg);opacity:1}}
+  @keyframes g-preen{0%,100%{transform:translate(0,0) rotate(0)}30%,75%{transform:translate(-10px,8px) rotate(-14deg)}}
+  @keyframes preen-w{0%,100%{transform:var(--wl-t)}30%,75%{transform:translate(0px,0px) rotate(149deg)}}
+  /* jelly squash: short holds at each extreme, quick crossings, two decaying bounces */
+  @keyframes poke-body{0%,100%{transform:translateY(0) scale(1,1)}10%{transform:translateY(0) scale(1.22,.78)}24%{transform:translateY(0) scale(1.18,.82)}
+    34%{transform:translateY(-14px) scale(.87,1.15)}48%{transform:translateY(-10px) scale(.9,1.12)}58%{transform:translateY(0) scale(1.1,.9)}70%{transform:translateY(0) scale(1.07,.93)}
+    80%{transform:translateY(-2px) scale(.97,1.04)}90%{transform:translateY(0) scale(1.02,.98)}}
+  @keyframes poke-head{0%,100%{transform:translateY(0) rotate(0) scale(1,1)}16%{transform:translateY(8px) rotate(0) scale(1.14,.82)}
+    40%{transform:translateY(-10px) rotate(-5deg) scale(.93,1.1)}60%{transform:translateY(2px) rotate(4deg) scale(1.04,.97)}80%{transform:translateY(0) rotate(-2deg) scale(1,1)}}
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@400;600;800&display=swap">
+
+<header>
+  <h1>AI <span>Sel</span> — ördək</h1>
+  <p class="sub">Cyclowareness maskotu: salamlaşır, dərsi danışır, cavablarına reaksiya verir. İşarəni gəzdir, ona toxun, əhvalını dəyiş.</p>
+</header>
+
+<main>
+  <div>
+    <div id="stage"><div id="stage-slot"></div></div>
+    <p class="caption">Mənə toxun</p>
+  </div>
+  <aside class="panel" aria-label="İdarəetmə">
+    <div class="group"><h3>Əhval</h3><div class="btns" id="moods"></div></div>
+    <div class="group"><h3>Jest</h3><div class="btns" id="gestures"></div></div>
+    <div class="group toggles">
+      <label class="toggle"><input type="checkbox" id="talking"> Danışır</label>
+      <label class="toggle"><input type="checkbox" id="still"> Hərəkətsiz</label>
+      <button class="btn accent" id="poke" type="button">Toxun</button>
+      <button class="btn" id="theme" type="button">Tema: Sistem</button>
+    </div>
+    <div class="group range"><label for="size">Ölçü</label><input type="range" id="size" min="96" max="400" step="8" value="320"><output for="size" id="size-out">320 px</output></div>
+  </aside>
+</main>
+
+<section id="sizes">
+  <h2>Kiçik ölçülər</h2>
+  <div class="sizes-row" id="size-row"></div>
+  <h3>Portalda</h3>
+  <div class="ctx-row">
+    <div class="ctx-card ink"><div data-duck="64" data-mood="happy"></div><b>tünd fon</b></div>
+    <div class="ctx-card"><div class="app-icon"><div data-duck="60" data-mood="happy"></div></div><b>tətbiq ikonu</b></div>
+    <div class="ctx-card wide"><div class="notif"><div class="avatar"><div data-duck="60"></div></div>
+      <div><strong>AI Sel</strong><small>Yeni dərs hazırdır — Fişinq 101</small></div></div><b>bildiriş avatarı</b></div>
+  </div>
+</section>
+<footer>Ağ ördək, narıncı dimdik və ayaqlar; indigo yalnız kiçik qalxan nişanında. Hər hissə öz oynağı ətrafında fırlanır.</footer>
+
+<script>
+(() => {
+  const MOODS = ['idle','talk','happy','think','alert','sad','celebrate','surprised','proud','curious','worried','excited','sleepy','laughing'];
+  const MOOD_LABEL = {idle:'Sakit',talk:'Söhbət',happy:'Şən',think:'Düşünür',alert:'Diqqət',sad:'Kədərli',celebrate:'Bayram',surprised:'Təəccüb',
+    proud:'Qürurlu',curious:'Maraqlı',worried:'Narahat',excited:'Həyəcanlı',sleepy:'Yuxulu',laughing:'Gülür'};
+  // gesture -> duration (ms); the class is removed on the g-<name> animationend, the timer is only a fallback
+  const GESTURES = {wave:1200,nod:800,shake:800,cheer:1100,'point-left':1000,'point-right':1000,'point-up':1000,'point-down':1000,hop:800,shrug:1000,
+    'lean-in':1000,bow:1200,ponder:1200,present:1100,'shield-up':1100,wiggle:900,preen:1200};
+  const GESTURE_LABEL = {wave:'Salam',nod:'Hə',shake:'Yox',cheer:'Ura!','point-left':'Sola','point-right':'Sağa','point-up':'Yuxarı','point-down':'Aşağı',
+    hop:'Hoppan',shrug:'Çiyin','lean-in':'Yaxınlaş',bow:'Təzim',ponder:'Fikirləş',present:'Təqdim','shield-up':'Qalxan'};
+  const TALK = ['a', 'b', 'c'];
+  const rmq = matchMedia('(prefers-reduced-motion: reduce)');
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+  const instances = new Set();
+  let seq = 0, interacted = false, lastSmallBlink = 0, lastPointerAt = -1e9, ptr = null, raf = 0;
+
+  const FOOT = 'M-7 0 C-16 3 -25 15 -24 23 C-23 28 -16 28 -12 23 C-9 28 -3 28 0 23 C3 28 9 28 12 23 C16 28 23 28 24 23 C25 15 16 3 7 0 Z';
+  const SPARK = 'M0 -8 C1 -2.5 2.5 -1 8 0 C2.5 1 1 2.5 0 8 C-1 2.5 -2.5 1 -8 0 C-2.5 -1 -1 -2.5 0 -8 Z';
+  // mitten wing, shoulder at 0,0; three soft feather lobes at the tip read as a hand
+  const WING_L = 'M0 0 C-12 -3 -30 6 -36 26 C-40 39 -39 50 -34 55 C-31 60 -25 60 -23 54 C-20 61 -13 61 -11 54 C-8 59 -3 57 -2 50 C2 40 8 34 7 22 C6 10 5 2 0 0 Z';
+  const mirror = (d) => d.replace(/(-?\d+(?:\.\d+)?) (-?\d+(?:\.\d+)?)/g, (m, x, y) => `${-x} ${y}`).replace(/^M-0/, 'M0');
+  const WING_R = mirror(WING_L);
+  const FINGER = 'M-6.5 0 C-7.5 14 -5 28 0 40 C5 28 7.5 14 6.5 0 Z';   // leading feather, base at 0,0, extends along +y
+  // chunky three-lobe tuft, base at 0,0 (drawn behind the head circle, so the base is hidden)
+  const TUFT = 'M-13 9 C-20 -1 -28 -9 -27 -19 C-26 -27 -16 -29 -12 -21 C-10 -17 -8 -13 -6 -10 C-9 -23 -4 -37 7 -43 C12 -46 19 -43 18 -36 '
+    + 'C17 -31 12 -30 10 -25 C9 -21 9 -16 9 -12 C13 -18 20 -22 25 -18 C29 -13 23 -2 14 9 Z';
+  const TAIL = 'M8 6 C-4 6 -20 0 -30 -8 C-37 -13 -33 -22 -26 -19 C-30 -26 -25 -33 -18 -29 C-19 -35 -12 -39 -7 -33 C-1 -24 4 -12 8 -2 Z';
+
+  const markup = (s) => {
+    const id = (n) => `id="${n}${s}"`, P = `fill="url(#g-plush${s})"`, R = `fill="url(#g-rim${s})"`;
+    // lids match the head colour under each eye: flat on the left, a horizontal gradient on the right (darker side of the head)
+    const eye = (side, x, lid = (k) => `fill="${side === 'l' ? '#fcfbff' : `url(#g-lid-${k}${s})`}"`) => `
+      <g transform="translate(${x} -4)"><g class="eye eye-${side}" ${id('eye-' + side)}>
+        <g class="eye-open" clip-path="url(#clip-eye${s})">
+          <ellipse class="sclera" fill="url(#g-sclera${s})" rx="24" ry="28"/>
+          <g class="pupil pupil-${side}" ${id('pupil-' + side)}>
+            <circle class="iris" cy="2" r="19"/><circle class="iris-ring" cy="2" r="14.5"/>
+            <circle class="highlight" ${side === 'l' ? id('highlight') : ''} cx="-7" cy="-6" r="7"/><circle class="highlight highlight-2" cx="7.5" cy="8.5" r="3.2"/>
+          </g>
+          <ellipse class="eye-ring" rx="22.5" ry="26.5"/>
+          <ellipse class="lid lid-b" ${lid('b')} cy="58" rx="27" ry="30"/>
+          <ellipse class="lid lid-t" ${lid('t')} cy="-58" rx="27" ry="30"/>
+        </g>
+        <path class="lash-line" d="M-19 1 Q0 13 19 1"/>
+        <path class="smile-eye" d="M-18 5 Q0 -15 18 5"/>
+      </g></g>`;
+    const wing = (side, x) => `
+      <g transform="translate(${x} 212)"><g class="wing wing-${side}" ${id('wing-' + side)}>
+        <g transform="translate(${side === 'l' ? -19 : 19} 44) rotate(${side === 'l' ? 19 : -19})"><g class="finger finger-${side}" ${id('finger-' + side)}><path class="plush" ${P} d="${FINGER}"/></g></g>
+        <path class="plush" ${P} d="${side === 'l' ? WING_L : WING_R}"/>
+        ${side === 'r' ? `<g transform="translate(30 80)"><path class="wing-spark" d="${SPARK}"/></g>` : ''}
+      </g></g>`;
+    return `
+  <svg class="duck-svg" viewBox="0 0 320 320" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="g-plush${s}" cx="38%" cy="28%" r="78%"><stop offset="0" stop-color="#fff"/><stop offset=".55" class="s-mid"/><stop offset="1" class="s-shade"/></radialGradient>
+      <radialGradient id="g-rim${s}" cx="40%" cy="35%" r="70%"><stop offset=".76" stop-color="#ffb070" stop-opacity="0"/><stop offset="1" stop-color="#ffa05a" stop-opacity=".38"/></radialGradient>
+      <radialGradient id="g-sclera${s}" cx="45%" cy="40%" r="65%"><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#e4e0f1"/></radialGradient>
+      <linearGradient id="g-bill${s}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb35f"/><stop offset=".55" stop-color="#ff8a2c"/><stop offset="1" stop-color="#f26f0f"/></linearGradient>
+      <linearGradient id="g-bill-b${s}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f27414"/><stop offset="1" stop-color="#d4560a"/></linearGradient>
+      <linearGradient id="g-foot${s}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff9a3d"/><stop offset="1" stop-color="#ef6a0c"/></linearGradient>
+      <radialGradient id="g-cheek${s}"><stop offset="0" stop-color="#ff8c7a" stop-opacity=".8"/><stop offset="1" stop-color="#ff8c7a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="g-belly${s}" cx="50%" cy="45%" r="55%"><stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".6" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+      <radialGradient id="g-neck${s}"><stop offset="0" class="s-neck"/><stop offset="1" stop-color="#16123a" stop-opacity="0"/></radialGradient>
+      <radialGradient id="g-glow${s}"><stop offset="0" stop-color="#4f46e5" stop-opacity=".5"/><stop offset=".55" stop-color="#4f46e5" stop-opacity=".2"/><stop offset="1" stop-color="#4f46e5" stop-opacity="0"/></radialGradient>
+      <radialGradient id="g-shadow${s}"><stop offset="0" class="s-shadow" stop-opacity=".22"/><stop offset=".6" class="s-shadow" stop-opacity=".12"/><stop offset="1" class="s-shadow" stop-opacity="0"/></radialGradient>
+      <linearGradient id="g-lid-b${s}"><stop offset="0" stop-color="#fcfcff"/><stop offset=".45" stop-color="#faf9fe"/><stop offset="1" stop-color="#f3f2fa"/></linearGradient>
+      <linearGradient id="g-lid-t${s}"><stop offset="0" stop-color="#fcfbff"/><stop offset=".5" stop-color="#fbfaff"/><stop offset="1" stop-color="#f6f5fc"/></linearGradient>
+      <clipPath id="clip-eye${s}"><ellipse rx="24" ry="28"/></clipPath>
+    </defs>
+    <g transform="translate(8 14) scale(.95)">
+    <ellipse class="shadow" ${id('shadow')} fill="url(#g-shadow${s})" cx="160" cy="309" rx="80" ry="10"/>
+    <g class="figure" ${id('figure')}>
+      <g class="feet" ${id('feet')}>
+        <g transform="translate(131 287) rotate(-14)"><g class="foot foot-l" ${id('foot-l')}><path fill="url(#g-foot${s})" d="${FOOT}"/></g></g>
+        <g transform="translate(189 287) rotate(14)"><g class="foot foot-r" ${id('foot-r')}><path fill="url(#g-foot${s})" d="${FOOT}"/></g></g>
+      </g>
+      <g class="breath" ${id('breath')}><g class="torso" ${id('torso')}>
+        <g transform="translate(112 222) scale(1.35)"><g class="tail" ${id('tail')}><path class="plush" ${P} d="${TAIL}"/></g></g>
+        <g class="body" ${id('body')}>
+          <ellipse class="plush" ${P} cx="160" cy="232" rx="76" ry="64"/>
+          <ellipse class="rim" ${R} cx="160" cy="232" rx="76" ry="64"/>
+          <ellipse class="belly detail" fill="url(#g-belly${s})" cx="160" cy="252" rx="46" ry="34"/>
+          <ellipse class="neck-shade" fill="url(#g-neck${s})" cx="160" cy="212" rx="66" ry="14"/>
+          <g transform="translate(160 262)"><g class="badge" ${id('badge')}>
+            <circle class="badge-glow" fill="url(#g-glow${s})" r="16"/>
+            <circle class="badge-ping" r="17"/><circle class="badge-ring" r="17"/>
+            <path class="badge-shield" d="M0 -12 L10 -7.5 V0 C10 7 5 11 0 13 C-5 11 -10 7 -10 0 V-7.5 Z"/>
+            <path class="badge-check" d="M-4.5 .5 L-1.5 3.5 L4.5 -3.5"/>
+          </g></g>
+        </g>
+        <g class="head-nod" ${id('head-nod')}><g class="head-gest" ${id('head-gest')}><g transform="translate(160 118)"><g class="head" ${id('head')}>
+          <g transform="translate(0 -88)"><g class="tuft" ${id('tuft')}><path class="plush" ${P} d="${TUFT}"/></g></g>
+          <circle class="plush" ${P} r="92"/>
+          <circle class="rim" ${R} r="92"/>
+          <g class="face" ${id('face')}>
+            <ellipse class="cheek cheek-l" ${id('cheek-l')} fill="url(#g-cheek${s})" cx="-64" cy="30" rx="17" ry="11"/>
+            <ellipse class="cheek cheek-r" ${id('cheek-r')} fill="url(#g-cheek${s})" cx="64" cy="30" rx="17" ry="11"/>
+            ${eye('l', -34)}${eye('r', 34)}
+            <g transform="translate(-34 -44)"><g class="brow brow-l" ${id('brow-l')}><path d="M-14 3 Q0 -5 14 3"/></g></g>
+            <g transform="translate(34 -44)"><g class="brow brow-r" ${id('brow-r')}><path d="M-14 3 Q0 -5 14 3"/></g></g>
+            <g transform="translate(0 26)"><g class="beak" ${id('beak')}>
+              <g transform="translate(0 18)"><g class="beak-bottom" ${id('beak-bottom')}>
+                <rect class="mouth" x="-26" y="-22" width="52" height="28" rx="5"/>
+                <ellipse class="tongue" cy="3" rx="12" ry="4.5"/>
+                <path class="bill" fill="url(#g-bill-b${s})" d="M-27 0 Q0 10 27 0 Q27 14.5 0 15.5 Q-27 14.5 -27 0 Z"/>
+              </g></g>
+              <g class="beak-top" ${id('beak-top')}>
+                <path class="bill" fill="url(#g-bill${s})" d="M-35 0 Q-35 -9 -22 -9 L22 -9 Q35 -9 35 0 Q35 16.5 17.5 23 L-17.5 23 Q-35 16.5 -35 0 Z"/>
+                <ellipse class="gloss detail" cx="-14" cy="-2.5" rx="10" ry="3.3"/>
+                <circle class="nostril detail" cx="-12" cy="5.5" r="1.8"/><circle class="nostril detail" cx="12" cy="5.5" r="1.8"/>
+              </g>
+            </g></g>
+            <g transform="translate(-52 20)"><path class="tear" ${id('tear')} d="M0 0 C-3 5 -5 9 -5 12 A5 5 0 0 0 5 12 C5 9 3 5 0 0 Z"/></g>
+          </g>
+        </g></g></g></g>
+        ${wing('l', 98)}${wing('r', 222)}
+        <g class="sparks" ${id('sparks')}>
+          <g transform="translate(56 54)"><path class="spark a s1" d="${SPARK}"/></g>
+          <g transform="translate(268 40) scale(.8)"><path class="spark b s2" d="${SPARK}"/></g>
+          <g transform="translate(284 150) scale(.7)"><path class="spark a s3" d="${SPARK}"/></g>
+          <g transform="translate(34 160) scale(.6)"><path class="spark b s4" d="${SPARK}"/></g>
+        </g>
+        <g class="confetti" ${id('confetti')}>
+          <g transform="translate(70 100)"><rect class="cf cf1" x="-5" y="-5" width="10" height="10" rx="2"/></g>
+          <g transform="translate(254 76)"><circle class="cf cf2" r="5.5"/></g>
+          <g transform="translate(44 196)"><rect class="cf cf3" x="-4.5" y="-4.5" width="9" height="9" rx="2"/></g>
+          <g transform="translate(278 190)"><circle class="cf cf4" r="5"/></g>
+          <g transform="translate(112 22)"><circle class="cf cf5" r="4.5"/></g>
+          <g transform="translate(214 18)"><rect class="cf cf6" x="-5" y="-5" width="10" height="10" rx="2"/></g>
+        </g>
+        <text class="zz" ${id('zz')} x="226" y="52" font-size="20">z</text><text class="zz" x="246" y="34" font-size="14">z</text>
+      </g></g>
+    </g>
+    </g>
+  </svg><div class="bubble" aria-hidden="true">Qaq!</div>`;
+  };
+
+  function createDuck(container, opts = {}) {
+    const n = seq++, s = n ? '-' + n : '';
+    const root = document.createElement('div');
+    root.className = 'duck mood-idle';
+    if (opts.focusable !== false) { root.tabIndex = 0; root.setAttribute('role', 'button'); root.setAttribute('aria-label', 'AI Sel ördək — toxun'); }
+    root.innerHTML = markup(s);
+    container.appendChild(root);
+    const bubble = root.querySelector('.bubble');
+    const st = {mood: 'idle', gesture: null, userStill: false, still: false, talking: false, small: false, blinkOn: opts.blink !== false,
+      follow: opts.follow !== false, lastLook: 0, quietUntil: 0, defer: 0, timers: new Set()};
+    const later = (fn, ms) => { const t = setTimeout(() => { st.timers.delete(t); fn(); }, ms); st.timers.add(t); return t; };
+    const quiet = () => { st.quietUntil = performance.now() + 700; };   // no blink right after a state change
+
+    // ----- mood / talking / still / size -----
+    function setMood(m) {
+      if (!MOODS.includes(m)) m = 'idle';
+      root.classList.remove('mood-' + st.mood); st.mood = m; root.classList.add('mood-' + m); quiet();
+    }
+    function setTalking(on) {
+      st.talking = !!on;
+      if (st.talking && !root.classList.contains('talking')) { root.dataset.talk = 'a'; root.style.setProperty('--talk-d', '1.5s'); }
+      root.classList.toggle('talking', st.talking);
+    }
+    // swap to another irregular pattern at each loop boundary (beak is nearly closed there, so the swap is seamless)
+    root.addEventListener('animationiteration', (e) => {
+      if (!st.talking || !e.target.classList.contains('beak-bottom')) return;
+      const others = TALK.filter((v) => v !== root.dataset.talk);
+      root.dataset.talk = others[Math.random() * others.length | 0];
+      root.style.setProperty('--talk-d', rand(1.25, 1.85).toFixed(2) + 's');
+    });
+    function applyStill() { st.still = st.userStill || rmq.matches; root.classList.toggle('still', st.still); if (st.still) clearGesture(); }
+    function setStill(on) { st.userStill = !!on; applyStill(); }
+    function setSize(px) {
+      px = Math.max(16, Number(px) || 320);
+      root.style.setProperty('--size', px);
+      st.small = px <= 96;
+      root.classList.toggle('is-small', px <= 96); root.classList.toggle('is-tiny', px <= 48);
+    }
+
+    // ----- gestures -----
+    function clearGesture() { if (st.gesture) { root.classList.remove('g-' + st.gesture); st.gesture = null; } clearTimeout(st.gTimer); }
+    function play(g) {
+      if (!(g in GESTURES) || st.still) return;
+      clearGesture();
+      void root.offsetWidth;                       // restart the animation if the same gesture repeats
+      st.gesture = g; root.classList.add('g-' + g); quiet();
+      st.gTimer = setTimeout(fallback, GESTURES[g] + 150);
+    }
+    // safety net if animationend never arrives; a gesture paused by a renderer/devtools holds its pose
+    function fallback() {
+      const main = root.getAnimations && root.getAnimations({subtree: true}).find((a) => a.animationName === 'g-' + st.gesture);
+      if (main && main.playState === 'paused') st.gTimer = setTimeout(fallback, 250); else clearGesture();
+    }
+    root.addEventListener('animationend', (e) => {
+      if (st.gesture && e.animationName === 'g-' + st.gesture) clearGesture();
+      if (e.animationName === 'poke-body' || e.animationName === 'poke-head') root.classList.remove('poke-body', 'poke-head');
+    });
+
+    // ----- gaze -----
+    function setLook(lx, ly) { root.style.setProperty('--look-x', clamp(lx, -1, 1).toFixed(3)); root.style.setProperty('--look-y', clamp(ly, -1, 1).toFixed(3)); }
+    function lookFrom(r, x, y) {
+      const cx = r.left + r.width / 2, cy = r.top + r.height * .38;   // the eyes sit in the upper half
+      setLook((x * innerWidth - cx) / (innerWidth * .32), (y * innerHeight - cy) / (innerHeight * .32));
+    }
+    function lookAt(x, y) { lookFrom(root.getBoundingClientRect(), x, y); st.lastLook = performance.now(); quiet(); }
+
+    // ----- poke -----
+    function poke(where) {
+      where = where === 'head' ? 'head' : 'body';
+      root.classList.remove('poke-head', 'poke-body'); void root.offsetWidth;
+      root.classList.add('poke-' + where); bubble.classList.add('show');
+      clearTimeout(st.pokeTimer); clearTimeout(st.bubbleTimer);
+      st.bubbleTimer = setTimeout(() => bubble.classList.remove('show'), 700);
+      st.pokeTimer = setTimeout(() => root.classList.remove('poke-' + where), 1050);
+    }
+    root.addEventListener('pointerdown', (e) => { if (e.button === 0) poke(e.target.closest && e.target.closest('.head') ? 'head' : 'body'); });
+    root.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); poke('head'); } });
+
+    // ----- idle life: blink, glance, wiggle/preen -----
+    function blink(second) {
+      root.classList.add('blink');
+      later(() => {
+        root.classList.remove('blink');
+        if (!second && Math.random() < .25) later(() => blink(true), 190); else scheduleBlink(rand(3000, 6000));
+      }, 130);
+    }
+    function scheduleBlink(ms) { later(tryBlink, ms); }
+    function tryBlink() {
+      const now = performance.now();
+      if (!st.blinkOn || (st.small && !interacted)) return scheduleBlink(rand(1500, 3000));       // small ducks wait for the first interaction
+      if (now < st.quietUntil && st.defer < 2) { st.defer++; return scheduleBlink(st.quietUntil - now + 80); }
+      if (st.small && now - lastSmallBlink < 1100) return scheduleBlink(rand(400, 1200));           // never two small ducks at once
+      st.defer = 0; if (st.small) lastSmallBlink = now;
+      blink(false);
+    }
+    scheduleBlink(rand(2500, 5000));
+    function glance() {
+      root.classList.add('glance');
+      setLook(rand(-.85, .85), rand(-.6, .5));
+      later(() => { setLook(0, 0); later(() => root.classList.remove('glance'), 600); }, rand(700, 1300));
+    }
+    function idleTick() {
+      if (!st.still && !st.gesture && performance.now() - Math.max(st.lastLook, lastPointerAt) > 3500) {
+        if (st.mood === 'idle' && !st.talking && Math.random() < .3) play(Math.random() < .5 ? 'wiggle' : 'preen'); else glance();
+      }
+      later(idleTick, rand(6500, 9500));
+    }
+    later(idleTick, rand(5000, 8000));
+
+    const onRmq = () => applyStill();
+    rmq.addEventListener('change', onRmq);
+    setSize(opts.size ?? 320); applyStill(); setLook(0, 0);
+
+    const api = {
+      el: root, host: root, setMood, setTalking, play, lookAt, poke, setStill, setSize,
+      setBlink(on) { st.blinkOn = !!on; if (!on) root.classList.remove('blink'); },
+      get mood() { return st.mood; }, get gesture() { return st.gesture; }, get still() { return st.still; }, get talking() { return st.talking; },
+      moods: MOODS.slice(), gestures: Object.keys(GESTURE_LABEL),
+      _follow(r) { if (st.follow && !st.still && ptr) lookFrom(r, ptr[0], ptr[1]); },
+      destroy() { st.timers.forEach(clearTimeout); clearGesture(); instances.delete(api); rmq.removeEventListener('change', onRmq); root.remove(); }
+    };
+    instances.add(api);
+    return api;
+  }
+  window.createDuck = createDuck;
+
+  // one shared pointer/touch follower: read every rect first, then write (no layout thrash)
+  function onPointer(e) {
+    interacted = true; lastPointerAt = performance.now();
+    ptr = [e.clientX / innerWidth, e.clientY / innerHeight];
+    if (!raf) raf = requestAnimationFrame(() => {
+      raf = 0;
+      const list = [...instances], rects = list.map((d) => d.el.getBoundingClientRect());
+      list.forEach((d, i) => d._follow(rects[i]));
+    });
+  }
+  addEventListener('pointermove', onPointer, {passive: true});
+  addEventListener('pointerdown', onPointer, {passive: true});
+  addEventListener('keydown', () => { interacted = true; });
+
+  // ---------- page wiring ----------
+  const duck = window.duck = createDuck(document.getElementById('stage-slot'), {size: 320});
+  const row = document.getElementById('size-row');
+  for (const px of [32, 48, 64, 96]) {
+    const card = document.createElement('div'); card.className = 'size-card';
+    card.innerHTML = `<div class="slot"></div><b>${px} px</b>`;
+    row.appendChild(card);
+    createDuck(card.querySelector('.slot'), {size: px});
+  }
+  document.querySelectorAll('[data-duck]').forEach((h) => {
+    const d = createDuck(h, {size: +h.dataset.duck, focusable: false});
+    if (h.dataset.mood) d.setMood(h.dataset.mood);
+  });
+  const moodsEl = document.getElementById('moods');
+  for (const m of MOODS) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'btn' + (m === 'idle' ? ' active' : ''); b.textContent = MOOD_LABEL[m];
+    b.addEventListener('click', () => { duck.setMood(m); moodsEl.querySelectorAll('.btn').forEach((x) => x.classList.toggle('active', x === b)); });
+    moodsEl.appendChild(b);
+  }
+  const gesturesEl = document.getElementById('gestures');
+  for (const g of Object.keys(GESTURE_LABEL)) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'btn'; b.textContent = GESTURE_LABEL[g];
+    b.addEventListener('click', () => duck.play(g));
+    gesturesEl.appendChild(b);
+  }
+  document.getElementById('talking').addEventListener('change', (e) => duck.setTalking(e.target.checked));
+  const stillBox = document.getElementById('still');
+  stillBox.checked = duck.still;
+  stillBox.addEventListener('change', (e) => duck.setStill(e.target.checked));
+  document.getElementById('poke').addEventListener('click', () => duck.poke('head'));
+  const size = document.getElementById('size'), sizeOut = document.getElementById('size-out');
+  size.addEventListener('input', () => { duck.setSize(size.value); sizeOut.value = size.value + ' px'; });
+  const themeBtn = document.getElementById('theme'), themes = [['', 'Sistem'], ['dark', 'Tünd'], ['light', 'Açıq']];
+  let ti = 0;
+  themeBtn.addEventListener('click', () => {
+    ti = (ti + 1) % themes.length;
+    if (themes[ti][0]) document.documentElement.dataset.theme = themes[ti][0]; else delete document.documentElement.dataset.theme;
+    themeBtn.textContent = 'Tema: ' + themes[ti][1];
+  });
+})();
+</script>

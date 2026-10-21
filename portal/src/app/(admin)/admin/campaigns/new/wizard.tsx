@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import { useClientFormat } from "@/lib/client-format";
 import { Building2, Calendar, Check, Clock, Globe, Mail, MessageSquare, Phone, Usb } from "lucide-react";
 import { saveCampaignAction } from "@/server/actions/campaigns";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ import { toast } from "@/components/ui/toast";
 import { TemplatePreview } from "@/components/admin/template-preview";
 import { TEMPLATES, templateText, type Channel } from "@/lib/campaigns/templates";
 import { cn } from "@/lib/cn";
+import { bakuParts, fromBakuParts } from "@/lib/baku-clock";
 
 const CHANNELS: { key: Channel; icon: typeof Mail }[] = [
   { key: "email", icon: Mail },
@@ -23,18 +25,13 @@ const CHANNELS: { key: Channel; icon: typeof Mail }[] = [
 /** A draft or scheduled campaign reopened for editing; the wizard starts on the review step. */
 export type WizardInitial = { id: string; name: string; templateKey: string; channel: Channel; audience: "all" | "department"; departmentId: string | null; scheduledAt: string | null };
 
-const pad = (n: number) => String(n).padStart(2, "0");
-/** Local date and time parts for the date/time inputs (the clock fields, not a formatted date). */
-function localParts(iso: string) {
-  const d = new Date(iso);
-  return { date: `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, time: `${pad(d.getHours())}:${pad(d.getMinutes())}` };
-}
-
 export function CampaignWizard({ departments, smsVoice, initial }: { departments: { id: string; name: string; people: number }[]; smsVoice: boolean; initial?: WizardInitial }) {
   const t = useTranslations("admin.campaigns");
   const tw = useTranslations("admin.campaigns.wizard");
   const tc = useTranslations("common");
   const locale = useLocale();
+  const format = useClientFormat();
+  const whenLabel = (d: Date) => format.dateTime(d, { day: "numeric", month: "numeric", year: "numeric", timeStyle: "short" });
   const router = useRouter();
   const [step, setStep] = useState(initial ? 5 : 1);
   const [channel, setChannel] = useState<Channel | null>(initial?.channel ?? null);
@@ -42,8 +39,9 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
   const [audience, setAudience] = useState<"all" | "department" | null>(initial?.audience ?? null);
   const [departmentId, setDepartmentId] = useState(initial?.departmentId ?? "");
   const [when, setWhen] = useState<"later" | "date" | null>(initial ? (initial.scheduledAt ? "date" : "later") : null);
-  const [date, setDate] = useState(() => (initial?.scheduledAt ? localParts(initial.scheduledAt).date : ""));
-  const [time, setTime] = useState(() => (initial?.scheduledAt ? localParts(initial.scheduledAt).time : "10:00"));
+  // The send time is entered in Baku time, the zone it is listed in everywhere, not the browser's.
+  const [date, setDate] = useState(() => (initial?.scheduledAt ? bakuParts(initial.scheduledAt).date : ""));
+  const [time, setTime] = useState(() => (initial?.scheduledAt ? bakuParts(initial.scheduledAt).time : "10:00"));
   // Render must stay pure, so the clock is sampled when the schedule inputs change.
   const [now, setNow] = useState(0);
   const [name, setName] = useState(initial?.name ?? "");
@@ -51,7 +49,7 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
   const templates = useMemo(() => TEMPLATES.filter((x) => x.channel === channel), [channel]);
   const tpl = TEMPLATES.find((x) => x.key === templateKey) ?? null;
   const dept = departments.find((d) => d.id === departmentId);
-  const scheduledAt = when === "date" && date ? new Date(`${date}T${time || "10:00"}:00`) : null;
+  const scheduledAt = when === "date" && date ? fromBakuParts(date, time || "10:00") : null;
 
   const canNext = (s: number) =>
     s === 1 ? !!channel : s === 2 ? !!templateKey : s === 3 ? audience === "all" || (audience === "department" && !!departmentId) : s === 4 ? when === "later" || (when === "date" && !!date && !!scheduledAt && scheduledAt.getTime() > now) : true;
@@ -60,7 +58,7 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
     channel ? { step: 1, label: t("channelLabel"), value: t(`channel.${channel}`) } : null,
     tpl ? { step: 2, label: t("template"), value: templateText(tpl.name, locale) } : null,
     audience ? { step: 3, label: t("audience"), value: audience === "all" ? t("wholeOrg") : (dept?.name ?? "") } : null,
-    when ? { step: 4, label: tw("schedule"), value: when === "later" ? tw("notYet") : scheduledAt?.toLocaleString(locale) ?? "" } : null,
+    when ? { step: 4, label: tw("schedule"), value: when === "later" ? tw("notYet") : scheduledAt ? whenLabel(scheduledAt) : "" } : null,
   ].filter(Boolean) as { step: number; label: string; value: string }[];
 
   const card = (active: boolean, disabled = false) =>
@@ -71,7 +69,7 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
       <div className="flex flex-wrap items-center gap-2">
         <Pill tone="brand">{tw("step", { current: step })}</Pill>
         {chips.map((c) => (
-          <button key={c.step} type="button" onClick={() => setStep(c.step)} className="rounded-pill bg-sunken px-3 py-1 text-tab font-semibold text-ink-muted hover:text-ink">
+          <button key={c.step} type="button" onClick={() => setStep(c.step)} className="rounded-pill bg-sunken px-3 py-1 text-tab font-semibold text-ink-muted hover:text-ink pointer-coarse:min-h-11">
             <span className="text-ink-subtle">{c.label}</span> <span className="text-ink">{c.value}</span>
           </button>
         ))}
@@ -176,8 +174,8 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
               <Field label={tw("date")} htmlFor="w-date">
                 <Input id="w-date" type="date" value={date} onChange={(e) => (setDate(e.target.value), setNow(Date.now()))} className="w-48" />
               </Field>
-              <Field label={tw("time")} htmlFor="w-time">
-                <Input id="w-time" type="time" value={time} onChange={(e) => (setTime(e.target.value), setNow(Date.now()))} className="w-36" />
+              <Field label={tw("time")} htmlFor="w-time" hint={tc("time.bakuZone")}>
+                <Input id="w-time" type="time" value={time} onChange={(e) => (setTime(e.target.value), setNow(Date.now()))} className="w-36" aria-describedby="w-time-hint" />
               </Field>
             </div>
           ) : null}
@@ -195,13 +193,13 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
               [t("channelLabel"), t(`channel.${tpl.channel}`), 1],
               [t("template"), templateText(tpl.name, locale), 2],
               [t("audience"), audience === "all" ? t("wholeOrg") : (dept?.name ?? ""), 3],
-              [t("sendTime"), when === "later" ? tw("notYet") : (scheduledAt?.toLocaleString(locale) ?? ""), 4],
+              [t("sendTime"), when === "later" ? tw("notYet") : scheduledAt ? whenLabel(scheduledAt) : "", 4],
             ].map(([k, val, s]) => (
               <div key={String(s)} className="flex items-center justify-between gap-3 border-b border-line py-2 last:border-0">
                 <dt className="text-ink-muted">{k}</dt>
-                <dd className="flex items-center gap-3 font-semibold">
-                  {val}
-                  <button type="button" className="text-tab text-brand-600 hover:underline" onClick={() => setStep(Number(s))}>
+                <dd className="flex min-w-0 items-center gap-3 text-right font-semibold">
+                  <span className="min-w-0 break-words">{val}</span>
+                  <button type="button" className="-mx-2 inline-flex min-h-10 shrink-0 items-center px-2 text-tab text-brand-600 hover:underline" onClick={() => setStep(Number(s))}>
                     {tw("change")}
                   </button>
                 </dd>
@@ -237,6 +235,11 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
                 if (res.ok && res.id) {
                   toast(tw("saved"));
                   router.push(`/admin/campaigns/${res.id}`);
+                } else if (res.reason === "past_date") {
+                  // The planned time passed while the wizard was open: back to the schedule step.
+                  toast(tw("pastDate"), "error");
+                  setNow(Date.now());
+                  setStep(4);
                 } else toast(tc("errors.invalid"), "error");
               })
             }

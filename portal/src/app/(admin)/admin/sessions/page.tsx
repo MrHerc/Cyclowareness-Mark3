@@ -45,8 +45,8 @@ export default async function SessionsAdminPage({ searchParams }: PageProps<"/ad
                 <Card>
                   <CardBody className="grid gap-4">
                     <div className="flex flex-wrap items-start gap-3">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-body font-semibold">{s.title}</p>
+                      <div className="min-w-0 flex-[1_1_12rem]">
+                        <p className="text-body font-semibold break-words">{s.title}</p>
                         {s.description ? <p className="mt-1 text-caption text-ink-muted">{s.description}</p> : null}
                         <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-caption text-ink-muted">
                           <span className="inline-flex items-center gap-1.5">
@@ -75,7 +75,7 @@ export default async function SessionsAdminPage({ searchParams }: PageProps<"/ad
                     </div>
                     {mine.length ? (
                       <details className="group rounded-lg border border-line" open={view === "past"}>
-                        <summary className="cursor-pointer list-none px-4 py-2.5 text-caption font-semibold text-ink-muted hover:text-ink">
+                        <summary className="cursor-pointer list-none px-4 py-2.5 text-caption font-semibold text-ink-muted hover:text-ink pointer-coarse:py-[calc((2.75rem_-_1lh)/2)]">
                           {tr("attendance")} · {mine.length}
                         </summary>
                         <ul className="grid gap-1 border-t border-line p-3 sm:grid-cols-2">

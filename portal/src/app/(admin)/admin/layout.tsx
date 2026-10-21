@@ -12,8 +12,9 @@ import type { Feature } from "@/lib/tenant-defaults";
 import { AdminMobileMenu, AdminNav, type AdminNavGroup } from "@/components/shell/admin-nav";
 import { NotificationsButton } from "@/components/shell/notifications";
 import { AccountMenu } from "@/components/admin/account-menu";
-import { TenantMark } from "@/components/brand";
+import { BrandMark, TenantMark } from "@/components/brand";
 import { Avatar } from "@/components/ui/avatar";
+import { textLinkClass } from "@/components/ui/button";
 import { desc } from "drizzle-orm";
 
 type ItemDef = { key: string; href: string; perm: Permission; feature?: Feature };
@@ -45,8 +46,8 @@ const GROUPS: { key: string; heading?: boolean; items: ItemDef[] }[] = [
   {
     key: "intel",
     items: [
-      { key: "threatIntel", href: "/admin/intel?kind=threat", perm: "intel.read", feature: "threat_intel" },
-      { key: "policyIntel", href: "/admin/intel?kind=policy", perm: "intel.read", feature: "policy_intel" },
+      { key: "threatIntel", href: "/admin/intel/threat", perm: "intel.read", feature: "threat_intel" },
+      { key: "policyIntel", href: "/admin/intel/policy", perm: "intel.read", feature: "policy_intel" },
     ],
   },
   {
@@ -114,7 +115,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const footer = (
     <div className="mt-6 grid gap-3 border-t border-line pt-4">
-      <Link href="/" className="flex h-10 items-center gap-3 rounded-pill px-3 text-body-sm font-semibold text-ink-muted hover:bg-sunken hover:text-ink">
+      <Link href="/" className="flex h-10 items-center gap-3 rounded-pill px-3 text-body-sm font-semibold text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:h-11">
         <BookOpenCheck className="size-[1.15rem] text-ink-subtle" />
         {tr("nav.learnerView")}
       </Link>
@@ -127,11 +128,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <AccountMenu />
       </div>
       <p className="flex gap-2 px-1 text-tab text-ink-subtle">
-        <Link href="/legal/terms" className="hover:text-ink">
+        <Link href="/legal/terms" className={textLinkClass("hover:text-ink")}>
           {tc("footer.terms")}
         </Link>
         ·
-        <Link href="/legal/privacy" className="hover:text-ink">
+        <Link href="/legal/privacy" className={textLinkClass("hover:text-ink")}>
           {tc("footer.privacy")}
         </Link>
       </p>
@@ -141,21 +142,23 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-dvh bg-canvas lg:pl-68">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-68 flex-col overflow-y-auto border-r border-line bg-surface px-3 pt-5 pb-4 lg:flex">
+        {/* Product lockup in the sidebar (as in the learner rail); the organisation's own logo sits in the header. */}
         <div className="mb-6 px-2">
-          <TenantMark name={v.tenant.name} logoUrl={v.tenant.branding.logoUrl} />
-          <p className="mt-1 pl-10.5 text-tab text-ink-subtle">{tr("console")}</p>
+          <BrandMark href="/admin" byline />
+          <p className="mt-3 ml-11.5 inline-flex rounded-pill bg-brand-50 px-2.5 py-0.5 text-tab-sm font-semibold text-brand-700">{tr("console")}</p>
         </div>
         <Suspense>
           <AdminNav groups={groups} />
         </Suspense>
         {footer}
       </aside>
-      <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-line/70 bg-canvas/85 px-4 backdrop-blur-xl sm:px-6 lg:px-10">
+      <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-line/70 px-4 sm:px-6 lg:px-10">
+        {/* The blur sits on a layer, not the header: backdrop-filter would make the header the box every fixed popover inside it is placed in. */}
+        <div aria-hidden className="absolute inset-0 -z-10 bg-canvas/85 backdrop-blur-xl" />
         <Suspense>
           <AdminMobileMenu groups={groups}>{footer}</AdminMobileMenu>
         </Suspense>
-        <span className="min-w-0 flex-1 truncate text-body-sm font-semibold text-ink-muted lg:hidden">{v.tenant.name}</span>
-        <span className="hidden flex-1 lg:block" />
+        <TenantMark name={v.tenant.name} logoUrl={v.tenant.branding.logoUrl} className="min-w-0 flex-1" />
         <NotificationsButton items={notes.map((n) => ({ id: n.id, title: n.title, body: n.body, href: n.href, createdAt: n.createdAt.toISOString(), read: !!n.readAt }))} />
       </header>
       <main id="main" className="mx-auto max-w-(--container-content) animate-reveal px-4 py-6 sm:px-6 lg:px-10 lg:py-10">

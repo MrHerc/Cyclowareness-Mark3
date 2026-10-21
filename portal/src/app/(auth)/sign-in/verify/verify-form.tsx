@@ -1,15 +1,29 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { unstable_rethrow } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { verifySecondFactorAction, signOutAction, type AuthState } from "@/server/actions/auth";
 import { Field, Input } from "@/components/ui/field";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { TextButton } from "@/components/ui/button";
+
+/**
+ * A failure before the server answers (offline, a dropped connection, a restart or deploy) rejects the action, and
+ * useActionState would rethrow it into the error boundary. It becomes the translated "try again" error on the form instead;
+ * the redirect after a correct code still goes through.
+ */
+function submitCode(prev: AuthState, data: FormData): Promise<AuthState> {
+  return verifySecondFactorAction(prev, data).catch((error: unknown): AuthState => {
+    unstable_rethrow(error);
+    return { error: "generic", step: data.get("mode") === "backup" ? "backup" : "totp" };
+  });
+}
 
 export function VerifyForm({ next }: { next: string }) {
   const t = useTranslations("auth");
   const [mode, setMode] = useState<"totp" | "backup">("totp");
-  const [state, action] = useActionState<AuthState, FormData>(verifySecondFactorAction, undefined);
+  const [state, action] = useActionState<AuthState, FormData>(submitCode, undefined);
   const error = state?.error && state.step === mode ? t(`errors.${state.error}` as "errors.generic") : null;
   return (
     <div className="rounded-2xl border border-line bg-surface p-7 shadow-raised sm:p-8">
@@ -34,14 +48,14 @@ export function VerifyForm({ next }: { next: string }) {
           />
         </Field>
         <SubmitButton size="lg">{t("code.verify")}</SubmitButton>
-        <button type="button" onClick={() => setMode(mode === "totp" ? "backup" : "totp")} className="text-caption font-semibold text-brand-600 hover:underline">
+        <TextButton className="justify-self-center" onClick={() => setMode(mode === "totp" ? "backup" : "totp")}>
           {mode === "totp" ? t("code.useBackup") : t("code.useAuthenticator")}
-        </button>
+        </TextButton>
       </form>
       <form action={signOutAction} className="mt-3 text-center">
-        <button type="submit" className="text-caption text-ink-muted hover:text-ink hover:underline">
+        <TextButton type="submit" tone="muted" className="font-normal">
           {t("code.otherAccount")}
-        </button>
+        </TextButton>
       </form>
     </div>
   );

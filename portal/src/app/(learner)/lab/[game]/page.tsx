@@ -19,7 +19,7 @@ export default async function GamePage({ params }: PageProps<"/lab/[game]">) {
   return (
     <div className="grid gap-6">
       <PageHeader title={tr(`games.${game}.title`)} subtitle={tr(`games.${game}.body`)} back={{ href: "/lab", label: tr("back") }} />
-      <GameClient game={game} items={publicItems(game, locale)} orgName={v.tenant.name} />
+      <GameClient game={game} items={publicItems(game, locale)} forge={{ orgName: v.tenant.name, orgSlug: v.tenant.slug, userName: v.user.name, email: v.user.email }} />
     </div>
   );
 }

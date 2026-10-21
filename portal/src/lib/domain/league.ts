@@ -1,5 +1,7 @@
 /** Department league: score = 60 % assigned completion + 40 % simulation reporting. */
 
+import { todayInBaku } from "@/lib/time";
+
 export type DepartmentStats = {
   id: string;
   name: string;
@@ -26,10 +28,14 @@ export function rankLeague(rows: DepartmentStats[]): LeagueRow[] {
   }));
 }
 
-/** Days left in the month, counting today. */
+/**
+ * Days left in the month, counting today. The month and today are Baku's (like every day in the UI),
+ * not the server's local ones, so from 00:00 to 04:00 Baku on the 1st it already counts the new month.
+ */
 export function daysLeftInMonth(now: Date): number {
-  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-  return end.getDate() - now.getDate() + 1;
+  const [year, month, day] = todayInBaku(now).split("-").map(Number);
+  const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  return lastDay - day + 1;
 }
 
 export type LeagueTrend = "up" | "down" | "same";

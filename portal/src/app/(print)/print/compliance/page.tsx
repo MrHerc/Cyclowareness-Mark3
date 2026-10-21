@@ -1,11 +1,14 @@
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { and, eq, inArray } from "drizzle-orm";
 import { db, t } from "@/server/db";
-import { allowed, requirePermission } from "@/server/auth/viewer";
-import { buildReport } from "@/server/reports/build";
+import { notFound } from "next/navigation";
+import { AlertTriangle } from "lucide-react";
+import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
+import { buildReport, parseReportFilters, scopedPeople } from "@/server/reports/build";
 import { audit } from "@/server/services/audit";
 import { DocHeader, ReportSection } from "@/components/admin/report-document";
 import { PrintToolbar } from "@/components/admin/print-toolbar";
+import { Notice } from "@/components/ui/layout";
 import { pick } from "@/i18n/config";
 
 export const metadata = { robots: { index: false } };
@@ -14,10 +17,22 @@ export const metadata = { robots: { index: false } };
 export default async function CompliancePack({ searchParams }: PageProps<"/print/compliance">) {
   const sp = await searchParams;
   const v = await requirePermission("reports.read");
+  if (!hasFeature(v, "compliance_pack")) notFound();
   const locale = await getLocale();
   const [tr, format] = await Promise.all([getTranslations("admin.reports"), getFormatter()]);
   const str = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : undefined);
-  const filters = { from: str("from"), to: str("to"), departmentId: str("d") };
+  // Every section, the period header and the audit entry use the filters the reports apply; a period they
+  // would ignore (2026-13-01, a start after the end) is refused, never shown to auditors as that period.
+  const { filters, rejected } = parseReportFilters({ from: str("from"), to: str("to"), d: str("d") });
+  if (rejected) {
+    return (
+      <main className="mx-auto max-w-2xl px-8 py-12">
+        <Notice tone="warn" icon={<AlertTriangle />} title={tr("filtersRejectedTitle")}>
+          {tr("filtersRejected")}
+        </Notice>
+      </main>
+    );
+  }
   const [completion, confirmations, simulations, risk] = await Promise.all([
     buildReport(v, "completion", filters, locale),
     buildReport(v, "confirmations", filters, locale),
@@ -36,8 +51,8 @@ export default async function CompliancePack({ searchParams }: PageProps<"/print
     [tr("compliance.settingRows.sso"), s.identity.ssoEnabled ? yes : no],
     [tr("compliance.settingRows.email"), s.email.enabled ? yes : no],
   ];
-  // Cross-check: modules marked completed must each have a stored attestation.
-  const users = await db().select({ id: t.users.id, name: t.users.name }).from(t.users).where(eq(t.users.tenantId, v.tenant.id));
+  // Cross-check: modules marked completed must each have a stored attestation (same people as the sections above).
+  const { users } = await scopedPeople(v, filters);
   const ids = users.map((u) => u.id);
   const [completed, attests] = ids.length
     ? await Promise.all([

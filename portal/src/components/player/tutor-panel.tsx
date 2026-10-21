@@ -116,7 +116,7 @@ export function TutorPanel({
       {mode === "offline" && answer ? <p className="mt-2 text-tab text-ink-subtle">{t("offline")}</p> : null}
       <div className="mt-4 flex flex-wrap gap-2">
         {suggestions.map((s) => (
-          <button key={s} type="button" onClick={() => ask(s)} className="rounded-pill bg-brand-50 px-3 py-1.5 text-caption font-semibold text-brand-700 hover:bg-brand-100">
+          <button key={s} type="button" onClick={() => ask(s)} className="rounded-pill bg-brand-50 px-3 py-1.5 text-caption font-semibold text-brand-700 hover:bg-brand-100 pointer-coarse:min-h-11">
             {s}
           </button>
         ))}

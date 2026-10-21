@@ -9,7 +9,8 @@ import { issueAccountLink } from "../auth/links";
 import { domainProofFound, domainProofRecord, normaliseHost } from "../auth/domain-proof";
 import { audit } from "../services/audit";
 import { env } from "../env";
-import { DEFAULT_BRANDING, PLAN_FEATURES, defaultSettings, type Feature } from "../../lib/tenant-defaults";
+import { TENANT_SLUG_RE, createTenantWithAdmin } from "../services/tenants";
+import { PLAN_FEATURES, withDefaults, type Feature } from "../../lib/tenant-defaults";
 import { LOCALES } from "../../i18n/config";
 
 /**
@@ -27,7 +28,7 @@ const tenantSchema = z.object({
     .string()
     .trim()
     .toLowerCase()
-    .regex(/^[a-z0-9](?:[a-z0-9-]{1,38}[a-z0-9])$/),
+    .regex(TENANT_SLUG_RE),
   plan: z.enum(t.PLANS),
   locale: z.enum(LOCALES),
   adminName: z.string().trim().min(2).max(120),
@@ -43,16 +44,9 @@ export async function createTenantAction(input: z.infer<typeof tenantSchema>): P
   const [slugTaken] = await db().select({ id: t.tenants.id }).from(t.tenants).where(eq(t.tenants.slug, d.slug));
   const [emailTaken] = await db().select({ id: t.users.id }).from(t.users).where(eq(t.users.email, email));
   if (slugTaken || emailTaken) return { ok: false, error: "taken" };
-  const [tenant] = await db()
-    .insert(t.tenants)
-    .values({ slug: d.slug, name: d.name, plan: d.plan, branding: { ...DEFAULT_BRANDING, senderName: d.name }, settings: defaultSettings(d.locale) })
-    .returning({ id: t.tenants.id });
-  const [admin] = await db()
-    .insert(t.users)
-    .values({ tenantId: tenant.id, email, name: d.adminName, role: "tenant_admin", status: "invited", locale: d.locale })
-    .returning({ id: t.users.id });
-  const link = await issueAccountLink(admin.id, "invite");
-  await audit(db(), { tenantId: tenant.id, actorId: v.user.id, action: "tenant.created", targetType: "tenant", targetId: tenant.id, meta: { name: d.name, plan: d.plan, by: v.user.email } });
+  const { tenantId, adminId } = await createTenantWithAdmin(db(), { slug: d.slug, name: d.name, plan: d.plan, locale: d.locale, adminName: d.adminName, adminEmail: email });
+  const link = await issueAccountLink(adminId, "invite");
+  await audit(db(), { tenantId, actorId: v.user.id, action: "tenant.created", targetType: "tenant", targetId: tenantId, meta: { name: d.name, plan: d.plan, by: v.user.email } });
   refresh();
   return { ok: true, link };
 }
@@ -103,21 +97,29 @@ export async function verifyTenantDomainAction(tenantId: string, domain: string,
   const v = await actionViewer("platform.manage");
   const host = normaliseHost(domain);
   if (!uuid.safeParse(tenantId).success || !host) return { ok: false, error: "invalid" };
-  const [tenant] = await db().select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenantId));
+  const [tenant] = await db().select({ id: t.tenants.id }).from(t.tenants).where(eq(t.tenants.id, tenantId));
   if (!tenant) return { ok: false };
   const found = await domainProofFound(host, domainProofRecord(tenantId, env.secret));
   const verified = found || force;
   const now = new Date();
-  const settings = structuredClone(tenant.settings);
-  delete settings.identity.domainCheckFailingSince;
-  if (verified) settings.identity.domainCheckedAt = now.toISOString();
-  else delete settings.identity.domainCheckedAt;
-  if (!found && force) settings.identity.domainProofForced = true;
-  else delete settings.identity.domainProofForced;
-  await db()
-    .update(t.tenants)
-    .set({ domain: host, domainVerifiedAt: verified ? now : null, settings })
-    .where(eq(t.tenants.id, tenantId));
+  // The DNS lookup is done; the row is read and written under a lock so a settings save made by the
+  // organisation's admin meanwhile is not overwritten with the copy from before the lookup.
+  const saved = await db().transaction(async (tx) => {
+    const [row] = await tx.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenantId)).for("update");
+    if (!row) return false;
+    const settings = withDefaults(structuredClone(row.settings));
+    delete settings.identity.domainCheckFailingSince;
+    if (verified) settings.identity.domainCheckedAt = now.toISOString();
+    else delete settings.identity.domainCheckedAt;
+    if (!found && force) settings.identity.domainProofForced = true;
+    else delete settings.identity.domainProofForced;
+    await tx
+      .update(t.tenants)
+      .set({ domain: host, domainVerifiedAt: verified ? now : null, settings })
+      .where(eq(t.tenants.id, tenantId));
+    return true;
+  });
+  if (!saved) return { ok: false };
   await audit(db(), {
     tenantId,
     actorId: v.user.id,

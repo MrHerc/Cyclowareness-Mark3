@@ -5,6 +5,7 @@ import { ArrowDown, SkipForward, Volume2, VolumeX } from "lucide-react";
 import { Mascot, angleBetween } from "@/components/mascot/mascot";
 import type { MascotGesture } from "@/components/mascot/mapping";
 import { CHAPTERS, type Chapter, type GuideTiming, type LandingCopy, type Line } from "@/lib/landing";
+import { textButtonClass } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
 import { GuideProvider, useGuide } from "./guide";
 import { unmark } from "./marked";
@@ -295,7 +296,7 @@ function Tour({ copy, guide: timing, lang, countries, privacyLabel }: { copy: La
         </div>
       </section>
 
-      {chapterSection("phone", phone.headline, phone.line, <PhoneCall scene={phone} beats={copy.tour.beats.phone} clock={inbox.clock} screenLabel={copy.ui.screenLabel} />, "tint")}
+      {chapterSection("phone", phone.headline, phone.line, <PhoneCall scene={phone} beats={copy.tour.beats.phone} clock={inbox.clock} screenLabel={copy.ui.screenLabel} skipLabel={copy.ui.skip} />, "tint")}
       {chapterSection("tutor", tutor.headline, tutor.line, <TutorDemo scene={tutor} beats={copy.tour.beats.tutor} />)}
       {chapterSection("languages", languages.headline, languages.line, <LanguagesDemo scene={languages} beats={copy.tour.beats.languages} />, "tint")}
       {chapterSection("admin", admin.headline, admin.line, <AdminDemo scene={admin} beats={copy.tour.beats.admin} you={you} />)}
@@ -370,13 +371,16 @@ function GuideDock({
       <nav aria-label={copy.tour.railLabel} className="pointer-events-auto flex w-full max-w-xl items-center gap-3 rounded-pill bg-surface/95 py-2 pr-2 pl-5 shadow-overlay ring-1 ring-line backdrop-blur">
         <ol className="flex min-w-0 flex-1 gap-1" aria-label={copy.tour.railLabel}>
           {CHAPTERS.map((c, i) => (
-            <li key={c} className="flex-1">
-              <span className={cn("block h-1.5 rounded-pill transition-colors", i === index ? "bg-brand-600" : seen.has(c) ? "bg-brand-200" : "bg-sunken")} aria-label={`${copy.tour.chapters[c]}${seen.has(c) ? ` · ${copy.tour.doneLabel}` : ""}`} />
+            <li key={c} className="flex-1" aria-current={i === index ? "step" : undefined}>
+              <span aria-hidden className={cn("block h-1.5 rounded-pill transition-colors", i === index ? "bg-brand-600" : seen.has(c) ? "bg-brand-200" : "bg-sunken")} />
+              <span className="sr-only">{`${copy.tour.chapters[c]}${seen.has(c) ? ` · ${copy.tour.doneLabel}` : ""}`}</span>
             </li>
           ))}
         </ol>
-        <p className="shrink-0 text-caption font-semibold whitespace-nowrap">
-          {copy.tour.chapters[current]} <span className="text-ink-subtle tabular-nums">{index + 1}/7</span>
+        {/* On a narrow phone a long chapter name truncates instead of pushing the buttons off screen. */}
+        <p className="flex min-w-0 gap-1 text-caption font-semibold whitespace-nowrap">
+          <span className="truncate">{copy.tour.chapters[current]}</span>
+          <span className="shrink-0 text-ink-subtle tabular-nums">{index + 1}/7</span>
         </p>
         <button
           type="button"
@@ -388,14 +392,14 @@ function GuideDock({
           aria-pressed={!guide.quiet}
           aria-label={guide.quiet ? copy.ui.quietOff : copy.ui.quiet}
           title={guide.quiet ? copy.ui.quietOff : copy.ui.quiet}
-          className={cn("grid size-10 shrink-0 place-items-center rounded-full", guide.quiet ? "bg-sunken text-ink-muted" : "bg-brand-600 text-brand-on")}
+          className={cn("grid size-10 shrink-0 place-items-center rounded-full pointer-coarse:size-11", guide.quiet ? "bg-sunken text-ink-muted" : "bg-brand-600 text-brand-on")}
         >
           {guide.quiet ? <VolumeX className="size-5" /> : <Volume2 className="size-5" />}
         </button>
-        <button type="button" onClick={onNext} disabled={last} aria-label={copy.ui.next} title={copy.ui.next} className="grid size-10 shrink-0 place-items-center rounded-full hover:bg-sunken disabled:opacity-40">
+        <button type="button" onClick={onNext} disabled={last} aria-label={copy.ui.next} title={copy.ui.next} className="grid size-10 shrink-0 place-items-center rounded-full hover:bg-sunken disabled:opacity-40 pointer-coarse:size-11">
           <ArrowDown className="size-5" />
         </button>
-        <button type="button" onClick={onSkip} disabled={last} aria-label={copy.ui.skip} title={copy.ui.skip} className="grid size-10 shrink-0 place-items-center rounded-full hover:bg-sunken disabled:opacity-40">
+        <button type="button" onClick={onSkip} disabled={last} aria-label={copy.ui.skip} title={copy.ui.skip} className="grid size-10 shrink-0 place-items-center rounded-full hover:bg-sunken disabled:opacity-40 pointer-coarse:size-11">
           <SkipForward className="size-5" />
         </button>
       </nav>
@@ -422,7 +426,7 @@ export function ForgetButton({ label, done }: { label: string; done: string }) {
         }
         setCleared(true);
       }}
-      className="text-caption font-semibold text-ink-muted underline-offset-2 hover:text-ink hover:underline"
+      className={textButtonClass("muted", "caption", "underline-offset-2")}
     >
       {label}
     </button>

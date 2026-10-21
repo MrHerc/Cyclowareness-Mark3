@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { CSSProperties } from "react";
 import { Geologica, Noto_Sans_Georgian } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getViewer } from "@/server/auth/viewer";
 import { brandStyle } from "@/lib/color";
 import { Toaster } from "@/components/ui/toast";
@@ -17,14 +17,17 @@ const geologica = Geologica({
 });
 const georgian = Noto_Sans_Georgian({ subsets: ["georgian"], variable: "--font-georgian", display: "swap" });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(env.APP_URL),
-  title: { default: "Cyclowareness", template: "%s · Cyclowareness" },
-  applicationName: "Cyclowareness",
-  description: "Kiber təhlükələri tanımağı qısa, interaktiv dərslərlə öyrənin.",
-  icons: { icon: [{ url: "/favicon.ico" }, { url: "/icons/icon.svg", type: "image/svg+xml" }], apple: "/icons/icon-192.png" },
-  formatDetection: { telephone: false, email: false, address: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("common");
+  return {
+    metadataBase: new URL(env.APP_URL),
+    title: { default: "Cyclowareness", template: "%s · Cyclowareness" },
+    applicationName: "Cyclowareness",
+    description: t("appDescription"),
+    icons: { icon: [{ url: "/favicon.ico" }, { url: "/icons/icon.svg", type: "image/svg+xml" }], apple: "/icons/icon-192.png" },
+    formatDetection: { telephone: false, email: false, address: false },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#f7f6fb",

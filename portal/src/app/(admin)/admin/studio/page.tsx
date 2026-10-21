@@ -67,8 +67,8 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
                 <li key={m.id}>
                   <Card>
                     <CardBody className="flex flex-wrap items-center gap-4">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-body font-semibold">{pick(m.title, locale)}</p>
+                      <div className="min-w-0 flex-[1_1_12rem]">
+                        <p className="text-body font-semibold break-words">{pick(m.title, locale)}</p>
                         <p className="mt-1 text-caption text-ink-muted">
                           {tc(`categories.${m.category as "email"}`)} · {tc(`difficulty.${m.difficulty}`)} · {tc("units.min", { count: m.minutes })} · {format.dateTime(m.createdAt, { dateStyle: "medium" })}
                         </p>
@@ -93,7 +93,7 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
                 href={`/admin/approvals?tab=${m.status === "pending" ? "pending" : m.status === "second_approval" ? "second" : "decided"}`}
                 className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-surface p-4 shadow-xs hover:shadow-raised"
               >
-                <span className="min-w-0 flex-1">
+                <span className="min-w-0 flex-[1_1_12rem]">
                   <b className="block truncate text-body-sm">{m.title}</b>
                   <span className="block truncate text-caption text-ink-muted">{m.body}</span>
                 </span>

@@ -2,7 +2,9 @@
 
 import { Fragment, type ReactNode, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import NextLink from "next/link";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+import { useClientFormat } from "@/lib/client-format";
+import { RelativeTime } from "@/components/relative-time";
 import {
   AlarmClock,
   ArrowUpRight,
@@ -20,6 +22,7 @@ import {
   PenLine,
   Pilcrow,
   Send,
+  ShieldAlert,
   ShieldCheck,
   Star,
   Trash2,
@@ -42,14 +45,16 @@ import {
   saveLearningAction,
   saveNotificationsAction,
   saveProtectionAction,
+  resendFailedMailAction,
   sendTestEventAction,
   setLogoAction,
   testEmailAction,
   verifyDomainAction,
 } from "@/server/actions/settings";
 import type { TemplateKind, TenantSettings } from "@/server/db/schema";
+import { DESTINATION_PORTS, SYSLOG_DEFAULT_PORT } from "@/lib/destination-ports";
 import { Card, CardBody, CardHeader, Divider } from "@/components/ui/card";
-import { Button, ButtonAnchor } from "@/components/ui/button";
+import { Button, ButtonAnchor, TextButton, textButtonClass } from "@/components/ui/button";
 import { Checkbox, Field, Input, Segmented, Select, Switch, Textarea } from "@/components/ui/field";
 import { Dot, Pill } from "@/components/ui/pill";
 import { Notice } from "@/components/ui/layout";
@@ -59,15 +64,48 @@ import { parseEmailMarkup } from "@/lib/email-markup";
 import { LOCALES, LOCALE_NAMES, SITE_LOCALES } from "@/i18n/config";
 import { readableOn } from "@/lib/color";
 import { cn } from "@/lib/cn";
+import { endpointKey } from "@/lib/stored-secret";
 
+/*
+ * Settings as the browser receives them: stored secrets (encrypted) stay on the server, the tabs
+ * only learn whether one is set (src/app/(admin)/admin/settings/page.tsx strips them).
+ */
+type Identity = TenantSettings["identity"];
+export type IdentityView = Omit<Identity, "sso" | "ldap"> & {
+  sso?: Omit<NonNullable<Identity["sso"]>, "clientSecretEnc"> & { hasClientSecret: boolean };
+  ldap?: Omit<NonNullable<Identity["ldap"]>, "passwordEnc"> & { hasPassword: boolean };
+};
+export type EmailView = Omit<TenantSettings["email"], "passwordEnc"> & { hasPassword: boolean };
+export type IntegrationsView = Omit<TenantSettings["integrations"], "webhookSecretEnc"> & { hasWebhookSecret: boolean };
+
+/** Marks the control the server rejected until it is edited again, and moves focus to it. */
+function markInvalid(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.setAttribute("aria-invalid", "true");
+  el.addEventListener("input", () => el.removeAttribute("aria-invalid"), { once: true });
+  el.focus();
+}
+
+/**
+ * Runs a settings action and reports the outcome. `fields` maps the action's zod paths to input
+ * ids, so a rejected value names its field (from the rendered label) and marks the input.
+ */
 function useSave() {
   const t = useTranslations("settings");
   const tc = useTranslations("common");
   const [pending, start] = useTransition();
-  const save = (fn: () => Promise<{ ok: boolean }>) =>
+  const save = (fn: () => Promise<{ ok: boolean; field?: string; message?: string }>, fields?: Record<string, string>) =>
     start(async () => {
       const res = await fn();
-      toast(res.ok ? t("saved") : tc("errors.invalid"), res.ok ? "success" : "error");
+      if (res.ok) {
+        toast(t("saved"), "success");
+        return;
+      }
+      const id = res.field ? fields?.[res.field] : undefined;
+      const label = id ? document.querySelector(`label[for="${id}"]`)?.textContent?.trim() || document.getElementById(id)?.getAttribute("aria-label") || undefined : undefined;
+      toast(res.message ?? (label ? tc("errors.invalidField", { field: label }) : tc("errors.invalid")), "error");
+      if (id) markInvalid(id);
     });
   return { pending, save };
 }
@@ -95,7 +133,20 @@ function Step({ n, children }: { n: number; children: ReactNode }) {
 
 /* ───────── branding ───────── */
 
-export function BrandingTab({ name, branding, domain, verifiedOn }: { name: string; branding: { primary: string; accent: string; logoUrl?: string | null; senderName?: string; senderDomain?: string }; domain: string | null; verifiedOn: string | null }) {
+export function BrandingTab({
+  name,
+  branding,
+  domain,
+  verifiedOn,
+  lapsing,
+}: {
+  name: string;
+  branding: { primary: string; accent: string; logoUrl?: string | null; senderName?: string; senderDomain?: string };
+  domain: string | null;
+  verifiedOn: string | null;
+  /** The daily re-check no longer finds the record: since when, and the day the proof ends (formatted on the server). */
+  lapsing: { since: string; endsOn: string } | null;
+}) {
   const t = useTranslations("settings.branding");
   const tc = useTranslations("common");
   const { pending, save } = useSave();
@@ -130,8 +181,9 @@ export function BrandingTab({ name, branding, domain, verifiedOn }: { name: stri
         setProof({ domain: proofDomain.trim().toLowerCase(), verifiedOn: res.verifiedOn });
         toast(t("checkOk"), "success");
       } else {
-        setProof(null);
-        toast(t("checkMissing"), "error");
+        // A missing record never removes an existing proof (see verifyDomainAction).
+        if (!res.kept) setProof(null);
+        toast(res.kept ? t("checkKept") : t("checkMissing"), "error");
       }
     });
 
@@ -142,24 +194,25 @@ export function BrandingTab({ name, branding, domain, verifiedOn }: { name: stri
       save(async () => {
         const res = await setLogoAction(String(reader.result));
         if (res.ok) setLogo(String(reader.result));
-        return res;
+        // Oversized or unsupported files get the client check's message; an SVG with scripts or outside references its own.
+        return res.ok ? res : { ok: false, message: res.error === "unsafeSvg" ? t("logoUnsafe") : t("logoError") };
       });
     reader.readAsDataURL(f);
   };
 
-  const swatches = (value: string, set: (v: string) => void, label: string, def: string) => (
+  const swatches = (value: string, set: (v: string) => void, label: string, def: string, id: string) => (
     <div className="grid gap-2">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <span className="text-caption font-semibold">{label}</span>
-        <input type="color" value={value} onChange={(e) => set(e.target.value)} aria-label={label} className="size-9 cursor-pointer rounded-md border border-line" />
-        <Input value={value} onChange={(e) => set(e.target.value)} className="h-9 w-28 font-mono text-caption" aria-label={`${label} hex`} />
-        <button type="button" className="text-tab font-semibold text-brand-600 hover:underline" onClick={() => set(def)}>
+        <input type="color" value={value} onChange={(e) => set(e.target.value)} aria-label={label} className="size-9 cursor-pointer rounded-md border border-line pointer-coarse:size-11" />
+        <Input id={id} value={value} onChange={(e) => set(e.target.value)} className="h-9 w-28 font-mono text-caption pointer-coarse:h-11" aria-label={`${label} hex`} />
+        <TextButton size="tab" onClick={() => set(def)}>
           {t("default")}
-        </button>
+        </TextButton>
       </div>
       <div className="flex flex-wrap gap-1.5">
         {BRAND_PALETTE.map((c) => (
-          <button key={c} type="button" aria-label={c} onClick={() => set(c.toLowerCase())} className={cn("size-7 rounded-full border-2", value.toLowerCase() === c.toLowerCase() ? "border-ink" : "border-transparent")} style={{ background: c }} />
+          <button key={c} type="button" aria-label={c} onClick={() => set(c.toLowerCase())} className={cn("size-7 rounded-full border-2 pointer-coarse:size-11", value.toLowerCase() === c.toLowerCase() ? "border-ink" : "border-transparent")} style={{ background: c }} />
         ))}
       </div>
     </div>
@@ -220,8 +273,8 @@ export function BrandingTab({ name, branding, domain, verifiedOn }: { name: stri
         <Card>
           <CardHeader title={t("colours")} description={t("coloursBody")} />
           <CardBody className="grid gap-5">
-            {swatches(primary, setPrimary, t("primary"), "#4f46e5")}
-            {swatches(accent, setAccent, t("accent"), "#ff7a1a")}
+            {swatches(primary, setPrimary, t("primary"), "#4f46e5", "b-primary")}
+            {swatches(accent, setAccent, t("accent"), "#ff7a1a", "b-accent")}
           </CardBody>
         </Card>
         <Card>
@@ -238,7 +291,11 @@ export function BrandingTab({ name, branding, domain, verifiedOn }: { name: stri
         <Card>
           <CardHeader title={t("domainProof")} description={t("domainProofBody")} />
           <CardBody className="grid gap-4">
-            {proof ? (
+            {proof && lapsing && proof.domain === domain ? (
+              <Notice tone="warn" icon={<ShieldAlert />}>
+                {t("proofLapsing", { domain: proof.domain, since: lapsing.since, date: lapsing.endsOn })}
+              </Notice>
+            ) : proof ? (
               <Notice tone="safe" icon={<ShieldCheck />}>
                 {t("proven", { domain: proof.domain, date: proof.verifiedOn })}
               </Notice>
@@ -263,7 +320,7 @@ export function BrandingTab({ name, branding, domain, verifiedOn }: { name: stri
             </Button>
           </CardBody>
         </Card>
-        <SaveBar pending={pending} onSave={() => save(() => saveBrandingAction({ name: n, primary, accent, senderName, senderDomain }))} />
+        <SaveBar pending={pending} onSave={() => save(() => saveBrandingAction({ name: n, primary, accent, senderName, senderDomain }), { name: "b-name", primary: "b-primary", accent: "b-accent", senderName: "b-sn", senderDomain: "b-sd" })} />
       </div>
       <aside className="xl:sticky xl:top-24 xl:self-start">
         <div className="mb-2 flex items-baseline justify-between gap-3">
@@ -324,7 +381,7 @@ export function LanguagesTab({ defaultLocale, locales }: { defaultLocale: string
       <Card>
         <CardHeader title={t("defaultTitle")} description={t("defaultBody")} />
         <CardBody>
-          <Select value={def} onChange={(e) => setDef(e.target.value)} className="max-w-xs" aria-label={t("defaultTitle")}>
+          <Select id="lg-default" value={def} onChange={(e) => setDef(e.target.value)} className="max-w-xs" aria-label={t("defaultTitle")}>
             {LOCALES.filter((l) => on.has(l)).map((l) => (
               <option key={l} value={l}>
                 {LOCALE_NAMES[l]}
@@ -364,7 +421,7 @@ export function LanguagesTab({ defaultLocale, locales }: { defaultLocale: string
           })}
         </CardBody>
       </Card>
-      <SaveBar pending={pending} onSave={() => save(() => saveLanguagesAction(def, [...on]))} />
+      <SaveBar pending={pending} onSave={() => save(() => saveLanguagesAction(def, [...on]), { defaultLocale: "lg-default" })} />
     </div>
   );
 }
@@ -377,7 +434,7 @@ export function IdentityTab({
   signInLink,
   testResult,
 }: {
-  identity: TenantSettings["identity"];
+  identity: IdentityView;
   redirectUri: string;
   signInLink: string;
   /** Result of the last test sign-in (/api/sso/start?test=1 returns here with it). */
@@ -436,6 +493,9 @@ export function IdentityTab({
     if ("issuer" in patch || "clientId" in patch) setChecked(null);
   };
   const setLdap = (patch: Partial<typeof ldap>) => setS({ ...s, ldap: { ...ldap, ...patch } });
+  // A stored secret is not kept for a different server (saveIdentityAction): say so before saving.
+  const ssoReenter = !!identity.sso?.hasClientSecret && !sso.clientSecret && endpointKey(identity.sso.issuer) !== endpointKey(sso.issuer);
+  const ldapReenter = !!identity.ldap?.hasPassword && !ldap.password && endpointKey(identity.ldap.url) !== endpointKey(ldap.url);
   const ldapHeading = (n: number, title: string) => (
     <h3 className="text-body-sm font-semibold text-ink">
       <Step n={n}>{title}</Step>
@@ -490,7 +550,7 @@ export function IdentityTab({
           <Field label={t("clientId")} htmlFor="i-client">
             <Input id="i-client" value={sso.clientId} onChange={(e) => setSso({ clientId: e.target.value })} />
           </Field>
-          <Field label={t("clientSecret")} htmlFor="i-secret" hint={identity.sso?.clientSecretEnc ? t("secretSet") : t("secretHint")}>
+          <Field label={t("clientSecret")} htmlFor="i-secret" hint={ssoReenter ? t("secretReenter") : identity.sso?.hasClientSecret ? t("secretSet") : t("secretHint")}>
             <Input id="i-secret" type="password" autoComplete="new-password" value={sso.clientSecret} onChange={(e) => setSso({ clientSecret: e.target.value })} />
           </Field>
           {sso.protocol === "saml" ? (
@@ -577,7 +637,7 @@ export function IdentityTab({
               <Field label={t("bindDn")} htmlFor="l-dn">
                 <Input id="l-dn" value={ldap.bindDn} onChange={(e) => setLdap({ bindDn: e.target.value })} />
               </Field>
-              <Field label={t("bindPassword")} htmlFor="l-pw" hint={identity.ldap?.passwordEnc ? t("secretSet") : t("secretHint")}>
+              <Field label={t("bindPassword")} htmlFor="l-pw" hint={ldapReenter ? t("secretReenter") : identity.ldap?.hasPassword ? t("secretSet") : t("secretHint")}>
                 <Input id="l-pw" type="password" autoComplete="new-password" value={ldap.password} onChange={(e) => setLdap({ password: e.target.value })} />
               </Field>
               <Field label={t("caCertificate")} htmlFor="l-ca" hint={t("caCertificateHint")} className="sm:col-span-2">
@@ -695,14 +755,34 @@ export function IdentityTab({
       <SaveBar
         pending={pending}
         onSave={() =>
-          save(() =>
-            saveIdentityAction({
-              requireAdmin2fa: s.requireAdmin2fa,
-              maxDevices: s.maxDevices,
-              ssoEnabled: s.ssoEnabled,
-              sso: { ...sso, clientSecret: sso.clientSecret || undefined },
-              ldap: { ...ldap, password: ldap.password || undefined },
-            }),
+          save(
+            async () => {
+              const res = await saveIdentityAction({
+                requireAdmin2fa: s.requireAdmin2fa,
+                maxDevices: s.maxDevices,
+                ssoEnabled: s.ssoEnabled,
+                sso: { ...sso, clientSecret: sso.clientSecret || undefined },
+                ldap: { ...ldap, password: ldap.password || undefined },
+              });
+              return res.error === "secretRequired" ? { ...res, message: t("secretReenter") } : res;
+            },
+            {
+              maxDevices: "i-devices",
+              "sso.issuer": "i-issuer",
+              "sso.clientId": "i-client",
+              "sso.clientSecret": "i-secret",
+              "sso.emailClaim": "i-claim",
+              "sso.samlEntryPoint": "i-saml-url",
+              "sso.samlCertificate": "i-saml-cert",
+              "ldap.url": "l-url",
+              "ldap.bindDn": "l-dn",
+              "ldap.password": "l-pw",
+              "ldap.caCertificate": "l-ca",
+              "ldap.certificatePin": "l-pin",
+              "ldap.searchBase": "l-base",
+              "ldap.filter": "l-filter",
+              "ldap.departmentAttribute": "l-attr",
+            },
           )
         }
       />
@@ -712,13 +792,20 @@ export function IdentityTab({
 
 /* ───────── email ───────── */
 
-export function EmailTab({ email, viewerEmail, outbox }: { email: TenantSettings["email"]; viewerEmail: string; outbox: { id: string; to: string; subject: string; status: string; createdAt: string; error: string | null }[] }) {
+export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: EmailView; viewerEmail: string; outbox: { id: string; to: string; subject: string; status: string; createdAt: string; error: string | null; resendable: boolean; cancelled: boolean }[]; failedCount: number }) {
   const t = useTranslations("settings.email");
-  const format = useFormatter();
   const { pending, save } = useSave();
+  const [resending, startResend] = useTransition();
+  const resend = (id?: string) =>
+    startResend(async () => {
+      const res = await resendFailedMailAction(id);
+      toast(res.ok ? t("resent", { count: res.count }) : t("resendFailed"), res.ok ? "success" : "error");
+    });
   const [s, setS] = useState({ host: email.host ?? "", port: email.port ?? 587, secure: email.secure ?? false, user: email.user ?? "", password: "", fromName: email.fromName ?? "", fromAddress: email.fromAddress ?? "", replyTo: email.replyTo ?? "", helpdesk: email.helpdesk ?? "", enabled: email.enabled });
   const [to, setTo] = useState(viewerEmail);
   const [testing, startTest] = useTransition();
+  // The stored password is not kept for a different host or port (saveEmailAction); 587 is the default port.
+  const passwordReenter = email.hasPassword && !s.password && endpointKey(email.host, email.port ?? 587) !== endpointKey(s.host, s.port || 587);
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_20rem]">
       <div className="grid content-start gap-5">
@@ -740,13 +827,13 @@ export function EmailTab({ email, viewerEmail, outbox }: { email: TenantSettings
             <Field label={t("security")} htmlFor="e-sec">
               <Segmented name="sec" ariaLabel={t("security")} value={s.secure ? "ssl" : "starttls"} onChange={(v) => setS({ ...s, secure: v === "ssl", port: v === "ssl" ? 465 : 587 })} options={[{ value: "starttls", label: "STARTTLS" }, { value: "ssl", label: "SSL/TLS" }]} />
             </Field>
-            <Field label={t("port")} htmlFor="e-port">
+            <Field label={t("port")} htmlFor="e-port" hint={t("portHint", { ports: DESTINATION_PORTS.smtp.join(", ") })}>
               <Input id="e-port" type="number" value={s.port} onChange={(e) => setS({ ...s, port: Number(e.target.value) })} />
             </Field>
             <Field label={t("user")} htmlFor="e-user">
               <Input id="e-user" value={s.user} onChange={(e) => setS({ ...s, user: e.target.value })} autoComplete="off" />
             </Field>
-            <Field label={t("password")} htmlFor="e-pw" hint={email.passwordEnc ? "••••••" : undefined}>
+            <Field label={t("password")} htmlFor="e-pw" hint={passwordReenter ? t("passwordReenter") : email.hasPassword ? "••••••" : undefined}>
               <Input id="e-pw" type="password" value={s.password} onChange={(e) => setS({ ...s, password: e.target.value })} autoComplete="new-password" />
             </Field>
           </CardBody>
@@ -773,19 +860,43 @@ export function EmailTab({ email, viewerEmail, outbox }: { email: TenantSettings
             </Field>
           </CardBody>
         </Card>
-        <SaveBar pending={pending} onSave={() => save(() => saveEmailAction({ ...s, password: s.password || undefined, port: s.port || undefined }))} />
+        <SaveBar
+          pending={pending}
+          onSave={() =>
+            save(async () => {
+              const res = await saveEmailAction({ ...s, password: s.password || undefined, port: s.port || undefined });
+              return res.error === "secretRequired" ? { ...res, message: t("passwordReenter") } : res;
+            }, { host: "e-host", port: "e-port", user: "e-user", password: "e-pw", fromName: "e-fn", fromAddress: "e-fa", replyTo: "e-rt", helpdesk: "e-hd" })}
+        />
         <Card>
-          <CardHeader title={t("outbox")} description={t("outboxBody")} />
+          <CardHeader
+            title={t("outbox")}
+            description={t("outboxBody")}
+            action={
+              failedCount ? (
+                <Button size="sm" variant="secondary" icon={<Send />} disabled={resending} onClick={() => resend()}>
+                  {t("resendAll", { count: failedCount })}
+                </Button>
+              ) : undefined
+            }
+          />
           <CardBody className="pt-3">
             {outbox.length ? (
               <ul className="divide-y divide-line">
                 {outbox.map((m) => (
-                  <li key={m.id} className="flex flex-wrap items-center gap-3 py-2 text-caption">
+                  <li key={m.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2 text-caption">
                     <Pill tone={m.status === "sent" ? "safe" : m.status === "failed" ? "risk" : m.status === "queued" ? "warn" : "neutral"}>{t(`status.${m.status as "sent"}`)}</Pill>
                     <span className="min-w-0 flex-1 truncate">
                       <b>{m.subject}</b> → {m.to}
                     </span>
-                    <span className="text-ink-subtle">{format.relativeTime(new Date(m.createdAt))}</span>
+                    <RelativeTime date={m.createdAt} className="text-ink-subtle" />
+                    {m.cancelled ? (
+                      <span className="text-ink-subtle">{t("campaignCancelled")}</span>
+                    ) : m.resendable ? (
+                      <Button size="sm" variant="ghost" disabled={resending} onClick={() => resend(m.id)} title={m.error ?? undefined}>
+                        {t("resend")}
+                      </Button>
+                    ) : null}
                   </li>
                 ))}
               </ul>
@@ -810,7 +921,7 @@ export function EmailTab({ email, viewerEmail, outbox }: { email: TenantSettings
                 onClick={() =>
                   startTest(async () => {
                     const res = await testEmailAction(to);
-                    toast(res.ok ? t("testOk") : t("testFailed", { error: res.error ?? "" }), res.ok ? "success" : "error");
+                    toast(res.ok ? t("testOk") : t("testFailed", { error: t(`testErrors.${(res.error ?? "send_failed") as "send_failed"}`) }), res.ok ? "success" : "error");
                   })
                 }
               >
@@ -850,6 +961,18 @@ function MarkupText({ text }: { text: string }) {
       <Fragment key={i}>{tok.text}</Fragment>
     ),
   );
+}
+
+/** The first edited template the server would refuse, so the tab can switch to it and say why. */
+function templateProblem(templates: NonNullable<TenantSettings["notifications"]["templates"]>): { kind: TemplateKind; lang: string; field: "subject" | "body"; error: "templateEmpty" | "templateNoLink" } | null {
+  for (const [kind, byLang] of Object.entries(templates) as [TemplateKind, Record<string, { subject: string; body: string }> | undefined][]) {
+    for (const [lang, tpl] of Object.entries(byLang ?? {})) {
+      if (!tpl.subject.trim()) return { kind, lang, field: "subject", error: "templateEmpty" };
+      if (!tpl.body.trim()) return { kind, lang, field: "body", error: "templateEmpty" };
+      if (!/\{\{\s*link\s*\}\}/.test(tpl.body)) return { kind, lang, field: "body", error: "templateNoLink" };
+    }
+  }
+  return null;
 }
 
 export function NotificationsTab({ notifications, locales, emailReady, orgName }: { notifications: TenantSettings["notifications"]; locales: string[]; emailReady: boolean; orgName: string }) {
@@ -898,7 +1021,7 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
           </p>
           <p className="text-caption text-ink-muted">{emailReady ? t("bannerReadyBody") : t("banner")}</p>
         </div>
-        <NextLink href="?tab=email" scroll={false} className="inline-flex items-center gap-1 text-caption font-semibold text-brand-600 hover:underline">
+        <NextLink href="?tab=email" scroll={false} className={textButtonClass()}>
           {t("emailSettings")}
           <ArrowUpRight className="size-4" />
         </NextLink>
@@ -914,7 +1037,7 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
                 aria-pressed={kind === k}
                 onClick={() => setKind(k)}
                 className={cn(
-                  "inline-flex items-center gap-1.5 rounded-pill px-3.5 py-1.5 text-caption font-semibold [&_svg]:size-4",
+                  "inline-flex items-center gap-1.5 rounded-pill px-3.5 py-1.5 text-caption font-semibold pointer-coarse:min-h-11 [&_svg]:size-4",
                   kind === k ? "bg-brand-600 text-brand-on" : "bg-surface text-ink-muted ring-1 ring-line hover:text-ink",
                 )}
               >
@@ -971,9 +1094,9 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
                 <Button size="sm" variant="secondary" onClick={() => edit("{{link}}", "", true)}>
                   {t("varLink")}
                 </Button>
-                <button type="button" className="ml-auto text-tab font-semibold text-brand-600 hover:underline" onClick={() => setCurrent(DEFAULT_TEMPLATES[kind][lang] ?? DEFAULT_TEMPLATES[kind].en)}>
+                <TextButton size="tab" className="ml-auto" onClick={() => setCurrent(DEFAULT_TEMPLATES[kind][lang] ?? DEFAULT_TEMPLATES[kind].en)}>
                   {t("resetTemplate")}
-                </button>
+                </TextButton>
               </div>
             </div>
             <div>
@@ -1037,8 +1160,18 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
       </Card>
       <SaveBar
         pending={pending}
-        onSave={() =>
-          save(() =>
+        onSave={() => {
+          // Same rules as the server: a template needs a subject and a message, and the message the {{link}} to the training.
+          const problem = templateProblem(templates);
+          if (problem) {
+            setKind(problem.kind);
+            setLang(problem.lang);
+            toast(t(problem.error, { kind: t(`kinds.${problem.kind}`), language: LOCALE_NAMES[problem.lang as "az"] ?? problem.lang, token: "{{link}}" }), "error");
+            requestAnimationFrame(() => markInvalid(problem.field === "subject" ? "n-subject" : "n-body"));
+            return;
+          }
+          save(
+            () =>
             saveNotificationsAction({
               firstReminderDays: n.firstReminderDays,
               urgentReminderHours: n.urgentReminderHours,
@@ -1048,8 +1181,9 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
               overdueDays: n.overdueDays,
               templates: templates as never,
             }),
-          )
-        }
+            { firstReminderDays: "n-first", urgentReminderHours: "n-urgent", failedSimulations: "n-failed", overdueDays: "n-over" },
+          );
+        }}
       />
     </div>
   );
@@ -1090,7 +1224,7 @@ export function AttestationTab({ texts, locales }: { texts: Record<string, strin
             <Textarea id="a-text" value={value} onChange={(e) => setValue(e.target.value)} maxLength={600} />
             <p className="text-right text-tab text-ink-subtle tabular-nums">{value.length} / 600</p>
           </Field>
-          <SaveBar pending={pending} onSave={() => save(() => saveAttestationAction(lang, value))} />
+          <SaveBar pending={pending} onSave={() => save(() => saveAttestationAction(lang, value), { text: "a-text" })} />
         </CardBody>
       </Card>
       <aside>
@@ -1126,7 +1260,8 @@ export function CertificateTab({ cert, orgName, logoUrl, locale, verifyHost }: {
   const { pending, save } = useSave();
   const [s, setS] = useState({ title: cert.title ?? "", text: cert.text ?? "", signerName: cert.signerName ?? "", signerTitle: cert.signerTitle ?? "", publicLink: cert.publicLink });
   const textRef = useRef<HTMLTextAreaElement>(null);
-  const sampleDate = new Date().toLocaleDateString(locale);
+  const format = useClientFormat();
+  const sampleDate = format.dateTime(new Date(), { day: "numeric", month: "numeric", year: "numeric" });
   const text = (s.text || DEFAULT_CERTIFICATE_TEXT[locale] || DEFAULT_CERTIFICATE_TEXT.en).replaceAll("{name}", t("sampleName")).replaceAll("{module}", t("sampleModule")).replaceAll("{date}", sampleDate);
   /** Inserts a placeholder where the cursor is in the Text field. */
   const insert = (placeholder: string) => {
@@ -1181,7 +1316,7 @@ export function CertificateTab({ cert, orgName, logoUrl, locale, verifyHost }: {
             <Switch label={t("publicLink")} description={t("publicLinkBody")} checked={s.publicLink} onChange={(e) => setS({ ...s, publicLink: e.target.checked })} />
           </CardBody>
         </Card>
-        <SaveBar pending={pending} onSave={() => save(() => saveCertificateAction(s))} />
+        <SaveBar pending={pending} onSave={() => save(() => saveCertificateAction(s), { title: "c-title", text: "c-text", signerName: "c-sn", signerTitle: "c-st" })} />
       </div>
       <aside className="xl:sticky xl:top-24 xl:self-start">
         <p className="mb-2 text-caption font-semibold text-ink-muted">{t("preview")}</p>
@@ -1282,7 +1417,7 @@ export function LearningTab({ learning }: { learning: TenantSettings["learning"]
           </Field>
         </CardBody>
       </Card>
-      <SaveBar pending={pending} onSave={() => save(() => saveLearningAction(s))} />
+      <SaveBar pending={pending} onSave={() => save(() => saveLearningAction(s), { riskThreshold: "l-threshold", dailyGoalXp: "l-goal" })} />
     </div>
   );
 }
@@ -1320,7 +1455,7 @@ function enhanceWatermark(file: File, done: (dataUrl: string) => void) {
 export function ProtectionTab({ protection }: { protection: TenantSettings["protection"] }) {
   const t = useTranslations("settings.protection");
   const tc = useTranslations("common");
-  const format = useFormatter();
+  const format = useClientFormat();
   const { pending, save } = useSave();
   const [s, setS] = useState({ ...protection, androidScreenBlock: protection.androidScreenBlock ?? false });
   const [img, setImg] = useState<string | null>(null);
@@ -1428,10 +1563,9 @@ const RECEIVER_HEADERS = [
   ["X-Cyclowareness-Delivery", "hdrDelivery"],
 ] as const;
 
-export function IntegrationsTab({ integrations, deliveries }: { integrations: TenantSettings["integrations"]; deliveries: { id: string; event: string; target: string; status: string; responseCode: number | null; createdAt: string }[] }) {
+export function IntegrationsTab({ integrations, deliveries }: { integrations: IntegrationsView; deliveries: { id: string; event: string; target: string; status: string; responseCode: number | null; createdAt: string }[] }) {
   const t = useTranslations("settings.integrations");
   const tc = useTranslations("common");
-  const format = useFormatter();
   const { pending, save } = useSave();
   const [s, setS] = useState({
     webhookEnabled: integrations.webhookEnabled,
@@ -1439,13 +1573,13 @@ export function IntegrationsTab({ integrations, deliveries }: { integrations: Te
     webhookEvents: integrations.webhookEvents,
     syslogEnabled: integrations.syslogEnabled,
     syslogHost: integrations.syslogHost ?? "",
-    syslogPort: integrations.syslogPort ?? 6514,
+    syslogPort: integrations.syslogPort ?? SYSLOG_DEFAULT_PORT.tls,
     syslogTransport: integrations.syslogTransport ?? "tls",
     syslogFormat: integrations.syslogFormat ?? "cef",
   });
   const [secret, setSecret] = useState<string | null>(null);
   const [busy, start] = useTransition();
-  const hasSecret = Boolean(integrations.webhookSecretEnc || secret);
+  const hasSecret = Boolean(integrations.hasWebhookSecret || secret);
   const toggleEvent = (e: string) => setS({ ...s, webhookEvents: s.webhookEvents.includes(e) ? s.webhookEvents.filter((x) => x !== e) : [...s.webhookEvents, e] });
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_22rem]">
@@ -1493,11 +1627,11 @@ export function IntegrationsTab({ integrations, deliveries }: { integrations: Te
               <Field label={t("server")} htmlFor="s-host">
                 <Input id="s-host" value={s.syslogHost} onChange={(e) => setS({ ...s, syslogHost: e.target.value })} placeholder="siem.example.local" />
               </Field>
-              <Field label={t("port")} htmlFor="s-port">
+              <Field label={t("port")} htmlFor="s-port" hint={t("portHint", { ports: DESTINATION_PORTS.syslog.join(", ") })}>
                 <Input id="s-port" type="number" value={s.syslogPort} onChange={(e) => setS({ ...s, syslogPort: Number(e.target.value) })} />
               </Field>
               <Field label={t("transport")} htmlFor="s-tr">
-                <Segmented name="tr" ariaLabel={t("transport")} value={s.syslogTransport} onChange={(v) => setS({ ...s, syslogTransport: v as "tls", syslogPort: v === "tls" ? 6514 : v === "tcp" ? 514 : 5514 })} options={[{ value: "tls", label: "TLS" }, { value: "tcp", label: "TCP" }, { value: "udp", label: "UDP" }]} />
+                <Segmented name="tr" ariaLabel={t("transport")} value={s.syslogTransport} onChange={(v) => setS({ ...s, syslogTransport: v as "tls", syslogPort: SYSLOG_DEFAULT_PORT[v as "tls"] })} options={[{ value: "tls", label: "TLS" }, { value: "tcp", label: "TCP" }, { value: "udp", label: "UDP" }]} />
               </Field>
               <Field label={t("format")} htmlFor="s-fmt">
                 <Segmented name="fmt" ariaLabel={t("format")} value={s.syslogFormat} onChange={(v) => setS({ ...s, syslogFormat: v as "cef" })} options={[{ value: "cef", label: "CEF" }, { value: "json", label: "JSON (RFC 5424)" }]} />
@@ -1520,10 +1654,26 @@ export function IntegrationsTab({ integrations, deliveries }: { integrations: Te
           </CardBody>
         </Card>
         <div className="flex justify-end gap-2">
-          <Button variant="secondary" icon={<Send />} disabled={busy} onClick={() => start(async () => toast((await sendTestEventAction()).ok ? t("testQueued") : tc("errors.invalid")))}>
+          <Button
+            variant="secondary"
+            icon={<Send />}
+            disabled={busy || (!s.webhookUrl && !s.syslogHost)}
+            onClick={() =>
+              start(async () => {
+                const res = await sendTestEventAction();
+                toast(res.ok ? t("testQueued") : res.error === "no_target" ? t("testNoTarget") : tc("errors.generic"), res.ok ? "success" : "error");
+              })
+            }
+          >
             {t("sendTest")}
           </Button>
-          <Button disabled={pending} onClick={() => save(() => saveIntegrationsAction({ ...s, webhookUrl: s.webhookUrl || undefined, syslogHost: s.syslogHost || undefined, webhookEvents: s.webhookEvents as never }))}>
+          <Button
+            disabled={pending}
+            onClick={() =>
+              // Emptied fields go out as "", which tells the server to remove the stored value.
+              save(() => saveIntegrationsAction({ ...s, webhookUrl: s.webhookUrl.trim(), syslogHost: s.syslogHost.trim(), webhookEvents: s.webhookEvents as never }), { webhookUrl: "w-url", syslogHost: "s-host", syslogPort: "s-port" })
+            }
+          >
             {tc("save")}
           </Button>
         </div>
@@ -1533,12 +1683,12 @@ export function IntegrationsTab({ integrations, deliveries }: { integrations: Te
             {deliveries.length ? (
               <ul className="divide-y divide-line">
                 {deliveries.map((d) => (
-                  <li key={d.id} className="flex flex-wrap items-center gap-3 py-2 text-caption">
+                  <li key={d.id} className="flex items-center gap-3 py-2 text-caption">
                     <Pill tone={d.status === "delivered" ? "safe" : d.status === "failed" ? "risk" : "warn"}>{t(`status.${d.status as "queued"}`)}</Pill>
                     <code className="font-mono">{d.event}</code>
-                    <span className="text-ink-muted">{d.target}</span>
+                    <span className="min-w-0 flex-1 truncate text-ink-muted">{d.target}</span>
                     {d.responseCode ? <span className="text-ink-subtle">HTTP {d.responseCode}</span> : null}
-                    <span className="ml-auto text-ink-subtle">{format.relativeTime(new Date(d.createdAt))}</span>
+                    <RelativeTime date={d.createdAt} className="ml-auto text-ink-subtle" />
                   </li>
                 ))}
               </ul>

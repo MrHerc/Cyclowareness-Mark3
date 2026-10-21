@@ -11,6 +11,7 @@ import { Pill } from "@/components/ui/pill";
 import { ProgressBar } from "@/components/ui/progress";
 import { AreaChart } from "@/components/ui/charts";
 import { PageHeader } from "@/components/ui/layout";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 import { PrintButton } from "@/components/admin/print-toolbar";
 import { riskBand } from "@/lib/domain/risk";
 import { requestNow } from "@/lib/time";
@@ -67,7 +68,7 @@ export default async function LeadershipPage() {
   ];
 
   return (
-    <div className="grid gap-6 print:gap-4">
+    <div className="grid grid-cols-1 gap-6 print:gap-4">
       <PageHeader title={tn("leadership")} subtitle={tr("subtitle")} icon={<Sparkles />} actions={<PrintButton label={tr("print")} icon={<Printer />} />} />
 
       <div className={cn("rounded-2xl p-6 print:border print:border-line", headline === "good" ? "bg-safe-50" : headline === "bad" ? "bg-risk-50" : "bg-warn-50")}>
@@ -75,7 +76,7 @@ export default async function LeadershipPage() {
         <p className="mt-1 text-caption text-ink-muted">{tr("generated", { date: format.dateTime(new Date(), { dateStyle: "long" }) })}</p>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <Card>
           <CardHeader
             title={tr("riskTrend")}
@@ -103,10 +104,10 @@ export default async function LeadershipPage() {
             />
           </CardBody>
         </Card>
-        <div className="grid content-start gap-4">
+        <div className="grid grid-cols-1 content-start gap-4">
           {tiles.map((x) => (
             <Card key={x.label}>
-              <CardBody className="grid gap-2.5">
+              <CardBody className="grid grid-cols-1 gap-2.5">
                 <div className="flex items-baseline justify-between">
                   <span className="text-body-sm font-semibold">{x.label}</span>
                   <span className="text-title font-bold tabular-nums">{x.value}%</span>
@@ -140,39 +141,42 @@ export default async function LeadershipPage() {
         </div>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Card>
           <CardHeader title={tr("departments")} />
           <CardBody className="pt-3">
-            <table className="w-full text-left text-caption">
-              <thead className="text-tab text-ink-subtle">
-                <tr className="border-b border-line">
-                  <th className="py-2 font-semibold">{tr("department")}</th>
-                  <th className="py-2 text-right font-semibold">{tr("headcount")}</th>
-                  <th className="py-2 text-right font-semibold">{tr("completionShort")}</th>
-                  <th className="py-2 text-right font-semibold">{tr("avgRisk")}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-line">
-                {[...d.deptRows]
-                  .sort((a, b) => b.risk - a.risk)
-                  .map((r) => {
-                    const b = riskBand(r.risk);
-                    return (
-                      <tr key={r.id}>
-                        <td className="py-2.5 font-semibold">{r.name}</td>
-                        <td className="py-2.5 text-right tabular-nums">{r.learners}</td>
-                        <td className="py-2.5 text-right tabular-nums">{r.completion}%</td>
-                        <td className="py-2.5 text-right">
-                          <Pill tone={b === "high" ? "risk" : b === "medium" ? "warn" : "safe"} className="tabular-nums">
-                            {r.risk}
-                          </Pill>
-                        </td>
-                      </tr>
-                    );
-                  })}
-              </tbody>
-            </table>
+            {/* Long department names and translated headers can need more room than a phone gives the card. */}
+            <ScrollRegion label={tr("departments")}>
+              <table className="w-full text-left text-caption">
+                <thead className="text-tab text-ink-subtle">
+                  <tr className="border-b border-line">
+                    <th className="py-2 font-semibold">{tr("department")}</th>
+                    <th className="py-2 text-right font-semibold">{tr("headcount")}</th>
+                    <th className="py-2 text-right font-semibold">{tr("completionShort")}</th>
+                    <th className="py-2 text-right font-semibold">{tr("avgRisk")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {[...d.deptRows]
+                    .sort((a, b) => b.risk - a.risk)
+                    .map((r) => {
+                      const b = riskBand(r.risk);
+                      return (
+                        <tr key={r.id}>
+                          <td className="py-2.5 font-semibold">{r.name}</td>
+                          <td className="py-2.5 text-right tabular-nums">{r.learners}</td>
+                          <td className="py-2.5 text-right tabular-nums">{r.completion}%</td>
+                          <td className="py-2.5 text-right">
+                            <Pill tone={b === "high" ? "risk" : b === "medium" ? "warn" : "safe"} className="tabular-nums">
+                              {r.risk}
+                            </Pill>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+            </ScrollRegion>
           </CardBody>
         </Card>
         <Card>

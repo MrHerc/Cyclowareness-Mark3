@@ -245,7 +245,18 @@ export function ModuleRowActions({ id, status, previewHref }: { id: string; stat
             <Button variant="ghost" onClick={() => setConfirm(false)}>
               {tc("cancel")}
             </Button>
-            <Button variant="danger" disabled={pending} onClick={() => start(async () => void ((await deleteModuleAction(id)).ok && (toast(t("deleted")), setConfirm(false))))}>
+            <Button
+              variant="danger"
+              disabled={pending}
+              onClick={() =>
+                start(async () => {
+                  const res = await deleteModuleAction(id);
+                  if (!res.ok) return toast(res.error === "in_use" ? t("deleteInUse") : tc("errors.generic"), "error");
+                  toast(t("deleted"));
+                  setConfirm(false);
+                })
+              }
+            >
               {t("delete")}
             </Button>
           </>
@@ -480,7 +491,8 @@ export function DeletePath({ id }: { id: string }) {
               disabled={pending}
               onClick={() =>
                 start(async () => {
-                  if (!(await deletePathAction(id)).ok) return toast(tc("errors.generic"), "error");
+                  const res = await deletePathAction(id);
+                  if (!res.ok) return toast(res.error === "in_use" ? t("deleteInUse") : tc("errors.generic"), "error");
                   toast(t("deleted"));
                   setOpen(false);
                   router.refresh();

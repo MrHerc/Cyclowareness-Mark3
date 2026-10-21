@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 import { Award, Star } from "lucide-react";
 import { attestModuleAction, rateModuleAction } from "@/server/actions/learning";
 import { Dialog } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Button, textLinkClass } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
@@ -69,7 +69,11 @@ export function AttestCard({ slug, moduleTitle, text, autoOpen }: { slug: string
 export function CertificateLink({ token }: { token: string }) {
   const t = useTranslations("learner.module");
   return (
-    <Link href={`/c/${token}`} className="mt-3 inline-flex items-center gap-1.5 text-caption font-semibold text-brand-600 hover:underline">
+    // On coarse pointers the hit area's negative margin replaces mt-3, so the 0.75rem is restated there.
+    <Link
+      href={`/c/${token}`}
+      className={textLinkClass("mt-3 inline-flex items-center gap-1.5 text-caption font-semibold text-brand-600 hover:underline pointer-coarse:mt-[calc(0.75rem_-_max(0px,calc((2.75rem_-_1lh)/2)))]")}
+    >
       <Award className="size-4" />
       {t("viewCertificate")}
     </Link>
@@ -89,7 +93,7 @@ export function RateModule({ slug }: { slug: string }) {
       <p className="text-body-sm font-semibold">{t("rate")}</p>
       <div className="mt-2 flex gap-1" role="radiogroup" aria-label={t("rate")}>
         {[1, 2, 3, 4, 5].map((n) => (
-          <button key={n} type="button" role="radio" aria-checked={rating === n} aria-label={String(n)} onClick={() => setRating(n)} className="rounded-full p-1 hover:bg-sunken">
+          <button key={n} type="button" role="radio" aria-checked={rating === n} aria-label={String(n)} onClick={() => setRating(n)} className="rounded-full p-1 hover:bg-sunken pointer-coarse:p-2">
             <Star className={cn("size-7", n <= rating ? "fill-laurel-500 text-laurel-600" : "text-line-strong")} />
           </button>
         ))}

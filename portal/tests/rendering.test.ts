@@ -232,7 +232,8 @@ describe("formatSyslog", () => {
     };
     expect(formatSyslog("campaign.result", payload, "cef", now)).toBe(
       `${header(130, "campaign.result")} CEF:0|Cyclowareness|Portal|1.0|campaign.result|campaign.result|8|` +
-        `rt=${now.getTime()} cs1Label=tenant cs1=tenant-9 cs_severity=high cs_url=https://x.y/?a\\=1 cs_note=line1 line2 cs_weirdkey=v cs_obj={"k":1}`,
+        // No occurredAt in the payload: rt falls back to the delivery time. Line breaks are CEF-escaped as \n.
+        `rt=${now.getTime()} cs1Label=tenant cs1=tenant-9 cs2Label=deliveredAt cs2=${now.toISOString()} cs_severity=high cs_url=https://x.y/?a\\=1 cs_note=line1\\nline2 cs_weirdkey=v cs_obj={"k":1}`,
     );
   });
 
@@ -259,12 +260,12 @@ describe("formatSyslog", () => {
   });
 
   it("always carries the tenant id as cs1, empty when missing", () => {
-    expect(formatSyslog("x", {}, "cef", now)).toMatch(/\|4\|rt=\d+ cs1Label=tenant cs1=$/);
+    expect(formatSyslog("x", {}, "cef", now)).toMatch(/\|4\|rt=\d+ cs1Label=tenant cs1= cs2Label=deliveredAt cs2=\S+$/);
   });
 
   it("strips extension keys to alphanumerics and caps them at 30 characters", () => {
     const msg = formatSyslog("x", { data: { ["k".repeat(40)]: 1, "!!!": 2 } }, "cef", now);
-    expect(msg).toContain(` cs_${"k".repeat(27)}=1`);
-    expect(msg).not.toContain("=2");
+    // The "!!!" key has no alphanumerics left and is dropped, so the capped key is the last entry.
+    expect(msg.endsWith(` cs_${"k".repeat(27)}=1`)).toBe(true);
   });
 });

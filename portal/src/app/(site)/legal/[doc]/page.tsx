@@ -56,8 +56,9 @@ export default async function LegalPage({ params, searchParams }: PageProps<"/le
   return (
     <div className="min-h-dvh bg-canvas">
       <header className="sticky top-0 z-20 border-b border-line bg-canvas/85 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 pt-[calc(var(--safe-top)+0.75rem)] pb-3 sm:px-8">
-          <BrandMark />
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 pt-[calc(var(--safe-top)+0.75rem)] pb-3 sm:gap-4 sm:px-8">
+          {/* As on the landing header: the switcher never shrinks; the wordmark wraps away (clipped by h-8) before the page scrolls sideways. */}
+          <BrandMark className="h-8 min-w-0 flex-wrap overflow-hidden" />
           <LanguageSwitcher />
         </div>
       </header>
@@ -85,7 +86,7 @@ export default async function LegalPage({ params, searchParams }: PageProps<"/le
                     hrefLang={l}
                     lang={l}
                     aria-current={l === want ? "page" : undefined}
-                    className="inline-block rounded-pill px-3 py-1.5 text-caption ring-1 ring-line hover:bg-sunken aria-[current=page]:bg-brand-50 aria-[current=page]:font-bold"
+                    className="inline-flex items-center gap-1 rounded-pill px-3 py-1.5 text-caption ring-1 ring-line hover:bg-sunken aria-[current=page]:bg-brand-50 aria-[current=page]:font-bold pointer-coarse:min-h-11"
                   >
                     {LOCALE_NAMES[l]} <span className="text-tab text-ink-subtle">{l.toUpperCase()}</span>
                   </a>
@@ -105,7 +106,7 @@ export default async function LegalPage({ params, searchParams }: PageProps<"/le
             <ol className="grid gap-1 text-caption">
               {toc.map((h) => (
                 <li key={h.id}>
-                  <a href={`#${h.id}`} className="block rounded-md px-2 py-1.5 text-ink-muted hover:bg-sunken hover:text-ink">
+                  <a href={`#${h.id}`} className="flex items-center rounded-md px-2 py-1.5 text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:min-h-11">
                     {h.text}
                   </a>
                 </li>

@@ -210,7 +210,7 @@ export function Tour({ org, still = false }: { org: string; still?: boolean }) {
               {t(`steps.${step.key}.body`)}
             </p>
           </div>
-          <button type="button" onClick={finish} aria-label={t("skip")} className="-mt-1 -mr-1 grid size-9 shrink-0 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink">
+          <button type="button" onClick={finish} aria-label={t("skip")} className="-mt-1 -mr-1 grid size-9 shrink-0 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:size-11">
             <X className="size-4.5" />
           </button>
         </div>

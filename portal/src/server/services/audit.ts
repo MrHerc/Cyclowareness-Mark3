@@ -123,6 +123,20 @@ export const AUDIT_ACTIONS = [
 ] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
+/**
+ * PostgreSQL cannot store U+0000 in text or jsonb, and audit entries carry caller-supplied strings
+ * (filters, names, user agents). It is removed everywhere, keys included, so no entry can fail to be
+ * written because of it. Only plain objects and arrays are walked; other values keep their JSON form.
+ */
+export function withoutNul<T>(value: T): T {
+  if (typeof value === "string") return value.replaceAll("\u0000", "") as T;
+  if (Array.isArray(value)) return value.map(withoutNul) as T;
+  if (value !== null && typeof value === "object" && [Object.prototype, null].includes(Object.getPrototypeOf(value))) {
+    return Object.fromEntries(Object.entries(value).map(([k, v]) => [k.replaceAll("\u0000", ""), withoutNul(v)])) as T;
+  }
+  return value;
+}
+
 export async function audit(
   db: DB,
   entry: {
@@ -140,10 +154,10 @@ export async function audit(
     tenantId: entry.tenantId,
     actorId: entry.actorId,
     action: entry.action,
-    targetType: entry.targetType ?? null,
-    targetId: entry.targetId ?? null,
-    meta: entry.meta ?? null,
-    ip: entry.ip ?? null,
+    targetType: entry.targetType === undefined ? null : withoutNul(entry.targetType),
+    targetId: entry.targetId === undefined ? null : withoutNul(entry.targetId),
+    meta: entry.meta === undefined ? null : withoutNul(entry.meta),
+    ip: entry.ip == null ? null : withoutNul(entry.ip),
     ...(entry.at ? { at: entry.at } : {}),
   });
 }

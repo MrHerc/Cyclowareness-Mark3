@@ -60,6 +60,7 @@ export default async function LessonPage({ params }: PageProps<"/learn/[slug]/[l
 
   return (
     <LessonPlayer
+      viewerId={v.user.id}
       slug={m.slug}
       moduleTitle={m.title}
       topic={CATEGORY_TOPIC[m.category]}

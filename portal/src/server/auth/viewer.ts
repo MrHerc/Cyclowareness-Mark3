@@ -6,8 +6,10 @@ import { db, t } from "../db";
 import type { Role, TenantBranding, TenantSettings } from "../db/schema";
 import { can, isPrivileged, PERMISSION_FEATURE, type Permission } from "./permissions";
 import { invalidateSession, readSessionToken, renewedExpiry, sessionIdFromToken, shouldRenew } from "./session";
+import { cookies } from "next/headers";
 import { currentPath } from "../request";
-import { featuresFor, type Feature } from "../../lib/tenant-defaults";
+import { DEFAULT_LOCALE, LOCALE_COOKIE, isSiteLocale } from "../../i18n/config";
+import { featuresFor, withDefaults, type Feature } from "../../lib/tenant-defaults";
 
 /** Data access layer: the only way pages and actions learn who is asking. */
 export type Viewer = {
@@ -112,7 +114,7 @@ export const getSession = cache(async (): Promise<Viewer | null> => {
       name: tenant.name,
       plan: tenant.plan,
       branding: tenant.branding,
-      settings: tenant.settings,
+      settings: withDefaults(tenant.settings),
       features: featuresFor(tenant.plan, tenant.features),
     },
   };
@@ -128,8 +130,17 @@ export const getViewer = cache(async (): Promise<Viewer | null> => {
 
 export async function requireViewer(): Promise<Viewer> {
   const v = await getSession();
-  if (!v) redirect(`/sign-in?next=${encodeURIComponent(await currentPath())}`);
-  if (v.user.totpEnabled && !v.twoFactorVerified) redirect("/sign-in/verify");
+  if (!v) {
+    const path = await currentPath();
+    // "/" with an expired or revoked session cookie is a visitor arriving at the site: show the public
+    // site (as for visitors without a cookie) instead of the sign-in form.
+    if (path === "/") {
+      const locale = (await cookies()).get(LOCALE_COOKIE)?.value;
+      redirect(`/${isSiteLocale(locale) ? locale : DEFAULT_LOCALE}`);
+    }
+    redirect(`/sign-in?next=${encodeURIComponent(path)}`);
+  }
+  if (v.user.totpEnabled && !v.twoFactorVerified) redirect(`/sign-in/verify?next=${encodeURIComponent(await currentPath())}`);
   return v;
 }
 
@@ -142,13 +153,16 @@ export function allowed(v: Viewer, permission: Permission): boolean {
   return can(v.user.role, permission) && (!feature || v.tenant.features.has(feature));
 }
 
+/** The tenant's "admins use 2FA" rule applies to this privileged user, who has not set it up yet. */
+export function twoFactorGap(v: Viewer): boolean {
+  return v.tenant.settings.identity.requireAdmin2fa && isPrivileged(v.user.role) && !v.user.totpEnabled;
+}
+
 /** For admin pages: permission + plan feature + the tenant's "admins use 2FA" rule. */
 export async function requirePermission(permission: Permission): Promise<Viewer> {
   const v = await requireViewer();
   if (!allowed(v, permission)) notFound();
-  if (v.tenant.settings.identity.requireAdmin2fa && isPrivileged(v.user.role) && !v.user.totpEnabled) {
-    redirect("/profile?section=security&required=1");
-  }
+  if (twoFactorGap(v)) redirect("/profile?section=security&required=1");
   return v;
 }
 
@@ -158,10 +172,22 @@ export async function requireFeature(feature: Feature): Promise<Viewer> {
   return v;
 }
 
-/** For server actions: same checks, but throws instead of redirecting. */
+/**
+ * For server actions: same checks, but throws instead of redirecting. Self-service actions
+ * (no permission) stay open so a privileged user can still set up 2FA when the tenant requires it.
+ */
 export async function actionViewer(permission?: Permission): Promise<Viewer> {
   const v = await getViewer();
   if (!v) throw new Error("UNAUTHENTICATED");
   if (permission && !allowed(v, permission)) throw new Error("FORBIDDEN");
+  if (permission && twoFactorGap(v)) throw new Error("TWO_FACTOR_REQUIRED");
+  return v;
+}
+
+/** For route handlers: the viewer, or the response to send when the checks fail. */
+export async function apiViewer(permission: Permission): Promise<Viewer | Response> {
+  const v = await getViewer();
+  if (!v) return new Response("Unauthorized", { status: 401 });
+  if (!allowed(v, permission) || twoFactorGap(v)) return new Response("Forbidden", { status: 403 });
   return v;
 }

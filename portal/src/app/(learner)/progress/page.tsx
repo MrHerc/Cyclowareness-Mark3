@@ -92,7 +92,7 @@ export default async function ProgressPage() {
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-body-sm font-semibold">{m.title}</p>
                     <div className="mt-2 flex items-center gap-2">
-                      <ProgressBar value={m.percent} tone={m.status === "completed" ? "safe" : "reward"} size="sm" />
+                      <ProgressBar decorative value={m.percent} tone={m.status === "completed" ? "safe" : "reward"} size="sm" />
                       <span className="text-tab font-bold tabular-nums">{m.percent}%</span>
                     </div>
                   </div>

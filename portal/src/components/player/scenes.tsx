@@ -43,6 +43,7 @@ import { BrandAvatar } from "./brand-avatar";
 import { ArtifactModeProvider, hasLink, lensTargets, cleanSpeech } from "./rich";
 import { Illustration, Stat } from "./illustrations";
 import { wordsOf, type Voice } from "./narrator";
+import { tutorAnswerId } from "./resume";
 import { checkPassword } from "@/lib/password-strength";
 import { vibrate } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
@@ -70,6 +71,8 @@ export type SceneEnv = {
   onDone: () => void;
   /** Lets the tutor scene drive the shared progress bar (0–1 inside the scene). */
   onProgress?: (fraction: number) => void;
+  /** When a saved lesson is resumed: the progress last reported inside this scene, so the tutor scene reopens at that beat. */
+  resumeProgress?: number;
 };
 
 const MOODS: Record<string, MascotMood> = { talk: "talk", think: "think", alert: "alert", happy: "happy", celebrate: "celebrate" };
@@ -346,7 +349,7 @@ function aimTowards(host: HTMLElement | null, mascot: HTMLElement | null, spot: 
 
 export function TutorScene({ scene, env, onBack }: { scene: Extract<Scene, { type: "tutor" }>; env: SceneEnv; onBack?: () => void }) {
   const t = useTranslations("player");
-  const [i, setI] = useState(0);
+  const [i, setI] = useState(() => Math.min(scene.beats.length - 1, Math.max(0, Math.round((env.resumeProgress ?? 0) * scene.beats.length))));
   const [word, setWord] = useState(0);
   const [ended, setEnded] = useState(false);
   // A beat with a checkpoint turns into a question step: asking → picked → checked (feedback sheet).
@@ -425,7 +428,7 @@ export function TutorScene({ scene, env, onBack }: { scene: Extract<Scene, { typ
     if (!pickedOpt || checked) return;
     setChecked(true);
     if (!pickedOpt.correct) vibrate();
-    env.onAnswer({ sceneId: `${scene.id}:${beat.id}`, correct: pickedOpt.correct, firstTry: true });
+    env.onAnswer({ sceneId: tutorAnswerId(scene.id, beat.id), correct: pickedOpt.correct, firstTry: true });
   };
 
   // After the narration the beat moves on by itself: to its question, or to the next beat.

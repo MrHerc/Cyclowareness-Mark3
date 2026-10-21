@@ -7,11 +7,13 @@ import { hasFeature, requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
 import { computeTenantRisk } from "@/server/services/risk";
 import { getDepartments, listPeople } from "@/server/queries/admin";
+import { departmentClosure } from "@/server/services/assignments";
 import { Card, CardBody } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { Pill } from "@/components/ui/pill";
 import { StackBar } from "@/components/ui/charts";
 import { EmptyState, Notice, PageHeader, TabsNav } from "@/components/ui/layout";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 import { riskBand } from "@/lib/domain/risk";
 
 export async function generateMetadata() {
@@ -33,12 +35,19 @@ export default async function RiskProfilesPage({ searchParams }: PageProps<"/adm
   if (!hasFeature(v, "risk_profiles")) notFound();
   const sp = await searchParams;
   const band = BANDS.includes(sp.band as "all") ? (sp.band as (typeof BANDS)[number]) : "all";
-  const dept = typeof sp.d === "string" ? sp.d : "";
   const [tr, tn, tc] = await Promise.all([getTranslations("secops.risk"), getTranslations("admin.nav"), getTranslations("common")]);
   const people = (await listPeople(v)).filter((p) => p.status === "active" && p.role !== "super_admin");
+  const allDepartments = await getDepartments(v.tenant.id);
+  // A department filter covers its sub-departments, as on /admin/users and in reports. Offer the
+  // departments that hold any visible person directly or below them; anything else is no filter.
+  const closure = departmentClosure(allDepartments);
   const visibleDepts = new Set(people.map((p) => p.departmentId));
-  const departments = (await getDepartments(v.tenant.id)).filter((d) => visibleDepts.has(d.id));
-  const ids = people.map((p) => p.id);
+  const departments = allDepartments.filter((d) => [...(closure.get(d.id) ?? [])].some((id) => visibleDepts.has(id)));
+  const dept = typeof sp.d === "string" && departments.some((d) => d.id === sp.d) ? sp.d : "";
+  const inDept = dept ? closure.get(dept)! : null;
+  // The distribution, average and band counts describe the selected department; the band only narrows the list.
+  const inScope = inDept ? people.filter((p) => p.departmentId && inDept.has(p.departmentId)) : people;
+  const ids = inScope.map((p) => p.id);
   const [evidence, open] = await Promise.all([
     computeTenantRisk(db(), v.tenant.id, new Date(), ids),
     ids.length
@@ -50,12 +59,12 @@ export default async function RiskProfilesPage({ searchParams }: PageProps<"/adm
   ]);
   const openBy = new Map<string, number>();
   for (const o of open) openBy.set(o.userId, (openBy.get(o.userId) ?? 0) + 1);
-  const rows = people
+  const rows = inScope
     .map((p) => ({ ...p, b: evidence.get(p.id) ?? { score: p.riskScore, parts: { training: 0, overdue: 0, simulations: 0, openRisks: 0, knowledge: 0 } } }))
     .sort((a, b) => b.b.score - a.b.score);
   const counts = { high: 0, medium: 0, low: 0 };
   for (const r of rows) counts[riskBand(r.b.score)]++;
-  const list = rows.filter((r) => (band === "all" || riskBand(r.b.score) === band) && (!dept || r.departmentId === dept));
+  const list = rows.filter((r) => band === "all" || riskBand(r.b.score) === band);
   const avg = rows.length ? Math.round(rows.reduce((s, r) => s + r.b.score, 0) / rows.length) : 0;
 
   return (
@@ -105,7 +114,7 @@ export default async function RiskProfilesPage({ searchParams }: PageProps<"/adm
       </div>
       {list.length ? (
         <Card>
-          <div className="overflow-x-auto">
+          <ScrollRegion label={tn("risk")}>
             <table className="w-full min-w-[48rem] text-left text-caption">
               <thead className="text-tab text-ink-subtle">
                 <tr className="border-b border-line">
@@ -150,7 +159,7 @@ export default async function RiskProfilesPage({ searchParams }: PageProps<"/adm
                 })}
               </tbody>
             </table>
-          </div>
+          </ScrollRegion>
         </Card>
       ) : (
         <EmptyState icon={<Activity />} title={tr("empty")} />

@@ -19,11 +19,12 @@ export async function generateMetadata() {
 
 const TOPICS = ["all", "module", "platform", "idea"] as const;
 
-function Stars({ value, className }: { value: number; className?: string }) {
+/** Five stars as one image; `label` is the translated rating ("4.3 out of 5 stars"). */
+function Stars({ value, label, className }: { value: number; label: string; className?: string }) {
   return (
-    <span className={cn("inline-flex gap-0.5", className)} aria-label={`${value} / 5`}>
+    <span role="img" className={cn("inline-flex gap-0.5", className)} aria-label={label}>
       {[1, 2, 3, 4, 5].map((i) => (
-        <Star key={i} className={cn("size-3.5", i <= Math.round(value) ? "fill-reward-400 text-reward-400" : "text-line-strong")} />
+        <Star key={i} aria-hidden className={cn("size-3.5", i <= Math.round(value) ? "fill-reward-400 text-reward-400" : "text-line-strong")} />
       ))}
     </span>
   );
@@ -62,7 +63,7 @@ export default async function FeedbackPage({ searchParams }: PageProps<"/admin/f
               <div className="flex items-end gap-3">
                 <span className="text-display font-bold tabular-nums">{avg.toFixed(1)}</span>
                 <span className="pb-2">
-                  <Stars value={avg} />
+                  <Stars value={avg} label={tr("stars", { value: Math.round(avg * 10) / 10 })} />
                   <span className="block text-caption text-ink-muted">{tr("count", { count: all.length })}</span>
                 </span>
               </div>
@@ -87,7 +88,7 @@ export default async function FeedbackPage({ searchParams }: PageProps<"/admin/f
                 {byModule.map((m) => (
                   <li key={m.id} className="flex items-center gap-3 py-2 text-caption">
                     <span className="min-w-0 flex-1 truncate font-semibold">{m.title}</span>
-                    <Stars value={m.avg} />
+                    <Stars value={m.avg} label={tr("stars", { value: Math.round(m.avg * 10) / 10 })} />
                     <span className="w-8 text-right tabular-nums">{m.avg.toFixed(1)}</span>
                     <span className="w-8 text-right text-ink-subtle tabular-nums">×{m.n}</span>
                   </li>
@@ -102,9 +103,9 @@ export default async function FeedbackPage({ searchParams }: PageProps<"/admin/f
         <ul className="grid gap-3">
           {list.map((f) => (
             <li key={f.id} className="flex flex-wrap items-start gap-3 rounded-xl border border-line bg-surface p-4 shadow-xs">
-              <Stars value={f.rating} className="mt-1" />
-              <div className="min-w-0 flex-1">
-                <p className={cn("text-body-sm", !f.comment && "text-ink-subtle italic")}>{f.comment ?? tr("noComment")}</p>
+              <Stars value={f.rating} label={tr("stars", { value: f.rating })} className="mt-1" />
+              <div className="min-w-0 flex-[1_1_12rem]">
+                <p className={cn("text-body-sm break-words", !f.comment && "text-ink-subtle italic")}>{f.comment ?? tr("noComment")}</p>
                 <p className="mt-1 text-tab text-ink-subtle">
                   {f.userId ? (people.get(f.userId)?.name ?? ts("unknownPerson")) : ts("anonymous")} · {tr(`topics.${f.topic}`)}
                   {f.moduleId ? ` · ${modTitle.get(f.moduleId) ?? ""}` : ""} · {format.dateTime(f.createdAt, { dateStyle: "medium" })}

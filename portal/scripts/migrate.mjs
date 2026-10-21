@@ -14,7 +14,12 @@ if (!url) {
   process.exit(1);
 }
 
-const pool = new pg.Pool({ connectionString: url, max: 1 });
+const pool = new pg.Pool({ connectionString: url, max: 1, connectionTimeoutMillis: 10_000 });
+// Without a listener an idle-client error (database restart mid-run) would be thrown as an uncaught exception.
+pool.on("error", (error) => console.error("[migrate] idle client error", error));
+// The migrator's transaction holds a checked-out client, which has no pool listener: log its error
+// too, so the migration rejects (exit code 1, pool closed) instead of crashing the process.
+pool.on("connect", (client) => client.on("error", (error) => console.error("[migrate] client error", error)));
 try {
   await migrate(drizzle(pool), { migrationsFolder: "./drizzle" });
   console.log("Migrations applied (pg).");

@@ -5,12 +5,12 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check, ChevronRight, Copy, Download, ImagePlus, KeyRound, MessageSquareWarning, MonitorSmartphone, ShieldCheck, ShieldOff, Signpost, Trash2 } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Button, TextButton } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
-import { Field, Input, Segmented, Switch, Textarea } from "@/components/ui/field";
+import { Field, Input, Segmented, Switch } from "@/components/ui/field";
 import { Pill } from "@/components/ui/pill";
-import { SubmitButton } from "@/components/ui/submit-button";
 import { toast } from "@/components/ui/toast";
+import { ProblemForm } from "@/components/learner/problem-form";
 import { setPreferencesAction } from "@/server/actions/preferences";
 import {
   cancelDeletionAction,
@@ -23,7 +23,6 @@ import {
   signOutOtherDevicesAction,
   startTotpAction,
 } from "@/server/actions/profile";
-import { reportProblemAction } from "@/server/actions/learning";
 import { hapticsEnabled, hapticsSupported, setHapticsEnabled, vibrate } from "@/lib/haptics";
 import { cn } from "@/lib/cn";
 
@@ -61,15 +60,24 @@ export function PhotoEditor({ name, src }: { name: string; src: string | null })
     <div className="flex flex-col items-center text-center">
       <Avatar name={name} src={src} size="2xl" className="bg-safe-50 text-safe-700" />
       <p className="mt-4 text-headline font-bold">{name}</p>
-      <input ref={input} type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => onFile(e.target.files?.[0])} />
+      {/* The visible button below is the control; the hidden input is named but kept out of the tab order. */}
+      <input
+        ref={input}
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        className="sr-only"
+        tabIndex={-1}
+        aria-label={src ? t("changePhoto") : t("addPhoto")}
+        onChange={(e) => onFile(e.target.files?.[0])}
+      />
       <div className="mt-3 flex flex-col items-center gap-1.5">
         <Button variant="secondary" size="sm" icon={<ImagePlus />} onClick={() => input.current?.click()} disabled={pending}>
           {src ? t("changePhoto") : t("addPhoto")}
         </Button>
         {src ? (
-          <button type="button" className="text-tab font-semibold text-risk-600 hover:underline" onClick={() => start(async () => void (await setAvatarAction(null)))}>
+          <TextButton tone="danger" size="tab" disabled={pending} onClick={() => start(async () => void (await setAvatarAction(null)))}>
             {t("removePhoto")}
-          </button>
+          </TextButton>
         ) : null}
       </div>
     </div>
@@ -504,12 +512,6 @@ export function ProblemButton() {
   const t = useTranslations("learner.problem");
   const tp = useTranslations("learner.profile");
   const [open, setOpen] = useState(false);
-  const action = async (data: FormData) => {
-    if ((await reportProblemAction(undefined, data)).ok) {
-      toast(t("sent"));
-      setOpen(false);
-    }
-  };
   return (
     <>
       <button type="button" className="flex w-full items-center gap-3 rounded-lg px-1 py-3 text-left hover:bg-sunken" onClick={() => setOpen(true)}>
@@ -518,11 +520,7 @@ export function ProblemButton() {
         <ChevronRight className="size-4 text-ink-subtle" />
       </button>
       <Dialog open={open} onClose={() => setOpen(false)} title={t("title")} description={t("description")} size="sm">
-        <form action={action} className="grid gap-3">
-          <input type="hidden" name="context" value="page:/profile" />
-          <Textarea name="message" aria-label={t("message")} placeholder={t("message")} required minLength={3} maxLength={4000} />
-          <SubmitButton>{t("submit")}</SubmitButton>
-        </form>
+        <ProblemForm context="page:/profile" onSent={() => setOpen(false)} />
       </Dialog>
     </>
   );

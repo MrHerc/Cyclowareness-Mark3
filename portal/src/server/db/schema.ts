@@ -8,9 +8,11 @@ import {
   primaryKey,
   text,
   timestamp,
+  unique,
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 const id = () => uuid("id").primaryKey().defaultRandom();
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -140,11 +142,14 @@ export const departments = pgTable(
     id: id(),
     tenantId: tenantRef(),
     name: text("name").notNull(),
+    /** departmentKey(name) (lib/departments.ts), written with every new name: two departments of one organisation never share it. */
+    nameKey: text("name_key").notNull(),
     parentId: uuid("parent_id"),
     headUserId: uuid("head_user_id"),
     createdAt: createdAt(),
   },
-  (t) => [index("departments_tenant_idx").on(t.tenantId)],
+  // Leads with tenant_id, so it also serves the per-organisation lookups.
+  (t) => [uniqueIndex("departments_tenant_name_key_idx").on(t.tenantId, t.nameKey)],
 );
 
 export const USER_STATUS = ["active", "invited", "suspended", "deleted"] as const;
@@ -182,12 +187,18 @@ export const users = pgTable(
     tourDone: boolean("tour_done").notNull().default(false),
     deletionRequestedAt: ts("deletion_requested_at"),
     lastActiveAt: ts("last_active_at"),
+    /** When department_id last changed (null: never since the account was created). Reminders for department assignments count from it. */
+    departmentChangedAt: ts("department_changed_at"),
+    /** When an invited account became active (invite accepted, first SSO sign-in). Null for accounts created active. */
+    activatedAt: ts("activated_at"),
     createdAt: createdAt(),
   },
   (t) => [
     uniqueIndex("users_email_idx").on(t.email),
     index("users_tenant_idx").on(t.tenantId),
     index("users_department_idx").on(t.departmentId),
+    // Phone sign-in must resolve to exactly one person; deleted (anonymised) accounts keep no number.
+    uniqueIndex("users_phone_active_idx").on(t.phone).where(sql`phone is not null and status <> 'deleted'`),
   ],
 );
 
@@ -206,7 +217,7 @@ export const sessions = pgTable(
     lastSeenAt: ts("last_seen_at").notNull().defaultNow(),
     createdAt: createdAt(),
   },
-  (t) => [index("sessions_user_idx").on(t.userId)],
+  (t) => [index("sessions_user_idx").on(t.userId), index("sessions_expires_idx").on(t.expiresAt)],
 );
 
 export const AUTH_TOKEN_KINDS = ["invite", "reset", "phone_otp"] as const;
@@ -236,6 +247,17 @@ export const loginAttempts = pgTable(
     at: ts("at").notNull().defaultNow(),
   },
   (t) => [index("login_attempts_key_idx").on(t.key, t.at)],
+);
+
+/** Fixed-window request counters shared by every server instance (src/server/rate-limit.ts). */
+export const rateLimitBuckets = pgTable(
+  "rate_limit_buckets",
+  {
+    key: text("key").notNull(),
+    windowStart: ts("window_start").notNull(),
+    count: integer("count").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.key, t.windowStart] }), index("rate_limit_buckets_window_idx").on(t.windowStart)],
 );
 
 export const auditLog = pgTable(
@@ -269,7 +291,7 @@ export const notifications = pgTable(
     readAt: ts("read_at"),
     createdAt: createdAt(),
   },
-  (t) => [index("notifications_user_idx").on(t.userId, t.createdAt)],
+  (t) => [index("notifications_user_idx").on(t.userId, t.createdAt), index("notifications_tenant_kind_idx").on(t.tenantId, t.kind, t.createdAt)],
 );
 
 export const watermarkCodes = pgTable("watermark_codes", {
@@ -303,7 +325,8 @@ export const modules = pgTable(
     createdBy: uuid("created_by"),
     createdAt: createdAt(),
   },
-  (t) => [uniqueIndex("modules_slug_tenant_idx").on(t.slug, t.tenantId)],
+  // NULLS NOT DISTINCT: the global library (tenant_id null) also has one module per slug.
+  (t) => [unique("modules_slug_tenant_idx").on(t.slug, t.tenantId).nullsNotDistinct()],
 );
 
 export const lessons = pgTable(
@@ -346,7 +369,7 @@ export const learningPaths = pgTable("learning_paths", {
   standards: jsonb("standards").$type<string[]>().notNull(),
   moduleSlugs: jsonb("module_slugs").$type<string[]>().notNull(),
   createdAt: createdAt(),
-});
+}, (t) => [unique("learning_paths_key_tenant_idx").on(t.key, t.tenantId).nullsNotDistinct()]);
 
 /* ───────────────────────── Learning ───────────────────────── */
 
@@ -402,6 +425,8 @@ export const lessonProgress = pgTable(
       .notNull()
       .references(() => lessons.id, { onDelete: "cascade" }),
     completedAt: ts("completed_at"),
+    /** The latest completion (completed_at keeps the first): a replay after a risk opened is proven by it. */
+    lastCompletedAt: ts("last_completed_at"),
     xpAwarded: integer("xp_awarded").notNull().default(0),
     attempts: integer("attempts").notNull().default(0),
     secondsSpent: integer("seconds_spent").notNull().default(0),
@@ -451,13 +476,14 @@ export const attestations = pgTable("attestations", {
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
+  // Compliance evidence: a module with attestations cannot be deleted (NO ACTION, so deleting a tenant still cascades).
   moduleId: uuid("module_id")
     .notNull()
-    .references(() => modules.id, { onDelete: "cascade" }),
+    .references(() => modules.id, { onDelete: "no action" }),
   text: text("text").notNull(),
   locale: text("locale").notNull(),
   at: ts("at").notNull().defaultNow(),
-});
+}, (t) => [index("attestations_user_idx").on(t.userId)]);
 
 export const certificates = pgTable("certificates", {
   id: id(),
@@ -465,12 +491,13 @@ export const certificates = pgTable("certificates", {
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
-  moduleId: uuid("module_id").references(() => modules.id, { onDelete: "cascade" }),
-  pathId: uuid("path_id").references(() => learningPaths.id, { onDelete: "cascade" }),
+  // Compliance evidence, as for attestations: issued certificates block deleting their module or path.
+  moduleId: uuid("module_id").references(() => modules.id, { onDelete: "no action" }),
+  pathId: uuid("path_id").references(() => learningPaths.id, { onDelete: "no action" }),
   serial: text("serial").notNull().unique(),
   publicToken: text("public_token").notNull().unique(),
   issuedAt: ts("issued_at").notNull().defaultNow(),
-});
+}, (t) => [index("certificates_user_idx").on(t.userId), index("certificates_tenant_idx").on(t.tenantId)]);
 
 export const policies = pgTable("policies", {
   id: id(),
@@ -494,7 +521,7 @@ export const policyVersions = pgTable("policy_versions", {
   translations: jsonb("translations").$type<Record<string, { title: string; summary?: string; bodyMd: string }>>(),
   publishedAt: ts("published_at"),
   createdAt: createdAt(),
-});
+}, (t) => [index("policy_versions_policy_idx").on(t.policyId)]);
 
 export const policySignoffs = pgTable(
   "policy_signoffs",
@@ -579,7 +606,7 @@ export const behaviorRisks = pgTable(
     createdAt: createdAt(),
     closedAt: ts("closed_at"),
   },
-  (t) => [index("risks_user_idx").on(t.userId, t.status)],
+  (t) => [index("risks_user_idx").on(t.userId, t.status), index("risks_tenant_idx").on(t.tenantId, t.status)],
 );
 
 export const riskSnapshots = pgTable(
@@ -627,7 +654,7 @@ export const threatReports = pgTable(
     campaignRecipientId: uuid("campaign_recipient_id"),
     createdAt: createdAt(),
   },
-  (t) => [index("threat_reports_tenant_idx").on(t.tenantId, t.status), uniqueIndex("threat_reports_number_idx").on(t.tenantId, t.number)],
+  (t) => [index("threat_reports_tenant_idx").on(t.tenantId, t.status), uniqueIndex("threat_reports_number_idx").on(t.tenantId, t.number), index("threat_reports_reporter_idx").on(t.reporterId)],
 );
 
 export type SandboxFinding = { id: string; severity: "info" | "low" | "medium" | "high"; weight: number; params?: Record<string, string | number> };
@@ -755,7 +782,7 @@ export const materialDecisions = pgTable("material_decisions", {
   decision: text("decision", { enum: ["approve", "reject", "edit"] }).notNull(),
   reason: text("reason"),
   at: ts("at").notNull().defaultNow(),
-});
+}, (t) => [index("material_decisions_material_idx").on(t.materialId)]);
 
 export const intelItems = pgTable(
   "intel_items",
@@ -793,7 +820,7 @@ export const campaigns = pgTable(
     channel: text("channel", { enum: ["email", "sms", "voice", "usb", "qr"] }).notNull(),
     templateKey: text("template_key").notNull(),
     audience: text("audience", { enum: ["all", "department"] }).notNull(),
-    departmentId: uuid("department_id"),
+    departmentId: uuid("department_id").references(() => departments.id, { onDelete: "set null" }),
     status: text("status", { enum: CAMPAIGN_STATUS }).notNull().default("draft"),
     scheduledAt: ts("scheduled_at"),
     launchedAt: ts("launched_at"),
@@ -821,7 +848,7 @@ export const campaignRecipients = pgTable(
     submittedAt: ts("submitted_at"),
     reportedAt: ts("reported_at"),
   },
-  (t) => [index("recipients_campaign_idx").on(t.campaignId)],
+  (t) => [index("recipients_campaign_idx").on(t.campaignId), index("recipients_user_idx").on(t.userId)],
 );
 
 /* ───────────────────────── Support & feedback ───────────────────────── */
@@ -874,7 +901,7 @@ export const ticketMessages = pgTable("ticket_messages", {
   authorId: uuid("author_id").notNull(),
   body: text("body").notNull(),
   at: ts("at").notNull().defaultNow(),
-});
+}, (t) => [index("ticket_messages_ticket_idx").on(t.ticketId)]);
 
 export const feedback = pgTable(
   "feedback",
@@ -942,7 +969,7 @@ export const reportSchedules = pgTable("report_schedules", {
   /** Weekly: 1–7, Monday first. Monthly: day of the month, 1–28. */
   day: integer("day").notNull().default(1),
   recipients: jsonb("recipients").$type<string[]>().notNull(),
-  departmentId: uuid("department_id"),
+  departmentId: uuid("department_id").references(() => departments.id, { onDelete: "set null" }),
   lastSentAt: ts("last_sent_at"),
   createdBy: uuid("created_by"),
   createdAt: createdAt(),
@@ -963,7 +990,7 @@ export const webhookDeliveries = pgTable(
     createdAt: createdAt(),
     deliveredAt: ts("delivered_at"),
   },
-  (t) => [index("deliveries_status_idx").on(t.status, t.createdAt)],
+  (t) => [index("deliveries_status_idx").on(t.status, t.createdAt), index("deliveries_tenant_idx").on(t.tenantId, t.createdAt)],
 );
 
 export const tutorCache = pgTable("tutor_cache", {

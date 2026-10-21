@@ -27,7 +27,8 @@ export async function trackingView(token: string, via: "link" | "qr") {
     org: tenant?.name ?? "",
     flags: data.template.redFlags.map((f) => templateText(f, data.locale)),
     moduleSlug: data.template.moduleSlug,
-    harvest: data.template.harvest && !scanner,
+    // A cancelled campaign records nothing, so it goes straight to the teachable moment.
+    harvest: data.template.harvest && !scanner && !data.cancelled,
     submitted: data.submitted,
     brandName: templateText(data.template.sender.name, data.locale),
   };
@@ -36,11 +37,11 @@ export async function trackingView(token: string, via: "link" | "qr") {
 async function peek(token: string) {
   const { TEMPLATE_BY_KEY } = await import("../lib/campaigns/templates");
   const [row] = await db()
-    .select({ templateKey: t.campaigns.templateKey, tenantId: t.campaigns.tenantId, locale: t.users.locale, submittedAt: t.campaignRecipients.submittedAt })
+    .select({ templateKey: t.campaigns.templateKey, tenantId: t.campaigns.tenantId, status: t.campaigns.status, locale: t.users.locale, submittedAt: t.campaignRecipients.submittedAt })
     .from(t.campaignRecipients)
     .innerJoin(t.campaigns, eq(t.campaigns.id, t.campaignRecipients.campaignId))
     .innerJoin(t.users, eq(t.users.id, t.campaignRecipients.userId))
     .where(eq(t.campaignRecipients.token, token));
   const template = row ? TEMPLATE_BY_KEY.get(row.templateKey) : undefined;
-  return row && template ? { tenantId: row.tenantId, template, locale: row.locale, submitted: !!row.submittedAt } : null;
+  return row && template ? { tenantId: row.tenantId, template, locale: row.locale, submitted: !!row.submittedAt, cancelled: row.status === "cancelled" } : null;
 }

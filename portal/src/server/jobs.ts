@@ -3,31 +3,39 @@ import { createConnection as tcpConnect } from "node:net";
 import { connect as tlsConnect } from "node:tls";
 import { createSocket } from "node:dgram";
 import { hostname } from "node:os";
-import { and, asc, eq, gte, inArray, isNotNull, isNull, lt, ne, or, sql } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, isNotNull, isNull, lt, ne, notInArray, or, sql } from "drizzle-orm";
+import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 import type { DB } from "./db/client";
 import * as t from "./db/schema";
 import type { TenantSettings } from "./db/schema";
-import { campaignTick } from "./services/campaigns";
+import { campaignTick, sendQueuedSms } from "./services/campaigns";
 import { retryQueued, queueEmail, renderEmailHtml } from "./mail";
 import { decryptSecret, hmac } from "./crypto";
-import { env } from "./env";
+import { destinationProblem } from "./net-guard";
+import { appUrl, env } from "./env";
 import { DOMAIN_PROOF_GRACE_DAYS, domainProofFound, domainProofRecord } from "./auth/domain-proof";
 import { audit } from "./services/audit";
+import { RATE_LIMIT_MAX_WINDOW_MS } from "./rate-limit";
 import { resolveAssignments } from "./services/assignments";
 import { notifyUsers } from "./services/notify";
 import { recomputeRisk, snapshotTenant } from "./services/risk";
 import { targetTraining } from "./services/secops";
 import { dayKey } from "../lib/domain/gamification";
+import { featuresFor, withDefaults } from "../lib/tenant-defaults";
+import { bakuDayPlus, todayInBaku } from "../lib/time";
 import { pick } from "../i18n/config";
 
 /**
- * Background work, run every minute by the job runner (src/instrumentation.ts).
+ * Background work, run every minute by the job runner (src/server/jobs-runner.ts).
  * Every step is idempotent: running a tick twice sends nothing twice.
  */
 
 const DAY = 86_400_000;
 const HOUR = 3_600_000;
-const APP_URL = () => (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+/** Time budget per tick for each delivery step (mail, SMS, webhooks/syslog), so one unreachable server cannot hold up the tick. */
+const DELIVERY_BUDGET_MS = 20_000;
+/** End of a YYYY-MM-DD due day, Baku time. */
+const dueEnd = (due: string) => new Date(`${due}T23:59:59+04:00`);
 
 export async function runJobs(db: DB, now = new Date()): Promise<Record<string, number>> {
   const out: Record<string, number> = {};
@@ -40,11 +48,14 @@ export async function runJobs(db: DB, now = new Date()): Promise<Record<string, 
     }
   };
   await step("campaigns", async () => (await campaignTick(db), 0));
-  await step("mail", () => retryQueued(db));
+  await step("mail", () => retryQueued(db, { budgetMs: DELIVERY_BUDGET_MS, now }));
+  await step("sms", () => sendQueuedSms(db, { budgetMs: DELIVERY_BUDGET_MS, now }));
   await step("events", () => deliverEvents(db, now));
   await step("domains", () => recheckDomains(db, now));
+  await step("cleanup", () => cleanup(db, now));
   const tenants = await db.select({ id: t.tenants.id, name: t.tenants.name, settings: t.tenants.settings, branding: t.tenants.branding }).from(t.tenants);
-  for (const tenant of tenants) {
+  for (const row of tenants) {
+    const tenant = { ...row, settings: withDefaults(row.settings) };
     await step(`snapshot:${tenant.id}`, () => dailySnapshot(db, tenant.id, now));
     await step(`reminders:${tenant.id}`, () => reminders(db, tenant, now));
     await step(`managers:${tenant.id}`, () => managerAlerts(db, tenant, now));
@@ -58,92 +69,158 @@ export async function runJobs(db: DB, now = new Date()): Promise<Record<string, 
 
 const MAX_ATTEMPTS = 6;
 
-/** Signed JSON webhooks and CEF/JSON syslog, with exponential backoff (1, 4, 9, 16, 25 minutes). */
-export async function deliverEvents(db: DB, now = new Date()): Promise<number> {
-  // Back-off is part of the query so waiting rows do not occupy the batch and starve newer ones.
-  const rows = await db
-    .select()
-    .from(t.webhookDeliveries)
-    .where(
-      and(
-        eq(t.webhookDeliveries.status, "queued"),
-        lt(t.webhookDeliveries.attempts, MAX_ATTEMPTS),
-        or(eq(t.webhookDeliveries.attempts, 0), sql`${t.webhookDeliveries.createdAt} + (${t.webhookDeliveries.attempts} * ${t.webhookDeliveries.attempts}) * interval '1 minute' <= ${now.toISOString()}::timestamptz`),
-      ),
-    )
-    .orderBy(asc(t.webhookDeliveries.createdAt))
-    .limit(50);
+/** Connection-level failures (DNS, refused, timeout): the receiver is down, not the message wrong. */
+function isNetworkError(error: unknown): boolean {
+  const e = error as { name?: string; code?: string; cause?: { code?: string } };
+  const message = String((error as Error)?.message);
+  // "unresolvable" comes from the destination check: a DNS outage, like ENOTFOUND from fetch.
+  return e?.name === "TimeoutError" || e?.name === "AbortError" || /^(ECONNREFUSED|ECONNRESET|ENOTFOUND|EHOSTUNREACH|ETIMEDOUT|EAI_AGAIN)$/.test(e?.code ?? e?.cause?.code ?? "") || message === "syslog timeout" || message === "fetch failed" || message === "unresolvable";
+}
+
+/** Rows looked at per tick at most (besides the time budget). */
+const EVENTS_PER_TICK = 200;
+
+type EventTenant = { settings: TenantSettings; integrations: boolean } | null;
+
+/**
+ * Signed JSON webhooks and CEF/JSON syslog, with exponential backoff (1, 4, 9, 16, 25 minutes).
+ * Rows queued before the admin switched the integration (or the plan feature) off are not sent;
+ * the Settings test event is the exception. Once a receiver is unreachable in a tick, its other
+ * rows wait for the next tick without using up attempts, and further pages leave that receiver
+ * out, so its backlog never crowds out other organisations' events. The step stops after its
+ * time budget.
+ */
+export async function deliverEvents(db: DB, now = new Date(), budgetMs = DELIVERY_BUDGET_MS): Promise<number> {
+  const deadline = Date.now() + budgetMs;
+  const tenantCache = new Map<string, EventTenant>();
+  const down: { tenantId: string; target: "webhook" | "syslog" }[] = [];
+  // Rows looked at in this tick: a failed one can still be due, but gets one attempt per tick.
+  const seen: string[] = [];
   let done = 0;
-  const settingsCache = new Map<string, TenantSettings>();
-  for (const d of rows) {
-    let settings = settingsCache.get(d.tenantId);
-    if (!settings) {
-      const [tenant] = await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, d.tenantId));
-      if (!tenant) continue;
-      settings = tenant.settings;
-      settingsCache.set(d.tenantId, settings);
+  while (seen.length < EVENTS_PER_TICK && Date.now() <= deadline) {
+    // Back-off is part of the query so waiting rows do not occupy the page and starve newer ones.
+    const rows = await db
+      .select()
+      .from(t.webhookDeliveries)
+      .where(
+        and(
+          eq(t.webhookDeliveries.status, "queued"),
+          lt(t.webhookDeliveries.attempts, MAX_ATTEMPTS),
+          or(eq(t.webhookDeliveries.attempts, 0), sql`${t.webhookDeliveries.createdAt} + (${t.webhookDeliveries.attempts} * ${t.webhookDeliveries.attempts}) * interval '1 minute' <= ${now.toISOString()}::timestamptz`),
+          seen.length ? notInArray(t.webhookDeliveries.id, seen) : undefined,
+          ...down.map((x) => sql`not (${t.webhookDeliveries.tenantId} = ${x.tenantId} and ${t.webhookDeliveries.target} = ${x.target})`),
+        ),
+      )
+      .orderBy(asc(t.webhookDeliveries.createdAt))
+      .limit(Math.min(50, EVENTS_PER_TICK - seen.length));
+    if (!rows.length) break;
+    for (const d of rows) {
+      if (Date.now() > deadline) break;
+      if (down.some((x) => x.tenantId === d.tenantId && x.target === d.target)) continue;
+      seen.push(d.id);
+      const res = await deliverEvent(db, d, tenantCache);
+      if (res === "delivered") done++;
+      // The receiver is down: this attempt counted, the target's other rows wait for the next tick.
+      else if (res === "unreachable") down.push({ tenantId: d.tenantId, target: d.target });
     }
-    const i = settings.integrations;
-    let ok = false;
-    let code: number | null = null;
-    let error: string | null = null;
-    try {
-      if (d.target === "webhook") {
-        if (!i.webhookUrl) throw new Error("no webhook address");
-        const secret = decryptSecret(i.webhookSecretEnc);
-        if (!secret) throw new Error("no signing secret");
-        const body = JSON.stringify({ id: d.id, ...d.payload });
-        const ts = Math.floor(now.getTime() / 1000).toString();
-        const res = await fetch(i.webhookUrl, {
-          method: "POST",
-          redirect: "error",
-          signal: AbortSignal.timeout(10_000),
-          headers: {
-            "content-type": "application/json",
-            "user-agent": "Cyclowareness-Webhooks/1.0",
-            "x-cyclowareness-event": d.event,
-            "x-cyclowareness-delivery": d.id,
-            "x-cyclowareness-timestamp": ts,
-            "x-cyclowareness-signature": `sha256=${hmac(body, secret)}`,
-            "x-cyclowareness-signature-timestamped": `sha256=${hmac(`${ts}.${body}`, secret)}`,
-          },
-          body,
-        });
-        code = res.status;
-        ok = res.ok;
-        if (!ok) error = `HTTP ${res.status}`;
-      } else {
-        if (!i.syslogHost) throw new Error("no syslog server");
-        await sendSyslog(i.syslogHost, i.syslogPort ?? 6514, i.syslogTransport ?? "tls", formatSyslog(d.event, d.payload, i.syslogFormat ?? "cef", now));
-        ok = true;
-      }
-    } catch (e) {
-      error = e instanceof Error ? e.message.slice(0, 300) : "failed";
-    }
-    const attempts = d.attempts + 1;
-    await db
-      .update(t.webhookDeliveries)
-      .set(ok ? { status: "delivered", attempts, responseCode: code, error: null, deliveredAt: now } : { status: attempts >= MAX_ATTEMPTS ? "failed" : "queued", attempts, responseCode: code, error })
-      .where(eq(t.webhookDeliveries.id, d.id));
-    if (ok) done++;
   }
   return done;
 }
 
-const SEVERITY_CEF: Record<string, number> = { low: 3, medium: 5, high: 8, critical: 10 };
-
-function cefEscape(v: string, header = false): string {
-  return header ? v.replace(/\\/g, "\\\\").replace(/\|/g, "\\|") : v.replace(/\\/g, "\\\\").replace(/=/g, "\\=").replace(/\r?\n/g, " ");
+/** One row of deliverEvents. */
+async function deliverEvent(db: DB, d: typeof t.webhookDeliveries.$inferSelect, tenantCache: Map<string, EventTenant>): Promise<"delivered" | "failed" | "unreachable" | "skipped"> {
+  let tenant = tenantCache.get(d.tenantId);
+  if (tenant === undefined) {
+    const [row] = await db.select({ settings: t.tenants.settings, plan: t.tenants.plan, features: t.tenants.features }).from(t.tenants).where(eq(t.tenants.id, d.tenantId));
+    tenant = row ? { settings: withDefaults(row.settings), integrations: featuresFor(row.plan, row.features).has("integrations") } : null;
+    tenantCache.set(d.tenantId, tenant);
+  }
+  if (!tenant) return "skipped";
+  const i = tenant.settings.integrations;
+  const isTest = (d.payload.data as { test?: unknown } | undefined)?.test === true;
+  const switchedOff = !tenant.integrations || (d.target === "webhook" ? !i.webhookEnabled : !i.syslogEnabled);
+  if (switchedOff && !isTest) {
+    await db.update(t.webhookDeliveries).set({ status: "failed", error: "integration disabled" }).where(eq(t.webhookDeliveries.id, d.id));
+    return "failed";
+  }
+  let ok = false;
+  let unreachable = false;
+  let code: number | null = null;
+  let error: string | null = null;
+  try {
+    if (d.target === "webhook") {
+      if (!i.webhookUrl) throw new Error("no webhook address");
+      const url = new URL(i.webhookUrl);
+      const problem = await destinationProblem(url.hostname, Number(url.port || 443), "webhook");
+      if (problem) throw new Error(problem);
+      const secret = decryptSecret(i.webhookSecretEnc);
+      if (!secret) throw new Error("no signing secret");
+      const body = JSON.stringify({ id: d.id, ...d.payload });
+      // Signed at the moment of sending: receivers reject timestamps older than five minutes.
+      const ts = Math.floor(Date.now() / 1000).toString();
+      const res = await fetch(i.webhookUrl, {
+        method: "POST",
+        redirect: "error",
+        signal: AbortSignal.timeout(10_000),
+        headers: {
+          "content-type": "application/json",
+          "user-agent": "Cyclowareness-Webhooks/1.0",
+          "x-cyclowareness-event": d.event,
+          "x-cyclowareness-delivery": d.id,
+          "x-cyclowareness-timestamp": ts,
+          "x-cyclowareness-signature": `sha256=${hmac(body, secret)}`,
+          "x-cyclowareness-signature-timestamped": `sha256=${hmac(`${ts}.${body}`, secret)}`,
+        },
+        body,
+      });
+      code = res.status;
+      ok = res.ok;
+      if (!ok) error = `HTTP ${res.status}`;
+    } else {
+      if (!i.syslogHost) throw new Error("no syslog server");
+      const port = i.syslogPort ?? 6514;
+      const problem = await destinationProblem(i.syslogHost, port, "syslog");
+      if (problem) throw new Error(problem);
+      await sendSyslog(i.syslogHost, port, i.syslogTransport ?? "tls", formatSyslog(d.event, d.payload, i.syslogFormat ?? "cef", new Date()));
+      ok = true;
+    }
+  } catch (e) {
+    unreachable = isNetworkError(e);
+    error = e instanceof Error ? e.message.slice(0, 300) : "failed";
+  }
+  const attempts = d.attempts + 1;
+  await db
+    .update(t.webhookDeliveries)
+    .set(ok ? { status: "delivered", attempts, responseCode: code, error: null, deliveredAt: new Date() } : { status: attempts >= MAX_ATTEMPTS ? "failed" : "queued", attempts, responseCode: code, error })
+    .where(eq(t.webhookDeliveries.id, d.id));
+  return ok ? "delivered" : unreachable ? "unreachable" : "failed";
 }
 
-/** RFC 5424 message carrying CEF or JSON (facility local0, severity by event). */
-export function formatSyslog(event: string, payload: Record<string, unknown>, format: "cef" | "json", now: Date): string {
+const SEVERITY_CEF: Record<string, number> = { low: 3, medium: 5, high: 8, critical: 10 };
+
+/**
+ * CEF escaping. Header fields: backslash and pipe escaped, line breaks removed. Extension values:
+ * backslash and equals escaped, every line break (CRLF, lone CR, LF) written as \n, so a value can
+ * never split the record on a line-based receiver.
+ */
+export function cefEscape(v: string, header = false): string {
+  return header ? v.replace(/\\/g, "\\\\").replace(/\|/g, "\\|").replace(/[\r\n]+/g, " ") : v.replace(/\\/g, "\\\\").replace(/=/g, "\\=").replace(/\r\n|\r|\n/g, "\\n");
+}
+
+/**
+ * RFC 5424 message carrying CEF or JSON (facility local0, severity by event). The header timestamp
+ * and CEF `rt` are the time the event happened (payload.occurredAt), not the delivery time, which
+ * goes into cs2 (deliveredAt) so retries and runner downtime do not move events in the SIEM.
+ */
+export function formatSyslog(event: string, payload: Record<string, unknown>, format: "cef" | "json", deliveredAt: Date): string {
   const data = (payload.data ?? {}) as Record<string, unknown>;
+  const occurred = new Date(String(payload.occurredAt ?? ""));
+  const at = Number.isNaN(occurred.getTime()) ? deliveredAt : occurred;
   const sev = SEVERITY_CEF[String(data.severity ?? "")] ?? (event.includes("malicious") || event.includes("risky") ? 7 : 4);
   const pri = 16 * 8 + (sev >= 8 ? 2 : sev >= 6 ? 4 : 6);
-  const header = `<${pri}>1 ${now.toISOString()} ${hostname()} cyclowareness - ${event.replace(/[^\w.-]/g, "_")} -`;
+  const header = `<${pri}>1 ${at.toISOString()} ${hostname()} cyclowareness - ${event.replace(/[^\w.-]/g, "_")} -`;
   if (format === "json") return `${header} ${JSON.stringify(payload)}`;
-  const ext = Object.entries({ rt: now.getTime(), cs1Label: "tenant", cs1: String(payload.tenantId ?? ""), ...flatten(data) })
+  const ext = Object.entries({ rt: at.getTime(), cs1Label: "tenant", cs1: String(payload.tenantId ?? ""), cs2Label: "deliveredAt", cs2: deliveredAt.toISOString(), ...flatten(data) })
     .map(([k, v]) => `${k}=${cefEscape(String(v))}`)
     .join(" ");
   return `${header} CEF:0|Cyclowareness|Portal|1.0|${cefEscape(event, true)}|${cefEscape(event, true)}|${sev}|${ext}`;
@@ -187,6 +264,10 @@ function sendSyslog(host: string, port: number, transport: "tls" | "tcp" | "udp"
 /**
  * Once a day the TXT record of every proven domain is resolved again. The domain stays either way;
  * the first missing day is remembered and after 7 days without the record the proof is removed.
+ * Only the check's own identity keys are written, in one statement, so a settings save made during
+ * the DNS lookup is kept. The statement only applies when the row is still as it was read: a domain
+ * changed, force-proven or verified again (both verify actions write domainCheckedAt or
+ * domainCheckFailingSince) in the meantime is left alone until the next tick.
  */
 async function recheckDomains(db: DB, now: Date): Promise<number> {
   const tenants = await db
@@ -195,26 +276,33 @@ async function recheckDomains(db: DB, now: Date): Promise<number> {
     .where(and(isNotNull(t.tenants.domain), isNotNull(t.tenants.domainVerifiedAt)));
   let checked = 0;
   for (const tenant of tenants) {
-    const identity = tenant.settings.identity;
+    const identity = withDefaults(tenant.settings).identity;
     const last = identity.domainCheckedAt ? Date.parse(identity.domainCheckedAt) : 0;
     if (!tenant.domain || identity.domainProofForced || now.getTime() - last < DAY) continue;
     const found = await domainProofFound(tenant.domain, domainProofRecord(tenant.id, env.secret));
     const wasFailing = !!identity.domainCheckFailingSince;
     const failingSince = found ? null : (identity.domainCheckFailingSince ?? now.toISOString());
     const removed = !!failingSince && now.getTime() - Date.parse(failingSince) >= DOMAIN_PROOF_GRACE_DAYS * DAY;
-    const settings = structuredClone(tenant.settings);
-    if (removed) {
-      delete settings.identity.domainCheckedAt;
-      delete settings.identity.domainCheckFailingSince;
-    } else {
-      settings.identity.domainCheckedAt = now.toISOString();
-      if (failingSince) settings.identity.domainCheckFailingSince = failingSince;
-      else delete settings.identity.domainCheckFailingSince;
-    }
-    await db
+    const current = sql`coalesce(${t.tenants.settings} -> 'identity', '{}'::jsonb)`;
+    const patched = removed
+      ? sql`jsonb_set(${t.tenants.settings}, '{identity}', ${current} - 'domainCheckedAt' - 'domainCheckFailingSince')`
+      : sql`jsonb_set(${t.tenants.settings}, '{identity}', (${current} - 'domainCheckFailingSince') || ${JSON.stringify({ domainCheckedAt: now.toISOString(), ...(failingSince ? { domainCheckFailingSince: failingSince } : {}) })}::jsonb)`;
+    const updated = await db
       .update(t.tenants)
-      .set({ settings, ...(removed ? { domainVerifiedAt: null } : {}) })
-      .where(eq(t.tenants.id, tenant.id));
+      .set({ settings: patched, ...(removed ? { domainVerifiedAt: null } : {}) })
+      .where(
+        and(
+          eq(t.tenants.id, tenant.id),
+          eq(t.tenants.domain, tenant.domain),
+          isNotNull(t.tenants.domainVerifiedAt),
+          sql`coalesce((${t.tenants.settings} -> 'identity' ->> 'domainProofForced')::boolean, false) = false`,
+          // The values the decision was made from (compared as stored strings).
+          sql`${t.tenants.settings} -> 'identity' ->> 'domainCheckFailingSince' is not distinct from ${identity.domainCheckFailingSince ?? null}::text`,
+          sql`${t.tenants.settings} -> 'identity' ->> 'domainCheckedAt' is not distinct from ${identity.domainCheckedAt ?? null}::text`,
+        ),
+      )
+      .returning({ id: t.tenants.id });
+    if (!updated.length) continue;
     // One entry when the record goes missing, one when it is back, one when the proof is removed.
     if (removed || found === wasFailing) {
       await audit(db, {
@@ -228,6 +316,58 @@ async function recheckDomains(db: DB, now: Date): Promise<number> {
     checked++;
   }
   return checked;
+}
+
+/* ───────── retention ───────── */
+
+const CLEANUP_BATCH = 5_000;
+
+declare global {
+  var __jobsCleanupDay: string | undefined;
+}
+
+/** Deletes up to CLEANUP_BATCH rows per call (bounded statements), repeating while full batches come back and time is left. */
+async function deleteInBatches(db: DB, table: PgTable, key: PgColumn, where: ReturnType<typeof and>, deadline: number): Promise<number> {
+  let total = 0;
+  for (;;) {
+    const ids = db.select({ id: key }).from(table).where(where).limit(CLEANUP_BATCH);
+    const gone = await db.delete(table).where(inArray(key, ids)).returning({ id: key });
+    total += gone.length;
+    if (gone.length < CLEANUP_BATCH || Date.now() > deadline) return total;
+  }
+}
+
+/**
+ * Once a day per process: sign-in attempts past every lockout window, ended rate-limit windows,
+ * expired sessions and sign-in links, watermark codes of ended sessions after 90 days, delivered or
+ * finished mail and integration deliveries after 90 days, and read notifications after 400 days
+ * (the reminder history needs a year).
+ */
+async function cleanup(db: DB, now: Date): Promise<number> {
+  const day = dayKey(now);
+  if (globalThis.__jobsCleanupDay === day) return 0;
+  const deadline = Date.now() + 30_000;
+  const ago = (ms: number) => new Date(now.getTime() - ms);
+  let total = 0;
+  total += await deleteInBatches(db, t.loginAttempts, t.loginAttempts.id, and(lt(t.loginAttempts.at, ago(2 * DAY))), deadline);
+  // Rate-limit windows that have ended (none is longer than RATE_LIMIT_MAX_WINDOW_MS). Batched by
+  // window start: every row with an old window start is old, so the batch never reaches a live window.
+  total += await deleteInBatches(db, t.rateLimitBuckets, t.rateLimitBuckets.windowStart, and(lt(t.rateLimitBuckets.windowStart, ago(RATE_LIMIT_MAX_WINDOW_MS))), deadline);
+  total += await deleteInBatches(db, t.sessions, t.sessions.id, and(lt(t.sessions.expiresAt, now)), deadline);
+  total += await deleteInBatches(db, t.authTokens, t.authTokens.id, and(lt(t.authTokens.expiresAt, ago(DAY))), deadline);
+  total += await deleteInBatches(
+    db,
+    t.watermarkCodes,
+    t.watermarkCodes.code,
+    and(lt(t.watermarkCodes.createdAt, ago(90 * DAY)), or(isNull(t.watermarkCodes.sessionId), notInArray(t.watermarkCodes.sessionId, db.select({ id: t.sessions.id }).from(t.sessions)))),
+    deadline,
+  );
+  total += await deleteInBatches(db, t.outbox, t.outbox.id, and(inArray(t.outbox.status, ["sent", "logged", "failed"]), lt(t.outbox.createdAt, ago(90 * DAY))), deadline);
+  total += await deleteInBatches(db, t.webhookDeliveries, t.webhookDeliveries.id, and(inArray(t.webhookDeliveries.status, ["delivered", "failed"]), lt(t.webhookDeliveries.createdAt, ago(90 * DAY))), deadline);
+  total += await deleteInBatches(db, t.notifications, t.notifications.id, and(isNotNull(t.notifications.readAt), lt(t.notifications.createdAt, ago(400 * DAY))), deadline);
+  // Done for today only when everything fit in the time budget; otherwise the next tick continues.
+  if (Date.now() <= deadline) globalThis.__jobsCleanupDay = day;
+  return total;
 }
 
 /* ───────── daily risk snapshot ───────── */
@@ -256,42 +396,64 @@ async function dailySnapshot(db: DB, tenantId: string, now: Date): Promise<numbe
 
 type TenantLite = { id: string; name: string; settings: TenantSettings; branding: { primary: string } };
 
-/** First reminder N days after assignment, urgent reminder N hours before the due date, overdue notice. */
+/**
+ * First reminder N days after the person was assigned (the assignment's date, or the day they
+ * joined when that is later), urgent reminder N hours before the due date, overdue notice.
+ */
 async function reminders(db: DB, tenant: TenantLite, now: Date): Promise<number> {
   const n = tenant.settings.notifications;
   const assigned = await resolveAssignments(db, tenant.id);
-  type Pending = { userId: string; moduleId: string; assignmentId: string; due: string | null };
+  type Pending = { userId: string; moduleId: string; since: Date; due: string | null };
   const byKey = new Map<string, Pending>();
-  for (const [userId, mods] of assigned) for (const m of mods.values()) byKey.set(`${userId}:${m.moduleId}`, { userId, moduleId: m.moduleId, assignmentId: m.assignmentId, due: m.due });
+  for (const [userId, mods] of assigned) for (const m of mods.values()) byKey.set(`${userId}:${m.moduleId}`, { userId, moduleId: m.moduleId, since: m.assignedAt, due: m.due });
   // Targeted training (incident, approved material, refresher) lives in behaviour risks, not assignments;
   // a person with both for the same module is listed once, with the earlier due date.
   const risks = await db
-    .select({ id: t.behaviorRisks.id, userId: t.behaviorRisks.userId, moduleId: t.behaviorRisks.moduleId, dueDate: t.behaviorRisks.dueDate, createdAt: t.behaviorRisks.createdAt })
+    .select({ userId: t.behaviorRisks.userId, moduleId: t.behaviorRisks.moduleId, dueDate: t.behaviorRisks.dueDate, createdAt: t.behaviorRisks.createdAt })
     .from(t.behaviorRisks)
     .where(and(eq(t.behaviorRisks.tenantId, tenant.id), eq(t.behaviorRisks.status, "open"), isNotNull(t.behaviorRisks.moduleId)));
-  const riskCreated = new Map<string, Date>();
   for (const r of risks) {
     if (!r.moduleId) continue;
-    riskCreated.set(r.id, r.createdAt);
     const key = `${r.userId}:${r.moduleId}`;
     const prev = byKey.get(key);
-    if (!prev || (r.dueDate && (!prev.due || r.dueDate < prev.due))) byKey.set(key, { userId: r.userId, moduleId: r.moduleId, assignmentId: r.id, due: r.dueDate });
+    if (!prev || (r.dueDate && (!prev.due || r.dueDate < prev.due))) byKey.set(key, { userId: r.userId, moduleId: r.moduleId, since: r.createdAt, due: r.dueDate });
   }
-  const pending = [...byKey.values()];
-  if (!pending.length) return 0;
-  const userIds = [...new Set(pending.map((p) => p.userId))];
-  const [done, mods, assignments, sent] = await Promise.all([
-    db.select({ userId: t.moduleProgress.userId, moduleId: t.moduleProgress.moduleId }).from(t.moduleProgress).where(and(inArray(t.moduleProgress.userId, userIds), eq(t.moduleProgress.status, "completed"))),
-    db.select({ id: t.modules.id, slug: t.modules.slug, title: t.modules.title }).from(t.modules),
-    db.select({ id: t.assignments.id, createdAt: t.assignments.createdAt }).from(t.assignments).where(eq(t.assignments.tenantId, tenant.id)),
+  if (!byKey.size) return 0;
+  const userIds = [...new Set([...byKey.values()].map((p) => p.userId))];
+  const moduleIds = [...new Set([...byKey.values()].map((p) => p.moduleId))];
+  const [done, mods] = await Promise.all([
     db
-      .select({ userId: t.notifications.userId, kind: t.notifications.kind, href: t.notifications.href, createdAt: t.notifications.createdAt })
-      .from(t.notifications)
-      .where(and(eq(t.notifications.tenantId, tenant.id), inArray(t.notifications.kind, ["reminder", "overdue", "assignment"]), gte(t.notifications.createdAt, new Date(now.getTime() - 400 * DAY)))),
+      .select({ userId: t.moduleProgress.userId, moduleId: t.moduleProgress.moduleId })
+      .from(t.moduleProgress)
+      .where(and(inArray(t.moduleProgress.userId, userIds), inArray(t.moduleProgress.moduleId, moduleIds), eq(t.moduleProgress.status, "completed"))),
+    db.select({ id: t.modules.id, slug: t.modules.slug, title: t.modules.title }).from(t.modules).where(inArray(t.modules.id, moduleIds)),
   ]);
   const doneSet = new Set(done.map((d) => `${d.userId}:${d.moduleId}`));
   const modById = new Map(mods.map((m) => [m.id, m]));
-  const assignedAt = new Map<string, Date>([...assignments.map((a) => [a.id, a.createdAt] as const), ...riskCreated]);
+  const pending = [...byKey.values()].filter((p) => !doneSet.has(`${p.userId}:${p.moduleId}`) && modById.has(p.moduleId));
+  if (!pending.length) return 0;
+  // History of the notices that can still matter: since the earliest assignment or urgent window
+  // among the open items (at most 400 days), for these people and modules only.
+  let earliest = now.getTime();
+  for (const p of pending) {
+    earliest = Math.min(earliest, p.since.getTime());
+    if (p.due) earliest = Math.min(earliest, dueEnd(p.due).getTime() - n.urgentReminderHours * HOUR);
+  }
+  const hrefs = [...new Set(pending.map((p) => `/learn/${modById.get(p.moduleId)!.slug}`))];
+  const pendingUsers = [...new Set(pending.map((p) => p.userId))];
+  const sent = await db
+    .select({ userId: t.notifications.userId, kind: t.notifications.kind, href: t.notifications.href, createdAt: t.notifications.createdAt })
+    .from(t.notifications)
+    .where(
+      and(
+        eq(t.notifications.tenantId, tenant.id),
+        inArray(t.notifications.kind, ["reminder", "overdue", "assignment"]),
+        inArray(t.notifications.href, hrefs),
+        // Very large audiences skip the per-person filter (bind parameter limits); the time window still applies.
+        pendingUsers.length <= 5_000 ? inArray(t.notifications.userId, pendingUsers) : undefined,
+        gte(t.notifications.createdAt, new Date(Math.max(earliest, now.getTime() - 400 * DAY))),
+      ),
+    );
   const sentBy = new Map<string, { kind: string; at: Date }[]>();
   for (const s of sent) {
     const key = `${s.userId}:${s.href}`;
@@ -299,21 +461,17 @@ async function reminders(db: DB, tenant: TenantLite, now: Date): Promise<number>
   }
   const groups = new Map<string, string[]>(); // `${kind}|${moduleId}|${due}` → users
   for (const p of pending) {
-    if (doneSet.has(`${p.userId}:${p.moduleId}`)) continue;
-    const mod = modById.get(p.moduleId);
-    if (!mod) continue;
-    const href = `/learn/${mod.slug}`;
-    const history = sentBy.get(`${p.userId}:${href}`) ?? [];
+    const mod = modById.get(p.moduleId)!;
+    const history = sentBy.get(`${p.userId}:/learn/${mod.slug}`) ?? [];
     const since = (at: Date) => history.filter((h) => h.at >= at);
-    const created = assignedAt.get(p.assignmentId) ?? now;
-    const dueAt = p.due ? new Date(`${p.due}T23:59:59+04:00`) : null;
+    const dueAt = p.due ? dueEnd(p.due) : null;
     let kind: "reminder" | "overdue" | null = null;
     if (dueAt && now > dueAt) {
       if (n.overdueNotice && !since(dueAt).some((h) => h.kind === "overdue")) kind = "overdue";
     } else if (dueAt && dueAt.getTime() - now.getTime() <= n.urgentReminderHours * HOUR) {
       if (!since(new Date(dueAt.getTime() - n.urgentReminderHours * HOUR)).some((h) => h.kind === "reminder")) kind = "reminder";
-    } else if (now.getTime() - created.getTime() >= n.firstReminderDays * DAY) {
-      if (!since(created).some((h) => h.kind === "reminder")) kind = "reminder";
+    } else if (now.getTime() - p.since.getTime() >= n.firstReminderDays * DAY) {
+      if (!since(p.since).some((h) => h.kind === "reminder")) kind = "reminder";
     }
     if (!kind) continue;
     const key = `${kind}|${p.moduleId}|${p.due ?? ""}`;
@@ -323,8 +481,10 @@ async function reminders(db: DB, tenant: TenantLite, now: Date): Promise<number>
   for (const [key, users] of groups) {
     const [kind, moduleId, due] = key.split("|");
     const mod = modById.get(moduleId)!;
-    const title = pick(mod.title, tenant.settings.defaultLocale);
-    count += await notifyUsers(db, tenant.id, users, kind as "reminder", { module: title, dueDate: due || undefined, link: `/learn/${mod.slug}` }, { title, href: `/learn/${mod.slug}` });
+    // The module title in each recipient's language.
+    const title = (locale: string) => pick(mod.title, locale);
+    // Deferred like all mail created inside the tick: retryQueued sends it with its time budget and per-server back-off.
+    count += await notifyUsers(db, tenant.id, users, kind as "reminder", { module: title, dueDate: due || undefined, link: `/learn/${mod.slug}` }, { title, href: `/learn/${mod.slug}` }, { defer: true });
   }
   return count;
 }
@@ -337,21 +497,35 @@ const MANAGER_REASON: Record<string, (n: number) => string> = {
   ru: (n) => `${n} рискованных действия в симуляциях за 30 дней`,
 };
 
-/** Tells department heads when someone in their team keeps failing simulations. At most weekly per person. */
+const OVERDUE_REASON: Record<string, (n: number, days: number) => string> = {
+  az: (n, days) => `${n} təlimin son tarixi ${days} gündən çoxdur ki, keçib`,
+  en: (n, days) => (n === 1 ? `1 training is more than ${days} days overdue` : `${n} trainings are more than ${days} days overdue`),
+  ru: (n, days) => {
+    const form = new Intl.PluralRules("ru").select(n);
+    const noun = form === "one" ? "обучение просрочено" : form === "few" ? "обучения просрочены" : "обучений просрочено";
+    return `${n} ${noun} более чем на ${days} дн.`;
+  },
+};
+
+const reasonIn = <A extends unknown[]>(table: Record<string, (...args: A) => string>, ...args: A) => (locale: string) => (table[locale] ?? table.en)(...args);
+
+/**
+ * Tells department heads when someone in their team keeps failing simulations, or is more than
+ * Settings → Notifications "overdue for N days" late with assigned training. At most weekly per
+ * person and reason; the reason is written in the head's language.
+ */
 async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<number> {
   const n = tenant.settings.notifications;
   if (!n.managerAlerts) return 0;
   const since = new Date(now.getTime() - 30 * DAY);
-  const failed = await db
-    .select({ userId: t.campaignRecipients.userId, n: sql<number>`count(*)` })
-    .from(t.campaignRecipients)
-    .innerJoin(t.campaigns, eq(t.campaigns.id, t.campaignRecipients.campaignId))
-    .where(and(eq(t.campaigns.tenantId, tenant.id), gte(t.campaignRecipients.sentAt, since), or(isNotNull(t.campaignRecipients.clickedAt), isNotNull(t.campaignRecipients.submittedAt))))
-    .groupBy(t.campaignRecipients.userId);
-  const flagged = failed.filter((f) => Number(f.n) >= n.failedSimulations);
-  if (!flagged.length) return 0;
-  const [people, departments, recent] = await Promise.all([
-    db.select({ id: t.users.id, name: t.users.name, departmentId: t.users.departmentId }).from(t.users).where(and(eq(t.users.tenantId, tenant.id), inArray(t.users.id, flagged.map((f) => f.userId)), eq(t.users.status, "active"))),
+  const [failed, people, departments, recent] = await Promise.all([
+    db
+      .select({ userId: t.campaignRecipients.userId, n: sql<number>`count(*)` })
+      .from(t.campaignRecipients)
+      .innerJoin(t.campaigns, eq(t.campaigns.id, t.campaignRecipients.campaignId))
+      .where(and(eq(t.campaigns.tenantId, tenant.id), gte(t.campaignRecipients.sentAt, since), or(isNotNull(t.campaignRecipients.clickedAt), isNotNull(t.campaignRecipients.submittedAt))))
+      .groupBy(t.campaignRecipients.userId),
+    db.select({ id: t.users.id, name: t.users.name, departmentId: t.users.departmentId }).from(t.users).where(and(eq(t.users.tenantId, tenant.id), eq(t.users.status, "active"), isNotNull(t.users.departmentId))),
     db.select({ id: t.departments.id, headUserId: t.departments.headUserId }).from(t.departments).where(eq(t.departments.tenantId, tenant.id)),
     db
       .select({ href: t.notifications.href })
@@ -360,14 +534,40 @@ async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<num
   ]);
   const alerted = new Set(recent.map((r) => r.href));
   const headOf = new Map(departments.map((d) => [d.id, d.headUserId]));
+  const failedBy = new Map(failed.filter((f) => Number(f.n) >= n.failedSimulations).map((f) => [f.userId, Number(f.n)]));
+
+  // Assigned training whose due date passed more than overdueDays ago and is still not completed.
+  const overdueBy = new Map<string, number>();
+  const assigned = await resolveAssignments(db, tenant.id);
+  const overdue: { userId: string; moduleId: string }[] = [];
+  for (const [userId, mods] of assigned) {
+    for (const m of mods.values()) if (m.due && now.getTime() - dueEnd(m.due).getTime() > n.overdueDays * DAY) overdue.push({ userId, moduleId: m.moduleId });
+  }
+  if (overdue.length) {
+    const done = await db
+      .select({ userId: t.moduleProgress.userId, moduleId: t.moduleProgress.moduleId })
+      .from(t.moduleProgress)
+      .where(and(inArray(t.moduleProgress.userId, [...new Set(overdue.map((o) => o.userId))]), eq(t.moduleProgress.status, "completed")));
+    const doneSet = new Set(done.map((d) => `${d.userId}:${d.moduleId}`));
+    for (const o of overdue) if (!doneSet.has(`${o.userId}:${o.moduleId}`)) overdueBy.set(o.userId, (overdueBy.get(o.userId) ?? 0) + 1);
+  }
+
   let count = 0;
   for (const p of people) {
     const head = p.departmentId ? headOf.get(p.departmentId) : null;
-    const href = `/admin/users/${p.id}`;
-    if (!head || head === p.id || alerted.has(href)) continue;
-    const times = Number(flagged.find((f) => f.userId === p.id)?.n ?? 0);
-    const reason = (MANAGER_REASON[tenant.settings.defaultLocale] ?? MANAGER_REASON.en)(times);
-    count += await notifyUsers(db, tenant.id, [head], "manager", { person: p.name, reason, link: href }, { title: p.name, body: reason, href });
+    if (!head || head === p.id) continue;
+    const times = failedBy.get(p.id);
+    const failHref = `/admin/users/${p.id}`;
+    if (times && !alerted.has(failHref)) {
+      const reason = reasonIn(MANAGER_REASON, times);
+      count += await notifyUsers(db, tenant.id, [head], "manager", { person: p.name, reason, link: failHref }, { title: p.name, body: reason, href: failHref }, { defer: true });
+    }
+    const late = overdueBy.get(p.id);
+    const lateHref = `/admin/users/${p.id}#training`;
+    if (late && !alerted.has(lateHref)) {
+      const reason = reasonIn(OVERDUE_REASON, late, n.overdueDays);
+      count += await notifyUsers(db, tenant.id, [head], "manager", { person: p.name, reason, link: lateHref }, { title: p.name, body: reason, href: lateHref }, { defer: true });
+    }
   }
   return count;
 }
@@ -376,22 +576,33 @@ async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<num
 
 const REFRESHER_TITLE: Record<string, string> = { az: "Qısa təkrar dərs", en: "Short refresher", ru: "Короткое повторение" };
 
-/** People at or above the risk threshold get one short refresher a month (no penalty, no XP loss). */
+/**
+ * People at or above the risk threshold get one short refresher a month (no penalty, no XP loss):
+ * their next open assigned module, else the phishing module, never one they already completed.
+ * Whoever already got this month's refresher (open or finished) is left alone until next month.
+ */
 async function refreshers(db: DB, tenant: TenantLite, now: Date): Promise<number> {
   const l = tenant.settings.learning;
   if (!l.refresher) return 0;
-  const month = now.toISOString().slice(0, 7);
+  const month = todayInBaku(now).slice(0, 7);
   const ref = `REFRESH-${month}`;
   const risky = await db
     .select({ id: t.users.id })
     .from(t.users)
     .where(and(eq(t.users.tenantId, tenant.id), eq(t.users.status, "active"), ne(t.users.role, "super_admin"), gte(t.users.riskScore, l.riskThreshold)));
   if (!risky.length) return 0;
-  const assigned = await resolveAssignments(db, tenant.id, risky.map((r) => r.id));
+  const already = await db
+    .select({ userId: t.behaviorRisks.userId })
+    .from(t.behaviorRisks)
+    .where(and(eq(t.behaviorRisks.tenantId, tenant.id), eq(t.behaviorRisks.sourceRef, ref)));
+  const hadOne = new Set(already.map((a) => a.userId));
+  const candidates = risky.filter((r) => !hadOne.has(r.id));
+  if (!candidates.length) return 0;
+  const assigned = await resolveAssignments(db, tenant.id, candidates.map((r) => r.id));
   const completed = await db
     .select({ userId: t.moduleProgress.userId, moduleId: t.moduleProgress.moduleId })
     .from(t.moduleProgress)
-    .where(and(inArray(t.moduleProgress.userId, risky.map((r) => r.id)), eq(t.moduleProgress.status, "completed")));
+    .where(and(inArray(t.moduleProgress.userId, candidates.map((r) => r.id)), eq(t.moduleProgress.status, "completed")));
   const doneSet = new Set(completed.map((c) => `${c.userId}:${c.moduleId}`));
   // The organisation's own copy of the phishing module wins over the library one.
   const fallbacks = await db
@@ -400,9 +611,9 @@ async function refreshers(db: DB, tenant: TenantLite, now: Date): Promise<number
     .where(and(eq(t.modules.slug, "phishing-email"), eq(t.modules.status, "published"), or(isNull(t.modules.tenantId), eq(t.modules.tenantId, tenant.id))));
   const fallback = fallbacks.find((m) => m.tenantId === tenant.id) ?? fallbacks[0];
   const byModule = new Map<string, string[]>();
-  for (const r of risky) {
+  for (const r of candidates) {
     const open = [...(assigned.get(r.id)?.values() ?? [])].filter((m) => !doneSet.has(`${r.id}:${m.moduleId}`)).sort((a, b) => (a.due ?? "9999").localeCompare(b.due ?? "9999"));
-    const moduleId = open[0]?.moduleId ?? fallback?.id;
+    const moduleId = open[0]?.moduleId ?? (fallback && !doneSet.has(`${r.id}:${fallback.id}`) ? fallback.id : undefined);
     if (!moduleId) continue;
     byModule.set(moduleId, [...(byModule.get(moduleId) ?? []), r.id]);
   }
@@ -414,9 +625,9 @@ async function refreshers(db: DB, tenant: TenantLite, now: Date): Promise<number
       moduleId,
       severity: "medium",
       kind: "path",
-      title: REFRESHER_TITLE[tenant.settings.defaultLocale] ?? REFRESHER_TITLE.en,
+      title: (locale) => REFRESHER_TITLE[locale] ?? REFRESHER_TITLE.en,
       sourceRef: ref,
-      dueDate: new Date(now.getTime() + 14 * DAY).toISOString().slice(0, 10),
+      dueDate: bakuDayPlus(14, now),
     });
     count += got.length;
   }
@@ -448,14 +659,14 @@ async function scheduledReports(db: DB, tenant: TenantLite, now: Date): Promise<
     const dueToday = s.frequency === "weekly" ? weekday === s.day : local.getDate() === s.day;
     const minGap = s.frequency === "weekly" ? 6 * DAY : 27 * DAY;
     if (!dueToday || local.getHours() < 8 || (s.lastSentAt && now.getTime() - s.lastSentAt.getTime() < minGap)) continue;
-    const from = new Date(now.getTime() - (s.frequency === "weekly" ? 7 : 30) * DAY).toISOString().slice(0, 10);
-    const to = now.toISOString().slice(0, 10);
+    const from = bakuDayPlus(-(s.frequency === "weekly" ? 7 : 30), now);
+    const to = todayInBaku(now);
     const lang = tenant.settings.defaultLocale in REPORT_MAIL ? tenant.settings.defaultLocale : "en";
     const name = REPORT_NAMES[lang][s.kind] ?? s.kind;
-    const link = `${APP_URL()}/api/admin/reports/${s.kind}?format=${s.format}&from=${from}&to=${to}${s.departmentId ? `&d=${s.departmentId}` : ""}`;
+    const link = `${appUrl()}/api/admin/reports/${s.kind}?format=${s.format}&from=${from}&to=${to}${s.departmentId ? `&d=${s.departmentId}` : ""}`;
     for (const recipient of s.recipients) {
       const text = REPORT_MAIL[lang].body(name, link);
-      await queueEmail(db, tenant.id, { to: recipient, subject: REPORT_MAIL[lang].subject(name), text, html: renderEmailHtml(text, { brand: tenant.branding.primary, footer: tenant.name }), kind: "report" });
+      await queueEmail(db, tenant.id, { to: recipient, subject: REPORT_MAIL[lang].subject(name), text, html: renderEmailHtml(text, { brand: tenant.branding.primary, footer: tenant.name }), kind: "report" }, { defer: true });
       count++;
     }
     await db.update(t.reportSchedules).set({ lastSentAt: now }).where(eq(t.reportSchedules.id, s.id));

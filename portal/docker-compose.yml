@@ -1,7 +1,10 @@
 # Production-style stack: PostgreSQL 16 + the portal image.
-#   1. cp .env.example .env   and set APP_SECRET (32+ random characters), APP_URL, TRUST_PROXY=1 behind a proxy
+#   1. cp .env.example .env   and set APP_SECRET (32+ random characters), APP_URL, TRUST_PROXY=1
+#      behind a proxy and, for a new installation, BOOTSTRAP_OPERATOR_EMAIL
 #   2. docker compose up -d --build
-#   3. (optional, wipes the database) docker compose --profile tools run --rm seed
+#   3. docker compose logs app   shows the one-time invitation link of the platform operator
+# The app imports the lesson library on every start (idempotent, progress is kept). The demo
+# organisation is optional and only for throwaway stacks: docker compose --profile tools run --rm seed
 # Values come from .env (both as interpolation source and env_file); DATABASE_URL always points at "db".
 
 services:
@@ -31,16 +34,45 @@ services:
         required: false
     environment:
       DATABASE_URL: postgres://portal:${POSTGRES_PASSWORD:-portal}@db:5432/portal
-      APP_URL: ${APP_URL:-http://localhost:3000}
+      APP_URL: ${APP_URL:?set APP_URL in .env to the public https:// address}
       APP_SECRET: ${APP_SECRET:?set APP_SECRET in .env (32+ random characters)}
       JOBS_ENABLED: ${JOBS_ENABLED:-1}
-      # 1 when nginx, Caddy or Traefik terminates TLS in front and sets X-Forwarded-For.
-      TRUST_PROXY: ${TRUST_PROXY:-0}
+      # Number of proxies in front that append to X-Forwarded-For. The app is published on loopback for
+      # one TLS proxy on this host (nginx, Caddy, Traefik), so 1 is the default; set 0 only without a proxy.
+      TRUST_PROXY: ${TRUST_PROXY:-1}
+    # The container's healthcheck (Dockerfile) calls /api/health, which needs the database.
     ports:
-      - "3000:3000"
+      # Loopback only: the TLS proxy on this host forwards to it, and plain HTTP is not reachable from
+      # outside (Docker-published ports bypass ufw/firewalld). Use "3000:3000" only to expose it on purpose.
+      - "127.0.0.1:3000:3000"
 
-  # Demo organisation loader. Built from the builder stage because the seed is TypeScript and uses
-  # the app's own services. It truncates every table first, so never point it at real data.
+  # Background worker for stacks that run the app with JOBS_ENABLED=0 (several app replicas, or jobs
+  # kept apart from web traffic): docker compose --profile worker up -d worker
+  worker:
+    profiles: [worker]
+    build:
+      context: .
+      target: builder
+    restart: unless-stopped
+    # On SIGTERM the worker finishes the tick in progress (each delivery step stops after 20 s) before
+    # it exits; the default 10 s would kill it between sending a message and recording it.
+    stop_grace_period: 90s
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://portal:${POSTGRES_PASSWORD:-portal}@db:5432/portal
+      APP_URL: ${APP_URL:?set APP_URL in .env to the public https:// address}
+      APP_SECRET: ${APP_SECRET:?set APP_SECRET in .env (32+ random characters)}
+    command: ["npm", "run", "jobs"]
+
+  # Demo organisation loader (fictional "Safarov Industries" with ~37 accounts sharing SEED_PASSWORD).
+  # It TRUNCATES EVERY TABLE first: only for a fresh or throwaway stack, never for customer data.
+  # Built from the builder stage because the seed is TypeScript and uses the app's own services.
   seed:
     profiles: [tools]
     build:
@@ -56,6 +88,8 @@ services:
       DATABASE_URL: postgres://portal:${POSTGRES_PASSWORD:-portal}@db:5432/portal
       APP_URL: ${APP_URL:-http://localhost:3000}
       APP_SECRET: ${APP_SECRET:?set APP_SECRET in .env (32+ random characters)}
+      # The seed refuses to touch a DATABASE_URL without it.
+      ALLOW_SEED: "1"
     command: ["npx", "tsx", "scripts/seed.ts"]
 
 volumes:

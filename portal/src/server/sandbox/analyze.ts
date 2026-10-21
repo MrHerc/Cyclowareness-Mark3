@@ -480,7 +480,8 @@ export function toStix(a: Pick<Analysis, "objectName" | "verdict" | "iocs" | "mi
         pattern: p,
         pattern_type: "stix",
         valid_from: now,
-        labels: a.mitre,
+        // STIX 2.1 forbids empty lists, so a clean analysis (no techniques) omits labels entirely.
+        ...(a.mitre.length ? { labels: a.mitre } : {}),
       },
     ];
   });

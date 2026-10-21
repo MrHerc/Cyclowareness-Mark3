@@ -40,7 +40,9 @@ export type LandingCopy = {
     | "socialLabel"
     | "regNoLabel"
     | "partnersLabel"
-    | "testimonialsLabel",
+    | "testimonialsLabel"
+    | "privacy"
+    | "terms",
     string
   >;
   hero: { question: string; sub: string; start: string; demo: string };
@@ -145,7 +147,7 @@ export type DemoScene = {
   consentVersion: string;
   submit: string;
   sending: string;
-  errors: Record<"required" | "email" | "rateLimited" | "failed", string>;
+  errors: Record<"required" | "email" | "consent" | "rateLimited" | "failed", string>;
   invite: Line;
   success: Line;
 };

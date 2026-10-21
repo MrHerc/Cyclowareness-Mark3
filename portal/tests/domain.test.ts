@@ -556,17 +556,26 @@ describe("withTrend", () => {
 
 describe("daysLeftInMonth", () => {
   it("counts today", () => {
-    expect(daysLeftInMonth(new Date(2026, 0, 1))).toBe(31);
-    expect(daysLeftInMonth(new Date(2026, 0, 31))).toBe(1);
+    expect(daysLeftInMonth(new Date("2026-01-01T12:00:00+04:00"))).toBe(31);
+    expect(daysLeftInMonth(new Date("2026-01-31T12:00:00+04:00"))).toBe(1);
   });
 
   it("knows the length of February", () => {
-    expect(daysLeftInMonth(new Date(2026, 1, 15))).toBe(14);
-    expect(daysLeftInMonth(new Date(2024, 1, 1))).toBe(29);
+    expect(daysLeftInMonth(new Date("2026-02-15T12:00:00+04:00"))).toBe(14);
+    expect(daysLeftInMonth(new Date("2024-02-01T12:00:00+04:00"))).toBe(29);
   });
 
   it("handles 30-day months", () => {
-    expect(daysLeftInMonth(new Date(2026, 3, 29))).toBe(2);
+    expect(daysLeftInMonth(new Date("2026-04-29T12:00:00+04:00"))).toBe(2);
+  });
+
+  it("counts the Baku month, not the server's (UTC) one", () => {
+    // 21:30 UTC on 31 October is 01:30 on 1 November in Baku: a fresh 30-day month, not "1 day left".
+    expect(daysLeftInMonth(new Date("2026-10-31T21:30:00Z"))).toBe(30);
+    // 19:30 UTC is still 23:30 on 31 October in Baku.
+    expect(daysLeftInMonth(new Date("2026-10-31T19:30:00Z"))).toBe(1);
+    // The year rolls over in Baku four hours before UTC.
+    expect(daysLeftInMonth(new Date("2026-12-31T20:00:00Z"))).toBe(31);
   });
 });
 

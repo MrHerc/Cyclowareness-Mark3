@@ -1,14 +1,17 @@
-import Link from "next/link";
 import { getFormatter, getTranslations } from "next-intl/server";
-import { ArrowLeft, CalendarDays, Minus } from "lucide-react";
+import { CalendarDays, Trophy } from "lucide-react";
 import { db } from "@/server/db";
-import { requirePermission } from "@/server/auth/viewer";
+import { allowed, requirePermission } from "@/server/auth/viewer";
 import { departmentLeague } from "@/server/services/league";
+import { Card } from "@/components/ui/card";
+import { ButtonLink } from "@/components/ui/button";
+import { BackLink, EmptyState } from "@/components/ui/layout";
 import { Pill } from "@/components/ui/pill";
 import { ProgressBar } from "@/components/ui/progress";
 import { daysLeftInMonth } from "@/lib/domain/league";
 import { FullscreenButton } from "@/components/admin/fullscreen-button";
 import { cn } from "@/lib/cn";
+import { TrendMark } from "@/app/(learner)/league/trend";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.league");
@@ -17,11 +20,11 @@ export async function generateMetadata() {
 
 export default async function AdminLeague() {
   const v = await requirePermission("league.read");
-  const [tr, tc, format] = await Promise.all([getTranslations("admin.league"), getTranslations("common"), getFormatter()]);
+  const [tr, tl, tc, format] = await Promise.all([getTranslations("admin.league"), getTranslations("learner.league"), getTranslations("common"), getFormatter()]);
   const rows = await departmentLeague(db(), v.tenant.id);
   const now = new Date();
   return (
-    <div id="league-board" className="grid gap-6 bg-canvas">
+    <div id="league-board" className="grid grid-cols-[minmax(0,1fr)] gap-6 bg-canvas">
       <div className="grid gap-3">
         <div>
           <h1 className="text-headline font-bold">{tr("title")}</h1>
@@ -38,27 +41,39 @@ export default async function AdminLeague() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Link href="/admin" className="inline-flex items-center gap-1 px-1 text-caption font-semibold text-brand-700 hover:text-brand-900">
-            <ArrowLeft className="size-4" />
+          <BackLink href="/admin" className="px-1">
             {tr("back")}
-          </Link>
+          </BackLink>
           <FullscreenButton label={tr("fullscreen")} target="league-board" />
         </div>
       </div>
-      <ol className="grid gap-4">
-        {rows.map((r) => (
-          <li key={r.id} className={cn("flex items-center gap-5 rounded-2xl border bg-surface p-5 shadow-raised sm:gap-8 sm:p-7", r.place === 1 ? "border-reward-400 ring-4 ring-reward-200" : "border-line")}>
-            <span className={cn("grid size-16 shrink-0 place-items-center rounded-full font-display text-title font-bold sm:size-20 sm:text-headline", r.place === 1 ? "bg-reward-500 text-(--accent-on)" : r.place <= 3 ? "bg-brand-600 text-brand-on" : "bg-sunken text-ink-muted")}>{r.place}</span>
-            <div className="min-w-0 flex-1">
-              <p className="truncate font-display text-title font-bold sm:text-headline">{r.name}</p>
-              <p className="text-body text-ink-muted">{tr("learners", { count: r.learners })}</p>
-              <ProgressBar value={r.points} size="lg" tone={r.place === 1 ? "reward" : "brand"} className="mt-3" />
-            </div>
-            <span className="font-display text-display font-bold tabular-nums">{r.points}</span>
-            <Minus className="size-6 text-ink-subtle" aria-hidden />
-          </li>
-        ))}
-      </ol>
+      {rows.length === 0 ? (
+        <Card>
+          <EmptyState
+            icon={<Trophy />}
+            title={tr("empty")}
+            body={tr("emptyBody")}
+            action={allowed(v, "departments.write") ? <ButtonLink href="/admin/departments">{tr("toDepartments")}</ButtonLink> : null}
+          />
+        </Card>
+      ) : (
+        <ol className="grid grid-cols-[minmax(0,1fr)] gap-4">
+          {rows.map((r) => (
+            <li key={r.id} className={cn("flex items-center gap-3 rounded-2xl border bg-surface p-4 shadow-raised sm:gap-8 sm:p-7", r.place === 1 ? "border-reward-400 ring-4 ring-reward-200" : "border-line")}>
+              <span className={cn("grid size-12 shrink-0 place-items-center rounded-full font-display text-title font-bold sm:size-20 sm:text-headline", r.place === 1 ? "bg-reward-500 text-(--accent-on)" : r.place <= 3 ? "bg-brand-600 text-brand-on" : "bg-sunken text-ink-muted")}>{r.place}</span>
+              <div className="min-w-0 flex-1">
+                <p className="break-words font-display text-title-sm font-bold sm:truncate sm:text-headline" title={r.name}>
+                  {r.name}
+                </p>
+                <p className="text-body text-ink-muted">{tr("learners", { count: r.learners })}</p>
+                <ProgressBar decorative value={r.points} size="lg" tone={r.place === 1 ? "reward" : "brand"} className="mt-3" />
+              </div>
+              <span className="shrink-0 font-display text-headline font-bold tabular-nums sm:text-display">{r.points}</span>
+              <TrendMark trend={r.trend} label={tl(`trend_${r.trend}`)} className="size-6 [&_svg]:size-5" />
+            </li>
+          ))}
+        </ol>
+      )}
     </div>
   );
 }

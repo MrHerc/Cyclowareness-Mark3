@@ -568,9 +568,10 @@ describe("sso routing", () => {
     expect(decideSignInStep("Ali@AGENCY.gov.az", { ...tenant, domain: "Agency.Gov.AZ" }, learner)).toEqual(sso);
   });
 
-  it("sends unknown people on the domain to the provider only when it may create them", () => {
+  it("sends unknown people on the domain to the provider whether or not it may create them, so the step does not reveal accounts", () => {
     expect(decideSignInStep("new@agency.gov.az", tenant, null)).toEqual(sso);
-    expect(decideSignInStep("new@agency.gov.az", { ...tenant, autoCreate: false }, null)).toEqual(password);
+    expect(decideSignInStep("new@agency.gov.az", { ...tenant, autoCreate: false }, null)).toEqual(sso);
+    expect(decideSignInStep("new@agency.gov.az", { ...tenant, autoCreate: false }, null)).toEqual(decideSignInStep("ali@agency.gov.az", { ...tenant, autoCreate: false }, learner));
   });
 
   it("gives unknown and known people the same answer off the domain, so nothing says whether an account exists", () => {

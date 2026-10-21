@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { and, eq, inArray } from "drizzle-orm";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { FlaskConical, GraduationCap, Inbox, Lock, Siren } from "lucide-react";
-import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
+import { allowed } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
 import { moduleScores } from "@/server/services/secops";
 import { peopleById } from "@/server/queries/secops";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 import { Pill } from "@/components/ui/pill";
 import { PageHeader } from "@/components/ui/layout";
 import { ProgressBar } from "@/components/ui/progress";
@@ -15,6 +15,8 @@ import { CopyText, IncidentControls, IncidentTrainingEditor } from "@/components
 import { formOptions } from "@/server/queries/secops-options";
 import { defang } from "@/lib/defang";
 import { pick } from "@/i18n/config";
+import { bakuDayPlus } from "@/lib/time";
+import { incidentForPage } from "./incident";
 
 const SEV_TONE = { low: "neutral", medium: "warn", high: "risk", critical: "risk" } as const;
 
@@ -24,12 +26,7 @@ export async function generateMetadata() {
 }
 
 export default async function IncidentPage({ params }: PageProps<"/admin/incidents/[id]">) {
-  const v = await requirePermission("secops.read");
-  if (!hasFeature(v, "incidents")) notFound();
-  const { id } = await params;
-  if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
-  const [inc] = await db().select().from(t.incidents).where(and(eq(t.incidents.id, id), eq(t.incidents.tenantId, v.tenant.id)));
-  if (!inc) notFound();
+  const { v, inc } = await incidentForPage((await params).id);
   const locale = await getLocale();
   const [tr, ts, tn, tc, format] = await Promise.all([getTranslations("secops.incidents"), getTranslations("secops"), getTranslations("admin.nav"), getTranslations("common"), getFormatter()]);
   const [mod, sandbox, report, progress, risks, scores] = await Promise.all([
@@ -109,6 +106,7 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
                       modules={options.modules}
                       departments={options.departments}
                       people={options.people}
+                      defaultDue={bakuDayPlus(7)}
                     />
                   ) : null}
                 </span>
@@ -124,7 +122,7 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
                     </span>
                   </div>
                   {!inc.autoTrainingAt ? <p className="text-caption text-ink-muted">{tr("notAssigned")}</p> : null}
-                  <div className="overflow-x-auto">
+                  <ScrollRegion label={tr("trainingProgress")}>
                     <table className="w-full min-w-[34rem] text-left text-caption">
                       <thead className="text-tab text-ink-subtle">
                         <tr className="border-b border-line">
@@ -172,7 +170,7 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
                         })}
                       </tbody>
                     </table>
-                  </div>
+                  </ScrollRegion>
                 </>
               ) : (
                 <p className="text-caption text-ink-muted">{tr("notAssigned")}</p>
@@ -200,7 +198,7 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
               {inc.mitre.length ? (
                 <div className="mt-4 flex flex-wrap gap-1.5">
                   {inc.mitre.map((m) => (
-                    <a key={m} href={`https://attack.mitre.org/techniques/${m.replace(".", "/")}/`} target="_blank" rel="noopener noreferrer" className="rounded-pill bg-ink px-2.5 py-1 font-mono text-tab-sm font-semibold text-white hover:bg-ink/85">
+                    <a key={m} href={`https://attack.mitre.org/techniques/${m.replace(".", "/")}/`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center rounded-pill bg-ink px-2.5 py-1 font-mono text-tab-sm font-semibold text-white hover:bg-ink/85 pointer-coarse:min-h-11 pointer-coarse:px-3.5">
                       {m}
                     </a>
                   ))}

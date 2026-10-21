@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Bell, Check, Circle } from "lucide-react";
 import { hideSetupAction, remindAwaitingAction, skipSetupStepAction } from "@/server/actions/admin-overview";
+import { TextButton, textLinkClass } from "@/components/ui/button";
 import { Select } from "@/components/ui/field";
 import { Ring } from "@/components/ui/progress";
 import { Pill } from "@/components/ui/pill";
@@ -83,12 +84,12 @@ export function SetupGuide({ steps, skipped, canEdit }: { steps: Step[]; skipped
           <p className="text-caption text-ink-muted">{t("setupDone", { done, total: counted.length })}</p>
         </div>
         {canEdit ? (
-          <button type="button" disabled={pending} onClick={() => start(() => hideSetupAction(true))} className="rounded-pill px-3 py-1.5 text-caption font-semibold text-ink-muted hover:bg-sunken">
+          <button type="button" disabled={pending} onClick={() => start(() => hideSetupAction(true))} className="rounded-pill px-3 py-1.5 text-caption font-semibold text-ink-muted hover:bg-sunken pointer-coarse:min-h-11">
             {t("hide")}
           </button>
         ) : null}
       </div>
-      <ul className="mt-5 grid gap-2 md:grid-cols-2">
+      <ul className="mt-5 grid grid-cols-1 gap-2 md:grid-cols-2">
         {steps.map((s) => {
           const isSkipped = skipped.includes(s.key);
           const ok = s.done || isSkipped;
@@ -96,14 +97,14 @@ export function SetupGuide({ steps, skipped, canEdit }: { steps: Step[]; skipped
             <li key={s.key} className={cn("flex items-start gap-3 rounded-lg border p-3.5", ok ? "border-line bg-sunken/50" : "border-line bg-surface")}>
               {ok ? <Check className="mt-0.5 size-5 shrink-0 rounded-full bg-safe-500 p-0.5 text-white" strokeWidth={3} /> : <Circle className="mt-0.5 size-5 shrink-0 text-line-strong" />}
               <div className="min-w-0 flex-1">
-                <Link href={s.href} className={cn("text-body-sm font-semibold hover:underline", ok && "text-ink-muted")}>
+                <Link href={s.href} className={textLinkClass(cn("block text-body-sm font-semibold hover:underline", ok && "text-ink-muted"))}>
                   {t(`setup.${s.key as "people"}.title`)}
                 </Link>
                 <p className="text-tab text-ink-subtle">{t(`setup.${s.key as "people"}.body`)}</p>
                 {s.skippable && !ok && canEdit ? (
-                  <button type="button" onClick={() => start(() => skipSetupStepAction(s.key))} className="mt-1 text-tab font-semibold text-brand-600 hover:underline">
+                  <TextButton size="tab" className="mt-1" disabled={pending} onClick={() => start(() => skipSetupStepAction(s.key))}>
                     {t("markNotNeeded")}
-                  </button>
+                  </TextButton>
                 ) : null}
               </div>
               <Pill tone={s.done ? "safe" : isSkipped ? "neutral" : s.optional ? "neutral" : "warn"}>{s.done ? t("done") : isSkipped ? t("notNeeded") : s.optional ? t("optional") : t("todo")}</Pill>
@@ -125,7 +126,7 @@ export function RemindButton({ moduleId, moduleTitle, count }: { moduleId: strin
       aria-label={t("remindWaiting", { module: moduleTitle })}
       title={t("remindWaiting", { module: moduleTitle })}
       onClick={() => start(async () => toast(t("reminded", { count: (await remindAwaitingAction(moduleId)).count })))}
-      className="inline-flex items-center gap-1.5 rounded-pill px-2 py-1 text-caption font-semibold text-reward-ink hover:bg-reward-100"
+      className="inline-flex items-center gap-1.5 rounded-pill px-2 py-1 text-caption font-semibold text-reward-ink hover:bg-reward-100 pointer-coarse:min-h-11"
     >
       <Bell className="size-3.5" />
       {t("waitingPeople", { count })}

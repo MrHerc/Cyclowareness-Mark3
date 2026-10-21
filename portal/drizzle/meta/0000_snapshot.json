@@ -1,5 +1,5 @@
 {
-  "id": "51f86277-39f6-46e7-96ad-1130329ccf5e",
+  "id": "186fecd7-8ae7-4d87-8565-0d068a4bf551",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -398,7 +398,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "attestations_user_idx": {
+          "name": "attestations_user_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "attestations_tenant_id_tenants_id_fk": {
           "name": "attestations_tenant_id_tenants_id_fk",
@@ -436,7 +452,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -739,6 +755,27 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "risks_tenant_idx": {
+          "name": "risks_tenant_idx",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -854,6 +891,21 @@
           "columns": [
             {
               "expression": "campaign_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "recipients_user_idx": {
+          "name": "recipients_user_idx",
+          "columns": [
+            {
+              "expression": "user_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -1023,6 +1075,19 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
+        },
+        "campaigns_department_id_departments_id_fk": {
+          "name": "campaigns_department_id_departments_id_fk",
+          "tableFrom": "campaigns",
+          "tableTo": "departments",
+          "columnsFrom": [
+            "department_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -1086,7 +1151,38 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "certificates_user_idx": {
+          "name": "certificates_user_idx",
+          "columns": [
+            {
+              "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "certificates_tenant_idx": {
+          "name": "certificates_tenant_idx",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "certificates_tenant_id_tenants_id_fk": {
           "name": "certificates_tenant_id_tenants_id_fk",
@@ -1124,7 +1220,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         },
         "certificates_path_id_learning_paths_id_fk": {
@@ -1137,7 +1233,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "cascade",
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },
@@ -1267,6 +1363,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "name_key": {
+          "name": "name_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "parent_id": {
           "name": "parent_id",
           "type": "uuid",
@@ -1288,17 +1390,23 @@
         }
       },
       "indexes": {
-        "departments_tenant_idx": {
-          "name": "departments_tenant_idx",
+        "departments_tenant_name_key_idx": {
+          "name": "departments_tenant_name_key_idx",
           "columns": [
             {
               "expression": "tenant_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
+            },
+            {
+              "expression": "name_key",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
             }
           ],
-          "isUnique": false,
+          "isUnique": true,
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -2003,7 +2111,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "learning_paths_key_tenant_idx": {
+          "name": "learning_paths_key_tenant_idx",
+          "nullsNotDistinct": true,
+          "columns": [
+            "key",
+            "tenant_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -2086,6 +2203,12 @@
         },
         "completed_at": {
           "name": "completed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_completed_at": {
+          "name": "last_completed_at",
           "type": "timestamp with time zone",
           "primaryKey": false,
           "notNull": false
@@ -2647,7 +2770,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "material_decisions_material_idx": {
+          "name": "material_decisions_material_idx",
+          "columns": [
+            {
+              "expression": "material_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "material_decisions_material_id_materials_id_fk": {
           "name": "material_decisions_material_id_materials_id_fk",
@@ -3005,29 +3144,7 @@
           "default": "now()"
         }
       },
-      "indexes": {
-        "modules_slug_tenant_idx": {
-          "name": "modules_slug_tenant_idx",
-          "columns": [
-            {
-              "expression": "slug",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "tenant_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "modules_tenant_id_tenants_id_fk": {
           "name": "modules_tenant_id_tenants_id_fk",
@@ -3044,7 +3161,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "modules_slug_tenant_idx": {
+          "name": "modules_slug_tenant_idx",
+          "nullsNotDistinct": true,
+          "columns": [
+            "slug",
+            "tenant_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -3116,6 +3242,33 @@
           "columns": [
             {
               "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "notifications_tenant_kind_idx": {
+          "name": "notifications_tenant_kind_idx",
+          "columns": [
+            {
+              "expression": "tenant_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "kind",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -3533,7 +3686,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "policy_versions_policy_idx": {
+          "name": "policy_versions_policy_idx",
+          "columns": [
+            {
+              "expression": "policy_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "policy_versions_policy_id_policies_id_fk": {
           "name": "policy_versions_policy_id_policies_id_fk",
@@ -3669,6 +3838,62 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.rate_limit_buckets": {
+      "name": "rate_limit_buckets",
+      "schema": "",
+      "columns": {
+        "key": {
+          "name": "key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "window_start": {
+          "name": "window_start",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "count": {
+          "name": "count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        }
+      },
+      "indexes": {
+        "rate_limit_buckets_window_idx": {
+          "name": "rate_limit_buckets_window_idx",
+          "columns": [
+            {
+              "expression": "window_start",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "rate_limit_buckets_key_window_start_pk": {
+          "name": "rate_limit_buckets_key_window_start_pk",
+          "columns": [
+            "key",
+            "window_start"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.report_schedules": {
       "name": "report_schedules",
       "schema": "",
@@ -3756,6 +3981,19 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
+        "report_schedules_department_id_departments_id_fk": {
+          "name": "report_schedules_department_id_departments_id_fk",
+          "tableFrom": "report_schedules",
+          "tableTo": "departments",
+          "columnsFrom": [
+            "department_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
@@ -4161,6 +4399,21 @@
           "columns": [
             {
               "expression": "user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "sessions_expires_idx": {
+          "name": "sessions_expires_idx",
+          "columns": [
+            {
+              "expression": "expires_at",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -4591,6 +4844,21 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "threat_reports_reporter_idx": {
+          "name": "threat_reports_reporter_idx",
+          "columns": [
+            {
+              "expression": "reporter_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
@@ -4664,7 +4932,23 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "ticket_messages_ticket_idx": {
+          "name": "ticket_messages_ticket_idx",
+          "columns": [
+            {
+              "expression": "ticket_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "ticket_messages_ticket_id_support_tickets_id_fk": {
           "name": "ticket_messages_ticket_id_support_tickets_id_fk",
@@ -5056,6 +5340,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "department_changed_at": {
+          "name": "department_changed_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "activated_at": {
+          "name": "activated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -5106,6 +5402,22 @@
             }
           ],
           "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "users_phone_active_idx": {
+          "name": "users_phone_active_idx",
+          "columns": [
+            {
+              "expression": "phone",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "phone is not null and status <> 'deleted'",
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -5284,6 +5596,27 @@
           "columns": [
             {
               "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "deliveries_tenant_idx": {
+          "name": "deliveries_tenant_idx",
+          "columns": [
+            {
+              "expression": "tenant_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"

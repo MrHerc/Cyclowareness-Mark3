@@ -1,35 +1,30 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { getFormatter, getLocale, getTranslations } from "next-intl/server";
+import { getFormatter, getTranslations } from "next-intl/server";
 import { and, desc, eq } from "drizzle-orm";
 import { Award, Check, ChevronLeft, Clock, Gauge, Layers, Play, RotateCcw, Zap } from "lucide-react";
 import { db, t } from "@/server/db";
-import { allowed, requireViewer } from "@/server/auth/viewer";
-import { getCatalog, nextLesson } from "@/server/queries/catalog";
+import { nextLesson } from "@/server/queries/catalog";
 import { Card } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
 import { ProgressBar } from "@/components/ui/progress";
-import { ButtonLink } from "@/components/ui/button";
+import { ButtonLink, textLinkClass } from "@/components/ui/button";
 import { ModuleArt } from "@/components/learner/module-icon";
 import { AttestCard, CertificateLink, RateModule } from "./module-actions";
+import { moduleForPage } from "./module";
 import { DEFAULT_ATTESTATION } from "@/lib/tenant-defaults";
 import { pick } from "@/i18n/config";
+import { todayInBaku } from "@/lib/time";
 import { cn } from "@/lib/cn";
 
 export async function generateMetadata({ params }: PageProps<"/learn/[slug]">) {
-  const { slug } = await params;
-  const v = await requireViewer();
-  const m = (await getCatalog(v, await getLocale(), allowed(v, "studio.write"))).find((x) => x.slug === slug);
-  return { title: m?.title ?? "" };
+  const { m } = await moduleForPage((await params).slug);
+  return { title: m.title };
 }
 
 export default async function ModulePage({ params, searchParams }: PageProps<"/learn/[slug]">) {
   const [{ slug }, sp] = await Promise.all([params, searchParams]);
-  const v = await requireViewer();
-  const locale = await getLocale();
-  const [tr, tc, format] = await Promise.all([getTranslations("learner.module"), getTranslations("common"), getFormatter()]);
-  const m = (await getCatalog(v, locale, allowed(v, "studio.write"))).find((x) => x.slug === slug);
-  if (!m) notFound();
+  const { v, locale, m } = await moduleForPage(slug);
+  const [tr, tc, tl, format] = await Promise.all([getTranslations("learner.module"), getTranslations("common"), getTranslations("learner.learn"), getFormatter()]);
   const next = nextLesson(m);
   // The orange marker follows the last opened lesson (as in the original), else the next one to do.
   const currentKey = m.lessons.some((l) => l.key === m.lastLessonKey) ? m.lastLessonKey : next?.key;
@@ -50,17 +45,18 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
           .limit(1)
       : [];
   const attestText = v.tenant.settings.attestationText[locale] ?? pick(DEFAULT_ATTESTATION, locale);
+  const overdue = !!m.due && m.due < todayInBaku() && m.status !== "completed";
 
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-8">
       <div className="min-w-0">
-        <Link href="/learn" className="inline-flex items-center gap-1 text-caption font-semibold text-ink-muted hover:text-ink">
+        <Link href="/learn" className="inline-flex items-center gap-1 text-caption font-semibold text-ink-muted hover:text-ink pointer-coarse:-my-3 pointer-coarse:min-h-11">
           <ChevronLeft className="size-4" />
           {tr("back")}
         </Link>
         <div className="mt-4 flex flex-wrap gap-2">
           <Pill tone="brand">{tc(`categories.${m.category}`)}</Pill>
-          {m.due ? <Pill tone={m.due < new Date().toISOString().slice(0, 10) && m.status !== "completed" ? "risk" : "neutral"}>{tr("due", { date: format.dateTime(new Date(`${m.due}T12:00:00`), { day: "numeric", month: "long" }) })}</Pill> : null}
+          {m.due ? <Pill tone={overdue ? "risk" : "neutral"}>{tr("due", { date: format.dateTime(new Date(`${m.due}T12:00:00`), { day: "numeric", month: "long" }) })}</Pill> : null}
         </div>
         <h1 className="mt-3 text-headline font-bold text-balance">{m.title}</h1>
         <p className="mt-2 text-lead text-ink-muted">{m.subtitle}</p>
@@ -130,8 +126,10 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
               ))}
             </ul>
             <div className="flex items-center gap-3">
-              <ProgressBar value={m.percent} tone="reward" label={`${m.percent}%`} />
-              <span className="text-caption font-bold tabular-nums">{m.percent}%</span>
+              <ProgressBar value={m.percent} tone="reward" label={tl("moduleProgress", { title: m.title })} />
+              <span aria-hidden className="text-caption font-bold tabular-nums">
+                {m.percent}%
+              </span>
             </div>
             {m.status === "awaiting_attestation" ? (
               <AttestCard slug={m.slug} moduleTitle={m.title} text={attestText} autoOpen={sp.confirm === "1"} />
@@ -141,7 +139,7 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
               </ButtonLink>
             )}
             {m.percent > 0 && m.status !== "awaiting_attestation" ? (
-              <Link href={`/learn/${m.slug}/${m.lessons[0].key}`} className="inline-flex items-center justify-center gap-1.5 text-caption font-semibold text-ink-muted hover:text-ink">
+              <Link href={`/learn/${m.slug}/${m.lessons[0].key}`} className={textLinkClass("inline-flex items-center justify-center gap-1.5 text-caption font-semibold text-ink-muted hover:text-ink")}>
                 <RotateCcw className="size-4" />
                 {tr("startOver")}
               </Link>

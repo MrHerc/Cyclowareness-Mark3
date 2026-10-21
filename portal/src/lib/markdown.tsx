@@ -41,6 +41,15 @@ function inline(text: string, key: string): ReactNode[] {
   return out;
 }
 
+/** Text of an inline Markdown fragment without its markup, for accessible names. */
+export function plainText(text: string): string {
+  return text
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/\*\*([^*]+)\*\*|\*([^*]+)\*/g, "$1$2")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 export function headingsOf(md: string): Heading[] {
   return md
     .split("\n")
@@ -55,6 +64,7 @@ export function Markdown({ source, skipTitle = false }: { source: string; skipTi
   let para: string[] = [];
   let list: { ordered: boolean; items: string[] } | null = null;
   let table: string[][] | null = null;
+  let heading: string | null = null;
   let k = 0;
   const flushPara = () => {
     if (para.length) blocks.push(<p key={`p${k++}`}>{inline(para.join(" "), `p${k}`)}</p>);
@@ -70,8 +80,11 @@ export function Markdown({ source, skipTitle = false }: { source: string; skipTi
     if (!table) return;
     const [head, ...rows] = table;
     const key = k++;
+    // The wrapper scrolls sideways on narrow screens, so keyboard users must be able to focus it;
+    // it is named after the section it belongs to, or its column headers when there is none.
+    const label = heading ?? head.map(plainText).filter(Boolean).join(", ");
     blocks.push(
-      <div key={`t${key}`} className="overflow-x-auto rounded-lg ring-1 ring-line">
+      <div key={`t${key}`} tabIndex={0} role="region" aria-label={label || undefined} className="overflow-x-auto rounded-lg ring-1 ring-line">
         <table className="w-full min-w-[36rem] text-left text-body-sm">
           <thead className="bg-sunken">
             <tr>
@@ -127,6 +140,7 @@ export function Markdown({ source, skipTitle = false }: { source: string; skipTi
     if (h) {
       flushPara();
       flushList();
+      heading = plainText(h[2]);
       if (h[1].length === 1) {
         if (!skipTitle) blocks.push(<h1 key={`h${k++}`}>{h[2]}</h1>);
       } else {

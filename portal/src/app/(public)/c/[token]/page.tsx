@@ -5,8 +5,8 @@ import { eq } from "drizzle-orm";
 import { ShieldCheck } from "lucide-react";
 import { db, t } from "@/server/db";
 import { getViewer } from "@/server/auth/viewer";
-import { env } from "@/server/env";
-import { DEFAULT_CERTIFICATE_TEXT } from "@/lib/tenant-defaults";
+import { appUrl } from "@/server/env";
+import { DEFAULT_CERTIFICATE_TEXT, withDefaults } from "@/lib/tenant-defaults";
 import { pick } from "@/i18n/config";
 import { brandStyle } from "@/lib/color";
 import { PrintButton } from "./print-button";
@@ -25,19 +25,20 @@ export default async function CertificatePage({ params }: PageProps<"/c/[token]"
     .leftJoin(t.learningPaths, eq(t.learningPaths.id, t.certificates.pathId))
     .where(eq(t.certificates.publicToken, token));
   if (!row || row.user.status === "deleted") notFound();
+  const settings = withDefaults(row.tenant.settings);
   const viewer = await getViewer();
   const own = viewer?.user.id === row.user.id || (viewer?.tenant.id === row.tenant.id && viewer.user.role !== "learner");
-  if (!row.tenant.settings.certificate.publicLink && !own) notFound();
+  if (!settings.certificate.publicLink && !own) notFound();
 
   const locale = await getLocale();
   const [tr, format] = await Promise.all([getTranslations("learner.certificate"), getFormatter()]);
-  const c = row.tenant.settings.certificate;
+  const c = settings.certificate;
   const title = c.title || tr("title");
   const subject = pick(row.moduleTitle ?? row.pathTitle, locale);
   const date = format.dateTime(row.cert.issuedAt, { dateStyle: "long" });
   const template = (c.text && c.text.trim()) || pick(DEFAULT_CERTIFICATE_TEXT, locale);
   const text = template.replaceAll("{name}", row.user.name).replaceAll("{module}", subject).replaceAll("{date}", date);
-  const verifyUrl = `${env.APP_URL.replace(/\/$/, "")}/c/${token}`;
+  const verifyUrl = `${appUrl()}/c/${token}`;
 
   return (
     <div className="min-h-dvh bg-canvas px-4 py-10 print:bg-white print:p-0" style={brandStyle(row.tenant.branding.primary, row.tenant.branding.accent) as React.CSSProperties}>

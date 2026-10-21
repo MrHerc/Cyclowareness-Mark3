@@ -9,7 +9,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { ButtonAnchor, ButtonLink } from "@/components/ui/button";
 import { Notice, PageHeader } from "@/components/ui/layout";
 import { CompliancePack, ReportFilters, Schedules } from "@/components/admin/reports-client";
-import { requestNow } from "@/lib/time";
+import { dayRange, requestNow } from "@/lib/time";
 import { pick } from "@/i18n/config";
 
 const DAY = 86_400_000;
@@ -35,23 +35,43 @@ export default async function ReportsPage({ searchParams }: PageProps<"/admin/re
       .innerJoin(t.modules, eq(t.modules.id, t.feedback.moduleId))
       .where(and(eq(t.feedback.tenantId, v.tenant.id), isNotNull(t.feedback.moduleId)))
       .groupBy(t.feedback.moduleId, t.modules.title),
-    db().select().from(t.reportSchedules).where(eq(t.reportSchedules.tenantId, v.tenant.id)).orderBy(desc(t.reportSchedules.createdAt)),
+    // Scoped roles see and manage only the schedules they created; administrators all of the organisation's.
+    db()
+      .select()
+      .from(t.reportSchedules)
+      .where(and(eq(t.reportSchedules.tenantId, v.tenant.id), allowed(v, "settings.write") ? undefined : eq(t.reportSchedules.createdBy, v.user.id)))
+      .orderBy(desc(t.reportSchedules.createdAt)),
   ]);
   const visible = scope ? departments.filter((d) => scope.has(d.id)) : departments;
-  // Without dates in the URL the filter covers the last 30 days up to today.
   const now = requestNow();
   const str = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : undefined);
-  const from = str("from") ?? isoDay(new Date(now.getTime() - 30 * DAY));
-  const to = str("to") ?? isoDay(now);
-  const dept = str("d");
-  const qs = new URLSearchParams({ from, to, ...(dept ? { d: dept } : {}) }).toString();
+  // Without dates in the URL the filter covers the last 30 days up to today. Once the URL names a date
+  // (the filter always writes both; an empty one means "no bound"), the default never fills in the other
+  // side, so it cannot turn a chosen end date into a reversed range.
+  const hasDates = sp.from !== undefined || sp.to !== undefined;
+  const range = hasDates ? dayRange(str("from"), str("to")) : dayRange(isoDay(new Date(now.getTime() - 30 * DAY)), isoDay(now));
+  const from = range.fromDay;
+  const to = range.toDay;
+  // Values the reports would ignore (impossible days, a range ending before it starts, a department the
+  // viewer cannot pick) show as empty filters with a notice, so the form never claims a period or
+  // department the downloads do not apply.
+  const rawDept = str("d") ?? "";
+  const dept = visible.some((d) => d.id === rawDept) ? rawDept : "";
+  const ignored = range.rejected || (!!rawDept && !dept);
+  const qs = new URLSearchParams({ ...(from ? { from } : {}), ...(to ? { to } : {}), ...(dept ? { d: dept } : {}) }).toString();
   const kinds = REPORT_KINDS.filter((k) => k !== "secops" || allowed(v, "secops.read"));
   const sorted = feedback.map((f) => ({ ...f, r: Number(f.r) })).sort((a, b) => a.r - b.r);
 
   return (
-    <div className="grid gap-5">
+    // minmax(0, 1fr): a wide child (a long notice or filter row) must not size the column beyond the screen.
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
       <PageHeader title={tr("title")} subtitle={tr("subtitle")} />
-      <ReportFilters departments={visible.map((d) => ({ id: d.id, name: d.name }))} defaults={{ from, to }} />
+      {ignored ? (
+        <Notice tone="warn" icon={<AlertTriangle />}>
+          {tr("filtersIgnored")}
+        </Notice>
+      ) : null}
+      <ReportFilters departments={visible.map((d) => ({ id: d.id, name: d.name }))} value={{ from, to, d: dept }} />
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {kinds.map((k) => (
           <Card key={k} className="flex flex-col p-5">

@@ -20,7 +20,7 @@ export function CampaignActions({ id, status, audience, channel }: { id: string;
         </Button>
       ) : null}
       {status === "draft" || status === "scheduled" ? (
-        <ButtonLink variant="secondary" icon={<Pencil />} href={`/admin/campaigns/new?edit=${id}`}>
+        <ButtonLink variant="secondary" icon={<Pencil />} href={`/admin/campaigns/edit/${id}`}>
           {t("edit")}
         </ButtonLink>
       ) : null}

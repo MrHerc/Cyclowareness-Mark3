@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { and, asc, eq, or } from "drizzle-orm";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { FileText, Recycle, Siren, Users } from "lucide-react";
-import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
+import { allowed } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
 import { LOOP_STAGES } from "@/server/db/schema";
 import { peopleById } from "@/server/queries/secops";
@@ -12,6 +11,7 @@ import { Pill } from "@/components/ui/pill";
 import { PageHeader } from "@/components/ui/layout";
 import { StageTrack } from "@/components/secops/stage-track";
 import { LoopActions } from "@/components/secops/intake";
+import { loopForPage } from "./loop";
 
 const VERDICT_TONE = { malicious: "risk", suspicious: "warn", pending: "neutral", benign: "safe" } as const;
 
@@ -21,12 +21,7 @@ export async function generateMetadata() {
 }
 
 export default async function LoopPage({ params }: PageProps<"/admin/loops/[id]">) {
-  const v = await requirePermission("secops.read");
-  if (!hasFeature(v, "closed_loops")) notFound();
-  const { id } = await params;
-  if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
-  const [loop] = await db().select().from(t.loops).where(and(eq(t.loops.id, id), eq(t.loops.tenantId, v.tenant.id)));
-  if (!loop) notFound();
+  const { v, loop } = await loopForPage((await params).id);
   const [tr, ts, tn, format] = await Promise.all([getTranslations("secops.loops"), getTranslations("secops"), getTranslations("admin.nav"), getFormatter()]);
   const [events, materials, incident] = await Promise.all([
     db().select().from(t.loopEvents).where(eq(t.loopEvents.loopId, loop.id)).orderBy(asc(t.loopEvents.at)),

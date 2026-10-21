@@ -1,8 +1,6 @@
-import { notFound } from "next/navigation";
-import { and, asc, eq } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { LifeBuoy } from "lucide-react";
-import { hasFeature, requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
 import { peopleById } from "@/server/queries/secops";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
@@ -12,6 +10,7 @@ import { TicketThread } from "@/components/support/ticket-thread";
 import { TicketStatus } from "@/components/secops/service";
 import { requestNow } from "@/lib/time";
 import { pick } from "@/i18n/config";
+import { ticketForPage } from "./ticket";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.nav");
@@ -19,12 +18,7 @@ export async function generateMetadata() {
 }
 
 export default async function SupportTicketPage({ params }: PageProps<"/admin/support/[id]">) {
-  const v = await requirePermission("support.manage");
-  if (!hasFeature(v, "support")) notFound();
-  const { id } = await params;
-  if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
-  const [ticket] = await db().select().from(t.supportTickets).where(and(eq(t.supportTickets.id, id), eq(t.supportTickets.tenantId, v.tenant.id)));
-  if (!ticket) notFound();
+  const { v, ticket } = await ticketForPage((await params).id);
   const locale = await getLocale();
   const [tr, tc, format] = await Promise.all([getTranslations("secops.support"), getTranslations("common"), getFormatter()]);
   const [messages, mod] = await Promise.all([

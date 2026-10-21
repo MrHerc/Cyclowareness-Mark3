@@ -3,15 +3,17 @@
 import { useActionState, useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+import { RelativeTime } from "@/components/relative-time";
 import { Bell, Building2, FileUp, KeyRound, Link2, Mail, Plus, Search, UserX } from "lucide-react";
 import { addPersonAction, createLinkAction, emailInvitesAction, importPeopleAction, moveDepartmentAction, remindPeopleAction, setStatusAction, type ImportPreview, type PersonState } from "@/server/actions/people";
 import { remindAwaitingAction } from "@/server/actions/admin-overview";
 import { Avatar } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
+import { Button, TextButton } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select } from "@/components/ui/field";
 import { SortHeader } from "@/components/ui/layout";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 import { Pill } from "@/components/ui/pill";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { toast } from "@/components/ui/toast";
@@ -34,6 +36,9 @@ export type PeopleRow = {
 };
 
 const ROLES = ["learner", "department_head", "executive", "analyst", "campaign_manager", "content_creator", "tenant_admin"] as const;
+
+/** Around a row checkbox: a 44 px hit area on touch screens, pulled back by negative margins so rows keep their height (unchanged with a mouse). */
+const CHECK_HIT = "pointer-coarse:-m-3.5 pointer-coarse:inline-flex pointer-coarse:size-11 pointer-coarse:items-center pointer-coarse:justify-center";
 
 export function PeopleFilters({ departments }: { departments: { id: string; name: string }[] }) {
   const t = useTranslations("admin.people");
@@ -115,7 +120,6 @@ export function PeopleTable({
   const t = useTranslations("admin.people");
   const tc = useTranslations("common");
   const to = useTranslations("admin.overview");
-  const format = useFormatter();
   const sp = useSearchParams();
   const sortHref = useMemo(() => {
     const next = new URLSearchParams(sp.toString());
@@ -194,12 +198,14 @@ export function PeopleTable({
           </>
         )}
       </div>
-      <div className="overflow-x-auto">
+      <ScrollRegion label={t("title")}>
         <table className="w-full min-w-[60rem] text-left text-body-sm">
           <thead className="text-tab text-ink-subtle">
             <tr className="border-b border-line">
               <th className="w-10 py-3 pl-4">
-                <input type="checkbox" aria-label={tc("all")} className="size-4 accent-(--brand)" checked={all} onChange={() => setSelected(all ? new Set() : new Set(selectable.map((r) => r.id)))} />
+                <label className={CHECK_HIT}>
+                  <input type="checkbox" aria-label={tc("all")} className="size-4 accent-(--brand)" checked={all} onChange={() => setSelected(all ? new Set() : new Set(selectable.map((r) => r.id)))} />
+                </label>
               </th>
               <SortHeader label={t("col.person")} active dir={sortDir} href={sortHref} className="px-3 py-3" />
               <th className="px-3 py-3 font-semibold">{t("col.department")}</th>
@@ -219,7 +225,11 @@ export function PeopleTable({
               return (
                 <tr key={r.id} className={cn("border-b border-line last:border-0 hover:bg-sunken/40", selected.has(r.id) && "bg-brand-50/50")}>
                   <td className="py-3 pl-4">
-                    {deleted ? null : <input type="checkbox" aria-label={r.name} className="size-4 accent-(--brand)" checked={selected.has(r.id)} onChange={() => toggle(r.id)} />}
+                    {deleted ? null : (
+                      <label className={CHECK_HIT}>
+                        <input type="checkbox" aria-label={r.name} className="size-4 accent-(--brand)" checked={selected.has(r.id)} onChange={() => toggle(r.id)} />
+                      </label>
+                    )}
                   </td>
                   <td className="px-3 py-3">
                     {deleted ? (
@@ -231,7 +241,7 @@ export function PeopleTable({
                         </span>
                       </span>
                     ) : (
-                      <Link href={`/admin/users/${r.id}`} className="flex items-center gap-3">
+                      <Link href={`/admin/users/${r.id}`} className="flex items-center gap-3 pointer-coarse:min-h-11">
                         <Avatar name={r.name} src={r.avatarUrl} size="sm" />
                         <span className="min-w-0">
                           <span className="block truncate font-semibold hover:underline">{r.name}</span>
@@ -253,19 +263,19 @@ export function PeopleTable({
                     </span>
                   </td>
                   <td className="px-3 py-3 tabular-nums">{r.xp}</td>
-                  <td className="px-3 py-3 text-ink-muted">{r.lastActiveAt ? format.relativeTime(new Date(r.lastActiveAt)) : tc("time.never")}</td>
+                  <td className="px-3 py-3 text-ink-muted">{r.lastActiveAt ? <RelativeTime date={r.lastActiveAt} /> : tc("time.never")}</td>
                   {canWrite ? (
                     <td className="py-3 pr-4 pl-3">
                       {r.status === "invited" ? (
-                        <button type="button" disabled={pending} onClick={() => copyLink(r.id, "invite")} className="inline-flex items-center gap-1 text-caption font-semibold text-brand-600 hover:underline">
+                        <TextButton disabled={pending} onClick={() => copyLink(r.id, "invite")}>
                           <Link2 className="size-3.5" />
                           {t("inviteLink")}
-                        </button>
+                        </TextButton>
                       ) : r.status === "active" ? (
-                        <button type="button" disabled={pending} onClick={() => copyLink(r.id, "reset")} className="inline-flex items-center gap-1 text-caption font-semibold text-ink-muted hover:text-ink hover:underline">
+                        <TextButton tone="muted" disabled={pending} onClick={() => copyLink(r.id, "reset")}>
                           <KeyRound className="size-3.5" />
                           {t("resetLink")}
-                        </button>
+                        </TextButton>
                       ) : null}
                     </td>
                   ) : null}
@@ -274,7 +284,7 @@ export function PeopleTable({
             })}
           </tbody>
         </table>
-      </div>
+      </ScrollRegion>
     </div>
   );
 }
@@ -283,26 +293,49 @@ export function AddPerson({ departments }: { departments: { id: string; name: st
   const t = useTranslations("admin.people");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
-  const [state, action] = useActionState<PersonState, FormData>(async (prev, data) => {
-    const res = await addPersonAction(prev, data);
+  const [state, action, pending] = useActionState<PersonState, FormData>(async (prev, data) => {
+    // A request that fails outright (network, server) keeps the dialog and what was typed, with a notice.
+    const res = await addPersonAction(prev, data).catch((): PersonState => ({ error: "generic" }));
     if (res?.ok) {
       toast(t("added", { name: res.name ?? "" }));
       setOpen(false);
     }
     return res;
   }, undefined);
+  const [, startSubmit] = useTransition();
+  // Each rejected value is reported on its own field; anything without a field of its own goes in the notice below.
+  const fields = state?.fields ?? [];
+  const emailError = state?.error === "emailTaken" ? t("emailTaken") : state?.error === "foreignDomain" ? t("foreignDomain") : fields.includes("email") ? tc("errors.email") : null;
+  const phoneError = state?.error === "phoneTaken" ? t("phoneTaken") : fields.includes("phone") ? t("invalidPhone") : null;
+  const nameError = fields.includes("name") ? tc("errors.invalid") : null;
+  const deptError = fields.includes("departmentId") ? t("invalidDepartment") : null;
+  const formError = state?.error === "generic" ? tc("errors.generic") : state?.error && !state.ok && !emailError && !phoneError && !nameError && !deptError ? tc("errors.invalid") : null;
+  const invalid = (error: unknown, id: string) => (error ? { "aria-invalid": true, "aria-describedby": `${id}-error` } : {});
   return (
     <>
       <Button icon={<Plus />} onClick={() => setOpen(true)}>
         {t("add")}
       </Button>
       <Dialog open={open} onClose={() => setOpen(false)} title={t("addTitle")} description={t("addBody")}>
-        <form action={action} className="grid gap-4">
-          <Field label={t("fullName")} htmlFor="p-name">
-            <Input id="p-name" name="name" required minLength={2} maxLength={120} placeholder={t("fullNamePh")} />
+        {/* Submitted through a transition rather than the form action, so a rejected form keeps what was typed. */}
+        <form
+          className="grid gap-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const data = new FormData(e.currentTarget);
+            startSubmit(() => action(data));
+          }}
+        >
+          {formError ? (
+            <p role="alert" className="text-caption text-risk-600">
+              {formError}
+            </p>
+          ) : null}
+          <Field label={t("fullName")} htmlFor="p-name" error={nameError}>
+            <Input id="p-name" name="name" required minLength={2} maxLength={120} placeholder={t("fullNamePh")} {...invalid(nameError, "p-name")} />
           </Field>
-          <Field label={t("workEmail")} htmlFor="p-email" error={state?.error === "emailTaken" ? t("emailTaken") : state?.error ? tc("errors.invalid") : null}>
-            <Input id="p-email" name="email" type="email" required placeholder={t("workEmailPh")} />
+          <Field label={t("workEmail")} htmlFor="p-email" error={emailError}>
+            <Input id="p-email" name="email" type="email" required placeholder={t("workEmailPh")} {...invalid(emailError, "p-email")} />
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label={tc("role")} htmlFor="p-role">
@@ -314,8 +347,8 @@ export function AddPerson({ departments }: { departments: { id: string; name: st
                 ))}
               </Select>
             </Field>
-            <Field label={tc("department")} htmlFor="p-dept">
-              <Select id="p-dept" name="departmentId" defaultValue="">
+            <Field label={tc("department")} htmlFor="p-dept" error={deptError}>
+              <Select id="p-dept" name="departmentId" defaultValue="" {...invalid(deptError, "p-dept")}>
                 <option value="">{tc("noDepartment")}</option>
                 {departments.map((d) => (
                   <option key={d.id} value={d.id}>
@@ -327,8 +360,8 @@ export function AddPerson({ departments }: { departments: { id: string; name: st
             <Field label={t("jobTitle")} htmlFor="p-job" optional={tc("optional")}>
               <Input id="p-job" name="jobTitle" maxLength={120} />
             </Field>
-            <Field label={t("phone")} htmlFor="p-phone" optional={tc("optional")}>
-              <Input id="p-phone" name="phone" type="tel" placeholder="+994501234567" />
+            <Field label={t("phone")} htmlFor="p-phone" optional={tc("optional")} error={phoneError}>
+              <Input id="p-phone" name="phone" type="tel" placeholder="+994501234567" {...invalid(phoneError, "p-phone")} />
             </Field>
           </div>
           <Field label={t("interfaceLanguage")} htmlFor="p-locale">
@@ -344,7 +377,7 @@ export function AddPerson({ departments }: { departments: { id: string; name: st
             <Button variant="secondary" onClick={() => setOpen(false)}>
               {tc("cancel")}
             </Button>
-            <SubmitButton>{t("add")}</SubmitButton>
+            <SubmitButton disabled={pending}>{t("add")}</SubmitButton>
           </div>
         </form>
       </Dialog>
@@ -425,11 +458,13 @@ export function ImportPeople() {
               </p>
             ) : null}
             {preview.problems.length ? (
-              <ul className="max-h-60 overflow-y-auto rounded-lg bg-risk-50 p-3 text-caption text-risk-700">
-                {preview.problems.map((p, i) => (
-                  <li key={i}>{t("importLine", { line: p.line, problem: t(`importErrors.${p.problem as "name"}`) })}</li>
-                ))}
-              </ul>
+              <ScrollRegion axis="y" label={t("importProblems", { count: preview.problems.length })} className="max-h-60 rounded-lg bg-risk-50 p-3 text-caption text-risk-700">
+                <ul>
+                  {preview.problems.map((p, i) => (
+                    <li key={i}>{t("importLine", { line: p.line, problem: t(`importErrors.${p.problem as "name"}`) })}</li>
+                  ))}
+                </ul>
+              </ScrollRegion>
             ) : null}
             <div className="flex justify-end gap-3">
               <Button variant="secondary" onClick={reset}>

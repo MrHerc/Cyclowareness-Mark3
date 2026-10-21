@@ -33,7 +33,7 @@ export function TemplatePreview({ tpl, locale, compact = false }: { tpl: Campaig
   return (
     <div className="rounded-xl border border-line bg-surface p-3.5">
       <p className="flex items-center gap-1.5 text-tab text-ink-muted">
-        <Mail className="size-3.5" />
+        <Mail className="size-3.5 shrink-0" />
         <b className="text-ink">{templateText(tpl.sender.name, locale)}</b>
         <span className="truncate">&lt;{tpl.sender.address}&gt;</span>
       </p>

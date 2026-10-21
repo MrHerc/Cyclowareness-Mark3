@@ -6,6 +6,7 @@ import { audit } from "./audit";
 import { emitEvent } from "./events";
 import { TEMPLATE_BY_KEY } from "../../lib/campaigns/templates";
 import { REPORT_BONUS_DAILY_CAP, REPORT_BONUS_XP, dayKey } from "../../lib/domain/gamification";
+import { isUniqueViolation } from "../db/errors";
 
 export type ThreatChannel = (typeof t.threatReports.$inferInsert)["channel"];
 
@@ -18,10 +19,29 @@ function normalise(s: string): string {
     .trim();
 }
 
+type NumberedTable = typeof t.threatReports | typeof t.sandboxAnalyses | typeof t.incidents | typeof t.supportTickets;
+
 /** Next per-tenant number for a numbered table (reports, sandbox, incidents, tickets). */
-export async function nextNumber(db: DB, table: typeof t.threatReports | typeof t.sandboxAnalyses | typeof t.incidents | typeof t.supportTickets, tenantId: string, start: number) {
+export async function nextNumber(db: DB, table: NumberedTable, tenantId: string, start: number) {
   const [row] = await db.select({ n: max(table.number) }).from(table).where(eq(table.tenantId, tenantId));
   return Math.max(start, Number(row?.n ?? 0) + 1);
+}
+
+/**
+ * Inserts a row that takes the next per-tenant number. Two requests at the same moment read the
+ * same max(); the unique (tenant, number) index refuses the second insert, which then takes the
+ * following number. Only that insert is retried, and only on a unique violation, so nothing done
+ * after it (XP, audit, events) can run twice.
+ */
+export async function insertNumbered<T>(db: DB, table: NumberedTable, tenantId: string, start: number, insert: (number: number) => Promise<T>): Promise<{ number: number; row: T }> {
+  for (let attempt = 0; ; attempt++) {
+    const number = await nextNumber(db, table, tenantId, start);
+    try {
+      return { number, row: await insert(number) };
+    } catch (error) {
+      if (attempt >= 7 || !isUniqueViolation(error)) throw error;
+    }
+  }
 }
 
 /**
@@ -50,51 +70,46 @@ export async function submitThreatReport(
     });
   });
 
-  for (let attempt = 0; ; attempt++) {
-    const number = await nextNumber(db, t.threatReports, p.tenantId, 100);
-    try {
-      await db.insert(t.threatReports).values({
-        tenantId: p.tenantId,
-        number,
-        reporterId: p.userId,
-        channel: p.channel,
-        subject: p.subject.slice(0, 300),
-        details: p.details?.slice(0, 4000) ?? null,
-        url: p.url?.slice(0, 2000) ?? null,
-        status: match ? "triaged" : "new",
-        severity: match ? "low" : null,
-        campaignRecipientId: match?.id ?? null,
-      });
-      let xp = 0;
-      if (match && !match.reportedAt) {
-        await db.update(t.campaignRecipients).set({ reportedAt: new Date() }).where(and(eq(t.campaignRecipients.id, match.id), isNull(t.campaignRecipients.reportedAt)));
-      }
-      // Report bonus, capped per day so it can't be farmed.
-      const today = dayKey(new Date());
-      const [{ n }] = await db
-        .select({ n: count() })
-        .from(t.xpEvents)
-        .where(and(eq(t.xpEvents.userId, p.userId), eq(t.xpEvents.reason, "report"), sql`to_char(${t.xpEvents.at} at time zone 'Asia/Baku', 'YYYY-MM-DD') = ${today}`));
-      if (Number(n) < REPORT_BONUS_DAILY_CAP) {
-        await awardXp(db, { tenantId: p.tenantId, userId: p.userId, amount: REPORT_BONUS_XP, reason: "report", ref: `TR-${number}` });
-        xp = REPORT_BONUS_XP;
-      }
-      await audit(db, { tenantId: p.tenantId, actorId: p.userId, action: "threat.reported", targetType: "threat_report", targetId: String(number), ip: p.ip ?? null, meta: { channel: p.channel, simulation: !!match } });
-      await emitEvent(db, p.tenantId, match ? "simulation.reported" : "threat.reported", { number, channel: p.channel, simulation: !!match });
-      if (!match) {
-        const analysts = await db
-          .select({ id: t.users.id })
-          .from(t.users)
-          .where(and(eq(t.users.tenantId, p.tenantId), eq(t.users.status, "active"), inArray(t.users.role, ["analyst"])));
-        if (analysts.length) {
-          await db.insert(t.notifications).values(
-            analysts.map((a) => ({ tenantId: p.tenantId, userId: a.id, kind: "threat", title: `TR-${number}`, body: p.subject.slice(0, 140), href: "/admin/threats" })),
-          );
-        }
-      }
-      return { number, simulation: !!match, xp };
-    } catch (error) {
-      if (attempt >= 3) throw error;
+  const { number } = await insertNumbered(db, t.threatReports, p.tenantId, 100, (number) =>
+    db.insert(t.threatReports).values({
+      tenantId: p.tenantId,
+      number,
+      reporterId: p.userId,
+      channel: p.channel,
+      subject: p.subject.slice(0, 300),
+      details: p.details?.slice(0, 4000) ?? null,
+      url: p.url?.slice(0, 2000) ?? null,
+      status: match ? "triaged" : "new",
+      severity: match ? "low" : null,
+      campaignRecipientId: match?.id ?? null,
+    }),
+  );
+  let xp = 0;
+  if (match && !match.reportedAt) {
+    await db.update(t.campaignRecipients).set({ reportedAt: new Date() }).where(and(eq(t.campaignRecipients.id, match.id), isNull(t.campaignRecipients.reportedAt)));
+  }
+  // Report bonus, capped per day so it can't be farmed.
+  const today = dayKey(new Date());
+  const [{ n }] = await db
+    .select({ n: count() })
+    .from(t.xpEvents)
+    .where(and(eq(t.xpEvents.userId, p.userId), eq(t.xpEvents.reason, "report"), sql`to_char(${t.xpEvents.at} at time zone 'Asia/Baku', 'YYYY-MM-DD') = ${today}`));
+  if (Number(n) < REPORT_BONUS_DAILY_CAP) {
+    await awardXp(db, { tenantId: p.tenantId, userId: p.userId, amount: REPORT_BONUS_XP, reason: "report", ref: `TR-${number}` });
+    xp = REPORT_BONUS_XP;
+  }
+  await audit(db, { tenantId: p.tenantId, actorId: p.userId, action: "threat.reported", targetType: "threat_report", targetId: String(number), ip: p.ip ?? null, meta: { channel: p.channel, simulation: !!match } });
+  await emitEvent(db, p.tenantId, match ? "simulation.reported" : "threat.reported", { number, channel: p.channel, simulation: !!match });
+  if (!match) {
+    const analysts = await db
+      .select({ id: t.users.id })
+      .from(t.users)
+      .where(and(eq(t.users.tenantId, p.tenantId), eq(t.users.status, "active"), inArray(t.users.role, ["analyst"])));
+    if (analysts.length) {
+      await db.insert(t.notifications).values(
+        analysts.map((a) => ({ tenantId: p.tenantId, userId: a.id, kind: "threat", title: `TR-${number}`, body: p.subject.slice(0, 140), href: "/admin/threats" })),
+      );
     }
   }
+  return { number, simulation: !!match, xp };
 }

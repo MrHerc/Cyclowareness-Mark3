@@ -9,27 +9,47 @@ import { TEMPLATE_BY_KEY } from "../../lib/campaigns/templates";
 import { riskBand } from "../../lib/domain/risk";
 import { levelFor } from "../../lib/domain/gamification";
 import { pick } from "../../i18n/config";
+import { dayRange, todayInBaku } from "../../lib/time";
+import { isUuid } from "../../lib/ids";
 import type { ReportKind } from "../db/schema";
 
 export type Cell = string | number | Date | null;
 export type ReportTable = { title: string; headers: string[]; rows: Cell[][] };
 export type ReportFilters = { from?: string; to?: string; departmentId?: string };
 
+/** Impossible days and a reversed range are ignored (no date filter) rather than compared as Invalid Date, which drops every row. */
 function range(f: ReportFilters) {
-  return {
-    from: f.from && /^\d{4}-\d{2}-\d{2}$/.test(f.from) ? new Date(`${f.from}T00:00:00`) : null,
-    to: f.to && /^\d{4}-\d{2}-\d{2}$/.test(f.to) ? new Date(`${f.to}T23:59:59`) : null,
-  };
+  const r = dayRange(f.from, f.to);
+  return { from: r.from, to: r.to };
 }
 const within = (d: Date | null, r: { from: Date | null; to: Date | null }) => !d || ((!r.from || d >= r.from) && (!r.to || d <= r.to));
 
+/**
+ * Filters from a document link (?from&to&d) as the report applies them. `rejected` when a value was given
+ * but cannot be applied (a day that does not exist, a start after the end, a malformed department id):
+ * the caller refuses it rather than printing the unfiltered report under the period that was asked for.
+ */
+export function parseReportFilters(raw: { from?: string; to?: string; d?: string }): { filters: ReportFilters; rejected: boolean } {
+  const r = dayRange(raw.from, raw.to);
+  const badDepartment = !!raw.d && !isUuid(raw.d);
+  return {
+    filters: { from: r.fromDay || undefined, to: r.toDay || undefined, departmentId: raw.d && !badDepartment ? raw.d : undefined },
+    rejected: r.rejected || badDepartment,
+  };
+}
+
 /** People in scope: the viewer's own scope, narrowed to a department filter when given. */
-async function scopedPeople(v: Viewer, f: ReportFilters) {
+/** The people a report covers: the viewer's scope (department heads see their departments) narrowed by the department filter. */
+export async function scopedPeople(v: Viewer, f: ReportFilters) {
   const scope = await scopeDepartmentIds(v);
   const departments = await db().select().from(t.departments).where(eq(t.departments.tenantId, v.tenant.id));
   const closure = departmentClosure(departments);
   let dept: Set<string> | null = scope;
-  if (f.departmentId && closure.has(f.departmentId) && (!scope || scope.has(f.departmentId))) dept = closure.get(f.departmentId)!;
+  if (f.departmentId) {
+    // A department filter that no longer exists (deleted or merged) or lies outside the viewer's scope
+    // matches nobody; it must never widen the report to the whole organisation.
+    dept = closure.has(f.departmentId) && (!scope || scope.has(f.departmentId)) ? closure.get(f.departmentId)! : new Set<string>();
+  }
   const users = await db()
     .select()
     .from(t.users)
@@ -62,7 +82,7 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
       const assigned = await resolveAssignments(db(), v.tenant.id, ids);
       const progress = ids.length ? await db().select().from(t.moduleProgress).where(inArray(t.moduleProgress.userId, ids)) : [];
       const pm = new Map(progress.map((p) => [`${p.userId}:${p.moduleId}`, p]));
-      const today = new Date().toISOString().slice(0, 10);
+      const today = todayInBaku();
       const rows: Cell[][] = [];
       for (const u of users) {
         for (const a of (assigned.get(u.id) ?? new Map()).values()) {

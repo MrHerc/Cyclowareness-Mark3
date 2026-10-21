@@ -19,13 +19,17 @@ export function CardHeader({
   className?: string;
 }) {
   return (
-    <header className={cn("flex items-start gap-3 px-5 pt-5 sm:px-6 sm:pt-6", className)}>
-      {icon ? <span className="grid size-9 shrink-0 place-items-center rounded-sm bg-brand-50 text-brand-600 [&_svg]:size-[1.1rem]">{icon}</span> : null}
-      <div className="min-w-0 flex-1">
-        <h2 className="text-title-sm font-semibold text-ink">{title}</h2>
-        {description ? <p className="mt-1 text-caption text-ink-muted">{description}</p> : null}
+    // The action moves under the title once the title would get less than ~10rem next to it (phones, narrow
+    // columns), instead of squeezing the title into a sliver under the action.
+    <header className={cn("flex flex-wrap items-start gap-3 px-5 pt-5 sm:px-6 sm:pt-6", className)}>
+      <div className="flex min-w-0 flex-[1_1_10rem] items-start gap-3">
+        {icon ? <span className="grid size-9 shrink-0 place-items-center rounded-sm bg-brand-50 text-brand-600 [&_svg]:size-[1.1rem]">{icon}</span> : null}
+        <div className="min-w-0 flex-1">
+          <h2 className="text-title-sm font-semibold text-ink">{title}</h2>
+          {description ? <p className="mt-1 text-caption text-ink-muted">{description}</p> : null}
+        </div>
       </div>
-      {action ? <div className="shrink-0">{action}</div> : null}
+      {action ? <div className="max-w-full shrink-0">{action}</div> : null}
     </header>
   );
 }

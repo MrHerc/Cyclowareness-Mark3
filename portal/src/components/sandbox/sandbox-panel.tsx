@@ -79,7 +79,7 @@ export function AnalysisResult({
             <p className="mb-2 text-caption font-semibold text-ink-muted">{t("sandbox.mitre")}</p>
             <div className="flex flex-wrap gap-1.5">
               {a.mitre.map((m) => (
-                <a key={m} href={`https://attack.mitre.org/techniques/${m.replace(".", "/")}/`} target="_blank" rel="noopener noreferrer" className="rounded-pill bg-ink px-2.5 py-1 font-mono text-tab-sm font-semibold text-white hover:bg-ink/85">
+                <a key={m} href={`https://attack.mitre.org/techniques/${m.replace(".", "/")}/`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center rounded-pill bg-ink px-2.5 py-1 font-mono text-tab-sm font-semibold text-white hover:bg-ink/85 pointer-coarse:min-h-11 pointer-coarse:px-3.5">
                   {m}
                 </a>
               ))}
@@ -93,7 +93,7 @@ export function AnalysisResult({
             </Button>
           ) : null}
           {stixHref ? (
-            <a href={stixHref} className="inline-flex h-9 items-center gap-1.5 rounded-pill border border-line-strong px-3.5 text-caption font-semibold hover:bg-sunken">
+            <a href={stixHref} className="inline-flex h-9 items-center gap-1.5 rounded-pill border border-line-strong px-3.5 text-caption font-semibold hover:bg-sunken pointer-coarse:h-11">
               STIX 2.1
             </a>
           ) : null}
@@ -103,11 +103,18 @@ export function AnalysisResult({
   );
 }
 
+// A rejected analysis (server unreachable, a deploy in between) becomes the generic error on its form instead of
+// replacing the sandbox panel with the error boundary.
+function submitAnalysis(prev: SandboxState, data: FormData): Promise<SandboxState> {
+  return analyzeAction(prev, data).catch((): SandboxState => ({ error: "generic" }));
+}
+
 export function SandboxPanel({ analyst = false }: { analyst?: boolean }) {
   const t = useTranslations("security.sandbox");
   const tc = useTranslations("common");
-  const [fileState, fileAction] = useActionState<SandboxState, FormData>(analyzeAction, undefined);
-  const [urlState, urlAction] = useActionState<SandboxState, FormData>(analyzeAction, undefined);
+  const [fileState, fileAction, filePending] = useActionState<SandboxState, FormData>(submitAnalysis, undefined);
+  const [urlState, urlAction, urlPending] = useActionState<SandboxState, FormData>(submitAnalysis, undefined);
+  const [, startSubmit] = useTransition();
   const [last, setLast] = useState<"file" | "url" | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
   const [dragging, setDragging] = useState(false);
@@ -123,7 +130,18 @@ export function SandboxPanel({ analyst = false }: { analyst?: boolean }) {
         <Card>
           <CardHeader title={t("file")} icon={<Upload />} />
           <CardBody>
-            <form action={fileAction} onSubmit={() => setLast("file")} className="grid gap-4">
+            {/* Both forms are sent through a transition, so React skips its form reset: after a refused or failed check the
+                chosen file is still attached (matching the name shown) and the typed link is kept. */}
+            <form
+              action={fileAction}
+              onSubmit={(e) => {
+                e.preventDefault();
+                setLast("file");
+                const data = new FormData(e.currentTarget);
+                startSubmit(() => fileAction(data));
+              }}
+              className="grid gap-4"
+            >
               <input type="hidden" name="kind" value="file" />
               <label
                 onDragOver={(e) => {
@@ -157,7 +175,7 @@ export function SandboxPanel({ analyst = false }: { analyst?: boolean }) {
                 <span className="mt-1 text-tab text-ink-subtle">{t("fileHint")}</span>
               </label>
               {last === "file" && errText(fileState?.error) ? <p className="text-caption text-risk-600">{errText(fileState?.error)}</p> : null}
-              <SubmitButton icon={<FlaskConical />} disabled={!fileName}>
+              <SubmitButton icon={<FlaskConical />} disabled={!fileName} pending={filePending}>
                 {t("analyzeFile")}
               </SubmitButton>
             </form>
@@ -175,7 +193,16 @@ export function SandboxPanel({ analyst = false }: { analyst?: boolean }) {
         <Card>
           <CardHeader title={t("url")} icon={<Link2 />} />
           <CardBody>
-            <form action={urlAction} onSubmit={() => setLast("url")} className="grid gap-4">
+            <form
+              action={urlAction}
+              onSubmit={(e) => {
+                e.preventDefault();
+                setLast("url");
+                const data = new FormData(e.currentTarget);
+                startSubmit(() => urlAction(data));
+              }}
+              className="grid gap-4"
+            >
               <input type="hidden" name="kind" value="url" />
               <label className="grid gap-1.5">
                 <span className="text-caption font-semibold">{t("urlLabel")}</span>
@@ -183,7 +210,9 @@ export function SandboxPanel({ analyst = false }: { analyst?: boolean }) {
                 <span className="text-tab text-ink-subtle">{t("urlHint")}</span>
               </label>
               {last === "url" && errText(urlState?.error) ? <p className="text-caption text-risk-600">{errText(urlState?.error)}</p> : null}
-              <SubmitButton icon={<FileSearch />}>{t("analyzeUrl")}</SubmitButton>
+              <SubmitButton icon={<FileSearch />} pending={urlPending}>
+                {t("analyzeUrl")}
+              </SubmitButton>
             </form>
             <p className="mt-5 text-tab-sm font-bold tracking-wide text-ink-muted uppercase">{t("checks")}</p>
             <ul className="mt-2 grid grid-cols-2 gap-1.5">
@@ -207,11 +236,11 @@ export function SandboxPanel({ analyst = false }: { analyst?: boolean }) {
                 ? undefined
                 : () =>
                     start(async () => {
-                      const res = await escalateAnalysisAction(state.analysis!.id);
+                      const res = await escalateAnalysisAction(state.analysis!.id).catch(() => ({ ok: false }));
                       if (res.ok) {
                         setEscalated(new Set(escalated).add(state.analysis!.id));
                         toast(t("escalated"));
-                      }
+                      } else toast(tc("errors.generic"), "error");
                     })
             }
           />

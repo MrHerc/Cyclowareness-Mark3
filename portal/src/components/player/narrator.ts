@@ -79,7 +79,7 @@ export function useNarrator({ enabled, rate, lang = "en" }: { enabled: boolean; 
    * With sound off nothing is spoken and onEnd is not called (the learner continues manually).
    */
   const speak = useCallback(
-    (text: string, opts: { voice?: Voice; lang?: string; onWord?: (i: number) => void; onEnd?: () => void } = {}) => {
+    (text: string, opts: { voice?: Voice; lang?: string; onWord?: (i: number) => void; onEnd?: () => void; onError?: (error: string) => void } = {}) => {
       stop();
       const my = ++token.current;
       const clean = speechText(text);
@@ -136,9 +136,11 @@ export function useNarrator({ enabled, rate, lang = "en" }: { enabled: boolean; 
       u.onerror = (e) => {
         if (e.error === "interrupted" || e.error === "canceled" || my !== token.current) return;
         // An engine failure is not "narration finished": show the whole text but let the learner continue by hand.
+        // Callers that run on their own (the landing guide) get `onError` to fall back to reading time.
         clearTimers();
         setSpeaking(false);
         opts.onWord?.(words.length);
+        opts.onError?.(e.error);
       };
       window.speechSynthesis.speak(u);
     },

@@ -1,25 +1,22 @@
-import { notFound } from "next/navigation";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
-import { and, asc, eq } from "drizzle-orm";
-import { Check, Minus } from "lucide-react";
+import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { AlertTriangle, Check, Minus } from "lucide-react";
 import { db, t } from "@/server/db";
-import { allowed, requirePermission } from "@/server/auth/viewer";
+import { allowed } from "@/server/auth/viewer";
 import { campaignAudience, campaignStats } from "@/server/services/campaigns";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 import { Funnel } from "@/components/ui/charts";
-import { PageHeader } from "@/components/ui/layout";
+import { Notice, PageHeader } from "@/components/ui/layout";
 import { Pill } from "@/components/ui/pill";
 import { Avatar } from "@/components/ui/avatar";
 import { CampaignActions } from "@/components/admin/campaign-actions";
 import { TemplatePreview } from "@/components/admin/template-preview";
 import { TEMPLATE_BY_KEY, templateText } from "@/lib/campaigns/templates";
+import { campaignForPage } from "./campaign";
 
 export default async function CampaignPage({ params }: PageProps<"/admin/campaigns/[id]">) {
-  const { id } = await params;
-  const v = await requirePermission("campaigns.read");
-  if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
-  const [c] = await db().select().from(t.campaigns).where(and(eq(t.campaigns.id, id), eq(t.campaigns.tenantId, v.tenant.id)));
-  if (!c) notFound();
+  const { v, c } = await campaignForPage((await params).id);
   const locale = await getLocale();
   const [tr, tc, format] = await Promise.all([getTranslations("admin.campaigns"), getTranslations("common"), getFormatter()]);
   const tpl = TEMPLATE_BY_KEY.get(c.templateKey);
@@ -35,6 +32,19 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
       .orderBy(asc(t.users.name)),
     c.departmentId ? db().select({ name: t.departments.name }).from(t.departments).where(eq(t.departments.id, c.departmentId)) : Promise.resolve([]),
   ]);
+  // A campaign that has not started yet shows why its last launch (scheduled or manual) was refused,
+  // until it is edited (rescheduled, audience changed) after that.
+  const [last] =
+    c.status === "draft" || c.status === "scheduled"
+      ? await db()
+          .select({ action: t.auditLog.action, at: t.auditLog.at, meta: t.auditLog.meta })
+          .from(t.auditLog)
+          .where(and(eq(t.auditLog.tenantId, v.tenant.id), inArray(t.auditLog.action, ["campaign.launch_blocked", "campaign.changed"]), eq(t.auditLog.targetId, c.id)))
+          .orderBy(desc(t.auditLog.at))
+          .limit(1)
+      : [];
+  const blocked = last?.action === "campaign.launch_blocked" ? last : undefined;
+  const blockedReason = blocked && ["mail", "sms", "voice", "empty"].includes(String(blocked.meta?.reason)) ? (String(blocked.meta?.reason) as "mail") : null;
   const s = stats.get(c.id) ?? { sent: 0, opened: 0, clicked: 0, submitted: 0, reported: 0 };
   const pct = (n: number) => (s.sent ? Math.round((n / s.sent) * 100) : 0);
   const mark = (d: Date | null, tone: "risk" | "safe" | "brand") =>
@@ -47,6 +57,11 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
         back={{ href: "/admin/campaigns", label: tr("allCampaigns") }}
         actions={allowed(v, "campaigns.write") ? <CampaignActions id={c.id} status={c.status} audience={audience.length} channel={c.channel} /> : null}
       />
+      {blocked && blockedReason ? (
+        <Notice tone="warn" icon={<AlertTriangle />} title={tr("lastLaunchBlocked", { date: format.dateTime(blocked.at, { dateStyle: "medium", timeStyle: "short" }) })}>
+          {tr("lastLaunchBlockedBody", { reason: tr(`blocked.${blockedReason}`) })}
+        </Notice>
+      ) : null}
       <div className="flex flex-wrap gap-2">
         <Pill tone={c.status === "completed" ? "safe" : c.status === "running" ? "brand" : "neutral"}>{tr(`status.${c.status}`)}</Pill>
         <Pill>{tr(`channel.${c.channel === "qr" ? "email" : c.channel}`)}</Pill>
@@ -80,7 +95,7 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
                 <dd className="font-semibold">{c.launchedAt ? recipients.length : audience.length}</dd>
                 <dt className="text-ink-muted">{tr("sendTime")}</dt>
                 <dd className="font-semibold">
-                  {c.launchedAt ? format.dateTime(c.launchedAt, { dateStyle: "medium", timeStyle: "short" }) : c.scheduledAt ? format.dateTime(c.scheduledAt, { dateStyle: "medium", timeStyle: "short" }) : tr("draftSaved")}
+                  {c.launchedAt ? format.dateTime(c.launchedAt, { dateStyle: "medium", timeStyle: "short" }) : c.status === "scheduled" && c.scheduledAt ? format.dateTime(c.scheduledAt, { dateStyle: "medium", timeStyle: "short" }) : tr("draftSaved")}
                 </dd>
                 <dt className="text-ink-muted">{tr("channelLabel")}</dt>
                 <dd className="font-semibold">{tr(`channel.${c.channel === "qr" ? "email" : c.channel}`)}</dd>
@@ -98,36 +113,38 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
         </div>
       </div>
       {recipients.length ? (
-        <Card>
+        <Card className="min-w-0">
           <CardHeader title={tr("recipients")} />
-          <CardBody className="overflow-x-auto pt-3">
-            <table className="w-full min-w-[40rem] text-body-sm">
-              <thead className="text-tab text-ink-subtle">
-                <tr className="border-b border-line">
-                  <th className="py-2.5 pr-3 text-left font-semibold">{tr("col.person")}</th>
-                  <th className="px-3 py-2.5 text-left font-semibold">{tr("col.department")}</th>
-                  <th className="px-3 py-2.5 font-semibold">{tr("col.opened")}</th>
-                  <th className="px-3 py-2.5 font-semibold">{tr("col.clicked")}</th>
-                  <th className="px-3 py-2.5 font-semibold">{tr("col.reported")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recipients.map(({ r, name, avatar, department }) => (
-                  <tr key={r.id} className="border-b border-line last:border-0">
-                    <td className="py-2.5 pr-3">
-                      <span className="flex items-center gap-2">
-                        <Avatar name={name} src={avatar} size="xs" />
-                        {name}
-                      </span>
-                    </td>
-                    <td className="px-3 py-2.5 text-ink-muted">{department ?? "—"}</td>
-                    <td className="px-3 py-2.5 text-center">{mark(r.openedAt, "brand")}</td>
-                    <td className="px-3 py-2.5 text-center">{mark(r.clickedAt, "risk")}</td>
-                    <td className="px-3 py-2.5 text-center">{mark(r.reportedAt, "safe")}</td>
+          <CardBody className="pt-3">
+            <ScrollRegion label={tr("recipients")}>
+              <table className="w-full min-w-[40rem] text-body-sm">
+                <thead className="text-tab text-ink-subtle">
+                  <tr className="border-b border-line">
+                    <th className="py-2.5 pr-3 text-left font-semibold">{tr("col.person")}</th>
+                    <th className="px-3 py-2.5 text-left font-semibold">{tr("col.department")}</th>
+                    <th className="px-3 py-2.5 font-semibold">{tr("col.opened")}</th>
+                    <th className="px-3 py-2.5 font-semibold">{tr("col.clicked")}</th>
+                    <th className="px-3 py-2.5 font-semibold">{tr("col.reported")}</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {recipients.map(({ r, name, avatar, department }) => (
+                    <tr key={r.id} className="border-b border-line last:border-0">
+                      <td className="py-2.5 pr-3">
+                        <span className="flex items-center gap-2">
+                          <Avatar name={name} src={avatar} size="xs" />
+                          {name}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2.5 text-ink-muted">{department ?? "—"}</td>
+                      <td className="px-3 py-2.5 text-center">{mark(r.openedAt, "brand")}</td>
+                      <td className="px-3 py-2.5 text-center">{mark(r.clickedAt, "risk")}</td>
+                      <td className="px-3 py-2.5 text-center">{mark(r.reportedAt, "safe")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </ScrollRegion>
           </CardBody>
         </Card>
       ) : null}

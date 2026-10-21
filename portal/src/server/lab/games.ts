@@ -128,7 +128,7 @@ export const GAMES = {
 export type GameKey = keyof typeof GAMES;
 
 export function isGame(v: string): v is GameKey {
-  return v in GAMES;
+  return Object.hasOwn(GAMES, v);
 }
 
 /** Items as the browser sees them (no answers). */

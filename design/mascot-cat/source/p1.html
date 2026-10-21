@@ -1,0 +1,272 @@
+<title>AI Sel pişik</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* =====================================================================================
+   AI SEL — Cyclowareness cat mascot (the owner's grey tabby-and-white cat) · "cozy storybook"
+   One self-contained page: inline CSS + JS, Canvas 2D rig, no libraries, no raster images.
+
+   PART TREE (draw order, back to front; "near" = side facing the camera)
+     shadow (floor / cushion)            soft ellipse + paw contact shadows
+     tail            (tailFront < .33)   12-segment chain, tapered ribbon, solid tabby rings, dark tip
+     far legs        (depth < 0)         darker coat, small socks, so they read as behind the body
+     torso + neck                        union of circles along a cubic spine (haunch / waist / chest mass,
+       │                                 belly pouch, shoulder-blade and hip bumps that swap with the stride)
+       ├ white belly + chest bib         soft tufted edge, clipped to the torso
+       └ marbling                        dorsal saddle, flank bull's-eye (solid oyster + open ring),
+                                         tapered rib bands — solid, soft-edged, following the body
+     tail            (.33 … .67)         the sleep curl's tail, between the torso and the near legs
+     near hind leg (haunch swirl, shin bands, hock, metatarsal, paw/sole + white sock + toe beans)
+     tail            (tailFront ≥ .67)   wraps on the floor round the front paws (sitting)
+     front legs      (upper arm, forearm, paw + white sock, toe lines, beans)
+     collar band (indigo #4f46e5)
+     head: ears(+pink inner, tufts) → skull/cheek-fluff union → tabby "M", cheek bars,
+           white muzzle, blush → eyes (halo, rim, iris green-gold, pupil, glints, lids clipped
+           to the socket; closed = one dark arc) → brows → mouth (ω / open, tongue, fangs) → nose → whiskers
+     collar tag: metal shield with check, damped pendulum clamped to ±0.5 rad, tucked face-on near the floor
+     paws over the face (pawFront / paw2: groom, wave, cheer, celebrate, think, shield-up) + tongue on the paw
+     effects: "mrr" bubble, hearts, Zzz, confetti, thought dots, tear, rub wisps + press shadow, feather toy
+
+   JOINTS (body frame: x forward, y up, z toward camera; projected with body yaw theta)
+     spine: hip H → shoulder S (bodyL, arch, sag, curl 0..1 = cubic C-curl for sleep, blade, hipBump)
+     neck: S → head centre (neckA, neckL) · head: roll, pitch, faceCam (yaw toward camera),
+           lookTurn, squish, headScale · ears: earRot (+perk / −flatten), earL, earR twitch
+     eyes: lid, lidLow, pupil (0 slit … 1 round), eyeOpen, lookX/Y, happyEyes, squeeze
+     jaw: mouth, jawTall, tongue, smile, fang · brows: brow (−worried/+cross), browUp · whisk, whiskT
+     front legs nf/ff: shoulder → elbow (2-bone IK; elbow 0 bends back, 1 bends down/out, per-leg nfE/ffE)
+           → wrist → paw (angle a); armZ spreads the shoulders for paws-up poses; paw2 = both paws over the face
+     hind legs nh/fh: hip → knee (IK, bends forward) → hock → metatarsal (angle a) → paw, or sole + beansH
+     tail root offset tailDX/tailDY (the sleep curl tucks it under the haunch)
+     tail: tailA base angle, tailCurl per segment, tailTip, tailWave/tailSpd (lagged sine),
+           tailQuiver, tailPuff, tailFront (layer) · tag: pendulum on the collar
+     scalars: x, gy (floor/cushion height), lift (jump), theta (body yaw 0=right … π=left, always
+           turning through π/2 so the cat turns toward the viewer), bodyR (breath), colPush (rub)
+
+   POSES are plain data (STAND, SIT, PRESENT, LOAF, CURL, CROUCH, POUNCE, LAND, BOW, BACK, RUB, KNEADST).
+   BEHAVIOURS (sit, walk, turn, trot, rub, groom, sleep, wake, stretch, yawn, chase, pet, knead, look,
+   flick, present) are lists of timed segments; each segment is f(u, localTime, globalTime) → pose,
+   blended into the next. Walks are distance-driven: a footfall planner locks stance paws to the floor
+   (lateral sequence), starts from and settles back to the standing pose one paw at a time, and can
+   step backwards. Anything started from the curl first runs `wake` (uncurl, stand, play-bow, hop down);
+   a sleeping cat only gets up for >1 s of fast pointer play after 6 s asleep, and a click makes it purr
+   in place. Mascot mode never leaves its box (walk/rub/chase map to present/pet/lean-in; below 80 px
+   the bust crop dozes sitting up instead of curling).
+   Procedural layers on top: breathing, random blinks, ear and whisker twitches, purr tremble,
+   look-at, talking mouth, mood overlay (+ mood paws), gesture overlay.
+
+   API (window.cat = roaming stage instance; window.createCat(container, opts) for more)
+     createCat(el, { mode: 'roam' | 'mascot', size, facing: 'right' | 'left', label })
+     .behaviours  .moods  .gestures  .state → { behaviour, mood, auto, still, talking }
+     .do(name, opts)    walk {x px}, rub {target: index | element}, chase {x,y px}, sleep, wake, …
+     .setAuto(bool) .getAuto() .setMood(m) .getMood() .setTalking(bool) .play(gesture)
+     .lookAt(clientX, clientY) .poke() .setStill(bool) .isStill() .setSize(px) .destroy()
+     .renderAt(name, t, { mood, talking, gesture, gt }) — deterministic frozen frame, .resume() unfreezes
+     .onState = (behaviour) => …   .onRub = (pillarEl, intensity) => …
+
+   PORTING
+     React: const ref = useRef(); useEffect(() => { const c = createCat(ref.current, { mode: 'mascot',
+       size }); return () => c.destroy(); }, []); then call c.setMood / setTalking / play from props.
+     Rive: every pose key is a state-machine number input (0..1 or degrees), every behaviour a state
+       whose timeline is the segment list here; mood = enum input, talking = bool, gestures = triggers,
+       poke = trigger, lookAt = two numbers. Blend times are the segment `b` values.
+   ===================================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Geologica:wght@400;600;800&display=swap');
+:root{
+  --canvas:#f7f6fb; --ink:#16123a; --muted:#5f5b7d; --card:#ffffff; --card-2:#faf9fe; --line:#e5e2f0;
+  --brand:#4f46e5; --brand-soft:#ecebfd; --accent:#ff7a1a; --focus:#ff7a1a;
+  --wall-top:#f8f3fb; --wall-bot:#f0e7f5; --dot:rgba(110,90,190,.11); --glow:rgba(255,198,140,.5);
+  --win-a:#fff8ec; --win-b:#ffe2c2; --win-frame:#e9def0;
+  --floor-top:#eadccd; --floor-bot:#dccab8; --board:#f3e9df;
+  --rug:#e6e1fb; --rug-2:#d2cbf6; --rug-edge:#f1eefd;
+  --pillar:#ffffff; --pillar-2:#f4f2fc; --pillar-ink:#16123a; --pillar-edge:#e4e0f2; --pillar-bar:#e9e7f8;
+  --cushion:#8d85ec; --cushion-2:#6c63d9; --cushion-top:#aba5f5; --cushion-rim:#c9c5fa;
+  --shadow:rgba(64,48,110,.28);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme=light]){
+    --canvas:#0e0c22; --ink:#ecebff; --muted:#aaa7cc; --card:#18153a; --card-2:#1d1a42; --line:#2e2a58;
+    --brand:#6d66f2; --brand-soft:#262260;
+    --wall-top:#1d1940; --wall-bot:#241d45; --dot:rgba(220,210,255,.05); --glow:rgba(255,160,80,.18);
+    --win-a:#2b2c63; --win-b:#3a3576; --win-frame:#3a2f5c;
+    --floor-top:#2f2542; --floor-bot:#251c36; --board:#3a2d4c;
+    --rug:#3a3270; --rug-2:#302a60; --rug-edge:#463d80;
+    --pillar:#25204c; --pillar-2:#1d1940; --pillar-ink:#ecebff; --pillar-edge:#3a3470; --pillar-bar:#302a63;
+    --cushion:#5b53c9; --cushion-2:#4038a6; --cushion-top:#6f68dc; --cushion-rim:#8a84ea;
+    --shadow:rgba(0,0,0,.50);
+    color-scheme: dark;
+  }
+}
+:root[data-theme=dark]{
+  --canvas:#0e0c22; --ink:#ecebff; --muted:#aaa7cc; --card:#18153a; --card-2:#1d1a42; --line:#2e2a58;
+  --brand:#6d66f2; --brand-soft:#262260;
+  --wall-top:#1d1940; --wall-bot:#241d45; --dot:rgba(220,210,255,.05); --glow:rgba(255,160,80,.18);
+  --win-a:#2b2c63; --win-b:#3a3576; --win-frame:#3a2f5c;
+  --floor-top:#2f2542; --floor-bot:#251c36; --board:#3a2d4c;
+  --rug:#3a3270; --rug-2:#302a60; --rug-edge:#463d80;
+  --pillar:#25204c; --pillar-2:#1d1940; --pillar-ink:#ecebff; --pillar-edge:#3a3470; --pillar-bar:#302a63;
+  --cushion:#5b53c9; --cushion-2:#4038a6; --cushion-top:#6f68dc; --cushion-rim:#8a84ea;
+  --shadow:rgba(0,0,0,.50);
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--canvas);color:var(--ink);
+  font-family:Geologica,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  padding:28px max(16px, env(safe-area-inset-right, 0px)) 56px max(16px, env(safe-area-inset-left, 0px));
+  overflow-x:hidden}
+.wrap{max-width:1000px;margin:0 auto}
+.hero{display:grid;gap:8px;margin-bottom:18px}
+.eyebrow{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--brand)}
+h1{margin:0;font-weight:800;font-size:clamp(28px,4.4vw,44px);line-height:1.05;letter-spacing:-.02em}
+h1 span{font-weight:400;color:var(--muted)}
+.lede{margin:0;max-width:62ch;color:var(--muted);font-size:15px;line-height:1.5}
+h2{margin:0 0 12px;font-size:18px;font-weight:800}
+
+/* ---------- stage ---------- */
+.stage-card{border-radius:24px;padding:0;overflow:hidden;box-shadow:0 18px 40px -26px var(--shadow),0 0 0 1px var(--line)}
+#stage{position:relative;width:100%;aspect-ratio:1000/560;overflow:hidden;container-type:inline-size;
+  background:
+    radial-gradient(circle, var(--dot) 1.2px, transparent 1.8px) 0 0/26px 26px,
+    linear-gradient(180deg,var(--wall-top),var(--wall-bot));
+  touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+#stage:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
+#stage.toy{cursor:none}
+.sc-glow{position:absolute;inset:0;background:radial-gradient(55% 75% at 27% 16%,var(--glow),transparent 72%);pointer-events:none}
+.sc-window{position:absolute;left:19.5%;top:9%;width:17%;height:40%;border-radius:120px 120px 10px 10px;
+  background:linear-gradient(180deg,var(--win-a),var(--win-b));box-shadow:0 0 0 7px var(--win-frame),0 0 60px 10px var(--glow);opacity:.95}
+.sc-window::before,.sc-window::after{content:"";position:absolute;background:var(--win-frame)}
+.sc-window::before{left:50%;top:0;bottom:0;width:5px;transform:translateX(-50%)}
+.sc-window::after{left:0;right:0;top:55%;height:5px}
+.sc-floor{position:absolute;left:0;right:0;bottom:0;height:14%;
+  background:linear-gradient(180deg,var(--floor-top),var(--floor-bot));box-shadow:0 -5px 0 var(--board)}
+.sc-rug{position:absolute;left:62%;bottom:2.2%;width:42%;height:10%;transform:translateX(-50%);border-radius:50%;
+  background:radial-gradient(closest-side,var(--rug) 62%,var(--rug-2) 64%,var(--rug-2) 80%,var(--rug-edge) 82%,var(--rug-2) 100%);opacity:.9}
+.pillar{position:absolute;left:var(--x);bottom:13.4%;width:11%;height:57%;border-radius:2.2cqw 2.2cqw .8cqw .8cqw;
+  background:linear-gradient(180deg,var(--pillar),var(--pillar-2));border:1px solid var(--pillar-edge);
+  box-shadow:0 1.4cqw 2.6cqw -1.6cqw var(--shadow),inset 0 -2cqw 2.4cqw -2cqw rgba(79,70,229,.22);
+  transform-origin:50% 100%;transform:translateX(calc(var(--push,0)*1px)) rotate(calc(var(--wob,0)*1deg)) scaleX(calc(1 + var(--press,0)*.012));
+  display:flex;flex-direction:column;align-items:center;gap:.8cqw;padding:1.8cqw .9cqw 0;color:var(--pillar-ink);overflow:hidden}
+.pillar::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(70% 30% at 50% 82%,rgba(79,70,229,.22),transparent 70%);opacity:var(--press,0)}
+.pillar svg{width:3.4cqw;height:3.4cqw;flex:none}
+.pillar b{font-weight:600;font-size:clamp(8px,1.45cqw,15px);line-height:1.15;text-align:center}
+.pillar i{display:block;width:70%;height:.55cqw;border-radius:9px;background:var(--pillar-bar);position:relative;overflow:hidden}
+.pillar i::after{content:"";position:absolute;inset:0;width:var(--p,60%);background:var(--brand);border-radius:inherit}
+.pillar s{display:block;width:56%;height:.45cqw;border-radius:9px;background:var(--pillar-bar);text-decoration:none}
+.cat-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+.stage-hint{position:absolute;left:1.6cqw;top:1.4cqw;font-size:clamp(9px,1.25cqw,13px);font-weight:600;color:var(--muted);
+  background:color-mix(in srgb,var(--card) 70%,transparent);padding:.5cqw 1cqw;border-radius:99px;pointer-events:none}
+@media (max-width:600px){ #stage{aspect-ratio:10/9} }
+@container (max-width:560px){
+  .pillar{width:20%;gap:1.4cqw;padding-top:3cqw} .pillar[data-col="1"]{display:none} .pillar[data-col="2"]{left:76%}
+  .pillar svg{width:6cqw;height:6cqw} .pillar b{font-size:clamp(10px,3.2cqw,14px)} .pillar i{height:1.2cqw} .pillar s{height:1cqw}
+  .sc-window{left:22%;width:26%;height:34%} .sc-rug{left:52%;width:70%}
+  .stage-hint{font-size:11px;padding:4px 9px;left:10px;top:10px}
+}
+
+/* ---------- controls ---------- */
+.panel{margin-top:16px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px;display:grid;gap:12px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.lbl{flex:0 0 100%;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.btn{font:600 14px/1 Geologica,system-ui,sans-serif;padding:10px 14px;border-radius:999px;border:1px solid var(--line);
+  background:var(--card-2);color:var(--ink);cursor:pointer;transition:transform .15s,background-color .2s,border-color .2s;min-height:38px}
+.btn:hover{border-color:var(--brand)}
+.btn:active{transform:translateY(1px)}
+.btn[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.chip{font-size:13px;padding:8px 12px;min-height:34px}
+.btn.now{box-shadow:0 0 0 2px var(--accent) inset}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.btn:focus:not(:focus-visible){outline:none}
+
+/* ---------- sizes ---------- */
+#sizes{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
+.sizes-row{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end}
+.slot{margin:0;display:grid;justify-items:center;gap:8px;padding:12px;border-radius:16px;background:var(--card-2);border:1px solid var(--line)}
+.mbox{position:relative;width:calc(var(--sz)*1px);height:calc(var(--sz)*1px);border-radius:14px;
+  background:radial-gradient(circle at 50% 42%,var(--brand-soft),transparent 72%)}
+.mbox canvas{position:absolute;inset:0;width:100%;height:100%}
+.slot figcaption{font-size:12px;color:var(--muted);font-weight:600}
+.note{margin:14px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+.note code{font-size:12px;background:var(--brand-soft);padding:1px 6px;border-radius:6px;overflow-wrap:anywhere}
+@media (max-width:520px){ body{padding-top:18px} .btn{padding:9px 12px;font-size:13px} .slot{padding:10px} }
+</style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<main class="wrap">
+  <header class="hero">
+    <div class="eyebrow">Cyclowareness · yeni maskot</div>
+    <h1>AI Sel <span>— təhlükəsizlik pişiyi</span></h1>
+    <p class="lede">Boz-ağ tabby pişik, boynunda qalxan nişanlı tasma. Siçanı səhnədə tez gəzdirin, ovlamağa başlayacaq; üstünə toxunun, mırıldayacaq.</p>
+  </header>
+
+  <section class="stage-card" aria-label="Pişik səhnəsi">
+    <div id="stage" role="button" tabindex="0" aria-label="AI Sel pişiyi otaqda gəzir, sütunlara sürtünür, yastıqda yatır. Sığallamaq üçün Enter və ya Boşluq düyməsini basın.">
+      <div class="sc-glow"></div>
+      <div class="sc-window"></div>
+      <div class="sc-floor"></div>
+      <div class="sc-rug"></div>
+      <div class="pillar" data-col="0" style="--x:4%;--p:72%">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linejoin="round"/><path d="m4 7 8 6 8-6" fill="none" stroke="#ff7a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <b>Fişinq 101</b><i></i><s></s>
+      </div>
+      <div class="pillar" data-col="1" style="--x:47%;--p:45%">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2.5" fill="none" stroke="#4f46e5" stroke-width="2"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10" fill="none" stroke="#4f46e5" stroke-width="2"/><circle cx="12" cy="15" r="1.6" fill="#ff7a1a"/></svg>
+        <b>Parol</b><i></i><s></s>
+      </div>
+      <div class="pillar" data-col="2" style="--x:84%;--p:88%">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5.5c0 4.3 3 7.6 7 9.5 4-1.9 7-5.2 7-9.5V6z" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linejoin="round"/><path d="m9 12 2.2 2.2L15.5 10" fill="none" stroke="#ff7a1a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <b>İki addımlı giriş</b><i></i><s></s>
+      </div>
+      <div class="stage-hint">Siçanı tez gəzdirin · pişiyə toxunun</div>
+    </div>
+  </section>
+
+  <section class="panel" aria-label="İdarəetmə paneli">
+    <div class="row" id="rowDo">
+      <span class="lbl">Davranış</span>
+      <button class="btn" id="bAuto" aria-pressed="true">Avtomatik</button>
+      <button class="btn" data-do="sit">Otur</button>
+      <button class="btn" data-do="walk">Gəz</button>
+      <button class="btn" data-do="rub">Sütuna sürtün</button>
+      <button class="btn" data-do="groom">Pəncəsini yala</button>
+      <button class="btn" data-do="sleep">Yat</button>
+      <button class="btn" data-do="wake">Oyan</button>
+      <button class="btn" data-do="stretch">Gərnəş</button>
+      <button class="btn" data-do="yawn">Əsnə</button>
+      <button class="btn" data-do="chase">Ov</button>
+      <button class="btn" data-do="pet">Sığalla</button>
+      <button class="btn" data-do="knead">Yoğur</button>
+      <button class="btn" data-do="look">Ətrafa bax</button>
+      <button class="btn" data-do="flick">Qulaq-quyruq</button>
+    </div>
+    <div class="row" id="rowMood">
+      <span class="lbl">Əhval</span>
+    </div>
+    <div class="row" id="rowGest">
+      <span class="lbl">Jestlər (dərs maskotu)</span>
+    </div>
+    <div class="row">
+      <span class="lbl">Rejim</span>
+      <button class="btn" id="bTalk" aria-pressed="false">Danışır</button>
+      <button class="btn" id="bStill" aria-pressed="false">Hərəkətsiz</button>
+    </div>
+    <div class="row" role="group" aria-label="Tema">
+      <span class="lbl">Tema</span>
+      <button class="btn chip" data-theme-set="auto" aria-pressed="true">Avto</button>
+      <button class="btn chip" data-theme-set="light" aria-pressed="false">İşıqlı</button>
+      <button class="btn chip" data-theme-set="dark" aria-pressed="false">Qaranlıq</button>
+    </div>
+  </section>
+
+  <section id="sizes" aria-label="Maskot ölçüləri">
+    <h2>Maskot rejimi · ölçülər</h2>
+    <div class="sizes-row">
+      <figure class="slot"><div class="mbox" data-size="32" style="--sz:32"></div><figcaption>32 px</figcaption></figure>
+      <figure class="slot"><div class="mbox" data-size="48" style="--sz:48"></div><figcaption>48 px</figcaption></figure>
+      <figure class="slot"><div class="mbox" data-size="64" style="--sz:64"></div><figcaption>64 px</figcaption></figure>
+      <figure class="slot"><div class="mbox" data-size="96" style="--sz:96"></div><figcaption>96 px</figcaption></figure>
+      <figure class="slot"><div class="mbox" data-size="160" style="--sz:160"></div><figcaption>160 px · təqdimat</figcaption></figure>
+    </div>
+    <p class="note">Dərslərdə: <code>createCat(el, {mode:'mascot', size})</code> · <code>setMood</code> · <code>setTalking</code> · <code>play('shield-up')</code> · <code>destroy()</code></p>
+  </section>
+</main>

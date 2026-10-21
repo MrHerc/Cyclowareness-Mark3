@@ -5,6 +5,7 @@ import { refresh } from "next/cache";
 import { z } from "zod";
 import { db, t } from "../db";
 import { actionViewer } from "../auth/viewer";
+import { isUuid } from "../../lib/ids";
 import { audit } from "../services/audit";
 import { launchCampaign, recordSubmit, type LaunchBlock } from "../services/campaigns";
 import { TEMPLATE_BY_KEY } from "../../lib/campaigns/templates";
@@ -19,7 +20,7 @@ const draftSchema = z.object({
   scheduledAt: z.iso.datetime({ offset: true }).nullable(),
 });
 
-export async function saveCampaignAction(input: z.infer<typeof draftSchema>): Promise<{ ok: boolean; id?: string }> {
+export async function saveCampaignAction(input: z.infer<typeof draftSchema>): Promise<{ ok: boolean; id?: string; reason?: "past_date" }> {
   const v = await actionViewer("campaigns.write");
   const p = draftSchema.safeParse(input);
   if (!p.success) return { ok: false };
@@ -31,7 +32,7 @@ export async function saveCampaignAction(input: z.infer<typeof draftSchema>): Pr
   const tpl = TEMPLATE_BY_KEY.get(p.data.templateKey)!;
   if ((tpl.channel === "sms" || tpl.channel === "voice") && !v.tenant.features.has("sms_voice")) return { ok: false };
   const scheduledAt = p.data.scheduledAt ? new Date(p.data.scheduledAt) : null;
-  if (scheduledAt && scheduledAt.getTime() < Date.now() - 60_000) return { ok: false };
+  if (scheduledAt && scheduledAt.getTime() < Date.now() - 60_000) return { ok: false, reason: "past_date" };
   if (p.data.id) {
     const [c] = await db().select({ id: t.campaigns.id, status: t.campaigns.status }).from(t.campaigns).where(and(eq(t.campaigns.id, p.data.id), eq(t.campaigns.tenantId, v.tenant.id)));
     if (!c || (c.status !== "draft" && c.status !== "scheduled")) return { ok: false };
@@ -71,6 +72,7 @@ export async function saveCampaignAction(input: z.infer<typeof draftSchema>): Pr
 
 export async function launchCampaignAction(id: string): Promise<{ ok: boolean; count?: number; reason?: LaunchBlock }> {
   const v = await actionViewer("campaigns.write");
+  if (!isUuid(id)) return { ok: false };
   const [c] = await db().select().from(t.campaigns).where(and(eq(t.campaigns.id, id), eq(t.campaigns.tenantId, v.tenant.id)));
   if (!c) return { ok: false };
   const res = await launchCampaign(db(), c.id, v.user.id);
@@ -80,6 +82,8 @@ export async function launchCampaignAction(id: string): Promise<{ ok: boolean; c
 
 export async function setCampaignStatusAction(id: string, status: "cancelled" | "completed"): Promise<{ ok: boolean }> {
   const v = await actionViewer("campaigns.write");
+  // Only these two end states can be set by hand; anything else would let a running campaign be relaunched.
+  if (!isUuid(id) || (status !== "cancelled" && status !== "completed")) return { ok: false };
   const [c] = await db().select().from(t.campaigns).where(and(eq(t.campaigns.id, id), eq(t.campaigns.tenantId, v.tenant.id)));
   if (!c || c.status === "completed" || c.status === "cancelled") return { ok: false };
   await db()

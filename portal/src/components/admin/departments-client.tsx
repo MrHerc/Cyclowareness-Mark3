@@ -103,7 +103,7 @@ export function DepartmentsTree({ departments, people }: { departments: Dept[]; 
                 if (res.ok) {
                   toast(edit.mode === "add" ? t("created") : edit.mode === "move" ? t("moved") : t("renamed"));
                   setEdit(null);
-                } else toast(res.error === "cycle" ? t("cycle") : tc("errors.invalid"), "error");
+                } else toast(res.error === "cycle" ? t("cycle") : res.error === "duplicate" ? t("duplicate") : tc("errors.invalid"), "error");
               });
             }}
           >

@@ -79,7 +79,7 @@ export default async function OpsCenterPage() {
                     <li key={i.id}>
                       <Link href={`/admin/incidents/${i.id}`} className="flex flex-wrap items-center gap-3 py-3 hover:text-brand-700">
                         <span className="font-mono text-tab text-ink-subtle">IR-{i.number}</span>
-                        <span className="min-w-0 flex-1 truncate text-body-sm font-semibold">{i.confidential ? `${tc(`severity.${i.severity}`)} · ${ts("incidents.confidential")}` : i.title}</span>
+                        <span className="min-w-0 flex-[1_1_12rem] truncate text-body-sm font-semibold">{i.confidential ? `${tc(`severity.${i.severity}`)} · ${ts("incidents.confidential")}` : i.title}</span>
                         {i.live ? <Pill tone="risk">{ts("incidents.live")}</Pill> : null}
                         <Pill tone={i.severity === "critical" || i.severity === "high" ? "risk" : "warn"}>{tc(`severity.${i.severity}`)}</Pill>
                         <Pill>{ts(`incidents.statuses.${i.status}`)}</Pill>

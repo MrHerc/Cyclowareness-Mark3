@@ -1,13 +1,14 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
-import { ShieldAlert } from "lucide-react";
+import { AlertTriangle, ShieldAlert } from "lucide-react";
 import { reportThreatAction, type ReportState } from "@/server/actions/security";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select, Textarea } from "@/components/ui/field";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { Button } from "@/components/ui/button";
+import { Notice } from "@/components/ui/layout";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 
@@ -16,17 +17,38 @@ const CHANNELS = ["email", "sms", "call", "link", "file", "in_person", "other"] 
 export function ReportForm({ onDone }: { onDone?: () => void }) {
   const t = useTranslations("security.report");
   const tc = useTranslations("common");
-  const [state, action] = useActionState<ReportState, FormData>(reportThreatAction, undefined);
+  // A thrown action (server unreachable) becomes the generic form error instead of unmounting the form.
+  const [state, action, pending] = useActionState<ReportState, FormData>((prev, data) => reportThreatAction(prev, data).catch(() => ({ error: "generic" })), undefined);
+  const [, startSubmit] = useTransition();
+  const form = useRef<HTMLFormElement>(null);
+  // The subject error belongs to its field; rate limits and anything else are shown above the form.
+  const subjectError = state?.error === "subject" ? t("errors.subject") : null;
+  const formError = !state?.error || subjectError ? null : state.error === "rateLimited" ? tc("errors.rateLimited") : tc("errors.generic");
 
   useEffect(() => {
     if (!state?.ok || !state.number) return;
-    toast(state.simulation ? t("simulation", { xp: state.xp ?? 0 }) : state.xp ? t("thanksXp", { number: state.number, xp: state.xp }) : t("thanks", { number: state.number }));
+    toast(state.simulation ? (state.xp ? t("simulation", { xp: state.xp }) : t("simulationNoXp")) : state.xp ? t("thanksXp", { number: state.number, xp: state.xp }) : t("thanks", { number: state.number }));
+    form.current?.reset();
     onDone?.();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   return (
-    <form action={action} className="grid gap-4">
+    // Submitted through a transition rather than the form action, so a rejected report keeps what was typed.
+    <form
+      ref={form}
+      className="grid gap-4"
+      onSubmit={(e) => {
+        e.preventDefault();
+        const data = new FormData(e.currentTarget);
+        startSubmit(() => action(data));
+      }}
+    >
+      {formError ? (
+        <Notice tone="risk" icon={<AlertTriangle />}>
+          <span role="alert">{formError}</span>
+        </Notice>
+      ) : null}
       <Field label={t("channel")} htmlFor="channel">
         <Select id="channel" name="channel" defaultValue="email">
           {CHANNELS.map((c) => (
@@ -36,8 +58,8 @@ export function ReportForm({ onDone }: { onDone?: () => void }) {
           ))}
         </Select>
       </Field>
-      <Field label={t("subject")} htmlFor="subject" error={state?.error === "subject" ? t("errors.subject") : state?.error === "rateLimited" ? tc("errors.rateLimited") : null}>
-        <Input id="subject" name="subject" maxLength={300} placeholder={t("subjectPlaceholder")} required aria-invalid={state?.error === "subject"} />
+      <Field label={t("subject")} htmlFor="subject" error={subjectError}>
+        <Input id="subject" name="subject" maxLength={300} placeholder={t("subjectPlaceholder")} required {...(subjectError ? { "aria-invalid": true, "aria-describedby": "subject-error" } : {})} />
       </Field>
       <Field label={t("details")} htmlFor="details" optional={tc("optional")}>
         <Textarea id="details" name="details" maxLength={4000} placeholder={t("detailsPlaceholder")} />
@@ -51,7 +73,9 @@ export function ReportForm({ onDone }: { onDone?: () => void }) {
             {tc("cancel")}
           </Button>
         ) : null}
-        <SubmitButton icon={<ShieldAlert />}>{t("submit")}</SubmitButton>
+        <SubmitButton icon={<ShieldAlert />} pending={pending}>
+          {t("submit")}
+        </SubmitButton>
       </div>
     </form>
   );

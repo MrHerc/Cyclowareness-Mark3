@@ -1,7 +1,7 @@
 <!-- version: 1; effective: 2026-10-04 -->
 # İstifadə Şərtləri
 
-Platformadan istifadə qaydaları: tərəflər, hesabların təhlükəsizliyi, məqbul istifadə, saxta fişinq və QR təlimləri, Təşkilatın vəzifələri, əqli mülkiyyət, Sİ müəllimin hədləri, məsuliyyət, tətbiq olunan hüquq və əlaqə. İmzalanmış müştəri müqaviləsi bu Şərtlərdən üstündür.
+Platformadan istifadə qaydaları: tərəflər, hesabların təhlükəsizliyi, məqbul istifadə, saxta fişinq və QR təlimləri, Təşkilatın vəzifələri, əqli mülkiyyət, AI Sel-in hədləri, məsuliyyət, tətbiq olunan hüquq və əlaqə. İmzalanmış müştəri müqaviləsi bu Şərtlərdən üstündür.
 
 ## 1. Bu Şərtlər haqqında
 
@@ -21,7 +21,7 @@ Platformadan istifadə qaydaları: tərəflər, hesabların təhlükəsizliyi, m
 
 ## 3. Xidmət
 
-3.1. Təşkilatın seçdiyi paketdən asılı olaraq Xidmətə interaktiv dərslər və simulyasiyalar, süni intellekt əsaslı müəllim (bundan sonra "Sİ müəllim"), oyunlar, xallar (XP) və şöbələr arası liqa, sertifikatlar, təsdiqetmə imkanı olan siyasətlər kitabxanası, saxta fişinq və QR kod təlimləri, hesabatlar olan inzibati panel, habelə Təşkilatın sistemləri ilə inteqrasiya (vahid giriş, Active Directory və ya LDAP, elektron poçt, SIEM və ITSM) daxildir.
+3.1. Təşkilatın seçdiyi paketdən asılı olaraq Xidmətə interaktiv dərslər və simulyasiyalar, süni intellekt əsaslı köməkçi (bundan sonra "AI Sel"), oyunlar, xallar (XP) və şöbələr arası liqa, sertifikatlar, təsdiqetmə imkanı olan siyasətlər kitabxanası, saxta fişinq və QR kod təlimləri, hesabatlar olan inzibati panel, habelə Təşkilatın sistemləri ilə inteqrasiya (vahid giriş, Active Directory və ya LDAP, elektron poçt, SIEM və ITSM) daxildir.
 3.2. Lokal versiyada hostinqə, ehtiyat nüsxələrə, şəbəkə təhlükəsizliyinə, yeniləmələrin quraşdırılmasına və qoşulan xarici xidmətlərin ayarlanmasına Təşkilat cavabdehdir. Bu halda Təminatçının öhdəlikləri yalnız Müştəri müqaviləsində göstərilənlərdir.
 3.3. Xidmət müasir veb brauzerlərdə və Android tətbiqində işləyir. Bəzi funksiyalar (kamera, mikrofon, internetsiz təlim) qurğudan və İstifadəçinin verdiyi icazələrdən asılıdır.
 3.4. Xidmət təlim vasitəsidir. Təlimin keçilməsi insan səhvi riskini azaldır, lakin Təşkilatın heç vaxt kiberinsidentlə üzləşməyəcəyinə zəmanət vermir.
@@ -54,7 +54,7 @@ Platformadan istifadə qaydaları: tərəflər, hesabların təhlükəsizliyi, m
 - Təlim materiallarının surətini çıxarmaq, avtomatik toplamaq, dərc etmək, satmaq və ya başqa üsulla Təşkilatdan kənarda əlçatan etmək, yaxud onlardan süni intellekt modellərinin öyrədilməsi üçün istifadə etmək;
 - Xidmətdən başqalarını aldatmaq, təqib etmək və ya başqa şəxsin adından çıxış etmək üçün istifadə etmək;
 - dərsləri öz əvəzinə başqa şəxsə keçirtmək və ya yalan təsdiq vermək;
-- Sİ müəllimə və ya sərbəst mətn sahələrinə parol, məxfi məlumat, yaxud özünün və ya başqalarının fərdi məlumatlarını daxil etmək.
+- AI Sel-ə və ya sərbəst mətn sahələrinə parol, məxfi məlumat, yaxud özünün və ya başqalarının fərdi məlumatlarını daxil etmək.
 6.2. Xidmətdə zəiflik aşkar edən şəxs bu barədə sonradan göstəriləcək ünvanına bildirməli, ondan zəifliyin mövcudluğunu göstərmək üçün lazım olandan artıq istifadə etməməli və aradan qaldırılanadək onu açıqlamamalıdır.
 6.3. Bu qaydalar pozulduqda Təminatçı 14-cü bölməyə uyğun olaraq çıxışı məhdudlaşdıra və Təşkilata məlumat verə bilər. Təşkilat öz daxili qaydalarını tətbiq edə bilər. Qanunvericiliklə nəzərdə tutulmuş məsuliyyət bundan asılı deyil.
 
@@ -88,12 +88,12 @@ Platformadan istifadə qaydaları: tərəflər, hesabların təhlükəsizliyi, m
 9.5. Dərslərdə və simulyasiyalarda göstərilən brend adları, saytlar və təşkilatlar yalnız təlim nümunəsi kimi istifadə olunur. Bu, onların sahibləri ilə hər hansı əlaqə və ya onların razılığı demək deyil.
 9.6. Təminatçı Xidmət barədə təklif və rəylərdən, fərdi məlumat ehtiva etmədikləri halda, heç bir öhdəlik daşımadan istifadə edə bilər.
 
-## 10. Sİ müəllim
+## 10. AI Sel (Sİ köməkçisi)
 
-10.1. Sİ müəllim cari dərslə bağlı yazılı və ya səsli suallara cavab verir. Bulud versiyasında cavablar Google Cloud Vertex AI vasitəsilə Google Gemini modelləri tərəfindən yaradılır.
-10.2. Sİ müəllimin cavabları qeyri-dəqiq, natamam və ya köhnəlmiş ola bilər. Onlar yalnız təlim üçündür və hüquqi, texniki və ya digər peşəkar məsləhət deyil. Real insident zamanı Təşkilatın insidentlərə cavab qaydasına əməl edin və onun informasiya təhlükəsizliyi əməkdaşları ilə əlaqə saxlayın.
-10.3. Sİ müəllimə fərdi məlumat, parol və ya məxfi məlumat daxil etməyin. Xidmət sualı göndərməzdən əvvəl elektron poçt ünvanlarını, telefon nömrələrini, kart və hesab nömrələrini gizlədir, lakin avtomatik gizlətmə hər şeyi aşkar edə bilməz.
-10.4. Sİ müəllim kibergigiyenadan kənar suallara cavab vermir, saatlıq hədlərə malikdir və Təşkilat onu səsli suallarla birlikdə söndürə bilər.
+10.1. AI Sel cari dərslə bağlı yazılı və ya səsli suallara cavab verir. Bulud versiyasında cavablar Google Cloud Vertex AI vasitəsilə Google Gemini modelləri tərəfindən yaradılır.
+10.2. AI Sel-in cavabları qeyri-dəqiq, natamam və ya köhnəlmiş ola bilər. Onlar yalnız təlim üçündür və hüquqi, texniki və ya digər peşəkar məsləhət deyil. Real insident zamanı Təşkilatın insidentlərə cavab qaydasına əməl edin və onun informasiya təhlükəsizliyi əməkdaşları ilə əlaqə saxlayın.
+10.3. AI Sel-ə fərdi məlumat, parol və ya məxfi məlumat daxil etməyin. Xidmət sualı göndərməzdən əvvəl elektron poçt ünvanlarını, telefon nömrələrini, kart və hesab nömrələrini gizlədir, lakin avtomatik gizlətmə hər şeyi aşkar edə bilməz.
+10.4. AI Sel kibergigiyenadan kənar suallara cavab vermir, saatlıq hədlərə malikdir və Təşkilat onu səsli suallarla birlikdə söndürə bilər.
 10.5. Eyni suala süni intellekt modelinə yeni sorğu göndərmədən yenidən cavab vermək üçün suallar və cavablar saxlanılır. Onlar sual verən şəxsin adı və hesabı ilə əlaqələndirilmədən saxlanılır.
 
 ## 11. Təsdiqlər, siyasətlərlə tanışlıq və sertifikatlar

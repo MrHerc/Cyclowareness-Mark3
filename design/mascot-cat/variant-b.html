@@ -1,0 +1,1710 @@
+<title>AI Sel pişik</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Geologica:wght@400;600;800&display=swap');
+:root{
+  --bg:#f7f6fb; --ink:#16123a; --muted:#625e80; --surface:#ffffff; --surface-2:#f1eff9; --line:#e2deef;
+  --brand:#4f46e5; --brand-soft:#e9e7fd; --brand-ink:#ffffff; --accent:#ff7a1a;
+  --wall-a:#f5f3fc; --wall-b:#ebe7f7; --floor-a:#e3dcf1; --floor-b:#d6cde9; --floor-line:#c9bfe0;
+  --pillar:#ffffff; --pillar-edge:#e0dbef; --pillar-ink:#16123a; --pillar-sub:#6b6790; --pillar-shadow:rgba(40,30,90,.10);
+  --cushion-a:#cdc7ee; --cushion-b:#9f97d8; --cushion-pipe:#857bcc; --cushion-shadow:rgba(40,30,90,.18);
+  --cat-shadow:rgba(40,30,90,.20); --whisker:#8f95a1; --cat-line:rgba(34,30,66,.55);
+  --bubble:#ffffff; --bubble-ink:#16123a; --bubble-line:#e2deef; --focus:#4f46e5; --chip:#f1eff9; --chip-ink:#2a2552;
+  --win-a:#e9e6fd; --win-b:#fff1e3; --win-frame:#d9d2ee; --rug:#ebe4f7; --rug-edge:#d3c8ec; --plant:#7fb38a; --plant-d:#5e9a70; --pot:#ff7a1a; --sun:rgba(255,214,170,.28);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme=light]){
+    --bg:#0e0c20; --ink:#efedff; --muted:#a7a3c8; --surface:#17142e; --surface-2:#1e1a3a; --line:#2c2852;
+    --brand:#7c74ff; --brand-soft:#26215a; --brand-ink:#ffffff; --accent:#ff8a33;
+    --wall-a:#1a1734; --wall-b:#141129; --floor-a:#221d44; --floor-b:#1b1738; --floor-line:#332c63;
+    --pillar:#211d40; --pillar-edge:#352f66; --pillar-ink:#efedff; --pillar-sub:#a7a3c8; --pillar-shadow:rgba(0,0,0,.35);
+    --cushion-a:#5a52a8; --cushion-b:#3d3684; --cushion-pipe:#7a71d6; --cushion-shadow:rgba(0,0,0,.45);
+    --cat-shadow:rgba(0,0,0,.42); --whisker:#d4d7de; --cat-line:rgba(8,6,20,.75);
+    --bubble:#26214d; --bubble-ink:#efedff; --bubble-line:#3a3470; --focus:#a29cff; --chip:#1e1a3a; --chip-ink:#dcd9f7;
+    --win-a:#1d1946; --win-b:#2d2763; --win-frame:#3a3470; --rug:#241f4a; --rug-edge:#352e68; --plant:#4f8a62; --plant-d:#3d6f4e; --pot:#e86d12; --sun:rgba(160,150,255,.10);
+    color-scheme: dark;
+  }
+}
+:root[data-theme=dark]{
+  --bg:#0e0c20; --ink:#efedff; --muted:#a7a3c8; --surface:#17142e; --surface-2:#1e1a3a; --line:#2c2852;
+  --brand:#7c74ff; --brand-soft:#26215a; --brand-ink:#ffffff; --accent:#ff8a33;
+  --wall-a:#1a1734; --wall-b:#141129; --floor-a:#221d44; --floor-b:#1b1738; --floor-line:#332c63;
+  --pillar:#211d40; --pillar-edge:#352f66; --pillar-ink:#efedff; --pillar-sub:#a7a3c8; --pillar-shadow:rgba(0,0,0,.35);
+  --cushion-a:#5a52a8; --cushion-b:#3d3684; --cushion-pipe:#7a71d6; --cushion-shadow:rgba(0,0,0,.45);
+  --cat-shadow:rgba(0,0,0,.42); --whisker:#d4d7de; --cat-line:rgba(8,6,20,.75);
+  --bubble:#26214d; --bubble-ink:#efedff; --bubble-line:#3a3470; --focus:#a29cff; --chip:#1e1a3a; --chip-ink:#dcd9f7;
+  --win-a:#1d1946; --win-b:#2d2763; --win-frame:#3a3470; --rug:#241f4a; --rug-edge:#352e68; --plant:#4f8a62; --plant-d:#3d6f4e; --pot:#e86d12; --sun:rgba(160,150,255,.10);
+  color-scheme: dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Geologica,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:1040px;margin:0 auto;padding:20px 0 56px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px;color:var(--muted)}
+.brand b{color:var(--ink)}
+.brand .mark{width:26px;height:26px;border-radius:8px;background:var(--brand);display:grid;place-items:center}
+.brand .mark svg{width:15px;height:15px}
+.theme{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 12px;font:600 13px/1 inherit;font-family:inherit;cursor:pointer}
+h1{font-size:clamp(26px,4.4vw,40px);line-height:1.08;margin:0 0 8px;font-weight:800;letter-spacing:-.02em}
+.lead{margin:0 0 20px;color:var(--muted);max-width:640px;font-size:15px;line-height:1.5}
+#stage{position:relative;width:100%;aspect-ratio:1000/560;border-radius:22px;overflow:hidden;background:linear-gradient(180deg,var(--wall-a),var(--wall-b));
+  border:1px solid var(--line);container-type:inline-size;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+#stage.pointer-in{cursor:none}
+#stage .scenery,#stage .cat-svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+#stage .cat-svg{z-index:3;pointer-events:none}
+#stage .cat-svg .cat-hit{pointer-events:visiblePainted;cursor:pointer}
+.col{position:absolute;bottom:12.14%;z-index:2;border-radius:14px 14px 6px 6px;background:var(--pillar);border:1px solid var(--pillar-edge);
+  box-shadow:0 10px 24px -12px var(--pillar-shadow),inset 0 -10px 18px -14px var(--pillar-shadow);transform-origin:50% 100%;
+  display:flex;flex-direction:column;align-items:center;padding:7% 6% 0;gap:4%;transition:transform .5s cubic-bezier(.3,1.6,.5,1)}
+.col .ic{width:4cqw;height:4cqw;border-radius:1.1cqw;display:grid;place-items:center;background:var(--brand-soft);flex:none}
+.col .ic svg{width:2.4cqw;height:2.4cqw}
+.col .lb{font-weight:800;font-size:clamp(7px,1.45cqw,15px);text-align:center;line-height:1.1;color:var(--pillar-ink)}
+.col .sb{font-weight:400;font-size:clamp(6px,1.05cqw,11px);color:var(--pillar-sub);text-align:center}
+.col .bar{width:6.4cqw;height:max(3px,.4cqw);flex:none;border-radius:4px;background:var(--surface-2);overflow:hidden;margin-top:auto;margin-bottom:12%}
+.col .bar i{display:block;height:100%;background:var(--brand);border-radius:4px}
+.hint{font-size:13px;color:var(--muted);margin:10px 2px 0}
+.panel{margin-top:16px;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 14px 6px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.row .lab{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;min-width:74px}
+.btn{appearance:none;border:1px solid var(--line);background:var(--chip);color:var(--chip-ink);border-radius:999px;padding:8px 13px;font:600 13px/1.1 inherit;font-family:inherit;cursor:pointer;transition:background .15s,border-color .15s,transform .1s}
+.btn:hover{border-color:var(--brand)}
+.btn:active{transform:translateY(1px)}
+.btn[aria-pressed=true]{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn.toy{border-color:color-mix(in srgb,var(--accent) 55%,var(--line))}
+.btn:focus-visible,.theme:focus-visible,#stage:focus-visible,.size-card:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+#sizes{margin-top:30px}
+#sizes h2{font-size:20px;margin:0 0 4px;font-weight:800}
+#sizes p{margin:0 0 14px;color:var(--muted);font-size:14px}
+.sizes-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(0,2.2fr);gap:12px;align-items:stretch}
+.size-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-width:0}
+.size-card .cap{font-size:12px;color:var(--muted);font-weight:600}
+.size-card.present{flex-direction:row;align-items:flex-end;justify-content:flex-start;gap:12px}
+.say{position:relative;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:14px;line-height:1.4;margin-bottom:58px;flex:1;min-width:0}
+.say:before{content:"";position:absolute;left:-7px;bottom:16px;width:12px;height:12px;background:var(--surface-2);border-left:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(45deg)}
+.mascot-box{display:block;flex:none;max-width:100%}
+.mascot-box svg{display:block;max-width:100%;height:auto}
+@media (max-width:760px){
+  .sizes-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .size-card.present{grid-column:1/-1}
+  .row .lab{min-width:100%}
+}
+@media (max-width:420px){ .btn{padding:7px 10px;font-size:12px} }
+</style>
+
+<main class="wrap">
+  <header class="top">
+    <div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.5 4 5.6v6.1c0 4.9 3.4 8.6 8 9.8 4.6-1.2 8-4.9 8-9.8V5.6z" fill="#fff"/><path d="m8.4 12.1 2.5 2.5 4.9-5" fill="none" stroke="#4f46e5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Cyclowareness · <b>AI Sel</b></div>
+    <button class="theme" id="themeBtn" type="button">Tema: avto</button>
+  </header>
+  <h1>AI Sel — tekir pişik maskot</h1>
+  <p class="lead">Boz-ağ, yaşıl-qızılı gözlü, boynunda qalxan nişanlı tasma. Səhnədə özü yaşayır: oturur, gəzir, sütuna sürtünür, pəncəsini yalayır, yastıqda qıvrılıb yatır. Siçanı tez tərpətsən, ovlamağa başlayır. Üstünə klikləsən mırlayır.</p>
+
+  <div id="stage" tabindex="0" aria-label="AI Sel pişiyinin səhnəsi. Siçanı tərpədin və ya pişiyə klikləyin.">
+    <svg class="scenery" viewBox="0 0 1000 560" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <defs>
+        <linearGradient id="flr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--floor-a)"/><stop offset="1" stop-color="var(--floor-b)"/></linearGradient>
+        <radialGradient id="cush" cx=".45" cy=".35" r=".75"><stop offset="0" stop-color="var(--cushion-a)"/><stop offset="1" stop-color="var(--cushion-b)"/></radialGradient>
+        <radialGradient id="glow" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="var(--brand)" stop-opacity=".10"/><stop offset="1" stop-color="var(--brand)" stop-opacity="0"/></radialGradient>
+      </defs>
+      <linearGradient id="win" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--win-a)"/><stop offset="1" stop-color="var(--win-b)"/></linearGradient>
+      <circle cx="845" cy="170" r="210" fill="url(#glow)"/>
+      <g transform="translate(770 62)">
+        <rect x="0" y="0" width="150" height="190" rx="16" fill="url(#win)" stroke="var(--win-frame)" stroke-width="6"/>
+        <path d="M75 3V187M3 95H147" stroke="var(--win-frame)" stroke-width="5"/>
+        <circle cx="112" cy="44" r="13" fill="#fff" opacity=".55"/>
+        <g fill="#fff" opacity=".35"><ellipse cx="38" cy="146" rx="20" ry="7"/><ellipse cx="46" cy="140" rx="11" ry="8"/><ellipse cx="110" cy="160" rx="16" ry="6"/><ellipse cx="116" cy="155" rx="9" ry="6"/></g>
+        <rect x="-12" y="186" width="174" height="10" rx="5" fill="var(--win-frame)"/>
+      </g>
+      <path d="M770 440 910 440 1000 560 650 560Z" fill="var(--sun)"/>
+      <g transform="translate(262 92)" opacity=".9">
+        <rect x="0" y="0" width="76" height="92" rx="10" fill="var(--pillar)" stroke="var(--pillar-edge)" stroke-width="2"/>
+        <path d="M38 18 20 25v15c0 13 8 22 18 26 10-4 18-13 18-26V25z" fill="var(--brand-soft)" stroke="var(--brand)" stroke-width="2.5" stroke-linejoin="round"/>
+        <path d="m30 42 6 6 11-12" fill="none" stroke="var(--brand)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="18" y="74" width="40" height="5" rx="2.5" fill="var(--floor-line)"/>
+      </g>
+      <path d="M36 96h96M56 116h56" fill="none" stroke="var(--floor-line)" stroke-width="2" opacity=".5"/>
+      <rect x="0" y="440" width="1000" height="120" fill="url(#flr)"/>
+      <path d="M0 440.5H1000" stroke="var(--floor-line)" stroke-width="2"/>
+      <g opacity=".5" stroke="var(--floor-line)" stroke-width="1.5"><path d="M130 440 60 560M340 440 300 560M560 440 560 560M770 440 810 560M960 440 1040 560"/></g>
+      <ellipse cx="350" cy="500" rx="290" ry="34" fill="var(--rug)" stroke="var(--rug-edge)" stroke-width="3"/>
+      <ellipse cx="350" cy="500" rx="252" ry="24" fill="none" stroke="var(--rug-edge)" stroke-width="2" stroke-dasharray="2 9" stroke-linecap="round"/>
+      <g transform="translate(964 470)">
+        <path d="M-2-40C-26-70-30-96-14-118 0-96 4-70-2-40Z" fill="var(--plant)"/>
+        <path d="M2-36C10-74 30-92 44-100 44-74 30-54 2-36Z" fill="var(--plant-d)"/>
+        <path d="M-4-34C-30-50-46-52-60-48-48-34-28-28-4-34Z" fill="var(--plant-d)"/>
+        <path d="M0-42C-6-80 2-112 10-134 22-108 16-78 0-42Z" fill="var(--plant)" opacity=".9"/>
+        <path d="M-22-42H22L16 0H-16Z" fill="var(--pot)"/>
+        <rect x="-25" y="-48" width="50" height="10" rx="4" fill="var(--pot)"/>
+        <ellipse cx="0" cy="2" rx="22" ry="4" fill="var(--cat-shadow)"/>
+      </g>
+      <g transform="translate(0 22)">
+      <ellipse cx="840" cy="474" rx="104" ry="13" fill="var(--cushion-shadow)"/>
+      <path d="M738 466c0-20 46-30 102-30s102 10 102 30c0 12-46 16-102 16s-102-4-102-16z" fill="url(#cush)"/>
+      <path d="M744 462c8 10 46 14 96 14s88-4 96-14" fill="none" stroke="var(--cushion-pipe)" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+      <ellipse cx="840" cy="448" rx="70" ry="9" fill="#fff" opacity=".10"/>
+      </g>
+      <g transform="translate(560 490)"><ellipse cx="0" cy="5" rx="16" ry="3" fill="var(--cat-shadow)"/><path d="M-12 2c0-7 6-11 13-11 6 0 11 4 11 9 0 3-3 3-7 3H-9c-2 0-3 0-3-1z" fill="var(--accent)"/><circle cx="6" cy="-7" r="3.4" fill="var(--accent)"/><circle cx="8" cy="-4" r="1" fill="#16123a"/><path d="M-12 2c-6 1-10-2-13 2" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"/></g>
+    </svg>
+    <div class="col" data-col="0" style="left:8.2%;width:9.6%;height:44%"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6 8.5 7 8.5-7"/></svg></div><div class="lb">Fişinq 101</div><div class="sb">modul 1</div><div class="bar"><i style="width:72%"></i></div></div>
+    <div class="col" data-col="1" style="left:40.7%;width:9.6%;height:55%"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div><div class="lb">Parol</div><div class="sb">modul 2</div><div class="bar"><i style="width:45%"></i></div></div>
+    <div class="col" data-col="2" style="left:59.2%;width:9.6%;height:37%"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 17h2"/></svg></div><div class="lb">2FA</div><div class="sb">modul 3</div><div class="bar"><i style="width:20%"></i></div></div>
+  </div>
+  <p class="hint">Səhnədə siçanı və ya barmağı sürətlə gəzdir — AI Sel lələyi ovlayacaq. Pişiyə klikləsən, mırlayacaq.</p>
+
+  <div class="panel" role="group" aria-label="İdarəetmə">
+    <div class="row"><span class="lab">Rejim</span>
+      <button class="btn" id="bAuto" type="button" aria-pressed="true">Avtomatik</button>
+      <button class="btn" id="bTalk" type="button" aria-pressed="false">Danışır</button>
+      <button class="btn" id="bStill" type="button" aria-pressed="false">Hərəkətsiz</button>
+    </div>
+    <div class="row" id="rowB"><span class="lab">Davranış</span></div>
+    <div class="row" id="rowM"><span class="lab">Əhval</span></div>
+    <div class="row" id="rowG"><span class="lab">Jest</span></div>
+  </div>
+
+  <section id="sizes" aria-labelledby="sizesH">
+    <h2 id="sizesH">Maskot rejimi</h2>
+    <p>Dərs pleyerindəki kiçik qutu üçün: yerindən getmir, əhval və jestlərlə danışır.</p>
+    <div class="sizes-grid">
+      <div class="size-card"><div class="mascot-box" data-size="32"></div><span class="cap">32 px</span></div>
+      <div class="size-card"><div class="mascot-box" data-size="48"></div><span class="cap">48 px</span></div>
+      <div class="size-card"><div class="mascot-box" data-size="64"></div><span class="cap">64 px</span></div>
+      <div class="size-card"><div class="mascot-box" data-size="96"></div><span class="cap">96 px</span></div>
+      <div class="size-card present"><div class="mascot-box" data-size="160" id="presentBox"></div><div class="say" id="sayText">Salam! Mən AI Sel-əm. Şübhəli məktubu açmazdan əvvəl göndərənə bax — mən də belə edirəm.</div></div>
+    </div>
+  </section>
+</main>
+
+<script>
+/*
+ =====================================================================================
+  AI Sel — cat mascot rig (Direction B: realistic motion study). Single file, SVG, no libs.
+ =====================================================================================
+  PART TREE (back -> front, inside <g.cat-root> which carries translate(wx,floor) scale(dir*S*sx,S)):
+    shadow (ellipse, separate group so it stays on the floor)
+    body (optional outline filter)
+      tailBack          tail tube + rings + dark tip (moved to tailFront when pose.tfront=1)
+      legHF             far hind:  thigh/shin/metatarsus/paw capsules + sock
+      legFF             far fore:  upper arm/forearm/paw + sock
+      torso             outline path + clipped markings (dorsal band, flank blotch "bullseye", stripes, white belly, bib)
+      legHN             near hind: haunch oval + shadow, shin, metatarsus, paw, sock, stripes, toes
+      curl              sleeping curl drawing (cross-fades in, rig body fades out; the rig head stays)
+      neck              neck capsule + white throat
+      collar            indigo band + highlight
+      legFN (slot A)    near fore (default)
+      head              (counter-scaled during turns) ears(far,near) / skull+cheeks+bridge union / tabby marks /
+                        chin(jaw) / mouth interior / tongue / fangs / white muzzle pads / nose / mouth line /
+                        eyes x2 (light ring, clipped iris+pupil+glints, lid line, lower lid, brow tuft) / whiskers
+      legFN (slot B)    near fore when pose.fore=1 (paw in front of the face: lick, wipe, wave, shield-up)
+      tag               D-ring + shield tag with check mark (pendulum, glint)
+      tailFront
+    fx (stage space)    "mrr" bubble, Zzz, "!" / "?", feather toy cursor
+
+  JOINTS / DOFs (pose = flat numeric object, see BASE):
+    root rx,ry,sx(turn squash) · torso tx,ty,ta(pitch),tl(length),arch(spine flex),belly,bumpN/bumpF(scapula roll),yaw(3/4 body)
+    neck na(angle),nl(length),hdx/hdy · head hy(yaw),hp(pitch),hr(roll) — 2.5D: features are 3D points projected
+    fore legs: shoulder->elbow->wrist->toe (2-bone IK, elbow bends back) targets fnx,fny / ffx,ffy, paw angle fna/ffa, curl fnc/ffc
+    hind legs: hip->stifle->hock->paw (metatarsus angle hnm/hfm + 2-bone IK, stifle forward), paw angle hna/hfa, curl hnc/hfc
+    tail: 12-segment spring chain (root angle tra, curvature tc, tip curl tc2, sway tsw/tsf, quiver tq, layer tfront)
+    face: eo(upper lid) ll(lower lid / smile-eyes) lidT(tilt) pup(pupil dilation) lx,ly(gaze) brow,browT
+          earF(forward) earB(flatten) earS(swivel/airplane) earL/earR(twitch) wh(whisker angle) wt(twitch)
+          jaw smile tongue tcurl teeth · misc fore(paw layer) look(pointer tracking weight) curl purr pads spread
+    collar tag: damped pendulum driven by pivot acceleration.
+
+  BEHAVIOURS are clips: f(time) -> {pose, wx, dir, elev}; a plan is a list of clips with boundary blending.
+  Live = clips sampled by the clock + procedural layers (blink, ear twitch, breathing, tail springs, tag pendulum,
+  pointer look, purr). renderAt(name,t) samples the same clips deterministically (no randomness, tail in rest pose).
+
+  API (window.cat for the stage; createCat(container,{mode:'roam'|'mascot', size}) returns the same shape):
+    behaviours: string[]   moods: string[]   gestures: string[]
+    do(name, opts?)        walk {x}, rub {target: column index}, others in place
+    setAuto(bool) setMood(m) setTalking(bool) play(gesture) lookAt(clientX, clientY | null) poke()
+    setStill(bool) isStill() setSize(px) renderAt(name, t, {mood, talking}) resume() destroy()
+    mode 'mascot' never leaves its box: walk/rub -> idle sit (rub -> purr), sleep -> seated doze, stretch -> seated yawn-stretch,
+    chase -> in-place swat. lookAt takes viewport (client) coordinates in both modes. renderAt opts may also carry {gesture}.
+  PORTING: poses are plain objects (BASE keys), clips are pure functions of time -> a React port keeps createCat as-is behind a
+  ref + useEffect; a Rive rebuild maps the BASE keys to state-machine inputs (bones: torso, neck, head yaw/pitch/roll, 4x IK legs,
+  12-bone tail chain, jaw, lids, ears) and the clips to timelines.
+ =====================================================================================
+*/
+(() => {
+'use strict';
+const NS = 'http://www.w3.org/2000/svg';
+const PI = Math.PI, TAU = PI * 2;
+const clamp = (v, a = 0, b = 1) => v < a ? a : v > b ? b : v;
+const lerp = (a, b, t) => a + (b - a) * t;
+const inv = (a, b, v) => clamp((v - a) / (b - a));
+const ss = (a, b, v) => { const t = inv(a, b, v); return t * t * (3 - 2 * t); };
+const sine = t => 0.5 - 0.5 * Math.cos(PI * clamp(t));
+const eOut = t => { t = clamp(t); return 1 - (1 - t) * (1 - t); };
+const eIn = t => { t = clamp(t); return t * t; };
+const fract = x => x - Math.floor(x);
+const win = (t, a, b, r = 0.12) => ss(a, a + r, t) * (1 - ss(b - r, b, t));
+const hump = (t, a, b) => (t <= a || t >= b) ? 0 : Math.sin(PI * (t - a) / (b - a));
+const angLerp = (a, b, t) => { let d = b - a; while (d > PI) d -= TAU; while (d < -PI) d += TAU; return a + d * t; };
+const r1 = n => Math.round(n * 10) / 10;
+const hash = n => { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); };
+const noise = x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return lerp(hash(i), hash(i + 1), u) * 2 - 1; };
+function E(tag, attrs, parent) { const e = document.createElementNS(NS, tag); if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; }
+const A = (el, k, v) => { if (el._c === undefined) el._c = {}; if (el._c[k] !== v) { el._c[k] = v; el.setAttribute(k, v); } };
+
+/* ---------------- path helpers (all subpaths wound counter-clockwise on screen so unions fill cleanly) ---------------- */
+const circ = (x, y, r) => `M${r1(x - r)} ${r1(y)}a${r1(r)} ${r1(r)} 0 1 0 ${r1(2 * r)} 0a${r1(r)} ${r1(r)} 0 1 0 ${r1(-2 * r)} 0Z`;
+function capsule(a, ra, b, rb) {
+  const dx = b[0] - a[0], dy = b[1] - a[1], d = Math.hypot(dx, dy);
+  if (d <= Math.abs(ra - rb) + 0.05) return ra > rb ? circ(a[0], a[1], ra) : circ(b[0], b[1], rb);
+  const g = Math.atan2(dy, dx), ph = Math.acos(clamp((ra - rb) / d, -1, 1));
+  const P = (c, r, an) => [c[0] + r * Math.cos(an), c[1] + r * Math.sin(an)];
+  const A1 = P(a, ra, g + ph), A2 = P(b, rb, g + ph), B2 = P(b, rb, g - ph), B1 = P(a, ra, g - ph);
+  const lb = ph > PI / 2 ? 1 : 0, la = 1 - lb;
+  return `M${r1(A1[0])} ${r1(A1[1])}L${r1(A2[0])} ${r1(A2[1])}A${r1(rb)} ${r1(rb)} 0 ${lb} 0 ${r1(B2[0])} ${r1(B2[1])}L${r1(B1[0])} ${r1(B1[1])}A${r1(ra)} ${r1(ra)} 0 ${la} 0 ${r1(A1[0])} ${r1(A1[1])}Z`;
+}
+function smoothClosed(pts, k = 1) {
+  const n = pts.length; let d = `M${r1(pts[0][0])} ${r1(pts[0][1])}`;
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+    d += `C${r1(p1[0] + (p2[0] - p0[0]) * k / 6)} ${r1(p1[1] + (p2[1] - p0[1]) * k / 6)} ${r1(p2[0] - (p3[0] - p1[0]) * k / 6)} ${r1(p2[1] - (p3[1] - p1[1]) * k / 6)} ${r1(p2[0])} ${r1(p2[1])}`;
+  }
+  return d + 'Z';
+}
+function smoothOpen(pts, k = 1) {
+  const n = pts.length; let d = `M${r1(pts[0][0])} ${r1(pts[0][1])}`;
+  for (let i = 0; i < n - 1; i++) {
+    const p0 = pts[Math.max(0, i - 1)], p1 = pts[i], p2 = pts[i + 1], p3 = pts[Math.min(n - 1, i + 2)];
+    d += `C${r1(p1[0] + (p2[0] - p0[0]) * k / 6)} ${r1(p1[1] + (p2[1] - p0[1]) * k / 6)} ${r1(p2[0] - (p3[0] - p1[0]) * k / 6)} ${r1(p2[1] - (p3[1] - p1[1]) * k / 6)} ${r1(p2[0])} ${r1(p2[1])}`;
+  }
+  return d;
+}
+const ellPts = (cx, cy, rx, ry, rot, n = 12) => { const o = [], c = Math.cos(rot), s = Math.sin(rot); for (let i = 0; i < n; i++) { const a = i / n * TAU, x = Math.cos(a) * rx, y = Math.sin(a) * ry; o.push([cx + x * c - y * s, cy + x * s + y * c]); } return o; };
+function hull(pts) {
+  const P = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cr = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lo = [], up = [];
+  for (const p of P) { while (lo.length >= 2 && cr(lo[lo.length - 2], lo[lo.length - 1], p) <= 0) lo.pop(); lo.push(p); }
+  for (let i = P.length - 1; i >= 0; i--) { const p = P[i]; while (up.length >= 2 && cr(up[up.length - 2], up[up.length - 1], p) <= 0) up.pop(); up.push(p); }
+  up.pop(); lo.pop(); return lo.concat(up);
+}
+const poly = pts => 'M' + pts.map(p => r1(p[0]) + ' ' + r1(p[1])).join('L') + 'Z';
+// tapered tabby stripe: a lens along a polyline, widest in the middle, pointed ends
+function taper(pts, w, bias = 0.5) {
+  const n = pts.length, L = [], R = [];
+  for (let i = 0; i < n; i++) {
+    const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1, nx = -dy / l, ny = dx / l;
+    const f = i / (n - 1), ww = w * Math.pow(Math.sin(Math.PI * (0.1 + 0.8 * f)), 0.8) * (1 + (bias - 0.5) * (1 - 2 * f));
+    L.push([pts[i][0] + nx * ww, pts[i][1] + ny * ww]); R.push([pts[i][0] - nx * ww, pts[i][1] - ny * ww]);
+  }
+  const e0 = pts[0], e1 = pts[n - 1];
+  return smoothClosed([e0].concat(L, [e1], R.reverse()), 1);
+}
+const triCCW = (a, b, c) => { const s = a[0] * (b[1] - c[1]) + b[0] * (c[1] - a[1]) + c[0] * (a[1] - b[1]); return s < 0 ? poly([a, b, c]) : poly([a, c, b]); };
+const norm3 = v => { const l = Math.hypot(v[0], v[1], v[2]) || 1; return [v[0] / l, v[1] / l, v[2] / l]; };
+const cross3 = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const rotAxis = (v, k, th) => { const c = Math.cos(th), s = Math.sin(th), kv = cross3(k, v), d = dot3(k, v) * (1 - c); return [v[0] * c + kv[0] * s + k[0] * d, v[1] * c + kv[1] * s + k[1] * d, v[2] * c + kv[2] * s + k[2] * d]; };
+function ik2(a, b, l1, l2, bend) {
+  let dx = b[0] - a[0], dy = b[1] - a[1], d = Math.hypot(dx, dy);
+  const g = Math.atan2(dy, dx); d = clamp(d, Math.abs(l1 - l2) + 0.5, l1 + l2 - 0.05);
+  const cA = (l1 * l1 + d * d - l2 * l2) / (2 * l1 * d), an = g + bend * Math.acos(clamp(cA, -1, 1));
+  return { j: [a[0] + l1 * Math.cos(an), a[1] + l1 * Math.sin(an)], e: [a[0] + d * Math.cos(g), a[1] + d * Math.sin(g)] };
+}
+const lerp2 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+const add2 = (a, b, k = 1) => [a[0] + b[0] * k, a[1] + b[1] * k];
+const sub2 = (a, b) => [a[0] - b[0], a[1] - b[1]];
+const len2 = v => Math.hypot(v[0], v[1]);
+const nrm2 = v => { const l = len2(v) || 1; return [v[0] / l, v[1] / l]; };
+const perp = v => [-v[1], v[0]];
+
+/* ---------------- palette (character colours stay constant across themes) ---------------- */
+const C = {
+  coat: '#8f97a4', coatL: '#a9b0bb', coatFar: '#737b88', stripe: '#575e6a', stripeFar: '#5d6470',
+  white: '#fbfaf7', whiteFar: '#d6d8df', whiteShade: '#e6e7ec', pink: '#ee9ba7', nose: '#e88d9b', noseD: '#c96a7b',
+  bean: '#e9a1ad', beanG: '#6f727e', earIn: '#f0b3bd', earInD: '#d98d9b', pupil: '#16151c', rim: '#2b2c35',
+  mouth: '#5c2433', tongue: '#f08797', tooth: '#fffdf8', ring: '#c8ccd4', collar: '#4f46e5', collarL: '#8b85ff', collarD: '#3b33c4',
+  tagA: '#f3f5f9', tagB: '#a3abb9', tagEdge: '#7d8596', check: '#4f46e5'
+};
+
+/* ---------------- skeleton constants (cat-local units, floor y=0, facing +x) ---------------- */
+const HR = 20.5;                       // head (skull) radius
+const PR = 4.6;                        // paw radius / thickness
+const L_UA = 23, L_FA = 25, PAW_F = 10;   // fore: upper arm, forearm, paw length
+const L_TH = 22, L_SH = 25, L_MT = 20, PAW_H = 10; // hind: thigh, shin, metatarsus, paw length
+const TAIL_N = 12, TAIL_SEG = 7.4;
+const TORSO = [[50, -16], [33, -18], [15, -15], [-6, -14], [-28, -16], [-46, -17], [-59, -11], [-65, 1], [-60, 13], [-48, 19], [-30, 16], [-6, 20], [18, 24], [38, 24], [52, 17], [59, 5], [57, -7]];
+const SJN = [35, 6], SJF = [32, 3], HJN = [-44, 0], HJF = [-41, -2], NBL = [47, -7], TRL = [-61, -7];
+const MARK = {
+  dorsal: [[60, -30], [56, -12], [44, -10], [34, -12], [24, -8], [12, -10], [2, -7], [-10, -9], [-20, -7], [-32, -10], [-44, -8], [-54, -5], [-62, 0], [-68, 4], [-76, -8], [-70, -30], [0, -32]],
+  blotchO: [[-30, -2], [-26, -8], [-14, -10], [0, -8], [6, -2], [3, 6], [-6, 10], [-18, 11], [-28, 7]],
+  blotchI: [[-21, 0], [-16, -3], [-9, -3], [-5, 0], [-8, 3], [-15, 4]],
+  white: [[64, 0], [55, 5], [42, 10], [26, 16], [8, 19], [-8, 18], [-22, 14], [-34, 12], [-44, 15], [-50, 32], [66, 32]],
+  stripes: [[[[33, -14], [30, -5], [28, 4], [29, 10]], 2.3], [[[24, -13], [21, -4], [20, 5]], 2.0], [[[14, -12], [11, -4], [11, 3]], 1.6], [[[10, -2], [8, 6], [10, 12]], 1.3],
+    [[[-34, -12], [-36, -4], [-35, 3]], 1.8], [[[-42, -12], [-45, -3], [-44, 5]], 1.6], [[[-27, 4], [-24, 10]], 1.1], [[[4, 3], [6, 10]], 1.0]]
+};
+// head spheres in head units: [x,y,z,r]
+const HEAD_S = [[0, -0.04, 0, 1], [-0.5, 0.3, 0.2, 0.66], [0.5, 0.3, 0.2, 0.66], [0, 0.14, 0.6, 0.42]];
+const HEAD_MARKS = [
+  [[0, -0.48, 0.87], [0, -0.7, 0.71], [0, -0.92, 0.38]],
+  [[-0.17, -0.46, 0.87], [-0.2, -0.68, 0.7], [-0.22, -0.9, 0.38]],
+  [[0.17, -0.46, 0.87], [0.2, -0.68, 0.7], [0.22, -0.9, 0.38]],
+  [[-0.38, -0.4, 0.82], [-0.45, -0.64, 0.62], [-0.5, -0.83, 0.3]],
+  [[0.38, -0.4, 0.82], [0.45, -0.64, 0.62], [0.5, -0.83, 0.3]],
+  [[-0.66, 0.05, 0.72], [-0.86, 0.14, 0.5], [-1.0, 0.24, 0.24]],
+  [[0.66, 0.05, 0.72], [0.86, 0.14, 0.5], [1.0, 0.24, 0.24]],
+  [[-0.62, 0.24, 0.72], [-0.84, 0.38, 0.5], [-0.98, 0.48, 0.24]],
+  [[0.62, 0.24, 0.72], [0.84, 0.38, 0.5], [0.98, 0.48, 0.24]]
+];
+
+/* ---------------- pose model ---------------- */
+const BASE = {
+  rx: 0, ry: 0, sx: 1,
+  tx: 0, ty: -54, ta: 0, tl: 1, arch: 0, belly: 0, bumpN: 0, bumpF: 0, yaw: 0, sjx: 0, sjy: 0,
+  na: -0.62, nl: 21, hdx: 0, hdy: 0, hy: 1.32, hp: 0.16, hr: 0,
+  fnx: 40, fny: 0, fna: 0, fnc: 0, ffx: 35, ffy: 0, ffa: 0, ffc: 0,
+  hnx: -47, hny: 0, hnm: -1.95, hna: 0, hnc: 0, hfx: -52, hfy: 0, hfm: -1.95, hfa: 0, hfc: 0,
+  tra: -2.3, tc: 0.11, tcb: 0, tc2: 0.32, tsw: 0.1, tsf: 0.3, tq: 0, tfront: 0, tpuff: 0,
+  eo: 1, ll: 0, lidT: 0, pup: 0.4, lx: 0, ly: 0, brow: 0, browT: 0,
+  earF: 0.1, earB: 0, earS: 0, earL: 0, earR: 0, wh: 0, wt: 0,
+  jaw: 0, smile: 0.15, tongue: 0, tcurl: 0, teeth: 0,
+  fore: 0, look: 0.6, curl: 0, purr: 0, pads: 0, spread: 0, shadow: 1, tuft: 1, whv: 1, doze: 0
+};
+const KEYS = Object.keys(BASE);
+const ANG = new Set(['ta', 'na', 'tra', 'hnm', 'hfm']);
+const FLAG = new Set(['tfront', 'fore']);
+const GROUP = {}; // for staggered transitions
+['rx', 'ry', 'sx', 'tx', 'ty', 'ta', 'tl', 'arch', 'belly', 'bumpN', 'bumpF', 'yaw', 'sjx', 'sjy'].forEach(k => GROUP[k] = 'body');
+['fnx', 'fny', 'fna', 'fnc', 'ffx', 'ffy', 'ffa', 'ffc', 'fore', 'pads', 'spread'].forEach(k => GROUP[k] = 'fore');
+['hnx', 'hny', 'hnm', 'hna', 'hnc', 'hfx', 'hfy', 'hfm', 'hfa', 'hfc'].forEach(k => GROUP[k] = 'hind');
+['tra', 'tc', 'tcb', 'tc2', 'tsw', 'tsf', 'tq', 'tfront', 'tpuff'].forEach(k => GROUP[k] = 'tail');
+KEYS.forEach(k => { if (!GROUP[k]) GROUP[k] = 'head'; });
+function mixPose(a, b, t) { const o = {}; for (const k of KEYS) { const x = a[k], y = b[k]; o[k] = FLAG.has(k) ? (t < 0.5 ? x : y) : ANG.has(k) ? angLerp(x, y, t) : x + (y - x) * t; } return o; }
+function mixG(a, b, t, st) { // st: {body:[a,b], fore:[..], ...} sub-windows of t
+  const o = {}; const tt = {};
+  for (const g of ['body', 'fore', 'hind', 'head', 'tail']) { const w = (st && st[g]) || [0, 1]; tt[g] = sine(inv(w[0], w[1], t)); }
+  for (const k of KEYS) { const u = tt[GROUP[k]], x = a[k], y = b[k]; o[k] = FLAG.has(k) ? (u < 0.5 ? x : y) : ANG.has(k) ? angLerp(x, y, u) : x + (y - x) * u; }
+  return o;
+}
+const P = o => Object.assign({}, BASE, o);
+const STAND = P({});
+const SIT = P({ tx: -13, ty: -41, ta: -0.9, tl: 0.86, arch: 8, sjx: 6, sjy: 12, na: -1.45, nl: 19, hy: 0.55, hp: 0.12,
+  fnx: 15, ffx: 14, fna: 0, hnx: -6, hnm: 3.08, hfx: -9, hfm: 3.08,
+  tra: 2.25, tcb: -0.62, tc: -0.02, tc2: -0.25, tsw: 0.03, tsf: 0.2, tfront: 1, yaw: 0.62, look: 1, smile: 0.2 });
+const LIE = P({ tx: -4, ty: -22, ta: 0.02, tl: 0.97, arch: 2, na: -0.62, nl: 18, hy: 1.0, hp: 0.25,
+  fnx: 40, ffx: 37, hnx: -14, hnm: 3.1, hfx: -18, hfm: 3.1, tra: 2.4, tcb: -0.5, tc: -0.02, tc2: -0.15, tsw: 0.03, tfront: 1, look: 0.7 });
+const CROUCH = P({ tx: -2, ty: -33, ta: 0.05, tl: 0.98, arch: -2, na: -0.42, nl: 19, hy: 1.48, hp: 0.0,
+  fnx: 42, ffx: 38, hnx: -36, hnm: -2.55, hfx: -40, hfm: -2.55, tra: 2.78, tc: -0.035, tc2: -0.34, tsw: 0.05, bumpN: 4, bumpF: 3,
+  earF: 0.9, pup: 0.85, eo: 1.1, wh: 0.6, look: 1, smile: 0 });
+const BOW = P({ tx: 4, ty: -37, ta: 0.5, tl: 1.04, arch: -6, sjy: 4, na: -1.15, nl: 14, hy: 1.35, hp: -0.05,
+  fnx: 86, ffx: 82, fna: 0, hnx: -48, hnm: -1.75, hfx: -52, hfm: -1.75,
+  tra: -1.9, tc: 0.05, tc2: 0.25, eo: 0.1, ll: 0.35, earB: 0.5, spread: 1, smile: 0.4, look: 0 });
+const PRESENT = P(Object.assign({}, SIT, { yaw: 0.78, hy: 0.36, hp: 0.06, look: 0.7 }));
+
+/* ---------------- moods & gestures ---------------- */
+const MOODS = {
+  idle: {},
+  talk: { eo: 1.02, brow: 0.1, earF: 0.25 },
+  happy: { eo: 0.62, ll: 0.62, smile: 1, earF: 0.3, brow: 0.15, tail: 'up' },
+  think: { eo: 0.72, lx: 0.55, ly: -0.7, browT: 0.35, brow: 0.2, hr: 0.14, earS: 0.25, earR: 0.25, smile: -0.05, tail: 'flick' },
+  alert: { eo: 1.18, pup: 0.12, earF: 1, wh: 0.75, hp: -0.06, brow: 0.35, smile: -0.1, tail: 'stiff' },
+  sad: { eo: 0.66, lidT: 0.6, browT: 0.75, earB: 0.7, earS: 0.35, wh: -0.75, smile: -0.7, hp: 0.32, pup: 0.55, ly: 0.35, tail: 'low' },
+  celebrate: { eo: 0.18, ll: 0.95, smile: 1, jaw: 0.55, earF: 0.45, brow: 0.3, tail: 'up', bounce: 1 },
+  surprised: { eo: 1.3, pup: 0.95, earF: 0.7, jaw: 0.42, brow: 0.6, wh: 0.9, smile: -0.2, hp: -0.08, tail: 'puff' },
+  proud: { eo: 0.58, ll: 0.38, smile: 0.65, hp: -0.24, earF: 0.35, brow: 0.1, chest: 1, tail: 'up' },
+  curious: { eo: 1.08, pup: 0.6, hr: 0.3, earF: 0.7, earL: -0.2, wh: 0.45, lx: 0.25, brow: 0.3, smile: 0.1, tail: 'curl' },
+  worried: { eo: 0.95, lidT: 0.38, browT: 0.65, pup: 0.62, earS: 0.75, earB: 0.25, wh: -0.35, smile: -0.4, hp: 0.12, tail: 'low' },
+  excited: { eo: 1.14, pup: 0.85, earF: 0.85, jaw: 0.3, smile: 0.75, brow: 0.35, wh: 0.5, tail: 'quiver', bounce: 0.6 },
+  sleepy: { eo: 0.3, ll: 0.12, earS: 0.35, earB: 0.15, hp: 0.2, smile: 0.1, pup: 0.5, tail: 'low' },
+  laughing: { eo: 0.02, ll: 1, jaw: 0.6, smile: 1, earF: 0.25, brow: 0.25, tail: 'up', laugh: 1 }
+};
+const MOOD_KEYS = ['eo', 'll', 'lidT', 'pup', 'lx', 'ly', 'brow', 'browT', 'earF', 'earB', 'earS', 'earL', 'earR', 'wh', 'jaw', 'smile', 'hp', 'hr'];
+const GESTURES = ['wave', 'nod', 'shake', 'cheer', 'point-left', 'point-right', 'point-down', 'shrug', 'lean-in', 'shield-up', 'bow'];
+const BEHAVIOURS = ['sit', 'walk', 'rub', 'groom', 'sleep', 'stretch', 'yawn', 'chase', 'pet', 'knead', 'lookaround', 'present'];
+
+/* ---------------- gait ---------------- */
+const GAITS = {
+  walk: { L: 64, duty: 0.62, liftF: 8, liftH: 7, speed: 76, off: { hn: 0, fn: 0.75, hf: 0.5, ff: 0.25 }, bob: 1.2 },
+  slow: { L: 50, duty: 0.66, liftF: 6, liftH: 5, speed: 30, off: { hn: 0, fn: 0.75, hf: 0.5, ff: 0.25 }, bob: 0.8 },
+  trot: { L: 92, duty: 0.42, liftF: 12, liftH: 11, speed: 205, off: { hn: 0, ff: 0, fn: 0.5, hf: 0.5 }, bob: 2.2 }
+};
+function legGait(u, G, front) {
+  if (u < G.duty) { const s = u / G.duty; return { dx: G.L * G.duty * (0.5 - s), dy: 0, c: 0, st: Math.sin(PI * s) }; }
+  const s = (u - G.duty) / (1 - G.duty);
+  return { dx: G.L * G.duty * (-0.5 + sine(s)), dy: -(front ? G.liftF : G.liftH) * Math.pow(Math.sin(PI * s), 0.8), c: Math.sin(PI * Math.min(1, s * 1.1)), st: 0 };
+}
+function applyGait(p, phase, G, w = 1) {
+  const r = {};
+  for (const k of ['fn', 'ff', 'hn', 'hf']) {
+    const g = legGait(fract(phase + G.off[k]), G, k[0] === 'f'); r[k] = g;
+    p[k + 'x'] += g.dx * w; p[k + 'y'] += g.dy * w; p[k + 'c'] += g.c * w;
+    if (k[0] === 'h') p[k + 'm'] -= g.c * 0.45 * w;
+  }
+  const bob = Math.cos(phase * TAU * 2) * G.bob * w;
+  p.ty += bob; p.hdy -= bob * 0.8;
+  p.bumpN += 3.6 * r.fn.st * w; p.bumpF += 2.6 * r.ff.st * w;
+  p.ta += 0.014 * Math.sin(phase * TAU * 2 + 0.6) * w;
+  p.tsw += 0.05 * w; p.tsf = lerp(p.tsf, 1 / 0.9, w);
+  return r;
+}
+
+/* ---------------- clips ---------------- */
+// clip: {name, dur, f(t)->{p,wx,dir,elev}, end:{...state}}
+const clipHold = (name, S0, dur, fn) => { const S = Object.assign({}, S0); return { name, dur, end: {}, f: t => ({ p: fn(t), wx: S.wx, dir: S.dir, elev: S.elev }) }; };
+function clipTrans(name, S0, a, b, dur, posture, st) {
+  const S = Object.assign({}, S0);
+  return { name, dur, end: { posture }, f: t => ({ p: mixG(a, b, t / dur, st), wx: S.wx, dir: S.dir, elev: S.elev }) };
+}
+function clipTurn(S0, base) {
+  const S = Object.assign({}, S0), dur = 0.78;
+  return { name: 'turn', dur, end: { dir: -S.dir }, f: t => {
+    const u = clamp(t / dur), e = sine(u), c = Math.cos(PI * e), p = Object.assign({}, base);
+    p.sx = Math.max(0.3, Math.abs(c)); p.hy = base.hy * Math.pow(Math.abs(c), 0.7);
+    p.ty += 2.5 * hump(u, 0, 1);
+    const legs = [['fn', 0.0], ['hf', 0.18], ['ff', 0.36], ['hn', 0.54]];
+    for (const [k, o] of legs) { const h = hump(u, o, o + 0.42); p[k + 'y'] -= 5 * h; p[k + 'c'] += 0.5 * h; }
+    p.tsw += 0.15 * hump(u, 0, 1);
+    return { p, wx: S.wx, dir: u < 0.5 ? S.dir : -S.dir, elev: S.elev };
+  } };
+}
+function clipWalk(S0, x1, o = {}) {
+  const S = Object.assign({}, S0);
+  const G = GAITS[o.gait || 'walk'], base = o.base || STAND, dir = S.dir, elev0 = S.elev, k = o.k || 1, GL = G.L * k;
+  const dist = Math.abs(x1 - S.wx), speed = (o.speed || G.speed) * k;
+  const acc = clamp(dist / speed * 0.5, 0.08, o.gait === 'trot' ? 0.25 : 0.5);
+  let tc, vm; if (dist >= speed * acc) { tc = dist / speed - acc; vm = speed; } else { tc = 0; vm = dist / acc; }
+  const T = tc + 2 * acc, settle = o.noSettle ? 0 : 0.5, dur = T + settle;
+  const sAt = t => t < acc ? 0.5 * vm * t * t / acc : t < acc + tc ? 0.5 * vm * acc + vm * (t - acc) : t < T ? dist - 0.5 * vm * (T - t) * (T - t) / acc : dist;
+  const phase0 = o.phase0 || 0;
+  const endOffs = {}; { const pe = dist / GL + phase0; for (const k of ['fn', 'ff', 'hn', 'hf']) endOffs[k] = legGait(fract(pe + G.off[k]), G, k[0] === 'f'); }
+  return { name: o.name || 'walk', dur, end: { wx: x1, posture: 'stand', elev: 0 }, f: t => {
+    const s = sAt(Math.min(t, T)), p = Object.assign({}, base);
+    if (t <= T) {
+      const w = clamp(vm > 1 ? 1 : 0);
+      applyGait(p, s / GL + phase0, G, w);
+      if (o.mod) o.mod(p, t, s, S.wx + dir * s);
+    } else {
+      const u = (t - T) / settle, order = ['hf', 'fn', 'hn', 'ff'];
+      order.forEach((k, i) => {
+        const g = endOffs[k], a = clamp((u - i * 0.18) / 0.34), e = sine(a);
+        p[k + 'x'] += g.dx * (1 - e); p[k + 'y'] += g.dy * (1 - e) - (Math.abs(g.dx) > 3 || g.dy < -1 ? 4 * hump(a, 0, 1) : 0);
+        p[k + 'c'] += g.c * (1 - e);
+      });
+      if (o.mod) o.mod(p, T, dist, x1);
+    }
+    const hop = elev0 > 0 ? hump(t, 0, 0.45) * 6 : 0;
+    return { p: (p.ry -= hop, p), wx: S.wx + dir * s, dir, elev: elev0 * (1 - ss(0.05, 0.4, t)) };
+  } };
+}
+
+/* ---------------- the cat ---------------- */
+let UID = 0;
+const ALL = new Set();
+const reduceMQ = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+
+function createCat(container, opts = {}) {
+  const mode = opts.mode === 'mascot' ? 'mascot' : 'roam';
+  const uid = 'ai' + (++UID);
+  const stageW = 1000, stageH = 560, FY = 492;
+  const env = {
+    columns: opts.columns || [{ x: 130, w: 96, top: 235 }, { x: 455, w: 96, top: 179 }, { x: 640, w: 96, top: 280 }],
+    cushion: opts.cushion || { x: 840, top: 476 },
+    minX: 110, maxX: 890, onRub: opts.onRub || null
+  };
+  let S = mode === 'roam' ? 1.45 : 1;
+  const svg = E('svg', { class: 'cat-svg', 'aria-hidden': 'true', focusable: 'false' });
+  if (mode === 'roam') { svg.setAttribute('viewBox', `0 0 ${stageW} ${stageH}`); svg.setAttribute('preserveAspectRatio', 'xMidYMid meet'); }
+  container.appendChild(svg);
+
+  /* ---- build rig DOM ---- */
+  const defs = E('defs', null, svg);
+  const ig = E('radialGradient', { id: uid + 'ir', cx: '.5', cy: '.5', r: '.55' }, defs);
+  [['0', '#efe08a'], ['.5', '#c8cf6c'], ['1', '#86ad62']].forEach(([o, c]) => E('stop', { offset: o, 'stop-color': c }, ig));
+  const tg = E('linearGradient', { id: uid + 'tg', x1: '0', y1: '0', x2: '1', y2: '1' }, defs);
+  [['0', C.tagA], ['.55', '#cfd4de'], ['1', C.tagB]].forEach(([o, c]) => E('stop', { offset: o, 'stop-color': c }, tg));
+  const eg = E('linearGradient', { id: uid + 'eg', x1: '0', y1: '1', x2: '0', y2: '0' }, defs);
+  [['0', C.earInD], ['1', C.earIn]].forEach(([o, c]) => E('stop', { offset: o, 'stop-color': c }, eg));
+  const flt = E('filter', { id: uid + 'ol', x: '-8%', y: '-8%', width: '116%', height: '116%', 'color-interpolation-filters': 'sRGB' }, defs);
+  E('feMorphology', { in: 'SourceAlpha', operator: 'dilate', radius: '0.9', result: 'd' }, flt);
+  E('feFlood', { 'flood-color': '#221e42', 'flood-opacity': '0.5', result: 'f' }, flt);
+  E('feComposite', { in: 'f', in2: 'd', operator: 'in', result: 'o' }, flt);
+  const fm = E('feMerge', null, flt); E('feMergeNode', { in: 'o' }, fm); E('feMergeNode', { in: 'SourceGraphic' }, fm);
+  const clipT = E('path', null, E('clipPath', { id: uid + 'ct' }, defs));
+  const clipH = E('path', null, E('clipPath', { id: uid + 'ch' }, defs));
+
+  const shadowG = E('g', null, svg);
+  const shadow = E('ellipse', { fill: 'var(--cat-shadow)' }, shadowG);
+  const rootG = E('g', { class: 'cat-hit' }, svg);
+  const body = E('g', { filter: `url(#${uid}ol)` }, rootG);
+  const tailBack = E('g', null, body);
+  const mkLeg = (far) => {
+    const g = E('g', null, body);
+    const o = { g };
+    if (!far) { o.hshadow = E('path', { fill: '#3c3f52', opacity: '.1' }, g); o.haunch = E('path', { fill: C.coat }, g); }
+    o.base = E('path', { fill: far ? C.coatFar : C.coat }, g);
+    o.sock = E('path', { fill: far ? C.whiteFar : C.white }, g);
+    o.stripes = E('path', { fill: far ? C.stripeFar : C.stripe, opacity: far ? '.5' : '.78' }, g);
+    o.toes = E('path', { fill: 'none', stroke: '#a9acb6', 'stroke-width': '.8', 'stroke-linecap': 'round' }, g);
+    o.pads = E('path', { fill: C.bean }, g);
+    return o;
+  };
+  const legHF = mkLeg(true), legFF = mkLeg(true);
+  const torsoG = E('g', null, body);
+  const torso = E('path', { fill: C.coat }, torsoG);
+  const tm = E('g', { 'clip-path': `url(#${uid}ct)` }, torsoG);
+  const mDorsal = E('path', { fill: C.stripe, opacity: '.55' }, tm);
+  const mBlotO = E('path', { fill: C.stripe, opacity: '.62' }, tm);
+  const mBlotI = E('path', { fill: C.coat, opacity: '.7' }, tm);
+  const mStr = E('path', { fill: C.stripe, opacity: '.72' }, tm);
+  const mWhite = E('path', { fill: C.white }, tm);
+  const mBib = E('path', { fill: C.white }, tm);
+  const legHN = mkLeg(false);
+  const curlG = E('g', { opacity: '0' }, body);
+  const neckG = E('g', null, body);
+  const neck = E('path', { fill: C.coat }, neckG);
+  const neckM = E('path', { fill: C.stripe, opacity: '.5' }, neckG);
+  const throat = E('path', { fill: C.white }, neckG);
+  const collarG = E('g', null, body);
+  const collar = E('path', { fill: 'none', stroke: C.collar, 'stroke-width': '4.6', 'stroke-linecap': 'round' }, collarG);
+  const collarHi = E('path', { fill: 'none', stroke: C.collarL, 'stroke-width': '1.2', 'stroke-linecap': 'round', opacity: '.8' }, collarG);
+  const legFN = mkLeg(false);
+  const slotA = E('g', null, body); slotA.appendChild(legFN.g);
+  const headG = E('g', null, body);
+  const tagG = E('g', null, body);
+  const slotB = E('g', null, body);
+  const tailFront = E('g', null, body);
+  // tail
+  const tailG = E('g', null, tailBack);
+  const tailP = E('path', { fill: C.coat }, tailG);
+  const tailR = E('path', { fill: C.stripe, opacity: '.7' }, tailG);
+  // head parts
+  const H = {};
+  H.earA = { outer: E('path', { fill: C.coat, stroke: C.coat, 'stroke-width': '2', 'stroke-linejoin': 'round' }, headG) };
+  H.earA.inner = E('path', { fill: `url(#${uid}eg)` }, headG); H.earA.fur = E('path', { fill: 'none', stroke: '#f6f1ef', 'stroke-width': '.7', 'stroke-linecap': 'round' }, headG);
+  H.earB = { outer: E('path', { fill: C.coat, stroke: C.coat, 'stroke-width': '2', 'stroke-linejoin': 'round' }, headG) };
+  H.earB.inner = E('path', { fill: `url(#${uid}eg)` }, headG); H.earB.fur = E('path', { fill: 'none', stroke: '#f6f1ef', 'stroke-width': '.7', 'stroke-linecap': 'round' }, headG);
+  H.base = E('path', { fill: C.coat }, headG);
+  const hm = E('g', { 'clip-path': `url(#${uid}ch)` }, headG);
+  H.marks = E('path', { fill: C.stripe, opacity: '.8' }, hm);
+  H.cheekW = E('path', { fill: C.white, opacity: '.0' }, hm);
+  H.chin = E('path', { fill: C.white }, headG);
+  H.mouth = E('path', { fill: C.mouth }, headG);
+  H.tongue = E('path', { fill: C.tongue }, headG);
+  H.teeth = E('path', { fill: C.tooth }, headG);
+  H.pads = E('path', { fill: C.white }, headG);
+  H.nose = E('path', { fill: C.nose, stroke: C.nose, 'stroke-width': '1', 'stroke-linejoin': 'round' }, headG);
+  H.noseHi = E('path', { fill: '#fff', opacity: '.45' }, headG);
+  H.mline = E('path', { fill: 'none', stroke: '#4b4049', 'stroke-width': '.9', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, headG);
+  H.eyes = [0, 1].map(i => {
+    const g = E('g', null, headG);
+    const ring = E('path', { fill: C.ring, opacity: '.7' }, g);
+    const cp = E('path', null, E('clipPath', { id: uid + 'e' + i }, defs));
+    const inner = E('g', { 'clip-path': `url(#${uid}e${i})` }, g);
+    const ball = E('path', { fill: '#93b766' }, inner);
+    const iris = E('circle', { r: '.9', fill: `url(#${uid}ir)` }, inner);
+    const pupil = E('ellipse', { fill: C.pupil }, inner);
+    const shade = E('path', { fill: 'none', stroke: '#1a1820', 'stroke-opacity': '.3', 'stroke-width': '.5' }, inner);
+    const hl1 = E('circle', { r: '.27', fill: '#fff' }, inner), hl2 = E('circle', { r: '.12', fill: '#fff', opacity: '.85' }, inner);
+    const lid = E('path', { fill: 'none', stroke: C.rim, 'stroke-width': '.22', 'stroke-linecap': 'round' }, g);
+    const low = E('path', { fill: 'none', stroke: C.rim, 'stroke-width': '.12', 'stroke-linecap': 'round', opacity: '.85' }, g);
+    const brow = E('path', { fill: 'none', stroke: C.stripe, 'stroke-width': '.26', 'stroke-linecap': 'round', opacity: '.85' }, g);
+    return { g, ring, cp, ball, iris, pupil, shade, hl1, hl2, lid, low, brow };
+  });
+  H.whisk = E('path', { fill: 'none', stroke: 'var(--whisker)', 'stroke-width': '.55', 'stroke-linecap': 'round', opacity: '.9' }, headG);
+  // tag
+  const tagRing = E('circle', { r: '1.7', fill: 'none', stroke: C.tagEdge, 'stroke-width': '1' }, tagG);
+  const tagS = E('g', null, tagG);
+  E('path', { d: 'M-4.6 2.2H4.6V6.4C4.6 10.4 2.4 12.4 0 13.4-2.4 12.4-4.6 10.4-4.6 6.4Z', fill: `url(#${uid}tg)`, stroke: C.tagEdge, 'stroke-width': '.7', 'stroke-linejoin': 'round' }, tagS);
+  E('path', { d: 'M-2.3 7.2 -.6 9 2.6 5.3', fill: 'none', stroke: C.check, 'stroke-width': '1.45', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, tagS);
+  const glint = E('path', { d: 'M-3.6 3.1H-1L-3.6 8.2Z', fill: '#fff' }, tagS);
+  // curl (sleep) drawing
+  const CURL = buildCurl(curlG, uid);
+  // fx (stage space)
+  const fx = E('g', { 'pointer-events': 'none' }, svg);
+  const bub = E('g', { opacity: '0' }, fx);
+  const bubR = E('rect', { x: '-30', y: '-17', width: '60', height: '26', rx: '13', fill: 'var(--bubble)', stroke: 'var(--bubble-line)', 'stroke-width': '1.5' }, bub);
+  E('path', { d: 'M-6 8.5 0 16 5 8.5', fill: 'var(--bubble)', stroke: 'var(--bubble-line)', 'stroke-width': '1.5', 'stroke-linejoin': 'round' }, bub);
+  E('rect', { x: '-8', y: '6', width: '16', height: '4', fill: 'var(--bubble)' }, bub);
+  const bubT = E('text', { x: '0', y: '1', 'text-anchor': 'middle', 'font-size': '13', 'font-weight': '800', fill: 'var(--bubble-ink)', 'font-family': 'Geologica, system-ui, sans-serif' }, bub);
+  const zzz = E('g', { opacity: '0', fill: 'var(--brand)', 'font-family': 'Geologica, system-ui, sans-serif', 'font-weight': '800' }, fx);
+  const zs = [0, 1, 2].map(i => { const t = E('text', { 'font-size': String(11 + i * 4) }, zzz); t.textContent = 'z'; return t; });
+  const feather = E('g', { opacity: '0' }, fx);
+  E('path', { d: 'M0 0C6-10 18-22 32-24C30-12 20-3 0 0Z', fill: 'var(--accent)' }, feather);
+  E('path', { d: 'M0 0C10-8 20-16 30-22', fill: 'none', stroke: '#fff', 'stroke-width': '1.2', opacity: '.7' }, feather);
+  E('path', { d: 'M3-4 8-1M9-9 14-6M15-14 20-11', fill: 'none', stroke: '#ffb27a', 'stroke-width': '1.2', 'stroke-linecap': 'round' }, feather);
+  E('circle', { r: '2.6', fill: 'var(--accent)' }, feather);
+
+  /* ---- instance state ---- */
+  const st = {
+    wx: mode === 'roam' ? 300 : 0, dir: 1, posture: 'sit', elev: 0,
+    plan: null, planT: 0, planName: 'sit', from: null, fromT: 0,
+    auto: mode === 'roam', still: false, mood: 'idle', moodW: {}, talking: false, gesture: null, gestureT: 0,
+    frozen: false, time: 0, last: null, lastPose: null, energy: 1, history: [],
+    blinkT: 2, blinkP: -1, twT: 3, twP: -1, twSide: 1, wtT: 2, wtP: -1,
+    pointer: null, ptrSpeed: 0, ptrLastMove: -10, ptrInside: false, chase: null, look: null, lookUntil: 0,
+    purrUntil: -1, bubbleText: '', bubbleUntil: -1, zUntil: -1,
+    tail: null, tailPrev: null, tag: { a: 0, v: 0 }, prevPivot: null, prevRoot: null, prevRootV: 0,
+    talkSeed: Math.random() * 100, visible: true, sizePx: opts.size || 160, rubCol: -1
+  };
+  for (const m of Object.keys(MOODS)) st.moodW[m] = m === 'idle' ? 1 : 0;
+
+  /* ---- geometry solve shared by drawing and clips ---- */
+  function torsoFn(p) {
+    const ca = Math.cos(p.ta), sa = Math.sin(p.ta), tl = p.tl * (1 - 0.28 * p.yaw);
+    return (lx, ly) => { const k = Math.max(0, 1 - (lx / 64) * (lx / 64)); const y = ly - p.arch * k; const x = lx * tl; return [p.tx + x * ca - y * sa, p.ty + x * sa + y * ca]; };
+  }
+  function headFrame(p) {
+    const cy = Math.cos(p.hy), sy = Math.sin(p.hy), cp = Math.cos(p.hp), sp = Math.sin(p.hp), cr = Math.cos(p.hr), sr = Math.sin(p.hr);
+    return (x, y, z) => { const x1 = x * cr - y * sr, y1 = x * sr + y * cr; const y2 = y1 * cp + z * sp, z2 = -y1 * sp + z * cp; return [x1 * cy + z2 * sy, y2, -x1 * sy + z2 * cy]; };
+  }
+  function headCenter(p, T) { const nb = T(NBL[0], NBL[1]); return [nb[0] + p.nl * Math.cos(p.na) + p.hdx, nb[1] + p.nl * Math.sin(p.na) + p.hdy]; }
+  function headPoint(p, x, y, z) { const T = torsoFn(p), hc = headCenter(p, T), fr = headFrame(p), v = fr(x, y, z); return [hc[0] + v[0] * HR, hc[1] + v[1] * HR]; }
+
+  /* ---- tail ---- */
+  function tailTargets(p, root, time) {
+    const pts = [root.slice()]; let ang = p.tra;
+    for (let i = 1; i <= TAIL_N; i++) {
+      const f = i / TAIL_N;
+      ang += p.tc + p.tcb * (1 - ss(0.12, 0.45, f)) + p.tc2 * ss(0.5, 1, f) * 0.9 + p.tsw * 0.28 * Math.sin(time * TAU * p.tsf - i * 0.5) * (0.35 + f) + p.tq * 0.05 * Math.sin(time * TAU * 12 + i * 0.9) * (1.1 - f * 0.6);
+      const q = pts[i - 1]; let x = q[0] + TAIL_SEG * Math.cos(ang), y = q[1] + TAIL_SEG * Math.sin(ang);
+      if (y > -3.3) y = -3.3;
+      pts.push([x, y]);
+    }
+    return pts;
+  }
+  function tailStep(tgt, dt, rootAcc) {
+    if (!st.tail || st.tail.length !== tgt.length) { st.tail = tgt.map(q => q.slice()); st.tailPrev = tgt.map(q => q.slice()); return; }
+    const T = st.tail, Pv = st.tailPrev; T[0] = tgt[0].slice(); Pv[0] = tgt[0].slice();
+    const k60 = dt * 60;
+    for (let i = 1; i < T.length; i++) {
+      const f = i / (T.length - 1), q = T[i], pv = Pv[i];
+      const vx = (q[0] - pv[0]) * 0.86, vy = (q[1] - pv[1]) * 0.86;
+      pv[0] = q[0]; pv[1] = q[1];
+      const k = lerp(0.34, 0.1, f) * k60;
+      q[0] += vx + (tgt[i][0] - q[0]) * k - rootAcc * (0.002 + 0.006 * f) * k60;
+      q[1] += vy + (tgt[i][1] - q[1]) * k + 0.04 * f * k60;
+      const a = T[i - 1], d = sub2(q, a), l = len2(d) || 1;
+      q[0] = a[0] + d[0] / l * TAIL_SEG; q[1] = a[1] + d[1] / l * TAIL_SEG;
+      if (q[1] > -3.3) q[1] = -3.3;
+    }
+  }
+  function tubePath(pts, w0, w1) {
+    const n = pts.length, L = [], R = [];
+    for (let i = 0; i < n; i++) {
+      const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)], t = nrm2(sub2(b, a)), nn = perp(t), w = lerp(w0, w1, Math.pow(i / (n - 1), 0.9));
+      L.push(add2(pts[i], nn, w)); R.push(add2(pts[i], nn, -w));
+    }
+    const tl = nrm2(sub2(pts[n - 1], pts[n - 2])), tip = add2(pts[n - 1], tl, w1 * 1.1);
+    return { d: smoothClosed(L.concat([tip], R.reverse()), 1), L, Rr: R.slice().reverse() };
+  }
+  function tailRings(pts, w0, w1, puff) {
+    const n = pts.length; let d = '';
+    const at = (s) => { const i = Math.min(n - 2, Math.floor(s)), f = s - i; const c = lerp2(pts[i], pts[i + 1], f); const t = nrm2(sub2(pts[i + 1], pts[i])); const w = lerp(w0, w1, Math.pow(s / (n - 1), 0.9)) * 0.97 * puff; return [add2(c, perp(t), w), add2(c, perp(t), -w)]; };
+    for (const s0 of [2.7, 4.7, 6.5, 8.2, 9.7]) { const a = at(s0), b = at(s0 + 0.5); d += poly([a[0], b[0], b[1], a[1]]); }
+    const a = at(n - 2.3), tl = nrm2(sub2(pts[n - 1], pts[n - 2])), tip = add2(pts[n - 1], tl, w1 * 1.1);
+    const e = at(n - 1.6);
+    d += smoothClosed([a[0], e[0], add2(pts[n - 1], perp(tl), w1 * puff), tip, add2(pts[n - 1], perp(tl), -w1 * puff), e[1], a[1]], 0.6);
+    return d;
+  }
+
+  /* ---- legs ---- */
+  function foreLeg(Sj, x, y, ang, curl) {
+    const Wt = [x, y - PR], k = ik2(Sj, Wt, L_UA, L_FA, 1), a = ang + curl * 1.05;
+    return { S: Sj, E: k.j, W: k.e, T: [k.e[0] + PAW_F * Math.cos(a), k.e[1] + PAW_F * Math.sin(a)], a };
+  }
+  function hindLeg(Hj, x, y, meta, ang, curl) {
+    const P0 = [x, y - PR], At = [P0[0] + L_MT * Math.cos(meta), P0[1] + L_MT * Math.sin(meta)], k = ik2(Hj, At, L_TH, L_SH, -1);
+    const P2 = [k.e[0] - L_MT * Math.cos(meta), k.e[1] - L_MT * Math.sin(meta)], a = ang + curl * 0.9;
+    return { H: Hj, K: k.j, A: k.e, P: P2, T: [P2[0] + PAW_H * Math.cos(a), P2[1] + PAW_H * Math.sin(a)], a };
+  }
+  function stripeAcross(a, b, ra, rb, f, bend = 1.2) {
+    const c = lerp2(a, b, f), t = nrm2(sub2(b, a)), n = perp(t), w = lerp(ra, rb, f) * 0.86;
+    const p1 = add2(c, n, w), p2 = add2(c, n, -w), m = add2(c, t, bend);
+    return taper([p1, m, p2], 1.25);
+  }
+  function pawDetail(W, Tt, ang, spread, padsOn, isHind) {
+    const t = [Math.cos(ang), Math.sin(ang)], n = perp(t); let toes = '', pads = '';
+    const len = len2(sub2(Tt, W));
+    for (const f of [0.62, 0.82]) { const c = add2(W, t, len * f + spread * (f - 0.7) * 6), up = add2(c, n, -PR * 0.95), dn = add2(c, n, -PR * 0.35); toes += `M${r1(up[0])} ${r1(up[1])}L${r1(dn[0])} ${r1(dn[1])}`; }
+    if (padsOn > 0.02) {
+      const main = add2(add2(W, t, len * 0.35), n, PR * 0.25); pads += circ(main[0], main[1], PR * 0.5);
+      for (const [f, o] of [[0.75, 0.55], [0.9, 0.15], [0.86, -0.35]]) { const c = add2(add2(W, t, len * f + spread * 2), n, PR * o); pads += circ(c[0], c[1], PR * 0.26); }
+    }
+    return { toes, pads };
+  }
+
+  /* ---- the draw ---- */
+  function draw(p, time, dt, live) {
+    const T = torsoFn(p);
+    const yaw = p.yaw;
+    // torso
+    const tp = TORSO.map(([x, y], i) => { let yy = y; if (i === 1) yy -= p.bumpN; if (i === 2) yy -= p.bumpF * 0.8; if (i >= 10 && i <= 12) yy += p.belly; if (i >= 14 && i <= 16) { x += 3 * yaw; } return T(x, yy); });
+    const td = smoothClosed(tp, 1);
+    A(torso, 'd', td); A(clipT, 'd', td);
+    A(mDorsal, 'd', smoothClosed(MARK.dorsal.map(q => T(q[0], q[1] + (q[1] < -10 && q[0] > 25 && q[0] < 40 ? -p.bumpN : 0)))));
+    A(mBlotO, 'd', smoothClosed(MARK.blotchO.map(q => T(q[0], q[1]))));
+    A(mBlotI, 'd', smoothClosed(MARK.blotchI.map(q => T(q[0], q[1]))));
+    A(mStr, 'd', MARK.stripes.map(([s, w]) => taper(s.map(q => T(q[0], q[1])), w)).join(''));
+    A(mWhite, 'd', smoothClosed(MARK.white.map(q => T(q[0], q[1] - (q[0] > 30 ? 6 * yaw : 0)))));
+    const bibS = 0.2 + yaw;
+    A(mBib, 'd', smoothClosed([T(66, -14 - 4 * yaw), T(52, -10 - 6 * bibS), T(42, 2), T(36, 16), T(50, 34), T(70, 30)]));
+    // legs
+    const sxN = -9 * yaw, sxF = 11 * yaw;
+    const SjN = add2(T(SJN[0] + p.sjx, SJN[1] + p.sjy), [sxN, 0]), SjF = add2(T(SJF[0] + p.sjx, SJF[1] + p.sjy), [sxF, -1 * yaw]);
+    const HjN = add2(T(HJN[0], HJN[1]), [-3 * yaw, 0]), HjF = add2(T(HJF[0], HJF[1]), [8 * yaw, 0]);
+    const fN = foreLeg(SjN, p.fnx + sxN, p.fny, p.fna, p.fnc), fF = foreLeg(SjF, p.ffx + sxF, p.ffy, p.ffa, p.ffc);
+    const hN = hindLeg(HjN, p.hnx - 3 * yaw, p.hny, p.hnm, p.hna, p.hnc), hF = hindLeg(HjF, p.hfx + 14 * yaw, p.hfy, p.hfm, p.hfa, p.hfc);
+    const drawFore = (L, g, far) => {
+      A(L.base, 'd', capsule(g.S, 8.4, g.E, 6.4) + capsule(g.E, 6.1, g.W, 4.8) + capsule(g.W, PR, g.T, 4.2));
+      const wu = lerp2(g.W, g.E, 0.2);
+      A(L.sock, 'd', capsule(wu, 5.1, g.W, PR) + capsule(g.W, PR, g.T, 4.2));
+      A(L.stripes, 'd', stripeAcross(g.E, g.W, 6.1, 4.8, 0.28) + stripeAcross(g.E, g.W, 6.1, 4.8, 0.55) + stripeAcross(g.S, g.E, 8.4, 6.4, 0.7));
+      if (!far) { const pd = pawDetail(g.W, g.T, g.a, p.spread, p.pads, false); A(L.toes, 'd', pd.toes); A(L.pads, 'd', pd.pads); A(L.pads, 'opacity', String(r1(p.pads))); }
+      else { A(L.toes, 'd', ''); A(L.pads, 'd', ''); }
+    };
+    const drawHind = (L, g, far) => {
+      const thighD = far ? capsule(g.H, 10, g.K, 6.6) : '';
+      A(L.base, 'd', thighD + capsule(g.K, 6.4, g.A, 4.4) + capsule(g.A, 4.4, g.P, PR) + capsule(g.P, PR, g.T, 4.2));
+      A(L.sock, 'd', capsule(lerp2(g.A, g.K, 0.08), 4.5, g.P, PR) + capsule(g.P, PR, g.T, 4.2));
+      let s = stripeAcross(g.K, g.A, 6.4, 4.4, 0.3) + stripeAcross(g.K, g.A, 6.4, 4.4, 0.6);
+      if (!far) {
+        const hk = sub2(g.K, g.H), dd = nrm2(hk), Hb = add2(g.H, dd, -3);
+        A(L.haunch, 'd', capsule(Hb, 15, g.K, 7.6));
+        A(L.hshadow, 'd', capsule(add2(Hb, [1.5, 2.5]), 16.5, add2(g.K, [1.5, 2]), 8.6));
+        s += stripeAcross(Hb, g.K, 15, 7.6, 0.3, 2.5) + stripeAcross(Hb, g.K, 15, 7.6, 0.52, 2.2) + stripeAcross(Hb, g.K, 15, 7.6, 0.74, 1.6);
+        const pd = pawDetail(g.P, g.T, g.a, p.spread * 0.5, 0, true); A(L.toes, 'd', pd.toes); A(L.pads, 'd', '');
+      } else { A(L.toes, 'd', ''); A(L.pads, 'd', ''); }
+      A(L.stripes, 'd', s);
+    };
+    drawFore(legFF, fF, true); drawFore(legFN, fN, false); drawHind(legHF, hF, true); drawHind(legHN, hN, false);
+    const farC = yaw > 0.4 ? C.coat : C.coatFar;
+    A(legFF.base, 'fill', farC); A(legFF.sock, 'fill', yaw > 0.4 ? C.white : C.whiteFar); A(legHF.base, 'fill', yaw > 0.4 ? '#828a97' : C.coatFar);
+    // layer of near fore leg
+    const wantB = p.fore > 0.5;
+    if (wantB && legFN.g.parentNode !== slotB) slotB.appendChild(legFN.g); else if (!wantB && legFN.g.parentNode !== slotA) slotA.appendChild(legFN.g);
+    // neck + head
+    const NB = T(NBL[0], NBL[1]);
+    const hc = headCenter(p, T), fr = headFrame(p);
+    const pr = (x, y, z) => { const v = fr(x, y, z); return [hc[0] + v[0] * HR, hc[1] + v[1] * HR, v[2]]; };
+    const HA = pr(0, 0.5, -0.32);
+    A(neck, 'd', capsule(NB, 14, HA, 12.5));
+    A(neckM, 'd', capsule(add2(NB, nrm2(perp(sub2(HA, NB))), 9), 4, add2(HA, nrm2(perp(sub2(HA, NB))), 8), 3.5));
+    const chinP = pr(0, 0.62, 0.5), chestF = T(54, 2 - 4 * yaw);
+    A(throat, 'd', capsule(chestF, 7 + 7 * yaw, lerp2(HA, chinP, 0.72), 6.5 + 4 * yaw));
+    // collar
+    const ax = nrm2(sub2(HA, NB)), nn = perp(ax), Cc = lerp2(NB, HA, 0.66), hw = 12.6;
+    let e1 = add2(Cc, nn, hw), e2 = add2(Cc, nn, -hw); if (e1[0] < e2[0]) { const q = e1; e1 = e2; e2 = q; }
+    const bul = hw * (0.25 + 0.75 * yaw), ctl = add2(Cc, ax, -bul * 1.6);
+    A(collar, 'd', `M${r1(e1[0])} ${r1(e1[1])}Q${r1(ctl[0])} ${r1(ctl[1])} ${r1(e2[0])} ${r1(e2[1])}`);
+    const hiOff = add2([0, 0], ax, 1.2);
+    A(collarHi, 'd', `M${r1(e1[0] + hiOff[0])} ${r1(e1[1] + hiOff[1])}Q${r1(ctl[0] + hiOff[0])} ${r1(ctl[1] + hiOff[1])} ${r1(e2[0] + hiOff[0])} ${r1(e2[1] + hiOff[1])}`);
+    const qa = (t) => [(1 - t) * (1 - t) * e1[0] + 2 * (1 - t) * t * ctl[0] + t * t * e2[0], (1 - t) * (1 - t) * e1[1] + 2 * (1 - t) * t * ctl[1] + t * t * e2[1]];
+    const pivot = qa(lerp(0.12, 0.5, clamp(yaw * 1.4)));
+    // tag pendulum
+    let tagA;
+    if (live) {
+      const pv = st.prevPivot || pivot; const vx = (pivot[0] - pv[0]) / Math.max(dt, 1e-3);
+      const ax2 = (vx - (st.prevPivotV || 0)) / Math.max(dt, 1e-3); st.prevPivotV = vx; st.prevPivot = pivot;
+      const tg = st.tag; const acc = -40 * Math.sin(tg.a) - 3.2 * tg.v - clamp(ax2 + st.prevRootA * st.dir, -3000, 3000) * 0.012;
+      tg.v += acc * dt; tg.a = clamp(tg.a + tg.v * dt, -1.1, 1.1); tagA = tg.a;
+    } else tagA = 0.1 * Math.sin(time * 4.2);
+    const sxv = Math.max(0.3, p.sx);
+    A(tagG, 'transform', `translate(${r1(pivot[0])} ${r1(pivot[1])}) scale(${r1(st.dir / sxv * 100) / 100} 1) rotate(${r1(tagA * 57.3 * st.dir)})`);
+    A(tagS, 'transform', `scale(${r1((0.78 + 0.22 * clamp(yaw * 1.5)) * 100) / 100} 1)`);
+    A(glint, 'opacity', String(r1(Math.max(st._glint || 0, 0.25 + 0.6 * clamp(0.5 + Math.sin(tagA * 4 + time * 0.7) * 0.5)))));
+    // head
+    A(headG, 'transform', sxv < 0.999 ? `translate(${r1(hc[0])} ${r1(hc[1])}) scale(${r1(1 / sxv * 100) / 100} 1) translate(${r1(-hc[0])} ${r1(-hc[1])})` : '');
+    drawHead(p, hc, fr, pr, time);
+    // tail
+    const root = T(TRL[0], TRL[1]);
+    const tgts = tailTargets(p, root, time);
+    let tpts;
+    if (live) { tailStep(tgts, dt, st.prevRootA * 1 || 0); tpts = st.tail; } else { st.tail = null; tpts = tgts; }
+    const puff = 1 + p.tpuff * 0.7, w0 = 6.4 * puff, w1 = 4.4 * puff;
+    A(tailP, 'd', tubePath(tpts, w0, w1).d);
+    A(tailR, 'd', tailRings(tpts, w0, w1, 1));
+    const wantF = p.tfront > 0.5; if (wantF && tailG.parentNode !== tailFront) tailFront.appendChild(tailG); else if (!wantF && tailG.parentNode !== tailBack) tailBack.appendChild(tailG);
+    // curl cross-fade
+    const cu = clamp(p.curl), rigO = String(r1(1 - ss(0.4, 0.8, cu)));
+    for (const g of [tailG, legHF.g, legFF.g, torsoG, legHN.g, neckG, collarG, legFN.g, tagG]) A(g, 'opacity', rigO);
+    A(curlG, 'opacity', String(r1(ss(0.02, 0.42, cu))));
+    if (cu > 0.01) {
+      const br = live || st.frozen ? Math.sin(time * TAU / 3.6) : 0;
+      A(CURL.br, 'transform', `translate(0 0) scale(${1 + 0.006 * br} ${1 + 0.028 * br})`);
+      const pt = (st.dreamUntil > time) ? Math.sin(time * 30) * 4 : 0;
+      A(CURL.paw, 'transform', `rotate(${r1(pt)} 46 -18)`);
+    }
+    // shadow
+    const xs = [fN.T[0], fF.T[0], hN.P[0], hF.P[0], fN.W[0], hN.A[0], tp[6][0], tp[14][0]];
+    let mn = Math.min(...xs), mx = Math.max(...xs); if (cu > 0.5) { mn = -70; mx = 70; }
+    const lift = Math.max(0, -(p.ry)) ;
+    A(shadow, 'cx', String(r1((mn + mx) / 2))); A(shadow, 'cy', '0');
+    A(shadow, 'rx', String(r1(((mx - mn) / 2 + 12) * (1 - clamp(lift / 120) * 0.5))));
+    A(shadow, 'ry', String(r1(5.5 * (1 - clamp(lift / 120) * 0.5))));
+    A(shadow, 'opacity', String(r1(p.shadow * (1 - clamp(lift / 90) * 0.6) * (st.elev > 0 ? 0.0 : 1))));
+    return { hc, pr, fN, pivot };
+  }
+
+  function eyeShape(eo, ll, lidT) {
+    const I = [-1, 0.06], O = [1, -0.14];
+    const cl = lerp(0.98, -0.72, clamp(ll));
+    const open = eo > 1 ? -1.06 * eo : lerp(cl, -1.06, clamp(eo));
+    const u1 = Math.min(cl, open - lidT * 0.5), u2 = Math.min(cl, open + lidT * 0.35);
+    const up = `M${I[0]} ${I[1]}C-.45 ${r1(u1 * 10) / 10} .45 ${r1(u2 * 10) / 10} ${O[0]} ${O[1]}`;
+    const lo = `C.45 ${r1(cl * 10) / 10} -.45 ${r1(cl * 10) / 10} ${I[0]} ${I[1]}`;
+    return { clip: up + lo + 'Z', up, low: `M${O[0]} ${O[1]}` + lo, cl, u1, u2 };
+  }
+  // high precision helper for eye-local (small units)
+  const r2 = n => Math.round(n * 100) / 100;
+  function eyeShape2(eo, ll, lidT) {
+    const I = [-1, 0.06], O = [1, -0.14];
+    const cl = lerp(0.98, -0.72, clamp(ll));
+    const open = eo > 1 ? -1.06 * eo : lerp(cl, -1.06, clamp(eo));
+    const u1 = Math.min(cl, open - lidT * 0.5), u2 = Math.min(cl, open + lidT * 0.35);
+    const up = `M-1 .06C-.45 ${r2(u1)} .45 ${r2(u2)} 1 -.14`;
+    const lo = `C.45 ${r2(cl)} -.45 ${r2(cl)} -1 .06`;
+    return { clip: up + lo + 'Z', up, low: `M1 -.14` + lo, cl, u1, u2 };
+  }
+
+  function drawHead(p, hc, fr, pr, time) {
+    const R = HR;
+    // ears
+    const ears = [-1, 1].map(s => {
+      let w = norm3([s, 0.42, 0.08]), u = norm3([s * 0.3, -1, -0.1]), n = cross3(w, u); if (n[2] < 0) n = [-n[0], -n[1], -n[2]];
+      const tw = s < 0 ? p.earL : p.earR;
+      const sw = (p.earS - 0.55 * p.earF) * 0.85 + tw;
+      const sg = Math.sign(dot3(cross3(n, [s, 0, 0]), u)) || 1;
+      w = rotAxis(w, u, sg * sw); n = rotAxis(n, u, sg * sw);
+      const fb = p.earB * 1.05 - p.earF * 0.1;
+      const sg2 = Math.sign(dot3(cross3(u, [0, 0, -1]), w)) || 1;
+      u = rotAxis(u, w, sg2 * fb); n = rotAxis(n, w, sg2 * fb);
+      const B = [s * 0.5, -0.62, -0.05], Sc = 0.43;
+      const P3 = (a, b, dep) => [B[0] + (w[0] * a + u[0] * b) * Sc - n[0] * dep, B[1] + (w[1] * a + u[1] * b) * Sc - n[1] * dep, B[2] + (w[2] * a + u[2] * b) * Sc - n[2] * dep];
+      const pts = [];
+      for (const [a, b] of [[-1, 0], [-0.82, 1.05], [-0.1, 2.05], [0.18, 2.12], [0.86, 1.02], [1, 0]]) { pts.push(pr(...P3(a, b, 0))); pts.push(pr(...P3(a * 0.9, b * 0.94, 0.36 * (1 - b / 2.5)))); }
+      const hl = hull(pts.map(q => [q[0], q[1]]));
+      const inn = [[-0.62, 0.14], [-0.5, 0.95], [0.0, 1.7], [0.2, 1.72], [0.56, 0.92], [0.64, 0.14]].map(([a, b]) => pr(...P3(a, b, -0.01)));
+      const nz = fr(...n)[2];
+      const fur = [[[-0.1, 0.25], [-0.32, 1.05]], [[0.15, 0.22], [0.02, 1.2]], [[0.36, 0.3], [0.32, 0.95]]].map(([a, b]) => { const q1 = pr(...P3(a[0], a[1], -0.02)), q2 = pr(...P3(b[0], b[1], -0.02)); return `M${r1(q1[0])} ${r1(q1[1])}L${r1(q2[0])} ${r1(q2[1])}`; }).join('');
+      return { z: pr(...B)[2], outer: poly(hl), inner: smoothClosed(inn.map(q => [q[0], q[1]]), 1), vis: ss(0.02, 0.32, nz), fur };
+    }).sort((a, b) => a.z - b.z);
+    [H.earA, H.earB].forEach((o, i) => { const e = ears[i]; A(o.outer, 'd', e.outer); A(o.inner, 'd', e.inner); A(o.inner, 'opacity', String(r1(e.vis))); A(o.fur, 'd', e.fur); A(o.fur, 'opacity', String(r1(e.vis * 0.8))); });
+    // base union + cheek tufts
+    let d = '';
+    for (const [x, y, z, r] of HEAD_S) { const c = pr(x, y, z); d += circ(c[0], c[1], r * R); }
+    const mc = pr(0, 0.34, 0.72);
+    for (const s of [-1, 1]) {
+      const c = pr(s * 0.5, 0.3, 0.2), dv = nrm2(sub2([c[0], c[1]], [mc[0], mc[1]]));
+      if (len2(sub2([c[0], c[1]], [mc[0], mc[1]])) < 2) continue;
+      const base = Math.atan2(dv[1], dv[0]) + 0.35, rr = 0.66 * R;
+      for (const [o, k0, wdt] of [[0, 1.2, 0.17], [0.42, 1.14, 0.15], [-0.38, 1.1, 0.13]]) {
+        const k = 1 + (k0 - 1) * p.tuft, th = base + o, a1 = [c[0] + Math.cos(th - wdt) * rr * 0.92, c[1] + Math.sin(th - wdt) * rr * 0.92], a2 = [c[0] + Math.cos(th + wdt) * rr * 0.92, c[1] + Math.sin(th + wdt) * rr * 0.92], tip = [c[0] + Math.cos(th + 0.05) * rr * k, c[1] + Math.sin(th + 0.05) * rr * k];
+        d += triCCW(a1, tip, a2);
+      }
+    }
+    A(H.base, 'd', d); A(clipH, 'd', d);
+    // markings
+    let md = '';
+    for (const line of HEAD_MARKS) {
+      const zA = line.reduce((s, q) => s + fr(...norm3(q))[2], 0) / line.length;
+      if (zA < 0.12) continue;
+      md += taper(line.map(q => { const v = pr(...q); return [v[0], v[1]]; }), (line.w || 0.06) * R * ss(0.12, 0.4, zA), 0.7);
+    }
+    A(H.marks, 'd', md);
+    // jaw
+    const th = p.jaw * 0.58, J = [0, 0.3, 0.15];
+    const jr = (x, y, z) => { const dy = y - J[1], dz = z - J[2]; return [x, J[1] + dy * Math.cos(th) + dz * Math.sin(th), J[2] - dy * Math.sin(th) + dz * Math.cos(th)]; };
+    const sm = p.smile;
+    const chinC = pr(...jr(0, 0.6, 0.64)); A(H.chin, 'd', circ(chinC[0], chinC[1], 0.21 * R));
+    const UL = [[-0.3, 0.4 - sm * 0.05, 0.78], [-0.16, 0.45, 0.92], [0, 0.44, 0.98], [0.16, 0.45, 0.92], [0.3, 0.4 - sm * 0.05, 0.78]];
+    const LLr = [[0.28, 0.43, 0.76], [0.15, 0.48, 0.88], [0, 0.49, 0.93], [-0.15, 0.48, 0.88], [-0.28, 0.43, 0.76]];
+    if (p.jaw > 0.02) {
+      const up = UL.map(q => pr(...q)), lo = LLr.map(q => pr(...jr(...q)));
+      A(H.mouth, 'd', smoothClosed(up.concat(lo).map(q => [q[0], q[1]]), 0.8));
+      const tg = [[-0.17, 0.5, 0.72], [-0.12, 0.5 - p.tcurl * 0.06, 0.86], [0, 0.49 - p.tcurl * 0.16, 0.9 + p.tcurl * 0.05], [0.12, 0.5 - p.tcurl * 0.06, 0.86], [0.17, 0.5, 0.72], [0, 0.52, 0.66]].map(q => pr(...jr(...q)));
+      A(H.tongue, 'd', smoothClosed(tg.map(q => [q[0], q[1]]), 1));
+      let td = '';
+      if (p.jaw > 0.25 || p.teeth > 0) {
+        for (const s of [-1, 1]) {
+          const a = pr(s * 0.2, 0.44, 0.88), b = pr(s * 0.14, 0.45, 0.93), c = pr(s * 0.18, 0.44 + 0.11 * Math.min(1, p.jaw * 1.5), 0.9);
+          td += triCCW([a[0], a[1]], [c[0], c[1]], [b[0], b[1]]);
+          const a2 = pr(...jr(s * 0.17, 0.49, 0.84)), b2 = pr(...jr(s * 0.11, 0.5, 0.88)), c2 = pr(...jr(s * 0.15, 0.42, 0.87));
+          td += triCCW([a2[0], a2[1]], [c2[0], c2[1]], [b2[0], b2[1]]);
+        }
+      }
+      A(H.teeth, 'd', td);
+    } else { A(H.mouth, 'd', ''); A(H.teeth, 'd', ''); }
+    if (p.tongue > 0.02) {
+      const ext = p.tongue;
+      const tq = [[-0.13, 0.48, 0.8], [-0.12, 0.52, 0.98 + ext * 0.2], [0, 0.55 - ext * 0.05, 1.04 + ext * 0.34], [0.12, 0.52, 0.98 + ext * 0.2], [0.13, 0.48, 0.8]].map(q => pr(...jr(...q)));
+      A(H.tongue, 'd', (p.jaw > 0.02 ? H.tongue._c.d || '' : '') + smoothClosed(tq.map(q => [q[0], q[1]]), 1));
+    } else if (p.jaw <= 0.02) A(H.tongue, 'd', '');
+    // pads + blaze
+    let pd = '';
+    for (const s of [-1, 1]) { const c = pr(s * 0.17, 0.32, 0.86); pd += circ(c[0], c[1], 0.2 * R * (1 + Math.max(0, sm) * 0.06)); }
+    const bz = pr(0, 0.18, 0.9); pd += circ(bz[0], bz[1], 0.17 * R);
+    A(H.pads, 'd', pd);
+    // nose
+    const nL = pr(-0.14, 0.09, 0.97), nR = pr(0.14, 0.09, 0.97), nB = pr(0, 0.25, 1.0), nT = pr(0, 0.06, 1.04);
+    A(H.nose, 'd', `M${r1(nL[0])} ${r1(nL[1])}Q${r1(nT[0])} ${r1(nT[1] - 0.6)} ${r1(nR[0])} ${r1(nR[1])}L${r1(nB[0])} ${r1(nB[1])}Z`);
+    const nH = pr(-0.04, 0.1, 1.03); A(H.noseHi, 'd', circ(nH[0], nH[1], 0.035 * R));
+    // mouth line
+    const nb = pr(0, 0.26, 1.0), m0 = pr(0, 0.37, 0.99);
+    let ml = `M${r1(nb[0])} ${r1(nb[1])}L${r1(m0[0])} ${r1(m0[1])}`;
+    for (const s of [-1, 1]) {
+      const pts = [[0, 0.37, 0.99], [s * 0.09, 0.44 - sm * 0.02, 0.96], [s * 0.2, 0.43 - sm * 0.05, 0.9], [s * 0.3, 0.38 - sm * 0.08, 0.78]];
+      const vis = fr(s * 0.6, 0, 0.8)[2]; if (vis < -0.25) continue;
+      ml += smoothOpen(pts.map(q => { const v = pr(...q); return [v[0], v[1]]; }));
+    }
+    A(H.mline, 'd', ml);
+    // eyes
+    const es = eyeShape2(p.eo, p.ll, p.lidT);
+    [-1, 1].forEach((s, i) => {
+      const e = H.eyes[i];
+      const C3 = norm3([s * 0.42, -0.03, 0.84]).map(v => v * 0.97), n = norm3(C3);
+      const u = norm3([s * n[2], 0, -s * n[0]]), v = [0, 1, 0];
+      const c = pr(...C3), U = fr(...u), V = fr(...v), es2 = 0.3 * R;
+      const nz = fr(...n)[2], vis = ss(0.06, 0.3, nz);
+      if (vis < 0.01) { A(e.g, 'opacity', '0'); return; }
+      A(e.g, 'opacity', String(r1(vis)));
+      const a = U[0] * es2, b = U[1] * es2, cc = V[0] * es2, dd = V[1] * es2;
+      A(e.g, 'transform', `matrix(${r2(a)} ${r2(b)} ${r2(cc)} ${r2(dd)} ${r1(c[0])} ${r1(c[1])})`);
+      A(e.cp, 'd', es.clip); A(e.ball, 'd', es.clip); A(e.lid, 'd', es.up); A(e.low, 'd', es.low);
+      // ring around eye (light fur)
+      A(e.ring, 'd', `M-1.32 .12C-.6 ${r2(Math.min(es.u1, -0.3) * 1.25 - 0.2)} .6 ${r2(Math.min(es.u2, -0.3) * 1.25 - 0.2)} 1.34 -.2C.6 1.35 -.6 1.35 -1.32 .12Z`);
+      const lx = p.lx * s * 0 + p.lx, ly = p.ly;
+      // gaze: lx is in screen space (positive = toward screen right); convert to eye-local x via the matrix sign
+      const sgn = a >= 0 ? 1 : -1;
+      const ix = clamp(lx * sgn, -1, 1) * 0.28, iy = clamp(ly, -1, 1) * 0.2;
+      A(e.iris, 'cx', String(r2(ix))); A(e.iris, 'cy', String(r2(iy)));
+      const pw = lerp(0.13, 0.62, clamp(p.pup)), ph = lerp(0.72, 0.68, clamp(p.pup));
+      A(e.pupil, 'cx', String(r2(ix * 1.12))); A(e.pupil, 'cy', String(r2(iy))); A(e.pupil, 'rx', String(r2(pw))); A(e.pupil, 'ry', String(r2(ph)));
+      A(e.shade, 'd', es.up);
+      // glints placed toward screen upper-left
+      const det = a * dd - b * cc || 1; const sv = [-0.42 * es2, -0.42 * es2];
+      const gl = [(dd * sv[0] - cc * sv[1]) / det, (-b * sv[0] + a * sv[1]) / det];
+      const gx = clamp(gl[0], -0.6, 0.6) + ix * 0.5, gy = clamp(gl[1], -0.6, 0.4) + iy * 0.5;
+      A(e.hl1, 'cx', String(r2(gx))); A(e.hl1, 'cy', String(r2(gy)));
+      A(e.hl2, 'cx', String(r2(gx * -0.6 + ix * 0.6))); A(e.hl2, 'cy', String(r2(gy * -0.5 + 0.25)));
+      // brow tuft (inner end = local x -1)
+      const by = -1.22 - p.brow * 0.35 + Math.min(0, es.u1 + 1.0) * 0.2, bin = by - p.browT * 0.32, bout = by + p.browT * 0.22 + 0.06;
+      A(e.brow, 'd', `M-.78 ${r2(bin)}Q0 ${r2(by - 0.22)} .72 ${r2(bout)}`);
+    });
+    // whiskers
+    let wd = '';
+    for (const s of [-1, 1]) {
+      if (fr(s * 0.7, 0.3, 0.6)[2] < -0.35) continue;
+      for (let i = 0; i < 3; i++) {
+        const tw = p.wt * 0.06 * Math.sin(time * 40 + i);
+        const a = pr(s * 0.3, 0.33 + i * 0.05, 0.86 - i * 0.03);
+        const m = pr(s * 0.95, 0.3 + i * 0.09 - p.wh * 0.06 + tw, 0.84 + p.wh * 0.25 - i * 0.05);
+        const b = pr(s * (1.6 + 0.04 * i), 0.24 + i * 0.17 - p.wh * 0.14 + tw * 2, 0.6 + p.wh * 0.5 - i * 0.12);
+        wd += `M${r1(a[0])} ${r1(a[1])}Q${r1(m[0])} ${r1(m[1])} ${r1(b[0])} ${r1(b[1])}`;
+      }
+    }
+    A(H.whisk, 'd', wd); A(H.whisk, 'opacity', String(r1(0.9 * p.whv)));
+  }
+
+  /* ---------------- plans (behaviour -> clips) ---------------- */
+  function sitIdleClip(S, dur, script) {
+    // scripted: fixed beats for renderAt. live: the same beats at random moments (slow blink = "cat kiss")
+    const R = script ? () => 0.5 : Math.random;
+    const ev = script ? { sb: 0.28, es: 0.55, wk: 0.6, lk: 0.78, tf: 0.82, side: 1, lkY: 1.05 }
+      : { sb: 0.1 + R() * 0.5, es: 0.3 + R() * 0.5, wk: R() * 0.9, lk: R() < 0.55 ? 0.45 + R() * 0.3 : 9, tf: R() * 0.85, side: R() < 0.5 ? -1 : 1, lkY: R() < 0.5 ? 1.1 : -0.45 };
+    const sbLen = 2.2 / dur, lkLen = 2.0 / dur;
+    return clipHold('sit', S, dur, t => {
+      const p = Object.assign({}, SIT), u = t / dur;
+      const sb = win(u, ev.sb, ev.sb + sbLen, sbLen * 0.35); p.eo = lerp(1, 0.08, sb); p.ll = 0.25 * sb; p.smile += 0.3 * sb;
+      const es = hump(u, ev.es, ev.es + 0.7 / dur * 2); if (ev.side > 0) { p.earR += 0.8 * es; p.earL -= 0.15 * es; } else { p.earL += 0.8 * es; p.earR -= 0.15 * es; }
+      p.wt = hump(u, ev.wk, ev.wk + 0.35 / dur);
+      const lk = win(u, ev.lk, ev.lk + lkLen, lkLen * 0.3); p.hy = lerp(p.hy, ev.lkY, lk); p.hp = lerp(p.hp, -0.12, lk); p.lx = 0.6 * lk * Math.sign(ev.lkY - SIT.hy); p.ly = -0.4 * lk; p.earF += 0.5 * lk;
+      p.tc2 += 0.25 * hump(u, ev.tf, ev.tf + 0.5 / dur);
+      return p;
+    });
+  }
+  function postureTo(target, S, add) {
+    const from = S.posture;
+    if (from === target) return;
+    if (from === 'curl') { add(clipTrans('uncurl', S, Object.assign({}, LIE, { curl: 1, eo: 0, hp: 0.6, hy: 0.4 }), LIE, 1.0, 'lie')); }
+    const f2 = S.posture;
+    if (target === 'stand') {
+      if (f2 === 'sit') add(clipTrans('stand-up', S, SIT, STAND, 0.6, 'stand', { body: [0, 0.8], hind: [0.05, 0.85], fore: [0, 0.6], head: [0, 0.6], tail: [0.2, 1] }));
+      else if (f2 === 'lie') add(clipTrans('stand-up', S, LIE, STAND, 0.75, 'stand', { body: [0.1, 0.9], fore: [0, 0.6], hind: [0.2, 1], head: [0, 0.6], tail: [0.3, 1] }));
+    } else if (target === 'sit') {
+      if (f2 === 'stand') add(clipTrans('sit-down', S, STAND, SIT, 0.75, 'sit', { body: [0, 0.85], hind: [0, 0.8], fore: [0.15, 0.9], head: [0.1, 0.8], tail: [0.35, 1] }));
+      else if (f2 === 'lie') add(clipTrans('sit-up', S, LIE, SIT, 0.7, 'sit', { body: [0, 0.9], fore: [0, 0.7], hind: [0.1, 0.9], tail: [0.3, 1] }));
+    } else if (target === 'lie') {
+      if (f2 === 'stand') add(clipTrans('lie-down', S, STAND, LIE, 1.0, 'lie', { fore: [0, 0.55], body: [0.1, 0.95], hind: [0.3, 1], head: [0.2, 0.9], tail: [0.4, 1] }));
+      else if (f2 === 'sit') add(clipTrans('lie-down', S, SIT, LIE, 0.85, 'lie', { fore: [0, 0.6], body: [0.1, 0.9], hind: [0.2, 1], tail: [0.3, 1] }));
+    }
+  }
+  function walkTo(S, x, add, o = {}) {
+    x = clamp(x, env.minX, env.maxX);
+    if (!o.cushion && mode === 'roam' && Math.abs(x - env.cushion.x) < 150) x = env.cushion.x - 150;
+    if (Math.abs(x - S.wx) < 4) return;
+    postureTo('stand', S, add);
+    const want = x > S.wx ? 1 : -1;
+    if (want !== S.dir) add(clipTurn(S, STAND));
+    add(clipWalk(S, x, Object.assign({ k: S_() }, o)));
+  }
+  function rubPass(S, edge) {
+    const k = S_(), D = 205 * k, base = STAND;
+    return clipWalk(S, S.wx + S.dir * D, { gait: 'slow', name: 'rub', base, k, mod: (p, t, s, wx) => {
+      const e = (edge - wx) * S.dir / k; // edge in cat-local x
+      const cheek = win(e, 40, 96, 0.2) , neckC = win(e, 18, 56, 0.25), flank = win(e, -58, 40, 0.25), tailC = win(e, -120, -46, 0.25);
+      const c = Math.max(cheek, neckC);
+      p.hr += -0.32 * cheek; p.hy = lerp(p.hy, 0.75, cheek); p.hp += 0.18 * cheek; p.hdx -= 4 * cheek; p.hdy += 2 * cheek;
+      p.eo = lerp(p.eo, 0.25, Math.max(c, flank * 0.8)); p.ll = 0.35 * Math.max(c, flank); p.earB += 0.35 * cheek; p.smile = lerp(p.smile, 0.6, c);
+      p.arch += 7 * flank; p.ty -= 2.5 * flank; p.bumpN += 1.5 * flank;
+      p.tra = angLerp(p.tra, -1.62, Math.max(flank, tailC)); p.tc = lerp(p.tc, 0.02, flank); p.tc2 = lerp(p.tc2, 0.9, tailC); p.tq = Math.max(flank, tailC) * 0.9;
+      p.purr = Math.max(c, flank) * 0.6; p.look = 0;
+      st._rub = Math.max(cheek, flank * 0.7, tailC * 0.5);
+    } });
+  }
+  function groomClip(S, dur) {
+    return clipHold('groom', S, dur, t => {
+      const u = t / dur, p = Object.assign({}, SIT);
+      const lift = ss(0, 0.1, u) * (1 - ss(0.88, 1, u));
+      p.yaw = lerp(SIT.yaw, 0.2, lift); p.hy = lerp(SIT.hy, 1.12, lift); p.hp = lerp(SIT.hp, 0.34, lift); p.na = SIT.na + 0.12 * lift; p.look = 0;
+      p.eo = lerp(1, 0.3, lift); p.ll = 0.3 * lift; p.fore = lift > 0.25 ? 1 : 0; p.smile = 0;
+      const lick1 = win(u, 0.1, 0.46, 0.04), wipe = win(u, 0.46, 0.72, 0.05), lick2 = win(u, 0.72, 0.88, 0.04);
+      const licking = Math.max(lick1, lick2), lk = Math.max(0, Math.sin(t * TAU * 2.4));
+      p.tongue = licking * (0.35 + 0.65 * lk); p.jaw = licking * (0.1 + 0.14 * lk); p.hp += 0.08 * lk * licking;
+      const mouth = headPoint(p, 0, 0.56, 1.18);
+      let wx = mouth[0] + 3.5, wy = mouth[1] + 10.5 - 2.5 * lk * licking, pa = -1.72;
+      if (wipe > 0.01) {
+        const w = (u - 0.46) / 0.26, kk = 0.5 - 0.5 * Math.cos(clamp(w) * TAU * 2);
+        const q = headPoint(p, -0.62 * kk, 0.42 - 1.0 * kk, 0.98 - 0.62 * kk);
+        wx = lerp(wx, q[0] + 1, wipe); wy = lerp(wy, q[1] + 8, wipe); pa = lerp(pa, -2.15, wipe);
+        p.hr = lerp(p.hr, -0.22 * kk, wipe); p.hp = lerp(p.hp, 0.5, wipe); p.eo = lerp(p.eo, 0, wipe); p.earB += 0.55 * wipe * kk; p.earS += 0.3 * wipe * kk;
+      }
+      p.fnx = lerp(SIT.fnx, wx + 9 * p.yaw, lift); p.fny = lerp(0, wy + PR, lift); p.fna = lerp(0, pa, lift); p.pads = lift * 0.9; p.fnc = 0;
+      p.tsw = 0.06;
+      return p;
+    });
+  }
+  function yawnClip(S, dur) {
+    return clipHold('yawn', S, dur, t => {
+      const u = t / dur, p = Object.assign({}, SIT);
+      const open = ss(0.06, 0.3, u) * (1 - ss(0.52, 0.66, u));
+      p.jaw = open * 1.05; p.tongue = 0; p.tcurl = open; p.hp = lerp(0.1, -0.38, open); p.hy = lerp(p.hy, 0.7, open);
+      p.eo = lerp(1, 0, ss(0.04, 0.2, u) * (1 - ss(0.6, 0.72, u))); p.ll = 0.4 * open; p.earB = 0.55 * open; p.wh = -0.7 * open;
+      p.arch += 2 * open; p.ty -= 1.5 * open; p.look = 0;
+      const sh = win(u, 0.7, 0.9, 0.03), dec = 1 - inv(0.7, 0.9, u);
+      p.hr = 0.26 * Math.sin((u - 0.7) * TAU * 7) * sh * dec; p.earS = 0.5 * Math.abs(Math.sin((u - 0.7) * TAU * 7)) * sh; p.hy += 0.12 * Math.sin((u - 0.7) * TAU * 7) * sh;
+      const bl = hump(u, 0.92, 0.98); p.eo *= 1 - bl;
+      return p;
+    });
+  }
+  function petClip(S, dur, base) {
+    return clipHold('pet', S, dur, t => {
+      const u = t / dur, p = Object.assign({}, base), w = ss(0, 0.15, u) * (1 - ss(0.85, 1, u));
+      p.eo = lerp(p.eo, 0.0, w); p.ll = lerp(p.ll, 0.9, w); p.smile = lerp(p.smile, 1, w); p.hr = lerp(p.hr, 0.28 + 0.06 * Math.sin(t * 3), w);
+      p.hp = lerp(p.hp, 0.2, w); p.hy = lerp(p.hy, Math.min(p.hy, 0.6), w); p.earB += 0.25 * w; p.earS += 0.15 * w; p.look = 0;
+      p.purr = w; p.tra = angLerp(p.tra, base === SIT ? p.tra : -1.7, w); p.tq = base === SIT ? 0 : 0.7 * w; p.tc2 += 0.2 * w;
+      const kn = Math.sin(t * TAU * 1.4);
+      if (base === SIT) { p.fny -= Math.max(0, kn) * 4 * w; p.ffy -= Math.max(0, -kn) * 4 * w; p.spread = w * 0.6; }
+      return p;
+    });
+  }
+  function kneadClip(S, dur, base) {
+    return clipHold('knead', S, dur, t => {
+      const u = t / dur, p = Object.assign({}, base), w = ss(0, 0.1, u) * (1 - ss(0.9, 1, u));
+      const k = t * TAU * 1.3;
+      p.fny -= Math.max(0, Math.sin(k)) * 7 * w; p.ffy -= Math.max(0, Math.sin(k + PI)) * 7 * w;
+      p.fnx += Math.sin(k) * 2 * w; p.ffx += Math.sin(k + PI) * 2 * w; p.fnc += Math.max(0, Math.sin(k)) * 0.5 * w; p.ffc += Math.max(0, Math.sin(k + PI)) * 0.5 * w;
+      p.spread = w * (0.5 + 0.5 * Math.max(0, -Math.sin(k)));
+      p.eo = lerp(p.eo, 0.3, w); p.ll = 0.4 * w; p.purr = w; p.smile = lerp(p.smile, 0.8, w); p.hp += 0.12 * w; p.ty += Math.sin(k * 2) * 0.6 * w; p.look = 0.2;
+      return p;
+    });
+  }
+  function stretchClip(S, dur) {
+    return clipHold('stretch', S, dur, t => {
+      const u = t / dur;
+      const a = sine(inv(0, 0.2, u)) * (1 - sine(inv(0.52, 0.66, u)));
+      let p = mixPose(STAND, BOW, a);
+      // walk front paws forward one after another
+      p.fnx = lerp(STAND.fnx, BOW.fnx, sine(inv(0.0, 0.14, u))) * (1 - 0) ; p.ffx = lerp(STAND.ffx, BOW.ffx, sine(inv(0.06, 0.2, u)));
+      if (u > 0.52) { const b = sine(inv(0.52, 0.66, u)); p.fnx = lerp(BOW.fnx, STAND.fnx, b); p.ffx = lerp(BOW.ffx, STAND.ffx, sine(inv(0.56, 0.7, u))); }
+      p.fny -= 6 * hump(u, 0.0, 0.14) + 6 * hump(u, 0.52, 0.66); p.ffy -= 6 * hump(u, 0.06, 0.2) + 6 * hump(u, 0.56, 0.7);
+      p.rx -= 4 * win(u, 0.22, 0.5, 0.1);
+      // back leg stretch
+      const b = win(u, 0.68, 0.92, 0.07);
+      p.hnx = lerp(p.hnx, -92, b); p.hny = lerp(p.hny, -9, b); p.hnm = angLerp(p.hnm, 3.0, b); p.hna = lerp(0, 0.9, b); p.rx += 5 * b; p.ta -= 0.06 * b;
+      p.hp = lerp(p.hp, -0.22, b); p.eo = lerp(p.eo, 0.35, b); p.tra = angLerp(p.tra, -2.55, b); p.tc = lerp(p.tc, 0.1, b); p.tc2 = lerp(p.tc2, 0.35, b);
+      p.look = 0;
+      return p;
+    });
+  }
+  function lookClip(S, dur) {
+    return clipHold('lookaround', S, dur, t => {
+      const u = t / dur, p = Object.assign({}, SIT);
+      const k = [[0, 0.55, 0.12, 0, 0], [0.18, 1.35, -0.05, 0.6, -0.2], [0.42, -0.35, 0.05, -0.7, 0], [0.66, 0.6, -0.42, 0.1, -0.8], [0.86, 0.5, 0.1, 0, 0], [1, 0.55, 0.12, 0, 0]];
+      let i = 0; while (i < k.length - 2 && u > k[i + 1][0]) i++;
+      const f = sine(inv(k[i][0] + 0.03, k[i + 1][0] - 0.03, u));
+      p.hy = lerp(k[i][1], k[i + 1][1], f); p.hp = lerp(k[i][2], k[i + 1][2], f); p.lx = lerp(k[i][3], k[i + 1][3], f); p.ly = lerp(k[i][4], k[i + 1][4], f);
+      p.earF = 0.5; p.earR += 0.5 * hump(u, 0.36, 0.5); p.earL += 0.5 * hump(u, 0.12, 0.24); p.look = 0;
+      return p;
+    });
+  }
+  function curlClip(S, dur, script) {
+    return clipHold('sleep', S, dur, t => {
+      const u = t / dur, p = Object.assign({}, LIE, { curl: 1, eo: 0, ll: 0, hy: 0.42, hp: 0.62, hr: -0.42, na: -0.2, nl: 6, tx: 14, ty: -10, ta: 0.1, earB: 0.1, earS: 0.2, look: 0, smile: 0.3, wh: -0.6, shadow: 0, tuft: 0.35, whv: 0.35 });
+      const ins = ss(0, 0.06, u); p.curl = ins;
+      if (ins < 1) { const q = mixPose(LIE, p, ins); Object.assign(p, q); p.curl = ins; }
+      // ear twitch & dream paw in scripted mode
+      if (script) { p.earR += 0.9 * hump(u, 0.55, 0.6); }
+      p.hdy += 0.6 * Math.sin(t * TAU / 3.6);
+      return p;
+    });
+  }
+  function chaseScript(S) {
+    // deterministic: lock+crouch, wiggle, pounce, swat, trot
+    const clips = [];
+    const x0 = S.wx;
+    clips.push(clipHold('chase', S, 1.6, t => {
+      const u = t / 1.6, p = mixPose(STAND, CROUCH, sine(inv(0, 0.3, u)));
+      const wg = win(u, 0.35, 1, 0.08); const w = Math.sin(t * TAU * 3.2) * wg;
+      p.hnx += 3 * w; p.hfx -= 3 * w; p.hny -= Math.max(0, w) * 3; p.hfy -= Math.max(0, -w) * 3; p.rx += 0.8 * w; p.ty -= 1.2 * Math.abs(w) * wg; p.arch -= 1.5 * wg;
+      p.tq = 0.25; p.tc2 += 0.22 * Math.sin(t * 7); return p;
+    }));
+    const S2 = { wx: x0, dir: S.dir, elev: 0 };
+    const D = 150;
+    clips.push({ name: 'chase', dur: 0.7, end: { wx: x0 + S.dir * D }, f: t => {
+      const u = t / 0.7, p = Object.assign({}, CROUCH);
+      const air = inv(0.18, 0.8, u), h = 4 * air * (1 - air);
+      p.ry = -64 * h; p.ta = lerp(0.05, -0.22, h) + 0.3 * ss(0.7, 1, air); p.tl = 1 + 0.1 * h; p.arch = -6 * h;
+      p.fnx = lerp(CROUCH.fnx, 64, ss(0.1, 0.5, u)); p.ffx = lerp(CROUCH.ffx, 60, ss(0.1, 0.5, u)); p.fny = -18 * h; p.ffy = -15 * h; p.fna = -0.6 * h; p.ffa = -0.5 * h;
+      p.hnx = lerp(CROUCH.hnx, -74, ss(0.12, 0.45, u)); p.hfx = lerp(CROUCH.hfx, -78, ss(0.12, 0.45, u)); p.hny = -10 * h; p.hfy = -8 * h; p.hnm = angLerp(-2.55, 2.9, h); p.hfm = angLerp(-2.55, 2.9, h); p.hna = 0.8 * h; p.hfa = 0.8 * h;
+      if (u > 0.75) { const l = sine(inv(0.75, 1, u)); p.fnx = lerp(64, 46, l); p.ffx = lerp(60, 40, l); p.hnx = lerp(-74, -40, l); p.hfx = lerp(-78, -44, l); }
+      p.tra = angLerp(2.95, 3.1, h); p.tc = -0.02; p.hp = 0.15 * h; p.eo = 1.15; p.pup = 1; p.earF = 1; p.jaw = 0.15 * h; p.look = 0;
+      const s = D * ss(0.12, 0.85, u);
+      return { p, wx: x0 + S.dir * s, dir: S.dir, elev: 0 };
+    } });
+    const x1 = x0 + S.dir * D, S3 = { wx: x1, dir: S.dir, elev: 0 };
+    clips.push(clipHold('chase', S3, 1.1, t => {
+      const u = t / 1.1, p = Object.assign({}, CROUCH, { ty: -38, ta: -0.12, arch: 0 });
+      const sw = hump(u, 0.1, 0.5), sw2 = hump(u, 0.45, 0.85);
+      p.fnx = 46 + 24 * sw; p.fny = -40 * sw; p.fna = -1.05 * sw; p.fnc = 0; p.ffx = 40 + 20 * sw2; p.ffy = -30 * sw2; p.ffa = -0.9 * sw2; p.spread = Math.max(sw, sw2);
+      p.fore = 1; p.pads = 0.8 * sw; p.hp = -0.05; p.eo = 1.15; p.pup = 0.95; p.earF = 0.6; p.earB = 0.25 * Math.max(sw, sw2); p.look = 0; p.ta -= 0.12 * Math.max(sw, sw2); p.ty -= 4 * Math.max(sw, sw2);
+      p.tc2 += 0.3 * Math.sin(t * 8);
+      return p;
+    }));
+    clips.push(clipWalk(S3, x1 + S.dir * 160, { gait: 'trot', name: 'chase', k: S_(), base: Object.assign({}, STAND, { earF: 0.9, pup: 0.8, tra: -1.8, tc: 0.06, tc2: 0.2, hp: 0.05, look: 0 }) }));
+    return clips;
+  }
+
+  function plan(name, o = {}, S0, scripted) {
+    const S = Object.assign({}, S0), clips = [];
+    const add = c => { clips.push(c); Object.assign(S, c.end); };
+    const inPlace = mode === 'mascot';
+    switch (name) {
+      case 'sit': case 'present':
+        postureTo('sit', S, add); add(sitIdleClip(S, scripted ? 6 : (inPlace ? 8 : 6 + Math.random() * 4), scripted)); break;
+      case 'walk': {
+        if (inPlace) { postureTo('sit', S, add); add(sitIdleClip(S, 3, false)); break; }
+        const x = o.x != null ? o.x : (S.wx < 450 ? 560 + Math.random() * 130 : 130 + Math.random() * 230);
+        if (scripted) { const G = GAITS.walk; add({ name: 'walk', dur: G.L / G.speed, end: {}, f: t => { const p = Object.assign({}, STAND); applyGait(p, t / (G.L / G.speed), G, 1); return { p, wx: S.wx, dir: S.dir, elev: 0 }; } }); break; }
+        walkTo(S, x, add); break;
+      }
+      case 'rub': {
+        if (inPlace) { postureTo('sit', S, add); add(petClip(S, 2.4, SIT)); break; }
+        let ci = o.target != null ? o.target : scripted ? 1 : Math.floor(Math.random() * env.columns.length); ci = clamp(ci | 0, 0, env.columns.length - 1);
+        const col = env.columns[ci];
+        st.rubCol = ci;
+        const from = scripted ? -1 : (S.wx < col.x ? -1 : 1);
+        const edge = from < 0 ? col.x - col.w / 2 + 6 : col.x + col.w / 2 - 6;
+        const ax = from < 0 ? edge - 112 * S_() : edge + 112 * S_();
+        if (scripted) { S.wx = ax; S.dir = 1; S.posture = 'stand'; }
+        else { walkTo(S, ax, add); if (S.dir !== -from) add(clipTurn(S, STAND)); }
+        add(rubPass(S, edge)); add(clipTurn(S, STAND)); add(rubPass(S, edge));
+        break;
+      }
+      case 'groom': postureTo('sit', S, add); add(groomClip(S, 6.4)); break;
+      case 'yawn': postureTo('sit', S, add); add(yawnClip(S, 2.8)); break;
+      case 'knead': postureTo('sit', S, add); add(kneadClip(S, 3.4, SIT)); break;
+      case 'lookaround': postureTo('sit', S, add); add(lookClip(S, 4.6)); break;
+      case 'stretch': if (inPlace) { postureTo('sit', S, add); add(yawnClip(S, 2.8)); break; } postureTo('stand', S, add); add(stretchClip(S, 4.8)); break;
+      case 'pet': { const base = S.posture === 'stand' ? STAND : SIT; if (S.posture !== 'stand' && S.posture !== 'sit') postureTo('sit', S, add); add(petClip(S, 2.8, S.posture === 'stand' ? STAND : SIT)); break; }
+      case 'sleep': {
+        if (inPlace) { postureTo('sit', S, add); add(clipHold('sleep', S, scripted ? 6 : 20, t => { const u = scripted ? t / 6 : t / 20, d = ss(0, 0.12, u) * (1 - ss(0.94, 1, u)); return Object.assign({}, SIT, { eo: lerp(1, 0, d), ll: 0.1 * d, hp: lerp(SIT.hp, 0.42 + 0.04 * Math.sin(t * TAU / 3.6), d), hy: lerp(SIT.hy, 0.45, d), smile: 0.35, earS: 0.3 * d, earB: 0.1 * d, arch: SIT.arch + 1.5 * d, look: 0, doze: d }); })); break; }
+        const cx = env.cushion.x, elev = (FY - env.cushion.top) / S_();
+        if (scripted) { S.wx = cx; S.dir = 1; S.posture = 'stand'; S.elev = elev; }
+        else {
+          walkTo(S, cx, add, { cushion: true });
+          const Sx = Object.assign({}, S);
+          add({ name: 'sleep', dur: 0.6, end: { elev }, f: t => { const u = t / 0.6, h = hump(u, 0, 1); const p = Object.assign({}, STAND); p.ry = -10 * h; p.fny = -6 * h; p.ffy = -6 * h; p.hnc = 0.5 * h; return { p, wx: Sx.wx, dir: Sx.dir, elev: elev * sine(u) }; } });
+        }
+        add(kneadClip(S, 2.6, Object.assign({}, STAND, { ty: -48, eo: 0.5 })));
+        add(clipTurn(S, Object.assign({}, STAND, { ty: -44 }))); add(clipTurn(S, Object.assign({}, STAND, { ty: -42 })));
+        postureTo('lie', S, add);
+        add(curlClip(S, scripted ? 7 : 26 + Math.random() * 14, scripted)); S.posture = 'curl';
+        break;
+      }
+      case 'chase': {
+        if (inPlace) { postureTo('sit', S, add); add(clipHold('chase', S, 1.4, t => { const u = t / 1.4, p = Object.assign({}, SIT), sw = hump(u, 0.15, 0.6); p.fnx += 14 * sw; p.fny -= 30 * sw; p.fna = -1.2 * sw; p.fore = sw > 0.1 ? 1 : 0; p.pads = sw; p.pup = 0.95; p.earF = 1; p.eo = 1.15; return p; })); break; }
+        if (scripted) { S.wx = 260; S.dir = 1; S.posture = 'stand'; chaseScript(S).forEach(add); break; }
+        postureTo('stand', S, add); chaseScript(S).forEach(add); break;
+      }
+      default: postureTo('sit', S, add); add(sitIdleClip(S, 5, false));
+    }
+    if (!clips.length) add(sitIdleClip(S, 4, false));
+    let acc = 0; for (const c of clips) { c.t0 = acc; acc += c.dur; }
+    return { name, clips, dur: acc, end: S, start: Object.assign({}, S0, scripted ? {} : {}) };
+  }
+  const S_ = () => S;
+  function samplePlan(pl, t) {
+    const cl = pl.clips; let k = 0; while (k < cl.length - 1 && t >= cl[k].t0 + cl[k].dur) k++;
+    const c = cl[k], lt = clamp(t - c.t0, 0, c.dur), r = c.f(lt);
+    const B = 0.22;
+    if (k > 0 && lt < B) { const pr = cl[k - 1].f(cl[k - 1].dur); return { p: mixPose(pr.p, r.p, sine(lt / B)), wx: r.wx, dir: r.dir, elev: r.elev, clip: c.name }; }
+    return Object.assign({ clip: c.name }, r);
+  }
+
+  /* ---------------- overlays: mood, gesture, talking, procedural ---------------- */
+  function moodVec() {
+    const o = {}; for (const k of MOOD_KEYS) o[k] = 0;
+    let tail = {}, bounce = 0, chest = 0, laugh = 0;
+    for (const m in st.moodW) { const w = st.moodW[m]; if (w < 0.001) continue; const M = MOODS[m]; for (const k of MOOD_KEYS) if (M[k] != null) o[k] += (M[k] - (BASE[k] || 0)) * w; if (M.tail) tail[M.tail] = (tail[M.tail] || 0) + w; bounce += (M.bounce || 0) * w; chest += (M.chest || 0) * w; laugh += (M.laugh || 0) * w; }
+    return { o, tail, bounce, chest, laugh };
+  }
+  function applyMood(p, t, sitting) {
+    const mv = moodVec(), o = mv.o;
+    // eyes etc are absolute in moods (relative to BASE)
+    for (const k of MOOD_KEYS) p[k] += o[k];
+    const tl = mv.tail;
+    if (sitting) {
+      if (tl.up) { const w = tl.up; p.tcb = lerp(p.tcb, 0, w); p.tra = angLerp(p.tra, -1.75, w); p.tc = lerp(p.tc, 0.08, w); p.tc2 = lerp(p.tc2, 0.55, w); p.tfront = w > 0.5 ? 0 : p.tfront; }
+      if (tl.low) { const w = tl.low; p.tc2 = lerp(p.tc2, -0.05, w); p.tsw *= 1 - w; }
+      if (tl.stiff) { const w = tl.stiff; p.tcb = lerp(p.tcb, 0, w); p.tra = angLerp(p.tra, -1.7, w); p.tc = lerp(p.tc, 0.0, w); p.tc2 = lerp(p.tc2, 0.12, w); p.tfront = w > 0.5 ? 0 : p.tfront; }
+      if (tl.puff) { const w = tl.puff; p.tcb = lerp(p.tcb, 0, w); p.tra = angLerp(p.tra, -1.75, w); p.tc = lerp(p.tc, 0.03, w); p.tc2 = lerp(p.tc2, 0.1, w); p.tpuff = w; p.tfront = w > 0.5 ? 0 : p.tfront; p.arch += 3 * w; }
+      if (tl.quiver) { const w = tl.quiver; p.tcb = lerp(p.tcb, 0, w); p.tra = angLerp(p.tra, -1.72, w); p.tc = lerp(p.tc, 0.05, w); p.tc2 = lerp(p.tc2, 0.5, w); p.tq = w; p.tfront = w > 0.5 ? 0 : p.tfront; }
+      if (tl.curl) { const w = tl.curl; p.tc2 = lerp(p.tc2, -0.45, w); }
+      if (tl.flick) { const w = tl.flick; p.tc2 += 0.5 * w * Math.max(0, Math.sin(t * 2.2)) ** 6; }
+    }
+    if (mv.bounce > 0.01) { const b = Math.abs(Math.sin(t * TAU * 1.6)); p.ry -= 5 * b * mv.bounce; p.fny -= 3 * b * mv.bounce; }
+    if (mv.chest > 0.01) { p.arch -= 1 * mv.chest; p.ta -= 0.06 * mv.chest; p.ty -= 2 * mv.chest; }
+    if (mv.laugh > 0.01) { p.hr += 0.1 * Math.sin(t * TAU * 3) * mv.laugh; p.jaw += 0.18 * Math.abs(Math.sin(t * TAU * 3.2)) * mv.laugh; p.ty += Math.sin(t * TAU * 3.2) * 0.8 * mv.laugh; }
+  }
+  function applyGesture(p, g, u, t, info) {
+    const env1 = ss(0, 0.16, u) * (1 - ss(0.82, 1, u));
+    const head = info.hc, sh = info.sh;
+    switch (g) {
+      case 'wave': {
+        p.fore = env1 > 0.2 ? 1 : 0; const wv = Math.sin(t * TAU * 2.6);
+        p.fnx = lerp(p.fnx, head[0] - 12 + 5 * wv + 9 * p.yaw, env1); p.fny = lerp(p.fny, head[1] + 16 + PR, env1); p.fna = lerp(p.fna, -1.62 + 0.35 * wv, env1); p.pads = env1; p.spread = env1 * 0.8;
+        p.hr += 0.12 * env1; p.eo = lerp(p.eo, 0.7, env1); p.ll = lerp(p.ll, 0.5, env1); p.smile = lerp(p.smile, 1, env1); break;
+      }
+      case 'nod': p.hp += 0.22 * Math.sin(u * TAU * 2) * env1; p.eo = lerp(p.eo, 0.8, env1); break;
+      case 'shake': p.hy += 0.38 * Math.sin(u * TAU * 3) * env1; p.hr += 0.08 * Math.sin(u * TAU * 3) * env1; p.earS += 0.3 * env1; p.smile = lerp(p.smile, -0.3, env1); break;
+      case 'cheer': { const h = hump(u, 0.1, 0.55); p.ry -= 18 * h; p.fny -= 16 * h; p.ffy -= 14 * h; p.fna -= 0.6 * h; p.ffa -= 0.5 * h; p.eo = lerp(p.eo, 0.1, env1); p.ll = lerp(p.ll, 0.95, env1); p.jaw = Math.max(p.jaw, 0.5 * env1); p.smile = lerp(p.smile, 1, env1); p.tra = angLerp(p.tra, -1.75, env1); p.tcb = lerp(p.tcb, 0, env1); p.tc = lerp(p.tc, 0.06, env1); p.tfront = env1 > 0.5 ? 0 : p.tfront; p.tq = env1; p.earF += 0.4 * env1; break; }
+      case 'point-right': case 'point-left': case 'point-down': {
+        const side = g === 'point-right' ? 1 : g === 'point-left' ? -1 : 0;
+        p.fore = env1 > 0.2 ? 1 : 0; p.pads = 0.2 * env1;
+        if (side) { p.fnx = lerp(p.fnx, sh[0] + side * 34, env1); p.fny = lerp(p.fny, sh[1] + 10 + PR, env1); p.fna = lerp(p.fna, side > 0 ? -0.15 : -2.9, env1); p.hy = lerp(p.hy, side > 0 ? 1.2 : -0.55, env1); p.lx = lerp(p.lx, side * 0.8, env1); }
+        else { p.fnx = lerp(p.fnx, p.fnx + 12, env1); p.fny = lerp(p.fny, -3 - 4 * Math.abs(Math.sin(t * TAU * 2)), env1); p.fna = lerp(p.fna, 0.3, env1); p.hp = lerp(p.hp, 0.5, env1); p.ly = lerp(p.ly, 0.9, env1); }
+        p.earF += 0.5 * env1; break;
+      }
+      case 'shrug': p.bumpN += 4 * env1; p.bumpF += 3 * env1; p.hr += 0.2 * env1; p.earS += 0.7 * env1; p.wh -= 0.5 * env1; p.smile = lerp(p.smile, -0.1, env1); p.lidT -= 0.2 * env1; p.browT += 0.5 * env1; p.ly -= 0.3 * env1; break;
+      case 'lean-in': p.tx += 5 * env1; p.ta += 0.12 * env1; p.na += 0.25 * env1; p.hy = lerp(p.hy, 0.2, env1); p.eo = lerp(p.eo, 1.12, env1); p.pup = lerp(p.pup, 0.75, env1); p.earF += 0.6 * env1; p.wh += 0.5 * env1; break;
+      case 'shield-up': {
+        p.fore = env1 > 0.2 ? 1 : 0; const pv = info.pivot;
+        p.fnx = lerp(p.fnx, pv[0] - 7 + 9 * p.yaw, env1); p.fny = lerp(p.fny, pv[1] + 13 + PR, env1); p.fna = lerp(p.fna, -0.95, env1); p.pads = 0.15 * env1;
+        p.hp = lerp(p.hp, -0.1, env1); p.eo = lerp(p.eo, 0.62, env1); p.ll = lerp(p.ll, 0.4, env1); p.smile = lerp(p.smile, 0.7, env1); p.ta -= 0.05 * env1; p.earF += 0.3 * env1; st._glint = env1 * hump(u, 0.25, 0.75); break;
+      }
+      case 'bow': p.hp += 0.55 * env1; p.na += 0.3 * env1; p.ta += 0.1 * env1; p.eo = lerp(p.eo, 0.05, env1); p.ll = lerp(p.ll, 0.6, env1); p.earB += 0.2 * env1; p.smile = lerp(p.smile, 0.6, env1); break;
+    }
+  }
+  function talkJaw(t) {
+    const s = t * 7.2 + st.talkSeed; const syl = Math.max(0, Math.sin(s * 1.0 + 2 * noise(s * 0.37)));
+    const word = ss(-0.2, 0.25, noise(t * 1.9 + st.talkSeed));
+    return clamp(syl * (0.35 + 0.55 * (0.5 + 0.5 * noise(t * 5.3 + 3))) * word, 0, 0.75);
+  }
+
+  /* ---------------- main update ---------------- */
+  function startPlan(name, o = {}) {
+    const S0 = { wx: st.wx, dir: st.dir, posture: st.posture, elev: st.elev };
+    st.plan = plan(name, o, S0, false); st.planT = 0; st.planName = name;
+    st.from = st.lastPose ? Object.assign({}, st.lastPose) : null; st.fromT = 0;
+    st.history.push(name); if (st.history.length > 6) st.history.shift();
+    if (name !== 'chase') st.chase = null;
+  }
+  function pickNext() {
+    if (st.chase) return nextChase();
+    if (!st.auto || st.still) { startPlan('sit'); return; }
+    const last = st.history[st.history.length - 1];
+    if (last === 'sleep') { startPlan('stretch'); return; }
+    if (last === 'stretch' && st.history[st.history.length - 2] === 'sleep') { startPlan('yawn'); return; }
+    st.energy -= 0.09;
+    if (st.energy < 0.2) { st.energy = 1; startPlan('sleep'); return; }
+    const W = mode === 'mascot' ? { sit: 4, groom: 1.4, yawn: 0.8, lookaround: 1.6, knead: 0.6 }
+      : { sit: 2.4, walk: 3.2, rub: 1.4, groom: 2, lookaround: 1.5, stretch: 1, yawn: 0.9, knead: 0.6 };
+    if (last && W[last]) W[last] *= 0.15;
+    if (st.posture === 'stand') { W.sit *= 1.5; }
+    let sum = 0; for (const k in W) sum += W[k]; let r = Math.random() * sum;
+    for (const k in W) { r -= W[k]; if (r <= 0) { startPlan(k); return; } }
+    startPlan('sit');
+  }
+  // chase controller: builds short plans from the live pointer
+  function beginChase() {
+    if (mode !== 'roam' || st.still) return;
+    if (st.chase) { st.chase.interest = Math.min(st.chase.interest + 1.5, 9); return; }
+    st.chase = { interest: 8, began: st.time };
+    nextChase(true);
+  }
+  function nextChase(first) {
+    const c = st.chase, ptr = st.pointer;
+    if (!c || !ptr || st.time - st.ptrLastMove > 1.6 || c.interest <= 0) {
+      st.chase = null; const S0 = { wx: st.wx, dir: st.dir, posture: st.posture, elev: st.elev };
+      const pl = plan('groom', {}, S0, false); st.plan = pl; st.planT = 0; st.planName = 'groom'; st.from = st.lastPose ? Object.assign({}, st.lastPose) : null; st.fromT = 0; return;
+    }
+    const S = { wx: st.wx, dir: st.dir, posture: st.posture, elev: st.elev }, clips = [];
+    const add = cl => { clips.push(cl); Object.assign(S, cl.end); };
+    postureTo('stand', S, add);
+    const tx = clamp(ptr.x, env.minX, env.maxX), dx = tx - S.wx, want = dx >= 0 ? 1 : -1;
+    if (want !== S.dir && Math.abs(dx) > 30) add(clipTurn(S, STAND));
+    const dist = Math.abs(tx - S.wx);
+    if (dist > 270) { add(clipWalk(S, tx - S.dir * 150, { gait: 'trot', name: 'chase', noSettle: true, k: S_(), base: Object.assign({}, STAND, { earF: 0.9, pup: 0.8, tra: -1.8, tc: 0.06, tc2: 0.2, look: 1 }) })); }
+    else {
+      const x0 = S.wx, D = clamp(dist - 70, 0, 200) * S.dir;
+      const Sx = Object.assign({}, S);
+      add(clipHold('chase', Sx, 1.3, t => { const u = t / 1.3, p = mixPose(STAND, CROUCH, sine(inv(0, 0.35, u))); const wg = win(u, 0.4, 1, 0.08), w = Math.sin(t * TAU * 3.3) * wg; p.hnx += 3 * w; p.hfx -= 3 * w; p.hny -= Math.max(0, w) * 3; p.hfy -= Math.max(0, -w) * 3; p.rx += 0.8 * w; p.arch -= 1.5 * wg; p.tq = 0.3; return p; }));
+      add({ name: 'chase', dur: 0.62, end: { wx: x0 + D }, f: t => {
+        const u = t / 0.62, p = Object.assign({}, CROUCH), air = inv(0.16, 0.8, u), h = 4 * air * (1 - air);
+        p.ry = -62 * h * (0.55 + 0.45 * Math.abs(D) / 200); p.ta = lerp(0.05, -0.18, h) + 0.25 * ss(0.7, 1, air); p.tl = 1 + 0.1 * h; p.arch = -6 * h;
+        p.fnx = lerp(CROUCH.fnx, 64, ss(0.1, 0.5, u)); p.ffx = lerp(CROUCH.ffx, 60, ss(0.1, 0.5, u)); p.fny = -18 * h; p.ffy = -15 * h; p.fna = -0.6 * h; p.ffa = -0.5 * h;
+        p.hnx = lerp(CROUCH.hnx, -74, ss(0.12, 0.45, u)); p.hfx = lerp(CROUCH.hfx, -78, ss(0.12, 0.45, u)); p.hny = -10 * h; p.hfy = -8 * h; p.hnm = angLerp(-2.55, 2.9, h); p.hfm = angLerp(-2.55, 2.9, h); p.hna = 0.8 * h; p.hfa = 0.8 * h;
+        if (u > 0.75) { const l = sine(inv(0.75, 1, u)); p.fnx = lerp(64, 46, l); p.ffx = lerp(60, 40, l); p.hnx = lerp(-74, -40, l); p.hfx = lerp(-78, -44, l); }
+        p.eo = 1.15; p.pup = 1; p.earF = 1; p.jaw = 0.15 * h; p.look = 0.5;
+        return { p, wx: x0 + D * ss(0.1, 0.85, u), dir: Sx.dir, elev: 0 };
+      } });
+      const S3 = Object.assign({}, S);
+      add(clipHold('chase', S3, 0.9, t => { const u = t / 0.9, p = Object.assign({}, CROUCH, { ty: -38, ta: -0.12, arch: 0 }); const sw = hump(u, 0.05, 0.45), sw2 = hump(u, 0.42, 0.82); p.fnx = 46 + 24 * sw; p.fny = -40 * sw; p.fna = -1.05 * sw; p.ffx = 40 + 20 * sw2; p.ffy = -30 * sw2; p.ffa = -0.9 * sw2; p.spread = Math.max(sw, sw2); p.fore = 1; p.pads = 0.8 * sw; p.look = 1; p.pup = 0.95; p.earF = 0.6; p.earB = 0.25 * Math.max(sw, sw2); p.ta -= 0.12 * Math.max(sw, sw2); p.ty -= 4 * Math.max(sw, sw2); return p; }));
+      S.posture = 'stand';
+    }
+    let a = 0; for (const cl of clips) { cl.t0 = a; a += cl.dur; }
+    st.plan = { name: 'chase', clips, dur: a, end: S }; st.planT = 0; st.planName = 'chase';
+    st.from = st.lastPose ? Object.assign({}, st.lastPose) : null; st.fromT = 0;
+    c.interest -= a;
+  }
+
+  function frame(dt) {
+    st.time += dt;
+    const t = st.time;
+    if (!st.plan) startPlan('sit');
+    st.planT += dt;
+    if (st.planT >= st.plan.dur) {
+      const e = st.plan.end; st.wx = e.wx; st.dir = e.dir; st.posture = e.posture; st.elev = e.elev || 0;
+      if (st.still) { st.planT = Math.min(st.planT, st.plan.dur); }
+      else pickNext();
+    }
+    let r = st.still ? { p: Object.assign({}, SIT, mode === 'mascot' ? { yaw: PRESENT.yaw, hy: PRESENT.hy } : {}), wx: st.wx, dir: st.dir, elev: st.elev, clip: 'sit' } : samplePlan(st.plan, st.planT);
+    if (st.still && st.posture !== 'sit') { st.posture = 'sit'; }
+    let p = r.p;
+    if (mode === 'mascot' && !st.still && (r.clip === 'sit')) { p = Object.assign({}, p, { yaw: PRESENT.yaw, hy: lerp(p.hy, PRESENT.hy, 0.8) }); }
+    if (st.from) { st.fromT += dt; const k = st.fromT / 0.35; if (k >= 1) st.from = null; else p = mixPose(st.from, p, sine(k)); }
+    // root
+    const prevWx = st.wx; st.wx = r.wx; st.dir = r.dir; st.elev = r.elev;
+    const vx = (st.wx - (st.prevWx == null ? st.wx : st.prevWx)) / Math.max(dt, 1e-3); st.prevWx = st.wx;
+    st.prevRootA = clamp((vx - (st.prevRootV || 0)) / Math.max(dt, 1e-3), -4000, 4000) / S; st.prevRootV = vx;
+    p = Object.assign({}, p);
+    // mood (blend weights)
+    for (const m in st.moodW) { const target = m === st.mood ? 1 : 0; st.moodW[m] += (target - st.moodW[m]) * clamp(dt * 6); }
+    const sitting = r.clip === 'sit' || r.clip === 'pet' && st.posture === 'sit' || mode === 'mascot';
+    const moodScale = (r.clip === 'sit' || r.clip === 'lookaround' || mode === 'mascot') ? 1 : 0.35;
+    if (st.mood !== 'idle' || st.moodW.idle < 0.99) { const q = Object.assign({}, p); applyMood(q, t, sitting); p = mixPose(p, q, moodScale); if (sitting) { p.tfront = q.tfront; } }
+    // gesture
+    st._glint = 0;
+    if (st.gesture) {
+      st.gestureT += dt; const gd = 1.6, u = st.gestureT / gd;
+      if (u >= 1) st.gesture = null;
+      else { const T = torsoFn(p); const hc = headCenter(p, T); const sh = T(SJN[0] + p.sjx, SJN[1] + p.sjy); applyGesture(p, st.gesture, u, t, { hc, sh, pivot: st.lastPivot || [hc[0], hc[1] + 20] }); }
+    }
+    // talking
+    if (st.talking && !st.still && p.curl < 0.5) { const j = talkJaw(t); p.jaw = Math.max(p.jaw, j); p.hp += j * 0.04; p.hr += 0.03 * noise(t * 1.3); }
+    else if (st.talking && st.still) { const j = talkJaw(t); p.jaw = Math.max(p.jaw, j); }
+    // procedural (live only)
+    if (!st.still) {
+      // breathing
+      const br = Math.sin(t * TAU / (p.curl > 0.5 ? 3.6 : 2.8));
+      p.arch += 0.5 * br; p.belly += 0.6 * br;
+      // ear twitch
+      st.twT -= dt; if (st.twT <= 0) { st.twT = 2.5 + Math.random() * 6; st.twP = 0; st.twSide = Math.random() < 0.5 ? -1 : 1; }
+      if (st.twP >= 0) { st.twP += dt / 0.28; if (st.twP >= 1) st.twP = -1; else { const k = Math.sin(st.twP * PI) * 0.8; if (st.twSide < 0) p.earL += k; else p.earR += k; } }
+      // whisker twitch
+      st.wtT -= dt; if (st.wtT <= 0) { st.wtT = 1.5 + Math.random() * 4; st.wtP = 0; }
+      if (st.wtP >= 0) { st.wtP += dt / 0.3; if (st.wtP >= 1) st.wtP = -1; else p.wt += Math.sin(st.wtP * PI); }
+      // dream paw
+      if (p.curl > 0.9 && Math.random() < dt * 0.08) st.dreamUntil = t + 0.6;
+      // look at pointer / lookAt target
+      const tgt = st.look && st.lookUntil > t ? st.look : (st.ptrInside || st.chase || st.demo) && st.pointer && mode === 'roam' ? st.pointer : null;
+      st.attn = lerp(st.attn || 0, tgt && p.curl < 0.3 ? 1 : 0, clamp(dt * 3));
+      if (st.attn > 0.01 && (tgt || st.lastTgt)) {
+        const tg2 = tgt || st.lastTgt; st.lastTgt = tg2;
+        const T = torsoFn(p), hc = headCenter(p, T);
+        const hx = mode === 'roam' ? st.wx + st.dir * S * hc[0] : st.dir * hc[0], hy = mode === 'roam' ? FY - S * st.elev + S * hc[1] : hc[1];
+        const dxl = (tg2.x - hx) * st.dir / S, dyl = (tg2.y - hy) / S;
+        const yawD = clamp(Math.atan2(dxl, 95), -0.75, 1.45), pitchD = clamp(Math.atan2(dyl, Math.hypot(dxl, 95)) * 0.9, -0.55, 0.55);
+        const w = p.look * st.attn;
+        p.hy = lerp(p.hy, yawD, w * 0.85); p.hp = lerp(p.hp, pitchD, w * 0.8);
+        p.lx = lerp(p.lx, clamp((yawD - p.hy) * 2 + Math.sign(dxl * st.dir) * 0.15, -1, 1) * st.dir, w); p.ly = lerp(p.ly, clamp(pitchD * 1.4, -1, 1), w);
+        if (st.chase) { p.pup = Math.max(p.pup, 0.85); p.earF = Math.max(p.earF, 0.8); }
+      }
+      // purr
+      if (st.purrUntil > t) p.purr = Math.max(p.purr, 1);
+      if (p.purr > 0.01) { p.rx += Math.sin(t * TAU * 23) * 0.32 * p.purr; p.ry += Math.cos(t * TAU * 19) * 0.22 * p.purr; }
+    }
+    // blink (also in still mode)
+    st.blinkT -= dt; if (st.blinkT <= 0) { st.blinkT = 2.2 + Math.random() * 4.5; st.blinkP = 0; }
+    if (st.blinkP >= 0) { st.blinkP += dt / 0.17; if (st.blinkP >= 1) st.blinkP = -1; else p.eo *= 1 - Math.sin(st.blinkP * PI); }
+    render(p, t, dt, true, r.clip);
+  }
+
+  function render(p, t, dt, live, clipName) {
+    st.lastPose = p;
+    const sx = Math.max(0.3, p.sx);
+    const elevPx = st.elev * S;
+    const rootT = mode === 'roam' ? `translate(${r1(st.wx)} ${r1(FY - elevPx)}) scale(${r1(st.dir * S * sx * 1000) / 1000} ${r1(S * 1000) / 1000})` : `scale(${st.dir * sx} 1)`;
+    A(rootG, 'transform', rootT + ` translate(${r1(p.rx)} ${r1(p.ry)})`);
+    A(shadowG, 'transform', rootT + ` translate(${r1(p.rx)} 0)`);
+    const info = draw(p, t, dt, live);
+    st.lastPivot = info.pivot;
+    // fx
+    const toStage = (q) => mode === 'roam' ? [st.wx + st.dir * S * sx * (q[0] + p.rx), FY - elevPx + S * (q[1] + p.ry)] : [st.dir * sx * (q[0] + p.rx), q[1] + p.ry];
+    const hs = toStage(info.hc);
+    const sc = mode === 'roam' ? 1 : 1.1;
+    let bubO = 0, txt = '';
+    if (live) {
+      if (p.purr > 0.5) { st.bubbleText = 'mrrr…'; st.bubbleUntil = Math.max(st.bubbleUntil, t + 0.7); }
+      if (st.bubbleUntil > t) { bubO = clamp((st.bubbleUntil - t) / 0.3); txt = st.bubbleText; }
+    } else if (p.purr > 0.5) { bubO = 1; txt = 'mrrr…'; }
+    if (st._bubForce) { bubO = 1; txt = st._bubForce; }
+    if (txt && bubT.textContent !== txt) { bubT.textContent = txt; }
+    if (txt) { const w = Math.max(44, txt.length * 8.4 + 18); A(bubR, 'x', String(-w / 2)); A(bubR, 'width', String(w)); }
+    A(bub, 'opacity', String(r1(bubO)));
+    A(bub, 'transform', mode === 'roam' ? `translate(${r1(hs[0] + 6)} ${r1(hs[1] - HR * S * 2.05)}) scale(${sc})` : `translate(${r1(hs[0] + 40 * st.dir)} ${r1(hs[1] - 18)}) scale(.8)`);
+    const zO = p.curl > 0.8 || p.doze > 0.8 ? 1 : 0, zk = mode === 'roam' ? 1 : 0.45;
+    A(zzz, 'opacity', String(zO));
+    if (zO) zs.forEach((z, i) => { const ph = fract(t * 0.35 + i / 3); A(z, 'x', String(r1(hs[0] + (14 + ph * 26 + i * 3) * st.dir * (mode === 'roam' ? 1 : 1.3)))); A(z, 'y', String(r1(hs[1] - (20 + ph * 50) * zk))); A(z, 'opacity', String(r1(hump(ph, 0, 1)))); A(z, 'font-size', String(r1((11 + i * 4) * (mode === 'roam' ? 1 : 0.7)))); });
+    // column wobble
+    if (env.onRub) { const v = clipName === 'rub' ? (st._rub || 0) : 0; if (Math.abs(v - (st._rubPrev || 0)) > 0.02) { env.onRub(st.rubCol, v); st._rubPrev = v; } }
+    st._rub = 0;
+    // feather cursor
+    if (mode === 'roam' && st.pointer && (st.ptrInside || st.demo)) { A(feather, 'opacity', '1'); A(feather, 'transform', `translate(${r1(st.pointer.x)} ${r1(st.pointer.y)}) rotate(${r1(-10 + 14 * Math.sin(t * 7))})`); }
+    else A(feather, 'opacity', '0');
+  }
+
+  /* ---------------- deterministic renderAt ---------------- */
+  function renderAt(name, t = 0.5, o = {}) {
+    st.frozen = true; st._glint = 0;
+    const S0 = mode === 'roam' ? { wx: 300, dir: 1, posture: 'sit', elev: 0 } : { wx: 0, dir: 1, posture: 'sit', elev: 0 };
+    let nm = name; if (!BEHAVIOURS.includes(nm)) nm = 'sit';
+    const pre = { sit: 'sit', present: 'sit', groom: 'sit', yawn: 'sit', knead: 'sit', lookaround: 'sit', pet: 'sit', stretch: 'stand', walk: 'stand', rub: 'stand', chase: 'stand', sleep: 'stand' }[nm];
+    S0.posture = pre;
+    const pl = plan(nm, {}, S0, true);
+    const tt = clamp(t) * pl.dur * 0.999;
+    const r = samplePlan(pl, tt);
+    let p = Object.assign({}, r.p);
+    if (mode === 'mascot' && (nm === 'sit' || nm === 'present')) { p.yaw = PRESENT.yaw; p.hy = PRESENT.hy; }
+    if (nm === 'present') { p.yaw = PRESENT.yaw; p.hy = PRESENT.hy; p.hp = PRESENT.hp; }
+    const saveW = Object.assign({}, st.moodW);
+    if (o.mood && MOODS[o.mood]) {
+      for (const m in st.moodW) st.moodW[m] = m === o.mood ? 1 : 0;
+      p.yaw = PRESENT.yaw; p.hy = PRESENT.hy; p.hp = PRESENT.hp; p.lx = 0; p.ly = 0; p.eo = 1; p.ll = 0; p.earL = 0; p.earR = 0; p.wt = 0;
+      const q = Object.assign({}, p); applyMood(q, tt, true); p = q;
+    }
+    if (o.talking) p.jaw = Math.max(p.jaw, 0.45);
+    if (o.gesture) { const T = torsoFn(p); applyGesture(p, o.gesture, 0.45, tt, { hc: headCenter(p, T), sh: T(SJN[0] + p.sjx, SJN[1] + p.sjy), pivot: st.lastPivot || [0, -60] }); }
+    st.moodW = saveW;
+    st.wx = r.wx; st.dir = r.dir; st.elev = r.elev || 0;
+    if (nm === 'rub') st._rub = 0;
+    render(p, tt, 1 / 60, false, r.clip);
+    return { clip: r.clip, dur: pl.dur };
+  }
+
+  /* ---------------- input ---------------- */
+  const listeners = [];
+  const on = (el, ev, fn, o) => { el.addEventListener(ev, fn, o); listeners.push([el, ev, fn, o]); };
+  function toStage(e) { const m = svg.getScreenCTM(); if (!m) return { x: 0, y: 0 }; const q = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse()); return { x: q.x, y: q.y }; }
+  if (mode === 'roam') {
+    const stEl = opts.stage || container;
+    let lastP = null, lastPT = 0;
+    on(stEl, 'pointermove', e => {
+      const q = toStage(e), now = performance.now() / 1000;
+      if (lastP) { const d = Math.hypot(q.x - lastP.x, q.y - lastP.y), dtt = Math.max(0.008, now - lastPT); st.ptrSpeed = lerp(st.ptrSpeed, d / dtt, 0.35); }
+      lastP = q; lastPT = now; st.pointer = q; st.ptrInside = true; st.ptrLastMove = st.time; st.demo = false;
+      if (stEl.classList) stEl.classList.toggle('pointer-in', e.pointerType === 'mouse');
+      if (!st.frozen && st.ptrSpeed > 700 && st.posture !== 'curl' && !st.still) beginChase();
+    });
+    on(stEl, 'pointerleave', () => { st.ptrInside = false; st.ptrSpeed = 0; if (stEl.classList) stEl.classList.remove('pointer-in'); });
+    on(rootG, 'pointerdown', e => { e.stopPropagation(); poke(); });
+  } else {
+    on(rootG, 'pointerdown', e => { e.stopPropagation(); poke(); });
+  }
+  function poke() {
+    if (st.frozen) resume();
+    stopDemo();
+    if (st.posture === 'curl') { st.purrUntil = st.time + 2.2; st.bubbleText = 'mrrr…'; st.bubbleUntil = st.time + 2.2; st.twT = 0; return; }
+    st.chase = null; startPlan('pet'); st.bubbleText = 'mrrr…'; st.bubbleUntil = st.time + 2.6;
+  }
+
+  /* ---------------- public API ---------------- */
+  const api = {
+    mode, behaviours: BEHAVIOURS.slice(), moods: Object.keys(MOODS), gestures: GESTURES.slice(),
+    do(name, o = {}) {
+      if (st.frozen) resume();
+      if (!BEHAVIOURS.includes(name)) return false;
+      if (st.still) return false;
+      if (name === 'chase') {
+        if (mode === 'roam') { st.demo = true; demoChase(); return true; }
+      }
+      stopDemo();
+      st.chase = null; startPlan(name, o); return true;
+    },
+    setAuto(b) { st.auto = !!b; },
+    getAuto() { return st.auto; },
+    setMood(m) { if (MOODS[m]) st.mood = m; },
+    getMood() { return st.mood; },
+    setTalking(b) { st.talking = !!b; },
+    play(g) { if (st.frozen) resume(); const al = { 'point': 'point-right', 'clap': 'cheer', 'yes': 'nod', 'no': 'shake', 'hello': 'wave', 'hi': 'wave', 'think': 'shrug', 'lean': 'lean-in', 'shield': 'shield-up' }; const gg = GESTURES.includes(g) ? g : al[g]; if (!gg) return false; st.gesture = gg; st.gestureT = 0; if (st.posture !== 'sit' && mode === 'roam' && !st.still) { st.chase = null; startPlan('sit'); } return true; },
+    lookAt(x, y) { if (x == null) { st.look = null; return; } st.look = toStage({ clientX: x, clientY: y }); st.lookUntil = st.time + 3; kick(); },
+    poke,
+    setStill(b) { st.still = !!b; if (st.still) { stopDemo(); st.auto = false; st.chase = null; st.gesture = null; st.posture = 'sit'; st.plan = plan('sit', {}, { wx: st.wx, dir: st.dir, posture: 'sit', elev: st.elev }, false); st.planT = 0; st.from = st.lastPose ? Object.assign({}, st.lastPose) : null; st.fromT = 0; } },
+    isStill() { return st.still; },
+    setSize(px) { st.sizePx = px; if (mode === 'mascot') layoutMascot(); else S = clamp(px / 140, 0.5, 2); },
+    renderAt, resume,
+    destroy() { ALL.delete(api); listeners.forEach(([el, ev, fn, o]) => el.removeEventListener(ev, fn, o)); svg.remove(); if (io) io.disconnect(); },
+    _st: st, _tick: frame, svg
+  };
+  function stopDemo() { st.demoRun = (st.demoRun || 0) + 1; if (st.demo) { st.demo = false; st.ptrSpeed = 0; } }
+  function resume() { kick(); st.frozen = false; st.from = st.lastPose ? Object.assign({}, st.lastPose) : null; st.fromT = 0; st.prevWx = null; st.tail = null; }
+  function demoChase() {
+    const stEl = opts.stage || container; let k = 0; const t0 = st.time; st.demoRun = (st.demoRun || 0) + 1; const run = st.demoRun;
+    const step = () => {
+      if (run !== st.demoRun || st.ptrInside) return;
+      const tt = st.time - t0; if (tt > 7) { st.demo = false; return; }
+      st.pointer = { x: 500 + 330 * Math.sin(tt * 1.1) + 60 * Math.sin(tt * 3.7), y: 440 - 40 * Math.abs(Math.sin(tt * 2.3)) }; st.ptrLastMove = st.time; st.ptrSpeed = 900;
+      if (!st.chase) beginChase();
+      requestAnimationFrame(step);
+    };
+    step();
+  }
+  // mascot layout
+  function layoutMascot() {
+    const px = st.sizePx, bust = px <= 48;
+    const vb = bust ? [-33, -127, 72, 72] : [-73, -131, 146, 146];
+    svg.setAttribute('viewBox', vb.join(' '));
+    svg.setAttribute('width', String(px)); svg.setAttribute('height', String(Math.round(px * vb[3] / vb[2])));
+    H.whisk.style.display = px < 64 ? 'none' : '';
+    for (const L of [legFN, legHN]) L.toes.style.display = px < 90 ? 'none' : '';
+    body.setAttribute('filter', px < 64 ? '' : `url(#${uid}ol)`);
+  }
+  if (mode === 'mascot') { st.posture = 'sit'; layoutMascot(); }
+  // visibility
+  let io = null;
+  if ('IntersectionObserver' in window) { io = new IntersectionObserver(es => { for (const e of es) st.visible = e.isIntersecting; if (st.visible) kick(); }, { rootMargin: '80px' }); io.observe(container); }
+  if (reduceMQ && reduceMQ.matches) api.setStill(true);
+  ALL.add(api); kick();
+  // initial frame
+  st.plan = plan('sit', {}, { wx: st.wx, dir: st.dir, posture: 'sit', elev: 0 }, false);
+  frame(1 / 60);
+  return api;
+}
+
+/* ---------------- sleeping curl (static drawing, like the reference photo, cross-faded in) ---------------- */
+function buildCurl(g, uid) {
+  const br = E('g', null, E('g', { transform: 'translate(4 0) scale(.9)' }, g));
+  const cp = E('path', null, E('clipPath', { id: uid + 'cc' }, g.ownerSVGElement.querySelector('defs')));
+  // tail (under), wrapping the front
+  const tailPts = [[-46, -12], [-58, -9], [-64, -2], [-58, 3], [-44, 5], [-26, 6], [-8, 6], [10, 4], [24, 0], [32, -5]];
+  const tub = (pts, w0, w1) => { const n = pts.length, L = [], R = []; for (let i = 0; i < n; i++) { const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)], t = nrm2(sub2(b, a)), nn = perp(t), w = lerp(w0, w1, i / (n - 1)); L.push(add2(pts[i], nn, w)); R.push(add2(pts[i], nn, -w)); } const tl = nrm2(sub2(pts[n - 1], pts[n - 2])); return smoothClosed(L.concat([add2(pts[n - 1], tl, w1)], R.reverse())); };
+  E('path', { d: tub(tailPts, 6.2, 4.4), fill: C.coat }, br);
+  let rings = '';
+  for (const i of [2, 4, 6]) { const a = tailPts[i], b = tailPts[i + 1], m = lerp2(a, b, 0.5), t = nrm2(sub2(b, a)), n = perp(t), w = 5.6; rings += poly([add2(add2(m, t, -2), n, w), add2(add2(m, t, 2), n, w), add2(add2(m, t, 2), n, -w), add2(add2(m, t, -2), n, -w)]); }
+  E('path', { d: rings, fill: C.stripe, opacity: '.85' }, br);
+  E('path', { d: tub([[22, 0.6], [28, -2.4], [32, -5]], 4.6, 4.4), fill: C.stripe }, br);
+  // body crescent
+  const bodyPts = [[-50, -4], [-61, -16], [-60, -32], [-48, -47], [-26, -57], [0, -60], [26, -56], [46, -45], [57, -32], [58, -20], [50, -9], [30, -10], [6, -12], [-18, -11], [-36, -6]];
+  const bd = smoothClosed(bodyPts); cp.setAttribute('d', bd);
+  E('path', { d: bd, fill: C.coat }, br);
+  const cg = E('g', { 'clip-path': `url(#${uid}cc)` }, br);
+  E('path', { d: smoothClosed([[-70, -14], [-68, -36], [-52, -56], [-26, -68], [0, -71], [28, -66], [50, -54], [66, -38], [54, -36], [40, -46], [22, -51], [0, -53], [-22, -50], [-42, -42], [-52, -28], [-56, -12]]), fill: C.stripe, opacity: '.62' }, cg);
+  E('path', { d: smoothClosed(ellPts(-6, -38, 16, 10.5, -0.12, 12)), fill: C.stripe, opacity: '.8' }, cg);
+  E('path', { d: smoothClosed(ellPts(-5, -38.5, 7.5, 4, -0.12, 10)), fill: C.coatL, opacity: '.9' }, cg);
+  E('path', { d: 'M36 -48Q31 -38 30 -27M26 -52Q21 -42 21 -31M-34 -44Q-40 -36 -41 -27M14 -52Q11 -46 11 -40', fill: 'none', stroke: C.stripe, 'stroke-width': '3.8', 'stroke-linecap': 'round', opacity: '.75' }, cg);
+  E('path', { d: smoothClosed([[52, -10], [46, -21], [24, -25], [0, -27], [-22, -24], [-40, -16], [-52, -4], [-30, -2], [0, -4], [40, 0]]), fill: C.white }, cg);
+  // near haunch + white hind leg with pink beans (as in the photo)
+  E('path', { d: smoothClosed(ellPts(-36, -28, 20, 15, -0.35, 14)), fill: C.coat }, br);
+  E('path', { d: 'M-50 -30Q-44 -40 -32 -42M-46 -22Q-40 -32 -28 -35', fill: 'none', stroke: C.stripe, 'stroke-width': '3.4', 'stroke-linecap': 'round', opacity: '.8' }, br);
+  E('path', { d: capsule([-24, -24], 8.5, [-8, -14], 6) + capsule([-8, -14], 6, [6, -10], 5.2), fill: C.white }, br);
+  E('path', { d: capsule([-20, -30], 5, [-2, -24], 4.6) + capsule([-2, -24], 4.6, [8, -22], 4.4), fill: C.white }, br);
+  E('path', { d: circ(2, -11, 2.6) + circ(7.5, -13.5, 1.3) + circ(9, -10, 1.3) + circ(7.4, -6.6, 1.3) + circ(4, -22.5, 2) + circ(8.4, -24.5, 1.05) + circ(9.6, -21.5, 1.05), fill: C.bean }, br);
+  E('path', { d: circ(4.6, -8.2, 1.1), fill: C.beanG, opacity: '.8' }, br);
+  // front legs (grey striped forearms, white paws) reaching toward the hind paws, as in the photo
+  E('path', { d: capsule([46, -10], 6.8, [26, -4.5], 5.1) + capsule([26, -4.5], 5.1, [17, -4], 4.7), fill: C.coatFar }, br);
+  E('path', { d: capsule([24, -4.6], 5, [15, -4.2], 4.7), fill: C.white }, br);
+  const paw = E('g', null, br);
+  E('path', { d: capsule([48, -20], 7.4, [26, -14], 5.4), fill: C.coat }, paw);
+  E('path', { d: taper([[40, -26], [39, -20], [40, -14]], 1.3) + taper([[34, -25], [33, -19], [34, -13]], 1.3) + taper([[29, -23], [28, -18], [29, -12]], 1.1), fill: C.stripe, opacity: '.8' }, paw);
+  E('path', { d: capsule([28, -14.5], 5.4, [18, -13], 5), fill: C.white }, paw);
+  // collar + tag resting on the cushion
+  const tg = E('g', { transform: 'translate(44 -3) rotate(-22) scale(.92)' }, br);
+  E('path', { d: 'M-1 -2 Q2 1 0 2.2', fill: 'none', stroke: C.collar, 'stroke-width': '3', 'stroke-linecap': 'round' }, tg);
+  E('path', { d: 'M-4.6 2.2H4.6V6.4C4.6 10.4 2.4 12.4 0 13.4-2.4 12.4-4.6 10.4-4.6 6.4Z', fill: `url(#${uid}tg)`, stroke: C.tagEdge, 'stroke-width': '.7' }, tg);
+  E('path', { d: 'M-2.3 7.2 -.6 9 2.6 5.3', fill: 'none', stroke: C.check, 'stroke-width': '1.45', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, tg);
+  return { br, paw };
+}
+
+/* ---------------- shared ticker ---------------- */
+// the rAF loop only runs while the tab is visible and at least one live cat is on screen
+let lastT = null, running = false;
+function tick(now) {
+  const t = now / 1000; const dt = lastT == null ? 1 / 60 : clamp(t - lastT, 0, 0.05); lastT = t;
+  let active = 0;
+  if (!document.hidden) for (const c of ALL) { if (c._st.frozen || !c._st.visible) continue; c._tick(dt); active++; }
+  if (!active) { running = false; lastT = null; return; }
+  requestAnimationFrame(tick);
+}
+function kick() { if (!running && !document.hidden) { running = true; lastT = null; requestAnimationFrame(tick); } }
+document.addEventListener('visibilitychange', () => { lastT = null; kick(); });
+window.createCat = createCat;
+
+/* ================= page wiring ================= */
+const stageEl = document.getElementById('stage');
+const cols = Array.from(stageEl.querySelectorAll('.col'));
+const cat = createCat(stageEl, { mode: 'roam', stage: stageEl, onRub: (i, v) => { const el = cols[i]; if (!el) return; el.style.transform = v > 0.05 ? `rotate(${(v * 1.6).toFixed(2)}deg) translateX(${(v * 1.5).toFixed(2)}px)` : ''; } });
+window.cat = cat;
+const minis = [];
+document.querySelectorAll('#sizes .mascot-box').forEach(el => { const sz = +el.dataset.size; const m = createCat(el, { mode: 'mascot', size: sz }); minis.push(m); el.style.width = sz + 'px'; });
+const presentCat = minis[minis.length - 1];
+if (!(reduceMQ && reduceMQ.matches)) { minis[2].setAuto(true); minis[3].setAuto(true); }
+window.mascots = minis;
+
+const BL = { sit: 'Otur', walk: 'Gəz', rub: 'Sütuna sürtün', groom: 'Pəncəsini yala', sleep: 'Yat', stretch: 'Gərnəş', yawn: 'Əsnə', chase: 'Ov', pet: 'Sığalla', knead: 'Yoğur', lookaround: 'Ətrafa bax' };
+const ML = { idle: 'Sakit', talk: 'Danışan', happy: 'Şən', think: 'Düşünür', alert: 'Diqqətli', sad: 'Kədərli', celebrate: 'Bayram', surprised: 'Təəccüb', proud: 'Qürurlu', curious: 'Maraqlı', worried: 'Narahat', excited: 'Həyəcanlı', sleepy: 'Yuxulu', laughing: 'Gülür' };
+const GL = { wave: 'Əl yellə', nod: 'Baş tərpət', shake: 'Yox', cheer: 'Alqış', 'point-left': 'Sola', 'point-right': 'Sağa', 'point-down': 'Aşağı', shrug: 'Çiyin çək', 'lean-in': 'Yaxınlaş', 'shield-up': 'Qalxan', bow: 'Təzim' };
+const mkBtn = (row, label, fn, cls) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'btn' + (cls ? ' ' + cls : ''); b.textContent = label; b.addEventListener('click', fn); row.appendChild(b); return b; };
+const autoB = document.getElementById('bAuto'), talkB = document.getElementById('bTalk'), stillB = document.getElementById('bStill');
+const setPressed = (b, v) => b.setAttribute('aria-pressed', v ? 'true' : 'false');
+const rowB = document.getElementById('rowB'), rowM = document.getElementById('rowM'), rowG = document.getElementById('rowG');
+Object.keys(BL).forEach(k => mkBtn(rowB, BL[k], () => { if (cat.isStill()) { cat.setStill(false); setPressed(stillB, false); } cat.setAuto(false); setPressed(autoB, false); cat.do(k); if (k === 'pet') cat.poke(); }, k === 'chase' ? 'toy' : ''));
+const moodBtns = {};
+Object.keys(ML).forEach(k => { moodBtns[k] = mkBtn(rowM, ML[k], () => { cat.setMood(k); minis.forEach(m => m.setMood(k)); for (const q in moodBtns) setPressed(moodBtns[q], q === k); if (k !== 'idle' && cat._st.posture !== 'sit') { cat.setAuto(false); setPressed(autoB, false); cat.do('sit'); } }); });
+setPressed(moodBtns.idle, true);
+Object.keys(GL).forEach(k => mkBtn(rowG, GL[k], () => { cat.setAuto(false); setPressed(autoB, false); cat.play(k); presentCat.play(k); }));
+autoB.addEventListener('click', () => { const v = autoB.getAttribute('aria-pressed') !== 'true'; setPressed(autoB, v); if (v && cat.isStill()) { cat.setStill(false); setPressed(stillB, false); } cat.setAuto(v); if (v) cat.do('sit'); });
+talkB.addEventListener('click', () => { const v = talkB.getAttribute('aria-pressed') !== 'true'; setPressed(talkB, v); cat.setTalking(v); minis.forEach(m => m.setTalking(v)); });
+stillB.addEventListener('click', () => { const v = stillB.getAttribute('aria-pressed') !== 'true'; setPressed(stillB, v); cat.setStill(v); minis.forEach(m => m.setStill(v)); if (v) setPressed(autoB, false); });
+if (reduceMQ && reduceMQ.matches) { setPressed(stillB, true); setPressed(autoB, false); minis.forEach(m => m.setStill(true)); }
+if (reduceMQ && reduceMQ.addEventListener) reduceMQ.addEventListener('change', e => { setPressed(stillB, e.matches); cat.setStill(e.matches); minis.forEach(m => m.setStill(e.matches)); if (!e.matches) { cat.setAuto(true); setPressed(autoB, true); } });
+// the present mascot talks on its own now and then
+let talkDemo = 0;
+setInterval(() => { if (presentCat.isStill() || talkB.getAttribute('aria-pressed') === 'true') return; talkDemo++; presentCat.setTalking(talkDemo % 2 === 1); if (talkDemo % 4 === 1) presentCat.play(['wave', 'nod', 'shield-up', 'point-right'][(talkDemo >> 2) % 4]); }, 3200);
+// keyboard on stage: space = pet
+stageEl.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); cat.poke(); } });
+// theme toggle
+const themeBtn = document.getElementById('themeBtn'); const themes = ['auto', 'light', 'dark']; let ti = 0;
+const TL = { auto: 'Tema: avto', light: 'Tema: işıqlı', dark: 'Tema: qaranlıq' };
+themeBtn.addEventListener('click', () => { ti = (ti + 1) % 3; const m = themes[ti]; if (m === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', m); themeBtn.textContent = TL[m]; });
+})();
+</script>

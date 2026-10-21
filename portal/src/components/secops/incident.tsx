@@ -24,10 +24,13 @@ export function NewIncident({
   prefill,
   label,
   defaultOpen = false,
+  defaultDue,
 }: {
   modules: Option[];
   departments: Option[];
   people: PersonOption[];
+  /** The prefilled training due date (YYYY-MM-DD), computed on the server so it is the Baku day and matches between render and hydration. */
+  defaultDue: string;
   prefill?: { title?: string; severity?: (typeof SEVERITIES)[number]; source?: (typeof SOURCES)[number]; iocs?: string; mitre?: string; sandboxId?: string; description?: string };
   label?: string;
   defaultOpen?: boolean;
@@ -49,7 +52,7 @@ export function NewIncident({
     mitre: prefill?.mitre ?? "",
     assignNow: true,
   });
-  const [train, setTrain] = useState<TrainingValue>(emptyTraining());
+  const [train, setTrain] = useState<TrainingValue>(() => emptyTraining(defaultDue));
   const submit = () =>
     start(async () => {
       const res = await createIncidentAction({
@@ -144,8 +147,8 @@ export function NewIncident({
 
 type TrainingValue = { moduleId: string; minScore: string; dueDate: string; departmentId: string; userIds: Set<string> };
 
-function emptyTraining(): TrainingValue {
-  return { moduleId: "", minScore: "70", dueDate: new Date(Date.now() + 7 * 86_400_000).toISOString().slice(0, 10), departmentId: "", userIds: new Set() };
+function emptyTraining(dueDate: string): TrainingValue {
+  return { moduleId: "", minScore: "70", dueDate, departmentId: "", userIds: new Set() };
 }
 
 function trainingInput(v: TrainingValue) {
@@ -238,7 +241,7 @@ function TrainingFields({ value, onChange, modules, departments, people }: { val
               <div className="flex flex-wrap gap-1.5">
                 <span className="text-tab text-ink-muted">{t("selected", { count: selected.length })}:</span>
                 {selected.map((p) => (
-                  <button key={p.id} type="button" onClick={() => toggle(p.id)} className="rounded-pill bg-brand-50 px-2.5 py-1 text-tab font-semibold text-brand-700 hover:bg-brand-100">
+                  <button key={p.id} type="button" onClick={() => toggle(p.id)} className="rounded-pill bg-brand-50 px-2.5 py-1 text-tab font-semibold text-brand-700 hover:bg-brand-100 pointer-coarse:min-h-11">
                     {p.name} ×
                   </button>
                 ))}
@@ -257,22 +260,24 @@ export function IncidentTrainingEditor({
   modules,
   departments,
   people,
+  defaultDue,
 }: {
   id: string;
   initial: { moduleId: string | null; minScore: number | null; dueDate: string | null; userIds: string[] };
   modules: Option[];
   departments: Option[];
   people: PersonOption[];
+  /** The due date offered when the incident has none yet (YYYY-MM-DD, the Baku day, computed on the server). */
+  defaultDue: string;
 }) {
   const t = useTranslations("secops.incidents");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
   const [train, setTrain] = useState<TrainingValue>({
-    ...emptyTraining(),
+    ...emptyTraining(initial.dueDate ?? defaultDue),
     moduleId: initial.moduleId ?? "",
     minScore: initial.minScore === null ? "70" : String(initial.minScore),
-    dueDate: initial.dueDate ?? emptyTraining().dueDate,
     userIds: new Set(initial.userIds),
   });
   return (

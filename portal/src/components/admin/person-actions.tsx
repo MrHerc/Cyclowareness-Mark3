@@ -34,6 +34,8 @@ export function PersonActions({
   const [locale, setLocale] = useState(person.locale);
   const [role, setRole] = useState(person.role);
   const [dept, setDept] = useState(person.departmentId ?? "");
+  // A rejected phone is reported on its own field (taken by another account, or not a usable number).
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const done = (msg = t("saved")) => {
     toast(msg);
     setOpen(null);
@@ -96,7 +98,13 @@ export function PersonActions({
           className="grid gap-4"
           onSubmit={(e) => {
             e.preventDefault();
-            start(async () => void ((await updatePersonAction(person.id, { name, jobTitle, phone, locale: locale as "az" })).ok ? done() : toast(tc("errors.invalid"), "error")));
+            start(async () => {
+              const res = await updatePersonAction(person.id, { name, jobTitle, phone, locale: locale as "az" });
+              const phoneProblem = res.error === "phoneTaken" ? tp("phoneTaken") : res.fields?.includes("phone") ? tp("invalidPhone") : null;
+              setPhoneError(res.ok ? null : phoneProblem);
+              if (res.ok) done();
+              else if (!phoneProblem || (res.fields?.length ?? 0) > 1) toast(tc("errors.invalid"), "error");
+            });
           }}
         >
           <Field label={tp("fullName")} htmlFor="e-name">
@@ -105,8 +113,17 @@ export function PersonActions({
           <Field label={tp("jobTitle")} htmlFor="e-job">
             <Input id="e-job" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} />
           </Field>
-          <Field label={tp("phone")} htmlFor="e-phone">
-            <Input id="e-phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+994501234567" />
+          <Field label={tp("phone")} htmlFor="e-phone" error={phoneError}>
+            <Input
+              id="e-phone"
+              value={phone}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                setPhoneError(null);
+              }}
+              placeholder="+994501234567"
+              {...(phoneError ? { "aria-invalid": true, "aria-describedby": "e-phone-error" } : {})}
+            />
           </Field>
           <Field label={tp("interfaceLanguage")} htmlFor="e-locale">
             <Select id="e-locale" value={locale} onChange={(e) => setLocale(e.target.value)}>

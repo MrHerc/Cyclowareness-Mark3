@@ -18,8 +18,8 @@ export function ReportSection({ title, note, headers, rows, formatDate, empty }:
         <table className="w-full border-collapse text-[0.72rem] leading-snug">
           <thead>
             <tr>
-              {headers.map((h) => (
-                <th key={h} className="border-b-2 border-ink px-1.5 py-1.5 text-left font-bold">
+              {headers.map((h, i) => (
+                <th key={i} className="border-b-2 border-ink px-1.5 py-1.5 text-left font-bold">
                   {h}
                 </th>
               ))}

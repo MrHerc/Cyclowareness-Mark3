@@ -2,16 +2,18 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+import { useClientFormat } from "@/lib/client-format";
 import { Bell, CheckCheck } from "lucide-react";
 import { markNotificationsReadAction } from "@/server/actions/notifications";
 import { cn } from "@/lib/cn";
+import { coarseHitArea } from "@/components/ui/button";
 
 export type NotificationItem = { id: string; title: string; body: string | null; href: string | null; createdAt: string; read: boolean };
 
 export function NotificationsButton({ items }: { items: NotificationItem[] }) {
   const t = useTranslations("common");
-  const format = useFormatter();
+  const format = useClientFormat();
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
   const ref = useRef<HTMLDivElement>(null);
@@ -38,13 +40,19 @@ export function NotificationsButton({ items }: { items: NotificationItem[] }) {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-label={`${t("nav.notifications")}${unread ? ` (${unread})` : ""}`}
-        className="relative grid size-10 place-items-center rounded-full border border-line bg-surface text-ink-muted hover:text-ink"
+        className="relative grid size-10 place-items-center rounded-full border border-line bg-surface text-ink-muted hover:text-ink pointer-coarse:size-11"
       >
         <Bell className="size-[1.15rem]" />
         {unread ? <span className="absolute top-1.5 right-1.5 size-2.5 rounded-full border-2 border-surface bg-reward-500" /> : null}
       </button>
       {open ? (
-        <div role="dialog" aria-label={t("notifications.title")} className="absolute right-0 z-50 mt-2 w-[min(22rem,calc(100vw-2rem))] animate-rise overflow-hidden rounded-xl border border-line bg-surface shadow-overlay">
+        // Phones: pinned to the viewport under the top bar, since the bell is not at the header's right edge everywhere
+        // (learner header) and a panel anchored to it would hang off the left side. From sm up it drops from the bell.
+        <div
+          role="dialog"
+          aria-label={t("notifications.title")}
+          className="fixed inset-x-4 top-[calc(var(--topbar-height)+var(--safe-top)+0.5rem)] z-50 animate-rise overflow-hidden rounded-xl border border-line bg-surface shadow-overlay sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-2 sm:w-[22rem]"
+        >
           <div className="flex items-center justify-between border-b border-line px-4 py-3">
             <p className="text-body-sm font-semibold">{t("notifications.title")}</p>
             {unread ? (
@@ -52,7 +60,7 @@ export function NotificationsButton({ items }: { items: NotificationItem[] }) {
                 type="button"
                 disabled={pending}
                 onClick={() => start(() => markNotificationsReadAction())}
-                className="inline-flex items-center gap-1 text-tab font-semibold text-brand-600 hover:underline disabled:opacity-50"
+                className={cn("inline-flex items-center gap-1 text-tab font-semibold text-brand-600 hover:underline disabled:opacity-50", coarseHitArea)}
               >
                 <CheckCheck className="size-4" />
                 {t("notifications.markAll")}
@@ -60,7 +68,7 @@ export function NotificationsButton({ items }: { items: NotificationItem[] }) {
             ) : null}
           </div>
           {items.length ? (
-            <ul className="max-h-96 divide-y divide-line overflow-y-auto">
+            <ul className="max-h-[min(24rem,calc(100dvh-var(--topbar-height)-var(--safe-top)-6rem))] divide-y divide-line overflow-y-auto">
               {items.map((n) => {
                 const body = (
                   <div className="flex gap-3 px-4 py-3">

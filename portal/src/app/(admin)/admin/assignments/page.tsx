@@ -4,7 +4,7 @@ import { Building2, CalendarDays, ClipboardList, Globe, Route, User } from "luci
 import { db, t } from "@/server/db";
 import { allowed, requirePermission } from "@/server/auth/viewer";
 import { assignmentTargets } from "@/server/services/assignments";
-import { getDepartments } from "@/server/queries/admin";
+import { getDepartments, scopeDepartmentIds } from "@/server/queries/admin";
 import { Card } from "@/components/ui/card";
 import { EmptyState, PageHeader } from "@/components/ui/layout";
 import { ProgressBar } from "@/components/ui/progress";
@@ -23,7 +23,7 @@ export default async function AssignmentsPage() {
   const v = await requirePermission("assignments.read");
   const locale = await getLocale();
   const [tr, tc, format] = await Promise.all([getTranslations("admin.assignments"), getTranslations("common"), getFormatter()]);
-  const [rows, targets, modules, paths, departments, people] = await Promise.all([
+  const [allRows, targets, modules, paths, departments, allPeople] = await Promise.all([
     db().select().from(t.assignments).where(eq(t.assignments.tenantId, v.tenant.id)).orderBy(desc(t.assignments.createdAt)),
     assignmentTargets(db(), v.tenant.id),
     db()
@@ -32,8 +32,18 @@ export default async function AssignmentsPage() {
       .where(and(or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id)), eq(t.modules.status, "published"))),
     db().select().from(t.learningPaths).where(or(isNull(t.learningPaths.tenantId), eq(t.learningPaths.tenantId, v.tenant.id))),
     getDepartments(v.tenant.id),
-    db().select({ id: t.users.id, name: t.users.name }).from(t.users).where(and(eq(t.users.tenantId, v.tenant.id), eq(t.users.status, "active"))),
+    db().select({ id: t.users.id, name: t.users.name, departmentId: t.users.departmentId }).from(t.users).where(and(eq(t.users.tenantId, v.tenant.id), eq(t.users.status, "active"))),
   ]);
+  // Department heads see only the people inside their departments: individual assignments to others are
+  // hidden and the completion counts cover their people only.
+  const scope = await scopeDepartmentIds(v);
+  const people = scope ? allPeople.filter((p) => p.departmentId && scope.has(p.departmentId)) : allPeople;
+  const visible = new Set(people.map((p) => p.id));
+  const whoById = new Map(allRows.map((a) => [a.id, [...(targets.get(a.id) ?? new Set<string>())].filter((uid) => !scope || visible.has(uid))]));
+  // A head sees organisation-wide rows, their own departments' rows and any row that reaches one of their people.
+  const rows = scope
+    ? allRows.filter((a) => (a.scope !== "department" && a.scope !== "user") || (a.scope === "department" && !!a.departmentId && scope.has(a.departmentId)) || (whoById.get(a.id)?.length ?? 0) > 0)
+    : allRows;
   const modById = new Map(modules.map((m) => [m.id, m]));
   const pathById = new Map(paths.map((p) => [p.id, p]));
   const deptById = new Map(departments.map((d) => [d.id, d.name]));
@@ -76,7 +86,7 @@ export default async function AssignmentsPage() {
             const mod = a.moduleId ? modById.get(a.moduleId) : null;
             const path = a.pathId ? pathById.get(a.pathId) : null;
             const moduleIds = mod ? [mod.id] : (path?.moduleSlugs.map((s) => slugToId.get(s)).filter((x): x is string => !!x) ?? []);
-            const who = [...(targets.get(a.id) ?? new Set<string>())];
+            const who = whoById.get(a.id) ?? [];
             const done = who.filter((uid) => moduleIds.every((m) => doneSet.has(`${uid}:${m}`))).length;
             const pct = who.length ? Math.round((done / who.length) * 100) : 0;
             return (
@@ -89,8 +99,8 @@ export default async function AssignmentsPage() {
                       <Route className="size-6" />
                     </span>
                   )}
-                  <div className="min-w-0 flex-1">
-                    <p className="text-body-sm font-semibold">{pick(mod?.title ?? path?.title, locale)}</p>
+                  <div className="min-w-0 flex-[1_1_12rem]">
+                    <p className="text-body-sm font-semibold break-words">{pick(mod?.title ?? path?.title, locale)}</p>
                     <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-tab text-ink-muted">
                       <span className="inline-flex items-center gap-1">
                         {a.scope === "everyone" ? <Globe className="size-3.5" /> : a.scope === "department" ? <Building2 className="size-3.5" /> : <User className="size-3.5" />}
@@ -108,7 +118,7 @@ export default async function AssignmentsPage() {
                   </div>
                   <div className="flex w-56 items-center gap-2">
                     <span className="shrink-0 text-tab text-ink-muted">{tr("completedOf", { done, total: who.length })}</span>
-                    <ProgressBar value={pct} size="sm" />
+                    <ProgressBar decorative value={pct} size="sm" />
                     <span className="text-tab font-bold">{pct}%</span>
                   </div>
                   {canWrite ? <AssignmentRowActions id={a.id} dueKind={a.dueKind} dueDate={a.dueDate} dueDays={a.dueDays} /> : null}

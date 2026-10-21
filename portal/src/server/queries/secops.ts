@@ -3,6 +3,7 @@ import { and, desc, eq, gte, inArray, isNotNull, isNull, or, sql } from "drizzle
 import { db, t } from "../db";
 import type { Viewer } from "../auth/viewer";
 import { pick } from "../../i18n/config";
+import { dayBoundary, todayInBaku } from "../../lib/time";
 
 const DAY = 86_400_000;
 
@@ -33,8 +34,9 @@ export async function trainingModules(tenantId: string, locale: string) {
 export async function opsOverview(v: Viewer) {
   const tid = v.tenant.id;
   const now = Date.now();
-  const since14 = new Date(now - 13 * DAY);
-  since14.setHours(0, 0, 0, 0);
+  // Start of the Baku day 13 days ago (14 days including today): the days the chart below is keyed by,
+  // not the server's local midnight. todayInBaku always yields a real day, so dayBoundary cannot be null.
+  const since14 = dayBoundary(todayInBaku(new Date(now - 13 * DAY)))!;
   const since30 = new Date(now - 30 * DAY);
   const since90 = new Date(now - 90 * DAY);
 

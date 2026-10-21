@@ -2,7 +2,9 @@
 
 import { useState, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+import { useClientFormat } from "@/lib/client-format";
+import { parseDay } from "@/lib/day";
 import { CalendarClock, FileDown, Plus, Trash2 } from "lucide-react";
 import { removeScheduleAction, saveScheduleAction } from "@/server/actions/reports";
 import { Button, ButtonLink } from "@/components/ui/button";
@@ -10,31 +12,62 @@ import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
 
-/** Shared filter for the report cards. `defaults` (last 30 days) apply while the URL carries no dates. */
-export function ReportFilters({ departments, defaults }: { departments: { id: string; name: string }[]; defaults: { from: string; to: string } }) {
+/** A period the reports can apply: each date empty or an existing day, the start not after the end. */
+const validPeriod = (from: string, to: string) => (!from || !!parseDay(from)) && (!to || !!parseDay(to)) && !(from && to && from > to);
+
+/**
+ * Shared filter for the report cards. `value` is what the page applied to the downloads (the last 30 days
+ * while the URL carries no dates; empty where a value was ignored), so the form always shows the period
+ * the links use. Dates are written to the URL together, an empty one meaning "no bound"; a period the
+ * reports cannot apply (a start after the end, or a year still being typed) is flagged here, not applied.
+ */
+export function ReportFilters({ departments, value }: { departments: { id: string; name: string }[]; value: { from: string; to: string; d: string } }) {
   const t = useTranslations("admin.reports");
   const tc = useTranslations("common");
   const router = useRouter();
   const sp = useSearchParams();
-  const set = (k: string, v: string) => {
+  const [from, setFrom] = useState(value.from);
+  const [to, setTo] = useState(value.to);
+  const [dept, setDept] = useState(value.d);
+  // Follow the server whenever it applies something else (a navigation, or values it had to ignore).
+  const [applied, setApplied] = useState(value);
+  if (applied.from !== value.from || applied.to !== value.to || applied.d !== value.d) {
+    setApplied(value);
+    setFrom(value.from);
+    setTo(value.to);
+    setDept(value.d);
+  }
+  const invalid = !validPeriod(from, to);
+  const go = (q: URLSearchParams) => router.replace(`?${q.toString()}`, { scroll: false });
+  const setDates = (nextFrom: string, nextTo: string) => {
+    setFrom(nextFrom);
+    setTo(nextTo);
+    if (!validPeriod(nextFrom, nextTo)) return;
     const q = new URLSearchParams(sp.toString());
-    if (v) q.set(k, v);
-    else q.delete(k);
-    router.replace(`?${q.toString()}`, { scroll: false });
+    q.set("from", nextFrom);
+    q.set("to", nextTo);
+    go(q);
+  };
+  const setDepartment = (next: string) => {
+    setDept(next);
+    const q = new URLSearchParams(sp.toString());
+    if (next) q.set("d", next);
+    else q.delete("d");
+    go(q);
   };
   return (
     <div className="flex flex-wrap items-end gap-3 rounded-xl border border-line bg-surface p-4 shadow-xs">
       <label className="grid gap-1 text-caption font-semibold">
         {tc("from")}
-        <Input type="date" className="w-44" value={sp.get("from") ?? defaults.from} onChange={(e) => set("from", e.target.value)} />
+        <Input type="date" className="w-44" value={from} max={to || undefined} aria-invalid={invalid || undefined} aria-describedby={invalid ? "report-range-error" : undefined} onChange={(e) => setDates(e.target.value, to)} />
       </label>
       <label className="grid gap-1 text-caption font-semibold">
         {tc("to")}
-        <Input type="date" className="w-44" value={sp.get("to") ?? defaults.to} onChange={(e) => set("to", e.target.value)} />
+        <Input type="date" className="w-44" value={to} min={from || undefined} aria-invalid={invalid || undefined} aria-describedby={invalid ? "report-range-error" : undefined} onChange={(e) => setDates(from, e.target.value)} />
       </label>
       <label className="grid gap-1 text-caption font-semibold">
         {tc("department")}
-        <Select className="w-56" defaultValue={sp.get("d") ?? ""} onChange={(e) => set("d", e.target.value)}>
+        <Select className="w-56" value={dept} onChange={(e) => setDepartment(e.target.value)}>
           <option value="">{t("allDepartments")}</option>
           {departments.map((d) => (
             <option key={d.id} value={d.id}>
@@ -43,30 +76,47 @@ export function ReportFilters({ departments, defaults }: { departments: { id: st
           ))}
         </Select>
       </label>
+      {invalid ? (
+        <p id="report-range-error" role="alert" className="basis-full text-caption font-semibold text-risk-600">
+          {t("rangeInvalid")}
+        </p>
+      ) : null}
     </div>
   );
 }
 
-/** The compliance pack has its own period, independent of the shared filter. */
+/** The compliance pack has its own period, independent of the shared filter; an invalid one cannot be generated. */
 export function CompliancePack({ defaults }: { defaults: { from: string; to: string } }) {
   const t = useTranslations("admin.reports");
   const tc = useTranslations("common");
   const [from, setFrom] = useState(defaults.from);
   const [to, setTo] = useState(defaults.to);
+  const invalid = !validPeriod(from, to);
   const q = new URLSearchParams({ ...(from ? { from } : {}), ...(to ? { to } : {}) }).toString();
   return (
     <div className="mt-4 flex flex-wrap items-end gap-3">
       <label className="grid gap-1 text-caption font-semibold">
         {tc("from")}
-        <Input type="date" className="w-40" value={from} onChange={(e) => setFrom(e.target.value)} />
+        <Input type="date" className="w-40" value={from} max={to || undefined} aria-invalid={invalid || undefined} aria-describedby={invalid ? "compliance-range-error" : undefined} onChange={(e) => setFrom(e.target.value)} />
       </label>
       <label className="grid gap-1 text-caption font-semibold">
         {tc("to")}
-        <Input type="date" className="w-40" value={to} onChange={(e) => setTo(e.target.value)} />
+        <Input type="date" className="w-40" value={to} min={from || undefined} aria-invalid={invalid || undefined} aria-describedby={invalid ? "compliance-range-error" : undefined} onChange={(e) => setTo(e.target.value)} />
       </label>
-      <ButtonLink size="sm" icon={<FileDown />} href={`/print/compliance${q ? `?${q}` : ""}`} target="_blank">
-        {t("generate")}
-      </ButtonLink>
+      {invalid ? (
+        <Button size="sm" icon={<FileDown />} disabled>
+          {t("generate")}
+        </Button>
+      ) : (
+        <ButtonLink size="sm" icon={<FileDown />} href={`/print/compliance${q ? `?${q}` : ""}`} target="_blank">
+          {t("generate")}
+        </ButtonLink>
+      )}
+      {invalid ? (
+        <p id="compliance-range-error" role="alert" className="basis-full text-caption font-semibold text-risk-600">
+          {t("rangeInvalid")}
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -82,7 +132,7 @@ export function Schedules({
 }) {
   const t = useTranslations("admin.reports");
   const tc = useTranslations("common");
-  const format = useFormatter();
+  const format = useClientFormat();
   const [open, setOpen] = useState(false);
   const [kind, setKind] = useState(kinds[0]?.key ?? "completion");
   const [fmt, setFmt] = useState("xlsx");
@@ -110,7 +160,18 @@ export function Schedules({
                   {s.recipients.join(", ")} · {s.lastSentAt ? t("lastSent", { date: format.dateTime(new Date(s.lastSentAt), { dateStyle: "medium" }) }) : t("never")}
                 </span>
               </span>
-              <Button size="icon-sm" variant="ghost" className="text-risk-600" aria-label={tc("remove")} onClick={() => start(async () => void ((await removeScheduleAction(s.id)).ok && toast(t("scheduleRemoved"))))}>
+              <Button
+                size="icon-sm"
+                variant="ghost"
+                className="text-risk-600"
+                aria-label={tc("remove")}
+                onClick={() =>
+                  start(async () => {
+                    const res = await removeScheduleAction(s.id);
+                    toast(res.ok ? t("scheduleRemoved") : tc("errors.generic"), res.ok ? "success" : "error");
+                  })
+                }
+              >
                 <Trash2 />
               </Button>
             </li>

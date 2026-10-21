@@ -13,6 +13,14 @@ import { CATEGORY_FROM_LABEL } from "../../lib/domain/catalog";
 
 const LIB = path.join(process.cwd(), "content", "library");
 
+/**
+ * PostgreSQL advisory lock taken around an import (server start-up, `npm run content:sync`), so two
+ * imports never run at the same time. The UNIQUE NULLS NOT DISTINCT constraint on (slug, tenant_id)
+ * would refuse the second copy of a new global module, but that error would fail the whole import;
+ * with the lock, two concurrent first imports run one after the other and both succeed.
+ */
+export const CONTENT_SYNC_LOCK_KEY = 7_281_940;
+
 type I18n = { modules: Record<string, [string, string]>; lessons: Record<string, string> };
 
 function readJson<T>(file: string): T {

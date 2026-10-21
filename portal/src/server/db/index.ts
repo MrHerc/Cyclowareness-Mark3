@@ -6,14 +6,17 @@ declare global {
 }
 
 /** One connection (pool or embedded instance) per server process, reused across hot reloads. */
-export function db(): DB {
+export function dbHandle(): DbHandle {
   globalThis.__dbHandle ??= createDb();
-  return globalThis.__dbHandle.db;
+  return globalThis.__dbHandle;
+}
+
+export function db(): DB {
+  return dbHandle().db;
 }
 
 export function dbDriver(): DbHandle["driver"] {
-  globalThis.__dbHandle ??= createDb();
-  return globalThis.__dbHandle.driver;
+  return dbHandle().driver;
 }
 
 export type { DB };

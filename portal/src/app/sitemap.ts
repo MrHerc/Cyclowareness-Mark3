@@ -1,9 +1,12 @@
 import type { MetadataRoute } from "next";
 import { SITE_LOCALES } from "@/i18n/config";
-import { env } from "@/server/env";
+import { appUrl } from "@/server/env";
+
+/** Rendered per request: every <loc> and hreflang link comes from the runtime APP_URL, never from the build's environment. */
+export const dynamic = "force-dynamic";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = env.APP_URL.replace(/\/$/, "");
+  const base = appUrl();
   const languages = Object.fromEntries(SITE_LOCALES.map((l) => [l, `${base}/${l}`]));
   return [
     { url: `${base}/`, changeFrequency: "weekly", priority: 1, alternates: { languages } },

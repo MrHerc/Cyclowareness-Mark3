@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+import { useClientFormat } from "@/lib/client-format";
 import { Check, ChevronDown, ChevronRight, Clock, Compass, Layers, Zap } from "lucide-react";
 import { Pill } from "@/components/ui/pill";
 import { moduleIcon } from "@/components/learner/module-icon";
@@ -26,11 +27,14 @@ export type PathItem = {
 
 const VISIBLE = 4;
 
-/** Vertical "Your path" timeline from the original Home page. */
-export function PathTimeline({ items }: { items: PathItem[] }) {
+/**
+ * Vertical "Your path" timeline from the original Home page. `today` is the Baku day (YYYY-MM-DD) the
+ * server rendered on: due dates end at midnight Baku, and a client component keeps the clock out of render.
+ */
+export function PathTimeline({ items, today }: { items: PathItem[]; today: string }) {
   const t = useTranslations("learner.home");
   const tc = useTranslations("common");
-  const format = useFormatter();
+  const format = useClientFormat();
   const [all, setAll] = useState(false);
   const shown = all ? items : items.slice(0, VISIBLE);
   return (
@@ -88,7 +92,7 @@ export function PathTimeline({ items }: { items: PathItem[] }) {
                       {tc("units.xp", { count: m.xp })}
                     </span>
                     {m.due && !done ? (
-                      <span className={cn("font-semibold", m.due < new Date().toISOString().slice(0, 10) ? "text-risk-600" : "text-ink-muted")}>
+                      <span className={cn("font-semibold", m.due < today ? "text-risk-600" : "text-ink-muted")}>
                         {tc("time.due", { date: format.dateTime(new Date(`${m.due}T12:00:00`), { day: "numeric", month: "short" }) })}
                       </span>
                     ) : null}

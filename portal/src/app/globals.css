@@ -177,6 +177,23 @@
   ::selection {
     background: color-mix(in oklab, var(--brand) 20%, white);
   }
+  /* A `grid` without grid-cols-* has one implicit `auto` column, which grows to its widest item's
+     min-content (a wide table, a nowrap title) and pushes the whole page past a phone's width.
+     Clamp it to the container like `grid-cols-1`; any grid-cols-* utility still wins (utilities layer).
+     Grids that position their track with justify-content / place-content (which needs an `auto` track
+     to have room to move) are left alone; justify-items / place-items still work with the 1fr track. */
+  .grid:not(
+      [class*="grid-flow-col"],
+      [class*="justify-start"],
+      [class*="justify-center"],
+      [class*="justify-end"],
+      [class*="justify-between"],
+      [class*="justify-around"],
+      [class*="justify-evenly"],
+      [class*="place-content-"]
+    ) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* Motion preference: "calm" and "still" set on <html data-motion>. */

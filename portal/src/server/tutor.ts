@@ -1,6 +1,33 @@
 import "server-only";
+import { z } from "zod";
 import type { Scene } from "../lib/content/types";
 import { plain } from "../lib/content/types";
+
+/** Library and studio slugs and lesson keys are lowercase kebab-case (see library.ts, secops.ts). */
+const KEY = /^[a-z0-9-]{1,100}$/;
+/** Control characters other than tab and line breaks; U+0000 cannot even be stored in Postgres text. */
+const CONTROL = /(?![\t\n\r])\p{Cc}/u;
+
+/** Body of POST /api/tutor. */
+export const tutorRequestSchema = z.object({
+  slug: z.string().regex(KEY),
+  lessonKey: z.string().regex(KEY),
+  sceneId: z
+    .string()
+    .max(100)
+    .regex(/^\P{Cc}*$/u)
+    .nullish(),
+  question: z
+    .string()
+    .trim()
+    .min(2)
+    .max(500)
+    .refine((q) => !CONTROL.test(q)),
+  locale: z.enum(["az", "en", "ru"]),
+});
+
+/** Largest accepted tutor request body; a 500-character question plus ids fits well inside it. */
+export const TUTOR_BODY_LIMIT = 8 * 1024;
 
 /** Compact, PII-free lesson context for the tutor (no names, emails or job titles of the learner). */
 export function lessonContext(moduleTitle: string, lessonTitle: string, scenes: Scene[], sceneId?: string | null): string {
@@ -54,7 +81,8 @@ export function offlineAnswer(scenes: Scene[], sceneId: string | null | undefine
   const scene = scenes.find((s) => s.id === sceneId) ?? scenes[0];
   const pool: string[] = [];
   const push = (x?: string | null) => x && pool.push(x);
-  for (const s of [scene, ...scenes]) {
+  // The current scene first, then the rest of the lesson, each scene once.
+  for (const s of scene ? [scene, ...scenes.filter((x) => x !== scene)] : scenes) {
     if (s.type === "choice") {
       push(s.explain);
       push(s.question.options.find((o) => o.correct)?.feedback);
@@ -64,11 +92,48 @@ export function offlineAnswer(scenes: Scene[], sceneId: string | null | undefine
     else if (s.type === "tutor") s.beats.forEach((b) => push(b.say));
     if (pool.length > 30) break;
   }
-  const words = q.split(/\W+/).filter((w) => w.length > 3);
-  const scored = pool.map((p) => ({ p, s: words.reduce((n, w) => n + (p.toLowerCase().includes(w) ? 1 : 0), 0) }));
+  // Letters of any script: \W would also split Azerbaijani and Russian words apart.
+  const words = q.split(/[^\p{L}\p{N}]+/u).filter((w) => w.length > 3);
+  const scored = [...new Set(pool)].map((p) => ({ p, s: words.reduce((n, w) => n + (p.toLowerCase().includes(w) ? 1 : 0), 0) }));
   scored.sort((a, b) => b.s - a.s);
-  const best = scored.slice(0, 2).map((x) => x.p);
-  return best.length ? best.join(" ") : plain(pool[0] ?? "");
+  // The two best explanations, sentence by sentence. Lessons repeat a sentence across scenes (a beat
+  // and its recap point, often inside a longer text): each sentence is said once, and an explanation
+  // that adds nothing new is skipped for the next one.
+  const seen = new Set<string>();
+  const answer: string[] = [];
+  let used = 0;
+  for (const { p } of scored) {
+    if (used === 2) break;
+    const fresh = sentences(p).filter((x) => {
+      const key = sentenceKey(x);
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+    if (fresh.length) {
+      answer.push(...fresh);
+      used++;
+    }
+  }
+  return answer.length ? answer.join(" ") : plain(pool[0] ?? "");
+}
+
+/** Sentences of an explanation, split after closing punctuation (the punctuation stays with its sentence). */
+function sentences(text: string): string[] {
+  return text
+    .trim()
+    .split(/(?<=[.!?…])\s+/u)
+    .filter(Boolean);
+}
+
+/** Comparable form of a sentence: case, markdown emphasis, spacing and closing punctuation do not count. */
+function sentenceKey(sentence: string): string {
+  return sentence
+    .toLowerCase()
+    .replace(/[*_`~]/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/[\s.!?…:;,]+$/u, "")
+    .trim();
 }
 
 export const TUTOR_LANGUAGE: Record<string, string> = { az: "Azerbaijani", en: "English", ru: "Russian" };

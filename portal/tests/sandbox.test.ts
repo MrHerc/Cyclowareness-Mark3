@@ -663,6 +663,32 @@ describe("toStix", () => {
     }
   });
 
+  // STIX 2.1 (section 3.8) forbids empty lists; a clean file has no MITRE techniques.
+  it("never emits an empty list for a clean file analysis", () => {
+    const a = analyzeFile("notes.txt", Buffer.from("Meeting notes: bring the quarterly figures.\n"));
+    expect(a.mitre).toEqual([]);
+    const b = toStix(a, created, "SB-3");
+    const indicators = b.objects.slice(1);
+    expect(indicators.length).toBeGreaterThan(0);
+    for (const i of indicators) expect(i).not.toHaveProperty("labels");
+    const emptyLists: string[] = [];
+    const walk = (v: unknown, path: string) => {
+      if (Array.isArray(v)) {
+        if (v.length === 0) emptyLists.push(path);
+        v.forEach((x, n) => walk(x, `${path}[${n}]`));
+      } else if (v && typeof v === "object") {
+        for (const [k, x] of Object.entries(v)) walk(x, `${path}.${k}`);
+      }
+    };
+    walk(b, "bundle");
+    expect(emptyLists).toEqual([]);
+  });
+
+  it("keeps MITRE techniques as labels when present", () => {
+    const b = toStix({ ...sample, mitre: ["T1204.002"] }, created, "SB-4");
+    for (const i of b.objects.slice(1)) expect(i).toHaveProperty("labels", ["T1204.002"]);
+  });
+
   // The analyser emits a single "ip" IOC type and toStix always renders it as ipv4-addr
   // (analyze.ts:455-456), so an IPv6 host produces an invalid ipv4-addr pattern.
   it("renders IPv6 hosts as ipv6-addr patterns", () => {

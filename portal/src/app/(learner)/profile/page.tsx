@@ -9,7 +9,7 @@ import { isPrivileged } from "@/server/auth/permissions";
 import { signOutAction } from "@/server/actions/auth";
 import { Card, CardBody } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
-import { ButtonLink, buttonClass } from "@/components/ui/button";
+import { ButtonLink, buttonClass, textLinkClass } from "@/components/ui/button";
 import { EmptyState, Notice } from "@/components/ui/layout";
 import { LanguageSwitcher } from "@/components/language-switcher";
 import { pick } from "@/i18n/config";
@@ -218,11 +218,11 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
           {tr("signOut")}
         </button>
         <p className="flex gap-3 text-caption text-ink-subtle">
-          <Link href="/legal/terms" className="hover:text-ink">
+          <Link href="/legal/terms" className={textLinkClass("hover:text-ink")}>
             {tc("footer.terms")}
           </Link>
           ·
-          <Link href="/legal/privacy" className="hover:text-ink">
+          <Link href="/legal/privacy" className={textLinkClass("hover:text-ink")}>
             {tc("footer.privacy")}
           </Link>
         </p>

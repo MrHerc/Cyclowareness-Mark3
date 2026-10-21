@@ -1,14 +1,14 @@
 import { desc } from "drizzle-orm";
-import { allowed, getViewer } from "@/server/auth/viewer";
+import { apiViewer } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
 import { audit } from "@/server/services/audit";
 import { toCsv } from "@/lib/csv";
+import { todayInBaku } from "@/lib/time";
 
 /** Demo requests from the public site, as CSV (platform operators only). */
 export async function GET() {
-  const v = await getViewer();
-  if (!v) return new Response("Unauthorized", { status: 401 });
-  if (!allowed(v, "platform.manage")) return new Response("Forbidden", { status: 403 });
+  const v = await apiViewer("platform.manage");
+  if (v instanceof Response) return v;
   const rows = await db().select().from(t.demoRequests).orderBy(desc(t.demoRequests.createdAt));
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "demo.exported", meta: { count: rows.length } });
   const csv = toCsv(
@@ -18,7 +18,7 @@ export async function GET() {
   return new Response(csv, {
     headers: {
       "content-type": "text/csv; charset=utf-8",
-      "content-disposition": `attachment; filename="demo-requests-${new Date().toISOString().slice(0, 10)}.csv"`,
+      "content-disposition": `attachment; filename="demo-requests-${todayInBaku()}.csv"`,
       "cache-control": "no-store",
     },
   });

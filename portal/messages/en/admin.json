@@ -184,6 +184,10 @@
     "interfaceLanguage": "Interface language",
     "added": "{name} added.",
     "emailTaken": "Someone already uses this email.",
+    "foreignDomain": "Another organisation has proven this domain; its addresses cannot be added here.",
+    "phoneTaken": "This number already belongs to another account.",
+    "invalidPhone": "Enter the number in international format with the country code: +994501234567.",
+    "invalidDepartment": "The selected department no longer exists. Reload the list and choose another one.",
     "importTitle": "Import people",
     "importBody": "Upload a CSV file. We check it first and show every problem before anything is saved.",
     "importSteps": {
@@ -205,8 +209,13 @@
       "email": "email is not valid",
       "duplicate": "email appears twice in the file",
       "exists": "someone already has this email",
+      "foreignDomain": "the domain belongs to another organisation",
+      "phoneTaken": "this phone number already belongs to another account",
+      "phone": "the phone number is not valid: use the country code, for example +994501234567",
       "role": "unknown role",
       "department": "unknown department (it will be created)",
+      "departmentTaken": "someone has just created this department: check the file again",
+      "departmentAmbiguous": "more than one department matches this name: rename or merge them first",
       "tooMany": "The file has more than 5,000 rows."
     },
     "deletionRequests": "Account deletion requests",
@@ -229,6 +238,7 @@
     "twoFactorReset": "Two-step sign-in reset. Their sessions were signed out.",
     "twoFactorResetTitle": "Two-step sign-in was reset",
     "twoFactorResetBody": "An administrator reset your two-step sign-in. Set it up again in your profile.",
+    "deletionRequestedBody": "Asked for their account to be deleted.",
     "deleteTitle": "Delete {name}?",
     "deleteBody": "Their name, email and sign-in data are removed. Learning results stay without their name. This can't be undone.",
     "riskScore": "Risk score",
@@ -301,17 +311,18 @@
     "topLevel": "Top level",
     "headLabel": "Department head",
     "deleteTitle": "Delete {name}?",
-    "deleteBody": "People in it keep their accounts and move to “No department”. Sub-departments move up one level.",
+    "deleteBody": "People in it keep their accounts and move to “No department”. Sub-departments move up one level. Assignments and scheduled reports for this department are removed. Campaigns aimed at it that have not started go back to drafts without an audience: choose a new audience for them. Results of campaigns that already ran are kept.",
     "mergeTitle": "Merge {name} into…",
     "mergeTarget": "Target department",
-    "mergeBody": "People, sub-departments, assignments and campaign audiences move to the target department. {name} is deleted.",
+    "mergeBody": "People, sub-departments, assignments, campaign audiences and scheduled reports move to the target department. {name} is deleted.",
     "mergeConfirm": "Merge",
     "created": "Department created",
     "renamed": "Department renamed",
     "moved": "Department moved",
     "deleted": "Department deleted",
     "merged": "Departments merged",
-    "cycle": "A department can't be moved under itself."
+    "cycle": "A department can't be moved under itself.",
+    "duplicate": "A department with this name already exists. Choose another name or merge the two departments."
   },
   "assignments": {
     "title": "Assignments",
@@ -400,6 +411,8 @@
     "launchBody": "{count, plural, one {# person} other {# people}} will receive the simulation now. People who click see a short explanation and a training.",
     "launched": "Campaign launched",
     "launchBlocked": "Can't launch: {reason}",
+    "lastLaunchBlocked": "The launch on {date} did not go ahead",
+    "lastLaunchBlockedBody": "Reason: {reason}. A scheduled campaign is moved back to drafts and is not retried automatically: fix the cause, then launch or schedule the campaign again.",
     "blocked": {
       "mail": "email sending is not set up (Settings → Email)",
       "sms": "no SMS provider is configured",
@@ -433,6 +446,7 @@
       "change": "Change",
       "draftNote": "The campaign is saved as a draft. Nothing is sent until someone launches it.",
       "scheduledNote": "The campaign goes out automatically at the planned time.",
+      "pastDate": "The planned time has already passed. Pick a later date and time, or keep the campaign as a draft.",
       "save": "Save as draft",
       "schedule": "Schedule",
       "update": "Save changes",
@@ -667,14 +681,21 @@
     "print": "Print or save as PDF",
     "generatedAt": "Generated {date}",
     "period": "Period: {from} — {to}",
-    "allTime": "All time"
+    "allTime": "All time",
+    "filtersRejectedTitle": "This document was not produced",
+    "filtersRejected": "The link asks for a period or department that cannot be applied: a day that does not exist, a start date after the end date, or an invalid department. Close this window, choose the period again on the Reports page and generate the document from there.",
+    "filtersIgnored": "The period or department in the address could not be applied (a day that does not exist, a start date after the end date, or an unknown department), so it was ignored. The downloads below use the values shown in the filter.",
+    "rangeInvalid": "Choose existing days, with the start date on or before the end date. This period has not been applied."
   },
   "league": {
     "title": "Department league",
     "updated": "Updated {time}",
     "back": "Back to overview",
     "fullscreen": "Full screen",
-    "learners": "{count, plural, one {# learner} other {# learners}}"
+    "learners": "{count, plural, one {# learner} other {# learners}}",
+    "empty": "No departments in the league yet",
+    "emptyBody": "The league ranks departments that have active people. Add people to a department and it appears here.",
+    "toDepartments": "Go to departments"
   },
   "audit": {
     "title": "Audit log",
@@ -770,7 +791,7 @@
     "settings_setup_guide": "Setup guide changed",
     "watermark_lookup": "Watermark code looked up",
     "problem_status": "Problem report status changed",
-    "tutor_cache_removed": "AI tutor answer removed from the cache",
+    "tutor_cache_removed": "AI Sel answer removed from the cache",
     "threat_reported": "Threat reported",
     "threat_triaged": "Threat report triaged",
     "sandbox_analyzed": "Sandbox analysis",
@@ -891,7 +912,7 @@
       "support": "Support desk",
       "feedback": "Feedback",
       "live_sessions": "Live sessions",
-      "ai_tutor": "AI tutor",
+      "ai_tutor": "AI Sel (AI tutor)",
       "sms_voice": "SMS and voice simulations",
       "qr_trap": "QR traps",
       "sandbox": "Sandbox",
@@ -909,7 +930,7 @@
       "policy_intel": "Policy intelligence",
       "leadership": "Leadership panel",
       "ops_center": "Operations center",
-      "tutor_voice": "Voice tutor"
+      "tutor_voice": "AI Sel voice"
     }
   }
 }

@@ -3,10 +3,11 @@
  * Every function takes the database explicitly so the seed can replay history with past dates.
  */
 import { encodeBase32LowerCaseNoPadding } from "@oslojs/encoding";
-import { and, asc, count, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, count, eq, inArray, lte, sql } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
 import { dayKey, lessonXp, nextStreak } from "../../lib/domain/gamification";
+import { isUniqueViolation } from "../db/errors";
 
 export function randomToken(bytes = 20): string {
   const buf = new Uint8Array(bytes);
@@ -71,11 +72,13 @@ export async function completeLesson(
 
   await db
     .insert(t.lessonProgress)
-    .values({ userId: p.userId, lessonId: p.lessonId, completedAt: at, xpAwarded: xp, attempts: 1, secondsSpent: p.secondsSpent ?? 0 })
+    .values({ userId: p.userId, lessonId: p.lessonId, completedAt: at, lastCompletedAt: at, xpAwarded: xp, attempts: 1, secondsSpent: p.secondsSpent ?? 0 })
     .onConflictDoUpdate({
       target: [t.lessonProgress.userId, t.lessonProgress.lessonId],
       set: {
         completedAt: sql`coalesce(${t.lessonProgress.completedAt}, ${at.toISOString()}::timestamptz)`,
+        // Replayed history (seed) can arrive out of order; keep the latest completion.
+        lastCompletedAt: sql`greatest(coalesce(${t.lessonProgress.lastCompletedAt}, ${at.toISOString()}::timestamptz), ${at.toISOString()}::timestamptz)`,
         xpAwarded: sql`${t.lessonProgress.xpAwarded} + ${xp}`,
         attempts: sql`${t.lessonProgress.attempts} + 1`,
         secondsSpent: sql`${t.lessonProgress.secondsSpent} + ${p.secondsSpent ?? 0}`,
@@ -110,6 +113,37 @@ export async function completeLesson(
       target: [t.moduleProgress.userId, t.moduleProgress.moduleId],
       set: { status, percent, lastLessonKey: lesson.key },
     });
+  // A completed module stays completed when it is replayed, so no attestation follows. A risk
+  // linked to it since then (a click in a simulation) asks for the training again: it closes once
+  // every lesson of the module has been completed again after the risk opened (each lesson's
+  // last_completed_at is at or after the risk), as the attestation closes it the first time.
+  if (status === "completed" && percent >= 100) {
+    const [replay] = await db
+      .select({ lessons: count(t.lessonProgress.lastCompletedAt), oldest: sql<Date | null>`min(${t.lessonProgress.lastCompletedAt})`.mapWith(t.lessonProgress.lastCompletedAt) })
+      .from(t.lessonProgress)
+      .where(
+        and(
+          eq(t.lessonProgress.userId, p.userId),
+          inArray(
+            t.lessonProgress.lessonId,
+            siblings.map((s) => s.id),
+          ),
+        ),
+      );
+    if (replay && Number(replay.lessons) === siblings.length && replay.oldest) {
+      await db
+        .update(t.behaviorRisks)
+        .set({ status: "closed", closedAt: at })
+        .where(
+          and(
+            eq(t.behaviorRisks.userId, p.userId),
+            eq(t.behaviorRisks.moduleId, lesson.moduleId),
+            eq(t.behaviorRisks.status, "open"),
+            lte(t.behaviorRisks.createdAt, replay.oldest),
+          ),
+        );
+    }
+  }
   return { xpAwarded: xp, firstTime, moduleStatus: status, percent };
 }
 
@@ -121,10 +155,22 @@ export async function touchModule(db: DB, p: { userId: string; moduleId: string;
     .onConflictDoUpdate({ target: [t.moduleProgress.userId, t.moduleProgress.moduleId], set: { lastLessonKey: p.lessonKey } });
 }
 
+/**
+ * Next serial of the organisation for the year: SLUG-2026-000042. Taken from the highest serial
+ * issued so far (not the row count, which goes down when a certificate is deleted and would hand
+ * out an existing serial again).
+ */
 async function nextSerial(db: DB, tenantId: string, at: Date): Promise<string> {
   const [tenant] = await db.select({ slug: t.tenants.slug }).from(t.tenants).where(eq(t.tenants.id, tenantId));
-  const [{ n }] = await db.select({ n: count() }).from(t.certificates).where(eq(t.certificates.tenantId, tenantId));
-  return `${tenant.slug.toUpperCase()}-${at.getFullYear()}-${String(Number(n) + 1).padStart(6, "0")}`;
+  // The year of the Baku day (as the certificate shows it), not of the server's own time zone.
+  const prefix = `${tenant.slug.toUpperCase()}-${dayKey(at).slice(0, 4)}-`;
+  // The cast matters: with a text parameter, `substring(... from ...)` is the regular-expression form.
+  const rest = sql`substring(${t.certificates.serial} from ${prefix.length + 1}::int)`;
+  const [row] = await db
+    .select({ n: sql<number | null>`max(cast(${rest} as integer))` })
+    .from(t.certificates)
+    .where(and(eq(t.certificates.tenantId, tenantId), sql`starts_with(${t.certificates.serial}, ${prefix})`, sql`${rest} ~ '^[0-9]{1,9}$'`));
+  return `${prefix}${String(Number(row?.n ?? 0) + 1).padStart(6, "0")}`;
 }
 
 export async function issueCertificate(
@@ -132,7 +178,9 @@ export async function issueCertificate(
   p: { tenantId: string; userId: string; moduleId?: string; pathId?: string; at?: Date },
 ): Promise<{ serial: string; publicToken: string }> {
   const at = p.at ?? new Date();
-  for (let attempt = 0; attempt < 5; attempt++) {
+  // Two certificates issued at the same moment read the same highest serial; the unique index
+  // refuses the second, which then takes the next one. Other errors are not retried.
+  for (let attempt = 0; ; attempt++) {
     const serial = await nextSerial(db, p.tenantId, at);
     const publicToken = randomToken(16);
     try {
@@ -141,16 +189,15 @@ export async function issueCertificate(
         userId: p.userId,
         moduleId: p.moduleId ?? null,
         pathId: p.pathId ?? null,
-        serial: attempt === 0 ? serial : `${serial}-${attempt}`,
+        serial,
         publicToken,
         issuedAt: at,
       });
       return { serial, publicToken };
     } catch (error) {
-      if (attempt === 4) throw error;
+      if (attempt >= 7 || !isUniqueViolation(error)) throw error;
     }
   }
-  throw new Error("unreachable");
 }
 
 /**

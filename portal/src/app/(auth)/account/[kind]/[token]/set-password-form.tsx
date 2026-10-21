@@ -12,9 +12,15 @@ import { cn } from "@/lib/cn";
 
 const MIN = 10;
 
+// A failure before the server answers (offline, a dropped connection, a restart or deploy) stays on this form with the
+// translated "try again" error, instead of the error boundary replacing the page; both password fields keep their values.
+function submitPassword(prev: AuthState, data: FormData): Promise<AuthState> {
+  return setPasswordAction(prev, data).catch((): AuthState => ({ error: "generic" }));
+}
+
 export function SetPasswordForm({ kind, token, name, email }: { kind: "invite" | "reset"; token: string; name: string; email: string }) {
   const t = useTranslations("auth");
-  const [state, action] = useActionState<AuthState, FormData>(setPasswordAction, undefined);
+  const [state, action] = useActionState<AuthState, FormData>(submitPassword, undefined);
   const [pw, setPw] = useState("");
   const [confirm, setConfirm] = useState("");
   const score = useMemo(() => (pw ? checkPassword(pw, [email, name]).score : 0), [pw, email, name]);

@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { and, asc, count, desc, eq, gte, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
-import { ArrowLeft, Award, Building2, Check, Flame, Mail, QrCode, ShieldAlert } from "lucide-react";
+import { Award, Building2, Check, Flame, Mail, QrCode, ShieldAlert } from "lucide-react";
 import { db, t } from "@/server/db";
-import { allowed, requirePermission } from "@/server/auth/viewer";
-import { getDepartments, scopeDepartmentIds } from "@/server/queries/admin";
+import { allowed } from "@/server/auth/viewer";
+import { getDepartments } from "@/server/queries/admin";
 import { computeTenantRisk } from "@/server/services/risk";
 import { badgesFor } from "@/server/queries/badges";
 import { assignedForUser } from "@/server/services/assignments";
@@ -13,6 +12,7 @@ import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { Avatar } from "@/components/ui/avatar";
 import { Pill } from "@/components/ui/pill";
 import { ProgressBar } from "@/components/ui/progress";
+import { BackLink } from "@/components/ui/layout";
 import { BarChart, Heatmap, Sparkline } from "@/components/ui/charts";
 import { DeletePersonButton, PersonActions } from "@/components/admin/person-actions";
 import { TEMPLATES } from "@/lib/campaigns/templates";
@@ -21,23 +21,14 @@ import { riskBand } from "@/lib/domain/risk";
 import { requestNow } from "@/lib/time";
 import { pick } from "@/i18n/config";
 import { cn } from "@/lib/cn";
+import { personForPage } from "./person";
 
 const DAY = 86_400_000;
 /** Templates that carry a QR code: a click on their link means the code was scanned with a phone. */
 const QR_KEYS = TEMPLATES.filter((x) => x.qr).map((x) => x.key);
 
 export default async function PersonPage({ params }: PageProps<"/admin/users/[id]">) {
-  const { id } = await params;
-  const v = await requirePermission("people.read");
-  if (!/^[0-9a-f-]{36}$/.test(id)) notFound();
-  const [person] = await db()
-    .select({ u: t.users, dept: t.departments.name })
-    .from(t.users)
-    .leftJoin(t.departments, eq(t.departments.id, t.users.departmentId))
-    .where(and(eq(t.users.id, id), eq(t.users.tenantId, v.tenant.id)));
-  if (!person || person.u.status === "deleted") notFound();
-  const scope = await scopeDepartmentIds(v);
-  if (scope && !(person.u.departmentId && scope.has(person.u.departmentId))) notFound();
+  const { v, person } = await personForPage((await params).id);
   const u = person.u;
   const locale = await getLocale();
   const [tr, tc, tp, ts, tcol, format] = await Promise.all([
@@ -145,36 +136,33 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
   } as const;
 
   return (
-    <div className="grid gap-6">
-      <Link href="/admin/users" className="inline-flex w-fit items-center gap-1 text-caption font-semibold text-brand-600 hover:text-brand-700">
-        <ArrowLeft className="size-4" />
-        {tr("back")}
-      </Link>
-      <Card className="p-6">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6">
+      <BackLink href="/admin/users">{tr("back")}</BackLink>
+      <Card className="p-4 sm:p-6">
         <div className="flex flex-wrap items-start gap-5">
           <Avatar name={u.name} src={u.avatarUrl} size="xl" />
-          <div className="min-w-0 flex-1">
-            <h1 className="font-display text-display font-bold text-balance">{u.name}</h1>
+          <div className="min-w-[min(100%,14rem)] flex-1">
+            <h1 className="font-display text-display font-bold text-balance wrap-break-word">{u.name}</h1>
             <p className="mt-1 text-body text-ink-muted">{u.jobTitle ?? "—"}</p>
             <div className="mt-2 flex flex-wrap gap-2">
               <Pill tone="brand">{tc(`roles.${u.role}`)}</Pill>
               <Pill tone={u.status === "active" ? "safe" : u.status === "invited" ? "brand" : "neutral"}>{tc(`userStatus.${u.status}`)}</Pill>
               {u.totpEnabled ? <Pill tone="safe">2FA</Pill> : null}
             </div>
-            <ul className="mt-3 grid gap-1 text-caption text-ink-muted">
+            <ul className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-1 text-caption text-ink-muted">
               <li className="flex items-center gap-2">
                 <Mail className="size-4 shrink-0" />
                 <span className="min-w-0 truncate">{u.email}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Building2 className="size-4" />
+                <Building2 className="size-4 shrink-0" />
                 {person.dept ?? tc("noDepartment")}
               </li>
               <li>{tr("joined", { date: format.dateTime(u.createdAt, { dateStyle: "medium" }) })}</li>
             </ul>
           </div>
           {allowed(v, "people.write") ? (
-            <div className="flex max-w-sm flex-wrap justify-end gap-2 sm:ml-auto">
+            <div className="flex max-w-full flex-wrap justify-end gap-2 sm:ml-auto sm:max-w-sm [&>button]:max-w-full [&>button]:whitespace-normal">
               <PersonActions
                 isSelf={u.id === v.user.id}
                 departments={departments.map((d) => ({ id: d.id, name: d.name }))}
@@ -223,11 +211,11 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
         </div>
       </section>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <Card>
           <CardHeader title={tr("learning")} />
           <CardBody className="grid gap-3 pt-3">
-            <div className="grid grid-cols-3 divide-x divide-line rounded-lg bg-sunken">
+            <div className="grid grid-cols-3 divide-x divide-line rounded-lg bg-sunken wrap-break-word">
               <div className="p-3">
                 <p className="text-title font-bold text-safe-700">{completed}</p>
                 <p className="text-tab text-ink-muted">{tr("completed")}</p>
@@ -255,7 +243,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
             </dl>
           </CardBody>
         </Card>
-        <div className="grid content-start gap-4">
+        <div className="grid grid-cols-[minmax(0,1fr)] content-start gap-4">
           <Card>
             <CardHeader title={tr("answers")} description={tr("answersSub")} />
             <CardBody className="pt-3">{firstTry !== null ? <p className="text-numeral font-bold">{`${firstTry}%`}</p> : <p className="text-caption text-ink-muted">{tr("noAnswers")}</p>}</CardBody>
@@ -292,7 +280,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
         </div>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
         <Card>
           <CardHeader title={tr("xp30")} />
           <CardBody>
@@ -308,7 +296,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-3">
         <Card>
           <CardHeader title={tr("weakAreas")} description={tr("weakAreasSub")} />
           <CardBody className="grid gap-2.5 pt-3">
@@ -319,7 +307,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
                     <span>{tc(`categories.${w.category as "email"}`)}</span>
                     <b>{w.rate}%</b>
                   </div>
-                  <ProgressBar value={w.rate} size="sm" tone={w.rate < 60 ? "risk" : w.rate < 80 ? "warn" : "safe"} className="mt-1" />
+                  <ProgressBar decorative value={w.rate} size="sm" tone={w.rate < 60 ? "risk" : w.rate < 80 ? "warn" : "safe"} className="mt-1" />
                 </div>
               ))
             ) : (
@@ -340,7 +328,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
                         <span>{ts(`why.${k}`)}</span>
                         <b className="tabular-nums">+{val}</b>
                       </div>
-                      <ProgressBar value={(val / max) * 100} size="sm" tone={val === 0 ? "safe" : val / max > 0.5 ? "risk" : "warn"} className="mt-1" />
+                      <ProgressBar decorative value={(val / max) * 100} size="sm" tone={val === 0 ? "safe" : val / max > 0.5 ? "risk" : "warn"} className="mt-1" />
                     </div>
                   );
                 })
@@ -366,10 +354,10 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader title={tr("moduleProgress")} />
-          <CardBody className="grid max-h-96 gap-2 overflow-y-auto pt-3">
+          <CardBody className="grid max-h-96 grid-cols-[minmax(0,1fr)] gap-2 overflow-y-auto pt-3">
             {[...moduleBySlug.values()].map((m) => {
               const p = progressById.get(m.id);
               const status = STATUS[p?.status ?? "not_started"];
@@ -379,7 +367,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
                     {pick(m.title, locale)}
                   </Link>
                   <Pill tone={status.tone}>{status.label}</Pill>
-                  <span className="w-10 shrink-0 text-right tabular-nums">{p?.percent ?? 0}%</span>
+                  <span className="w-11 shrink-0 text-right tabular-nums">{p?.percent ?? 0}%</span>
                 </div>
               );
             })}
@@ -407,7 +395,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
         </Card>
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-3">
         <Card>
           <CardHeader title={tcol("path")} />
           <CardBody className="pt-3">

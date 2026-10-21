@@ -3,12 +3,13 @@ import { db, t } from "@/server/db";
 import { getViewer } from "@/server/auth/viewer";
 import { audit } from "@/server/services/audit";
 import { rateLimit } from "@/server/rate-limit";
+import { todayInBaku } from "@/lib/time";
 
 /** "Download my data" (GDPR-style access): profile and learning history as one JSON file. */
 export async function GET() {
   const v = await getViewer();
   if (!v) return new Response("Unauthorized", { status: 401 });
-  if (!rateLimit(`export:${v.user.id}`, 5, 60 * 60_000).ok) return new Response("Too many requests", { status: 429 });
+  if (!(await rateLimit(`export:${v.user.id}`, 5, 60 * 60_000)).ok) return new Response("Too many requests", { status: 429 });
   const uid = v.user.id;
   const [profile] = await db()
     .select({
@@ -48,7 +49,7 @@ export async function GET() {
   return new Response(body, {
     headers: {
       "content-type": "application/json; charset=utf-8",
-      "content-disposition": `attachment; filename="my-data-${new Date().toISOString().slice(0, 10)}.json"`,
+      "content-disposition": `attachment; filename="my-data-${todayInBaku()}.json"`,
       "cache-control": "no-store",
     },
   });

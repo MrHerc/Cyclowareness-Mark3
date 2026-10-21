@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+import { useClientFormat } from "@/lib/client-format";
 import { Copy, Globe2, KeyRound, Pencil, Plus, SlidersHorizontal, Trash2 } from "lucide-react";
 import { adminLinkAction, createTenantAction, deleteDemoAction, renameTenantAction, setDemoStatusAction, setTenantFeatureAction, setTenantPlanAction, verifyTenantDomainAction } from "@/server/actions/platform";
 import { Button } from "@/components/ui/button";
@@ -160,7 +161,7 @@ export function TenantControls({
 }) {
   const t = useTranslations("admin.platform");
   const tc = useTranslations("common");
-  const format = useFormatter();
+  const format = useClientFormat();
   const [pending, start] = useTransition();
   const [mode, setMode] = useState<"features" | "link" | "rename" | "domain" | null>(null);
   const [adminId, setAdminId] = useState(admins[0]?.id ?? "");

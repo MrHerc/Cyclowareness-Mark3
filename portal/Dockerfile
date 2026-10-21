@@ -11,21 +11,20 @@ FROM base AS deps
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 
-# 2. Build. `next build` runs with NODE_ENV=production, and src/server/env.ts refuses to load
-#    in production without APP_SECRET, so a throwaway value is provided here. It never reaches
-#    the runner and nothing is encrypted with it. DATABASE_URL stays unset: the build must not
-#    open a database.
+# 2. Build. No secrets are needed here: src/server/env.ts skips the APP_SECRET check during
+#    `next build` (NEXT_PHASE) and enforces it when the server starts. DATABASE_URL stays
+#    unset: the build must not open a database.
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Windows checkouts may turn the entrypoint into CRLF, which /bin/sh cannot run.
 RUN sed -i 's/\r$//' scripts/docker-entrypoint.sh
-ARG APP_SECRET=build-only-placeholder-secret-never-used-at-runtime
-ENV APP_SECRET=$APP_SECRET
 RUN npm run build
 
 # 3. Runtime: the standalone server plus everything the app reads from disk at runtime
-#    (content/ via process.cwd(), drizzle/ for the migration step, public/ and static assets).
+#    (content/ via process.cwd(): landing copy, legal texts and the lesson library the server
+#    imports into the database on every start; drizzle/ for the migration step; public/ and
+#    static assets).
 FROM base AS runner
 ENV NODE_ENV=production \
     HOSTNAME=0.0.0.0 \
@@ -43,8 +42,9 @@ COPY --from=deps --chown=node:node /app/node_modules/drizzle-orm ./node_modules/
 
 USER node
 EXPOSE 3000
-# /sign-in is public and renders through the database, so a passing check means the app and
-# its database connection are both up. The slim image has no curl, hence node's fetch.
-HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:3000/sign-in').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+# /api/health answers 200 only when the server can query the database (503 otherwise). The slim
+# image has no curl, hence node's fetch; exitCode rather than process.exit() inside the callback.
+# The start period covers the migrations and the content import of a first start.
+HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:3000/api/health',{signal:AbortSignal.timeout(4000)}).then((r)=>{process.exitCode=r.ok?0:1}).catch(()=>{process.exitCode=1})"
 ENTRYPOINT ["sh", "scripts/docker-entrypoint.sh"]

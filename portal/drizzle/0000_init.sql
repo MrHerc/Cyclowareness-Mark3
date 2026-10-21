@@ -145,6 +145,7 @@ CREATE TABLE "departments" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"tenant_id" uuid NOT NULL,
 	"name" text NOT NULL,
+	"name_key" text NOT NULL,
 	"parent_id" uuid,
 	"head_user_id" uuid,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
@@ -228,7 +229,8 @@ CREATE TABLE "learning_paths" (
 	"recurrence" jsonb NOT NULL,
 	"standards" jsonb NOT NULL,
 	"module_slugs" jsonb NOT NULL,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "learning_paths_key_tenant_idx" UNIQUE NULLS NOT DISTINCT("key","tenant_id")
 );
 --> statement-breakpoint
 CREATE TABLE "lesson_contents" (
@@ -243,6 +245,7 @@ CREATE TABLE "lesson_progress" (
 	"user_id" uuid NOT NULL,
 	"lesson_id" uuid NOT NULL,
 	"completed_at" timestamp with time zone,
+	"last_completed_at" timestamp with time zone,
 	"xp_awarded" integer DEFAULT 0 NOT NULL,
 	"attempts" integer DEFAULT 0 NOT NULL,
 	"seconds_spent" integer DEFAULT 0 NOT NULL,
@@ -354,7 +357,8 @@ CREATE TABLE "modules" (
 	"status" text DEFAULT 'published' NOT NULL,
 	"sort_order" integer DEFAULT 0 NOT NULL,
 	"created_by" uuid,
-	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "modules_slug_tenant_idx" UNIQUE NULLS NOT DISTINCT("slug","tenant_id")
 );
 --> statement-breakpoint
 CREATE TABLE "notifications" (
@@ -422,6 +426,13 @@ CREATE TABLE "problem_reports" (
 	"status" text DEFAULT 'new' NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "rate_limit_buckets" (
+	"key" text NOT NULL,
+	"window_start" timestamp with time zone NOT NULL,
+	"count" integer DEFAULT 0 NOT NULL,
+	CONSTRAINT "rate_limit_buckets_key_window_start_pk" PRIMARY KEY("key","window_start")
 );
 --> statement-breakpoint
 CREATE TABLE "report_schedules" (
@@ -586,6 +597,8 @@ CREATE TABLE "users" (
 	"tour_done" boolean DEFAULT false NOT NULL,
 	"deletion_requested_at" timestamp with time zone,
 	"last_active_at" timestamp with time zone,
+	"department_changed_at" timestamp with time zone,
+	"activated_at" timestamp with time zone,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
@@ -629,7 +642,7 @@ ALTER TABLE "assignments" ADD CONSTRAINT "assignments_module_id_modules_id_fk" F
 ALTER TABLE "assignments" ADD CONSTRAINT "assignments_path_id_learning_paths_id_fk" FOREIGN KEY ("path_id") REFERENCES "public"."learning_paths"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "attestations" ADD CONSTRAINT "attestations_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "attestations" ADD CONSTRAINT "attestations_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "attestations" ADD CONSTRAINT "attestations_module_id_modules_id_fk" FOREIGN KEY ("module_id") REFERENCES "public"."modules"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "attestations" ADD CONSTRAINT "attestations_module_id_modules_id_fk" FOREIGN KEY ("module_id") REFERENCES "public"."modules"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "audit_log" ADD CONSTRAINT "audit_log_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "auth_tokens" ADD CONSTRAINT "auth_tokens_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "behavior_risks" ADD CONSTRAINT "behavior_risks_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -638,10 +651,11 @@ ALTER TABLE "behavior_risks" ADD CONSTRAINT "behavior_risks_module_id_modules_id
 ALTER TABLE "campaign_recipients" ADD CONSTRAINT "campaign_recipients_campaign_id_campaigns_id_fk" FOREIGN KEY ("campaign_id") REFERENCES "public"."campaigns"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "campaign_recipients" ADD CONSTRAINT "campaign_recipients_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "campaigns" ADD CONSTRAINT "campaigns_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "campaigns" ADD CONSTRAINT "campaigns_department_id_departments_id_fk" FOREIGN KEY ("department_id") REFERENCES "public"."departments"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "certificates" ADD CONSTRAINT "certificates_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "certificates" ADD CONSTRAINT "certificates_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "certificates" ADD CONSTRAINT "certificates_module_id_modules_id_fk" FOREIGN KEY ("module_id") REFERENCES "public"."modules"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
-ALTER TABLE "certificates" ADD CONSTRAINT "certificates_path_id_learning_paths_id_fk" FOREIGN KEY ("path_id") REFERENCES "public"."learning_paths"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "certificates" ADD CONSTRAINT "certificates_module_id_modules_id_fk" FOREIGN KEY ("module_id") REFERENCES "public"."modules"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "certificates" ADD CONSTRAINT "certificates_path_id_learning_paths_id_fk" FOREIGN KEY ("path_id") REFERENCES "public"."learning_paths"("id") ON DELETE no action ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "departments" ADD CONSTRAINT "departments_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "feedback" ADD CONSTRAINT "feedback_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "feedback" ADD CONSTRAINT "feedback_module_id_modules_id_fk" FOREIGN KEY ("module_id") REFERENCES "public"."modules"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
@@ -674,6 +688,7 @@ ALTER TABLE "policy_versions" ADD CONSTRAINT "policy_versions_policy_id_policies
 ALTER TABLE "problem_reports" ADD CONSTRAINT "problem_reports_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "problem_reports" ADD CONSTRAINT "problem_reports_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "report_schedules" ADD CONSTRAINT "report_schedules_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "report_schedules" ADD CONSTRAINT "report_schedules_department_id_departments_id_fk" FOREIGN KEY ("department_id") REFERENCES "public"."departments"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "risk_snapshots" ADD CONSTRAINT "risk_snapshots_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "sandbox_analyses" ADD CONSTRAINT "sandbox_analyses_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "session_registrations" ADD CONSTRAINT "session_registrations_session_id_live_sessions_id_fk" FOREIGN KEY ("session_id") REFERENCES "public"."live_sessions"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
@@ -697,12 +712,17 @@ ALTER TABLE "xp_events" ADD CONSTRAINT "xp_events_tenant_id_tenants_id_fk" FOREI
 ALTER TABLE "xp_events" ADD CONSTRAINT "xp_events_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "answers_user_idx" ON "answers" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "assignments_tenant_idx" ON "assignments" USING btree ("tenant_id");--> statement-breakpoint
+CREATE INDEX "attestations_user_idx" ON "attestations" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "audit_tenant_at_idx" ON "audit_log" USING btree ("tenant_id","at");--> statement-breakpoint
 CREATE INDEX "auth_tokens_user_idx" ON "auth_tokens" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "risks_user_idx" ON "behavior_risks" USING btree ("user_id","status");--> statement-breakpoint
+CREATE INDEX "risks_tenant_idx" ON "behavior_risks" USING btree ("tenant_id","status");--> statement-breakpoint
 CREATE INDEX "recipients_campaign_idx" ON "campaign_recipients" USING btree ("campaign_id");--> statement-breakpoint
+CREATE INDEX "recipients_user_idx" ON "campaign_recipients" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "campaigns_tenant_idx" ON "campaigns" USING btree ("tenant_id");--> statement-breakpoint
-CREATE INDEX "departments_tenant_idx" ON "departments" USING btree ("tenant_id");--> statement-breakpoint
+CREATE INDEX "certificates_user_idx" ON "certificates" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "certificates_tenant_idx" ON "certificates" USING btree ("tenant_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "departments_tenant_name_key_idx" ON "departments" USING btree ("tenant_id","name_key");--> statement-breakpoint
 CREATE INDEX "feedback_tenant_idx" ON "feedback" USING btree ("tenant_id");--> statement-breakpoint
 CREATE INDEX "incidents_tenant_idx" ON "incidents" USING btree ("tenant_id","status");--> statement-breakpoint
 CREATE UNIQUE INDEX "incidents_number_idx" ON "incidents" USING btree ("tenant_id","number");--> statement-breakpoint
@@ -712,26 +732,34 @@ CREATE UNIQUE INDEX "lessons_module_key_idx" ON "lessons" USING btree ("module_i
 CREATE INDEX "login_attempts_key_idx" ON "login_attempts" USING btree ("key","at");--> statement-breakpoint
 CREATE INDEX "loop_events_loop_idx" ON "loop_events" USING btree ("loop_id");--> statement-breakpoint
 CREATE INDEX "loops_tenant_idx" ON "loops" USING btree ("tenant_id","stage");--> statement-breakpoint
+CREATE INDEX "material_decisions_material_idx" ON "material_decisions" USING btree ("material_id");--> statement-breakpoint
 CREATE INDEX "materials_tenant_idx" ON "materials" USING btree ("tenant_id","status");--> statement-breakpoint
-CREATE UNIQUE INDEX "modules_slug_tenant_idx" ON "modules" USING btree ("slug","tenant_id");--> statement-breakpoint
 CREATE INDEX "notifications_user_idx" ON "notifications" USING btree ("user_id","created_at");--> statement-breakpoint
+CREATE INDEX "notifications_tenant_kind_idx" ON "notifications" USING btree ("tenant_id","kind","created_at");--> statement-breakpoint
 CREATE INDEX "outbox_status_idx" ON "outbox" USING btree ("status","created_at");--> statement-breakpoint
 CREATE INDEX "outbox_tenant_idx" ON "outbox" USING btree ("tenant_id","created_at");--> statement-breakpoint
 CREATE UNIQUE INDEX "policy_signoff_unique" ON "policy_signoffs" USING btree ("version_id","user_id");--> statement-breakpoint
+CREATE INDEX "policy_versions_policy_idx" ON "policy_versions" USING btree ("policy_id");--> statement-breakpoint
 CREATE INDEX "problems_tenant_idx" ON "problem_reports" USING btree ("tenant_id","status");--> statement-breakpoint
+CREATE INDEX "rate_limit_buckets_window_idx" ON "rate_limit_buckets" USING btree ("window_start");--> statement-breakpoint
 CREATE UNIQUE INDEX "risk_snap_unique" ON "risk_snapshots" USING btree ("tenant_id","day");--> statement-breakpoint
 CREATE INDEX "sandbox_tenant_idx" ON "sandbox_analyses" USING btree ("tenant_id","created_at");--> statement-breakpoint
 CREATE UNIQUE INDEX "sandbox_number_idx" ON "sandbox_analyses" USING btree ("tenant_id","number");--> statement-breakpoint
 CREATE INDEX "sessions_user_idx" ON "sessions" USING btree ("user_id");--> statement-breakpoint
+CREATE INDEX "sessions_expires_idx" ON "sessions" USING btree ("expires_at");--> statement-breakpoint
 CREATE INDEX "tickets_tenant_idx" ON "support_tickets" USING btree ("tenant_id","status");--> statement-breakpoint
 CREATE UNIQUE INDEX "tickets_number_idx" ON "support_tickets" USING btree ("tenant_id","number");--> statement-breakpoint
 CREATE INDEX "threat_reports_tenant_idx" ON "threat_reports" USING btree ("tenant_id","status");--> statement-breakpoint
 CREATE UNIQUE INDEX "threat_reports_number_idx" ON "threat_reports" USING btree ("tenant_id","number");--> statement-breakpoint
+CREATE INDEX "threat_reports_reporter_idx" ON "threat_reports" USING btree ("reporter_id");--> statement-breakpoint
+CREATE INDEX "ticket_messages_ticket_idx" ON "ticket_messages" USING btree ("ticket_id");--> statement-breakpoint
 CREATE UNIQUE INDEX "user_risk_snap_unique" ON "user_risk_snapshots" USING btree ("user_id","day");--> statement-breakpoint
 CREATE INDEX "user_risk_snap_tenant_day_idx" ON "user_risk_snapshots" USING btree ("tenant_id","day");--> statement-breakpoint
 CREATE UNIQUE INDEX "users_email_idx" ON "users" USING btree ("email");--> statement-breakpoint
 CREATE INDEX "users_tenant_idx" ON "users" USING btree ("tenant_id");--> statement-breakpoint
 CREATE INDEX "users_department_idx" ON "users" USING btree ("department_id");--> statement-breakpoint
+CREATE UNIQUE INDEX "users_phone_active_idx" ON "users" USING btree ("phone") WHERE phone is not null and status <> 'deleted';--> statement-breakpoint
 CREATE INDEX "deliveries_status_idx" ON "webhook_deliveries" USING btree ("status","created_at");--> statement-breakpoint
+CREATE INDEX "deliveries_tenant_idx" ON "webhook_deliveries" USING btree ("tenant_id","created_at");--> statement-breakpoint
 CREATE INDEX "xp_user_at_idx" ON "xp_events" USING btree ("user_id","at");--> statement-breakpoint
 CREATE INDEX "xp_tenant_at_idx" ON "xp_events" USING btree ("tenant_id","at");

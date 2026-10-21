@@ -6,7 +6,9 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { db, t } from "../db";
 import { actionViewer, allowed, type Viewer } from "../auth/viewer";
+import { rateLimit } from "../rate-limit";
 import { queueEmail } from "../mail";
+import { appUrl } from "../env";
 import { attestModule, completeLesson, issueCertificate, touchModule } from "../services/progress";
 import { recomputeRisk } from "../services/risk";
 import { emitEvent } from "../services/events";
@@ -70,6 +72,7 @@ export async function rateModuleAction(input: { slug: string; rating: number; co
   const v = await actionViewer();
   const p = rateSchema.safeParse(input);
   if (!p.success) return { ok: false };
+  if (!(await rateLimit(`rate:${v.user.id}`, 20, 60 * 60_000)).ok) return { ok: false };
   const mod = await moduleBySlug(v, p.data.slug);
   if (!mod) return { ok: false };
   // Module ratings are anonymous by design (Reports → Module feedback).
@@ -147,13 +150,14 @@ export async function reportProblemAction(_: { ok?: boolean } | undefined, form:
   const message = String(form.get("message") ?? "").trim();
   const context = String(form.get("context") ?? "").slice(0, 200);
   if (message.length < 3) return { error: "message" };
+  if (!(await rateLimit(`problem:${v.user.id}`, 10, 60 * 60_000)).ok) return { error: "rateLimited" };
   await db().insert(t.problemReports).values({ tenantId: v.tenant.id, userId: v.user.id, context: context || null, message: message.slice(0, 4000) });
   await emitEvent(db(), v.tenant.id, "issue.reported", { context });
   // Settings → Email → "Problem reports by email": a copy goes to the helpdesk.
   const email = v.tenant.settings.email;
   if (email.enabled && email.helpdesk) {
     const tr = await getTranslations({ locale: v.tenant.settings.defaultLocale, namespace: "admin.problems" });
-    const link = `${(process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "")}/admin/problems`;
+    const link = `${appUrl()}/admin/problems`;
     await queueEmail(db(), v.tenant.id, {
       to: email.helpdesk,
       kind: "problem",

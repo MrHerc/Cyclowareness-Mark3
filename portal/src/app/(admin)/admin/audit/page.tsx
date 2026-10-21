@@ -7,9 +7,12 @@ import { requirePermission } from "@/server/auth/viewer";
 import { AUDIT_ACTIONS } from "@/server/services/audit";
 import { Card } from "@/components/ui/card";
 import { EmptyState, PageHeader } from "@/components/ui/layout";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 import { Avatar } from "@/components/ui/avatar";
 import { Input, Select } from "@/components/ui/field";
 import { AutoSubmit } from "@/components/admin/auto-submit";
+import { dayRange } from "@/lib/time";
+import { pageParam } from "@/lib/page-param";
 
 const PAGE = 50;
 
@@ -23,9 +26,11 @@ export default async function AuditPage({ searchParams }: PageProps<"/admin/audi
   const sp = await searchParams;
   const str = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : "");
   const action = (AUDIT_ACTIONS as readonly string[]).includes(str("action")) ? str("action") : "";
-  const from = /^\d{4}-\d{2}-\d{2}$/.test(str("from")) ? str("from") : "";
-  const to = /^\d{4}-\d{2}-\d{2}$/.test(str("to")) ? str("to") : "";
-  const page = Math.max(1, Number(str("page")) || 1);
+  // Impossible days (2026-13-01) and a range that ends before it starts are ignored, not sent to the database.
+  const range = dayRange(str("from"), str("to"));
+  const from = range.fromDay;
+  const to = range.toDay;
+  const page = pageParam(str("page"));
   const [tr, ta, tc, format] = await Promise.all([getTranslations("admin.audit"), getTranslations("admin.auditActions"), getTranslations("common"), getFormatter()]);
   const rows = await db()
     .select({ a: t.auditLog, name: t.users.name, avatar: t.users.avatarUrl })
@@ -35,8 +40,8 @@ export default async function AuditPage({ searchParams }: PageProps<"/admin/audi
       and(
         eq(t.auditLog.tenantId, v.tenant.id),
         action ? eq(t.auditLog.action, action) : undefined,
-        from ? gte(t.auditLog.at, new Date(`${from}T00:00:00`)) : undefined,
-        to ? lte(t.auditLog.at, new Date(`${to}T23:59:59`)) : undefined,
+        range.from ? gte(t.auditLog.at, range.from) : undefined,
+        range.to ? lte(t.auditLog.at, range.to) : undefined,
       ),
     )
     .orderBy(desc(t.auditLog.at))
@@ -77,7 +82,7 @@ export default async function AuditPage({ searchParams }: PageProps<"/admin/audi
         </button>
       </form>
       {rows.length ? (
-        <div className="overflow-x-auto rounded-xl border border-line bg-surface shadow-xs">
+        <ScrollRegion label={tr("title")} className="rounded-xl border border-line bg-surface shadow-xs">
           <table className="w-full min-w-[52rem] text-left text-body-sm">
             <thead className="text-tab text-ink-subtle">
               <tr className="border-b border-line">
@@ -105,7 +110,7 @@ export default async function AuditPage({ searchParams }: PageProps<"/admin/audi
               ))}
             </tbody>
           </table>
-        </div>
+        </ScrollRegion>
       ) : (
         <Card>
           <EmptyState icon={<ScrollText />} title={tr("empty")} />
@@ -113,12 +118,12 @@ export default async function AuditPage({ searchParams }: PageProps<"/admin/audi
       )}
       <nav className="flex justify-center gap-3 text-caption">
         {page > 1 ? (
-          <Link href={qs(page - 1)} className="rounded-pill border border-line px-4 py-2 font-semibold hover:bg-sunken">
+          <Link href={qs(page - 1)} className="inline-flex items-center rounded-pill border border-line px-4 py-2 font-semibold hover:bg-sunken pointer-coarse:min-h-11">
             {tc("previousPage")}
           </Link>
         ) : null}
         {hasNext ? (
-          <Link href={qs(page + 1)} className="rounded-pill border border-line px-4 py-2 font-semibold hover:bg-sunken">
+          <Link href={qs(page + 1)} className="inline-flex items-center rounded-pill border border-line px-4 py-2 font-semibold hover:bg-sunken pointer-coarse:min-h-11">
             {tc("nextPage")}
           </Link>
         ) : null}

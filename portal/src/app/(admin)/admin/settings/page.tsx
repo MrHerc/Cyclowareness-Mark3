@@ -1,9 +1,13 @@
-import { desc, eq } from "drizzle-orm";
+import { count, desc, eq, sql } from "drizzle-orm";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { Award, Bell, Fingerprint, GraduationCap, Languages, Mail, Palette, PenLine, ShieldCheck, Webhook, type LucideIcon } from "lucide-react";
 import { requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
-import { env } from "@/server/env";
+import { appUrl, env } from "@/server/env";
+import { DOMAIN_PROOF_GRACE_DAYS } from "@/server/auth/domain-proof";
+import { CAMPAIGN_CANCELLED_ERROR, resendableMail } from "@/server/mail";
+import type { TenantSettings } from "@/server/db/schema";
+import { requestNow } from "@/lib/time";
 import { PageHeader, TabsNav } from "@/components/ui/layout";
 import {
   AttestationTab,
@@ -13,6 +17,9 @@ import {
   IdentityTab,
   IntegrationsTab,
   LanguagesTab,
+  type EmailView,
+  type IdentityView,
+  type IntegrationsView,
   LearningTab,
   NotificationsTab,
   ProtectionTab,
@@ -33,6 +40,21 @@ const TAB_ICONS: Record<Tab, LucideIcon> = {
   integrations: Webhook,
 };
 
+/* Stored secrets are encrypted, but they still must not reach the browser: the tabs get "is set" flags. */
+function identityView({ sso, ldap, ...rest }: TenantSettings["identity"]): IdentityView {
+  return {
+    ...rest,
+    sso: sso ? (({ clientSecretEnc, ...s }) => ({ ...s, hasClientSecret: !!clientSecretEnc }))(sso) : undefined,
+    ldap: ldap ? (({ passwordEnc, ...l }) => ({ ...l, hasPassword: !!passwordEnc }))(ldap) : undefined,
+  };
+}
+function emailView({ passwordEnc, ...rest }: TenantSettings["email"]): EmailView {
+  return { ...rest, hasPassword: !!passwordEnc };
+}
+function integrationsView({ webhookSecretEnc, ...rest }: TenantSettings["integrations"]): IntegrationsView {
+  return { ...rest, hasWebhookSecret: !!webhookSecretEnc };
+}
+
 export async function generateMetadata() {
   const tr = await getTranslations("settings");
   return { title: tr("title") };
@@ -44,7 +66,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
   const tab: Tab = TABS.includes(sp.tab as Tab) ? (sp.tab as Tab) : "branding";
   const tr = await getTranslations("settings");
   const s = v.tenant.settings;
-  const base = env.APP_URL.replace(/\/$/, "");
+  const base = appUrl();
 
   let body: React.ReactNode;
   switch (tab) {
@@ -52,7 +74,21 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
       const [row] = await db().select({ domain: t.tenants.domain, verifiedAt: t.tenants.domainVerifiedAt }).from(t.tenants).where(eq(t.tenants.id, v.tenant.id));
       // Dates are formatted on the server: some browsers ship without every locale's date data.
       const format = await getFormatter();
-      body = <BrandingTab name={v.tenant.name} branding={v.tenant.branding} domain={row?.domain ?? null} verifiedOn={row?.verifiedAt ? format.dateTime(row.verifiedAt, { dateStyle: "medium" }) : null} />;
+      // The daily re-check stopped finding the record: the proof ends after the grace period.
+      const failingSince = row?.verifiedAt && !s.identity.domainProofForced && s.identity.domainCheckFailingSince ? new Date(s.identity.domainCheckFailingSince) : null;
+      const lapsing =
+        failingSince && !Number.isNaN(failingSince.getTime())
+          ? { since: format.dateTime(failingSince, { dateStyle: "medium" }), endsOn: format.dateTime(new Date(failingSince.getTime() + DOMAIN_PROOF_GRACE_DAYS * 86_400_000), { dateStyle: "medium" }) }
+          : null;
+      body = (
+        <BrandingTab
+          name={v.tenant.name}
+          branding={v.tenant.branding}
+          domain={row?.domain ?? null}
+          verifiedOn={row?.verifiedAt ? format.dateTime(row.verifiedAt, { dateStyle: "medium" }) : null}
+          lapsing={lapsing}
+        />
+      );
       break;
     }
     case "languages":
@@ -61,7 +97,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
     case "identity":
       body = (
         <IdentityTab
-          identity={s.identity}
+          identity={identityView(s.identity)}
           redirectUri={`${base}/api/sso/callback/${v.tenant.slug}`}
           signInLink={`${base}/api/sso/start?tenant=${v.tenant.slug}`}
           testResult={sp.ssoTest === "ok" || sp.ssoTest === "failed" ? sp.ssoTest : null}
@@ -70,12 +106,16 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
       break;
     case "email": {
       const rows = await db()
-        .select({ id: t.outbox.id, to: t.outbox.to, subject: t.outbox.subject, status: t.outbox.status, createdAt: t.outbox.createdAt, error: t.outbox.error })
+        .select({ id: t.outbox.id, to: t.outbox.to, subject: t.outbox.subject, status: t.outbox.status, createdAt: t.outbox.createdAt, error: t.outbox.error, resendable: sql<boolean>`(${resendableMail(v.tenant.id, requestNow())})` })
         .from(t.outbox)
         .where(eq(t.outbox.tenantId, v.tenant.id))
         .orderBy(desc(t.outbox.createdAt))
         .limit(20);
-      body = <EmailTab email={s.email} viewerEmail={v.user.email} outbox={rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }))} />;
+      const [failed] = await db()
+        .select({ n: count() })
+        .from(t.outbox)
+        .where(resendableMail(v.tenant.id, requestNow()));
+      body = <EmailTab email={emailView(s.email)} viewerEmail={v.user.email} outbox={rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString(), resendable: !!r.resendable, cancelled: r.error === CAMPAIGN_CANCELLED_ERROR }))} failedCount={Number(failed?.n ?? 0)} />;
       break;
     }
     case "notifications":
@@ -100,7 +140,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
         .where(eq(t.webhookDeliveries.tenantId, v.tenant.id))
         .orderBy(desc(t.webhookDeliveries.createdAt))
         .limit(20);
-      body = <IntegrationsTab integrations={s.integrations} deliveries={rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }))} />;
+      body = <IntegrationsTab integrations={integrationsView(s.integrations)} deliveries={rows.map((r) => ({ ...r, createdAt: r.createdAt.toISOString() }))} />;
       break;
     }
   }

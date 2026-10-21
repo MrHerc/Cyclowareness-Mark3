@@ -3,7 +3,7 @@ import { and, eq, isNotNull, lt, or } from "drizzle-orm";
 import { db, t } from "../db";
 import { sha256Hex } from "../crypto";
 import { randomToken } from "../services/progress";
-import { env } from "../env";
+import { appUrl } from "../env";
 
 /**
  * One-time link for inviting a person or resetting a password. Returns the full URL.
@@ -24,6 +24,6 @@ export async function issueAccountLink(userId: string, kind: "invite" | "reset")
   await db()
     .insert(t.authTokens)
     .values({ id: sha256Hex(token), userId, kind, expiresAt: new Date(Date.now() + (kind === "invite" ? 14 * 86_400_000 : 60 * 60_000)) });
-  return `${env.APP_URL.replace(/\/$/, "")}/account/${kind}/${token}`;
+  return `${appUrl()}/account/${kind}/${token}`;
 }
 

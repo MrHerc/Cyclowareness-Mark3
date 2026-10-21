@@ -1,32 +1,41 @@
+import { env } from "./env";
+
 /**
- * Text messages (sign-in codes, SMS simulations). The provider is chosen by SMS_PROVIDER;
- * without one, development logs the message and production reports it as unavailable.
+ * Text messages (sign-in codes, SMS simulations). The provider is chosen by SMS_PROVIDER
+ * (validated in env.ts: "webhook" needs SMS_WEBHOOK_URL); without one, development logs the
+ * message and production reports it as unavailable.
  * Provider adapters (e.g. Twilio, Vonage, a local operator gateway) plug in here.
  */
-export type SmsResult = { ok: true; simulated: boolean } | { ok: false; error: "unavailable" | "failed" };
+/**
+ * `down`: the gateway gave no answer (DNS, refused, timeout) or refused service as a whole (5xx,
+ * sign-in, rate limit), so other messages would fail the same way; `failed`: it refused this message.
+ */
+export type SmsResult = { ok: true; simulated: boolean } | { ok: false; error: "unavailable" | "failed" | "down" };
 
 export function smsAvailable(): boolean {
-  return !!process.env.SMS_PROVIDER || process.env.NODE_ENV !== "production";
+  return !!env.SMS_PROVIDER || !env.isProd;
 }
 
 export async function sendSms(to: string, text: string): Promise<SmsResult> {
-  const provider = process.env.SMS_PROVIDER;
+  const provider = env.SMS_PROVIDER;
   if (!provider) {
-    if (process.env.NODE_ENV === "production") return { ok: false, error: "unavailable" };
+    if (env.isProd) return { ok: false, error: "unavailable" };
     console.info(`[sms:simulated] to=${to.replace(/\d(?=\d{4})/g, "•")} text="${text}"`);
     return { ok: true, simulated: true };
   }
-  if (provider === "webhook" && process.env.SMS_WEBHOOK_URL) {
+  if (provider === "webhook" && env.SMS_WEBHOOK_URL) {
     try {
-      const res = await fetch(process.env.SMS_WEBHOOK_URL, {
+      const res = await fetch(env.SMS_WEBHOOK_URL, {
         method: "POST",
-        headers: { "content-type": "application/json", authorization: `Bearer ${process.env.SMS_WEBHOOK_TOKEN ?? ""}` },
+        headers: { "content-type": "application/json", ...(env.SMS_WEBHOOK_TOKEN ? { authorization: `Bearer ${env.SMS_WEBHOOK_TOKEN}` } : {}) },
         body: JSON.stringify({ to, text }),
         signal: AbortSignal.timeout(10_000),
       });
-      return res.ok ? { ok: true, simulated: false } : { ok: false, error: "failed" };
+      if (res.ok) return { ok: true, simulated: false };
+      return { ok: false, error: res.status >= 500 || [401, 403, 429].includes(res.status) ? "down" : "failed" };
     } catch {
-      return { ok: false, error: "failed" };
+      // fetch rejects only when no answer came back: unreachable, refused or the timeout.
+      return { ok: false, error: "down" };
     }
   }
   return { ok: false, error: "unavailable" };

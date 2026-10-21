@@ -1,7 +1,7 @@
 <!-- version: 2; effective: 2026-10-08 -->
 # Məxfilik Siyasəti
 
-Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi əsasla işləndiyi, kimin cavabdeh olduğu, Sİ müəllimə nə göndərildiyi, məlumatların harada və nə qədər saxlanıldığı, necə qorunduğu və hüquqlarınızı necə həyata keçirə biləcəyiniz.
+Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi əsasla işləndiyi, kimin cavabdeh olduğu, AI Sel-ə nə göndərildiyi, məlumatların harada və nə qədər saxlanıldığı, necə qorunduğu və hüquqlarınızı necə həyata keçirə biləcəyiniz.
 
 ## 1. Bu Siyasət haqqında
 
@@ -28,14 +28,14 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 | Təsdiqlər və siyasətlərlə tanışlıq | təsdiq etdiyiniz mətnin dəqiq məzmunu, siyasətin versiyası, vaxt, IP ünvanı | siz və Xidmət |
 | Sertifikatlar | modul, verilmə tarixi, seriya nömrəsi, yoxlama keçidi | Xidmət |
 | Təlim hücumlarının nəticələri | təlim QR kodlarının skan edilməsi (vaxt, qurğu növü, qısaldılmış IP ünvanı), aktiv edildikdə saxta fişinqdə edilən hərəkətlər, şübhəli məktublar barədə bildirişlər | Xidmət |
-| Sİ müəllim | yazdığınız sual və ya səs yazınız, onun mətni, cavab | siz |
+| AI Sel | yazdığınız sual və ya səs yazınız, onun mətni, cavab | siz |
 | Təhlükəsizlik və qurğu məlumatları | girişlərin və inzibati hərəkətlərin audit jurnalı, IP ünvanı, brauzer və qurğu növü (user agent), aktiv sessiyalar | Xidmət |
 | Məktublar | dəvətlər, parol keçidləri, xatırlatmalar, hesabatlar: alıcı, növ, çatdırılma statusu | Xidmət |
 | Hüquqların həyata keçirilməsi ilə bağlı qeydlər | məlumatların endirilməsi, silinmə sorğuları, qərarlar və səbəblər | siz, Təşkilatınız |
 
 3.1. Xidmət xüsusi kateqoriyalı fərdi məlumatlar (irqi və ya milli mənsubiyyət, ailə həyatı, dini etiqad, səhhət və ya məhkumluq barədə məlumatlar) tələb etmir və şəklinizdən və ya səsinizdən kimliyinizi müəyyən etmək üçün istifadə etmir.
 3.2. Liqa cədvəlləri ayrı-ayrı şəxsləri deyil, şöbələri müqayisə edir və üçdən az aktiv iştirakçısı olan şöbələri göstərmir.
-3.3. Açıq sayt. Xidmətin açıq səhifəsinə hesabsız baxırsınızsa, orada etdiyiniz seçimlər (rol, təşkilatın ölçüsü, sakit rejim, bağlanmış ipucları) yalnız sizin öz brauzerinizdə (yerli yaddaş və sessiya yaddaşı) saxlanılır və Təminatçıya göndərilmir. Onları səhifədəki "Seçimimi unut" keçidi ilə və ya brauzerdə sayt məlumatlarını silməklə təmizləyə bilərsiniz. Demo sorğusu formasını göndərsəniz, Təminatçı daxil etdiyiniz məlumatları (ad, iş e-poçtu, təşkilat, əməkdaş sayı aralığı, ölkə, istəyə bağlı mesaj), seçdiyiniz rolu, sizi formaya nəyin gətirdiyini və sınaq xalınızın səviyyəsini saxlayır. Bu məlumatlar qeyd xanasını işarələməklə verdiyiniz razılığa əsasən sorğunuza cavab vermək üçün istifadə olunur, Təminatçı isə onların sahibidir. Təminatçının quraşdırmasında başqa müddət müəyyən edilməyibsə, məlumatlar 24 aydan sonra, və ya sonradan göstəriləcək ünvanına sorğunuz əsasında daha tez silinir. Onlar heç vaxt Sİ müəllimə, süni intellekt xidmətlərinə və ya analitikaya göndərilmir.
+3.3. Açıq sayt. Xidmətin açıq səhifəsinə hesabsız baxırsınızsa, orada etdiyiniz seçimlər (rol, təşkilatın ölçüsü, sakit rejim, bağlanmış ipucları) yalnız sizin öz brauzerinizdə (yerli yaddaş və sessiya yaddaşı) saxlanılır və Təminatçıya göndərilmir. Onları səhifədəki "Seçimimi unut" keçidi ilə və ya brauzerdə sayt məlumatlarını silməklə təmizləyə bilərsiniz. Demo sorğusu formasını göndərsəniz, Təminatçı daxil etdiyiniz məlumatları (ad, iş e-poçtu, təşkilat, əməkdaş sayı aralığı, ölkə, istəyə bağlı mesaj), seçdiyiniz rolu, sizi formaya nəyin gətirdiyini və sınaq xalınızın səviyyəsini saxlayır. Bu məlumatlar qeyd xanasını işarələməklə verdiyiniz razılığa əsasən sorğunuza cavab vermək üçün istifadə olunur, Təminatçı isə onların sahibidir. Təminatçının quraşdırmasında başqa müddət müəyyən edilməyibsə, məlumatlar 24 aydan sonra, və ya sonradan göstəriləcək ünvanına sorğunuz əsasında daha tez silinir. Onlar heç vaxt AI Sel-ə, süni intellekt xidmətlərinə və ya analitikaya göndərilmir.
 
 ## 4. Məqsədlər və hüquqi əsaslar
 
@@ -45,21 +45,21 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 | Təşkilat üçün hesabatlar: tamamlama, təsdiqlər, siyasətlərlə tanışlıq, təlim hücumlarının nəticələri, risk | yuxarıdakı kimi; hansı hesabatlardan istifadə edəcəyini Təşkilat müəyyən edir |
 | Sistemə giriş, ikiaddımlı giriş, qurğu hədləri, audit jurnalı, hücumlardan müdafiə | mülkiyyətçinin və operatorun təhlükəsizlik vəzifələri ("Fərdi məlumatlar haqqında" Qanunun 5.8 və 9.12-ci maddələri); GDPR-in 32-ci maddəsi və qanuni maraq (6(1)(f) maddəsi) |
 | Profil şəkli | sizin razılığınız: şəkil könüllüdür və onu istənilən vaxt silə bilərsiniz |
-| Sİ müəllimə səsli suallar (mikrofon) | sizin razılığınız: hər səs yazısını özünüz başladırsınız və əvəzində yaza bilərsiniz |
+| AI Sel-ə səsli suallar (mikrofon) | sizin razılığınız: hər səs yazısını özünüz başladırsınız və əvəzində yaza bilərsiniz |
 | Hüquqlarınızla bağlı sorğulara cavab verilməsi və onların qeydiyyatı | hüquqi öhdəlik ("Fərdi məlumatlar haqqında" Qanunun 7 və 12-ci maddələri; GDPR-in 12-22-ci maddələri) |
 | Səlahiyyətli orqanların sorğularına cavab verilməsi | hüquqi öhdəlik |
 
 4.1. İşlənilmə razılığınıza əsaslandıqda razılığınızı istənilən vaxt geri götürə bilərsiniz. Geri götürmə ondan əvvəl aparılmış işlənilməyə təsir etmir.
 4.2. Təminatçı məlumatlarınızdan reklam üçün istifadə etmir, onları satmır və onlar əsasında marketinq profilləri yaratmır.
 
-## 5. Sİ müəllim
+## 5. AI Sel (Sİ köməkçisi)
 
-5.1. Sİ müəllimə sual verdikdə Xidmət Google Cloud Vertex AI xidmətinə yalnız sualı, cari dərsin məzmununu, interfeys dilini və texniki identifikatorları göndərir. Adınız, elektron poçt ünvanınız, vəzifəniz və Təşkilatınızın adı heç vaxt göndərilmir.
+5.1. AI Sel-ə (Sİ köməkçisinə) sual verdikdə Xidmət Google Cloud Vertex AI xidmətinə yalnız sualı, cari dərsin məzmununu, interfeys dilini və texniki identifikatorları göndərir. Adınız, elektron poçt ünvanınız, vəzifəniz və Təşkilatınızın adı heç vaxt göndərilmir.
 5.2. Göndərməzdən əvvəl Xidmət sualdakı elektron poçt ünvanlarını, telefon nömrələrini, kart nömrələrini, IBAN-ları və uzun rəqəm ardıcıllıqlarını gizlədir. Avtomatik gizlətmə hər şeyi aşkar edə bilməz, ona görə suallarınıza fərdi məlumat və ya məxfi məlumat daxil etməyin.
 5.3. Səsli sual mətnə çevrilmək üçün Google-a səs yazısı kimi göndərilir; səsin özü şəxsin kimliyini müəyyən etməyə imkan verə bilər. Mətnə çevrildikdən sonra yazı Xidmətdə saxlanılmır.
 5.4. Eyni suala yeni sorğu göndərmədən yenidən cavab vermək üçün gizlədilmiş sual mətni və cavab hesabınızla heç bir əlaqə olmadan saxlanılır. Cavabın səs faylı bir dəfə yaradılır və təkrar istifadə olunur.
 5.5. Öz şərtlərinə əsasən Google bu məlumatlardan müştərinin icazəsi olmadan süni intellekt modellərini öyrətmək üçün istifadə etmir. Google sui-istifadəni aşkar etmək üçün sorğuları öz şərtlərində təsvir olunduğu kimi məhdud müddət saxlaya bilər.
-5.6. Təşkilatınız Sİ müəllimi və ya səsli sualları söndürə bilər.
+5.6. Təşkilatınız AI Sel-i və ya səsli sualları söndürə bilər.
 
 ## 6. Məlumatlarınızı kim görə bilər
 
@@ -67,7 +67,7 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 6.2. Təşkilatınızın qoşduğu sistemlər: onun poçt serveri (Xidmətin məktubları Təşkilatın poçt serveri vasitəsilə göndərilir), identifikasiya provayderi və ya kataloqu (sistemə giriş və işçilərin sinxronlaşdırılması üçün), habelə istifadəçi identifikatorunuz, elektron poçt ünvanınız və şöbəniz daxil olmaqla təhlükəsizlik hadisələrini qəbul edə bilən SIEM və ya ITSM sistemləri.
 6.3. Təminatçının subprosessorları (Bulud versiyası):
 - UpCloud (UpCloud Ltd, Finlandiya, və onun törəmə şirkətləri): London, United Kingdom ərazisindəki data mərkəzində serverlər, fayl yaddaşı və ehtiyat nüsxələr;
-- Google Cloud (Google LLC və onun affilləşmiş şəxsləri): 5-ci bölməyə uyğun olaraq Sİ müəllimin cavabları, səsli sualların mətnə çevrilməsi və nitq sintezi üçün Vertex AI.
+- Google Cloud (Google LLC və onun affilləşmiş şəxsləri): 5-ci bölməyə uyğun olaraq AI Sel-in cavabları, səsli sualların mətnə çevrilməsi və nitq sintezi üçün Vertex AI.
 6.4. Sertifikatın açıq səhifəsi: Təşkilatınız açıq yoxlamanı aktiv etdikdə sertifikatınızın keçidinə malik hər kəs adınızı, modulu, tarixi, Təşkilatı və seriya nömrəsini görür. Sizin barənizdə başqa heç nə göstərilmir.
 6.5. Dövlət orqanları: yalnız qanunvericilik tələb etdikdə və onun hüdudlarında.
 6.6. Təminatçının istifadə etdiyi server monitorinqi bildirişlərində fərdi məlumat yoxdur.
@@ -84,7 +84,7 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 - Hesab məlumatları: hesab mövcud olduğu müddətdə. Hesab silindikdə ad, elektron poçt ünvanı, şəkil, vəzifə, giriş məlumatları, sessiyalar, habelə təsdiqlərin, siyasətlərlə tanışlığın və QR skanlarının IP ünvanları dərhal silinir; Təşkilatın statistikası və sübutları düzgün qalsın deyə təlim tarixçəsi, təsdiqlər, sertifikatlar və audit qeydləri anonim işarə altında qalır.
 - Giriş sessiyası: Təşkilatın quraşdırmasında başqa dəyər müəyyən edilməyibsə, 8 saat fəaliyyət olmadıqda bitir.
 - İkiaddımlı giriş və vahid giriş mərhələləri: 10 dəqiqə. Endirmə keçidləri: 5 dəqiqə.
-- Sİ müəllimdən istifadə sayğacları: 24 saat.
+- AI Sel-dən istifadə sayğacları: 24 saat.
 - Məktubların çatdırılma qeydləri: çatdırılma başa çatdıqdan sonra 90 gün.
 - Kataloq sinxronlaşdırması hesabatları: 180 gün.
 - Audit jurnalı: Xidmət vasitəsilə dəyişdirilə və silinə bilməz; Təşkilatın müqaviləsi qüvvədə olduğu müddətdə və ondan sonra müqavilədə müəyyən edilmiş və ya qanunvericiliyin tələb etdiyi müddətdə saxlanılır.
@@ -145,7 +145,7 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 ## 13. Mobil tətbiqin icazələri
 
 - Kamera: yalnız profil şəkli çəkməyi seçdikdə;
-- Mikrofon: yalnız Sİ müəllim üçün səsli sual yazdığınız müddətdə;
+- Mikrofon: yalnız AI Sel üçün səsli sual yazdığınız müddətdə;
 - Yaddaş: sertifikatlar və hesabatlar kimi endirdiyiniz faylları saxlamaq üçün;
 - İnternet: Xidmətə qoşulmaq üçün.
 13.1. İstənilən icazədən imtina edə və ya onu qurğunun ayarlarında geri götürə bilərsiniz; Xidmətin qalan hissəsi işləməyə davam edir.

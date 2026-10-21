@@ -3,15 +3,17 @@ import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { db, t } from "@/server/db";
-import { env } from "@/server/env";
+import { appUrl, env } from "@/server/env";
 import { getSession } from "@/server/auth/viewer";
 import { isPrivileged } from "@/server/auth/permissions";
+import { emailDomain } from "@/server/auth/sso-routing";
 import { createSession, setSessionCookie } from "@/server/auth/session";
 import { SSO_STATE_COOKIE, discover, exchangeCode, openState, verifyIdToken } from "@/server/auth/oidc";
 import { decryptSecret } from "@/server/crypto";
 import { audit } from "@/server/services/audit";
 import { clientIp, userAgent } from "@/server/request";
-import { featuresFor } from "@/lib/tenant-defaults";
+import { featuresFor, withDefaults } from "@/lib/tenant-defaults";
+import { TENANT_SLUG_RE } from "@/server/services/tenants";
 import { DEFAULT_LOCALE, LOCALE_COOKIE, isLocale } from "@/i18n/config";
 
 const emailSchema = z.email().max(254);
@@ -33,12 +35,14 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
   // One attempt per cookie. Deleting a __Host- cookie needs the same Secure and Path attributes.
   jar.delete({ name: SSO_STATE_COOKIE, path: "/", secure: env.isProd, httpOnly: true, sameSite: "lax" });
   const failed = state?.test ? "/admin/settings?tab=identity&ssoTest=failed" : "/sign-in?error=sso";
-  if (!state || state.tenant !== slug || url.searchParams.get("state") !== state.state) redirect(failed);
+  // The slug is checked before it reaches the database (a NUL byte or an over-long value would make the query throw).
+  if (!state || state.tenant !== slug || !TENANT_SLUG_RE.test(slug) || url.searchParams.get("state") !== state.state) redirect(failed);
 
-  const [tenant] = await db()
-    .select({ id: t.tenants.id, slug: t.tenants.slug, plan: t.tenants.plan, features: t.tenants.features, settings: t.tenants.settings })
+  const [row] = await db()
+    .select({ id: t.tenants.id, slug: t.tenants.slug, domain: t.tenants.domain, plan: t.tenants.plan, features: t.tenants.features, settings: t.tenants.settings })
     .from(t.tenants)
     .where(eq(t.tenants.slug, slug));
+  const tenant = row ? { ...row, settings: withDefaults(row.settings) } : undefined;
   const sso = tenant?.settings.identity.sso;
   if (!tenant || !sso || sso.protocol !== "oidc" || !sso.issuer || !sso.clientId) redirect(failed);
   const ip = await clientIp();
@@ -55,7 +59,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
     const provider = await discover(sso.issuer);
     const idToken = await exchangeCode(provider, {
       code,
-      redirectUri: `${env.APP_URL.replace(/\/$/, "")}/api/sso/callback/${tenant.slug}`,
+      redirectUri: `${appUrl()}/api/sso/callback/${tenant.slug}`,
       clientId: sso.clientId,
       clientSecret: decryptSecret(sso.clientSecretEnc),
       verifier: state.verifier,
@@ -92,12 +96,15 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
   if (user && user.status !== "active" && user.status !== "invited") return refuse(user.status, user.id);
   if (!user) {
     if (!sso.autoCreate) return refuse("unknown_person");
+    // The provider vouches only for the organisation's own proven domain.
+    if (emailDomain(email) !== tenant.domain?.toLowerCase()) return refuse("foreign_domain");
     const locale = isLocale(tenant.settings.defaultLocale) ? tenant.settings.defaultLocale : DEFAULT_LOCALE;
-    [user] = await db().insert(t.users).values({ tenantId: tenant.id, email, name, role: "learner", status: "active", locale }).returning();
+    // Created active, so this is also its activation (setStatusAction tells never-activated accounts apart by it).
+    [user] = await db().insert(t.users).values({ tenantId: tenant.id, email, name, role: "learner", status: "active", locale, activatedAt: new Date() }).returning();
     await audit(db(), { tenantId: tenant.id, actorId: user.id, action: "sso.person_created", targetType: "user", targetId: user.id, ip });
   } else if (user.status === "invited") {
     // The organisation's identity provider vouches for the person, so the invitation is complete.
-    await db().update(t.users).set({ status: "active" }).where(eq(t.users.id, user.id));
+    await db().update(t.users).set({ status: "active", activatedAt: new Date() }).where(eq(t.users.id, user.id));
   }
 
   const { token, expiresAt } = await createSession({

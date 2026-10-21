@@ -18,12 +18,13 @@ const variants: Record<ButtonVariant, string> = {
   safe: "bg-safe-600 text-white hover:bg-safe-700 disabled:bg-sunken disabled:text-ink-disabled disabled:shadow-none aria-disabled:bg-sunken aria-disabled:text-ink-disabled aria-disabled:shadow-none",
 };
 
+/** Small sizes grow to a 44 px touch target on coarse pointers (phones, tablets), the size of `md` and `icon`. */
 const sizes: Record<ButtonSize, string> = {
-  sm: "h-9 px-3.5 text-caption",
+  sm: "h-9 px-3.5 text-caption pointer-coarse:h-11",
   md: "h-11 px-5 text-body-sm",
   lg: "h-13 px-7 text-body",
   icon: "size-11 text-body",
-  "icon-sm": "size-9 text-caption",
+  "icon-sm": "size-9 text-caption pointer-coarse:size-11",
 };
 
 export function buttonClass(variant: ButtonVariant = "primary", size: ButtonSize = "md", className?: string) {
@@ -50,6 +51,48 @@ export function ButtonLink({ variant, size, icon, iconRight, className, children
       {iconRight}
     </Link>
   );
+}
+
+export type TextButtonTone = "brand" | "muted" | "danger";
+
+const textTones: Record<TextButtonTone, string> = {
+  brand: "text-brand-600",
+  muted: "text-ink-muted hover:text-ink",
+  danger: "text-risk-600",
+};
+
+/**
+ * A link-styled text button ("Remove photo", "Copy invite link"). Text alone is a 15–20 px line, so
+ * on coarse pointers it grows to the 44 px touch target with min-height/min-width only: no padding or
+ * negative margins, so it never bleeds past its container and call-site margins (ml-auto, mt-1) survive.
+ */
+export function textButtonClass(tone: TextButtonTone = "brand", size: "tab" | "caption" = "caption", className?: string) {
+  return cn(
+    "inline-flex items-center gap-1 font-semibold hover:underline disabled:pointer-events-none disabled:opacity-50 pointer-coarse:min-h-11 pointer-coarse:min-w-11 pointer-coarse:justify-center [&_svg]:shrink-0",
+    size === "tab" ? "text-tab" : "text-caption",
+    textTones[tone],
+    className,
+  );
+}
+
+export function TextButton({ tone, size, className, type = "button", ...props }: { tone?: TextButtonTone; size?: "tab" | "caption" } & ComponentProps<"button">) {
+  return <button type={type} className={textButtonClass(tone, size, className)} {...props} />;
+}
+
+/**
+ * Grows a text link or a checkbox label to the 44 px touch target on coarse pointers without moving
+ * anything: block padding of (44 px − one line) / 2, given back by an equal negative block margin, so
+ * the line, table row or card keeps its height and the text stays where it was. Fine pointers are
+ * untouched, and so are browsers without the `lh` unit (the declarations are dropped). Use it on a
+ * block, flex or inline-flex element (an inline <a> takes no vertical margin). On coarse pointers it
+ * replaces the call site's vertical margins: a link that needs `mt-3` there restates it as
+ * `pointer-coarse:mt-[calc(0.75rem_-_max(0px,calc((2.75rem_-_1lh)/2)))]`.
+ */
+export const coarseHitArea = "pointer-coarse:py-[max(0px,calc((2.75rem_-_1lh)/2))] pointer-coarse:-my-[max(0px,calc((2.75rem_-_1lh)/2))]";
+
+/** A text link in running content ("All people", "View certificate", "SB-512" in a table cell), with that 44 px coarse hit area. */
+export function textLinkClass(className?: string) {
+  return cn(coarseHitArea, className);
 }
 
 /** Plain anchor for downloads and route handlers (no client-side navigation). */

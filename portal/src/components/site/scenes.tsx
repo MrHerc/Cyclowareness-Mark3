@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { Battery, Camera, CheckCircle2, Cloud, FileDown, Mail, MessageSquare, Phone, PhoneOff, QrCode, RotateCcw, Server, Signal, XCircle } from "lucide-react";
-import { requestDemoAction, type DemoState } from "@/server/actions/site";
+import { requestDemoAction, type DemoField, type DemoState, type DemoValues } from "@/server/actions/site";
 import { LOCALE_NAMES, type SiteLocale } from "@/i18n/config";
 import { EMPLOYEE_RANGES, type AdminScene, type DeployScene, type DemoScene, type InboxScene, type LanguagesScene, type Line, type PhoneScene, type TutorScene } from "@/lib/landing";
 import { cn } from "@/lib/cn";
@@ -178,7 +178,7 @@ export function InboxGame({
                       <p className="truncate text-body-sm font-bold">{scene.cards[0].sender}</p>
                       <p className="truncate text-caption text-white/80">{scene.cards[0].subject ?? scene.cards[0].body}</p>
                     </div>
-                    <button type="button" onClick={open} className="h-10 shrink-0 rounded-pill bg-white px-5 text-caption font-bold text-[#1d1a4e] shadow-raised hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                    <button type="button" onClick={open} className="h-10 shrink-0 rounded-pill bg-white px-5 text-caption font-bold text-[#1d1a4e] shadow-raised hover:bg-white/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white pointer-coarse:h-11">
                       {scene.open}
                     </button>
                   </div>
@@ -285,7 +285,7 @@ export function InboxGame({
                   ))}
                 </div>
               </div>
-              <button type="button" onClick={open} className="inline-flex w-fit items-center gap-1.5 text-caption font-semibold text-white/70 hover:text-white">
+              <button type="button" onClick={open} className="inline-flex w-fit items-center gap-1.5 text-caption font-semibold text-white/70 hover:text-white pointer-coarse:min-h-11">
                 <RotateCcw className="size-4" />
                 {scene.again}
               </button>
@@ -300,12 +300,17 @@ export function InboxGame({
 
 /* ───────── 2 · phone call ───────── */
 
-export function PhoneCall({ scene, beats, clock, screenLabel }: { scene: PhoneScene; beats: Beats; clock: string; screenLabel: string }) {
+export function PhoneCall({ scene, beats, clock, screenLabel, skipLabel }: { scene: PhoneScene; beats: Beats; clock: string; screenLabel: string; skipLabel: string }) {
   const guide = useGuide();
   const [state, setState] = useState<"ringing" | "talking" | "choice" | "declined" | "hungUp" | "gaveCode">("ringing");
   const answer = () => {
     setState("talking");
     guide.say(scene.script, { then: () => setState("choice") });
+  };
+  /** Straight to the decision, without waiting for the rest of the call. */
+  const skipCall = () => {
+    guide.stop();
+    setState("choice");
   };
   const end = (s: "declined" | "hungUp" | "gaveCode") => {
     setState(s);
@@ -349,11 +354,16 @@ export function PhoneCall({ scene, beats, clock, screenLabel }: { scene: PhoneSc
                   {scene.giveCode}
                 </button>
               </div>
+              {state === "talking" ? (
+                <button type="button" onClick={skipCall} className="justify-self-center text-caption font-semibold text-white/75 underline-offset-2 hover:text-white hover:underline pointer-coarse:min-h-11 pointer-coarse:px-3">
+                  {skipLabel}
+                </button>
+              ) : null}
             </div>
           ) : (
             <div className="grid gap-3">
               <p className={cn("rounded-2xl px-4 py-3 text-caption font-semibold", state === "gaveCode" ? "bg-risk-500/25 text-risk-100" : "bg-safe-500/25 text-safe-100")}>{scene[state].text}</p>
-              <button type="button" onClick={() => setState("ringing")} className="inline-flex items-center justify-center gap-1.5 text-caption font-semibold text-white/75 hover:text-white">
+              <button type="button" onClick={() => setState("ringing")} className="inline-flex items-center justify-center gap-1.5 text-caption font-semibold text-white/75 hover:text-white pointer-coarse:min-h-11">
                 <RotateCcw className="size-4" />
                 {scene.again}
               </button>
@@ -391,7 +401,7 @@ export function TutorDemo({ scene, beats }: { scene: TutorScene; beats: Beats })
               if (beats.lesson && asked) lines.push(beats.lesson);
               guide.say(lines, { gesture: "explain" });
             }}
-            className={cn("rounded-pill px-4 py-2 text-caption font-semibold ring-1", asked === c.id ? "bg-brand-50 text-brand-700 ring-brand-200" : "bg-surface ring-line hover:bg-sunken")}
+            className={cn("rounded-pill px-4 py-2 text-caption font-semibold ring-1 pointer-coarse:min-h-11", asked === c.id ? "bg-brand-50 text-brand-700 ring-brand-200" : "bg-surface ring-line hover:bg-sunken")}
           >
             {c.question}
           </button>
@@ -489,7 +499,7 @@ export function AdminDemo({ scene, beats, you }: { scene: AdminScene; beats: Bea
         <button
           type="button"
           onClick={() => guide.say(beats.lesson ? [scene.explain, beats.lesson] : scene.explain, { gesture: "present" })}
-          className="inline-flex h-10 items-center gap-2 rounded-pill bg-ink px-4 text-caption font-semibold text-white hover:bg-ink/85"
+          className="inline-flex h-10 items-center gap-2 rounded-pill bg-ink px-4 text-caption font-semibold text-white hover:bg-ink/85 pointer-coarse:h-11"
         >
           <FileDown className="size-4" />
           {scene.export}
@@ -533,6 +543,18 @@ export function DeployDemo({ scene, beats }: { scene: DeployScene; beats: Beats 
 
 /* ───────── 7 · demo request ───────── */
 
+/** What the visitor typed, in the shape a refused server submit echoes back. */
+function typedValues(data: FormData): DemoValues {
+  const text = (k: string) => String(data.get(k) ?? "");
+  return { name: text("name"), email: text("email"), organisation: text("organisation"), country: text("country"), employees: text("employees"), message: text("message"), consent: data.get("consent") === "on" };
+}
+
+// A rejected submit (offline, a deploy in between) shows the "failed" message on the form with what was typed,
+// instead of replacing the landing page with the error boundary.
+function submitDemo(prev: DemoState, data: FormData): Promise<DemoState> {
+  return requestDemoAction(prev, data).catch((): DemoState => ({ error: "failed", values: typedValues(data) }));
+}
+
 export function DemoForm({
   scene,
   lang,
@@ -545,8 +567,20 @@ export function DemoForm({
   privacyLabel: string;
 }) {
   const guide = useGuide();
-  const [state, action, pending] = useActionState<DemoState, FormData>(requestDemoAction, undefined);
+  // `posted`: the answer to a submit made without JavaScript (or before hydration), which goes straight to the server action
+  // as a POST and comes back as a new page. `sent`: the answer to a hydrated submit, sent through submitDemo.
+  const [posted, post] = useActionState<DemoState, FormData>(requestDemoAction, undefined);
+  const [sent, send, pending] = useActionState<DemoState, FormData>(submitDemo, undefined);
+  const state = sent ?? posted;
+  const [, startSubmit] = useTransition();
+  const form = useRef<HTMLFormElement>(null);
   const said = useRef(false);
+  // After a refused submit, move focus to the first field that needs attention.
+  useEffect(() => {
+    if (!state?.fields) return;
+    const first = form.current?.querySelector<HTMLElement>("[aria-invalid='true']");
+    first?.focus();
+  }, [state]);
   useEffect(() => {
     if (state?.ok && !said.current) {
       said.current = true;
@@ -561,10 +595,37 @@ export function DemoForm({
       </div>
     );
   }
-  const err = (f: string) => (state?.field === f ? (state.error === "email" ? scene.errors.email : scene.errors.required) : null);
+  const err = (f: DemoField) => {
+    const kind = state?.fields?.[f];
+    return kind === "email" ? scene.errors.email : kind === "consent" ? scene.errors.consent : kind ? scene.errors.required : null;
+  };
+  /** aria wiring of a field and its message. */
+  const a11y = (f: DemoField) => (err(f) ? { "aria-invalid": true as const, "aria-describedby": `demo-${f}-error` } : { "aria-invalid": false as const });
+  const message = (f: DemoField) =>
+    err(f) ? (
+      <span id={`demo-${f}-error`} className="text-risk-600">
+        {err(f)}
+      </span>
+    ) : null;
+  /** Values echoed by a refused submit; they only matter for a server-rendered (no-JS) form, which React cannot keep. */
+  const v = state?.values;
   const field = "h-12 w-full rounded-lg border border-line-control bg-surface px-4 text-body-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
   return (
-    <form action={action} className="mx-auto grid w-full max-w-xl gap-4 rounded-3xl bg-surface p-6 shadow-overlay ring-1 ring-line" noValidate>
+    // `action` is the server action itself so a submit made before hydration (or without JavaScript) is
+    // still a POST to it instead of a GET that puts the visitor's details in the URL. Once hydrated,
+    // onSubmit prevents the default and dispatches submitDemo in its own transition: React then skips
+    // its automatic form reset, so a refused or failed submit keeps every value the visitor typed.
+    <form
+      ref={form}
+      action={post}
+      onSubmit={(e) => {
+        e.preventDefault();
+        const data = new FormData(e.currentTarget);
+        startSubmit(() => send(data));
+      }}
+      className="mx-auto grid w-full max-w-xl gap-4 rounded-3xl bg-surface p-6 shadow-overlay ring-1 ring-line"
+      noValidate
+    >
       <input type="hidden" name="locale" value={lang} />
       <input type="hidden" name="consentVersion" value={scene.consentVersion} />
       <div aria-hidden className="absolute -left-[9999px] h-0 overflow-hidden">
@@ -575,23 +636,23 @@ export function DemoForm({
       </div>
       <label className="grid gap-1.5 text-caption font-semibold">
         {scene.fullName}
-        <input name="name" required maxLength={120} autoComplete="name" className={field} aria-invalid={!!err("name")} />
-        {err("name") ? <span className="text-risk-600">{err("name")}</span> : null}
+        <input name="name" required maxLength={120} autoComplete="name" defaultValue={v?.name} className={field} {...a11y("name")} />
+        {message("name")}
       </label>
       <label className="grid gap-1.5 text-caption font-semibold">
         {scene.workEmail}
-        <input name="email" type="email" required maxLength={254} autoComplete="email" className={field} aria-invalid={!!err("email")} />
-        {err("email") ? <span className="text-risk-600">{err("email")}</span> : null}
+        <input name="email" type="email" required maxLength={254} autoComplete="email" defaultValue={v?.email} className={field} {...a11y("email")} />
+        {message("email")}
       </label>
       <label className="grid gap-1.5 text-caption font-semibold">
         {scene.organisation}
-        <input name="organisation" required maxLength={200} autoComplete="organization" className={field} aria-invalid={!!err("organisation")} />
-        {err("organisation") ? <span className="text-risk-600">{err("organisation")}</span> : null}
+        <input name="organisation" required maxLength={200} autoComplete="organization" defaultValue={v?.organisation} className={field} {...a11y("organisation")} />
+        {message("organisation")}
       </label>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="grid gap-1.5 text-caption font-semibold">
           {scene.country}
-          <select name="country" required defaultValue="" className={field} aria-invalid={!!err("country")}>
+          <select name="country" required defaultValue={v?.country ?? ""} className={field} {...a11y("country")}>
             <option value="" disabled>
               {scene.countryPrompt}
             </option>
@@ -607,11 +668,11 @@ export function DemoForm({
               </option>
             ))}
           </select>
-          {err("country") ? <span className="text-risk-600">{err("country")}</span> : null}
+          {message("country")}
         </label>
         <label className="grid gap-1.5 text-caption font-semibold">
           {scene.employees}
-          <select name="employees" required defaultValue="" className={field} aria-invalid={!!err("employees")}>
+          <select name="employees" required defaultValue={v?.employees ?? ""} className={field} {...a11y("employees")}>
             <option value="" disabled>
               —
             </option>
@@ -621,17 +682,18 @@ export function DemoForm({
               </option>
             ))}
           </select>
-          {err("employees") ? <span className="text-risk-600">{err("employees")}</span> : null}
+          {message("employees")}
         </label>
       </div>
       <label className="grid gap-1.5 text-caption font-semibold">
         <span>
           {scene.message} <span className="font-normal text-ink-subtle">({scene.optional})</span>
         </span>
-        <textarea name="message" maxLength={2000} rows={3} className={cn(field, "h-auto py-3")} />
+        <textarea name="message" maxLength={2000} rows={3} defaultValue={v?.message} className={cn(field, "h-auto py-3")} {...a11y("message")} />
+        {message("message")}
       </label>
       <label className="flex items-start gap-3 text-caption">
-        <input type="checkbox" name="consent" required className="mt-0.5 size-4 accent-(--brand)" />
+        <input type="checkbox" name="consent" required defaultChecked={v?.consent} className="mt-0.5 size-4 accent-(--brand)" {...a11y("consent")} />
         <span>
           {scene.consent}{" "}
           <a href="/legal/privacy" target="_blank" className="font-semibold text-brand-600 underline-offset-2 hover:underline">
@@ -639,7 +701,11 @@ export function DemoForm({
           </a>
         </span>
       </label>
-      {err("consent") ? <span className="text-caption text-risk-600">{scene.errors.required}</span> : null}
+      {err("consent") ? (
+        <span id="demo-consent-error" className="text-caption text-risk-600">
+          {err("consent")}
+        </span>
+      ) : null}
       {state?.error === "rateLimited" || state?.error === "failed" ? (
         <p role="alert" className="rounded-lg bg-risk-50 px-4 py-3 text-caption font-semibold text-risk-700">
           {scene.errors[state.error]}

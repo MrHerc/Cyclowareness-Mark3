@@ -56,7 +56,7 @@ export function ReportActions({
       {!done ? (
         <Select
           aria-label={t("severity")}
-          className="h-9 w-32"
+          className="h-9 w-32 pointer-coarse:h-11"
           value={report.severity ?? ""}
           disabled={pending}
           onChange={(e) => start(async () => void ((await triageReportAction(report.id, e.target.value)).ok && toast(t("triaged"))))}
@@ -171,7 +171,7 @@ export function LoopActions({ id, next, verdict, closed }: { id: string; next: s
     <div className="flex flex-wrap items-center gap-2">
       <Select
         aria-label={t("setVerdict")}
-        className="h-10 w-40"
+        className="h-10 w-40 pointer-coarse:h-11"
         value={verdict}
         disabled={pending}
         onChange={(e) => start(async () => void ((await setLoopVerdictAction(id, e.target.value)).ok && toast(t("moved"))))}
@@ -183,7 +183,8 @@ export function LoopActions({ id, next, verdict, closed }: { id: string; next: s
         ))}
       </Select>
       {next ? (
-        <Button icon={<ChevronRight />} onClick={() => setMode("advance")} disabled={pending}>
+        // The stage name can be long ("Перейти к этапу «Преобразование»"): let the label wrap on narrow phones.
+        <Button icon={<ChevronRight />} onClick={() => setMode("advance")} disabled={pending} className="h-auto min-h-10 max-w-full py-2 text-left whitespace-normal pointer-coarse:min-h-11">
           {t("next", { stage: ts(`stages.${next as "analysis"}`) })}
         </Button>
       ) : null}
@@ -311,6 +312,7 @@ export function IntelActions({
   modules,
   departments,
   canConvert,
+  canReview,
 }: {
   id: string;
   kind: "threat" | "policy";
@@ -318,6 +320,8 @@ export function IntelActions({
   modules: Option[];
   departments: Option[];
   canConvert: boolean;
+  /** Triage (reviewed / dismissed) needs the team's write permission; reading the feed alone does not allow it. */
+  canReview: boolean;
 }) {
   const t = useTranslations("secops.intel");
   const tc = useTranslations("common");
@@ -326,7 +330,7 @@ export function IntelActions({
   const [moduleId, setModuleId] = useState("");
   const [departmentId, setDepartmentId] = useState("");
   const router = useRouter();
-  if (status === "converted") return null;
+  if (status === "converted" || (!canConvert && !canReview)) return null;
   const convert = () =>
     start(async () => {
       if (kind === "policy") {
@@ -349,12 +353,12 @@ export function IntelActions({
           {kind === "policy" ? t("convertPolicy") : t("convertThreat")}
         </Button>
       ) : null}
-      {status === "new" ? (
+      {canReview && status === "new" ? (
         <Button size="sm" variant="secondary" icon={<Check />} disabled={pending} onClick={() => start(async () => void ((await setIntelStatusAction(id, "reviewed")).ok && toast(t("updated"))))}>
           {t("review")}
         </Button>
       ) : null}
-      {status !== "dismissed" ? (
+      {canReview && status !== "dismissed" ? (
         <Button size="sm" variant="ghost" icon={<Ban />} disabled={pending} onClick={() => start(async () => void ((await setIntelStatusAction(id, "dismissed")).ok && toast(t("updated"))))}>
           {t("dismiss")}
         </Button>

@@ -1,14 +1,15 @@
 "use client";
 
 import { useTransition } from "react";
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
+import { useClientFormat } from "@/lib/client-format";
 import { UserX } from "lucide-react";
 import { decideDeletionAction } from "@/server/actions/people";
 import { Button } from "@/components/ui/button";
 
 export function DeletionRequests({ people }: { people: { id: string; name: string; email: string; at: string }[] }) {
   const t = useTranslations("admin.people");
-  const format = useFormatter();
+  const format = useClientFormat();
   const [pending, start] = useTransition();
   return (
     <section className="rounded-xl border border-warn-100 bg-warn-50 p-4">

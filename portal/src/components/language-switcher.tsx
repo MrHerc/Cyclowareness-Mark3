@@ -4,20 +4,36 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Globe } from "lucide-react";
-import { LOCALES, LOCALE_NAMES } from "@/i18n/config";
+import { LOCALES, LOCALE_NAMES, type Locale } from "@/i18n/config";
 import { setLocaleAction } from "@/server/actions/auth";
 import { cn } from "@/lib/cn";
 
+/**
+ * Interface language picker. The visible face is drawn by us (globe + code on phones, the full
+ * name from sm up) so it never pushes a header past 320 px; the native select sits transparently
+ * on top of it, so the options, keyboard handling and accessible name stay the platform's.
+ */
 export function LanguageSwitcher({ className }: { className?: string }) {
-  const locale = useLocale();
+  const locale = useLocale() as Locale;
   const router = useRouter();
   const t = useTranslations("auth");
   const [pending, start] = useTransition();
   return (
-    <label className={cn("relative inline-flex items-center", className)}>
-      <span className="sr-only">{t("language")}</span>
-      <Globe aria-hidden className="pointer-events-none absolute left-3 size-4 text-ink-muted" />
+    <label
+      className={cn(
+        "relative inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-pill border border-line bg-surface px-3 text-caption font-semibold whitespace-nowrap text-ink hover:bg-sunken has-[select:focus-visible]:outline-2 has-[select:focus-visible]:outline-offset-2 has-[select:focus-visible]:outline-brand-600 has-[select:disabled]:opacity-60 sm:pr-4 pointer-coarse:h-11",
+        className,
+      )}
+    >
+      <Globe aria-hidden className="size-4 text-ink-muted" />
+      <span aria-hidden>
+        <span className="sm:hidden">{locale.toUpperCase()}</span>
+        <span className="hidden sm:inline">
+          {LOCALE_NAMES[locale]} · {locale.toUpperCase()}
+        </span>
+      </span>
       <select
+        aria-label={t("language")}
         value={locale}
         disabled={pending}
         onChange={(e) =>
@@ -26,7 +42,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
             router.refresh();
           })
         }
-        className="h-9 cursor-pointer appearance-none rounded-pill border border-line bg-surface pr-4 pl-9 text-caption font-semibold text-ink hover:bg-sunken"
+        className="absolute -inset-px cursor-pointer appearance-none rounded-pill opacity-0"
       >
         {LOCALES.map((l) => (
           <option key={l} value={l}>

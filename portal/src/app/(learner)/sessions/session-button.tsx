@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { CheckCircle2 } from "lucide-react";
 import { toggleSessionAction } from "@/server/actions/engage";
-import { Button } from "@/components/ui/button";
+import { Button, TextButton } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 
 export function SessionButton({ id, registered, full }: { id: string; registered: boolean; full: boolean }) {
@@ -17,9 +17,9 @@ export function SessionButton({ id, registered, full }: { id: string; registered
           <CheckCircle2 className="size-4" />
           {t("registered")}
         </span>
-        <button type="button" disabled={pending} className="text-tab text-ink-muted hover:text-risk-600 hover:underline" onClick={() => start(async () => void ((await toggleSessionAction(id, false)).ok && toast(t("cancelledToast"))))}>
+        <TextButton tone="muted" size="tab" className="font-normal hover:text-risk-600" disabled={pending} onClick={() => start(async () => void ((await toggleSessionAction(id, false)).ok && toast(t("cancelledToast"))))}>
           {t("cancel")}
-        </button>
+        </TextButton>
       </div>
     );
   }

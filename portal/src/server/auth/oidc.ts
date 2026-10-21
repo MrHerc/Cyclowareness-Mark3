@@ -1,6 +1,7 @@
 import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { signValue, unsignValue } from "../crypto";
+import { destinationProblem } from "../net-guard";
 
 /**
  * Minimal OpenID Connect relying party (authorization code flow with PKCE, state and nonce).
@@ -11,6 +12,11 @@ export type OidcProvider = { issuer: string; authorizationEndpoint: string; toke
 const trimSlash = (s: string) => s.replace(/\/+$/, "");
 
 async function getJson(url: string, init?: RequestInit): Promise<Record<string, unknown>> {
+  // A tenant's issuer must be a public host: the platform must not probe its own network for a customer.
+  if (process.env.NODE_ENV === "production") {
+    const u = new URL(url);
+    if (await destinationProblem(u.hostname, Number(u.port || 443), "https")) throw new Error("blocked_endpoint");
+  }
   const res = await fetch(url, { ...init, cache: "no-store", redirect: "error", signal: AbortSignal.timeout(10_000) });
   if (!res.ok) throw new Error(`http_${res.status}`);
   const body = (await res.json()) as unknown;

@@ -1,10 +1,11 @@
+import { isUuid } from "@/lib/ids";
 import { eq } from "drizzle-orm";
 import { db, t } from "@/server/db";
 
 /** Uploaded tenant assets (logos). Public: logos appear on certificates and emails. */
 export async function GET(_: Request, { params }: RouteContext<"/api/assets/[id]">) {
   const { id } = await params;
-  if (!/^[0-9a-f-]{36}$/.test(id)) return new Response("Not found", { status: 404 });
+  if (!isUuid(id)) return new Response("Not found", { status: 404 });
   const [a] = await db().select().from(t.assets).where(eq(t.assets.id, id));
   if (!a) return new Response("Not found", { status: 404 });
   return new Response(new Uint8Array(Buffer.from(a.dataBase64, "base64")), {

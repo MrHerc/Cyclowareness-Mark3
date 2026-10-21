@@ -1,9 +1,11 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, unstable_rethrow } from "next/navigation";
 import { and, count, desc, eq, gt, isNotNull, isNull, ne } from "drizzle-orm";
 import { z } from "zod";
+import { safePath } from "../../lib/safe-path";
+import { cleanPhone, PHONE_PATTERN } from "../../lib/phone";
 import { db, t } from "../db";
 import { hashPassword, passwordProblem, verifyPassword } from "../auth/password";
 import { clearSessionCookie, createSession, invalidateSession, invalidateUserSessions, readSessionToken, sessionIdFromToken, setSessionCookie } from "../auth/session";
@@ -11,9 +13,9 @@ import { getSession } from "../auth/viewer";
 import { hashBackupCode, verifyTotp } from "../auth/totp";
 import { isPrivileged } from "../auth/permissions";
 import { decideSignInStep, emailDomain, type SignInStep } from "../auth/sso-routing";
-import { featuresFor } from "../../lib/tenant-defaults";
+import { featuresFor, withDefaults } from "../../lib/tenant-defaults";
 import { audit } from "../services/audit";
-import { clientIp, userAgent } from "../request";
+import { clientIp, ipRateKey, userAgent } from "../request";
 import { sha256Hex } from "../crypto";
 import { sendSms, smsAvailable } from "../sms";
 import { queueEmail } from "../mail";
@@ -34,10 +36,38 @@ function getDummyHash(): Promise<string> {
   return dummyHash;
 }
 
-/** Only same-site relative paths, never "//evil" or "https://…". */
+/**
+ * Runs a form action so that a thrown failure (database or SMS provider unavailable) leaves the visitor on the form with what
+ * they typed and the translated "try again" message (`generic`), instead of the error boundary replacing the page.
+ * redirect() and the other control-flow errors of Next.js still go through.
+ */
+async function orFailed(run: () => Promise<AuthState>, failed: NonNullable<AuthState>): Promise<AuthState> {
+  try {
+    return await run();
+  } catch (error) {
+    unstable_rethrow(error);
+    console.error("[auth] action failed", error);
+    return { ...failed, error: "generic" };
+  }
+}
+
+const typed = (form: FormData, name: string) => String(form.get(name) ?? "").trim();
+
+/**
+ * The audit entry of a step that has already taken effect (a session cookie set, a code sent, a password changed). A failed
+ * write is logged instead of thrown: orFailed would otherwise report the completed step as failed.
+ */
+async function auditDone(entry: Parameters<typeof audit>[1]): Promise<void> {
+  try {
+    await audit(db(), entry);
+  } catch (error) {
+    console.error("[auth] audit write failed", error);
+  }
+}
+
+/** Only same-site relative paths (see lib/safe-path.ts for what is refused). */
 function safeNext(value: FormDataEntryValue | null): string {
-  const v = typeof value === "string" ? value : "";
-  return v.startsWith("/") && !v.startsWith("//") && !v.startsWith("/\\") && !v.startsWith("/sign-in") ? v : "/";
+  return safePath(value);
 }
 
 async function failures(key: string): Promise<number> {
@@ -46,6 +76,27 @@ async function failures(key: string): Promise<number> {
     .from(t.loginAttempts)
     .where(and(eq(t.loginAttempts.key, key), eq(t.loginAttempts.success, false), gt(t.loginAttempts.at, new Date(Date.now() - LOCK_WINDOW_MS))));
   return Number(n);
+}
+
+/**
+ * Without TRUST_PROXY the client address is unknown and the per-address lockout cannot work. Instead of
+ * a shared lock (which anyone could trip to lock every user out), a burst of failed sign-ins across all
+ * accounts slows down further failures; a correct password is never refused or delayed by it.
+ */
+const ANONYMOUS_SLOWDOWN_AFTER = 300;
+const ANONYMOUS_SLOWDOWN_MS = 2_000;
+const anonymousFailureTimes: number[] = [];
+function recordAnonymousFailure(): number {
+  const since = Date.now() - LOCK_WINDOW_MS;
+  while (anonymousFailureTimes.length && anonymousFailureTimes[0] < since) anonymousFailureTimes.shift();
+  if (anonymousFailureTimes.length < 10_000) anonymousFailureTimes.push(Date.now());
+  return anonymousFailureTimes.length;
+}
+
+/** The one active account with this number; none when the number is shared (sign-in by phone is then refused). */
+async function userByPhone(phone: string) {
+  const rows = await db().select().from(t.users).where(and(eq(t.users.phone, phone), eq(t.users.status, "active"))).limit(2);
+  return rows.length === 1 ? rows[0] : undefined;
 }
 
 async function recordAttempt(keys: string[], success: boolean) {
@@ -61,7 +112,7 @@ async function startSession(user: { id: string; tenantId: string; locale: string
     twoFactorVerified: verified || !user.totpEnabled,
     ip: await clientIp(),
     userAgent: await userAgent(),
-    maxDevices: tenant?.settings.identity.maxDevices ?? null,
+    maxDevices: tenant ? withDefaults(tenant.settings).identity.maxDevices : null,
   });
   await setSessionCookie(token, expiresAt);
   if (isLocale(user.locale)) (await cookies()).set(LOCALE_COOKIE, user.locale, { path: "/", maxAge: 365 * 86_400, sameSite: "lax" });
@@ -83,7 +134,8 @@ async function signInStepFor(email: string): Promise<SignInStep> {
     .limit(1);
   if (!tenant) return { step: "password" };
   const [person] = await db().select({ tenantId: t.users.tenantId, role: t.users.role, status: t.users.status }).from(t.users).where(eq(t.users.email, email));
-  const sso = tenant.settings.identity.sso;
+  const identity = withDefaults(tenant.settings).identity;
+  const sso = identity.sso;
   return decideSignInStep(
     email,
     {
@@ -91,7 +143,7 @@ async function signInStepFor(email: string): Promise<SignInStep> {
       slug: tenant.slug,
       domain: tenant.domain,
       domainVerifiedAt: tenant.domainVerifiedAt,
-      ssoEnabled: tenant.settings.identity.ssoEnabled,
+      ssoEnabled: identity.ssoEnabled,
       ssoFeature: featuresFor(tenant.plan, tenant.features).has("sso"),
       ssoReady: sso?.protocol === "oidc" && !!sso.issuer && !!sso.clientId,
       autoCreate: sso?.autoCreate ?? false,
@@ -100,7 +152,11 @@ async function signInStepFor(email: string): Promise<SignInStep> {
   );
 }
 
-export async function checkEmailAction(_: AuthState, form: FormData): Promise<AuthState> {
+export async function checkEmailAction(prev: AuthState, form: FormData): Promise<AuthState> {
+  return orFailed(() => checkEmail(prev, form), { email: typed(form, "email") });
+}
+
+async function checkEmail(_: AuthState, form: FormData): Promise<AuthState> {
   const email = String(form.get("email") ?? "").trim().toLowerCase();
   if (!email) return { error: "emailRequired" };
   if (!emailSchema.safeParse(email).success) return { error: "emailInvalid", email };
@@ -108,7 +164,11 @@ export async function checkEmailAction(_: AuthState, form: FormData): Promise<Au
   return next.step === "sso" ? { step: "sso", email, ssoUrl: next.url } : { step: "password", email };
 }
 
-export async function signInAction(_: AuthState, form: FormData): Promise<AuthState> {
+export async function signInAction(prev: AuthState, form: FormData): Promise<AuthState> {
+  return orFailed(() => signIn(prev, form), { step: "password", email: typed(form, "email").toLowerCase() });
+}
+
+async function signIn(_: AuthState, form: FormData): Promise<AuthState> {
   const email = String(form.get("email") ?? "").trim().toLowerCase();
   const password = String(form.get("password") ?? "");
   const next = safeNext(form.get("next"));
@@ -117,7 +177,9 @@ export async function signInAction(_: AuthState, form: FormData): Promise<AuthSt
 
   const ip = await clientIp();
   const accountKey = `email:${email}`;
-  const ipKey = ip ? `ip:${ip}` : null;
+  // Grouped like the other per-client limits (an IPv6 client by its /64), so rotating addresses within one network does not
+  // reset the lock; the audit log below keeps the full address.
+  const ipKey = ip ? `ip:${ipRateKey(ip)}` : null;
   if ((await failures(accountKey)) >= MAX_FAILS_PER_ACCOUNT || (ipKey && (await failures(ipKey)) >= MAX_FAILS_PER_IP)) {
     return { error: "locked", step: "password", email };
   }
@@ -126,17 +188,22 @@ export async function signInAction(_: AuthState, form: FormData): Promise<AuthSt
   const ok = await verifyPassword(user?.passwordHash ?? (await getDummyHash()), password);
   if (!user || !ok || user.status !== "active") {
     await recordAttempt([accountKey, ...(ipKey ? [ipKey] : [])], false);
+    if (!ipKey && recordAnonymousFailure() > ANONYMOUS_SLOWDOWN_AFTER) await new Promise((r) => setTimeout(r, ANONYMOUS_SLOWDOWN_MS));
     if (user) await audit(db(), { tenantId: user.tenantId, actorId: user.id, action: "auth.sign_in_refused", ip, meta: { reason: !ok ? "password" : user.status } });
     return { error: user && ok ? "blocked" : "invalidCredentials", step: "password", email };
   }
   await recordAttempt([accountKey], true);
   await startSession(user, false);
-  await audit(db(), { tenantId: user.tenantId, actorId: user.id, action: "auth.sign_in", ip, meta: { method: "password" } });
+  await auditDone({ tenantId: user.tenantId, actorId: user.id, action: "auth.sign_in", ip, meta: { method: "password" } });
   if (user.totpEnabled) redirect(`/sign-in/verify?next=${encodeURIComponent(next)}`);
   redirect(next);
 }
 
-export async function verifySecondFactorAction(_: AuthState, form: FormData): Promise<AuthState> {
+export async function verifySecondFactorAction(prev: AuthState, form: FormData): Promise<AuthState> {
+  return orFailed(() => verifySecondFactor(prev, form), { step: form.get("mode") === "backup" ? "backup" : "totp" });
+}
+
+async function verifySecondFactor(_: AuthState, form: FormData): Promise<AuthState> {
   const session = await getSession();
   if (!session) redirect("/sign-in");
   const mode = form.get("mode") === "backup" ? "backup" : "totp";
@@ -166,44 +233,56 @@ export async function verifySecondFactorAction(_: AuthState, form: FormData): Pr
   redirect(next);
 }
 
+/** The same cleaning as the admin dialogs and the CSV import (lib/phone), so one spelling works everywhere. */
 function normalisePhone(raw: string): string | null {
-  const p = raw.replace(/[\s().-]/g, "");
-  return /^\+\d{8,15}$/.test(p) ? p : null;
+  const p = cleanPhone(raw);
+  return PHONE_PATTERN.test(p) ? p : null;
 }
 
-export async function requestPhoneCodeAction(_: AuthState, form: FormData): Promise<AuthState> {
+export async function requestPhoneCodeAction(prev: AuthState, form: FormData): Promise<AuthState> {
+  return orFailed(() => requestPhoneCode(prev, form), { step: "phone", phone: typed(form, "phone") });
+}
+
+async function requestPhoneCode(_: AuthState, form: FormData): Promise<AuthState> {
   const phone = normalisePhone(String(form.get("phone") ?? ""));
-  if (!phone) return { error: "phoneInvalid", step: "phone" };
-  if (!smsAvailable()) return { error: "smsUnavailable", step: "phone" };
+  // Every refusal echoes the number as typed: React resets the form after the action, and the field falls back to it.
+  const refused = (error: string): AuthState => ({ error, step: "phone", phone: typed(form, "phone") });
+  if (!phone) return refused("phoneInvalid");
+  if (!smsAvailable()) return refused("smsUnavailable");
   const ip = await clientIp();
   const key = `phone:${phone}`;
-  if ((await failures(key)) >= MAX_FAILS_PER_ACCOUNT) return { error: "locked", step: "phone" };
+  if ((await failures(key)) >= MAX_FAILS_PER_ACCOUNT) return refused("locked");
   // Throttle code requests per number.
   await recordAttempt([`phone-send:${phone}`], true);
   const [{ n: sent }] = await db()
     .select({ n: count() })
     .from(t.loginAttempts)
     .where(and(eq(t.loginAttempts.key, `phone-send:${phone}`), gt(t.loginAttempts.at, new Date(Date.now() - LOCK_WINDOW_MS))));
-  if (Number(sent) > 5) return { error: "rateLimited", step: "phone" };
+  if (Number(sent) > 5) return refused("rateLimited");
 
-  const [user] = await db().select().from(t.users).where(and(eq(t.users.phone, phone), eq(t.users.status, "active")));
-  if (user && isPrivileged(user.role)) return { error: "privilegedPhone", step: "phone" };
+  const user = await userByPhone(phone);
   let devCode: string | undefined;
-  if (user) {
+  // Privileged accounts sign in with their password and authenticator: no code goes out, and the
+  // answer looks like the one for an unknown number so nothing says which numbers belong to staff.
+  if (user && !isPrivileged(user.role)) {
     const digits = new Uint32Array(1);
     crypto.getRandomValues(digits);
     const code = String(digits[0] % 1_000_000).padStart(6, "0");
     await db().delete(t.authTokens).where(and(eq(t.authTokens.userId, user.id), eq(t.authTokens.kind, "phone_otp")));
     await db().insert(t.authTokens).values({ id: sha256Hex(`otp:${user.id}:${code}`), userId: user.id, kind: "phone_otp", expiresAt: new Date(Date.now() + 5 * 60_000) });
     const res = await sendSms(phone, `Cyclowareness: ${code}`);
-    if (!res.ok) return { error: "smsUnavailable", step: "phone" };
+    if (!res.ok) return refused("smsUnavailable");
     if (env.showOtp) devCode = code;
-    await audit(db(), { tenantId: user.tenantId, actorId: user.id, action: "auth.sign_in", ip, meta: { method: "phone", stage: "code_sent" } });
+    await auditDone({ tenantId: user.tenantId, actorId: user.id, action: "auth.sign_in", ip, meta: { method: "phone", stage: "code_sent" } });
   }
   return { step: "code", phone, devCode };
 }
 
-export async function verifyPhoneCodeAction(_: AuthState, form: FormData): Promise<AuthState> {
+export async function verifyPhoneCodeAction(prev: AuthState, form: FormData): Promise<AuthState> {
+  return orFailed(() => verifyPhoneCode(prev, form), { step: "code", phone: typed(form, "phone") });
+}
+
+async function verifyPhoneCode(_: AuthState, form: FormData): Promise<AuthState> {
   const phone = normalisePhone(String(form.get("phone") ?? ""));
   const code = String(form.get("code") ?? "").replace(/\s/g, "");
   const next = safeNext(form.get("next"));
@@ -212,7 +291,7 @@ export async function verifyPhoneCodeAction(_: AuthState, form: FormData): Promi
   const key = `phone:${phone}`;
   if ((await failures(key)) >= MAX_FAILS_PER_ACCOUNT) return { error: "locked", step: "code", phone };
 
-  const [user] = await db().select().from(t.users).where(and(eq(t.users.phone, phone), eq(t.users.status, "active")));
+  const user = await userByPhone(phone);
   const [token] = user
     ? await db()
         .select()
@@ -232,15 +311,18 @@ export async function verifyPhoneCodeAction(_: AuthState, form: FormData): Promi
     return { error: "invalidCode", step: "code", phone };
   }
   await db().update(t.authTokens).set({ usedAt: new Date() }).where(eq(t.authTokens.id, token.id));
-  await startSession(user, true);
-  await audit(db(), { tenantId: user.tenantId, actorId: user.id, action: "auth.sign_in", ip: await clientIp(), meta: { method: "phone" } });
+  // The SMS code replaces the password only; an authenticator, when set up, is still required.
+  await startSession(user, false);
+  await auditDone({ tenantId: user.tenantId, actorId: user.id, action: "auth.sign_in", ip: await clientIp(), meta: { method: "phone" } });
+  if (user.totpEnabled) redirect(`/sign-in/verify?next=${encodeURIComponent(next)}`);
   redirect(next);
 }
 
 export async function forgotPasswordAction(_: AuthState, form: FormData): Promise<AuthState> {
   const email = String(form.get("email") ?? "").trim().toLowerCase();
   if (!email) return { error: "emailRequired" };
-  if (!emailSchema.safeParse(email).success) return { error: "emailInvalid" };
+  // Echoed back so the form keeps what was typed next to the error.
+  if (!emailSchema.safeParse(email).success) return { error: "emailInvalid", email };
   await recordAttempt([`forgot:${email}`], true);
   const [{ n }] = await db()
     .select({ n: count() })
@@ -261,7 +343,11 @@ export async function forgotPasswordAction(_: AuthState, form: FormData): Promis
   return { done: true };
 }
 
-export async function setPasswordAction(_: AuthState, form: FormData): Promise<AuthState> {
+export async function setPasswordAction(prev: AuthState, form: FormData): Promise<AuthState> {
+  return orFailed(() => setPassword(prev, form), {});
+}
+
+async function setPassword(_: AuthState, form: FormData): Promise<AuthState> {
   const token = String(form.get("token") ?? "");
   const kind = form.get("kind") === "invite" ? "invite" : "reset";
   const password = String(form.get("password") ?? "");
@@ -280,13 +366,13 @@ export async function setPasswordAction(_: AuthState, form: FormData): Promise<A
 
   await db()
     .update(t.users)
-    .set({ passwordHash: await hashPassword(password), ...(row.user.status === "invited" ? { status: "active" as const } : {}) })
+    .set({ passwordHash: await hashPassword(password), ...(row.user.status === "invited" ? { status: "active" as const, activatedAt: new Date() } : {}) })
     .where(eq(t.users.id, row.user.id));
   await db().update(t.authTokens).set({ usedAt: new Date() }).where(eq(t.authTokens.id, row.token.id));
   // Several invite links may be out there (emailed, copied, CSV); the account activates once.
   await db().delete(t.authTokens).where(and(eq(t.authTokens.userId, row.user.id), eq(t.authTokens.kind, "invite"), ne(t.authTokens.id, row.token.id)));
   await invalidateUserSessions(row.user.id);
-  await audit(db(), { tenantId: row.user.tenantId, actorId: row.user.id, action: "auth.password_set", ip: await clientIp(), meta: { kind } });
+  await auditDone({ tenantId: row.user.tenantId, actorId: row.user.id, action: "auth.password_set", ip: await clientIp(), meta: { kind } });
   return { done: true };
 }
 
@@ -299,7 +385,7 @@ export async function signOutAction(): Promise<void> {
     if (session) await audit(db(), { tenantId: session.tenant.id, actorId: session.user.id, action: "auth.sign_out", ip: await clientIp() });
   }
   await clearSessionCookie();
-  redirect("/sign-in");
+  redirect("/sign-in?signedOut=1");
 }
 
 export async function setLocaleAction(locale: string): Promise<void> {

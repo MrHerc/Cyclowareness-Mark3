@@ -7,7 +7,7 @@ import { playLabAction, type LabResult } from "@/server/actions/engage";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress";
-import { checkPassword } from "@/lib/password-strength";
+import { type PassphraseContext, passphraseRules } from "@/lib/password-strength";
 import { cn } from "@/lib/cn";
 
 type Item = { id: string; sender?: string; address?: string; subject?: string; snippet?: string; url?: string; context?: string; situation?: string };
@@ -18,7 +18,7 @@ const OPTIONS: Record<string, string[]> = {
   "mfa-fatigue": ["approve", "deny", "ignore"],
 };
 
-export function GameClient({ game, items, orgName }: { game: string; items: Item[]; orgName: string }) {
+export function GameClient({ game, items, forge }: { game: string; items: Item[]; forge: PassphraseContext }) {
   const t = useTranslations("learner.lab");
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -66,6 +66,8 @@ export function GameClient({ game, items, orgName }: { game: string; items: Item
               </li>
             ))}
           </ul>
+        ) : result.items[0] && !result.items[0].correct && result.items[0].why ? (
+          <p className="mt-6 rounded-lg bg-risk-50 p-3.5 text-body-sm text-risk-700">{result.items[0].why}</p>
         ) : null}
         <div className="mt-6 flex justify-center gap-3">
           <Button variant="secondary" icon={<RotateCcw />} onClick={reset}>
@@ -78,7 +80,7 @@ export function GameClient({ game, items, orgName }: { game: string; items: Item
   }
 
   if (game === "password-forge") {
-    return <PasswordForge orgName={orgName} value={pw} setValue={setPw} show={show} setShow={setShow} pending={pending} onSubmit={() => submit({ passphrase: pw })} />;
+    return <PasswordForge forge={forge} value={pw} setValue={setPw} show={show} setShow={setShow} pending={pending} onSubmit={() => submit({ passphrase: pw })} />;
   }
 
   const item = items[i];
@@ -87,7 +89,7 @@ export function GameClient({ game, items, orgName }: { game: string; items: Item
   return (
     <div className="mx-auto grid w-full max-w-2xl gap-5">
       <div className="flex items-center gap-3">
-        <ProgressBar value={((i + (chosen ? 1 : 0)) / items.length) * 100} />
+        <ProgressBar decorative value={((i + (chosen ? 1 : 0)) / items.length) * 100} />
         <span className="shrink-0 text-caption text-ink-muted">{t("progressLabel", { current: i + 1, total: items.length })}</span>
       </div>
       <Card className="p-6">
@@ -146,16 +148,16 @@ export function GameClient({ game, items, orgName }: { game: string; items: Item
   );
 }
 
-function PasswordForge({ orgName, value, setValue, show, setShow, pending, onSubmit }: { orgName: string; value: string; setValue: (v: string) => void; show: boolean; setShow: (v: boolean) => void; pending: boolean; onSubmit: () => void }) {
+function PasswordForge({ forge, value, setValue, show, setShow, pending, onSubmit }: { forge: PassphraseContext; value: string; setValue: (v: string) => void; show: boolean; setShow: (v: boolean) => void; pending: boolean; onSubmit: () => void }) {
   const t = useTranslations("learner.lab");
-  const score = useMemo(() => (value ? checkPassword(value, [orgName]).score : 0), [value, orgName]);
-  const words = value.trim().split(/[\s\-_.]+/).filter((w) => w.length >= 3);
-  const banned = ["password", "parol", "пароль", "qwerty", "123456", orgName.toLowerCase()];
+  // The same rules the server scores with (src/lib/password-strength.ts), so the ticks match the verdict.
+  const checks = useMemo(() => passphraseRules(value, forge), [value, forge]);
+  const score = checks.score;
   const rules = [
-    { ok: value.length >= 14, label: t("pwRules.length") },
-    { ok: words.length >= 3, label: t("pwRules.words") },
-    { ok: score >= 4, label: t("pwRules.strong") },
-    { ok: !!value && !banned.some((b) => b && value.toLowerCase().includes(b)), label: t("pwRules.noCommon") },
+    { ok: checks.length, label: t("pwRules.length") },
+    { ok: checks.words, label: t("pwRules.words") },
+    { ok: checks.strong, label: t("pwRules.strong") },
+    { ok: checks.noCommon, label: t("pwRules.noCommon") },
   ];
   return (
     <Card className="mx-auto w-full max-w-xl p-6">
