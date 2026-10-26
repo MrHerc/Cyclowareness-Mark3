@@ -1,14 +1,16 @@
 import { eq } from "drizzle-orm";
 import { db, t } from "@/server/db";
 import { getViewer } from "@/server/auth/viewer";
+import { deniedResponse } from "@/server/auth/api";
 import { audit } from "@/server/services/audit";
 import { rateLimit } from "@/server/rate-limit";
 import { todayInBaku } from "@/lib/time";
+import { riskTitles } from "@/lib/risk-title";
 
 /** "Download my data" (GDPR-style access): profile and learning history as one JSON file. */
-export async function GET() {
+export async function GET(request: Request) {
   const v = await getViewer();
-  if (!v) return new Response("Unauthorized", { status: 401 });
+  if (!v) return deniedResponse(request, 401);
   if (!(await rateLimit(`export:${v.user.id}`, 5, 60 * 60_000)).ok) return new Response("Too many requests", { status: 429 });
   const uid = v.user.id;
   const [profile] = await db()
@@ -42,7 +44,7 @@ export async function GET() {
   ]);
   await audit(db(), { tenantId: v.tenant.id, actorId: uid, action: "person.data_downloaded", targetType: "user", targetId: uid });
   const body = JSON.stringify(
-    { exportedAt: new Date().toISOString(), organisation: v.tenant.name, profile, modules, lessons, answers, xp, attestations, certificates, policySignoffs: signoffs, reports, risks, lab: labs, supportTickets: tickets },
+    { exportedAt: new Date().toISOString(), organisation: v.tenant.name, profile, modules, lessons, answers, xp, attestations, certificates, policySignoffs: signoffs, reports, risks: risks.map((r) => ({ ...r, title: riskTitles(r.title) ?? r.title })), lab: labs, supportTickets: tickets },
     null,
     2,
   );

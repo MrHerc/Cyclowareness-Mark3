@@ -13,7 +13,8 @@ export function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   const first = parts[0]?.[0] ?? "?";
   const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
-  return (first + last).toLocaleUpperCase();
+  // Not toLocaleUpperCase(): its result follows the runtime's locale, so server and browser could disagree.
+  return (first + last).toUpperCase();
 }
 
 function hash(s: string): number {

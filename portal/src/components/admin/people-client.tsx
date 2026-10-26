@@ -18,7 +18,7 @@ import { Pill } from "@/components/ui/pill";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { toast } from "@/components/ui/toast";
 import { riskBand } from "@/lib/domain/risk";
-import { LOCALES, LOCALE_NAMES } from "@/i18n/config";
+import { DEFAULT_LOCALE, LOCALES, LOCALE_NAMES, isLocale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 
 export type PeopleRow = {
@@ -29,7 +29,8 @@ export type PeopleRow = {
   status: string;
   departmentName: string | null;
   riskScore: number;
-  xp: number;
+  /** Formatted on the server in the interface language (browsers have no Azerbaijani number data). */
+  xp: string;
   lastActiveAt: string | null;
   awaiting: number;
   avatarUrl: string | null;
@@ -157,7 +158,7 @@ export function PeopleTable({
         {selected.size ? (
           <>
             <span className="font-semibold">{t("selected", { count: selected.size })}</span>
-            <Button size="sm" variant="secondary" icon={<Bell />} disabled={pending} onClick={() => start(async () => toast(`${t("bulkRemind")}: ${(await remindPeopleAction(ids)).count}`))}>
+            <Button size="sm" variant="secondary" icon={<Bell />} disabled={pending} onClick={() => start(async () => toast(to("reminded", { count: (await remindPeopleAction(ids)).count })))}>
               {t("bulkRemind")}
             </Button>
             {canWrite ? (
@@ -289,7 +290,7 @@ export function PeopleTable({
   );
 }
 
-export function AddPerson({ departments }: { departments: { id: string; name: string }[] }) {
+export function AddPerson({ departments, defaultLocale, locales }: { departments: { id: string; name: string }[]; defaultLocale: string; locales: string[] }) {
   const t = useTranslations("admin.people");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
@@ -365,8 +366,9 @@ export function AddPerson({ departments }: { departments: { id: string; name: st
             </Field>
           </div>
           <Field label={t("interfaceLanguage")} htmlFor="p-locale">
-            <Select id="p-locale" name="locale" defaultValue="az">
-              {LOCALES.map((l) => (
+            {/* The organisation's default language, offering only the languages it switched on (Settings → Languages). */}
+            <Select id="p-locale" name="locale" defaultValue={isLocale(defaultLocale) ? defaultLocale : DEFAULT_LOCALE}>
+              {LOCALES.filter((l) => locales.includes(l) || l === defaultLocale).map((l) => (
                 <option key={l} value={l}>
                   {LOCALE_NAMES[l]}
                 </option>
@@ -453,9 +455,7 @@ export function ImportPeople() {
               {preview.problems.length ? <Pill tone="risk">{t("importProblems", { count: preview.problems.length })}</Pill> : null}
             </div>
             {preview.newDepartments.length ? (
-              <p className="text-caption text-ink-muted">
-                {t("importErrors.department")}: <b>{preview.newDepartments.join(", ")}</b>
-              </p>
+              <p className="text-caption text-ink-muted">{t("importNewDepartments", { count: preview.newDepartments.length, names: preview.newDepartments.join(", ") })}</p>
             ) : null}
             {preview.problems.length ? (
               <ScrollRegion axis="y" label={t("importProblems", { count: preview.problems.length })} className="max-h-60 rounded-lg bg-risk-50 p-3 text-caption text-risk-700">

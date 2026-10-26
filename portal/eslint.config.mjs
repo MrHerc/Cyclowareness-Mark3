@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // The cat mascot's canvas engine, vendored from design/mascot-cat/source (p2.js + p3.js + p4.js);
+    // typed by engine.d.ts beside it. Re-port design changes instead of editing it by hand.
+    "src/components/mascot/cat/engine.js",
   ]),
 ]);
 

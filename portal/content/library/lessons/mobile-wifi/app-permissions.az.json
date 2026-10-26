@@ -1,0 +1,601 @@
+{
+  "id": "app-permissions",
+  "title": "Tətbiq icazələri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "a-tutor",
+      "beats": [
+        {
+          "id": "a-b1",
+          "say": "Telefonunuzda iş poçtunuz, yazışmalarınız və bank tətbiqləriniz var. Tətbiq quraşdırarkən nəyə icazə verdiyinizi yoxlayın.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "a-b3",
+          "say": "Fənər tətbiqi niyə mesajlarınızı oxusun? Bu icazə ilə o, bank kodlarınızı da görə bilər.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "permission",
+              "brandRef": "fener-pro",
+              "app": "Torch Pro",
+              "permissions": [
+                {
+                  "label": [
+                    {
+                      "text": "Fənər"
+                    }
+                  ],
+                  "needed": true
+                },
+                {
+                  "label": [
+                    {
+                      "text": "Kontaktlar",
+                      "spot": "contacts"
+                    }
+                  ],
+                  "needed": false
+                },
+                {
+                  "label": [
+                    {
+                      "text": "SMS mesajları",
+                      "spot": "sms"
+                    }
+                  ],
+                  "needed": false
+                },
+                {
+                  "label": [
+                    {
+                      "text": "Dəqiq məkan",
+                      "spot": "location"
+                    }
+                  ],
+                  "needed": false
+                }
+              ]
+            }
+          },
+          "highlight": "sms",
+          "checkpoint": {
+            "prompt": "Kalkulyator tətbiqi kontaktlarınıza giriş istəyir. Nə edirsiniz?",
+            "options": [
+              {
+                "id": "allow",
+                "label": "İcazə verirəm",
+                "correct": false,
+                "feedback": "Kalkulyatora kontaktlar lazım deyil. Bu, məlumatlarınızı toplamaq cəhdi ola bilər."
+              },
+              {
+                "id": "deny",
+                "label": "İcazə vermirəm və tətbiqi silirəm",
+                "correct": true,
+                "feedback": "Düzdür. Ehtiyacı olmayan girişi istəyən tətbiqi silmək ən yaxşısıdır."
+              }
+            ]
+          }
+        },
+        {
+          "id": "a-b4",
+          "say": "Əlçatanlıq ən güclü icazədir: ekranınızı oxuyur və sizin yerinizə toxunur. Bu icazəni yalnız etibar etdiyiniz bir neçə tətbiqə verin.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "a-b5",
+          "say": "Sadə qayda: icazə tətbiqin işinə uyğun olmalıdır. Xəritə tətbiqinə məkan lazımdır, kalkulyatora isə yox.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "app-install",
+      "environment": "phone",
+      "title": "Pulsuz redaktor",
+      "intro": "Sizə foto redaktoru lazımdır. Telefonunuzun göstərdiklərinə baxın və hər addımda qərar verin.",
+      "steps": [
+        {
+          "id": "offer",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Endirimlər qrupu"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "FotoRedaktor Plus Pro mağazada pulludur, buradan pulsuz yükləyin: "
+                  },
+                  {
+                    "text": "fotoredaktor-pro.test/app.apk",
+                    "link": {
+                      "label": "fotoredaktor-pro.test/app.apk",
+                      "href": "https://fotoredaktor-pro.test/app.apk"
+                    }
+                  }
+                ],
+                "time": "13:05"
+              }
+            ]
+          },
+          "say": "Kimsə qrupda pulsuz tətbiq faylı paylaşıb.",
+          "actions": [
+            {
+              "id": "download",
+              "label": "Faylı yüklə",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Pullu tətbiqi pulsuz təklif etmək çox yayılmış tələdir. Belə fayllarda çox vaxt zərərli proqram gizlənir."
+            },
+            {
+              "id": "block",
+              "label": "Blokla və bildir",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Tətbiqləri yalnız telefonunuzun rəsmi mağazasından quraşdırın.",
+              "next": "store-app"
+            }
+          ]
+        },
+        {
+          "id": "unknown-source",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Naməlum mənbə"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Təhlükəsizliyiniz üçün telefonunuz bu mənbədən naməlum tətbiqlərin quraşdırılmasına icazə vermir."
+                }
+              ]
+            ],
+            "buttons": [
+              "Ayarlar",
+              "Ləğv et"
+            ]
+          },
+          "actions": [
+            {
+              "id": "settings",
+              "label": "Ayarlarda icazə ver",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "Bu qoruma məhz belə fayllar üçündür. Onu söndürsəniz, telefon zərərli tətbiqlərə açıq qalar."
+            },
+            {
+              "id": "cancel",
+              "label": "Ləğv et",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Naməlum mənbələrdən quraşdırma söndürülmüş qalmalıdır."
+            }
+          ]
+        },
+        {
+          "id": "fake-apk",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "fotoredaktor-plus-fake",
+            "name": [
+              {
+                "text": "FotoRedaktor_Plus_Pro.apk"
+              }
+            ],
+            "type": "apk",
+            "size": "18 MB",
+            "source": [
+              {
+                "text": "Telegram: Endirimlər qrupu"
+              }
+            ]
+          },
+          "say": "İkon tanış görünür. Adını diqqətlə oxuyun.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "Quraşdır",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Bu, mağazadakı tətbiqin klonudur: adı bir boşluqla fərqlənir. O, SMS kodlarınızı oxuya bilər."
+            },
+            {
+              "id": "cancel",
+              "label": "Ləğv et",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Mesajla gələn .apk faylını quraşdırmayın, tətbiqi rəsmi mağazada tapın."
+            }
+          ]
+        },
+        {
+          "id": "store-app",
+          "label": "Rəsmi mağazadan quraşdırılıb",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "fotoredaktor-plus",
+            "app": "Foto Redaktor Plus",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Foto və videolar"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Kontaktlar"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "SMS mesajları"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "Mağazadakı tətbiq də lazım olandan artıq icazə istəyir.",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "İcazə ver",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "Foto redaktoruna nə kontaktlar, nə də SMS lazımdır. SMS-lərə girişi olan tətbiq bank kodlarını oxuya bilər."
+            },
+            {
+              "id": "deny",
+              "label": "İcazə vermə",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Yalnız funksiyaya lazım olan icazəni verin: bu halda sadəcə fotolara giriş."
+            }
+          ]
+        },
+        {
+          "id": "fake-antivirus",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "qoruyucu-fake",
+            "app": "Qoruyucu Antivirus",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Əlçatanlıq: ekranı idarə etmək"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "Antivirus ekranınızı idarə etmək istəyir.",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "İcazə ver",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Bu icazə ilə tətbiq ekranı oxuyur və sizin yerinizə toxunur. Bank troyanları məhz bunu istəyir."
+            },
+            {
+              "id": "deny",
+              "label": "İcazə vermə",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Antivirus adı altında ekranı idarə etmək istəyən tətbiqi silin və bildirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "a-hotspot",
+      "prompt": "Bu tətbiqə lazım olmayan icazələri tapın.",
+      "artifact": {
+        "kind": "permission",
+        "brandRef": "fotoredaktor-plus",
+        "app": "Foto Redaktor Plus",
+        "permissions": [
+          {
+            "label": [
+              {
+                "text": "Foto və videolar",
+                "reveal": "Bu telefonda saxlanan foto və videoları oxuyur"
+              }
+            ],
+            "needed": true
+          },
+          {
+            "label": [
+              {
+                "text": "Kamera",
+                "reveal": "Foto çəkir və video yazır"
+              }
+            ],
+            "needed": true
+          },
+          {
+            "label": [
+              {
+                "text": "Kontaktlar",
+                "spot": "contacts",
+                "reveal": "Kontakt siyahınızı oxuyur: adlar, nömrələr, e-poçt ünvanları"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "SMS göndərmək və oxumaq",
+                "spot": "sms",
+                "reveal": "Telefondakı bütün SMS mesajlarını oxuyur və yenilərini göndərir"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "Əlçatanlıq: ekranı idarə etmək",
+                "spot": "accessibility",
+                "reveal": "Ekrandakı hər şeyi görür və başqa tətbiqlərdə sizin yerinizə toxunur"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "Zəng tarixçəsi",
+                "spot": "call-log",
+                "reveal": "Zənglərinizin siyahısını oxuyur: kim, nə vaxt və nə qədər"
+              }
+            ],
+            "needed": false
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "contacts",
+          "label": "Kontaktlar",
+          "explain": "Fotoları redaktə etmək üçün kontaktlarınız lazım deyil."
+        },
+        {
+          "id": "sms",
+          "label": "SMS-lərə giriş",
+          "explain": "SMS-lərə girişi olan tətbiq bank və giriş kodlarınızı oxuya bilər."
+        },
+        {
+          "id": "accessibility",
+          "label": "Ekranın idarə edilməsi",
+          "explain": "Bu icazə tətbiqə ekranı oxumağa və sizin yerinizə toxunmağa imkan verir. Zərərli tətbiqlər məhz bunu istəyir."
+        },
+        {
+          "id": "call-log",
+          "label": "Zəng tarixçəsi",
+          "explain": "Foto redaktorunun kimə zəng etdiyinizi bilməsinə ehtiyac yoxdur."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "a-swipe",
+      "prompt": "Təhlükəsizdir, yoxsa tələ?",
+      "cards": [
+        {
+          "id": "bank-apk",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank-fake",
+            "sender": [
+              {
+                "text": "+994 55 000 11 22"
+              }
+            ],
+            "time": "13:02",
+            "messages": [
+              [
+                {
+                  "text": "SahilBank yeni tətbiqini təqdim edir. Buradan yükləyin: "
+                },
+                {
+                  "text": "sahilbank-app.test/SahilBank.apk"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bankın tətbiqi rəsmi mağazada olur. Linklə göndərilən quraşdırma faylı zərərli ola bilər."
+        },
+        {
+          "id": "map-location",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "xerite-app",
+            "app": "Xəritə",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Məkan (yalnız tətbiqdən istifadə zamanı)"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Xəritə tətbiqinə yol göstərmək üçün məkanınız lazımdır. Yalnız istifadə zamanı icazə vermək ağıllı seçimdir."
+        },
+        {
+          "id": "torch-mic",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "fener-pro",
+            "app": "Fənər",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Kontaktlar"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Mikrofon"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Fənər tətbiqinə nə kontaktlar, nə də mikrofon lazımdır."
+        },
+        {
+          "id": "video-call",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "videozeng-app",
+            "app": "Video zəng",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Kamera"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Mikrofon"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Video zəng üçün kamera və mikrofon həqiqətən lazımdır."
+        },
+        {
+          "id": "discount-apk",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Endirim kanalı"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Endirim tətbiqini bu fayldan quraşdırın. Ayarlarda naməlum mənbələrə icazə verin."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Naməlum mənbələrə icazə vermək telefonunuzun qorumasını zəiflədir. Bunu istəyən mesaja inanmayın."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "a-choice-store",
+      "question": {
+        "prompt": "Tətbiqləri haradan quraşdırmaq təhlükəsizdir?",
+        "options": [
+          {
+            "id": "official-store",
+            "label": "Telefonunuzun rəsmi tətbiq mağazasından",
+            "correct": true,
+            "feedback": "Düzdür. Rəsmi mağaza tətbiqləri yoxlayır və riski xeyli azaldır."
+          },
+          {
+            "id": "sms-link",
+            "label": "Mesajdakı linkdən",
+            "correct": false,
+            "feedback": "Mesajdakı link saxta tətbiqə apara bilər."
+          },
+          {
+            "id": "cracked",
+            "label": "Forumdakı pulsuz «sındırılmış» versiyadan",
+            "correct": false,
+            "feedback": "Sındırılmış versiyalarda çox vaxt zərərli proqram olur."
+          },
+          {
+            "id": "work-portal",
+            "label": "Təşkilatınızın təsdiqlədiyi tətbiq kataloqundan",
+            "correct": true,
+            "feedback": "Düzdür. Təşkilatınızın idarə etdiyi kataloq da rəsmi mənbədir."
+          }
+        ],
+        "multi": true
+      },
+      "explain": "Rəsmi mağaza tam zəmanət vermir, amma riski xeyli azaldır. Rəylərə və icazələrə də baxın."
+    },
+    {
+      "type": "recap",
+      "id": "a-recap",
+      "points": [
+        "Tətbiqləri yalnız rəsmi mağazadan quraşdırın",
+        "İcazə tətbiqin işinə uyğun olmalıdır",
+        "SMS və əlçatanlıq icazələrinə xüsusilə diqqət yetirin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -1,0 +1,369 @@
+{
+  "id": "share-smart",
+  "title": "Ağıllı paylaşın",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Salam! Sosial şəbəkələrdə paylaşdığınız hər foto və hər cümlə kimin üçünsə məlumatdır. Gəlin, buna birlikdə baxaq.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Ofisdə çəkilmiş foto giriş kartınızı, açıq ekranı və ya lövhədəki qeydləri göstərə bilər. Bu, hücum üçün hazır materialdır.",
+          "mood": "alert",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Səfərləri əvvəlcədən elan etməyin: bu, hamıya evinizin boş qalacağını və sizinlə əlaqə saxlamağın çətin olacağını xəbər verir. Fotoları qayıdandan sonra paylaşın.",
+          "mood": "think",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "travel"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Saxta profillər də var. Xəyalınızdakı işi təklif edən rekruter əslində təşkilatınız barədə məlumat toplaya bilər. Profilin nə vaxt yaradıldığını yoxlayın.",
+          "mood": "alert",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "app": "generic",
+              "contact": [
+                {
+                  "text": "Rəşad Məmmədli"
+                },
+                {
+                  "text": " · NovaHire Group, 3 əlaqə",
+                  "spot": "profile"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Salam! Profilinizə baxdım. Xaricdə yüksək maaşlı iş sizə tam uyğun gələrdi."
+                    }
+                  ],
+                  "time": "11:02"
+                }
+              ]
+            }
+          },
+          "highlight": "profile"
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "safe-post",
+      "question": {
+        "prompt": "Hansı paylaşım ən təhlükəsizdir?",
+        "options": [
+          {
+            "id": "badge-selfie",
+            "label": "Ofisdə yeni giriş kartımla selfi",
+            "correct": false,
+            "feedback": "Kartın dizaynı, adınız və vəzifəniz görünür. Bu, saxta kart üçün hazır nümunədir."
+          },
+          {
+            "id": "trip-plan",
+            "label": "Sabahdan bir həftəlik məzuniyyətə gedirəm",
+            "correct": false,
+            "feedback": "Bu, evinizin nə vaxt boş qalacağını və sizinlə nə vaxt əlaqə saxlamaq mümkün olmayacağını bildirir."
+          },
+          {
+            "id": "after-trip",
+            "label": "Qayıtdıqdan sonra paylaşılan təbiət fotosu",
+            "correct": true,
+            "feedback": "Düzdür. Yer və vaxt artıq keçmişdə qalıb, iş barədə isə heç nə görünmür."
+          },
+          {
+            "id": "desk-photo",
+            "label": "Arxa planda açıq monitor olan iş masam",
+            "correct": false,
+            "feedback": "Ekrandakı sənədi, məktubu və ya sistemin adını şəkli böyüdərək oxumaq olar."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "eye"
+        }
+      },
+      "explain": "Paylaşmazdan əvvəl arxa plana baxın: giriş kartı, ekran, lövhə, sənədlər."
+    },
+    {
+      "type": "hotspot",
+      "id": "fake-recruiter",
+      "prompt": "Saxta rekruterin əlamətlərini tapın.",
+      "artifact": {
+        "kind": "chat",
+        "app": "generic",
+        "contact": [
+          {
+            "text": "Rəşad Məmmədli"
+          },
+          {
+            "text": " · NovaHire Group, 3 əlaqə",
+            "spot": "profile"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Salam! Profilinizə baxdım. "
+              },
+              {
+                "text": "Xaricdə ayda 6000 dollar maaşlı iş sizi gözləyir.",
+                "spot": "too-good"
+              }
+            ],
+            "time": "11:02"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Müsahibədən əvvəl qısa bir sual: "
+              },
+              {
+                "text": "təşkilatınız hansı e-poçt sistemindən və hansı proqramlardan istifadə edir?",
+                "spot": "internal-info"
+              }
+            ],
+            "time": "11:03"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "İş e-poçtunuzu yazaraq formanı doldurun: "
+              },
+              {
+                "text": "novahire-careers.example.net/apply",
+                "spot": "link"
+              },
+              {
+                "text": " Yerlər məhduddur, qəbul bu gün bağlanır.",
+                "spot": "urgency"
+              }
+            ],
+            "time": "11:04"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "profile",
+          "label": "Yeni profil, az əlaqə",
+          "explain": "Əsl rekruterlərin adətən uzun tarixçəsi və ortaq tanışları olur. Cəmi üç əlaqəsi olan profil yenicə yaradılıb."
+        },
+        {
+          "id": "too-good",
+          "label": "Həddən artıq cəlbedici təklif",
+          "explain": "Hələ heç bir müsahibə olmadan böyük maaş vədi yemdir. Həyəcan sayıqlığınızı azaldır."
+        },
+        {
+          "id": "internal-info",
+          "label": "Təşkilatınız barədə suallar",
+          "explain": "Rekruterə təşkilatınızın sistemlərini bilmək lazım deyil. Bu, hücum üçün kəşfiyyatdır."
+        },
+        {
+          "id": "link",
+          "label": "İş e-poçtu istəyən kənar link",
+          "explain": "İş e-poçtunuzu kənar formaya yazsanız, o, fişinq siyahısına düşür. Forma parol da istəyə bilər."
+        },
+        {
+          "id": "urgency",
+          "label": "Tələsdirmə",
+          "explain": "«Qəbul bu gün bağlanır» yazılıb ki, dayanıb düşünməyəsiniz."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "messages",
+      "prompt": "Bu mesaj təhlükəsizdir, yoxsa tələdir?",
+      "cards": [
+        {
+          "id": "vote-code",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Günel Rzayeva"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam! Qızım müsabiqədə iştirak edir, xahiş edirəm, ona səs ver. SMS ilə kod gələcək, onu mənə göndər."
+                  }
+                ],
+                "time": "20:14"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bu kod hesabınızın açarıdır. Mesaj dostunuzun hesabından gəlsə belə, kodu heç kimə verməyin."
+        },
+        {
+          "id": "login-alert",
+          "artifact": {
+            "kind": "sms",
+            "sender": [
+              {
+                "text": "Kontakto"
+              }
+            ],
+            "time": "08:30",
+            "messages": [
+              [
+                {
+                  "text": "Hesabınıza yeni giriş: Bakı, telefon. Əgər bu siz deyilsinizsə, tətbiqdə «Təhlükəsizlik» bölməsini açın."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Link yoxdur, kod istənmir, mesaj sizi tətbiqin özünə yönləndirir. Yoxlamanı tətbiqin içində edin."
+        },
+        {
+          "id": "boss-number",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Kamran Əliyev · ortaq kontakt yoxdur"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam, eyni sahədə işləyirik. Şöbə rəisinizin mobil nömrəsini mənə göndərə bilərsiniz?"
+                  }
+                ],
+                "time": "15:47"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Tanımadığınız biri rəhbərinizə çıxış yolu axtarır. Əlaqə məlumatlarını yalnız rəsmi kanallarla verin."
+        },
+        {
+          "id": "meeting-moved",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Aysel Quliyeva (həmkar)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Sabahkı görüş saat 11-ə keçirildi, otaq eynidir."
+                  }
+                ],
+                "time": "17:05"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Tanış həmkar, heç bir xahiş və həssas məlumat yoxdur. Bu mesaj təhlükəsizdir."
+        },
+        {
+          "id": "press-office",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Rəsmi Mətbuat Xidməti"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hesabınızı təsdiqləmək üçün vəzifənizi, iş e-poçtunuzu və doğum tarixinizi göndərin."
+                  }
+                ],
+                "time": "10:21"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Rəsmi qurumlar sosial şəbəkədə belə məlumat istəmir. Cavab verməyin və profildən şikayət edin."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "privacy",
+      "prompt": "Hər ayarı onun verdiyi faydayla uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "friends-only",
+          "left": "Profil yalnız dostlara görünür",
+          "right": "Tanımadığınız adamlar fotolarınızı görə bilmir"
+        },
+        {
+          "id": "location-off",
+          "left": "Məkan funksiyası söndürülüb",
+          "right": "Harada olduğunuzu heç kim görmür"
+        },
+        {
+          "id": "tag-review",
+          "left": "İşarələmələr əvvəlcə yoxlanılır",
+          "right": "Heç kim sizi icazəniz olmadan işarələyə bilməz"
+        },
+        {
+          "id": "two-step",
+          "left": "İki addımlı doğrulama",
+          "right": "Parol sızsa belə, hesab qorunur"
+        }
+      ],
+      "explain": "Bu ayarları vaxtaşırı yoxlayın. Tətbiqin yeni funksiyaları onları dəyişə bilər."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Arxa planı yoxlayın: giriş kartı, ekran, sənədlər.",
+        "Səfər fotolarını qayıtdıqdan sonra paylaşın.",
+        "İş məlumatlarını və kodları heç vaxt tanımadığınız adamlara verməyin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

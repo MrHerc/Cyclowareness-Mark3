@@ -1,0 +1,460 @@
+{
+  "id": "why-a-manager",
+  "title": "Niyə parol meneceri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Hər hesabın öz uzun parolu olmalıdır. Onların hamısını heç kim yadda saxlaya bilməz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Eyni paroldan heç vaxt bir neçə hesabda istifadə etməyin: bir saytdan məlumat sızanda hücumçular həmin parolu bütün hesablarınızda yoxlayır.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Təşkilatın parol meneceri hər hesab üçün güclü parol yaradır və onu şifrələnmiş seyfdə saxlayır.",
+          "mood": "talk",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "parolseyf",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "Parol yaradıldı"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "28 simvol, təsadüfi",
+                    "spot": "gen"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Saxla"
+              ]
+            }
+          },
+          "highlight": "gen"
+        },
+        {
+          "id": "b4",
+          "say": "Siz yalnız bir uzun əsas parol yadda saxlayırsınız və seyfi iki addımlı doğrulama ilə qoruyursunuz.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "where-passwords-live",
+      "prompt": "Bu, parol üçün təhlükəsiz yerdirmi?",
+      "cards": [
+        {
+          "id": "excel",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Parollar_hamisi.xlsx"
+              }
+            ],
+            "type": "xls",
+            "size": "18 KB",
+            "source": [
+              {
+                "text": "İş masası"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Fayl şifrələnməyib: kompüterə daxil olan hər kəs bütün parolları birdən görür."
+        },
+        {
+          "id": "vault",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "parolseyf",
+            "app": "ParolSeyf",
+            "title": [
+              {
+                "text": "Giriş məlumatları seyfdə saxlanıldı"
+              }
+            ],
+            "body": [
+              {
+                "text": "portal.idare.example"
+              }
+            ],
+            "time": "09:05"
+          },
+          "verdict": "safe",
+          "explain": "Parol şifrələnmiş seyfdə saxlanılır və yalnız əsas parolunuzla açılır."
+        },
+        {
+          "id": "saved-messages",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Saxlanılan mesajlar"
+              }
+            ],
+            "messages": [
+              {
+                "from": "me",
+                "body": [
+                  {
+                    "text": "Poçtun parolu: Aysel1990"
+                  }
+                ],
+                "time": "08:31"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Messencer seyf deyil. Telefon itsə və ya hesab ələ keçirilsə, parollar da yad əllərə düşür."
+        },
+        {
+          "id": "shared-vault",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Ümumi seyf: Mətbuat xidməti"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "3 üzv. Saytın admin paneli, sosial media hesabı."
+                }
+              ]
+            ],
+            "buttons": [
+              "Bağla"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Komanda parolları şifrələnmiş seyfdə paylaşır, girişi isə istənilən vaxt ləğv etmək olar."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "password-requests",
+      "environment": "phone",
+      "title": "Parol istəkləri",
+      "intro": "Bu gün bir neçə nəfər sizdən parol istəyir. Hər birinə telefonunuzda cavab verin.",
+      "steps": [
+        {
+          "id": "colleague-asks",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Səbinə Hüseynova"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam! Saytın admin panelinin parolunu bura yaza bilərsiniz? Bugünkü xəbəri yerləşdirməliyəm."
+                  }
+                ],
+                "time": "10:12"
+              }
+            ]
+          },
+          "say": "O, sizin həmkarınızdır və girişə həqiqətən ehtiyacı var.",
+          "actions": [
+            {
+              "id": "type",
+              "label": "Parolu yaz",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Parol yazışmada qalır və telefon itsə, sıza bilər. Onu seyf vasitəsilə paylaşın."
+            },
+            {
+              "id": "vault",
+              "label": "Seyfdə sizinlə paylaşacağam",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Düzdür. Seyfdə parol şifrələnmiş qalır, giriş isə lazım olanda ləğv edilə bilər."
+            },
+            {
+              "id": "sms",
+              "label": "SMS ilə göndərəcəyəm",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "SMS də şifrələnmir və telefonda qalır. Parolları yalnız seyf vasitəsilə paylaşın."
+            }
+          ]
+        },
+        {
+          "id": "fake-share-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "parolseyf-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "ParolSeyf"
+                }
+              ],
+              "address": [
+                {
+                  "text": "no-reply@parolseyf-share.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Elnur Kərimov sizinlə seyf paylaşdı"
+              }
+            ],
+            "time": "11:40",
+            "body": [
+              [
+                {
+                  "text": "«Maliyyə» seyfinə baxmaq üçün daxil olun: "
+                },
+                {
+                  "text": "parolseyf-share.example.net/seyf",
+                  "link": {
+                    "label": "parolseyf-share.example.net/seyf",
+                    "href": "https://parolseyf-share.example.net/seyf"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Siz heç bir paylaşım gözləmirdiniz.",
+          "actions": [
+            {
+              "id": "click",
+              "label": "Linki aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Əsl paylaşım ParolSeyf tətbiqinin özündə görünür. Bu link əsas parolunuzu ələ keçirmək üçündür."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür: bu ünvan ParolSeyf xidmətinə aid deyil. Paylaşımları yoxlamaq üçün tətbiqi özünüz açın."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Siz təhlükəsizsiniz, amma həmkarlarınıza da eyni məktub gələ bilər. Onu bildirin."
+            }
+          ]
+        },
+        {
+          "id": "fake-support",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "parolseyf-fake",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "ParolSeyf Dəstək"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Seyfinizdə xəta aşkar etdik. Onu bərpa etmək üçün əsas parolunuzu və sizə gələn kodu bura yazın."
+                  }
+                ],
+                "time": "14:03"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "send",
+              "label": "Əsas parolu yaz",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Əsas parol bütün parollarınızı açır. Heç bir dəstək xidməti onu soruşmur."
+            },
+            {
+              "id": "block",
+              "label": "Blokla",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Düzdür. Heç kim, hətta İT dəstəyi də əsas parolunuzu və ya kodu soruşmur."
+            },
+            {
+              "id": "report",
+              "label": "Bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Təhlükəsizlik komandasına da bildirin ki, həmkarlarınızı xəbərdar etsinlər."
+            }
+          ]
+        },
+        {
+          "id": "reused-alert",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Bu parol 3 hesabda istifadə olunur"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Eyni parol İşPoçt, ofis portalı və Kontakto səhifəsi üçün saxlanılıb."
+                }
+              ]
+            ],
+            "buttons": [
+              "Sonra",
+              "Parolları dəyiş"
+            ]
+          },
+          "say": "ParolSeyf parollarınızı yoxladı.",
+          "actions": [
+            {
+              "id": "update",
+              "label": "Parolları dəyiş",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Düzdür. Generator hər hesab üçün ayrıca parol yaradır, ona görə bir sızma digər hesablara yol açmır."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Təkrar istifadə olunan parol hücumçuların ən sevdiyi zəif nöqtədir. Bir sızma hər üç hesabı açardı."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "password",
+      "id": "master-password",
+      "prompt": "Əsas parol yaradın: ən azı 15 simvoldan ibarət uzun parol ifadəsi.",
+      "targetScore": 4,
+      "tips": [
+        "Dörd-beş təsadüfi sözü boşluqla birləşdirin",
+        "Bu paroldan başqa heç yerdə istifadə etməyin",
+        "Adlardan, doğum tarixlərindən və məşhur sitatlardan qaçın"
+      ]
+    },
+    {
+      "type": "match",
+      "id": "manager-terms",
+      "prompt": "Hər termini mənası ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "vault",
+          "left": "Seyf",
+          "right": "Parollarınızın şifrələnmiş saxlanma yeri"
+        },
+        {
+          "id": "master",
+          "left": "Əsas parol",
+          "right": "Seyfi açan yeganə parol"
+        },
+        {
+          "id": "generator",
+          "left": "Generator",
+          "right": "Uzun, təsadüfi parollar yaradır"
+        },
+        {
+          "id": "shared",
+          "left": "Ümumi seyf",
+          "right": "Komandaya parolları təhlükəsiz paylaşmağa imkan verir"
+        }
+      ],
+      "explain": "Parolları menecer yadda saxlayır, siz isə yalnız əsas parolu qoruyursunuz."
+    },
+    {
+      "type": "choice",
+      "id": "shared-account",
+      "question": {
+        "prompt": "Şöbənizdə üç nəfər eyni sosial media hesabını idarə edir. Parolu necə paylaşmalıdırlar?",
+        "options": [
+          {
+            "id": "own",
+            "label": "Mümkünsə, hər kəsə ayrıca giriş, mümkün deyilsə, ümumi seyf",
+            "correct": true,
+            "feedback": "Düzdür. Kimsə komandadan gedəndə onun girişi bir addımda ləğv olunur."
+          },
+          {
+            "id": "group-chat",
+            "label": "Parolu komandanın ümumi çatına yazmaq",
+            "correct": false,
+            "feedback": "Qrup çatına yazılan parol orada illərlə qalır, yeni üzvlər də onu görür."
+          },
+          {
+            "id": "note",
+            "label": "Stikerə yazıb monitora yapışdırmaq",
+            "correct": false,
+            "feedback": "İçəri girən hər kəs parolu görə və şəklini çəkə bilər."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "key"
+        }
+      },
+      "explain": "Ümumi hesab üçün də parol yazışmalarda və ya kağızda deyil, seyfdə saxlanılır."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Hər hesab üçün ayrıca parol: onu menecer yaradır və yadda saxlayır.",
+        "Parolları ümumi seyfdə paylaşın, heç vaxt çatda yox.",
+        "Əsas parolunuzu heç kimə deməyin, seyfi isə iki addımlı doğrulama ilə qoruyun."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

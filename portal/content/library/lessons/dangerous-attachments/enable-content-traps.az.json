@@ -1,0 +1,468 @@
+{
+  "id": "enable-content-traps",
+  "title": "Redaktə və makros tələləri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ec-tutor",
+      "beats": [
+        {
+          "id": "ec-b1",
+          "say": "İnternetdən gələn sənəd əvvəlcə «Qorunan baxış» rejimində, yalnız oxumaq üçün açılır. Bu, sizin qalxanınızdır.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "ec-b2",
+          "say": "Boş səhifədə belə bir yazı görsəniz, dayanın. Əsl sənəd sizdən düymə basmağı istəmir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "senedyaz",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "Qorunan baxış: bu fayl internetdən gəlib"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Sənəd boşdur, yalnız bir şəkil görünür:"
+                  }
+                ],
+                [
+                  {
+                    "text": "«Mətni görmək üçün əvvəlcə „Redaktəni aktivləşdir“, sonra „Məzmunu aktivləşdir“ düyməsini basın.»",
+                    "spot": "lure"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Redaktəni aktivləşdir",
+                "Bağla"
+              ]
+            }
+          },
+          "highlight": "lure"
+        },
+        {
+          "id": "ec-b3",
+          "say": "Makros sənədin içindəki gizli əmrdir. O, kompüterə zərərli proqram quraşdıra bilər.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "ec-b4",
+          "say": "Sənədi açmaq üçün saytdan xüsusi baxış proqramı yükləmək təklifini də heç vaxt qəbul etməyin.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ec-sim-doc",
+      "environment": "desktop",
+      "title": "Sənədin açılması",
+      "intro": "«Tender şərtləri» adlı qoşmanı açdınız. Hər pəncərəni oxuyun və hər addımda qərar verin.",
+      "steps": [
+        {
+          "id": "protected-view",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "senedyaz",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Qorunan baxış: bu fayl internetdən gəlib"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Sənəd boşdur, yalnız bir şəkil görünür:"
+                }
+              ],
+              [
+                {
+                  "text": "«Mətni görmək üçün əvvəlcə „Redaktəni aktivləşdir“, sonra „Məzmunu aktivləşdir“ düyməsini basın.»",
+                  "spot": "lure"
+                }
+              ]
+            ],
+            "buttons": [
+              "Redaktəni aktivləşdir",
+              "Bağla"
+            ]
+          },
+          "say": "Sənəd boşdur və sizdən düymə basmağı istəyir.",
+          "actions": [
+            {
+              "id": "enable",
+              "label": "Redaktəni aktivləşdir",
+              "kind": "enable-content",
+              "outcome": "risky",
+              "feedback": "Qorunan baxış rejimindən çıxdınız. Bu rejim məhz belə fayllardan qorumaq üçündür."
+            },
+            {
+              "id": "close",
+              "label": "Sənədi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Düymə basmağı istəyən boş səhifə tələdir.",
+              "next": "it-alert"
+            },
+            {
+              "id": "report",
+              "label": "Təhlükəsizlik komandasına bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Redaktəni aktivləşdirmədən bildirdiniz.",
+              "next": "it-alert"
+            }
+          ]
+        },
+        {
+          "id": "macro-blocked",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "senedyaz",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Təhlükəsizlik riski: makroslar bloklanıb"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Fayl internetdən gəldiyi üçün bu sənəddəki makroslar bloklanıb."
+                }
+              ],
+              [
+                {
+                  "text": "Sənəddə yazılıb: «Faylı xüsusiyyətlər pəncərəsində blokdan çıxarın və makroslara icazə verin.»",
+                  "spot": "unblock"
+                }
+              ]
+            ],
+            "buttons": [
+              "Ətraflı",
+              "Bağla"
+            ]
+          },
+          "say": "Proqram makrosları bloklayıb. Sənəd isə sizdən onları blokdan çıxarmağı istəyir.",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "Blokdan çıxar və makroslara icazə ver",
+              "kind": "enable-content",
+              "outcome": "compromised",
+              "feedback": "Gizli makros işə düşdü və zərərli proqram quraşdırdı. Dərhal kompüteri şəbəkədən ayırın və təhlükəsizlik komandasına zəng edin."
+            },
+            {
+              "id": "close",
+              "label": "Sənədi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Vaxtında dayandınız. Proqram sizi qorudu, siz də bu qorumadan yan keçmədiniz."
+            }
+          ]
+        },
+        {
+          "id": "it-alert",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "it-destek",
+            "app": "İT dəstəyi",
+            "title": [
+              {
+                "text": "Xəbərdarlıq: saxta tender sənədləri"
+              }
+            ],
+            "body": [
+              {
+                "text": "Zərərli «tender şərtləri» sənədləri yayılır. Sizə də gəlibsə, bildirin."
+              }
+            ],
+            "time": "11:02"
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Məktubu bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bildirişiniz İT dəstəyinə məktubu bütün poçt qutularından silməyə kömək edir."
+            },
+            {
+              "id": "ignore",
+              "label": "Fikir vermə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Faylı bağladınız, amma məktub hələ də poçt qutusundadır. Həmkarlarınız onu açmasın deyə bildirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ec-sim-viewer",
+      "environment": "browser",
+      "title": "Saxta PDF oxuyucu",
+      "intro": "Məktubdakı link sənədi açmaq üçün proqram təklif edir. Nə edirsiniz?",
+      "steps": [
+        {
+          "id": "viewer-page",
+          "label": "Bu sənədə baxmaq üçün Sənəd Oxu proqramını yeniləyin",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "senedoxu-fake",
+            "url": [
+              {
+                "text": "https://senedoxu-yenile.example.net/bax"
+              }
+            ]
+          },
+          "say": "Ünvan sətrinə baxın.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "Yüklə və quraşdır",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Saxta oxuyucu zərərli proqramdır. Brauzeriniz PDF faylları özü aça bilir."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Proqramlar yalnız İT dəstəyi və ya təşkilatınızın proqram təminatı mərkəzi vasitəsilə quraşdırılır."
+            },
+            {
+              "id": "report",
+              "label": "Saytı bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Saytı bildirməklə həmkarlarınızı da qoruyursunuz."
+            }
+          ]
+        },
+        {
+          "id": "viewer-download",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "senedoxu-fake",
+            "name": [
+              {
+                "text": "SenedOxu_Yenileme.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "5,7 MB",
+            "source": [
+              {
+                "text": "senedoxu-yenile.example.net"
+              }
+            ]
+          },
+          "say": "Yükləmə öz-özünə başladı. Faylın növünü yoxlayın.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "Bu, saxta saytdan gələn proqramdır. Onu açsanız, kompüter yoluxacaq."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Düzdür. İstəmədiyiniz yükləməni açmadan silin."
+            },
+            {
+              "id": "report",
+              "label": "İT dəstəyinə bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. İT dəstəyi bu saytı hamı üçün bloklaya bilər."
+            }
+          ]
+        },
+        {
+          "id": "portal-pdf",
+          "label": "Telimat_2026.pdf",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "idare",
+            "url": [
+              {
+                "text": "https://portal.idare.example/senedler/telimat-2026.pdf"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Sənədi aç",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Düzdür. Daxili portal, fayl brauzerdə açılır, heç nə quraşdırmaq lazım deyil."
+            },
+            {
+              "id": "report",
+              "label": "Saytı bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Bu, təşkilatınızın öz portalıdır və heç nə quraşdırmağı istəmir. Bildirişləri şübhəli hallar üçün saxlayın."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "ec-hotspot",
+      "prompt": "Bu məktubda tələ əlamətlərini tapın.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "docusfera-fake",
+        "from": {
+          "name": [
+            {
+              "text": "DocuSfera"
+            }
+          ],
+          "address": [
+            {
+              "text": "imza@docusfera-sened.example.net",
+              "spot": "domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Müqavilə imzanızı gözləyir"
+          }
+        ],
+        "time": "15:47",
+        "body": [
+          [
+            {
+              "text": "Sənəd köhnə formatda hazırlanıb."
+            }
+          ],
+          [
+            {
+              "text": "Ona baxmaq üçün əvvəlcə redaktəni, sonra məzmunu aktivləşdirin.",
+              "spot": "enable"
+            }
+          ],
+          [
+            {
+              "text": "Açılmazsa, oxuyucunuzu buradan yeniləyin: ",
+              "spot": "viewer"
+            },
+            {
+              "text": "Sənəd Oxu proqramını yüklə",
+              "spot": "viewer",
+              "link": {
+                "label": "Sənəd Oxu",
+                "href": "https://senedoxu-yenile.example.net/yukle"
+              }
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Muqavile_imza.xlsm",
+                "spot": "macro"
+              }
+            ],
+            "size": "210 KB"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Fərqli domen",
+          "explain": "İmza xidmətinin adından istifadə olunur, amma domen fərqlidir. Məktubu bildirin."
+        },
+        {
+          "id": "enable",
+          "label": "Aktivləşdirmə tələbi",
+          "explain": "Əsl sənədi redaktəni və ya makrosları aktivləşdirmədən də oxumaq olur."
+        },
+        {
+          "id": "macro",
+          "label": "Makroslu fayl",
+          "explain": "Genişlənməsi «m» hərfi ilə bitən Office faylı (xlsm, docm) makros daşıya bilər."
+        },
+        {
+          "id": "viewer",
+          "label": "Proqram yükləmə linki",
+          "explain": "Sənəd üçün xüsusi proqram tələb olunması saxta oxuyucu əlamətidir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "order",
+      "id": "ec-order",
+      "prompt": "Sənəd makrosları aktivləşdirməyi istəyir. Addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "stop",
+          "label": "Heç bir düyməni basmayın"
+        },
+        {
+          "id": "close",
+          "label": "Sənədi bağlayın"
+        },
+        {
+          "id": "report",
+          "label": "Məktubu təhlükəsizlik komandasına bildirin"
+        },
+        {
+          "id": "verify",
+          "label": "Fayl gözlənilirdisə, göndərənin bildiyiniz nömrəsinə zəng edib soruşun"
+        }
+      ],
+      "explain": "Əvvəlcə dayanın və sənədi bağlayın, sonra bildirin. Göndərənlə yalnız əvvəlcədən bildiyiniz nömrə ilə əlaqə saxlayın."
+    },
+    {
+      "type": "recap",
+      "id": "ec-recap",
+      "points": [
+        "Düymə basmağı istəyən boş sənəd tələdir",
+        "Redaktəni və makrosları aktivləşdirməyin: sənədi bağlayın və bildirin",
+        "Sənədi açmaq üçün heç vaxt saytdan proqram yükləməyin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

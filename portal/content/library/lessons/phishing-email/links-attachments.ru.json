@@ -1,0 +1,483 @@
+{
+  "id": "links-attachments",
+  "title": "Ссылки и вложения",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "read-the-link",
+      "beats": [
+        {
+          "id": "intro",
+          "say": "Текст ссылки говорит одно, а её адрес — другое. Давайте научимся читать адрес.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "padlock",
+          "say": "Замок означает лишь то, что соединение зашифровано. У поддельных сайтов замок тоже есть.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          },
+          "checkpoint": {
+            "prompt": "Доказывает ли замок, что сайт настоящий?",
+            "options": [
+              {
+                "id": "yes",
+                "label": "Да",
+                "correct": false,
+                "feedback": "Нет. Мошенники тоже легко получают замок."
+              },
+              {
+                "id": "no",
+                "label": "Нет",
+                "correct": true,
+                "feedback": "Верно. Всегда проверяйте имя сайта."
+              }
+            ]
+          }
+        },
+        {
+          "id": "owner",
+          "say": "Имя сайта заканчивается перед первой одиночной косой чертой. Последняя часть имени вместе с окончанием и указывает на владельца.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "xidmet-agentliyi-fake",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "xidmetagentliyi.az.",
+                  "spot": "decoy"
+                },
+                {
+                  "text": "hesab-yoxla.info",
+                  "spot": "real-domain"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "real-domain"
+        },
+        {
+          "id": "decoy",
+          "say": "Знакомое имя в начале — просто приманка. Любой может поставить его перед именем своего сайта.",
+          "mood": "alert",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "xidmet-agentliyi-fake",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "xidmetagentliyi.az.",
+                  "spot": "decoy"
+                },
+                {
+                  "text": "hesab-yoxla.info",
+                  "spot": "real-domain"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "decoy"
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "whose-link",
+      "question": {
+        "prompt": "Кому на самом деле принадлежит эта ссылка?",
+        "options": [
+          {
+            "id": "bank",
+            "label": "UlduzBank",
+            "correct": false,
+            "feedback": "Название банка стоит в начале, а владелец — это имя в конце."
+          },
+          {
+            "id": "owner",
+            "label": "az-giris.info",
+            "correct": true,
+            "feedback": "Верно. Конец имени сайта показывает настоящего владельца."
+          },
+          {
+            "id": "path",
+            "label": "kart",
+            "correct": false,
+            "feedback": "Это не имя сайта, а путь к странице после косой черты."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "ulduzbank-fake",
+            "url": [
+              {
+                "text": "https://ulduzbank.az-giris.info/kart"
+              }
+            ]
+          }
+        }
+      },
+      "explain": "Здесь ulduzbank.az — просто приманка. Сайт принадлежит az-giris.info."
+    },
+    {
+      "type": "simulation",
+      "id": "link-to-login",
+      "environment": "browser",
+      "title": "После нажатия",
+      "intro": "Вы открыли ссылку из письма. Прочитайте адрес в браузере и решите, что делать.",
+      "steps": [
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi-fake",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://xidmetagentliyi.az.",
+                "reveal": "hesab-yoxla.info"
+              },
+              {
+                "text": "hesab-yoxla.info",
+                "spot": "real-domain"
+              },
+              {
+                "text": "/giris"
+              }
+            ],
+            "fields": [
+              "Электронная почта",
+              "Пароль"
+            ],
+            "button": "Войти"
+          },
+          "say": "Посмотрите на конец адреса: кто настоящий владелец?",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Войти",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Страница принадлежит hesab-yoxla.info, а не агентству. Немедленно смените пароль и сообщите о случившемся."
+            },
+            {
+              "id": "close",
+              "label": "Закрыть вкладку",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Верно. Знакомое имя в начале — лишь приманка, а настоящий домен — hesab-yoxla.info."
+            },
+            {
+              "id": "report",
+              "label": "Сообщить о сайте",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Отлично. Ваше сообщение помогает заблокировать поддельный сайт и для всех остальных."
+            }
+          ]
+        },
+        {
+          "id": "download",
+          "label": "Загрузка счёта",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "ofistechizat-fake",
+            "name": [
+              {
+                "text": "Faktura_0925.pdf.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "2,1 МБ",
+            "source": [
+              {
+                "text": "ofis-techizat.com"
+              }
+            ]
+          },
+          "say": "Браузер загрузил файл. Проверьте, чем заканчивается его имя.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Открыть",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "Настоящий тип файла — .exe, то есть программа. Счёт никогда не бывает программой."
+            },
+            {
+              "id": "delete",
+              "label": "Удалить",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Верно. Удалите программу, которая выдаёт себя за документ, и сообщите о письме."
+            },
+            {
+              "id": "scan",
+              "label": "Проверить антивирусом",
+              "kind": "scan",
+              "outcome": "safe",
+              "feedback": "Хорошая привычка. Но файл с окончанием .pdf.exe можно удалить и без проверки."
+            }
+          ]
+        },
+        {
+          "id": "real-portal",
+          "label": "Вы открыли портал из закладок",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/giris",
+                "reveal": "xidmetagentliyi.az"
+              }
+            ],
+            "fields": [
+              "Электронная почта",
+              "Пароль"
+            ],
+            "button": "Войти"
+          },
+          "say": "На этот раз вы открыли адрес сами. Что дальше?",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Войти",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Верно. Это официальный домен агентства, и страницу вы открыли сами."
+            },
+            {
+              "id": "report",
+              "label": "Сообщить о сайте",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Это официальный портал агентства. Сайту, который вы сами открыли из закладок, можно доверять."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "invoice-trap",
+      "prompt": "Найдите в этом письме признаки опасности.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "ofistechizat-fake",
+        "from": {
+          "name": [
+            {
+              "text": "OfisTəchizat MMC",
+              "reveal": "hesab@ofis-techizat.com"
+            }
+          ],
+          "address": [
+            {
+              "text": "hesab@"
+            },
+            {
+              "text": "ofis-techizat.com",
+              "spot": "sender-domain"
+            }
+          ]
+        },
+        "to": "s.huseynova@xidmetagentliyi.az",
+        "subject": [
+          {
+            "text": "Счёт № 0925: оплата просрочена"
+          }
+        ],
+        "time": "14:32",
+        "body": [
+          [
+            {
+              "text": "Здравствуйте!"
+            }
+          ],
+          [
+            {
+              "text": "Просроченный счёт во вложении. "
+            },
+            {
+              "text": "Откройте его и включите макросы, иначе текст не отобразится.",
+              "spot": "enable-content"
+            }
+          ],
+          [
+            {
+              "text": "Если файл не открывается, скачайте его здесь: "
+            },
+            {
+              "text": "https://qisa.example/f8Rt",
+              "spot": "short-link"
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Faktura_0925.pdf.zip",
+                "spot": "double-ext",
+                "reveal": "Тип файла: ZIP-архив (.zip)"
+              }
+            ],
+            "size": "312 КБ"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender-domain",
+          "label": "Домен-двойник",
+          "explain": "Похож на адрес известного поставщика, но домен другой. Сверьте настоящий адрес по своим записям."
+        },
+        {
+          "id": "enable-content",
+          "label": "Просьба включить макросы",
+          "explain": "Макросы могут выполнять скрытые команды. Office блокирует их в файлах из интернета, и настоящий счёт никогда не попросит обойти эту защиту."
+        },
+        {
+          "id": "short-link",
+          "label": "Короткая ссылка",
+          "explain": "Не видно, куда она ведёт. Подталкивать к загрузке по ссылке — классическая уловка."
+        },
+        {
+          "id": "double-ext",
+          "label": "Двойное расширение",
+          "explain": "Имя начинается как у PDF, но на самом деле это ZIP-архив. Внутри может скрываться программа."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "link-check",
+      "prompt": "Эта ссылка безопасна или это ловушка?",
+      "cards": [
+        {
+          "id": "home",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi",
+            "url": [
+              {
+                "text": "https://xidmetagentliyi.az/elanlar"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Имя сайта точно совпадает с адресом агентства."
+        },
+        {
+          "id": "portal",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/mezuniyyet"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Часть portal в начале — собственный раздел агентства. Окончание по-прежнему xidmetagentliyi.az."
+        },
+        {
+          "id": "decoy",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi-fake",
+            "url": [
+              {
+                "text": "https://xidmetagentliyi.az-portal.info/giris"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Адрес заканчивается на az-portal.info. Название агентства просто написано в начале."
+        },
+        {
+          "id": "swap",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi-fake",
+            "url": [
+              {
+                "text": "https://xidmetaqentliyi.az/maas"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Вместо g стоит q. Это совершенно другой сайт."
+        },
+        {
+          "id": "short",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://qisa.example/a8Zq"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Сокращённая ссылка скрывает, куда она ведёт. Если она пришла неожиданно, не открывайте её."
+        },
+        {
+          "id": "bank",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "ulduzbank",
+            "url": [
+              {
+                "text": "https://ulduzbank.az/kartlar"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Это собственный адрес банка, он заканчивается на ulduzbank.az. И всё же надёжнее всего вводить адрес банка самостоятельно."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Настоящий владелец сайта указан в конце его имени.",
+        "Короткие ссылки и неожиданные файлы проверяйте, прежде чем открывать.",
+        "Если файл просит включить макросы, закройте его и сообщите о нём."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

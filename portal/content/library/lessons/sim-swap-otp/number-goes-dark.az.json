@@ -1,0 +1,466 @@
+{
+  "id": "number-goes-dark",
+  "title": "Nömrə söndü",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ss1-tutor",
+      "beats": [
+        {
+          "id": "ss1-b1",
+          "say": "Salam! Bu gün cinayətkarların telefon nömrənizi ələ keçirib SMS kodlarınızı necə oğurladığından danışacağıq.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        },
+        {
+          "id": "ss1-b2",
+          "say": "Cinayətkar operatoru aldadıb nömrənizi öz SIM kartına köçürəndə telefonunuz birdən şəbəkəni itirir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "notification",
+              "brandRef": "w2b-sahiltel",
+              "app": "SahilTel",
+              "title": [
+                {
+                  "text": "Şəbəkə yoxdur",
+                  "spot": "no-service"
+                }
+              ],
+              "body": [
+                {
+                  "text": "Yalnız təcili zənglər. SIM kart tanınmadı."
+                }
+              ],
+              "time": "00:14"
+            }
+          },
+          "highlight": "no-service"
+        },
+        {
+          "id": "ss1-b3",
+          "say": "Hər il kartlardan milyonlarla manat oğurlanır. Çox vaxt buna başqasına verilmiş kodlar və məlumatlar səbəb olur.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "stat",
+            "value": "Milyonlarla manat",
+            "label": "hər il kartlardan oğurlanır"
+          }
+        },
+        {
+          "id": "ss1-b4",
+          "say": "Nömrəniz gecə sönsə, səhəri gözləməyin. Başqa telefondan operatorunuza zəng edin.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ss1-sim",
+      "environment": "phone",
+      "title": "Gecəyarısı",
+      "intro": "Gecədir, telefonunuz yanınızdadır. Hər bildirişə baxın və düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "no-service",
+          "label": "00:14 Şəbəkə yoxdur",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2b-sahiltel",
+            "app": "SahilTel",
+            "title": [
+              {
+                "text": "Şəbəkə yoxdur"
+              }
+            ],
+            "body": [
+              {
+                "text": "Yalnız təcili zənglər. SIM kart tanınmadı."
+              }
+            ],
+            "time": "00:14"
+          },
+          "actions": [
+            {
+              "id": "call-operator",
+              "label": "Başqa telefondan operatora zəng et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Nömrəniz başqa karta keçibsə, operator onu bloklayıb sizə qaytara bilər."
+            },
+            {
+              "id": "sleep",
+              "label": "Telefonu söndür və yat",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Cinayətkar məhz buna ümid edir. Bütün gecə SMS kodlarınız ona gedəcək."
+            }
+          ]
+        },
+        {
+          "id": "bank-login",
+          "label": "00:27 UlduzBank Mobil",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "ulduzbank-app",
+            "app": "UlduzBank Mobil",
+            "title": [
+              {
+                "text": "Yeni cihazdan giriş"
+              }
+            ],
+            "body": [
+              {
+                "text": "Android, Gəncə, 00:27. Bu siz deyildinizsə, kartınızı dondurun."
+              }
+            ],
+            "time": "00:27"
+          },
+          "say": "SIM kart işləmir, amma bank tətbiqinin bildirişləri ev internetiylə hələ də gəlir.",
+          "actions": [
+            {
+              "id": "freeze",
+              "label": "Tətbiqi aç və kartı dondur",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Düzdür. Dondurulmuş kartdan pul çıxmır, sonra bankla əlaqə saxlayıb onu yenidən aktivləşdirə bilərsiniz."
+            },
+            {
+              "id": "call-bank",
+              "label": "Başqa telefondan kartın arxasındakı nömrəyə zəng et",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Kartın arxasındakı nömrə bankın əsl nömrəsidir, kartı bloklamağı xahiş edin."
+            },
+            {
+              "id": "dismiss",
+              "label": "Bağla",
+              "kind": "ignore",
+              "outcome": "compromised",
+              "feedback": "Cinayətkar artıq SMS kodlarınızı alır. O, bir neçə dəqiqə ərzində hesabdan pul çıxara bilər."
+            }
+          ]
+        },
+        {
+          "id": "push-request",
+          "label": "00:33 Təsdiqləyici",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "tesdiqleyici",
+            "app": "Təsdiqləyici",
+            "title": [
+              {
+                "text": "Giriş sorğusu: İşPoçt"
+              }
+            ],
+            "body": [
+              {
+                "text": "Gəncə, 00:33. Daxil olan sizsiniz?"
+              }
+            ],
+            "time": "00:33"
+          },
+          "actions": [
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Əla. Nömrəniz cinayətkarın əlindədir, amma bu təsdiq yalnız sizin telefonunuzdadır."
+            },
+            {
+              "id": "approve",
+              "label": "Təsdiqlə",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Qapını özünüz açdınız. Gözləmədiyiniz sorğunu heç vaxt təsdiqləməyin, xüsusilə də gecə."
+            }
+          ]
+        },
+        {
+          "id": "messenger-moved",
+          "label": "00:41 Söhbət",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "sohbet",
+            "app": "Söhbət",
+            "title": [
+              {
+                "text": "Hesabınız başqa telefonda açıldı"
+              }
+            ],
+            "body": [
+              {
+                "text": "Bu nömrə yeni cihazda qeydiyyatdan keçdi."
+              }
+            ],
+            "time": "00:41"
+          },
+          "say": "Messencer hesabınız da nömrənizə bağlıdır.",
+          "actions": [
+            {
+              "id": "warn-family",
+              "label": "Ailəni və dostları başqa yolla xəbərdar et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Cinayətkar sizin adınızdan ailənizdən pul istəyə bilər, ona görə onları əvvəlcədən xəbərdar edin."
+            },
+            {
+              "id": "ignore",
+              "label": "Fikir vermə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Elə bu gecə dostlarınız sizin adınızdan təcili pul xahişi ala bilər. Onları indi xəbərdar edin."
+            }
+          ]
+        },
+        {
+          "id": "recovery-sms",
+          "label": "08:05 UlduzBank",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ulduzbank-fake",
+            "sender": [
+              {
+                "text": "UlduzBank"
+              }
+            ],
+            "time": "08:05",
+            "messages": [
+              [
+                {
+                  "text": "Şübhəli əməliyyatlara görə kartınız bloklandı. Bərpa etmək üçün kart məlumatlarınızı daxil edin: "
+                },
+                {
+                  "text": "ulduzbank-berpa.example",
+                  "link": {
+                    "label": "ulduzbank-berpa.example",
+                    "href": "https://ulduzbank-berpa.example/kart"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Səhər nömrəniz geri qayıdıb. Bu mesaja baxın.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Spam kimi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Cinayətkarlar baş vermiş real hadisədən istifadə edib ikinci dəfə zərbə vururlar."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Kartla bağlı məsələləri yalnız bank tətbiqində və ya kartın üzərindəki nömrə ilə həll edin."
+            },
+            {
+              "id": "open-link",
+              "label": "Linki aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Bu, bankın saytı deyil. Kart məlumatlarınızı daxil etsəniz, ikinci dəfə pul itirəcəksiniz."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "ss1-order",
+      "prompt": "Nömrəniz birdən söndü. Addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "operator",
+          "label": "Başqa telefondan operatora zəng edin və nömrənizi geri qaytarın"
+        },
+        {
+          "id": "bank",
+          "label": "Kartın üzərindəki nömrə ilə banka zəng edin və kartı dondurun"
+        },
+        {
+          "id": "passwords",
+          "label": "Əsas hesablarda parolları dəyişin, SMS əvəzinə autentifikator tətbiqinə keçin"
+        },
+        {
+          "id": "it",
+          "label": "İş hesablarınız barədə İT dəstəyinə məlumat verin"
+        },
+        {
+          "id": "police",
+          "label": "Pul oğurlanıbsa, 102 nömrəsi ilə polisə müraciət edin"
+        }
+      ],
+      "explain": "Əvvəlcə nömrəni geri qaytarın ki, yeni kodlar cinayətkara getməsin. Dərhal ardınca bankdan kartınızı dondurmağı xahiş edin."
+    },
+    {
+      "type": "swipe",
+      "id": "ss1-swipe",
+      "prompt": "Hansı mesaj normaldır, hansı təhlükəlidir? Kartı sürüşdürün.",
+      "cards": [
+        {
+          "id": "own-code",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ulduzbank",
+            "sender": [
+              {
+                "text": "UlduzBank"
+              }
+            ],
+            "time": "14:02",
+            "messages": [
+              [
+                {
+                  "text": "Giriş kodunuz: 482193. Bu kodu heç kimə deməyin."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Bu kodu özünüz istəmisinizsə, mesaj normaldır. Kodu özünüz daxil edin və başqa heç yerə yazmayın."
+        },
+        {
+          "id": "sim-changed",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "w2b-sahiltel",
+            "sender": [
+              {
+                "text": "SahilTel"
+              }
+            ],
+            "time": "23:52",
+            "messages": [
+              [
+                {
+                  "text": "Nömrəniz üçün SIM kartın dəyişdirilməsi sorğusu qəbul edildi."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Yeni SIM kart istəməmisinizsə, bu, hücumun ilk əlamətidir. Dərhal operatorunuza zəng edin."
+        },
+        {
+          "id": "tell-code",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ulduzbank-fake",
+            "sender": [
+              {
+                "text": "UlduzBank"
+              }
+            ],
+            "time": "10:18",
+            "messages": [
+              [
+                {
+                  "text": "Kartınız bloklanıb. Kartı blokdan çıxarmaq üçün sizə gələn kodu zəng edən əməkdaşımıza deyin."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bank heç vaxt kodu öz əməkdaşına deməyinizi istəmir. Bu mesajın məqsədi kodu oğurlamaqdır."
+        },
+        {
+          "id": "night-login",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "ulduzbank-app",
+            "app": "UlduzBank Mobil",
+            "title": [
+              {
+                "text": "Yeni cihazdan giriş"
+              }
+            ],
+            "body": [
+              {
+                "text": "Android, Gəncə, 02:14"
+              }
+            ],
+            "time": "02:14"
+          },
+          "verdict": "threat",
+          "explain": "Siz yatarkən kimsə başqa cihazdan daxil olub. Kartı dondurun və banka zəng edin."
+        },
+        {
+          "id": "own-push",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "tesdiqleyici",
+            "app": "Təsdiqləyici",
+            "title": [
+              {
+                "text": "Giriş sorğusu: İşPoçt"
+              }
+            ],
+            "body": [
+              {
+                "text": "Bakı, 09:01. Daxil olan sizsiniz?"
+              }
+            ],
+            "time": "09:01"
+          },
+          "verdict": "safe",
+          "explain": "Hazırda özünüz daxil olursunuzsa, sorğu normaldır. Gözləmədiyiniz istənilən sorğunu rədd edin."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "ss1-choice",
+      "question": {
+        "prompt": "Nömrəniz başqasına keçsə, hansı qoruma işləməyə davam edir?",
+        "options": [
+          {
+            "id": "sms",
+            "label": "SMS ilə göndərilən kod",
+            "correct": false,
+            "feedback": "Nömrə cinayətkara keçəndə SMS kodları da onunla birlikdə gedir. Əsas hesablar üçün bu, zəif qorumadır."
+          },
+          {
+            "id": "app",
+            "label": "Autentifikator tətbiqi və ya giriş açarı (passkey)",
+            "correct": true,
+            "feedback": "Düzdür. Onlar SIM karta yox, cihazınızın özünə bağlıdır."
+          },
+          {
+            "id": "long-password",
+            "label": "Daha uzun parol",
+            "correct": false,
+            "feedback": "Uzun parol yaxşıdır, amma onu SMS kodu ilə sıfırlamaq mümkündürsə, cinayətkar yenə də daxil olur."
+          }
+        ]
+      },
+      "explain": "Bank, e-poçt və dövlət xidmətləri kimi əsas hesablarda imkan olduqca SMS əvəzinə autentifikator tətbiqi və ya giriş açarı seçin."
+    },
+    {
+      "type": "recap",
+      "id": "ss1-recap",
+      "points": [
+        "Nömrəniz birdən sönsə, dərhal başqa telefondan operatora zəng edin",
+        "Sonra banka zəng edib kartınızı dondurun",
+        "Əsas hesablarda SMS əvəzinə autentifikator tətbiqi və ya giriş açarından istifadə edin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

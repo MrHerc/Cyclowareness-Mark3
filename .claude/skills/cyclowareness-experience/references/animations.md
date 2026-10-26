@@ -255,7 +255,7 @@ approximate (they drift); search the symbol.
 | A3 | `src/components/admin/account-menu.tsx`: `animate-rise` popover `bottom-full`; outside-click and Escape close it | CSS |
 | A4 | `src/components/ui/skeleton.tsx` (`bg-sunken rounded-xl` + `before:animate-shimmer before:bg-gradient-to-r … via-white/70`). Route skeletons: `src/app/(admin)/admin/users/[id]/loading.tsx`, `src/app/(learner)/learn/(catalog)/loading.tsx`, `src/app/(learner)/learn/[slug]/loading.tsx` (each wraps in `role="status" aria-busy="true"` with an sr-only `common.loading`). **No admin-wide `loading.tsx`**: the comment in `admin-nav.tsx` explains a Suspense boundary there would stream HTTP 200 before `notFound()` runs | CSS |
 | A5 | Learner: `src/app/(learner)/template.tsx` (`<div className="animate-reveal">`, re-mounts per navigation). Admin: `animate-reveal` on `<main>` in `src/app/(admin)/admin/layout.tsx` — plays once per layout mount, **not** per navigation. Auth: `src/app/(auth)/layout.tsx` card. Player phases and scenes: `player.tsx` (`key={scene.id} … animate-reveal`) | CSS |
-| O1 | `CountUp` in `overview-client.tsx`: rAF loop, 900 ms, cubic ease-out `1 - (1-p)^3`, `Math.round`; used by the five tiles in `src/app/(admin)/admin/page.tsx` (`text-numeral tabular-nums`) | JS |
+| O1 | `CountUp` in `overview-client.tsx`: rAF loop, 900 ms, cubic ease-out `1 - (1-p)^3`, `Math.round`, printed with `useClientFormat().number` (grouped in the UI language); used by the five tiles in `src/app/(admin)/admin/(overview)/page.tsx` (`text-numeral tabular-nums`) | JS |
 | O2 | `src/components/ui/charts.tsx` `AreaChart` (server-rendered SVG, gradient area, last-value pill, sr-only `HiddenTable`, optional `riskStrip` and `guides={[34,66]}`). **No draw-in animation.** Also `BarChart`, `Sparkline`, `Heatmap`, `StackBar`, `Funnel` — all static | none |
 | O3 | `Ring` (`ui/progress.tsx`) in `SetupGuide`; stroke-dashoffset transition fires only when `value` changes, so no fill-on-load | CSS (change only) |
 | O4 | `ProgressBar` / `StackBar` / `Funnel` with inline `width:%`; `ProgressBar` has the width transition, the others none | CSS (change only) |
@@ -272,8 +272,8 @@ approximate (they drift); search the symbol.
 | F6 | `src/components/shell/protection.tsx` `Protection`: `data-content-shield fixed inset-0 z-90 … bg-canvas/80 backdrop-blur-2xl`, logo `size-20 animate-float`; shown on `blur`/`visibilitychange` | CSS |
 | H1 | `src/components/learner/home-mascot.tsx`: `<Mascot className="size-full animate-float" …>` inside a button; tap cycles `REACTIONS` (happy/wave, excited/hop, proud/shield-up, laughing/cheer, curious/ponder) via `gestureKey`; idle `act` apple at 45 s, nap at 180 s, `wake` on hover/click; opens `TutorPanel` | CSS + Rive |
 | H2 | `src/app/(learner)/layout.tsx` streak/XP pills: `hover:bg-sunken` only; flame gets `fill-reward-400` when streak > 0 | none |
-| H3 | `Ring` in `src/app/(learner)/page.tsx` (daily goal, `size=112`) and `progress/page.tsx` (level, `tone="white"`) | CSS (change only) |
-| H4 | `ProgressBar tone="white"` on the Continue card (`(learner)/page.tsx`) | CSS (change only) |
+| H3 | `Ring` in `src/app/(learner)/app/page.tsx` (Home, route `/app`; daily goal, `size=112`) and `progress/page.tsx` (level, `tone="white"`) | CSS (change only) |
+| H4 | `ProgressBar tone="white"` on the Continue card (`(learner)/app/page.tsx`) | CSS (change only) |
 | H5 | `src/components/learner/path-timeline.tsx`: current card `ring-2 ring-reward-200 transition-shadow hover:shadow-raised`; "Show all" chevron `transition-transform` + `rotate-180` | CSS |
 | H6 | `src/app/(learner)/template.tsx` | CSS |
 | H7 | `src/components/learner/tour.tsx`: spotlight div with `shadow-[0_0_0_200vmax_rgba(22,18,58,0.55)]` and `transition-[top,left,width,height,opacity] duration-(--duration-base) ease-(--ease-out-expo)`; bubble `transition-[top,left]`; `START_DELAY = 700` ms so the page reveal finishes first; anchors by `data-tour="…"`; mascot mood/gesture per step | CSS + Rive |
@@ -343,9 +343,10 @@ Haptics (not in the spec's motion section but part of the feedback loop): `src/l
   `tests/rendering.test.ts`); `tests/player-resume.test.ts` covers the player's resume logic. Visual
   checks happen on the dev server (`preview_start "portal"`, port 3000, never restart it) with
   Profile → Motion switched and DevTools "Emulate CSS prefers-reduced-motion".
-- **Dates inside animated UI** (toasts, notification popover, tour captions): Chromium has no `az`
-  ICU data, so use `useClientFormat()` / `<RelativeTime>` (ADR-017), never `Intl` or
-  `toLocaleString` in client code. The notifications popover already does this.
+- **Dates and numbers inside animated UI** (toasts, notification popover, tour captions, count-ups):
+  Chromium has no `az` date data or number symbols, so use `useClientFormat()` / `<RelativeTime>`
+  (ADR-017; its `number` for digits, as `CountUp` does), never `Intl` or `toLocaleString` in client
+  code. The notifications popover already does this.
 - **i18n.** Motion labels live in `messages/{az,en,ru}/learner.json` (`profile.motion`,
   `motionBody`, `motionFull`, `motionCalm`, `motionStill`) and `messages/*/player.json` (`motion`);
   loading text in `common.json` (`loading`), the shield label in `common.json` (`shield`). Edit these

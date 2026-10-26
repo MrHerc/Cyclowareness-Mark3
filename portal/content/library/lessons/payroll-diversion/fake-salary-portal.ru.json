@@ -1,0 +1,505 @@
+{
+  "id": "fake-salary-portal",
+  "title": "Поддельный зарплатный портал",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "pd2-tutor",
+      "beats": [
+        {
+          "id": "pd2-b1",
+          "say": "Теперь вы обычный сотрудник и хотите посмотреть свой расчётный листок.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "pd2-b2",
+          "say": "Верхний результат поиска часто оказывается рекламой. Мошенники размещают там свои поддельные порталы.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "w2f-kadr-kabineti-fake",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "kadr-kabineti-giris.example.net",
+                  "spot": "ad-domain"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "ad-domain"
+        },
+        {
+          "id": "pd2-b3",
+          "say": "Поддельная страница выглядит точь-в-точь как настоящая. Введёте пароль, и мошенник захватит вашу учётную запись, а потом сменит зарплатный счёт.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "login",
+              "brandRef": "w2f-kadr-kabineti-fake",
+              "brand": "Kadr Kabineti",
+              "url": [
+                {
+                  "text": "https://kadr-kabineti-giris.example.net/giris"
+                }
+              ],
+              "fields": [
+                "Рабочая почта",
+                "Пароль"
+              ],
+              "button": "Войти"
+            }
+          }
+        },
+        {
+          "id": "pd2-b4",
+          "say": "Вводите адрес портала сами или открывайте его из закладок. И не отключайте двухэтапную проверку.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "pd2-choice",
+      "question": {
+        "prompt": "Вы ввели в поиске «kadr kabineti». Как вы войдёте?",
+        "options": [
+          {
+            "id": "ad",
+            "label": "Реклама: Kadr Kabineti, официальный вход (kadr-kabineti-giris.example.net)",
+            "correct": false,
+            "feedback": "Рекламное место покупают, поэтому поддельный сайт может оказаться на самом верху. Этот домен не принадлежит вашей организации."
+          },
+          {
+            "id": "lookalike",
+            "label": "kadr-kabineti.example.org: расчётный листок",
+            "correct": false,
+            "feedback": "Название похоже, но домен не принадлежит вашей организации. Похожее название — самая частая уловка."
+          },
+          {
+            "id": "typed",
+            "label": "Ввожу адрес вручную: kabinet.seherxidmetleri.example",
+            "correct": true,
+            "feedback": "Правильно. Адрес, который вы вводите сами или сохранили в закладках, не зависит от рекламы."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2f-tapinti",
+            "url": [
+              {
+                "text": "https://axtar.example/?q=kadr+kabineti"
+              }
+            ]
+          }
+        }
+      },
+      "explain": "Мошенники поднимают поддельные порталы наверх с помощью поисковой рекламы. Один раз проверьте адрес портала и сохраните его в закладках."
+    },
+    {
+      "type": "simulation",
+      "id": "pd2-sim",
+      "environment": "browser",
+      "title": "Расчётный листок",
+      "intro": "Вы открыли браузер, чтобы посмотреть расчётный листок. Следите за адресной строкой и на каждом шаге принимайте верное решение.",
+      "steps": [
+        {
+          "id": "search",
+          "label": "Реклама: Kadr Kabineti, официальный вход для расчётных листков",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2f-tapinti",
+            "url": [
+              {
+                "text": "https://axtar.example/?q=kadr+kabineti",
+                "reveal": "axtar.example"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "ad",
+              "label": "Открыть рекламную ссылку",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Эта реклама ведёт на поддельный портал. В адресной строке нет домена вашей организации.",
+              "next": "fake-login"
+            },
+            {
+              "id": "bookmark",
+              "label": "Открыть Kadr Kabineti из закладок",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Правильно. Закладка всегда ведёт на настоящий адрес.",
+              "next": "real-login"
+            }
+          ]
+        },
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2f-kadr-kabineti-fake",
+            "brand": "Kadr Kabineti",
+            "url": [
+              {
+                "text": "https://kadr-kabineti-giris.example.net/giris",
+                "reveal": "kadr-kabineti-giris.example.net"
+              }
+            ],
+            "fields": [
+              "Рабочая почта",
+              "Пароль"
+            ],
+            "button": "Войти"
+          },
+          "say": "Посмотрите на адресную строку.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Войти",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Ваш пароль достался мошеннику. Сразу смените его на настоящем портале и позвоните в отдел кадров."
+            },
+            {
+              "id": "close",
+              "label": "Закрыть вкладку",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Верно, это не домен вашей организации. Откройте портал из закладок.",
+              "next": "real-login"
+            }
+          ]
+        },
+        {
+          "id": "fake-code",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2f-kadr-kabineti-fake",
+            "brand": "Kadr Kabineti",
+            "url": [
+              {
+                "text": "https://kadr-kabineti-giris.example.net/tesdiq",
+                "reveal": "kadr-kabineti-giris.example.net"
+              }
+            ],
+            "fields": [
+              "Код из SMS"
+            ],
+            "button": "Подтвердить"
+          },
+          "say": "Теперь сайт просит код, отправленный на ваш телефон.",
+          "actions": [
+            {
+              "id": "code",
+              "label": "Подтвердить",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "С этим кодом мошенник получает полный доступ к вашей учётной записи. Вводите код только на настоящем сайте и только когда входите вы сами."
+            },
+            {
+              "id": "close",
+              "label": "Закрыть вкладку",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Хорошо, что вы остановились. Теперь смените пароль на настоящем портале и сообщите в отдел кадров."
+            }
+          ]
+        },
+        {
+          "id": "real-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2f-kadr-kabineti",
+            "brand": "Kadr Kabineti",
+            "url": [
+              {
+                "text": "https://kabinet.seherxidmetleri.example/giris",
+                "reveal": "seherxidmetleri.example"
+              }
+            ],
+            "fields": [
+              "Рабочая почта",
+              "Пароль"
+            ],
+            "button": "Войти"
+          },
+          "say": "Это собственный адрес вашей организации.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Войти",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Правильно. Домен принадлежит вашей организации, и вы открыли страницу сами."
+            },
+            {
+              "id": "close",
+              "label": "Закрыть вкладку",
+              "kind": "cancel",
+              "outcome": "risky",
+              "feedback": "Это настоящий портал. Если вы проверили адрес, входить безопасно."
+            }
+          ]
+        },
+        {
+          "id": "mfa-offer",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2f-kadr-kabineti",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Двухэтапная проверка отключена"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Включите её сейчас, чтобы защитить учётную запись. Каждый вход будет подтверждаться на вашем телефоне."
+                }
+              ]
+            ],
+            "buttons": [
+              "Включить",
+              "Позже"
+            ]
+          },
+          "actions": [
+            {
+              "id": "enable",
+              "label": "Включить",
+              "kind": "allow",
+              "outcome": "safe",
+              "feedback": "Отлично. Даже если пароль украдут, второй шаг не пустит постороннего."
+            },
+            {
+              "id": "later",
+              "label": "Позже",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Без двухэтапной проверки один пароль открывает всё. Включите её сегодня же."
+            }
+          ]
+        },
+        {
+          "id": "bank-details",
+          "label": "Ваши банковские реквизиты: последнее изменение 14.03.2025, отдел кадров",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2f-kadr-kabineti",
+            "url": [
+              {
+                "text": "https://kabinet.seherxidmetleri.example/rekvizitler",
+                "reveal": "seherxidmetleri.example"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "check",
+              "label": "Проверить счёт",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Хорошая привычка. Если увидите изменение, которое вы не вносили, сразу позвоните в отдел кадров."
+            },
+            {
+              "id": "skip",
+              "label": "Уйти, не посмотрев",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Если реквизиты сменил посторонний, вы узнали бы об этом только в день зарплаты. Проверка займёт считаные секунды."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "pd2-swipe",
+      "prompt": "Безопасно или мошенничество?",
+      "cards": [
+        {
+          "id": "boss-gift-cards",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Сабина Алиева, руководитель"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Я на совещании и не могу позвонить. Срочно купите пять карт BonusMarket по 100 манатов и пришлите мне сюда коды. Деньги верну."
+                  }
+                ],
+                "time": "11:02"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Код подарочной карты — это те же наличные, и вернуть их нельзя. Чтобы проверить просьбу, позвоните руководителю по известному вам номеру."
+        },
+        {
+          "id": "salary-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank",
+            "sender": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "time": "09:00",
+            "messages": [
+              [
+                {
+                  "text": "На вашу карту зачислена зарплата 1240,00 AZN. Баланс: 1386,50 AZN."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ссылки нет, и у вас ничего не просят. Это обычное информационное сообщение."
+        },
+        {
+          "id": "fake-hr-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "w2f-kadr-kabineti-fake",
+            "sender": [
+              {
+                "text": "KadrKabinet"
+              }
+            ],
+            "time": "08:41",
+            "messages": [
+              [
+                {
+                  "text": "Выплата вашей зарплаты приостановлена. Обновите банковские реквизиты: "
+                },
+                {
+                  "text": "kadr-kabinet.example.info/yenile",
+                  "link": {
+                    "label": "kadr-kabinet.example.info/yenile",
+                    "href": "https://kadr-kabinet.example.info/yenile"
+                  }
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Отдел кадров никогда не возобновляет выплату зарплаты по ссылке из SMS. Откройте портал сами или позвоните в отдел."
+        },
+        {
+          "id": "payslip-ready",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2f-kadr-kabineti",
+            "app": "Kadr Kabineti",
+            "title": [
+              {
+                "text": "Расчётный листок за сентябрь готов"
+              }
+            ],
+            "body": [
+              {
+                "text": "Откройте раздел «Зарплата» на портале."
+              }
+            ],
+            "time": "10:15"
+          },
+          "verdict": "safe",
+          "explain": "В этом уведомлении нет ссылки, оно отправляет вас на знакомый портал. Откройте его из закладок."
+        },
+        {
+          "id": "colleague-code",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Гюнель, бухгалтерия"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Тебе придёт код от Kadr Kabineti, сообщи его мне, чтобы я исправила зарплатную ведомость."
+                  }
+                ],
+                "time": "13:20"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Код для входа предназначен только вам. Кто получит ваш код, тот попадёт в вашу учётную запись."
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "pd2-order",
+      "prompt": "Вы ввели пароль на поддельном портале. Расставьте шаги по порядку.",
+      "items": [
+        {
+          "id": "change-password",
+          "label": "Сразу смените пароль на настоящем портале"
+        },
+        {
+          "id": "call",
+          "label": "Позвоните в отдел кадров и службу безопасности"
+        },
+        {
+          "id": "check-details",
+          "label": "Вместе с ними проверьте банковские реквизиты и последние входы"
+        },
+        {
+          "id": "enable-mfa",
+          "label": "Включите двухэтапную проверку"
+        }
+      ],
+      "explain": "Сначала смените пароль, затем позвоните, чтобы остановить любое изменение реквизитов. Если вы ввели ещё и код, обязательно скажите об этом."
+    },
+    {
+      "type": "recap",
+      "id": "pd2-recap",
+      "points": [
+        "Открывайте портал из закладок, а не через поиск.",
+        "Не отключайте двухэтапную проверку.",
+        "Просьбы купить подарочные карты или сообщить код проверяйте по телефону."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

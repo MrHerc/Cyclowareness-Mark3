@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, type ReactNode } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { paragraphs, type Rich, type Span } from "@/lib/content/types";
 import { cn } from "@/lib/cn";
 
@@ -28,10 +28,23 @@ export function useArtifactMode() {
   return useContext(Ctx);
 }
 
+/**
+ * The language of the lesson text when it is not the interface language (an English lesson shown
+ * while its az/ru translation is missing), for `lang` on lesson text; undefined when they match.
+ */
+const ContentLangCtx = createContext<string | undefined>(undefined);
+export const ContentLangProvider = ContentLangCtx.Provider;
+
+export function useContentLang() {
+  return useContext(ContentLangCtx);
+}
+
 /** `boldFrom`: the part of the text from this index on is bold (an email address after its "@"). */
 function SpanView({ span, boldFrom }: { span: Span; boldFrom?: number }) {
   const mode = useArtifactMode();
   const t = useTranslations("player");
+  const locale = useLocale();
+  const contentLang = useContentLang();
   const spot = span.spot;
   const isHighlight = !!spot && mode.highlight === spot;
   const isFound = !!spot && !!mode.hotspot?.found.has(spot);
@@ -76,7 +89,9 @@ function SpanView({ span, boldFrom }: { span: Span; boldFrom?: number }) {
             <span className="absolute -right-3 -bottom-2 h-1.5 w-5 rotate-45 rounded-pill bg-ink" />
           </span>
           <span role="tooltip" className="absolute top-full left-0 z-30 mt-2 block w-max max-w-72 animate-rise rounded-md bg-ink px-3 py-2 text-left text-caption leading-snug font-normal text-white shadow-overlay">
-            <span className="block text-tab-sm font-semibold text-white/70">{t("lensActually")}</span>
+            <span className="block text-tab-sm font-semibold text-white/70" lang={contentLang ? locale : undefined}>
+              {t("lensActually")}
+            </span>
             <span className="font-bold text-white">{mode.lens!.reveal}</span>
           </span>
         </>
@@ -117,12 +132,13 @@ function boldOffsets(paras: Span[][], on: boolean): (number | undefined)[][] {
 
 /** Renders rich text (string, a line of spans or paragraphs of spans). `boldAfterAt` bolds an address's domain. */
 export function RichText({ value, className, as: Tag = "div", boldAfterAt = false }: { value: Rich | undefined | null; className?: string; as?: "div" | "span"; boldAfterAt?: boolean }) {
+  const lang = useContentLang();
   const paras = paragraphs(value);
   if (!paras.length) return null;
   const bold = boldOffsets(paras, boldAfterAt);
   if (Tag === "span" || paras.length === 1) {
     return (
-      <Tag className={className}>
+      <Tag className={className} lang={lang}>
         {paras[0].map((s, i) => (
           <SpanView key={i} span={s} boldFrom={bold[0][i]} />
         ))}
@@ -130,7 +146,7 @@ export function RichText({ value, className, as: Tag = "div", boldAfterAt = fals
     );
   }
   return (
-    <div className={cn("grid gap-2.5", className)}>
+    <div className={cn("grid gap-2.5", className)} lang={lang}>
       {paras.map((p, i) => (
         <p key={i}>
           {p.map((s, j) => (

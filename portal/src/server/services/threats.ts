@@ -1,4 +1,5 @@
 import { and, count, desc, eq, gte, inArray, isNull, max, sql } from "drizzle-orm";
+import { createTranslator } from "next-intl";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
 import { awardXp } from "./progress";
@@ -7,6 +8,7 @@ import { emitEvent } from "./events";
 import { TEMPLATE_BY_KEY } from "../../lib/campaigns/templates";
 import { REPORT_BONUS_DAILY_CAP, REPORT_BONUS_XP, dayKey } from "../../lib/domain/gamification";
 import { isUniqueViolation } from "../db/errors";
+import { messagesFor } from "../../i18n/translator";
 
 export type ThreatChannel = (typeof t.threatReports.$inferInsert)["channel"];
 
@@ -102,12 +104,17 @@ export async function submitThreatReport(
   await emitEvent(db, p.tenantId, match ? "simulation.reported" : "threat.reported", { number, channel: p.channel, simulation: !!match });
   if (!match) {
     const analysts = await db
-      .select({ id: t.users.id })
+      .select({ id: t.users.id, locale: t.users.locale })
       .from(t.users)
       .where(and(eq(t.users.tenantId, p.tenantId), eq(t.users.status, "active"), inArray(t.users.role, ["analyst"])));
     if (analysts.length) {
+      // "New threat report TR-1042" in each analyst's language; the reported subject is the body.
+      const titles = new Map<string, string>();
+      for (const locale of new Set(analysts.map((a) => a.locale))) {
+        titles.set(locale, createTranslator({ ...(await messagesFor(locale)), namespace: "secops.threats" })("notifyTitle", { number }));
+      }
       await db.insert(t.notifications).values(
-        analysts.map((a) => ({ tenantId: p.tenantId, userId: a.id, kind: "threat", title: `TR-${number}`, body: p.subject.slice(0, 140), href: "/admin/threats" })),
+        analysts.map((a) => ({ tenantId: p.tenantId, userId: a.id, kind: "threat", title: titles.get(a.locale) ?? `TR-${number}`, body: p.subject.slice(0, 140), href: "/admin/threats" })),
       );
     }
   }

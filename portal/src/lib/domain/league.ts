@@ -16,11 +16,12 @@ export function leagueScore(completion: number, reportRate: number): number {
   return Math.round(completion * 0.6 + reportRate * 0.4);
 }
 
-export function rankLeague(rows: DepartmentStats[]): LeagueRow[] {
+/** `locale`: the collation of the name tie-break (the organisation's language), so Ə, Ç, Ş sort where its readers expect them. */
+export function rankLeague(rows: DepartmentStats[], locale?: string): LeagueRow[] {
   const scored = rows
     .filter((r) => r.learners > 0)
     .map((r) => ({ ...r, points: leagueScore(r.completion, r.reportRate) }))
-    .sort((a, b) => b.points - a.points || b.completion - a.completion || a.name.localeCompare(b.name));
+    .sort((a, b) => b.points - a.points || b.completion - a.completion || a.name.localeCompare(b.name, locale));
   return scored.map((r, i) => ({
     ...r,
     place: i + 1,

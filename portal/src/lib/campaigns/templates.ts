@@ -20,7 +20,7 @@ export type CampaignTemplate = {
   subject: L10n;
   body: L10n;
   cta?: L10n;
-  attachment?: { name: string; size: string };
+  attachment?: { name: L10n; size: L10n };
   /** What gave it away: shown on the teachable-moment page. */
   redFlags: L10n[];
 };
@@ -84,7 +84,7 @@ export const TEMPLATES: CampaignTemplate[] = [
       "Hello,\n\nPlease find the September invoice attached. Payment is 5 days late. Open the file and click “Enable content” to see the amount.",
       "Здравствуйте,\n\nВо вложении счёт за сентябрь. Оплата просрочена на 5 дней. Откройте файл и нажмите «Включить содержимое», чтобы увидеть сумму.",
     ),
-    attachment: { name: "Faktura_0925.pdf.zip", size: "312 KB" },
+    attachment: { name: l("Faktura_0925.pdf.zip", "Invoice_0925.pdf.zip", "Счёт_0925.pdf.zip"), size: l("312 KB", "312 KB", "312 КБ") },
     redFlags: [
       l("«.pdf.zip» — ikiqat uzantı: içində sənəd yox, arxiv var.", "“.pdf.zip” is a double extension: it is an archive, not a document.", "«.pdf.zip» — двойное расширение: это архив, а не документ."),
       l("«Məzmunu aktivləşdirin» makrosu işə salır.", "“Enable content” runs macros.", "«Включить содержимое» запускает макросы."),
@@ -98,7 +98,7 @@ export const TEMPLATES: CampaignTemplate[] = [
     moduleSlug: "quishing",
     harvest: true,
     qr: true,
-    name: l("İki addımlı girişin yenilənməsi (QR)", "Two-step verification renewal (QR)", "Обновление двухэтапного входа (QR)"),
+    name: l("İki addımlı doğrulamanın yenilənməsi (QR)", "Two-step verification renewal (QR)", "Обновление двухэтапной проверки (QR)"),
     sender: { name: l("İT Dəstək", "IT Support", "ИТ-поддержка"), address: "it-destek@rxagentlik-support.info" },
     subject: l("İki addımlı giriş bu gün bitir — QR kodu skan edin", "Two-step sign-in expires today — scan the QR code", "Двухэтапный вход истекает сегодня — отсканируйте QR-код"),
     body: l(
@@ -262,13 +262,13 @@ export const TEMPLATES: CampaignTemplate[] = [
     sender: { name: l("Direktorun yeni köməkçisi", "The director’s new assistant", "Новый помощник директора"), address: "+994 55 000 41 90" },
     subject: l("USB", "USB", "USB"),
     body: l(
-      "Salam, direktorun yeni köməkçisiyəm. Sizə bağlama göndərdim, içində iclas təqdimatı olan fləş kart var. Zəhmət olmasa açıb baxın.",
+      "Salam, direktorun yeni köməkçisiyəm. Sizə bağlama göndərdim, içində iclas təqdimatı olan fleş kart var. Zəhmət olmasa açıb baxın.",
       "Hi, I’m the director’s new assistant. I sent you a parcel with a flash drive holding the meeting slides. Please open it and take a look.",
       "Здравствуйте, я новый помощник директора. Отправил вам посылку с флешкой, на ней презентация к совещанию. Откройте, пожалуйста.",
     ),
-    attachment: { name: "Iclas_teqdimati.html", size: "8 KB" },
+    attachment: { name: l("Iclas_teqdimati.html", "Meeting_slides.html", "Презентация_совещания.html"), size: l("8 KB", "8 KB", "8 КБ") },
     redFlags: [
-      l("Naməlum fləş kartı heç vaxt iş kompüterinə taxmayın.", "Never plug an unknown flash drive into a work computer.", "Никогда не вставляйте неизвестную флешку в рабочий компьютер."),
+      l("Naməlum fleş kartı heç vaxt iş kompüterinə taxmayın.", "Never plug an unknown flash drive into a work computer.", "Никогда не вставляйте неизвестную флешку в рабочий компьютер."),
       l("«Yeni köməkçi» kimliyini İT və ya rəhbərlə yoxlayın.", "Check the “new assistant” with IT or your manager.", "Проверьте «нового помощника» через ИТ или руководителя."),
       l("Tapılan və ya gözlənilməyən cihazı İT-yə təhvil verin.", "Hand found or unexpected devices to IT.", "Передайте найденное или неожиданное устройство в ИТ."),
     ],

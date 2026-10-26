@@ -10,6 +10,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { Checkbox, Field, Input, Select, Switch, Textarea } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
+import { searchFold } from "./search-fold";
 
 const SEVERITIES = ["low", "medium", "high", "critical"] as const;
 const SOURCES = ["analyst", "report", "sandbox", "siem", "intel"] as const;
@@ -166,9 +167,9 @@ function TrainingFields({ value, onChange, modules, departments, people }: { val
   const t = useTranslations("secops.incidents");
   const [query, setQuery] = useState("");
   const matches = useMemo(() => {
-    const q = query.trim().toLocaleLowerCase();
+    const q = searchFold(query.trim());
     if (q.length < 2) return [];
-    return people.filter((p) => p.name.toLocaleLowerCase().includes(q) || p.email.includes(q)).slice(0, 8);
+    return people.filter((p) => searchFold(p.name).includes(q) || searchFold(p.email).includes(q)).slice(0, 8);
   }, [query, people]);
   const toggle = (id: string) => {
     const next = new Set(value.userIds);
@@ -205,7 +206,7 @@ function TrainingFields({ value, onChange, modules, departments, people }: { val
             </p>
             <Field label={t("department")} htmlFor="tr-dept">
               <Select id="tr-dept" value={value.departmentId} onChange={(e) => onChange({ ...value, departmentId: e.target.value })}>
-                <option value="">—</option>
+                <option value="">{t("noDepartment")}</option>
                 {departments.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.label}
@@ -239,10 +240,10 @@ function TrainingFields({ value, onChange, modules, departments, people }: { val
             ) : null}
             {selected.length ? (
               <div className="flex flex-wrap gap-1.5">
-                <span className="text-tab text-ink-muted">{t("selected", { count: selected.length })}:</span>
+                <span className="text-tab text-ink-muted">{t("selected", { count: selected.length })}</span>
                 {selected.map((p) => (
-                  <button key={p.id} type="button" onClick={() => toggle(p.id)} className="rounded-pill bg-brand-50 px-2.5 py-1 text-tab font-semibold text-brand-700 hover:bg-brand-100 pointer-coarse:min-h-11">
-                    {p.name} ×
+                  <button key={p.id} type="button" onClick={() => toggle(p.id)} aria-label={t("removePerson", { name: p.name })} className="rounded-pill bg-brand-50 px-2.5 py-1 text-tab font-semibold text-brand-700 hover:bg-brand-100 pointer-coarse:min-h-11">
+                    {p.name} <span aria-hidden>×</span>
                   </button>
                 ))}
               </div>
@@ -355,7 +356,7 @@ export function IncidentControls({ id, status, live, canAssign }: { id: string; 
       )}
       {status !== "resolved" ? (
         <Button variant="ghost" disabled={pending} onClick={() => update({ live: !live })}>
-          {t("live")}: {live ? tc("on") : tc("off")}
+          {live ? t("unmarkLive") : t("markLive")}
         </Button>
       ) : null}
     </div>

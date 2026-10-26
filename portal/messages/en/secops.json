@@ -35,6 +35,14 @@
   "unknownPerson": "Former employee",
   "anonymous": "Anonymous",
   "people": "{count, plural, one {# person} other {# people}}",
+  "iocTypes": {
+    "domain": "Domain",
+    "url": "URL",
+    "ip": "IP",
+    "sha256": "SHA-256",
+    "email": "Email",
+    "filename": "File name"
+  },
   "ops": {
     "subtitle": "Everything that needs a security decision today, in one place.",
     "newReports": "New reports",
@@ -46,7 +54,7 @@
     "activeLoops": "Open loops",
     "activeLoopsHint": "{count} closed in 30 days",
     "timeToClose": "Median time to close a loop",
-    "timeToCloseValue": "{hours} h",
+    "timeToCloseValue": "{hours, number} h",
     "timeToCloseEmpty": "No closed loops yet",
     "reportsChart": "Reports from employees, last 14 days",
     "reportsHeaders": {
@@ -123,8 +131,13 @@
     "analyze": "Check link in sandbox",
     "analyzed": "Sandbox SB-{number}: {verdict}",
     "triaged": "Report triaged",
+    "notifyTitle": "New threat report TR-{number}",
     "converted": "Loop opened",
-    "dismissed": "Report dismissed"
+    "dismissed": "Report dismissed",
+    "errors": {
+      "already": "This report has already been turned into a loop.",
+      "plan": "Closed loops are not included in your plan."
+    }
   },
   "approvals": {
     "subtitle": "No AI or template material reaches employees before a person approves it.",
@@ -147,6 +160,7 @@
     "secondApprove": "Approve (second)",
     "reject": "Reject",
     "rejectReason": "Why is it rejected?",
+    "reasonQuoted": "“{reason}”",
     "edit": "Edit",
     "saveEdit": "Save changes",
     "title": "Title",
@@ -189,20 +203,26 @@
     "severity": "Severity",
     "source": "Source",
     "iocs": "Indicators (one per line)",
-    "iocsHint": "Domains, URLs, IP addresses, hashes or file names. Stored defanged.",
+    "iocsHint": "Domains, URLs, IP addresses, hashes or file names. Shown defanged (example[.]com) so nobody opens them by accident.",
     "mitre": "MITRE ATT&CK techniques",
-    "mitreHint": "For example T1566.002, separated by commas",
+    "mitreHint": "For example, T1566.002; separate several with commas",
     "training": "Training after the incident",
     "module": "Lesson",
     "noModule": "No training",
     "minScore": "Pass mark (%)",
+    "minScoreValue": "Pass mark: {score}%",
     "due": "Due date",
+    "dueValue": "Due {date}",
     "targets": "Who needs it",
     "targetsHint": "People and departments involved",
     "department": "Whole department",
+    "noDepartment": "No department",
     "people": "People",
     "pickPeople": "Search people",
-    "selected": "{count} selected",
+    "selected": "{count} selected:",
+    "removePerson": "Remove {name}",
+    "markLive": "Mark as live",
+    "unmarkLive": "Remove live mark",
     "autoTraining": "Assign the training now",
     "create": "Create incident",
     "created": "Incident IR-{number} created",
@@ -257,7 +277,7 @@
     "stix": "Download STIX 2.1",
     "createIncident": "Open incident",
     "incidentLinked": "Linked to IR-{number}",
-    "size": "{kb} KB",
+    "size": "{kb, number} KB",
     "sha": "SHA-256"
   },
   "risk": {
@@ -325,7 +345,7 @@
       "value": "Average risk"
     },
     "now": "Now {value}",
-    "change": "{delta} points in 30 days",
+    "change": "{sign}{abs, plural, one {# point} other {# points}} in 30 days",
     "completion": "Training completion",
     "reportRate": "Simulation report rate",
     "clickRate": "Simulation click rate",
@@ -336,8 +356,8 @@
     "completionShort": "Completion",
     "headcount": "People",
     "incidents": "Incidents, 30 days",
-    "opened": "Opened",
-    "resolved": "Resolved",
+    "opened": "opened",
+    "resolved": "resolved",
     "loops": "Closed loops, 30 days",
     "trained": "People trained after real threats",
     "topRisks": "Highest open risks",
@@ -372,8 +392,8 @@
     "unpublish": "Move to drafts",
     "preview": "Preview",
     "delete": "Delete",
-    "deleteBody": "The lesson is removed permanently, together with its assignments. Only a lesson nobody has started can be deleted: once someone has progress, a confirmation or a certificate for it, someone has an open risk this lesson closes, or an incident trains with it, use Move to drafts instead, which keeps their results and certificate links.",
-    "deleteInUse": "This lesson was not deleted: people already have progress, confirmations or certificates for it, someone has an open risk this lesson closes, or an incident trains with it. Use Move to drafts instead.",
+    "deleteBody": "The lesson is removed permanently, together with its assignments. Only a lesson nobody has started can be deleted: once someone has progress, a confirmation or a certificate for it, someone has an open risk this lesson closes, or an incident trains with it, use “Move to drafts” instead, which keeps their results and certificate links.",
+    "deleteInUse": "This lesson was not deleted: people already have progress, confirmations or certificates for it, someone has an open risk this lesson closes, or an incident trains with it. Use “Move to drafts” instead.",
     "form": {
       "title": "Title",
       "subtitle": "One-line summary",
@@ -386,6 +406,7 @@
       "pointsHint": "AI Sel reads each point aloud as a step of the lesson.",
       "question": "Check question",
       "options": "Answers",
+      "optionN": "Answer {n}",
       "correct": "Correct",
       "optionFeedback": "Why (shown after answering)",
       "recap": "Summary (one per line)",
@@ -438,9 +459,10 @@
       "search": "Search lessons",
       "up": "Move up",
       "down": "Move down",
-      "remove": "Remove",
+      "removeItem": "Remove {title}",
       "save": "Save path"
     },
+    "unavailableLesson": "Unavailable lesson",
     "saved": "Path saved",
     "deleted": "Path deleted",
     "assign": "Assign"
@@ -452,7 +474,7 @@
     "past": "Past",
     "empty": "No sessions.",
     "registered": "{count} registered",
-    "capacity": "of {capacity}",
+    "registeredOf": "{count} of {capacity} registered",
     "attended": "{count} attended",
     "form": {
       "title": "Title",
@@ -469,7 +491,7 @@
     },
     "attendance": "Attendance",
     "noRegistrations": "Nobody registered yet.",
-    "present": "Attended",
+    "presentFor": "{name} attended",
     "delete": "Delete session",
     "deleteBody": "Registered people are notified that the session is cancelled.",
     "saved": "Session saved",
@@ -504,7 +526,12 @@
     "empty": "No tickets with this status.",
     "setStatus": "Status",
     "updated": "Ticket updated",
-    "back": "All tickets"
+    "back": "All tickets",
+    "notifyTitle": "Request #{number}: {subject}",
+    "notifyBody": {
+      "answered": "Your request has been answered.",
+      "closed": "Your request has been closed."
+    }
   },
   "feedback": {
     "subtitle": "What employees think of the lessons and the platform.",
@@ -522,5 +549,162 @@
     "markReviewed": "Mark reviewed",
     "reviewed": "Reviewed",
     "empty": "No feedback yet."
+  },
+  "aiTrainer": {
+    "title": "Create a training with AI",
+    "subtitle": "Describe what people should learn. AI writes the lessons, checks them automatically, and you review the draft before anyone sees it.",
+    "connected": "AI connected",
+    "notConnected": "AI not connected",
+    "offlineTitle": "AI is not connected",
+    "offlineBody": "An administrator has to set ANTHROPIC_API_KEY on the server. Until then you can build a draft from the closest library lesson: it goes through the same format and safety checks, without the AI review.",
+    "prompt": "What should the training teach?",
+    "promptHint": "Topic, audience and tone, in a sentence or two.",
+    "promptPlaceholder": "For example: teach warehouse staff to recognise fake delivery text messages. Calm, friendly tone, everyday examples.",
+    "language": "Language",
+    "category": "Category",
+    "difficulty": "Difficulty",
+    "minutes": "Minutes (about)",
+    "lessons": "Lessons",
+    "generate": "Generate with AI",
+    "fromLibrary": "Build from the library instead",
+    "generating": "AI is writing the training and checking it. This can take a minute or two…",
+    "building": "Building a draft from the library and checking it…",
+    "howTitle": "How it works",
+    "how": {
+      "write": "You describe it",
+      "check": "Automatic checks",
+      "review": "AI review",
+      "publish": "You publish"
+    },
+    "howHelp": {
+      "write": "Topic, audience, tone, language and length.",
+      "check": "Lesson format, links, contacts, wording and answers.",
+      "review": "A second AI pass checks facts and clarity. Problems are fixed once automatically.",
+      "publish": "The training is saved as a draft. Open it in the player, then publish it from the list."
+    },
+    "errors": {
+      "invalid": "Describe the topic in at least one sentence.",
+      "offline": "AI is not connected. Set ANTHROPIC_API_KEY, or build from the library.",
+      "failed": "The training could not be prepared. Try again or reword the prompt.",
+      "noMatch": "No library lesson matches this prompt. Try other keywords or another category."
+    },
+    "steps": {
+      "schema": "Format",
+      "safety": "Safety rules",
+      "review": "AI review"
+    },
+    "stepHelp": {
+      "schema": "Lesson structure, scene types and the links between steps.",
+      "safety": "Only example domains, no real emails or phone numbers, no offensive words, correct answers, known illustrations.",
+      "review": "Facts, clarity for non-technical staff, and whether it teaches what you asked."
+    },
+    "status": {
+      "pass": "Passed",
+      "fail": "Failed",
+      "skipped": "Skipped"
+    },
+    "notes": {
+      "offline": "Skipped: AI is not connected.",
+      "blocked": "Skipped until the earlier checks pass.",
+      "unavailable": "The reviewer did not answer. Review the content yourself."
+    },
+    "verdict": {
+      "verified": "Verified",
+      "needs_review": "Needs human review"
+    },
+    "verdictHelp": {
+      "verified": "All three checks passed. Read it once in the player, then publish it.",
+      "needs_review": "Some checks failed or were skipped. Go through the points below before you publish."
+    },
+    "regenerated": "The first version had problems, so it was written again once with them as feedback.",
+    "severity": {
+      "blocking": "Blocking",
+      "minor": "Minor"
+    },
+    "issuesNone": "No issues found.",
+    "moreIssues": "Show {count} more",
+    "sourceAi": "Written by AI",
+    "sourceLibrary": "From the library: {title}",
+    "contentLanguage": "The lesson text of this library module is in {language}.",
+    "contentLanguageName": {
+      "az": "Azerbaijani",
+      "en": "English",
+      "ru": "Russian"
+    },
+    "issues": {
+      "missing": "A required field is missing.",
+      "wrongType": "This field has the wrong kind of value.",
+      "textShort": "The text is too short: at least {min, plural, one {# character} other {# characters}}.",
+      "textLong": "The text is too long: at most {max, plural, one {# character} other {# characters}}.",
+      "fewItems": "Too few items: at least {min}.",
+      "manyItems": "Too many items: at most {max}.",
+      "numberSmall": "The number is too small: at least {min}.",
+      "numberLarge": "The number is too large: at most {max}.",
+      "badValue": "This value is not supported here.",
+      "badFormat": "This part does not follow the lesson format.",
+      "duplicateSceneId": "Two scenes have the same id “{id}”.",
+      "startMissing": "The scenario starts at step “{node}”, which does not exist.",
+      "nextMissing": "A choice leads to step “{next}”, which does not exist.",
+      "noCorrectOption": "The question has no correct answer.",
+      "minToFindTooHigh": "The scene asks learners to find more signs than it has.",
+      "structure": "The lesson structure has a problem.",
+      "emailOutside": "Email address outside the example domains: {value}",
+      "realDomain": "Real-looking domain or link: {value}",
+      "phone": "Phone numbers are not allowed: {value}",
+      "profanity": "Inappropriate word: {value}",
+      "unknownIllustration": "Unknown illustration “{id}”.",
+      "optionIdsRepeat": "Two answers have the same id.",
+      "multiFewCorrect": "A question with several right answers needs at least 2 correct ones; this one has {count}.",
+      "multiNoWrong": "A question with several right answers has no wrong answer.",
+      "singleCorrectCount": "A question with one right answer needs exactly 1 correct answer; this one has {count}.",
+      "spotNotMarked": "The sign “{spot}” is not marked in the sample material.",
+      "orderIdsRepeat": "Two items to put in order have the same id.",
+      "swipeNoThreat": "The “Safe or threat” cards include no threat."
+    },
+    "where": {
+      "lessons": "Lesson list",
+      "lesson": "Lesson {n}",
+      "scene": "Scene {n}",
+      "sceneOf": "Scene {n}: {type}",
+      "option": "Answer {n}",
+      "beat": "Step {n}",
+      "card": "Card {n}",
+      "item": "Item {n}",
+      "pair": "Pair {n}",
+      "spot": "Sign {n}",
+      "point": "Takeaway {n}",
+      "node": "Stage {n}",
+      "step": "Stage {n}",
+      "choice": "Choice {n}",
+      "action": "Action {n}",
+      "artifact": "Sample material",
+      "titleField": "Title",
+      "title": "Training title",
+      "subtitle": "Training subtitle"
+    },
+    "lessonN": "Lesson {n}",
+    "scene": {
+      "intro": "Intro",
+      "tutor": "Tutor",
+      "choice": "Question",
+      "swipe": "Safe or threat",
+      "order": "Put in order",
+      "match": "Match",
+      "hotspot": "Find the signs",
+      "recap": "Recap",
+      "simulation": "Simulation",
+      "scenario": "Scenario",
+      "password": "Password"
+    },
+    "correct": "correct answer",
+    "verdictCard": {
+      "threat": "Threat",
+      "safe": "Safe"
+    },
+    "save": "Save as draft",
+    "saved": "Saved as a draft. Nobody sees it until you publish it from the list.",
+    "draftNotice": "Saving creates a draft. Employees do not see it until you publish it.",
+    "openPlayer": "Open in player",
+    "reset": "Start over"
   }
 }

@@ -58,7 +58,7 @@ type GuideApi = {
   mood: MascotMood;
   talking: boolean;
   gesture: { name: MascotGesture; key: number } | null;
-  /** The mascot's guide poses: wait in quiet mode, listen while a caller line plays, whisper for whispered lines, the travel walk between chapters. */
+  /** The mascot's guide poses: wait in quiet mode, listen while a caller line plays, whisper for whispered lines. */
   pose: MascotGuide;
   /** Where the mascot points while the current queue plays. */
   aim: MascotAim;
@@ -66,7 +66,6 @@ type GuideApi = {
   fire: MascotFire | null;
   act: GuideAct;
   move: (name: GuideMove) => void;
-  setTravel: (dir: "left" | "right" | null) => void;
   setAct: (act: GuideAct) => void;
   activated: boolean;
   memory: () => Memory | null;
@@ -105,7 +104,6 @@ export function GuideProvider({ lang, memoryDays, children }: { lang: string; me
   const [playing, setPlaying] = useState<{ whisper: boolean; aim: { angle: number } | null } | null>(null);
   const [fire, setFire] = useState<MascotFire | null>(null);
   const [act, setAct] = useState<GuideAct>("rest");
-  const [travel, setTravel] = useState<"left" | "right" | null>(null);
   const [activated, setActivated] = useState(false);
   const { speak: nSpeak, stop: nStop, speaking, supported } = useNarrator({ enabled: !quiet && activated, rate: 1, lang });
   const queue = useRef<{ lines: Line[]; opts: Say } | null>(null);
@@ -259,9 +257,8 @@ export function GuideProvider({ lang, memoryDays, children }: { lang: string; me
       wait: quiet,
       listen: playing !== null && caption?.line.voice === "caller",
       whisper: playing !== null && (playing.whisper || caption?.line.emotion === "whisper"),
-      travel,
     }),
-    [quiet, playing, caption, travel],
+    [quiet, playing, caption],
   );
 
   const api = useMemo<GuideApi>(
@@ -272,7 +269,8 @@ export function GuideProvider({ lang, memoryDays, children }: { lang: string; me
       quiet,
       setQuiet,
       caption,
-      mood: caption ? (EMOTION_MOOD[caption.line.emotion ?? ""] ?? "talk") : "idle",
+      // The line's mood while the queue plays; the caption stays up afterwards, the mascot goes back to idle.
+      mood: playing && caption ? (EMOTION_MOOD[caption.line.emotion ?? ""] ?? "talk") : "idle",
       talking: speaking,
       gesture,
       pose,
@@ -280,7 +278,6 @@ export function GuideProvider({ lang, memoryDays, children }: { lang: string; me
       fire,
       act,
       move,
-      setTravel,
       setAct,
       activated,
       memory,

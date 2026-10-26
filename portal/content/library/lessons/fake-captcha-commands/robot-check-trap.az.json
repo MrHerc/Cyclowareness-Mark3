@@ -1,0 +1,514 @@
+{
+  "id": "robot-check-trap",
+  "title": "Robot yoxlaması",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "fc1-tutor",
+      "beats": [
+        {
+          "id": "fc1-b1",
+          "say": "Salam! Bu gün özünü robot yoxlaması kimi göstərən saxta səhifələri tanımağı öyrənəcəyik.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "fc1-b2",
+          "say": "Belə səhifə üç addım göstərir: düymələri basın, mətni yapışdırın, təsdiqləyin.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2a-xezer-forum-fake",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "İnsan olduğunuzu təsdiqləyin"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "1. Göstərilən düymələri eyni anda basın."
+                  }
+                ],
+                [
+                  {
+                    "text": "2. Kopyalanmış mətni yapışdırın.",
+                    "spot": "paste"
+                  }
+                ],
+                [
+                  {
+                    "text": "3. Enter düyməsini basın."
+                  }
+                ]
+              ],
+              "buttons": [
+                "Mən robot deyiləm"
+              ]
+            }
+          },
+          "highlight": "paste"
+        },
+        {
+          "id": "fc1-b3",
+          "say": "Əsl yoxlama heç vaxt sizdən klaviaturada əmr yazmağı istəmir.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        },
+        {
+          "id": "fc1-b4",
+          "say": "Qayda belədir: sayt sizə nə yazmağı desə də, yazmayın və səhifəni bağlayın.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "fc1-hotspot",
+      "prompt": "Bu yoxlama səhifəsindəki xəbərdarlıq əlamətlərini tapın.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2a-xezer-forum-fake",
+        "tone": "app",
+        "title": [
+          {
+            "text": "İnsan olduğunuzu təsdiqləyin"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Davam etmək üçün aşağıdakı addımları yerinə yetirin:"
+            }
+          ],
+          [
+            {
+              "text": "1. Klaviaturanızda pəncərə açan düymələri basın.",
+              "spot": "keys"
+            }
+          ],
+          [
+            {
+              "text": "2. Kopyalanmış mətni xanaya yapışdırın.",
+              "spot": "paste"
+            }
+          ],
+          [
+            {
+              "text": "3. Enter düyməsi ilə təsdiqləyin.",
+              "spot": "enter"
+            }
+          ],
+          [
+            {
+              "text": "Bu yoxlama botları aşkar etmək üçün lazımdır.",
+              "spot": "excuse"
+            }
+          ]
+        ],
+        "buttons": [
+          "Mən robot deyiləm"
+        ]
+      },
+      "spots": [
+        {
+          "id": "keys",
+          "label": "Düymələri basmaq",
+          "explain": "Əsl yoxlama heç vaxt klaviatura düymələrini basmağı istəmir. Gizli əmr məhz belə işə salınır."
+        },
+        {
+          "id": "paste",
+          "label": "Yapışdırmaq",
+          "explain": "Yapışdırdığınız mətn əslində gizli əmrdir. Sayt sizə nəyi yapışdırmağı desə də, bunu etməyin."
+        },
+        {
+          "id": "enter",
+          "label": "Təsdiq düyməsi",
+          "explain": "Təsdiqləyəndə əmr işə düşür və zərərli proqram quraşdırılır. Bu addımı atmayın."
+        },
+        {
+          "id": "excuse",
+          "label": "Saxta bəhanə",
+          "explain": "Botları aşkar etmək sadəcə bəhanədir. Əsl yoxlama şəkil seçməyi və ya xananı işarələməyi istəyir."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "simulation",
+      "id": "fc1-sim",
+      "environment": "browser",
+      "title": "Forum saytında",
+      "intro": "Forum saytında bir neçə yoxlama ilə qarşılaşırsınız. Hər biri üçün düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "clickfix",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-xezer-forum-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İnsan olduğunuzu təsdiqləyin"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Davam etmək üçün göstərilən düymələri basın və mətni yapışdırın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Başla",
+              "Bağla"
+            ]
+          },
+          "say": "Səhifə sizə düymələri basmağı və mətni yapışdırmağı deyir.",
+          "actions": [
+            {
+              "id": "close",
+              "label": "Səhifəni bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əmr yazmağı istəyən yoxlama saxtadır, ona görə səhifəni bağlamaq doğru addımdır."
+            },
+            {
+              "id": "do",
+              "label": "Addımları yerinə yetir",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Yapışdırdığınız gizli əmr zərərli proqram quraşdırdı. Belə addımları heç vaxt yerinə yetirməyin."
+            },
+            {
+              "id": "report",
+              "label": "İT dəstəyinə bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Yaxşı addımdır. Bu səhifəni İT dəstəyinə göstərmək həmkarlarınızı da qoruyur."
+            }
+          ]
+        },
+        {
+          "id": "real-captcha",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-xezer-forum",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Şəkilləri seçin"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Robot olmadığınızı göstərmək üçün svetofor olan şəkilləri seçin."
+                }
+              ]
+            ],
+            "buttons": [
+              "Təsdiqlə",
+              "Yenilə"
+            ]
+          },
+          "say": "Bu, adi şəkil yoxlamasıdır.",
+          "actions": [
+            {
+              "id": "complete",
+              "label": "Şəkilləri seç və təsdiqlə",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əsl yoxlama belə görünür: şəkil seçmək və ya xananı işarələmək."
+            },
+            {
+              "id": "close",
+              "label": "Səhifəni bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Bu da olar. Davam etmək istəmirsinizsə, səhifəni sadəcə bağlaya bilərsiniz."
+            },
+            {
+              "id": "report",
+              "label": "Hücum kimi bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Bu yoxlama təhlükəsizdir, ona görə onu bildirməyə ehtiyac yoxdur. Yalnız əmr istəyən yoxlamalar saxtadır."
+            }
+          ]
+        },
+        {
+          "id": "fix-pdf",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "senedoxu-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Sənəd açılmır"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "PDF göstərilə bilmədi. Problemi həll etmək üçün aşağıdakı əmri kopyalayın və işə salın."
+                }
+              ],
+              [
+                {
+                  "text": "[saytın kopyaladığı naməlum mətn]"
+                }
+              ]
+            ],
+            "buttons": [
+              "Düzəlt",
+              "Bağla"
+            ]
+          },
+          "say": "Bu səhifə sənədi açmaq üçün sizə hansısa əmri işə salmağı təklif edir.",
+          "actions": [
+            {
+              "id": "close",
+              "label": "Səhifəni bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Sənədin açılmadığını deyən səhifə də eyni tələdir, onu bağlayın."
+            },
+            {
+              "id": "fix",
+              "label": "Əmri işə sal",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Bu əmr kompüterə zərərli proqram quraşdırdı. Sənədin açılmadığını deyən səhifəyə inanmayın."
+            },
+            {
+              "id": "report",
+              "label": "İT dəstəyinə bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Yaxşı seçimdir. İT dəstəyi səhifəni yoxlayıb başqalarını xəbərdar edə bilər."
+            }
+          ]
+        },
+        {
+          "id": "fix-meeting",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-gorus-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Görüş xətası"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Görüşə qoşulmaq üçün bu əmri işə salın, sonra səhifəni yeniləyin."
+                }
+              ]
+            ],
+            "buttons": [
+              "Əmri işə sal",
+              "Bağla"
+            ]
+          },
+          "say": "İndi isə səhifə görüş tətbiqində xəta olduğunu deyir.",
+          "actions": [
+            {
+              "id": "close",
+              "label": "Səhifəni bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Görüş tətbiqi heç vaxt əmr işə salmağı istəmir, deməli, bu da tələdir."
+            },
+            {
+              "id": "fix",
+              "label": "Əmri işə sal",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Əmr zərərli proqramı işə saldı. Xətanı düzəltdiyini iddia edən istənilən əmr eyni hiylədir."
+            },
+            {
+              "id": "report",
+              "label": "İT dəstəyinə bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Belə saxta xəta səhifələrini İT dəstəyinə bildirmək hamıya kömək edir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "fc1-swipe",
+      "prompt": "Bu yoxlama əsldir, yoxsa tələ?",
+      "cards": [
+        {
+          "id": "image-captcha",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-xezer-forum",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Xananı işarələyin"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "«Mən robot deyiləm» xanasını işarələyin və davam edin."
+                }
+              ]
+            ],
+            "buttons": [
+              "Davam et"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Bu, adi yoxlamadır. Xananı işarələmək və ya şəkil seçmək təhlükəsizdir."
+        },
+        {
+          "id": "keystroke-captcha",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-xezer-forum-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Yoxlamanı tamamlayın"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Pəncərə açan düymələri basın və mətni yapışdırın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Başla"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Əmr yazmağı istəyən yoxlama saxtadır. Səhifəni bağlayın."
+        },
+        {
+          "id": "letters-captcha",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-xezer-forum",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Hərfləri yazın"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Şəkildəki hərfləri aşağıdakı xanaya yazın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Təsdiqlə"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Bu, adi yoxlamadır. Şəkildəki hərfləri yazmaq kompüterinizdə heç nəyi işə salmır."
+        },
+        {
+          "id": "paste-run",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "senedoxu-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Davam etmək üçün"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bu mətni kopyalayın və «İcra et» pəncərəsinə yapışdırın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Kopyala"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Saytın kopyalamağınızı istədiyi mətni heç vaxt işə salmayın. Bu, gizli əmrdir."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "fc1-choice",
+      "question": {
+        "prompt": "Əsl robot yoxlaması sizdən nə istəyə bilər? Uyğun olanların hamısını seçin.",
+        "options": [
+          {
+            "id": "tick",
+            "label": "Xananı işarələmək",
+            "correct": true,
+            "feedback": "Düzdür. Xananı işarələmək adi yoxlamadır və təhlükəsizdir."
+          },
+          {
+            "id": "images",
+            "label": "Şəkil seçmək",
+            "correct": true,
+            "feedback": "Düzdür. Şəkil seçmək əsl yoxlamanın başqa bir növüdür."
+          },
+          {
+            "id": "letters",
+            "label": "Şəkildəki hərfləri yazmaq",
+            "correct": true,
+            "feedback": "Düzdür. Hərfləri yazmaq kompüterinizdə heç nəyi işə salmır."
+          },
+          {
+            "id": "keys",
+            "label": "Düymələri basıb mətni yapışdırmaq",
+            "correct": false,
+            "feedback": "Tələ məhz budur. Əsl yoxlama sizi heç vaxt kompüterinizin öz pəncərələrinə yönəltmir."
+          }
+        ],
+        "multi": true
+      },
+      "explain": "Əsl yoxlama səhifənin içində qalır. Sizi düymələri basmağa və mətn yapışdırmağa yönəldən yoxlama saxtadır."
+    },
+    {
+      "type": "recap",
+      "id": "fc1-recap",
+      "points": [
+        "Əsl yoxlama heç vaxt əmr yazmağı istəmir",
+        "Saytın tapşırdığı mətni heç vaxt yapışdırmayın",
+        "Belə səhifəni bağlayın və İT dəstəyinə bildirin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

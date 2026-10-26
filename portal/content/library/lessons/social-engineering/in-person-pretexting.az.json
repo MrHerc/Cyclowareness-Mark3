@@ -1,0 +1,510 @@
+{
+  "id": "in-person-pretexting",
+  "title": "Üzbəüz fəndlər",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l3-tutor",
+      "beats": [
+        {
+          "id": "l3-b1",
+          "say": "Fırıldaqçı həmişə ekranda olmur. Bəzən o, əlində qutu, qapının ağzında dayanır.",
+          "mood": "talk",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        },
+        {
+          "id": "l3-b2",
+          "say": "Giriş kartı olmayan şəxs üçün qapını açıq saxlamayın. Onu nəzakətlə qəbul masasına yönləndirin.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        },
+        {
+          "id": "l3-b3",
+          "say": "Özünü texnik kimi təqdim edən şəxs forma geyinib sizi tələsdirə bilər. Belə ziyarəti İT dəstəyindən özünüz dəqiqləşdirin.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "desk"
+          },
+          "checkpoint": {
+            "prompt": "Gözlənilmədən bir texnik gəlib. Nə edirsiniz?",
+            "options": [
+              {
+                "id": "let-in",
+                "label": "Əynində forma var, içəri buraxıram",
+                "correct": false,
+                "feedback": "Formanı hər kəs geyinə bilər. Ziyarət barədə İT dəstəyindən özünüz soruşun."
+              },
+              {
+                "id": "check",
+                "label": "Yoxlamaq üçün İT dəstəyinə özüm zəng edirəm",
+                "correct": true,
+                "feedback": "Düzdür. Gözlənilməz ziyarəti rəsmi kanalla yoxlayın."
+              }
+            ]
+          }
+        },
+        {
+          "id": "l3-b5",
+          "say": "Hər hal üçün bir vərdiş: dayanın, yoxlayın, bildirin. Rəsmi yolla dəqiqləşdirin və şübhələrinizi təhlükəsizlik komandasına çatdırın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "flag"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "visitor-at-door",
+      "environment": "phone",
+      "title": "Qapıdakı texnik",
+      "intro": "Səhərdir, işdəsiniz. Binaya girmək istəyən bir ziyarətçi barədə mesajlar gəlir.",
+      "steps": [
+        {
+          "id": "no-badge",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek-fake",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "İT dəstəyi (yeni)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam, printerinizi təmir etməyə gəlmişəm, girişdəyəm. Kartımı evdə unutmuşam, aşağı düşüb qapını aça bilərsiniz?"
+                  }
+                ],
+                "time": "09:12"
+              }
+            ]
+          },
+          "say": "Naməlum texnik, üstəlik giriş kartı da yoxdur.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Gəlirəm, açıram",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Kartı olmayan birini içəri buraxmaq qapını hər kəsin üzünə açır. Onu qəbul masasına yönləndirin."
+            },
+            {
+              "id": "verify",
+              "label": "İT dəstəyinin rəsmi nömrəsinə zəng edirəm",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Gözlənilməz texnik ziyarətini rəsmi kanalla özünüz yoxlayın."
+            }
+          ]
+        },
+        {
+          "id": "reception",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "idare",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Qəbul masası"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Qəbul masasında Orxan adlı texnik var, sizin adınızı çəkir. Heç bir ziyarət planlaşdırılmayıb. İçəri buraxaqmı?"
+                  }
+                ],
+                "time": "09:15"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "let-in",
+              "label": "Buraxın, onu mən çağırmışam",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Siz onu çağırmamısınız. İndi yad adam sizin adınızla binada sərbəst gəzir."
+            },
+            {
+              "id": "wait",
+              "label": "Mən yoxlayana qədər qəbul masasında gözləsin",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Düzdür. Ziyarətçi qəbul masasında qeydiyyatdan keçir və yoxlanılana qədər tək buraxılmır."
+            }
+          ]
+        },
+        {
+          "id": "boss-pressure",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Kamran Əliyev (yeni nömrə)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Texniki mən çağırmışam. Onu özünüz server otağına aparın. İclasdayam, zəng etməyin."
+                  }
+                ],
+                "time": "09:17"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "escort",
+              "label": "Yaxşı, aparıram",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Rəhbərin adı və «zəng etməyin» tələbi yoxlamağınıza mane olmaq üçündür. Kənar şəxslər heç vaxt server otağına buraxılmır."
+            },
+            {
+              "id": "verify",
+              "label": "Rəhbərimin bildiyim nömrəsinə zəng edirəm",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Əla. Yeni nömrədən yazan rəhbəri həmişə onun köhnə, tanış nömrəsinə zəng edərək yoxlayın."
+            },
+            {
+              "id": "block",
+              "label": "Blokla və bildir",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Düzdür. Sonra rəhbərinizə və təhlükəsizlik komandasına bildirin."
+            }
+          ]
+        },
+        {
+          "id": "real-it",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "İT dəstəyi"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Bu gün sizə heç bir texnik göndərməmişik. Yaxşı ki, yazdınız, mühafizə artıq qəbul masasına gedir."
+                  }
+                ],
+                "time": "09:20"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "thanks",
+              "label": "Təşəkkürlər, qəbul masasına da xəbər verəcəyəm",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Düzdür. Dayandınız, yoxladınız və bildirdiniz: hər üç addımı atdınız."
+            },
+            {
+              "id": "go-down",
+              "label": "Aşağı düşüb onunla özüm danışacağam",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Şübhəli şəxslə tək üz-üzə gəlməyin. Bununla təhlükəsizlik komandası məşğul olacaq."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l3-hotspot-email",
+      "prompt": "Bu məktubun şübhəli hissələrini tapın.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "idare-fake",
+        "from": {
+          "name": [
+            {
+              "text": "Təsərrüfat şöbəsi",
+              "reveal": "texnik@servis-idare.test"
+            }
+          ],
+          "address": [
+            {
+              "text": "texnik@servis-idare.test",
+              "spot": "outside-address"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "TƏCİLİ: ",
+            "spot": "urgent-subject"
+          },
+          {
+            "text": "server otağında təmir"
+          }
+        ],
+        "time": "08:47",
+        "body": [
+          [
+            {
+              "text": "Salam,"
+            }
+          ],
+          [
+            {
+              "text": "Bu gün saat 15:00-da texnik Orxan server otağındakı kondisioneri yoxlayacaq."
+            }
+          ],
+          [
+            {
+              "text": "Gecikirik, ona görə "
+            },
+            {
+              "text": "onu müşayiətsiz içəri buraxın",
+              "spot": "unescorted"
+            },
+            {
+              "text": "."
+            }
+          ],
+          [
+            {
+              "text": "Xahiş edirik, "
+            },
+            {
+              "text": "bu məktubu heç kimə yönləndirməyin",
+              "spot": "no-forward"
+            },
+            {
+              "text": "."
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "outside-address",
+          "label": "Kənar ünvan",
+          "explain": "Daxili şöbə təşkilatın öz poçtundan yazır. Bu ünvan isə başqa domenə aiddir."
+        },
+        {
+          "id": "urgent-subject",
+          "label": "Tələsdirmə",
+          "explain": "Böyük hərflərlə yazılmış «təcili» sözü sizi yoxlamadan hərəkət etməyə təhrik edir."
+        },
+        {
+          "id": "unescorted",
+          "label": "Müşayiətsiz giriş",
+          "explain": "Ziyarətçi həmişə müşayiət olunur, xüsusən də server otağında."
+        },
+        {
+          "id": "no-forward",
+          "label": "Gizli saxlamaq xahişi",
+          "explain": "Heç kimə deməmək xahişi hər hansı yoxlamanın qarşısını almaq üçündür."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "l3-choice-tailgate",
+      "question": {
+        "prompt": "Əlləri qutularla dolu bir kişi giriş kartı olmadan arxanızca içəri keçmək istəyir. Nə edirsiniz?",
+        "options": [
+          {
+            "id": "hold-door",
+            "label": "Qapını tuturam, axı əlləri doludur",
+            "correct": false,
+            "feedback": "Nəzakətli olmaq yaxşıdır, amma yad şəxs heç bir yoxlama olmadan içəri girir."
+          },
+          {
+            "id": "send-reception",
+            "label": "Onu nəzakətlə qəbul masasına yönləndirirəm",
+            "correct": true,
+            "feedback": "Düzdür. Qəbul masası onu yoxlayacaq və lazımi şəxsin yanına aparacaq."
+          },
+          {
+            "id": "ask-and-let",
+            "label": "Kim olduğunu soruşub içəri buraxıram",
+            "correct": false,
+            "feedback": "Onun cavabını yoxlaya bilməzsiniz. Qərarı qəbul masası və ya mühafizə versin."
+          }
+        ]
+      },
+      "explain": "Kiminsə arxasınca içəri keçmək ən sadə fiziki hücumdur. Hər kəs öz kartından istifadə edir, qonaqlar isə qəbul masasından keçir."
+    },
+    {
+      "type": "swipe",
+      "id": "l3-swipe",
+      "prompt": "Təhlükəsizdir, yoxsa tələ?",
+      "cards": [
+        {
+          "id": "no-badge-door",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek-fake",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "İT dəstəyi (yeni)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam, printerinizə baxmağa gəlmişəm. Kartımı evdə unutmuşam, aşağı düşüb qapını aça bilərsiniz?"
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Kartı olmayan şəxsi içəri buraxmaq olmaz. Onu qəbul masasına yönləndirin."
+        },
+        {
+          "id": "planned-maintenance",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "İT dəstəyi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "support@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Şənbə günü planlı işlər"
+              }
+            ],
+            "time": "11:05",
+            "body": [
+              [
+                {
+                  "text": "Şənbə günü saat 10:00-dan 12:00-dək poçt işləməyəcək. Sizdən heç bir addım tələb olunmur."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Nə link, nə parol, nə də giriş icazəsi istəyir. Sadəcə bildirişdir."
+        },
+        {
+          "id": "found-usb",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Samir (həmkar)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Dəhlizdə üstündə «Maaşlar 2026» yazılmış fleş kart tapdım. Sənin kompüterində açaq?"
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Tapılmış fleş kartda zərərli proqram ola bilər. Onu açmayın, təhlükəsizlik komandanıza təhvil verin."
+        },
+        {
+          "id": "guest-at-reception",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "idare",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Qəbul masası"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Qonağınız Tural bəy qəbul masasında qeydiyyatdan keçib və ziyarətçi kartı alıb. Sizi gözləyir."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Qonaq qeydiyyatdan keçib və gözləyir. Onu özünüz qarşılayın və müşayiət edin."
+        },
+        {
+          "id": "menu-qr",
+          "artifact": {
+            "kind": "qr",
+            "brandRef": "idare-fake",
+            "caption": [
+              {
+                "text": "Yeməkxana menyusu: skan edin və iş parolunuzla daxil olun"
+              }
+            ],
+            "destination": [
+              {
+                "text": "menyu-idare.test/login"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Menyuya baxmaq üçün iş parolu lazım deyil. Belə QR kod parolunuzu oğurlamaq üçündür."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "l3-recap",
+      "points": [
+        "Kartı olmayan hər kəsi qəbul masasına yönləndirin",
+        "Tapılmış fleş kartı heç vaxt kompüterə taxmayın",
+        "Həmişə: dayanın, yoxlayın, bildirin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

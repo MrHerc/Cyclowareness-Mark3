@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { localizeStandard } from "@/lib/standards";
 import { Award, Check, ChevronRight, Lock, Repeat, Route, Users } from "lucide-react";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/layout";
@@ -22,6 +23,7 @@ export default async function PathPage({ params }: PageProps<"/paths/[key]">) {
     getTranslations("common"),
     getTranslations("learner.learn"),
   ]);
+  const locale = await getLocale();
   const firstOpen = p.modules.find((m) => m.status !== "completed");
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -86,7 +88,7 @@ export default async function PathPage({ params }: PageProps<"/paths/[key]">) {
           <CardBody className="flex flex-wrap gap-1.5 pt-3">
             {p.standards.map((s) => (
               <span key={s} className="rounded-xs bg-sunken px-2 py-1 font-mono text-tab text-ink">
-                {s}
+                {localizeStandard(s, locale)}
               </span>
             ))}
           </CardBody>

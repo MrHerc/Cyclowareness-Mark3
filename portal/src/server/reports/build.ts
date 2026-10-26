@@ -8,7 +8,7 @@ import { scopeDepartmentIds } from "../queries/admin";
 import { TEMPLATE_BY_KEY } from "../../lib/campaigns/templates";
 import { riskBand } from "../../lib/domain/risk";
 import { levelFor } from "../../lib/domain/gamification";
-import { pick } from "../../i18n/config";
+import { LOCALE_NAMES, pick, type Locale } from "../../i18n/config";
 import { dayRange, todayInBaku } from "../../lib/time";
 import { isUuid } from "../../lib/ids";
 import type { ReportKind } from "../db/schema";
@@ -89,6 +89,7 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
           const p = pm.get(`${u.id}:${a.moduleId}`);
           const status = p?.status === "completed" ? c("done") : a.due && a.due < today ? c("overdue") : p?.status === "awaiting_attestation" ? c("awaiting") : p?.status === "in_progress" ? c("inProgress") : c("notStarted");
           if (!within(p?.completedAt ?? null, r) && p?.status === "completed") continue;
+          // The due day stays a YYYY-MM-DD day (no time of day in CSV and XLSX); the printed report writes it in its language.
           rows.push([u.name, u.email, dept(u), pick(modById.get(a.moduleId)?.title, locale), a.due, status, p?.percent ?? 0, p?.completedAt ?? null]);
         }
       }
@@ -163,7 +164,7 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
       const rows: Cell[][] = [
         ...att.filter((a) => within(a.at, r)).map((a) => {
           const u = uById.get(a.userId)!;
-          return [u.name, u.email, dept(u), pick(modById.get(a.moduleId)?.title, locale), c("done"), a.at, a.locale.toUpperCase(), a.text] as Cell[];
+          return [u.name, u.email, dept(u), pick(modById.get(a.moduleId)?.title, locale), c("done"), a.at, LOCALE_NAMES[a.locale as Locale] ?? a.locale, a.text] as Cell[];
         }),
         ...waiting.map((w) => {
           const u = uById.get(w.userId)!;
@@ -174,6 +175,7 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
     }
 
     case "simulations": {
+      const tcmp = await getTranslations({ locale, namespace: "admin.campaigns" });
       const rec = ids.length
         ? await db()
             .select({ r: t.campaignRecipients, name: t.campaigns.name, channel: t.campaigns.channel, templateKey: t.campaigns.templateKey })
@@ -191,13 +193,15 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
           .map((x) => {
             const u = uById.get(x.r.userId)!;
             const tpl = TEMPLATE_BY_KEY.get(x.templateKey);
-            return [x.name, x.channel, tpl ? (tpl.name[locale as "az"] ?? tpl.name.en) : x.templateKey, u.name, dept(u), x.r.sentAt, x.r.openedAt, x.r.clickedAt, x.r.submittedAt, x.r.reportedAt];
+            // A QR campaign is an email carrying the code, as the campaign pages show it.
+            return [x.name, tcmp(`channel.${x.channel === "qr" ? "email" : x.channel}`), tpl ? (tpl.name[locale as "az"] ?? tpl.name.en) : x.templateKey, u.name, dept(u), x.r.sentAt, x.r.openedAt, x.r.clickedAt, x.r.submittedAt, x.r.reportedAt];
           }),
       };
     }
 
     case "secops": {
       const tid = v.tenant.id;
+      const [ts, tsb] = await Promise.all([getTranslations({ locale, namespace: "secops" }), getTranslations({ locale, namespace: "security.sandbox" })]);
       const [reports, incidents, sandbox, loops] = await Promise.all([
         db().select().from(t.threatReports).where(and(eq(t.threatReports.tenantId, tid), isNull(t.threatReports.campaignRecipientId))),
         db().select().from(t.incidents).where(eq(t.incidents.tenantId, tid)),
@@ -205,10 +209,10 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
         db().select().from(t.loops).where(eq(t.loops.tenantId, tid)),
       ]);
       const rows: Cell[][] = [
-        ...reports.filter((x) => within(x.createdAt, r)).map((x) => [c("threatReport"), `TR-${x.number}`, x.subject, x.severity ?? "", x.status, x.createdAt] as Cell[]),
-        ...incidents.filter((x) => within(x.createdAt, r)).map((x) => [c("incident"), `IR-${x.number}`, x.title, x.severity, x.status, x.createdAt] as Cell[]),
-        ...sandbox.filter((x) => within(x.createdAt, r)).map((x) => [c("sandbox"), `SB-${x.number}`, x.objectName, `${x.verdict} (${x.score})`, x.incidentId ? "escalated" : "", x.createdAt] as Cell[]),
-        ...loops.filter((x) => within(x.createdAt, r)).map((x) => [c("loop"), x.id.slice(0, 8), x.title, x.verdict, x.stage, x.createdAt] as Cell[]),
+        ...reports.filter((x) => within(x.createdAt, r)).map((x) => [c("threatReport"), `TR-${x.number}`, x.subject, x.severity ? tc(`severity.${x.severity}`) : "", ts(`threats.statuses.${x.status}`), x.createdAt] as Cell[]),
+        ...incidents.filter((x) => within(x.createdAt, r)).map((x) => [c("incident"), `IR-${x.number}`, x.title, tc(`severity.${x.severity}`), ts(`incidents.statuses.${x.status}`), x.createdAt] as Cell[]),
+        ...sandbox.filter((x) => within(x.createdAt, r)).map((x) => [c("sandbox"), `SB-${x.number}`, x.objectName, `${tsb(`verdict.${x.verdict}`)} (${x.score})`, x.incidentId ? c("escalated") : "", x.createdAt] as Cell[]),
+        ...loops.filter((x) => within(x.createdAt, r)).map((x) => [c("loop"), x.id.slice(0, 8), x.title, ts(`verdicts.${x.verdict}`), ts(`stages.${x.stage}`), x.createdAt] as Cell[]),
       ];
       return { title, headers: [c("type"), c("number"), c("title"), c("severity"), c("status"), c("created")], rows };
     }

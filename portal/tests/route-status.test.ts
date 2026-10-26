@@ -72,7 +72,7 @@ describe("loading.tsx placement", () => {
   });
 
   it("gives every learner page reached from the navigation, and the pages under it, a skeleton of its own", () => {
-    const routes = ["(home)", "learn/(catalog)", "learn/[slug]", "paths/(index)", "paths/[key]", "lab/(index)", "lab/[game]", "league", "progress", "security/(overview)", "security/sandbox", "profile", "sessions", "help/(index)", "help/tickets/[id]"];
+    const routes = ["app", "learn/(catalog)", "learn/[slug]", "paths/(index)", "paths/[key]", "lab/(index)", "lab/[game]", "league", "progress", "security/(overview)", "security/sandbox", "profile", "sessions", "help/(index)", "help/tickets/[id]"];
     const missing = routes.map((r) => path.join("(learner)", r)).filter((r) => !existsSync(path.join(app, r, "page.tsx")) || !existsSync(path.join(app, r, "loading.tsx")));
     expect(missing).toEqual([]);
   });

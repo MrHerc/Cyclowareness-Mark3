@@ -7,6 +7,7 @@ import { playLabAction, type LabResult } from "@/server/actions/engage";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressBar } from "@/components/ui/progress";
+import { toast } from "@/components/ui/toast";
 import { type PassphraseContext, passphraseRules } from "@/lib/password-strength";
 import { cn } from "@/lib/cn";
 
@@ -20,6 +21,7 @@ const OPTIONS: Record<string, string[]> = {
 
 export function GameClient({ game, items, forge }: { game: string; items: Item[]; forge: PassphraseContext }) {
   const t = useTranslations("learner.lab");
+  const tc = useTranslations("common");
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [result, setResult] = useState<Extract<LabResult, { score: number }> | null>(null);
@@ -31,6 +33,7 @@ export function GameClient({ game, items, forge }: { game: string; items: Item[]
     start(async () => {
       const res = await playLabAction(game, a);
       if ("score" in res) setResult(res);
+      else toast(res.error === "rateLimited" ? tc("errors.rateLimited") : tc("errors.generic"), "error");
     });
   const reset = () => {
     setI(0);
@@ -73,7 +76,7 @@ export function GameClient({ game, items, forge }: { game: string; items: Item[]
           <Button variant="secondary" icon={<RotateCcw />} onClick={reset}>
             {t("again")}
           </Button>
-          <ButtonLink href="/lab">{t("back")}</ButtonLink>
+          <ButtonLink href="/lab">{t("backToLab")}</ButtonLink>
         </div>
       </Card>
     );

@@ -1,0 +1,446 @@
+{
+  "id": "print-scan",
+  "title": "Printerlər və skanerlər",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Printerdə unudulmuş vərəq ən sadə məlumat sızmasıdır. Dəhlizdən keçən hər kəs onu götürə bilər.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "desk"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Göndərməzdən əvvəl hansı printerin seçildiyini və təhlükəsiz çapın açıq olub-olmadığını yoxlayın.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "nc-capmerkezi",
+              "tone": "system",
+              "title": [
+                {
+                  "text": "Çap"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Printer: "
+                  },
+                  {
+                    "text": "Dəhliz-2 (ümumi)",
+                    "spot": "printer"
+                  }
+                ],
+                [
+                  {
+                    "text": "Təhlükəsiz çap: "
+                  },
+                  {
+                    "text": "söndürülüb",
+                    "spot": "secure"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Ləğv et",
+                "Çap et"
+              ]
+            }
+          },
+          "highlight": "secure"
+        },
+        {
+          "id": "b3",
+          "say": "Təhlükəsiz çapda vərəqlər yalnız siz printerdə kartınızı yaxınlaşdıranda və ya PIN kod daxil edəndə çıxır.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Skanerdən gələn məktublarla da ehtiyatlı olun. Hücumçular fişinq məktubunu çox vaxt skan edilmiş sənəd kimi təqdim edirlər.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "print-day",
+      "environment": "desktop",
+      "title": "Çap günü",
+      "intro": "Bu gün bir neçə sənəd çap edirsiniz. Açılan pəncərələrə baxın və qərar verin.",
+      "steps": [
+        {
+          "id": "salary-print",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "nc-capmerkezi",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Çap: Maas_cedveli_oktyabr.xlsx"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Printer: Dəhliz-2 (ümumi)"
+                }
+              ],
+              [
+                {
+                  "text": "Təhlükəsiz çap: söndürülüb"
+                }
+              ],
+              [
+                {
+                  "text": "Nüsxə sayı: 1"
+                }
+              ]
+            ],
+            "buttons": [
+              "Birbaşa çap et",
+              "Təhlükəsiz çapla göndər"
+            ]
+          },
+          "say": "Bu sənəddə işçilərin maaşları var.",
+          "actions": [
+            {
+              "id": "secure",
+              "label": "Təhlükəsiz çapla göndər",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Sənəd növbədə gözləyir və yalnız siz printerin yanında olanda çıxır."
+            },
+            {
+              "id": "direct",
+              "label": "Birbaşa çap et",
+              "kind": "open",
+              "outcome": "risky",
+              "feedback": "Vərəq ümumi dəhlizdə sizi gözləyəcək. Bir az ləngisəniz, onu başqası görə bilər."
+            }
+          ]
+        },
+        {
+          "id": "paper-out",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "nc-capmerkezi",
+            "app": "Çap Mərkəzi",
+            "title": [
+              {
+                "text": "Dəhliz-2: kağız qurtarıb"
+              }
+            ],
+            "body": [
+              {
+                "text": "Ezamiyyet_siyahisi.pdf növbədədir. Kağız qoyulan kimi çap olunacaq."
+              }
+            ],
+            "time": "11:20"
+          },
+          "actions": [
+            {
+              "id": "cancel",
+              "label": "Çapı ləğv et",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Kağız qoyulan kimi vərəq siz orada olmadan çıxacaqdı, ona görə sənədi təhlükəsiz çapla yenidən göndərin."
+            },
+            {
+              "id": "ignore",
+              "label": "Bağla",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Kağızı kim qoysa, siyahını da o götürəcək. Növbədə qalan tapşırığı ləğv edin."
+            }
+          ]
+        },
+        {
+          "id": "driver-popup",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "nc-drayver",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Printer drayveri köhnəlib"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Çapı davam etdirmək üçün Drayver Yeniləyici proqramını yükləyin."
+                }
+              ],
+              [
+                {
+                  "text": "printer-drayver.example.info"
+                }
+              ]
+            ],
+            "buttons": [
+              "Bağla",
+              "İndi yüklə"
+            ]
+          },
+          "say": "Sayt sizə printer proqramı təklif edir.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "İndi yüklə",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Sayt kompüterinizdəki drayveri yoxlaya bilməz. Belə yükləmələr adətən zərərli proqram olur."
+            },
+            {
+              "id": "cancel",
+              "label": "Bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Printer drayverlərini yalnız İT dəstəyi quraşdırır."
+            },
+            {
+              "id": "report",
+              "label": "İT dəstəyinə bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. İT dəstəyi bu pəncərənin haradan gəldiyini yoxlayacaq."
+            }
+          ]
+        },
+        {
+          "id": "scan-folder",
+          "label": "Ümumi qovluq: Skanlar",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "nc-capmerkezi",
+            "name": [
+              {
+                "text": "Skan_pasportlar_0410.pdf"
+              }
+            ],
+            "type": "pdf",
+            "size": "3,2 MB",
+            "source": [
+              {
+                "text": "Ümumi qovluq: Skaner, 3-cü mərtəbə"
+              }
+            ]
+          },
+          "say": "Skan etdiyiniz pasport surətləri ümumi qovluğa düşüb.",
+          "actions": [
+            {
+              "id": "move",
+              "label": "Öz qovluğuma köçür",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Fayl ümumi qovluqda qalmasın deyə onu öz qovluğunuza köçürün."
+            },
+            {
+              "id": "leave",
+              "label": "Orada saxla",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Bu qovluğu bütün mərtəbə aça bilər. Pasport surətləri şəxsi məlumatlardır."
+            },
+            {
+              "id": "share",
+              "label": "Linki şöbəyə göndər",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Şəxsi məlumatlar yalnız onlara ehtiyacı olan şəxsə göndərilir. Bütün şöbəyə göndərməyin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "scan-mail",
+      "prompt": "Skanerdən gəldiyini iddia edən bu məktubda şübhəli yerləri tapın.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "nc-capmerkezi-fake",
+        "from": {
+          "name": [
+            {
+              "text": "Skaner, 3-cü mərtəbə"
+            }
+          ],
+          "address": [
+            {
+              "text": "scan@idare-skan.example.net",
+              "spot": "sender"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Skan edilmiş sənəd: 4 səhifə"
+          }
+        ],
+        "time": "14:03",
+        "body": [
+          [
+            {
+              "text": "Hörmətli istifadəçi,"
+            }
+          ],
+          [
+            {
+              "text": "Sizin üçün sənəd skan edilib. "
+            },
+            {
+              "text": "24 saat ərzində baxmasanız, sənəd silinəcək.",
+              "spot": "urgent"
+            }
+          ],
+          [
+            {
+              "text": "Sənədə bax",
+              "spot": "link",
+              "link": {
+                "label": "Sənədə bax",
+                "href": "https://idare-skan.example.net/view"
+              }
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Skan_0410.pdf"
+              },
+              {
+                "text": ".html",
+                "spot": "ext"
+              }
+            ],
+            "size": "12 KB"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender",
+          "label": "Göndərənin domeni",
+          "explain": "Skaneriniz məktubları idare.example domenindən göndərir. Bu domen ona oxşayır, amma fərqlidir."
+        },
+        {
+          "id": "urgent",
+          "label": "Vaxt təzyiqi",
+          "explain": "Skaner sizi tələsdirmir. Vaxt təzyiqi fişinqin klassik əlamətidir."
+        },
+        {
+          "id": "link",
+          "label": "Kənar link",
+          "explain": "Link təşkilatınızdan kənar sayta aparır, orada sizdən parol istəniləcək."
+        },
+        {
+          "id": "ext",
+          "label": "Fayl genişlənməsi",
+          "explain": ".html faylı sənəd deyil, veb səhifədir. Onu açanda saxta giriş forması görünə bilər."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "found-print",
+      "question": {
+        "prompt": "Printerdə başqasının maaş cədvəlini tapırsınız. Nə edirsiniz?",
+        "options": [
+          {
+            "id": "owner",
+            "label": "Oxumadan sahibinə və ya rəhbərə verirəm",
+            "correct": true,
+            "feedback": "Düzdür. Sənəd lazımi adama qayıdır, sahibi isə növbəti dəfə daha diqqətli olacaq."
+          },
+          {
+            "id": "leave",
+            "label": "Yerində qoyuram, sahibi özü gələr",
+            "correct": false,
+            "feedback": "Sizdən sonra gələn hər kəs onu görə bilər. Vərəqləri printerdə qoyub getməyin."
+          },
+          {
+            "id": "bin",
+            "label": "Ən yaxın zibil qutusuna atıram",
+            "correct": false,
+            "feedback": "Adi zibil qutusundakı vərəqi çıxarıb götürmək asandır. Məxfi kağızlar kağız doğrayıcıda məhv edilir."
+          },
+          {
+            "id": "photo",
+            "label": "Komanda çatına şəklini atıram: «Bu kimindir?»",
+            "correct": false,
+            "feedback": "Bu, maaş məlumatlarını daha çox adama yayır. Vərəqi sakitcə sahibinə verin."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "desk"
+        }
+      },
+      "explain": "Printerdə qalan vərəq məlumat sızmasıdır. Onu sahibinə, sahibi bilinmirsə, rəhbərə qaytarın."
+    },
+    {
+      "type": "match",
+      "id": "right-move",
+      "prompt": "Hər vəziyyəti düzgün addımla uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "paper",
+          "left": "Kağız qurtarıb, sənəd növbədədir",
+          "right": "Çap tapşırığını ləğv edin"
+        },
+        {
+          "id": "driver",
+          "left": "Sayt printer proqramı təklif edir",
+          "right": "İT dəstəyinə müraciət edin"
+        },
+        {
+          "id": "scan",
+          "left": "Skan ümumi qovluğa düşüb",
+          "right": "Onu öz qovluğunuza köçürün"
+        },
+        {
+          "id": "secret",
+          "left": "Məxfi faylı çap etməlisiniz",
+          "right": "Təhlükəsiz çapdan istifadə edin"
+        }
+      ],
+      "explain": "Kiçik vərdişlər çap zamanı məlumat sızmasının qarşısını alır."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Məxfi faylları təhlükəsiz çapla göndərin və dərhal götürün.",
+        "Printer proqramlarını yalnız İT dəstəyi quraşdırır.",
+        "Skanerdən gələn məktublarda göndərəni və fayl genişlənməsini yoxlayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

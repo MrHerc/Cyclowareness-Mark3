@@ -19,6 +19,7 @@ import { Checkbox, Field, Input, Select, Switch, Textarea } from "@/components/u
 import { toast } from "@/components/ui/toast";
 import { LOCALE_NAMES } from "@/i18n/config";
 import type { Category } from "@/lib/domain/catalog";
+import { searchFold } from "./search-fold";
 
 type Option = { id: string; label: string };
 const lines = (s: string) =>
@@ -196,7 +197,7 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
                   <input type="radio" name="st-correct" checked={o.correct} onChange={() => setF({ ...f, options: f.options.map((x, j) => ({ ...x, correct: j === i })) })} className="size-4 accent-(--brand)" />
                   {t("form.correct")}
                 </label>
-                <Input aria-label={`${t("form.options")} ${i + 1}`} value={o.label} onChange={(e) => setF({ ...f, options: f.options.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)) })} maxLength={200} className="bg-surface" />
+                <Input aria-label={t("form.optionN", { n: i + 1 })} value={o.label} onChange={(e) => setF({ ...f, options: f.options.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)) })} maxLength={200} className="bg-surface" />
                 <Input aria-label={t("form.optionFeedback")} placeholder={t("form.optionFeedback")} value={o.feedback} onChange={(e) => setF({ ...f, options: f.options.map((x, j) => (j === i ? { ...x, feedback: e.target.value } : x)) })} maxLength={400} className="bg-surface" />
               </div>
             ))}
@@ -270,6 +271,7 @@ export function ModuleRowActions({ id, status, previewHref }: { id: string; stat
 
 export function MaterialForm({ modules, departments }: { modules: Option[]; departments: Option[] }) {
   const t = useTranslations("secops.studio");
+  const ts = useTranslations("secops");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
@@ -316,7 +318,7 @@ export function MaterialForm({ modules, departments }: { modules: Option[]; depa
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label={t("material.module")} htmlFor="mat-mod">
               <Select id="mat-mod" value={f.moduleId} onChange={(e) => setF({ ...f, moduleId: e.target.value })}>
-                <option value="">—</option>
+                <option value="">{ts("approvals.noModule")}</option>
                 {modules.map((m) => (
                   <option key={m.id} value={m.id}>
                     {m.label}
@@ -344,7 +346,8 @@ export function MaterialForm({ modules, departments }: { modules: Option[]; depa
 
 /* ───────── learning paths ───────── */
 
-export type PathDraft = { id: string | null; title: string; description: string; audience: string; recurrence: string; standards: string; mandatory: boolean; moduleSlugs: string[] };
+/** `sourceId`: the library path a duplicate starts from, so its other translations are kept. */
+export type PathDraft = { id: string | null; sourceId?: string | null; title: string; description: string; audience: string; recurrence: string; standards: string; mandatory: boolean; moduleSlugs: string[] };
 
 export function PathEditor({ initial, modules, trigger }: { initial: PathDraft | null; modules: { slug: string; label: string }[]; trigger: "new" | "edit" | "duplicate" }) {
   const t = useTranslations("secops.paths");
@@ -356,8 +359,8 @@ export function PathEditor({ initial, modules, trigger }: { initial: PathDraft |
   const [query, setQuery] = useState("");
   const bySlug = useMemo(() => new Map(modules.map((m) => [m.slug, m.label])), [modules]);
   const matches = useMemo(() => {
-    const q = query.trim().toLocaleLowerCase();
-    return q.length < 2 ? [] : modules.filter((m) => !f.moduleSlugs.includes(m.slug) && m.label.toLocaleLowerCase().includes(q)).slice(0, 8);
+    const q = searchFold(query.trim());
+    return q.length < 2 ? [] : modules.filter((m) => !f.moduleSlugs.includes(m.slug) && searchFold(m.label).includes(q)).slice(0, 8);
   }, [query, modules, f.moduleSlugs]);
   const move = (i: number, d: -1 | 1) => {
     const next = [...f.moduleSlugs];
@@ -421,21 +424,24 @@ export function PathEditor({ initial, modules, trigger }: { initial: PathDraft |
           <div className="grid gap-2">
             <p className="text-caption font-semibold">{t("form.modules")}</p>
             <ol className="grid gap-1.5">
-              {f.moduleSlugs.map((slug, i) => (
-                <li key={slug} className="flex items-center gap-2 rounded-lg border border-line px-3 py-2 text-caption">
-                  <span className="w-5 text-ink-subtle tabular-nums">{i + 1}</span>
-                  <span className="min-w-0 flex-1 truncate font-semibold">{bySlug.get(slug) ?? slug}</span>
-                  <Button size="icon-sm" variant="ghost" aria-label={t("form.up")} onClick={() => move(i, -1)} disabled={i === 0}>
-                    <ArrowUp />
-                  </Button>
-                  <Button size="icon-sm" variant="ghost" aria-label={t("form.down")} onClick={() => move(i, 1)} disabled={i === f.moduleSlugs.length - 1}>
-                    <ArrowDown />
-                  </Button>
-                  <Button size="icon-sm" variant="ghost" aria-label={t("form.remove")} onClick={() => setF({ ...f, moduleSlugs: f.moduleSlugs.filter((s) => s !== slug) })}>
-                    <X />
-                  </Button>
-                </li>
-              ))}
+              {f.moduleSlugs.map((slug, i) => {
+                const title = bySlug.get(slug) ?? t("unavailableLesson");
+                return (
+                  <li key={slug} className="flex items-center gap-2 rounded-lg border border-line px-3 py-2 text-caption">
+                    <span className="w-5 text-ink-subtle tabular-nums">{i + 1}</span>
+                    <span className="min-w-0 flex-1 truncate font-semibold">{title}</span>
+                    <Button size="icon-sm" variant="ghost" aria-label={t("form.up")} onClick={() => move(i, -1)} disabled={i === 0}>
+                      <ArrowUp />
+                    </Button>
+                    <Button size="icon-sm" variant="ghost" aria-label={t("form.down")} onClick={() => move(i, 1)} disabled={i === f.moduleSlugs.length - 1}>
+                      <ArrowDown />
+                    </Button>
+                    <Button size="icon-sm" variant="ghost" aria-label={t("form.removeItem", { title })} onClick={() => setF({ ...f, moduleSlugs: f.moduleSlugs.filter((s) => s !== slug) })}>
+                      <X />
+                    </Button>
+                  </li>
+                );
+              })}
             </ol>
             <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("form.search")} aria-label={t("form.add")} />
             {matches.length ? (

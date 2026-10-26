@@ -12,9 +12,11 @@ import { Ring } from "@/components/ui/progress";
 import { Pill } from "@/components/ui/pill";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
+import { useClientFormat } from "@/lib/client-format";
 
-/** Numbers count up from 0 like the original KPI tiles (a single frame when motion is reduced). */
+/** Numbers count up from 0 like the original KPI tiles (a single frame when motion is reduced), grouped in the UI language. */
 export function CountUp({ value, suffix = "" }: { value: number; suffix?: string }) {
+  const format = useClientFormat();
   const [n, setN] = useState(0);
   const raf = useRef(0);
   useEffect(() => {
@@ -30,7 +32,7 @@ export function CountUp({ value, suffix = "" }: { value: number; suffix?: string
   }, [value]);
   return (
     <>
-      {n}
+      {format.number(n)}
       {suffix}
     </>
   );

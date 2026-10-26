@@ -1,0 +1,549 @@
+{
+  "id": "wrong-recipient",
+  "title": "Не тот получатель",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Письмо, отправленное не тому человеку, — одна из самых частых утечек. Обычно виноваты спешка и автозаполнение.",
+          "mood": "talk",
+          "gesture": "nod",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Одно и то же имя появляется дважды: один адрес рабочий, другой — личный или внешний. Проверьте домен.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "ispoct",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "Кому: Лейла"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Лейла Гасанова, leyla.hasanova@rxagentlik.az"
+                  }
+                ],
+                [
+                  {
+                    "text": "Лейла Гасанова, "
+                  },
+                  {
+                    "text": "leyla.hasanova85@poct.example",
+                    "spot": "external"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Выбрать"
+              ]
+            }
+          },
+          "highlight": "external"
+        },
+        {
+          "id": "b3",
+          "say": "Не надейтесь на отзыв письма после отправки: для внешних адресов он обычно не срабатывает.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Перед отправкой проверьте три вещи: получателя, вложение и тех, кто стоит в копии.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "before-send",
+      "environment": "inbox",
+      "title": "Перед отправкой",
+      "intro": "Три черновика ждут отправки, и ещё пришёл один ответ извне. Проверьте каждое письмо.",
+      "steps": [
+        {
+          "id": "autocomplete",
+          "label": "Черновик",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "Вы"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "Лейла Гасанова <leyla.hasanova85@poct.example>",
+            "subject": [
+              {
+                "text": "Список обращений"
+              }
+            ],
+            "time": "11:38",
+            "body": [
+              [
+                {
+                  "text": "Лейла, во вложении список, который вы просили."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Muracietler_2026.xlsx"
+                  }
+                ],
+                "size": "310 КБ"
+              }
+            ]
+          },
+          "say": "Прочитайте домен получателя до конца.",
+          "actions": [
+            {
+              "id": "fix",
+              "label": "Проверить и исправить получателя",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Правильно: имя совпало, а домен — нет. Рабочий адрес заканчивается на rxagentlik.az."
+            },
+            {
+              "id": "send",
+              "label": "Отправить",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Получателем был личный почтовый ящик. Конфиденциальный список покинул организацию."
+            }
+          ]
+        },
+        {
+          "id": "reply-all",
+          "label": "Черновик",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "Вы"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "layihe-qrupu@rxagentlik.az, e.rzayev@merkez-konsalting.example",
+            "subject": [
+              {
+                "text": "Re: Ценовое предложение партнёра"
+              }
+            ],
+            "time": "12:05",
+            "body": [
+              [
+                {
+                  "text": "Коллеги, предложение Merkez Konsalting выглядит дорогим, давайте поговорим и с другой компанией."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "remove",
+              "label": "Удалить внешний адрес",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Правильно. «Ответить всем» сохраняет всех прежних получателей, в том числе внешних."
+            },
+            {
+              "id": "send",
+              "label": "Отправить",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Партнёр есть среди получателей. Внутреннее обсуждение дошло бы и до него."
+            }
+          ]
+        },
+        {
+          "id": "correct-draft",
+          "label": "Черновик",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "Вы"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "kadrlar@rxagentlik.az",
+            "subject": [
+              {
+                "text": "Заявление на отпуск"
+              }
+            ],
+            "time": "12:20",
+            "body": [
+              [
+                {
+                  "text": "Здравствуйте! Моё заявление на отпуск во вложении."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Erize.pdf"
+                  }
+                ],
+                "size": "52 КБ"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "send",
+              "label": "Отправить",
+              "kind": "share",
+              "outcome": "safe",
+              "feedback": "Всё в порядке: внутренний адрес, нужный файл, без лишних получателей."
+            },
+            {
+              "id": "check",
+              "label": "Проверить ещё раз",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Проверка никогда не помешает. Это письмо в порядке, его можно отправлять."
+            }
+          ]
+        },
+        {
+          "id": "partner-notice",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "merkez-konsalting",
+            "from": {
+              "name": [
+                {
+                  "text": "Эльчин Рзаев"
+                }
+              ],
+              "address": [
+                {
+                  "text": "e.rzayev@merkez-konsalting.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Это письмо пришло мне по ошибке?"
+              }
+            ],
+            "time": "13:10",
+            "body": [
+              [
+                {
+                  "text": "Здравствуйте! Вчера ваш отдел прислал мне таблицу зарплат сотрудников. Наверное, по ошибке. Что мне делать?"
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "forward",
+              "label": "Переслать в службу безопасности",
+              "kind": "forward",
+              "outcome": "safe",
+              "feedback": "Правильно. Письмо, ушедшее не тому адресату, — это инцидент. Специалист подскажет, что делать."
+            },
+            {
+              "id": "reply",
+              "label": "Ответить: пожалуйста, удалите его",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Попросить удалить — правильно, но сначала сообщите в службу безопасности."
+            },
+            {
+              "id": "delete",
+              "label": "Удалить",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Утечка от этого не исчезнет. Сообщите о ней, чтобы специалисты приняли меры."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "recall",
+      "question": {
+        "prompt": "Письмо ушло не на тот адрес, и вы его отозвали. Этого достаточно?",
+        "options": [
+          {
+            "id": "enough",
+            "label": "Да, письмо удалится",
+            "correct": false,
+            "feedback": "Для внешних адресов отзыв обычно не срабатывает, а письмо, возможно, уже прочитали."
+          },
+          {
+            "id": "report",
+            "label": "Нет, я всё равно сразу сообщаю в службу безопасности",
+            "correct": true,
+            "feedback": "Правильно. Отзыв может не сработать, а сообщить нужно обязательно."
+          },
+          {
+            "id": "wait",
+            "label": "Подожду, может, его не откроют",
+            "correct": false,
+            "feedback": "Ожидание не уменьшает вред. Чем быстрее вы сообщите, тем больше возможностей всё исправить."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "inbox"
+        }
+      },
+      "explain": "Отправили не тому? Не скрывайте: сразу сообщите руководителю и в службу безопасности."
+    },
+    {
+      "type": "swipe",
+      "id": "recipient-check",
+      "prompt": "Получатели указаны правильно?",
+      "cards": [
+        {
+          "id": "hr",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "Вы"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "kadrlar@rxagentlik.az",
+            "subject": [
+              {
+                "text": "Запрос справки"
+              }
+            ],
+            "time": "14:00",
+            "body": [
+              [
+                {
+                  "text": "Здравствуйте! Мне нужна справка с места работы."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Внутренний адрес, нужный отдел, никаких лишних получателей."
+        },
+        {
+          "id": "lookalike",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "Вы"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "Рашад Алиев <reshad.aliyev@rxagentlik-az.com>",
+            "subject": [
+              {
+                "text": "Таблица бюджета"
+              }
+            ],
+            "time": "14:12",
+            "body": [
+              [
+                {
+                  "text": "Рашад, таблица во вложении."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Budce_2027.xlsx"
+                  }
+                ],
+                "size": "180 КБ"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Домен rxagentlik-az.com не ваш. Автозаполнение подставило старый или поддельный адрес."
+        },
+        {
+          "id": "all-staff",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "Вы"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "butun-emekdaslar@rxagentlik.az",
+            "subject": [
+              {
+                "text": "Медицинская справка коллеги"
+              }
+            ],
+            "time": "14:30",
+            "body": [
+              [
+                {
+                  "text": "Справка во вложении."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Arayis.pdf"
+                  }
+                ],
+                "size": "96 КБ"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Личный документ нельзя отправлять всем сотрудникам. Отправляйте его только тому, кому он нужен."
+        },
+        {
+          "id": "no-bcc",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "Вы"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "40 партнёров, все в поле «Кому»",
+            "subject": [
+              {
+                "text": "Поздравление с праздником"
+              }
+            ],
+            "time": "15:00",
+            "body": [
+              [
+                {
+                  "text": "Уважаемые партнёры, поздравляем вас с праздником!"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "В массовой рассылке ставьте адреса в поле «Скрытая копия», чтобы получатели не видели друг друга."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "address-fields",
+      "prompt": "Распределите получателей по нужным полям.",
+      "pairs": [
+        {
+          "id": "to",
+          "left": "Основной получатель, от него ждут ответа",
+          "right": "Кому"
+        },
+        {
+          "id": "cc",
+          "left": "Коллега, которого держат в курсе",
+          "right": "Копия"
+        },
+        {
+          "id": "bcc",
+          "left": "Много получателей, которые не знают друг друга",
+          "right": "Скрытая копия"
+        }
+      ],
+      "explain": "Правильное поле не даёт посторонним увидеть адреса, которые им не нужны."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Перед отправкой читайте домен получателя до конца.",
+        "Нажимая «Ответить всем», проверяйте внешние адреса в копии.",
+        "Ошиблись? Не надейтесь на отзыв письма, сразу сообщите."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

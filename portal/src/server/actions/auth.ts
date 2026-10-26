@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect, unstable_rethrow } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { and, count, desc, eq, gt, isNotNull, isNull, ne } from "drizzle-orm";
 import { z } from "zod";
 import { safePath } from "../../lib/safe-path";
@@ -18,8 +19,8 @@ import { audit } from "../services/audit";
 import { clientIp, ipRateKey, userAgent } from "../request";
 import { sha256Hex } from "../crypto";
 import { sendSms, smsAvailable } from "../sms";
-import { queueEmail } from "../mail";
-import { LOCALE_COOKIE, isLocale } from "../../i18n/config";
+import { queueEmail, renderEmailHtml } from "../mail";
+import { DEFAULT_LOCALE, LOCALE_COOKIE, isLocale } from "../../i18n/config";
 import { randomToken } from "../services/progress";
 import { env } from "../env";
 import { issueAccountLink } from "../auth/links";
@@ -270,7 +271,9 @@ async function requestPhoneCode(_: AuthState, form: FormData): Promise<AuthState
     const code = String(digits[0] % 1_000_000).padStart(6, "0");
     await db().delete(t.authTokens).where(and(eq(t.authTokens.userId, user.id), eq(t.authTokens.kind, "phone_otp")));
     await db().insert(t.authTokens).values({ id: sha256Hex(`otp:${user.id}:${code}`), userId: user.id, kind: "phone_otp", expiresAt: new Date(Date.now() + 5 * 60_000) });
-    const res = await sendSms(phone, `Cyclowareness: ${code}`);
+    // In the person's language, with the warning not to pass it on; every wording fits one SMS.
+    const ts = await getTranslations({ locale: isLocale(user.locale) ? user.locale : DEFAULT_LOCALE, namespace: "auth.phone" });
+    const res = await sendSms(phone, ts("smsText", { code }));
     if (!res.ok) return refused("smsUnavailable");
     if (env.showOtp) devCode = code;
     await auditDone({ tenantId: user.tenantId, actorId: user.id, action: "auth.sign_in", ip, meta: { method: "phone", stage: "code_sent" } });
@@ -332,12 +335,11 @@ export async function forgotPasswordAction(_: AuthState, form: FormData): Promis
   const [user] = await db().select().from(t.users).where(and(eq(t.users.email, email), eq(t.users.status, "active")));
   if (user) {
     const link = await issueAccountLink(user.id, "reset");
-    await queueEmail(db(), user.tenantId, {
-      to: user.email,
-      kind: "password_reset",
-      subject: user.locale === "en" ? "Reset your password" : user.locale === "ru" ? "Восстановление пароля" : "Parolun bərpası",
-      text: `${user.name},\n\n${user.locale === "en" ? "Use this link to set a new password. It works for one hour." : user.locale === "ru" ? "Перейдите по ссылке, чтобы задать новый пароль. Ссылка действует один час." : "Yeni parol təyin etmək üçün linkə keçin. Link bir saat işləyir."}\n\n${link}`,
-    });
+    // The password-reset email in the person's interface language, its link as a button saying what it does.
+    const lang = isLocale(user.locale) ? user.locale : DEFAULT_LOCALE;
+    const tr = await getTranslations({ locale: lang, namespace: "auth.forgot.mail" });
+    const text = tr("body", { name: user.name.split(" ")[0], link });
+    await queueEmail(db(), user.tenantId, { to: user.email, kind: "password_reset", subject: tr("subject"), text, html: renderEmailHtml(text, { buttonLabel: tr("button"), lang }), lang });
     await audit(db(), { tenantId: user.tenantId, actorId: user.id, action: "auth.password_reset_requested", ip: await clientIp() });
   }
   return { done: true };
@@ -390,7 +392,9 @@ export async function signOutAction(): Promise<void> {
 
 export async function setLocaleAction(locale: string): Promise<void> {
   if (!isLocale(locale)) return;
-  (await cookies()).set(LOCALE_COOKIE, locale, { path: "/", maxAge: 365 * 86_400, sameSite: "lax" });
   const session = await getSession();
+  // Settings → Languages: signed-in people pick only from the languages their organisation has switched on.
+  if (session && !session.tenant.settings.locales.includes(locale)) return;
+  (await cookies()).set(LOCALE_COOKIE, locale, { path: "/", maxAge: 365 * 86_400, sameSite: "lax" });
   if (session) await db().update(t.users).set({ locale }).where(eq(t.users.id, session.user.id));
 }

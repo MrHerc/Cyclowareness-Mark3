@@ -1,0 +1,510 @@
+{
+  "id": "public-wifi",
+  "title": "Публичный Wi-Fi",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "b-tutor",
+      "beats": [
+        {
+          "id": "b-b1",
+          "say": "Бесплатный Wi-Fi в кафе, аэропортах и отелях — это удобно. Но кто его настроил?",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "wifi"
+          }
+        },
+        {
+          "id": "b-b2",
+          "say": "Злоумышленник может скопировать название сети кафе — точно или почти точно. Такую сеть называют «злым двойником».",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "wifi",
+              "networks": [
+                {
+                  "ssid": [
+                    {
+                      "text": "Cafe_Nargiz"
+                    }
+                  ],
+                  "secured": true,
+                  "signal": 3
+                },
+                {
+                  "ssid": [
+                    {
+                      "text": "Cafe_Nargiz_Free",
+                      "spot": "twin"
+                    }
+                  ],
+                  "secured": false,
+                  "signal": 4
+                },
+                {
+                  "ssid": [
+                    {
+                      "text": "Home-5G"
+                    }
+                  ],
+                  "secured": true,
+                  "signal": 1
+                }
+              ]
+            }
+          },
+          "highlight": "twin"
+        },
+        {
+          "id": "b-b3",
+          "say": "Поддельная сеть может открыть страницу входа и попросить ваш рабочий пароль. Никогда не вводите его, чтобы подключиться к Wi-Fi.",
+          "mood": "alert",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "login",
+              "brand": "Бесплатный Wi-Fi",
+              "url": [
+                {
+                  "text": "wifi-giris.test",
+                  "spot": "portal-url"
+                }
+              ],
+              "fields": [
+                "Рабочая почта",
+                "Пароль от почты"
+              ],
+              "button": "Подключиться"
+            }
+          },
+          "highlight": "portal-url"
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "cafe-twin",
+      "environment": "phone",
+      "title": "Wi-Fi в кафе",
+      "intro": "Вам нужно отправить рабочее письмо из кафе. К какой сети вы подключитесь?",
+      "steps": [
+        {
+          "id": "networks",
+          "artifact": {
+            "kind": "wifi",
+            "networks": [
+              {
+                "ssid": [
+                  {
+                    "text": "Kafe_Nargiz"
+                  }
+                ],
+                "secured": true,
+                "signal": 2
+              },
+              {
+                "ssid": [
+                  {
+                    "text": "Kafe_Nargiz_Free"
+                  }
+                ],
+                "secured": false,
+                "signal": 4
+              },
+              {
+                "ssid": [
+                  {
+                    "text": "DIRECT-Printer"
+                  }
+                ],
+                "secured": true,
+                "signal": 1
+              }
+            ]
+          },
+          "say": "Два похожих названия. Одна сеть открыта, и сигнал у неё сильный.",
+          "actions": [
+            {
+              "id": "free",
+              "label": "Подключиться к Kafe_Nargiz_Free",
+              "kind": "connect",
+              "outcome": "risky",
+              "feedback": "Открытая сеть с сильным сигналом и похожим названием может оказаться злым двойником. Сначала спросите у персонала точное название сети.",
+              "next": "portal"
+            },
+            {
+              "id": "ask",
+              "label": "Спросить точное название у персонала",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Правильно. Сотрудники кафе знают точное название сети и пароль."
+            },
+            {
+              "id": "mobile",
+              "label": "Перейти на мобильный интернет",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Отличный выбор. Для важных задач мобильный интернет безопаснее публичного Wi-Fi.",
+              "next": "vpn"
+            }
+          ]
+        },
+        {
+          "id": "staff-said",
+          "label": "Персонал: сеть Kafe_Nargiz, пароль — на кассе",
+          "artifact": {
+            "kind": "wifi",
+            "networks": [
+              {
+                "ssid": [
+                  {
+                    "text": "Kafe_Nargiz"
+                  }
+                ],
+                "secured": true,
+                "signal": 2
+              },
+              {
+                "ssid": [
+                  {
+                    "text": "Kafe_Nargiz_Free"
+                  }
+                ],
+                "secured": false,
+                "signal": 4
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "real",
+              "label": "Подключиться к Kafe_Nargiz",
+              "kind": "connect",
+              "outcome": "safe",
+              "feedback": "Правильно. Но даже точное название можно скопировать, поэтому для работы подключите VPN.",
+              "next": "vpn"
+            },
+            {
+              "id": "free",
+              "label": "Подключиться к Kafe_Nargiz_Free",
+              "kind": "connect",
+              "outcome": "risky",
+              "feedback": "Персонал назвал другую сеть. Сильный сигнал — типичная уловка злого двойника."
+            }
+          ]
+        },
+        {
+          "id": "portal",
+          "label": "Открылась страница входа",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "kafe-nargiz-fake",
+            "brand": "Kafe Nargiz Wi-Fi",
+            "url": [
+              {
+                "text": "http://"
+              },
+              {
+                "text": "kafe-nargiz-wifi.test",
+                "spot": "portal"
+              },
+              {
+                "text": "/giris"
+              }
+            ],
+            "fields": [
+              "Рабочая почта",
+              "Пароль"
+            ],
+            "button": "Выйти в интернет"
+          },
+          "say": "Страница подключения к Wi-Fi просит ваш рабочий пароль.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Выйти в интернет",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Для Wi-Fi рабочий пароль никогда не нужен. Сейчас же смените его с другого устройства и сообщите в службу безопасности."
+            },
+            {
+              "id": "leave",
+              "label": "Закрыть и отключиться от сети",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Правильно: страница Wi-Fi, которая просит рабочий пароль, — подделка. Удалите эту сеть из сохранённых."
+            }
+          ]
+        },
+        {
+          "id": "vpn",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "agentlik-vpn",
+            "tone": "app",
+            "title": [
+              {
+                "text": "VPN не подключён"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Для доступа к рабочей почте ваша организация требует VPN."
+                }
+              ]
+            ],
+            "buttons": [
+              "Подключить VPN",
+              "Продолжить без VPN"
+            ]
+          },
+          "actions": [
+            {
+              "id": "vpn",
+              "label": "Подключить VPN",
+              "kind": "connect",
+              "outcome": "safe",
+              "feedback": "Правильно. VPN передаёт данные по зашифрованному туннелю, даже если сеть поддельная."
+            },
+            {
+              "id": "skip",
+              "label": "Продолжить без VPN",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Даже для быстрой задачи это рискованно. Если организация требует VPN, всегда сначала подключайте его."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "b-hotspot",
+      "prompt": "Вы в аэропорту. Найдите подозрительные сети.",
+      "artifact": {
+        "kind": "wifi",
+        "networks": [
+          {
+            "ssid": [
+              {
+                "text": "Terminal-WiFi"
+              }
+            ],
+            "secured": false,
+            "signal": 3
+          },
+          {
+            "ssid": [
+              {
+                "text": "Terminal_WiFi",
+                "spot": "lookalike"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "Free_Fast_Internet",
+                "spot": "bait-name"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "Terminal-WiFi-VIP",
+                "spot": "vip"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "Cafe-Guest"
+              }
+            ],
+            "secured": true,
+            "signal": 2
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "lookalike",
+          "label": "Почти официальное название",
+          "explain": "Разница в один символ — признак злого двойника. Подделка может скопировать и точное название, поэтому для важных задач используйте VPN."
+        },
+        {
+          "id": "bait-name",
+          "label": "Заманчивое название",
+          "explain": "Слишком заманчивое название — это приманка. Неизвестно, кто создал эту сеть."
+        },
+        {
+          "id": "vip",
+          "label": "Выдуманная VIP-сеть",
+          "explain": "Лишняя сеть, которой нет на официальной табличке, может быть поддельной."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "swipe",
+      "id": "b-swipe",
+      "prompt": "Можно подключиться или это риск?",
+      "cards": [
+        {
+          "id": "open-unknown",
+          "artifact": {
+            "kind": "wifi",
+            "networks": [
+              {
+                "ssid": [
+                  {
+                    "text": "Free_WiFi_Fast"
+                  }
+                ],
+                "secured": false,
+                "signal": 4
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Открытая сеть, созданная неизвестно кем. Для важных задач используйте мобильный интернет."
+        },
+        {
+          "id": "own-hotspot",
+          "artifact": {
+            "kind": "wifi",
+            "networks": [
+              {
+                "ssid": [
+                  {
+                    "text": "Мой телефон"
+                  }
+                ],
+                "secured": true,
+                "signal": 4
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Это точка доступа вашего собственного телефона, защищённая паролем. Она безопаснее публичной сети."
+        },
+        {
+          "id": "portal-password",
+          "artifact": {
+            "kind": "login",
+            "brand": "Бесплатный Wi-Fi",
+            "url": [
+              {
+                "text": "free-wifi-giris.test"
+              }
+            ],
+            "fields": [
+              "Рабочая почта",
+              "Пароль"
+            ],
+            "button": "Подключиться"
+          },
+          "verdict": "threat",
+          "explain": "Для Wi-Fi рабочий пароль никогда не нужен. Это поддельная страница, которая его крадёт."
+        },
+        {
+          "id": "hotel-room",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "qala-otel",
+            "brand": "Qala Hotel guest Wi-Fi",
+            "url": [
+              {
+                "text": "wifi.otel-qala.test"
+              }
+            ],
+            "fields": [
+              "Номер комнаты",
+              "Фамилия"
+            ],
+            "button": "Подключиться"
+          },
+          "verdict": "safe",
+          "explain": "Многие отели просят только номер комнаты и фамилию, а в адресе есть название отеля. Пароль и данные карты здесь не запрашивают. Уточните название сети на ресепшене и для работы используйте VPN."
+        },
+        {
+          "id": "wifi-card",
+          "artifact": {
+            "kind": "sms",
+            "sender": [
+              {
+                "text": "WiFi-Xidmet"
+              }
+            ],
+            "time": "17:40",
+            "messages": [
+              [
+                {
+                  "text": "Ваш бесплатный интернет-пакет заканчивается. Чтобы продлить его, введите данные карты: "
+                },
+                {
+                  "text": "wifi-paket.test"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Для бесплатного интернета данные карты не нужны. Это попытка их украсть."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "b-choice-vpn",
+      "question": {
+        "prompt": "Вам нужна рабочая почта в кафе, а ваша организация требует VPN. Как вы поступите?",
+        "options": [
+          {
+            "id": "vpn-first",
+            "label": "Сначала включу VPN, потом открою почту",
+            "correct": true,
+            "feedback": "Верно. VPN передаёт рабочие данные по зашифрованному каналу."
+          },
+          {
+            "id": "quick-no-vpn",
+            "label": "Это ненадолго, обойдусь без VPN",
+            "correct": false,
+            "feedback": "Правило действует и для быстрых задач. Поддельная сеть ждёт именно таких моментов."
+          },
+          {
+            "id": "personal-mail",
+            "label": "Перешлю файлы на личную почту",
+            "correct": false,
+            "feedback": "Пересылая рабочие данные на личную почту, вы можете нарушить правила и оставить данные без защиты."
+          }
+        ]
+      },
+      "explain": "Правило про VPN введено не зря. Оно защищает рабочие данные даже в открытой сети."
+    },
+    {
+      "type": "recap",
+      "id": "b-recap",
+      "points": [
+        "Узнавайте точное название сети у персонала",
+        "Никогда не вводите рабочий пароль для подключения к Wi-Fi",
+        "Для важных задач — мобильный интернет или VPN"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

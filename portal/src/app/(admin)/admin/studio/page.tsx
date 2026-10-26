@@ -11,6 +11,8 @@ import { Card, CardBody } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
 import { EmptyState, PageHeader, TabsNav } from "@/components/ui/layout";
 import { MaterialForm, ModuleRowActions, StudioLessonForm } from "@/components/secops/studio";
+import { AiTrainer } from "@/components/admin/ai-trainer/ai-trainer";
+import { TRAINING_LOCALES } from "@/server/ai-verify";
 import { CATEGORIES } from "@/lib/domain/catalog";
 import { pick } from "@/i18n/config";
 
@@ -56,6 +58,12 @@ export default async function StudioPage({ searchParams }: PageProps<"/admin/stu
             <StudioLessonForm locales={v.tenant.settings.locales} defaultLocale={locale} categories={categories} aiOn={aiEnabled()} />
           </>
         }
+      />
+      <AiTrainer
+        aiOn={aiEnabled()}
+        locales={TRAINING_LOCALES.filter((l) => v.tenant.settings.locales.includes(l))}
+        defaultLocale={locale}
+        categories={categories}
       />
       <TabsNav items={TABS.map((k) => ({ href: `?tab=${k}`, label: tr(`tabs.${k}`), active: tab === k, count: k === "lessons" ? own.length : materials.length }))} />
       {tab === "lessons" ? (

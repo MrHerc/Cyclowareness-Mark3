@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { and, eq, isNotNull, isNull, or } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
+import { localizeStandard } from "@/lib/standards";
 import { Route } from "lucide-react";
 import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
@@ -37,6 +38,7 @@ export default async function PathsAdminPage() {
   for (const a of assignments) if (a.pathId) assignedCount.set(a.pathId, (assignedCount.get(a.pathId) ?? 0) + 1);
   const draftOf = (p: (typeof paths)[number], copy: boolean): PathDraft => ({
     id: copy ? null : p.id,
+    sourceId: copy ? p.id : null,
     title: pick(p.title, locale),
     description: pick(p.description, locale),
     audience: pick(p.audience, locale),
@@ -48,7 +50,7 @@ export default async function PathsAdminPage() {
   const canAssign = allowed(v, "assignments.write");
   const assignProps = {
     modules: modules.map((m) => ({ id: m.id, title: pick(m.title, locale), meta: tc("units.min", { count: m.minutes }) })),
-    paths: paths.map((p) => ({ id: p.id, title: pick(p.title, locale), meta: tc("units.modules", { count: p.moduleSlugs.length }) })),
+    paths: paths.map((p) => ({ id: p.id, title: pick(p.title, locale), meta: tr("modules", { count: p.moduleSlugs.length }) })),
     departments: options.departments.map((d) => ({ id: d.id, name: d.label })),
     people: options.people.map((p) => ({ id: p.id, name: p.name })),
   };
@@ -73,7 +75,7 @@ export default async function PathsAdminPage() {
                         {p.mandatory ? <Pill tone="risk">{tr("mandatory")}</Pill> : null}
                         {p.standards.map((s) => (
                           <Pill key={s} tone="cyan">
-                            {s}
+                            {localizeStandard(s, locale)}
                           </Pill>
                         ))}
                         <span className="ml-auto text-tab text-ink-subtle">{tr("assigned", { count: assignedCount.get(p.id) ?? 0 })}</span>
@@ -85,7 +87,7 @@ export default async function PathsAdminPage() {
                       <ol className="flex flex-wrap gap-1.5 text-tab">
                         {p.moduleSlugs.map((s, i) => (
                           <li key={s} className="rounded-pill bg-sunken px-2.5 py-1 text-ink-muted">
-                            {i + 1}. {titleBySlug.get(s) ?? s}
+                            {i + 1}. {titleBySlug.get(s) ?? tr("unavailableLesson")}
                           </li>
                         ))}
                       </ol>

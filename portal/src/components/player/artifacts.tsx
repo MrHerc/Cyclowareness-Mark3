@@ -49,7 +49,7 @@ import type {
 } from "@/lib/content/types";
 import { plain } from "@/lib/content/types";
 import { BrandAvatar } from "./brand-avatar";
-import { RichText, useArtifactMode } from "./rich";
+import { RichText, useArtifactMode, useContentLang } from "./rich";
 import { cn } from "@/lib/cn";
 
 const BrandsCtx = createContext<Record<string, Brand>>({});
@@ -204,6 +204,7 @@ function SmsView({ a }: { a: SmsArtifact }) {
 }
 
 function DialogView({ a }: { a: DialogArtifact }) {
+  const lang = useContentLang();
   const tone = a.tone ?? "app";
   const Icon = tone === "warning" ? AlertTriangle : tone === "system" ? Shield : Info;
   return (
@@ -218,7 +219,7 @@ function DialogView({ a }: { a: DialogArtifact }) {
         </div>
       </div>
       {a.buttons?.length ? (
-        <div className="mt-5 flex flex-wrap justify-end gap-2">
+        <div className="mt-5 flex flex-wrap justify-end gap-2" lang={lang}>
           {a.buttons.map((b, i) => (
             <span key={i} className={cn("rounded-pill px-4 py-2 text-caption font-semibold", i === a.buttons!.length - 1 ? "bg-brand-600 text-brand-on" : "border border-line-strong text-ink")}>
               {b}
@@ -248,8 +249,11 @@ function BrowserBar({ url, secure }: { url: ReactNode; secure: boolean }) {
 
 function LoginView({ a }: { a: LoginArtifact }) {
   const t = useTranslations("player.artifact");
+  const lang = useContentLang();
   const brand = useBrand(a.brandRef);
   const urlText = plain(a.url);
+  // Fields and button come from the lesson; a lesson that leaves them out gets the interface's own.
+  const fieldLang = a.fields ? lang : undefined;
   return (
     <Shell>
       <BrowserBar url={<RichText value={a.url} as="span" />} secure={urlText.startsWith("https")} />
@@ -260,12 +264,12 @@ function LoginView({ a }: { a: LoginArtifact }) {
             <p className="text-body font-bold">{a.brand ?? brand?.name}</p>
           </div>
           <div className="grid gap-2.5">
-            {(a.fields ?? ["Email", "Password"]).map((f) => (
-              <div key={f} className="rounded-md border border-line-strong px-3 py-2.5 text-caption text-ink-disabled">
+            {(a.fields ?? [t("emailField"), t("passwordField")]).map((f) => (
+              <div key={f} lang={fieldLang} className="rounded-md border border-line-strong px-3 py-2.5 text-caption text-ink-disabled">
                 {f}
               </div>
             ))}
-            <span className="mt-1 rounded-pill py-2.5 text-center text-caption font-semibold text-white" style={{ background: brand?.color ?? "var(--brand)" }}>
+            <span lang={a.button ? lang : undefined} className="mt-1 rounded-pill py-2.5 text-center text-caption font-semibold text-white" style={{ background: brand?.color ?? "var(--brand)" }}>
               {a.button ?? t("signIn")}
             </span>
           </div>
@@ -352,6 +356,7 @@ export function SpeakingBars({ active, className }: { active: boolean; className
  */
 export function CallView({ a, status, talking }: { a: CallArtifact; status?: string; talking?: boolean }) {
   const t = useTranslations("player");
+  const lang = useContentLang();
   const brand = useBrand(a.brandRef);
   const live = status !== undefined;
   return (
@@ -361,7 +366,11 @@ export function CallView({ a, status, talking }: { a: CallArtifact; status?: str
         <BrandAvatar brand={brand} name={plain(a.caller)} size="lg" className={cn("mt-6 size-20 text-title ring-4 transition-shadow", talking ? "ring-safe-500/70" : "ring-white/10")} />
         <RichText value={a.caller} className="mt-4 text-title-sm font-semibold" />
         <RichText value={a.number} className="mt-1 text-caption text-white/70" />
-        {a.label ? <p className="text-tab text-white/50">{a.label}</p> : null}
+        {a.label ? (
+          <p className="text-tab text-white/50" lang={lang}>
+            {a.label}
+          </p>
+        ) : null}
         {talking !== undefined ? <SpeakingBars active={talking} className="mt-3 text-safe-500" /> : null}
         <div className="mt-auto flex w-full justify-around pt-10">
           <span className="grid size-14 place-items-center rounded-full bg-risk-500">
@@ -387,6 +396,7 @@ const FILE_ICONS: Record<string, typeof FileIcon> = {
 
 function FileView({ a }: { a: FileArtifact }) {
   const t = useTranslations("player.artifact");
+  const lang = useContentLang();
   const name = plain(a.name);
   const Icon = FILE_ICONS[name.toLowerCase().split(".").pop() ?? ""] ?? FileIcon;
   return (
@@ -397,13 +407,12 @@ function FileView({ a }: { a: FileArtifact }) {
         </span>
         <div className="min-w-0">
           <RichText value={a.name} className="text-body-sm font-semibold break-all" />
-          <p className="text-tab text-ink-subtle">
+          <p className="text-tab text-ink-subtle" lang={lang}>
             {[a.type, a.size].filter(Boolean).join(" · ")}
           </p>
           {a.source ? (
             <p className="mt-1 text-tab text-ink-muted">
-              {t("fileFrom", { source: "" })}
-              <RichText value={a.source} as="span" />
+              {t("fileSource")} <RichText value={a.source} as="span" />
             </p>
           ) : null}
         </div>
@@ -491,12 +500,13 @@ export function ArtifactView({ artifact, onBack, inbox }: { artifact: Artifact; 
 
 /** Small list row used by the inbox simulation. */
 export function EmailListItem({ a, active, done, onClick }: { a: EmailArtifact; active: boolean; done: boolean; onClick?: () => void }) {
+  const lang = useContentLang();
   const brand = useBrand(a.brandRef);
   return (
     <button type="button" onClick={onClick} disabled={!onClick} className={cn("flex w-full items-start gap-3 border-b border-line px-3 py-3 text-left transition-colors", active ? "bg-brand-50" : "hover:bg-sunken", !onClick && "cursor-default")}>
       <span className={cn("mt-2 size-2 shrink-0 rounded-full", done ? "bg-transparent" : "bg-brand-600")} />
       <BrandAvatar brand={brand} name={plain(a.from?.name)} size="sm" />
-      <span className="min-w-0 flex-1">
+      <span className="min-w-0 flex-1" lang={lang}>
         <span className="flex items-baseline justify-between gap-2">
           <span className={cn("truncate text-caption", done ? "text-ink-muted" : "font-semibold text-ink")}>{plain(a.from?.name)}</span>
           <span className="shrink-0 text-tab-sm text-ink-subtle">{a.time}</span>

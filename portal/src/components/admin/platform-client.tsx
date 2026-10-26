@@ -126,6 +126,9 @@ export function NewTenant() {
   );
 }
 
+/** Russian letters in Latin (after NFKD, й and ё arrive as и and е). */
+const CYRILLIC: Record<string, string> = { а: "a", б: "b", в: "v", г: "g", д: "d", е: "e", ж: "zh", з: "z", и: "i", к: "k", л: "l", м: "m", н: "n", о: "o", п: "p", р: "r", с: "s", т: "t", у: "u", ф: "f", х: "kh", ц: "ts", ч: "ch", ш: "sh", щ: "shch", ъ: "", ы: "y", ь: "", э: "e", ю: "yu", я: "ya" };
+
 function autoSlug(name: string): string {
   return name
     .toLowerCase()
@@ -133,6 +136,7 @@ function autoSlug(name: string): string {
     .normalize("NFKD")
     .replace(/[̀-ͯ]/g, "")
     .replace(/ı/g, "i")
+    .replace(/[а-я]/g, (ch) => CYRILLIC[ch] ?? "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, 40);

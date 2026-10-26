@@ -1,13 +1,17 @@
 /**
  * Training library: imports the shipped content (content/library) into the database.
  * Idempotent: run on every deploy (`npm run content:sync`) and by the seed.
+ * Each lesson is `<id>.en.json` plus optional `<id>.az.json` / `<id>.ru.json` translations, stored as
+ * one lesson_contents row per locale; tenant (studio) lessons are never touched.
  */
 import fs from "node:fs";
 import path from "node:path";
 import { and, eq, isNull } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
+import type { z } from "zod";
 import { lessonFileSchema, lessonIntegrityErrors } from "../../lib/content/validate";
+import { localeParityErrors } from "../../lib/content/locale-parity";
 import type { ModuleFile } from "../../lib/content/types";
 import { CATEGORY_FROM_LABEL } from "../../lib/domain/catalog";
 
@@ -34,9 +38,52 @@ export function readLibrary() {
   return { modules, az, ru };
 }
 
-export async function syncLibrary(db: DB): Promise<{ modules: number; lessons: number }> {
+/** Languages a library lesson may be translated into: `<id>.az.json` / `<id>.ru.json` next to `<id>.en.json`. */
+export const LESSON_TRANSLATIONS = ["az", "ru"] as const;
+type TranslationLocale = (typeof LESSON_TRANSLATIONS)[number];
+type CheckedLesson = z.infer<typeof lessonFileSchema>;
+
+/** Schema and integrity rules for every file; a translation must also keep its English original's structure. */
+function checkedLesson(raw: unknown, label: string, english?: unknown): CheckedLesson {
+  const parsed = lessonFileSchema.safeParse(raw);
+  if (!parsed.success) throw new Error(`${label}: ${parsed.error.message}`);
+  const integrity = lessonIntegrityErrors(parsed.data);
+  if (integrity.length) throw new Error(`${label}: ${integrity.join("; ")}`);
+  if (english !== undefined) {
+    const parity = localeParityErrors(english, raw);
+    if (parity.length) throw new Error(`${label}: ${parity.slice(0, 10).join("; ")}${parity.length > 10 ? ` (and ${parity.length - 10} more)` : ""}`);
+  }
+  return parsed.data;
+}
+
+/**
+ * Reads a library lesson in English and in each translation that exists. A file that fails the checks
+ * aborts with "<module>/<lesson>: …" (English) or "<module>/<lesson>.<locale>: …" (a translation).
+ */
+export function readLibraryLesson(slug: string, id: string): { en: CheckedLesson; translations: Partial<Record<TranslationLocale, CheckedLesson>> } {
+  const key = `${slug}/${id}`;
+  const file = (locale: string) => path.join(LIB, "lessons", slug, `${id}.${locale}.json`);
+  const read = (locale: string, label: string): unknown => {
+    try {
+      return readJson(file(locale));
+    } catch (e) {
+      throw new Error(`${label}: ${(e as Error).message}`);
+    }
+  };
+  const english = read("en", key);
+  const en = checkedLesson(english, key);
+  const translations: Partial<Record<TranslationLocale, CheckedLesson>> = {};
+  for (const locale of LESSON_TRANSLATIONS) {
+    const label = `${key}.${locale}`;
+    if (fs.existsSync(file(locale))) translations[locale] = checkedLesson(read(locale, label), label, english);
+  }
+  return { en, translations };
+}
+
+export async function syncLibrary(db: DB): Promise<{ modules: number; lessons: number; locales: Record<"en" | TranslationLocale, number> }> {
   const { modules, az, ru } = readLibrary();
   let lessonCount = 0;
+  const locales = { en: 0, az: 0, ru: 0 };
   for (const [order, m] of modules.entries()) {
     const category = CATEGORY_FROM_LABEL[m.category];
     if (!category) throw new Error(`Unknown category ${m.category} in ${m.slug}`);
@@ -65,11 +112,7 @@ export async function syncLibrary(db: DB): Promise<{ modules: number; lessons: n
     }
 
     for (const [position, les] of m.lessons.entries()) {
-      const file = path.join(LIB, "lessons", m.slug, `${les.id}.en.json`);
-      const parsed = lessonFileSchema.safeParse(readJson(file));
-      if (!parsed.success) throw new Error(`${m.slug}/${les.id}: ${parsed.error.message}`);
-      const integrity = lessonIntegrityErrors(parsed.data);
-      if (integrity.length) throw new Error(`${m.slug}/${les.id}: ${integrity.join("; ")}`);
+      const { en, translations } = readLibraryLesson(m.slug, les.id);
       const key = `${m.slug}/${les.id}`;
       const lessonTitle = { en: les.title, az: az.lessons[key] ?? les.title, ru: ru.lessons[key] ?? les.title };
       const [row] = await db
@@ -86,14 +129,24 @@ export async function syncLibrary(db: DB): Promise<{ modules: number; lessons: n
           .values({ moduleId, key: les.id, title: lessonTitle, minutes: les.minutes, position })
           .returning({ id: t.lessons.id });
       }
-      await db
-        .insert(t.lessonContents)
-        .values({ lessonId, locale: "en", scenes: parsed.data.scenes })
-        .onConflictDoUpdate({ target: [t.lessonContents.lessonId, t.lessonContents.locale], set: { scenes: parsed.data.scenes, updatedAt: new Date() } });
+      const texts: Partial<Record<"en" | TranslationLocale, CheckedLesson>> = { en, ...translations };
+      for (const locale of ["en", ...LESSON_TRANSLATIONS] as const) {
+        const lesson = texts[locale];
+        if (!lesson) {
+          // The files are the source: a translation that was removed stops being served.
+          await db.delete(t.lessonContents).where(and(eq(t.lessonContents.lessonId, lessonId), eq(t.lessonContents.locale, locale)));
+          continue;
+        }
+        await db
+          .insert(t.lessonContents)
+          .values({ lessonId, locale, scenes: lesson.scenes })
+          .onConflictDoUpdate({ target: [t.lessonContents.lessonId, t.lessonContents.locale], set: { scenes: lesson.scenes, updatedAt: new Date() } });
+        locales[locale]++;
+      }
       lessonCount++;
     }
   }
-  return { modules: modules.length, lessons: lessonCount };
+  return { modules: modules.length, lessons: lessonCount, locales };
 }
 
 type PathFile = {

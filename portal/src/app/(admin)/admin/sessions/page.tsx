@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { asc, desc, eq, inArray } from "drizzle-orm";
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { CalendarClock, MapPin, Radio, UserRound } from "lucide-react";
 import { hasFeature, requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
@@ -22,7 +22,7 @@ export default async function SessionsAdminPage({ searchParams }: PageProps<"/ad
   if (!hasFeature(v, "live_sessions")) notFound();
   const sp = await searchParams;
   const view = VIEWS.includes(sp.view as "past") ? (sp.view as (typeof VIEWS)[number]) : "upcoming";
-  const [tr, tn, format] = await Promise.all([getTranslations("secops.sessions"), getTranslations("admin.nav"), getFormatter()]);
+  const [tr, tn, tc, format, locale] = await Promise.all([getTranslations("secops.sessions"), getTranslations("admin.nav"), getTranslations("common"), getFormatter(), getLocale()]);
   const now = new Date();
   const all = await db().select().from(t.liveSessions).where(eq(t.liveSessions.tenantId, v.tenant.id)).orderBy(view === "upcoming" ? asc(t.liveSessions.startsAt) : desc(t.liveSessions.startsAt));
   const ends = (s: (typeof all)[number]) => new Date(s.startsAt.getTime() + s.durationMin * 60_000);
@@ -37,7 +37,7 @@ export default async function SessionsAdminPage({ searchParams }: PageProps<"/ad
       {list.length ? (
         <ul className="grid gap-4">
           {list.map((s) => {
-            const mine = regs.filter((r) => r.sessionId === s.id).sort((a, b) => (people.get(a.userId)?.name ?? "").localeCompare(people.get(b.userId)?.name ?? ""));
+            const mine = regs.filter((r) => r.sessionId === s.id).sort((a, b) => (people.get(a.userId)?.name ?? "").localeCompare(people.get(b.userId)?.name ?? "", locale));
             const attended = mine.filter((r) => r.attended).length;
             const started = s.startsAt <= now;
             return (
@@ -51,7 +51,7 @@ export default async function SessionsAdminPage({ searchParams }: PageProps<"/ad
                         <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-caption text-ink-muted">
                           <span className="inline-flex items-center gap-1.5">
                             <CalendarClock className="size-4" />
-                            {format.dateTime(s.startsAt, { dateStyle: "medium", timeStyle: "short" })} · {s.durationMin}′
+                            {format.dateTime(s.startsAt, { dateStyle: "medium", timeStyle: "short" })} · {tc("units.min", { count: s.durationMin })}
                           </span>
                           <span className="inline-flex items-center gap-1.5">
                             <MapPin className="size-4" />
@@ -64,8 +64,7 @@ export default async function SessionsAdminPage({ searchParams }: PageProps<"/ad
                         </p>
                       </div>
                       <Pill tone={s.capacity && mine.length >= s.capacity ? "warn" : "brand"}>
-                        {tr("registered", { count: mine.length })}
-                        {s.capacity ? ` ${tr("capacity", { capacity: s.capacity })}` : ""}
+                        {s.capacity ? tr("registeredOf", { count: mine.length, capacity: s.capacity }) : tr("registered", { count: mine.length })}
                       </Pill>
                       {started ? <Pill tone="safe">{tr("attended", { count: attended })}</Pill> : null}
                       <SessionEditor
@@ -81,10 +80,10 @@ export default async function SessionsAdminPage({ searchParams }: PageProps<"/ad
                         <ul className="grid gap-1 border-t border-line p-3 sm:grid-cols-2">
                           {mine.map((r) => (
                             <li key={r.userId} className="flex items-center gap-3 rounded-md px-2 py-1.5 text-caption hover:bg-sunken">
-                              {started ? <AttendanceToggle sessionId={s.id} userId={r.userId} attended={r.attended} label={`${tr("present")}: ${people.get(r.userId)?.name ?? ""}`} /> : null}
+                              {started ? <AttendanceToggle sessionId={s.id} userId={r.userId} attended={r.attended} label={tr("presentFor", { name: people.get(r.userId)?.name ?? "—" })} /> : null}
                               <span className="min-w-0 flex-1 truncate">
                                 <b>{people.get(r.userId)?.name ?? "—"}</b>
-                                <span className="text-ink-subtle"> · {people.get(r.userId)?.departmentName ?? ""}</span>
+                                {people.get(r.userId)?.departmentName ? <span className="text-ink-subtle"> · {people.get(r.userId)?.departmentName}</span> : null}
                               </span>
                             </li>
                           ))}

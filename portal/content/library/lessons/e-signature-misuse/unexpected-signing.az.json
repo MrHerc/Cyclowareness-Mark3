@@ -1,0 +1,447 @@
+{
+  "id": "unexpected-signing",
+  "title": "Gözlənilməz imza sorğusu",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l2-tutor",
+      "beats": [
+        {
+          "id": "l2-b1",
+          "say": "İmza sorğusu gələndə əvvəlcə özünüzdən soruşun: bu sorğunu mən başlatmışam?",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "certificate"
+          }
+        },
+        {
+          "id": "l2-b2",
+          "say": "Sorğuda sənədin adı və onu göndərən xidmət göstərilir. Gözləmədiyiniz sorğunu rədd edin.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "notification",
+              "brandRef": "mohurid",
+              "app": "MöhürID",
+              "title": [
+                {
+                  "text": "İmza sorğusu"
+                }
+              ],
+              "body": [
+                {
+                  "text": "Sənəd: "
+                },
+                {
+                  "text": "Etibarname_tam_selahiyyet.pdf",
+                  "spot": "doc"
+                },
+                {
+                  "text": ". Xidmət: imza-xidmet.test"
+                }
+              ],
+              "time": "07:58"
+            }
+          },
+          "highlight": "doc"
+        },
+        {
+          "id": "l2-b3",
+          "say": "Oxumadan imzalamayın. Sənədin adı, məbləğ və alıcı gözlədiyinizə uyğun olmalıdır.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "l2-b4",
+          "say": "Şübhəniz varsa, imzalamayın və təhlükəsizlik komandasına bildirin. İmzanı geri götürmək çətindir.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l2-sim",
+      "environment": "phone",
+      "title": "İmza sorğuları",
+      "intro": "Gün ərzində telefonunuza imza sorğuları gəlir. Hər birini yoxlayın və qərar verin.",
+      "steps": [
+        {
+          "id": "unexpected",
+          "label": "Heç nə imzalamaq fikrində deyildiniz",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "mohurid",
+            "app": "MöhürID",
+            "title": [
+              {
+                "text": "İmza sorğusu"
+              }
+            ],
+            "body": [
+              {
+                "text": "Sənəd: Etibarname_avtomobil.pdf. Xidmət: Bulud Notariat"
+              }
+            ],
+            "time": "07:58"
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç və imzala",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Başqasının hazırladığı etibarnaməni imzaladınız. Dərhal imza xidmətinə və təhlükəsizlik komandasına zəng edin."
+            },
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Başlatmadığınız sorğu kiminsə adınızdan istifadə etməyə çalışdığını göstərir."
+            },
+            {
+              "id": "report",
+              "label": "Təhlükəsizlik komandasına bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Rədd edib bildirmək hücumu vaxtında dayandırır."
+            }
+          ]
+        },
+        {
+          "id": "rush-colleague",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Elvin (Satınalma)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "SənədAxını sistemində sənə müqavilə göndərdim. Oxumağa vaxt yoxdur, tez imzala, rəis gözləyir."
+                  }
+                ],
+                "time": "10:20"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "read",
+              "label": "Əvvəlcə sənədi oxuyuram",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Sizi tələsdirsələr də, bu, sənədi oxumamağa səbəb deyil: imzaya görə siz cavabdehsiniz."
+            },
+            {
+              "id": "rush",
+              "label": "Yaxşı, oxumadan imzalayıram",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Oxunmamış sənəddə məbləğ və ya alıcı dəyişdirilmiş ola bilər."
+            }
+          ]
+        },
+        {
+          "id": "fake-portal-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "senedaxini-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "SənədAxını"
+                }
+              ],
+              "address": [
+                {
+                  "text": "noreply@senedaxini-imza.test"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "İmzanız gözlənilir: Qebul_akti.pdf"
+              }
+            ],
+            "time": "12:05",
+            "body": [
+              [
+                {
+                  "text": "Sənədi imzalamaq üçün sistemə "
+                },
+                {
+                  "text": "daxil olun",
+                  "link": {
+                    "label": "daxil olun",
+                    "href": "https://senedaxini-imza.test/login"
+                  }
+                },
+                {
+                  "text": "."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "click",
+              "label": "Daxil ol",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Saxta giriş səhifəsi parolunuzu ələ keçirdi. Onu dərhal dəyişin və təhlükəsizlik komandasına bildirin."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Domen SənədAxını sisteminə məxsus deyil, sistemi özünüz açın."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Təhlükəsizdir. Amma bildirsəniz, başqaları da qorunar."
+            }
+          ]
+        },
+        {
+          "id": "own-request",
+          "label": "Portalda məzuniyyət ərizənizi imzalamağa indicə başladınız",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "mohurid",
+            "app": "MöhürID",
+            "title": [
+              {
+                "text": "İmza sorğusu"
+              }
+            ],
+            "body": [
+              {
+                "text": "Sənəd: Mezuniyyet_erizesi.pdf. Xidmət: SənədAxını"
+              }
+            ],
+            "time": "14:30"
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç və imzala",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bu sorğunu siz başlatdınız, sənəd və xidmət də gözlədiyiniz kimidir."
+            },
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "risky",
+              "feedback": "Buna ehtiyac yox idi: sorğu sizin idi və hər şey uyğundur. Yoxlamaq hər şeyi rədd etmək demək deyil."
+            }
+          ]
+        },
+        {
+          "id": "mismatch",
+          "label": "Portalda iş yerindən arayış sifariş etmişdiniz",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "mohurid",
+            "app": "MöhürID",
+            "title": [
+              {
+                "text": "İmza sorğusu"
+              }
+            ],
+            "body": [
+              {
+                "text": "Sənəd: Etibarname_bank_hesabi.pdf. Xidmət: imza-xidmet.test"
+              }
+            ],
+            "time": "16:12"
+          },
+          "say": "Sənədin adını gözlədiyinizlə müqayisə edin.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç və imzala",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Bu, arayışınız deyil, bank etibarnaməsi idi. Ad uyğun gəlmirsə, imzalamayın."
+            },
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Nə sənəd, nə də xidmət gözlədiyiniz kimi deyil, ona görə sorğunu rədd edin və bildirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l2-hotspot",
+      "prompt": "İmzalamazdan əvvəl bu sorğuda nəyin səhv olduğunu tapın.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "mohurid",
+        "tone": "app",
+        "title": [
+          {
+            "text": "İmzalamağı təsdiqləyin"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Sənəd: "
+            },
+            {
+              "text": "Etibarnamə: bütün bank hesabları üzərində tam səlahiyyət",
+              "spot": "doc"
+            }
+          ],
+          [
+            {
+              "text": "Kimin xeyrinə: "
+            },
+            {
+              "text": "Hüseyn Məmmədli",
+              "spot": "person"
+            }
+          ],
+          [
+            {
+              "text": "Müddət: "
+            },
+            {
+              "text": "3 il",
+              "spot": "term"
+            }
+          ],
+          [
+            {
+              "text": "Sorğunu göndərən: "
+            },
+            {
+              "text": "imza-xidmet.test",
+              "spot": "source"
+            }
+          ]
+        ],
+        "buttons": [
+          "Rədd et",
+          "PIN kodu daxil et"
+        ]
+      },
+      "spots": [
+        {
+          "id": "doc",
+          "label": "Tam səlahiyyət",
+          "explain": "Bu sənəd kiməsə hesablarınız üzərində geniş hüquqlar verir. Belə sənəd heç vaxt gözlənilmədən gəlməməlidir."
+        },
+        {
+          "id": "person",
+          "label": "Tanımadığınız şəxs",
+          "explain": "Səlahiyyəti kimin aldığını bilmirsinizsə, imzalamayın."
+        },
+        {
+          "id": "term",
+          "label": "Uzun müddət",
+          "explain": "Üç illik etibarnamə zərərin uzun müddət davam etməsinə imkan verir."
+        },
+        {
+          "id": "source",
+          "label": "Naməlum xidmət",
+          "explain": "Sorğu tanıdığınız rəsmi sistemdən deyil, naməlum saytdan gəlir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "order",
+      "id": "l2-order",
+      "prompt": "İmzalamazdan əvvəlki addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "started",
+          "label": "Sorğunu özünüz başlatdığınızı yoxlayın"
+        },
+        {
+          "id": "read",
+          "label": "Sənədi açıb oxuyun"
+        },
+        {
+          "id": "details",
+          "label": "Adı, məbləği və alıcını yoxlayın"
+        },
+        {
+          "id": "pin",
+          "label": "Yalnız bundan sonra PIN kodunuzu daxil edin"
+        }
+      ],
+      "explain": "Hansısa addım uyğun gəlmirsə, dayanın və rədd edin. Şübhəli sorğunu təhlükəsizlik komandasına bildirin."
+    },
+    {
+      "type": "choice",
+      "id": "l2-choice",
+      "question": {
+        "prompt": "Şübhəli sənədi səhvən imzaladınız. İlk addım nədir?",
+        "options": [
+          {
+            "id": "hide",
+            "label": "Heç kimə demirəm, bəlkə heç nə olmaz",
+            "correct": false,
+            "feedback": "İmza etibarlıdır və ondan istifadə oluna bilər. Gizlətmək zərəri artırır."
+          },
+          {
+            "id": "report",
+            "label": "Dərhal imza xidmətinə və təhlükəsizlik komandasına zəng edirəm",
+            "correct": true,
+            "feedback": "Düzdür. Xidmət sertifikatı dayandıra bilər, təhlükəsizlik komandası isə nəticələri araşdırır."
+          },
+          {
+            "id": "pin",
+            "label": "Yalnız PIN kodumu dəyişirəm",
+            "correct": false,
+            "feedback": "Faydalıdır, amma imzalanmış sənəd yenə də qüvvədədir. Əvvəlcə bildirin."
+          }
+        ]
+      },
+      "explain": "Səhv imza atılıbsa, vaxt həlledicidir. Tez bildirmək sənəddən istifadənin qarşısını almağa şans verir."
+    },
+    {
+      "type": "recap",
+      "id": "l2-recap",
+      "points": [
+        "İmza sorğusunu yalnız onu özünüz başlatmısınızsa təsdiqləyin.",
+        "Sənədi oxuyun: ad, məbləğ və alıcı gözlədiyinizə uyğun olmalıdır.",
+        "Səhvən imzalamısınızsa, dərhal imza xidmətinə və təhlükəsizlik komandasına bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

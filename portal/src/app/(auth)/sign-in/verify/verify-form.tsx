@@ -7,6 +7,7 @@ import { verifySecondFactorAction, signOutAction, type AuthState } from "@/serve
 import { Field, Input } from "@/components/ui/field";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { TextButton } from "@/components/ui/button";
+import { authCard, authLead, authTitle } from "../../ui";
 
 /**
  * A failure before the server answers (offline, a dropped connection, a restart or deploy) rejects the action, and
@@ -26,11 +27,11 @@ export function VerifyForm({ next }: { next: string }) {
   const [state, action] = useActionState<AuthState, FormData>(submitCode, undefined);
   const error = state?.error && state.step === mode ? t(`errors.${state.error}` as "errors.generic") : null;
   return (
-    <div className="rounded-2xl border border-line bg-surface p-7 shadow-raised sm:p-8">
+    <div className={authCard}>
       <form action={action} className="grid gap-5" noValidate key={mode}>
         <div>
-          <h1 className="text-headline font-bold">{mode === "totp" ? t("code.title") : t("code.backupTitle")}</h1>
-          <p className="mt-2 text-body-sm text-ink-muted">{mode === "totp" ? t("code.subtitle") : t("code.backupSubtitle")}</p>
+          <h1 className={authTitle}>{mode === "totp" ? t("code.title") : t("code.backupTitle")}</h1>
+          <p className={authLead}>{mode === "totp" ? t("code.subtitle") : t("code.backupSubtitle")}</p>
         </div>
         <input type="hidden" name="mode" value={mode} />
         <input type="hidden" name="next" value={next} />
@@ -43,7 +44,7 @@ export function VerifyForm({ next }: { next: string }) {
             inputMode={mode === "totp" ? "numeric" : "text"}
             pattern={mode === "totp" ? "[0-9]{6}" : undefined}
             maxLength={mode === "totp" ? 6 : 16}
-            className="text-center font-mono text-title tracking-[0.4em]"
+            className="h-14 text-center font-mono text-title tracking-[0.4em]"
             aria-invalid={!!error}
           />
         </Field>
@@ -52,7 +53,7 @@ export function VerifyForm({ next }: { next: string }) {
           {mode === "totp" ? t("code.useBackup") : t("code.useAuthenticator")}
         </TextButton>
       </form>
-      <form action={signOutAction} className="mt-3 text-center">
+      <form action={signOutAction} className="mt-5 border-t border-line pt-4 text-center">
         <TextButton type="submit" tone="muted" className="font-normal">
           {t("code.otherAccount")}
         </TextButton>

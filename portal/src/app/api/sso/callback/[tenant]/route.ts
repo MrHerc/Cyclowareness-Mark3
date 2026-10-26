@@ -14,7 +14,7 @@ import { audit } from "@/server/services/audit";
 import { clientIp, userAgent } from "@/server/request";
 import { featuresFor, withDefaults } from "@/lib/tenant-defaults";
 import { TENANT_SLUG_RE } from "@/server/services/tenants";
-import { DEFAULT_LOCALE, LOCALE_COOKIE, isLocale } from "@/i18n/config";
+import { DEFAULT_LOCALE, LOCALE_COOKIE, isLocale, type Locale } from "@/i18n/config";
 
 const emailSchema = z.email().max(254);
 
@@ -50,6 +50,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
   let email: string | null = null;
   let name = "";
   let reason = "";
+  /** The provider's `locale` claim ("ru", "en-GB"), as a language code. */
+  let claimedLocale = "";
   try {
     const code = url.searchParams.get("code");
     if (!code) {
@@ -72,6 +74,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
     if (!parsed.success) throw new Error("no_email_claim");
     email = parsed.data;
     name = nameFrom(claims, email);
+    claimedLocale = typeof claims.locale === "string" ? claims.locale.slice(0, 2).toLowerCase() : "";
   } catch (error) {
     reason = error instanceof Error ? error.message.slice(0, 60) : "error";
   }
@@ -98,7 +101,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
     if (!sso.autoCreate) return refuse("unknown_person");
     // The provider vouches only for the organisation's own proven domain.
     if (emailDomain(email) !== tenant.domain?.toLowerCase()) return refuse("foreign_domain");
-    const locale = isLocale(tenant.settings.defaultLocale) ? tenant.settings.defaultLocale : DEFAULT_LOCALE;
+    // The language the provider knows the person by, else the one they were using here, if the organisation has it on.
+    const enabled = (l: string | undefined): l is Locale => isLocale(l) && tenant.settings.locales.includes(l);
+    const locale = [claimedLocale, jar.get(LOCALE_COOKIE)?.value].find(enabled) ?? (isLocale(tenant.settings.defaultLocale) ? tenant.settings.defaultLocale : DEFAULT_LOCALE);
     // Created active, so this is also its activation (setStatusAction tells never-activated accounts apart by it).
     [user] = await db().insert(t.users).values({ tenantId: tenant.id, email, name, role: "learner", status: "active", locale, activatedAt: new Date() }).returning();
     await audit(db(), { tenantId: tenant.id, actorId: user.id, action: "sso.person_created", targetType: "user", targetId: user.id, ip });

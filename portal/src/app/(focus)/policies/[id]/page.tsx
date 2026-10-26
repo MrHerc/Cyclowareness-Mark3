@@ -9,8 +9,8 @@ import { requireViewer } from "@/server/auth/viewer";
 import { Pill } from "@/components/ui/pill";
 import { Notice } from "@/components/ui/layout";
 import { Markdown, headingsOf } from "@/lib/markdown";
-import { LOCALE_NAMES, type SiteLocale } from "@/i18n/config";
 import { numericDate } from "@/lib/time";
+import { policyTextFor } from "@/lib/policy-text";
 import { SignForm } from "./sign-form";
 
 async function load(id: string, tenantId: string) {
@@ -33,7 +33,9 @@ export async function generateMetadata({ params }: PageProps<"/policies/[id]">) 
   const { id } = await params;
   const v = await requireViewer();
   const data = await load(id, v.tenant.id);
-  return { title: data?.version.title ?? "" };
+  const locale = await getLocale();
+  // The tab title follows the text the page shows: the translation when there is one.
+  return { title: data ? policyTextFor(data.version, locale, v.tenant.settings.defaultLocale).title : "" };
 }
 
 export default async function PolicyReader({ params, searchParams }: PageProps<"/policies/[id]">) {
@@ -42,14 +44,12 @@ export default async function PolicyReader({ params, searchParams }: PageProps<"
   const data = await load(id, v.tenant.id);
   if (!data) notFound();
   const locale = await getLocale();
-  const [tr, tc, format] = await Promise.all([getTranslations("learner.policy"), getTranslations("common"), getFormatter()]);
+  const [tr, tp, tc, format] = await Promise.all([getTranslations("learner.policy"), getTranslations("player.policy"), getTranslations("common"), getFormatter()]);
   const { version } = data;
-  const translated = locale !== "az" ? version.translations?.[locale] : undefined;
-  // The base text is the organisation's default language (Azerbaijani for this tenant).
-  const title = translated?.title ?? version.title;
-  const body = translated?.bodyMd ?? version.bodyMd;
-  const summary = translated?.summary ?? version.summary;
-  const shownLanguage = translated ? locale : "az";
+  // The reader's language when the version has it, else the base text in the language it was written in.
+  const { title, bodyMd: body, summary, lang: shownLanguage } = policyTextFor(version, locale, v.tenant.settings.defaultLocale);
+  // The policy text in another language than the page (no translation yet) carries its own `lang`.
+  const textLang = shownLanguage !== locale ? shownLanguage : undefined;
   const toc = headingsOf(body);
   const from = typeof sp.from === "string" && sp.from.startsWith("/") && !sp.from.startsWith("//") ? sp.from : "/";
   const [signed] = await db()
@@ -65,7 +65,9 @@ export default async function PolicyReader({ params, searchParams }: PageProps<"
           <Link href={from} aria-label={tc("close")} className="grid size-10 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink">
             <X className="size-5" />
           </Link>
-          <p className="truncate text-body-sm font-semibold">{title}</p>
+          <p lang={textLang} className="truncate text-body-sm font-semibold">
+            {title}
+          </p>
         </div>
       </header>
       <div className="mx-auto grid max-w-5xl gap-10 px-4 py-8 lg:grid-cols-[minmax(0,1fr)_14rem]">
@@ -74,14 +76,20 @@ export default async function PolicyReader({ params, searchParams }: PageProps<"
             <Pill tone="brand">{tr("version", { version: version.version })}</Pill>
             {version.publishedAt ? <span className="text-caption text-ink-muted">{tr("published", { date: numericDate(version.publishedAt) })}</span> : null}
           </div>
-          <h1 className="mt-4 text-headline font-bold text-balance">{title}</h1>
-          {summary ? <p className="mt-3 text-lead text-ink-muted">{summary}</p> : null}
-          {shownLanguage !== locale ? (
+          <h1 lang={textLang} className="mt-4 text-headline font-bold text-balance">
+            {title}
+          </h1>
+          {summary ? (
+            <p lang={textLang} className="mt-3 text-lead text-ink-muted">
+              {summary}
+            </p>
+          ) : null}
+          {textLang ? (
             <Notice tone="info" className="mt-5">
-              {tr("otherLanguage", { language: LOCALE_NAMES[shownLanguage as SiteLocale] })}
+              {tp("otherLanguage", { language: tp(`language.${shownLanguage as "az" | "en" | "ru"}`) })}
             </Notice>
           ) : null}
-          <div className="mt-8">
+          <div lang={textLang} className="mt-8">
             <Markdown source={body} skipTitle />
           </div>
 
@@ -92,7 +100,7 @@ export default async function PolicyReader({ params, searchParams }: PageProps<"
             {signed ? (
               <p className="mt-4 flex items-center gap-2 text-body-sm font-semibold text-safe-700">
                 <CheckCircle2 className="size-5" />
-                {tr("signed", { version: version.version, date: format.dateTime(signed.at, { dateStyle: "medium", timeStyle: "short" }) })}
+                {tp("signed", { version: version.version, date: format.dateTime(signed.at, { dateStyle: "medium", timeStyle: "short" }) })}
               </p>
             ) : (
               <div className="mt-4">
@@ -105,7 +113,7 @@ export default async function PolicyReader({ params, searchParams }: PageProps<"
           <nav aria-label={tr("contents")} className="hidden lg:block">
             <div className="sticky top-24">
               <p className="mb-2 text-caption font-semibold text-ink-muted">{tr("contents")}</p>
-              <ol className="grid gap-1 text-caption">
+              <ol lang={textLang} className="grid gap-1 text-caption">
                 {toc
                   .filter((h) => h.level === 2)
                   .map((h) => (

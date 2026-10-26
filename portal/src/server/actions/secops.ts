@@ -2,7 +2,7 @@
 
 import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
 import { refresh } from "next/cache";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { db, t } from "../db";
 import { actionViewer, allowed, type Viewer } from "../auth/viewer";
@@ -14,7 +14,7 @@ import { emitEvent } from "../services/events";
 import { departmentClosure } from "../services/assignments";
 import { aiEnabled, draftLesson, lessonDraftSchema, type LessonDraft } from "../ai";
 import { rateLimit } from "../rate-limit";
-import { LOCALES, pick } from "../../i18n/config";
+import { isLocale, LOCALES, pick } from "../../i18n/config";
 import { AUDIENCES, CATEGORIES } from "../../lib/domain/catalog";
 import { parseDay } from "../../lib/day";
 import { isForeignKeyViolation } from "../db/errors";
@@ -559,6 +559,8 @@ export async function deleteModuleAction(id: string): Promise<Result> {
 
 const pathSchema = z.object({
   id: uuid.nullable(),
+  /** A duplicate: the library (or own) path it copies, whose other translations it keeps. */
+  sourceId: uuid.nullable().optional(),
   title: z.string().trim().min(3).max(120),
   description: z.string().trim().max(600),
   audience: z.string().trim().max(120),
@@ -573,27 +575,38 @@ export async function savePathAction(input: z.infer<typeof pathSchema>): Promise
   const p = pathSchema.safeParse(input);
   if (!p.success) return { ok: false, error: "invalid" };
   const d = p.data;
-  const lang = v.tenant.settings.defaultLocale;
+  // The editor shows the texts in the admin's interface language, so that is the translation they change.
+  const ui = await getLocale();
+  const lang = isLocale(ui) ? ui : v.tenant.settings.defaultLocale;
   const known = await db().select({ slug: t.modules.slug }).from(t.modules).where(and(inArray(t.modules.slug, d.moduleSlugs), or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id))));
   const ok = new Set(known.map((k) => k.slug));
   const slugs = [...new Set(d.moduleSlugs)].filter((s) => ok.has(s));
   if (!slugs.length) return { ok: false, error: "invalid" };
+  // An edit starts from the path itself, a duplicate from the path it copies (library or own).
+  const baseId = d.id ?? d.sourceId ?? null;
+  const [base] = baseId
+    ? await db()
+        .select()
+        .from(t.learningPaths)
+        .where(and(eq(t.learningPaths.id, baseId), d.id ? eq(t.learningPaths.tenantId, v.tenant.id) : or(isNull(t.learningPaths.tenantId), eq(t.learningPaths.tenantId, v.tenant.id))))
+    : [];
+  // A text left as shown keeps all its translations; an edited one replaces only this language's.
+  const merge = (from: Record<string, string> | undefined, value: string) => (from && pick(from, lang) === value ? from : { ...from, [lang]: value });
   const values = {
-    title: { [lang]: d.title },
-    description: { [lang]: d.description },
-    audience: { [lang]: d.audience },
-    recurrence: { [lang]: d.recurrence },
+    title: merge(base?.title, d.title),
+    description: merge(base?.description, d.description),
+    audience: merge(base?.audience, d.audience),
+    recurrence: merge(base?.recurrence, d.recurrence),
     standards: d.standards.split(",").map((s) => s.trim()).filter(Boolean).slice(0, 12),
     mandatory: d.mandatory,
     moduleSlugs: slugs,
   };
   if (d.id) {
-    const [own] = await db().select({ id: t.learningPaths.id }).from(t.learningPaths).where(and(eq(t.learningPaths.id, d.id), eq(t.learningPaths.tenantId, v.tenant.id)));
-    if (!own) return { ok: false };
-    await db().update(t.learningPaths).set(values).where(eq(t.learningPaths.id, own.id));
-    await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "path.changed", targetType: "path", targetId: own.id, meta: { title: d.title } });
+    if (!base) return { ok: false };
+    await db().update(t.learningPaths).set(values).where(eq(t.learningPaths.id, base.id));
+    await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "path.changed", targetType: "path", targetId: base.id, meta: { title: d.title } });
     refresh();
-    return { ok: true, id: own.id };
+    return { ok: true, id: base.id };
   }
   const [row] = await db()
     .insert(t.learningPaths)
@@ -663,10 +676,16 @@ export async function deleteSessionAction(id: string): Promise<Result> {
   if (!uuid.safeParse(id).success) return { ok: false };
   const [s] = await db().select().from(t.liveSessions).where(and(eq(t.liveSessions.id, id), eq(t.liveSessions.tenantId, v.tenant.id)));
   if (!s) return { ok: false };
-  const regs = await db().select({ userId: t.sessionRegistrations.userId }).from(t.sessionRegistrations).where(eq(t.sessionRegistrations.sessionId, s.id));
+  const regs = await db()
+    .select({ userId: t.sessionRegistrations.userId, locale: t.users.locale })
+    .from(t.sessionRegistrations)
+    .innerJoin(t.users, eq(t.users.id, t.sessionRegistrations.userId))
+    .where(eq(t.sessionRegistrations.sessionId, s.id));
   if (regs.length && s.startsAt > new Date()) {
-    const tr = await getTranslations({ locale: v.tenant.settings.defaultLocale, namespace: "secops.sessions" });
-    await db().insert(t.notifications).values(regs.map((r) => ({ tenantId: v.tenant.id, userId: r.userId, kind: "session", title: tr("cancelledTitle", { title: s.title }), href: "/sessions" })));
+    // Each registrant reads the cancellation in their own interface language.
+    const title = new Map<string, string>();
+    for (const locale of new Set(regs.map((r) => r.locale))) title.set(locale, (await getTranslations({ locale, namespace: "secops.sessions" }))("cancelledTitle", { title: s.title }));
+    await db().insert(t.notifications).values(regs.map((r) => ({ tenantId: v.tenant.id, userId: r.userId, kind: "session", title: title.get(r.locale) ?? s.title, href: "/sessions" })));
   }
   await db().delete(t.liveSessions).where(eq(t.liveSessions.id, s.id));
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "session.deleted", targetType: "session", targetId: s.id, meta: { title: s.title, notified: regs.length } });
@@ -696,8 +715,12 @@ export async function setTicketStatusAction(id: string, status: string): Promise
   await db().update(t.supportTickets).set({ status: s.data, updatedAt: new Date() }).where(eq(t.supportTickets.id, tk.id));
   // The requester hears about an answer or closure even when no message was written.
   if ((s.data === "answered" || s.data === "closed") && s.data !== tk.status) {
-    const tr = await getTranslations({ locale: v.tenant.settings.defaultLocale, namespace: "secops.support" });
-    await db().insert(t.notifications).values({ tenantId: v.tenant.id, userId: tk.userId, kind: "ticket", title: `#${tk.number}`, body: tr(`statuses.${s.data}`), href: `/help/tickets/${tk.id}` });
+    // In the requester's interface language, not the agent's.
+    const [requester] = await db().select({ locale: t.users.locale }).from(t.users).where(eq(t.users.id, tk.userId));
+    const tr = await getTranslations({ locale: requester?.locale ?? v.tenant.settings.defaultLocale, namespace: "secops.support" });
+    await db()
+      .insert(t.notifications)
+      .values({ tenantId: v.tenant.id, userId: tk.userId, kind: "ticket", title: tr("notifyTitle", { number: tk.number, subject: tk.subject.slice(0, 80) }), body: tr(`notifyBody.${s.data}`), href: `/help/tickets/${tk.id}` });
   }
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "ticket.status", targetType: "ticket", targetId: tk.id, meta: { number: tk.number, status: s.data } });
   refresh();

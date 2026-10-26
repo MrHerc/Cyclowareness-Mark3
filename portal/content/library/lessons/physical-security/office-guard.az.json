@@ -1,0 +1,394 @@
+{
+  "id": "office-guard",
+  "title": "Ofisi qorumaq",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "no-computer",
+          "say": "Hücumçuya həmişə kompüter lazım olmur. Masada qalmış bir sənəd və ya kilidlənməmiş ekran kifayətdir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "desk"
+          }
+        },
+        {
+          "id": "lock-screen",
+          "say": "Yerinizdən hər dəfə qalxanda ekranı kilidləyin. Windows kompüterində Windows düyməsi ilə L hərfini eyni anda basın.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "tailgating",
+          "say": "Tanımadığınız biri kartla açılan qapıdan arxanızca keçmək istəsə, nəzakətlə ondan öz kartından istifadə etməsini xahiş edin.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        },
+        {
+          "id": "visitors",
+          "say": "Qonaqlar qeydiyyatdan keçir, qonaq kartı taxır və binada həmişə müşayiət olunur.",
+          "mood": "happy",
+          "gesture": "nod",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "tailgate",
+      "title": "Arxanızda kimsə var",
+      "start": "door",
+      "nodes": [
+        {
+          "id": "door",
+          "text": "Zəhmət olmasa, qapını saxlaya bilərsiniz? Əllərim doludur. Kartım çantamdadır, printeri təmir etməyə gəlmişəm.",
+          "speaker": "Tanımadığınız kişi",
+          "voice": "young-man-2",
+          "channel": "in-person",
+          "spoken": "Zəhmət olmasa, qapını saxlaya bilərsiniz? Əllərim doludur. <breath> Kartım çantamdadır, printeri təmir etməyə gəlmişəm.",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          },
+          "choices": [
+            {
+              "label": "Qapını saxlayıram, axı əlləri doludur",
+              "outcome": "compromised",
+              "feedback": "Yoxlanılmamış şəxs içəri keçdi. Hücumçular məhz bu nəzakətə arxalanır."
+            },
+            {
+              "label": "Kartını tapsın deyə qutuları tutmağı təklif edirəm",
+              "next": "no-badge",
+              "feedback": "Həm nəzakətli, həm də düzgün."
+            },
+            {
+              "label": "Qapının bağlanmasını gözləyib heç nə demədən uzaqlaşıram",
+              "outcome": "risky",
+              "feedback": "O, içəri keçmədi, amma qapını başqası aça bilər. Mühafizəyə xəbər vermək daha yaxşıdır."
+            }
+          ]
+        },
+        {
+          "id": "no-badge",
+          "text": "Deyəsən, evdə qoyub gəlmişəm. Tələsirəm, rəhbəriniz məni gözləyir.",
+          "speaker": "Tanımadığınız kişi",
+          "voice": "young-man-2",
+          "channel": "in-person",
+          "spoken": "Deyəsən, ee, evdə qoyub gəlmişəm. Tələsirəm, rəhbəriniz məni gözləyir.",
+          "choices": [
+            {
+              "label": "Yaxşı, keçin",
+              "outcome": "compromised",
+              "feedback": "Rəhbərin adını çəkmək və sizi tələsdirmək ən köhnə hiylədir. Kart yoxdursa, giriş də yoxdur."
+            },
+            {
+              "label": "Onu mühafizə postuna aparıram",
+              "next": "guard",
+              "feedback": "Düzdür. Orada ona qonaq kartı verə və ya onu geri göndərə bilərlər."
+            }
+          ]
+        },
+        {
+          "id": "guard",
+          "text": "Bu gün heç bir printer təmiri planlaşdırılmayıb. Yaxşı ki, onu bura gətirdiniz.",
+          "speaker": "Mühafizəçi",
+          "voice": "older-man",
+          "channel": "in-person",
+          "manner": "firm",
+          "spoken": "Bu gün heç bir printer təmiri planlaşdırılmayıb. <breath> Yaxşı ki, onu bura gətirdiniz.",
+          "character": "guard",
+          "choices": [
+            {
+              "label": "Təhlükəsizlik komandasına da qısa məlumat göndərirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Onlar kamera yazılarına baxacaq və digər girişləri yoxlayacaqlar."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "reception-call",
+      "environment": "call",
+      "title": "Resepsiyadan zəng",
+      "intro": "Resepsiyadan sizə zəng edirlər. Gözləmədiyiniz qonaqla bağlı nə edəcəyinizə qərar verin.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Resepsiya"
+              }
+            ],
+            "number": [
+              {
+                "text": "Daxili nömrə 115"
+              }
+            ],
+            "label": "İş telefonu",
+            "voice": "woman-2"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab ver",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Cavab verin. Qonaqla bağlı qərarı siz verirsiniz."
+            },
+            {
+              "id": "decline",
+              "label": "Rədd et",
+              "kind": "decline",
+              "outcome": "risky",
+              "feedback": "Resepsiya cavab almayacaq və qonağı yoxlamadan içəri buraxa bilər. Belə zənglərə mütləq cavab verin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "visitor",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Resepsiya"
+              }
+            ],
+            "number": [
+              {
+                "text": "Daxili nömrə 115"
+              }
+            ],
+            "label": "İş telefonu",
+            "voice": "woman-2"
+          },
+          "say": "Salam, burada kondisioner ustası var. Deyir ki, siz, bağışlayın, onu çağırmısınız. Yuxarı göndərim?",
+          "spoken": "Salam, <breath> burada, ee, kondisioner ustası var. Deyir ki, siz <cough> bağışlayın, onu çağırmısınız. Yuxarı göndərim?",
+          "actions": [
+            {
+              "id": "send-up",
+              "label": "Bəli, yuxarı göndərin",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Yoxlanılmamış şəxs binada tək gəzəcək. Əvvəlcə iş sifarişini yoxlayın."
+            },
+            {
+              "id": "hold",
+              "label": "Mən heç kimi çağırmamışam, onu resepsiyada saxlayın",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Gözlənilməz qonaq yoxlanılmadan içəri keçmir."
+            },
+            {
+              "id": "come-down",
+              "label": "Özüm aşağı düşüb baxaram",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Yaxşı. Qonağı resepsiyada qarşılayın və onu tək buraxmayın."
+            }
+          ]
+        },
+        {
+          "id": "name-drop",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Resepsiya"
+              }
+            ],
+            "number": [
+              {
+                "text": "Daxili nömrə 115"
+              }
+            ],
+            "label": "İş telefonu",
+            "voice": "woman-2"
+          },
+          "say": "Deyir ki, Kamran bəy icazə verib. Server otağında cəmi beş dəqiqəlik işi var.",
+          "spoken": "Deyir ki, <breath> Kamran bəy icazə verib. Server otağında cəmi beş dəqiqəlik işi var.",
+          "actions": [
+            {
+              "id": "let-in",
+              "label": "Onda içəri buraxın",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Server otağına yoxlanılmamış giriş ciddi təhlükədir. Rəhbərin adı icazə demək deyil."
+            },
+            {
+              "id": "check-order",
+              "label": "Sifarişi təsərrüfat şöbəsi ilə yoxlayıram",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Sifarişi qonağın sözü ilə yox, rəsmi kanallarla yoxlayın."
+            },
+            {
+              "id": "call-boss",
+              "label": "Kamran bəyə özüm zəng edəcəyəm",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Yaxşı. Rəhbərinizə bildiyiniz nömrə ilə zəng edib soruşun.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Zəng bitdi. Təsərrüfat şöbəsi bildirir ki, bu gün heç bir usta çağırılmayıb.",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Resepsiya"
+              }
+            ],
+            "number": [
+              {
+                "text": "Daxili nömrə 115"
+              }
+            ],
+            "label": "İş telefonu",
+            "voice": "woman-2"
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Mühafizəyə və təhlükəsizlik komandasına bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Mühafizəçilər həmin şəxsi saxlayacaq, kamera yazıları isə yoxlanılacaq."
+            },
+            {
+              "id": "ignore",
+              "label": "Heç nə etmə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Saxta usta başqa girişdən keçməyə cəhd edə bilər. Bildirmək binanı qoruyur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "clean-desk",
+      "question": {
+        "prompt": "Nahara gedirsiniz. Masanızda nə qalmamalıdır?",
+        "options": [
+          {
+            "id": "sticky-note",
+            "label": "Üzərində parol yazılmış stiker",
+            "correct": true,
+            "feedback": "Parol heç vaxt kağız üzərində, göz önündə qalmamalıdır."
+          },
+          {
+            "id": "citizen-file",
+            "label": "Vətəndaş müraciəti olan qovluq",
+            "correct": true,
+            "feedback": "Məxfi sənədləri kilidli şkafa qoyun."
+          },
+          {
+            "id": "phone",
+            "label": "Kilidlənməmiş iş telefonu",
+            "correct": true,
+            "feedback": "Kilidsiz telefon hesablarınıza qapı açır."
+          },
+          {
+            "id": "cup",
+            "label": "Boş qəhvə fincanı",
+            "correct": false,
+            "feedback": "Bu, risk deyil. Sadəcə yığışdırın."
+          }
+        ],
+        "multi": true,
+        "visual": {
+          "kind": "illustration",
+          "id": "desk"
+        }
+      },
+      "explain": "Təmiz masa qaydası: yerinizdən ayrılanda sənədlər, yaddaş daşıyıcıları və cihazlar kilid altında saxlanılır."
+    },
+    {
+      "type": "match",
+      "id": "situations",
+      "prompt": "Hər vəziyyəti düzgün reaksiya ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "stranger",
+          "left": "Dəhlizdə kartı olmayan tanımadığınız şəxs",
+          "right": "Nəzakətlə soruşun və mühafizəyə yönləndirin"
+        },
+        {
+          "id": "printer",
+          "left": "Başqasının printerdə qalmış məxfi sənədi",
+          "right": "Oxumadan sahibinə qaytarın"
+        },
+        {
+          "id": "lost-badge",
+          "left": "Giriş kartınızı itirmisiniz",
+          "right": "Bloklansın deyə dərhal bildirin"
+        },
+        {
+          "id": "open-screen",
+          "left": "Həmkarınız ekranını kilidləmədən gedib",
+          "right": "Ekranı kilidləyin və ona xatırladın"
+        }
+      ],
+      "explain": "Fiziki təhlükəsizlik hər kəsin işidir. Kiçik bir addım böyük məlumat sızmasının qarşısını alır."
+    },
+    {
+      "type": "order",
+      "id": "visitor-flow",
+      "prompt": "Qonaq gələndə atılan addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "sign-in",
+          "label": "Qonaq resepsiyada qeydiyyatdan keçir"
+        },
+        {
+          "id": "badge",
+          "label": "Qonaq kartı alır və onu görünən yerə taxır"
+        },
+        {
+          "id": "escort",
+          "label": "Qəbul edən əməkdaş onu qarşılayır və müşayiət edir"
+        },
+        {
+          "id": "return",
+          "label": "Çıxarkən kart geri qaytarılır"
+        }
+      ],
+      "explain": "Qonaq binada heç vaxt tək qalmır və çıxarkən kartı geri qaytarır."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Yerinizdən qalxanda ekranı kilidləyin, sənədləri isə kilid altında saxlayın.",
+        "Tanımadığınız şəxsləri arxanızca içəri buraxmayın, onları mühafizəyə yönləndirin.",
+        "Çap etdiyiniz sənədləri dərhal götürün, məxfi kağızları isə qaydaya uyğun məhv edin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

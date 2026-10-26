@@ -1,9 +1,9 @@
 # Password and Account Security Policy
 
-Rules for passwords, two-step sign-in and the password manager on the Organisation's accounts.
+Rules for passwords, two-step verification and the password manager on the Organisation's accounts.
 
 ## 1. Purpose
-1.1. This policy sets out password, two-step sign-in and account rules that prevent work accounts from being taken over.
+1.1. This policy sets out password, two-step verification and account rules that prevent work accounts from being taken over.
 
 ## 2. Scope
 2.1. The policy applies to all employees, contractors and other persons with access to the Organisation's information systems.
@@ -17,8 +17,8 @@ Rules for passwords, two-step sign-in and the password manager on the Organisati
 
 3.4. If a password may have leaked, change it at once and inform the IT security team.
 
-## 4. Two-step sign-in
-4.1. Two-step sign-in is turned on for every work account.
+## 4. Two-step verification
+4.1. Two-step verification is turned on for every work account.
 
 4.2. Never approve a sign-in request you did not start. It means someone else has your password: deny the request and tell IT.
 

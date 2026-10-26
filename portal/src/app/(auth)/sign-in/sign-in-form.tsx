@@ -4,11 +4,12 @@ import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ArrowLeft, Building2, Eye, EyeOff, Smartphone } from "lucide-react";
+import { ArrowLeft, Building2, CircleAlert, CircleCheck, Eye, EyeOff, LockKeyhole, Mail, Smartphone } from "lucide-react";
 import { checkEmailAction, signInAction, type AuthState } from "@/server/actions/auth";
 import { Field, Input } from "@/components/ui/field";
-import { ButtonAnchor } from "@/components/ui/button";
+import { ButtonAnchor, ButtonLink } from "@/components/ui/button";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { authBackPill, authCard, authInput, authInputIcon, authLead, authNotice, authTitle } from "../ui";
 
 /**
  * A failure before the server answers (offline, a dropped connection, a restart or deploy) rejects the action, and
@@ -59,21 +60,16 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
   const errorText = error ? (error === "blocked" ? t("blocked") : t(`errors.${error}` as "errors.generic")) : null;
 
   return (
-    <div className="rounded-2xl border border-line bg-surface p-7 shadow-raised sm:p-8">
+    <div className={authCard}>
       {stage === "sso" ? (
         <div className="grid gap-5">
           <div>
-            <button
-              type="button"
-              onClick={() => setStage("email")}
-              aria-label={t("changeEmail")}
-              className="mb-3 inline-flex items-center gap-1.5 rounded-pill bg-sunken px-3 py-1.5 text-caption font-semibold text-ink-muted hover:text-ink pointer-coarse:min-h-11"
-            >
-              <ArrowLeft className="size-4" />
-              <span className="max-w-56 truncate">{email}</span>
+            <button type="button" onClick={() => setStage("email")} aria-label={t("changeEmail")} className={authBackPill}>
+              <ArrowLeft className="size-4 shrink-0" />
+              <span className="min-w-0 truncate">{email}</span>
             </button>
-            <h1 className="text-headline font-bold">{t("ssoTitle")}</h1>
-            <p className="mt-2 text-body-sm text-ink-muted">{t("ssoBody")}</p>
+            <h1 className={authTitle}>{t("ssoTitle")}</h1>
+            <p className={authLead}>{t("ssoBody")}</p>
           </div>
           <ButtonAnchor href={ssoUrl} size="lg" icon={<Building2 />}>
             {t("ssoContinue")}
@@ -82,58 +78,65 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
       ) : stage === "email" ? (
         <form action={emailAction} className="grid gap-5" noValidate>
           <div>
-            <h1 className="text-headline font-bold">{t("title")}</h1>
-            <p className="mt-2 text-body-sm text-ink-muted">{t("subtitle")}</p>
+            <h1 className={authTitle}>{t("title")}</h1>
+            <p className={authLead}>{t("subtitle")}</p>
           </div>
-          {notice ? <p className="rounded-md bg-safe-50 px-3.5 py-2.5 text-caption text-safe-700">{notice}</p> : null}
+          {notice ? (
+            <p className={`${authNotice} bg-safe-50 text-safe-700`}>
+              <CircleCheck aria-hidden />
+              {notice}
+            </p>
+          ) : null}
           {alertText ? (
-            <p role="alert" className="rounded-md bg-risk-50 px-3.5 py-2.5 text-caption text-risk-700">
+            <p role="alert" className={`${authNotice} bg-risk-50 text-risk-700`}>
+              <CircleAlert aria-hidden />
               {alertText}
             </p>
           ) : null}
           <Field label={t("emailLabel")} htmlFor="email" error={errorText}>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              inputMode="email"
-              autoComplete="username"
-              autoFocus
-              defaultValue={emailState?.email ?? email}
-              placeholder={t("emailPlaceholder")}
-              aria-invalid={!!errorText}
-              aria-describedby={errorText ? "email-error" : undefined}
-              required
-            />
+            <div className="relative">
+              <Mail aria-hidden className={authInputIcon} />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                inputMode="email"
+                autoComplete="username"
+                autoFocus
+                defaultValue={emailState?.email ?? email}
+                placeholder={t("emailPlaceholder")}
+                aria-invalid={!!errorText}
+                aria-describedby={errorText ? "email-error" : undefined}
+                className={authInput}
+                required
+              />
+            </div>
           </Field>
           <SubmitButton size="lg">{t("next")}</SubmitButton>
-          <Link
-            href={`/sign-in/phone?next=${encodeURIComponent(next)}`}
-            className="inline-flex items-center justify-center gap-2 text-caption font-semibold text-brand-600 hover:underline pointer-coarse:-my-3 pointer-coarse:min-h-11"
-          >
-            <Smartphone className="size-4" />
+          <p className="flex items-center gap-3 text-tab font-medium text-ink-subtle">
+            <span aria-hidden className="h-px flex-1 bg-line" />
+            {t("or")}
+            <span aria-hidden className="h-px flex-1 bg-line" />
+          </p>
+          <ButtonLink href={`/sign-in/phone?next=${encodeURIComponent(next)}`} variant="secondary" icon={<Smartphone />}>
             {t("withPhone")}
-          </Link>
+          </ButtonLink>
         </form>
       ) : (
         <form action={pwAction} className="grid gap-5" noValidate>
           <div>
-            <button
-              type="button"
-              onClick={() => setStage("email")}
-              aria-label={t("changeEmail")}
-              className="mb-3 inline-flex items-center gap-1.5 rounded-pill bg-sunken px-3 py-1.5 text-caption font-semibold text-ink-muted hover:text-ink pointer-coarse:min-h-11"
-            >
-              <ArrowLeft className="size-4" />
-              <span className="max-w-56 truncate">{email}</span>
+            <button type="button" onClick={() => setStage("email")} aria-label={t("changeEmail")} className={authBackPill}>
+              <ArrowLeft className="size-4 shrink-0" />
+              <span className="min-w-0 truncate">{email}</span>
             </button>
-            <h1 className="text-headline font-bold">{t("passwordTitle")}</h1>
+            <h1 className={authTitle}>{t("passwordTitle")}</h1>
           </div>
           <input type="hidden" name="email" value={email} />
           <input type="hidden" name="next" value={next} />
           <input type="text" name="username" autoComplete="username" value={email} readOnly hidden />
           <Field label={t("passwordLabel")} htmlFor="password" error={errorText}>
             <div className="relative">
+              <LockKeyhole aria-hidden className={authInputIcon} />
               <Input
                 id="password"
                 name="password"
@@ -142,7 +145,7 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
                 autoFocus
                 aria-invalid={!!errorText}
                 aria-describedby={errorText ? "password-error" : undefined}
-                className="pr-12"
+                className={`${authInput} pr-12`}
                 required
               />
               <button
@@ -161,7 +164,7 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
           </Link>
         </form>
       )}
-      <p className="mt-6 text-center text-tab text-ink-subtle">
+      <p className="mt-7 border-t border-line pt-5 text-center text-tab leading-normal text-pretty text-ink-subtle">
         {t.rich("consent", {
           terms: (c) => (
             <Link href="/legal/terms" className="underline hover:text-ink">

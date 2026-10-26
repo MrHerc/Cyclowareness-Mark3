@@ -1,0 +1,542 @@
+{
+  "id": "code-by-mistake",
+  "title": "Səhvən gələn kod",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "mh1-tutor",
+      "beats": [
+        {
+          "id": "mh1-b1",
+          "say": "Salam! Bu gün messencer hesabınızı ələ keçirməyə çalışan adamları tanımağı öyrənəcəyik.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "mh1-b2",
+          "say": "Onlara cəmi bir şey lazımdır: telefonunuza gələn altırəqəmli kod.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "brandRef": "sohbet",
+              "sender": [
+                {
+                  "text": "Söhbət"
+                }
+              ],
+              "time": "10:03",
+              "messages": [
+                [
+                  {
+                    "text": "Söhbət kodunuz: "
+                  },
+                  {
+                    "text": "731 064",
+                    "spot": "code"
+                  },
+                  {
+                    "text": ". Bu kodu heç kimlə paylaşmayın."
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "code"
+        },
+        {
+          "id": "mh1-b3",
+          "say": "Bu kodu heç kimə verməyin: nə dosta, nə həmkara, nə də dəstək xidmətinə.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        },
+        {
+          "id": "mh1-b4",
+          "say": "Kimsə mesajda pul istəyirsə, ona telefonla zəng edin və özündən soruşun.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "mh1-scenario",
+      "title": "Həmkarın mesajı",
+      "start": "start",
+      "nodes": [
+        {
+          "id": "start",
+          "text": "Həmkarınız Rənadan mesaj gəlir, bir dəqiqə sonra isə telefonunuza Söhbət kodu düşür. Nə edirsiniz?",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "brandRef": "sohbet",
+              "app": "generic",
+              "contact": [
+                {
+                  "text": "Rəna Quliyeva"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Salam, bağışla, səhvən sənin nömrənə kod göndərdim."
+                    }
+                  ],
+                  "time": "10:02"
+                },
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Zəhmət olmasa, sənə gələn altırəqəmli kodu mənə göndərərsən?"
+                    }
+                  ],
+                  "time": "10:02"
+                }
+              ]
+            }
+          },
+          "choices": [
+            {
+              "label": "Kodu göndərmirəm, Rənaya telefonla zəng edirəm",
+              "next": "call",
+              "feedback": "Düzdür. Kod sizin öz hesabınızın açarıdır, adi zəng isə Rənanın həqiqətən yazıb-yazmadığını göstərir."
+            },
+            {
+              "label": "Kodu göndərirəm, axı həmkarımdır",
+              "next": "taken",
+              "feedback": "Bu, onun yox, sizin hesabınızın kodu idi. Onu göndərdiyiniz anda hesabınız başqasının əlinə keçir."
+            },
+            {
+              "label": "Cavab vermirəm və mesajı silirəm",
+              "outcome": "risky",
+              "feedback": "Kodu verməmək düzgündür. Amma Rənanın hesabı oğurlanıb, ona görə ona zəng edib xəbərdar edin."
+            }
+          ]
+        },
+        {
+          "id": "call",
+          "text": "Mən heç nə göndərməmişəm! Dünən axşamdan hesabıma daxil ola bilmirəm.",
+          "speaker": "Rəna (telefonda)",
+          "voice": "young-woman",
+          "channel": "phone",
+          "manner": "worried",
+          "spoken": "Mən heç nə göndərməmişəm! <breath> Dünən axşamdan hesabıma daxil ola bilmirəm.",
+          "choices": [
+            {
+              "label": "Ona nömrəsi ilə yenidən daxil olmağı məsləhət görürəm, iş qrupunu da birlikdə xəbərdar edirik",
+              "outcome": "safe",
+              "feedback": "Əla. Yenidən daxil olmaq hesabı geri qaytarır, qrup da artıq saxta mesajlara inanmayacaq."
+            },
+            {
+              "label": "Mənə heç nə olmayıb, ona görə məsələni unuduram",
+              "outcome": "risky",
+              "feedback": "Rənanın hesabından başqalarına da yazacaqlar. Ona və qrupa kömək etməklə hamını qoruyursunuz."
+            }
+          ]
+        },
+        {
+          "id": "taken",
+          "text": "Kodu göndərdiniz. Bir azdan Söhbət sizi hesabdan çıxarır, sizin adınızdan isə qrupa pul istəyən mesaj gedir.",
+          "choices": [
+            {
+              "label": "Nömrəmlə yenidən daxil oluram və iki addımlı doğrulamanı aktivləşdirirəm",
+              "outcome": "risky",
+              "feedback": "Hesabı bərpa etməyin düzgün yolu budur. Amma ən yaxşısı kodu heç vaxt verməməkdir."
+            },
+            {
+              "label": "Gözləyirəm, bəlkə özü düzələr",
+              "outcome": "compromised",
+              "feedback": "Siz gözlədikcə onlar dostlarınızdan pul istəməyə davam edir. Dərhal nömrənizlə yenidən daxil olun."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "mh1-sim",
+      "environment": "phone",
+      "title": "Səhər mesajları",
+      "intro": "Telefonunuza bir neçə mesaj gəlib. Hər birini açın və düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "group-money",
+          "label": "09:12 Şöbə qrupu",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "sohbet",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Şöbə qrupu"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Elnarə Hüseynova: Hamıya salam. Təcili 300 manat lazımdır, axşam qaytaracağam."
+                  }
+                ],
+                "time": "09:12"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Elnarə Hüseynova: Kart nömrəsini şəxsi mesajla göndərəcəyəm. Zəng etməyin, iclasdayam."
+                  }
+                ],
+                "time": "09:12"
+              }
+            ]
+          },
+          "say": "Şöbə müdirinizin hesabından qrupa mesaj gəlir.",
+          "actions": [
+            {
+              "id": "call",
+              "label": "Elnarəyə telefonla zəng et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bildiyiniz nömrəyə zəng etmək mesajı kimin yazdığını dərhal göstərir."
+            },
+            {
+              "id": "send",
+              "label": "Göndərərəm, kartı yaz",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Pul oğrunun kartına gedəcək. «Zəng etməyin» deyən təcili pul xahişi klassik fənddir."
+            },
+            {
+              "id": "report",
+              "label": "Qrupda saxta mesaj kimi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Yaxşı addımdır. Sonra Elnarəyə zəng edin və hesabını geri qaytarmağa kömək edin."
+            }
+          ]
+        },
+        {
+          "id": "code-sms",
+          "label": "09:20 Söhbət",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sohbet",
+            "sender": [
+              {
+                "text": "Söhbət"
+              }
+            ],
+            "time": "09:20",
+            "messages": [
+              [
+                {
+                  "text": "Söhbət kodunuz: 731 064. Bu kodu heç kimlə paylaşmayın."
+                }
+              ]
+            ]
+          },
+          "say": "Siz istəmədiyiniz halda Söhbət kodu gəldi.",
+          "actions": [
+            {
+              "id": "keep",
+              "label": "Kodu heç kimə vermirəm",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. İstəmədiyiniz kod gəlirsə, deməli, kimsə hesabınıza daxil olmağa çalışır."
+            },
+            {
+              "id": "delete",
+              "label": "SMS-i sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Bu da olar. Əsas odur ki, kod heç kimə getməsin."
+            }
+          ]
+        },
+        {
+          "id": "friend-asks",
+          "label": "09:21 Aysel Məmmədova",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "sohbet",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Aysel Məmmədova"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam, əzizim, sənə kod gəldi? Öz kodumu səhvən sənin nömrənə göndərmişəm."
+                  }
+                ],
+                "time": "09:21"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Zəhmət olmasa, tez göndər, telefonum bloklanır."
+                  }
+                ],
+                "time": "09:21"
+              }
+            ]
+          },
+          "say": "Bir dəqiqə sonra dostunuz Ayseldən mesaj gəlir.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Kodu ona göndər",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Bu, sizin hesabınızın kodu idi. İndi hesabınız Ayselin hesabını oğurlayan adamın əlindədir."
+            },
+            {
+              "id": "call",
+              "label": "Ayselə telefonla zəng et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Sizə gələn kod sizin hesabınıza aiddir, zəng isə əsl Ayseli xəbərdar edir."
+            },
+            {
+              "id": "block",
+              "label": "Blokla",
+              "kind": "block",
+              "outcome": "risky",
+              "feedback": "Kodu verməmək düzgündür. Amma Ayselin hesabı oğurlanıb, ona görə bunu ona başqa yolla xəbər verin."
+            }
+          ]
+        },
+        {
+          "id": "new-device",
+          "label": "09:30 Söhbət",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "sohbet",
+            "app": "Söhbət",
+            "title": [
+              {
+                "text": "Yeni cihaz qoşuldu"
+              }
+            ],
+            "body": [
+              {
+                "text": "Kompüter, Gəncə. Bu siz deyildinizsə, qoşulmuş cihazlarınızı yoxlayın."
+              }
+            ],
+            "time": "09:30"
+          },
+          "say": "İndi isə Söhbət yeni cihaz barədə bildiriş göndərdi.",
+          "actions": [
+            {
+              "id": "check",
+              "label": "Aç və cihazı sil",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Düzdür. Tanımadığınız cihazı sildiyiniz anda o, artıq mesajlarınızı oxuya bilmir."
+            },
+            {
+              "id": "ignore",
+              "label": "Bildirişi bağla",
+              "kind": "ignore",
+              "outcome": "compromised",
+              "feedback": "O cihaz bütün yazışmalarınızı görür. Belə bildiriş görən kimi dərhal yoxlayın."
+            }
+          ]
+        },
+        {
+          "id": "fake-support",
+          "label": "09:41 Söhbət Dəstək",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "w2a-sohbet-fake",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Söhbət Dəstək"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hesabınızda şübhəli giriş aşkarlanıb və bir saat ərzində hesab bloklanacaq."
+                  }
+                ],
+                "time": "09:41"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Təsdiqləmək üçün telefonunuza gələn kodu bura yazın."
+                  }
+                ],
+                "time": "09:41"
+              }
+            ]
+          },
+          "say": "Sonuncu mesaj guya Söhbət dəstək xidmətindəndir.",
+          "actions": [
+            {
+              "id": "block",
+              "label": "Blokla və bildir",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əsl dəstək xidməti heç vaxt kodunuzu istəmir."
+            },
+            {
+              "id": "share",
+              "label": "Kodu yaz",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Dəstək adından yazan fırıldaqçıdır. Kodu göndərdiyiniz anda hesabınız onun olur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "mh1-hotspot",
+      "prompt": "Bu mesajda fırıldaq əlamətlərini tapın.",
+      "artifact": {
+        "kind": "chat",
+        "brandRef": "sohbet",
+        "app": "generic",
+        "contact": [
+          {
+            "text": "Şöbə qrupu"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Elnarə Hüseynova: "
+              },
+              {
+                "text": "Təcili 300 manat lazımdır",
+                "spot": "urgent"
+              },
+              {
+                "text": ", "
+              },
+              {
+                "text": "axşam qaytaracağam.",
+                "spot": "return"
+              }
+            ],
+            "time": "09:12"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Kart nömrəsini şəxsi mesajla göndərəcəyəm.",
+                "spot": "card"
+              },
+              {
+                "text": " "
+              },
+              {
+                "text": "Zəng etməyin, iclasdayam.",
+                "spot": "no-call"
+              }
+            ],
+            "time": "09:12"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "urgent",
+          "label": "Təcili pul",
+          "explain": "Tələskənlik düşünməyə vaxt qoymur. Təcili pul xahişini həmişə yoxlamaq lazımdır."
+        },
+        {
+          "id": "no-call",
+          "label": "«Zəng etməyin»",
+          "explain": "Zəngdən qaçmaq ən güclü əlamətdir. Oğru səsini eşitdirə bilməz, ona görə yazır."
+        },
+        {
+          "id": "card",
+          "label": "Naməlum kart",
+          "explain": "Pul tanımadığınız karta gedir. Bu kartın Elnarəyə aid olduğunu heç nə göstərmir."
+        },
+        {
+          "id": "return",
+          "label": "Qaytarma vədi",
+          "explain": "Tez qaytarma vədi sizi sakitləşdirmək üçündür. Əvvəlcə zəng edib yoxlayın."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "choice",
+      "id": "mh1-choice",
+      "question": {
+        "prompt": "Hesabınız artıq oğurlanıb. İlk addım hansıdır?",
+        "options": [
+          {
+            "id": "relogin",
+            "label": "Nömrəmlə Söhbət tətbiqinə yenidən daxil oluram",
+            "correct": true,
+            "feedback": "Düzdür. Yeni kod yalnız sizin telefonunuza gəlir və hesab sizə qayıdır."
+          },
+          {
+            "id": "new-account",
+            "label": "Yeni hesab açıram, köhnəsini unuduram",
+            "correct": false,
+            "feedback": "Köhnə hesab oğrunun əlində qalır. O, dostlarınızdan pul istəməyə davam edəcək."
+          },
+          {
+            "id": "write",
+            "label": "Oğruya yazıb hesabı geri istəyirəm",
+            "correct": false,
+            "feedback": "Oğru hesabı qaytarmayacaq, hətta pul da istəyə bilər. Nömrənizlə yenidən daxil olun."
+          }
+        ]
+      },
+      "explain": "Nömrənizlə yenidən daxil olun, iki addımlı doğrulamanı aktivləşdirin və dostlarınızı başqa yolla xəbərdar edin."
+    },
+    {
+      "type": "recap",
+      "id": "mh1-recap",
+      "points": [
+        "Kodu heç kimə, hətta dosta da verməyin",
+        "Pul xahişini adi telefon zəngi ilə yoxlayın",
+        "Hesab əldən çıxıbsa, nömrənizlə yenidən daxil olun"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

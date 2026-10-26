@@ -10,7 +10,13 @@ import { DocHeader, ReportSection } from "@/components/admin/report-document";
 import { PrintToolbar } from "@/components/admin/print-toolbar";
 import { Notice } from "@/components/ui/layout";
 
-export const metadata = { robots: { index: false } };
+/** The title is what the browser's "Save as PDF" suggests as the file name. */
+export async function generateMetadata({ params }: PageProps<"/print/report/[kind]">) {
+  const { kind } = await params;
+  if (!(REPORT_KINDS as readonly string[]).includes(kind)) return { robots: { index: false } };
+  const tr = await getTranslations("admin.reports");
+  return { title: tr(`kinds.${kind as ReportKind}.title`), robots: { index: false } };
+}
 
 export default async function PrintReport({ params, searchParams }: PageProps<"/print/report/[kind]">) {
   const [{ kind }, sp] = await Promise.all([params, searchParams]);
@@ -33,13 +39,14 @@ export default async function PrintReport({ params, searchParams }: PageProps<"/
   }
   const report = await buildReport(v, kind as ReportKind, filters, locale);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "report.downloaded", meta: { kind, format: "pdf", ...filters } });
-  const period = filters.from || filters.to ? tr("period", { from: filters.from ?? "…", to: filters.to ?? "…" }) : tr("allTime");
+  const day = (s?: string) => (s ? format.dateTime(new Date(`${s}T12:00:00+04:00`), { dateStyle: "long" }) : "…");
+  const period = filters.from || filters.to ? tr("period", { from: day(filters.from), to: day(filters.to) }) : tr("allTime");
   return (
     <>
       <PrintToolbar label={tr("print")} />
       <main className="mx-auto max-w-5xl px-8 py-8 print:max-w-none print:p-0">
         <DocHeader org={v.tenant.name} title={report.title} sub={`${period} · ${tr("generatedAt", { date: format.dateTime(new Date(), { dateStyle: "long", timeStyle: "short" }) })}`} logo={v.tenant.branding.logoUrl} />
-        <ReportSection title={report.title} headers={report.headers} rows={report.rows} formatDate={(d) => format.dateTime(d, { dateStyle: "short", timeStyle: "short" })} empty="—" />
+        <ReportSection title={report.title} headers={report.headers} rows={report.rows} formatDate={(d) => format.dateTime(d, { dateStyle: "short", timeStyle: "short" })} formatDay={(d) => format.dateTime(d, { dateStyle: "short" })} formatNumber={(n) => format.number(n)} empty={tr("compliance.none")} />
       </main>
     </>
   );

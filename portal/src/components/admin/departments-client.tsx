@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
+import { searchFold } from "@/components/secops/search-fold";
 
 export type Dept = { id: string; name: string; parentId: string | null; headUserId: string | null; headName: string | null; people: number };
 
@@ -38,7 +39,7 @@ export function DepartmentsTree({ departments, people }: { departments: Dept[]; 
     }
     return departments.filter((d) => !subtree.has(d.id));
   }, [merge, departments, children]);
-  const matches = (d: Dept) => !q || d.name.toLocaleLowerCase().includes(q.toLocaleLowerCase()) || (d.headName ?? "").toLocaleLowerCase().includes(q.toLocaleLowerCase());
+  const matches = (d: Dept) => !q || searchFold(d.name).includes(searchFold(q)) || searchFold(d.headName ?? "").includes(searchFold(q));
 
   const row = (d: Dept, depth: number): React.ReactNode => {
     const kids = children.get(d.id) ?? [];
@@ -186,7 +187,7 @@ export function DepartmentsTree({ departments, people }: { departments: Dept[]; 
             <p className="text-body-sm text-ink-muted">{t("mergeBody", { name: merge.source.name })}</p>
             <Field label={t("mergeTarget")} htmlFor="d-merge">
               <Select id="d-merge" value={merge.targetId} onChange={(e) => setMerge({ ...merge, targetId: e.target.value })} autoFocus>
-                <option value="">â€”</option>
+                <option value="">{t("mergePick")}</option>
                 {mergeTargets.map((d) => (
                   <option key={d.id} value={d.id}>
                     {d.name}

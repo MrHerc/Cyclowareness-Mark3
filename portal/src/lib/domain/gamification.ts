@@ -22,7 +22,7 @@ export function lessonXp(moduleXp: number, lessonCount: number, position: number
 
 export const REPORT_BONUS_XP = 5;
 export const REPORT_BONUS_DAILY_CAP = 5;
-export const LAB_XP: Record<string, number> = { "inbox-triage": 20, "link-detective": 15, "password-forge": 15, "mfa-fatigue": 15 };
+export const LAB_XP: Record<string, number> = { "inbox-triage": 20, "link-detective": 15, "password-forge": 15, "mfa-fatigue": 15, "phishing-anatomy": 30, "process-hunt": 30, "fake-signin": 25 };
 
 /** ISO day (YYYY-MM-DD) in the organisation's time zone. */
 export function dayKey(date: Date, timeZone = "Asia/Baku"): string {

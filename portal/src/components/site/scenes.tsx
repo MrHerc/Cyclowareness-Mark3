@@ -59,6 +59,8 @@ function PhoneFrame({
   clock,
   label,
   spot,
+  perch,
+  aside,
   children,
   className,
 }: {
@@ -66,11 +68,15 @@ function PhoneFrame({
   label: string;
   /** `data-spot` name, so the guide can point at the phone. */
   spot?: string;
+  /** `data-perch` name, so the travelling guide cat can sit on the frame's top edge. */
+  perch?: string;
+  /** Drawn against the frame, outside the screen (the guide cat's perch beside the phone). */
+  aside?: React.ReactNode;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
-    <div role="group" aria-label={label} data-spot={spot} className={cn("relative rounded-[2.25rem] bg-surface p-2.5 shadow-overlay ring-1 ring-line", className)}>
+    <div role="group" aria-label={label} data-spot={spot} data-perch={perch} className={cn("relative rounded-[2.25rem] bg-surface p-2.5 shadow-overlay ring-1 ring-line", className)}>
       <div className="relative flex min-h-[30rem] flex-col overflow-hidden rounded-[1.8rem] bg-[#1d1a4e] text-white">
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.07)_1px,transparent_0)] [background-size:14px_14px]" />
         <div className="relative flex items-center justify-between px-6 pt-5">
@@ -82,6 +88,7 @@ function PhoneFrame({
         </div>
         <div className="relative flex flex-1 flex-col">{children}</div>
       </div>
+      {aside}
     </div>
   );
 }
@@ -97,7 +104,7 @@ export function InboxGame({
   question,
   rapport,
   screenLabel,
-  mascot,
+  perch,
   onDone,
   onRole,
 }: {
@@ -107,8 +114,8 @@ export function InboxGame({
   question: string;
   rapport: { score: Record<"low" | "mid" | "high", Line>; fast: Line };
   screenLabel: string;
-  /** The guide peeking from the phone's edge (positioned against the phone). */
-  mascot?: React.ReactNode;
+  /** The guide's perch at the phone's edge (positioned against the phone; the cat is the landing's ScrollCat). */
+  perch?: React.ReactNode;
   onDone: (score: number, total: number) => void;
   onRole: (role: string) => void;
 }) {
@@ -292,7 +299,7 @@ export function InboxGame({
             </div>
           )}
         </PhoneFrame>
-        {mascot}
+        {perch}
       </div>
     </div>
   );
@@ -319,7 +326,15 @@ export function PhoneCall({ scene, beats, clock, screenLabel, skipLabel }: { sce
     guide.say(lines, { gesture: s === "gaveCode" ? "facepalm" : "cheer" });
   };
   return (
-    <PhoneFrame clock={clock} label={screenLabel} className="mx-auto w-full max-w-[22rem]">
+    <PhoneFrame
+      clock={clock}
+      label={screenLabel}
+      perch="phone"
+      // The guide cat can also peek from the phone's edge, as on the hero; not on a phone, where the frame
+      // fills the width and the cat would cover the call's caption and buttons (its top edge is the perch there).
+      aside={<span aria-hidden data-perch="phone-side" data-perch-box className="pointer-events-none absolute top-[48%] -right-12 hidden size-28 sm:block" />}
+      className="mx-auto w-full max-w-[22rem]"
+    >
       <div className="flex flex-1 flex-col items-center gap-4 px-6 pt-8 pb-8 text-center">
         <span className={cn("grid size-24 place-items-center rounded-full bg-white/12 font-display text-[2.4rem] font-bold ring-1 ring-white/20", state === "ringing" && "motion-safe:animate-pulse")}>N</span>
         <div>
@@ -381,7 +396,7 @@ export function TutorDemo({ scene, beats }: { scene: TutorScene; beats: Beats })
   const guide = useGuide();
   const [asked, setAsked] = useState<string | null>(null);
   return (
-    <div className="mx-auto grid w-full max-w-xl gap-4 rounded-3xl bg-surface p-5 shadow-overlay ring-1 ring-line">
+    <div data-perch="tutor" className="mx-auto grid w-full max-w-xl gap-4 rounded-3xl bg-surface p-5 shadow-overlay ring-1 ring-line">
       <div className="w-[88%] rounded-2xl rounded-bl-sm bg-sunken px-4 py-3 text-body-sm">
         <Marked text={scene.sample} reveal={!!asked} />
       </div>
@@ -418,7 +433,7 @@ export function LanguagesDemo({ scene, beats }: { scene: LanguagesScene; beats: 
   const [picked, setPicked] = useState<string | null>(null);
   return (
     <div className="mx-auto grid w-full max-w-2xl gap-4">
-      <ul className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+      <ul data-perch="languages" className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         {scene.samples.map((s) => (
           <li key={s.locale}>
             <button
@@ -463,7 +478,7 @@ export function AdminDemo({ scene, beats, you }: { scene: AdminScene; beats: Bea
   const cols = ["clicked", "reported", "learned"] as const;
   const tone = { clicked: "bg-risk-500", reported: "bg-safe-500", learned: "bg-brand-500" };
   return (
-    <div className="mx-auto w-full max-w-2xl overflow-hidden rounded-3xl bg-surface shadow-overlay ring-1 ring-line">
+    <div data-perch="admin" className="mx-auto w-full max-w-2xl overflow-hidden rounded-3xl bg-surface shadow-overlay ring-1 ring-line">
       <table className="w-full text-left text-caption">
         <thead className="bg-sunken text-tab text-ink-muted">
           <tr>
@@ -515,7 +530,7 @@ export function DeployDemo({ scene, beats }: { scene: DeployScene; beats: Beats 
   const guide = useGuide();
   const [pick, setPick] = useState<"cloud" | "onPrem" | null>(null);
   return (
-    <div role="radiogroup" aria-label={scene.headline} className="mx-auto grid w-full max-w-2xl gap-4 sm:grid-cols-2">
+    <div role="radiogroup" aria-label={scene.headline} data-perch="deploy" className="mx-auto grid w-full max-w-2xl gap-4 sm:grid-cols-2">
       {(["cloud", "onPrem"] as const).map((k) => {
         const Icon = k === "cloud" ? Cloud : Server;
         return (
@@ -589,7 +604,7 @@ export function DemoForm({
   }, [state, guide, scene.success]);
   if (state?.ok) {
     return (
-      <div className="mx-auto grid w-full max-w-xl justify-items-center gap-3 rounded-3xl bg-safe-50 p-8 text-center ring-1 ring-safe-100" role="status">
+      <div data-perch="demo" className="mx-auto grid w-full max-w-xl justify-items-center gap-3 rounded-3xl bg-safe-50 p-8 text-center ring-1 ring-safe-100" role="status">
         <CheckCircle2 className="size-12 text-safe-600" />
         <p className="text-title-sm font-semibold text-safe-700">{scene.success.text}</p>
       </div>
@@ -623,6 +638,7 @@ export function DemoForm({
         const data = new FormData(e.currentTarget);
         startSubmit(() => send(data));
       }}
+      data-perch="demo"
       className="mx-auto grid w-full max-w-xl gap-4 rounded-3xl bg-surface p-6 shadow-overlay ring-1 ring-line"
       noValidate
     >

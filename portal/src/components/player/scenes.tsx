@@ -40,7 +40,7 @@ import { Mascot, angleBetween } from "@/components/mascot/mascot";
 import type { MascotGesture, MascotMood } from "@/components/mascot/mapping";
 import { ArtifactView, CallView, EmailListItem, SpeakingBars } from "./artifacts";
 import { BrandAvatar } from "./brand-avatar";
-import { ArtifactModeProvider, hasLink, lensTargets, cleanSpeech } from "./rich";
+import { ArtifactModeProvider, hasLink, lensTargets, cleanSpeech, useContentLang } from "./rich";
 import { Illustration, Stat } from "./illustrations";
 import { wordsOf, type Voice } from "./narrator";
 import { tutorAnswerId } from "./resume";
@@ -52,7 +52,8 @@ import { cn } from "@/lib/cn";
 export type PlayerAnswer = { sceneId: string; itemId?: string; correct: boolean; firstTry: boolean; outcome?: Outcome };
 
 type Narrator = {
-  speak: (text: string, opts?: { voice?: Voice; onWord?: (i: number) => void; onEnd?: () => void }) => void;
+  /** `lang`: read the text with that language's voice instead of the lesson's (interface strings). */
+  speak: (text: string, opts?: { voice?: Voice; lang?: string; onWord?: (i: number) => void; onEnd?: () => void }) => void;
   stop: () => void;
   pause: () => void;
   resume: () => void;
@@ -62,6 +63,8 @@ type Narrator = {
 
 export type SceneEnv = {
   narrator: Narrator;
+  /** The interface language: interface strings that are read aloud use its voice, not the lesson's. */
+  uiLocale: string;
   soundOn: boolean;
   still: boolean;
   topic?: string;
@@ -79,11 +82,13 @@ const MOODS: Record<string, MascotMood> = { talk: "talk", think: "think", alert:
 
 /* ─────────────── shared pieces ─────────────── */
 
-function Karaoke({ text, word, soundOn, className, variant = "title" }: { text: string; word: number; soundOn: boolean; className?: string; variant?: "title" | "body" }) {
+/** Lesson text with the spoken word highlighted; `ui` marks an interface string (no lesson `lang`). */
+function Karaoke({ text, word, soundOn, className, variant = "title", ui = false }: { text: string; word: number; soundOn: boolean; className?: string; variant?: "title" | "body"; ui?: boolean }) {
+  const contentLang = useContentLang();
   const words = useMemo(() => wordsOf(text), [text]);
   const body = variant === "body";
   return (
-    <p className={cn(body ? "text-body" : "text-[clamp(1.35rem,1.05rem+1.1vw,2rem)] leading-snug font-bold tracking-tight text-balance", className)} aria-live="polite">
+    <p lang={ui ? undefined : contentLang} className={cn(body ? "text-body" : "text-[clamp(1.35rem,1.05rem+1.1vw,2rem)] leading-snug font-bold tracking-tight text-balance", className)} aria-live="polite">
       {words.map((w, i) => (
         <span key={i}>
           <span
@@ -107,9 +112,10 @@ function Karaoke({ text, word, soundOn, className, variant = "title" }: { text: 
 }
 
 function VisualView({ visual, highlight }: { visual?: Visual; highlight?: string | null }) {
+  const lang = useContentLang();
   if (!visual) return null;
   if (visual.kind === "illustration") return <Illustration id={visual.id} className="mx-auto" />;
-  if (visual.kind === "stat") return <Stat value={visual.value} label={visual.label} />;
+  if (visual.kind === "stat") return <Stat value={visual.value} label={visual.label} lang={lang} />;
   return (
     <ArtifactModeProvider value={{ highlight }}>
       <ArtifactView artifact={visual.artifact} />
@@ -122,6 +128,8 @@ type FeedbackProps = {
   title: string;
   /** Explanation: spoken on mount and shown as karaoke. */
   text?: string;
+  /** `text` is an interface string, not lesson text: it is read with the interface language's voice. */
+  uiText?: boolean;
   extra?: ReactNode;
   onContinue: () => void;
   continueLabel: string;
@@ -132,7 +140,7 @@ type FeedbackProps = {
 };
 
 /** The feedback content: mascot, verdict, spoken explanation and Continue with its auto-advance line. */
-export function FeedbackCard({ tone, title, text, extra, onContinue, continueLabel, env, mascot = true, autoAdvance = true }: FeedbackProps) {
+export function FeedbackCard({ tone, title, text, uiText = false, extra, onContinue, continueLabel, env, mascot = true, autoAdvance = true }: FeedbackProps) {
   const Icon = tone === "safe" ? CheckCircle2 : tone === "warn" ? AlertTriangle : XCircle;
   const titleId = useId();
   const ref = useRef<HTMLButtonElement>(null);
@@ -144,7 +152,7 @@ export function FeedbackCard({ tone, title, text, extra, onContinue, continueLab
 
   useEffect(() => {
     ref.current?.focus();
-    if (text) env.narrator.speak(text, { onWord: setWord, onEnd: () => setEnded(true) });
+    if (text) env.narrator.speak(text, { lang: uiText ? env.uiLocale : undefined, onWord: setWord, onEnd: () => setEnded(true) });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -175,7 +183,7 @@ export function FeedbackCard({ tone, title, text, extra, onContinue, continueLab
               gesture={tone === "safe" ? "cheer" : undefined}
               fire={tone === "safe" ? undefined : { name: "huff", key: 0 }}
               talking={env.narrator.speaking}
-              className="size-14 shrink-0 sm:size-16"
+              className="size-14 shrink-0 overflow-hidden rounded-md bg-surface ring-1 ring-line sm:size-16"
               still={env.still}
             />
           ) : null}
@@ -184,7 +192,7 @@ export function FeedbackCard({ tone, title, text, extra, onContinue, continueLab
             <p id={titleId} className={cn("text-title-sm font-bold", tone === "safe" ? "text-safe-600" : tone === "warn" ? "text-warn-700" : "text-risk-700")}>
               {title}
             </p>
-            {text ? <Karaoke text={text} word={word} soundOn={env.soundOn} variant="body" className="mt-1" /> : null}
+            {text ? <Karaoke text={text} word={word} soundOn={env.soundOn} variant="body" className="mt-1" ui={uiText} /> : null}
             {extra}
           </div>
         </div>
@@ -282,6 +290,7 @@ function ChoiceOptions({
   multi?: boolean;
   className?: string;
 }) {
+  const contentLang = useContentLang();
   const optRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const firstPicked = options.findIndex((o) => picked.has(o.id));
 
@@ -297,7 +306,7 @@ function ChoiceOptions({
   };
 
   return (
-    <div role={multi ? "group" : "radiogroup"} aria-labelledby={labelledBy} onKeyDown={onArrow} className={cn("grid gap-3", className)}>
+    <div role={multi ? "group" : "radiogroup"} aria-labelledby={labelledBy} onKeyDown={onArrow} lang={contentLang} className={cn("grid gap-3", className)}>
       {options.map((o, k) => {
         const on = picked.has(o.id);
         // After the check a right answer that was left out (multi) is outlined, not filled.
@@ -349,6 +358,7 @@ function aimTowards(host: HTMLElement | null, mascot: HTMLElement | null, spot: 
 
 export function TutorScene({ scene, env, onBack }: { scene: Extract<Scene, { type: "tutor" }>; env: SceneEnv; onBack?: () => void }) {
   const t = useTranslations("player");
+  const contentLang = useContentLang();
   const [i, setI] = useState(() => Math.min(scene.beats.length - 1, Math.max(0, Math.round((env.resumeProgress ?? 0) * scene.beats.length))));
   const [word, setWord] = useState(0);
   const [ended, setEnded] = useState(false);
@@ -474,7 +484,7 @@ export function TutorScene({ scene, env, onBack }: { scene: Extract<Scene, { typ
           </div>
           {asking && checkpoint ? (
             <div key={`${i}-question`} className="mt-5 animate-rise">
-              <h2 id={questionId} className="text-title font-bold text-balance">
+              <h2 id={questionId} lang={contentLang} className="text-title font-bold text-balance">
                 {checkpoint.prompt}
               </h2>
               <ChoiceOptions className="mt-5" options={checkpoint.options} picked={pickedSet} checked={checked} onPick={setPicked} labelledBy={questionId} />
@@ -538,6 +548,7 @@ export function TutorScene({ scene, env, onBack }: { scene: Extract<Scene, { typ
 
 export function IntroScene({ scene, env }: { scene: Extract<Scene, { type: "intro" }>; env: SceneEnv }) {
   const t = useTranslations("player");
+  const contentLang = useContentLang();
   useEffect(() => {
     env.narrator.speak(`${scene.title}. ${scene.body}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -546,8 +557,10 @@ export function IntroScene({ scene, env }: { scene: Extract<Scene, { type: "intr
     <div className="mx-auto grid max-w-3xl items-center gap-8 py-6 md:grid-cols-[1fr_1.2fr]">
       <VisualView visual={scene.visual} />
       <div>
-        <h2 className="text-headline font-bold">{scene.title}</h2>
-        <p className="mt-3 text-lead text-ink-muted">{scene.body}</p>
+        <div lang={contentLang}>
+          <h2 className="text-headline font-bold">{scene.title}</h2>
+          <p className="mt-3 text-lead text-ink-muted">{scene.body}</p>
+        </div>
         <Button size="lg" className="mt-6" onClick={() => (env.narrator.stop(), env.onDone())} iconRight={<ChevronRight />}>
           {t("start")}
         </Button>
@@ -589,6 +602,7 @@ function LensButton({ active, last, onClick }: { active: boolean; last: boolean;
 
 export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: "simulation" }>; env: SceneEnv }) {
   const t = useTranslations("player");
+  const contentLang = useContentLang();
   const inbox = scene.environment === "inbox";
   const [started, setStarted] = useState(false);
   const [introWord, setIntroWord] = useState(0);
@@ -684,13 +698,13 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
   // The step label is the context line: announced here as it changes, shown by each environment in its own place.
   const header = (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <p className="flex items-center gap-3 text-title font-medium">
+      <p lang={contentLang} className="flex items-center gap-3 text-title font-medium">
         <span className="grid size-10 place-items-center rounded-xl bg-brand-600 text-brand-on">
           <Icon className="size-5" />
         </span>
         {scene.title}
       </p>
-      <p className="sr-only" aria-live="polite">
+      <p lang={contentLang} className="sr-only" aria-live="polite">
         {started ? step?.label : null}
       </p>
       <div className="flex items-center gap-3">
@@ -710,12 +724,12 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
   const contextLine =
     step?.label && scene.environment !== "call" ? (
       tab ? (
-        <div aria-hidden className="flex w-fit max-w-full items-center gap-2 rounded-t-lg bg-surface px-4 py-2 text-caption font-semibold text-ink-muted shadow-xs">
+        <div aria-hidden lang={contentLang} className="flex w-fit max-w-full items-center gap-2 rounded-t-lg bg-surface px-4 py-2 text-caption font-semibold text-ink-muted shadow-xs">
           <Icon className="size-4 shrink-0" />
           <span className="truncate">{step.label}</span>
         </div>
       ) : (
-        <p aria-hidden className="text-center text-caption font-semibold text-ink-muted">
+        <p aria-hidden lang={contentLang} className="text-center text-caption font-semibold text-ink-muted">
           {step.label}
         </p>
       )
@@ -727,8 +741,8 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
       </ArtifactModeProvider>
       {targets.length ? (
         <div className="absolute right-4 bottom-4 z-20 flex items-end gap-2">
-          {/* The mascot peers through its glass while the lens is out. */}
-          {lens ? <Mascot mood="curious" guide={{ peer: true }} className="size-14 animate-reveal sm:size-16" still={env.still} /> : null}
+          {/* The mascot peers through its glass while the lens is out (below 80 px it is a head crop, framed as a tile). */}
+          {lens ? <Mascot mood="curious" guide={{ peer: true }} className="size-14 animate-reveal overflow-hidden rounded-md bg-surface shadow-xs ring-1 ring-line sm:size-16" still={env.still} /> : null}
           <LensButton active={lensIdx !== null} last={lensIdx === targets.length - 1} onClick={() => setLensIdx((x) => (x === null ? 0 : x + 1 >= targets.length ? null : x + 1))} />
         </div>
       ) : null}
@@ -750,13 +764,13 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
       <div className="flex items-center gap-3 border-b border-line px-4 py-2.5">
         <span className="flex items-center gap-1.5 text-body-sm font-bold text-brand-600">
           <Mail className="size-5" />
-          Mail
+          {t("simulation.mailApp")}
         </span>
         <span className="hidden flex-1 items-center gap-2 rounded-pill bg-sunken px-3 py-1.5 text-caption text-ink-disabled sm:flex">
           <Search className="size-4" />
           {t("simulation.searchMail")}
         </span>
-        <span className="ml-auto grid size-8 place-items-center rounded-full bg-brand-600 text-tab font-bold text-brand-on">Y</span>
+        <span className="ml-auto grid size-8 place-items-center rounded-full bg-brand-600 text-tab font-bold text-brand-on">{t("scenario.you").charAt(0)}</span>
       </div>
       <div className="grid md:grid-cols-[9rem_16rem_minmax(0,1fr)]">
         <nav className="hidden border-r border-line p-2 text-caption md:block">
@@ -794,7 +808,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
               {actions.map((a) => {
                 const AIcon = ACTION_ICON[a.kind];
                 return (
-                  <button key={a.id} type="button" disabled={!!result} onClick={() => choose(a)} className="flex flex-col items-center gap-1 py-3 text-caption font-semibold text-ink hover:bg-sunken">
+                  <button key={a.id} type="button" disabled={!!result} onClick={() => choose(a)} lang={contentLang} className="flex flex-col items-center gap-1 py-3 text-caption font-semibold text-ink hover:bg-sunken">
                     {AIcon ? <AIcon className="size-5" /> : null}
                     {a.label}
                   </button>
@@ -829,7 +843,9 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
                   <Icon className="size-6" />
                 </span>
                 <p className="mt-3 text-tab-sm font-bold text-brand-700">{t("simulation.mailbox")}</p>
-                <h2 className="text-headline font-bold">{scene.title}</h2>
+                <h2 lang={contentLang} className="text-headline font-bold">
+                  {scene.title}
+                </h2>
                 <Karaoke text={scene.intro} word={introWord} soundOn={env.soundOn} variant="body" className="mt-2" />
                 <Button size="lg" className="mt-5 min-w-40" onClick={begin}>
                   {t("simulation.begin")}
@@ -842,7 +858,9 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
             <span className="grid size-16 place-items-center rounded-full bg-brand-50 text-brand-600">
               <Icon className="size-8" />
             </span>
-            <h2 className="mt-5 text-headline font-bold">{scene.title}</h2>
+            <h2 lang={contentLang} className="mt-5 text-headline font-bold">
+              {scene.title}
+            </h2>
             <Karaoke text={scene.intro} word={introWord} soundOn={env.soundOn} variant="body" className="mt-3 text-lead" />
             <Button size="lg" className="mt-7" onClick={begin} iconRight={<ChevronRight />}>
               {t("simulation.begin")}
@@ -885,7 +903,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
           {contextLine}
           {artifactNode}
           {step?.label && scene.environment === "call" ? (
-            <p aria-hidden className="text-center text-caption font-semibold text-ink-muted">
+            <p aria-hidden lang={contentLang} className="text-center text-caption font-semibold text-ink-muted">
               {step.label}
             </p>
           ) : null}
@@ -896,7 +914,9 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
         <div className="flex flex-wrap items-center gap-3">
           <p className="flex items-start gap-2 rounded-xl bg-surface px-4 py-3 text-body-sm shadow-xs ring-1 ring-line">
             <MessageCircle className="mt-0.5 size-4 shrink-0 text-brand-600" />
-            <span className="italic">“{cleanSpeech(step.say)}”</span>
+            <span lang={contentLang} className="italic">
+              {t("quote", { text: cleanSpeech(step.say) })}
+            </span>
           </p>
         </div>
       ) : null}
@@ -906,7 +926,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
           {actions.map((a) => {
             const AIcon = ACTION_ICON[a.kind];
             return (
-              <Button key={a.id} variant={a.kind === "report" ? "danger-soft" : "secondary"} size="lg" onClick={() => choose(a)} disabled={!!result} icon={AIcon ? <AIcon /> : undefined}>
+              <Button key={a.id} variant={a.kind === "report" ? "danger-soft" : "secondary"} size="lg" onClick={() => choose(a)} disabled={!!result} icon={AIcon ? <AIcon /> : undefined} lang={contentLang}>
                 {a.label}
               </Button>
             );
@@ -935,10 +955,19 @@ export function ChoiceScene({ scene, env }: { scene: Extract<Scene, { type: "cho
   const opts = scene.question.options;
   const correctIds = useMemo(() => new Set(opts.filter((o) => o.correct).map((o) => o.id)), [opts]);
   const multi = !!scene.multi || correctIds.size > 1;
-  const spokenPrompt = multi ? `${scene.question.prompt} ${t("multiHint")}.` : scene.question.prompt;
+  const contentLang = useContentLang();
+  // The choose-all hint is an interface string: read after the prompt, by a voice of the interface
+  // language when the lesson text is in another one.
+  const speakPrompt = () => {
+    const prompt = scene.question.prompt;
+    const hint = `${t("multiHint")}.`;
+    if (!multi) env.narrator.speak(prompt);
+    else if (!contentLang) env.narrator.speak(`${prompt} ${hint}`);
+    else env.narrator.speak(prompt, { onEnd: () => env.narrator.speak(hint, { lang: env.uiLocale }) });
+  };
 
   useEffect(() => {
-    env.narrator.speak(spokenPrompt);
+    speakPrompt();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -976,7 +1005,7 @@ export function ChoiceScene({ scene, env }: { scene: Extract<Scene, { type: "cho
         {checked ? <span /> : <Mascot mood={env.narrator.speaking ? "talk" : "idle"} talking={env.narrator.speaking} topic={env.topic as never} className="size-24 shrink-0 sm:size-28" still={env.still} />}
         <TimerPill left={left} total={env.timer} />
       </div>
-      <h2 id={promptId} className="mt-5 text-title font-bold text-balance">
+      <h2 id={promptId} lang={contentLang} className="mt-5 text-title font-bold text-balance">
         {scene.question.prompt}
       </h2>
       {multi ? <p className="mt-1.5 text-caption font-semibold text-ink-muted">{t("multiHint")}</p> : null}
@@ -998,7 +1027,7 @@ export function ChoiceScene({ scene, env }: { scene: Extract<Scene, { type: "cho
       )}
       {!checked ? (
         <div className="sticky bottom-0 mt-8 flex items-center justify-center gap-2 bg-gradient-to-t from-canvas via-canvas/95 to-transparent pt-6 pb-[calc(var(--safe-bottom)+1rem)]">
-          <Button variant="secondary" size="icon" aria-label={t("replay")} onClick={() => env.narrator.speak(spokenPrompt)}>
+          <Button variant="secondary" size="icon" aria-label={t("replay")} onClick={speakPrompt}>
             <RotateCcw />
           </Button>
           <Button size="lg" className="min-w-40 max-w-md flex-1" disabled={picked.size === 0} onClick={() => check()}>
@@ -1033,6 +1062,7 @@ export function ChoiceScene({ scene, env }: { scene: Extract<Scene, { type: "cho
 
 export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "hotspot" }>; env: SceneEnv }) {
   const t = useTranslations("player");
+  const contentLang = useContentLang();
   const [found, setFound] = useState<Set<string>>(new Set());
   const [miss, setMiss] = useState(0);
   const [lastSpot, setLastSpot] = useState<string | null>(null);
@@ -1073,7 +1103,9 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
         </ArtifactModeProvider>
       </div>
       <div>
-        <h2 className="text-title font-bold text-balance">{scene.prompt}</h2>
+        <h2 lang={contentLang} className="text-title font-bold text-balance">
+          {scene.prompt}
+        </h2>
         <p className="mt-2 text-caption text-ink-muted">{t("hotspot.tap")}</p>
         <div className="mt-4 flex items-center gap-3">
           <div className="flex gap-1.5">
@@ -1084,7 +1116,7 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
           <span className="text-caption font-semibold">{t("hotspot.found", { found: Math.min(found.size, need), need })}</span>
         </div>
         {last && !finished ? (
-          <div className="mt-4 animate-rise rounded-lg border border-risk-100 bg-risk-50 p-3.5">
+          <div lang={contentLang} className="mt-4 animate-rise rounded-lg border border-risk-100 bg-risk-50 p-3.5">
             <p className="text-body-sm font-semibold text-risk-700">{last.label}</p>
             <p className="mt-0.5 text-caption text-ink">{last.explain}</p>
           </div>
@@ -1095,8 +1127,9 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
           tone="safe"
           title={t("wellDone")}
           text={t("hotspot.done")}
+          uiText
           extra={
-            <ul className="mt-2 grid gap-1.5">
+            <ul lang={contentLang} className="mt-2 grid gap-1.5">
               {scene.spots.map((s) => (
                 <li key={s.id} className="text-body-sm">
                   <b>{s.label}.</b> {s.explain}
@@ -1118,6 +1151,7 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
 
 export function SwipeScene({ scene, env }: { scene: Extract<Scene, { type: "swipe" }>; env: SceneEnv }) {
   const t = useTranslations("player");
+  const contentLang = useContentLang();
   const [i, setI] = useState(0);
   const [answer, setAnswer] = useState<"threat" | "safe" | null>(null);
   const [drag, setDrag] = useState(0);
@@ -1147,7 +1181,9 @@ export function SwipeScene({ scene, env }: { scene: Extract<Scene, { type: "swip
   return (
     <div className="mx-auto grid w-full max-w-xl gap-5 py-2">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-title font-bold">{scene.prompt}</h2>
+        <h2 lang={contentLang} className="text-title font-bold">
+          {scene.prompt}
+        </h2>
         <span className="shrink-0 text-caption text-ink-muted">{t("swipe.left", { count: scene.cards.length - i })}</span>
       </div>
       <div className="relative">
@@ -1190,7 +1226,8 @@ export function SwipeScene({ scene, env }: { scene: Extract<Scene, { type: "swip
         <FeedbackSheet
           tone={ok ? "safe" : "risk"}
           title={ok ? t("wellDone") : t("notQuite")}
-          text={`${card.verdict === "threat" ? t("swipe.itsThreat") : t("swipe.itsSafe")}. ${card.explain}`}
+          text={card.explain}
+          extra={<p className="mt-1 text-body-sm font-semibold">{card.verdict === "threat" ? t("swipe.itsThreat") : t("swipe.itsSafe")}</p>}
           continueLabel={t("continue")}
           onContinue={next}
           env={env}
@@ -1216,6 +1253,7 @@ function shuffle<T>(arr: T[], seed: string): T[] {
 
 export function MatchScene({ scene, env }: { scene: Extract<Scene, { type: "match" }>; env: SceneEnv }) {
   const t = useTranslations("player");
+  const contentLang = useContentLang();
   const rights = useMemo(() => shuffle(scene.pairs, scene.id), [scene]);
   const [left, setLeft] = useState<string | null>(null);
   const [matched, setMatched] = useState<Set<string>>(new Set());
@@ -1249,11 +1287,13 @@ export function MatchScene({ scene, env }: { scene: Extract<Scene, { type: "matc
 
   return (
     <div className="mx-auto w-full max-w-4xl py-2">
-      <h2 className="text-title font-bold text-balance">{scene.prompt}</h2>
+      <h2 lang={contentLang} className="text-title font-bold text-balance">
+        {scene.prompt}
+      </h2>
       <p className="mt-1.5 text-caption text-ink-muted">
         {t("match.pick")} · {t("match.matched", { count: matched.size, total: scene.pairs.length })}
       </p>
-      <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-6">
+      <div lang={contentLang} className="mt-6 grid grid-cols-2 gap-3 sm:gap-6">
         <div className="grid content-start gap-2.5">
           {scene.pairs.map((p) => (
             <button
@@ -1289,7 +1329,7 @@ export function MatchScene({ scene, env }: { scene: Extract<Scene, { type: "matc
         </div>
       </div>
       {complete ? (
-        <FeedbackSheet tone={mistakes === 0 ? "safe" : "warn"} title={t("wellDone")} text={scene.explain} continueLabel={t("continue")} onContinue={() => (env.narrator.stop(), env.onDone())} env={env} />
+        <FeedbackSheet tone={mistakes === 0 ? "safe" : "warn"} title={mistakes === 0 ? t("wellDone") : t("doneAfterTries")} text={scene.explain} continueLabel={t("continue")} onContinue={() => (env.narrator.stop(), env.onDone())} env={env} />
       ) : null}
     </div>
   );
@@ -1299,6 +1339,7 @@ export function MatchScene({ scene, env }: { scene: Extract<Scene, { type: "matc
 
 export function OrderScene({ scene, env }: { scene: Extract<Scene, { type: "order" }>; env: SceneEnv }) {
   const t = useTranslations("player");
+  const contentLang = useContentLang();
   const initial = useMemo(() => {
     let s = shuffle(scene.items, scene.id);
     if (s.every((x, i) => x.id === scene.items[i].id)) s = [...s.slice(1), s[0]];
@@ -1333,7 +1374,9 @@ export function OrderScene({ scene, env }: { scene: Extract<Scene, { type: "orde
 
   return (
     <div className="mx-auto w-full max-w-2xl py-2">
-      <h2 className="text-title font-bold text-balance">{scene.prompt}</h2>
+      <h2 lang={contentLang} className="text-title font-bold text-balance">
+        {scene.prompt}
+      </h2>
       <p className="mt-1.5 text-caption text-ink-muted">{t("order.hint")}</p>
       <ol className="mt-6 grid gap-2.5">
         {items.map((x, i) => {
@@ -1341,7 +1384,9 @@ export function OrderScene({ scene, env }: { scene: Extract<Scene, { type: "orde
           return (
             <li key={x.id} className={cn("flex items-center gap-3 rounded-lg border-2 bg-surface px-3 py-2.5 transition-colors", wrongHere ? "border-warn-500 bg-warn-50" : result === "ok" ? "border-safe-500 bg-safe-50" : "border-line")}>
               <span className="grid size-8 shrink-0 place-items-center rounded-full bg-sunken text-caption font-bold text-ink-muted">{i + 1}</span>
-              <span className="min-w-0 flex-1 text-body-sm font-semibold">{x.label}</span>
+              <span lang={contentLang} className="min-w-0 flex-1 text-body-sm font-semibold">
+                {x.label}
+              </span>
               <span className="flex shrink-0 gap-1">
                 <button type="button" aria-label={t("order.up")} onClick={() => move(i, -1)} disabled={i === 0 || result === "ok"} className="grid size-9 place-items-center rounded-full hover:bg-sunken disabled:opacity-30">
                   <ArrowUp className="size-4" />
@@ -1362,7 +1407,7 @@ export function OrderScene({ scene, env }: { scene: Extract<Scene, { type: "orde
           </Button>
         </div>
       ) : (
-        <FeedbackSheet tone={attempts === 1 ? "safe" : "warn"} title={t("wellDone")} text={scene.explain} continueLabel={t("continue")} onContinue={() => (env.narrator.stop(), env.onDone())} env={env} />
+        <FeedbackSheet tone={attempts === 1 ? "safe" : "warn"} title={attempts === 1 ? t("wellDone") : t("doneAfterTries")} text={scene.explain} continueLabel={t("continue")} onContinue={() => (env.narrator.stop(), env.onDone())} env={env} />
       )}
     </div>
   );
@@ -1372,6 +1417,7 @@ export function OrderScene({ scene, env }: { scene: Extract<Scene, { type: "orde
 
 export function ScenarioScene({ scene, env }: { scene: Extract<Scene, { type: "scenario" }>; env: SceneEnv }) {
   const t = useTranslations("player");
+  const contentLang = useContentLang();
   const nodes = useMemo(() => new Map(scene.nodes.map((n) => [n.id, n])), [scene]);
   const [history, setHistory] = useState<{ node: ScenarioNode; choice?: string }[]>([{ node: nodes.get(scene.start)! }]);
   const [ending, setEnding] = useState<{ outcome: Outcome; feedback: string } | null>(null);
@@ -1409,7 +1455,8 @@ export function ScenarioScene({ scene, env }: { scene: Extract<Scene, { type: "s
   // The current node is staged by its channel: a call screen, a chat thread, or a speaker card; the choices follow.
   const channel = current.channel;
   const ChannelIcon = channel === "phone" ? Phone : channel === "video" ? Video : channel === "in-person" ? UserRound : channel === "message" ? MessageCircle : Sparkles;
-  const name = current.speaker ?? (current.character ? current.character.charAt(0).toUpperCase() + current.character.slice(1) : undefined);
+  // `character` is an English id (guest, minister…), never shown: without a speaker the name is generic.
+  const name = current.speaker ?? t("scenario.unknownSpeaker");
   const talking = env.narrator.speaking && !pending && !ending;
   const thread: ChatArtifact = {
     kind: "chat",
@@ -1422,12 +1469,12 @@ export function ScenarioScene({ scene, env }: { scene: Extract<Scene, { type: "s
     ) : channel === "message" ? (
       <ArtifactView artifact={thread} />
     ) : channel === "in-person" || channel === "video" ? (
-      <SpeakerCard name={name} video={channel === "video"} talking={talking} />
+      <SpeakerCard name={name} nameLang={current.speaker ? contentLang : undefined} video={channel === "video"} talking={talking} />
     ) : null;
 
   return (
     <div className={cn("mx-auto grid w-full gap-4 py-2", stage ? "max-w-5xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:gap-8" : "max-w-2xl")}>
-      <h2 className="flex items-center gap-2 text-title font-bold lg:col-span-full">
+      <h2 lang={contentLang} className="flex items-center gap-2 text-title font-bold lg:col-span-full">
         <ChannelIcon className="size-6 text-brand-600" />
         {scene.title}
       </h2>
@@ -1448,14 +1495,14 @@ export function ScenarioScene({ scene, env }: { scene: Extract<Scene, { type: "s
           <div className="grid gap-3">
             {history.map((h, k) => (
               <div key={k} className="grid gap-2">
-                <div className="max-w-[90%] animate-rise rounded-2xl rounded-tl-sm bg-surface px-4 py-3 shadow-xs ring-1 ring-line">
+                <div lang={contentLang} className="max-w-[90%] animate-rise rounded-2xl rounded-tl-sm bg-surface px-4 py-3 shadow-xs ring-1 ring-line">
                   {h.node.speaker ? <p className="text-tab font-semibold text-brand-700">{h.node.speaker}</p> : null}
                   <p className="mt-0.5 text-body-sm">{h.node.text}</p>
                 </div>
                 {h.choice ? (
                   <div className="ml-auto max-w-[85%] animate-rise rounded-2xl rounded-tr-sm bg-brand-600 px-4 py-3 text-body-sm text-brand-on">
                     <p className="text-tab font-semibold opacity-80">{t("scenario.you")}</p>
-                    {h.choice}
+                    <p lang={contentLang}>{h.choice}</p>
                   </div>
                 ) : null}
               </div>
@@ -1464,7 +1511,7 @@ export function ScenarioScene({ scene, env }: { scene: Extract<Scene, { type: "s
           </div>
         )}
         {!pending && !ending && current.choices?.length ? (
-          <div className="grid gap-2">
+          <div lang={contentLang} className="grid gap-2">
             {current.choices.map((c, k) => (
               <button key={k} type="button" onClick={() => choose(c)} className="rounded-xl border-2 border-line bg-surface px-4 py-3 text-left text-body-sm font-semibold transition-colors hover:border-brand-400">
                 {c.label}
@@ -1496,7 +1543,7 @@ export function ScenarioScene({ scene, env }: { scene: Extract<Scene, { type: "s
 }
 
 /** Who is talking in person or on video: avatar with a ring and voice bars while the line is narrated. */
-function SpeakerCard({ name, video, talking }: { name?: string; video: boolean; talking: boolean }) {
+function SpeakerCard({ name, nameLang, video, talking }: { name?: string; nameLang?: string; video: boolean; talking: boolean }) {
   const t = useTranslations("player");
   return (
     <div className={cn("mx-auto flex w-full max-w-sm items-center gap-4 rounded-2xl p-4 shadow-raised ring-1", video ? "bg-ink text-white ring-ink" : "bg-surface ring-line")}>
@@ -1509,7 +1556,9 @@ function SpeakerCard({ name, video, talking }: { name?: string; video: boolean; 
         ) : null}
       </span>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-body font-bold">{name}</p>
+        <p lang={nameLang} className="truncate text-body font-bold">
+          {name}
+        </p>
         <p className={cn("text-caption", video ? "text-white/70" : "text-ink-muted")}>{video ? t("scenario.videoCall") : t("scenario.inPerson")}</p>
         <SpeakingBars active={talking} className={cn("mt-1.5", video ? "text-safe-500" : "text-brand-600")} />
       </div>
@@ -1522,6 +1571,7 @@ function SpeakerCard({ name, video, talking }: { name?: string; video: boolean; 
 export function PasswordScene({ scene, env }: { scene: Extract<Scene, { type: "password" }>; env: SceneEnv }) {
   const t = useTranslations("player.password");
   const tp = useTranslations("player");
+  const contentLang = useContentLang();
   const [value, setValue] = useState("");
   const [score, setScore] = useState(0);
   const [reached, setReached] = useState(false);
@@ -1544,7 +1594,9 @@ export function PasswordScene({ scene, env }: { scene: Extract<Scene, { type: "p
 
   return (
     <div className="mx-auto w-full max-w-xl py-2">
-      <h2 className="text-title font-bold text-balance">{scene.prompt}</h2>
+      <h2 lang={contentLang} className="text-title font-bold text-balance">
+        {scene.prompt}
+      </h2>
       <label className="mt-6 block text-caption font-semibold" htmlFor="pw-scene">
         {t("label")}
       </label>
@@ -1570,7 +1622,7 @@ export function PasswordScene({ scene, env }: { scene: Extract<Scene, { type: "p
           ))}
         </div>
       </div>
-      <ul className="mt-5 grid gap-1.5">
+      <ul lang={contentLang} className="mt-5 grid gap-1.5">
         {scene.tips.map((tip, k) => (
           <li key={k} className="flex items-start gap-2 text-body-sm text-ink-muted">
             <Check className="mt-0.5 size-4 shrink-0 text-brand-600" />
@@ -1589,6 +1641,7 @@ export function PasswordScene({ scene, env }: { scene: Extract<Scene, { type: "p
 
 export function RecapScene({ scene, env, saving, onFinish }: { scene: Extract<Scene, { type: "recap" }>; env: SceneEnv; saving: boolean; onFinish: () => void }) {
   const t = useTranslations("player.recap");
+  const contentLang = useContentLang();
   useEffect(() => {
     env.narrator.speak(scene.points.join(". "));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1598,7 +1651,7 @@ export function RecapScene({ scene, env, saving, onFinish }: { scene: Extract<Sc
       <Mascot mood="celebrate" gesture="cheer" fire={{ name: "bounce", key: 0 }} talking={env.narrator.speaking} className="mx-auto size-48 md:size-56" topic={env.topic as never} still={env.still} />
       <div>
         <h2 className="text-headline font-bold">{t("title")}</h2>
-        <ul className="mt-5 grid gap-3">
+        <ul lang={contentLang} className="mt-5 grid gap-3">
           {scene.points.map((p, k) => (
             <li key={k} className="flex animate-rise items-start gap-3 rounded-xl bg-surface p-4 shadow-xs ring-1 ring-line" style={{ animationDelay: `${k * 90}ms` }}>
               <span className="grid size-7 shrink-0 place-items-center rounded-full bg-safe-500 text-white">

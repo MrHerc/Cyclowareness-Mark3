@@ -1,0 +1,411 @@
+{
+  "id": "search-results",
+  "title": "Результаты поиска",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "sr-tutor",
+      "beats": [
+        {
+          "id": "sr-b1",
+          "say": "Здравствуйте! Многие попадают на официальные сайты через поиск, а не вводят адрес сами. Мошенники это тоже знают.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "sr-b2",
+          "say": "Они покупают рекламу, чтобы оказаться на самом верху. Рядом с таким результатом стоит небольшая пометка: «Реклама».",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2c-tapan",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "Tapan: справка с портала для граждан"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Реклама",
+                    "spot": "ad-label"
+                  },
+                  {
+                    "text": "  vetendasportal-gov.example"
+                  }
+                ],
+                [
+                  {
+                    "text": "Vatandash Portal: справка за 5 минут"
+                  }
+                ],
+                [
+                  {
+                    "text": "vetendasportal.gov.az"
+                  }
+                ],
+                [
+                  {
+                    "text": "Vatandash Portal: справки онлайн"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Найти"
+              ]
+            }
+          },
+          "highlight": "ad-label"
+        },
+        {
+          "id": "sr-b3",
+          "say": "Поддельный сайт очень похож на настоящий: в адресе отличается одна буква, есть лишнее слово или другое окончание.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "sr-b4",
+          "say": "Один раз проверьте официальный адрес и добавьте его в закладки. А потом всегда открывайте сайт оттуда.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "sr-hotspot",
+      "prompt": "Найдите опасные места в результатах поиска.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2c-tapan",
+        "tone": "app",
+        "title": [
+          {
+            "text": "Tapan: справка с портала для граждан"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Реклама",
+              "spot": "ad-label"
+            },
+            {
+              "text": "  "
+            },
+            {
+              "text": "vetendasportal-gov.example",
+              "spot": "lookalike"
+            }
+          ],
+          [
+            {
+              "text": "Официальный сайт. Справка за 5 минут",
+              "spot": "fake-official"
+            }
+          ],
+          [
+            {
+              "text": "Реклама  "
+            },
+            {
+              "text": "vetendaspotral.example.info",
+              "spot": "typo"
+            }
+          ],
+          [
+            {
+              "text": "Vatandash Portal: вход и справки"
+            }
+          ],
+          [
+            {
+              "text": "vetendasportal.gov.az"
+            }
+          ],
+          [
+            {
+              "text": "Vatandash Portal: справки онлайн"
+            }
+          ]
+        ],
+        "buttons": [
+          "Найти"
+        ]
+      },
+      "spots": [
+        {
+          "id": "ad-label",
+          "label": "Пометка «Реклама»",
+          "explain": "За место наверху этого результата заплатили. Рекламу могут купить и мошенники, поэтому никогда не входите через рекламу."
+        },
+        {
+          "id": "lookalike",
+          "label": "Лишнее слово",
+          "explain": "В адрес добавили слово gov, но окончание другое. Адрес официального портала заканчивается на gov.az."
+        },
+        {
+          "id": "fake-official",
+          "label": "Ложная надпись «официальный»",
+          "explain": "Слова «официальный сайт» может написать кто угодно. Официальный это сайт или нет, показывает окончание адреса, а не текст."
+        },
+        {
+          "id": "typo",
+          "label": "Перестановка букв",
+          "explain": "В слове portal две буквы поменялись местами. В спешке это трудно заметить."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "sr-choice",
+      "question": {
+        "prompt": "Вы часто входите на портал для граждан. Как это сделать безопаснее всего?",
+        "options": [
+          {
+            "id": "bookmark",
+            "label": "Один раз проверю официальный адрес и добавлю его в закладки",
+            "correct": true,
+            "feedback": "Правильно. Закладка каждый раз открывает один и тот же адрес, и реклама больше не играет роли."
+          },
+          {
+            "id": "first-result",
+            "label": "Каждый раз буду искать сайт и нажимать на первый результат",
+            "correct": false,
+            "feedback": "Первый результат может оказаться рекламой. Мошенники рассчитывают именно на эту привычку."
+          },
+          {
+            "id": "sms-link",
+            "label": "Воспользуюсь ссылкой, которая пришла по SMS",
+            "correct": false,
+            "feedback": "Ссылку по SMS может прислать кто угодно. Открывайте официальный сайт сами."
+          }
+        ]
+      },
+      "explain": "Добавьте в закладки сайты, которыми часто пользуетесь. Тогда ни результаты поиска, ни реклама вас не обманут."
+    },
+    {
+      "type": "simulation",
+      "id": "sr-sim",
+      "environment": "browser",
+      "title": "Скачивание программы",
+      "intro": "Завтра у вас онлайн-встреча, и нужно скачать приложение Gorush. Вы начинаете с поиска.",
+      "steps": [
+        {
+          "id": "results",
+          "label": "Скачать Gorush: результаты поиска",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tapan",
+            "url": [
+              {
+                "text": "https://tapan.example/axtar?q=gorus+yukle",
+                "reveal": "tapan.example"
+              }
+            ]
+          },
+          "say": "Вверху — реклама, а под ней — собственный сайт приложения.",
+          "actions": [
+            {
+              "id": "ad",
+              "label": "Реклама: gorus-app-download.example.net",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Реклама привела вас на другой сайт. Ещё не поздно: посмотрите на адрес.",
+              "next": "fake-site"
+            },
+            {
+              "id": "organic",
+              "label": "gorus.example: официальный сайт",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "Правильно. Вы пропустили рекламу и открыли собственный сайт приложения.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "fake-site",
+          "label": "Gorush: скачать бесплатно",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-gorus-fake",
+            "url": [
+              {
+                "text": "https://gorus-app-download.example.net/yukle",
+                "reveal": "gorus-app-download.example.net"
+              }
+            ]
+          },
+          "say": "Страница очень похожа на настоящий сайт. Посмотрите на адрес.",
+          "actions": [
+            {
+              "id": "download",
+              "label": "Скачать",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Этот сайт не принадлежит разработчику приложения. Установщику отсюда доверять нельзя.",
+              "next": "fake-file"
+            },
+            {
+              "id": "leave",
+              "label": "Закрыть вкладку",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Это был не собственный сайт приложения. Перейдите на официальный сайт сами.",
+              "next": "real-site"
+            },
+            {
+              "id": "check",
+              "label": "Проверить адрес",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Название похоже, но домен другой. Не доверяйте этому сайту.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "fake-file",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "w2c-gorus-fake",
+            "name": [
+              {
+                "text": "GorusSetup_2026.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "84 МБ",
+            "source": [
+              {
+                "text": "gorus-app-download.example.net"
+              }
+            ]
+          },
+          "say": "Файл скачался. Вы его откроете?",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Открыть",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Вместе с приложением этот установщик ставит программу, которая крадёт пароли. Никогда не открывайте файлы с поддельного сайта.",
+              "next": "after-bad"
+            },
+            {
+              "id": "delete",
+              "label": "Удалить",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Правильно. Удалите файл, сообщите в ИТ-поддержку и скачайте приложение с официального сайта.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "after-bad",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "qoruyucu",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Qoruyucu: подозрительная программа"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Файл GorusSetup_2026.exe пытался прочитать пароли, сохранённые в вашем браузере."
+                }
+              ]
+            ],
+            "buttons": [
+              "Поместить в карантин",
+              "Закрыть"
+            ]
+          },
+          "say": "Антивирус кое-что обнаружил. Теперь действуйте быстро.",
+          "actions": [
+            {
+              "id": "isolate",
+              "label": "Отключиться от сети и позвонить в ИТ-поддержку",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Правильно. Если ваш регламент не требует иного, отключите компьютер от сети, не выключая его, и сразу позвоните."
+            },
+            {
+              "id": "ignore",
+              "label": "Закрыть и продолжить работу",
+              "kind": "cancel",
+              "outcome": "compromised",
+              "feedback": "Программа продолжает работать и может отправить ваши пароли наружу. Немедленно сообщите о случившемся."
+            }
+          ]
+        },
+        {
+          "id": "real-site",
+          "label": "Gorush: скачать для компьютера",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "gorus",
+            "url": [
+              {
+                "text": "https://gorus.example/yukle",
+                "reveal": "gorus.example"
+              }
+            ]
+          },
+          "say": "Это собственный сайт приложения.",
+          "actions": [
+            {
+              "id": "ask-it",
+              "label": "Попросить ИТ-поддержку установить приложение",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Это лучший способ. На рабочем компьютере программы устанавливает ИТ-поддержка.",
+              "next": "results"
+            },
+            {
+              "id": "download",
+              "label": "Скачать",
+              "kind": "install",
+              "outcome": "safe",
+              "feedback": "Правильно, это официальный сайт. Но на рабочем компьютере сначала уточните правила ИТ-поддержки.",
+              "next": "results"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "sr-recap",
+      "points": [
+        "Для входа пользуйтесь закладкой, а не рекламой",
+        "Читайте окончание адреса и сравнивайте его с официальным",
+        "Берите программы только с официального сайта или у ИТ-поддержки"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

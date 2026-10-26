@@ -3,9 +3,10 @@
  *
  * Chromium ships no `az` data: `Intl.DateTimeFormat("az")` prints "2026 M10 14" and
  * `Intl.RelativeTimeFormat("az")` prints "-6 h". These functions reproduce ICU's `az` patterns
- * exactly (tests/az-format.test.ts checks them against Node's full ICU), reading the calendar
- * fields through en-US data, which every browser has. Used by client components through
- * `useClientFormat`; server code keeps next-intl's formatter.
+ * exactly (tests/az-format.test.ts checks them against Node's full ICU; relative counts differ on
+ * purpose, see `formatAzRelative`), reading the calendar fields through en-US data, which every
+ * browser has. Used by client components through `useClientFormat`; server code keeps next-intl's
+ * formatter, through `getAppFormatter` where it prints relative times.
  */
 
 export type AzDateOptions =
@@ -58,16 +59,39 @@ export function formatAzDate(date: Date, o: AzDateOptions = { dateStyle: "medium
   return d && o.timeStyle ? `${d}, ${time}` : d || (o.timeStyle ? time : "");
 }
 
-export type RelativeUnit = "second" | "minute" | "hour" | "day" | "week" | "month" | "year";
+const numberFormatters = new Map<string, Intl.NumberFormat>();
+
+/**
+ * A number in Azerbaijani ("1.234,5", "25%"): ICU's az pattern is en-US with the group and decimal
+ * separators swapped, so en-US data (which every browser has) gives the digits and grouping.
+ */
+export function formatAzNumber(n: number, o: Intl.NumberFormatOptions = {}): string {
+  const key = JSON.stringify(o);
+  let f = numberFormatters.get(key);
+  if (!f) {
+    f = new Intl.NumberFormat("en-US", o);
+    numberFormatters.set(key, f);
+  }
+  return f
+    .formatToParts(n)
+    .map((p) => (p.type === "group" ? "." : p.type === "decimal" ? "," : p.value))
+    .join("");
+}
+
+export type RelativeUnit ="second" | "minute" | "hour" | "day" | "week" | "month" | "year";
 const UNITS: Record<RelativeUnit, string> = { second: "saniyə", minute: "dəqiqə", hour: "saat", day: "gün", week: "həftə", month: "ay", year: "il" };
 const NAMED: Partial<Record<RelativeUnit, [string, string]>> = { day: ["dünən", "sabah"], week: ["keçən həftə", "gələn həftə"], month: ["keçən ay", "gələn ay"], year: ["keçən il", "gələn il"] };
 
-/** ICU `numeric: "auto"` wording ("dünən", "6 saat öncə", "2 gün ərzində"). */
+/**
+ * ICU `numeric: "auto"` wording ("dünən", "bu həftə"), except that counts read "6 saat əvvəl" and
+ * "2 gün sonra": CLDR's "öncə" / "ərzində" sound bookish next to the rest of the interface. Server
+ * components get the same through `getAppFormatter` (src/i18n/server-format.ts).
+ */
 export function formatAzRelative(value: number, unit: RelativeUnit): string {
   if (value === 0) return unit === "second" ? "indi" : `bu ${UNITS[unit]}`;
   const named = NAMED[unit];
   if (named && Math.abs(value) === 1) return value < 0 ? named[0] : named[1];
-  return value < 0 ? `${-value} ${UNITS[unit]} öncə` : `${value} ${UNITS[unit]} ərzində`;
+  return value < 0 ? `${-value} ${UNITS[unit]} əvvəl` : `${value} ${UNITS[unit]} sonra`;
 }
 
 /** The unit next-intl picks for a difference in seconds: the largest one with a non-zero count. */

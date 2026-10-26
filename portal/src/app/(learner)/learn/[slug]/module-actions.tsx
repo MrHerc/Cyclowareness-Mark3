@@ -93,7 +93,7 @@ export function RateModule({ slug }: { slug: string }) {
       <p className="text-body-sm font-semibold">{t("rate")}</p>
       <div className="mt-2 flex gap-1" role="radiogroup" aria-label={t("rate")}>
         {[1, 2, 3, 4, 5].map((n) => (
-          <button key={n} type="button" role="radio" aria-checked={rating === n} aria-label={String(n)} onClick={() => setRating(n)} className="rounded-full p-1 hover:bg-sunken pointer-coarse:p-2">
+          <button key={n} type="button" role="radio" aria-checked={rating === n} aria-label={t("stars", { count: n })} onClick={() => setRating(n)} className="rounded-full p-1 hover:bg-sunken pointer-coarse:p-2">
             <Star className={cn("size-7", n <= rating ? "fill-laurel-500 text-laurel-600" : "text-line-strong")} />
           </button>
         ))}

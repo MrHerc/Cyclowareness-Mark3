@@ -7,7 +7,7 @@ import { z } from "zod";
 import { db, t } from "../db";
 import { actionViewer, allowed, type Viewer } from "../auth/viewer";
 import { rateLimit } from "../rate-limit";
-import { queueEmail } from "../mail";
+import { queueEmail, renderEmailHtml } from "../mail";
 import { appUrl } from "../env";
 import { attestModule, completeLesson, issueCertificate, touchModule } from "../services/progress";
 import { recomputeRisk } from "../services/risk";
@@ -156,14 +156,42 @@ export async function reportProblemAction(_: { ok?: boolean } | undefined, form:
   // Settings → Email → "Problem reports by email": a copy goes to the helpdesk.
   const email = v.tenant.settings.email;
   if (email.enabled && email.helpdesk) {
-    const tr = await getTranslations({ locale: v.tenant.settings.defaultLocale, namespace: "admin.problems" });
+    const lang = v.tenant.settings.defaultLocale;
+    const tr = await getTranslations({ locale: lang, namespace: "admin.problems" });
     const link = `${appUrl()}/admin/problems`;
+    const where = context ? await contextName(v, context, lang) : "";
+    const text = `${message.slice(0, 4000)}\n\n${tr("emailFrom", { name: v.user.name, email: v.user.email })}\n\n${link}`;
     await queueEmail(db(), v.tenant.id, {
       to: email.helpdesk,
       kind: "problem",
-      subject: context ? tr("emailSubject", { context }) : tr("emailSubjectPlain"),
-      text: `${message.slice(0, 4000)}\n\n${tr("emailFrom", { name: v.user.name, email: v.user.email })}\n\n${link}`,
+      subject: where ? tr("emailSubject", { context: where }) : tr("emailSubjectPlain"),
+      text,
+      html: renderEmailHtml(text, { buttonLabel: tr("emailButton"), lang, brand: v.tenant.branding.primary, footer: v.tenant.name }),
+      lang,
     });
   }
   return { ok: true };
+}
+
+const LESSON_CONTEXT = /^lesson:([^/#]+)\/([^#]+)/;
+
+/**
+ * Where a problem was reported, as the admin problems page names it: "lesson “…” in “…”" for the player's
+ * "lesson:<module>/<lesson>#<scene>", "page …" for "page:<path>", in the helpdesk's language.
+ */
+async function contextName(v: Viewer, context: string, locale: string): Promise<string> {
+  const tr = await getTranslations({ locale, namespace: "admin.problems" });
+  const lesson = LESSON_CONTEXT.exec(context);
+  if (lesson) {
+    const rows = await db()
+      .select({ tenantId: t.modules.tenantId, module: t.modules.title, lesson: t.lessons.title })
+      .from(t.lessons)
+      .innerJoin(t.modules, eq(t.modules.id, t.lessons.moduleId))
+      .where(and(eq(t.modules.slug, lesson[1]), eq(t.lessons.key, lesson[2]), or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id))));
+    // A tenant's own module with the same slug replaces the library one.
+    const found = rows.find((r) => r.tenantId) ?? rows[0];
+    if (found) return tr("contextLesson", { lesson: pick(found.lesson, locale), module: pick(found.module, locale) });
+  }
+  if (context.startsWith("page:")) return tr("contextPage", { path: context.slice(5) });
+  return context;
 }

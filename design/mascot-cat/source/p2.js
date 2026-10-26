@@ -79,6 +79,8 @@ function soft(g, st, col, k = 1) { if (st.lod) return; g.shadowColor = col; g.sh
 function hard(g) { g.shadowBlur = 0; g.shadowColor = 'transparent'; }
 
 /* ============================ pose model ============================ */
+// the tail's sway phase advances at tailSpd * PI * TAIL_RATE rad/s (a sitting cat: one slow sweep in ~4 s)
+const TAIL_RATE = 0.55;
 const BASE = {
   x: 0, gy: 0, lift: 0, theta: 0,
   hipY: 39, shY: 41, bodyL: 50, shift: 0, arch: 2.5, sag: 2, bodyR: 1, curl: 0,
@@ -88,7 +90,7 @@ const BASE = {
   mouth: 0, jawTall: 0, tongue: 0, smile: 0.35, fang: 0, brow: 0, browUp: 0, whisk: 0, whiskT: 0, blush: 0.55, tear: 0,
   nfx: 23, nfy: 0, nfa: 0, ffx: 25, ffy: 0, ffa: 0, nhx: -23, nhy: 0, nha: 0.25, fhx: -21, fhy: 0, fha: 0.25,
   legZ: 4.5, armZ: 0, elbow: 0, nfE: 0, ffE: 0, splay: 0, beans: 0, beansH: 0, sole: 0, pawFront: 0, pawFar: 0, paw2: 0,
-  tailA: 72, tailCurl: -5, tailTip: -22, tailWave: 5, tailSpd: 1.4, tailQuiver: 0, tailFront: 0, tailPuff: 1, tailLen: 1, tailDX: 0, tailDY: 0,
+  tailA: 72, tailCurl: -5, tailTip: -22, tailWave: 5, tailSpd: 1.4, tailQuiver: 0, tailFront: 0, tailPuff: 1, tailLen: 1, tailDX: 0, tailDY: 0, tailRoot: 0.45, tailFlick: 0,
   purr: 0, blade: 0, hipBump: 0, zzz: 0, colPush: 0, glint: 0
 };
 const P = (o) => Object.assign({}, BASE, o);
@@ -164,24 +166,39 @@ function solve(p, T) {
       legs.push({ k, front, near, depth: dep(J[0], z), J: pr(J[0], J[1], z), K: pr(r.j[0], r.j[1], z), Hk: pr(r.e[0], r.e[1], z), Hl: pr(heel2[0], heel2[1], z), P: pr(Pc2[0], Pc2[1], z), td: [c, 0], lift: Pc2[1] - 3.4 });
     }
   }
-  // tail: lagged chain with ground contact
+  // tail: a 12-segment chain from under the hip. Rest shape: base angle tailA, an even curl per segment
+  // (tailCurl) and the tip curled by tailTip over the last five. Motion: one slow sway phase travels from
+  // the base to the tip with ~1.7 rad of lag (follow-through, so the tail swings in an S-curve), as an
+  // offset of each segment's direction from its rest direction, so the swing never accumulates into a
+  // wriggle. tailRoot is how much the base swings (a sitting cat keeps it still); segments lying on the
+  // floor in the rest shape do not sway (the wrapped part of a sitting tail stays put, the tip lifts);
+  // tailFlick curls the tip further (an occasional relaxed flick). The phase is p.tailPh, a continuous
+  // accumulator kept by the live cat (pose blends change tailSpd, and T * tailSpd jumped); frozen frames
+  // use T. The floor is a soft contact, so there is no kink where the tail meets it.
   const tail = [];
   {
     const T0 = [H[0] - uH[0] * 11 + nH[0] * 3.5 + p.tailDX, H[1] - uH[1] * 11 + nH[1] * 3.5 + p.tailDY];
-    const NS = 12, SL = 4.7 * p.tailLen, tw = T * p.tailSpd * PI;
+    const NS = 12, SL = 4.7 * p.tailLen, ph = p.tailPh != null ? p.tailPh : T * p.tailSpd * PI * TAIL_RATE;
+    const amp = p.tailWave * 2.2 * D2R, root = clamp(p.tailRoot), fl = p.tailFlick || 0, fs = p.tailTip < 0 ? -1 : 1;
+    const floorAt = (f) => lerp(5.5, 4.1, f) * p.tailPuff * 0.92 - p.lift;
+    const ground = (y, f) => { const d = y - floorAt(f); return d > 6 ? y : floorAt(f) + Math.log(1 + Math.exp(d)); };
+    // rest directions and, from the rest chain, how far each joint is off the floor
+    const ra = [], air = [];
     let a = PI - p.tailA * D2R, x = T0[0], y = T0[1];
-    const w0 = 5.5 * p.tailPuff;
-    tail.push([...pr(x, y), w0]);
     for (let i = 1; i <= NS; i++) {
-      const f = i / NS;
-      let inc = p.tailCurl * D2R + (i >= 8 ? (p.tailTip * D2R) / 5 : 0);
-      inc += p.tailWave * D2R * 0.36 * Math.sin(tw - i * 0.55);
-      if (i < 5) inc += p.tailQuiver * D2R * 1.6 * Math.sin(T * 41 + i * 1.3);
-      a += inc;
-      x += Math.cos(a) * SL; y += Math.sin(a) * SL;
-      const w = lerp(5.5, 4.1, f) * p.tailPuff;
-      if (y < w * 0.92 - p.lift) y = w * 0.92 - p.lift;
-      tail.push([...pr(x, y), w]);
+      a += p.tailCurl * D2R + (i >= 8 ? (p.tailTip * D2R) / 5 : 0);
+      ra.push(a); x += Math.cos(a) * SL; y = ground(y + Math.sin(a) * SL, i / NS);
+      air.push(sstep((y - floorAt(i / NS)) / 5));
+    }
+    x = T0[0]; y = T0[1];
+    tail.push([...pr(x, y), 5.5 * p.tailPuff]);
+    for (let i = 1; i <= NS; i++) {
+      const f = i / NS, wv = lerp(root, 1, f) * air[i - 1];
+      let ai = ra[i - 1] + amp * wv * Math.sin(ph - 1.7 * f);
+      if (i >= 8) ai += fs * fl * 32 * D2R * sstep((i - 7) / 5);
+      if (i < 5) ai += p.tailQuiver * D2R * 1.2 * Math.sin(T * 41 + i * 1.3);
+      x += Math.cos(ai) * SL; y = ground(y + Math.sin(ai) * SL, f);
+      tail.push([...pr(x, y), lerp(5.5, 4.1, f) * p.tailPuff]);
     }
   }
   return { pr, c, sn, H, S, u, n, uS, nS, uH, nH, bz, bzn, rad, torso, neck, head, Hb, o, legs, tail };
@@ -629,7 +646,9 @@ function drawFx(g, R, p, st) {
     g.globalAlpha = 1;
   }
   if (st.think > 0.3) {
-    g.fillStyle = st.ink; for (let i = 0; i < 3; i++) { const a = clamp(Math.sin(T * 3 - i * 0.7) * 0.5 + 0.6); g.globalAlpha = st.think * a * 0.55; g.beginPath(); g.arc(hx - 18 - i * 5.5, hy - 26 - i * 4, 1.4 + i * 0.6, 0, TAU); g.fill(); }
+    // a light halo, so the dots also read over a dark surface
+    g.fillStyle = st.ink; g.strokeStyle = 'rgba(255,255,255,.85)'; g.lineWidth = 1.6;
+    for (let i = 0; i < 3; i++) { const a = clamp(Math.sin(T * 3 - i * 0.7) * 0.5 + 0.6); g.globalAlpha = st.think * a * 0.55; g.beginPath(); g.arc(hx - 18 - i * 5.5, hy - 26 - i * 4, 1.4 + i * 0.6, 0, TAU); g.stroke(); g.fill(); }
     g.globalAlpha = 1;
   }
   if (st.surprise > 0.3) {

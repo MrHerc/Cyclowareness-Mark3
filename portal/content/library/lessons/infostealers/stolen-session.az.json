@@ -1,0 +1,353 @@
+{
+  "id": "stolen-session",
+  "title": "Oğurlanmış sessiya",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "is2-tutor",
+      "beats": [
+        {
+          "id": "is2-b1",
+          "say": "Salam! Səhər görürsünüz ki, gecə iş e-poçtunuzdan xaricə qırx məktub göndərilib.",
+          "mood": "alert",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        },
+        {
+          "id": "is2-b2",
+          "say": "Parolunuzu heç kim bilmirdi. Zərərli proqram brauzerdən giriş sessiyanızı, yəni kuki faylını oğurlayıb.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "notification",
+              "brandRef": "ispoct",
+              "app": "İşPoçt",
+              "title": [
+                {
+                  "text": "Yeni giriş"
+                }
+              ],
+              "body": [
+                {
+                  "text": "Amsterdam, 03:05, naməlum brauzer",
+                  "spot": "location"
+                }
+              ],
+              "time": "03:05"
+            }
+          },
+          "highlight": "location"
+        },
+        {
+          "id": "is2-b3",
+          "say": "Kuki sayta artıq daxil olduğunuzu bildirir, ona görə sayt nə parol, nə də kod istəyir.",
+          "mood": "talk",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "is2-b4",
+          "say": "Üç şey kömək edir: təmiz cihaz, bütün sessiyalardan çıxış və İT dəstəyi.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "is2-match",
+      "prompt": "Oğurlanan hər məlumat cinayətkara hansı imkanı verir? Cütləri uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "cookie",
+          "left": "Brauzerdəki giriş sessiyası",
+          "right": "Hesaba parolsuz və kodsuz daxil olmaq"
+        },
+        {
+          "id": "saved",
+          "left": "Brauzerdə saxlanmış parollar",
+          "right": "Başqa saytlardakı hesablarınıza daxil olmaq"
+        },
+        {
+          "id": "card",
+          "left": "Avtomatik doldurma üçün saxlanmış kart məlumatları",
+          "right": "Sizin adınızdan onlayn ödəniş etmək"
+        },
+        {
+          "id": "messenger",
+          "left": "Messencer sessiyası",
+          "right": "Yazışmalarınızı oxumaq və sizin adınızdan yazmaq"
+        }
+      ],
+      "explain": "Məlumat oğurlayan proqram bunların hamısını birdən götürür. Ona görə yalnız bir parolu yox, hamısını dəyişin və sessiyaları bağlayın."
+    },
+    {
+      "type": "simulation",
+      "id": "is2-sim",
+      "environment": "browser",
+      "title": "Təmiz iş kompüterində",
+      "intro": "İş kompüterinizin arxasındasınız və o, təmizdir. E-poçtunuzu açın və hər ekranda düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "sent-folder",
+          "label": "Göndərilənlər: bu gecə saat 03:12-də naməlum ünvanlara 40 məktub",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "ispoct",
+            "url": [
+              {
+                "text": "https://poct.idare.example/gonderilenler"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "call-it",
+              "label": "İT dəstəyinə zəng et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Mütəxəssis hesabı dərhal qoruya və nələrin göndərildiyini görə bilər."
+            },
+            {
+              "id": "delete",
+              "label": "Məktubları sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Silmək göndərilmiş məktubları geri qaytarmır, amma sübutları məhv edir. Əvvəlcə İT dəstəyinə bildirin."
+            },
+            {
+              "id": "later",
+              "label": "Bağla, sonra bax",
+              "kind": "ignore",
+              "outcome": "compromised",
+              "feedback": "Hücumçu hələ də hesabdadır və yazmağa davam edir. Hər dəqiqə vacibdir."
+            }
+          ]
+        },
+        {
+          "id": "new-login",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Yeni cihazdan giriş"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Windows, naməlum brauzer"
+                }
+              ],
+              [
+                {
+                  "text": "Amsterdam, bu gün 03:05"
+                }
+              ],
+              [
+                {
+                  "text": "Bu siz idiniz?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Bu mən deyildim",
+              "Bu mən idim"
+            ]
+          },
+          "actions": [
+            {
+              "id": "not-me",
+              "label": "Bu mən deyildim",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Sistem girişi şübhəli kimi qeyd edir və İT dəstəyi bunu görəcək."
+            },
+            {
+              "id": "me",
+              "label": "Bu mən idim",
+              "kind": "mark-safe",
+              "outcome": "compromised",
+              "feedback": "Hücumçunun girişini indicə təsdiqlədiniz. İndi sistem onu siz kimi qəbul edir."
+            }
+          ]
+        },
+        {
+          "id": "change-password",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "ispoct",
+            "brand": "İşPoçt",
+            "url": [
+              {
+                "text": "https://hesab.idare.example/parol"
+              }
+            ],
+            "fields": [
+              "Cari parol",
+              "Yeni parol",
+              "Yeni parolu təkrarlayın"
+            ],
+            "button": "Parolu dəyiş"
+          },
+          "say": "Ünvan əsldir, kompüter də təmizdir.",
+          "actions": [
+            {
+              "id": "change",
+              "label": "Parolu dəyiş",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Düzdür. Yeni parolu yalnız təmiz cihazda yazın, yoxsa proqram onu da oğurlayar."
+            },
+            {
+              "id": "skip",
+              "label": "Sonra",
+              "kind": "cancel",
+              "outcome": "risky",
+              "feedback": "Köhnə parol oğurlanmış ola bilər. Onu indi, bu təmiz kompüterdən dəyişin."
+            }
+          ]
+        },
+        {
+          "id": "sessions",
+          "label": "Aktiv sessiyalar: 3 cihaz. Hamısından çıxış edilsin?",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "ispoct",
+            "url": [
+              {
+                "text": "https://hesab.idare.example/sessiyalar"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "sign-out-all",
+              "label": "Bütün cihazlardan çıxış et",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "Əla. Oğurlanmış kuki artıq işləmir, hücumçu isə yenidən daxil olmağa məcbur qalacaq."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Parolun dəyişdirilməsi açıq sessiyanı həmişə bağlamır. Hücumçu hələ də içəridə ola bilər."
+            }
+          ]
+        },
+        {
+          "id": "forward-rule",
+          "label": "Yeni qayda, 03:07: bütün məktubları arxiv@poct-yedek.example ünvanına yönləndir",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "ispoct",
+            "url": [
+              {
+                "text": "https://poct.idare.example/qaydalar"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "show-it",
+              "label": "Qaydanı İT dəstəyinə göstər",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Hücumçu hesabdan çıxandan sonra da bu qayda məktublarınızı ona göndərməyə davam edirdi."
+            },
+            {
+              "id": "leave",
+              "label": "Olduğu kimi saxla",
+              "kind": "ignore",
+              "outcome": "compromised",
+              "feedback": "Bu, gizli yönləndirmədir. Sizə gələn hər yeni məktub hücumçuya gedəcək."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "is2-choice",
+      "question": {
+        "prompt": "Hücumçu parolunuz və kodunuz olmadan e-poçta necə daxil oldu?",
+        "options": [
+          {
+            "id": "cookie",
+            "label": "Brauzerdən oğurlanmış sessiya ilə",
+            "correct": true,
+            "feedback": "Düzdür. Sessiya sayta artıq daxil olduğunuzu göstərir, ona görə kod soruşulmur."
+          },
+          {
+            "id": "guess",
+            "label": "Parolu təxmin etməklə",
+            "correct": false,
+            "feedback": "Onda sistem kod istəyərdi. Burada isə nə parol, nə də kod lazım oldu."
+          },
+          {
+            "id": "server",
+            "label": "Poçt serveri sındırılıb",
+            "correct": false,
+            "feedback": "Serverdə problem yoxdur. Oğurlanan sizin brauzerinizdəki sessiya idi."
+          }
+        ]
+      },
+      "explain": "Kuki oğurlananda iki addımlı doğrulama da kömək etmir. Ona görə məlumat oğurlayan proqramı kompüterinizə buraxmayın."
+    },
+    {
+      "type": "order",
+      "id": "is2-order",
+      "prompt": "Kompüter yoluxubsa, addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "isolate",
+          "label": "Yoluxmuş kompüteri şəbəkədən ayırın"
+        },
+        {
+          "id": "report",
+          "label": "Dərhal İT dəstəyinə bildirin"
+        },
+        {
+          "id": "passwords",
+          "label": "Parolları təmiz cihazdan dəyişin"
+        },
+        {
+          "id": "sessions",
+          "label": "Bütün sessiyalardan çıxış edin"
+        },
+        {
+          "id": "rebuild",
+          "label": "Kompüteri İT dəstəyi sıfırdan quraşdırsın"
+        }
+      ],
+      "explain": "Parolu yoluxmuş kompüterdə dəyişsəniz, proqram yenisini də götürər. Kompüter yalnız sıfırdan quraşdırıldıqdan sonra təmiz sayılır."
+    },
+    {
+      "type": "recap",
+      "id": "is2-recap",
+      "points": [
+        "Oğurlanmış sessiya parolsuz və kodsuz giriş imkanı verir",
+        "Parolları təmiz cihazdan dəyişin, sonra bütün sessiyalardan çıxış edin",
+        "Yoluxmuş kompüteri İT dəstəyi sıfırdan quraşdırsın"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

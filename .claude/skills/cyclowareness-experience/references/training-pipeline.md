@@ -101,6 +101,7 @@ Source: `docs/audit/` (read-only, never edit; ADR-016 in `docs/build/DECISIONS.m
 |---|---|---|
 | `modules.json` | array of `ModuleFile` (below) | `syncLibrary` |
 | `lessons/<slug>/<lessonId>.en.json` | `{ id, title, minutes, scenes[] }`, validated by `lessonFileSchema` | `syncLibrary` |
+| `lessons/<slug>/<lessonId>.az.json`, `.ru.json` | the same lesson translated; must keep the English structure (`localeParityErrors`, lesson-engine.md §5); all 106 lessons have both | `syncLibrary` (`readLibraryLesson`) |
 | `i18n.az.json`, `i18n.ru.json` | `{ modules: { [slug]: [title, subtitle] }, lessons: { "slug/lessonId": title } }` | `syncLibrary` (titles only) |
 | `paths.json` | array of `PathFile` (below) | `syncPaths` |
 | `brands.json` | `{ [id]: { id, name, kind, color, glyph, monogram?, fake?, imitates? } }` | read at request time by the player (see lesson-engine.md) |
@@ -170,11 +171,17 @@ const [existing] = await db.select({ id: t.modules.id }).from(t.modules)
   .where(and(eq(t.modules.slug, m.slug), isNull(t.modules.tenantId)));
 if (existing) await db.update(t.modules).set(values).where(eq(t.modules.id, existing.id));
 else [{ id: moduleId }] = await db.insert(t.modules).values(values).returning({ id: t.modules.id });
-// per lesson: match (moduleId, key); update title/minutes/position or insert;
-await db.insert(t.lessonContents)
-  .values({ lessonId, locale: "en", scenes: parsed.data.scenes })
-  .onConflictDoUpdate({ target: [t.lessonContents.lessonId, t.lessonContents.locale],
-                        set: { scenes: parsed.data.scenes, updatedAt: new Date() } });
+// per lesson: readLibraryLesson(slug, id) → { en, translations: { az?, ru? } } (schema, integrity, parity);
+// match (moduleId, key); update title/minutes/position or insert;
+for (const locale of ["en", ...LESSON_TRANSLATIONS] as const) {          // LESSON_TRANSLATIONS = ["az", "ru"]
+  const lesson = texts[locale];
+  if (!lesson) { await db.delete(t.lessonContents).where(/* lessonId + locale */); continue; }   // file removed
+  await db.insert(t.lessonContents)
+    .values({ lessonId, locale, scenes: lesson.scenes })
+    .onConflictDoUpdate({ target: [t.lessonContents.lessonId, t.lessonContents.locale],
+                          set: { scenes: lesson.scenes, updatedAt: new Date() } });
+}
+// returns { modules, lessons, locales: { en, az, ru } }, logged as "texts: en 106, az 106, ru 106"
 ```
 
 - Matching keys: global module = `(slug, tenant_id IS NULL)`; lesson = `(module_id, key)`;
@@ -183,15 +190,19 @@ await db.insert(t.lessonContents)
 - Titles: `{ en: m.title, az: i18n.az.modules[slug][0] ?? en, ru: … }`; lesson titles from
   `i18n.*.lessons["slug/id"]`.
 - **No content hashes or revision numbers.** Every run rewrites `lesson_contents.scenes` for
-  locale `en` (bumping `updated_at`) and overwrites module `title/subtitle/xp/minutes/sort_order/
-  status`. Idempotency is "same input → same rows". Only `locale = "en"` rows are written, so
-  AZ/RU learners get EN scenes under AZ/RU titles (OPEN-QUESTIONS item 6).
-- An unknown category label or an invalid lesson file throws and aborts the whole import;
-  `syncPaths` throws on unknown slugs, then upserts `(key, tenant_id IS NULL)`.
+  every language file present (bumping `updated_at`), deletes the row of a translation whose file is
+  gone, and overwrites module `title/subtitle/xp/minutes/sort_order/status`. Idempotency is "same
+  input → same rows". Readers pick a row with `pickLessonContent` (viewer's language, then `en`, then
+  the only row of a single-language studio/AI-trainer lesson; lesson-engine.md §2.2).
+- An unknown category label or an invalid lesson file (English, or a translation that breaks the
+  parity rules) throws and aborts the import; `syncPaths` throws on unknown slugs, then upserts
+  `(key, tenant_id IS NULL)`.
 
-`tests/content.test.ts` runs the same validation over all 106 files, asserts 53/106 counts, 14
-multi-answer choice scenes, and AZ+RU titles for every module and lesson. Run only that file:
-`npx vitest run tests/content.test.ts` (from `portal/`).
+`tests/content.test.ts` runs the same validation over the 106 English files, asserts 53/106 counts
+(`.en.json` only), 14 multi-answer choice scenes, and AZ+RU titles for every module and lesson;
+`tests/content-locales.test.ts` checks every translation present, and
+`npx tsx scripts/check-lesson-locales.ts --coverage` also fails on a missing one. Run only those files:
+`npx vitest run tests/content.test.ts tests/content-locales.test.ts` (from `portal/`).
 
 ### 2.3 Tables (`src/server/db/schema.ts`)
 
@@ -269,8 +280,9 @@ Tabs `lessons | materials` (`?tab=`). The lessons tab lists the tenant's own mod
 header shows `StudioLessonForm` and, with feature `approvals`, `MaterialForm`
 (`src/components/secops/studio.tsx`).
 
-**What an author can create**: exactly one micro-lesson per module, in one language, with the
-fixed scene sequence `intro → tutor (beats) → choice (one correct) → recap`. Form fields
+**What an author can create with the form**: exactly one micro-lesson per module (the AI trainer,
+§3.3, drafts up to three), in one language, with the fixed scene sequence
+`intro → tutor (beats) → choice (one correct) → recap`. Form fields
 (i18n `secops.studio.form.*`): `aiTopic`, `language`, `category`, `difficulty`, `minutes`
 (1–30), `title`, `subtitle`, `intro`, `points` (one per line, 2–8), `question` + `options`
 (2–4, radio for the correct one, per-option `feedback`), `recap` (2–5 lines).
@@ -278,7 +290,8 @@ fixed scene sequence `intro → tutor (beats) → choice (one correct) → recap
 **What cannot be edited**: there is no edit action for an existing studio module or its scenes;
 only `setModuleStatusAction(id, "published" | "draft")` and `deleteModuleAction(id)` exist
 (`src/server/actions/secops.ts`). Library modules are not editable at all from the UI. Rich scene
-types (simulation, hotspot, swipe, …) are only authorable as JSON files in `content/library`.
+types (simulation, hotspot, swipe, …) are only authorable as JSON files in `content/library`, or
+arrive generated or copied through an AI-trainer draft (§3.3).
 
 `saveStudioLessonAction` (`src/server/actions/secops.ts`):
 
@@ -312,17 +325,50 @@ catalog and the tutor API). Publishing audits `module.published`. Deleting is re
 - `aiEnabled()` = `!!env.ANTHROPIC_API_KEY`; model `env.ANTHROPIC_MODEL` (default
   `"claude-opus-5-5"`, `src/server/env.ts`; OPEN-QUESTIONS item 1 mentions
   `claude-haiku-5-5` as the cheaper option).
-- `draftLesson(topic, locale)` calls `client.messages.create` with a forced tool
-  `save_lesson_draft` (`tool_choice: { type: "tool", name }`), `max_tokens: 4000`, a system prompt
+- `draftLesson(topic, locale)` calls `client.messages.create` with the tool `save_lesson_draft`
+  (`tool_choice: { type: "auto" }`: a forced tool is rejected while thinking is on, so the system
+  prompt asks for the tool and no `tool_use` block means no draft), `max_tokens: 4000`, a system prompt
   that forbids real PII/live links and demands exactly one correct option; output is validated by
   `lessonDraftSchema` (zod) and rejected when the correct-option count ≠ 1. Language from
-  `TUTOR_LANGUAGE[locale]` (`src/server/tutor.ts`).
+  `TUTOR_LANGUAGE[locale]` plus `languageStyle(locale)` (`src/server/tutor.ts`: the portal's terms,
+  form of address and quotes per language).
 - `draftLessonAction(topic, locale)` (`src/server/actions/secops.ts`): permission `studio.write`,
   topic ≥ 5 chars (else `"failed"`), rate limit `ai-draft:<userId>` 20/hour (`"rateLimited"`),
   unknown locale falls back to the tenant `defaultLocale`; returns `error: "offline"` when no key
   (UI shows `secops.studio.form.aiOffline`), `"failed"` otherwise. The draft only fills the form;
   saving still goes through `saveStudioLessonAction` with `ai: true` → `origin: "ai"`.
   ADR-008: AI output is always a draft and never reaches learners without a human publishing it.
+
+**AI trainer** (the `<AiTrainer>` section mounted on the Studio page,
+`src/components/admin/ai-trainer/ai-trainer.tsx`, i18n `secops.aiTrainer.*`; actions in
+`src/server/actions/ai-training.ts`, verification in `src/server/ai-verify.ts`). Form: prompt
+(10–4000 chars), language (`TRAINING_LOCALES = ["az", "en", "ru"]` filtered by the tenant's stored
+`settings.locales`), category, difficulty, minutes (2–45), lessons (1–3). Two paths, both
+`studio.write`:
+
+- `generateTrainingAction` (needs `ANTHROPIC_API_KEY`, else `error: "offline"`; rate limit
+  `ai-training:<userId>` 10/hour): `generateVerified()` asks the model (`generateTraining` in
+  `src/server/ai.ts`, "Write a training in `TUTOR_LANGUAGE[locale]`") for
+  `{ title, subtitle, lessons }` and runs `verifyDraft()`: step 1 `schema` (`trainingDraftSchema`:
+  1–3 lessons, each a full `lessonFileSchema` lesson, so any scene type), step 2 `safety`
+  (`safetyIssues`), step 3 `review` (a second model call whose findings are written in the Studio
+  user's UI language). On blocking issues it regenerates once with them as feedback; the verdict is
+  `verified` or `needs_review`.
+- `libraryTrainingAction` (no key needed; rate limit `ai-library:<userId>` 60/hour): `matchLibrary()`
+  picks the global library module whose title and subtitle (chosen language and English) share the
+  most word stems with the prompt (a category match adds a little; `noMatch` otherwise), takes its
+  first N lessons and one content language for all of them with `sharedContentLocale` (the chosen
+  one when every picked lesson has it, else `en`). Lesson and module titles and the subtitle come from
+  that language too; only the source label (`source.title`) uses the chosen one. Steps 1–2 run, step
+  3 is skipped. The trainer then shows `secops.aiTrainer.contentLanguage`.
+- `saveTrainingDraftAction({ draft, contentLocale, category, difficulty, origin, verdict })` re-checks
+  the draft (`schemaCheck`) and inserts a tenant module: `status: "draft"`, slug `ai-…` with
+  `origin: "ai"` for AI output or `own-…` with `origin: "custom"` for a library copy, minutes = the
+  lessons' sum clamped to 1–60, `xp = 40 + minutes × 5`; lessons `lesson-1…n` at positions 1…n with
+  titles `{ [contentLocale]: … }`, and one `lesson_contents` row per lesson in `contentLocale` (the
+  request language on the AI path, `source.contentLocale` on the library path). It audits
+  `module.created` with `source`, `verdict` (forced to `needs_review` when safety fails) and
+  `lessons`. Publishing stays a human step in the Studio list (ADR-008).
 
 ### 3.4 Materials and the approval gate
 
@@ -361,7 +407,9 @@ records a decision row `edit` (audit `material.edited`). The approvals page
 `targetTraining` (`src/server/services/secops.ts`) is the shared "give these people this
 module" primitive used by approvals, incidents and the refresher job: it skips people who already
 have an open risk with the same `sourceRef` or completed the module, inserts one `behavior_risks`
-row per person (`kind`, `severity`, localized `title`, `module_id`, `due_date` default +7 days),
+row per person (`kind`, `severity`, `title`: given as a function of the locale it is stored in every UI
+language as JSON text, `encodeRiskTitle` in `src/lib/risk-title.ts`, read back with
+`riskTitle(stored, locale)`; `module_id`, `due_date` default +7 days),
 sends `notifyUsers(..., "assignment", ...)` deferred, and `recomputeRisk`. Approval uses
 `kind: sourceRef.startsWith("POL-") ? "policy" : "incident"`, severity from the linked `IR-n`
 incident else `medium`, `sourceRef ?? MAT-<id8>`.
@@ -370,22 +418,35 @@ incident else `medium`, `sourceRef ?? MAT-<id8>`.
 
 Tables: `policies (id, tenant_id, title, archived_at, created_by, created_at)`,
 `policy_versions (id, policy_id, version, title, summary, body_md, translations jsonb
-{ en: { title, summary?, bodyMd } }, published_at, created_at)`,
+{ [locale]: { title, summary?, bodyMd, base? } }, published_at, created_at)`,
 `policy_signoffs (id, version_id, user_id, ip, signed_at)` unique `(version_id, user_id)`.
+The `title/summary/body_md` columns hold the base text, written in the tenant's default language;
+since the per-language editor a copy of it marked `base: true` sits in `translations` under that
+language and records it (no extra column). `src/lib/policy-text.ts`: `policyBaseLocale(translations,
+fallback)` (the `base` entry, else the tenant default, for older versions) and
+`policyTextFor(version, locale, fallbackBase)` (the reader's language when the version has it, else
+the base text, plus the language shown).
 
 Actions in `src/server/actions/workspace.ts`: `createPolicyAction(title)` (audit
-`policy.created`), `publishVersionAction({ title, summary, bodyMd, enTitle, enBody })` → next
-`version = max + 1`, `publishedAt = now`, `translations.en` (`title`, `bodyMd`; no summary) only
-when `enBody` is given, an in-app notification (kind `policy`, href `/policies/<id>?from=%2F`)
-for every active user (audit `policy.version_published`), `archivePolicyAction(id, archived)` (audit `policy.archived` /
+`policy.created`), `publishVersionAction({ policyId, title, summary?, bodyMd, translations? })` →
+next `version = max + 1`, `publishedAt = now`, `translations` = the `base: true` copy plus each other
+`LOCALES` language whose body is filled (under 20 characters refuses; an empty title takes the base
+title), an in-app notification for every active user in their language (that translation's title,
+`admin.policies.notifyBody`; kind `policy`, href `/policies/<id>?from=%2F`) (audit `policy.version_published`), `archivePolicyAction(id, archived)` (audit `policy.archived` /
 `policy.restored`), `remindPolicyAction(versionId)` → `notifyUsers(..., "policy_reminder", ...)`
-using `FIXED_MESSAGES.policy_reminder` (audit `policy.reminder`). Admin UI:
-`src/app/(admin)/admin/policies/page.tsx`, `policies/[id]/page.tsx` (`VersionEditor`,
+using `FIXED_MESSAGES.policy_reminder`, with the policy title in each person's language (audit
+`policy.reminder`). Admin UI: `src/app/(admin)/admin/policies/(index)/page.tsx`, `policies/[id]/page.tsx` (`VersionEditor`,
 `PolicyHeaderActions` from `src/components/admin/policy-client.tsx`), sign-off CSV at
-`src/app/api/admin/policies/[id]/signoffs/route.ts`. The base text is the tenant's default
-language (AZ in the demo); seed policies come from `content/policies/acceptable-use.{az,en}.md`
-and `passwords.{az,en}.md`. `convertPolicyIntelAction` creates an empty policy from a policy-intel
-item.
+`src/app/api/admin/policies/[id]/signoffs/route.ts`. `VersionEditor` gets the `base` language and,
+in a collapsible "Translations (optional)" section, one fieldset per other language the tenant has
+switched on (`settings.locales`), prefilled from the current version; a language left empty shows its
+readers the base text with a notice. The base text is the tenant's default language (AZ in the demo); seed
+policies come from `content/policies/acceptable-use.{az,en,ru}.md` and `passwords.{az,en,ru}.md`
+(`scripts/seed.ts`: az is the base, en and ru are translations, a `.ru.md` only when the file exists;
+seed versions carry no `base` copy, so `policyBaseLocale` falls back to the tenant default).
+`acceptable-use.az.md`, `acceptable-use.ru.md` and `passwords.ru.md` are translations; a legal review
+is recommended (OPEN-QUESTIONS 9).
+`convertPolicyIntelAction` creates an empty policy from a policy-intel item.
 
 ### 3.6 Audit events touching training
 
@@ -415,8 +476,13 @@ in `messages/*/admin.json`. Webhook/syslog event `attestation.completed` is emit
 - Learner side: `getPaths` (`src/server/queries/paths.ts`) joins each path's slugs onto the
   viewer's catalog, counts `done`, flags `assigned` (any assignment targets the path *and* the
   viewer is a target of one of its modules) and attaches a path `certificateToken`. Pages
-  `src/app/(learner)/paths/page.tsx` and `paths/[key]/page.tsx` (feature `paths`), i18n
+  `src/app/(learner)/paths/(index)/page.tsx` and `paths/[key]/page.tsx` (feature `paths`), i18n
   `learner.paths.*`.
+- Standards (`paths.json` `standards`, a tenant path's comma list) are stored once for every language
+  as written (`NIS2 Art. 21(2)(g)`, `ISO/IEC 27001:2022 A.8.2`). The admin paths page and both learner
+  path pages show them through `localizeStandard(ref, locale)` (`src/lib/standards.ts`,
+  `tests/standards.test.ts`), which changes only `Art.` to «maddə» (az) or «ст.» (ru); identifiers
+  and clause numbers never change (ADR-024).
 
 ### 4.2 Assignments data model
 
@@ -590,14 +656,17 @@ return `${prefix}${String(Number(row?.n ?? 0) + 1).padStart(6, "0")}`;
 Rendering: `src/app/(public)/c/[token]/page.tsx` — public route, `robots: noindex`, token regex
 `^[a-z2-7]{10,40}$`; hidden (`notFound`) when `settings.certificate.publicLink` is off unless the
 viewer is the owner or a non-learner of the same tenant. It applies the tenant brand
-(`brandStyle`), logo, `certificate.title` (fallback `learner.certificate.title`), the text
-template with `{name}`, `{module}` (module or path title in the viewer's locale) and `{date}`
-(`dateStyle: "long"`), serial, verify URL, optional `signerName`/`signerTitle`, and a browser
+(`brandStyle`), logo, `certificate.title[locale]` (fallback `learner.certificate.title`), the text
+template `certificate.text[locale]` (fallback `DEFAULT_CERTIFICATE_TEXT`, or
+`DEFAULT_PATH_CERTIFICATE_TEXT` for a path, in that language) with `{name}`, `{module}` (module or
+path title in the viewer's locale) and `{date}` (`dateStyle: "long"`), serial, verify URL, optional `signerName`/`signerTitle`, and a browser
 `PrintButton` (ADR-006: no server-side PDF). Links appear on the module page
 (`CertificateLink` → `/c/<token>`), the path page, `src/app/(learner)/profile/page.tsx`
 ("My certificates"), and the admin person page counts them. Settings:
 `src/components/admin/settings-tabs.tsx` `CertificateTab` → `saveCertificateAction`
-(`certSchema`: `title ≤ 60`, `text ≤ 400`, `signerName/Title ≤ 120`, `publicLink`), audit
+(`certSchema`: `title ≤ 60` and `text ≤ 400` per language of `LOCALES`, only filled languages
+stored; `signerName/Title ≤ 120`, `publicLink`; the tab switches between the tenant's
+`settings.locales`), audit
 `settings.certificate`; `AttestationTab` → `saveAttestationAction(locale, text)` per language.
 The original's 600-character limit is enforced on both sides: `<Textarea maxLength={600}>` +
 `{value.length} / 600` counter in the tab, and `saveAttestationAction` refuses (`field: "text"`)
@@ -642,11 +711,11 @@ the ranking `TREND_DAYS = 7` earlier; reporting counts simulations sent in `REPO
 |---|---|---|---|
 | Learn catalog | `src/app/(learner)/learn/(catalog)/page.tsx` + `catalog-view.tsx` | `getCatalog`, `yourPath` | Client filters: search, `view ∈ path | catalog`, `audience ∈ everyone | leaders | it` (`m.audiences.includes`), category chips from `CATEGORIES`. `pathRank` tiers: for-you & not started → 0, in progress/awaiting → 1000, rest → 2000, plus personal path order; `catalogRank = sortOrder`. Pills: `completed`, `awaiting`, `complete {percent}`, `forYou`, `custom` (non-library). i18n `learner.learn.*` |
 | Module page | `src/app/(learner)/learn/[slug]/page.tsx`, `module.ts`, `module-actions.tsx` | `moduleForPage` (404 for unknown slug), `nextLesson` | Lesson list with the orange marker on `lastLessonKey` (else next), stat tiles, progress bar, `Start / Continue / Review` → `/learn/<slug>/<key>`, `Start over` link, `AttestCard` (dialog, opens with `?confirm=1`, text from settings) → `attestModuleAction`, certificate block + `CertificateLink`, `RateModule` (anonymous `feedback` row, 20/hour). Due pill turns `risk` when overdue. i18n `learner.module.*`, `learner.attest.*` |
-| Home | `src/app/(learner)/page.tsx` | `getCatalog`, `continueModule`, `yourPath`, `getPolicies`, `myLeagueRow`, `todayXp`, `openRiskCount` | Policies-to-sign card (`/policies/<id>?from=%2F`), awaiting-attestation banner (`?confirm=1`), Continue hero (`continueModule`: most recently started in-progress/awaiting, else first unfinished path item), open-risks link, league row, **Your path** via `PathTimeline` (`src/components/learner/path-timeline.tsx`, `VISIBLE = 4`, "Show all"), daily goal ring, streak, XP/level, risk score. i18n `learner.home.*` |
+| Home | `src/app/(learner)/app/page.tsx` (route `/app`) | `getCatalog`, `continueModule`, `yourPath`, `getPolicies`, `myLeagueRow`, `todayXp`, `openRiskCount` | Policies-to-sign card (`/policies/<id>?from=%2F`), awaiting-attestation banner (`?confirm=1`), Continue hero (`continueModule`: most recently started in-progress/awaiting, else first unfinished path item), open-risks link, league row, **Your path** via `PathTimeline` (`src/components/learner/path-timeline.tsx`, `VISIBLE = 4`, "Show all"), daily goal ring, streak, XP/level, risk score. i18n `learner.home.*` |
 | Your path order | `yourPath` in `src/server/queries/catalog.ts` | | assigned (by due date, then `sortOrder`) → recommended (`forYou` = assigned to everyone/department/person; today identical to `assigned`) → remaining `everyone` modules |
 | Progress | `src/app/(learner)/progress/page.tsx` | `getCatalog`, `xpByDay`, `badgesFor` | Level ring, XP, streak + freezes, risk card → `/security`, started modules sorted by percent, `completedOf` over the whole catalog, 30-day XP bar chart + heatmap, 8 badges. i18n `learner.progress.*` |
-| Paths | `src/app/(learner)/paths/page.tsx`, `paths/[key]/page.tsx` | `getPaths` | Feature `paths`; roadmap with current node, audience/recurrence, standards chips, path certificate card |
-| Policy reader | `src/app/(focus)/policies/[id]/page.tsx`, `sign-form.tsx` | latest published version, own sign-off | `(focus)` layout (no shell), `?from=` back link (must start with `/`), translation picked by locale with an "other language" notice, TOC from H2s, `SignForm` posts `signPolicyAction` (checkbox `agree`, password unless the account has no local hash, rate limit 10 / 15 min, only the newest published version is signable) |
+| Paths | `src/app/(learner)/paths/(index)/page.tsx`, `paths/[key]/page.tsx` | `getPaths` | Feature `paths`; roadmap with current node, audience/recurrence, standards chips (`localizeStandard`, §4.1), path certificate card |
+| Policy reader | `src/app/(focus)/policies/[id]/page.tsx`, `sign-form.tsx` | latest published version, own sign-off | `(focus)` layout (no shell), `?from=` back link (must start with `/`), `policyTextFor` (`src/lib/policy-text.ts`) shows the reader's language, else the base text with its own `lang` and the `player.policy.otherLanguage` notice, TOC from H2s, `SignForm` posts `signPolicyAction` (checkbox `agree`, password unless the account has no local hash, rate limit 10 / 15 min, only the newest published version is signable) |
 | Profile | `src/app/(learner)/profile/page.tsx` | certificates join modules/paths | "My certificates" list → `/c/<token>` |
 | Icons | `src/components/learner/module-icon.tsx` | | `moduleIcon(slug, category)` = `BY_SLUG[slug] ?? BY_CATEGORY[category] ?? Mail` (lucide), `ModuleIcon` (sm/md/lg tile), `ModuleArt` (hero illustration, `tone onBrand | light`) |
 
@@ -658,7 +727,8 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
 
 - **PGlite is single-process.** `.data/pg` opens in one process only: stop `next dev` before
   `db:migrate`, `db:seed`, `db:reset`, `content:sync` (README "PGlite is single-process";
-  ADR-004). The dev servers on :3000/:3100 must not be restarted by a reference-writing task.
+  ADR-004). The dev server on :3000 and the presentation copies on :3100/:3200 must not be
+  restarted by a reference-writing task.
 - **Schema changes and `drizzle/`.** The repo ships one migration, `drizzle/0000_init.sql` +
   `drizzle/meta`; `tests/assignment-since.test.ts` migrates a throw-away PGlite from that folder.
   Project rule (README "Until the first release there is one migration"): until the first
@@ -667,14 +737,17 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
   `npm run db:generate`. Commit SQL and `drizzle/meta` together; a local database created from the
   previous init cannot be upgraded by `db:migrate`, so stop `next dev` and run `db:reset`.
 - **`content:sync` is a full overwrite** for library rows: module metadata, lesson titles,
-  positions and the `en` scenes. Do not hand-edit library rows in the database. Tenant studio
-  rows (`origin != "library"`, slug prefix `own-`) are never touched by sync.
+  positions and the en/az/ru scenes. Do not hand-edit library rows in the database. Tenant studio
+  rows (`origin != "library"`, slug prefix `own-` or, for AI-trainer output, `ai-`) are never
+  touched by sync.
 - **Per-tenant override by slug** exists in every reader (`tenantId` row wins), but no UI creates
-  a tenant row with a *library* slug (studio slugs are `own-…`); a hand-made one would shadow the
+  a tenant row with a *library* slug (studio slugs are `own-…`; AI-trainer drafts are `ai-…` or
+  `own-…`); a hand-made one would shadow the
   library module for that tenant, and the unique index allows it.
 - **`audiences` are lowercase** on disk and in `CatalogView`; `getCatalog` lower-cases stored
   values because early studio rows had `"Everyone"`. **Lesson positions:** library 0-based,
-  studio `position: 1` (harmless for a single lesson; mind it for multi-lesson studio modules).
+  studio `position: 1`, AI-trainer drafts `1…n` (harmless for a single lesson; mind it for
+  multi-lesson studio modules).
 - **Due dates are calendar days.** Store `YYYY-MM-DD` only; validate with `parseDay` (impossible
   days throw at the `date` column, `tests/due-date-actions.test.ts`). The end of a due day is
   `T23:59:59+04:00` (Baku) in jobs; `after_joining` adds days (UTC) to the person's start:
@@ -687,8 +760,11 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
   `admin.assignments/policies/reports/auditActions`, `secops.studio/approvals/paths`,
   `settings.attestation/certificate/learning`, `common.categories/audiences/difficulty/units`.
 - **AZ formatting on the client:** no `Intl`/`useFormatter`/`toLocale*` in client components; use
-  `useClientFormat()` (`src/lib/client-format.ts`, ADR-017). Server components use
-  `getFormatter`. `PathTimeline` and the catalog follow this.
+  `useClientFormat()` (`src/lib/client-format.ts`: dates, relative times and `number`, ADR-017). ICU
+  numbers in az messages rely on `<AzNumbersGate>` and its lazy polyfill (SKILL.md ground rules).
+  Server components use `getFormatter`, or `getAppFormatter()` (`src/i18n/server-format.ts`) when
+  they print a relative time (az «… əvvəl» / «… sonra», ADR-024). `PathTimeline` and the catalog
+  follow this.
 - **Never edit `docs/audit/`** (spec of the lost original, ADR-016). Rebuild decisions go to
   `docs/build/DECISIONS.md`, open items to `docs/build/OPEN-QUESTIONS.md`.
 - **Server actions** start with `actionViewer(permission)`; nothing else is exported from
@@ -712,14 +788,16 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
    catalog order (`sortOrder`).
 2. Create `content/library/lessons/<slug>/<lessonId>.en.json` per lesson (`{ id, title, minutes,
    scenes }`; scene DSL in `references/lesson-engine.md`; must satisfy `lessonFileSchema` and
-   `lessonIntegrityErrors`).
+   `lessonIntegrityErrors`), plus `<lessonId>.az.json` and `<lessonId>.ru.json` translations next to
+   it (lesson-engine.md recipe 6.3; without them az/ru learners get the English text).
 3. Add `i18n.az.json` and `i18n.ru.json` entries: `modules[slug] = [title, subtitle]` and
    `lessons["slug/lessonId"] = title` (the content test fails without them).
 4. Optionally add the slug to a path in `content/library/paths.json`.
 5. If the module needs its own icon, add it to `BY_SLUG` in
    `src/components/learner/module-icon.tsx`; otherwise `BY_CATEGORY` supplies one.
-6. Validate: `cd portal && npx vitest run tests/content.test.ts` (update the `53` / `106` / `14`
-   counts in the test when they change).
+6. Validate: `cd portal && npx vitest run tests/content.test.ts tests/content-locales.test.ts` and
+   `npx tsx scripts/check-lesson-locales.ts --coverage` (update the `53` / `106` / `14` counts in
+   `tests/content.test.ts`, which counts English files, when they change).
 7. Import: stop the dev server, `npm run content:sync` (or `npm run db:reset` for a fresh demo),
    restart. Production picks it up on the next container start (bootstrap).
 8. Do not touch `docs/audit/04-training-catalog.md`; if the catalog diverges from the original,
@@ -728,7 +806,7 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
 ### 8.2 Add or modify a learning path
 
 - Global: edit `content/library/paths.json` (new `key`, three-language `title/description/
-  audience/recurrence`, `standards`, ordered `modules` slugs that exist in `modules.json`), then
+  audience/recurrence`, `standards` written once for every language (§4.1), ordered `modules` slugs that exist in `modules.json`), then
   `npm run content:sync`. `syncPaths` throws on unknown slugs.
 - Tenant: Admin → Paths → New (or Duplicate a library path), `savePathAction`. Texts are stored in
   the tenant default locale only.
@@ -809,15 +887,19 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
 
 - **SCORM / xAPI export:** none (OPEN-QUESTIONS item 11). Lessons exist only as the portal's JSON
   DSL in `lesson_contents`; there is no package export or LMS launch.
-- **AZ/RU lesson content:** all 106 lessons are English; only titles/subtitles are translated
-  (`i18n.az.json`, `i18n.ru.json`); `syncLibrary` writes `lesson_contents.locale = "en"` only
-  (OPEN-QUESTIONS item 6). The schema already supports per-locale rows.
+- **AZ/RU lesson content:** all 106 library lessons ship in en, az and ru (one `lesson_contents` row
+  per language), but the az/ru texts were translated from English in this rebuild, not taken from
+  the original (OPEN-QUESTIONS item 6, closed on 2026-10-26; a native speaker's final read before
+  release is still recommended). Studio lessons and AI-trainer drafts still have one language each
+  (lesson-engine.md §7).
 - **PDF:** certificates and the compliance pack are browser-print pages (ADR-006,
   OPEN-QUESTIONS item 15); scheduled report mails carry a sign-in link, not an attachment.
-- **Studio depth:** the original Studio is not in the audit (the rebuild added it). Today it
-  authors one single-locale, four-scene micro-lesson per module, no editing after save, no
-  versions/revision history, no multi-lesson modules, no rich scene types; publishing is a
-  `draft | published` flag. Library modules cannot be customised per tenant through the UI.
+- **Studio depth:** the original Studio is not in the audit (the rebuild added it). Today the
+  Studio form authors one single-locale, four-scene micro-lesson per module, and the AI trainer
+  (§3.3) saves 1–3 single-locale lessons per draft (generated, or copied from a library module);
+  there is no editing after save, no versions/revision history and no hand authoring of rich scene
+  types; publishing is a `draft | published` flag. Library modules cannot be customised per tenant
+  through the UI.
 - **Materials with `origin: "ai"`** appear only in the seed; no server code generates AI
   materials (only `createMaterialAction` and `convertThreatIntelAction` insert `materials`).
 - **Automatic refresher** is implemented as a targeted `behavior_risks` row pointing at the

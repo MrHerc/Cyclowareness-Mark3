@@ -47,6 +47,11 @@ function personStart(u: UserLite): Date {
   return u.activatedAt && u.activatedAt > u.createdAt ? u.activatedAt : u.createdAt;
 }
 
+/** One assignment's due day (YYYY-MM-DD) for one person: the fixed date, N days after their start, or none. */
+export function dueFor(a: Pick<typeof t.assignments.$inferSelect, "dueKind" | "dueDate" | "dueDays">, u: UserLite): string | null {
+  return a.dueKind === "fixed" ? a.dueDate : a.dueKind === "after_joining" && a.dueDays ? bakuDayPlus(a.dueDays, personStart(u)) : null;
+}
+
 /** The people one assignment targets: everyone, a department with its sub-departments, or one person. */
 export function targetsOf(a: Target, users: UserLite[], closure: Map<string, Set<string>>): UserLite[] {
   return users.filter((u) => {
@@ -149,7 +154,7 @@ export async function resolveAssignments(db: DB, tenantId: string, onlyUserIds?:
     const moduleIds = modulesOf(a);
     if (!moduleIds.length) continue;
     for (const u of targetsOf(a, users, closure)) {
-      const due = a.dueKind === "fixed" ? a.dueDate : a.dueKind === "after_joining" && a.dueDays ? bakuDayPlus(a.dueDays, personStart(u)) : null;
+      const due = dueFor(a, u);
       const since = assignedSince(a, u);
       const map = result.get(u.id)!;
       for (const moduleId of moduleIds) {

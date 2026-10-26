@@ -1,4 +1,4 @@
-/** Interface languages with full app translations. Lessons ship in English with localised titles. */
+/** Interface languages with full app translations. Every library lesson is served in each of them (`<lesson>.{en,az,ru}.json`). */
 export const LOCALES = ["az", "en", "ru"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "az";
@@ -47,6 +47,23 @@ export function negotiate<T extends string>(header: string | null | undefined, s
     if (supported.includes(base)) return base;
   }
   return fallback;
+}
+
+/**
+ * Browser and public-site languages without an interface translation, mapped to the closest one
+ * (Turkish readers understand Azerbaijani, the post-Soviet languages fall back to Russian).
+ */
+export const UI_ALIAS: Record<string, Locale> = { tr: "az", uk: "ru", be: "ru", kk: "ru", ky: "ru", uz: "ru" };
+
+/**
+ * The interface language of a signed-out visitor from the browser's languages. Outside Azerbaijan an
+ * unknown language gets English (the product is sold globally); in Azerbaijan, or with no header at all,
+ * Azerbaijani. Shared by the request config and src/app/global-error.tsx (which has no server).
+ */
+export function browserUiLocale(acceptLanguage: string | null | undefined, country: string | null | undefined): Locale {
+  const fallback: Locale = country?.toUpperCase() === "AZ" || !acceptLanguage ? DEFAULT_LOCALE : "en";
+  const best = negotiate(acceptLanguage, [...LOCALES, ...Object.keys(UI_ALIAS)], fallback);
+  return isLocale(best) ? best : (UI_ALIAS[best] ?? fallback);
 }
 
 /** Reads a localised value from a `{ locale: text }` map with sensible fallbacks. */

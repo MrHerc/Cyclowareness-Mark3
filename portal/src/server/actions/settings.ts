@@ -331,8 +331,9 @@ export async function testEmailAction(to: string): Promise<{ ok: boolean; error?
   // The test uses the stored server as if sending were enabled; nothing is written until it succeeds.
   const [row] = await db().select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, v.tenant.id));
   // In the language of the admin who sends it (they usually send it to themselves).
-  const tr = await getTranslations({ locale: isLocale(v.user.locale) ? v.user.locale : v.tenant.settings.defaultLocale, namespace: "settings.email" });
-  const res = await sendTestEmail(db(), v.tenant.id, to, tr("testSubject", { organisation: v.tenant.name }), tr("testText"), { ...withDefaults(row.settings).email, enabled: true });
+  const lang = isLocale(v.user.locale) ? v.user.locale : v.tenant.settings.defaultLocale;
+  const tr = await getTranslations({ locale: lang, namespace: "settings.email" });
+  const res = await sendTestEmail(db(), v.tenant.id, to, tr("testSubject", { organisation: v.tenant.name }), tr("testText"), { ...withDefaults(row.settings).email, enabled: true }, lang);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "settings.email_tested", meta: { ok: res.ok } });
   if (!res.ok) return { ok: false, error: res.error };
   const testedAt = new Date().toISOString();
@@ -373,13 +374,31 @@ export async function saveAttestationAction(locale: string, text: string): Promi
   return { ok: true };
 }
 
-const certSchema = z.object({ title: z.string().trim().max(60), text: z.string().trim().max(400), signerName: z.string().trim().max(120), signerTitle: z.string().trim().max(120), publicLink: z.boolean() });
+/** The certificate's own title and text are per language, like the attestation text: each learner's certificate is in their language. */
+const certSchema = z.object({
+  title: z.partialRecord(z.enum(LOCALES), z.string().trim().max(60)),
+  text: z.partialRecord(z.enum(LOCALES), z.string().trim().max(400)),
+  signerName: z.string().trim().max(120),
+  signerTitle: z.string().trim().max(120),
+  publicLink: z.boolean(),
+});
+
+/** The languages with a text of their own; none means the default wording everywhere. */
+function ownTexts(map: Partial<Record<string, string>>): Record<string, string> | undefined {
+  const entries = Object.entries(map).filter((e): e is [string, string] => !!e[1]);
+  return entries.length ? Object.fromEntries(entries) : undefined;
+}
 
 export async function saveCertificateAction(input: z.infer<typeof certSchema>): Promise<SaveResult> {
   const v = await actionViewer("settings.write");
   const p = certSchema.safeParse(input);
-  if (!p.success) return invalid(p);
-  await saveSettings(v, (s) => ({ ...s, certificate: { title: p.data.title || undefined, text: p.data.text || undefined, signerName: p.data.signerName || undefined, signerTitle: p.data.signerTitle || undefined, publicLink: p.data.publicLink } }), "settings.certificate");
+  // The field of the form ("text"), not the language inside it ("text.ru").
+  if (!p.success) return { ok: false, field: p.error.issues[0]?.path.length ? String(p.error.issues[0].path[0]) : undefined };
+  await saveSettings(
+    v,
+    (s) => ({ ...s, certificate: { title: ownTexts(p.data.title), text: ownTexts(p.data.text), signerName: p.data.signerName || undefined, signerTitle: p.data.signerTitle || undefined, publicLink: p.data.publicLink } }),
+    "settings.certificate",
+  );
   return { ok: true };
 }
 

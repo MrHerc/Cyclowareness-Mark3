@@ -71,7 +71,7 @@ export default async function AssignmentsPage() {
               modules={modules.map((m) => ({ id: m.id, title: pick(m.title, locale), meta: tc("units.min", { count: m.minutes }) }))}
               paths={paths.map((p) => ({ id: p.id, title: pick(p.title, locale), meta: tc("units.modules", { count: p.moduleSlugs.length }) }))}
               departments={departments.map((d) => ({ id: d.id, name: d.name }))}
-              people={people.sort((a, b) => a.name.localeCompare(b.name))}
+              people={people.sort((a, b) => a.name.localeCompare(b.name, locale))}
             />
           ) : null
         }

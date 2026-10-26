@@ -14,7 +14,7 @@ const SESSION_SEEN_COOKIE = process.env.NODE_ENV === "production" ? "__Host-cy_s
  * The signed-in app (route groups (learner), (focus), (admin), (print)). Only these send an anonymous
  * visitor to sign-in; every other unknown path reaches the app and gets a real 404.
  */
-const APP_PREFIXES = ["/admin", "/super", "/learn", "/paths", "/league", "/progress", "/profile", "/lab", "/security", "/sessions", "/help", "/policies", "/print"];
+const APP_PREFIXES = ["/app", "/admin", "/super", "/learn", "/paths", "/league", "/progress", "/profile", "/lab", "/security", "/sessions", "/help", "/policies", "/print"];
 /** Language of `/` by visitor country (Cloudflare's CF-IPCountry) when the browser languages do not match. */
 const COUNTRY_LOCALE: Record<string, SiteLocale> = { AZ: "az", TR: "tr", GE: "ka", UA: "uk", RO: "ro", MD: "ro", DE: "de", AT: "de", FR: "fr", IT: "it", RU: "ru", BY: "ru", KZ: "ru", UZ: "ru" };
 
@@ -79,6 +79,15 @@ export function proxy(request: NextRequest) {
     return res;
   }
 
+  // /login is the short address of the sign-in page (keeps any ?next=).
+  if (pathname === "/login" || pathname.startsWith("/login/")) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/sign-in${pathname.slice("/login".length)}`;
+    const res = NextResponse.redirect(url, 308);
+    if (transport) res.headers.set("Strict-Transport-Security", transport);
+    return res;
+  }
+
   const hasSession = !!request.cookies.get(SESSION_COOKIE)?.value;
 
   if (!hasSession && needsSession(pathname)) {
@@ -91,8 +100,9 @@ export function proxy(request: NextRequest) {
     return res;
   }
 
-  if (pathname === "/" && !hasSession) {
-    // Visitors are sent to the public site in their language (signed-in people get their Home).
+  if (pathname === "/") {
+    // The root is always the public site in the visitor's language; the signed-in app lives at /app,
+    // sign-in at /login (alias of /sign-in) and the admin console at /admin.
     // A redirect rather than a rewrite: the answer depends on these request headers, and a cache in
     // front must never serve one visitor's language to the next under the same URL.
     const cookieLocale = request.cookies.get(LOCALE_COOKIE)?.value;

@@ -1,0 +1,379 @@
+{
+  "id": "badge-sense",
+  "title": "Giriş kartınız",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "key",
+          "say": "Giriş kartınız binanın açarıdır. Onu heç kimə, hətta həmkarınıza belə verməyin.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        },
+        {
+          "id": "photos",
+          "say": "Kartınızın göründüyü fotoları paylaşmayın. Belə foto kartın saxtasını hazırlamağı asanlaşdırır.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "uniform",
+          "say": "Hücumçu usta, kuryer və ya müfəttiş geyimində gələ bilər. Forma şəxsiyyəti təsdiq etmir.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "lost",
+          "say": "Kartınızı itirmisiniz? Bloklansın deyə dərhal bildirin. Binadan çıxanda isə kartı gizlədin.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "badge-phone",
+      "environment": "phone",
+      "title": "Giriş kartı ilə bağlı mesajlar",
+      "intro": "Gün ərzində telefonunuza giriş kartınızla bağlı mesajlar gəlir. Hər birinə düzgün cavab verin.",
+      "steps": [
+        {
+          "id": "borrow",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Elnur Hüseynov"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam, kartımı evdə unutmuşam. Seninkini mühafizə postunda qoy, axşam qaytararam."
+                  }
+                ],
+                "time": "08:52"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "lend",
+              "label": "Yaxşı, qoyaram",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Kartınızla edilən hər giriş sizin adınıza qeydə alınır. Onu heç vaxt başqasına verməyin."
+            },
+            {
+              "id": "decline",
+              "label": "Yox, postdan müvəqqəti kart al",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Mühafizə postu şəxsiyyəti yoxlayır və müvəqqəti kart verir."
+            }
+          ]
+        },
+        {
+          "id": "tagged",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "kontakto",
+            "app": "Kontakto",
+            "title": [
+              {
+                "text": "Gülnar sizi fotoda işarələdi"
+              }
+            ],
+            "body": [
+              {
+                "text": "«Komandada ilk günüm!» 24 bəyənmə"
+              }
+            ],
+            "time": "13:15"
+          },
+          "say": "Fotoda giriş kartınız aydın görünür.",
+          "actions": [
+            {
+              "id": "ask-remove",
+              "label": "Gülnardan fotonu dəyişməsini xahiş et",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Düzdür. Kartın fotosu kiməsə onun saxtasını hazırlamağa və ya binaya girməyə kömək edə bilər."
+            },
+            {
+              "id": "like",
+              "label": "Bəyən və keç",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Foto hamıya açıqdır, kartın dizaynını və adınızı göstərir. Giriş kartının fotolarını paylaşmayın."
+            }
+          ]
+        },
+        {
+          "id": "recon-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "db-alov-servis-fake",
+            "sender": [
+              {
+                "text": "AlovServis"
+              }
+            ],
+            "time": "15:30",
+            "messages": [
+              [
+                {
+                  "text": "Sabah odsöndürənləri yoxlamağa gəlirik. Server otağı neçənci mərtəbədədir və mühafizəçilərin növbəsi nə vaxt dəyişir?"
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab yaz: 3-cü mərtəbə, 20:00",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Bu, hücum üçün kəşfiyyatdır. Bina barədə məlumat verməyin."
+            },
+            {
+              "id": "report",
+              "label": "Təhlükəsizlik komandasına bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əsl podratçı bunu sizdən SMS ilə soruşmaz."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Heç bir məlumat vermədiniz, bu yaxşıdır. Amma bildirsəniz, həmkarlarınızı da qoruyarsınız."
+            }
+          ]
+        },
+        {
+          "id": "badge-phish",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "idare-fake",
+            "sender": [
+              {
+                "text": "Idare"
+              }
+            ],
+            "time": "17:05",
+            "messages": [
+              [
+                {
+                  "text": "Giriş kartınızın müddəti bitir. Kart bloklanmasın deyə məlumatlarınızı yeniləyin: "
+                },
+                {
+                  "text": "kart-yenile.example.net",
+                  "link": {
+                    "label": "kart-yenile.example.net",
+                    "href": "https://kart-yenile.example.net"
+                  }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Linki aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Link iş parolunuzu istəyən saxta səhifəyə aparır. Kartları yalnız mühafizə postu yeniləyir."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Kartla bağlı məsələləri mühafizə postunda şəxsən həll edin."
+            },
+            {
+              "id": "block",
+              "label": "Blokla",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Yaxşı. Təhlükəsizlik komandasına da bildirsəniz, daha yaxşı olar."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "uniform",
+      "title": "Formalı qonaq",
+      "start": "door",
+      "nodes": [
+        {
+          "id": "door",
+          "text": "Salam, biz Alov Servis şirkətindənik, odsöndürənləri yoxlayırıq. Server otağını açın, orada da bir dənə var.",
+          "speaker": "Formalı kişi",
+          "voice": "man",
+          "channel": "in-person",
+          "spoken": "Salam, biz Alov Servis şirkətindənik, odsöndürənləri yoxlayırıq. <breath> Server otağını açın, orada da bir dənə var.",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          },
+          "choices": [
+            {
+              "label": "Server otağını açıram",
+              "outcome": "compromised",
+              "feedback": "Forma və alət çantası şəxsiyyəti təsdiq etmir. Server otağına heç kim yoxlanılmadan girmir."
+            },
+            {
+              "label": "Qonaq kartını və iş sifarişini göstərməsini xahiş edirəm",
+              "next": "paper",
+              "feedback": "Yaxşı. Görək nə göstərəcək."
+            },
+            {
+              "label": "Mühafizəçiləri çağırıram",
+              "next": "guard",
+              "feedback": "Düzdür. Qərarı mühafizəçilər versin."
+            }
+          ]
+        },
+        {
+          "id": "paper",
+          "text": "Sənədlər maşındadır. Hər ay gəlirik, məni tanımadınız?",
+          "speaker": "Formalı kişi",
+          "voice": "man",
+          "channel": "in-person",
+          "spoken": "Sənədlər maşındadır. <short pause> Hər ay gəlirik, məni tanımadınız?",
+          "choices": [
+            {
+              "label": "Hə, tanıdım, keçin",
+              "outcome": "compromised",
+              "feedback": "Tanışlıq hissi hiylənin bir hissəsidir. Qonaq kartı yoxdursa, giriş də yoxdur."
+            },
+            {
+              "label": "Mühafizəçiləri çağırıram",
+              "next": "guard",
+              "feedback": "Düzdür. Qərarı mühafizəçilər versin."
+            }
+          ]
+        },
+        {
+          "id": "guard",
+          "text": "Bu ay Alov Servis tərəfindən heç bir yoxlama planlaşdırılmayıb. Həmin kişi çıxışa tərəf getdi.",
+          "speaker": "Mühafizəçi",
+          "voice": "older-man",
+          "channel": "in-person",
+          "manner": "firm",
+          "spoken": "Bu ay Alov Servis tərəfindən heç bir yoxlama planlaşdırılmayıb. <breath> Həmin kişi çıxışa tərəf getdi.",
+          "character": "guard",
+          "choices": [
+            {
+              "label": "Təhlükəsizlik komandasına yazıb onun görünüşünü təsvir edirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Onlar kamera yazılarına baxacaq və digər girişlərdəki mühafizəçiləri xəbərdar edəcəklər."
+            },
+            {
+              "label": "Getdi, deməli, problem yoxdur",
+              "outcome": "risky",
+              "feedback": "O, başqa gün və ya başqa qapıdan qayıda bilər. Bildirmək vacibdir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "badge-rules",
+      "prompt": "Hər vəziyyəti düzgün addımla uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "lend",
+          "left": "Həmkarınız kartınızı istəyir",
+          "right": "Onu mühafizə postuna yönləndirin"
+        },
+        {
+          "id": "photo",
+          "left": "Komanda fotosu çəkilir",
+          "right": "Əvvəlcə kartı gizlədin"
+        },
+        {
+          "id": "outside",
+          "left": "İşdən sonra alış-verişə gedirsiniz",
+          "right": "Kartı çantanıza qoyun"
+        },
+        {
+          "id": "no-badge",
+          "left": "Formalı ustanın qonaq kartı yoxdur",
+          "right": "Mühafizəçiləri çağırın"
+        }
+      ],
+      "explain": "Giriş kartı binada sizin şəxsiyyət vəsiqənizdir. Ondan yalnız binada və yalnız özünüz istifadə edin."
+    },
+    {
+      "type": "choice",
+      "id": "why-hide",
+      "question": {
+        "prompt": "Binadan kənarda giriş kartını niyə gizlətmək lazımdır?",
+        "options": [
+          {
+            "id": "dirt",
+            "label": "Çirklənməsin deyə",
+            "correct": false,
+            "feedback": "Səbəb səliqə yox, təhlükəsizlikdir."
+          },
+          {
+            "id": "target",
+            "label": "Kart adınızı və iş yerinizi göstərir, onu oğurlamaq da olar",
+            "correct": true,
+            "feedback": "Düzdür: görünən kart hücumçuya kimə yaxınlaşmaq lazım olduğunu göstərir. Bəzi kartları hətta yaxın məsafədən kopyalamaq olur."
+          },
+          {
+            "id": "rule",
+            "label": "Sadəcə qayda belədir",
+            "correct": false,
+            "feedback": "Bunun səbəbi var: kart həm sizi, həm də binanı qoruyur."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "badge-id"
+        }
+      },
+      "explain": "Binanın içində kartı görünən yerə taxın, çıxanda isə gizlədin."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Giriş kartınızı heç vaxt başqasına verməyin və onun fotosunu paylaşmayın.",
+        "Forma şəxsiyyəti təsdiq etmir: qonaq kartı yoxdursa, giriş də yoxdur.",
+        "Kartınızı itirmisiniz? Dərhal bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -1,0 +1,433 @@
+{
+  "id": "admin-hygiene",
+  "title": "Administrator gigiyenası",
+  "minutes": 4,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Administrator hesabı hücumçuların ən çox ələ keçirmək istədiyi açardır. Tək bir administrator hesabı ilə bütün şəbəkəyə çıxış əldə edə bilərlər.",
+          "mood": "think",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Gündəlik iş üçün adi hesabdan, idarəetmə üçün isə ayrıca hesabdan istifadə edin. Administrator hesabı ilə heç vaxt məktub oxumayın və internetdə gəzməyin.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Parolları və açarları koda, çat yazışmalarına və tiketlərə yazmayın. Onlar orada illərlə qalır. Bunun əvəzinə sirlər anbarından istifadə edin.",
+          "mood": "alert",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "app": "telegram",
+              "contact": [
+                {
+                  "text": "İnfrastruktur komandası · 46 üzv"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Test üçün bazaya belə qoşulun: "
+                    },
+                    {
+                      "text": "DB_PASSWORD=Pr0d!Baza2026",
+                      "spot": "secret"
+                    }
+                  ],
+                  "time": "23:14"
+                }
+              ]
+            }
+          },
+          "highlight": "secret"
+        },
+        {
+          "id": "b4",
+          "say": "Saxta dəstək əməkdaşları zəng edib çox vaxt uzaqdan idarəetmə aləti quraşdırmağınızı istəyir. Sonra sistemi sizin əlinizlə açırlar.",
+          "mood": "alert",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [
+                {
+                  "text": "Təchizatçının dəstək xidməti"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 12 000 01 23"
+                }
+              ],
+              "label": "Naməlum"
+            }
+          }
+        },
+        {
+          "id": "b5",
+          "say": "İdarəetmə panelləri, uzaqdan giriş və bulud konsolları üçün fişinqə davamlı çoxfaktorlu autentifikasiyanı, məsələn, fiziki təhlükəsizlik açarını aktiv edin.",
+          "mood": "happy",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "admin-phish",
+      "prompt": "Administratorlara yönəlmiş fişinqin əlamətlərini tapın.",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": [
+            {
+              "text": "Bulud Konsolu Bildirişləri"
+            }
+          ],
+          "address": [
+            {
+              "text": "alerts@"
+            },
+            {
+              "text": "cloudconsole-admin.example.info",
+              "spot": "domain"
+            }
+          ]
+        },
+        "to": "admin@idare.example",
+        "subject": [
+          {
+            "text": "Kritik: administrator hesabınız 2 saat sonra dayandırılacaq",
+            "spot": "urgency"
+          }
+        ],
+        "time": "06:12",
+        "body": [
+          [
+            {
+              "text": "Hörmətli administrator,"
+            }
+          ],
+          [
+            {
+              "text": "Tenantınız üçün çoxfaktorlu autentifikasiyanı (MFA) yenidən qeydiyyatdan keçirin."
+            }
+          ],
+          [
+            {
+              "text": "Konsola daxil olun: "
+            },
+            {
+              "text": "console-login.example.info/admin",
+              "spot": "link"
+            }
+          ],
+          [
+            {
+              "text": "Sonra təsdiq kodunu sizə zəng edən dəstək əməkdaşına deyin.",
+              "spot": "code-share"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Səhv domen",
+          "explain": "Provayderin bildirişləri onun öz domenindən gəlir. Konsolu həmişə öz əlfəcininizdən açın."
+        },
+        {
+          "id": "urgency",
+          "label": "Dayandırma təhdidi",
+          "explain": "İki saatlıq müddət yoxlamağa vaxt qoymamaq üçündür."
+        },
+        {
+          "id": "link",
+          "label": "Saxta giriş səhifəsi",
+          "explain": "Bu səhifə parolunuzu və kodunuzu real vaxtda hücumçuya ötürə bilər. Adi kodlar bunun qarşısını almır."
+        },
+        {
+          "id": "code-share",
+          "label": "Kodu kiməsə demək",
+          "explain": "Əsl dəstək heç vaxt təsdiq kodunuzu soruşmur. Kodu demək hesabı təhvil vermək deməkdir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "remote-support",
+      "question": {
+        "prompt": "Təchizatçının dəstək xidməti zəng edir və serverə uzaqdan giriş istəyir. Nə edirsiniz?",
+        "options": [
+          {
+            "id": "call-back",
+            "label": "Zəngi bitirirəm və müqavilədəki nömrəyə zəng edirəm",
+            "correct": true,
+            "feedback": "Düzdür. Bildiyiniz kanal vasitəsilə yoxlayın, sonra girişi yalnız təsdiqlənmiş alətlə verin."
+          },
+          {
+            "id": "install",
+            "label": "Dedikləri aləti quraşdırıram və kodu deyirəm",
+            "correct": false,
+            "feedback": "Bu, zəng edənə sistemə tam giriş verir. Hücumlarda uzaqdan idarəetmə alətlərindən məhz belə sui-istifadə edilir."
+          },
+          {
+            "id": "watch",
+            "label": "İcazə verirəm, amma ekranı izləyirəm",
+            "correct": false,
+            "feedback": "İzləmək kifayət deyil. Arxa qapı yerləşdirmək bir neçə saniyə çəkir."
+          }
+        ]
+      },
+      "explain": "Gözlənilməz uzaqdan giriş sorğusu həmişə bildiyiniz kanalla yoxlanılır və giriş yalnız təsdiqlənmiş alətlə verilir."
+    },
+    {
+      "type": "swipe",
+      "id": "secrets",
+      "prompt": "Belə etmək təhlükəsizdirmi?",
+      "cards": [
+        {
+          "id": "ticket-password",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Tiket 4821"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Sonrakı növbədəkilər görsün deyə server parolunu şərhə yazdım."
+                  }
+                ],
+                "time": "02:30"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Tiketləri çox adam görür və onlar arxivdə qalır. Parolu dəyişin və sirlər anbarına köçürün."
+        },
+        {
+          "id": "vault-share",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "DevOps qrupu"
+              }
+            ],
+            "messages": [
+              {
+                "from": "me",
+                "body": [
+                  {
+                    "text": "Açarı sirlər anbarına əlavə etdim və sizə oxumaq icazəsi verdim."
+                  }
+                ],
+                "time": "11:20"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Çatda açarın özü yoxdur, yalnız anbarda giriş icazəsi verilib. Düzgün yol budur."
+        },
+        {
+          "id": "env-in-repo",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://git.idare.example/infra/deploy/-/blob/main/.env"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": ".env faylı repozitoriyaya əlavə edilib. Açarlar tarixçədə qalır, ona görə faylı silmək kifayət deyil. Açarları dərhal dəyişin."
+        },
+        {
+          "id": "keys-issued",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "Təhlükəsizlik komandası"
+                }
+              ],
+              "address": [
+                {
+                  "text": "security@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Administrator hesabları üçün təhlükəsizlik açarları"
+              }
+            ],
+            "time": "15:00",
+            "body": [
+              [
+                {
+                  "text": "Bazar ertəsindən etibarən idarəetmə panelinə giriş üçün fiziki açar tələb olunur. Açarınızı 305 nömrəli otaqdan şəxsən götürün."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Link yoxdur, heç nə yükləmək və ya yazmaq lazım deyil, açar şəxsən təhvil verilir. Bu dəyişiklik sizi daha təhlükəsiz edir."
+        },
+        {
+          "id": "shared-admin",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Kamran (şəbəkə)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Məzuniyyətə çıxıram, administrator parolum budur, lazım olsa istifadə et."
+                  }
+                ],
+                "time": "18:55"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Ortaq administrator hesabında kimin nə etdiyini müəyyən etmək mümkün deyil. Əvəzedici şəxs öz hesabında müvəqqəti hüquqlar almalıdır."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "right-account",
+      "prompt": "Hər tapşırığı düzgün hesabla uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "mail",
+          "left": "Məktub oxumaq",
+          "right": "Gündəlik iş üçün adi hesab"
+        },
+        {
+          "id": "config",
+          "left": "Serverin konfiqurasiyası",
+          "right": "Ayrıca administrator hesabı"
+        },
+        {
+          "id": "script",
+          "left": "Avtomatlaşdırılmış skript",
+          "right": "Minimum hüquqlu xidmət hesabı"
+        },
+        {
+          "id": "emergency",
+          "left": "Təcili giriş",
+          "right": "Anbarda saxlanılan, nəzarət olunan hesab"
+        }
+      ],
+      "explain": "Hər tapşırığa yalnız lazım olan hüquqları verin. Administrator hesabından nə qədər az istifadə olunsa, hədəf bir o qədər kiçik olar."
+    },
+    {
+      "type": "scenario",
+      "id": "night-prompt",
+      "title": "Gecə gələn sorğu",
+      "start": "prompt",
+      "nodes": [
+        {
+          "id": "prompt",
+          "text": "Saat 02:00-dır. Telefonunuzda administrator hesabınıza girişi təsdiqləmək üçün sorğu görünür, siz isə yatırdınız.",
+          "choices": [
+            {
+              "label": "Rədd edirəm və təhlükəsizlik komandasını xəbərdar edirəm",
+              "next": "reuse",
+              "feedback": "Düzdür. Gözlənilməz sorğu kiminsə parolunuzu bildiyini göstərir."
+            },
+            {
+              "label": "Sorğular kəsilsin deyə təsdiqləyirəm",
+              "outcome": "compromised",
+              "feedback": "Hücumçu idarəetmə panelindədir. Buna «push bombing», yəni sorğu bombardmanı hücumu deyilir."
+            }
+          ]
+        },
+        {
+          "id": "reuse",
+          "text": "Bu paroldan başqa yerdə istifadə etmisiniz?",
+          "speaker": "Təhlükəsizlik komandası",
+          "voice": "man-3",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Bu paroldan <short pause> başqa yerdə istifadə etmisiniz?",
+          "choices": [
+            {
+              "label": "Bəli, şəxsi hesabda da. Hər ikisini dəyişəcəyəm",
+              "next": "harden",
+              "feedback": "Dürüst cavabdır. Başqa saytlardan sızan parollar çox vaxt məhz belə sınaqdan keçirilir."
+            },
+            {
+              "label": "Utanıram və heç nə demirəm",
+              "outcome": "risky",
+              "feedback": "Komanda sızmanın mənbəyini tapa bilmir. Dürüstlük araşdırmanı sürətləndirir."
+            }
+          ]
+        },
+        {
+          "id": "harden",
+          "text": "Parol dəyişdirildi. Bəs sonra?",
+          "choices": [
+            {
+              "label": "Aktiv sessiyaları bağlayıram və hesabı fiziki açara keçirirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Sessiyaları bağlamaq açıq qalan girişləri kəsir, fiziki açar isə fişinqə davamlıdır."
+            },
+            {
+              "label": "Hər şey qaydasındadır, işə qayıdıram",
+              "outcome": "risky",
+              "feedback": "Açıq sessiyalar və tokenlər hələ də aktiv ola bilər. Onları da bağlayın."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "İdarəetmə işi administrator hesabında, gündəlik iş adi hesabda.",
+        "Sirləri kodda və yazışmalarda saxlamayın, sızan hər şeyi dərhal dəyişin.",
+        "Gözlənilməz uzaqdan giriş sorğularını bildiyiniz kanalla yoxlayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

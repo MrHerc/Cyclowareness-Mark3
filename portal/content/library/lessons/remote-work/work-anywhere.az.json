@@ -1,0 +1,364 @@
+{
+  "id": "work-anywhere",
+  "title": "Harada işləsəniz də",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "protection-stays",
+          "say": "Evdə və ya kafedə işləyəndə ofisin qoruma vasitələri sizinlə birlikdə gəlmir. Təhlükəsizliyi özünüz təmin etməlisiniz.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        },
+        {
+          "id": "vpn",
+          "say": "İş sistemlərinə yalnız təşkilatınızın VPN-i ilə qoşulun. Pulsuz VPN tətbiqləri məlumatlarınızı başqalarına ötürə bilər.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "vpn"
+          }
+        },
+        {
+          "id": "open-wifi",
+          "say": "Hər kəs kafenin açıq şəbəkəsi ilə eyni adlı saxta şəbəkə yarada bilər. İmkanınız varsa, onun əvəzinə telefonunuzun modem rejimindən istifadə edin.",
+          "mood": "think",
+          "visual": {
+            "kind": "illustration",
+            "id": "wifi"
+          }
+        },
+        {
+          "id": "shoulder",
+          "say": "Arxanızdakı adamlar ekranınızı və yazdığınız parolu görə bilər. Arxanızı divara verib oturun və ekranda məxfilik filtrindən istifadə edin.",
+          "mood": "alert",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "family",
+          "say": "İş noutbuku ailə üzvləri üçün deyil. Evdə kiminsə yüklədiyi oyun özü ilə zərərli proqram gətirə bilər.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "cafe-networks",
+      "prompt": "Bu kafedəki hansı şəbəkələr şübhəlidir?",
+      "artifact": {
+        "kind": "wifi",
+        "networks": [
+          {
+            "ssid": [
+              {
+                "text": "Cinar_Pulsuz_WiFi",
+                "spot": "twin"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "Cinar-Cayxana"
+              }
+            ],
+            "secured": true,
+            "signal": 3
+          },
+          {
+            "ssid": [
+              {
+                "text": "Free_Internet_BAKU",
+                "spot": "free"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "RXAgentlik-Staff",
+                "spot": "staff"
+              }
+            ],
+            "secured": false,
+            "signal": 2
+          },
+          {
+            "ssid": [
+              {
+                "text": "Aynurun telefonu"
+              }
+            ],
+            "secured": true,
+            "signal": 4
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "twin",
+          "label": "Oxşar ad",
+          "explain": "Kafenin adını təqlid edən açıq şəbəkə. Parolu yoxdur və saxta ola bilər. Əsl şəbəkəni kafe işçilərindən soruşun."
+        },
+        {
+          "id": "free",
+          "label": "Sahibi naməlumdur",
+          "explain": "Sahibi bilinməyən açıq şəbəkə sizi saxta giriş səhifəsinə yönləndirə bilər."
+        },
+        {
+          "id": "staff",
+          "label": "Təşkilatınızın adı",
+          "explain": "Təşkilatınızın şəbəkəsi kafedə ola bilməz. Bu şəbəkə sizi aldatmaq üçün qurulub."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "swipe",
+      "id": "home-setup",
+      "prompt": "Evdən işləyərkən bunlardan hansı təhlükəsizdir?",
+      "cards": [
+        {
+          "id": "default-router",
+          "artifact": {
+            "kind": "login",
+            "brand": "HomeRouter",
+            "url": [
+              {
+                "text": "http://192.168.1.1"
+              }
+            ],
+            "fields": [
+              "İstifadəçi adı: admin",
+              "Parol: admin"
+            ],
+            "button": "Daxil ol"
+          },
+          "verdict": "threat",
+          "explain": "Zavod parolları hamıya məlumdur. Routerin parolunu elə indi dəyişin."
+        },
+        {
+          "id": "share-password",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Tural, həmkar"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Evdən sistemə girə bilmirəm. Parolunu de, cəmi bir dəqiqəlik."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Parol heç kimlə, hətta həmkarla belə paylaşılmır. Ona İT dəstəyinə müraciət etməyi təklif edin."
+        },
+        {
+          "id": "vpn-update",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "İT dəstəyi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it@rxagentlik.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "VPN tətbiqinin yeni versiyası"
+              }
+            ],
+            "time": "08:30",
+            "body": [
+              [
+                {
+                  "text": "Yeniləmə iş kompüterinizə avtomatik quraşdırılacaq. Heç nə yükləməyin."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Domen düzgündür və sizdən heç nə yükləmək istənmir."
+        },
+        {
+          "id": "free-vpn",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://super-free-vpn.top/download"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Naməlum pulsuz VPN trafikinizi oxuya bilər. İş üçün yalnız təşkilatın VPN-indən istifadə edin."
+        },
+        {
+          "id": "home-wifi",
+          "artifact": {
+            "kind": "wifi",
+            "networks": [
+              {
+                "ssid": [
+                  {
+                    "text": "Ev_5G"
+                  }
+                ],
+                "secured": true,
+                "signal": 4
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Parolla qorunan ev şəbəkəsi. Routerin parolu da dəyişdirilibsə, bu, yaxşı başlanğıcdır."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "home-and-cafe",
+      "title": "Evdə və kafedə",
+      "start": "evening",
+      "nodes": [
+        {
+          "id": "evening",
+          "text": "Sənin iş noutbukuna bir oyun yükləyə bilərəm? Mənimki çox yavaş işləyir.",
+          "speaker": "Ailə üzvü",
+          "voice": "young-man",
+          "channel": "in-person",
+          "manner": "natural",
+          "spoken": "Sənin iş noutbukuna bir oyun yükləyə bilərəm? <short pause> Mənimki çox yavaş işləyir.",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          },
+          "choices": [
+            {
+              "label": "Yaxşı, amma cəmi bir saatlığa",
+              "outcome": "compromised",
+              "feedback": "Oyunla birlikdə zərərli proqram gəldi və iş hesablarınız indi risk altındadır."
+            },
+            {
+              "label": "Yox, iş noutbuku yalnız iş üçündür",
+              "next": "cafe",
+              "feedback": "Düzdür. Səbəbini sakitcə izah edin."
+            }
+          ]
+        },
+        {
+          "id": "cafe",
+          "text": "Ertəsi gün kafedə işləyirsiniz. Sifariş vermək üçün piştaxtaya getməlisiniz, noutbukunuz isə açıqdır.",
+          "choices": [
+            {
+              "label": "Açıq qoyuram, cəmi iki dəqiqəlik işdir",
+              "outcome": "risky",
+              "feedback": "İki dəqiqə ekrana baxmaq, fleş kart taxmaq və ya noutbuku götürmək üçün kifayətdir."
+            },
+            {
+              "label": "Ekranı kilidləyib noutbuku özümlə götürürəm",
+              "next": "call",
+              "feedback": "Əla vərdişdir."
+            }
+          ]
+        },
+        {
+          "id": "call",
+          "text": "Masanıza qayıdanda rəhbəriniz zəng edib məxfi layihənin rəqəmlərini soruşur. Yaxınlıqda adamlar oturub.",
+          "choices": [
+            {
+              "label": "Rəqəmləri ucadan deyirəm",
+              "outcome": "risky",
+              "feedback": "Yaxındakılar eşidə bilər. Məxfi söhbətlər ictimai yerdə aparılmır."
+            },
+            {
+              "label": "Sakit yerə keçib geri zəng edəcəyimi deyirəm",
+              "outcome": "safe",
+              "feedback": "Afərin. Məxfi zəngləri yalnız heç kimin eşidə bilməyəcəyi yerdə edin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "home-router",
+      "question": {
+        "prompt": "Ev routeriniz üçün hansı addımlar vacibdir?",
+        "options": [
+          {
+            "id": "admin-password",
+            "label": "Zavod admin parolunu dəyişmək",
+            "correct": true,
+            "feedback": "Zavod parolunu hər kəs internetdə tapa bilər."
+          },
+          {
+            "id": "firmware",
+            "label": "Routerin proqram təminatını yeniləmək",
+            "correct": true,
+            "feedback": "Yeniləmələr məlum boşluqları bağlayır."
+          },
+          {
+            "id": "encryption",
+            "label": "WPA3 və ya WPA2 şifrələməsini seçmək",
+            "correct": true,
+            "feedback": "Bu, şəbəkənizi kənar dinləmədən qoruyur."
+          },
+          {
+            "id": "no-password",
+            "label": "Sürət üçün Wi-Fi şəbəkəsini parolsuz qoymaq",
+            "correct": false,
+            "feedback": "Ona hər kəs qoşula bilər, üstəlik bu, interneti sürətləndirmir."
+          }
+        ],
+        "multi": true,
+        "visual": {
+          "kind": "illustration",
+          "id": "wifi"
+        }
+      },
+      "explain": "Router evinizin internetə açılan qapısıdır. Zavod parolu və köhnə proqram təminatı bu qapını açıq qoyur."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "İş sistemlərinə yalnız təşkilatın VPN-i ilə qoşulun.",
+        "Açıq Wi-Fi əvəzinə telefonunuzun modem rejimindən istifadə edin.",
+        "İş noutbukunu ailə üzvləri ilə paylaşmayın və ekranı kilidləyin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

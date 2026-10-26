@@ -8,7 +8,7 @@ import { normaliseHost } from "./auth/domain-proof";
 import { destinationProblem } from "./net-guard";
 import { env } from "./env";
 import { parseEmailMarkup } from "../lib/email-markup";
-import { withDefaults } from "../lib/tenant-defaults";
+import { EMAIL_BUTTON_LABEL, withDefaults } from "../lib/tenant-defaults";
 import { TEMPLATE_BY_KEY, templateText } from "../lib/campaigns/templates";
 
 /**
@@ -17,7 +17,7 @@ import { TEMPLATE_BY_KEY, templateText } from "../lib/campaigns/templates";
  * `fromName` replaces the organisation's display name for this one message (phishing
  * simulations show the template's sender); the address is always the organisation's own.
  */
-export type Mail = { to: string; subject: string; text: string; html?: string; kind: string; fromName?: string };
+export type Mail = { to: string; subject: string; text: string; html?: string; kind: string; fromName?: string; /** Language of the message (the `lang` of the HTML and the default button label). */ lang: string };
 
 function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
@@ -25,9 +25,11 @@ function escapeHtml(s: string): string {
 
 /**
  * Simple branded HTML from plain text; URLs on their own line become buttons. With `markup`
- * (notification templates), **bold**, _italic_ and [text](https://…) links are rendered too.
+ * (notification templates), **bold**, _italic_ and [text](https://…) links are rendered too. `lang` is the
+ * language of the text (mail clients' screen readers and spell-checkers use it) and of the default button label.
  */
-export function renderEmailHtml(text: string, opts: { brand?: string; footer?: string; buttonLabel?: string; markup?: boolean } = {}): string {
+export function renderEmailHtml(text: string, opts: { brand?: string; footer?: string; buttonLabel?: string; markup?: boolean; lang?: string } = {}): string {
+  const lang = opts.lang ?? "en";
   const brand = opts.brand ?? "#4f46e5";
   const inline = (s: string) =>
     opts.markup
@@ -46,12 +48,12 @@ export function renderEmailHtml(text: string, opts: { brand?: string; footer?: s
     .map((para) => {
       const trimmed = para.trim();
       if (/^https?:\/\/\S+$/.test(trimmed)) {
-        return `<p style="margin:24px 0"><a href="${escapeHtml(trimmed)}" style="display:inline-block;background:${brand};color:#fff;text-decoration:none;font-weight:600;padding:12px 22px;border-radius:999px">${escapeHtml(opts.buttonLabel ?? "Open")}</a></p>`;
+        return `<p style="margin:24px 0"><a href="${escapeHtml(trimmed)}" style="display:inline-block;background:${brand};color:#fff;text-decoration:none;font-weight:600;padding:12px 22px;border-radius:999px">${escapeHtml(opts.buttonLabel ?? EMAIL_BUTTON_LABEL[lang] ?? EMAIL_BUTTON_LABEL.en)}</a></p>`;
       }
       return `<p style="margin:0 0 14px;line-height:1.55">${inline(trimmed).replace(/\n/g, "<br>")}</p>`;
     })
     .join("");
-  return `<!doctype html><html><body style="margin:0;background:#f7f6fb;font-family:Segoe UI,Arial,sans-serif;color:#16123a"><div style="max-width:560px;margin:0 auto;padding:32px 20px"><div style="background:#fff;border:1px solid #e7e5f0;border-radius:20px;padding:28px">${body}</div>${opts.footer ? `<p style="font-size:12px;color:#6b6788;margin:16px 8px">${escapeHtml(opts.footer)}</p>` : ""}</div></body></html>`;
+  return `<!doctype html><html lang="${escapeHtml(lang)}"><body style="margin:0;background:#f7f6fb;font-family:Segoe UI,Arial,sans-serif;color:#16123a"><div style="max-width:560px;margin:0 auto;padding:32px 20px"><div style="background:#fff;border:1px solid #e7e5f0;border-radius:20px;padding:28px">${body}</div>${opts.footer ? `<p style="font-size:12px;color:#6b6788;margin:16px 8px">${escapeHtml(opts.footer)}</p>` : ""}</div></body></html>`;
 }
 
 type Transport = { transporter: Transporter; address: string; name: string; replyTo?: string };
@@ -150,7 +152,7 @@ async function simulationInfo(db: DB, m: { kind: string; text: string }): Promis
  * job runner sends it (bulk sends such as campaigns and invitations stay out of the request).
  */
 export async function queueEmail(db: DB, tenantId: string | null, mail: Mail, opts: { defer?: boolean } = {}): Promise<{ id: string; status: "sent" | "failed" | "logged" | "queued" }> {
-  const html = mail.html ?? renderEmailHtml(mail.text);
+  const html = mail.html ?? renderEmailHtml(mail.text, { lang: mail.lang });
   const [row] = await db
     .insert(t.outbox)
     .values({ tenantId, to: mail.to, subject: mail.subject, text: mail.text, html, kind: mail.kind, status: "queued" })
@@ -188,11 +190,14 @@ type Delivery = { status: "sent" | "failed" | "logged" | "queued"; stop: boolean
 type OutboxRow = typeof t.outbox.$inferSelect;
 type TransportCache = Map<string, Transport | TransportProblem>;
 
-/** One attempt used up: the message stays queued for the retry schedule, or fails after the last attempt. */
-async function recordFailure(db: DB, m: OutboxRow, error: string, stop: boolean): Promise<Delivery> {
+/**
+ * One attempt used up: the message stays queued for the retry schedule, or fails after the last attempt.
+ * `error` is a code (MailTestError or "unresolvable"), which Settings → Email shows in the admin's language.
+ */
+async function recordFailure(db: DB, m: OutboxRow, error: MailTestError | "unresolvable", stop: boolean): Promise<Delivery> {
   const attempts = m.attempts + 1;
   const status = attempts >= MAX_MAIL_ATTEMPTS ? "failed" : "queued";
-  await db.update(t.outbox).set({ status, attempts, error: error.slice(0, 500) }).where(eq(t.outbox.id, m.id));
+  await db.update(t.outbox).set({ status, attempts, error }).where(eq(t.outbox.id, m.id));
   return { status, stop };
 }
 
@@ -227,7 +232,9 @@ async function deliverRow(db: DB, id: string, opts: { fromName?: string; transpo
     await db.update(t.outbox).set({ status: "sent", sentAt: new Date(), attempts: m.attempts + 1, error: null }).where(eq(t.outbox.id, id));
     return { status: "sent", stop: false };
   } catch (error) {
-    return recordFailure(db, m, String((error as Error)?.message ?? error), stopsServer(error));
+    // The raw server answer goes to the log; the outbox keeps a code the console can translate.
+    console.error(`[mail] delivery of ${m.id} failed`, String((error as Error)?.message ?? error).slice(0, 500));
+    return recordFailure(db, m, classifySmtpError(error), stopsServer(error));
   }
 }
 
@@ -316,7 +323,7 @@ function classifySmtpError(error: unknown): MailTestError {
 }
 
 /** `emailOverride` lets Settings test a server before sending is switched on. */
-export async function sendTestEmail(db: DB, tenantId: string, to: string, subject: string, text: string, emailOverride?: TenantSettings["email"]): Promise<{ ok: true } | { ok: false; error: MailTestError }> {
+export async function sendTestEmail(db: DB, tenantId: string, to: string, subject: string, text: string, emailOverride?: TenantSettings["email"], lang = "en"): Promise<{ ok: true } | { ok: false; error: MailTestError }> {
   const e = emailOverride;
   if (e?.host && (await destinationProblem(e.host, e.port ?? 587, "smtp"))) return { ok: false, error: "blocked_destination" };
   const transport = await transportFor(db, tenantId, emailOverride);
@@ -324,7 +331,7 @@ export async function sendTestEmail(db: DB, tenantId: string, to: string, subjec
   if (typeof transport === "string") return { ok: false, error: transport };
   try {
     await transport.transporter.verify();
-    await transport.transporter.sendMail({ from: fromHeader(transport), to, subject, text, html: renderEmailHtml(text) });
+    await transport.transporter.sendMail({ from: fromHeader(transport), to, subject, text, html: renderEmailHtml(text, { lang }) });
     return { ok: true };
   } catch (error) {
     return { ok: false, error: classifySmtpError(error) };

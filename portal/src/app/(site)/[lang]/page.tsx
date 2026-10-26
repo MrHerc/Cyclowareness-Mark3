@@ -49,7 +49,8 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
       <a href="#hero" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-pill focus:bg-surface focus:px-4 focus:py-2 focus:shadow-raised">
         {copy.tour.chapters.hero}
       </a>
-      <header className="sticky top-0 z-20 border-b border-transparent bg-canvas/85 backdrop-blur supports-[backdrop-filter]:bg-canvas/70">
+      {/* data-site-header: the travelling guide cat keeps below it. */}
+      <header data-site-header className="sticky top-0 z-20 border-b border-transparent bg-canvas/85 backdrop-blur supports-[backdrop-filter]:bg-canvas/70">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 pt-[calc(var(--safe-top)+0.75rem)] pb-3 sm:gap-4 sm:px-8">
           {/* The actions never shrink; the brand gives way instead. Its wordmark wraps onto a second line that h-8 clips
               whenever it no longer fits beside them (a long sign-in label on a 320 px phone), leaving the shield. */}
@@ -72,7 +73,7 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
                 ))}
               </ul>
             </details>
-            <Link href="/sign-in" className="h-10 content-center rounded-pill px-3 text-caption font-semibold whitespace-nowrap text-ink hover:bg-sunken sm:px-4 pointer-coarse:h-11">
+            <Link href="/login" className="h-10 content-center rounded-pill px-3 text-caption font-semibold whitespace-nowrap text-ink hover:bg-sunken sm:px-4 pointer-coarse:h-11">
               {copy.ui.signIn}
             </Link>
           </div>
@@ -86,7 +87,7 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
 
         <section aria-labelledby="faq-title" className="px-4 py-20 sm:px-8">
           <div className="mx-auto max-w-3xl">
-            <h2 id="faq-title" className="text-center font-display text-headline font-bold">
+            <h2 id="faq-title" data-perch="faq-title" data-perch-text className="text-center font-display text-headline font-bold">
               {copy.faq.title}
             </h2>
             <div className="mt-10 grid gap-3">
@@ -106,7 +107,7 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
         {site.partners.length ? (
           <section aria-labelledby="partners-title" className="px-4 py-16 sm:px-8">
             <div className="mx-auto max-w-6xl">
-              <h2 id="partners-title" className="text-center font-display text-headline font-bold">
+              <h2 id="partners-title" data-perch="partners-title" data-perch-text className="text-center font-display text-headline font-bold">
                 {copy.ui.partnersLabel}
               </h2>
               <ul className="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-6">
@@ -124,7 +125,7 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
         {site.testimonials.length ? (
           <section aria-labelledby="testimonials-title" className="px-4 py-16 sm:px-8">
             <div className="mx-auto max-w-6xl">
-              <h2 id="testimonials-title" className="text-center font-display text-headline font-bold">
+              <h2 id="testimonials-title" data-perch="testimonials-title" data-perch-text className="text-center font-display text-headline font-bold">
                 {copy.ui.testimonialsLabel}
               </h2>
               <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -142,7 +143,8 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
         ) : null}
       </main>
 
-      <footer className="border-t border-line px-4 py-10 sm:px-8">
+      {/* The guide cat's last perch: the footer's top line, towards the right. */}
+      <footer data-perch="footer" data-perch-at="0.86" className="border-t border-line px-4 py-10 sm:px-8">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4">
           <div className="grid gap-1">
             <BrandMark href={`/${lang}`} label={copy.ui.home} />

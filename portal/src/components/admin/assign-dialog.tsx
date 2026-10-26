@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Segmented, Select } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
+import { searchFold } from "@/components/secops/search-fold";
 import { cn } from "@/lib/cn";
 
 type Option = { id: string; title: string; meta: string };
@@ -41,7 +42,7 @@ export function AssignDialog({
   const [dueDays, setDueDays] = useState(30);
   const [reason, setReason] = useState("");
   const [pending, start] = useTransition();
-  const list = useMemo(() => (target === "module" ? modules : paths).filter((m) => !q || m.title.toLocaleLowerCase().includes(q.toLocaleLowerCase())), [target, modules, paths, q]);
+  const list = useMemo(() => (target === "module" ? modules : paths).filter((m) => !q || searchFold(m.title).includes(searchFold(q))), [target, modules, paths, q]);
   const valid = !!targetId && (scope !== "department" || !!departmentId) && (scope !== "user" || !!userId) && (dueKind !== "fixed" || !!dueDate);
 
   return (
@@ -129,7 +130,7 @@ export function AssignDialog({
             {dueKind === "after_joining" ? (
               <label className="flex items-center gap-2 text-body-sm">
                 <Input type="number" min={1} max={365} value={dueDays} onChange={(e) => setDueDays(Number(e.target.value))} className="w-28" />
-                {t("days")}
+                {t("daysUnit", { count: dueDays })}
               </label>
             ) : null}
           </div>

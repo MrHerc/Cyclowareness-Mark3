@@ -107,7 +107,7 @@ export default async function ApprovalsPage({ searchParams }: PageProps<"/admin/
                               <Pill tone={d.decision === "approve" ? "safe" : d.decision === "reject" ? "risk" : "neutral"}>{tr(`decision.${d.decision}`)}</Pill>
                               <span>{people.get(d.actorId)?.name ?? "—"}</span>
                               <span className="text-ink-subtle">{format.dateTime(d.at, { dateStyle: "medium", timeStyle: "short" })}</span>
-                              {d.reason ? <span className="w-full text-ink-muted">«{d.reason}»</span> : null}
+                              {d.reason ? <span className="w-full text-ink-muted">{tr("reasonQuoted", { reason: d.reason })}</span> : null}
                             </li>
                           ))}
                         </ul>

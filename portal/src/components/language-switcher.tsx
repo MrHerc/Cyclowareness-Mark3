@@ -12,8 +12,10 @@ import { cn } from "@/lib/cn";
  * Interface language picker. The visible face is drawn by us (globe + code on phones, the full
  * name from sm up) so it never pushes a header past 320 px; the native select sits transparently
  * on top of it, so the options, keyboard handling and accessible name stay the platform's.
+ * `locales`: the languages the organisation has switched on (Settings → Languages) for a signed-in
+ * person; every interface language when signed out.
  */
-export function LanguageSwitcher({ className }: { className?: string }) {
+export function LanguageSwitcher({ className, locales = LOCALES }: { className?: string; locales?: readonly string[] }) {
   const locale = useLocale() as Locale;
   const router = useRouter();
   const t = useTranslations("auth");
@@ -44,8 +46,8 @@ export function LanguageSwitcher({ className }: { className?: string }) {
         }
         className="absolute -inset-px cursor-pointer appearance-none rounded-pill opacity-0"
       >
-        {LOCALES.map((l) => (
-          <option key={l} value={l}>
+        {LOCALES.filter((l) => l === locale || locales.includes(l)).map((l) => (
+          <option key={l} value={l} lang={l}>
             {LOCALE_NAMES[l]} · {l.toUpperCase()}
           </option>
         ))}

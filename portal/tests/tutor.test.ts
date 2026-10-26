@@ -104,6 +104,19 @@ describe("offlineAnswer", () => {
     expect(offlineAnswer(ru, "a", "Зачем проверять отправителя?").startsWith("Проверьте адрес отправителя.")).toBe(true);
   });
 
+  it("matches words of translated lessons whatever the learner types for İ, ı or ё", () => {
+    const az: Scene[] = [
+      { type: "tutor", id: "a", beats: [{ id: "a1", say: "Bank yoxlamanı telefonla etməz.", mood: "talk" }] },
+      { type: "recap", id: "r", points: ["İkiaddımlı yoxlamanı açın."] },
+    ];
+    expect(offlineAnswer(az, "a", "ikiaddımlı yoxlamanı haradan açım?").startsWith("İkiaddımlı yoxlamanı açın.")).toBe(true);
+    const ru: Scene[] = [
+      { type: "tutor", id: "a", beats: [{ id: "a1", say: "Делать перевод по звонку нельзя.", mood: "talk" }] },
+      { type: "recap", id: "r", points: ["Идёт звонок: положите трубку."] },
+    ];
+    expect(offlineAnswer(ru, "a", "идет звонок, что делать?").startsWith("Идёт звонок: положите трубку.")).toBe(true);
+  });
+
   // Sentence identity as a learner reads it: case, emphasis and the closing full stop do not matter.
   const repeated = (answer: string) => {
     const keys = answer

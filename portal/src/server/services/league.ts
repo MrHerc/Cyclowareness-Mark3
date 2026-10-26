@@ -3,6 +3,7 @@ import type { DB } from "../db/client";
 import * as t from "../db/schema";
 import { resolveAssignments } from "./assignments";
 import { rankLeague, withTrend, type DepartmentStats, type LeagueRowWithTrend } from "../../lib/domain/league";
+import { withDefaults } from "../../lib/tenant-defaults";
 
 const DAY = 86_400_000;
 /** Reporting counts simulations sent in the last 90 days. */
@@ -16,13 +17,16 @@ const TREND_DAYS = 7;
  * Events after the cut-off are ignored (lesson completions, simulations sent and reports).
  */
 export async function departmentLeague(db: DB, tenantId: string, now = new Date()): Promise<LeagueRowWithTrend[]> {
-  const [departments, users] = await Promise.all([
+  const [departments, users, [tenant]] = await Promise.all([
     db.select({ id: t.departments.id, name: t.departments.name }).from(t.departments).where(eq(t.departments.tenantId, tenantId)),
     db
       .select({ id: t.users.id, departmentId: t.users.departmentId })
       .from(t.users)
       .where(and(eq(t.users.tenantId, tenantId), eq(t.users.status, "active"))),
+    db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenantId)),
   ]);
+  // Ties are ordered by name the way the organisation's language sorts it (Ə, Ç, Ş in place), the same for every viewer.
+  const collation = withDefaults(tenant?.settings).defaultLocale;
   const assigned = await resolveAssignments(db, tenantId);
   const moduleIds = [...new Set([...assigned.values()].flatMap((m) => [...m.keys()]))];
   const lessons = moduleIds.length ? await db.select({ id: t.lessons.id, moduleId: t.lessons.moduleId }).from(t.lessons).where(inArray(t.lessons.moduleId, moduleIds)) : [];
@@ -82,5 +86,5 @@ export async function departmentLeague(db: DB, tenantId: string, now = new Date(
     });
   };
 
-  return withTrend(rankLeague(statsAt(now)), rankLeague(statsAt(new Date(now.getTime() - TREND_DAYS * DAY))));
+  return withTrend(rankLeague(statsAt(now), collation), rankLeague(statsAt(new Date(now.getTime() - TREND_DAYS * DAY)), collation));
 }

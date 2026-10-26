@@ -1,0 +1,510 @@
+{
+  "id": "public-wifi",
+  "title": "İctimai Wi-Fi",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "b-tutor",
+      "beats": [
+        {
+          "id": "b-b1",
+          "say": "Kafelərdə, hava limanlarında və otellərdə pulsuz Wi-Fi rahatdır. Bəs onu kim qurub?",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "wifi"
+          }
+        },
+        {
+          "id": "b-b2",
+          "say": "Hücumçu kafenin şəbəkə adını eynilə və ya çox oxşar şəkildə kopyalaya bilər. Buna «şər əkiz» hücumu deyilir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "wifi",
+              "networks": [
+                {
+                  "ssid": [
+                    {
+                      "text": "Cafe_Nargiz"
+                    }
+                  ],
+                  "secured": true,
+                  "signal": 3
+                },
+                {
+                  "ssid": [
+                    {
+                      "text": "Cafe_Nargiz_Free",
+                      "spot": "twin"
+                    }
+                  ],
+                  "secured": false,
+                  "signal": 4
+                },
+                {
+                  "ssid": [
+                    {
+                      "text": "Home-5G"
+                    }
+                  ],
+                  "secured": true,
+                  "signal": 1
+                }
+              ]
+            }
+          },
+          "highlight": "twin"
+        },
+        {
+          "id": "b-b3",
+          "say": "Saxta şəbəkə iş parolunuzu istəyən giriş səhifəsi aça bilər. Wi-Fi üçün bu parolu heç vaxt yazmayın.",
+          "mood": "alert",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "login",
+              "brand": "Pulsuz Wi-Fi",
+              "url": [
+                {
+                  "text": "wifi-giris.test",
+                  "spot": "portal-url"
+                }
+              ],
+              "fields": [
+                "İş e-poçtu",
+                "E-poçt parolu"
+              ],
+              "button": "Qoşul"
+            }
+          },
+          "highlight": "portal-url"
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "cafe-twin",
+      "environment": "phone",
+      "title": "Kafedə Wi-Fi",
+      "intro": "Kafedən iş məktubu göndərməlisiniz. Hansı şəbəkəyə qoşulursunuz?",
+      "steps": [
+        {
+          "id": "networks",
+          "artifact": {
+            "kind": "wifi",
+            "networks": [
+              {
+                "ssid": [
+                  {
+                    "text": "Kafe_Nargiz"
+                  }
+                ],
+                "secured": true,
+                "signal": 2
+              },
+              {
+                "ssid": [
+                  {
+                    "text": "Kafe_Nargiz_Free"
+                  }
+                ],
+                "secured": false,
+                "signal": 4
+              },
+              {
+                "ssid": [
+                  {
+                    "text": "DIRECT-Printer"
+                  }
+                ],
+                "secured": true,
+                "signal": 1
+              }
+            ]
+          },
+          "say": "İki oxşar ad var. Biri açıqdır və siqnalı güclüdür.",
+          "actions": [
+            {
+              "id": "free",
+              "label": "Kafe_Nargiz_Free şəbəkəsinə qoşul",
+              "kind": "connect",
+              "outcome": "risky",
+              "feedback": "Oxşar adlı, açıq və güclü şəbəkə şər əkiz ola bilər. Əvvəlcə dəqiq adı işçilərdən soruşun.",
+              "next": "portal"
+            },
+            {
+              "id": "ask",
+              "label": "Dəqiq adı işçilərdən soruş",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Kafe işçiləri şəbəkənin dəqiq adını və parolunu bilir."
+            },
+            {
+              "id": "mobile",
+              "label": "Əvəzinə mobil internetdən istifadə et",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Əla seçim. Vacib işlər üçün mobil internet ictimai Wi-Fi-dan daha təhlükəsizdir.",
+              "next": "vpn"
+            }
+          ]
+        },
+        {
+          "id": "staff-said",
+          "label": "İşçi: şəbəkənin adı Kafe_Nargiz, parol kassanın yanındadır",
+          "artifact": {
+            "kind": "wifi",
+            "networks": [
+              {
+                "ssid": [
+                  {
+                    "text": "Kafe_Nargiz"
+                  }
+                ],
+                "secured": true,
+                "signal": 2
+              },
+              {
+                "ssid": [
+                  {
+                    "text": "Kafe_Nargiz_Free"
+                  }
+                ],
+                "secured": false,
+                "signal": 4
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "real",
+              "label": "Kafe_Nargiz şəbəkəsinə qoşul",
+              "kind": "connect",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Amma adı da kopyalamaq olar, ona görə iş üçün VPN-i qoşun.",
+              "next": "vpn"
+            },
+            {
+              "id": "free",
+              "label": "Kafe_Nargiz_Free şəbəkəsinə qoşul",
+              "kind": "connect",
+              "outcome": "risky",
+              "feedback": "İşçi bu adı deməyib. Güclü siqnal şər əkizin tipik fəndidir."
+            }
+          ]
+        },
+        {
+          "id": "portal",
+          "label": "Giriş səhifəsi açıldı",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "kafe-nargiz-fake",
+            "brand": "Kafe Nargiz Wi-Fi",
+            "url": [
+              {
+                "text": "http://"
+              },
+              {
+                "text": "kafe-nargiz-wifi.test",
+                "spot": "portal"
+              },
+              {
+                "text": "/giris"
+              }
+            ],
+            "fields": [
+              "İş e-poçtu",
+              "Parol"
+            ],
+            "button": "İnternetə qoşul"
+          },
+          "say": "Wi-Fi səhifəsi iş parolunuzu istəyir.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "İnternetə qoşul",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Wi-Fi üçün iş parolu heç vaxt lazım olmur. Parolu dərhal başqa cihazdan dəyişin və hadisəni bildirin."
+            },
+            {
+              "id": "leave",
+              "label": "Bağla və şəbəkədən çıx",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Doğrudur: iş parolunu istəyən Wi-Fi səhifəsi saxtadır. Telefonunuzun ayarlarında bu şəbəkəni «unudun»."
+            }
+          ]
+        },
+        {
+          "id": "vpn",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "agentlik-vpn",
+            "tone": "app",
+            "title": [
+              {
+                "text": "VPN qoşulmayıb"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "İş e-poçtunu açmaq üçün təşkilatınız VPN tələb edir."
+                }
+              ]
+            ],
+            "buttons": [
+              "VPN-i qoş",
+              "VPN-siz davam et"
+            ]
+          },
+          "actions": [
+            {
+              "id": "vpn",
+              "label": "VPN-i qoş",
+              "kind": "connect",
+              "outcome": "safe",
+              "feedback": "Doğrudur. VPN məlumatı hətta saxta şəbəkədə də şifrələnmiş tunellə ötürür."
+            },
+            {
+              "id": "skip",
+              "label": "VPN-siz davam et",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Hətta qısa iş də risklidir. Təşkilatınız VPN tələb edirsə, həmişə əvvəlcə onu qoşun."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "b-hotspot",
+      "prompt": "Hava limanındasınız. Şübhəli şəbəkələri tapın.",
+      "artifact": {
+        "kind": "wifi",
+        "networks": [
+          {
+            "ssid": [
+              {
+                "text": "Terminal-WiFi"
+              }
+            ],
+            "secured": false,
+            "signal": 3
+          },
+          {
+            "ssid": [
+              {
+                "text": "Terminal_WiFi",
+                "spot": "lookalike"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "Free_Fast_Internet",
+                "spot": "bait-name"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "Terminal-WiFi-VIP",
+                "spot": "vip"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "Cafe-Guest"
+              }
+            ],
+            "secured": true,
+            "signal": 2
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "lookalike",
+          "label": "Rəsmi ada çox oxşar",
+          "explain": "Cəmi bir simvol fərqi şər əkiz əlamətidir. Saxta şəbəkə adı hətta eynilə kopyalaya bilər, ona görə vacib işlər üçün VPN-dən istifadə edin."
+        },
+        {
+          "id": "bait-name",
+          "label": "Cazibədar ad",
+          "explain": "Həddən artıq cazibədar ad yemdir. Bu şəbəkəni kimin qurduğunu heç kim bilmir."
+        },
+        {
+          "id": "vip",
+          "label": "Uydurma VIP şəbəkə",
+          "explain": "Rəsmi lövhədə göstərilməyən əlavə şəbəkə saxta ola bilər."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "swipe",
+      "id": "b-swipe",
+      "prompt": "Qoşulmaq olar, yoxsa risklidir?",
+      "cards": [
+        {
+          "id": "open-unknown",
+          "artifact": {
+            "kind": "wifi",
+            "networks": [
+              {
+                "ssid": [
+                  {
+                    "text": "Free_WiFi_Fast"
+                  }
+                ],
+                "secured": false,
+                "signal": 4
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bu açıq şəbəkəni kimin qurduğu bilinmir. Vacib işlər üçün mobil internetdən istifadə edin."
+        },
+        {
+          "id": "own-hotspot",
+          "artifact": {
+            "kind": "wifi",
+            "networks": [
+              {
+                "ssid": [
+                  {
+                    "text": "Telefonum"
+                  }
+                ],
+                "secured": true,
+                "signal": 4
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Bu, öz telefonunuzun parolla qorunan giriş nöqtəsidir. İctimai şəbəkədən daha təhlükəsizdir."
+        },
+        {
+          "id": "portal-password",
+          "artifact": {
+            "kind": "login",
+            "brand": "Pulsuz Wi-Fi",
+            "url": [
+              {
+                "text": "free-wifi-giris.test"
+              }
+            ],
+            "fields": [
+              "İş e-poçtu",
+              "Parol"
+            ],
+            "button": "Qoşul"
+          },
+          "verdict": "threat",
+          "explain": "Wi-Fi üçün iş parolu heç vaxt lazım olmur. Bu, parolu oğurlayan saxta səhifədir."
+        },
+        {
+          "id": "hotel-room",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "qala-otel",
+            "brand": "Qala Hotel guest Wi-Fi",
+            "url": [
+              {
+                "text": "wifi.otel-qala.test"
+              }
+            ],
+            "fields": [
+              "Otaq nömrəsi",
+              "Soyad"
+            ],
+            "button": "Qoşul"
+          },
+          "verdict": "safe",
+          "explain": "Bir çox otel yalnız otaq nömrəsini və soyadı soruşur, ünvanda da otelin adı var. Parol və ya kart məlumatı istənmir. Şəbəkəni resepsiyada dəqiqləşdirin və iş üçün VPN-dən istifadə edin."
+        },
+        {
+          "id": "wifi-card",
+          "artifact": {
+            "kind": "sms",
+            "sender": [
+              {
+                "text": "WiFi-Xidmet"
+              }
+            ],
+            "time": "17:40",
+            "messages": [
+              [
+                {
+                  "text": "Pulsuz internet paketinizin müddəti bitir. Uzatmaq üçün kart məlumatlarınızı daxil edin: "
+                },
+                {
+                  "text": "wifi-paket.test"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Pulsuz internet üçün kart məlumatı lazım deyil. Bu, həmin məlumatları oğurlamaq cəhdidir."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "b-choice-vpn",
+      "question": {
+        "prompt": "Kafedə iş e-poçtunuzu açmalısınız, təşkilatınız isə VPN tələb edir.",
+        "options": [
+          {
+            "id": "vpn-first",
+            "label": "Əvvəlcə VPN-i qoşuram, sonra e-poçtu açıram",
+            "correct": true,
+            "feedback": "Düzdür. VPN iş məlumatlarınızı şifrələnmiş kanalla ötürür."
+          },
+          {
+            "id": "quick-no-vpn",
+            "label": "Tez bitəcək, VPN-siz girirəm",
+            "correct": false,
+            "feedback": "Qayda qısa işlərə də aiddir. Saxta şəbəkə məhz belə anları gözləyir."
+          },
+          {
+            "id": "personal-mail",
+            "label": "Faylları şəxsi e-poçtuma yönləndirirəm",
+            "correct": false,
+            "feedback": "İş məlumatını şəxsi e-poçta göndərmək qaydaları poza və məlumatı qorumasız qoya bilər."
+          }
+        ]
+      },
+      "explain": "VPN qaydası boşuna qoyulmayıb. O, açıq şəbəkədə də iş məlumatlarınızı qoruyur."
+    },
+    {
+      "type": "recap",
+      "id": "b-recap",
+      "points": [
+        "Şəbəkənin dəqiq adını işçilərdən öyrənin",
+        "Wi-Fi üçün heç vaxt iş parolunuzu yazmayın",
+        "Vacib işlər üçün mobil internet və ya VPN"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

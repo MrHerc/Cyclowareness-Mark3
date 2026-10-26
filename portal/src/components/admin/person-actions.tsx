@@ -16,10 +16,13 @@ const ROLES = ["learner", "department_head", "executive", "analyst", "campaign_m
 export function PersonActions({
   person,
   departments,
+  locales,
   isSelf,
 }: {
   person: { id: string; name: string; jobTitle: string | null; phone: string | null; locale: string; role: string; status: string; departmentId: string | null; totpEnabled: boolean };
   departments: { id: string; name: string }[];
+  /** The organisation's available languages (Settings → Languages). */
+  locales: string[];
   isSelf: boolean;
 }) {
   const t = useTranslations("admin.person");
@@ -127,7 +130,8 @@ export function PersonActions({
           </Field>
           <Field label={tp("interfaceLanguage")} htmlFor="e-locale">
             <Select id="e-locale" value={locale} onChange={(e) => setLocale(e.target.value)}>
-              {LOCALES.map((l) => (
+              {/* The person's current language stays listed even if the organisation has since switched it off. */}
+              {LOCALES.filter((l) => locales.includes(l) || l === person.locale).map((l) => (
                 <option key={l} value={l}>
                   {LOCALE_NAMES[l]}
                 </option>

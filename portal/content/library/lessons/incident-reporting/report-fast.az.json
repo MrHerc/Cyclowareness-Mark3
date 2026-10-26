@@ -1,0 +1,450 @@
+{
+  "id": "report-fast",
+  "title": "Tez və sakit",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "İnsident təkcə böyük hücum deyil. Şübhəli linkə toxunmaq, telefonu itirmək və ya məktubu səhv ünvana göndərmək də insident sayılır.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Hər kəs səhv edə bilər. Tez bildirmək problemin böyüməsinin qarşısını alır. Nə qədər tez xəbər versəniz, ziyan bir o qədər az olar.",
+          "mood": "happy",
+          "gesture": "nod",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Özünüz araşdırmayın və heç nəyi silməyin. Şübhəli məktub, mesaj və ya fayl mütəxəssis üçün sübutdur.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "b5",
+          "say": "Bildirəndə qısa olun: nə baş verib, nə vaxt, hansı cihazda və artıq nə etmisiniz.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "report-button",
+      "environment": "inbox",
+      "title": "«Fişinqi bildir» düyməsi",
+      "intro": "Gələnlər qutunuzda iki şübhəli məktub var. Hər birini açın və düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "quota",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "ispoct-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "İşPoçt administratoru"
+                }
+              ],
+              "address": [
+                {
+                  "text": "admin@ispoct-mail.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Poçt qutunuz 98% doludur"
+              }
+            ],
+            "time": "08:47",
+            "body": [
+              [
+                {
+                  "text": "Poçt qutusunun həcmini artırmasanız, yeni məktublar 24 saat ərzində silinəcək."
+                }
+              ],
+              [
+                {
+                  "text": "Həcmi artırmaq üçün: "
+                },
+                {
+                  "text": "ispoct-mail.example.net/kvota",
+                  "link": {
+                    "label": "ispoct-mail.example.net/kvota",
+                    "href": "https://ispoct-mail.example.net/kvota"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Göndərənin ünvanına baxın.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bildirişiniz sayəsində mütəxəssislər eyni məktubu digər əməkdaşların gələnlər qutusundan da silə bilir."
+            },
+            {
+              "id": "click",
+              "label": "Linki aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Göndərənin ünvanı təşkilatınızın domenində deyildi. Poçt qutusunun həcmi heç vaxt link vasitəsilə artırılmır."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Siz təhlükədən uzaqsınız, amma həmkarlarınız hələ də hədəfdədir, sübut isə yox oldu. Silmək əvəzinə bildirin."
+            },
+            {
+              "id": "forward",
+              "label": "Həmkarlara yönləndir",
+              "kind": "forward",
+              "outcome": "risky",
+              "feedback": "Yönləndirmək təhlükəni yayır. «Fişinqi bildir» düyməsi yoxdursa, məktubu yalnız təhlükəsizlik komandasına yönləndirin."
+            }
+          ]
+        },
+        {
+          "id": "password-reply",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "İT dəstəyi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "support@idare-helpdesk.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Hesabın yoxlanılması"
+              }
+            ],
+            "time": "09:15",
+            "body": [
+              [
+                {
+                  "text": "Sistem yenilənir. Hesabınızın aktiv qalması üçün bu məktuba istifadəçi adınız və parolunuzla cavab verin."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür, əsl İT dəstəyi heç vaxt parolunuzu soruşmur. Bildirişiniz həmkarlarınızı da xəbərdar edir."
+            },
+            {
+              "id": "reply",
+              "label": "Parolla cavab ver",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Parolunuz hücumçunun əlinə keçdi. Belə olarsa, parolu dərhal dəyişin və bildirin."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Siz parolunuzu vermədiniz, amma başqası verə bilər. Bildirsəniz, mütəxəssislər hamını qoruyar."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "is-it-incident",
+      "prompt": "Bunu bildirmək lazımdırmı? Təhlükədir, yoxsa adi haldır?",
+      "cards": [
+        {
+          "id": "wrong-recipient",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Siz"
+                }
+              ],
+              "address": [
+                {
+                  "text": "l.aliyeva@idare.example"
+                }
+              ]
+            },
+            "to": "kamran.aliyev.1990@mail.example",
+            "subject": [
+              {
+                "text": "Əməkdaşların siyahısı"
+              }
+            ],
+            "time": "10:02",
+            "body": [
+              [
+                {
+                  "text": "Xahiş etdiyiniz siyahı qoşmadadır."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "isciler_siyahisi.xlsx"
+                  }
+                ],
+                "size": "240 KB"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Siyahı təşkilatdan kənar şəxsi ünvana getdi. Bu, məlumat sızmasıdır, dərhal bildirin."
+        },
+        {
+          "id": "unasked-code",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ispoct",
+            "sender": [
+              {
+                "text": "İşPoçt"
+              }
+            ],
+            "time": "03:17",
+            "messages": [
+              [
+                {
+                  "text": "Giriş kodunuz: 482913. Onu heç kimlə paylaşmayın."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "İstəmədiyiniz kod gəlibsə, deməli, kimsə parolunuzu bilir. Parolu dəyişin və bildirin."
+        },
+        {
+          "id": "training-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "İT dəstəyi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it-support@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Cümə günü təhlükəsizlik təlimi"
+              }
+            ],
+            "time": "12:30",
+            "body": [
+              [
+                {
+                  "text": "Cümə günü saat 11:00-da əsas zalda qısa təlim keçiriləcək. Qeydiyyat tələb olunmur."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ünvan düzgündür, link yoxdur, heç nə istənmir. Bu, adi bildirişdir."
+        },
+        {
+          "id": "clicked-link",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Tural (həmkar)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Dünən o məktubdakı linki açdım, amma heç nə yazmadım. Yəqin ki, problem yoxdur, eləmi?"
+                  }
+                ],
+                "time": "09:20"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Linki sadəcə açmaq belə hücumçuya məlumat ötürə və ya faylın yüklənməsini başlada bilər. Qərarı mütəxəssis versin, ona görə bunu mütləq bildirin."
+        },
+        {
+          "id": "lost-phone",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Leyla (komanda)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "İş telefonumu taksidə unutmuşam. Sabah axtararam, təcili deyil."
+                  }
+                ],
+                "time": "19:45"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "İtmiş iş telefonu təcili insidentdir. Dəstək xidməti onu uzaqdan kilidləyə və ya içindəkiləri silə bilər."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "first-step",
+      "question": {
+        "prompt": "Parolunuzu saxta səhifəyə yazdınız. İlk addım nədir?",
+        "options": [
+          {
+            "id": "report",
+            "label": "Dərhal bildirirəm və parolu dəyişirəm",
+            "correct": true,
+            "feedback": "Düzdür. Hər dəqiqə vacibdir. Bu iki addım hücumçunun yolunu bağlayır."
+          },
+          {
+            "id": "silent",
+            "label": "Utandığım üçün heç kimə demirəm",
+            "correct": false,
+            "feedback": "Susmaq hücumçuya vaxt qazandırır. Bildirmək həm sizi, həm də təşkilatı qoruyur."
+          },
+          {
+            "id": "delete",
+            "label": "İz qalmasın deyə məktubu silirəm",
+            "correct": false,
+            "feedback": "Məktub sübutdur. Onu silsəniz, mütəxəssislər başqa kimin hədəfə alındığını görə bilməz."
+          },
+          {
+            "id": "recheck",
+            "label": "Yoxlamaq üçün linki yenidən açıram",
+            "correct": false,
+            "feedback": "Yenidən açmaq riski artırır. Araşdırmanı mütəxəssislərə həvalə edin."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "alarm"
+        }
+      },
+      "explain": "Tez bildirin, sübutu saxlayın, araşdırmanı mütəxəssislərə həvalə edin."
+    },
+    {
+      "type": "order",
+      "id": "strange-program",
+      "prompt": "Kompüterinizdə qəribə bir proqram işləyir. Addımları sıraya düzün.",
+      "items": [
+        {
+          "id": "stop",
+          "label": "Gördüyünüz işi dayandırın"
+        },
+        {
+          "id": "disconnect",
+          "label": "Kompüteri şəbəkədən ayırın, amma söndürməyin"
+        },
+        {
+          "id": "call",
+          "label": "İT dəstəyinə telefonla zəng edin"
+        },
+        {
+          "id": "note",
+          "label": "Gördüklərinizi qısaca qeyd edin"
+        }
+      ],
+      "explain": "Şəbəkədən ayırmaq yayılmanı dayandırır, söndürmək isə yaddaşdakı izləri silə bilər. Təşkilatınızın qaydası başqa cür deyirsə, ona əməl edin. Telefonla bildirin."
+    },
+    {
+      "type": "match",
+      "id": "good-report",
+      "prompt": "Hər sualı bildirişdəki cavabı ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "what",
+          "left": "Nə baş verdi?",
+          "right": "Parolumu saxta səhifəyə yazdım"
+        },
+        {
+          "id": "when",
+          "left": "Nə vaxt?",
+          "right": "Bu gün saat 09:40-da"
+        },
+        {
+          "id": "where",
+          "left": "Hansı cihazda?",
+          "right": "İş kompüterində, poçt tətbiqində"
+        },
+        {
+          "id": "done",
+          "left": "Nə etdiniz?",
+          "right": "Parolu dəyişdim, məktubu saxladım"
+        }
+      ],
+      "explain": "Qısa və dəqiq bildiriş mütəxəssisin vaxtına qənaət edir."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Şübhəniz varsa, dərhal bildirin. Səhv etmək ayıb deyil.",
+        "Özünüz araşdırmayın və heç nəyi silməyin.",
+        "Qısa olun: nə, nə vaxt, harada, nə etdiniz."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

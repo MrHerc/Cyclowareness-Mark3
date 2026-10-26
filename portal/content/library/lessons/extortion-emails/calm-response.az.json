@@ -1,0 +1,424 @@
+{
+  "id": "calm-response",
+  "title": "Sakit reaksiya",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "cr-tutor",
+      "beats": [
+        {
+          "id": "cr-b1",
+          "say": "Sizə şantaj məktubu gəlib. İndi düzgün addımları ardıcıllıqla məşq edək.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        },
+        {
+          "id": "cr-b2",
+          "say": "İlk iki qayda: pul ödəməyin və cavab yazmayın. Cavab yazsanız, yeni hədəfə çevrilirsiniz.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "cr-b3",
+          "say": "Məktubdakı paroldan hələ də istifadə edirsinizsə, onu dəyişin və iki addımlı doğrulamanı aktivləşdirin.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "ispoct",
+              "tone": "system",
+              "title": [
+                {
+                  "text": "Parolu dəyiş"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Köhnə parol"
+                  }
+                ],
+                [
+                  {
+                    "text": "Yeni parol: ən azı 15 simvol",
+                    "spot": "new"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Ləğv et",
+                "Dəyiş"
+              ]
+            }
+          },
+          "highlight": "new"
+        },
+        {
+          "id": "cr-b4",
+          "say": "Məktub iş poçtunuza gəlibsə, təhlükəsizlik komandasına bildirin. Bunda sizin heç bir günahınız yoxdur.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "cr-order",
+      "prompt": "Sizə şantaj məktubu gəlib. Addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "stop",
+          "label": "Pul ödəməyin və cavab yazmayın"
+        },
+        {
+          "id": "report",
+          "label": "Məktubu təhlükəsizlik komandasına bildirin"
+        },
+        {
+          "id": "change",
+          "label": "Məktubdakı parolu hər yerdə dəyişin"
+        },
+        {
+          "id": "mfa",
+          "label": "İki addımlı doğrulamanı aktivləşdirin"
+        }
+      ],
+      "explain": "Əvvəlcə dayanın, sonra bildirin və parolu dəyişin. Köhnə parol sızsa belə, iki addımlı doğrulama hesabı qoruyur."
+    },
+    {
+      "type": "simulation",
+      "id": "cr-sim",
+      "environment": "desktop",
+      "title": "Səhər, iş kompüteri",
+      "intro": "İş kompüterinizdə şantaj məktubu barədə bildiriş çıxır. Hər addımda düzgün qərarı seçin.",
+      "steps": [
+        {
+          "id": "toast",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "ispoct",
+            "app": "İşPoçt",
+            "title": [
+              {
+                "text": "Parolunuz: Gunes2019. 48 saatınız var"
+              }
+            ],
+            "body": [
+              {
+                "text": "Kameranızla çəkilmiş videolarınız məndədir. Bitkoin göndərin, yoxsa hamı onları görəcək."
+              }
+            ],
+            "time": "09:12"
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Pul ödəmədən və cavab yazmadan bildirmək ən yaxşı ilk addımdır.",
+              "next": "password"
+            },
+            {
+              "id": "reply",
+              "label": "Cavab yaz: sübut göstər",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Cavab yazdınız və fırıldaqçı dərhal «sübut» adlı fayl göndərdi."
+            },
+            {
+              "id": "pay",
+              "label": "Bitkoin ünvanını kopyala və ödə",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Pul getdi və geri qayıtmayacaq. Ödəyənlər adətən yeni tələb alırlar.",
+              "next": "password"
+            }
+          ]
+        },
+        {
+          "id": "proof",
+          "label": "Yükləmələr",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Subut_video.zip"
+              }
+            ],
+            "type": "zip",
+            "size": "1,2 MB",
+            "source": [
+              {
+                "text": "Anonim: cavab məktubu"
+              }
+            ]
+          },
+          "say": "Cavab gəldi, içində guya sübut var.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "Bu, sübut deyil, zərərli proqramdır. Şantaj məktubundan gələn faylları heç vaxt açmayın."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Düzdür. Faylı açmayın və məktubu təhlükəsizlik komandasına bildirin."
+            },
+            {
+              "id": "scan",
+              "label": "Antivirusla yoxla",
+              "kind": "scan",
+              "outcome": "safe",
+              "feedback": "Yaxşı vərdişdir, amma bu faylı saxlamağa ehtiyac yoxdur. Onu silin və bildirin."
+            }
+          ]
+        },
+        {
+          "id": "password",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Parolu dəyiş"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Məktubdakı parol köhnə məlumat sızmasında aşkar edilib."
+                }
+              ],
+              [
+                {
+                  "text": "Yeni parol: ən azı 15 simvol, başqa saytlarda istifadə olunmamış."
+                }
+              ]
+            ],
+            "buttons": [
+              "Sonra",
+              "Parolu dəyiş"
+            ]
+          },
+          "say": "Bu parol hələ də bəzi hesablarınızda istifadə olunur.",
+          "actions": [
+            {
+              "id": "change",
+              "label": "Parolu dəyiş",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Əla. Sızmış parol artıq bu hesabı açmır. Onu digər hesablarınızda da dəyişin."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Sızmış parollarla hesabları açmağa dəfələrlə cəhd edirlər. Dəyişikliyi təxirə salmayın."
+            }
+          ]
+        },
+        {
+          "id": "two-step",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct",
+            "tone": "system",
+            "title": [
+              {
+                "text": "İki addımlı doğrulama"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Daxil olanda paroldan əlavə telefonunuzdakı təsdiq tətbiqi də tələb olunsun?"
+                }
+              ]
+            ],
+            "buttons": [
+              "İndi yox",
+              "Aktivləşdir"
+            ]
+          },
+          "actions": [
+            {
+              "id": "enable",
+              "label": "Aktivləşdir",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Düzdür. Parol sızsa belə, ikinci addım hesabı qoruyur."
+            },
+            {
+              "id": "skip",
+              "label": "İndi yox",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "İki addımlı doğrulama olmadan bir parol hər şeyi açır. Onu bu gün aktivləşdirin."
+            }
+          ]
+        },
+        {
+          "id": "second-threat",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "ispoct",
+            "app": "İşPoçt",
+            "title": [
+              {
+                "text": "Son 24 saat!"
+              }
+            ],
+            "body": [
+              {
+                "text": "Ödəniş gəlməyib. Videolar sabah yayılacaq."
+              }
+            ],
+            "time": "08:30"
+          },
+          "say": "Bir gün sonra yeni təhdid gəldi.",
+          "actions": [
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Düzdür. Təkrar təhdid də blefdir, ona görə pul ödəməyin və cavab yazmayın."
+            },
+            {
+              "id": "report",
+              "label": "Bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Təhlükəsizlik komandası yeni məktubları da bloklaya bilər."
+            },
+            {
+              "id": "bargain",
+              "label": "Cavab yaz: mənə bir az vaxt verin",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Danışıqlara getmək fırıldaqçıya ümid verir. Cavab yazmayın, məktubu bildirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "cr-scenario",
+      "title": "Narahat həmkar",
+      "start": "panic",
+      "nodes": [
+        {
+          "id": "panic",
+          "text": "Baxın, şəxsi poçtuma şantaj məktubu gəlib, özü də köhnə parolumu göstərir!",
+          "speaker": "Nərmin (həmkarınız) telefonunu göstərir",
+          "voice": "woman",
+          "channel": "in-person",
+          "manner": "worried",
+          "spoken": "Baxın, <breath> şəxsi poçtuma şantaj məktubu gəlib, özü də köhnə parolumu göstərir!",
+          "character": "narmin",
+          "choices": [
+            {
+              "label": "Sakit olun, bu, kütləvi blefdir. Pul ödəməyin və cavab yazmayın",
+              "next": "reuse",
+              "feedback": "Düzdür. Sakit və aydın məsləhət panikanı dərhal azaldır."
+            },
+            {
+              "label": "Bəlkə yarısını ödəyəsiniz ki, sizdən əl çəksinlər",
+              "outcome": "compromised",
+              "feedback": "Ödəyənlər yeni tələblər alır. Pul təhdidi dayandırmır."
+            },
+            {
+              "label": "Cavab yazıb sübut istəyin",
+              "outcome": "risky",
+              "feedback": "Cavab ünvanın aktiv olduğunu göstərir və daha çox məktub gəlməsinə səbəb olur."
+            }
+          ]
+        },
+        {
+          "id": "reuse",
+          "text": "Həmin paroldan hələ də bir neçə saytda istifadə edirəm, nə edim?",
+          "speaker": "Nərmin (həmkarınız)",
+          "voice": "woman",
+          "channel": "in-person",
+          "manner": "worried",
+          "spoken": "Həmin paroldan hələ də bir neçə saytda istifadə edirəm, ee, nə edim?",
+          "character": "narmin",
+          "choices": [
+            {
+              "label": "Hər yerdə dəyişin, hər sayt üçün ayrıca parol seçin və iki addımlı doğrulamanı aktivləşdirin",
+              "outcome": "safe",
+              "feedback": "Əla. Ayrı-ayrı parollar bir sızmanın bütün hesablara yayılmasının qarşısını alır."
+            },
+            {
+              "label": "Yalnız bu poçtun parolunu dəyişin, qalanları vacib deyil",
+              "outcome": "risky",
+              "feedback": "Eyni parolu başqa saytlarda da yoxlayacaqlar. Hamısını dəyişin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "cr-choice",
+      "question": {
+        "prompt": "Yeniyetmə qohumunuz deyir ki, kimsə onun şəxsi videolarını yaymaqla hədələyir və pul istəyir. Nə etmək lazımdır?",
+        "options": [
+          {
+            "id": "police",
+            "label": "Heç vaxt pul ödəməmək, polisə müraciət etmək",
+            "correct": true,
+            "feedback": "Düzdür. Heç vaxt pul ödəməyin, polisə müraciət edin."
+          },
+          {
+            "id": "pay",
+            "label": "Bir dəfə ödəmək ki, iş bitsin",
+            "correct": false,
+            "feedback": "Ödəmək təhdidi dayandırmır. Heç vaxt pul ödəməyin, polisə müraciət edin."
+          },
+          {
+            "id": "hide",
+            "label": "Bunu sirr saxlamaq və heç kimə deməmək",
+            "correct": false,
+            "feedback": "Susmaq yalnız hədələyən adamın işinə yarayır. Heç vaxt pul ödəməyin, polisə müraciət edin."
+          }
+        ]
+      },
+      "explain": "Uşaq və ya yeniyetmə hədələnirsə, heç vaxt pul ödəməyin. Dərhal polisə müraciət edin."
+    },
+    {
+      "type": "recap",
+      "id": "cr-recap",
+      "points": [
+        "Pul ödəməyin, cavab yazmayın və məktubdakı faylları açmayın.",
+        "Sızmış parolu hər yerdə dəyişin və iki addımlı doğrulamanı aktivləşdirin.",
+        "Uşaq hədələnirsə, heç vaxt pul ödəməyin və polisə müraciət edin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

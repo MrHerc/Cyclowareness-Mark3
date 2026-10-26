@@ -1,0 +1,420 @@
+{
+  "id": "data-in-care",
+  "title": "Sizə əmanət edilən məlumat",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "what-is",
+          "say": "Vətəndaşların və həmkarlarınızın adları, şəxsiyyət sənədləri, ünvanları və telefon nömrələri şəxsi məlumatlardır. Bu məlumatlar sizə iş üçün əmanət edilib.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        },
+        {
+          "id": "law",
+          "say": "Azərbaycanda şəxsi məlumatlar qanunla qorunur. Onlardan yalnız qanuni məqsəd üçün və yalnız lazım olan qədər istifadə edin.",
+          "mood": "think",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "need-to-know",
+          "say": "Qayda sadədir: işinizə lazım deyilsə, baxmayın, soruşmayın və paylaşmayın.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "id-photos",
+          "say": "Şəxsiyyət vəsiqələrinin şəkillərini messencerlərlə göndərməyin. Belə şəkillər telefonlarda illərlə qalır və gec-tez sızır.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "request-check",
+      "prompt": "Hansı sorğular qaydasındadır?",
+      "cards": [
+        {
+          "id": "fake-police",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "+994 50 000 22 90"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam, mən polisdənəm. Rəşad Əliyevin qeydiyyat ünvanını və telefonunu mənə göndərin, təcilidir."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Dövlət orqanları məlumatı şəxsi nömrədən mesajla yox, rəsmi kanallarla sorğulayır."
+        },
+        {
+          "id": "hr-system",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "Kadrlar şöbəsi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "kadrlar@rxagentlik.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Məzuniyyət ərizəsi"
+              }
+            ],
+            "time": "11:02",
+            "body": [
+              [
+                {
+                  "text": "Zəhmət olmasa, ərizənizi daxili sənəd dövriyyəsi sistemində imzalayın. Əlavə sənəd lazım deyil."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Domen düzgündür, məktub daxili sistemə yönləndirir və əlavə məlumat istəmir."
+        },
+        {
+          "id": "curious-colleague",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Elvin, həmkar"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Qonşum bizə müraciət edib. Sənədlərində nə var? Şəklini çəkib at, maraqlıdır."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Maraq iş ehtiyacı deyil. İşiniz tələb etmirsə, sənədlər paylaşılmır."
+        },
+        {
+          "id": "personal-email",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "Leyla Həsənova"
+                }
+              ],
+              "address": [
+                {
+                  "text": "leyla.hasanova@rxagentlik.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Siyahı"
+              }
+            ],
+            "time": "11:02",
+            "body": [
+              [
+                {
+                  "text": "Şöbə əməkdaşlarının bütün FİN kodlarını və telefon nömrələrini şəxsi e-poçtuma göndərin, evdən işləyəcəyəm: leyla.h.1990@mail.example"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Hətta tanış həmkar istəsə belə, bu məlumatları şəxsi e-poçta göndərmək olmaz. Onlar iş sistemlərində qalmalıdır."
+        },
+        {
+          "id": "portal-sms",
+          "artifact": {
+            "kind": "sms",
+            "sender": [
+              {
+                "text": "DovletPortal"
+              }
+            ],
+            "time": "15:30",
+            "messages": [
+              [
+                {
+                  "text": "Müraciətiniz qəbul edildi. Nəticəni portaldakı şəxsi kabinetinizdə görə bilərsiniz."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Link yoxdur və heç nə istənilmir. Mesaj sadəcə məlumat verir."
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "id-photo-chat",
+      "prompt": "Bu yazışmada riskləri tapın.",
+      "artifact": {
+        "kind": "chat",
+        "app": "whatsapp",
+        "contact": [
+          {
+            "text": "Səbinə, kadrlar şöbəsi "
+          },
+          {
+            "text": "+994 77 000 19 55",
+            "spot": "number"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Salam! Məlumatlarınız yenilənir. "
+              },
+              {
+                "text": "Şəxsiyyət vəsiqənizin hər iki tərəfinin şəklini bura göndərin.",
+                "spot": "id-photo"
+              }
+            ],
+            "time": "16:10"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Saat 17:00-dək göndərin, əks halda maaşınız gecikəcək.",
+                "spot": "threat"
+              }
+            ],
+            "time": "16:10"
+          },
+          {
+            "from": "me",
+            "body": [
+              {
+                "text": "Kadrlar şöbəsi niyə WhatsApp-da yazır?"
+              }
+            ],
+            "time": "16:12"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Sistem işləmir, belə daha tezdir.",
+                "spot": "excuse"
+              }
+            ],
+            "time": "16:12"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "number",
+          "label": "Şəxsi nömrə",
+          "explain": "Kimsə naməlum şəxsi nömrədən kadrlar şöbəsi adından yazır."
+        },
+        {
+          "id": "id-photo",
+          "label": "Vəsiqənin şəkli",
+          "explain": "Vəsiqənin şəkli ilə fırıldaqçı sizin adınıza kredit götürə və ya hesab aça bilər."
+        },
+        {
+          "id": "threat",
+          "label": "Maaşla hədələmə",
+          "explain": "Maaşla hədələmək sizi tələsdirib yoxlamadan yayındırmaq üçündür."
+        },
+        {
+          "id": "excuse",
+          "label": "Bəhanə",
+          "explain": "«Sistem işləmir» sözləri rəsmi yoldan yayınmaq üçün bəhanədir. Kadrlar şöbəsinə özünüz zəng edin."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "scenario",
+      "id": "citizen-call",
+      "title": "Vətəndaş zəng edir",
+      "start": "call",
+      "nodes": [
+        {
+          "id": "call",
+          "text": "Salam, qardaşımın müraciəti sizdədir. O, xəstədir, xahiş edirəm, telefonunu və ünvanını mənə verin ki, ona kömək edə bilim.",
+          "speaker": "Zəng edən",
+          "voice": "older-woman",
+          "channel": "phone",
+          "manner": "worried",
+          "spoken": "Salam, qardaşımın müraciəti sizdədir. <breath> O, xəstədir, xahiş edirəm, telefonunu və ünvanını mənə verin ki, ona kömək edə bilim.",
+          "character": "citizen",
+          "choices": [
+            {
+              "label": "Ona yazığım gəlir, məlumatları verirəm",
+              "outcome": "compromised",
+              "feedback": "Kimin zəng etdiyini bilmirsiniz. Məlumatlar indi yad adamın əlindədir."
+            },
+            {
+              "label": "Zəng edəni yoxlamaq üçün qardaşının FİN kodunu soruşuram",
+              "outcome": "risky",
+              "feedback": "FİN kod sirr deyil. Onu bilmək heç nəyi sübut etmir."
+            },
+            {
+              "label": "Bu məlumatı telefonla verə bilməyəcəyimi izah edirəm",
+              "next": "pressure",
+              "feedback": "Düzdür. Nəzakətli, amma qətiyyətli olun."
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "text": "Siz necə adamsınız? O, xəstədir!",
+          "speaker": "Zəng edən",
+          "voice": "older-woman",
+          "channel": "phone",
+          "manner": "worried",
+          "spoken": "Siz necə adamsınız? <short pause> O, xəstədir!",
+          "character": "citizen",
+          "choices": [
+            {
+              "label": "Təzyiqə boyun əyib istisna edirəm",
+              "outcome": "compromised",
+              "feedback": "Emosional təzyiq ən çox yayılmış fənddir."
+            },
+            {
+              "label": "Rəsmi yolu izah edirəm: qardaşı özü və ya etibarnaməsi olan nümayəndə müraciət edə bilər",
+              "next": "after",
+              "feedback": "Əla. Düzgün yolu göstərdiniz və məlumatları qorudunuz."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "text": "Zəng bitdi. İndi nə etməli?",
+          "choices": [
+            {
+              "label": "Zəng barədə rəhbərimə və təhlükəsizlik komandasına bildirirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Eyni şəxs həmkarlarınıza da zəng edə bilər."
+            },
+            {
+              "label": "Heç nə, axı heç nə verməmişəm",
+              "outcome": "risky",
+              "feedback": "Qətiyyətli davrandınız, amma bildirsəniz, həmkarlarınız da hazırlıqlı olar."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "principles",
+      "prompt": "Hər prinsipi onun mənası ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "purpose",
+          "left": "Məqsəd",
+          "right": "Yalnız aydın, qanuni tapşırıq üçün istifadə edin"
+        },
+        {
+          "id": "minimum",
+          "left": "Minimallıq",
+          "right": "Lazım olandan artıq toplamayın"
+        },
+        {
+          "id": "need-to-know",
+          "left": "Bilmək zərurəti",
+          "right": "Yalnız işi tələb edən şəxslər baxa bilər"
+        },
+        {
+          "id": "confidential",
+          "left": "Məxfilik",
+          "right": "Hüquqi əsas olmadan heç vaxt üçüncü şəxslərə verməyin"
+        }
+      ],
+      "explain": "Bu prinsiplər gündəlik işdə vətəndaşların məlumatlarını qorumağa kömək edir."
+    },
+    {
+      "type": "choice",
+      "id": "send-way",
+      "question": {
+        "prompt": "Vətəndaşın sənədini həmkarınıza necə göndərə bilərsiniz?",
+        "options": [
+          {
+            "id": "whatsapp",
+            "label": "Şəklini çəkib şəxsi WhatsApp ilə göndərmək",
+            "correct": false,
+            "feedback": "Şəkil telefonlarda qalır və nəzarətdən çıxır."
+          },
+          {
+            "id": "internal",
+            "label": "Daxili sənəd dövriyyəsi sistemi ilə, yalnız ehtiyacı olan şəxsə",
+            "correct": true,
+            "feedback": "Düzdür. Giriş məhduddur və nəzarət altındadır."
+          },
+          {
+            "id": "private-mail",
+            "label": "Tez olsun deyə şəxsi e-poçtla",
+            "correct": false,
+            "feedback": "Şəxsi e-poçt təşkilatın qorumasından kənardadır."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "folder"
+        }
+      },
+      "explain": "Şəxsi məlumatlar heç vaxt təşkilatın təsdiqlənmiş sistemlərindən kənara çıxmamalıdır."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Şəxsi məlumatlardan yalnız iş tələb edəndə və yalnız lazım olan qədər istifadə edin.",
+        "Vəsiqə şəkillərini və siyahıları heç vaxt messencerlərlə göndərməyin.",
+        "Zəng edənləri rəsmi sorğu qaydasına yönləndirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

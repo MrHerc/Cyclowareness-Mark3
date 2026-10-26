@@ -27,6 +27,12 @@ export type CatalogCard = {
   custom: boolean;
 };
 
+/**
+ * Search key that ignores case and accents in every UI language: "insan" finds "İnsan" (İ lowercases to
+ * i plus a combining dot, ı folds to i), "е" finds "ё".
+ */
+const fold = (s: string) => s.toLowerCase().replace(/ı/g, "i").normalize("NFD").replace(/\p{M}/gu, "");
+
 export function CatalogView({ modules }: { modules: CatalogCard[] }) {
   const t = useTranslations("learner.learn");
   const tc = useTranslations("common");
@@ -36,11 +42,11 @@ export function CatalogView({ modules }: { modules: CatalogCard[] }) {
   const [category, setCategory] = useState<"all" | Category>("all");
 
   const list = useMemo(() => {
-    const needle = q.trim().toLocaleLowerCase();
+    const needle = fold(q.trim());
     return modules
       .filter((m) => m.audiences.includes(audience))
       .filter((m) => category === "all" || m.category === category)
-      .filter((m) => !needle || `${m.title} ${m.subtitle}`.toLocaleLowerCase().includes(needle))
+      .filter((m) => !needle || fold(`${m.title} ${m.subtitle}`).includes(needle))
       .sort((a, b) => (view === "path" ? a.pathRank - b.pathRank : a.catalogRank - b.catalogRank));
   }, [modules, q, view, audience, category]);
 

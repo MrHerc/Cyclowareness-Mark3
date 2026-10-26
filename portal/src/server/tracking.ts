@@ -31,6 +31,8 @@ export async function trackingView(token: string, via: "link" | "qr") {
     harvest: data.template.harvest && !scanner && !data.cancelled,
     submitted: data.submitted,
     brandName: templateText(data.template.sender.name, data.locale),
+    // The recipient's profile language (that of the flags and sender above): /t and /q show the teachable moment in it.
+    locale: data.locale,
   };
 }
 

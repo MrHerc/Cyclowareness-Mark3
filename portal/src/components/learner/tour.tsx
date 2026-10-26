@@ -58,8 +58,8 @@ function available(): Step[] {
  * the streak and XP pills, the Continue card and "Your path". Mounted by the learner layout while
  * `users.tourDone` is false; finishing or skipping marks it done.
  */
-export function Tour({ org, still = false }: { org: string; still?: boolean }) {
-  const onHome = usePathname() === "/";
+export function Tour({ org, goal, league, still = false }: { org: string; /** The tenant's daily XP goal. */ goal: number; /** The tenant has the league feature. */ league: boolean; still?: boolean }) {
+  const onHome = usePathname() === "/app";
   const t = useTranslations("learner.tour");
   const id = useId();
   const [steps, setSteps] = useState<Step[] | null>(null);
@@ -68,6 +68,9 @@ export function Tour({ org, still = false }: { org: string; still?: boolean }) {
   const spotRef = useRef<HTMLDivElement>(null);
   const bubbleRef = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
+  const mascotRef = useRef<HTMLDivElement>(null);
+  // The mascot points at the spotlighted item: the angle is kept with its stop, so a new stop starts without one.
+  const [aim, setAim] = useState<{ key: StepKey; angle: number } | null>(null);
 
   // Starts after the page reveal; restarts from the top when the person comes back to Home mid-tour.
   useEffect(() => {
@@ -96,8 +99,10 @@ export function Tour({ org, still = false }: { org: string; still?: boolean }) {
       const el = step.anchor ? findAnchor(step.anchor) : null;
       let top: number;
       let left: number;
+      let target: { x: number; y: number } | null = null;
       if (el) {
         const r = el.getBoundingClientRect();
+        target = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
         const box = { top: r.top - PAD, left: r.left - PAD, width: r.width + 2 * PAD, height: r.height + 2 * PAD };
         Object.assign(spot.style, { top: `${box.top}px`, left: `${box.left}px`, width: `${box.width}px`, height: `${box.height}px`, opacity: "1" });
         const right = box.left + box.width;
@@ -121,9 +126,19 @@ export function Tour({ org, still = false }: { org: string; still?: boolean }) {
         top = vh / 2 - bh / 2;
         left = vw / 2 - bw / 2;
       }
-      bubble.style.top = `${Math.min(Math.max(top, MARGIN), Math.max(MARGIN, vh - bh - MARGIN))}px`;
-      bubble.style.left = `${Math.min(Math.max(left, MARGIN), Math.max(MARGIN, vw - bw - MARGIN))}px`;
+      top = Math.min(Math.max(top, MARGIN), Math.max(MARGIN, vh - bh - MARGIN));
+      left = Math.min(Math.max(left, MARGIN), Math.max(MARGIN, vw - bw - MARGIN));
+      bubble.style.top = `${top}px`;
+      bubble.style.left = `${left}px`;
       bubble.style.visibility = "visible";
+      // Measured from where the mascot ends up (the bubble moves there with a transition), in 5° steps.
+      const m = mascotRef.current;
+      if (target && m) {
+        const dx = target.x - (left + m.offsetLeft + m.offsetWidth / 2);
+        const dy = top + m.offsetTop + m.offsetHeight / 2 - target.y;
+        const angle = ((Math.round((Math.atan2(dy, dx) * 180) / Math.PI / 5) * 5) % 360 + 360) % 360;
+        setAim((a) => (a?.key === step.key && a.angle === angle ? a : { key: step.key, angle }));
+      }
     };
     if (step.scroll) findAnchor(step.anchor!)?.scrollIntoView({ block: step.scroll, behavior: reduced ? "auto" : "smooth" });
     place();
@@ -179,6 +194,7 @@ export function Tour({ org, still = false }: { org: string; still?: boolean }) {
   const total = steps.length;
   const last = index === total - 1;
   const title = step.key === "welcome" ? t("steps.welcome.title", { org }) : t(`steps.${step.key}.title`);
+  const body = step.key === "xp" ? t("steps.xp.body", { goal }) : step.key === "home" && !league ? t("steps.home.bodyNoLeague") : t(`steps.${step.key}.body`);
 
   return (
     <div tabIndex={-1} onKeyDown={onKey} className="fixed inset-0 z-[70] outline-none">
@@ -198,7 +214,17 @@ export function Tour({ org, still = false }: { org: string; still?: boolean }) {
         style={{ visibility: "hidden" }}
       >
         <div className="flex items-start gap-3">
-          <Mascot mood={step.mood} gesture={still ? undefined : step.gesture} gestureKey={index} still={still} className="size-16 shrink-0" />
+          {/* 80 px: the full-body framing (below that the cat is a head crop and a pointing paw is cut off). */}
+          <div ref={mascotRef} className="size-20 shrink-0">
+            <Mascot
+              mood={step.mood}
+              gesture={still ? undefined : step.gesture}
+              gestureKey={index}
+              still={still}
+              aim={aim?.key === step.key ? { angle: aim.angle } : null}
+              className="size-full"
+            />
+          </div>
           <div className="min-w-0 flex-1" aria-live="polite">
             <p className="text-tab-sm font-semibold text-ink-subtle uppercase">
               {t("label")} · {t("stepOf", { current: index + 1, total })}
@@ -207,7 +233,7 @@ export function Tour({ org, still = false }: { org: string; still?: boolean }) {
               {title}
             </h2>
             <p id={`${id}-body`} className="mt-1 text-caption text-ink-muted">
-              {t(`steps.${step.key}.body`)}
+              {body}
             </p>
           </div>
           <button type="button" onClick={finish} aria-label={t("skip")} className="-mt-1 -mr-1 grid size-9 shrink-0 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:size-11">

@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getFormatter, getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { getAppFormatter } from "@/i18n/server-format";
 import { and, asc, count, desc, eq, gte, inArray, isNotNull, isNull, or, sql } from "drizzle-orm";
 import { Award, Building2, Check, Flame, Mail, QrCode, ShieldAlert } from "lucide-react";
 import { db, t } from "@/server/db";
@@ -19,13 +20,21 @@ import { TEMPLATES } from "@/lib/campaigns/templates";
 import { levelFor, dayKey, liveStreak } from "@/lib/domain/gamification";
 import { riskBand } from "@/lib/domain/risk";
 import { requestNow } from "@/lib/time";
-import { pick } from "@/i18n/config";
+import { isLocale, pick } from "@/i18n/config";
 import { cn } from "@/lib/cn";
+import { riskTitle, riskTitles } from "@/lib/risk-title";
 import { personForPage } from "./person";
 
 const DAY = 86_400_000;
 /** Templates that carry a QR code: a click on their link means the code was scanned with a phone. */
 const QR_KEYS = TEMPLATES.filter((x) => x.qr).map((x) => x.key);
+/** xp_events.reason values written by awardXp (progress.ts, lab and threat reports). */
+const XP_REASONS = ["lesson", "lab", "report"] as const;
+
+export async function generateMetadata({ params }: PageProps<"/admin/users/[id]">) {
+  const { person } = await personForPage((await params).id);
+  return { title: person.u.name };
+}
 
 export default async function PersonPage({ params }: PageProps<"/admin/users/[id]">) {
   const { v, person } = await personForPage((await params).id);
@@ -37,7 +46,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
     getTranslations("learner.progress"),
     getTranslations("security"),
     getTranslations("admin.reports.cols"),
-    getFormatter(),
+    getAppFormatter(),
   ]);
   const now = requestNow();
   const since30 = new Date(now.getTime() - 30 * DAY);
@@ -99,13 +108,14 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
     : [];
   const breakdown = evidence.get(u.id);
   const dayMap = new Map(xpDays.map((d) => [d.day, Number(d.xp)]));
+  // The charts' hidden data tables read the label aloud, so it is a date in the interface language; `day` stays the lookup key.
   const days = Array.from({ length: 30 }, (_, i) => {
     const day = dayKey(new Date(now.getTime() - (29 - i) * DAY));
-    return { label: day, value: dayMap.get(day) ?? 0 };
+    return { day, label: format.dateTime(new Date(`${day}T12:00:00+04:00`), { day: "numeric", month: "short" }), value: dayMap.get(day) ?? 0 };
   });
   // Days without a snapshot (before the history began) show today's score, so the line stays flat there.
   const riskByDay = new Map(riskDays.map((r) => [r.day, r.score]));
-  const riskTrend = days.map((d) => ({ label: d.label, value: riskByDay.get(d.label) ?? u.riskScore }));
+  const riskTrend = days.map((d) => ({ label: d.label, value: riskByDay.get(d.day) ?? u.riskScore }));
   const lvl = levelFor(u.xp);
   const band = riskBand(u.riskScore);
   const completed = progress.filter((p) => p.p.status === "completed").length;
@@ -147,7 +157,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
             <div className="mt-2 flex flex-wrap gap-2">
               <Pill tone="brand">{tc(`roles.${u.role}`)}</Pill>
               <Pill tone={u.status === "active" ? "safe" : u.status === "invited" ? "brand" : "neutral"}>{tc(`userStatus.${u.status}`)}</Pill>
-              {u.totpEnabled ? <Pill tone="safe">2FA</Pill> : null}
+              {u.totpEnabled ? <Pill tone="safe">{tr("twoFactorOn")}</Pill> : null}
             </div>
             <ul className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-1 text-caption text-ink-muted">
               <li className="flex items-center gap-2">
@@ -166,6 +176,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
               <PersonActions
                 isSelf={u.id === v.user.id}
                 departments={departments.map((d) => ({ id: d.id, name: d.name }))}
+                locales={v.tenant.settings.locales}
                 person={{ id: u.id, name: u.name, jobTitle: u.jobTitle, phone: u.phone, locale: u.locale, role: u.role, status: u.status, departmentId: u.departmentId, totpEnabled: u.totpEnabled }}
               />
             </div>
@@ -185,7 +196,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
         </div>
         <div className="bg-surface p-4">
           <p className="text-tab font-semibold text-ink-muted">{tr("xp")}</p>
-          <p className="mt-1.5 text-title font-bold tabular-nums">{u.xp}</p>
+          <p className="mt-1.5 text-title font-bold tabular-nums">{format.number(u.xp)}</p>
         </div>
         <div className="bg-surface p-4">
           <p className="text-tab font-semibold text-ink-muted">{tr("level")}</p>
@@ -233,7 +244,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
               <dt className="text-ink-muted">{tr("lessonsCompleted")}</dt>
               <dd className="text-right font-semibold">{Number(lessonsAgg[0].n)}</dd>
               <dt className="text-ink-muted">{tr("timeSpent")}</dt>
-              <dd className="text-right font-semibold">{hours ? `${hours} h` : tr("notYet")}</dd>
+              <dd className="text-right font-semibold">{hours ? tr("hours", { hours: format.number(hours, { maximumFractionDigits: 1 }) }) : tr("notYet")}</dd>
               <dt className="text-ink-muted">{tr("firstActive")}</dt>
               <dd className="text-right font-semibold">{firstActive ? format.relativeTime(firstActive) : tr("notYet")}</dd>
               <dt className="text-ink-muted">{tr("lastActive")}</dt>
@@ -343,7 +354,11 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
                 {risks.map((r) => (
                   <li key={r.id} className="flex items-start gap-2 rounded-md bg-sunken px-3 py-2 text-caption">
                     <Pill tone={r.severity === "high" || r.severity === "critical" ? "risk" : "warn"}>{tc(`severity.${r.severity}`)}</Pill>
-                    <span>{r.title}</span>
+                    {/* Newer titles carry every language; an older one is in the learner's language, shown only when it matches the console's. */}
+                    <span>
+                      <b>{ts(`kind.${r.kind}`)}</b>
+                      {riskTitles(r.title) || u.locale === locale ? <> · {riskTitle(r.title, locale)}</> : null}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -382,8 +397,8 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
                   <li key={a.a.id} className="flex items-start gap-2 text-caption">
                     <Award className="mt-0.5 size-4 shrink-0 text-reward-600" />
                     <span className="flex-1">
-                      <b>{pick(a.title, locale)}</b> · {format.dateTime(a.a.at, { dateStyle: "medium", timeStyle: "short" })} · {a.a.locale.toUpperCase()}
-                      <span className="block text-ink-subtle">“{a.a.text}”</span>
+                      <b>{pick(a.title, locale)}</b> · {format.dateTime(a.a.at, { dateStyle: "medium", timeStyle: "short" })} · {isLocale(a.a.locale) ? tc(`languages.${a.a.locale}`) : a.a.locale}
+                      <span className="block text-ink-subtle">{tr("quotedText", { text: a.a.text })}</span>
                     </span>
                   </li>
                 ))}
@@ -439,7 +454,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
                   <li key={x.id} className="flex items-center gap-2 text-caption">
                     <Check className="size-3.5 text-safe-600" />
                     <span className="flex-1">
-                      {x.reason} · +{x.amount} XP
+                      {XP_REASONS.includes(x.reason as (typeof XP_REASONS)[number]) ? tr(`xpReason.${x.reason as (typeof XP_REASONS)[number]}`) : x.reason} · +{format.number(x.amount)} XP
                     </span>
                     <span className="text-ink-subtle">{format.relativeTime(x.at)}</span>
                   </li>

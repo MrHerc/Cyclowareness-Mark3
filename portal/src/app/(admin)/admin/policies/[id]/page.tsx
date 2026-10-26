@@ -1,4 +1,4 @@
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { and, count, desc, eq, inArray } from "drizzle-orm";
 import { CheckCircle2, Circle, Download } from "lucide-react";
 import { db, t } from "@/server/db";
@@ -11,11 +11,17 @@ import { ButtonAnchor, ButtonLink } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { PolicyHeaderActions, VersionEditor } from "@/components/admin/policy-client";
 import { policyForPage } from "./policy";
+import { DEFAULT_LOCALE, isLocale, type Locale } from "@/i18n/config";
+
+export async function generateMetadata({ params }: PageProps<"/admin/policies/[id]">) {
+  const { policy } = await policyForPage((await params).id);
+  return { title: policy.title };
+}
 
 export default async function PolicyAdminPage({ params, searchParams }: PageProps<"/admin/policies/[id]">) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const { v, policy } = await policyForPage(id);
-  const [tr, tc, format] = await Promise.all([getTranslations("admin.policies"), getTranslations("common"), getFormatter()]);
+  const [tr, tc, format, locale] = await Promise.all([getTranslations("admin.policies"), getTranslations("common"), getFormatter(), getLocale()]);
   const tab = sp.tab === "signoffs" ? "signoffs" : "versions";
   const versions = await db().select().from(t.policyVersions).where(eq(t.policyVersions.policyId, id)).orderBy(desc(t.policyVersions.version));
   const current = versions[0] ?? null;
@@ -37,6 +43,7 @@ export default async function PolicyAdminPage({ params, searchParams }: PageProp
   const signedByVersion = new Map(counts.map((c) => [c.versionId, Number(c.n)]));
   const signedBy = new Map(signoffs.map((s) => [s.userId, s]));
   const canWrite = allowed(v, "policies.write");
+  const base: Locale = isLocale(v.tenant.settings.defaultLocale) ? v.tenant.settings.defaultLocale : DEFAULT_LOCALE;
 
   return (
     <div className="grid grid-cols-[minmax(0,1fr)] gap-5">
@@ -61,7 +68,21 @@ export default async function PolicyAdminPage({ params, searchParams }: PageProp
                 <VersionEditor
                   policyId={policy.id}
                   nextVersion={(current?.version ?? 0) + 1}
-                  initial={{ title: current?.title ?? policy.title, summary: current?.summary ?? "", bodyMd: current?.bodyMd ?? `# ${policy.title}\n\n## 1. \n`, enTitle: current?.translations?.en?.title ?? "", enBody: current?.translations?.en?.bodyMd ?? "" }}
+                  base={base}
+                  initial={{
+                    title: current?.title ?? policy.title,
+                    summary: current?.summary ?? "",
+                    bodyMd: current?.bodyMd ?? `# ${policy.title}\n\n## 1. \n`,
+                    // One translation per other language the organisation has switched on, prefilled from the current version.
+                    translations: Object.fromEntries(
+                      v.tenant.settings.locales
+                        .filter((l): l is Locale => isLocale(l) && l !== base)
+                        .map((l) => {
+                          const x = current?.translations?.[l];
+                          return [l, { title: x?.title ?? "", summary: x?.summary ?? "", bodyMd: x?.bodyMd ?? "" }];
+                        }),
+                    ),
+                  }}
                 />
               </CardBody>
             </Card>
@@ -119,7 +140,7 @@ export default async function PolicyAdminPage({ params, searchParams }: PageProp
           <CardBody className="pt-3">
             <ul className="divide-y divide-line">
               {people
-                .sort((a, b) => Number(signedBy.has(b.id)) - Number(signedBy.has(a.id)) || a.name.localeCompare(b.name))
+                .sort((a, b) => Number(signedBy.has(b.id)) - Number(signedBy.has(a.id)) || a.name.localeCompare(b.name, locale))
                 .map((p) => {
                   const s = signedBy.get(p.id);
                   return (

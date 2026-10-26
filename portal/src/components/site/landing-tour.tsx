@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDown, SkipForward, Volume2, VolumeX } from "lucide-react";
-import { Mascot, angleBetween } from "@/components/mascot/mascot";
+import { angleBetween } from "@/components/mascot/mascot";
 import type { MascotGesture } from "@/components/mascot/mapping";
 import { CHAPTERS, type Chapter, type GuideTiming, type LandingCopy, type Line } from "@/lib/landing";
 import { textButtonClass } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/cn";
 import { GuideProvider, useGuide } from "./guide";
 import { unmark } from "./marked";
 import { AdminDemo, DemoForm, DeployDemo, InboxGame, LanguagesDemo, PhoneCall, TutorDemo } from "./scenes";
+import { ScrollCat } from "./scroll-cat";
 
 type Countries = { priority: { code: string; name: string }[]; all: { code: string; name: string }[] };
 
@@ -24,7 +25,6 @@ export function LandingTour(props: { copy: LandingCopy; guide: GuideTiming; lang
 // Attract moves that stay gestures; look, knock, whisper and hop use the mascot's native inputs (see `sayMove`).
 const MOVE_GESTURE: Record<string, MascotGesture> = { "lean-in": "lean-in", ponder: "ponder", wave: "wave" };
 const NAP_MS = 120_000; // idle on the hero before the guide naps
-const TRAVEL_MS = 700; // the walk between chapters
 
 function timeOfDay(): "morning" | "day" | "evening" | "night" {
   const h = new Date().getHours();
@@ -55,9 +55,9 @@ function Tour({ copy, guide: timing, lang, countries, privacyLabel }: { copy: La
     currentRef.current = current;
   });
 
-  /** Where the hero phone is from the hero mascot, for the "look" move. */
-  const aimAtPhone = (): { angle: number } | null => {
-    const phone = sections.current.get("hero")?.querySelector('[data-spot="hero-phone"]');
+  /** Where the hero phone (or the first button on its screen) is from the hero mascot, for the look, knock and tap moves. */
+  const aimAtPhone = (part = ""): { angle: number } | null => {
+    const phone = sections.current.get("hero")?.querySelector(`[data-spot="hero-phone"]${part}`);
     return heroMascot.current && phone ? { angle: angleBetween(heroMascot.current, phone) } : null;
   };
 
@@ -65,7 +65,7 @@ function Tour({ copy, guide: timing, lang, countries, privacyLabel }: { copy: La
   const sayMove = (move: string, line: Line) => {
     const g = guideRef.current;
     if (move === "look") g.say(line, { aim: aimAtPhone() });
-    else if (move === "knock") g.say(line, { move: "knock" });
+    else if (move === "knock") g.say(line, { move: "knock", aim: aimAtPhone() });
     else if (move === "whisper") g.say(line, { whisper: true });
     else if (move === "hop") g.say(line, { move: "bounce" });
     else g.say(line, { gesture: MOVE_GESTURE[move] ?? "wave" });
@@ -84,7 +84,8 @@ function Tour({ copy, guide: timing, lang, countries, privacyLabel }: { copy: La
           return;
         }
         nudged.current = true;
-        g.say(copy.attract.nudge, { move: "tap" });
+        // On the hero the guide points at what to tap on the phone; elsewhere the phone is out of view.
+        g.say(copy.attract.nudge, { move: "tap", aim: currentRef.current === "hero" ? aimAtPhone(" button") : null });
       };
       nudgeTimer.current = window.setTimeout(check, timing.nudgeSeconds * 1000);
     },
@@ -118,18 +119,6 @@ function Tour({ copy, guide: timing, lang, countries, privacyLabel }: { copy: La
       if (napTimer !== null) window.clearTimeout(napTimer);
     };
   }, [arm]);
-
-  // Reaching another chapter sends the guide walking the way the page scrolled, with its depart and arrive.
-  const lastIndex = useRef(index);
-  useEffect(() => {
-    const from = lastIndex.current;
-    lastIndex.current = index;
-    if (from === index) return;
-    const g = guideRef.current;
-    g.setTravel(index > from ? "right" : "left");
-    const id = window.setTimeout(() => g.setTravel(null), TRAVEL_MS);
-    return () => window.clearTimeout(id);
-  }, [index]);
 
   const scrollTo = useCallback((c: Chapter) => {
     sections.current.get(c)?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
@@ -213,7 +202,7 @@ function Tour({ copy, guide: timing, lang, countries, privacyLabel }: { copy: La
             <p className="text-tab font-bold tracking-[0.2em] text-brand-600 uppercase">
               {CHAPTERS.indexOf(c) + 1} · {copy.tour.chapters[c]}
             </p>
-            <h2 id={`${c}-title`} className="mt-3 font-display text-headline font-bold text-balance">
+            <h2 id={`${c}-title`} data-perch={`${c}-title`} data-perch-text className="mt-3 font-display text-headline font-bold text-balance">
               {headline}
             </h2>
             {line ? <p className="mt-3 text-lead text-ink-muted">{line}</p> : null}
@@ -225,7 +214,9 @@ function Tour({ copy, guide: timing, lang, countries, privacyLabel }: { copy: La
   );
 
   return (
-    <div onPointerDownCapture={markInteracted} onKeyDownCapture={markInteracted}>
+    // Positioned: the travelling cat lives in its coordinates. Clipped across (not a scroll container, so nothing
+    // changes vertically): the cat's canvas is wider than its box and must not widen the page at the right edge.
+    <div className="relative overflow-x-clip" onPointerDownCapture={markInteracted} onKeyDownCapture={markInteracted}>
       {/* 1 · Hero: the phone with the message */}
       <section
         id="hero"
@@ -260,32 +251,8 @@ function Tour({ copy, guide: timing, lang, countries, privacyLabel }: { copy: La
               question={copy.hero.question}
               rapport={{ score: copy.rapport.score, fast: copy.rapport.fast }}
               screenLabel={copy.ui.screenLabel}
-              mascot={
-                <button
-                  ref={heroMascot}
-                  type="button"
-                  onClick={() => guide.say(guide.caption ? guide.caption.line : [...copy.tour.frame, copy.attract.greeting], { gesture: "wave" })}
-                  onPointerEnter={() => {
-                    activity.current();
-                    guide.move("touch");
-                  }}
-                  aria-label={copy.attract.tapPrompt}
-                  className="absolute top-[48%] -right-3 z-10 size-20 sm:-right-12 sm:size-28"
-                >
-                  <Mascot
-                    mood={guide.mood}
-                    talking={guide.talking}
-                    gesture={guide.gesture?.name}
-                    gestureKey={guide.gesture?.key}
-                    guide={guide.pose}
-                    aim={guide.aim}
-                    fire={guide.fire ?? undefined}
-                    act={guide.act}
-                    label={copy.ui.captionLabel}
-                    className="size-full"
-                  />
-                </button>
-              }
+              // The guide's first perch: peeking from the phone's edge (the cat is the ScrollCat below, sized like this box).
+              perch={<span aria-hidden data-perch="hero" data-perch-box className="pointer-events-none absolute top-[48%] -right-3 size-20 sm:-right-12 sm:size-28" />}
               onDone={(score, total) => setYou({ clicked: Math.round(((total - score) / total) * 100), reported: Math.round((score / total) * 100), learned: 100 })}
               onRole={(role) => {
                 const next: Chapter = role === "security" ? "deploy" : role === "people" ? "phone" : role === "leader" ? "admin" : "phone";
@@ -296,6 +263,18 @@ function Tour({ copy, guide: timing, lang, countries, privacyLabel }: { copy: La
         </div>
       </section>
 
+      {/* The one guide cat: it starts on the hero perch and jumps from perch to perch as the page scrolls. */}
+      <ScrollCat
+        buttonRef={heroMascot}
+        label={copy.ui.captionLabel}
+        tapPrompt={copy.attract.tapPrompt}
+        onTap={() => guide.say(guide.caption ? guide.caption.line : [...copy.tour.frame, copy.attract.greeting], { gesture: "wave" })}
+        onHover={() => {
+          activity.current();
+          guide.move("touch");
+        }}
+      />
+
       {chapterSection("phone", phone.headline, phone.line, <PhoneCall scene={phone} beats={copy.tour.beats.phone} clock={inbox.clock} screenLabel={copy.ui.screenLabel} skipLabel={copy.ui.skip} />, "tint")}
       {chapterSection("tutor", tutor.headline, tutor.line, <TutorDemo scene={tutor} beats={copy.tour.beats.tutor} />)}
       {chapterSection("languages", languages.headline, languages.line, <LanguagesDemo scene={languages} beats={copy.tour.beats.languages} />, "tint")}
@@ -303,60 +282,24 @@ function Tour({ copy, guide: timing, lang, countries, privacyLabel }: { copy: La
       {chapterSection("deploy", deploy.headline, deploy.line, <DeployDemo scene={deploy} beats={copy.tour.beats.deploy} />, "tint")}
       {chapterSection("demo", demo.headline, demo.line, <DemoForm scene={demo} lang={lang} countries={countries} privacyLabel={privacyLabel} />)}
 
-      <GuideDock copy={copy} current={current} index={index} seen={seen} showMascot={current !== "hero"} onNext={() => scrollTo(CHAPTERS[Math.min(index + 1, CHAPTERS.length - 1)])} onSkip={() => scrollTo("demo")} />
+      <GuideDock copy={copy} current={current} index={index} seen={seen} onNext={() => scrollTo(CHAPTERS[Math.min(index + 1, CHAPTERS.length - 1)])} onSkip={() => scrollTo("demo")} />
     </div>
   );
 }
 
-/** Floating guide: mascot + caption (karaoke) + the tour control pill. */
-function GuideDock({
-  copy,
-  current,
-  index,
-  seen,
-  showMascot,
-  onNext,
-  onSkip,
-}: {
-  copy: LandingCopy;
-  current: Chapter;
-  index: number;
-  seen: Set<Chapter>;
-  /** False on the hero, where the guide peeks from the phone instead. */
-  showMascot: boolean;
-  onNext: () => void;
-  onSkip: () => void;
-}) {
+/** Floating guide: the caption (karaoke) + the tour control pill. The guide itself is the travelling ScrollCat. */
+function GuideDock({ copy, current, index, seen, onNext, onSkip }: { copy: LandingCopy; current: Chapter; index: number; seen: Set<Chapter>; onNext: () => void; onSkip: () => void }) {
   const guide = useGuide();
   const words = useMemo(() => (guide.caption ? unmark(guide.caption.line.text).split(/\s+/) : []), [guide.caption]);
   const last = index === CHAPTERS.length - 1;
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex flex-col items-center gap-2 px-3 pb-[calc(var(--safe-bottom)+0.75rem)]">
-      {guide.caption ? (
-        <div className="pointer-events-auto flex w-full max-w-xl items-end gap-2" aria-live="polite">
-          {showMascot ? (
-            <button
-              type="button"
-              onClick={() => guide.say(guide.caption!.line)}
-              onPointerEnter={() => guide.move("touch")}
-              aria-label={copy.attract.tapPrompt}
-              className="relative -mb-1 size-20 shrink-0 sm:size-24"
-            >
-              <Mascot
-                mood={guide.mood}
-                talking={guide.talking}
-                gesture={guide.gesture?.name}
-                gestureKey={guide.gesture?.key}
-                guide={guide.pose}
-                aim={guide.aim}
-                fire={guide.fire ?? undefined}
-                act={guide.act}
-                className="size-full"
-                label={copy.ui.captionLabel}
-              />
-            </button>
-          ) : null}
-          <div className="mb-2 min-w-0 flex-1 rounded-2xl rounded-bl-sm bg-surface px-4 py-3 shadow-overlay ring-1 ring-line">
+    // data-guide-dock: the travelling cat keeps its perches above this.
+    <div data-guide-dock className="pointer-events-none fixed inset-x-0 bottom-0 z-30 flex flex-col items-center gap-2 px-3 pb-[calc(var(--safe-bottom)+0.75rem)]">
+      {/* Always there, as tall as three caption lines on a phone (two on wider screens), so a new line or the
+          first caption does not move the dock and shift the page; its empty part lets the pointer through. */}
+      <div className="flex min-h-[7.125rem] w-full max-w-xl items-end gap-2 sm:min-h-[5.75rem]" aria-live="polite">
+        {guide.caption ? (
+          <div className="pointer-events-auto mb-2 min-w-0 flex-1 rounded-2xl bg-surface px-4 py-3 shadow-overlay ring-1 ring-line">
             <p className="text-tab-sm font-bold tracking-wider text-ink-subtle uppercase">{guide.caption.line.voice === "caller" ? copy.scenes[1].callerLabel : copy.ui.captionLabel}</p>
             <p className="mt-0.5 text-body-sm">
               {words.map((w, i) => (
@@ -366,8 +309,8 @@ function GuideDock({
               ))}
             </p>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
       <nav aria-label={copy.tour.railLabel} className="pointer-events-auto flex w-full max-w-xl items-center gap-3 rounded-pill bg-surface/95 py-2 pr-2 pl-5 shadow-overlay ring-1 ring-line backdrop-blur">
         <ol className="flex min-w-0 flex-1 gap-1" aria-label={copy.tour.railLabel}>
           {CHAPTERS.map((c, i) => (

@@ -1,0 +1,518 @@
+{
+  "id": "opened-file-sent-wrong",
+  "title": "Fayllar və yanlış alıcılar",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Şübhəli bir fayl açdınız və ya məlumatları səhv adama göndərdiniz? Sakit olun, addımlar qısadır.",
+          "mood": "talk",
+          "gesture": "nod",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Faylı açdınız? Wi-Fi bağlantısını söndürün və kabeli çıxarın. Prosedurunuz başqa cür tələb etmirsə, kompüteri söndürməyin.",
+          "mood": "alert",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "wifi"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Faylı da, məktubu da silməyin: mütəxəssislər hücumun nə etdiyini məhz onlardan öyrənir.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "file",
+              "name": [
+                {
+                  "text": "Akt_imzala"
+                },
+                {
+                  "text": ".docm",
+                  "spot": "ext"
+                }
+              ],
+              "type": "doc",
+              "size": "84 KB",
+              "source": [
+                {
+                  "text": "n.ismayilov@tender-akt.example.net"
+                }
+              ]
+            }
+          },
+          "highlight": "ext"
+        },
+        {
+          "id": "b4",
+          "say": "Yoluxmuş kompüterdən deyil, telefonla bildirin. Səhv adama göndərilmiş məlumatları isə heç vaxt gizlətməyin.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "file-opened",
+      "environment": "desktop",
+      "title": "Faylı açdınız",
+      "intro": "«Akt_imzala» qoşmasını açdınız və makroslara icazə verdiniz. İndi qəribə şeylər baş verir.",
+      "steps": [
+        {
+          "id": "av-alert",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "qoruyucu",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Təhlükə aşkarlandı"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Akt_imzala.docm faylında zərərli makros tapıldı. Təmizləmə başa çatmadı."
+                }
+              ]
+            ],
+            "buttons": [
+              "Bağla",
+              "Ətraflı"
+            ]
+          },
+          "say": "Antivirusunuz xəbərdarlıq edir.",
+          "actions": [
+            {
+              "id": "disconnect",
+              "label": "Wi-Fi bağlantısını söndür, kabeli çıxar",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Düzdür. Şəbəkədən ayrılmış kompüter ziyanı yaya və ya məlumatları kənara göndərə bilməz."
+            },
+            {
+              "id": "keep-working",
+              "label": "Bağla və işə davam et",
+              "kind": "cancel",
+              "outcome": "compromised",
+              "feedback": "Təmizləmə başa çatmadı, yəni proqram hələ də işləyə bilər. Hər keçən dəqiqə ona yayılmağa imkan verir."
+            },
+            {
+              "id": "delete",
+              "label": "Faylı sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Silmək sübutu məhv edir və artıq işə düşmüş proqramı dayandırmır. Əvvəlcə kompüteri şəbəkədən ayırın."
+            }
+          ]
+        },
+        {
+          "id": "fake-helper",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "texkomek-24",
+            "app": "TexKömək 24",
+            "title": [
+              {
+                "text": "Kompüteriniz yoluxub"
+              }
+            ],
+            "body": [
+              {
+                "text": "Onu indi təmizləmək üçün TexKömək 24 xidmətinə uzaqdan giriş verin."
+              }
+            ],
+            "time": "10:07"
+          },
+          "say": "Bildiriş kömək təklif edir.",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "Uzaqdan girişə icazə ver",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Naməlum tətbiqə uzaqdan giriş vermək bütün kompüteri hücumçuya təhvil vermək deməkdir. Kömək yalnız öz İT dəstəyinizdən gəlir."
+            },
+            {
+              "id": "deny",
+              "label": "İmtina et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Kompüteri özünüz təmizləməyə çalışmayın, təhlükəsizlik komandasını gözləyin."
+            }
+          ]
+        },
+        {
+          "id": "keep-evidence",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Akt_imzala.docm"
+              }
+            ],
+            "type": "doc",
+            "size": "84 KB",
+            "source": [
+              {
+                "text": "Yükləmələr"
+              }
+            ]
+          },
+          "say": "Fayl hələ də «Yükləmələr» qovluğundadır.",
+          "actions": [
+            {
+              "id": "reopen",
+              "label": "Yenidən aç",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Hər açılışda makros yenidən işə düşə bilər. Fayla toxunmayın."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Təhlükəsizlik komandası faylın nə etdiyini məhz ondan öyrənəcək. Onu silməyin."
+            },
+            {
+              "id": "leave",
+              "label": "Olduğu kimi saxla",
+              "kind": "ignore",
+              "outcome": "safe",
+              "feedback": "Düzdür. Fayl sübutdur, təhlükəsizlik komandası onu təhlükəsiz şəkildə araşdıracaq."
+            }
+          ]
+        },
+        {
+          "id": "reconnect",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Şəbəkə bağlantısı yoxdur"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Wi-Fi söndürülüb. Yenidən qoşulmaq istəyirsiniz?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Oflayn qal",
+              "Qoşul"
+            ]
+          },
+          "say": "Poçtunuzu yoxlamaq istəyirsiniz, amma şəbəkə yoxdur.",
+          "actions": [
+            {
+              "id": "connect",
+              "label": "Qoşul",
+              "kind": "connect",
+              "outcome": "risky",
+              "feedback": "Təhlükəsizlik komandası icazə verənə qədər oflayn qalın: proqram fayllarınızı şifrələyə və ya yayıla bilər."
+            },
+            {
+              "id": "stay",
+              "label": "Oflayn qal",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Düzdür. İndi telefonunuzdan təhlükəsizlik komandasına zəng edin və nəyi açdığınızı deyin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "power-off",
+      "question": {
+        "prompt": "Kompüter yoluxub və şəbəkədən ayrılıb. Onu söndürməlisinizmi?",
+        "options": [
+          {
+            "id": "leave-on",
+            "label": "Xeyr, prosedurumuz başqa cür tələb etmirsə, açıq saxlayıram",
+            "correct": true,
+            "feedback": "Düzdür. Operativ yaddaşdakı izlər mütəxəssislər üçün vacibdir."
+          },
+          {
+            "id": "shut",
+            "label": "Bəli, dərhal söndürürəm",
+            "correct": false,
+            "feedback": "Söndürmək operativ yaddaşdakı izləri silir. Yayılmanın qarşısını isə şəbəkədən ayırmaq onsuz da alır."
+          },
+          {
+            "id": "keep-working",
+            "label": "Xeyr, onda işləməyə davam edirəm",
+            "correct": false,
+            "feedback": "Yoluxmuş kompüterdə işləmək parollarınızı və fayllarınızı riskə atır."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "alarm"
+        }
+      },
+      "explain": "Şəbəkədən ayırın, açıq saxlayın, telefonla bildirin. Təşkilatınızın proseduru fərqlidirsə, ona əməl edin."
+    },
+    {
+      "type": "order",
+      "id": "after-file",
+      "prompt": "Şübhəli bir fayl açdınız. Addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "isolate",
+          "label": "Kompüteri şəbəkədən ayırın"
+        },
+        {
+          "id": "call",
+          "label": "Telefonunuzdan təhlükəsizlik komandasına zəng edin"
+        },
+        {
+          "id": "tell",
+          "label": "Nəyi və nə vaxt açdığınızı dəqiq deyin"
+        },
+        {
+          "id": "passwords",
+          "label": "Parollarınızı başqa, təmiz cihazdan dəyişin"
+        }
+      ],
+      "explain": "Parolları heç vaxt yoluxmuş kompüterdə dəyişməyin: proqram yenilərini də oxuya bilər."
+    },
+    {
+      "type": "scenario",
+      "id": "wrong-recipient",
+      "title": "Yanlış alıcı",
+      "start": "sent",
+      "nodes": [
+        {
+          "id": "sent",
+          "text": "Siyahını həmkarınız Kamrana deyil, eyni adlı kənar ünvana göndərdiniz. Orada vətəndaşların adları və telefon nömrələri var.",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "idare",
+              "from": {
+                "name": [
+                  {
+                    "text": "Siz"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "r.mammadli@idare.example"
+                  }
+                ]
+              },
+              "to": "kamran.h@poct-mail.example",
+              "subject": [
+                {
+                  "text": "Vətəndaş müraciətləri: siyahı"
+                }
+              ],
+              "time": "15:20",
+              "body": [
+                [
+                  {
+                    "text": "Kamran, siyahını qoşmada göndərirəm."
+                  }
+                ]
+              ],
+              "attachments": [
+                {
+                  "name": [
+                    {
+                      "text": "Muracietler_sentyabr.xlsx"
+                    }
+                  ],
+                  "size": "240 KB"
+                }
+              ]
+            }
+          },
+          "choices": [
+            {
+              "label": "Dərhal rəhbərimə və təhlükəsizlik komandasına bildirirəm",
+              "next": "advice",
+              "feedback": "Düzdür. Şəxsi məlumatlar sızıbsa, təşkilat bundan vaxtında xəbər tutmalıdır."
+            },
+            {
+              "label": "Heç kimə demirəm, bəlkə açmazlar",
+              "outcome": "compromised",
+              "feedback": "Sızma gizli qalsa, təşkilat vətəndaşları qorumaq üçün heç nə edə bilməz."
+            },
+            {
+              "label": "Sadəcə alıcıdan onu silməyi xahiş edirəm, vəssalam",
+              "outcome": "risky",
+              "feedback": "Xahiş etmək kömək edir, amma təşkilat yenə də sızmadan xəbərdar olmalıdır."
+            }
+          ]
+        },
+        {
+          "id": "advice",
+          "text": "Alıcıya nəzakətlə yazın, faylı silməyi və bunu təsdiqləməyi xahiş edin.",
+          "speaker": "Təhlükəsizlik komandası",
+          "voice": "man-3",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Alıcıya nəzakətlə yazın, <breath> faylı silməyi və bunu təsdiqləməyi xahiş edin.",
+          "choices": [
+            {
+              "label": "Yazıram və cavabı mütəxəssisə yönləndirirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Yazılı təsdiq sızmanın nəzarət altına alındığını sübut edir."
+            },
+            {
+              "label": "Faylı Kamrana yenidən göndərirəm və unuduram",
+              "outcome": "risky",
+              "feedback": "Düzgün adama göndərmək yaxşıdır, amma yanlış ünvandakı nüsxə yerində qalır."
+            },
+            {
+              "label": "Heç bir iz qalmasın deyə göndərdiyim məktubu silirəm",
+              "outcome": "risky",
+              "feedback": "Göndərilmiş məktub nəyin hara və nə vaxt getdiyini göstərir. Onu saxlayın."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "colleague-reactions",
+      "prompt": "Həmkarınız düzgün hərəkət edibmi?",
+      "cards": [
+        {
+          "id": "farid",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Fərid"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Qəribə bir fayl açdım. Wi-Fi-ı söndürdüm, indi təhlükəsizlik komandasına zəng edirəm."
+                  }
+                ],
+                "time": "10:15"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Düzdür: əvvəlcə şəbəkədən ayırmaq, sonra telefonla bildirmək."
+        },
+        {
+          "id": "leyla",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Leyla"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Faylı açdım, sonra sildim. Heç kim bilməyəcək."
+                  }
+                ],
+                "time": "11:02"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Silmək izi məhv edir, gizlətmək isə hücuma vaxt qazandırır."
+        },
+        {
+          "id": "elvin",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Elvin"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Ekrana virus xəbərdarlığı çıxdı, ona görə internetdən pulsuz təmizləyici proqram yüklədim."
+                  }
+                ],
+                "time": "12:30"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Alətləri özbaşına quraşdırmaq izləri silə və yeni zərərli proqram gətirə bilər."
+        },
+        {
+          "id": "narmin",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Nərmin"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Sənədi səhvən kənar ünvana göndərdim. Dərhal rəhbərimə və təhlükəsizlik komandasına dedim."
+                  }
+                ],
+                "time": "15:45"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Düzdür. Tez bildirmək ziyanı məhdudlaşdırır."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Zərərli fayl açdınız? Şəbəkədən ayırın, prosedurunuz başqa cür tələb etmirsə, kompüteri açıq saxlayın və telefonla bildirin.",
+        "Faylı da, məktubu da silməyin, özünüz təmizləməyə də çalışmayın.",
+        "Nəyisə səhv adama göndərdiniz? Gizlətməyin: dərhal rəhbərinizə və təhlükəsizlik komandasına bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

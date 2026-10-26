@@ -1,0 +1,553 @@
+{
+  "id": "shared-doc-login",
+  "title": "Paylaşılmış sənəd",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "sd-tutor",
+      "beats": [
+        {
+          "id": "sd-b1",
+          "say": "Saxta giriş pəncərəsi çox vaxt belə bir məktubla başlayır: sizinlə sənəd paylaşılıb, ona baxmaq üçün daxil olun.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        },
+        {
+          "id": "sd-b2",
+          "say": "Düymə tanış hesabla daxil olmağı təklif edir. Açılan pəncərə isə saytın içində çəkilib.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "buludxidmet-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "BuludXidmət"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "paylasim@buludxidmet-share.example.net"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "Kamran Əliyev sizinlə sənəd paylaşdı"
+                }
+              ],
+              "time": "09:47",
+              "body": [
+                [
+                  {
+                    "text": "Kamran Əliyev sizinlə «Tender_teklifi_2026.pdf» sənədini paylaşdı."
+                  }
+                ],
+                [
+                  {
+                    "text": "Baxmaq üçün: "
+                  },
+                  {
+                    "text": "İşPoçt ilə daxil olun",
+                    "spot": "signin-btn",
+                    "link": {
+                      "label": "İşPoçt ilə daxil olun",
+                      "href": "https://buludxidmet-share.example.net/view?id=88213"
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "signin-btn"
+        },
+        {
+          "id": "sd-b3",
+          "say": "Qurumunuzun sosial media səhifəsini bağlamaqla hədələyən məktub da eyni tələdir.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "sd-b4",
+          "say": "Qayda belədir: məktubdakı düymə ilə daxil olmayın. Saytı özünüz açın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "sd-choice",
+      "question": {
+        "prompt": "Sizə bu məktub gəlib. Nə edirsiniz?",
+        "options": [
+          {
+            "id": "signin",
+            "label": "Düyməyə basıb İşPoçt hesabımla daxil oluram",
+            "correct": false,
+            "feedback": "Düymə sizi tanımadığınız sayta aparır. Oradakı giriş pəncərəsi saxta ola bilər."
+          },
+          {
+            "id": "ask-colleague",
+            "label": "Kamranın bildiyim nömrəsinə zəng edib soruşuram",
+            "correct": true,
+            "feedback": "Düzdür. Sənəd həqiqidirsə, Kamran onu qurumunuzun öz sistemində yenidən paylaşacaq."
+          },
+          {
+            "id": "forward",
+            "label": "Həmkarlarıma yönləndirirəm ki, onlar da baxsınlar",
+            "correct": false,
+            "feedback": "Onda tələ başqalarına da çatar. Şübhəli məktubu yalnız İT dəstəyinə göndərin."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "buludxidmet-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "BuludXidmət"
+                }
+              ],
+              "address": [
+                {
+                  "text": "paylasim@buludxidmet-share.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Kamran Əliyev sizinlə sənəd paylaşdı"
+              }
+            ],
+            "time": "09:47",
+            "body": [
+              [
+                {
+                  "text": "Kamran Əliyev sizinlə «Tender_teklifi_2026.pdf» sənədini paylaşdı."
+                }
+              ],
+              [
+                {
+                  "text": "Baxmaq üçün: "
+                },
+                {
+                  "text": "İşPoçt ilə daxil olun",
+                  "link": {
+                    "label": "İşPoçt ilə daxil olun",
+                    "href": "https://buludxidmet-share.example.net/view?id=88213"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "Link 24 saat ərzində etibarlıdır."
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "explain": "Sənəd həqiqidirsə, saytı özünüz açanda onu görəcəksiniz. Məktubdakı giriş düyməsinə heç vaxt ehtiyac yoxdur."
+    },
+    {
+      "type": "simulation",
+      "id": "sd-sim",
+      "environment": "inbox",
+      "title": "İş poçtunuz",
+      "intro": "Səhər poçtunuzda dörd məktub gözləyir. Hər birini açın və düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "real-share",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "buludxidmet",
+            "from": {
+              "name": [
+                {
+                  "text": "BuludXidmət"
+                }
+              ],
+              "address": [
+                {
+                  "text": "bildiris@buludxidmet.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Nərmin Həsənova sizinlə fayl paylaşdı"
+              }
+            ],
+            "time": "08:55",
+            "body": [
+              [
+                {
+                  "text": "Nərmin Həsənova sizinlə «Budce_2027.xlsx» faylını paylaşdı."
+                }
+              ],
+              [
+                {
+                  "text": "Qeyd: bu səhər danışdığımız büdcə cədvəli."
+                }
+              ],
+              [
+                {
+                  "text": "Faylı aç",
+                  "link": {
+                    "label": "Faylı aç",
+                    "href": "https://buludxidmet.example/idare/budce-2027"
+                  }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Faylı aç",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "Bu faylı gözləyirdiniz, link də xidmətin öz ünvanına aparır. Onu açmaq olar."
+            },
+            {
+              "id": "safe",
+              "label": "Təhlükəsiz kimi qeyd et",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Düzdür. Tanış həmkar, gözlənilən fayl və xidmətin öz ünvanı."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Ehtiyatlı olmaq yaxşıdır, amma burada heç bir xəbərdarlıq əlaməti yoxdur. Nərmin bu fayl barədə sizə səhər demişdi."
+            }
+          ]
+        },
+        {
+          "id": "fake-share",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "buludxidmet-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "BuludXidmət"
+                }
+              ],
+              "address": [
+                {
+                  "text": "paylasim@buludxidmet-share.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Kamran Əliyev sizinlə sənəd paylaşdı"
+              }
+            ],
+            "time": "09:47",
+            "body": [
+              [
+                {
+                  "text": "Kamran Əliyev sizinlə «Tender_teklifi_2026.pdf» sənədini paylaşdı."
+                }
+              ],
+              [
+                {
+                  "text": "Baxmaq üçün: "
+                },
+                {
+                  "text": "İşPoçt ilə daxil olun",
+                  "link": {
+                    "label": "İşPoçt ilə daxil olun",
+                    "href": "https://buludxidmet-share.example.net/view?id=88213"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "Link 24 saat ərzində etibarlıdır."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Başqa domen və saxta pəncərəyə aparan giriş düyməsi."
+            },
+            {
+              "id": "click",
+              "label": "İşPoçt ilə daxil ol",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Səhifə İşPoçt pəncərəsi çəkib parolunuzu istəyəcəkdi. Belə düymələrə toxunmayın."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Silmək də olar. Amma bildirsəniz, İT dəstəyi həmkarlarınızı xəbərdar edə bilər."
+            }
+          ]
+        },
+        {
+          "id": "copyright",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "w2c-kontakto-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "Kontakto Hüquq Mərkəzi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "huquq@kontakto-support.example.info"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Səhifəniz 24 saat ərzində silinəcək"
+              }
+            ],
+            "time": "10:12",
+            "body": [
+              [
+                {
+                  "text": "Qurumunuzun rəsmi səhifəsində müəllif hüquqlarının pozulması aşkarlanıb."
+                }
+              ],
+              [
+                {
+                  "text": "Etiraz etmək üçün səhifə administratoru kimi daxil olun: "
+                },
+                {
+                  "text": "Etiraz et",
+                  "link": {
+                    "label": "Etiraz et",
+                    "href": "https://kontakto-support.example.info/etiraz"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "Cavab verilməsə, səhifə birdəfəlik bağlanacaq."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əsl xəbərdarlıq sosial şəbəkənin öz tətbiqində də görünərdi."
+            },
+            {
+              "id": "click",
+              "label": "Etiraz et",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Etiraz səhifəsi Kontakto pəncərəsi çəkib parolu və kodu toplayacaqdı. Qurumunuzun səhifəsi fırıldaqçının əlinə keçəcəkdi."
+            },
+            {
+              "id": "reply",
+              "label": "Cavab yaz: bu, səhvdir",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Fırıldaqçı cavabı oxuyub yeni link göndərəcək. Bunun əvəzinə məktubu bildirin."
+            }
+          ]
+        },
+        {
+          "id": "it-notice",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "İT Dəstək"
+                }
+              ],
+              "address": [
+                {
+                  "text": "destek@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Bu axşam poçt serveri yenilənəcək"
+              }
+            ],
+            "time": "11:30",
+            "body": [
+              [
+                {
+                  "text": "Bu gün saat 19:00 ilə 20:00 arasında iş poçtu bir neçə dəqiqəlik əlçatan olmaya bilər."
+                }
+              ],
+              [
+                {
+                  "text": "Sizdən heç bir addım tələb olunmur."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "safe",
+              "label": "Təhlükəsiz kimi qeyd et",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Düzdür. Məktub daxili ünvandan gəlib, içində nə link var, nə də parol tələbi."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Bu məktubda link yoxdur və sizdən heç nə istənmir. Belə bildirişlər adi iş qaydasıdır."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Silmək olar, məktub sadəcə məlumat verir. Burada təhlükə yoxdur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "sd-hotspot",
+      "prompt": "Bu giriş pəncərəsinin saxta olduğunu göstərən əlamətləri tapın.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2c-kontakto-fake",
+        "tone": "app",
+        "title": [
+          {
+            "text": "Kontakto: giriş"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Brauzerin ünvan sətri: "
+            },
+            {
+              "text": "kontakto-support.example.info/etiraz",
+              "spot": "real-address"
+            }
+          ],
+          [
+            {
+              "text": "Pəncərədəki ünvan: "
+            },
+            {
+              "text": "https://kontakto.example/login",
+              "spot": "painted-bar"
+            }
+          ],
+          [
+            {
+              "text": "Telefon və ya e-poçt, parol"
+            }
+          ],
+          [
+            {
+              "text": "SMS ilə gələn kodu da daxil edin",
+              "spot": "code"
+            }
+          ],
+          [
+            {
+              "text": "Pəncərə səhifənin kənarından o yana keçmir",
+              "spot": "no-drag"
+            }
+          ],
+          [
+            {
+              "text": "Etiraz üçün 2 saat 59 dəqiqə qalıb",
+              "spot": "timer"
+            }
+          ]
+        ],
+        "buttons": [
+          "Daxil ol"
+        ]
+      },
+      "spots": [
+        {
+          "id": "real-address",
+          "label": "Əsl ünvan",
+          "explain": "Brauzerin öz ünvan sətri başqa sayt göstərir. Pəncərənin içindəki yazıya yox, ona baxın."
+        },
+        {
+          "id": "painted-bar",
+          "label": "Çəkilmiş ünvan",
+          "explain": "Bu ünvan sətri pəncərə şəklinin bir hissəsidir. Fırıldaqçı ora istədiyini yaza bilər."
+        },
+        {
+          "id": "code",
+          "label": "Doğrulama kodu",
+          "explain": "Kodu iki addımlı doğrulamadan yan keçmək üçün istəyirlər. Belə pəncərəyə heç vaxt kod yazmayın."
+        },
+        {
+          "id": "no-drag",
+          "label": "Tərpənməyən pəncərə",
+          "explain": "Əsl pəncərəni brauzerdən kənara sürüşdürmək olur. Bu isə səhifənin içində ilişib qalır."
+        },
+        {
+          "id": "timer",
+          "label": "Təzyiq",
+          "explain": "Geri sayım sizi yoxlamadan tələsik daxil olmağa sövq etmək üçündür."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "recap",
+      "id": "sd-recap",
+      "points": [
+        "Paylaşılmış sənədi saytı özünüz açaraq tapın",
+        "Səhifənizi bağlamaqla hədələyən məktub tələdir",
+        "Parolunuzu yazmısınızsa, onu dərhal dəyişin və İT dəstəyinə bildirin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

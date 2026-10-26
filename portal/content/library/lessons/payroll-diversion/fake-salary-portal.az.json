@@ -1,0 +1,505 @@
+{
+  "id": "fake-salary-portal",
+  "title": "Saxta maaş portalı",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "pd2-tutor",
+      "beats": [
+        {
+          "id": "pd2-b1",
+          "say": "İndi siz adi əməkdaşsınız və maaş vərəqənizə baxmaq istəyirsiniz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "pd2-b2",
+          "say": "Axtarışda ən yuxarıdakı nəticə çox vaxt reklam olur. Fırıldaqçılar saxta portalları elə ora reklam kimi yerləşdirirlər.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "w2f-kadr-kabineti-fake",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "kadr-kabineti-giris.example.net",
+                  "spot": "ad-domain"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "ad-domain"
+        },
+        {
+          "id": "pd2-b3",
+          "say": "Saxta səhifə əslinin eynidir. Parolunuzu orada yazsanız, hesabınız ələ keçirilə, ardınca maaş hesabınız da dəyişdirilə bilər.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "login",
+              "brandRef": "w2f-kadr-kabineti-fake",
+              "brand": "Kadr Kabineti",
+              "url": [
+                {
+                  "text": "https://kadr-kabineti-giris.example.net/giris"
+                }
+              ],
+              "fields": [
+                "İş e-poçtu",
+                "Parol"
+              ],
+              "button": "Daxil ol"
+            }
+          }
+        },
+        {
+          "id": "pd2-b4",
+          "say": "Portalın ünvanını özünüz yazın və ya onu əlfəcindən açın. İki addımlı doğrulamanı da aktiv saxlayın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "pd2-choice",
+      "question": {
+        "prompt": "Axtarışa «kadr kabineti» yazdınız. Portala necə daxil olarsınız?",
+        "options": [
+          {
+            "id": "ad",
+            "label": "Reklam: Kadr Kabineti, rəsmi giriş (kadr-kabineti-giris.example.net)",
+            "correct": false,
+            "feedback": "Reklam yeri satın alınır, ona görə saxta sayt lap yuxarıda ola bilər. Bu domen təşkilatınızın domeni deyil."
+          },
+          {
+            "id": "lookalike",
+            "label": "kadr-kabineti.example.org: maaş vərəqəsi",
+            "correct": false,
+            "feedback": "Ad oxşayır, amma domen təşkilatınıza aid deyil. Oxşar ad ən çox yayılmış fənddir."
+          },
+          {
+            "id": "typed",
+            "label": "Ünvanı özüm yazıram: kabinet.seherxidmetleri.example",
+            "correct": true,
+            "feedback": "Düzdür. Özünüz yazdığınız və ya əlfəcinə əlavə etdiyiniz ünvan reklamlardan asılı deyil."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2f-tapinti",
+            "url": [
+              {
+                "text": "https://axtar.example/?q=kadr+kabineti"
+              }
+            ]
+          }
+        }
+      },
+      "explain": "Fırıldaqçılar saxta portalları axtarış reklamları ilə ən yuxarı çıxarırlar. Portalın ünvanını bir dəfə yoxlayın və əlfəcinə əlavə edin."
+    },
+    {
+      "type": "simulation",
+      "id": "pd2-sim",
+      "environment": "browser",
+      "title": "Maaş vərəqəsi",
+      "intro": "Maaş vərəqənizə baxmaq üçün brauzeri açdınız. Ünvan sətrinə diqqət edin və hər addımda düzgün qərar verin.",
+      "steps": [
+        {
+          "id": "search",
+          "label": "Reklam: Kadr Kabineti, maaş vərəqəsi üçün rəsmi giriş",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2f-tapinti",
+            "url": [
+              {
+                "text": "https://axtar.example/?q=kadr+kabineti",
+                "reveal": "axtar.example"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "ad",
+              "label": "Reklam nəticəsini aç",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Bu reklam saxta portala aparır. Ünvan sətrində təşkilatınızın domeni yoxdur.",
+              "next": "fake-login"
+            },
+            {
+              "id": "bookmark",
+              "label": "Kadr Kabinetini əlfəcinlərdən aç",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əlfəcin sizi həmişə əsl ünvana aparır.",
+              "next": "real-login"
+            }
+          ]
+        },
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2f-kadr-kabineti-fake",
+            "brand": "Kadr Kabineti",
+            "url": [
+              {
+                "text": "https://kadr-kabineti-giris.example.net/giris",
+                "reveal": "kadr-kabineti-giris.example.net"
+              }
+            ],
+            "fields": [
+              "İş e-poçtu",
+              "Parol"
+            ],
+            "button": "Daxil ol"
+          },
+          "say": "Ünvan sətrinə baxın.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Daxil ol",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Parolunuz fırıldaqçıya getdi. Onu dərhal əsl portalda dəyişin və kadrlar şöbəsinə zəng edin."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür, domen təşkilatınıza aid deyil. Portalı əlfəcinlərdən açın.",
+              "next": "real-login"
+            }
+          ]
+        },
+        {
+          "id": "fake-code",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2f-kadr-kabineti-fake",
+            "brand": "Kadr Kabineti",
+            "url": [
+              {
+                "text": "https://kadr-kabineti-giris.example.net/tesdiq",
+                "reveal": "kadr-kabineti-giris.example.net"
+              }
+            ],
+            "fields": [
+              "SMS kodu"
+            ],
+            "button": "Təsdiqlə"
+          },
+          "say": "İndi sayt telefonunuza göndərilən kodu istəyir.",
+          "actions": [
+            {
+              "id": "code",
+              "label": "Təsdiqlə",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Bu kodla fırıldaqçı hesabınıza tam daxil olur. Kodu yalnız əsl saytda, özünüz daxil olarkən yazın."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Yaxşı ki, dayandınız. İndi parolunuzu əsl portalda dəyişin və kadrlar şöbəsinə xəbər verin."
+            }
+          ]
+        },
+        {
+          "id": "real-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2f-kadr-kabineti",
+            "brand": "Kadr Kabineti",
+            "url": [
+              {
+                "text": "https://kabinet.seherxidmetleri.example/giris",
+                "reveal": "seherxidmetleri.example"
+              }
+            ],
+            "fields": [
+              "İş e-poçtu",
+              "Parol"
+            ],
+            "button": "Daxil ol"
+          },
+          "say": "Bu, təşkilatınızın öz ünvanıdır.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Daxil ol",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Düzdür. Domen təşkilatınıza məxsusdur və səhifəni özünüz açmısınız."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "risky",
+              "feedback": "Bu, əsl portaldır. Ünvanı yoxladıqdan sonra daxil olmaq təhlükəsizdir."
+            }
+          ]
+        },
+        {
+          "id": "mfa-offer",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2f-kadr-kabineti",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İki addımlı doğrulama söndürülüb"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Hesabınızı qorumaq üçün onu indi aktivləşdirin. Hər girişi telefonunuz təsdiqləyəcək."
+                }
+              ]
+            ],
+            "buttons": [
+              "Aktivləşdir",
+              "Sonra"
+            ]
+          },
+          "actions": [
+            {
+              "id": "enable",
+              "label": "Aktivləşdir",
+              "kind": "allow",
+              "outcome": "safe",
+              "feedback": "Əla. Parolunuz oğurlansa belə, ikinci addım yad adamın qarşısını kəsir."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "İki addımlı doğrulama olmadan bir parol hər şeyi açır. Onu bu gün aktivləşdirin."
+            }
+          ]
+        },
+        {
+          "id": "bank-details",
+          "label": "Bank rekvizitləriniz: son dəyişiklik 14.03.2025, kadrlar şöbəsi tərəfindən",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2f-kadr-kabineti",
+            "url": [
+              {
+                "text": "https://kabinet.seherxidmetleri.example/rekvizitler",
+                "reveal": "seherxidmetleri.example"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "check",
+              "label": "Hesabı yoxla",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Yaxşı vərdişdir. Sizin etmədiyiniz dəyişiklik görsəniz, dərhal kadrlar şöbəsinə zəng edin."
+            },
+            {
+              "id": "skip",
+              "label": "Baxmadan çıx",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Rekvizitləri yad biri dəyişsəydi, bunu yalnız maaş günü bilərdiniz. Qısa baxış cəmi bir neçə saniyə çəkir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "pd2-swipe",
+      "prompt": "Təhlükəsizdir, yoxsa fırıldaq?",
+      "cards": [
+        {
+          "id": "boss-gift-cards",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Səbinə Əliyeva, rəhbər"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "İclasdayam, zəng edə bilmirəm. Tez 100 manatlıq beş BonusMarket kartı alın və kodlarını bura göndərin. Pulunuzu qaytaracağam."
+                  }
+                ],
+                "time": "11:02"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Hədiyyə kartının kodu nağd pul kimidir və heç vaxt geri qayıtmır. Yoxlamaq üçün rəhbərinizə bildiyiniz nömrə ilə zəng edin."
+        },
+        {
+          "id": "salary-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank",
+            "sender": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "time": "09:00",
+            "messages": [
+              [
+                {
+                  "text": "Kartınıza 1240,00 AZN maaş köçürülüb. Balans: 1386,50 AZN."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Burada link yoxdur və heç nə istənilmir. Bu, adi məlumat mesajıdır."
+        },
+        {
+          "id": "fake-hr-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "w2f-kadr-kabineti-fake",
+            "sender": [
+              {
+                "text": "KadrKabinet"
+              }
+            ],
+            "time": "08:41",
+            "messages": [
+              [
+                {
+                  "text": "Maaşınızın ödənişi dayandırılıb. Bank rekvizitlərinizi yeniləyin: "
+                },
+                {
+                  "text": "kadr-kabinet.example.info/yenile",
+                  "link": {
+                    "label": "kadr-kabinet.example.info/yenile",
+                    "href": "https://kadr-kabinet.example.info/yenile"
+                  }
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Kadrlar şöbəsi maaşı heç vaxt SMS-dəki link vasitəsilə bərpa etmir. Portalı özünüz açın və ya şöbəyə zəng edin."
+        },
+        {
+          "id": "payslip-ready",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2f-kadr-kabineti",
+            "app": "Kadr Kabineti",
+            "title": [
+              {
+                "text": "Sentyabr maaş vərəqəsi hazırdır"
+              }
+            ],
+            "body": [
+              {
+                "text": "Portalda «Maaş» bölməsinə baxın."
+              }
+            ],
+            "time": "10:15"
+          },
+          "verdict": "safe",
+          "explain": "Bu bildirişdə link yoxdur və o, sizi tanıdığınız portala yönləndirir. Portalı əlfəcinlərdən açın."
+        },
+        {
+          "id": "colleague-code",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Günel, mühasibatlıq"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Kadr Kabinetindən sizə kod gələcək, onu mənə deyin ki, maaş cədvəlini düzəldim."
+                  }
+                ],
+                "time": "13:20"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Giriş kodu yalnız sizin üçündür. Kodunuzu alan hər kəs hesabınıza da daxil olur."
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "pd2-order",
+      "prompt": "Parolunuzu saxta portalda yazdınız. Addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "change-password",
+          "label": "Parolu dərhal əsl portalda dəyişin"
+        },
+        {
+          "id": "call",
+          "label": "Kadrlar şöbəsinə və təhlükəsizlik komandasına zəng edin"
+        },
+        {
+          "id": "check-details",
+          "label": "Bank rekvizitlərini və son girişləri birlikdə yoxlayın"
+        },
+        {
+          "id": "enable-mfa",
+          "label": "İki addımlı doğrulamanı aktivləşdirin"
+        }
+      ],
+      "explain": "Əvvəlcə parolu dəyişin, sonra zəng edin ki, bank rekvizitlərindəki istənilən dəyişiklik dayandırılsın. Kodu da yazmısınızsa, bunu mütləq deyin."
+    },
+    {
+      "type": "recap",
+      "id": "pd2-recap",
+      "points": [
+        "Portalı axtarışdan yox, əlfəcindən açın.",
+        "İki addımlı doğrulamanı aktiv saxlayın.",
+        "Hədiyyə kartı və kod istəklərini telefonla yoxlayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -7,6 +7,7 @@ import { allowed, getSession } from "@/server/auth/viewer";
 import { SSO_STATE_COOKIE, codeChallenge, discover, randomValue, sealState } from "@/server/auth/oidc";
 import { TENANT_SLUG_RE } from "@/server/services/tenants";
 import { featuresFor, withDefaults } from "@/lib/tenant-defaults";
+import { DEFAULT_LOCALE, LOCALES, LOCALE_COOKIE, isLocale, negotiate } from "@/i18n/config";
 
 /**
  * Starts single sign-on for an organisation: /api/sso/start?tenant={slug}.
@@ -43,6 +44,10 @@ export async function GET(request: Request) {
     auth.searchParams.set("client_id", sso.clientId);
     auth.searchParams.set("redirect_uri", `${appUrl()}/api/sso/callback/${tenant.slug}`);
     auth.searchParams.set("scope", "openid email profile");
+    // The provider's sign-in page in the language the person uses here (OIDC Core 3.1.2.1; Entra ID, Okta and Keycloak honour it).
+    const cookieLocale = (await cookies()).get(LOCALE_COOKIE)?.value;
+    const fallback = isLocale(tenant.settings.defaultLocale) ? tenant.settings.defaultLocale : DEFAULT_LOCALE;
+    auth.searchParams.set("ui_locales", isLocale(cookieLocale) ? cookieLocale : negotiate(request.headers.get("accept-language"), LOCALES, fallback));
     auth.searchParams.set("state", state);
     auth.searchParams.set("nonce", nonce);
     auth.searchParams.set("code_challenge", codeChallenge(verifier));

@@ -57,7 +57,7 @@ export default async function OperatorTenantsPage() {
                       </p>
                     </div>
                     <Pill tone="brand">{tr(`plans.${x.plan}`)}</Pill>
-                    {Object.keys(overrides).length ? <Pill tone="warn">{Object.keys(overrides).length} ±</Pill> : null}
+                    {Object.keys(overrides).length ? <Pill tone="warn">{tr("overridesCount", { count: Object.keys(overrides).length })}</Pill> : null}
                   </div>
                   <p className="text-tab text-ink-subtle">
                     {tr("features")}: {effective.size} / {allFeatures.length}

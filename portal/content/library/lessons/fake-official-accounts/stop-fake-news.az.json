@@ -1,0 +1,411 @@
+{
+  "id": "stop-fake-news",
+  "title": "Saxta xəbəri dayandırın",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Saxta xəbər çox vaxt rəsmi qərar kimi görünür və qrup çatlarında sürətlə yayılır.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Mənbə yoxdur, tarix yoxdur, sizi tələsdirir və hamıya göndərməyinizi istəyir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "app": "whatsapp",
+              "contact": [
+                {
+                  "text": "Şöbə qrupu"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Yönləndirilib. ",
+                      "spot": "fwd"
+                    },
+                    {
+                      "text": "Sabahdan bütün maaş kartları dəyişir! "
+                    },
+                    {
+                      "text": "Hamıya göndərin!",
+                      "spot": "share-all"
+                    }
+                  ],
+                  "time": "08:40"
+                }
+              ]
+            }
+          },
+          "highlight": "fwd"
+        },
+        {
+          "id": "b3",
+          "say": "Paylaşmazdan əvvəl xəbəri təşkilatın saytında və etibarlı xəbər mənbələrində yoxlayın.",
+          "mood": "talk",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Xəbər saxtadırsa, ondan platformaya şikayət edin və qrupda qısa düzəliş yazın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "flag"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "group-news",
+      "environment": "phone",
+      "title": "Çatlarınızdakı xəbərlər",
+      "intro": "İş və ailə çatlarınıza xəbərlər gəlir. Hər biri ilə nə edirsiniz?",
+      "steps": [
+        {
+          "id": "salary-card",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Şöbə qrupu"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Yönləndirilib. Təcili! Sabahdan dövlət qulluqçularının maaş kartları dəyişdirilir. Köhnə kartınız bloklanmasın deyə məlumatlarınızı yeniləyin: "
+                  },
+                  {
+                    "text": "maas-kart-yeni.example.net",
+                    "link": {
+                      "label": "maas-kart-yeni.example.net",
+                      "href": "https://maas-kart-yeni.example.net"
+                    }
+                  }
+                ],
+                "time": "08:45"
+              }
+            ]
+          },
+          "say": "Mesajı həmkarınız paylaşıb, amma mənbə göstərilməyib.",
+          "actions": [
+            {
+              "id": "click",
+              "label": "Linki aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Bu səhifə kart məlumatlarını toplayır. Maaş kartlarının dəyişdirilməsini mühasibatlıq rəsmi kanallarla elan edir."
+            },
+            {
+              "id": "verify",
+              "label": "Mühasibatlıqdan soruş",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Daxili qərarı daxili mənbədən, bildiyiniz nömrəyə zəng edərək yoxlayın."
+            },
+            {
+              "id": "warn",
+              "label": "Cavab yaz: yoxlanmayıb, linki açmayın",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Yaxşı, həmkarlarınızı qorudunuz. Mesajı təhlükəsizlik komandasına da göstərin."
+            },
+            {
+              "id": "share",
+              "label": "Ailə qrupuna göndər",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Yoxlanmamış xəbəri yaymaq başqalarını da tələyə salır."
+            }
+          ]
+        },
+        {
+          "id": "news-site",
+          "label": "Rəsmi: bütün kommunal borclar silinir, qeydiyyat bu gün bitir",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "nd-gundem24-fake",
+            "url": [
+              {
+                "text": "https://gundem24-az.example.net/xeber/borclar-silinir"
+              }
+            ]
+          },
+          "say": "Tanış xəbər saytına oxşayır. Ünvanı yoxlayın.",
+          "actions": [
+            {
+              "id": "register",
+              "label": "Qeydiyyatdan keç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Gündəm24-ün əsl ünvanı belədir: gundem24.example. Bu isə klon saytdır. Forma şəxsi məlumatları toplayır."
+            },
+            {
+              "id": "share",
+              "label": "Paylaş",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Klon saytı yaymış olardınız. Paylaşmazdan əvvəl ünvanı və mənbəni yoxlayın."
+            },
+            {
+              "id": "verify",
+              "label": "Rəsmi saytı yoxla",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Belə qərar təşkilatın öz saytında dərc olunardı."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Yaxşı. Ünvan Gündəm24-ün əsl domeni deyildi."
+            }
+          ]
+        },
+        {
+          "id": "relatives-ask",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Ailə qrupu"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Burada dövlət idarəsində işləyən var? Deyirlər, sabahdan Bakıda internet üç günlük kəsiləcək. Doğrudur?"
+                  }
+                ],
+                "time": "19:20"
+              }
+            ]
+          },
+          "say": "Qohumlarınız sizə etibar edir.",
+          "actions": [
+            {
+              "id": "confirm",
+              "label": "Yəqin ki, doğrudur, hazırlaşın",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Dövlət işçisinin sözü xəbəri daha inandırıcı edir. Bilmədiyiniz şeyi təsdiqləməyin."
+            },
+            {
+              "id": "check",
+              "label": "Bilmirəm, rəsmi mənbədən yoxlayıb yazaram",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Düzdür. Səmimi «bilmirəm» yalan xəbərin qarşısını alır."
+            },
+            {
+              "id": "forward",
+              "label": "Başqa qruplara yönləndir",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Yalan xəbəri daha çox insana çatdırmış olardınız."
+            }
+          ]
+        },
+        {
+          "id": "fake-office-page",
+          "label": "Sosial Xidmətlər Nazirliyi: 50 vakansiya. Müraciət haqqı 10 AZN",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "nd-sxn-fake",
+            "url": [
+              {
+                "text": "https://kontakto.example/sxn.nazirlik.vakansiya"
+              }
+            ]
+          },
+          "say": "Bu səhifə öz nazirliyinizin adından açılıb.",
+          "actions": [
+            {
+              "id": "apply",
+              "label": "Müraciət et",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Nazirlik müraciət üçün haqq almır. Saxta səhifə insanların pulunu və məlumatlarını toplayır."
+            },
+            {
+              "id": "report",
+              "label": "Platformaya şikayət et",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Mətbuat xidmətinə də bildirin ki, rəsmi xəbərdarlıq dərc etsin."
+            },
+            {
+              "id": "press",
+              "label": "Mətbuat xidmətinə bildir",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Əla. Səhifə daha tez silinsin deyə platformaya da şikayət edin."
+            },
+            {
+              "id": "skip",
+              "label": "Keç, mənim işim deyil",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Saxta səhifə idarənizin adından insanları aldadır. Bildirmək bir dəqiqə çəkir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "check-tools",
+      "prompt": "Hər şübhəni düzgün yoxlama üsulu ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "no-source",
+          "left": "Xəbərdə mənbə göstərilməyib",
+          "right": "Təşkilatın rəsmi saytında axtarın"
+        },
+        {
+          "id": "old-photo",
+          "left": "Foto tanış və köhnə görünür",
+          "right": "Şəkli əks axtarışla yoxlayın"
+        },
+        {
+          "id": "site-address",
+          "left": "Sayt tanış xəbər saytına oxşayır",
+          "right": "Ünvanı əsl domenlə müqayisə edin"
+        },
+        {
+          "id": "fear",
+          "left": "Xəbər qorxudur və tələsdirir",
+          "right": "Dayanın və paylaşmazdan əvvəl yoxlayın"
+        }
+      ],
+      "explain": "Bir neçə saniyəlik yoxlama yalan xəbərin minlərlə insana çatmasının qarşısını ala bilər."
+    },
+    {
+      "type": "scenario",
+      "id": "shared-by-mistake",
+      "title": "Səhvən paylaşdınız",
+      "start": "shared",
+      "nodes": [
+        {
+          "id": "shared",
+          "text": "Bu səhər ailə qrupunda «maaş kartları dəyişir» xəbərini paylaşdınız. Günorta bunun saxta olduğunu öyrəndiniz.",
+          "choices": [
+            {
+              "label": "Silirəm və düzəliş yazıram",
+              "next": "relative",
+              "feedback": "Düzdür. Düzəliş xəbəri artıq görmüş insanların onu yaymasının qarşısını alır."
+            },
+            {
+              "label": "Səssizcə silirəm",
+              "outcome": "risky",
+              "feedback": "Xəbəri görənlər onu artıq başqalarına ötürmüş ola bilər. Qısa düzəliş bu zənciri qırır."
+            },
+            {
+              "label": "Heç nə etmirəm, artıq gecdir",
+              "outcome": "risky",
+              "feedback": "Gec deyil: düzəliş hələ də yayılmanın qarşısını alır."
+            }
+          ]
+        },
+        {
+          "id": "relative",
+          "text": "O linki açıb kart məlumatlarımı yazdım. İndi nə edim?",
+          "speaker": "Qohumunuz",
+          "voice": "young-man",
+          "channel": "phone",
+          "manner": "worried",
+          "spoken": "O linki açıb kart məlumatlarımı yazdım. <breath> İndi nə edim?",
+          "choices": [
+            {
+              "label": "Kartın üzərindəki nömrə ilə dərhal banka zəng et və kartı bloklat",
+              "outcome": "safe",
+              "feedback": "Düzdür. Kart nə qədər tez bloklansa, pul itirmək riski bir o qədər az olar."
+            },
+            {
+              "label": "Narahat olma, bəlkə heç nə olmayacaq",
+              "outcome": "compromised",
+              "feedback": "Fırıldaqçılar kart məlumatlarından çox vaxt dərhal istifadə edirlər."
+            },
+            {
+              "label": "Saytda yazdıqlarını sil",
+              "outcome": "risky",
+              "feedback": "Məlumatlar artıq fırıldaqçının əlindədir. Kartı yalnız bank bloklaya bilər."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "speak-for-office",
+      "question": {
+        "prompt": "Jurnalist sizə yazır: «Nazirliyinizin qərarını şərh edə bilərsinizmi?» Nə edirsiniz?",
+        "options": [
+          {
+            "id": "press",
+            "label": "Onu mətbuat xidmətinə yönləndirirəm",
+            "correct": true,
+            "feedback": "Düzdür. Təşkilat adından yalnız mətbuat xidməti danışır."
+          },
+          {
+            "id": "guess",
+            "label": "Bildiyimi deyirəm",
+            "correct": false,
+            "feedback": "Yarımçıq məlumata əsaslanan şərh yeni yalan xəbərə çevrilə bilər, «jurnalist» də saxta ola bilər."
+          },
+          {
+            "id": "doc",
+            "label": "Daxili sənədin fotosunu göndərirəm",
+            "correct": false,
+            "feedback": "Daxili sənədləri paylaşmaq olmaz, foto isə kontekstdən kənar yayıla bilər."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "social"
+        }
+      },
+      "explain": "Rəsmi şərhləri mətbuat xidməti verir. Bu, həm sizi, həm də təşkilatı qoruyur."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Paylaşmazdan əvvəl mənbəni təşkilatın öz saytında yoxlayın.",
+        "Əmin olmadığınız xəbəri təsdiqləməyin; təşkilat adından mətbuat xidməti danışır.",
+        "Saxta səhifə və xəbərlərdən şikayət edin; səhvən paylaşmısınızsa, düzəliş yazın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -1,0 +1,451 @@
+{
+  "id": "meeting-code",
+  "title": "Görüş kodu",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ac2-tutor",
+      "beats": [
+        {
+          "id": "ac2-b1",
+          "say": "Salam! İndi isə beynəlxalq forumdan gələn dəvətə və görüş koduna baxaq.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        },
+        {
+          "id": "ac2-b2",
+          "say": "Fırıldaqçı sizə bir kod və ofisinizin əsl giriş səhifəsini göndərir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "brandRef": "w2b-nordvale-fake",
+              "app": "generic",
+              "contact": [
+                {
+                  "text": "Leyla K. | Nordvale Council"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Görüşə qoşulmaq üçün bu kodu daxil edin: "
+                    },
+                    {
+                      "text": "QK7-MN4P",
+                      "spot": "code"
+                    }
+                  ],
+                  "time": "10:04"
+                }
+              ]
+            }
+          },
+          "highlight": "code"
+        },
+        {
+          "id": "ac2-b3",
+          "say": "Kodu daxil etsəniz, onun cihazı parolunuz olmadan, sizin adınızdan hesabınıza daxil olur.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        },
+        {
+          "id": "ac2-b4",
+          "say": "Qayda belədir: girişə özünüz başlamamısınızsa, heç vaxt heç yerdə kod daxil etməyin.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "ac2-scenario",
+      "title": "Forum dəvəti",
+      "start": "invite",
+      "nodes": [
+        {
+          "id": "invite",
+          "text": "Salam! Noyabrda Vyanada keçiriləcək forumumuzda çıxış etməyinizi istərdik. Bu sizə maraqlı olarmı?",
+          "speaker": "Leyla, Nordvale Council (yeni mesaj)",
+          "voice": "young-woman",
+          "channel": "message",
+          "spoken": "Salam! <breath> Noyabrda Vyanada keçiriləcək forumumuzda çıxış etməyinizi istərdik. Bu sizə maraqlı olarmı?",
+          "character": "leyla",
+          "choices": [
+            {
+              "label": "Təşəkkür edirəm. Rəhbərliklə razılaşdırmağım üçün rəsmi dəvəti iş e-poçtuma göndərin, zəhmət olmasa",
+              "next": "code",
+              "feedback": "Düzdür. Rəsmi dəvət rəsmi kanalla gəlir və onu yoxlaya bilərsiniz."
+            },
+            {
+              "label": "Çox maraqlıdır! Nə etməliyəm?",
+              "next": "code",
+              "feedback": "Maraq təbiidir. Amma tanımadığınız adamla söhbəti rəsmi kanala keçirmək daha yaxşıdır."
+            }
+          ]
+        },
+        {
+          "id": "code",
+          "text": "Əla! Sabah qısa onlayn görüş keçirək. Qoşulmaq üçün bu kodu ofisinizin giriş səhifəsində daxil edin: QK7-MN4P.",
+          "speaker": "Leyla, Nordvale Council",
+          "voice": "young-woman",
+          "channel": "message",
+          "spoken": "Əla! Sabah qısa onlayn görüş keçirək. <breath> Qoşulmaq üçün bu kodu ofisinizin giriş səhifəsində daxil edin: QK7-MN4P.",
+          "character": "leyla",
+          "choices": [
+            {
+              "label": "Bu girişə mən başlamamışam, ona görə kodu heç yerdə daxil etmirəm",
+              "next": "pressure",
+              "feedback": "Düzdür. Kod sizə mesajla gəlibsə, giriş başqasına aiddir."
+            },
+            {
+              "label": "Səhifə ofisimə aiddir, deməli, təhlükəsizdir. Daxil edirəm",
+              "outcome": "compromised",
+              "feedback": "Səhifə əsl idi, amma girişə fırıldaqçı başlamışdı. İndi onun cihazı poçt qutunuzdadır."
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "text": "Vaxtımız azdır, nazirliyiniz də razılıq verib. Sadəcə kodu daxil edin, cəmi iki dəqiqə çəkir.",
+          "speaker": "Leyla, Nordvale Council",
+          "voice": "young-woman",
+          "channel": "message",
+          "spoken": "Vaxtımız azdır, ee, nazirliyiniz də razılıq verib. Sadəcə kodu daxil edin, cəmi iki dəqiqə çəkir.",
+          "character": "leyla",
+          "choices": [
+            {
+              "label": "Forumun rəsmi saytından nömrəni tapıb özüm zəng edəcəyəm, İT dəstəyinə də bildirəcəyəm",
+              "outcome": "safe",
+              "feedback": "Əla. Əsl təşkilatçı yoxlamanı məmnuniyyətlə qarşılayır, fırıldaqçı isə yoxa çıxır."
+            },
+            {
+              "label": "Yaxşı, daxil edirəm",
+              "outcome": "compromised",
+              "feedback": "Təzyiq tələnin bir hissəsidir. Kodu daxil edən kimi hesabınız fırıldaqçının cihazına açılır."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ac2-sim",
+      "environment": "phone",
+      "title": "Telefonunuzda dəvət",
+      "intro": "Telefonunuza forum adından mesajlar gəlir. Hər birini açın və düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "code-chat",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "w2b-nordvale-fake",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Leyla K. | Nordvale Council"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam! Vyana forumundakı panel çıxışınız təsdiqləndi."
+                  }
+                ],
+                "time": "10:02"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Görüşə qoşulmaq üçün kod: QK7-MN4P"
+                  }
+                ],
+                "time": "10:03"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Kodu bu səhifədə daxil edin: "
+                  },
+                  {
+                    "text": "giris.idare.example/cihaz",
+                    "link": {
+                      "label": "giris.idare.example/cihaz",
+                      "href": "https://giris.idare.example/cihaz"
+                    }
+                  }
+                ],
+                "time": "10:03"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Girişə siz başlamamısınızsa, mesajla göndərilən kod tələdir.",
+              "next": "slides"
+            },
+            {
+              "id": "official",
+              "label": "Rəsmi dəvəti iş e-poçtuma göndərin, zəhmət olmasa",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Yaxşı cavabdır. Əsl təşkilatçı bunu edə bilər, fırıldaqçı isə bundan yayınacaq.",
+              "next": "slides"
+            },
+            {
+              "id": "open-page",
+              "label": "Səhifəni aç",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Səhifə əsldir, amma bu girişə başqası başlayıb. Növbəti ekrana diqqətlə baxın."
+            }
+          ]
+        },
+        {
+          "id": "device-confirm",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Başqa cihazda daxil olursunuz?"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Kod: QK7-MN4P"
+                }
+              ],
+              [
+                {
+                  "text": "Bu girişə özünüz başlamamısınızsa, davam etməyin."
+                }
+              ]
+            ],
+            "buttons": [
+              "Davam et",
+              "Ləğv et"
+            ]
+          },
+          "say": "Səhifə açıldı. Kodu daxil edən kimi bu sual görünür.",
+          "actions": [
+            {
+              "id": "continue",
+              "label": "Davam et",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Fırıldaqçının cihazı indi hesabınızdadır. Dərhal İT dəstəyinə zəng edin."
+            },
+            {
+              "id": "cancel",
+              "label": "Ləğv et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Səhifənin özü sizi xəbərdar etdi: bu girişə siz başlamamısınız."
+            }
+          ]
+        },
+        {
+          "id": "slides",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "w2b-nordvale-slides",
+            "app": "Nordvale Slides",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Profilinizi görmək"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Məktublarınızı oxumaq və göndərmək"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Siz sistemdə olmayanda da giriş imkanını saxlamaq"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "İndi isə təşkilatçı slaydlara link göndərdi. Bu link də icazə istəyir.",
+          "actions": [
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Slaydlara baxmaq üçün poçtunuz lazım deyil."
+            },
+            {
+              "id": "allow",
+              "label": "İcazə ver",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Bu tətbiq indi məktublarınızı oxuyur. İT dəstəyindən icazəni ləğv etməyi xahiş edin."
+            }
+          ]
+        },
+        {
+          "id": "tell-support",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "İT dəstəyi"
+              }
+            ],
+            "messages": [
+              {
+                "from": "me",
+                "body": [
+                  {
+                    "text": "Bir forumun adından kod və icazə sorğusu aldım."
+                  }
+                ],
+                "time": "10:20"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Təşəkkür edirik! Kodu daxil etdiniz və ya nəyəsə icazə verdiniz?"
+                  }
+                ],
+                "time": "10:21"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "yes",
+              "label": "Bəli, səhvən daxil etdim",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Dərhal xəbər vermək düzgün addımdır. Mütəxəssis həm girişi, həm də icazəni bağlayacaq."
+            },
+            {
+              "id": "no",
+              "label": "Xeyr, heç nə daxil etməmişəm",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Əla. Mütəxəssis digər həmkarlarınızı da xəbərdar edəcək."
+            },
+            {
+              "id": "silent",
+              "label": "Cavab vermə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Hər kəs səhv edə bilər, amma onu gizlətmək ziyanı artırır. Dürüst cavab vaxta qənaət edir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "ac2-match",
+      "prompt": "Hər vəziyyəti düzgün addımla uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "code-message",
+          "left": "Kimsə sizə mesajla kod göndərib",
+          "right": "Heç yerdə daxil etməyin və bildirin"
+        },
+        {
+          "id": "own-tv",
+          "left": "Televizorda girişə özünüz başlamısınız",
+          "right": "Ekrandakı kodu daxil edə bilərsiniz"
+        },
+        {
+          "id": "unknown-app",
+          "left": "Naməlum tətbiq daimi giriş istəyir",
+          "right": "Rədd edin"
+        },
+        {
+          "id": "mistake",
+          "left": "Səhvən kod daxil etmisiniz və ya tətbiqə icazə vermisiniz",
+          "right": "Dərhal İT dəstəyinə zəng edin"
+        }
+      ],
+      "explain": "Kod yalnız girişə özünüz başladığınız cihazdan gələndə təhlükəsizdir. Bütün digər hallarda dayanın və bildirin."
+    },
+    {
+      "type": "choice",
+      "id": "ac2-choice",
+      "question": {
+        "prompt": "Təşkilatçı deyir: «Səhifə sizin öz ofisinizə aiddir, narahat olmayın». Bu, kodu daxil etmək üçün əsasdırmı?",
+        "options": [
+          {
+            "id": "no",
+            "label": "Xeyr. Səhifə əsldir, amma girişə başqası başlayıb",
+            "correct": true,
+            "feedback": "Düzdür. Bu tələdə səhifə də, kod da əsldir, saxta olan yalnız girişə başlayan adamdır."
+          },
+          {
+            "id": "real-address",
+            "label": "Bəli, ünvan əsldirsə, təhlükə yoxdur",
+            "correct": false,
+            "feedback": "Ünvanı yoxlamaq parolu qoruyur, kodu yox. Girişə kim başlayıbsa, kod onun cihazına gedir."
+          },
+          {
+            "id": "famous",
+            "label": "Bəli, təşkilatçı tanınmış forumdandırsa",
+            "correct": false,
+            "feedback": "Tanınmış adı hər kəs yaza bilər. Forumu onun rəsmi saytında yoxlayın."
+          }
+        ]
+      },
+      "explain": "Kod girişə başlayan cihaza açar verir. Girişə siz başlamamısınızsa, kodu daxil etməyin."
+    },
+    {
+      "type": "recap",
+      "id": "ac2-recap",
+      "points": [
+        "Mesajla aldığınız kodu heç bir giriş səhifəsində daxil etməyin",
+        "Səhifə əsl olsa belə, girişə kimin başladığını yoxlayın",
+        "Səhv etmisinizsə, dərhal İT dəstəyinə bildirin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

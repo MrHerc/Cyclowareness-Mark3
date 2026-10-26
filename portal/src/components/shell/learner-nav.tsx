@@ -9,7 +9,7 @@ import { cn } from "@/lib/cn";
 type Item = { href: string; key: "home" | "learn" | "paths" | "lab" | "league" | "progress" | "security" | "profile" | "sessions" | "help"; icon: typeof Home };
 
 const PRIMARY: Item[] = [
-  { href: "/", key: "home", icon: Home },
+  { href: "/app", key: "home", icon: Home },
   { href: "/learn", key: "learn", icon: BookOpen },
   { href: "/paths", key: "paths", icon: Route },
   { href: "/lab", key: "lab", icon: FlaskConical },
@@ -23,7 +23,7 @@ const SECONDARY: Item[] = [
   { href: "/help", key: "help", icon: LifeBuoy },
 ];
 const TABS: Item[] = [
-  { href: "/", key: "home", icon: Home },
+  { href: "/app", key: "home", icon: Home },
   { href: "/learn", key: "learn", icon: BookOpen },
   { href: "/league", key: "league", icon: Trophy },
   { href: "/progress", key: "progress", icon: TrendingUp },
@@ -31,7 +31,7 @@ const TABS: Item[] = [
 ];
 
 function isActive(pathname: string, href: string) {
-  return href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+  return pathname === href || pathname.startsWith(`${href}/`);
 }
 
 /**

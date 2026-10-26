@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Skeleton } from "@/components/ui/skeleton";
 
-/** Lab placeholder: header with its icon, the info notice and the grid of game cards. */
+/** Lab placeholder: header with its icon, the info notice and the grid of game and machine-lab cards. */
 export default async function LabLoading() {
   const t = await getTranslations("common");
   return (
@@ -16,7 +16,7 @@ export default async function LabLoading() {
       </div>
       <Skeleton className="h-14" />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {Array.from({ length: 4 }, (_, i) => (
+        {Array.from({ length: 7 }, (_, i) => (
           <Skeleton key={i} className="h-56" />
         ))}
       </div>

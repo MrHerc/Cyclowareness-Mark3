@@ -1,0 +1,366 @@
+{
+  "id": "deepfake-voice",
+  "title": "Rəhbərin saxta səsi",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Süni intellekt qısa səs yazısından rəhbərin səsini kopyalaya bilər. Bunun üçün çıxışlar və müsahibələr kifayətdir.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Ekrandakı ad və nömrə də saxta ola bilər. Tanış görünən zəng sübut deyil.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [
+                {
+                  "text": "Səadət Məmmədli"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 50 000 47 12",
+                  "spot": "number"
+                }
+              ],
+              "label": "Mobil"
+            }
+          },
+          "highlight": "number"
+        },
+        {
+          "id": "b3",
+          "say": "Yoxlama ifadəsini əvvəlcədən razılaşdırın. Zəng edən onu bilmirsə, zəngi bitirin.",
+          "mood": "talk",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Ən təhlükəsiz yol: zəngi bitirin və həmin şəxsə bildiyiniz nömrə ilə özünüz zəng edin.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "cloned-call",
+      "environment": "call",
+      "title": "Müavinin səsi",
+      "intro": "Axşam saat səkkizdir. Telefonunuz zəng çalır və ekranda müavinin adı görünür.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Səadət Məmmədli"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 47 12"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "older-woman"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab ver",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Cavab vermək təhlükəli deyil. Əsas olan bundan sonra nə edəcəyinizdir."
+            },
+            {
+              "id": "decline",
+              "label": "Rədd et",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da düzgün yoldur. Narahatsınızsa, müavinə bildiyiniz nömrə ilə özünüz zəng edin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "request",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Səadət Məmmədli"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 47 12"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "older-woman"
+          },
+          "say": "Salam, mənəm, Səadət. Xəstəyəm, səsim batıb. Tərəfdaşa bu axşam təcili yetmiş beş min manat köçürün.",
+          "spoken": "Salam, mənəm, Səadət. <throat-clearing> Xəstəyəm, səsim batıb. Tərəfdaşa, ee, bu axşam təcili yetmiş beş min manat köçürün.",
+          "actions": [
+            {
+              "id": "phrase",
+              "label": "Zəhmət olmasa, yoxlama ifadəmizi deyin",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Razılaşdırılmış ifadə səsdən daha etibarlı yoxlamadır."
+            },
+            {
+              "id": "pay",
+              "label": "Yaxşı, indi köçürürəm",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Tanış səs artıq sübut deyil. Bu səsi süni intellekt yaratmışdı və pul getdi."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitirirəm, sizə özüm geri zəng edəcəyəm",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Düzgün qərardır. İndi müavinə bildiyiniz nömrə ilə zəng edin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Səadət Məmmədli"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 47 12"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "older-woman"
+          },
+          "say": "Nə ifadə? Vaxtım yoxdur, nazir gözləyir! Sənədləri sabah göndərərəm, indi köçürün.",
+          "spoken": "Nə ifadə? <breath> Vaxtım yoxdur, nazir gözləyir! Sənədləri sabah göndərərəm, indi köçürün.",
+          "actions": [
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Düzdür. İfadəni bilməyən və sizə təzyiq göstərən adam müavin deyil, fırıldaqçıdır."
+            },
+            {
+              "id": "pay",
+              "label": "Yaxşı, köçürürəm",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Təzyiq yoxlamadan yayınma əlamətidir. Pul heç vaxt geri qayıtmaya bilər."
+            },
+            {
+              "id": "details",
+              "label": "Hesab nömrəsini mənə göndərin",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Söhbəti davam etdirmək hücumçuya daha çox şans verir. Zəngi bitirin."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Zəng bitdi. İndi nə etməli?",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Səadət Məmmədli"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 47 12"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "older-woman"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "Müavinin telefon kitabçasındakı nömrəsinə zəng et",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Düzdür. Özünüz yığdığınız nömrə saxta zəngi dərhal üzə çıxarır."
+            },
+            {
+              "id": "report",
+              "label": "Təhlükəsizlik komandasına bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Bildirişiniz maliyyə şöbəsini və həmkarlarınızı eyni zəng barədə xəbərdar edir."
+            },
+            {
+              "id": "ignore",
+              "label": "Heç nə etmə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Hücumçu indi başqa həmkarınıza zəng edə bilər. Yoxlayın və bildirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "check-phrase",
+      "question": {
+        "prompt": "Yaxşı yoxlama ifadəsi hansıdır?",
+        "options": [
+          {
+            "id": "secret",
+            "label": "Heç yerdə yazılmayan və yalnız ikimizin bildiyi söz",
+            "correct": true,
+            "feedback": "Düzdür. İnternetdə olmayan sözü kopyalamaq mümkün deyil."
+          },
+          {
+            "id": "birthday",
+            "label": "Müavinin doğum tarixi",
+            "correct": false,
+            "feedback": "Doğum tarixini internetdə tapmaq olar."
+          },
+          {
+            "id": "office",
+            "label": "Təşkilatın adı və otaq nömrəsi",
+            "correct": false,
+            "feedback": "Bunu çox adam bilir, ona görə yoxlama sayılmır."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "key"
+        }
+      },
+      "explain": "İfadəni üzbəüz razılaşdırın və onu heç vaxt məktubla və ya mesajla göndərməyin."
+    },
+    {
+      "type": "match",
+      "id": "voice-signs",
+      "prompt": "Hər faktı mənası ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "voice",
+          "left": "Səs tanışdır",
+          "right": "Sübut deyil, onu kopyalamaq olar"
+        },
+        {
+          "id": "caller-id",
+          "left": "Ekranda tanış ad",
+          "right": "Nömrə də saxta ola bilər"
+        },
+        {
+          "id": "urgent",
+          "left": "Təcili və məxfi",
+          "right": "Yoxlamadan yayınmaq cəhdi"
+        },
+        {
+          "id": "phrase",
+          "left": "Yoxlama ifadəsi düzgündür",
+          "right": "Səsli zəngdə ən etibarlı yoxlama"
+        }
+      ],
+      "explain": "Səsə və ya ekrandakı ada deyil, razılaşdırılmış qaydaya etibar edin."
+    },
+    {
+      "type": "scenario",
+      "id": "video-call",
+      "title": "Video zəng",
+      "start": "screen",
+      "nodes": [
+        {
+          "id": "screen",
+          "text": "Tərəfdaşa avansı bu axşam göndərin.",
+          "speaker": "Nazir (video zəng, səs kəsilir)",
+          "voice": "older-man",
+          "channel": "video",
+          "spoken": "Tərəfdaşa avansı <short pause> bu axşam göndərin.",
+          "character": "minister",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          },
+          "choices": [
+            {
+              "label": "Zəngi bitirirəm və köməkçiyə bildiyim nömrə ilə zəng edirəm",
+              "next": "assistant",
+              "feedback": "Düzdür. Videonu da saxtalaşdırmaq olar, ikinci kanal qaydası yenə də qüvvədədir."
+            },
+            {
+              "label": "Onun üzünü görürəm, deməli, həqiqidir",
+              "outcome": "compromised",
+              "feedback": "Süni intellekt videonu da saxtalaşdıra bilər. Təkcə görüntü sübut deyil."
+            }
+          ]
+        },
+        {
+          "id": "assistant",
+          "text": "Nazir ezamiyyətdədir və heç kimə zəng etməyib.",
+          "speaker": "Nazirin köməkçisi",
+          "voice": "man-3",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Nazir ezamiyyətdədir <breath> və heç kimə zəng etməyib.",
+          "character": "assistant",
+          "choices": [
+            {
+              "label": "Təhlükəsizlik komandasına bildirirəm, zəngin vaxtını və hesabın adını qeyd edirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Bu qeydlər mütəxəssislərə hücumun izinə düşməyə kömək edir."
+            },
+            {
+              "label": "Pul getmədi, ona görə heç kimə demirəm",
+              "outcome": "risky",
+              "feedback": "Növbəti hədəf müavin və ya maliyyə şöbəsi ola bilər. Bildirmək hamını qoruyur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Tanış səs, üz və ya ad sübut deyil.",
+        "Yoxlama ifadəsini soruşun, zəngi bitirin və özünüz geri zəng edin.",
+        "Saxta zəngi dərhal təhlükəsizlik komandasına bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

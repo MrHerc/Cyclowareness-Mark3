@@ -4,6 +4,7 @@ import { connect as tlsConnect } from "node:tls";
 import { createSocket } from "node:dgram";
 import { hostname } from "node:os";
 import { and, asc, eq, gte, inArray, isNotNull, isNull, lt, ne, notInArray, or, sql } from "drizzle-orm";
+import { createTranslator } from "next-intl";
 import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 import type { DB } from "./db/client";
 import * as t from "./db/schema";
@@ -23,7 +24,8 @@ import { targetTraining } from "./services/secops";
 import { dayKey } from "../lib/domain/gamification";
 import { featuresFor, withDefaults } from "../lib/tenant-defaults";
 import { bakuDayPlus, todayInBaku } from "../lib/time";
-import { pick } from "../i18n/config";
+import { LOCALES, isLocale, pick } from "../i18n/config";
+import { messagesFor } from "../i18n/translator";
 
 /**
  * Background work, run every minute by the job runner (src/server/jobs-runner.ts).
@@ -484,30 +486,18 @@ async function reminders(db: DB, tenant: TenantLite, now: Date): Promise<number>
     // The module title in each recipient's language.
     const title = (locale: string) => pick(mod.title, locale);
     // Deferred like all mail created inside the tick: retryQueued sends it with its time budget and per-server back-off.
-    count += await notifyUsers(db, tenant.id, users, kind as "reminder", { module: title, dueDate: due || undefined, link: `/learn/${mod.slug}` }, { title, href: `/learn/${mod.slug}` }, { defer: true });
+    count += await notifyUsers(db, tenant.id, users, kind as "reminder", { module: title, dueDate: due || undefined, link: `/learn/${mod.slug}` }, { href: `/learn/${mod.slug}` }, { defer: true });
   }
   return count;
 }
 
 /* ───────── manager alerts ───────── */
 
-const MANAGER_REASON: Record<string, (n: number) => string> = {
-  az: (n) => `Son 30 gündə ${n} simulyasiyada riskli addım`,
-  en: (n) => `${n} risky simulation actions in the last 30 days`,
-  ru: (n) => `${n} рискованных действия в симуляциях за 30 дней`,
-};
-
-const OVERDUE_REASON: Record<string, (n: number, days: number) => string> = {
-  az: (n, days) => `${n} təlimin son tarixi ${days} gündən çoxdur ki, keçib`,
-  en: (n, days) => (n === 1 ? `1 training is more than ${days} days overdue` : `${n} trainings are more than ${days} days overdue`),
-  ru: (n, days) => {
-    const form = new Intl.PluralRules("ru").select(n);
-    const noun = form === "one" ? "обучение просрочено" : form === "few" ? "обучения просрочены" : "обучений просрочено";
-    return `${n} ${noun} более чем на ${days} дн.`;
-  },
-};
-
-const reasonIn = <A extends unknown[]>(table: Record<string, (...args: A) => string>, ...args: A) => (locale: string) => (table[locale] ?? table.en)(...args);
+/** Translators of the manager-alert reasons (admin.managerAlert, ICU plurals) for every interface language. */
+async function managerReasons() {
+  const byLocale = new Map(await Promise.all(LOCALES.map(async (l) => [l, createTranslator({ ...(await messagesFor(l)), namespace: "admin.managerAlert" })] as const)));
+  return (locale: string) => byLocale.get(isLocale(locale) ? locale : "en")!;
+}
 
 /**
  * Tells department heads when someone in their team keeps failing simulations, or is more than
@@ -552,6 +542,7 @@ async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<num
     for (const o of overdue) if (!doneSet.has(`${o.userId}:${o.moduleId}`)) overdueBy.set(o.userId, (overdueBy.get(o.userId) ?? 0) + 1);
   }
 
+  const reasons = await managerReasons();
   let count = 0;
   for (const p of people) {
     const head = p.departmentId ? headOf.get(p.departmentId) : null;
@@ -559,13 +550,13 @@ async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<num
     const times = failedBy.get(p.id);
     const failHref = `/admin/users/${p.id}`;
     if (times && !alerted.has(failHref)) {
-      const reason = reasonIn(MANAGER_REASON, times);
+      const reason = (locale: string) => reasons(locale)("failedSimulations", { count: times });
       count += await notifyUsers(db, tenant.id, [head], "manager", { person: p.name, reason, link: failHref }, { title: p.name, body: reason, href: failHref }, { defer: true });
     }
     const late = overdueBy.get(p.id);
     const lateHref = `/admin/users/${p.id}#training`;
     if (late && !alerted.has(lateHref)) {
-      const reason = reasonIn(OVERDUE_REASON, late, n.overdueDays);
+      const reason = (locale: string) => reasons(locale)("overdueTrainings", { count: late, days: n.overdueDays });
       count += await notifyUsers(db, tenant.id, [head], "manager", { person: p.name, reason, link: lateHref }, { title: p.name, body: reason, href: lateHref }, { defer: true });
     }
   }
@@ -636,17 +627,6 @@ async function refreshers(db: DB, tenant: TenantLite, now: Date): Promise<number
 
 /* ───────── scheduled reports ───────── */
 
-const REPORT_MAIL: Record<string, { subject: (k: string) => string; body: (k: string, link: string) => string }> = {
-  az: { subject: (k) => `Hesabat hazırdır: ${k}`, body: (k, link) => `«${k}» hesabatı hazırdır.\n\nTəhlükəsizlik üçün fayl məktuba əlavə edilmir: konsola daxil olub yükləyin.\n\n${link}` },
-  en: { subject: (k) => `Your report is ready: ${k}`, body: (k, link) => `The "${k}" report is ready.\n\nFor security the file is not attached: sign in to the console to download it.\n\n${link}` },
-  ru: { subject: (k) => `Отчёт готов: ${k}`, body: (k, link) => `Отчёт «${k}» готов.\n\nВ целях безопасности файл не прикладывается: войдите в консоль, чтобы скачать его.\n\n${link}` },
-};
-const REPORT_NAMES: Record<string, Record<string, string>> = {
-  az: { completion: "Tamamlanma", risk: "Risk", people: "Əməkdaşlar", modules: "Modullar", feedback: "Rəylər", confirmations: "Təsdiqlər", simulations: "Simulyasiyalar", secops: "Təhlükəsizlik əməliyyatları" },
-  en: { completion: "Completion", risk: "Risk", people: "People", modules: "Modules", feedback: "Feedback", confirmations: "Confirmations", simulations: "Simulations", secops: "Security operations" },
-  ru: { completion: "Завершение", risk: "Риск", people: "Сотрудники", modules: "Модули", feedback: "Отзывы", confirmations: "Подтверждения", simulations: "Симуляции", secops: "Операции безопасности" },
-};
-
 /** Notice with a sign-in link to the period's report, on the schedule's weekday (weekly) or day of the month (monthly) at 08:00 Baku time. */
 async function scheduledReports(db: DB, tenant: TenantLite, now: Date): Promise<number> {
   // Without email delivery nothing would leave the server; the first send happens on the next due day after it is enabled.
@@ -661,12 +641,29 @@ async function scheduledReports(db: DB, tenant: TenantLite, now: Date): Promise<
     if (!dueToday || local.getHours() < 8 || (s.lastSentAt && now.getTime() - s.lastSentAt.getTime() < minGap)) continue;
     const from = bakuDayPlus(-(s.frequency === "weekly" ? 7 : 30), now);
     const to = todayInBaku(now);
-    const lang = tenant.settings.defaultLocale in REPORT_MAIL ? tenant.settings.defaultLocale : "en";
-    const name = REPORT_NAMES[lang][s.kind] ?? s.kind;
+    // Opened while signed out, the link leads through sign-in (in the reader's language) to the download.
     const link = `${appUrl()}/api/admin/reports/${s.kind}?format=${s.format}&from=${from}&to=${to}${s.departmentId ? `&d=${s.departmentId}` : ""}`;
+    // Each recipient in their own language: a person of the organisation in their profile language, an
+    // outside address in that of whoever scheduled the report, else the organisation's default.
+    const known = s.recipients.length
+      ? await db
+          .select({ email: t.users.email, locale: t.users.locale })
+          .from(t.users)
+          .where(and(eq(t.users.tenantId, tenant.id), inArray(t.users.email, s.recipients.map((r) => r.toLowerCase()))))
+      : [];
+    const localeOf = new Map(known.map((u) => [u.email, u.locale]));
+    const [creator] = s.createdBy ? await db.select({ locale: t.users.locale }).from(t.users).where(eq(t.users.id, s.createdBy)) : [];
     for (const recipient of s.recipients) {
-      const text = REPORT_MAIL[lang].body(name, link);
-      await queueEmail(db, tenant.id, { to: recipient, subject: REPORT_MAIL[lang].subject(name), text, html: renderEmailHtml(text, { brand: tenant.branding.primary, footer: tenant.name }), kind: "report" }, { defer: true });
+      const lang = [localeOf.get(recipient.toLowerCase()), creator?.locale, tenant.settings.defaultLocale].find(isLocale) ?? "en";
+      const tr = createTranslator({ ...(await messagesFor(lang)), namespace: "admin.reports" });
+      const report = tr(`kinds.${s.kind}.title`);
+      const text = tr("mail.body", { report, link });
+      await queueEmail(
+        db,
+        tenant.id,
+        { to: recipient, subject: tr("mail.subject", { report }), text, html: renderEmailHtml(text, { brand: tenant.branding.primary, footer: tenant.name, buttonLabel: tr("mail.button"), lang }), kind: "report", lang },
+        { defer: true },
+      );
       count++;
     }
     await db.update(t.reportSchedules).set({ lastSentAt: now }).where(eq(t.reportSchedules.id, s.id));

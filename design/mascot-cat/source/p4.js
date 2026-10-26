@@ -49,12 +49,14 @@ const AUTO_W = {
   pet: () => ({ sit: 2, knead: 0.8, groom: 0.6 }),
   turn: () => ({ sit: 1 }), present: () => ({ sit: 1, walk: 1 })
 };
+// seconds each tail shape value takes to follow the pose (base first, then curl, then the tip)
+const TAIL_LAG = { tailA: 0.12, tailRoot: 0.12, tailDX: 0.1, tailDY: 0.1, tailLen: 0.15, tailPuff: 0.15, tailCurl: 0.2, tailTip: 0.26, tailWave: 0.4, tailSpd: 0.4 };
 const MASCOT_AUTO = { present: 6, groom: 1, yawn: 0.6, look: 1.2, knead: 0.5, flick: 1 };
 
 class Cat {
   constructor(el, opts = {}) {
     this.el = el; el.catInstance = this; this.mode = opts.mode === 'mascot' ? 'mascot' : 'roam';
-    this.behaviours = ['sit', 'walk', 'turn', 'trot', 'rub', 'groom', 'sleep', 'wake', 'stretch', 'yawn', 'chase', 'pet', 'knead', 'look', 'flick', 'present'];
+    this.behaviours = ['sit', 'walk', 'turn', 'trot', 'rub', 'groom', 'sleep', 'wake', 'stretch', 'yawn', 'chase', 'pet', 'knead', 'look', 'flick', 'present', 'jump'];
     this.moods = Object.keys(MOODS); this.gestures = Object.keys(GDUR);
     this.facing = opts.facing === 'left' ? 'left' : 'right';
     this.cv = document.createElement('canvas'); this.cv.className = 'cat-canvas'; this.cv.setAttribute('aria-hidden', 'true');
@@ -73,6 +75,7 @@ class Cat {
     this.blinkWall = performance.now() + 1500; this.blinkStart = -1e9; this.wasBlink = false; this.stillLid = 0; this.acc = 0;
     this.pointer = null; this.pointerIn = false; this.speed = 0; this.fastT = 0; this.chaseN = 0; this.chaseCool = 0; this.lastMove = -10; this.demo = null; this.sleepPet = -10;
     this.visible = true; this.userSize = 0; this.dirty = true; this.onState = null; this._ls = [];
+    this.tailS = null; this.tailPh = Math.random() * TAU; this.seed = Math.random() * 100; this.flickAt = -10; this.nextFlick = 2.5 + Math.random() * 4;
     this.resize();
     this.ro = new ResizeObserver(() => { this.resize(); this.renderNow(); });
     this.ro.observe(el);
@@ -225,7 +228,7 @@ class Cat {
     if (this.chaseN > 4) { this.chaseN = 0; this.chaseCool = this.clock + 9; this.start('groom'); }
     else this.start('chase', { x: this.pointer.x, y: this.pointer.y });
   }
-  gctx(base) { const R0 = solve(base, 0), k = nearFront(base.theta); return { S: R0.S, Hb: R0.Hb, k, kF: k === 'nf' ? 'ff' : 'nf', far: k === 'ff' ? 1 : 0, facing: faceDir(base.theta) }; }
+  gctx(base) { const R0 = solve(base, 0), k = nearFront(base.theta); return { S: R0.S, Hb: R0.Hb, k, kF: k === 'nf' ? 'ff' : 'nf', far: k === 'ff' ? 1 : 0, facing: faceDir(base.theta), mir: this.facing === 'left' && this.mode === 'mascot' ? -1 : 1 }; }
   moodPaws(p, B, name, w, T, live) { if (w > 0.02 && B && B.sitting && MOOD_PAWS[name]) MOOD_PAWS[name](p, w, this.gctx(p), T, live); }
   overlay(p, T, dt, live) {
     const mw = this.still ? 1 : sstep((T - this.moodT) / 0.35), busy = this.cur && this.cur.busy ? 0.35 : 1;
@@ -265,6 +268,26 @@ class Cat {
       const bt = (T - this.blinkAt) / 0.18;
       if (bt >= 0 && bt < 1) p.lid = Math.max(p.lid, Math.sin(PI * bt));
     } else if (this.still) p.lid = Math.max(p.lid, this.stillLid);
+    return this.tailLive(p, T, dt, live);
+  }
+  // The tail's secondary motion. Its shape follows the pose through a short low-pass, the base faster than
+  // the tip, so a mood, gesture or behaviour change swings it with follow-through instead of jumping; the
+  // sway phase is accumulated, so it stays continuous whatever pose blends do to tailSpd; and a relaxed
+  // tip flick (a quick curl, a slow release) comes every few seconds. Still: the pose's shape, no motion.
+  tailLive(p, T, dt, live) {
+    if (!this.tailS || !live) {
+      if (!this.tailS) this.tailS = {};
+      for (const k in TAIL_LAG) this.tailS[k] = p[k];
+      p.tailPh = this.tailPh;
+      return p;
+    }
+    const s = this.tailS;
+    for (const k in TAIL_LAG) { s[k] = lerp(s[k], p[k], 1 - Math.exp(-dt / TAIL_LAG[k])); p[k] = s[k]; }
+    this.tailPh += dt * PI * TAIL_RATE * p.tailSpd * (1 + 0.3 * noise(T * 0.23 + this.seed));
+    p.tailPh = this.tailPh;
+    if (T > this.nextFlick) { this.flickAt = T; this.nextFlick = T + 4.5 + Math.random() * 6; }
+    const ft = T - this.flickAt;
+    if (ft >= 0 && ft < 1) p.tailFlick = Math.max(p.tailFlick, (p.zzz > 0.5 ? 0.45 : 1) * (ft < 0.22 ? sstep(ft / 0.22) : 1 - sstep((ft - 0.22) / 0.78)));
     return p;
   }
   overlayFrozen(p, T, o) {

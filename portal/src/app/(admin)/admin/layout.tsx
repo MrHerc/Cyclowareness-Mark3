@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { and, count, eq, inArray, isNotNull } from "drizzle-orm";
@@ -12,67 +13,56 @@ import type { Feature } from "@/lib/tenant-defaults";
 import { AdminMobileMenu, AdminNav, type AdminNavGroup } from "@/components/shell/admin-nav";
 import { NotificationsButton } from "@/components/shell/notifications";
 import { AccountMenu } from "@/components/admin/account-menu";
-import { BrandMark, TenantMark } from "@/components/brand";
+import { AdminGuideButton, AdminTour } from "@/components/admin/admin-tour";
+import { BrandMark, TenantMark, isVendorLogo } from "@/components/brand";
 import { Avatar } from "@/components/ui/avatar";
 import { textLinkClass } from "@/components/ui/button";
 import { desc } from "drizzle-orm";
 
 type ItemDef = { key: string; href: string; perm: Permission; feature?: Feature };
 
+/**
+ * The console nav in the order an administrator works: people and training first, then phishing, security
+ * operations, insights, and settings last. Headed groups fold away (remembered per device); every item keeps
+ * its permission and plan-feature gate.
+ */
 const GROUPS: { key: string; heading?: boolean; items: ItemDef[] }[] = [
+  { key: "home", heading: false, items: [{ key: "overview", href: "/admin", perm: "overview.read" }] },
   {
-    key: "workspace",
+    key: "training",
     items: [
-      { key: "overview", href: "/admin", perm: "overview.read" },
       { key: "people", href: "/admin/users", perm: "people.read" },
+      { key: "departments", href: "/admin/departments", perm: "departments.write" },
       { key: "assignments", href: "/admin/assignments", perm: "assignments.read" },
-      { key: "campaigns", href: "/admin/campaigns", perm: "campaigns.read" },
+      { key: "paths", href: "/admin/paths", perm: "paths.write", feature: "paths" },
+      { key: "studio", href: "/admin/studio", perm: "studio.write", feature: "studio" },
+      { key: "approvals", href: "/admin/approvals", perm: "approvals.decide", feature: "approvals" },
       { key: "policies", href: "/admin/policies", perm: "policies.read" },
+      { key: "sessions", href: "/admin/sessions", perm: "sessions.write", feature: "live_sessions" },
       { key: "problems", href: "/admin/problems", perm: "problems.manage" },
     ],
   },
+  { key: "phishing", items: [{ key: "campaigns", href: "/admin/campaigns", perm: "campaigns.read" }] },
   {
     key: "secops",
     items: [
-      { key: "ops", href: "/admin/ops", perm: "secops.read", feature: "ops_center" },
-      { key: "loops", href: "/admin/loops", perm: "secops.read", feature: "closed_loops" },
-      { key: "threats", href: "/admin/threats", perm: "secops.read", feature: "threat_intake" },
-      { key: "approvals", href: "/admin/approvals", perm: "approvals.decide", feature: "approvals" },
       { key: "incidents", href: "/admin/incidents", perm: "secops.read", feature: "incidents" },
-      { key: "sandbox", href: "/admin/sandbox", perm: "secops.read", feature: "sandbox" },
-      { key: "risk", href: "/admin/risk", perm: "people.read", feature: "risk_profiles" },
-    ],
-  },
-  {
-    key: "intel",
-    items: [
+      { key: "threats", href: "/admin/threats", perm: "secops.read", feature: "threat_intake" },
       { key: "threatIntel", href: "/admin/intel/threat", perm: "intel.read", feature: "threat_intel" },
       { key: "policyIntel", href: "/admin/intel/policy", perm: "intel.read", feature: "policy_intel" },
-    ],
-  },
-  {
-    key: "content",
-    items: [
-      { key: "studio", href: "/admin/studio", perm: "studio.write", feature: "studio" },
-      { key: "paths", href: "/admin/paths", perm: "paths.write", feature: "paths" },
-      { key: "sessions", href: "/admin/sessions", perm: "sessions.write", feature: "live_sessions" },
+      { key: "sandbox", href: "/admin/sandbox", perm: "secops.read", feature: "sandbox" },
+      { key: "loops", href: "/admin/loops", perm: "secops.read", feature: "closed_loops" },
+      { key: "risk", href: "/admin/risk", perm: "people.read", feature: "risk_profiles" },
+      { key: "ops", href: "/admin/ops", perm: "secops.read", feature: "ops_center" },
     ],
   },
   {
     key: "insights",
     items: [
       { key: "reports", href: "/admin/reports", perm: "reports.read", feature: "reports" },
-      { key: "leadership", href: "/admin/leadership", perm: "leadership.read", feature: "leadership" },
       { key: "league", href: "/admin/league", perm: "league.read", feature: "league" },
+      { key: "leadership", href: "/admin/leadership", perm: "leadership.read", feature: "leadership" },
       { key: "audit", href: "/admin/audit", perm: "audit.read" },
-    ],
-  },
-  {
-    key: "organisation",
-    heading: false,
-    items: [
-      { key: "departments", href: "/admin/departments", perm: "departments.write" },
-      { key: "settings", href: "/admin/settings", perm: "settings.write" },
     ],
   },
   {
@@ -82,6 +72,7 @@ const GROUPS: { key: string; heading?: boolean; items: ItemDef[] }[] = [
       { key: "feedback", href: "/admin/feedback", perm: "feedback.read", feature: "feedback" },
     ],
   },
+  { key: "organisation", heading: false, items: [{ key: "settings", href: "/admin/settings", perm: "settings.write" }] },
   { key: "platform", items: [{ key: "tenants", href: "/super", perm: "platform.manage" }] },
 ];
 
@@ -101,12 +92,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const v = await requireViewer();
   if (!allowed(v, "admin.access")) notFound();
   if (v.tenant.settings.identity.requireAdmin2fa && isPrivileged(v.user.role) && !v.user.totpEnabled) redirect("/profile?required=1");
-  const [tr, tc, counts, notes] = await Promise.all([
+  const [tr, tc, counts, notes, jar] = await Promise.all([
     getTranslations("admin"),
     getTranslations("common"),
     badges(v),
     db().select().from(t.notifications).where(eq(t.notifications.userId, v.user.id)).orderBy(desc(t.notifications.createdAt)).limit(8),
+    cookies(),
   ]);
+  // Nav groups the viewer folded away (written by AdminNav; a client module cannot export the name to the server).
+  const collapsed = jar.get("cw-admin-nav")?.value ?? "";
   const groups: AdminNavGroup[] = GROUPS.map((g) => ({
     key: g.key,
     heading: g.heading,
@@ -115,7 +109,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   const footer = (
     <div className="mt-6 grid gap-3 border-t border-line pt-4">
-      <Link href="/" className="flex h-10 items-center gap-3 rounded-pill px-3 text-body-sm font-semibold text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:h-11">
+      <Link href="/app" className="flex h-10 items-center gap-3 rounded-pill px-3 text-body-sm font-semibold text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:h-11">
         <BookOpenCheck className="size-[1.15rem] text-ink-subtle" />
         {tr("nav.learnerView")}
       </Link>
@@ -148,7 +142,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           <p className="mt-3 ml-11.5 inline-flex rounded-pill bg-brand-50 px-2.5 py-0.5 text-tab-sm font-semibold text-brand-700">{tr("console")}</p>
         </div>
         <Suspense>
-          <AdminNav groups={groups} />
+          <AdminNav groups={groups} collapsedInitial={collapsed} />
         </Suspense>
         {footer}
       </aside>
@@ -156,14 +150,25 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         {/* The blur sits on a layer, not the header: backdrop-filter would make the header the box every fixed popover inside it is placed in. */}
         <div aria-hidden className="absolute inset-0 -z-10 bg-canvas/85 backdrop-blur-xl" />
         <Suspense>
-          <AdminMobileMenu groups={groups}>{footer}</AdminMobileMenu>
+          <AdminMobileMenu groups={groups} collapsedInitial={collapsed}>
+            {footer}
+          </AdminMobileMenu>
         </Suspense>
-        <TenantMark name={v.tenant.name} logoUrl={v.tenant.branding.logoUrl} className="min-w-0 flex-1" />
+        {/* The vendor's own wordmark already sits in the sidebar lockup; below the sidebar breakpoint the product mark takes its place. */}
+        {isVendorLogo(v.tenant.branding.logoUrl) ? (
+          <span className="flex min-w-0 flex-1">
+            <BrandMark href="/admin" className="h-8 min-w-0 flex-wrap overflow-hidden lg:hidden" />
+          </span>
+        ) : (
+          <TenantMark name={v.tenant.name} logoUrl={v.tenant.branding.logoUrl} className="min-w-0 flex-1" />
+        )}
+        <AdminGuideButton />
         <NotificationsButton items={notes.map((n) => ({ id: n.id, title: n.title, body: n.body, href: n.href, createdAt: n.createdAt.toISOString(), read: !!n.readAt }))} />
       </header>
       <main id="main" className="mx-auto max-w-(--container-content) animate-reveal px-4 py-6 sm:px-6 lg:px-10 lg:py-10">
         {children}
       </main>
+      <AdminTour still={v.user.motion === "still"} />
     </div>
   );
 }

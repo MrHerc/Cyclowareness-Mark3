@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { BookOpen, ChevronRight, Clock, FileText, Flame, Play, Radio, ShieldAlert, ShieldCheck, Target, Zap, Award } from "lucide-react";
+import { eq } from "drizzle-orm";
 import { requireViewer } from "@/server/auth/viewer";
+import { db, t as schema } from "@/server/db";
+import { pickLessonContent } from "@/lib/content/lesson-locale";
 import { getCatalog, continueModule, yourPath, nextLesson } from "@/server/queries/catalog";
 import { getPolicies, myLeagueRow, nextLiveSession, openRiskCount, todayXp } from "@/server/queries/learner";
 import { Card } from "@/components/ui/card";
@@ -43,6 +46,10 @@ export default async function HomePage() {
   const streak = liveStreak(v.user.streakCurrent, v.user.streakLastDay, dayKey(new Date()), v.user.streakFreezes);
   const band = riskBand(v.user.riskScore);
   const firstName = v.user.name.split(" ")[0];
+  // The lesson the home tutor answers about, with the language of the text the learner would get (studio lessons may exist in one language only).
+  const tutorLesson = v.tenant.features.has("ai_tutor") && current ? nextLesson(current) : null;
+  const tutorRows = tutorLesson ? await db().select({ locale: schema.lessonContents.locale }).from(schema.lessonContents).where(eq(schema.lessonContents.lessonId, tutorLesson.id)) : [];
+  const tutor = current && tutorLesson ? { slug: current.slug, lessonKey: tutorLesson.key, contentLocale: pickLessonContent(tutorRows, locale)?.locale } : undefined;
 
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:gap-8">
@@ -53,10 +60,10 @@ export default async function HomePage() {
             <p className="mt-2 text-lead text-ink-muted">{t("sub")}</p>
           </div>
           <HomeMascot
-            label={t("talk")}
+            label={tutor ? t("talk") : t("mascot")}
             still={v.user.motion === "still"}
             soundOn={v.user.soundOn}
-            tutor={v.tenant.features.has("ai_tutor") && current ? { slug: current.slug, lessonKey: nextLesson(current).key } : undefined}
+            tutor={tutor}
             tutorVoice={v.tenant.features.has("tutor_voice")}
           />
         </section>
@@ -242,7 +249,7 @@ export default async function HomePage() {
           <div className="min-w-0 pr-4">
             <p className="flex items-center gap-1.5 text-title font-bold tabular-nums">
               <Zap className="size-5 fill-brand-600 text-brand-600" />
-              {v.user.xp}
+              {format.number(v.user.xp)}
             </p>
             <p className="text-tab text-ink-muted">{t("totalXp")}</p>
             <Pill tone="brand" className="mt-2">
@@ -264,7 +271,8 @@ export default async function HomePage() {
               {t("nextSession")}
             </p>
             <p className="mt-2 text-body-sm font-semibold">{session.title}</p>
-            <p className="mt-1 text-caption text-ink-muted">{format.dateTime(session.startsAt, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+            {/* ICU's short Azerbaijani weekdays ("C.", "Ç.") are not read as days: spell them out there. */}
+            <p className="mt-1 text-caption text-ink-muted">{format.dateTime(session.startsAt, { weekday: locale === "az" ? "long" : "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
           </Link>
         ) : null}
       </aside>

@@ -1,0 +1,553 @@
+{
+  "id": "phone-call-tricks",
+  "title": "Telefon zəngi fəndləri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l1-tutor",
+      "beats": [
+        {
+          "id": "l1-b1",
+          "say": "Salam! Mən sizin təhlükəsizlik köməkçinizəm. Bu gün telefonla gələn fırıldaqları tanımağı öyrənəcəksiniz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "l1-b2",
+          "say": "Ekranda bankın adı görünür, amma zəng edənin adını və nömrəsini saxtalaşdırmaq asandır.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "sahilbank",
+              "caller": [
+                {
+                  "text": "SahilBank",
+                  "spot": "caller-name"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 12 000 00 00",
+                  "spot": "caller-number"
+                }
+              ],
+              "label": "Gələn zəng"
+            }
+          },
+          "highlight": "caller-name"
+        },
+        {
+          "id": "l1-b3",
+          "say": "Fırıldaqçılar sizi tələsdirir: kartınız bloklanıb, pulunuz hesabdan çıxır. Qorxu və tələskənlik onların əsas silahıdır.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          },
+          "checkpoint": {
+            "prompt": "Zəng edən SMS ilə gələn kodu soruşur. Nə edirsiniz?",
+            "options": [
+              {
+                "id": "say-code",
+                "label": "Kodu oxuyuram",
+                "correct": false,
+                "feedback": "Bu kod hesabınızı aça və ya ödənişi təsdiqləyə bilər. Bank onu heç vaxt soruşmur."
+              },
+              {
+                "id": "call-back",
+                "label": "Zəngi bitirib banka özüm zəng edirəm",
+                "correct": true,
+                "feedback": "Düzdür. Bu yoxlama fırıldaqçının planını tamamilə pozur."
+              }
+            ]
+          }
+        },
+        {
+          "id": "l1-b5",
+          "say": "Qızıl qayda: zəngi bitirin və rəsmi nömrəyə özünüz zəng edin. Nömrəni kartınızdan və ya rəsmi saytdan götürün.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "bank-vishing",
+      "environment": "call",
+      "title": "Bankdan zəng",
+      "intro": "Ekranda bankınızın adı görünür. Zəng edəni dinləyin və hər addımda cavabınızı seçin.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Bank",
+            "voice": "man"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab ver",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Zəngə cavab vermək təhlükəli deyil. Əsas məsələ nə dediyinizdir."
+            },
+            {
+              "id": "decline",
+              "label": "Rədd et",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olar. Narahatsınızsa, kartın arxasındakı nömrəyə özünüz zəng edin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "alarm",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Bank",
+            "voice": "man"
+          },
+          "say": "Salam, mən Fuad Məmmədov, SahilBankın təhlükəsizlik xidmətindən. Hazırda kimsə kartınızdan 1 200 manat çıxarmağa çalışır.",
+          "spoken": "Salam, <breath> mən Fuad Məmmədov, SahilBankın təhlükəsizlik xidmətindən. Hazırda kimsə kartınızdan, ee, 1 200 manat çıxarmağa çalışır.",
+          "actions": [
+            {
+              "id": "card",
+              "label": "Kartın son rəqəmlərini deyirəm",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Bankınız sizi onsuz da tanıyır və buna ehtiyacı yoxdur. Hər detal fırıldaqçını daha inandırıcı edir."
+            },
+            {
+              "id": "keep",
+              "label": "Telefonla heç bir kart məlumatı vermirəm",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Gələn zəngdə kart məlumatlarını heç vaxt verməyin: ad və nömrə saxta ola bilər."
+            }
+          ]
+        },
+        {
+          "id": "code",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Bank",
+            "voice": "man"
+          },
+          "say": "Bunu dayandırmaq üçün beş dəqiqəniz var. Telefonunuza indicə gələn kodu mənə oxuyun və heç kimə deməyin.",
+          "spoken": "Bunu dayandırmaq üçün beş dəqiqəniz var. <breath> Telefonunuza indicə gələn kodu mənə oxuyun və heç kimə deməyin.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Kodu oxuyuram",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "SMS kodu ödənişi təsdiqləyir. Onu oxusanız, pulu özünüz göndərmiş olursunuz."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Düzdür. Heç bir bank telefonla SMS kodu soruşmur.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "safe-account",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Bank",
+            "voice": "man"
+          },
+          "say": "Onda pulunuzu qorumaq üçün onu təhlükəsiz hesaba köçürün. Rekvizitləri indi SMS ilə göndərirəm.",
+          "spoken": "Onda, ee, pulunuzu qorumaq üçün onu təhlükəsiz hesaba köçürün. <breath> Rekvizitləri indi SMS ilə göndərirəm.",
+          "actions": [
+            {
+              "id": "transfer",
+              "label": "Pulu təhlükəsiz hesaba köçürürəm",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Təhlükəsiz hesab deyilən şey yoxdur: o hesab fırıldaqçıya məxsusdur. Bank heç vaxt pul köçürməyinizi istəmir."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Əla qərar. Pul köçürmə xahişi fırıldağın son addımıdır."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Zəng bitdi. İndi nə edirsiniz?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Bank",
+            "voice": "man"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "Kartdakı nömrəyə zəng et",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Düzdür. Rəsmi nömrəni özünüz yığın, mümkünsə başqa telefondan. Belə olanda xətt açıq qala bilməz."
+            },
+            {
+              "id": "redial",
+              "label": "Zəng gələn nömrəyə geri zəng et",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "Nömrə saxta ola bilər. Nömrəni kartınızdan və ya bankın rəsmi saytından götürün."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l1-choice-spoof",
+      "question": {
+        "prompt": "Ekranda bankın rəsmi nömrəsi görünür. Zəng həqiqidirmi?",
+        "options": [
+          {
+            "id": "yes-number",
+            "label": "Bəli, nömrə düzgündürsə, zəng həqiqidir",
+            "correct": false,
+            "feedback": "Nömrəni saxtalaşdırmaq olar. Ekrandakı nömrə sübut deyil."
+          },
+          {
+            "id": "call-back",
+            "label": "Bunu bilmək olmur, ona görə özüm geri zəng edirəm",
+            "correct": true,
+            "feedback": "Düzdür. Rəsmi nömrəni özünüz yığın, mümkünsə başqa telefondan. Belə olanda fırıldaqçı xətti açıq saxlaya bilməz."
+          },
+          {
+            "id": "ask-name",
+            "label": "Adını soruşuram, bu kifayətdir",
+            "correct": false,
+            "feedback": "Fırıldaqçı istənilən adı deyə bilər. Adı soruşmaq yoxlama deyil."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Gələn zəng"
+          }
+        }
+      },
+      "explain": "Zəng edənin adı və nömrəsi saxta ola bilər. Ən etibarlı yol zəngi bitirib rəsmi nömrəyə özünüz zəng etməkdir."
+    },
+    {
+      "type": "swipe",
+      "id": "l1-swipe",
+      "prompt": "Təhlükəsizdir, yoxsa fırıldaq?",
+      "cards": [
+        {
+          "id": "police-safe-account",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Zəng: +994 12 000 11 22"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Polisdən zəng edirik. Adınıza kredit rəsmiləşdirilib. Pulunuzu dərhal təhlükəsiz hesaba köçürün."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Polis heç vaxt pulu təhlükəsiz hesaba köçürməyi istəmir. Bu, geniş yayılmış fırıldaqdır."
+        },
+        {
+          "id": "bank-call-back",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "sahilbank",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Zəng: SahilBank"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Kartınızda şübhəli ödəniş gördük. Bizə heç nə deməyin, kartın arxasındakı nömrəyə zəng edin."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Heç nə istəmir və sizi rəsmi nömrəyə yönləndirir. Yoxlamaq üçün kartınızdakı nömrəyə zəng edin."
+        },
+        {
+          "id": "support-password",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek-fake",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Zəng: İT dəstəyi"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Poçt qutunuzda virus var. Parolunuzu deyin, onu uzaqdan təmizləyim."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "İT dəstəyinin parolunuza ehtiyacı yoxdur. Onu heç vaxt heç kimə deməyin."
+        },
+        {
+          "id": "support-planned",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Zəng: İT dəstəyi"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Dünən açdığınız sorğu ilə bağlı zəng edirəm. Sabah kompüterinizi yeniləyəcəyik, sizdən heç nə tələb olunmur."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Sorğunu özünüz açmısınız və sizdən heç nə istənmir. Bu, adi iş zəngidir."
+        },
+        {
+          "id": "remote-app",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "sahilbank",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Zəng: SahilBank"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hesabınızı qorumaq üçün bu tətbiqi quraşdırın ki, ekranınızı görə bilim."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Uzaqdan idarəetmə tətbiqi bütün telefonunuzu fırıldaqçının ixtiyarına verir. Bank heç vaxt bunu istəmir."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "l1-scenario",
+      "title": "Dəstək zəngi",
+      "start": "n1",
+      "nodes": [
+        {
+          "id": "n1",
+          "text": "Salam, mən Elvin, İT dəstəyindən. Hesabınız bloklanır, parolunuzu indi təsdiqləməliyik.",
+          "speaker": "Zəng edən",
+          "voice": "man-3",
+          "channel": "phone",
+          "spoken": "Salam, mən Elvin, İT dəstəyindən. <breath> Hesabınız bloklanır, parolunuzu indi təsdiqləməliyik.",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "it-destek-fake",
+              "caller": [
+                {
+                  "text": "İT dəstəyi"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 12 000 33 44"
+                }
+              ],
+              "label": "Gələn zəng"
+            }
+          },
+          "choices": [
+            {
+              "label": "Parolumu deyirəm",
+              "outcome": "compromised",
+              "feedback": "Parolunuz artıq başqasının əlindədir. Onu dərhal dəyişin və dəstəyin rəsmi nömrəsinə zəng edib bildirin."
+            },
+            {
+              "label": "Kim olduğunu soruşuram",
+              "next": "n2",
+              "feedback": "Yaxşı başlanğıcdır, amma cavaba tam etibar etməyin."
+            },
+            {
+              "label": "Zəngi bitirib dəstəyə özüm zəng edirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Əsl İT dəstəyi heç vaxt parolunuzu soruşmur."
+            }
+          ]
+        },
+        {
+          "id": "n2",
+          "text": "Mən Elvin Həsənov, üçüncü mərtəbədə otururam. Tələsin, hesab beş dəqiqəyə silinəcək. Heç olmasa bu proqramı quraşdırın.",
+          "speaker": "Zəng edən",
+          "voice": "man-3",
+          "channel": "phone",
+          "spoken": "Mən Elvin Həsənov, üçüncü mərtəbədə otururam. Tələsin, ee, hesab beş dəqiqəyə silinəcək. Heç olmasa bu proqramı quraşdırın.",
+          "choices": [
+            {
+              "label": "Proqramı quraşdırıram",
+              "next": "n3",
+              "feedback": "Uzaqdan idarəetmə proqramı ilə o, kompüterinizi görə və idarə edə bilər."
+            },
+            {
+              "label": "Özüm geri zəng edəcəyimi deyirəm",
+              "outcome": "safe",
+              "feedback": "Düzgün qərar. Tələsdirmə xəbərdarlıq əlamətidir, geri zəng etmək isə ən yaxşı yoxlamadır."
+            }
+          ]
+        },
+        {
+          "id": "n3",
+          "text": "Naməlum proqram açılır və kursor özbaşına hərəkət edir.",
+          "choices": [
+            {
+              "label": "Kompüteri şəbəkədən ayırıb dəstəyə zəng edirəm",
+              "outcome": "risky",
+              "feedback": "Düzgün reaksiya. Tez bildirmək zərəri məhdudlaşdırır."
+            },
+            {
+              "label": "Utanıram və heç kimə demirəm",
+              "outcome": "compromised",
+              "feedback": "Susmaq hücumçuya vaxt qazandırır. Bildirməkdə utanılası heç nə yoxdur, bu, hamını qoruyur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "l1-recap",
+      "points": [
+        "Zəng edənin adı və nömrəsi saxta ola bilər",
+        "Kodu, PIN-i və ya parolu heç vaxt heç kimə deməyin",
+        "Zəngi bitirin və rəsmi nömrəyə özünüz zəng edin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

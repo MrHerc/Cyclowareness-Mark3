@@ -30,7 +30,7 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
   const currentKey = m.lessons.some((l) => l.key === m.lastLessonKey) ? m.lastLessonKey : next?.key;
   const level = ({ Easy: 1, Medium: 2, Hard: 3 } as const)[m.difficulty];
   const stats = [
-    { icon: Clock, label: tr("minutes"), value: m.minutes, tint: false, meter: false },
+    { icon: Clock, label: tr("duration"), value: tc("units.min", { count: m.minutes }), tint: false, meter: false },
     { icon: Layers, label: tr("lessonsCount"), value: m.lessons.length, tint: false, meter: false },
     { icon: Zap, label: tr("xp"), value: m.xp, tint: true, meter: false },
     { icon: Gauge, label: tr("difficulty"), value: tc(`difficulty.${m.difficulty}`), tint: false, meter: true },
@@ -56,7 +56,7 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
         </Link>
         <div className="mt-4 flex flex-wrap gap-2">
           <Pill tone="brand">{tc(`categories.${m.category}`)}</Pill>
-          {m.due ? <Pill tone={overdue ? "risk" : "neutral"}>{tr("due", { date: format.dateTime(new Date(`${m.due}T12:00:00`), { day: "numeric", month: "long" }) })}</Pill> : null}
+          {m.due ? <Pill tone={overdue ? "risk" : "neutral"}>{tr("due", { date: format.dateTime(new Date(`${m.due}T12:00:00+04:00`), { day: "numeric", month: "long" }) })}</Pill> : null}
         </div>
         <h1 className="mt-3 text-headline font-bold text-balance">{m.title}</h1>
         <p className="mt-2 text-lead text-ink-muted">{m.subtitle}</p>

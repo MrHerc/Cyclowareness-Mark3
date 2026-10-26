@@ -22,9 +22,12 @@ import { clientIp } from "../request";
 import { parseCsv } from "../../lib/csv";
 import { cleanPhone, PHONE_PATTERN } from "../../lib/phone";
 import { departmentKey } from "../../lib/departments";
-import { LOCALES } from "../../i18n/config";
+import { LOCALES, LOCALE_NAMES, type Locale } from "../../i18n/config";
 import type { Role } from "../db/schema";
 import { pick } from "../../i18n/config";
+import azCommon from "../../../messages/az/common.json";
+import enCommon from "../../../messages/en/common.json";
+import ruCommon from "../../../messages/ru/common.json";
 
 async function target(v: Viewer, userId: string) {
   // The id reaches a uuid column: anything else is no person (instead of a database error).
@@ -360,12 +363,19 @@ export async function remindPeopleAction(userIds: string[]): Promise<{ count: nu
     if (!pending.length) continue;
     const first = modMap.get(pending[0].moduleId);
     if (!first) continue;
-    count += await notifyUsers(db(), v.tenant.id, [u.id], "reminder", { module: pick(first.title, u.locale), dueDate: pending[0].due ?? undefined, link: `/learn/${first.slug}` }, { title: pick(first.title, u.locale), href: `/learn/${first.slug}` }, { defer: true });
+    count += await notifyUsers(db(), v.tenant.id, [u.id], "reminder", { module: pick(first.title, u.locale), dueDate: pending[0].due ?? undefined, link: `/learn/${first.slug}` }, { href: `/learn/${first.slug}` }, { defer: true });
   }
   refresh();
   return { count };
 }
 
+/** Case, spacing and the dotted capital İ (whose lower case carries a combining dot) do not count when matching CSV words. */
+const fold = (s: string) => s.trim().toLowerCase().replace(/̇/g, "").replace(/\s+/g, " ");
+
+/**
+ * Role spellings the import accepts: the codes, a few English words, and the role names of every
+ * interface language, which is what the people export writes (so an exported file imports again).
+ */
 const ROLE_ALIASES: Record<string, Role> = {
   learner: "learner",
   employee: "learner",
@@ -378,7 +388,44 @@ const ROLE_ALIASES: Record<string, Role> = {
   admin: "tenant_admin",
   administrator: "tenant_admin",
   tenant_admin: "tenant_admin",
+  ...Object.fromEntries(
+    [azCommon.roles, enCommon.roles, ruCommon.roles].flatMap((names) =>
+      ASSIGNABLE_ROLES.map((role) => [fold(names[role as keyof typeof names]), role] as const),
+    ),
+  ),
 };
+
+/** Column names the import accepts besides the codes of the template: the obvious words in each interface language. */
+const COLUMN_ALIASES: Record<string, string> = {
+  "full name": "name",
+  ad: "name",
+  "ad soyad": "name",
+  "ad, soyad": "name",
+  имя: "name",
+  фио: "name",
+  "e-mail": "email",
+  "e-poçt": "email",
+  "эл. почта": "email",
+  "электронная почта": "email",
+  почта: "email",
+  şöbə: "department",
+  отдел: "department",
+  "job title": "job_title",
+  vəzifə: "job_title",
+  должность: "job_title",
+  rol: "role",
+  роль: "role",
+  "manager email": "manager_email",
+  "rəhbərin e-poçtu": "manager_email",
+  "почта руководителя": "manager_email",
+  telefon: "phone",
+  телефон: "phone",
+  dil: "language",
+  язык: "language",
+};
+
+/** Language spellings in the optional `language` column: the codes and each language's own name. */
+const LANGUAGE_ALIASES: Record<string, Locale> = Object.fromEntries(LOCALES.flatMap((l) => [[l, l], [fold(LOCALE_NAMES[l]), l]] as const));
 
 export type ImportPreview = { ok: boolean; rows: number; problems: { line: number; problem: string }[]; newDepartments: string[]; imported?: number; error?: string };
 
@@ -398,7 +445,10 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
   if (csv.length > 5_000_000) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "tooMany" };
   const table = parseCsv(csv);
   if (table.length < 2) return { ok: false, rows: 0, problems: [{ line: 1, problem: "header" }], newDepartments: [] };
-  const header = table[0].map((h) => h.trim().toLowerCase());
+  const header = table[0].map((h) => {
+    const name = fold(h);
+    return COLUMN_ALIASES[name] ?? name;
+  });
   const col = (name: string) => header.indexOf(name);
   if (col("name") < 0 || col("email") < 0) return { ok: false, rows: 0, problems: [{ line: 1, problem: "header" }], newDepartments: [] };
   if (table.length > 5001) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "tooMany" };
@@ -427,13 +477,17 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
   // is the one reported should someone add that department before the import is committed.
   const newDepartments = new Map<string, { name: string; line: number }>();
   const newDepartmentNames = () => [...newDepartments.values()].map((d) => d.name);
-  const rows: { line: number; name: string; email: string; department: string; jobTitle: string; role: Role; manager: string; phone: string }[] = [];
+  const rows: { line: number; name: string; email: string; department: string; jobTitle: string; role: Role; manager: string; phone: string; locale: string }[] = [];
   body.forEach((r, i) => {
     const line = i + 2;
     const get = (n: string) => cell(r, n);
     const name = get("name");
     const email = get("email").toLowerCase();
-    const roleRaw = get("role").toLowerCase();
+    const roleRaw = fold(get("role"));
+    // Optional: a language the organisation has switched on; empty means the organisation's default.
+    const languageRaw = get("language");
+    const language = languageRaw ? LANGUAGE_ALIASES[fold(languageRaw)] : undefined;
+    if (languageRaw && (!language || !v.tenant.settings.locales.includes(language))) problems.push({ line, problem: "language" });
     const department = get("department");
     if (!name) problems.push({ line, problem: "name" });
     if (!z.email().safeParse(email).success) problems.push({ line, problem: "email" });
@@ -453,7 +507,7 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
     const key = departmentKey(department);
     if (department && (deptMatches.get(key)?.length ?? 0) > 1) problems.push({ line, problem: "departmentAmbiguous" });
     else if (department && !deptByName.has(key) && !newDepartments.has(key)) newDepartments.set(key, { name: department, line });
-    rows.push({ line, name, email, department, jobTitle: get("job_title"), role: role ?? "learner", manager: get("manager_email").toLowerCase(), phone });
+    rows.push({ line, name, email, department, jobTitle: get("job_title"), role: role ?? "learner", manager: get("manager_email").toLowerCase(), phone, locale: language ?? v.tenant.settings.defaultLocale });
   });
   if (!commit || problems.length) return { ok: problems.length === 0, rows: rows.length, problems: problems.slice(0, 200), newDepartments: newDepartmentNames() };
 
@@ -489,7 +543,7 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
               departmentId: r.department ? deptByName.get(departmentKey(r.department)) ?? null : null,
               jobTitle: r.jobTitle || null,
               phone: r.phone || null,
-              locale: v.tenant.settings.defaultLocale,
+              locale: r.locale,
             })
             .returning({ id: t.users.id });
         } catch (error) {

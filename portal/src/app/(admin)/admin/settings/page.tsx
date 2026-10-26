@@ -125,7 +125,7 @@ export default async function SettingsPage({ searchParams }: PageProps<"/admin/s
       body = <AttestationTab texts={s.attestationText} locales={s.locales} />;
       break;
     case "certificate":
-      body = <CertificateTab cert={s.certificate} orgName={v.tenant.name} logoUrl={v.tenant.branding.logoUrl} locale={v.user.locale} verifyHost={new URL(env.APP_URL).host} />;
+      body = <CertificateTab cert={s.certificate} orgName={v.tenant.name} logoUrl={v.tenant.branding.logoUrl} locale={v.user.locale} locales={s.locales} verifyHost={new URL(env.APP_URL).host} />;
       break;
     case "learning":
       body = <LearningTab learning={s.learning} />;

@@ -52,7 +52,7 @@ export function CampaignActions({ id, status, audience, channel }: { id: string;
               start(async () => {
                 const res = await launchCampaignAction(id);
                 setOpen(false);
-                if (res.ok) toast(`${t("launched")} (${res.count})`);
+                if (res.ok) toast(t("launchedCount", { count: res.count ?? 0 }));
                 else toast(t("launchBlocked", { reason: t(`blocked.${res.reason ?? "empty"}`) }), "error");
               })
             }

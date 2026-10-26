@@ -1,0 +1,512 @@
+{
+  "id": "disguised-files",
+  "title": "Maskalanmış fayllar",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "df-tutor",
+      "beats": [
+        {
+          "id": "df-b1",
+          "say": "Salam! Faylın adı aldada bilər. Bu gün qoşmanın əslində nə olduğunu müəyyən etməyi öyrənəcəyik.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        },
+        {
+          "id": "df-b2",
+          "say": "Bu fayl PDF-ə oxşayır. Amma adın ən sonunda exe yazılıb, deməli, bu, proqramdır.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "file",
+              "name": [
+                {
+                  "text": "Qerar_2026.pdf"
+                },
+                {
+                  "text": ".exe",
+                  "spot": "ext"
+                }
+              ],
+              "type": "exe",
+              "size": "1,8 MB",
+              "source": [
+                {
+                  "text": "E-poçt qoşması"
+                }
+              ]
+            }
+          },
+          "highlight": "ext"
+        },
+        {
+          "id": "df-b3",
+          "say": "Arxivlər, disk obrazları və qısayol faylları da içində proqram gizlədə bilər.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        },
+        {
+          "id": "df-b4",
+          "say": "Qayda sadədir: gözlənilməz faylı açmazdan əvvəl onun növünü yoxlayın, şübhə yaranarsa, bildirin.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "df-sim-files",
+      "environment": "desktop",
+      "title": "Yükləmələr qovluğu",
+      "intro": "E-poçtdan yüklədiyiniz fayllara baxın. Fayl genişlənmələrini göstərin və hər biri ilə nə edəcəyinizi seçin.",
+      "steps": [
+        {
+          "id": "decree-exe",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Qerar_2026.pdf.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "1,8 MB",
+            "source": [
+              {
+                "text": "Yükləmələr: qerar@nazirlik-sened.example.net"
+              }
+            ]
+          },
+          "say": "Fayl genişlənmələrini göstərin. Adın sonunda nə yazılıb?",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Bu, sənəd deyil, proqramdır. Açılan kimi zərərli proqram quraşdıra bilər."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əsl qərar heç vaxt proqram olmur."
+            },
+            {
+              "id": "report",
+              "label": "Təhlükəsizlik komandasına bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Təhlükəsizlik komandası eyni məktubu digər əməkdaşların poçt qutularından da silə bilər."
+            }
+          ]
+        },
+        {
+          "id": "report-iso",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Hesabat_sentyabr.iso"
+              }
+            ],
+            "type": "iso",
+            "size": "4,2 MB",
+            "source": [
+              {
+                "text": "Yükləmələr: hesabat@audit-xidmet.example.net"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open",
+              "outcome": "risky",
+              "feedback": "ISO fayl disk kimi açılır və içində proqram ola bilər. Hesabatlar disk obrazı kimi göndərilmir."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Düzdür. Gözləmədiyiniz disk obrazını açmayın."
+            },
+            {
+              "id": "report",
+              "label": "Təhlükəsizlik komandasına bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Hesabat kimi təqdim olunan ISO fayl tipik hücumdur."
+            }
+          ]
+        },
+        {
+          "id": "photos-lnk",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Tedbir_fotolari"
+              }
+            ],
+            "type": "lnk",
+            "size": "3 KB",
+            "source": [
+              {
+                "text": "Yükləmələr: arxivdən çıxarılıb"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Bu, qısayol idi və gizli əmri işə saldı. Fotolar heç vaxt 3 KB olmur."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Düzdür. Foto kimi görünən qısayol (.lnk) tələdir."
+            },
+            {
+              "id": "report",
+              "label": "Təhlükəsizlik komandasına bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Açmadan bildirmək ən təhlükəsiz yoldur."
+            }
+          ]
+        },
+        {
+          "id": "leave-pdf",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "idare",
+            "name": [
+              {
+                "text": "Mezuniyyet_qrafiki.pdf"
+              }
+            ],
+            "type": "pdf",
+            "size": "220 KB",
+            "source": [
+              {
+                "text": "Yükləmələr: kadrlar@idare.example"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Düzdür. Daxili ünvandan gələn gözlənilən PDF faylı açmaq olar."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Bu fayl təhlükəsizdir: tanış göndərəndən gələn əsl PDF. Hər faylı silmək lazım deyil."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "df-hotspot",
+      "prompt": "Bu məktubdakı xəbərdarlıq əlamətlərini tapın.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "e-xidmet-fake",
+        "from": {
+          "name": [
+            {
+              "text": "e-Xidmət Portalı"
+            }
+          ],
+          "address": [
+            {
+              "text": "bildiris@e-xidmet-gov.example.net",
+              "spot": "domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Cərimə barədə bildiriş"
+          }
+        ],
+        "time": "09:31",
+        "body": [
+          [
+            {
+              "text": "Adınıza inzibati cərimə tətbiq edilib. Ətraflı məlumat qoşmadadır."
+            }
+          ],
+          [
+            {
+              "text": "Arxivin parolu: 2026",
+              "spot": "zip"
+            }
+          ],
+          [
+            {
+              "text": "3 gün ərzində ödənilməsə, məbləğ iki qat artacaq.",
+              "spot": "urgency"
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Cerime_bildirisi.zip",
+                "spot": "zip"
+              }
+            ],
+            "size": "860 KB"
+          },
+          {
+            "name": [
+              {
+                "text": "Odenis_qebzi.html",
+                "spot": "html"
+              }
+            ],
+            "size": "14 KB"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Saxta domen",
+          "explain": "Ünvana «-gov» əlavə edilib, sonluğu da fərqlidir. Rəsmi portalın domenini özünüz yoxlayın."
+        },
+        {
+          "id": "zip",
+          "label": "Parolla qorunan arxiv",
+          "explain": "Parol antivirusun arxivin içinə baxmasına mane olur. Rəsmi bildirişlər belə göndərilmir."
+        },
+        {
+          "id": "html",
+          "label": "HTML qoşma",
+          "explain": "HTML qoşma brauzerdə saxta ödəniş və ya giriş səhifəsi açır."
+        },
+        {
+          "id": "urgency",
+          "label": "Hədə və tələsdirmə",
+          "explain": "Qorxu sizi yoxlamadan faylı açmağa vadar etmək üçündür. Cərimələri yalnız rəsmi portalda yoxlayın."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "df-swipe",
+      "prompt": "Təhlükəsizdir, yoxsa tələ?",
+      "cards": [
+        {
+          "id": "manual-pdf",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "idare",
+            "name": [
+              {
+                "text": "Telimat_2026.pdf"
+              }
+            ],
+            "type": "pdf",
+            "size": "310 KB",
+            "source": [
+              {
+                "text": "it@idare.example, gözlənilən təlimat"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Daxili ünvan, gözlənilən sənəd, adi PDF. Açmaq olar."
+        },
+        {
+          "id": "salary-lnk",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Maas_cedveli.xlsx.lnk"
+              }
+            ],
+            "type": "lnk",
+            "size": "2 KB",
+            "source": [
+              {
+                "text": "Naməlum göndərən"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Cədvəl adı altında gizlənmiş qısayol. Onu açmaq gizli əmri işə sala bilər."
+        },
+        {
+          "id": "order-img",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "cevikkargo-fake",
+            "name": [
+              {
+                "text": "Sifaris_1873.img"
+              }
+            ],
+            "type": "img",
+            "size": "3,6 MB",
+            "source": [
+              {
+                "text": "sifaris@cevik-kargo.example.net"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "IMG disk obrazıdır. Sifariş məlumatları heç vaxt bu şəkildə göndərilmir."
+        },
+        {
+          "id": "slides-ppt",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "ofistechizat",
+            "name": [
+              {
+                "text": "Teqdimat_oktyabr.pptx"
+              }
+            ],
+            "type": "ppt",
+            "size": "2,1 MB",
+            "source": [
+              {
+                "text": "Səbinə Kərimova, görüş üçün razılaşdırılıb"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Adi formatda, əvvəlcədən razılaşdırılmış təqdimat. Heç bir xəbərdarlıq əlaməti yoxdur."
+        },
+        {
+          "id": "invoice-html",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "ofistechizat-fake",
+            "name": [
+              {
+                "text": "Faktura_oktyabr.html"
+              }
+            ],
+            "type": "html",
+            "size": "9 KB",
+            "source": [
+              {
+                "text": "faktura@ofistechizat-az.example.net"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Hesab-fakturalar HTML fayl olmur. Oxşar domendən gələn bu fayl giriş səhifəsi açır."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "df-match",
+      "prompt": "Hər fayl növünü onun riski ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "exe",
+          "left": ".exe",
+          "right": "Açılanda işə düşən proqram"
+        },
+        {
+          "id": "lnk",
+          "left": ".lnk",
+          "right": "Gizli əmri işə sala bilən qısayol"
+        },
+        {
+          "id": "iso",
+          "left": ".iso",
+          "right": "İçində proqram gizlədə bilən disk obrazı"
+        },
+        {
+          "id": "html",
+          "left": ".html",
+          "right": "Brauzerdə saxta giriş səhifəsi aça bilər"
+        },
+        {
+          "id": "zip",
+          "left": ".zip (parollu)",
+          "right": "Antivirus içinə baxa bilmir"
+        }
+      ],
+      "explain": "Bu növ fayllar iş məktublarında nadir hallarda olur. Gözləmədiyiniz belə faylı açmayın və bildirin."
+    },
+    {
+      "type": "choice",
+      "id": "df-choice",
+      "question": {
+        "prompt": "Həmkarınız deyir: «Faylı açdım, heç nə olmadı». Ona nə məsləhət görərsiniz?",
+        "options": [
+          {
+            "id": "report",
+            "label": "Kompüteri şəbəkədən ayırın və dərhal təhlükəsizlik komandasına zəng edin",
+            "correct": true,
+            "feedback": "Düzdür. Zərərli proqram çox vaxt səssiz işləyir, tez bildirmək isə zərəri məhdudlaşdırır."
+          },
+          {
+            "id": "wait",
+            "label": "Gözləyin, nəsə baş versə, bildirərsiniz",
+            "correct": false,
+            "feedback": "«Heç nə olmadı» çox vaxt yanlış təəssüratdır. Gözləmək hücumçuya vaxt qazandırır."
+          },
+          {
+            "id": "shutdown",
+            "label": "Kompüteri dərhal söndürün",
+            "correct": false,
+            "feedback": "Söndürmək yaddaşdakı sübutları silə bilər. Daxili qaydalarınız başqa cür tələb etmirsə, kompüteri açıq saxlayın, şəbəkədən ayırın və bildirin."
+          }
+        ]
+      },
+      "explain": "Açılmış şübhəli fayl insidentdir: kompüteri şəbəkədən ayırın, söndürməyin və dərhal bildirin."
+    },
+    {
+      "type": "recap",
+      "id": "df-recap",
+      "points": [
+        "Adın ən sonuna baxın: faylın əsl növü oradadır",
+        "Gözlənilməz arxivləri, ISO, qısayol və HTML faylları açmayın",
+        "Artıq açmısınız? Dərhal cihazı şəbəkədən ayırın və bildirin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

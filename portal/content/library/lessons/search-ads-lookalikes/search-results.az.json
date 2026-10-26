@@ -1,0 +1,411 @@
+{
+  "id": "search-results",
+  "title": "Axtarış nəticələri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "sr-tutor",
+      "beats": [
+        {
+          "id": "sr-b1",
+          "say": "Salam! Çox adam rəsmi saytı ünvanını yazaraq yox, axtarışla tapır. Fırıldaqçılar da bunu bilir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "sr-b2",
+          "say": "Onlar lap yuxarıda görünmək üçün reklam alırlar. Belə nəticənin yanında kiçik bir söz olur: Sponsorlu.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2c-tapan",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "Tapan: vətəndaş portalı arayış"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Sponsorlu",
+                    "spot": "ad-label"
+                  },
+                  {
+                    "text": "  vetendasportal-gov.example"
+                  }
+                ],
+                [
+                  {
+                    "text": "Vətəndaş Portalı: arayışı 5 dəqiqəyə alın"
+                  }
+                ],
+                [
+                  {
+                    "text": "vetendasportal.gov.az"
+                  }
+                ],
+                [
+                  {
+                    "text": "Vətəndaş Portalı: onlayn arayışlar"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Axtar"
+              ]
+            }
+          },
+          "highlight": "ad-label"
+        },
+        {
+          "id": "sr-b3",
+          "say": "Saxta sayt əslinə çox oxşayır: ya bir hərfi fərqlidir, ya artıq sözü var, ya da sonluğu başqadır.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "sr-b4",
+          "say": "Rəsmi ünvanı bir dəfə yoxlayın və əlfəcinlərə əlavə edin. Sonra onu həmişə oradan açın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "sr-hotspot",
+      "prompt": "Axtarış nəticələrindəki təhlükəli yerləri tapın.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2c-tapan",
+        "tone": "app",
+        "title": [
+          {
+            "text": "Tapan: vətəndaş portalı arayış"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Sponsorlu",
+              "spot": "ad-label"
+            },
+            {
+              "text": "  "
+            },
+            {
+              "text": "vetendasportal-gov.example",
+              "spot": "lookalike"
+            }
+          ],
+          [
+            {
+              "text": "Rəsmi sayt. Arayışı 5 dəqiqəyə alın",
+              "spot": "fake-official"
+            }
+          ],
+          [
+            {
+              "text": "Sponsorlu  "
+            },
+            {
+              "text": "vetendaspotral.example.info",
+              "spot": "typo"
+            }
+          ],
+          [
+            {
+              "text": "Vətəndaş Portalı: giriş və arayışlar"
+            }
+          ],
+          [
+            {
+              "text": "vetendasportal.gov.az"
+            }
+          ],
+          [
+            {
+              "text": "Vətəndaş Portalı: onlayn arayışlar"
+            }
+          ]
+        ],
+        "buttons": [
+          "Axtar"
+        ]
+      },
+      "spots": [
+        {
+          "id": "ad-label",
+          "label": "Reklam nişanı",
+          "explain": "Bu nəticənin ən yuxarıda çıxması üçün pul ödənilib. Reklamı fırıldaqçılar da ala bilər, ona görə daxil olmaq üçün heç vaxt reklamdan istifadə etməyin."
+        },
+        {
+          "id": "lookalike",
+          "label": "Artıq söz",
+          "explain": "Ünvana gov sözü əlavə edilib, amma sonluğu fərqlidir. Rəsmi portalın ünvanı gov.az ilə bitir."
+        },
+        {
+          "id": "fake-official",
+          "label": "Saxta «rəsmi» yazısı",
+          "explain": "«Rəsmi sayt» sözlərini hər kəs yaza bilər. Saytın rəsmi olduğunu yazı yox, ünvanın sonu göstərir."
+        },
+        {
+          "id": "typo",
+          "label": "Hərflərin yeri dəyişib",
+          "explain": "«Portal» sözündə iki hərfin yeri dəyişib. Tələsəndə bunu görmək çətindir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "sr-choice",
+      "question": {
+        "prompt": "Vətəndaş portalına tez-tez daxil olursunuz. Ən təhlükəsiz yol hansıdır?",
+        "options": [
+          {
+            "id": "bookmark",
+            "label": "Rəsmi ünvanı bir dəfə yoxlayıb əlfəcinlərə əlavə edirəm",
+            "correct": true,
+            "feedback": "Düzdür. Əlfəcin hər dəfə eyni ünvanı açır, reklamlar isə ümumiyyətlə aradan çıxır."
+          },
+          {
+            "id": "first-result",
+            "label": "Hər dəfə axtarıram və ilk nəticəyə basıram",
+            "correct": false,
+            "feedback": "İlk nəticə reklam ola bilər. Fırıldaqçılar məhz bu vərdişə arxalanır."
+          },
+          {
+            "id": "sms-link",
+            "label": "SMS ilə gələn linkdən istifadə edirəm",
+            "correct": false,
+            "feedback": "SMS ilə linki istənilən kəs göndərə bilər. Rəsmi saytı özünüz açın."
+          }
+        ]
+      },
+      "explain": "Tez-tez istifadə etdiyiniz saytları əlfəcinlərə əlavə edin. Onda axtarış nəticələri və reklamlar sizi aldada bilməz."
+    },
+    {
+      "type": "simulation",
+      "id": "sr-sim",
+      "environment": "browser",
+      "title": "Proqramın yüklənməsi",
+      "intro": "Sabah onlayn iclasınız var və Görüş tətbiqini yükləməlisiniz. Axtarışdan başlayırsınız.",
+      "steps": [
+        {
+          "id": "results",
+          "label": "Görüş yüklə: axtarış nəticələri",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tapan",
+            "url": [
+              {
+                "text": "https://tapan.example/axtar?q=gorus+yukle",
+                "reveal": "tapan.example"
+              }
+            ]
+          },
+          "say": "Ən yuxarıda reklam, onun altında isə tətbiqin öz saytı var.",
+          "actions": [
+            {
+              "id": "ad",
+              "label": "Sponsorlu: gorus-app-download.example.net",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Reklam sizi başqa sayta apardı. Hələ gec deyil: ünvana baxın.",
+              "next": "fake-site"
+            },
+            {
+              "id": "organic",
+              "label": "gorus.example: rəsmi sayt",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "Düzdür. Reklamı keçib tətbiqin öz saytını açdınız.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "fake-site",
+          "label": "Görüş: pulsuz yükləyin",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-gorus-fake",
+            "url": [
+              {
+                "text": "https://gorus-app-download.example.net/yukle",
+                "reveal": "gorus-app-download.example.net"
+              }
+            ]
+          },
+          "say": "Səhifə əsl sayta çox oxşayır. Ünvana baxın.",
+          "actions": [
+            {
+              "id": "download",
+              "label": "Yüklə",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Bu sayt tətbiqin istehsalçısına aid deyil. Buradan yüklənən quraşdırma faylına etibar etmək olmaz.",
+              "next": "fake-file"
+            },
+            {
+              "id": "leave",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Bu ünvan tətbiqin öz saytı deyildi. Rəsmi sayta özünüz keçin.",
+              "next": "real-site"
+            },
+            {
+              "id": "check",
+              "label": "Ünvanı yoxla",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Ad oxşar görünür, amma domen fərqlidir. Bu sayta etibar etməyin.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "fake-file",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "w2c-gorus-fake",
+            "name": [
+              {
+                "text": "GorusSetup_2026.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "84 MB",
+            "source": [
+              {
+                "text": "gorus-app-download.example.net"
+              }
+            ]
+          },
+          "say": "Fayl yükləndi. Onu açacaqsınızmı?",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Bu quraşdırıcı tətbiqlə birlikdə parolları oğurlayan proqram da quraşdırır. Saxta saytdan gələn faylı heç vaxt açmayın.",
+              "next": "after-bad"
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Düzdür. Faylı silin, İT dəstəyinə bildirin və tətbiqi rəsmi saytdan yükləyin.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "after-bad",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "qoruyucu",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Qoruyucu: şübhəli proqram"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "GorusSetup_2026.exe brauzerdə saxlanmış parolları oxumağa cəhd etdi."
+                }
+              ]
+            ],
+            "buttons": [
+              "Karantinə göndər",
+              "Bağla"
+            ]
+          },
+          "say": "Antivirus nəsə tapdı. İndi tez hərəkət etmək lazımdır.",
+          "actions": [
+            {
+              "id": "isolate",
+              "label": "Şəbəkədən ayır və İT dəstəyinə zəng et",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Düzdür. Qaydalarınızda başqa cür nəzərdə tutulmayıbsa, kompüteri söndürmədən şəbəkədən ayırın və dərhal zəng edin."
+            },
+            {
+              "id": "ignore",
+              "label": "Bağla və işə davam et",
+              "kind": "cancel",
+              "outcome": "compromised",
+              "feedback": "Proqram işləməyə davam edir və parollarınızı kənara ötürə bilər. Dərhal bildirin."
+            }
+          ]
+        },
+        {
+          "id": "real-site",
+          "label": "Görüş: kompüteriniz üçün yükləyin",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "gorus",
+            "url": [
+              {
+                "text": "https://gorus.example/yukle",
+                "reveal": "gorus.example"
+              }
+            ]
+          },
+          "say": "Bu, tətbiqin öz saytıdır.",
+          "actions": [
+            {
+              "id": "ask-it",
+              "label": "İT dəstəyindən quraşdırmağı xahiş et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Ən yaxşı yol budur. İş kompüterində proqramları İT dəstəyi quraşdırır.",
+              "next": "results"
+            },
+            {
+              "id": "download",
+              "label": "Yüklə",
+              "kind": "install",
+              "outcome": "safe",
+              "feedback": "Düzdür, bu, rəsmi saytdır. İş kompüterində isə əvvəlcə İT dəstəyinin qaydalarını yoxlayın.",
+              "next": "results"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "sr-recap",
+      "points": [
+        "Daxil olmaq üçün reklamdan yox, əlfəcindən istifadə edin",
+        "Ünvanın sonunu oxuyun və onu rəsmi ünvanla müqayisə edin",
+        "Proqramları yalnız rəsmi saytdan və ya İT dəstəyindən əldə edin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

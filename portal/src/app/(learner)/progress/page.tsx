@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { Award, BookCheck, Eye, Flame, FlaskConical, Footprints, Route, ShieldCheck, Signature, Snowflake, Zap } from "lucide-react";
 import { requireViewer } from "@/server/auth/viewer";
 import { getCatalog } from "@/server/queries/catalog";
@@ -24,7 +24,9 @@ export async function generateMetadata() {
 export default async function ProgressPage() {
   const v = await requireViewer();
   const locale = await getLocale();
-  const [t, tc, catalog, days, badges] = await Promise.all([getTranslations("learner.progress"), getTranslations("common"), getCatalog(v, locale), xpByDay(v), badgesFor(v.user.id, v.tenant.id)]);
+  const [t, tc, format, catalog, days, badges] = await Promise.all([getTranslations("learner.progress"), getTranslations("common"), getFormatter(), getCatalog(v, locale), xpByDay(v), badgesFor(v.user.id, v.tenant.id)]);
+  // Chart labels in the UI language (the screen-reader tables and the heatmap tooltips); the day is a Baku day.
+  const points = days.map((d) => ({ value: d.value, label: format.dateTime(new Date(`${d.label}T12:00:00+04:00`), { day: "numeric", month: "short" }) }));
   const lvl = levelFor(v.user.xp);
   const streak = liveStreak(v.user.streakCurrent, v.user.streakLastDay, dayKey(new Date()), v.user.streakFreezes);
   const band = riskBand(v.user.riskScore);
@@ -50,7 +52,7 @@ export default async function ProgressPage() {
             <span className="grid size-10 place-items-center rounded-sm bg-brand-50 text-brand-600">
               <Zap className="size-5" />
             </span>
-            <p className="mt-3 text-numeral font-bold tabular-nums">{v.user.xp}</p>
+            <p className="mt-3 text-numeral font-bold tabular-nums">{format.number(v.user.xp)}</p>
             <p className="text-caption text-ink-muted">{t("xp")}</p>
           </Card>
           <Card className="p-5">
@@ -111,13 +113,13 @@ export default async function ProgressPage() {
         <Card>
           <CardHeader title={t("xp30")} />
           <CardBody>
-            <BarChart points={days} caption={t("xp30")} headers={[tc("chart.date"), tc("chart.xp")]} />
+            <BarChart points={points} caption={t("xp30")} headers={[tc("chart.date"), tc("chart.xp")]} />
           </CardBody>
         </Card>
         <Card>
           <CardHeader title={t("activity")} description={t("activeDays", { count: activeDays })} />
           <CardBody>
-            <Heatmap days={days} caption={t("activity")} headers={[tc("chart.date"), tc("chart.xp")]} />
+            <Heatmap days={points} caption={t("activity")} headers={[tc("chart.date"), tc("chart.xp")]} />
           </CardBody>
         </Card>
       </div>

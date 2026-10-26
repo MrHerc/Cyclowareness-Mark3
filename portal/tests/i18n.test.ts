@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { IntlMessageFormat } from "intl-messageformat";
+import { parse } from "@formatjs/icu-messageformat-parser";
 import { NAMESPACES } from "@/i18n/messages";
 import { LOCALES } from "@/i18n/config";
 
@@ -22,9 +23,29 @@ function load(locale: string, ns: string) {
   return JSON.parse(fs.readFileSync(path.join(dir, locale, `${ns}.json`), "utf8"));
 }
 
-/** ICU placeholders such as {count} or {name}, ignoring plural/select branches. */
+type Element = { type: number; value?: unknown; options?: Record<string, { value: Element[] }>; children?: Element[] };
+
+/**
+ * ICU arguments such as {count} or {name}, from the parsed message: the words of plural/select branches
+ * ("one {Minute}") are text, not arguments. A message that does not parse falls back to a plain scan
+ * (the ICU validity check below reports it).
+ */
 function placeholders(msg: string): string[] {
-  return [...msg.matchAll(/\{\s*([a-zA-Z0-9_]+)\s*[,}]/g)].map((m) => m[1]).filter((v, i, a) => a.indexOf(v) === i).sort();
+  const names = new Set<string>();
+  const walk = (elements: Element[]) => {
+    for (const e of elements) {
+      // 1 argument, 2 number, 3 date, 4 time, 5 select, 6 plural (see TYPE in the parser).
+      if (e.type >= 1 && e.type <= 6 && typeof e.value === "string") names.add(e.value);
+      for (const option of Object.values(e.options ?? {})) walk(option.value);
+      if (e.children) walk(e.children);
+    }
+  };
+  try {
+    walk(parse(msg) as Element[]);
+  } catch {
+    for (const m of msg.matchAll(/\{\s*([a-zA-Z0-9_]+)\s*[,}]/g)) names.add(m[1]);
+  }
+  return [...names].sort();
 }
 
 describe("translations", () => {

@@ -15,6 +15,11 @@ import { TemplatePreview } from "@/components/admin/template-preview";
 import { TEMPLATE_BY_KEY, templateText } from "@/lib/campaigns/templates";
 import { campaignForPage } from "./campaign";
 
+export async function generateMetadata({ params }: PageProps<"/admin/campaigns/[id]">) {
+  const { c } = await campaignForPage((await params).id);
+  return { title: c.name };
+}
+
 export default async function CampaignPage({ params }: PageProps<"/admin/campaigns/[id]">) {
   const { v, c } = await campaignForPage((await params).id);
   const locale = await getLocale();
@@ -48,7 +53,17 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
   const s = stats.get(c.id) ?? { sent: 0, opened: 0, clicked: 0, submitted: 0, reported: 0 };
   const pct = (n: number) => (s.sent ? Math.round((n / s.sent) * 100) : 0);
   const mark = (d: Date | null, tone: "risk" | "safe" | "brand") =>
-    d ? <Check className={tone === "risk" ? "mx-auto size-4 text-risk-600" : tone === "safe" ? "mx-auto size-4 text-safe-600" : "mx-auto size-4 text-brand-600"} /> : <Minus className="mx-auto size-4 text-ink-disabled" />;
+    d ? (
+      <>
+        <Check aria-hidden className={tone === "risk" ? "mx-auto size-4 text-risk-600" : tone === "safe" ? "mx-auto size-4 text-safe-600" : "mx-auto size-4 text-brand-600"} />
+        <span className="sr-only">{tc("yes")}</span>
+      </>
+    ) : (
+      <>
+        <Minus aria-hidden className="mx-auto size-4 text-ink-disabled" />
+        <span className="sr-only">{tc("no")}</span>
+      </>
+    );
 
   return (
     <div className="grid gap-5">

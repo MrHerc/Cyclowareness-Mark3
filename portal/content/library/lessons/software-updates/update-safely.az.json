@@ -1,0 +1,374 @@
+{
+  "id": "update-safely",
+  "title": "Təhlükəsiz yeniləyin",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Yeniləmələr sadəcə yeni düymələr deyil. Onların çoxu hücumçuların artıq bildiyi təhlükəsizlik boşluqlarını bağlayır.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "update"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Boşluq açıqlanan kimi hücumçular yenilənməmiş cihazları axtarmağa başlayır. Yeniləməni gecikdirdiyiniz hər gün riski artırır.",
+          "mood": "alert",
+          "visual": {
+            "kind": "illustration",
+            "id": "ransomware"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "«Brauzeriniz köhnəlib, indi yükləyin» deyən pəncərə tələdir. Brauzerlər öz ayarlarından yenilənir.",
+          "mood": "think",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "brauzer-yenilenme-tecili.example.net",
+                  "spot": "fake-domain"
+                },
+                {
+                  "text": "/update.exe"
+                }
+              ]
+            }
+          },
+          "highlight": "fake-domain"
+        },
+        {
+          "id": "b4",
+          "say": "Əsl yeniləmələr cihazın ayarlarından və ya rəsmi tətbiq mağazasından gəlir. Şübhə yaranarsa, ayarları və ya mağazanı özünüz açıb yoxlayın.",
+          "mood": "happy",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "b5",
+          "say": "Yeniləmədən sonra cihazı yenidən başlatmağı təxirə salmayın. Çox vaxt qoruma yalnız cihaz yenidən başladıldıqdan sonra işə düşür.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "real-or-fake",
+      "prompt": "Əsl yeniləmədir, yoxsa tələ?",
+      "cards": [
+        {
+          "id": "sms-virus",
+          "artifact": {
+            "kind": "sms",
+            "sender": [
+              {
+                "text": "Servis"
+              }
+            ],
+            "time": "07:55",
+            "messages": [
+              [
+                {
+                  "text": "Telefonunuzda virus aşkarlandı! Təhlükəsizlik yeniləməsini yükləyin: fix-phone.example.info/app.apk"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Telefon yeniləmələri SMS ilə gəlmir. Bu link zərərli tətbiq quraşdırır."
+        },
+        {
+          "id": "planned-update",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "İT dəstəyi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it-support@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Bu axşam planlı yeniləmə"
+              }
+            ],
+            "time": "14:10",
+            "body": [
+              [
+                {
+                  "text": "Bu gün saat 19:00-dan sonra iş kompüterləri avtomatik yenilənəcək."
+                }
+              ],
+              [
+                {
+                  "text": "Kompüterinizi söndürməyin, sadəcə işinizi yadda saxlayın. Heç nə yükləməyə ehtiyac yoxdur."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Link yoxdur, fayl yoxdur, yüklənəcək heç nə yoxdur. Məktub sadəcə məlumat verir."
+        },
+        {
+          "id": "player-update",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://video-pleyer-yenile.example.net/pleyer_setup.exe"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "«Videoya baxmaq üçün pleyerinizi yeniləyin» deyən sayt klassik tələdir. Brauzerlər videonu heç bir əlavə proqram olmadan açır."
+        },
+        {
+          "id": "zip-update",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "Sistem Mərkəzi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "noreply@system-update-center.example.info"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Lisenziyanızın müddəti bitir! Yeniləmə tələb olunur"
+              }
+            ],
+            "time": "09:03",
+            "body": [
+              [
+                {
+                  "text": "Qoşmadakı yeniləməni bu gün quraşdırın."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Update_KB5039.zip"
+                  }
+                ],
+                "size": "1,8 MB"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Yeniləmələr e-poçt qoşması kimi gəlmir. Arxivin içində zərərli proqram gizlənə bilər."
+        },
+        {
+          "id": "remote-helper",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "İT dəstəyi (rəsmi)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Kompüterinizi uzaqdan yeniləmək üçün bu proqramı quraşdırın və ekranınızdakı kodu mənə göndərin."
+                  }
+                ],
+                "time": "16:20"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Uzaqdan idarəetmə proqramı hücumçuya kompüterinizə tam giriş verir. Dəstək xidmətinə bildiyiniz nömrə ilə özünüz zəng edin."
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "fake-update-email",
+      "prompt": "Saxta yeniləmə məktubunun əlamətlərini tapın.",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": [
+            {
+              "text": "Ofis Yeniləmə Xidməti"
+            }
+          ],
+          "address": [
+            {
+              "text": "security-update@"
+            },
+            {
+              "text": "idare-example.info",
+              "spot": "domain"
+            }
+          ]
+        },
+        "to": "sizə",
+        "subject": [
+          {
+            "text": "TƏCİLİ: ",
+            "spot": "urgency"
+          },
+          {
+            "text": "Kompüteriniz 24 saat ərzində bloklanacaq"
+          }
+        ],
+        "time": "08:47",
+        "body": [
+          [
+            {
+              "text": "Hörmətli həmkar,"
+            }
+          ],
+          [
+            {
+              "text": "Kompüterinizdə kritik yeniləmə çatışmır. Qoşmadakı faylı açıb quraşdırın."
+            }
+          ],
+          [
+            {
+              "text": "Quraşdırma zamanı antivirusu söndürün.",
+              "spot": "disable-av"
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Yenilenme_Tecili.exe",
+                "spot": "exe"
+              }
+            ],
+            "size": "2,1 MB"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Səhv domen",
+          "explain": "Təşkilatınız idare.example domenindən istifadə edir. Bu isə defislə yazılmış başqa domendir."
+        },
+        {
+          "id": "urgency",
+          "label": "Təcililik və hədə",
+          "explain": "Bloklanma hədəsi sizi düşünmədən hərəkət etməyə vadar etmək üçündür."
+        },
+        {
+          "id": "disable-av",
+          "label": "Antivirusu söndürmək tələbi",
+          "explain": "Heç bir əsl yeniləmə qorumanı söndürməyinizi istəmir. Bu, zərərli proqrama yol açır."
+        },
+        {
+          "id": "exe",
+          "label": "İcra olunan fayl",
+          "explain": "Açdığınız anda .exe faylı proqramı işə salır. Yeniləmələr bu yolla gəlmir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "order",
+      "id": "update-steps",
+      "prompt": "Yeniləmə addımlarını düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "save",
+          "label": "İşinizi yadda saxlayın"
+        },
+        {
+          "id": "settings",
+          "label": "Yeniləməni Ayarlar bölməsindən başladın"
+        },
+        {
+          "id": "restart",
+          "label": "Cihazı yenidən başladın"
+        },
+        {
+          "id": "check",
+          "label": "Hər şeyin işlədiyini yoxlayın"
+        }
+      ],
+      "explain": "Yadda saxlamaq işinizi qoruyur, yenidən başlatma isə yeniləməni tamamlayır."
+    },
+    {
+      "type": "choice",
+      "id": "old-device",
+      "question": {
+        "prompt": "Köhnə telefonunuz artıq yeniləmə almır. İndi nə etməli?",
+        "options": [
+          {
+            "id": "antivirus",
+            "label": "Antivirus quraşdırıb istifadəyə davam etmək",
+            "correct": false,
+            "feedback": "Antivirus sistemin özündəki boşluqları aradan qaldırmır."
+          },
+          {
+            "id": "move",
+            "label": "İş hesablarını silib dəstəklənən cihaza keçmək",
+            "correct": true,
+            "feedback": "Düzdür. Dəstəyi bitmiş cihaz yeni boşluqlar üçün düzəlişlər almayacaq."
+          },
+          {
+            "id": "nothing",
+            "label": "Heç nə, hələ yaxşı işləyir",
+            "correct": false,
+            "feedback": "Yaxşı işləmək təhlükəsiz olmaq demək deyil. Yeni boşluqlar açıq qalacaq."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "update"
+        }
+      },
+      "explain": "Dəstəyi bitmiş cihazda iş hesabları və məlumatları saxlamayın. Satmazdan əvvəl onu tam sıfırlayın."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Yeniləmələri gecikdirmədən quraşdırın, sonra cihazı yenidən başladın.",
+        "Yalnız Ayarlardan və ya rəsmi mağazadan yeniləyin.",
+        "Dəstəklənməyən cihazlarda iş məlumatları saxlamayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

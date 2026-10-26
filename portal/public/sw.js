@@ -4,7 +4,7 @@
  * cached on first use so the app shell opens fast. Without a connection, page navigations
  * show /offline.
  */
-const VERSION = "cy-v1";
+const VERSION = "cy-v3";
 const OFFLINE = "/offline";
 const PRECACHE = [OFFLINE, "/icons/icon.svg", "/icons/icon-192.png"];
 

@@ -1,0 +1,376 @@
+{
+  "id": "share-with-care",
+  "title": "Ehtiyatla paylaşın",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Bulud rahatdır: fayllar istənilən yerdən açılır. Amma səhv paylaşılan link də istənilən yerdən açılır.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "cloud"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Link yaradanda üç şeyi yoxlayın: onu kim aça bilər, redaktə etmək olarmı və link nə vaxta qədər açıq qalır.",
+          "mood": "think",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Bəzən heç parol da istənmir, sadəcə tətbiqə icazə verməyiniz xahiş olunur. Bir toxunuşla hücumçuya hesabınızın açarını verə bilərsiniz.",
+          "mood": "alert",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "from": {
+                "name": [
+                  {
+                    "text": "DocuSfera"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "no-reply@docusfera-share.example.net"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "Leyla Quliyeva sizinlə sənəd paylaşdı"
+                }
+              ],
+              "time": "10:41",
+              "body": [
+                [
+                  {
+                    "text": "Sənəd: Rüblük büdcə, yekun"
+                  }
+                ],
+                [
+                  {
+                    "text": "Sənədi açmaq üçün DocuSfera Viewer tətbiqinə hesabınıza giriş icazəsi verin.",
+                    "spot": "grant"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "grant"
+        },
+        {
+          "id": "b4",
+          "say": "Əgər icazə vermisinizsə, parolu dəyişmək kifayət etməyə bilər. İT dəstəyindən tətbiqin girişini dərhal ləğv etməyi xahiş edin.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "consent-prompt",
+      "prompt": "Bu tətbiqin öz işindən artıq nə istədiyini tapın.",
+      "artifact": {
+        "kind": "permission",
+        "app": "PDF Merger Pro",
+        "permissions": [
+          {
+            "label": [
+              {
+                "text": "Adınızı və e-poçt ünvanınızı görmək"
+              }
+            ],
+            "needed": true
+          },
+          {
+            "label": [
+              {
+                "text": "Məktublarınızı oxumaq, göndərmək və silmək",
+                "spot": "mail"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "Bütün fayllarınıza tam giriş",
+                "spot": "files"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "Kontaktlarınızı idarə etmək",
+                "spot": "contacts"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "İstifadə etmədiyiniz vaxt da girişi saxlamaq",
+                "spot": "offline"
+              }
+            ],
+            "needed": false
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "mail",
+          "label": "Poçt qutusuna tam giriş",
+          "explain": "PDF faylları birləşdirmək üçün poçtunuz lazım deyil. Bu icazə ilə kimsə sizin adınızdan məktub göndərə bilər."
+        },
+        {
+          "id": "files",
+          "label": "Bütün fayllar",
+          "explain": "Tətbiqə bütün buludunuz deyil, yalnız seçdiyiniz fayl lazımdır."
+        },
+        {
+          "id": "contacts",
+          "label": "Kontaktlar",
+          "explain": "Kontakt siyahınız növbəti fişinq dalğasının hədəf siyahısına çevrilir."
+        },
+        {
+          "id": "offline",
+          "label": "Daimi giriş",
+          "explain": "Tətbiq siz istifadəni dayandırandan sonra da daxil olmağa davam edə bilər. Parolu dəyişmək bunun qarşısını həmişə almır."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "link-settings",
+      "question": {
+        "prompt": "Hesabatı oxumaq üçün iki həmkarınıza göndərirsiniz. Hansı linki seçirsiniz?",
+        "options": [
+          {
+            "id": "anyone-edit",
+            "label": "Linki olan hər kəs, redaktə hüququ ilə",
+            "correct": false,
+            "feedback": "Link sızsa, hər kəs faylı açıb dəyişə bilər."
+          },
+          {
+            "id": "two-view",
+            "label": "Yalnız iki həmkar, ancaq baxış hüququ və bitmə tarixi ilə",
+            "correct": true,
+            "feedback": "Düzdür. Minimum giriş, minimum risk."
+          },
+          {
+            "id": "org-edit",
+            "label": "Təşkilatdakı hər kəs, redaktə hüququ ilə",
+            "correct": false,
+            "feedback": "Buna ehtiyacı olmayan yüzlərlə adam faylı açıb dəyişə bilər."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "folder"
+        }
+      },
+      "explain": "Ən az giriş verin: adı bəlli şəxslərə, yalnız lazım olan hüquqlarla və bitmə tarixi ilə."
+    },
+    {
+      "type": "swipe",
+      "id": "cloud-cards",
+      "prompt": "Bu paylaşım təhlükəsizdir, yoxsa riskli?",
+      "cards": [
+        {
+          "id": "expected-share",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "DocuSfera"
+                }
+              ],
+              "address": [
+                {
+                  "text": "no-reply@docusfera.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Samir Babayev sizinlə «Rüblük hesabat» faylını paylaşdı"
+              }
+            ],
+            "time": "09:15",
+            "body": [
+              [
+                {
+                  "text": "Samir: dünən danışdığımız hesabat budur."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Tanış həmkar, gözlənilən fayl, xidmətin öz domeni. Yenə də fayl açılanda ünvan sətrini yoxlayın."
+        },
+        {
+          "id": "salary-files",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "DocuSfera"
+                }
+              ],
+              "address": [
+                {
+                  "text": "share@docusfera-files.example.info"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Sizə 3 fayl göndərildi: Maaş artımı 2027.pdf"
+              }
+            ],
+            "time": "16:58",
+            "body": [
+              [
+                {
+                  "text": "Fayllar 24 saat sonra silinəcək. Onlara baxmaq üçün e-poçt parolunuzu təsdiqləyin."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Səhv domen, cəlbedici mövzu, vaxt təzyiqi və parol tələbi. Klassik tələdir."
+        },
+        {
+          "id": "open-link",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://docusfera.example/s/Hx82kQ?access=anyone&role=editor"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bu link hər kəsə redaktə imkanı verir. Göndərməzdən əvvəl giriş səviyyəsini dəyişin."
+        },
+        {
+          "id": "personal-cloud",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Günay (komanda)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Evdən işləmək üçün sənədləri şəxsi buluduma yüklədim."
+                  }
+                ],
+                "time": "18:40"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Şəxsi bulud təşkilatınızın nəzarətindən kənardadır. İş fayllarını yalnız təsdiqlənmiş xidmətdə saxlayın."
+        },
+        {
+          "id": "cleanup-notice",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "İT dəstəyi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it-support@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Köhnə açıq linklər bağlanacaq"
+              }
+            ],
+            "time": "11:00",
+            "body": [
+              [
+                {
+                  "text": "Cümə günü 90 gündən köhnə açıq linklər avtomatik bağlanacaq. Sizdən heç bir addım tələb olunmur."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ünvan düzgündür, link yoxdur, heç nə istənmir. Bu, faydalı təmizləmədir."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "access-levels",
+      "prompt": "Hər giriş səviyyəsini mənası ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "viewer",
+          "left": "Baxış hüququ",
+          "right": "Yalnız oxuya bilər"
+        },
+        {
+          "id": "commenter",
+          "left": "Şərh hüququ",
+          "right": "Oxuya və qeyd yaza bilər"
+        },
+        {
+          "id": "editor",
+          "left": "Redaktə hüququ",
+          "right": "Faylı dəyişə bilər"
+        },
+        {
+          "id": "anyone",
+          "left": "Linki olan hər kəs",
+          "right": "Kənar şəxslər də aça bilər"
+        }
+      ],
+      "explain": "Heç kimə lazım olmayan redaktə hüququ səhv və ya zərərli dəyişiklik riskini artırır."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Linkləri adı bəlli şəxslərlə və yalnız lazım olan hüquqlarla paylaşın.",
+        "Naməlum tətbiqi heç vaxt hesabınıza buraxmayın.",
+        "İş fayllarını şəxsi buludlarda saxlamayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

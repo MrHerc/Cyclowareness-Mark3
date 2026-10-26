@@ -10,7 +10,8 @@ const i18n = ["az", "ru"].map((l) => JSON.parse(readFileSync(path.join(root, `i1
 describe("content library", () => {
   it("has 53 modules and 106 lessons on disk", () => {
     expect(modules).toHaveLength(53);
-    const files = modules.flatMap((m) => readdirSync(path.join(root, "lessons", m.slug)));
+    // English originals only; the az/ru translations next to them are checked in content-locales.test.ts.
+    const files = modules.flatMap((m) => readdirSync(path.join(root, "lessons", m.slug)).filter((f) => f.endsWith(".en.json")));
     expect(files).toHaveLength(106);
   });
 

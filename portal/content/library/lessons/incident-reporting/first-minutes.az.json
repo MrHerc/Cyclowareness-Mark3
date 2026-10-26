@@ -1,0 +1,386 @@
+{
+  "id": "first-minutes",
+  "title": "İlk dəqiqələr",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Ən vacibi ilk dəqiqələrdir. Hücumçu tələsir, ona görə siz ondan da cəld olmalısınız.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Nəsə qaydasında görünmürsə, dayanın: tanımadığınız giriş, öz-özünə açılan pəncərə, yoxa çıxan fayllar.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "notification",
+              "brandRef": "ispoct",
+              "app": "İşPoçt",
+              "title": [
+                {
+                  "text": "Yeni cihazdan giriş"
+                }
+              ],
+              "body": [
+                {
+                  "text": "Kimsə saat 03:12-də "
+                },
+                {
+                  "text": "Gəncədə naməlum cihazdan",
+                  "spot": "place"
+                },
+                {
+                  "text": " hesabınıza daxil olub."
+                }
+              ],
+              "time": "08:31"
+            }
+          },
+          "highlight": "place"
+        },
+        {
+          "id": "b3",
+          "say": "Təcili halda İT dəstəyinə və ya təhlükəsizlik komandasına zəng edin. Məktub yazmaq sonraya qala bilər.",
+          "mood": "talk",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Kompüterdən şübhələnirsinizsə, bildirişi ondan göndərməyin. Hücumçu poçtu oxuya bilər, ona görə telefonla zəng edin.",
+          "mood": "think",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "strange-morning",
+      "environment": "desktop",
+      "title": "Qəribə səhər",
+      "intro": "Səhər kompüterinizi açırsınız və bir neçə qəribə şey görürsünüz. Hər birinə necə reaksiya verirsiniz?",
+      "steps": [
+        {
+          "id": "new-login",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "ispoct",
+            "app": "İşPoçt",
+            "title": [
+              {
+                "text": "Yeni cihazdan giriş"
+              }
+            ],
+            "body": [
+              {
+                "text": "Kimsə saat 03:12-də Gəncədə naməlum cihazdan hesabınıza daxil olub."
+              }
+            ],
+            "time": "08:31"
+          },
+          "say": "Bu girişi siz etməmisinizsə, nə edirsiniz?",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Bu mən deyildim: bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür, naməlum giriş o deməkdir ki, parolunuz başqasının əlindədir. Tez bildirmək hesabı xilas edir."
+            },
+            {
+              "id": "ignore",
+              "label": "Bağla",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Hücumçu hələ də hesabınızdadır və vaxt qazanır. Belə xəbərdarlığı görən kimi bildirin."
+            }
+          ]
+        },
+        {
+          "id": "remote-request",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "texkomek-24",
+            "tone": "app",
+            "title": [
+              {
+                "text": "TexKömək 24 qoşulmaq istəyir"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Operator ekranınızı görmək və kompüterinizi idarə etmək istəyir."
+                }
+              ]
+            ],
+            "buttons": [
+              "Rədd et",
+              "İcazə ver"
+            ]
+          },
+          "actions": [
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür, siz dəstək istəməmisiniz. Belə gözlənilməz sorğunu da bildirin."
+            },
+            {
+              "id": "allow",
+              "label": "İcazə ver",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Uzaqdakı şəxs indi kompüterinizi idarə edir. Özünüz müraciət etmədiyiniz dəstəyə heç vaxt icazə verməyin."
+            },
+            {
+              "id": "report",
+              "label": "Rədd et və bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Gözlənilməz uzaqdan giriş sorğusu dərhal bildirilməlidir."
+            }
+          ]
+        },
+        {
+          "id": "encrypted",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Fayllarınız şifrələnib"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Fayllarınızı geri almaq üçün 72 saat ərzində ödəniş edin. Kompüteri söndürsəniz, fayllar silinəcək."
+                }
+              ]
+            ],
+            "buttons": [
+              "Ödəniş səhifəsi"
+            ]
+          },
+          "say": "Ekranda fidyə tələbi var. İlk addımınız nədir?",
+          "actions": [
+            {
+              "id": "disconnect",
+              "label": "Kabeli çıxar, Wi-Fi bağlantısını söndür",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Düzdür, şəbəkədən ayrılmaq yayılmanı dayandırır. Kompüteri söndürməyin və dərhal zəng edin."
+            },
+            {
+              "id": "shutdown",
+              "label": "Kompüteri söndür",
+              "kind": "cancel",
+              "outcome": "risky",
+              "feedback": "Söndürmək yaddaşdakı izləri silə bilər. Təşkilatınızın qaydası başqa cür demirsə, şəbəkədən ayrılın və kompüteri açıq saxlayın."
+            },
+            {
+              "id": "pay",
+              "label": "Ödəniş səhifəsini aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Ödəmək faylları geri alacağınıza zəmanət vermir. Heç vaxt ödəməyin, qərarı mütəxəssislərə həvalə edin."
+            }
+          ]
+        },
+        {
+          "id": "call-line",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "it-tehlukesizlik",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Təhlükəsizlik xətti"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Təcili insident: +994 12 000 15 15"
+                }
+              ],
+              [
+                {
+                  "text": "Təcili deyilsə: «Fişinqi bildir» düyməsi və ya security@idare.example"
+                }
+              ]
+            ],
+            "buttons": [
+              "Sonra",
+              "Zəng et"
+            ]
+          },
+          "actions": [
+            {
+              "id": "call",
+              "label": "İndi zəng et",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Düzdür. Təcili insidenti telefonla bildirin: mütəxəssis nə etməli olduğunuzu dərhal deyəcək."
+            },
+            {
+              "id": "later",
+              "label": "Sabah məktub yaz",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Şifrələmə yayılır və hər dəqiqə vacibdir. Üstəlik, bu poçt qutusu da artıq təhlükəsiz olmaya bilər."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "who-to-tell",
+      "question": {
+        "prompt": "Hesabınıza yad biri daxil olub. Kimə xəbər verirsiniz?",
+        "options": [
+          {
+            "id": "security",
+            "label": "İT dəstəyinə və ya təhlükəsizlik komandasına",
+            "correct": true,
+            "feedback": "Düzdür. Hesabı yalnız onlar kilidləyə və yoxlaya bilər."
+          },
+          {
+            "id": "manager",
+            "label": "Həmçinin rəhbərimə",
+            "correct": true,
+            "feedback": "Düzdür. Rəhbəriniz işin təşkilinə kömək edir, amma mütəxəssisi əvəz etmir."
+          },
+          {
+            "id": "colleagues",
+            "label": "Yalnız şöbəmdəki həmkarlarıma",
+            "correct": false,
+            "feedback": "Həmkarlar hesabı kilidləyə bilməz, ona görə vaxt itir."
+          },
+          {
+            "id": "social",
+            "label": "Hamı bilsin deyə sosial şəbəkədə paylaşıram",
+            "correct": false,
+            "feedback": "İnsident barədə sosial şəbəkədə yazmaq hücumçuya və digər fırıldaqçılara kömək edir."
+          }
+        ],
+        "multi": true,
+        "visual": {
+          "kind": "illustration",
+          "id": "badge-id"
+        }
+      },
+      "explain": "Problemi mütəxəssis həll edir, rəhbərinizə məlumat verilir, başqa heç kimə demək lazım deyil."
+    },
+    {
+      "type": "match",
+      "id": "how-to-report",
+      "prompt": "Hər vəziyyət üçün bildirmə üsulunu seçin.",
+      "pairs": [
+        {
+          "id": "phish",
+          "left": "Şübhəli məktub gəlib",
+          "right": "«Fişinqi bildir» düyməsini basın"
+        },
+        {
+          "id": "ransom",
+          "left": "Ekranda fidyə tələbi var",
+          "right": "Şəbəkədən ayrılın və zəng edin"
+        },
+        {
+          "id": "phone",
+          "left": "İş telefonu itib",
+          "right": "Uzaqdan kilidləsinlər deyə dərhal zəng edin"
+        },
+        {
+          "id": "misdirect",
+          "left": "Fayl səhv adama gedib",
+          "right": "Rəhbərinizə və təhlükəsizlik komandasına bildirin"
+        }
+      ],
+      "explain": "Təcili və ya yayılan hallarda zəng edin. Qalanlarını «Fişinqi bildir» düyməsi ilə və ya e-poçtla bildirin."
+    },
+    {
+      "type": "scenario",
+      "id": "colleague-says-wait",
+      "title": "Gözləyək?",
+      "start": "window",
+      "nodes": [
+        {
+          "id": "window",
+          "text": "Narahat olma, yəqin yeniləmədir. Hay-küy salma.",
+          "speaker": "Tural (həmkar), qəribə pəncərəyə baxır",
+          "voice": "man-2",
+          "channel": "in-person",
+          "manner": "natural",
+          "spoken": "Narahat olma, ee, yəqin yeniləmədir. Hay-küy salma.",
+          "choices": [
+            {
+              "label": "Yenə də İT dəstəyinə zəng edirəm",
+              "next": "specialist",
+              "feedback": "Düzdür. Yalançı həyəcan problem deyil, gecikmiş bildiriş isə problemdir."
+            },
+            {
+              "label": "Gözləyirəm, bəlkə özü keçər",
+              "outcome": "risky",
+              "feedback": "Gözləmək hücumçuya vaxt qazandırır. Şübhəniz varsa, zəng edin."
+            }
+          ]
+        },
+        {
+          "id": "specialist",
+          "text": "Nə gördünüz və nə etdiniz?",
+          "speaker": "İT dəstəyi",
+          "voice": "woman-2",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Nə gördünüz <short pause> və nə etdiniz?",
+          "choices": [
+            {
+              "label": "Qısaca danışıram: nə, nə vaxt, hansı kompüterdə, nə etdim",
+              "outcome": "safe",
+              "feedback": "Əla. Dəqiq məlumatla mütəxəssis dərhal işə başlaya bilər."
+            },
+            {
+              "label": "Pəncərəni bağladım, xatırlamıram",
+              "outcome": "risky",
+              "feedback": "Hər detal kömək edir. Növbəti dəfə ekranın şəklini telefonla çəkin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Nəsə qaydasında görünmürsə, dayanın və dərhal bildirin.",
+        "Təcili halda zəng edin. Şübhəli kompüterdən bildiriş göndərməyin.",
+        "Yalançı həyəcan qorxulu deyil, gecikmək isə təhlükəlidir."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

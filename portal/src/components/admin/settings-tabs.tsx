@@ -58,8 +58,9 @@ import { Button, ButtonAnchor, TextButton, textButtonClass } from "@/components/
 import { Checkbox, Field, Input, Segmented, Select, Switch, Textarea } from "@/components/ui/field";
 import { Dot, Pill } from "@/components/ui/pill";
 import { Notice } from "@/components/ui/layout";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { toast } from "@/components/ui/toast";
-import { BRAND_PALETTE, DEFAULT_ATTESTATION, DEFAULT_CERTIFICATE_TEXT, DEFAULT_TEMPLATES, EMAIL_BUTTON_LABEL, WEBHOOK_EVENTS } from "@/lib/tenant-defaults";
+import { BRAND_PALETTE, DEFAULT_ATTESTATION, DEFAULT_CERTIFICATE_TEXT, DEFAULT_TEMPLATES, WEBHOOK_EVENTS, emailButtonLabel } from "@/lib/tenant-defaults";
 import { parseEmailMarkup } from "@/lib/email-markup";
 import { LOCALES, LOCALE_NAMES, SITE_LOCALES } from "@/i18n/config";
 import { readableOn } from "@/lib/color";
@@ -205,7 +206,7 @@ export function BrandingTab({
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <span className="text-caption font-semibold">{label}</span>
         <input type="color" value={value} onChange={(e) => set(e.target.value)} aria-label={label} className="size-9 cursor-pointer rounded-md border border-line pointer-coarse:size-11" />
-        <Input id={id} value={value} onChange={(e) => set(e.target.value)} className="h-9 w-28 font-mono text-caption pointer-coarse:h-11" aria-label={`${label} hex`} />
+        <Input id={id} value={value} onChange={(e) => set(e.target.value)} className="h-9 w-28 font-mono text-caption pointer-coarse:h-11" aria-label={t("hexCode", { colour: label })} />
         <TextButton size="tab" onClick={() => set(def)}>
           {t("default")}
         </TextButton>
@@ -379,6 +380,9 @@ export function LanguagesTab({ defaultLocale, locales }: { defaultLocale: string
   return (
     <div className="grid gap-5">
       <Card>
+        <CardHeader title={t("yourTitle")} description={t("yourBody")} action={<LanguageSwitcher locales={locales} />} className="pb-5 sm:pb-6" />
+      </Card>
+      <Card>
         <CardHeader title={t("defaultTitle")} description={t("defaultBody")} />
         <CardBody>
           <Select id="lg-default" value={def} onChange={(e) => setDef(e.target.value)} className="max-w-xs" aria-label={t("defaultTitle")}>
@@ -391,7 +395,7 @@ export function LanguagesTab({ defaultLocale, locales }: { defaultLocale: string
         </CardBody>
       </Card>
       <Card>
-        <CardHeader title={t("availableTitle")} description={t("availableBody")} action={<Pill tone="brand">{t("onCount", { count: on.size, total: SITE_LOCALES.length })}</Pill>} />
+        <CardHeader title={t("availableTitle")} description={t("availableBody")} action={<Pill tone="brand">{t("onCount", { count: on.size, total: LOCALES.length })}</Pill>} />
         <CardBody className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {SITE_LOCALES.map((l) => {
             const supported = (LOCALES as readonly string[]).includes(l);
@@ -414,7 +418,7 @@ export function LanguagesTab({ defaultLocale, locales }: { defaultLocale: string
                       </Pill>
                     ) : null}
                   </span>
-                  <span className="block text-tab text-ink-subtle">{supported ? t("lessonsInterface") : t("interfaceOnly")}</span>
+                  <span className="block text-tab text-ink-subtle">{supported ? t("lessonsInterface") : t("siteOnly")}</span>
                 </span>
               </label>
             );
@@ -833,7 +837,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
             <Field label={t("user")} htmlFor="e-user">
               <Input id="e-user" value={s.user} onChange={(e) => setS({ ...s, user: e.target.value })} autoComplete="off" />
             </Field>
-            <Field label={t("password")} htmlFor="e-pw" hint={passwordReenter ? t("passwordReenter") : email.hasPassword ? "••••••" : undefined}>
+            <Field label={t("password")} htmlFor="e-pw" hint={passwordReenter ? t("passwordReenter") : email.hasPassword ? t("passwordSet") : undefined}>
               <Input id="e-pw" type="password" value={s.password} onChange={(e) => setS({ ...s, password: e.target.value })} autoComplete="new-password" />
             </Field>
           </CardBody>
@@ -893,7 +897,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
                     {m.cancelled ? (
                       <span className="text-ink-subtle">{t("campaignCancelled")}</span>
                     ) : m.resendable ? (
-                      <Button size="sm" variant="ghost" disabled={resending} onClick={() => resend(m.id)} title={m.error ?? undefined}>
+                      <Button size="sm" variant="ghost" disabled={resending} onClick={() => resend(m.id)} title={m.error && t.has(`testErrors.${m.error as "send_failed"}`) ? t(`testErrors.${m.error as "send_failed"}`) : undefined}>
                         {t("resend")}
                       </Button>
                     ) : null}
@@ -975,6 +979,13 @@ function templateProblem(templates: NonNullable<TenantSettings["notifications"][
   return null;
 }
 
+/** Sample values for the template preview, in the template's language (not the admin's). */
+const PREVIEW_VARS: Record<string, { name: string; to: string; module: string; dueDate: string; person: string; reason: string }> = {
+  az: { name: "Aysel", to: "Aysel Hüseynova", module: "Fişinqi tapın", dueDate: "30 oktyabr 2026", person: "Elvin Məmmədov", reason: "Son 30 gündə 2 simulyasiyada riskli addım" },
+  en: { name: "Aysel", to: "Aysel Huseynova", module: "Spot the phish", dueDate: "October 30, 2026", person: "Elvin Mammadov", reason: "2 simulations with risky actions in the last 30 days" },
+  ru: { name: "Айсель", to: "Айсель Гусейнова", module: "Найдите фишинг", dueDate: "30 октября 2026 г.", person: "Эльвин Мамедов", reason: "2 симуляции с рискованными действиями за 30 дней" },
+};
+
 export function NotificationsTab({ notifications, locales, emailReady, orgName }: { notifications: TenantSettings["notifications"]; locales: string[]; emailReady: boolean; orgName: string }) {
   const t = useTranslations("settings.notifications");
   const { pending, save } = useSave();
@@ -985,7 +996,8 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
   const current = templates[kind]?.[lang] ?? DEFAULT_TEMPLATES[kind][lang] ?? DEFAULT_TEMPLATES[kind].en;
   const setCurrent = (patch: Partial<{ subject: string; body: string }>) => setTemplates({ ...templates, [kind]: { ...(templates[kind] ?? {}), [lang]: { ...current, ...patch } } });
   const preview = useMemo(() => {
-    const vars: Record<string, string> = { name: "Aysel", module: "Spot the phish", dueDate: "30.10.2026", link: "https://…", organisation: orgName, person: "Elvin", reason: "2 simulations failed" };
+    const sample = PREVIEW_VARS[lang] ?? PREVIEW_VARS.en;
+    const vars: Record<string, string> = { ...sample, link: "https://…", organisation: orgName };
     const fill = (s: string) => s.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k: string) => vars[k] ?? "");
     return {
       subject: fill(current.subject),
@@ -994,7 +1006,7 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
         .map((p) => p.trim())
         .filter(Boolean),
     };
-  }, [current, orgName]);
+  }, [current, orgName, lang]);
   const bodyRef = useRef<HTMLTextAreaElement>(null);
   /** Wraps the selection in `before`/`after` (or replaces it), then puts the selection back. */
   const edit = (before: string, after = "", replace = false) => {
@@ -1111,7 +1123,7 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
                   </div>
                   <div className="flex min-w-0 gap-2">
                     <dt className="shrink-0 text-ink-subtle">{t("previewTo")}</dt>
-                    <dd className="min-w-0 truncate font-semibold text-ink">Aysel Hüseynova</dd>
+                    <dd className="min-w-0 truncate font-semibold text-ink">{(PREVIEW_VARS[lang] ?? PREVIEW_VARS.en).to}</dd>
                   </div>
                 </dl>
                 <p className="mt-3 text-body-sm font-bold">{preview.subject}</p>
@@ -1119,7 +1131,7 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
                   {preview.paragraphs.map((p, i) =>
                     /^https?:\/\/\S+$/.test(p) ? (
                       <p key={i}>
-                        <span className="inline-flex rounded-pill bg-brand-600 px-4 py-2 font-semibold text-brand-on">{EMAIL_BUTTON_LABEL[lang] ?? EMAIL_BUTTON_LABEL.en}</span>
+                        <span className="inline-flex rounded-pill bg-brand-600 px-4 py-2 font-semibold text-brand-on">{emailButtonLabel(kind, lang)}</span>
                       </p>
                     ) : (
                       <p key={i} className="whitespace-pre-line">
@@ -1128,7 +1140,8 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
                     ),
                   )}
                 </div>
-                <p className="mt-4 border-t border-line pt-3 text-tab text-ink-subtle">{t("footer")}</p>
+                {/* Real emails end with the organisation's name (notify.ts), whatever the template's language. */}
+                <p className="mt-4 border-t border-line pt-3 text-tab text-ink-subtle">{orgName}</p>
               </div>
             </div>
           </div>
@@ -1255,20 +1268,26 @@ export function AttestationTab({ texts, locales }: { texts: Record<string, strin
 
 /* ───────── certificate ───────── */
 
-export function CertificateTab({ cert, orgName, logoUrl, locale, verifyHost }: { cert: TenantSettings["certificate"]; orgName: string; logoUrl?: string | null; locale: string; verifyHost: string }) {
+/** Title and text are written per language (each learner's certificate is in their language); signature and sharing are shared. */
+export function CertificateTab({ cert, orgName, logoUrl, locale, locales, verifyHost }: { cert: TenantSettings["certificate"]; orgName: string; logoUrl?: string | null; locale: string; locales: string[]; verifyHost: string }) {
   const t = useTranslations("settings.certificate");
+  const tl = useTranslations("learner.certificate");
   const { pending, save } = useSave();
-  const [s, setS] = useState({ title: cert.title ?? "", text: cert.text ?? "", signerName: cert.signerName ?? "", signerTitle: cert.signerTitle ?? "", publicLink: cert.publicLink });
+  const [s, setS] = useState({ title: { ...cert.title }, text: { ...cert.text }, signerName: cert.signerName ?? "", signerTitle: cert.signerTitle ?? "", publicLink: cert.publicLink });
+  const [lang, setLang] = useState(locales.includes(locale) ? locale : (locales[0] ?? locale));
+  const title = s.title[lang] ?? "";
+  const own = s.text[lang] ?? "";
+  const setText = (value: string) => setS({ ...s, text: { ...s.text, [lang]: value } });
   const textRef = useRef<HTMLTextAreaElement>(null);
   const format = useClientFormat();
   const sampleDate = format.dateTime(new Date(), { day: "numeric", month: "numeric", year: "numeric" });
-  const text = (s.text || DEFAULT_CERTIFICATE_TEXT[locale] || DEFAULT_CERTIFICATE_TEXT.en).replaceAll("{name}", t("sampleName")).replaceAll("{module}", t("sampleModule")).replaceAll("{date}", sampleDate);
+  const text = (own || DEFAULT_CERTIFICATE_TEXT[lang] || DEFAULT_CERTIFICATE_TEXT.en).replaceAll("{name}", t("sampleName")).replaceAll("{module}", t("sampleModule")).replaceAll("{date}", sampleDate);
   /** Inserts a placeholder where the cursor is in the Text field. */
   const insert = (placeholder: string) => {
     const el = textRef.current;
-    const from = el?.selectionStart ?? s.text.length;
+    const from = el?.selectionStart ?? own.length;
     const to = el?.selectionEnd ?? from;
-    setS({ ...s, text: (s.text.slice(0, from) + placeholder + s.text.slice(to)).slice(0, 400) });
+    setText((own.slice(0, from) + placeholder + own.slice(to)).slice(0, 400));
     el?.focus();
   };
   return (
@@ -1277,12 +1296,23 @@ export function CertificateTab({ cert, orgName, logoUrl, locale, verifyHost }: {
         <Card>
           <CardHeader title={t("textTitle")} description={t("textBody")} />
           <CardBody className="grid gap-4">
-            {!s.title && !s.text ? <Pill className="w-fit">{t("defaultText")}</Pill> : null}
+            {locales.length > 1 ? (
+              <Field label={t("language")} htmlFor="c-lang">
+                <Select id="c-lang" className="max-w-48" value={lang} onChange={(e) => setLang(e.target.value)}>
+                  {locales.map((l) => (
+                    <option key={l} value={l}>
+                      {LOCALE_NAMES[l as "az"] ?? l}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            ) : null}
+            {!title && !own ? <Pill className="w-fit">{t("defaultText")}</Pill> : null}
             <Field label={t("title")} htmlFor="c-title" hint={t("titleHint")}>
-              <Input id="c-title" value={s.title} onChange={(e) => setS({ ...s, title: e.target.value })} maxLength={60} placeholder="Certificate" />
+              <Input id="c-title" lang={lang} value={title} onChange={(e) => setS({ ...s, title: { ...s.title, [lang]: e.target.value } })} maxLength={60} placeholder={lang === locale ? tl("title") : undefined} />
             </Field>
             <Field label={t("text")} htmlFor="c-text">
-              <Textarea ref={textRef} id="c-text" value={s.text} onChange={(e) => setS({ ...s, text: e.target.value })} maxLength={400} placeholder={DEFAULT_CERTIFICATE_TEXT[locale]} />
+              <Textarea ref={textRef} id="c-text" lang={lang} value={own} onChange={(e) => setText(e.target.value)} maxLength={400} placeholder={DEFAULT_CERTIFICATE_TEXT[lang]} />
               <div className="flex flex-wrap gap-2">
                 {(
                   [
@@ -1336,10 +1366,14 @@ export function CertificateTab({ cert, orgName, logoUrl, locale, verifyHost }: {
                 <ShieldCheck className="size-6" />
               </span>
             </div>
-            <p className="mt-4 text-tab font-bold tracking-[0.25em] text-brand-600 uppercase">{s.title || "Certificate"}</p>
+            <p lang={title ? lang : undefined} className="mt-4 text-tab font-bold tracking-[0.25em] text-brand-600 uppercase">
+              {title || tl("title")}
+            </p>
             <p className="mt-1 font-display text-headline font-bold">{t("sampleName")}</p>
             <span className="mt-2 block h-1 w-12 rounded-pill bg-reward-500" />
-            <p className="mt-3 text-caption text-ink-muted">{text}</p>
+            <p lang={lang} className="mt-3 text-caption text-ink-muted">
+              {text}
+            </p>
             <Pill tone="brand" className="mt-3">
               {t("sampleModule")}
             </Pill>

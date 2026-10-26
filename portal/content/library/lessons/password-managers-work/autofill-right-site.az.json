@@ -1,0 +1,419 @@
+{
+  "id": "autofill-right-site",
+  "title": "Avtodoldurma işləməyəndə",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Parol meneceri saxta saytı sizdən daha yaxşı tanıyır: o, ünvanı hərf-hərf yoxlayır.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Ünvan azacıq da fərqlənsə, menecer parol təklif etmir. Bu, sizin üçün xəbərdarlıq siqnalıdır.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "idare-fake",
+              "url": [
+                {
+                  "text": "https://portal."
+                },
+                {
+                  "text": "idare-giris.example.net",
+                  "spot": "lookalike"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "lookalike"
+        },
+        {
+          "id": "b3",
+          "say": "Parolu seyfdən kopyalayıb özünüz yapışdırmayın. Əvvəlcə ünvanı yoxlayın.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Gözləmədiyiniz istənilən təsdiq sorğusunu rədd edin: bu, kiminsə parolunuzu bildiyini göstərir.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "autofill-check",
+      "environment": "browser",
+      "title": "Avtodoldurmanı yoxlayın",
+      "intro": "ParolSeyf brauzerinizdə işləyir. Hər səhifədə onun nə təklif etdiyinə baxın və ünvanı yoxlayın.",
+      "steps": [
+        {
+          "id": "real-portal",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "idare",
+            "brand": "Ofis portalı",
+            "url": [
+              {
+                "text": "https://portal.idare.example/giris",
+                "reveal": "idare.example"
+              }
+            ],
+            "fields": [
+              "İstifadəçi adı",
+              "Parol"
+            ],
+            "button": "Daxil ol"
+          },
+          "say": "ParolSeyf giriş məlumatlarınızı təklif edir. Ünvanı yoxlayın.",
+          "actions": [
+            {
+              "id": "fill",
+              "label": "ParolSeyf ilə doldur",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Düzdür. Ünvan saxlanmış giriş məlumatları ilə üst-üstə düşür, menecer də məhz buna görə onları təklif etdi."
+            },
+            {
+              "id": "close",
+              "label": "Səhifəni bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Ehtiyatlı olmaq yaxşıdır, amma bu, əsl ofis portalıdır və menecer onu tanıdı."
+            }
+          ]
+        },
+        {
+          "id": "lookalike",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "idare-fake",
+            "brand": "Ofis portalı",
+            "url": [
+              {
+                "text": "https://portal.idare-giris.example.net/giris",
+                "reveal": "idare-giris.example.net"
+              }
+            ],
+            "fields": [
+              "İstifadəçi adı",
+              "Parol"
+            ],
+            "button": "Daxil ol"
+          },
+          "say": "Bu səhifəni məktubdakı link açdı. ParolSeyf susur.",
+          "actions": [
+            {
+              "id": "type",
+              "label": "Parolu əllə yaz",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Menecer ona görə susdu ki, bu, saxta saytdır. Parolu indi əsl portalda dəyişin və hadisəni bildirin.",
+              "next": "fake-vault"
+            },
+            {
+              "id": "search",
+              "label": "ParolSeyf-də tap və doldur",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "Menecer bu saytı tanımır və bunun səbəbi var. Davam etməzdən əvvəl ünvanı diqqətlə oxuyun."
+            },
+            {
+              "id": "close",
+              "label": "Səhifəni bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bu, ofis portalı deyildi: domen idare-giris.example.net idi.",
+              "next": "fake-vault"
+            },
+            {
+              "id": "report",
+              "label": "Saytı bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Bildirişiniz həmkarlarınızı eyni linkdən qoruyur.",
+              "next": "fake-vault"
+            }
+          ]
+        },
+        {
+          "id": "mismatch",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "system",
+            "title": [
+              {
+                "text": "ParolSeyf: sayt uyğun gəlmir"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Saxlanmış ünvan: portal.idare.example"
+                }
+              ],
+              [
+                {
+                  "text": "Bu səhifə: portal.idare-giris.example.net"
+                }
+              ]
+            ],
+            "buttons": [
+              "Ləğv et",
+              "Yenə də doldur"
+            ]
+          },
+          "actions": [
+            {
+              "id": "cancel",
+              "label": "Ləğv et",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür, fərqi sizin yerinizə menecer aşkar etdi. Səhifəni bağlayın və hadisəni bildirin."
+            },
+            {
+              "id": "fill",
+              "label": "Yenə də doldur",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Xəbərdarlığa məhəl qoymadığınız üçün parolunuz saxta sayta getdi. Onu indi dəyişin və hadisəni bildirin."
+            }
+          ]
+        },
+        {
+          "id": "fake-vault",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "parolseyf-fake",
+            "brand": "ParolSeyf",
+            "url": [
+              {
+                "text": "https://parolseyf-giris.example.net/seyf",
+                "reveal": "parolseyf-giris.example.net"
+              }
+            ],
+            "fields": [
+              "E-poçt",
+              "Əsas parol"
+            ],
+            "button": "Seyfi aç"
+          },
+          "say": "Məktubdakı link sizi seyfin giriş səhifəsinə aparır.",
+          "actions": [
+            {
+              "id": "type",
+              "label": "Seyfi aç",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Əsas parolu yalnız ParolSeyf tətbiqinin özündə yazın. Bu sayt bütün seyfinizi ələ keçirmək istəyirdi."
+            },
+            {
+              "id": "close",
+              "label": "Səhifəni bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Seyfi heç vaxt linklə açmayın, tətbiqi özünüz işə salın."
+            },
+            {
+              "id": "report",
+              "label": "Saytı bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Bu saytın linki bir neçə nəfərə göndərilmiş ola bilər."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "vault-lure",
+      "prompt": "Bu məktubun saxta olduğunu göstərən əlamətlərə toxunun.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "parolseyf-fake",
+        "from": {
+          "name": [
+            {
+              "text": "ParolSeyf"
+            }
+          ],
+          "address": [
+            {
+              "text": "security@parolseyf-alert.example.net",
+              "spot": "sender"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Seyfiniz 24 saat ərzində silinəcək",
+            "spot": "deadline"
+          }
+        ],
+        "time": "07:58",
+        "body": [
+          [
+            {
+              "text": "Təhlükəsizlik yeniləməsi üçün "
+            },
+            {
+              "text": "əsas parolunuzu təsdiqləyin",
+              "spot": "ask-master"
+            },
+            {
+              "text": "."
+            }
+          ],
+          [
+            {
+              "text": "Təsdiq üçün: "
+            },
+            {
+              "text": "parolseyf-alert.example.net/tesdiq",
+              "spot": "link",
+              "link": {
+                "label": "parolseyf-alert.example.net/tesdiq",
+                "href": "https://parolseyf-alert.example.net/tesdiq"
+              }
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender",
+          "label": "Göndərən",
+          "explain": "Bu, ParolSeyf-in domeni deyil, ona bənzədilmiş saxta ünvandır."
+        },
+        {
+          "id": "deadline",
+          "label": "Son müddət",
+          "explain": "24 saatlıq hədə sizi düşünməyə qoymamaq üçündür."
+        },
+        {
+          "id": "ask-master",
+          "label": "Əsas parol tələbi",
+          "explain": "Heç bir xidmət əsas parolunuzu e-poçtla təsdiqləməyi istəmir."
+        },
+        {
+          "id": "link",
+          "label": "Link",
+          "explain": "Link saxta domenə aparır. Seyfi tətbiqdən özünüz açın."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "unexpected-push",
+      "question": {
+        "prompt": "Gecə ParolSeyf sizdən girişi təsdiqləməyi istəyir, amma siz heç yerə daxil olmursunuz. Nə edirsiniz?",
+        "options": [
+          {
+            "id": "deny",
+            "label": "Rədd edirəm və təhlükəsizlik komandasına bildirirəm",
+            "correct": true,
+            "feedback": "Düzdür. Kimsə əsas parolunuzu bilir: onu indi dəyişin, təhlükəsizlik komandası isə sessiyaları yoxlasın."
+          },
+          {
+            "id": "approve",
+            "label": "Sorğular dayansın deyə təsdiqləyirəm",
+            "correct": false,
+            "feedback": "Bu, push bombardmanıdır: sizi sorğularla bezdirib təsdiqə məcbur edirlər. Bir təsdiq hücumçunu seyfə buraxır."
+          },
+          {
+            "id": "ignore",
+            "label": "Məhəl qoymuram, səhər baxaram",
+            "correct": false,
+            "feedback": "Sorğu açıq qalır, kimsə isə artıq əsas parolunuzu bilir. Onu indi rədd edin və bildirin."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "parolseyf",
+            "app": "ParolSeyf",
+            "title": [
+              {
+                "text": "Giriş təsdiqlənsin?"
+              }
+            ],
+            "body": [
+              {
+                "text": "Yeni cihaz: Windows, 23:47"
+              }
+            ],
+            "time": "23:47"
+          }
+        }
+      },
+      "explain": "Gözlənilməz təsdiq sorğusu parolunuzun sızdığını göstərir. Rədd edin, bildirin, dəyişin."
+    },
+    {
+      "type": "match",
+      "id": "autofill-rules",
+      "prompt": "Hər vəziyyəti düzgün addımla uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "silent",
+          "left": "Menecer parol təklif etmir",
+          "right": "Ünvanı yoxlayın, parolu kopyalamayın"
+        },
+        {
+          "id": "link",
+          "left": "Məktubdakı link seyfi açmağı istəyir",
+          "right": "Tətbiqi özünüz açın"
+        },
+        {
+          "id": "shared-pc",
+          "left": "Başqasının kompüterindəsiniz",
+          "right": "Seyfinizi orada açmayın"
+        },
+        {
+          "id": "push",
+          "left": "Gözləmədiyiniz təsdiq sorğusu",
+          "right": "Rədd edin və bildirin"
+        }
+      ],
+      "explain": "Ünvanı menecer yoxlayır, o susan kimi isə siz dayanırsınız."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Menecer parol təklif etmirsə, dayanın və ünvanı yoxlayın.",
+        "Əsas parolu heç vaxt link vasitəsilə deyil, yalnız menecerin öz tətbiqində yazın.",
+        "Gözləmədiyiniz təsdiq sorğularını rədd edin və bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

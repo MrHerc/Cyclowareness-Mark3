@@ -1,0 +1,569 @@
+{
+  "id": "phone-rules",
+  "title": "İş telefonu qaydaları",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "İş telefonunuz təşkilatınızın cibinizdəki bir parçasıdır. Onda iş poçtu, sənədlər və kontaktlar saxlanılır.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "İdarəetmə profili telefonu qoruyur. Telefon itsə, İT dəstəyi onu kilidləyə və iş məlumatlarını silə bilər.",
+          "mood": "talk",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "notification",
+              "brandRef": "nc-iscihaz",
+              "app": "İşCihaz",
+              "title": [
+                {
+                  "text": "Telefon qorunur"
+                }
+              ],
+              "body": [
+                {
+                  "text": "Bu cihaz təşkilatınızın təhlükəsizlik qaydalarına uyğun idarə olunur."
+                }
+              ],
+              "time": "09:00"
+            }
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Profili heç vaxt mesajdakı linkdən quraşdırmayın. Saxta profil telefonunuzu hücumçunun ixtiyarına verə bilər.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "brandRef": "it-destek-fake",
+              "sender": [
+                {
+                  "text": "IT-Xidmet"
+                }
+              ],
+              "time": "11:42",
+              "messages": [
+                [
+                  {
+                    "text": "Profilinizin müddəti bitir. Yenisini quraşdırın: "
+                  },
+                  {
+                    "text": "iscihaz-profil.example.net",
+                    "spot": "link"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "link"
+        },
+        {
+          "id": "b4",
+          "say": "Tətbiqləri yalnız rəsmi mağazadan və ya təşkilatınızın cihaz tətbiqindən quraşdırın və hər icazəni yoxlayın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "new-phone",
+      "environment": "phone",
+      "title": "Yeni iş telefonunuz",
+      "intro": "Sizə yeni iş telefonu veriblər. Hər bildirişə baxın və düzgün qərar verin.",
+      "steps": [
+        {
+          "id": "enroll",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "nc-iscihaz",
+            "app": "İşCihaz",
+            "title": [
+              {
+                "text": "Qeydiyyatı tamamlayın"
+              }
+            ],
+            "body": [
+              {
+                "text": "İT dəstəyi cihazınızı hazırlayıb. İş poçtunu almaq üçün qeydiyyatı tamamlayın."
+              }
+            ],
+            "time": "09:05"
+          },
+          "say": "Bu tətbiqi İT dəstəyi özü quraşdırıb.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Bildirişi aç",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Düzdür. Təşkilatınızın öz tətbiqi ilə qeydiyyat ən təhlükəsiz yoldur."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Qeydiyyatdan keçməmiş telefon qorunmur. Bunu elə ilk gün edin."
+            }
+          ]
+        },
+        {
+          "id": "profile-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "it-destek-fake",
+            "sender": [
+              {
+                "text": "IT-Xidmet"
+              }
+            ],
+            "time": "11:42",
+            "messages": [
+              [
+                {
+                  "text": "Hörmətli həmkar, MDM profilinizin müddəti bu gün bitir. Telefonunuz bloklanmasın deyə yeni profili quraşdırın: "
+                },
+                {
+                  "text": "iscihaz-profil.example.net/new",
+                  "link": {
+                    "label": "iscihaz-profil.example.net/new",
+                    "href": "https://iscihaz-profil.example.net/new"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Göndərəni və linkin ünvanını yoxlayın.",
+          "actions": [
+            {
+              "id": "click",
+              "label": "Linki aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Bu, təşkilatınızın domeni deyil. Profillər yalnız İşCihaz tətbiqindən və ya İT dəstəyindən gəlir.",
+              "next": "profile-install"
+            },
+            {
+              "id": "report",
+              "label": "Bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Siz bildirdiyiniz üçün İT dəstəyi digər əməkdaşları da xəbərdar edə biləcək.",
+              "next": "qr-permission"
+            },
+            {
+              "id": "block",
+              "label": "Blokla",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Yaxşı. Həmkarlarınız da xəbərdar olsun deyə İT dəstəyinə də bildirin.",
+              "next": "qr-permission"
+            }
+          ]
+        },
+        {
+          "id": "profile-install",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "nc-iscihaz-fake",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Profil quraşdırılsın?"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "iscihaz-profil.example.net konfiqurasiya profili quraşdırmaq istəyir."
+                }
+              ],
+              [
+                {
+                  "text": "Profil sertifikat, VPN və poçt ayarları əlavə edəcək."
+                }
+              ]
+            ],
+            "buttons": [
+              "Rədd et",
+              "İcazə ver"
+            ]
+          },
+          "say": "Sayt telefonunuza profil yükləmək istəyir.",
+          "actions": [
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Belə profil bütün internet trafikinizi hücumçunun serverindən keçirə bilər."
+            },
+            {
+              "id": "allow",
+              "label": "İcazə ver",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Saxta profil telefona nəzarəti yad adama verir. Dərhal İT dəstəyinə zəng edin."
+            }
+          ]
+        },
+        {
+          "id": "qr-permission",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "nc-qr-oxuyucu",
+            "app": "QR Oxuyucu",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Kamera"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Kontaktlar"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Dəqiq məkan"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Əlçatanlıq: ekranı idarə etmək"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "QR oxuyucuya əslində nə lazımdır?",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "İcazə ver",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "QR oxuyucuya yalnız kamera lazımdır. Əlçatanlıq icazəsi tətbiqə ekranı oxumağa və sizin yerinizə toxunmağa imkan verir."
+            },
+            {
+              "id": "deny",
+              "label": "İcazə vermə",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Yalnız funksiyaya lazım olan icazəni verin, bu halda sadəcə kameranı."
+            }
+          ]
+        },
+        {
+          "id": "chat-apk",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "sohbet",
+            "name": [
+              {
+                "text": "Novbe_cedveli.apk"
+              }
+            ],
+            "type": "apk",
+            "size": "5,4 MB",
+            "source": [
+              {
+                "text": "Söhbət: Rəşad Məmmədov"
+              }
+            ]
+          },
+          "say": "Həmkarınız messencerdə sizə fayl göndərib.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "Quraşdır",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Növbə cədvəli heç vaxt quraşdırma faylı olmur. Yazışmada göndərilən .apk faylı telefona zərərli proqram gətirir."
+            },
+            {
+              "id": "cancel",
+              "label": "Ləğv et",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Həmkarınızın hesabı ələ keçirilmiş ola bilər, ona görə İT dəstəyinə bildirin."
+            }
+          ]
+        },
+        {
+          "id": "os-update",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "sistem-yenileme",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Sistem yeniləməsi"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Təhlükəsizlik yeniləməsi hazırdır. Telefon yenidən başladılacaq, bu, təxminən 10 dəqiqə çəkəcək."
+                }
+              ]
+            ],
+            "buttons": [
+              "Sonra",
+              "İndi yenilə"
+            ]
+          },
+          "actions": [
+            {
+              "id": "update",
+              "label": "İndi yenilə",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Düzdür. Yeniləmələr hücumçulara artıq məlum olan boşluqları bağlayır."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Gecikdirdiyiniz hər gün boşluq açıq qalır. Ən gec bu axşam yeniləyin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "app-asks",
+      "prompt": "Bu sorğu iş telefonu üçün təhlükəsizdir, yoxsa tələ?",
+      "cards": [
+        {
+          "id": "map-location",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "nc-yolxerite",
+            "app": "YolXəritə",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Məkan: yalnız tətbiq açıq olanda"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Xəritəyə məkan lazımdır, həm də yalnız açıq olanda. İcazə tətbiqin işinə uyğundur."
+        },
+        {
+          "id": "game-sms",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "nc-super-oyunlar",
+            "app": "Super Oyunlar",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "SMS mesajlarını oxumaq"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Kontaktlar"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Oyuna nə SMS, nə də kontaktlar lazımdır. SMS icazəsi ilə o, giriş kodlarınızı oxuya bilər."
+        },
+        {
+          "id": "battery-access",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "nc-batareya",
+            "app": "Batareya Qoruyucu",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Əlçatanlıq: ekranı idarə etmək"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Digər tətbiqlərin üzərində göstərmək"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Batareyaya qənaət etmək üçün ekranı idarə etmək lazım deyil. Bank troyanları məhz bu icazələri istəyir."
+        },
+        {
+          "id": "lock-notice",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "nc-iscihaz",
+            "app": "İşCihaz",
+            "title": [
+              {
+                "text": "Ekran kilidi tələb olunur"
+              }
+            ],
+            "body": [
+              {
+                "text": "İş poçtundan istifadə etmək üçün ən azı 6 rəqəmli PIN kod təyin edin."
+              }
+            ],
+            "time": "09:20"
+          },
+          "verdict": "safe",
+          "explain": "Bu, təşkilatınızın öz tətbiqidir və heç bir link göndərmir. Telefon itəndə güclü ekran kilidi ilk müdafiədir."
+        },
+        {
+          "id": "torch-notifications",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "fener-pro",
+            "app": "Fənər Pro",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Bildirişlərə giriş"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Fənərə bildirişləri oxumaq lazım deyil. Bu icazə ilə o, gələn kodları və mesajları görə bilər."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "permission-power",
+      "prompt": "Hər icazəni onun verdiyi imkanla uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "sms",
+          "left": "SMS oxumaq",
+          "right": "Bank və giriş kodlarını görmək"
+        },
+        {
+          "id": "accessibility",
+          "left": "Əlçatanlıq",
+          "right": "Ekranı oxumaq və sizin yerinizə toxunmaq"
+        },
+        {
+          "id": "notifications",
+          "left": "Bildirişlərə giriş",
+          "right": "Messencer mesajlarını oxumaq"
+        },
+        {
+          "id": "unknown-sources",
+          "left": "Naməlum tətbiqləri quraşdırmaq",
+          "right": "Mağazadan kənar proqram quraşdırmaq"
+        }
+      ],
+      "explain": "Ən güclü icazələr bu dördüdür. Onları yalnız İT dəstəyinin təsdiqlədiyi tətbiqlərə verin."
+    },
+    {
+      "type": "choice",
+      "id": "slow-phone",
+      "question": {
+        "prompt": "Dostunuz yavaş işləyən iş telefonunuzdan idarəetmə profilini silməyi məsləhət görür. Nə edirsiniz?",
+        "options": [
+          {
+            "id": "support",
+            "label": "Profili saxlayıram və İT dəstəyinə müraciət edirəm",
+            "correct": true,
+            "feedback": "Düzdür. Profil telefonu qoruyur, problemi isə İT dəstəyi həll edəcək."
+          },
+          {
+            "id": "remove",
+            "label": "Telefon sürətlənsin deyə profili silirəm",
+            "correct": false,
+            "feedback": "Profil olmadan itmiş telefonu uzaqdan kilidləmək olmur. Adətən iş poçtu da dayanır."
+          },
+          {
+            "id": "reset",
+            "label": "Telefonu zavod ayarlarına qaytarıram",
+            "correct": false,
+            "feedback": "Bu, İT dəstəyinin xəbəri olmadan profili və iş məlumatlarını silir. Əvvəlcə onlarla danışın."
+          },
+          {
+            "id": "friend",
+            "label": "Texnikadan başı çıxan dosta verirəm ki, düzəltsin",
+            "correct": false,
+            "feedback": "Telefonda iş məlumatları var. Onu yalnız İT dəstəyinə verin."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "phone-lock"
+        }
+      },
+      "explain": "İdarəetmə profili iş telefonunuzu qoruyur. Onu yalnız İT dəstəyi dəyişir."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Profillər və iş tətbiqləri yalnız İşCihaz tətbiqindən və ya İT dəstəyindən gəlir.",
+        "İcazələr tətbiqin işinə uyğun olmalıdır. Ən təhlükəlisi SMS və Əlçatanlıq icazələridir.",
+        "Ekran kilidi və yeniləmələr telefonunuzun ilk müdafiəsidir."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

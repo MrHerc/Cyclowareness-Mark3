@@ -1,0 +1,383 @@
+{
+  "id": "check-the-page",
+  "title": "Səhifəni yoxlayın",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "cp-tutor",
+      "beats": [
+        {
+          "id": "cp-b1",
+          "say": "Saxta ödəniş səhifəsi əslinin dəqiq surəti ola bilər.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "cp-b2",
+          "say": "Loqo, rənglər və düymələr eynidir. Fərq ünvan sətrində və səhifənin sizdən nə istədiyindədir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "login",
+              "brandRef": "e-xidmet-fake",
+              "brand": "e-Xidmət Portalı",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "e-xidmet-cerime.example.net",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/odenis"
+                }
+              ],
+              "fields": [
+                "Kart nömrəsi",
+                "Bitmə tarixi",
+                "CVV",
+                "SMS kodu"
+              ],
+              "button": "Ödə: 40 AZN"
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "cp-b3",
+          "say": "Qıfıl işarəsi də heç nəyi sübut etmir: saxta saytların çoxunda o var.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "cp-b4",
+          "say": "Ən təhlükəsiz yol budur: portalı əlfəcindən açın və ya ünvanı özünüz yazın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "cp-swipe",
+      "prompt": "Bu səhifə əsldir, yoxsa saxta?",
+      "cards": [
+        {
+          "id": "real-fines",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet",
+            "brand": "e-Xidmət Portalı",
+            "url": [
+              {
+                "text": "https://e-xidmet.example/cerimeler"
+              }
+            ],
+            "fields": [
+              "FİN kod",
+              "Parol"
+            ],
+            "button": "Daxil ol"
+          },
+          "verdict": "safe",
+          "explain": "Bu, portalın öz domenidir və onu özünüz açmısınız. Cərimələri məhz burada yoxlamaq lazımdır."
+        },
+        {
+          "id": "fake-discount",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet-fake",
+            "brand": "e-Xidmət Portalı",
+            "url": [
+              {
+                "text": "https://e-xidmet-endirim.example.net/cerime"
+              }
+            ],
+            "fields": [
+              "Kart nömrəsi",
+              "Bitmə tarixi",
+              "CVV",
+              "SMS kodu"
+            ],
+            "button": "50% endirimlə ödə"
+          },
+          "verdict": "threat",
+          "explain": "Domen fərqlidir və səhifə hər şeyi birdən istəyir: kartı, arxasındakı kodu və SMS kodunu. Bu, məlumat oğurlamaq üçün qurulmuş formadır."
+        },
+        {
+          "id": "app-notice",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "e-xidmet",
+            "app": "e-Xidmət",
+            "title": [
+              {
+                "text": "Yeni bildiriş"
+              }
+            ],
+            "body": [
+              {
+                "text": "Adınıza 1 cərimə qeydə alınıb. Ətraflı: tətbiqdəki «Cərimələr» bölməsi."
+              }
+            ],
+            "time": "09:15"
+          },
+          "verdict": "safe",
+          "explain": "Bildiriş rəsmi tətbiqin içindədir və onda link yoxdur. Cəriməni elə tətbiqin özündə yoxlayın və ödəyin."
+        },
+        {
+          "id": "fake-benefit",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet-fake",
+            "brand": "Ailə Dəstəyi",
+            "url": [
+              {
+                "text": "https://ailedestek-qeydiyyat.example.net"
+              }
+            ],
+            "fields": [
+              "Ad, soyad",
+              "FİN kod",
+              "Kart nömrəsi",
+              "CVV"
+            ],
+            "button": "Müavinəti al"
+          },
+          "verdict": "threat",
+          "explain": "Pul almaq üçün kartın arxasındakı kod heç vaxt lazım deyil. Dövlət müavinətləri link vasitəsilə qeydiyyat tələb etmir."
+        },
+        {
+          "id": "fake-gateway",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2d-manatpay-fake",
+            "brand": "ManatPay",
+            "url": [
+              {
+                "text": "https://manatpay-secure.example.net/3ds"
+              }
+            ],
+            "fields": [
+              "Kart nömrəsi",
+              "CVV",
+              "SMS kodu",
+              "Kartın PIN kodu"
+            ],
+            "button": "Təsdiqlə"
+          },
+          "verdict": "threat",
+          "explain": "Heç bir ödəniş səhifəsi kartın PIN kodunu soruşmur. PIN kod yalnız bankomatlar və kart terminalları üçündür."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "cp-sim",
+      "environment": "browser",
+      "title": "Cərimə linki",
+      "intro": "Dostunuz sizə cərimə linki göndərib və siz onu açmısınız. Brauzerdə hər addımda düzgün qərar verin.",
+      "steps": [
+        {
+          "id": "fake-fine-page",
+          "label": "Ödənilməmiş cərimə: 80 AZN. Bu gün 50% endirim",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "e-xidmet-fake",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "e-xidmet-cerime.example.net"
+              },
+              {
+                "text": "e-xidmet-cerime.example.net"
+              },
+              {
+                "text": "/odenis"
+              }
+            ]
+          },
+          "say": "Ünvan sətrinə baxın.",
+          "actions": [
+            {
+              "id": "pay",
+              "label": "Endirimlə ödə",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Endirim sizi tələsdirmək üçündür. İndi görün, səhifə nə istəyir."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür, bu, portalın öz domeni deyil. İndi portalı özünüz açın.",
+              "next": "real-portal"
+            }
+          ]
+        },
+        {
+          "id": "card-form",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet-fake",
+            "brand": "e-Xidmət Portalı",
+            "url": [
+              {
+                "text": "https://e-xidmet-cerime.example.net",
+                "reveal": "e-xidmet-cerime.example.net"
+              }
+            ],
+            "fields": [
+              "Kart nömrəsi",
+              "Bitmə tarixi",
+              "CVV",
+              "SMS kodu"
+            ],
+            "button": "Ödə: 40 AZN"
+          },
+          "say": "Səhifə kart məlumatlarını və SMS kodunu birlikdə istəyir.",
+          "actions": [
+            {
+              "id": "submit",
+              "label": "Ödə: 40 AZN",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Kart məlumatlarınız fırıldaqçılara getdi. Kartın üzərindəki nömrə ilə dərhal banka zəng edin."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzgün qərardır. Heç nə yazmadınız, indi cəriməni rəsmi portalda yoxlayın."
+            }
+          ]
+        },
+        {
+          "id": "real-portal",
+          "label": "Cərimələr: aktiv cərimə yoxdur",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "e-xidmet",
+            "url": [
+              {
+                "text": "https://e-xidmet.example/cerimeler",
+                "reveal": "e-xidmet.example"
+              }
+            ]
+          },
+          "say": "Portalı əlfəcindən açdınız.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Cərimələrə bax",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Düzdür. Rəsmi portal heç bir cərimə göstərmir, deməli, link saxta idi."
+            },
+            {
+              "id": "tell-friend",
+              "label": "Dosta xəbər ver",
+              "kind": "share",
+              "outcome": "safe",
+              "feedback": "Əla. Linki göndərən dostunuza deyin ki, orada heç nə yazmasın."
+            }
+          ]
+        },
+        {
+          "id": "benefit-page",
+          "label": "Ailəyə dəstək: qeydiyyat bu gün bitir",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "e-xidmet-fake",
+            "url": [
+              {
+                "text": "https://ailedestek-qeydiyyat.example.net",
+                "reveal": "ailedestek-qeydiyyat.example.net"
+              }
+            ]
+          },
+          "say": "Bu dəfə qonşunuz sizə müavinət linki göndərib.",
+          "actions": [
+            {
+              "id": "register",
+              "label": "Qeydiyyatdan keç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Bu forma kart məlumatlarını toplayır. Dövlət müavinətləri üçün heç vaxt link vasitəsilə qeydiyyat tələb olunmur."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. İstənilən müavinəti yalnız rəsmi portalda yoxlayın."
+            },
+            {
+              "id": "report",
+              "label": "Saxta saytı bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Bildirişiniz saxta saytın başqaları üçün də bloklanmasına kömək edir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "cp-match",
+      "prompt": "Səhifənin istədiyini onun mənası ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "pin",
+          "left": "Kartın PIN kodu",
+          "right": "Heç bir ödəniş səhifəsi onu soruşmur"
+        },
+        {
+          "id": "sms-code",
+          "left": "Bankınızdan gələn SMS kodu",
+          "right": "Ödənişi təsdiqləyir: əvvəlcə məbləği oxuyun"
+        },
+        {
+          "id": "benefit-cvv",
+          "left": "Müavinət almaq üçün kartın arxasındakı kod",
+          "right": "Pul almaq üçün lazım deyil"
+        },
+        {
+          "id": "discount",
+          "left": "Bu gün ödəsəniz, endirim",
+          "right": "Yoxlamadan ödəməyə tələsdirmə"
+        }
+      ],
+      "explain": "Əmin deyilsinizsə, ödəməyin. Rəsmi portalı özünüz yoxlayın və ya 102 nömrəsi ilə polisə zəng edin."
+    },
+    {
+      "type": "recap",
+      "id": "cp-recap",
+      "points": [
+        "Ünvan sətrini oxuyun: loqo və qıfıl heç nəyi sübut etmir.",
+        "PIN kodu və ya müavinət üçün kart kodunu istəyən səhifə saxtadır.",
+        "Şübhə yarananda: ETX 1654 və ya polis 102."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

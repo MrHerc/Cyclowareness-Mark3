@@ -56,7 +56,8 @@ export type TenantSettings = {
   protection: { contentProtection: boolean; watermark: boolean; androidScreenBlock?: boolean };
   learning: { timeLimits: boolean; refresher: boolean; riskThreshold: number; dailyGoalXp: number };
   attestationText: Record<string, string>;
-  certificate: { title?: string; text?: string; signerName?: string; signerTitle?: string; publicLink: boolean };
+  /** `title` and `text`: the organisation's own wording per language ({ az, en, ru }); a language without one gets the default. */
+  certificate: { title?: Record<string, string>; text?: Record<string, string>; signerName?: string; signerTitle?: string; publicLink: boolean };
   notifications: {
     firstReminderDays: number;
     urgentReminderHours: number;
@@ -517,8 +518,11 @@ export const policyVersions = pgTable("policy_versions", {
   title: text("title").notNull(),
   summary: text("summary"),
   bodyMd: text("body_md").notNull(),
-  /** Other languages of the same version: { az: { title, summary, bodyMd } }. */
-  translations: jsonb("translations").$type<Record<string, { title: string; summary?: string; bodyMd: string }>>(),
+  /**
+   * Other languages of the same version: { ru: { title, summary, bodyMd } }. A copy of the base text marked
+   * `base: true` names the language the title/summary/body columns are written in (lib/policy-text.ts).
+   */
+  translations: jsonb("translations").$type<Record<string, { title: string; summary?: string; bodyMd: string; base?: boolean }>>(),
   publishedAt: ts("published_at"),
   createdAt: createdAt(),
 }, (t) => [index("policy_versions_policy_idx").on(t.policyId)]);

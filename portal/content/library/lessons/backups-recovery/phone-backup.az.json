@@ -1,0 +1,478 @@
+{
+  "id": "phone-backup",
+  "title": "Telefonun ehtiyat nüsxəsi",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "br2-tutor",
+      "beats": [
+        {
+          "id": "br2-b1",
+          "say": "Telefon itəndə çox vaxt ən böyük itki ailə fotoları olur. Onları qorumaq cəmi bir neçə dəqiqə çəkir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "br2-b2",
+          "say": "Belə bir bildiriş görmüsünüzsə, son aylarda çəkdiyiniz fotoların nüsxəsi yoxdur.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "notification",
+              "brandRef": "w2f-telefon-ayarlari",
+              "app": "Ayarlar",
+              "title": [
+                {
+                  "text": "Ehtiyat nüsxə söndürülüb"
+                }
+              ],
+              "body": [
+                {
+                  "text": "Son ehtiyat nüsxə: 143 gün əvvəl",
+                  "spot": "days"
+                }
+              ],
+              "time": "21:10"
+            }
+          },
+          "highlight": "days"
+        },
+        {
+          "id": "br2-b3",
+          "say": "Amma ehtiyatlı olun: «yaddaşınız doludur, fotolarınız silinəcək» deyən mesaj fırıldaqçıların ən sevdiyi üsuldur.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "brandRef": "buludxidmet-fake",
+              "sender": [
+                {
+                  "text": "BuludXidmet"
+                }
+              ],
+              "time": "10:02",
+              "messages": [
+                [
+                  {
+                    "text": "Yaddaşınız doludur. Fotolarınız 24 saat ərzində silinəcək."
+                  }
+                ]
+              ]
+            }
+          }
+        },
+        {
+          "id": "br2-b4",
+          "say": "Ehtiyat nüsxəni telefonun öz ayarlarında aktivləşdirin. Sonra işlədiyini yoxlamaq üçün bir fotonu bərpa edin.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "cloud"
+          }
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "br2-order",
+      "prompt": "Telefonunuzda ehtiyat nüsxəni qurun. Addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "turn-on",
+          "label": "«Ayarlar»da avtomatik ehtiyat nüsxəni aktivləşdirin"
+        },
+        {
+          "id": "first-run",
+          "label": "Wi-Fi-a və şarj cihazına qoşulun, ilk ehtiyat nüsxəni gözləyin"
+        },
+        {
+          "id": "check-date",
+          "label": "Son ehtiyat nüsxənin bu günə aid olduğunu yoxlayın"
+        },
+        {
+          "id": "test-restore",
+          "label": "Bərpanı yoxlamaq üçün bir fotonu başqa cihazda açın"
+        }
+      ],
+      "explain": "Ehtiyat nüsxə yalnız işləyəndə kömək edir, ona görə tarixi yoxlayın və bir fotonu bərpa edin. Bulud hesabını da iki addımlı doğrulama ilə qoruyun."
+    },
+    {
+      "type": "hotspot",
+      "id": "br2-hotspot",
+      "prompt": "Bu mesajda fırıldaq əlamətlərini tapın.",
+      "artifact": {
+        "kind": "sms",
+        "brandRef": "buludxidmet-fake",
+        "sender": [
+          {
+            "text": "BuludXidmet"
+          }
+        ],
+        "time": "10:02",
+        "messages": [
+          [
+            {
+              "text": "Yaddaşınız 100% doludur.",
+              "spot": "full"
+            }
+          ],
+          [
+            {
+              "text": "Bütün fotolarınız 24 saat ərzində silinəcək.",
+              "spot": "deadline"
+            }
+          ],
+          [
+            {
+              "text": "Planınızı cəmi 1,99 AZN-ə genişləndirin: ",
+              "spot": "small-fee"
+            },
+            {
+              "text": "buludxidmet-plan.example.info",
+              "spot": "link"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "full",
+          "label": "Yaddaş doludur",
+          "explain": "Yaddaş dolanda yeni ehtiyat nüsxələr dayanır, amma köhnə fotolar dərhal silinmir. Yaddaşı telefonun ayarlarında özünüz yoxlayın."
+        },
+        {
+          "id": "deadline",
+          "label": "Son müddət",
+          "explain": "Qorxu və son müddət sizi düşünmədən ödəməyə sövq edir."
+        },
+        {
+          "id": "small-fee",
+          "label": "Kiçik məbləğ",
+          "explain": "Kiçik məbləğ ayıqlığınızı azaldır. Əsl məqsəd kart məlumatlarınızdır."
+        },
+        {
+          "id": "link",
+          "label": "Qəribə domen",
+          "explain": "Bu, bulud xidmətinin domeni deyil. Planı yalnız telefonun ayarlarında dəyişin."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "br2-sim",
+      "environment": "phone",
+      "title": "Fotolarınız haradadır?",
+      "intro": "Telefonunuzda bir neçə bildiriş var. Hər biri üçün fotolarınızı qoruyan addımı seçin.",
+      "steps": [
+        {
+          "id": "backup-off",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2f-telefon-ayarlari",
+            "app": "Ayarlar",
+            "title": [
+              {
+                "text": "Ehtiyat nüsxə söndürülüb"
+              }
+            ],
+            "body": [
+              {
+                "text": "Son ehtiyat nüsxə: 143 gün əvvəl. İndi aktivləşdirilsin?"
+              }
+            ],
+            "time": "21:10"
+          },
+          "actions": [
+            {
+              "id": "turn-on",
+              "label": "Ehtiyat nüsxəni aktivləşdir",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bundan sonra fotoların nüsxəsi hər gecə avtomatik çıxarılacaq."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Telefon bu gün itsə, beş aylıq fotolar da onunla gedəcək. Ehtiyat nüsxəni indi aktivləşdirin."
+            }
+          ]
+        },
+        {
+          "id": "storage-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "buludxidmet-fake",
+            "sender": [
+              {
+                "text": "BuludXidmet"
+              }
+            ],
+            "time": "10:02",
+            "messages": [
+              [
+                {
+                  "text": "Yaddaşınız doludur. Fotolarınız 24 saat ərzində silinəcək. Planınızı genişləndirin: "
+                },
+                {
+                  "text": "buludxidmet-plan.example.info",
+                  "link": {
+                    "label": "buludxidmet-plan.example.info",
+                    "href": "https://buludxidmet-plan.example.info/odenis"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Səhər belə bir mesaj gəlir.",
+          "actions": [
+            {
+              "id": "click",
+              "label": "Linki aç",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Link bulud xidmətinin saytına aparmır. Yaddaşı yalnız telefonun ayarlarında yoxlayın.",
+              "next": "card-page"
+            },
+            {
+              "id": "report",
+              "label": "Spam kimi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Bu, saxtadır: əsl xidmət fotolarınızı bir gün ərzində silməklə hədələmir.",
+              "next": "free-app"
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Düzdür. Yaddaşı ayarlarda özünüz yoxlayın.",
+              "next": "free-app"
+            }
+          ]
+        },
+        {
+          "id": "card-page",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "buludxidmet-fake",
+            "brand": "BuludXidmət",
+            "url": [
+              {
+                "text": "https://buludxidmet-plan.example.info/odenis"
+              }
+            ],
+            "fields": [
+              "Kart nömrəsi",
+              "Bitmə tarixi",
+              "CVV"
+            ],
+            "button": "1,99 AZN ödə"
+          },
+          "actions": [
+            {
+              "id": "pay",
+              "label": "1,99 AZN ödə",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Kart məlumatlarınız fırıldaqçıya getdi. Dərhal kartın arxasındakı nömrə ilə banka zəng edin və kartı bloklayın."
+            },
+            {
+              "id": "close",
+              "label": "Səhifəni bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Yaxşı ki, dayandınız. Yaddaş planınızı yalnız telefonun ayarlarında yoxlayın."
+            }
+          ]
+        },
+        {
+          "id": "free-app",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "w2f-foto-ehtiyat",
+            "app": "Foto Ehtiyat Pulsuz",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Foto və videolar"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Kontaktlar"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "SMS mesajları"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Zəng jurnalı"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "Mağazada pulsuz ehtiyat nüsxə tətbiqi tapdınız.",
+          "actions": [
+            {
+              "id": "deny",
+              "label": "İcazə vermə",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür, fotoların ehtiyat nüsxəsi üçün SMS-lərə və ya kontaktlara giriş lazım deyil. Telefonun öz ehtiyat nüsxəsi kifayətdir."
+            },
+            {
+              "id": "allow",
+              "label": "İcazə ver",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "SMS-lərə girişi olan tətbiq bank kodlarınızı oxuya bilər. Belə tətbiqi dərhal silin."
+            }
+          ]
+        },
+        {
+          "id": "lost-phone",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2f-telefon-ayarlari",
+            "app": "Ayarlar",
+            "title": [
+              {
+                "text": "Ehtiyat nüsxədən bərpa edilsin?"
+              }
+            ],
+            "body": [
+              {
+                "text": "Son ehtiyat nüsxə: dünən, 02:10. Fotolar: 4812"
+              }
+            ],
+            "time": "19:45"
+          },
+          "say": "Bir ay sonra telefonunuz metroda itir. Yeni telefonda hesabınıza daxil olursunuz.",
+          "actions": [
+            {
+              "id": "restore",
+              "label": "Bərpa et",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Əla. Ehtiyat nüsxə aktiv olduğu üçün ailə fotolarının hamısı yerindədir."
+            },
+            {
+              "id": "fresh",
+              "label": "Yeni telefon kimi qur",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Onda fotolar yeni telefona gəlməyəcək. Ehtiyat nüsxədən bərpa edin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "br2-scenario",
+      "title": "Telefon itib",
+      "start": "n1",
+      "nodes": [
+        {
+          "id": "n1",
+          "text": "Axşam telefonunuzu metroda itirdiniz. Evə çatanda ilk olaraq nə edirsiniz?",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          },
+          "choices": [
+            {
+              "label": "Telefonu başqa cihazdan kilidləyirəm və harada olduğunu yoxlayıram",
+              "next": "n2",
+              "feedback": "Düzdür. Kilid telefonu tapan adamın fotolarınıza və hesablarınıza çatmasının qarşısını alır."
+            },
+            {
+              "label": "Səhərə qədər gözləyirəm, bəlkə kimsə zəng edər",
+              "outcome": "risky",
+              "feedback": "Kilidlənməmiş telefonda hesablarınız risk altındadır. Telefonu dərhal kilidləyin."
+            },
+            {
+              "label": "Nömrəmi və ünvanımı sosial şəbəkədə paylaşıram",
+              "outcome": "risky",
+              "feedback": "Şəxsi məlumatlar fırıldaqçılara yeni fürsət verir. Əvvəlcə telefonu kilidləyin."
+            }
+          ]
+        },
+        {
+          "id": "n2",
+          "text": "Telefon tapılmadı. Ertəsi gün SMS gəlir: «Telefonunuz tapıldı, görmək üçün daxil olun».",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "sender": [
+                {
+                  "text": "+994 50 000 64 18"
+                }
+              ],
+              "time": "11:20",
+              "messages": [
+                [
+                  {
+                    "text": "Telefonunuz tapıldı. Harada olduğunu görmək üçün hesabınıza daxil olun: cihaz-tap.example.info"
+                  }
+                ]
+              ]
+            }
+          },
+          "choices": [
+            {
+              "label": "Linki açıb daxil oluram",
+              "outcome": "compromised",
+              "feedback": "Bu tələ telefonunu itirən insanları ovlayır. Hesabınızın parolu birbaşa fırıldaqçıya gedir."
+            },
+            {
+              "label": "Linki açmıram, yeni telefonu ehtiyat nüsxədən bərpa edirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Fotolar ehtiyat nüsxədə salamatdır, belə mesaja isə etibar etmək olmaz."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "br2-recap",
+      "points": [
+        "Telefonunuzda avtomatik ehtiyat nüsxəni aktivləşdirin.",
+        "Yoxlamaq üçün bir fotonu bərpa edin.",
+        "«Yaddaş doludur»? Linkə yox, ayarlara baxın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

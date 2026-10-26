@@ -1,0 +1,512 @@
+{
+  "id": "disguised-files",
+  "title": "Замаскированные файлы",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "df-tutor",
+      "beats": [
+        {
+          "id": "df-b1",
+          "say": "Здравствуйте! Имя файла может обманывать. Сегодня мы научимся определять, что на самом деле представляет собой вложение.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        },
+        {
+          "id": "df-b2",
+          "say": "Этот файл похож на PDF. Но в самом конце имени стоит exe, значит, это программа.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "file",
+              "name": [
+                {
+                  "text": "Qerar_2026.pdf"
+                },
+                {
+                  "text": ".exe",
+                  "spot": "ext"
+                }
+              ],
+              "type": "exe",
+              "size": "1,8 МБ",
+              "source": [
+                {
+                  "text": "Вложение из письма"
+                }
+              ]
+            }
+          },
+          "highlight": "ext"
+        },
+        {
+          "id": "df-b3",
+          "say": "Архивы, образы дисков и ярлыки тоже могут прятать внутри программу.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        },
+        {
+          "id": "df-b4",
+          "say": "Правило простое: прежде чем открыть неожиданный файл, проверьте его тип, а если сомневаетесь — сообщите.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "df-sim-files",
+      "environment": "desktop",
+      "title": "Папка «Загрузки»",
+      "intro": "Посмотрите на файлы, которые вы скачали из почты. Включите показ расширений и решите, что делать с каждым.",
+      "steps": [
+        {
+          "id": "decree-exe",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Qerar_2026.pdf.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "1,8 МБ",
+            "source": [
+              {
+                "text": "Загрузки: qerar@nazirlik-sened.example.net"
+              }
+            ]
+          },
+          "say": "Включите показ расширений. Что стоит в конце имени?",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Открыть",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Это не документ, а программа. Как только вы её откроете, она может заразить компьютер."
+            },
+            {
+              "id": "delete",
+              "label": "Удалить",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Верно. Настоящее постановление никогда не бывает программой."
+            },
+            {
+              "id": "report",
+              "label": "Сообщить в службу безопасности",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Отлично. Служба безопасности сможет удалить такое же письмо и из ящиков коллег."
+            }
+          ]
+        },
+        {
+          "id": "report-iso",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Hesabat_sentyabr.iso"
+              }
+            ],
+            "type": "iso",
+            "size": "4,2 МБ",
+            "source": [
+              {
+                "text": "Загрузки: hesabat@audit-xidmet.example.net"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Открыть",
+              "kind": "open",
+              "outcome": "risky",
+              "feedback": "ISO-файл открывается как диск и может содержать программу. Отчёты не присылают в виде образов дисков."
+            },
+            {
+              "id": "delete",
+              "label": "Удалить",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Верно. Не открывайте образ диска, которого вы не ждали."
+            },
+            {
+              "id": "report",
+              "label": "Сообщить в службу безопасности",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Отлично. ISO-файл под видом отчёта — типичная атака."
+            }
+          ]
+        },
+        {
+          "id": "photos-lnk",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Tedbir_fotolari"
+              }
+            ],
+            "type": "lnk",
+            "size": "3 КБ",
+            "source": [
+              {
+                "text": "Загрузки: извлечено из архива"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Открыть",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Это был ярлык, и он запустил скрытую команду. Фотографии не весят 3 КБ."
+            },
+            {
+              "id": "delete",
+              "label": "Удалить",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Верно. Ярлык (.lnk) под видом фотографий — это ловушка."
+            },
+            {
+              "id": "report",
+              "label": "Сообщить в службу безопасности",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Отлично. Сообщить, не открывая файл, — самый безопасный путь."
+            }
+          ]
+        },
+        {
+          "id": "leave-pdf",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "idare",
+            "name": [
+              {
+                "text": "Mezuniyyet_qrafiki.pdf"
+              }
+            ],
+            "type": "pdf",
+            "size": "220 КБ",
+            "source": [
+              {
+                "text": "Загрузки: kadrlar@idare.example"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Открыть",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Верно. Ожидаемый PDF с внутреннего адреса можно открывать."
+            },
+            {
+              "id": "delete",
+              "label": "Удалить",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Этот файл безопасен: настоящий PDF от знакомого отправителя. Удалять нужно не каждый файл."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "df-hotspot",
+      "prompt": "Найдите в этом письме тревожные признаки.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "e-xidmet-fake",
+        "from": {
+          "name": [
+            {
+              "text": "Портал e-Xidmət"
+            }
+          ],
+          "address": [
+            {
+              "text": "bildiris@e-xidmet-gov.example.net",
+              "spot": "domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Уведомление о штрафе"
+          }
+        ],
+        "time": "09:31",
+        "body": [
+          [
+            {
+              "text": "На ваше имя выписан административный штраф. Подробности во вложении."
+            }
+          ],
+          [
+            {
+              "text": "Пароль к архиву: 2026",
+              "spot": "zip"
+            }
+          ],
+          [
+            {
+              "text": "При неуплате в течение 3 дней сумма штрафа удваивается.",
+              "spot": "urgency"
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Cerime_bildirisi.zip",
+                "spot": "zip"
+              }
+            ],
+            "size": "860 КБ"
+          },
+          {
+            "name": [
+              {
+                "text": "Odenis_qebzi.html",
+                "spot": "html"
+              }
+            ],
+            "size": "14 КБ"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Поддельный домен",
+          "explain": "В адресе лишнее «-gov» и другое окончание. Домен официального портала проверьте сами."
+        },
+        {
+          "id": "zip",
+          "label": "Архив с паролем",
+          "explain": "Из-за пароля антивирус не может заглянуть внутрь. Официальные уведомления так не присылают."
+        },
+        {
+          "id": "html",
+          "label": "HTML-вложение",
+          "explain": "HTML-вложение открывает в браузере поддельную страницу оплаты или входа."
+        },
+        {
+          "id": "urgency",
+          "label": "Угроза и спешка",
+          "explain": "Страх нужен, чтобы вы открыли файл без проверки. Проверяйте штрафы только на официальном портале."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "df-swipe",
+      "prompt": "Безопасно или ловушка?",
+      "cards": [
+        {
+          "id": "manual-pdf",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "idare",
+            "name": [
+              {
+                "text": "Telimat_2026.pdf"
+              }
+            ],
+            "type": "pdf",
+            "size": "310 КБ",
+            "source": [
+              {
+                "text": "it@idare.example, ожидаемая инструкция"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Внутренний адрес, ожидаемый документ, обычный PDF. Можно открывать."
+        },
+        {
+          "id": "salary-lnk",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Maas_cedveli.xlsx.lnk"
+              }
+            ],
+            "type": "lnk",
+            "size": "2 КБ",
+            "source": [
+              {
+                "text": "Неизвестный отправитель"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Ярлык, замаскированный под таблицу. Если его открыть, может запуститься скрытая команда."
+        },
+        {
+          "id": "order-img",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "cevikkargo-fake",
+            "name": [
+              {
+                "text": "Sifaris_1873.img"
+              }
+            ],
+            "type": "img",
+            "size": "3,6 МБ",
+            "source": [
+              {
+                "text": "sifaris@cevik-kargo.example.net"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "IMG — это образ диска. Данные о заказе так никогда не присылают."
+        },
+        {
+          "id": "slides-ppt",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "ofistechizat",
+            "name": [
+              {
+                "text": "Teqdimat_oktyabr.pptx"
+              }
+            ],
+            "type": "ppt",
+            "size": "2,1 МБ",
+            "source": [
+              {
+                "text": "Сабина Каримова, согласовано к встрече"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Согласованная презентация в обычном формате. Тревожных признаков нет."
+        },
+        {
+          "id": "invoice-html",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "ofistechizat-fake",
+            "name": [
+              {
+                "text": "Faktura_oktyabr.html"
+              }
+            ],
+            "type": "html",
+            "size": "9 КБ",
+            "source": [
+              {
+                "text": "faktura@ofistechizat-az.example.net"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Счета не присылают в виде HTML-файлов. Этот файл с домена-двойника открывает страницу входа."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "df-match",
+      "prompt": "Сопоставьте каждый тип файла с риском, который он несёт.",
+      "pairs": [
+        {
+          "id": "exe",
+          "left": ".exe",
+          "right": "Программа, которая запускается при открытии"
+        },
+        {
+          "id": "lnk",
+          "left": ".lnk",
+          "right": "Ярлык, который может запустить скрытую команду"
+        },
+        {
+          "id": "iso",
+          "left": ".iso",
+          "right": "Образ диска, внутри которого может быть программа"
+        },
+        {
+          "id": "html",
+          "left": ".html",
+          "right": "Может открыть в браузере поддельную страницу входа"
+        },
+        {
+          "id": "zip",
+          "left": ".zip (с паролем)",
+          "right": "Антивирус не может заглянуть внутрь"
+        }
+      ],
+      "explain": "В рабочей почте такие файлы встречаются редко. Если вы не ждали такой файл, не открывайте его и сообщите о нём."
+    },
+    {
+      "type": "choice",
+      "id": "df-choice",
+      "question": {
+        "prompt": "Коллега говорит: «Я открыл файл, и ничего не произошло». Что вы посоветуете?",
+        "options": [
+          {
+            "id": "report",
+            "label": "Сразу отключиться от сети и позвонить в службу безопасности",
+            "correct": true,
+            "feedback": "Верно. Вредоносные программы часто работают незаметно, а если быстро сообщить, ущерб будет меньше."
+          },
+          {
+            "id": "wait",
+            "label": "Подождать и сообщить, если что-то случится",
+            "correct": false,
+            "feedback": "«Ничего не произошло» — часто обманчивое впечатление. Ожидание даёт злоумышленнику время."
+          },
+          {
+            "id": "shutdown",
+            "label": "Сразу выключить компьютер",
+            "correct": false,
+            "feedback": "При выключении могут исчезнуть следы атаки в оперативной памяти. Если ваш регламент не требует иного, не выключайте компьютер: отключите его от сети и сообщите."
+          }
+        ]
+      },
+      "explain": "Открытый подозрительный файл — это инцидент: отключитесь от сети, не выключайте компьютер и сразу сообщите."
+    },
+    {
+      "type": "recap",
+      "id": "df-recap",
+      "points": [
+        "Смотрите в самый конец имени: там настоящий тип файла",
+        "Не открывайте неожиданные архивы, ISO, ярлыки и HTML-файлы",
+        "Уже открыли? Отключитесь от сети и сразу сообщите"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

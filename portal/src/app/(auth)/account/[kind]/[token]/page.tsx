@@ -7,6 +7,7 @@ import { db, t } from "@/server/db";
 import { sha256Hex } from "@/server/crypto";
 import { ButtonLink } from "@/components/ui/button";
 import { SetPasswordForm } from "./set-password-form";
+import { authCard, authTitle } from "../../../ui";
 
 export async function generateMetadata(): Promise<Metadata> {
   const tr = await getTranslations("auth");
@@ -27,11 +28,11 @@ export default async function AccountLinkPage({ params }: PageProps<"/account/[k
 
   if (!row || row.usedAt || row.expiresAt < new Date()) {
     return (
-      <div className="rounded-2xl border border-line bg-surface p-8 text-center shadow-raised">
-        <span className="mx-auto mb-4 grid size-14 place-items-center rounded-full bg-sunken text-ink-subtle">
+      <div className={`${authCard} text-center`}>
+        <span className="mx-auto mb-5 grid size-16 place-items-center rounded-full bg-sunken text-ink-subtle ring-8 ring-sunken/50">
           <LinkIcon className="size-6" />
         </span>
-        <h1 className="text-title font-bold">{row ? tr("account.expiredTitle") : tr("account.invalidTitle")}</h1>
+        <h1 className={authTitle}>{row ? tr("account.expiredTitle") : tr("account.invalidTitle")}</h1>
         <p className="mt-2 text-body-sm text-ink-muted">{row ? tr("account.expiredBody") : tr("account.invalidBody")}</p>
         <ButtonLink href="/sign-in" className="mt-6" variant="secondary">
           {tr("account.signIn")}

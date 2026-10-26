@@ -7,8 +7,9 @@ import { emitEvent } from "./events";
 import { notifyUsers, type Localized } from "./notify";
 import { recomputeRisk } from "./risk";
 import { insertNumbered } from "./threats";
-import { pick } from "../../i18n/config";
+import { LOCALES, pick } from "../../i18n/config";
 import { bakuDayPlus, todayInBaku } from "../../lib/time";
+import { encodeRiskTitle } from "../../lib/risk-title";
 
 /* ───────── closed loops ───────── */
 
@@ -66,7 +67,8 @@ export async function closeLoop(db: DB, p: { tenantId: string; loopId: string; a
  * It shows up under "My open risks" with a due date and closes when they finish the module.
  * People who already have an open risk from the same source are skipped, and so are people who
  * already completed the module: their risk could never close. `title` may depend on the
- * person's language (it is stored per person and used in their notification). The emails join the
+ * language: the risk keeps every UI language (src/lib/risk-title.ts) and each notification uses the
+ * person's own. The emails join the
  * outbox and the job runner's mail step sends them, so neither a request nor the tick waits for the
  * mail server once per person.
  */
@@ -106,7 +108,9 @@ export async function targetTraining(
   if (!targets.length) return [];
   const due = p.dueDate ?? bakuDayPlus(7);
   const titleFor = (locale: string) => (typeof p.title === "function" ? p.title(locale) : p.title);
-  await db.insert(t.behaviorRisks).values(targetPeople.map((u) => ({ tenantId: p.tenantId, userId: u.id, kind: p.kind, severity: p.severity, title: titleFor(u.locale).slice(0, 300), sourceRef: p.sourceRef, moduleId: p.moduleId, dueDate: due })));
+  // A title written by the system is stored in every UI language; one typed by a person (incident, material) as it is.
+  const stored = typeof p.title === "function" ? encodeRiskTitle(Object.fromEntries(LOCALES.map((l) => [l, titleFor(l)]))) : p.title.slice(0, 300);
+  await db.insert(t.behaviorRisks).values(targetPeople.map((u) => ({ tenantId: p.tenantId, userId: u.id, kind: p.kind, severity: p.severity, title: stored, sourceRef: p.sourceRef, moduleId: p.moduleId, dueDate: due })));
   // Module title and reason in each person's own language.
   const moduleTitle = (locale: string) => pick(mod.title, locale);
   const note = p.note;

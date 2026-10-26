@@ -1,0 +1,464 @@
+<title>Cyclowareness Pricing</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: light header band, three plan cards (middle featured), explained comparison, additional costs, calculator, FAQ. One deliberate light theme. */
+:root {
+  color-scheme: light;
+  --bg: #f8f7fd; --surface: #ffffff; --tint: #f3f2fd; --tint-2: #ebe9fc; --ink: #1b1740; --muted: #5d5878; --faint: #8a86a3; --line: #e7e4f2;
+  --brand: #4f46e5; --brand-ink: #4338ca; --brand-soft: #eeedfd; --on-brand: #ffffff; --accent: #ff7a1a; --accent-soft: #fff1e6; --yes: #1f9d57; --yes-soft: #e6f6ed;
+  --display: "Geologica", system-ui, "Segoe UI", sans-serif;
+  --body: "Inter Tight", "Geologica", system-ui, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1140px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Header band */
+.hero { background: radial-gradient(1200px 380px at 85% -10%, #e2deff 0%, transparent 60%), radial-gradient(900px 320px at 0% 0%, #fff0e4 0%, transparent 55%), linear-gradient(180deg, #f3f1fe 0%, var(--bg) 100%); border-bottom: 1px solid var(--line); }
+.hero .wrap { padding-block: 28px 116px; }
+.brand { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.mark { width: 46px; height: 46px; border-radius: 12px; flex: none; box-shadow: 0 6px 16px -10px rgb(27 23 64 / 45%); }
+.lockup { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.lockup b { font-family: var(--display); font-size: 21px; line-height: 1.1; letter-spacing: -.01em; }
+.lockup img { display: block; height: 15px; width: auto; max-width: 100%; }
+.hero h1 { font-family: var(--display); font-weight: 800; font-size: clamp(32px, 5vw, 54px); line-height: 1.05; letter-spacing: -.025em; margin: 52px 0 14px; max-width: 20ch; text-wrap: balance; }
+.hero h1 em { font-style: normal; color: var(--brand); }
+.hero p { margin: 0; max-width: 62ch; font-size: 17px; color: var(--muted); }
+.facts { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.fact { background: rgb(255 255 255 / 70%); border: 1px solid var(--line); border-radius: 14px; padding: 10px 16px; display: flex; align-items: baseline; gap: 8px; }
+.fact strong { font-family: var(--display); font-size: 22px; color: var(--brand-ink); font-variant-numeric: tabular-nums; }
+.fact span { font-size: 13px; color: var(--muted); }
+
+/* Plan cards */
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: -84px; position: relative; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 28px 26px 26px; display: flex; flex-direction: column; min-width: 0; box-shadow: 0 1px 2px rgb(27 23 64 / 4%), 0 14px 34px -22px rgb(27 23 64 / 22%); }
+.card.featured { border: 2px solid var(--brand); box-shadow: 0 22px 50px -30px rgb(79 70 229 / 60%); }
+.badge { align-self: flex-start; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--brand-ink); background: var(--brand-soft); padding: 5px 10px; border-radius: 999px; margin-bottom: 14px; }
+.card h2 { font-family: var(--display); font-size: 24px; margin: 0; letter-spacing: -.01em; }
+.pos { margin: 6px 0 0; color: var(--muted); font-size: 14px; min-height: 3.3em; }
+.price { display: flex; align-items: baseline; gap: 8px; margin-top: 20px; font-variant-numeric: tabular-nums; }
+.price b { font-family: var(--display); font-size: 52px; line-height: 1; letter-spacing: -.03em; }
+.price span { color: var(--muted); font-size: 14px; line-height: 1.3; }
+.annual { margin-top: 8px; font-size: 13px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.rule { height: 1px; background: var(--line); margin: 20px 0 16px; }
+.inherit { font-size: 13px; font-weight: 700; color: var(--brand-ink); margin-bottom: 10px; }
+.card ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: 14px; }
+.card li { display: grid; grid-template-columns: 18px 1fr; gap: 10px; align-items: start; }
+.tick, .yes { display: inline-block; width: 18px; height: 18px; border-radius: 50%; position: relative; flex: none; }
+.tick { background: var(--brand-soft); margin-top: 2px; }
+.yes { background: var(--yes-soft); width: 20px; height: 20px; vertical-align: middle; }
+.tick::after, .yes::after { content: ""; position: absolute; inset: 4px; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 5.2 4 7.6 8.6 2.6' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M1.5 5.2 4 7.6 8.6 2.6' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / contain no-repeat; }
+.tick::after { background: var(--brand); }
+.yes::after { background: var(--yes); }
+.no { color: #c3c0d4; font-weight: 600; }
+.terms { text-align: center; color: var(--faint); font-size: 13px; margin: 18px 0 0; }
+
+/* Sections */
+section { margin-top: 72px; }
+.kicker { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--brand-ink); }
+h3 { font-family: var(--display); font-size: clamp(24px, 3vw, 32px); letter-spacing: -.015em; margin: 6px 0 8px; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0 0 22px; max-width: 66ch; }
+
+/* Every plan: library, posters, news */
+.tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.tile { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 22px; min-width: 0; }
+.tile .ico { width: 42px; height: 42px; border-radius: 12px; background: var(--brand-soft); color: var(--brand); display: grid; place-items: center; margin-bottom: 14px; }
+.tile .ico svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tile h4 { margin: 0 0 6px; font-family: var(--display); font-size: 17px; }
+.tile p { margin: 0; color: var(--muted); font-size: 14px; }
+.why { margin-top: 14px; background: var(--brand-soft); border-radius: 14px; padding: 14px 18px; font-size: 14px; color: var(--brand-ink); }
+
+/* Comparison */
+.tablebox { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; }
+table { width: 100%; border-collapse: collapse; min-width: 760px; font-size: 14px; }
+th, td { padding: 14px 18px; text-align: left; border-bottom: 1px solid var(--line); vertical-align: middle; }
+thead th { background: var(--tint); font-family: var(--display); font-size: 15px; }
+thead th small { display: block; font-family: var(--body); font-weight: 500; font-size: 12px; color: var(--faint); font-variant-numeric: tabular-nums; }
+th.c, td.c { text-align: center; width: 124px; }
+th.f, td.f { background: #f6f5ff; }
+thead th.f { background: var(--tint-2); }
+tr.group td { background: var(--tint); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding-block: 10px; }
+td .name { font-weight: 600; color: var(--ink); }
+td .desc { display: block; color: var(--muted); font-size: 13px; margin-top: 2px; max-width: 60ch; }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* Additional costs */
+.costs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.cost { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; min-width: 0; }
+.cost h4 { margin: 0 0 4px; font-family: var(--display); font-size: 16px; }
+.cost .how { display: inline-block; font-size: 12px; font-weight: 700; color: #b4520e; background: var(--accent-soft); border-radius: 999px; padding: 3px 9px; margin-bottom: 8px; }
+.cost .how.inc { color: var(--yes); background: var(--yes-soft); }
+.cost p { margin: 0; color: var(--muted); font-size: 14px; }
+.cost .tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin-bottom: 8px; }
+.cost .tags .how { margin-bottom: 0; }
+.cost .plans { font-size: 12px; font-weight: 600; color: var(--faint); }
+.cost .unit { margin-top: 14px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.cost .foot { margin-top: 10px; font-size: 12.5px; color: var(--faint); }
+.est { margin: 12px 0 0; border-top: 1px solid var(--line); }
+.cost .unit + .est { margin-top: 6px; }
+.est > div { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.est dt { font-size: 13.5px; color: var(--ink); min-width: 0; }
+.est dd { margin: 0; flex: none; max-width: 55%; text-align: right; font-family: var(--display); font-weight: 700; font-size: 14.5px; color: var(--brand-ink); font-variant-numeric: tabular-nums; }
+.est dd small { display: block; font-family: var(--body); font-weight: 500; font-size: 12px; color: var(--muted); }
+.example { margin-top: 16px; background: var(--tint); border: 1px solid var(--tint-2); border-radius: 16px; padding: 20px 22px; }
+.example h4 { margin: 0 0 4px; font-family: var(--display); font-size: 17px; }
+.example > p { margin: 0; color: var(--muted); font-size: 14px; }
+.example .est { max-width: 760px; }
+.example .est, .example .est > div { border-color: var(--tint-2); }
+.example .est > div.total dt { font-weight: 700; }
+.example .est > div.total dd { color: var(--ink); font-size: 16px; }
+.taxnote { margin: 16px 0 0; font-size: 13px; color: var(--muted); max-width: 92ch; }
+
+/* Calculator */
+.calc { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: 18px; align-items: stretch; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 24px; min-width: 0; }
+label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 8px; }
+input[type="number"] { width: 100%; font: 600 22px/1.2 var(--display); color: var(--ink); background: var(--tint); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; font-variant-numeric: tabular-nums; }
+input[type="range"] { width: 100%; margin-top: 16px; accent-color: var(--brand); }
+input:focus-visible { outline: 3px solid rgb(79 70 229 / 35%); outline-offset: 2px; }
+.hint { font-size: 12px; color: var(--faint); margin-top: 8px; }
+.totals { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.total { background: var(--tint); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0; }
+.total.f { border-color: var(--brand); background: #f6f5ff; }
+.total h4 { margin: 0; font-family: var(--display); font-size: 15px; }
+.total .big { font-family: var(--display); font-size: clamp(22px, 2.6vw, 30px); font-weight: 700; letter-spacing: -.02em; margin-top: 8px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.total .small { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* FAQ */
+.faq { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.faq div { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 20px 22px; min-width: 0; }
+.faq h4 { margin: 0 0 6px; font-family: var(--display); font-size: 16px; }
+.faq p { margin: 0; color: var(--muted); font-size: 14px; }
+
+footer { margin-top: 72px; border-top: 1px solid var(--line); background: var(--surface); }
+footer .maker { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; }
+footer .maker img { height: 13px; width: auto; max-width: 100%; }
+footer .wrap { padding-block: 24px 40px; display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; color: var(--faint); font-size: 13px; }
+
+@media (max-width: 920px) {
+  .cards { grid-template-columns: minmax(0, 1fr); margin-top: -72px; }
+  .pos { min-height: 0; }
+  .calc, .faq, .costs, .tiles { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) { .totals { grid-template-columns: minmax(0, 1fr); } .hero .wrap { padding-block: 24px 104px; } }
+</style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@500;600;700;800&family=Inter+Tight:wght@400;500;600;700&display=swap">
+
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><img class="mark" src="brand/icon.svg" alt="" width="46" height="46"><span class="lockup"><b>Cyclowareness</b><img src="brand/safarov-industries.png" alt="Safarov Industries" width="1600" height="166"></span></div>
+    <h1>Plans built to change how people <em>respond to attacks</em></h1>
+    <p>Security awareness training, attack simulation and security operations in one platform. Priced per employee, so every person in your organization is covered.</p>
+    <div class="facts" aria-label="Platform at a glance">
+      <div class="fact"><strong>150+</strong><span>trainings</span></div>
+      <div class="fact"><strong>20+</strong><span>learning paths</span></div>
+      <div class="fact"><strong>10</strong><span>languages, more on request</span></div>
+      <div class="fact"><strong>5</strong><span>simulation channels</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="cards">
+    <article class="card" aria-labelledby="p1">
+      <h2 id="p1">Essentials</h2>
+      <p class="pos">A complete awareness program from day one: training, email phishing simulation and reporting.</p>
+      <div class="price"><b>$1.40</b><span>per employee<br>per month</span></div>
+      <div class="annual">Billed annually · $16.80 per employee per year</div>
+      <div class="rule"></div>
+      <ul>
+        <li><span class="tick" aria-hidden="true"></span>150+ interactive trainings in 10 languages</li>
+        <li><span class="tick" aria-hidden="true"></span>20+ learning paths with assignments and automatic reminders</li>
+        <li><span class="tick" aria-hidden="true"></span>Narrated lessons with an animated guide</li>
+        <li><span class="tick" aria-hidden="true"></span>Library, posters and security news for every employee</li>
+        <li><span class="tick" aria-hidden="true"></span>Email phishing campaigns with a just-in-time teaching page</li>
+        <li><span class="tick" aria-hidden="true"></span>One-click phishing reporting with rewards</li>
+        <li><span class="tick" aria-hidden="true"></span>Policies with e-signature, certificates and attestations</li>
+        <li><span class="tick" aria-hidden="true"></span>Hands-on lab with virtual-machine exercises</li>
+        <li><span class="tick" aria-hidden="true"></span>Personal security dashboard and risk score</li>
+        <li><span class="tick" aria-hidden="true"></span>Reports, admin console, custom branding and audit log</li>
+      </ul>
+    </article>
+
+    <article class="card featured" aria-labelledby="p2">
+      <span class="badge">Most popular</span>
+      <h2 id="p2">Professional</h2>
+      <p class="pos">AI-assisted training, multi-channel simulation and a direct line from employee reports to your SOC.</p>
+      <div class="price"><b>$1.95</b><span>per employee<br>per month</span></div>
+      <div class="annual">Billed annually · $23.40 per employee per year</div>
+      <div class="rule"></div>
+      <div class="inherit">Everything in Essentials, plus</div>
+      <ul>
+        <li><span class="tick" aria-hidden="true"></span>AI tutor that answers learners' questions by text and voice</li>
+        <li><span class="tick" aria-hidden="true"></span>Training studio with AI course generation and automatic verification</li>
+        <li><span class="tick" aria-hidden="true"></span>SMS, voice-call, QR-code and USB-drop simulations</li>
+        <li><span class="tick" aria-hidden="true"></span>Threat-informed labs built from publicly disclosed APT campaigns</li>
+        <li><span class="tick" aria-hidden="true"></span>Suspicious-content sandbox with hand-off to your SOC</li>
+        <li><span class="tick" aria-hidden="true"></span>Incident risks, risk profiles, spaced review and nudges</li>
+        <li><span class="tick" aria-hidden="true"></span>Single sign-on, Active Directory / LDAP, webhooks and SIEM</li>
+        <li><span class="tick" aria-hidden="true"></span>Compliance evidence pack for ISO/IEC 27001 and NIST CSF</li>
+      </ul>
+    </article>
+
+    <article class="card" aria-labelledby="p3">
+      <h2 id="p3">Enterprise</h2>
+      <p class="pos">Awareness connected to security operations, for large and regulated organizations.</p>
+      <div class="price"><b>$2.50</b><span>per employee<br>per month</span></div>
+      <div class="annual">Billed annually · $30.00 per employee per year</div>
+      <div class="rule"></div>
+      <div class="inherit">Everything in Professional, plus</div>
+      <ul>
+        <li><span class="tick" aria-hidden="true"></span>Sector-specific rapid-response labs when peers are attacked</li>
+        <li><span class="tick" aria-hidden="true"></span>Closed loop from incident to targeted training to verified outcome</li>
+        <li><span class="tick" aria-hidden="true"></span>Two-person approval for training materials</li>
+        <li><span class="tick" aria-hidden="true"></span>Threat intelligence and policy intelligence</li>
+        <li><span class="tick" aria-hidden="true"></span>Security operations center view</li>
+        <li><span class="tick" aria-hidden="true"></span>HR system integration, such as SAP, for joiners, movers and leavers</li>
+        <li><span class="tick" aria-hidden="true"></span>Leadership dashboard for executives and the board</li>
+      </ul>
+    </article>
+  </div>
+  <p class="terms">Prices in US dollars, per employee per month, billed annually. Usage-based and optional costs, with approximate prices, are listed below.</p>
+
+  <section aria-labelledby="everyone">
+    <div class="kicker">Included in every plan</div>
+    <h3 id="everyone">Library, posters and news, open to every employee</h3>
+    <p class="sub">Awareness grows from regular contact, not from one course a year. These three sections are part of Essentials, Professional and Enterprise alike, and give people a reason to come back to the portal between trainings.</p>
+    <div class="tiles">
+      <div class="tile"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg></span><h4>Library</h4><p>Guides, checklists, short videos and how-tos on passwords, phishing, devices, travel and working from home. Searchable, in each employee&rsquo;s language, open at any time.</p></div>
+      <div class="tile"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/></svg></span><h4>Posters</h4><p>A growing collection of awareness posters to view in the portal and to print for offices, meeting rooms and break areas.</p></div>
+      <div class="tile"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M15 18h-5"/><path d="M18 14h-8"/><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2"/><rect width="8" height="4" x="10" y="6" rx="1"/></svg></span><h4>Security news</h4><p>Short, plain-language stories about current scams and attacks, each with what to do. New stories appear in the portal and in a regular digest.</p></div>
+    </div>
+    <p class="why">The goal is simple: more time in the learning portal. People who return to read, look and share between courses remember more and report more.</p>
+  </section>
+
+  <section aria-labelledby="cmp">
+    <div class="kicker">Compare</div>
+    <h3 id="cmp">Every capability, explained</h3>
+    <p class="sub">Each plan includes everything in the plan before it. The library of trainings, paths and labs grows continuously and every plan receives new content as it is published.</p>
+    <div class="tablebox">
+      <table>
+        <thead>
+          <tr><th scope="col">Capability</th><th scope="col" class="c">Essentials<small>$1.40</small></th><th scope="col" class="c f">Professional<small>$1.95</small></th><th scope="col" class="c">Enterprise<small>$2.50</small></th></tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section aria-labelledby="extra">
+    <div class="kicker">Additional costs</div>
+    <h3 id="extra">What the price covers, and what may cost extra</h3>
+    <p class="sub">The per-employee price covers the platform, hosting in our cloud, the content library and all updates. A few items depend on usage or on how you deploy. The approximate prices below are planning ranges based on public market rates checked in October 2026. They are not quotes: your contract states the final price.</p>
+    <div class="costs">
+      <div class="cost">
+        <div class="tags"><span class="how">Allowance, then credits</span><span class="plans">Professional, Enterprise</span></div>
+        <h4>AI tutor and AI course builder</h4>
+        <p>Included every month and shared across your organization: 50 tutor questions and 5 premium-voice answers per employee, and 1 AI-generated course for every 35 employees. Answers read aloud by the device’s own voice are free. Use above the allowance is billed as prepaid credits. On Enterprise you can connect your own AI provider account instead and pay the provider directly.</p>
+        <dl class="est">
+          <div><dt>Extra tutor questions</dt><dd>$2.50 per 1,000</dd></div>
+          <div><dt>Extra premium-voice answers</dt><dd>$35 per 1,000</dd></div>
+          <div><dt>Extra AI-generated course</dt><dd>$6 each</dd></div>
+          <div><dt>Heavy use, when it happens</dt><dd>$1.50–11.50<small>per employee per year</small></dd></div>
+        </dl>
+        <p class="foot">Most organizations stay within the allowance and pay nothing extra.</p>
+      </div>
+      <div class="cost">
+        <div class="tags"><span class="how">At cost</span><span class="plans">Professional, Enterprise</span></div>
+        <h4>SMS and voice-call simulations</h4>
+        <p>Text messages and calls go through a carrier or telephony provider that charges per message and per call minute. We pass these charges on at cost, or you connect your own provider account. Unanswered calls cost nothing.</p>
+        <p class="unit">Per employee per year, for 4 SMS and 2 voice-call simulations</p>
+        <dl class="est">
+          <div><dt>United States</dt><dd>$0.20–0.50</dd></div>
+          <div><dt>EU and United Kingdom</dt><dd>$0.75–3.00</dd></div>
+          <div><dt>Azerbaijan, Georgia, Türkiye, Ukraine</dt><dd>$1.50–6.00</dd></div>
+          <div><dt>Per message</dt><dd>$0.01–0.47</dd></div>
+          <div><dt>Per call minute, AI voice included</dt><dd>$0.03–0.71</dd></div>
+        </dl>
+        <p class="foot">Calls are billed per started minute. In some countries, such as the United States and Türkiye, SMS simulations need a registered sending route, which is set up during onboarding.</p>
+      </div>
+      <div class="cost">
+        <div class="tags"><span class="how inc">Included</span><span class="plans">All plans</span></div>
+        <h4>Cloud hosting</h4>
+        <p>Hosting, backups, monitoring and updates in our shared cloud, in the EU or the US, are part of the subscription. A dedicated instance, or hosting in a specific country for data-residency reasons, covers the extra infrastructure and operations.</p>
+        <dl class="est">
+          <div><dt>Shared cloud, EU or US</dt><dd>Included</dd></div>
+          <div><dt>Dedicated instance, up to 2,000 employees</dt><dd>$750–1,500<small>per month</small></dd></div>
+          <div><dt>Dedicated instance, 2,001–10,000 employees</dt><dd>$1,500–3,000<small>per month</small></dd></div>
+          <div><dt>Hosting in a specific country, such as Azerbaijan</dt><dd>$750–3,450<small>per month</small></dd></div>
+        </dl>
+        <p class="foot">A dedicated instance comes to about $9–18 per employee per year at 1,000 employees, and $3.60–7.20 at 5,000.</p>
+      </div>
+      <div class="cost">
+        <div class="tags"><span class="how">Licence + yearly support</span><span class="plans">Usually with Enterprise</span></div>
+        <h4>On-premises deployment</h4>
+        <p>For organizations that must keep everything on their own servers. As is usual for on-premises software, you buy a one-time licence and then pay 15–25% of it each year for support and updates, about 22% on average. A yearly on-premises licence from the subscription price, with support included, is also possible.</p>
+        <p class="unit">Enterprise example</p>
+        <dl class="est">
+          <div><dt>One-time licence, 3–5 times the yearly price</dt><dd>$90–150<small>per employee, once</small></dd></div>
+          <div><dt>Support and updates</dt><dd>$13.50–37.50<small>per employee per year</small></dd></div>
+          <div><dt>Installation, standard</dt><dd>$5,000–10,000<small>one-time, per installation</small></dd></div>
+          <div><dt>Installation with high availability, an air-gapped network or on-site work</dt><dd>$15,000–25,000<small>one-time, per installation</small></dd></div>
+        </dl>
+        <p class="foot">The AI tutor, cloud voices and content updates need an outbound internet connection or a separately licensed local model.</p>
+      </div>
+      <div class="cost">
+        <div class="tags"><span class="how inc">Standard included</span><span class="plans">All plans</span></div>
+        <h4>Implementation and onboarding</h4>
+        <p>Standard onboarding is part of every plan: user import, a kickoff call with your admins, self-service single sign-on and a guide for allowlisting our sending domain. Deeper integration work is quoted once, when you need it.</p>
+        <dl class="est">
+          <div><dt>Standard onboarding</dt><dd>Included</dd></div>
+          <div><dt>Assisted SSO and directory sync, a dedicated sending domain and SMS sender registration</dt><dd>$1,500–3,000<small>one-time</small></dd></div>
+          <div><dt>HR system integration, such as SAP</dt><dd>$3,000–6,000<small>one-time</small></dd></div>
+          <div><dt>Extra admin training session</dt><dd>$400–1,200<small>per session</small></dd></div>
+        </dl>
+        <p class="foot">For 1,000 employees, the SSO and directory package comes to about $1.50–3.00 per employee, once.</p>
+      </div>
+      <div class="cost">
+        <div class="tags"><span class="how">Per project</span><span class="plans">All plans</span></div>
+        <h4>Custom content and extra languages</h4>
+        <p>The library covers most needs. When you want something of your own, we build it as a professional service, in your branding. Further languages, such as Arabic, are added on request.</p>
+        <dl class="est">
+          <div><dt>Custom lesson, 5–8 minutes, one language</dt><dd>$1,500–3,500</dd></div>
+          <div><dt>Custom hands-on lab</dt><dd>$3,000–7,000</dd></div>
+          <div><dt>Custom phishing template with landing page</dt><dd>$250–750</dd></div>
+          <div><dt>One lesson in a language beyond the ten included</dt><dd>$110–400</dd></div>
+        </dl>
+        <p class="foot">For 1,000 employees, a custom lesson comes to about $1.50–3.50 per employee, once.</p>
+      </div>
+    </div>
+
+    <div class="example">
+      <h4>Worked example</h4>
+      <p>1,000 employees in Azerbaijan on Professional, with 4 SMS and 2 voice-call simulations per person a year and assisted single sign-on setup.</p>
+      <dl class="est">
+        <div><dt>Subscription</dt><dd>$23,400<small>per year</small></dd></div>
+        <div><dt>SMS and voice-call simulations</dt><dd>$3,500–5,700<small>per year</small></dd></div>
+        <div><dt>AI tutor and course builder, within the allowance</dt><dd>$0</dd></div>
+        <div><dt>Assisted SSO and directory setup</dt><dd>$1,500–3,000<small>one-time</small></dd></div>
+        <div class="total"><dt>First year in total</dt><dd>$28,400–32,100<small>about $2.37–2.68 per employee per month</small></dd></div>
+        <div class="total"><dt>From the second year</dt><dd>$26,900–29,100<small>about $2.24–2.43 per employee per month</small></dd></div>
+      </dl>
+    </div>
+
+    <p class="taxnote"><strong>Taxes.</strong> Prices exclude VAT and sales tax. Standard VAT rates are 18% in Azerbaijan and Georgia, 19% in Germany, 20% in France, Türkiye, Ukraine and the United Kingdom, 21% in Romania and 22% in Italy. Business buyers in the EU usually account for VAT themselves under the reverse charge. In the United States, sales tax applies in some states.</p>
+  </section>
+
+  <section aria-labelledby="calc">
+    <div class="kicker">Estimate</div>
+    <h3 id="calc">What would it cost for your organization?</h3>
+    <p class="sub">Enter the number of employees to see the yearly subscription for each plan, before usage-based costs and taxes.</p>
+    <div class="calc">
+      <div class="panel">
+        <label for="seats">Employees</label>
+        <input id="seats" type="number" inputmode="numeric" min="1" max="200000" step="1" value="1000">
+        <input id="seatsRange" type="range" min="50" max="20000" step="50" value="1000" aria-label="Employees (slider)">
+        <div class="hint">Volume pricing for large organizations is agreed in the contract.</div>
+      </div>
+      <div class="panel">
+        <div class="totals" aria-live="polite">
+          <div class="total"><h4>Essentials</h4><div class="big" id="t1">–</div><div class="small" id="m1">–</div></div>
+          <div class="total f"><h4>Professional</h4><div class="big" id="t2">–</div><div class="small" id="m2">–</div></div>
+          <div class="total"><h4>Enterprise</h4><div class="big" id="t3">–</div><div class="small" id="m3">–</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="faq">
+    <div class="kicker">Questions</div>
+    <h3 id="faq">Good to know</h3>
+    <div class="faq">
+      <div><h4>Which languages are included?</h4><p>The learner app, the admin console and the training library are available in ten languages: Azerbaijani, English, Russian, Turkish, Georgian, Ukrainian, Romanian, German, French and Italian. Employees choose their own language. Other languages, such as Arabic, can be added on request and are quoted separately.</p></div>
+      <div><h4>What happens when an employee reports something suspicious?</h4><p>The email, file or link goes to the sandbox, where it is analysed without being opened or run. The case is then routed to your SOC or responsible security team, who confirm the verdict, respond, and let the employee know the outcome.</p></div>
+      <div><h4>How do threat-informed labs work?</h4><p>When an APT campaign is publicly disclosed, or organizations similar to yours are attacked, our team analyses the attack and rebuilds it as a safe hands-on lab and a short lesson, so employees practise against what attackers are doing now.</p></div>
+      <div><h4>What does the AI tutor send to the AI model?</h4><p>Only the lesson content and the learner's question. Names, email addresses, scores and other personal data are never sent. AI-generated courses are saved as drafts and are published only by a person on your team.</p></div>
+      <div><h4>How are SMS and voice simulations delivered?</h4><p>Through a carrier or telephony provider, either ours or one you already use, connected during onboarding. Carrier charges are passed on at cost. Typical figures by country are listed under Additional costs.</p></div>
+      <div><h4>Where does the platform run?</h4><p>In our cloud by default, in a dedicated cloud instance, or on your own servers. The deployment option, support level and volume pricing are agreed in the contract.</p></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap"><span class="maker"><img src="brand/safarov-industries.png" alt="Safarov Industries" width="1600" height="166"><span>© 2026 Safarov Industries. Cyclowareness is a Safarov Industries product.</span></span><span>All prices in USD, excluding taxes</span></div>
+</footer>
+
+<script>
+(function () {
+  var Y = '<span class="yes" aria-hidden="true"></span><span class="sr">Included</span>';
+  var N = '<span class="no" aria-hidden="true">–</span><span class="sr">Not included</span>';
+  var groups = [
+    ["Training and content", [
+      ["150+ trainings in 10 languages", "Short interactive lessons with simulations, hotspots and branching scenarios, written for non-technical staff and edited by native speakers. More languages, such as Arabic, on request.", 1],
+      ["20+ learning paths", "Ready-made programs for onboarding, finance, IT, executives and annual compliance, mapped to ISO/IEC 27001 and NIST CSF.", 1],
+      ["Narrated lessons with an animated guide", "Every lesson is read aloud with word-by-word highlighting; motion and timer settings keep it accessible.", 1],
+      ["Assignments, reminders and manager alerts", "Assign by department, person or path with due dates; reminders and escalations go out automatically.", 1],
+      ["Certificates, attestations and policy e-signature", "Audit-ready proof: versioned policies signed by each employee, module attestations and verifiable certificates.", 1],
+      ["Gamification", "League, points, streaks and badges that keep participation high.", 1],
+      ["Hands-on lab", "Virtual-machine exercises: read real-looking email headers, hunt a malicious process in a terminal, expose a fake sign-in page.", 1],
+      ["Custom branding", "Your logo and colors across the portal and notifications.", 1],
+      ["AI tutor", "Learners ask about the lesson by text or voice and get answers grounded in the lesson content.", 2],
+      ["Training studio with AI course generation", "Describe a topic and the AI drafts a complete lesson, checked automatically for format, safety and accuracy before your team reviews and publishes it.", 2],
+      ["Spaced review and nudges", "Short refreshers and reminders timed to what each person is likely to forget.", 2],
+      ["Custom certificate and attestation text", "Your own certificate wording and signer, and your own confirmation statement in every language.", 2]
+    ]],
+    ["Library, posters and news", [
+      ["Knowledge library", "Guides, checklists, short videos and how-tos, searchable and in each employee's language.", 1],
+      ["Awareness posters", "A growing poster collection to view in the portal and print for the office.", 1],
+      ["Security news", "Plain-language stories about current scams and attacks with what to do, plus a regular digest.", 1]
+    ]],
+    ["Attack simulation", [
+      ["Email phishing campaigns", "Ready-made and custom templates, scheduling and a teaching page shown the moment someone clicks.", 1],
+      ["Phishing reporting with rewards", "Employees report suspicious messages in one click and earn points; every report lowers their risk score.", 1],
+      ["SMS, voice-call, QR-code and USB-drop simulations", "Test the channels attackers use beyond email, including deepfake voice calls.", 2],
+      ["Threat-informed labs", "When an APT campaign is publicly disclosed, the attack is analysed and rebuilt as a safe hands-on lab and lesson.", 2],
+      ["Sector-specific rapid response", "When organizations like yours are targeted, a tailored lab and briefing are prepared for your teams with priority.", 3]
+    ]],
+    ["Security operations", [
+      ["Personal security dashboard and risk score", "Each employee sees their risk score, what drives it and the next steps to lower it.", 1],
+      ["Suspicious-content sandbox with SOC hand-off", "Reported files, links and emails are analysed without being opened, then routed to your SOC or security team to confirm the verdict and respond.", 2],
+      ["Incident risks and risk profiles", "Risks from clicks, incidents and missed training are tracked per person and department.", 2],
+      ["Closed loop", "An incident triggers targeted training, and the result is verified before the risk is closed.", 3],
+      ["Two-person approval", "Training materials and changes need a second approver before they reach employees.", 3],
+      ["Threat and policy intelligence", "Turn new threat reports and policy changes into training actions.", 3],
+      ["Security operations center view", "A live view of reports, incidents and campaigns for the security team.", 3]
+    ]],
+    ["Administration, integration and reporting", [
+      ["Admin console with guided tour", "Departments, CSV import, roles, two-step verification and a complete audit log.", 1],
+      ["Reports and scheduled report emails", "Completion, risk and phishing reports with CSV export and automatic delivery.", 1],
+      ["Single sign-on and Active Directory / LDAP", "OIDC/SAML sign-in and directory synchronization.", 2],
+      ["Webhooks and syslog (SIEM)", "Stream events to your SIEM and other security tools.", 2],
+      ["Compliance evidence pack", "Evidence for ISO/IEC 27001 A.6.3 and NIST CSF PR.AT audits.", 2],
+      ["HR system integration", "Joiners, movers and leavers are synchronized from your HR system, such as SAP.", 3],
+      ["Leadership dashboard", "Risk trends and program results for executives and the board.", 3]
+    ]]
+  ];
+  var html = "";
+  groups.forEach(function (g) {
+    html += '<tr class="group"><td colspan="4">' + g[0] + "</td></tr>";
+    g[1].forEach(function (r) {
+      html += '<tr><td><span class="name">' + r[0] + '</span><span class="desc">' + r[1] + "</span></td>" +
+        '<td class="c">' + (r[2] <= 1 ? Y : N) + "</td>" +
+        '<td class="c f">' + (r[2] <= 2 ? Y : N) + "</td>" +
+        '<td class="c">' + Y + "</td></tr>";
+    });
+  });
+  document.getElementById("rows").innerHTML = html;
+
+  var prices = [1.40, 1.95, 2.50];
+  var money = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
+  var seats = document.getElementById("seats");
+  var range = document.getElementById("seatsRange");
+  function update(n) {
+    n = Math.max(1, Math.min(200000, Math.round(Number(n) || 0)));
+    prices.forEach(function (p, i) {
+      document.getElementById("t" + (i + 1)).textContent = money.format(n * p * 12) + " / year";
+      document.getElementById("m" + (i + 1)).textContent = money.format(n * p) + " per month · " + n.toLocaleString("en-US") + " employees";
+    });
+  }
+  seats.addEventListener("input", function () { update(seats.value); if (Number(seats.value) >= 50 && Number(seats.value) <= 20000) range.value = seats.value; });
+  range.addEventListener("input", function () { seats.value = range.value; update(range.value); });
+  update(seats.value);
+})();
+</script>

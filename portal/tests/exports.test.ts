@@ -32,9 +32,11 @@ describe("toCsv", () => {
     expect(toCsv(["a", "b", "c"], [[null, undefined, ""], [null, null, null]])).toBe(`${BOM}a,b,c\r\n,,\r\n,,\r\n`);
   });
 
-  it("writes Dates as ISO strings and numbers/booleans via String()", () => {
+  it("writes Dates as Baku wall-clock time (what the app shows) and numbers/booleans via String()", () => {
     const d = new Date(Date.UTC(2024, 0, 2, 3, 4, 5, 6));
-    expect(toCsv(["d", "n", "f", "z", "b"], [[d, 42, 3.5, 0, true]])).toBe(`${BOM}d,n,f,z,b\r\n2024-01-02T03:04:05.006Z,42,3.5,0,true\r\n`);
+    expect(toCsv(["d", "n", "f", "z", "b"], [[d, 42, 3.5, 0, true]])).toBe(`${BOM}d,n,f,z,b\r\n2024-01-02 07:04,42,3.5,0,true\r\n`);
+    // Late evening UTC is already the next day in Baku (+04:00).
+    expect(toCsv(["d"], [[new Date(Date.UTC(2024, 11, 31, 21, 30))]])).toBe(`${BOM}d\r\n2025-01-01 01:30\r\n`);
   });
 
   it("escapes headers with the same rules as data cells", () => {
@@ -247,9 +249,11 @@ describe("toXlsx", () => {
       expect(row(3)).toContain('<c r="B3"><v>3.5</v></c>');
     });
 
-    it("writes dates as Excel serial days (UTC) with the date style", () => {
-      expect(WHEN.getTime() / 86_400_000 + 25569).toBe(45293.5);
-      expect(row(2)).toContain('<c r="C2" s="2"><v>45293.5</v></c>');
+    it("writes dates as Excel serial days in Baku time (+04:00) with the date style", () => {
+      // 12:00 UTC is 16:00 in Baku: two thirds of 2 January 2024 (serial 45293).
+      const serial = (WHEN.getTime() + 4 * 3_600_000) / 86_400_000 + 25569;
+      expect(serial).toBeCloseTo(45293 + 16 / 24, 9);
+      expect(row(2)).toContain(`<c r="C2" s="2"><v>${serial}</v></c>`);
     });
 
     it("writes booleans as t=\"b\" cells", () => {

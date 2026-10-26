@@ -8,14 +8,15 @@ type L = { az: string; en: string; ru: string };
 const l = (az: string, en: string, ru: string): L => ({ az, en, ru });
 export const tx = (v: L, locale: string) => v[locale as keyof L] ?? v.en;
 
-export type InboxItem = { id: string; sender: string; address: string; subject: L; snippet: L; verdict: "phishing" | "safe"; why: L };
+/** `sender`: the display name in each language (people and fictional brands keep their name). */
+export type InboxItem = { id: string; sender: L; address: string; subject: L; snippet: L; verdict: "phishing" | "safe"; why: L };
 export type LinkItem = { id: string; url: string; context: L; verdict: "safe" | "suspicious"; why: L };
 export type MfaItem = { id: string; situation: L; correct: "approve" | "deny" | "ignore"; why: L };
 
 export const INBOX: InboxItem[] = [
   {
     id: "i1",
-    sender: "Microsoft 365",
+    sender: l("Microsoft 365", "Microsoft 365", "Microsoft 365"),
     address: "no-reply@m365-security-alerts.com",
     subject: l("Parolunuzun müddəti bu gün bitir", "Your password expires today", "Срок действия пароля истекает сегодня"),
     snippet: l("Hesabınızı saxlamaq üçün indi parolu yeniləyin.", "Update your password now to keep your account.", "Обновите пароль сейчас, чтобы сохранить учётную запись."),
@@ -24,7 +25,7 @@ export const INBOX: InboxItem[] = [
   },
   {
     id: "i2",
-    sender: "Elvin Məmmədov",
+    sender: l("Elvin Məmmədov", "Elvin Mammadov", "Эльвин Мамедов"),
     address: "elvin.mammadov@demo.cyclowareness.com",
     subject: l("Hesabatın son versiyası", "Final version of the report", "Финальная версия отчёта"),
     snippet: l("Dünən danışdığımız düzəlişləri etdim, baxarsan.", "I made the changes we discussed yesterday, have a look.", "Внёс правки, которые мы вчера обсуждали, посмотри."),
@@ -33,16 +34,16 @@ export const INBOX: InboxItem[] = [
   },
   {
     id: "i3",
-    sender: "DocuSfera",
+    sender: l("DocuSfera", "DocuSfera", "DocuSfera"),
     address: "sign@docusfera-documents.net",
     subject: l("Sənəd imzanızı gözləyir", "A document is waiting for your signature", "Документ ждёт вашей подписи"),
-    snippet: l("Muqavile_2025.pdf · İmzalamaq üçün daxil olun.", "Muqavile_2025.pdf · Sign in to sign.", "Muqavile_2025.pdf · Войдите, чтобы подписать."),
+    snippet: l("Muqavile_2025.pdf · İmzalamaq üçün daxil olun.", "Contract_2025.pdf · Sign in to sign.", "Договор_2025.pdf · Войдите, чтобы подписать."),
     verdict: "phishing",
     why: l("Gözləmədiyiniz sənəd, kənar domen və giriş tələbi.", "An unexpected document, an outside domain and a sign-in request.", "Неожиданный документ, внешний домен и запрос входа."),
   },
   {
     id: "i4",
-    sender: "İT Dəstək",
+    sender: l("İT Dəstək", "IT Support", "ИТ-поддержка"),
     address: "it@demo.cyclowareness.com",
     subject: l("Planlı texniki işlər: şənbə 22:00", "Planned maintenance: Saturday 22:00", "Плановые работы: суббота 22:00"),
     snippet: l("Poçt xidməti 30 dəqiqə əlçatan olmayacaq. Heç nə etməyiniz lazım deyil.", "Mail will be unavailable for 30 minutes. You don't need to do anything.", "Почта будет недоступна 30 минут. Ничего делать не нужно."),
@@ -51,10 +52,10 @@ export const INBOX: InboxItem[] = [
   },
   {
     id: "i5",
-    sender: "HR Department",
+    sender: l("HR şöbəsi", "HR Department", "Отдел кадров"),
     address: "hr@demo-cyclowareness.co",
     subject: l("Bayram bonusu siyahısı", "Holiday bonus list", "Список праздничных бонусов"),
-    snippet: l("Əlavədəki faylı açıb adınızı yoxlayın: Bonus_list.xlsm", "Open the attachment and check your name: Bonus_list.xlsm", "Откройте вложение и найдите своё имя: Bonus_list.xlsm"),
+    snippet: l("Qoşmadakı faylı açıb adınızı yoxlayın: Bonus_list.xlsm", "Open the attachment and check your name: Bonus_list.xlsm", "Откройте вложение и найдите своё имя: Bonus_list.xlsm"),
     verdict: "phishing",
     why: l("Domen «-co» ilə saxtalaşdırılıb, makroslu .xlsm fayl.", "A look-alike “-co” domain and a macro-enabled .xlsm file.", "Поддельный домен «-co» и файл .xlsm с макросами."),
   },
@@ -135,7 +136,7 @@ export function isGame(v: string): v is GameKey {
 export function publicItems(game: GameKey, locale: string) {
   switch (game) {
     case "inbox-triage":
-      return INBOX.map((i) => ({ id: i.id, sender: i.sender, address: i.address, subject: tx(i.subject, locale), snippet: tx(i.snippet, locale) }));
+      return INBOX.map((i) => ({ id: i.id, sender: tx(i.sender, locale), address: i.address, subject: tx(i.subject, locale), snippet: tx(i.snippet, locale) }));
     case "link-detective":
       return LINKS.map((i) => ({ id: i.id, url: i.url, context: tx(i.context, locale) }));
     case "mfa-fatigue":

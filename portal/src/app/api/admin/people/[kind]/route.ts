@@ -1,7 +1,8 @@
 import { and, eq, ne } from "drizzle-orm";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { db, t } from "@/server/db";
-import { allowed, apiViewer, getViewer, twoFactorGap } from "@/server/auth/viewer";
+import { allowed, getViewer, twoFactorGap } from "@/server/auth/viewer";
+import { apiViewer, deniedResponse } from "@/server/auth/api";
 import { issueAccountLink } from "@/server/auth/links";
 import { listPeople } from "@/server/queries/admin";
 import { audit } from "@/server/services/audit";
@@ -10,22 +11,28 @@ import { sameOrigin } from "@/server/request";
 import { toCsv } from "@/lib/csv";
 import { todayInBaku } from "@/lib/time";
 
+const TEMPLATE_SAMPLE: Record<string, string[]> = {
+  az: ["Aysel Məmmədova", "aysel@example.az", "Maliyyə", "Mühasib", "learner", "", "+994501234567", "az"],
+  en: ["Aysel Mammadova", "aysel@example.com", "Finance", "Accountant", "learner", "", "+994501234567", "en"],
+  ru: ["Айсель Мамедова", "aysel@example.com", "Финансы", "Бухгалтер", "learner", "", "+994501234567", "ru"],
+};
+
 /** People list export and bulk invite links, as CSV. */
-export async function GET(_: Request, { params }: RouteContext<"/api/admin/people/[kind]">) {
+export async function GET(request: Request, { params }: RouteContext<"/api/admin/people/[kind]">) {
   const { kind } = await params;
   const v = await getViewer();
-  if (!v) return new Response("Unauthorized", { status: 401 });
-  if (twoFactorGap(v)) return new Response("Forbidden", { status: 403 });
+  if (!v) return deniedResponse(request, 401);
+  if (twoFactorGap(v)) return deniedResponse(request, 403, "/profile?section=security&required=1");
   const date = todayInBaku();
 
   if (kind === "export") {
-    if (!allowed(v, "people.read")) return new Response("Forbidden", { status: 403 });
+    if (!allowed(v, "people.read")) return deniedResponse(request, 403);
     if (!(await rateLimit(`people-export:${v.user.id}`, 20, 60 * 60_000)).ok) return new Response("Too many requests", { status: 429 });
     const tc = await getTranslations("common");
     const people = await listPeople(v);
     const csv = toCsv(
       ["name", "email", "department", "job_title", "role", "status", "risk_score", "xp", "last_active", "joined"],
-      people.map((p) => [p.name, p.email, p.departmentName ?? "", p.jobTitle ?? "", tc(`roles.${p.role}`), tc(`userStatus.${p.status}`), p.riskScore, p.xp, p.lastActiveAt?.toISOString() ?? "", p.createdAt.toISOString()]),
+      people.map((p) => [p.name, p.email, p.departmentName ?? "", p.jobTitle ?? "", tc(`roles.${p.role}`), tc(`userStatus.${p.status}`), p.riskScore, p.xp, p.lastActiveAt ?? null, p.createdAt]),
     );
     await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "people.exported", meta: { count: people.length } });
     return new Response(csv, { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="people-${date}.csv"`, "cache-control": "no-store" } });
@@ -35,7 +42,9 @@ export async function GET(_: Request, { params }: RouteContext<"/api/admin/peopl
   if (kind === "invite-links") return new Response("Method not allowed", { status: 405, headers: { allow: "POST" } });
 
   if (kind === "template") {
-    return new Response(toCsv(["name", "email", "department", "job_title", "role", "manager_email", "phone"], [["Aysel Məmmədova", "aysel@example.az", "Maliyyə", "Mühasib", "learner", "", "+994501234567"]]), {
+    // The column names are what the import reads; the sample row is in the admin's language.
+    const sample = TEMPLATE_SAMPLE[await getLocale()] ?? TEMPLATE_SAMPLE.en;
+    return new Response(toCsv(["name", "email", "department", "job_title", "role", "manager_email", "phone", "language"], [sample]), {
       headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="people-template.csv"` },
     });
   }
@@ -47,7 +56,7 @@ export async function POST(request: Request, { params }: RouteContext<"/api/admi
   const { kind } = await params;
   if (kind !== "invite-links") return new Response("Not found", { status: 404 });
   if (!sameOrigin(request)) return new Response("Forbidden", { status: 403 });
-  const v = await apiViewer("people.write");
+  const v = await apiViewer("people.write", request);
   if (v instanceof Response) return v;
   if (!(await rateLimit(`people-export:${v.user.id}`, 20, 60 * 60_000)).ok) return new Response("Too many requests", { status: 429 });
   const invited = await db()

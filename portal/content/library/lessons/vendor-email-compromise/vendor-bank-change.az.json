@@ -1,0 +1,719 @@
+{
+  "id": "vendor-bank-change",
+  "title": "Yeni bank rekvizitləri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "vb-tutor",
+      "beats": [
+        {
+          "id": "vb-b1",
+          "say": "Salam! Bu gün tanış təchizatçının adından göndərilən saxta ödəniş tələblərini ayırd etməyi öyrənəcəyik.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        },
+        {
+          "id": "vb-b2",
+          "say": "Ən təhlükəli cümlə budur: bank rekvizitlərimiz dəyişib, növbəti hesab-fakturanı yeni hesaba ödəyin.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "ofistechizat-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "OfisTəchizat MMC Mühasibatlıq"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@ofistechizat-az.example.net"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "Bank rekvizitlərimiz dəyişib"
+                }
+              ],
+              "time": "10:42",
+              "body": [
+                [
+                  {
+                    "text": "Hörmətli tərəfdaş,"
+                  }
+                ],
+                [
+                  {
+                    "text": "Audit ilə əlaqədar hesabımızı UlduzBanka keçirmişik."
+                  }
+                ],
+                [
+                  {
+                    "text": "Xahiş edirik, sentyabr hesab-fakturasını (14 860 manat) yeni hesaba ödəyin: ",
+                    "spot": "new-iban"
+                  },
+                  {
+                    "text": "AZ00ULDZ00000000400520007731",
+                    "spot": "new-iban"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "new-iban"
+        },
+        {
+          "id": "vb-b3",
+          "say": "Belə məktub hətta təchizatçının əsl ünvanından da gələ bilər, çünki onun poçt qutusunu ələ keçirmək mümkündür.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "vb-b4",
+          "say": "Qayda sadədir: məktubdakı nömrəyə yox, əvvəlcədən bildiyiniz nömrəyə zəng edin.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "vb-hotspot",
+      "prompt": "Bu məktubdakı xəbərdarlıq əlamətlərini tapın.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "ofistechizat-fake",
+        "from": {
+          "name": [
+            {
+              "text": "OfisTəchizat MMC Mühasibatlıq"
+            }
+          ],
+          "address": [
+            {
+              "text": "muhasibat@ofistechizat-az.example.net",
+              "spot": "domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Bank rekvizitlərimiz dəyişib"
+          }
+        ],
+        "time": "10:42",
+        "body": [
+          [
+            {
+              "text": "Hörmətli tərəfdaş,"
+            }
+          ],
+          [
+            {
+              "text": "Audit ilə əlaqədar hesabımızı UlduzBanka keçirmişik."
+            }
+          ],
+          [
+            {
+              "text": "Xahiş edirik, sentyabr hesab-fakturasını (14 860 manat) yeni hesaba ödəyin: ",
+              "spot": "new-iban"
+            },
+            {
+              "text": "AZ00ULDZ00000000400520007731",
+              "spot": "new-iban"
+            }
+          ],
+          [
+            {
+              "text": "Ödəniş bu gün saat 16:00-dək edilməlidir, köhnə hesab bağlanır.",
+              "spot": "urgency"
+            }
+          ],
+          [
+            {
+              "text": "Suallar üçün yalnız bu nömrəyə zəng edin: +994 50 000 72 19",
+              "spot": "phone"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Fərqli domen",
+          "explain": "Təchizatçının ünvanı ofistechizat.example idi. Əlavə «-az» hissəsi və fərqli sonluq bunun oxşar saxta domen olduğunu göstərir."
+        },
+        {
+          "id": "new-iban",
+          "label": "Yeni hesab nömrəsi",
+          "explain": "Bu fırıldağın bütün məqsədi bank rekvizitlərini dəyişməkdir. Ora göndərilən pulu geri qaytarmaq çətindir."
+        },
+        {
+          "id": "urgency",
+          "label": "Vaxt təzyiqi",
+          "explain": "Son tarix sizi yoxlamadan ödəməyə tələsdirir. Əsl tərəfdaş yoxlamaq üçün sizə vaxt verir."
+        },
+        {
+          "id": "phone",
+          "label": "Məktubdakı nömrə",
+          "explain": "Bu nömrəyə zəng etsəniz, fırıldaqçı cavab verəcək. Bunun əvəzinə nömrəni müqavilədən götürün."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "vb-sim-inbox",
+      "environment": "inbox",
+      "title": "Mühasibatlığın poçt qutusu",
+      "intro": "Ödənişlərlə siz məşğul olursunuz. Dörd məktubu açın və hər biri üçün düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "invoice-normal",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "ofistechizat",
+            "from": {
+              "name": [
+                {
+                  "text": "OfisTəchizat MMC"
+                }
+              ],
+              "address": [
+                {
+                  "text": "satis@ofistechizat.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Sentyabr hesab-fakturası"
+              }
+            ],
+            "time": "09:15",
+            "body": [
+              [
+                {
+                  "text": "Salam, sentyabr hesab-fakturası qoşmadadır."
+                }
+              ],
+              [
+                {
+                  "text": "Ödənişi həmişəki kimi müqavilədəki hesaba edin. Hörmətlə, Səbinə Kərimova"
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Faktura_2026_09.pdf"
+                  }
+                ],
+                "size": "180 KB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Qoşmanı aç",
+              "kind": "open-attachment",
+              "outcome": "safe",
+              "feedback": "Tanış ünvan, gözlənilən PDF hesab-faktura, hesab da dəyişmir. Bu, adi məktubdur."
+            },
+            {
+              "id": "safe",
+              "label": "Təhlükəsiz kimi qeyd et",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Düzdür. Burada nə yeni hesab var, nə də vaxt təzyiqi."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Ehtiyatlı olmaq yaxşıdır, amma burada heç bir şübhəli əlamət yoxdur. Gözlənilən hesab-fakturanı müqavilədəki hesaba ödəyə bilərsiniz."
+            }
+          ]
+        },
+        {
+          "id": "bank-change-fake",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "ofistechizat-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "OfisTəchizat MMC Mühasibatlıq"
+                }
+              ],
+              "address": [
+                {
+                  "text": "muhasibat@ofistechizat-az.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Bank rekvizitlərimiz dəyişib"
+              }
+            ],
+            "time": "10:42",
+            "body": [
+              [
+                {
+                  "text": "Hörmətli tərəfdaş,"
+                }
+              ],
+              [
+                {
+                  "text": "Audit ilə əlaqədar hesabımızı UlduzBanka keçirmişik."
+                }
+              ],
+              [
+                {
+                  "text": "Xahiş edirik, sentyabr hesab-fakturasını (14 860 manat) yeni hesaba ödəyin: ",
+                  "spot": "new-iban"
+                },
+                {
+                  "text": "AZ00ULDZ00000000400520007731",
+                  "spot": "new-iban"
+                }
+              ],
+              [
+                {
+                  "text": "Ödəniş bu gün saat 16:00-dək edilməlidir, köhnə hesab bağlanır.",
+                  "spot": "urgency"
+                }
+              ],
+              [
+                {
+                  "text": "Suallar üçün yalnız bu nömrəyə zəng edin: +994 50 000 72 19",
+                  "spot": "phone"
+                }
+              ]
+            ]
+          },
+          "say": "Göndərənin domeninə baxın.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür: oxşar domen, yeni hesab və son tarix. Bildirmə düyməsi yoxdursa, məktubu təhlükəsizlik komandasına yönləndirin."
+            },
+            {
+              "id": "confirm",
+              "label": "Cavab ver: yeni hesabı qəbul edirik",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Ödəniş fırıldaqçıya gedərdi. Yeni bank rekvizitlərini heç vaxt yalnız məktuba əsasən qəbul etməyin."
+            },
+            {
+              "id": "ask",
+              "label": "Cavab ver: bu doğrudur?",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Fırıldaqçı cavab yazıb «bəli» deyəcək. Bunu yalnız əvvəlcədən bildiyiniz nömrə ilə yoxlamaq olar."
+            }
+          ]
+        },
+        {
+          "id": "bank-change-real-box",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "ofistechizat",
+            "from": {
+              "name": [
+                {
+                  "text": "Səbinə Kərimova"
+                }
+              ],
+              "address": [
+                {
+                  "text": "satis@ofistechizat.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "RE: Sentyabr hesab-fakturası"
+              }
+            ],
+            "time": "11:20",
+            "body": [
+              [
+                {
+                  "text": "Bağışlayın, bunu qeyd etməyi unutmuşduq."
+                }
+              ],
+              [
+                {
+                  "text": "Xahiş edirik, bu hesab-fakturanı yeni hesabımıza ödəyin: AZ00ULDZ00000000400520007731"
+                }
+              ],
+              [
+                {
+                  "text": "Təsdiqləmək üçün bu nömrəyə zəng edin: +994 55 000 31 84"
+                }
+              ]
+            ]
+          },
+          "say": "Ünvan əsldir. Yenə də ehtiyatlı olun.",
+          "actions": [
+            {
+              "id": "verify",
+              "label": "Müqavilədəki nömrəyə zəng et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Poçt qutusu ələ keçirilə bilər, amma müqavilədəki nömrə sizi əsl təchizatçı ilə əlaqələndirir."
+            },
+            {
+              "id": "call-mail",
+              "label": "Məktubdakı nömrəyə zəng et",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "O nömrə fırıldaqçıya məxsusdur və o, hər şeyi təsdiqləyəcək. Öz qeydlərinizdəki nömrədən istifadə edin."
+            },
+            {
+              "id": "safe",
+              "label": "Təhlükəsiz kimi qeyd et",
+              "kind": "mark-safe",
+              "outcome": "compromised",
+              "feedback": "Ünvan əsldir, amma poçt qutusu ələ keçirilib. Yeni bank rekvizitlərini həmişə ayrıca yoxlayın."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Yaxşı addımdır. Təhlükəsizlik komandası təchizatçını da xəbərdar edə bilər."
+            }
+          ]
+        },
+        {
+          "id": "boss-urgent",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "Anar Hüseynov"
+                }
+              ],
+              "address": [
+                {
+                  "text": "anar.huseynov@idare-mail.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Təcili: Kür Tikinti avansı"
+              }
+            ],
+            "time": "12:05",
+            "body": [
+              [
+                {
+                  "text": "Kür Tikintinin avansını bu gün onların yeni hesabına köçürün, rekvizitləri sabah göndərəcəklər."
+                }
+              ],
+              [
+                {
+                  "text": "İclasdayam, zəng etməyin. Anar"
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Ad rəhbərinizindir, amma domen idare.example deyil, «zəng etməyin» ifadəsi isə xəbərdarlıq əlamətidir."
+            },
+            {
+              "id": "verify",
+              "label": "Rəhbərin tanış nömrəsinə zəng et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Əla. Rəhbər iclasda olsa belə, bir dəqiqəlik yoxlama böyük itkinin qarşısını alır."
+            },
+            {
+              "id": "pay",
+              "label": "Cavab ver: bu gün ödəyirik",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Pul fırıldaqçıya gedərdi. Təzyiq və gizlilik tələbi ödənişi dayandırmağa əsasdır."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "vb-sim-call",
+      "environment": "call",
+      "title": "Təchizatçıdan zəng",
+      "intro": "Bir azdan təchizatçının adından zəng gəlir. Zəng edənin dediklərini oxuyun və cavabınızı seçin.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat-fake",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 55 000 31 84"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "man-2"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab ver",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Zəngə cavab vermək təhlükəli deyil. Bundan sonra nə deyəcəyiniz vacibdir."
+            },
+            {
+              "id": "decline",
+              "label": "Rədd et",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olar. Sonra təchizatçının müqavilədəki nömrəsinə özünüz zəng edin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pitch",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat-fake",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 55 000 31 84"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "man-2"
+          },
+          "say": "Salam, OfisTəchizatdan Zaur Quliyevdir. Yeni rekvizitlərimizi aldınız? Bu gün ödəməsəniz, sifarişiniz dayandırılacaq.",
+          "spoken": "Salam, <breath> OfisTəchizatdan Zaur Quliyevdir. Yeni rekvizitlərimizi aldınız? Bu gün ödəməsəniz, ee, sifarişiniz dayandırılacaq.",
+          "actions": [
+            {
+              "id": "agree",
+              "label": "Yaxşı, bu gün yeni hesaba ödəyirik",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Bu zəng də tələnin bir hissəsidir: məqsəd məktubu inandırıcı göstərməkdir. Zəng edənin nömrəsi heç nəyi sübut etmir."
+            },
+            {
+              "id": "own-check",
+              "label": "Dəyişikliyi öz qaydamızla yoxlayacağıq",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əsl təchizatçı yoxlamanı anlayışla qarşılayır."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Yaxşı seçimdir. İndi müqavilədəki nömrəyə özünüz zəng edin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat-fake",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 55 000 31 84"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "man-2"
+          },
+          "say": "Rəhbəriniz razılıq verib, onunla danışmışam. Ödəniş tapşırığının şəklini mənə göndərin, yoxlayım.",
+          "spoken": "Rəhbəriniz razılıq verib, onunla danışmışam. <breath> Ödəniş tapşırığının şəklini mənə göndərin, yoxlayım.",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Şəkli göndərirəm",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Ödəniş tapşırığında hesab və imza məlumatları var. Fırıldaqçılar onlardan yeni sənədləri saxtalaşdırmaq üçün istifadə edirlər."
+            },
+            {
+              "id": "verify",
+              "label": "Rəhbərimə özüm zəng edəcəyəm",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Əla. «Rəhbər razılıq verib» sözlərini yalnız rəhbərin özü təsdiqləyə bilər."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Düzdür. Təzyiq artanda zəngi bitirmək ən yaxşı cavabdır."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Zəng bitdi. İndi nə etməli?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat-fake",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 55 000 31 84"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "man-2"
+          },
+          "actions": [
+            {
+              "id": "contract",
+              "label": "Müqavilədəki nömrəyə zəng et",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əsl təchizatçı heç nəyin dəyişmədiyini deyəcək, siz də fırıldağı bildirəcəksiniz."
+            },
+            {
+              "id": "redial",
+              "label": "Zəng gələn nömrəyə geri zəng et",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "O nömrə fırıldaqçıya aiddir. Yalnız öz qeydlərinizdəki nömrə ilə yoxlayın."
+            },
+            {
+              "id": "ignore",
+              "label": "Heç nə etmə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Fırıldaqçı başqa həmkarınızı sınayacaq. Təhlükəsizlik komandasına bildirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "vb-order",
+      "prompt": "Yeni bank rekvizitləri gələndə addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "pause",
+          "label": "Ödənişi dayandırın"
+        },
+        {
+          "id": "known-number",
+          "label": "Nömrəni müqavilədən və ya əvvəlki qeydlərdən götürün"
+        },
+        {
+          "id": "call",
+          "label": "Zəng edib dəyişiklik barədə soruşun"
+        },
+        {
+          "id": "second",
+          "label": "İkinci həmkarın təsdiqini alın"
+        },
+        {
+          "id": "update",
+          "label": "Yalnız bundan sonra rekvizitləri yeniləyin"
+        }
+      ],
+      "explain": "Bank rekvizitləri yalnız tanış nömrə ilə yoxlandıqdan və ikinci həmkar təsdiqlədikdən sonra dəyişdirilir."
+    },
+    {
+      "type": "choice",
+      "id": "vb-choice",
+      "question": {
+        "prompt": "Pulu artıq yeni hesaba köçürmüsünüz. İlk növbədə nə etməlisiniz?",
+        "options": [
+          {
+            "id": "call-bank",
+            "label": "Köçürməni dayandırmaq üçün dərhal öz bankıma zəng edirəm və təhlükəsizlik komandasına bildirirəm",
+            "correct": true,
+            "feedback": "Düzdür. Bank nə qədər tez xəbər tutsa, pulu dayandırmaq şansı bir o qədər çox olar."
+          },
+          {
+            "id": "wait",
+            "label": "Təchizatçının cavabını gözləyirəm",
+            "correct": false,
+            "feedback": "Hər keçən saat pulu daha da uzaqlaşdırır. Gözləmək vaxt itkisidir."
+          },
+          {
+            "id": "email-again",
+            "label": "Həmin ünvana yazıb pulun qaytarılmasını xahiş edirəm",
+            "correct": false,
+            "feedback": "O poçt qutusunu fırıldaqçı oxuyur. Pulu yalnız bank dayandıra bilər."
+          }
+        ]
+      },
+      "explain": "Səhv köçürmədə hər şeyi vaxt həll edir: əvvəlcə bank, sonra təhlükəsizlik komandası. Məktubları sübut kimi saxlayın."
+    },
+    {
+      "type": "recap",
+      "id": "vb-recap",
+      "points": [
+        "Bank rekvizitləri dəyişəndə ödənişi dayandırın",
+        "Məktubdakı nömrəyə yox, bildiyiniz nömrəyə zəng edin",
+        "Artıq ödəmisiniz? Dərhal banka və təhlükəsizlik komandasına zəng edin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

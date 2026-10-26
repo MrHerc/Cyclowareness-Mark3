@@ -1,14 +1,17 @@
 import type { ReactNode } from "react";
+import { useFormatter, useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 
 /**
  * Lightweight server-rendered SVG charts. Every chart carries a visually hidden data table
- * (as in the original) so screen readers get the numbers.
+ * (as in the original) so screen readers get the numbers. Numbers go through next-intl's
+ * formatter (server only: these components are never rendered in the browser).
  */
 
 type Point = { label: string; value: number };
 
 function HiddenTable({ caption, rows, headers }: { caption: string; rows: Point[]; headers: [string, string] }) {
+  const format = useFormatter();
   return (
     <table className="sr-only">
       <caption>{caption}</caption>
@@ -22,7 +25,7 @@ function HiddenTable({ caption, rows, headers }: { caption: string; rows: Point[
         {rows.map((r) => (
           <tr key={r.label}>
             <td>{r.label}</td>
-            <td>{r.value}</td>
+            <td>{format.number(r.value)}</td>
           </tr>
         ))}
       </tbody>
@@ -56,6 +59,7 @@ export function AreaChart({
   height?: number;
   tone?: "brand" | "safe" | "risk";
 }) {
+  const format = useFormatter();
   const W = 600;
   const H = 200;
   const pad = 6;
@@ -76,7 +80,7 @@ export function AreaChart({
         <div aria-hidden className="absolute inset-y-0 left-0 w-8">
           {ticks.map((v) => (
             <span key={v} className="absolute right-1.5 -translate-y-1/2 text-right text-tab-sm text-ink-subtle tabular-nums" style={{ top: `${(y(v) / H) * 100}%` }}>
-              {v}
+              {format.number(v)}
               {suffix}
             </span>
           ))}
@@ -100,7 +104,7 @@ export function AreaChart({
               className="absolute -translate-x-full -translate-y-1/2 rounded-pill bg-ink px-2 py-0.5 text-tab-sm font-bold text-white tabular-nums"
               style={{ left: "100%", top: `${(y(last.value) / H) * 100}%` }}
             >
-              {last.value}
+              {format.number(last.value)}
               {suffix}
             </span>
           ) : null}
@@ -191,6 +195,7 @@ export function Sparkline({
 
 /** 30-day activity heatmap (one square per day). */
 export function Heatmap({ days, caption, headers }: { days: { label: string; value: number }[]; caption: string; headers: [string, string] }) {
+  const format = useFormatter();
   const max = Math.max(1, ...days.map((d) => d.value));
   return (
     <figure>
@@ -198,7 +203,7 @@ export function Heatmap({ days, caption, headers }: { days: { label: string; val
         {days.map((d) => (
           <span
             key={d.label}
-            title={`${d.label}: ${d.value}`}
+            title={`${d.label}: ${format.number(d.value)}`}
             className="aspect-square rounded-[5px]"
             style={{ background: d.value ? `color-mix(in oklab, var(--brand) ${20 + (d.value / max) * 80}%, white)` : "var(--color-sunken)" }}
           />
@@ -211,9 +216,10 @@ export function Heatmap({ days, caption, headers }: { days: { label: string; val
 
 /** Horizontal stacked share bar (people by risk level). */
 export function StackBar({ parts, className }: { parts: { value: number; className: string; label: string }[]; className?: string }) {
+  const format = useFormatter();
   const total = parts.reduce((s, p) => s + p.value, 0) || 1;
   return (
-    <div className={cn("flex h-3 w-full overflow-hidden rounded-pill bg-sunken", className)} role="img" aria-label={parts.map((p) => `${p.label}: ${p.value}`).join(", ")}>
+    <div className={cn("flex h-3 w-full overflow-hidden rounded-pill bg-sunken", className)} role="img" aria-label={parts.map((p) => `${p.label}: ${format.number(p.value)}`).join(", ")}>
       {parts.map((p) => (p.value ? <div key={p.label} className={p.className} style={{ width: `${(p.value / total) * 100}%` }} /> : null))}
     </div>
   );
@@ -221,6 +227,8 @@ export function StackBar({ parts, className }: { parts: { value: number; classNa
 
 /** Campaign funnel: Sent → Opened → Clicked → Reported. */
 export function Funnel({ steps }: { steps: { label: ReactNode; value: number; share?: number; tone: "brand" | "risk" | "safe" | "neutral" }[] }) {
+  const format = useFormatter();
+  const tc = useTranslations("common");
   const max = Math.max(1, ...steps.map((s) => s.value));
   return (
     <ol className="grid gap-2.5">
@@ -229,8 +237,8 @@ export function Funnel({ steps }: { steps: { label: ReactNode; value: number; sh
           <div className="mb-1.5 flex items-baseline justify-between gap-3 text-caption">
             <span className={cn("font-semibold", s.tone === "risk" ? "text-risk-600" : s.tone === "safe" ? "text-safe-700" : "text-ink")}>{s.label}</span>
             <span className="tabular-nums text-ink-muted">
-              <b className="text-ink">{s.value}</b>
-              {s.share !== undefined ? ` · ${s.share}%` : ""}
+              <b className="text-ink">{format.number(s.value)}</b>
+              {s.share !== undefined ? ` · ${tc("units.percent", { value: format.number(s.share) })}` : ""}
             </span>
           </div>
           <div className="h-2 overflow-hidden rounded-pill bg-sunken">

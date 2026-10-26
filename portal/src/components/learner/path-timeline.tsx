@@ -68,6 +68,7 @@ export function PathTimeline({ items, today }: { items: PathItem[]; today: strin
                     {done ? (
                       <Pill tone="safe">
                         <Check />
+                        <span className="sr-only">{t("completed")}</span>
                       </Pill>
                     ) : m.status === "in_progress" || m.status === "awaiting_attestation" ? (
                       <Pill tone="reward">{t("complete", { percent: m.percent })}</Pill>
@@ -93,7 +94,7 @@ export function PathTimeline({ items, today }: { items: PathItem[]; today: strin
                     </span>
                     {m.due && !done ? (
                       <span className={cn("font-semibold", m.due < today ? "text-risk-600" : "text-ink-muted")}>
-                        {tc("time.due", { date: format.dateTime(new Date(`${m.due}T12:00:00`), { day: "numeric", month: "short" }) })}
+                        {tc("time.due", { date: format.dateTime(new Date(`${m.due}T12:00:00+04:00`), { day: "numeric", month: "short" }) })}
                       </span>
                     ) : null}
                   </div>

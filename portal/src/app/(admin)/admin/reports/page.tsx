@@ -1,4 +1,4 @@
-import { getLocale, getTranslations } from "next-intl/server";
+import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { and, avg, count, desc, eq, isNotNull } from "drizzle-orm";
 import { FileDown, FileSpreadsheet, FileText, ShieldCheck, Star, AlertTriangle } from "lucide-react";
 import { db, t } from "@/server/db";
@@ -25,7 +25,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/admin/re
   const v = await requirePermission("reports.read");
   const sp = await searchParams;
   const locale = await getLocale();
-  const tr = await getTranslations("admin.reports");
+  const [tr, format] = await Promise.all([getTranslations("admin.reports"), getFormatter()]);
   const [departments, scope, feedback, schedules] = await Promise.all([
     getDepartments(v.tenant.id),
     scopeDepartmentIds(v),
@@ -78,13 +78,13 @@ export default async function ReportsPage({ searchParams }: PageProps<"/admin/re
             <p className="text-body font-bold">{tr(`kinds.${k}.title`)}</p>
             <p className="mt-1 flex-1 text-caption text-ink-muted">{tr(`kinds.${k}.body`)}</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <ButtonAnchor size="sm" variant="secondary" icon={<FileText />} href={`/api/admin/reports/${k}?format=csv${qs ? `&${qs}` : ""}`}>
+              <ButtonAnchor size="sm" variant="secondary" icon={<FileText />} href={`/api/admin/reports/${k}?format=csv${qs ? `&${qs}` : ""}`} aria-label={tr("downloadAs", { report: tr(`kinds.${k}.title`), format: "CSV" })}>
                 CSV
               </ButtonAnchor>
-              <ButtonAnchor size="sm" variant="secondary" icon={<FileSpreadsheet />} href={`/api/admin/reports/${k}?format=xlsx${qs ? `&${qs}` : ""}`}>
+              <ButtonAnchor size="sm" variant="secondary" icon={<FileSpreadsheet />} href={`/api/admin/reports/${k}?format=xlsx${qs ? `&${qs}` : ""}`} aria-label={tr("downloadAs", { report: tr(`kinds.${k}.title`), format: "Excel" })}>
                 Excel
               </ButtonAnchor>
-              <ButtonLink size="sm" variant="secondary" icon={<FileDown />} href={`/print/report/${k}${qs ? `?${qs}` : ""}`} target="_blank">
+              <ButtonLink size="sm" variant="secondary" icon={<FileDown />} href={`/print/report/${k}${qs ? `?${qs}` : ""}`} target="_blank" aria-label={tr("downloadAs", { report: tr(`kinds.${k}.title`), format: "PDF" })}>
                 PDF
               </ButtonLink>
             </div>
@@ -111,7 +111,7 @@ export default async function ReportsPage({ searchParams }: PageProps<"/admin/re
                   <span className="text-tab text-ink-subtle">{tr("ratings", { count: Number(f.n) })}</span>
                   <span className="inline-flex w-14 items-center justify-end gap-1 font-bold tabular-nums">
                     <Star className="size-4 fill-laurel-500 text-laurel-600" />
-                    {f.r.toFixed(1)}
+                    {format.number(f.r, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                   </span>
                 </li>
               ))}

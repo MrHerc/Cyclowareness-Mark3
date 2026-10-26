@@ -1,0 +1,558 @@
+{
+  "id": "drag-test",
+  "title": "Pəncərəni sürüşdürün",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "dt-tutor",
+      "beats": [
+        {
+          "id": "dt-b1",
+          "say": "Salam! Bəzi saytlar hesaba daxil olmaq üçün kiçik pəncərə açır. Bu gün saxta pəncərəni tanımağı öyrənəcəksiniz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "dt-b2",
+          "say": "Fırıldaqçı belə pəncərəni səhifənin içində, şəkil kimi çəkir. Hətta ünvan sətri də düzgün görünür.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "ispoct-fake",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "İşPoçt: giriş"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "https://poct.idare.example/giris",
+                    "spot": "fake-bar"
+                  }
+                ],
+                [
+                  {
+                    "text": "Sənədə baxmaq üçün iş e-poçtunuzla daxil olun."
+                  }
+                ]
+              ],
+              "buttons": [
+                "Daxil ol",
+                "Ləğv et"
+              ]
+            }
+          },
+          "highlight": "fake-bar"
+        },
+        {
+          "id": "dt-b3",
+          "say": "Yoxlama sadədir: pəncərəni tutub brauzerdən kənara sürüşdürün. Saxta pəncərə səhifədən çıxa bilməz.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "dt-b4",
+          "say": "Parol meneceriniz parolu özü doldurmursa, dayanın. Ünvanı yeni vərəqdə özünüz yazın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "dt-swipe",
+      "prompt": "Hansı giriş pəncərəsinə etibar etmək olar?",
+      "cards": [
+        {
+          "id": "edge-cut",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İşPoçt: giriş"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Pəncərəni yana sürüşdürdünüz."
+                }
+              ],
+              [
+                {
+                  "text": "O, səhifənin kənarına çatıb kəsildi."
+                }
+              ]
+            ],
+            "buttons": [
+              "Daxil ol"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Əsl pəncərə brauzerdən çıxır və ekranın istənilən yerinə keçə bilir. Kəsilirsə, deməli, səhifənin içində çəkilmiş şəkildir."
+        },
+        {
+          "id": "moves-out",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İşPoçt: giriş"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Pəncərəni yana sürüşdürdünüz: o, brauzerdən çıxıb iş masasına keçdi."
+                }
+              ],
+              [
+                {
+                  "text": "ParolSeyf parolu özü təklif etdi."
+                }
+              ]
+            ],
+            "buttons": [
+              "Daxil ol"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Pəncərə brauzerdən ayrı hərəkət edir, parol meneceri də saytı tanıyır. Bunlar əsl pəncərənin əlamətləridir."
+        },
+        {
+          "id": "no-fill",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "system",
+            "title": [
+              {
+                "text": "ParolSeyf"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bu sayt üçün saxlanmış parol tapılmadı."
+                }
+              ],
+              [
+                {
+                  "text": "Pəncərədə yazılan ünvan: poct.idare.example"
+                }
+              ]
+            ],
+            "buttons": [
+              "Bağla"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Parol meneceri pəncərədəki yazını yox, saytın əsl ünvanını yoxlayır. Parol tapmırsa, deməli, bu, başqa saytdır."
+        },
+        {
+          "id": "moves-along",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İşPoçt: giriş"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Brauzerin özünü yana sürüşdürdünüz."
+                }
+              ],
+              [
+                {
+                  "text": "Giriş pəncərəsi də onunla birlikdə yerini dəyişdi."
+                }
+              ]
+            ],
+            "buttons": [
+              "Daxil ol"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Əsl pəncərə öz yerində qalır. Brauzerlə birlikdə hərəkət edirsə, deməli, səhifənin bir hissəsidir."
+        },
+        {
+          "id": "own-tab",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Yeni vərəq: poct.idare.example"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Ünvanı özünüz yazdınız."
+                }
+              ],
+              [
+                {
+                  "text": "Parol meneceri parolu doldurdu."
+                }
+              ]
+            ],
+            "buttons": [
+              "Daxil ol"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ünvanı özünüz yazanda saxta pəncərənin araya girməyə yolu qalmır. Bu, ən etibarlı üsuldur."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "dt-sim",
+      "environment": "browser",
+      "title": "Tender sənədi",
+      "intro": "Təchizatçı tender sənədinin linkini göndərib. Sayt sənədi göstərmək üçün hesabınıza daxil olmağınızı istəyir. Diqqətli olun.",
+      "steps": [
+        {
+          "id": "doc-page",
+          "label": "Tender sənədi: ofis mebelinin satınalınması",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tender-baza",
+            "url": [
+              {
+                "text": "https://tender-baza.example.net/sened/4471"
+              }
+            ]
+          },
+          "say": "Sənəd kilidlidir. Sayt iş hesabınızla daxil olmağı təklif edir.",
+          "actions": [
+            {
+              "id": "open-login",
+              "label": "İşPoçt ilə daxil ol",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "Düyməyə basmaq hələ təhlükəli deyil. Əsl yoxlama indi açılacaq pəncərədir."
+            },
+            {
+              "id": "check-address",
+              "label": "Ünvanı yoxla",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Bu, iş poçtunuz deyil, tender saytıdır. Sonra açılacaq giriş pəncərəsinə çox diqqətlə baxın."
+            },
+            {
+              "id": "close-tab",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Ehtiyatlı seçimdir. Poçtunuzu özünüz açın, sənədi isə təchizatçıdan başqa yolla istəyin.",
+              "next": "own-tab"
+            }
+          ]
+        },
+        {
+          "id": "popup",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İşPoçt: giriş"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "https://poct.idare.example/giris"
+                }
+              ],
+              [
+                {
+                  "text": "Sənədə baxmaq üçün iş e-poçtunuzla daxil olun."
+                }
+              ],
+              [
+                {
+                  "text": "E-poçt: aysel.quliyeva@idare.example"
+                }
+              ]
+            ],
+            "buttons": [
+              "Daxil ol",
+              "Ləğv et"
+            ]
+          },
+          "say": "Pəncərədə düzgün ünvan görünür. Amma bu, hələ heç nəyi sübut etmir.",
+          "actions": [
+            {
+              "id": "drag",
+              "label": "Pəncərəni brauzerdən kənara sürüşdür",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzgün yoxlamadır. Görək pəncərə brauzerdən çıxa bilirmi."
+            },
+            {
+              "id": "autofill",
+              "label": "ParolSeyf ilə doldur",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Yaxşı fikirdir. Parol meneceri saytın əsl ünvanını yoxlayır.",
+              "next": "pm-check"
+            },
+            {
+              "id": "type-pass",
+              "label": "Parolu yaz və daxil ol",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Pəncərədəki ünvan sətri sadəcə şəkil idi. Parolunuz tender saytının sahibinə getdi.",
+              "next": "leaked"
+            },
+            {
+              "id": "cancel",
+              "label": "Ləğv et",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Yaxşı. Əmin olmadığınız pəncərəyə heç vaxt parol yazmayın.",
+              "next": "own-tab"
+            }
+          ]
+        },
+        {
+          "id": "drag-result",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İşPoçt: giriş"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Pəncərə səhifənin kənarına çatdı və kəsildi."
+                }
+              ],
+              [
+                {
+                  "text": "O, brauzerdən çıxmadı."
+                }
+              ]
+            ],
+            "buttons": [
+              "Daxil ol",
+              "Ləğv et"
+            ]
+          },
+          "say": "Pəncərə səhifənin kənarında kəsildi. Əsl pəncərə heç vaxt belə olmur.",
+          "actions": [
+            {
+              "id": "close-it",
+              "label": "Pəncərəni və vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Səhifədən çıxa bilməyən pəncərə saxtadır, ona görə oraya heç nə yazmayın.",
+              "next": "own-tab"
+            },
+            {
+              "id": "type-anyway",
+              "label": "Yenə də daxil ol",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Pəncərənin saxta olduğunu artıq görmüşdünüz. Parolunuz fırıldaqçıya getdi.",
+              "next": "leaked"
+            },
+            {
+              "id": "report",
+              "label": "Saytı İT dəstəyinə bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. İT dəstəyi saytı bloklayıb həmkarlarınızı da qoruya bilər.",
+              "next": "own-tab"
+            }
+          ]
+        },
+        {
+          "id": "pm-check",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "system",
+            "title": [
+              {
+                "text": "ParolSeyf"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "tender-baza.example.net üçün saxlanmış parol yoxdur."
+                }
+              ]
+            ],
+            "buttons": [
+              "Əllə yaz",
+              "Bağla"
+            ]
+          },
+          "say": "Parol meneceri bu sayt üçün parol tapmadı.",
+          "actions": [
+            {
+              "id": "type-manual",
+              "label": "Parolu əllə yaz",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Parol meneceri haqlı idi: bu sayt sizin poçtunuz deyil. Yazdığınız parol fırıldaqçıya getdi.",
+              "next": "leaked"
+            },
+            {
+              "id": "stop",
+              "label": "Dayan və pəncərəni bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Parol meneceri parolu doldurmayanda ən yaxşı addım dayanmaqdır."
+            }
+          ]
+        },
+        {
+          "id": "own-tab",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "ispoct",
+            "brand": "İşPoçt",
+            "url": [
+              {
+                "text": "https://poct.idare.example/giris"
+              }
+            ],
+            "fields": [
+              "İş e-poçtu",
+              "Parol"
+            ],
+            "button": "Daxil ol"
+          },
+          "say": "Ünvanı yeni vərəqdə özünüz yazdınız. Parol meneceri parolu doldurdu.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Daxil ol",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Düzdür. Ünvanı özünüz yazanda saxta pəncərənin araya girməyə yolu qalmır.",
+              "next": "doc-page"
+            },
+            {
+              "id": "check",
+              "label": "Ünvanı yoxla",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Bu, sizin əsl iş poçtunuzdur və parol meneceri onu tanıdı. Daxil olmaq təhlükəsizdir.",
+              "next": "doc-page"
+            }
+          ]
+        },
+        {
+          "id": "leaked",
+          "label": "Sənəd tapılmadı",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tender-baza",
+            "url": [
+              {
+                "text": "https://tender-baza.example.net/sened/4471"
+              }
+            ]
+          },
+          "say": "Parolunuz əldən çıxdı, sənəd isə heç açılmadı. İndi tez tərpənmək lazımdır.",
+          "actions": [
+            {
+              "id": "change-report",
+              "label": "Parolu dəyiş və İT dəstəyinə zəng et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Parolu yeni vərəqdə dəyişin, İT dəstəyi isə bütün açıq sessiyaları bağlasın."
+            },
+            {
+              "id": "retry",
+              "label": "Yenidən daxil ol",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Sayt parolunuzu ikinci dəfə toplayır. Bu, sənəd deyil, parol tələsidir."
+            },
+            {
+              "id": "ignore",
+              "label": "Heç nə etmə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Fırıldaqçı həmin parolla poçtunuzu artıq aça bilər. Parolu dəyişin və dərhal bildirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "dt-order",
+      "prompt": "Giriş pəncərəsi şübhəli görünəndə atılacaq addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "drag",
+          "label": "Pəncərəni brauzerdən kənara sürüşdürün"
+        },
+        {
+          "id": "close",
+          "label": "Çıxa bilmirsə, pəncərəni və vərəqi bağlayın"
+        },
+        {
+          "id": "own-tab",
+          "label": "Ünvanı yeni vərəqdə yazın və orada daxil olun"
+        },
+        {
+          "id": "report",
+          "label": "Saytı İT dəstəyinə bildirin"
+        }
+      ],
+      "explain": "Əvvəl yoxlayın, sonra bağlayın, sonra ünvanı özünüz yazın. Saytı bildirin ki, həmkarlarınız da qorunsun."
+    },
+    {
+      "type": "recap",
+      "id": "dt-recap",
+      "points": [
+        "Giriş pəncərəsini brauzerdən kənara sürüşdürün: saxta pəncərə səhifədən çıxa bilməz",
+        "Parol meneceri parolu doldurmursa, dayanın",
+        "Şübhə yaranarsa, ünvanı yeni vərəqdə özünüz yazın"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

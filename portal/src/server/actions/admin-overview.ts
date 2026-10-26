@@ -2,12 +2,13 @@
 
 import { and, eq, sql } from "drizzle-orm";
 import { refresh } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { db, t } from "../db";
 import { actionViewer } from "../auth/viewer";
 import { audit } from "../services/audit";
 import { notifyUsers } from "../services/notify";
 import { scopeDepartmentIds } from "../queries/admin";
-import { pick } from "../../i18n/config";
+import { LOCALES, isLocale, pick } from "../../i18n/config";
 import { isUuid } from "../../lib/ids";
 
 export async function hideSetupAction(hidden: boolean): Promise<void> {
@@ -45,10 +46,13 @@ export async function remindAwaitingAction(moduleId: string | null): Promise<{ c
     .innerJoin(t.modules, eq(t.modules.id, t.moduleProgress.moduleId))
     .where(and(eq(t.users.tenantId, v.tenant.id), eq(t.moduleProgress.status, "awaiting_attestation"), moduleId ? eq(t.moduleProgress.moduleId, moduleId) : undefined));
   const targets = rows.filter((r) => !scope || (r.departmentId && scope.has(r.departmentId)));
+  // The in-app note in each person's language; its title is the email subject ("Confirmation needed: …").
+  const bodies = new Map(await Promise.all(LOCALES.map(async (l) => [l, (await getTranslations({ locale: l, namespace: "admin.overview" }))("confirmReminderBody")] as const)));
+  const body = (locale: string) => bodies.get(isLocale(locale) ? locale : "en") ?? "";
   let sent = 0;
   // Deferred: the job runner sends the emails, so the request does not wait for the mail server once per person.
   for (const r of targets) {
-    sent += await notifyUsers(db(), v.tenant.id, [r.userId], "confirmation_reminder", { module: pick(r.title, r.locale), link: `/learn/${r.slug}?confirm=1` }, { title: pick(r.title, r.locale), body: "✓", href: `/learn/${r.slug}?confirm=1` }, { defer: true });
+    sent += await notifyUsers(db(), v.tenant.id, [r.userId], "confirmation_reminder", { module: pick(r.title, r.locale), link: `/learn/${r.slug}?confirm=1` }, { body, href: `/learn/${r.slug}?confirm=1` }, { defer: true });
   }
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "attestation.reminder", meta: { count: sent, moduleId } });
   refresh();

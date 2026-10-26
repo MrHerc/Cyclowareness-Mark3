@@ -1,13 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
-import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { Mail } from "lucide-react";
+import { Mail, Smartphone } from "lucide-react";
 import { requestPhoneCodeAction, verifyPhoneCodeAction, type AuthState } from "@/server/actions/auth";
 import { Field, Input } from "@/components/ui/field";
 import { SubmitButton } from "@/components/ui/submit-button";
+import { ButtonLink } from "@/components/ui/button";
+import { authCard, authInput, authInputIcon, authLead, authNotice, authTitle } from "../../ui";
 
 /**
  * A failure before the server answers (offline, a dropped connection, a restart or deploy) rejects the action, and
@@ -33,25 +34,28 @@ export function PhoneForm({ next }: { next: string }) {
   const errorText = err ? t(`errors.${err}` as "errors.generic") : null;
 
   return (
-    <div className="rounded-2xl border border-line bg-surface p-7 shadow-raised sm:p-8">
+    <div className={authCard}>
       {stage === "phone" ? (
         <form action={send} className="grid gap-5" noValidate>
           <div>
-            <h1 className="text-headline font-bold">{t("phone.title")}</h1>
-            <p className="mt-2 text-body-sm text-ink-muted">{t("phone.subtitle")}</p>
+            <h1 className={authTitle}>{t("phone.title")}</h1>
+            <p className={authLead}>{t("phone.subtitle")}</p>
           </div>
           <Field label={t("phone.label")} htmlFor="phone" error={errorText}>
-            <Input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" autoFocus placeholder={t("phone.placeholder")} defaultValue={phone} aria-invalid={!!errorText} />
+            <div className="relative">
+              <Smartphone aria-hidden className={authInputIcon} />
+              <Input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" autoFocus placeholder={t("phone.placeholder")} defaultValue={phone} aria-invalid={!!errorText} className={authInput} />
+            </div>
           </Field>
           <SubmitButton size="lg">{t("phone.send")}</SubmitButton>
         </form>
       ) : (
         <form action={verify} className="grid gap-5" noValidate>
           <div>
-            <h1 className="text-headline font-bold">{t("phone.codeTitle")}</h1>
-            <p className="mt-2 text-body-sm text-ink-muted">{t("phone.codeSubtitle", { phone: phone ?? "" })}</p>
+            <h1 className={authTitle}>{t("phone.codeTitle")}</h1>
+            <p className={authLead}>{t("phone.codeSubtitle", { phone: phone ?? "" })}</p>
           </div>
-          {sendState?.devCode ? <p className="rounded-md bg-warn-50 px-3.5 py-2.5 text-caption text-warn-700">{t("phone.devCode", { code: sendState.devCode })}</p> : null}
+          {sendState?.devCode ? <p className={`${authNotice} bg-warn-50 text-warn-700`}>{t("phone.devCode", { code: sendState.devCode })}</p> : null}
           <input type="hidden" name="phone" value={phone ?? ""} />
           <input type="hidden" name="next" value={next} />
           <Field label={t("phone.codeLabel")} htmlFor="code" error={errorText}>
@@ -63,20 +67,21 @@ export function PhoneForm({ next }: { next: string }) {
               pattern="[0-9]{6}"
               maxLength={6}
               autoFocus
-              className="text-center font-mono text-title tracking-[0.4em]"
+              className="h-14 text-center font-mono text-title tracking-[0.4em]"
               aria-invalid={!!errorText}
             />
           </Field>
           <SubmitButton size="lg">{t("phone.verify")}</SubmitButton>
         </form>
       )}
-      <Link
-        href={`/sign-in?next=${encodeURIComponent(next)}`}
-        className="mt-5 flex items-center justify-center gap-2 text-caption font-semibold text-brand-600 hover:underline pointer-coarse:mt-2 pointer-coarse:-mb-3 pointer-coarse:min-h-11"
-      >
-        <Mail className="size-4" />
+      <p className="my-5 flex items-center gap-3 text-tab font-medium text-ink-subtle">
+        <span aria-hidden className="h-px flex-1 bg-line" />
+        {t("or")}
+        <span aria-hidden className="h-px flex-1 bg-line" />
+      </p>
+      <ButtonLink href={`/sign-in?next=${encodeURIComponent(next)}`} variant="secondary" icon={<Mail />} className="w-full">
         {t("withEmail")}
-      </Link>
+      </ButtonLink>
     </div>
   );
 }

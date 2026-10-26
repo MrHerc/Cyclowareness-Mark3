@@ -1,0 +1,323 @@
+{
+  "id": "first-15-minutes",
+  "title": "İlk 15 dəqiqə",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Linkə kliklədiniz və ya parolunuzu yazdınız? Bu, hər kəsin başına gələ bilər.",
+          "mood": "talk",
+          "gesture": "nod",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Ən vacibi ilk on beş dəqiqədir: oğurlanmış parollardan çox vaxt dərhal istifadə edirlər.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "stat",
+            "value": "15",
+            "label": "həlledici dəqiqə"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Parolu əsl saytda dəyişin, təhlükəsizlik komandasına bildirin və məktubu saxlayın.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Baş verəni gizlətməyin. Susmaq hücumçuya vaxt qazandırır, dürüst bildiriş isə hamını qoruyur.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "after-the-click",
+      "environment": "desktop",
+      "title": "Parolunuzu yazdınız",
+      "intro": "Poçt parolunuzu saxta səhifədə yazdınız və bunu indicə anladınız. Növbəti addımlar sizdən asılıdır.",
+      "steps": [
+        {
+          "id": "retry-trap",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Giriş alınmadı"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Parol yanlışdır. Yenidən cəhd edin və ya başqa parol yazın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Bağla",
+              "Yenidən cəhd et"
+            ]
+          },
+          "say": "Səhifə xəta göstərir.",
+          "actions": [
+            {
+              "id": "retry",
+              "label": "Yenidən cəhd et",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Saxta saytlar xəta göstərir ki, parolu yenidən, bəzən də başqa bir parolu yazasınız."
+            },
+            {
+              "id": "close",
+              "label": "Bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür, daha heç nə yazmayın. Səhifəni bağlayın və növbəti addıma keçin."
+            }
+          ]
+        },
+        {
+          "id": "the-email",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "ispoct-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "İşPoçt Admin"
+                }
+              ],
+              "address": [
+                {
+                  "text": "admin@ispoct-mail.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Poçt qutunuz 98% doludur"
+              }
+            ],
+            "time": "09:41",
+            "body": [
+              [
+                {
+                  "text": "Məktublarınız silinməsin deyə yaddaş həcmini artırın: "
+                },
+                {
+                  "text": "ispoct-mail.example.net/yer",
+                  "link": {
+                    "label": "ispoct-mail.example.net/yer",
+                    "href": "https://ispoct-mail.example.net/yer"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Məktub hələ də gələnlər qutunuzdadır.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bildirişiniz sayəsində təhlükəsizlik komandası məktubu başqalarının gələnlər qutusundan da silə bilir."
+            },
+            {
+              "id": "forward",
+              "label": "Təhlükəsizlik komandasına yönləndir",
+              "kind": "forward",
+              "outcome": "safe",
+              "feedback": "Yaxşıdır. Bildirmə düyməsi yoxdursa, belə edin, sonra onlara zəng də edin."
+            },
+            {
+              "id": "delete",
+              "label": "Heç kim görməsin deyə sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Məktub sübutdur. Silinsə, təhlükəsizlik komandası hücumun izinə düşə bilməz."
+            }
+          ]
+        },
+        {
+          "id": "change-password",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "ispoct",
+            "brand": "İşPoçt",
+            "url": [
+              {
+                "text": "https://poct.idare.example/parol"
+              }
+            ],
+            "fields": [
+              "Cari parol",
+              "Yeni parol"
+            ],
+            "button": "Parolu dəyiş"
+          },
+          "say": "Ünvanı özünüz yazdınız. Parolu dəyişin.",
+          "actions": [
+            {
+              "id": "change",
+              "label": "Parolu dəyiş",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Düzdür, sayt əsldir. Yeni parol köhnəsinə bənzəməməlidir."
+            },
+            {
+              "id": "later",
+              "label": "Sabah dəyişərəm",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Oğurlanmış parollardan tez istifadə edirlər. Gözləmək hücumçuya vaxt verir."
+            }
+          ]
+        },
+        {
+          "id": "reused",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Bu parol başqa yerlərdə də istifadə olunur"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Köhnə poçt parolunuz ofis portalında və Kontakto səhifəsində də istifadə olunur."
+                }
+              ]
+            ],
+            "buttons": [
+              "Sonra",
+              "Hamısını dəyiş"
+            ]
+          },
+          "actions": [
+            {
+              "id": "update",
+              "label": "Hamısını dəyiş",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Düzdür. Hücumçular oğurlanmış parolu başqa saytlarda da yoxlayır."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Eyni paroldan istifadə edən hər hesab indi təhlükə altındadır. Hamısını bu gün dəyişin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "mistake-first-step",
+      "prompt": "Hər səhvi ilk addımla uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "clicked",
+          "left": "Kliklədim, amma heç nə yazmadım",
+          "right": "Səhifəni bağlayın və məktubu bildirin"
+        },
+        {
+          "id": "password",
+          "left": "Parolumu saxta səhifədə yazdım",
+          "right": "Onu əsl saytda dəyişin və bildirin"
+        },
+        {
+          "id": "code",
+          "left": "Zəng edənə doğrulama kodumu dedim",
+          "right": "Dərhal təhlükəsizlik komandasına zəng edin"
+        },
+        {
+          "id": "card",
+          "left": "Kart məlumatlarımı yazdım",
+          "right": "Kartınızın üzərindəki nömrə ilə banka zəng edin"
+        }
+      ],
+      "explain": "Hər dəfə bildirin: mütəxəssislər sizin görə bilmədiyiniz izləri yoxlayır."
+    },
+    {
+      "type": "choice",
+      "id": "approved-push",
+      "question": {
+        "prompt": "Telefonunuza giriş sorğusu gəldi və səhvən «Təsdiqlə» düyməsinə basdınız. İndi nə etməli?",
+        "options": [
+          {
+            "id": "report",
+            "label": "Dərhal təhlükəsizlik komandasına zəng edirəm və parolumu dəyişirəm",
+            "correct": true,
+            "feedback": "Düzdür. Siz hücumçunu içəri buraxdınız, təhlükəsizlik komandası isə sessiyaları dayandırıb onu hesabdan çıxaracaq."
+          },
+          {
+            "id": "nothing",
+            "label": "Heç nə, cəmi bir dəfə idi",
+            "correct": false,
+            "feedback": "Bir təsdiq kifayətdir: hücumçu artıq hesabınızdadır."
+          },
+          {
+            "id": "phone-off",
+            "label": "Telefonu söndürürəm",
+            "correct": false,
+            "feedback": "Telefonu söndürmək hücumçunu çıxarmır. O, artıq içəridədir."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "mfa-phone"
+        }
+      },
+      "explain": "Səhvən verilmiş təsdiq də, başqasına deyilmiş kod da eyni təcili addımı tələb edir: dərhal bildirin."
+    },
+    {
+      "type": "password",
+      "id": "new-password",
+      "prompt": "Oğurlanmış parolun yerinə yenisini yaradın: köhnəsinə heç bənzəməsin.",
+      "targetScore": 4,
+      "tips": [
+        "Köhnə parolu sadəcə azca dəyişməyin: Aysel2026 əvəzinə Aysel2027 yaramaz",
+        "Dörd təsadüfi sözü boşluqla birləşdirin",
+        "Yeni parolu parol menecerində saxlayın"
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Daha heç nə yazmayın: səhifəni bağlayın, məktubu isə saxlayın.",
+        "Parolu əsl saytda və ondan istifadə etdiyiniz bütün digər yerlərdə dəyişin.",
+        "Kodu kiməsə dediniz və ya «Təsdiqlə» düyməsinə basdınız? Dərhal təhlükəsizlik komandasına zəng edin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

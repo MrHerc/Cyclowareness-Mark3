@@ -1,0 +1,526 @@
+{
+  "id": "consent-screen",
+  "title": "İcazə ekranı",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ac1-tutor",
+      "beats": [
+        {
+          "id": "ac1-b1",
+          "say": "Salam! Bu gün parol əvəzinə icazə istəyən bir tələ ilə tanış olacağıq.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "ac1-b2",
+          "say": "Tətbiq deyir: sənədə baxmaq üçün mənə məktublarınızı oxumağa və sizin adınızdan məktub göndərməyə icazə verin.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "permission",
+              "brandRef": "w2b-dokubaxis",
+              "app": "DokuBaxış Viewer",
+              "permissions": [
+                {
+                  "label": [
+                    {
+                      "text": "Profilinizi görmək"
+                    }
+                  ],
+                  "needed": true
+                },
+                {
+                  "label": [
+                    {
+                      "text": "Məktublarınızı oxumaq və sizin adınızdan məktub göndərmək",
+                      "spot": "mail"
+                    }
+                  ],
+                  "needed": false
+                },
+                {
+                  "label": [
+                    {
+                      "text": "Siz sistemdə olmayanda da giriş imkanını saxlamaq"
+                    }
+                  ],
+                  "needed": false
+                }
+              ]
+            }
+          },
+          "highlight": "mail"
+        },
+        {
+          "id": "ac1-b3",
+          "say": "Bircə klik kifayətdir və tətbiq artıq poçt qutunuzdadır. Parolunuzu dəyişsəniz belə, icazə qüvvədə qalır.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        },
+        {
+          "id": "ac1-b4",
+          "say": "Qayda belədir: tətbiqin adını və icazələri oxuyun, tanımadığınız tətbiqə isə heç vaxt icazə verməyin.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "ac1-hotspot",
+      "prompt": "Bu tətbiqə lazım olmayan tələbləri tapın.",
+      "artifact": {
+        "kind": "permission",
+        "brandRef": "w2b-dokubaxis",
+        "app": "DokuBaxış Viewer",
+        "permissions": [
+          {
+            "label": [
+              {
+                "text": "Profilinizi görmək"
+              }
+            ],
+            "needed": true
+          },
+          {
+            "label": [
+              {
+                "text": "Məktublarınızı oxumaq və sizin adınızdan məktub göndərmək",
+                "spot": "mail"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "Bütün fayllarınızı oxumaq və dəyişmək",
+                "spot": "files"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "Kontaktlarınızı görmək",
+                "spot": "contacts"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "Siz sistemdə olmayanda da giriş imkanını saxlamaq",
+                "spot": "offline"
+              }
+            ],
+            "needed": false
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "mail",
+          "label": "Poçt və göndərmə",
+          "explain": "Sənədə baxmaq üçün poçta giriş lazım deyil. Bu icazə ilə tətbiq sizin adınızdan fişinq məktubları göndərə bilər."
+        },
+        {
+          "id": "files",
+          "label": "Bütün fayllar",
+          "explain": "Bir sənədi göstərən tətbiqə bütün fayllarınız lazım deyil. Bu, məlumat oğurlamaq üçündür."
+        },
+        {
+          "id": "contacts",
+          "label": "Kontaktlar",
+          "explain": "Kontakt siyahınız növbəti hücum üçün hədəf siyahısıdır. Sənədə baxmaq üçün o lazım deyil."
+        },
+        {
+          "id": "offline",
+          "label": "Daimi giriş",
+          "explain": "Bu o deməkdir ki, tətbiq siz hesabdan çıxandan sonra, hətta parolu dəyişəndən sonra da hesabınızda qalır."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "ac1-swipe",
+      "prompt": "Hansı icazə tələbi normaldır, hansı tələdir? Kartı sürüşdürün.",
+      "cards": [
+        {
+          "id": "meeting-app",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "gorus",
+            "app": "Görüş",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Təqviminizi görmək"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Profilinizi görmək"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Görüş ofisin tanış tətbiqidir və yalnız işi üçün lazım olanı istəyir."
+        },
+        {
+          "id": "greeting-card",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "w2b-bayram-tebriki",
+            "app": "Bayram Təbriki",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Kontaktlarınızı görmək"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Sizin adınızdan məktub göndərmək"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Təbrik açıqcasına nə kontaktlarınız, nə də məktub göndərmək hüququ lazımdır. Bu, sizin adınızdan fişinq yaymaq üçündür."
+        },
+        {
+          "id": "salary-calc",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "w2b-maas-kalkulyatoru",
+            "app": "Maaş Kalkulyatoru",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Məktublarınızı oxumaq"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Siz sistemdə olmayanda da giriş imkanını saxlamaq"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Kalkulyatora poçtunuz lazım deyil. Daimi giriş isə tətbiqi hesabınızın içində saxlayır."
+        },
+        {
+          "id": "editor",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "senedyaz",
+            "app": "SənədYaz",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Seçdiyiniz faylı açmaq və saxlamaq"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Tanış redaktor yalnız seçdiyiniz faylı istəyir. Bu icazə onun işinə uyğundur."
+        },
+        {
+          "id": "pdf-tool",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "pdf-birlesdirici",
+            "app": "PDF Birləşdirici Pro",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Bütün fayllarınızı oxumaq və dəyişmək"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Məktublarınızı oxumaq və göndərmək"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Faylları birləşdirmək üçün nə poçt, nə də bütün fayllarınız lazımdır. Belə tətbiqə icazə verməyin."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ac1-sim",
+      "environment": "browser",
+      "title": "Paylaşılmış büdcə sənədi",
+      "intro": "Həmkarınız Nigarın adından sizinlə büdcə sənədi paylaşılıb. Linki açdınız, indi hər ekranda qərar verin.",
+      "steps": [
+        {
+          "id": "real-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "ispoct",
+            "brand": "İşPoçt",
+            "url": [
+              {
+                "text": "https://giris.idare.example/icaze"
+              }
+            ],
+            "fields": [
+              "E-poçt",
+              "Parol"
+            ],
+            "button": "Daxil ol"
+          },
+          "say": "Ünvana baxın: bu, ofisin əsl giriş səhifəsidir.",
+          "actions": [
+            {
+              "id": "sign-in",
+              "label": "Daxil ol",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Ünvan əsldir, ona görə parol cinayətkara getmir. Tələ növbəti pəncərədədir."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Bu da təhlükəsizdir. Amma tutaq ki, daxil oldunuz: gəlin növbəti pəncərəyə baxaq."
+            }
+          ]
+        },
+        {
+          "id": "consent",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "w2b-dokubaxis",
+            "app": "DokuBaxış Viewer",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Profilinizi görmək"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Məktublarınızı oxumaq və sizin adınızdan məktub göndərmək"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Bütün fayllarınızı oxumaq və dəyişmək"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Siz sistemdə olmayanda da giriş imkanını saxlamaq"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "Sənəd açılmazdan əvvəl bu pəncərə göründü.",
+          "actions": [
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Sənədə baxmaq üçün nə poçt, nə bütün fayllara giriş, nə də daimi giriş lazımdır.",
+              "next": "known-app"
+            },
+            {
+              "id": "allow",
+              "label": "İcazə ver",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Tətbiq indi məktublarınızı oxuyur və sizin adınızdan yazır. Parolu dəyişmək onu dayandırmır."
+            }
+          ]
+        },
+        {
+          "id": "connected-apps",
+          "label": "Qoşulmuş tətbiqlər: DokuBaxış Viewer, poçta və fayllara daimi giriş",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "ispoct",
+            "url": [
+              {
+                "text": "https://hesab.idare.example/tetbiqler"
+              }
+            ]
+          },
+          "say": "Ertəsi gün hesabınıza baxırsınız.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "İcazəni ləğv etmələri üçün İT dəstəyinə bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Tətbiqi yalnız icazəni ləğv etməklə çıxarmaq olar, mütəxəssis isə izləri də yoxlayacaq."
+            },
+            {
+              "id": "password-only",
+              "label": "Yalnız parolu dəyiş",
+              "kind": "update",
+              "outcome": "risky",
+              "feedback": "Parol dəyişir, amma tətbiqin icazəsi qalır. İcazəni İT dəstəyi ləğv etməlidir."
+            },
+            {
+              "id": "leave",
+              "label": "Olduğu kimi saxla",
+              "kind": "ignore",
+              "outcome": "compromised",
+              "feedback": "Tətbiq hər gün məktublarınızı oxumağa davam edəcək. Elə bu gün bildirin."
+            }
+          ]
+        },
+        {
+          "id": "known-app",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "idare-komekci",
+            "app": "İdarə Köməkçisi",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Profilinizi görmək"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Təqviminizi görmək"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "say": "İndi isə ofisin öz köməkçi tətbiqi icazə istəyir.",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "İcazə ver",
+              "kind": "allow",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Tanış iş tətbiqi yalnız işi üçün lazım olanı istəyir."
+            },
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "risky",
+              "feedback": "Ehtiyatlı olmaq başadüşüləndir, amma bu tətbiq tanışdır və az şey istəyir. Şübhəniz olsa, İT dəstəyindən soruşun."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "ac1-choice",
+      "question": {
+        "prompt": "Ən təhlükəli icazələr hansılardır? Uyğun olanların hamısını seçin.",
+        "options": [
+          {
+            "id": "send",
+            "label": "Sizin adınızdan məktub göndərmək",
+            "correct": true,
+            "feedback": "Düzdür. Bu icazə ilə tətbiq sizin adınızdan həmkarlarınıza fişinq məktubları göndərir."
+          },
+          {
+            "id": "offline",
+            "label": "Siz sistemdə olmayanda da giriş imkanını saxlamaq",
+            "correct": true,
+            "feedback": "Düzdür. Bu o deməkdir ki, tətbiq siz hesabdan çıxandan sonra da hesabınızda qalır."
+          },
+          {
+            "id": "profile",
+            "label": "Adınızı və profil şəklinizi görmək",
+            "correct": false,
+            "feedback": "Bu, adi giriş üçün lazım olan kiçik icazədir."
+          }
+        ],
+        "multi": true
+      },
+      "explain": "Poçt, fayllar və daimi giriş ən böyük icazələrdir. Onları tanımadığınız tətbiqə heç vaxt verməyin."
+    },
+    {
+      "type": "recap",
+      "id": "ac1-recap",
+      "points": [
+        "İcazə ekranında tətbiqin adını və icazələri oxuyun",
+        "Tanımadığınız tətbiqə poçta və fayllara giriş, eləcə də daimi giriş verməyin",
+        "Səhvən icazə vermisinizsə, onu İT dəstəyi ləğv etsin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

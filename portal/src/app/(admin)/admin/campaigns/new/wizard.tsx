@@ -58,7 +58,7 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
     channel ? { step: 1, label: t("channelLabel"), value: t(`channel.${channel}`) } : null,
     tpl ? { step: 2, label: t("template"), value: templateText(tpl.name, locale) } : null,
     audience ? { step: 3, label: t("audience"), value: audience === "all" ? t("wholeOrg") : (dept?.name ?? "") } : null,
-    when ? { step: 4, label: tw("schedule"), value: when === "later" ? tw("notYet") : scheduledAt ? whenLabel(scheduledAt) : "" } : null,
+    when ? { step: 4, label: t("sendTime"), value: when === "later" ? tw("notYet") : scheduledAt ? whenLabel(scheduledAt) : "" } : null,
   ].filter(Boolean) as { step: number; label: string; value: string }[];
 
   const card = (active: boolean, disabled = false) =>
@@ -139,7 +139,7 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
           </div>
           {audience === "department" ? (
             <Select value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} className="max-w-sm" aria-label={tw("oneDepartment")}>
-              <option value="">—</option>
+              <option value="">{tw("pickDepartment")}</option>
               {departments.map((d) => (
                 <option key={d.id} value={d.id}>
                   {d.name} ({d.people})

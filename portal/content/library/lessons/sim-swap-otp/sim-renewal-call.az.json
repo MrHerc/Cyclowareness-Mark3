@@ -1,0 +1,404 @@
+{
+  "id": "sim-renewal-call",
+  "title": "SIM yeniləmə zəngi",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ss2-tutor",
+      "beats": [
+        {
+          "id": "ss2-b1",
+          "say": "Salam! İndi isə operator adından gələn bir zəngə baxaq: SIM kartınızı pulsuz yeniləmək təklifi.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "ss2-b2",
+          "say": "Ekranda operatorun adı və tanış nömrə görünə bilər. Hər ikisini saxtalaşdırmaq mümkündür.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "w2b-sahiltel-fake",
+              "caller": [
+                {
+                  "text": "SahilTel Müştəri Xidməti"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 12 000 44 10",
+                  "spot": "number"
+                }
+              ],
+              "label": "Bakı"
+            }
+          },
+          "highlight": "number"
+        },
+        {
+          "id": "ss2-b3",
+          "say": "Sizə gələn kodu zəng edən heç kimə deməyin, hətta özünü operatorun, bankın və ya polisin əməkdaşı kimi təqdim etsə belə.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        },
+        {
+          "id": "ss2-b4",
+          "say": "Operatorunuz hesab üçün PIN kod təklif edirsə, onu təyin edin. Bu, SIM kartın dəyişdirilməsini çətinləşdirir.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "ss2-choice",
+      "question": {
+        "prompt": "Operatordan zəng edən deyir: «SIM kartınızı yeniləyirik, kodu mənə oxuyun». Nə edirsiniz?",
+        "options": [
+          {
+            "id": "hang-up",
+            "label": "Zəngi bitirirəm və operatorun rəsmi nömrəsinə özüm zəng edirəm",
+            "correct": true,
+            "feedback": "Düzdür. Rəsmi nömrəyə özünüz zəng edəndə kiminlə danışdığınızı dəqiq bilirsiniz."
+          },
+          {
+            "id": "read-code",
+            "label": "Nömrə operatora məxsusdur, ona görə kodu oxuyuram",
+            "correct": false,
+            "feedback": "Ekrandakı nömrəni saxtalaşdırmaq olar. Bu kod nömrənizi başqasının kartına köçürür."
+          },
+          {
+            "id": "ask-id",
+            "label": "Zəng edənin adını və əməkdaş nömrəsini soruşuram",
+            "correct": false,
+            "feedback": "Cinayətkar ad da, nömrə də uydura bilər. Yeganə real yoxlama özünüzün etdiyiniz zəngdir."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2b-sahiltel-fake",
+            "caller": [
+              {
+                "text": "SahilTel Müştəri Xidməti"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 44 10"
+              }
+            ],
+            "label": "Bakı"
+          }
+        }
+      },
+      "explain": "Kod istəyən zəng ən təhlükəli zəngdir. Zəngi bitirin və operatora özünüz zəng edin."
+    },
+    {
+      "type": "simulation",
+      "id": "ss2-sim",
+      "environment": "call",
+      "title": "SahilTel-dən zəng",
+      "intro": "Telefonunuza zəng gəlir. Zəng edənin dediklərini oxuyun və cavabınızı seçin.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2b-sahiltel-fake",
+            "caller": [
+              {
+                "text": "SahilTel Müştəri Xidməti"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 44 10"
+              }
+            ],
+            "label": "Bakı",
+            "voice": "young-woman"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab ver",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Zəngə cavab vermək təhlükəli deyil. Əsas odur ki, heç bir kod deməyəsiniz."
+            },
+            {
+              "id": "decline",
+              "label": "Rədd et",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olar. Narahatsınızsa, operatora özünüz zəng edin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "offer",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2b-sahiltel-fake",
+            "caller": [
+              {
+                "text": "SahilTel Müştəri Xidməti"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 44 10"
+              }
+            ],
+            "label": "Bakı",
+            "voice": "young-woman"
+          },
+          "say": "Salam, SahilTel-dən Günel narahat edir. Köhnə SIM kartlar, bağışlayın, bu ay deaktiv edilir, ona görə sizinkini pulsuz yeniləyirik.",
+          "spoken": "Salam, <breath> SahilTel-dən Günel narahat edir. Köhnə SIM kartlar <cough> bağışlayın, bu ay deaktiv edilir, ona görə sizinkini pulsuz yeniləyirik.",
+          "actions": [
+            {
+              "id": "go-on",
+              "label": "Yaxşı, nə etməliyəm?",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Hələ heç nə itirməmisiniz, amma söhbət koda doğru gedir. Diqqətli olun."
+            },
+            {
+              "id": "own-call",
+              "label": "Operatorun rəsmi nömrəsinə özüm zəng edəcəyəm",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Yeniləmə həqiqətən varsa, rəsmi xətt bunu təsdiqləyəcək.",
+              "next": "after"
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Yaxşı qərardır. Gözləmədiyiniz istənilən təklifi rəsmi xətt vasitəsilə yoxlayın.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "code",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2b-sahiltel-fake",
+            "caller": [
+              {
+                "text": "SahilTel Müştəri Xidməti"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 44 10"
+              }
+            ],
+            "label": "Bakı",
+            "voice": "young-woman"
+          },
+          "say": "Telefonunuza indicə altırəqəmli kod gəldi. Onu mənə oxuyun ki, yeni kart aktivləşsin.",
+          "spoken": "Telefonunuza indicə altırəqəmli kod gəldi. <breath> Onu mənə oxuyun ki, yeni kart aktivləşsin.",
+          "actions": [
+            {
+              "id": "read",
+              "label": "Kodu oxuyuram",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Bu kodla nömrəniz cinayətkarın kartına keçir. Bundan sonra bank kodları ona gedəcək."
+            },
+            {
+              "id": "refuse",
+              "label": "Kodu heç kimə demirəm",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Kim istəsə də, kod yalnız sizin üçündür."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Əla. Kod istəyən zəngi bitirmək ən yaxşı cavabdır.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2b-sahiltel-fake",
+            "caller": [
+              {
+                "text": "SahilTel Müştəri Xidməti"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 44 10"
+              }
+            ],
+            "label": "Bakı",
+            "voice": "young-woman"
+          },
+          "say": "Kodu deməsəniz, nömrəniz bu axşam bağlanacaq. Bu, standart prosedurdur, vaxtımız azdır.",
+          "spoken": "Kodu deməsəniz, <breath> nömrəniz bu axşam bağlanacaq. Bu, ee, standart prosedurdur, vaxtımız azdır.",
+          "actions": [
+            {
+              "id": "give-in",
+              "label": "Yaxşı, kodu deyirəm",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Hədə sizi tələsdirmək üçündür. Kodu desəniz, nömrəniz elə bu axşam cinayətkara keçəcək."
+            },
+            {
+              "id": "office",
+              "label": "Lazım olsa, ofisinizə özüm gələrəm",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Yaxşı cavabdır. Nə vaxtsa yeni SIM kart lazım olsa, onu operatorun ofisində özünüz dəyişə bilərsiniz."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Təzyiq artanda söhbəti bitirin."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Zəng bitdi. İndi nə edirsiniz?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2b-sahiltel-fake",
+            "caller": [
+              {
+                "text": "SahilTel Müştəri Xidməti"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 44 10"
+              }
+            ],
+            "label": "Bakı",
+            "voice": "young-woman"
+          },
+          "actions": [
+            {
+              "id": "official",
+              "label": "Operatorun rəsmi nömrəsinə zəng et",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Düzdür. Zəngi operatora bildirin və hesabınız üçün PIN kod təyin etməyin mümkün olub-olmadığını soruşun."
+            },
+            {
+              "id": "redial",
+              "label": "Zəng gələn nömrəyə geri zəng et",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "Bu nömrə sizi yenə cinayətkara apara bilər. Nömrəni operatorun rəsmi saytından götürün."
+            },
+            {
+              "id": "nothing",
+              "label": "Heç nə etmə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Cinayətkar başqa yolla yenidən cəhd edəcək. Operatoru xəbərdar etmək nömrənizi qoruyur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "ss2-match",
+      "prompt": "Hər vəziyyəti düzgün addımla uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "asks-code",
+          "left": "Zəng edən kod istəyir",
+          "right": "Deməyin, zəngi bitirin"
+        },
+        {
+          "id": "no-service",
+          "left": "Telefonda birdən «Şəbəkə yoxdur» yazısı çıxır",
+          "right": "Başqa telefondan operatora zəng edin"
+        },
+        {
+          "id": "pin-offer",
+          "left": "Operator hesab üçün PIN kod təklif edir",
+          "right": "Təyin edin və heç kimə deməyin"
+        },
+        {
+          "id": "sms-only",
+          "left": "Əsas hesab yalnız SMS kodları ilə qorunur",
+          "right": "Autentifikator tətbiqinə və ya giriş açarına keçin"
+        }
+      ],
+      "explain": "Kodu heç vaxt heç kimə deməyin, nömrəniz sönəndə tez hərəkət edin və əsas hesabları yalnız SMS-dən asılı qoymayın."
+    },
+    {
+      "type": "choice",
+      "id": "ss2-choice-code",
+      "question": {
+        "prompt": "Telefonunuza gələn kodu nə vaxt başqasına demək olar?",
+        "options": [
+          {
+            "id": "never",
+            "label": "Heç vaxt: onu yalnız özüm açdığım sayt və ya tətbiqdə yazıram",
+            "correct": true,
+            "feedback": "Düzdür. Kod sizin imzanız kimidir və yalnız sizin əlinizdə qalmalıdır."
+          },
+          {
+            "id": "knows-me",
+            "label": "Zəng edən adımı və FİN kodumu bilirsə",
+            "correct": false,
+            "feedback": "Bu məlumatlar sızmış ola bilər. Sizi tanıyıb yenə də kod istəyən şəxs fırıldaqçıdır."
+          },
+          {
+            "id": "family",
+            "label": "Qohumum mesajda istəsə",
+            "correct": false,
+            "feedback": "Qohumunuzun hesabı da ələ keçirilmiş ola bilər. Ona özünüz adi telefonla zəng edin."
+          }
+        ]
+      },
+      "explain": "Banklar və dövlət qurumları SMS kodlarını istəmir. Kodu kim istəsə də, söhbəti bitirin."
+    },
+    {
+      "type": "recap",
+      "id": "ss2-recap",
+      "points": [
+        "Kim zəng etsə də, sizə gələn kodu heç kimə deməyin",
+        "Şübhəli zəngi bitirin və operatorun rəsmi nömrəsinə özünüz zəng edin",
+        "Operatorunuz hesab üçün PIN kod təklif edirsə, onu təyin edin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

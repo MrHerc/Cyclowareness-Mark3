@@ -1,0 +1,383 @@
+{
+  "id": "check-the-page",
+  "title": "Проверьте страницу",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "cp-tutor",
+      "beats": [
+        {
+          "id": "cp-b1",
+          "say": "Поддельная страница оплаты может быть точной копией настоящей.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "cp-b2",
+          "say": "Логотип, цвета и кнопки те же. Разница — в адресной строке и в том, что у вас просят.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "login",
+              "brandRef": "e-xidmet-fake",
+              "brand": "e-Xidmət Portalı",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "e-xidmet-cerime.example.net",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/odenis"
+                }
+              ],
+              "fields": [
+                "Номер карты",
+                "Срок действия",
+                "CVV",
+                "Код из SMS"
+              ],
+              "button": "Оплатить: 40 AZN"
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "cp-b3",
+          "say": "Значок замка тоже ничего не доказывает: он есть у большинства поддельных сайтов.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "cp-b4",
+          "say": "Самый надёжный способ — открыть портал из закладки или ввести адрес самостоятельно.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "cp-swipe",
+      "prompt": "Эта страница настоящая или поддельная?",
+      "cards": [
+        {
+          "id": "real-fines",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet",
+            "brand": "e-Xidmət Portalı",
+            "url": [
+              {
+                "text": "https://e-xidmet.example/cerimeler"
+              }
+            ],
+            "fields": [
+              "ФИН-код",
+              "Пароль"
+            ],
+            "button": "Войти"
+          },
+          "verdict": "safe",
+          "explain": "Это собственный домен портала, и вы открыли его сами. Проверять штрафы нужно именно здесь."
+        },
+        {
+          "id": "fake-discount",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet-fake",
+            "brand": "e-Xidmət Portalı",
+            "url": [
+              {
+                "text": "https://e-xidmet-endirim.example.net/cerime"
+              }
+            ],
+            "fields": [
+              "Номер карты",
+              "Срок действия",
+              "CVV",
+              "Код из SMS"
+            ],
+            "button": "Оплатить со скидкой 50%"
+          },
+          "verdict": "threat",
+          "explain": "Домен другой, а страница хочет всё сразу: данные карты, CVV и код из SMS. Это форма для кражи данных."
+        },
+        {
+          "id": "app-notice",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "e-xidmet",
+            "app": "e-Xidmət",
+            "title": [
+              {
+                "text": "Новое уведомление"
+              }
+            ],
+            "body": [
+              {
+                "text": "На ваше имя зарегистрирован 1 штраф. Подробности — в разделе «Штрафы» в приложении."
+              }
+            ],
+            "time": "09:15"
+          },
+          "verdict": "safe",
+          "explain": "Уведомление пришло в официальном приложении, и в нём нет ссылки. Проверьте и оплатите штраф прямо в приложении."
+        },
+        {
+          "id": "fake-benefit",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet-fake",
+            "brand": "Поддержка семей",
+            "url": [
+              {
+                "text": "https://ailedestek-qeydiyyat.example.net"
+              }
+            ],
+            "fields": [
+              "ФИО",
+              "ФИН-код",
+              "Номер карты",
+              "CVV"
+            ],
+            "button": "Получить пособие"
+          },
+          "verdict": "threat",
+          "explain": "Чтобы получить деньги, код с оборота карты никогда не нужен. Для государственных пособий не требуется регистрация по ссылке."
+        },
+        {
+          "id": "fake-gateway",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2d-manatpay-fake",
+            "brand": "ManatPay",
+            "url": [
+              {
+                "text": "https://manatpay-secure.example.net/3ds"
+              }
+            ],
+            "fields": [
+              "Номер карты",
+              "CVV",
+              "Код из SMS",
+              "ПИН-код карты"
+            ],
+            "button": "Подтвердить"
+          },
+          "verdict": "threat",
+          "explain": "Ни одна страница оплаты никогда не просит ПИН-код карты. ПИН-код нужен только в банкоматах и платёжных терминалах."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "cp-sim",
+      "environment": "browser",
+      "title": "Ссылка на штраф",
+      "intro": "Друг прислал вам ссылку на штраф, и вы её открыли. На каждом шаге в браузере примите правильное решение.",
+      "steps": [
+        {
+          "id": "fake-fine-page",
+          "label": "Неоплаченный штраф: 80 AZN. Сегодня скидка 50%",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "e-xidmet-fake",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "e-xidmet-cerime.example.net"
+              },
+              {
+                "text": "e-xidmet-cerime.example.net"
+              },
+              {
+                "text": "/odenis"
+              }
+            ]
+          },
+          "say": "Посмотрите на адресную строку.",
+          "actions": [
+            {
+              "id": "pay",
+              "label": "Оплатить со скидкой",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Скидка нужна, чтобы вас поторопить. Теперь посмотрите, что просит страница."
+            },
+            {
+              "id": "close",
+              "label": "Закрыть вкладку",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Правильно, это не собственный домен портала. Теперь откройте портал сами.",
+              "next": "real-portal"
+            }
+          ]
+        },
+        {
+          "id": "card-form",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet-fake",
+            "brand": "e-Xidmət Portalı",
+            "url": [
+              {
+                "text": "https://e-xidmet-cerime.example.net",
+                "reveal": "e-xidmet-cerime.example.net"
+              }
+            ],
+            "fields": [
+              "Номер карты",
+              "Срок действия",
+              "CVV",
+              "Код из SMS"
+            ],
+            "button": "Оплатить: 40 AZN"
+          },
+          "say": "Страница просит сразу и данные карты, и код из SMS.",
+          "actions": [
+            {
+              "id": "submit",
+              "label": "Оплатить: 40 AZN",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Данные вашей карты достались мошенникам. Сразу позвоните в банк по номеру, указанному на карте."
+            },
+            {
+              "id": "close",
+              "label": "Закрыть вкладку",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Верное решение. Вы ничего не ввели. Теперь проверьте штраф на официальном портале."
+            }
+          ]
+        },
+        {
+          "id": "real-portal",
+          "label": "Штрафы: активных штрафов нет",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "e-xidmet",
+            "url": [
+              {
+                "text": "https://e-xidmet.example/cerimeler",
+                "reveal": "e-xidmet.example"
+              }
+            ]
+          },
+          "say": "Вы открыли портал из закладки.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Посмотреть штрафы",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Правильно. На официальном портале штрафа нет, значит, ссылка была поддельной."
+            },
+            {
+              "id": "tell-friend",
+              "label": "Предупредить друга",
+              "kind": "share",
+              "outcome": "safe",
+              "feedback": "Отлично. Скажите другу, который прислал ссылку, чтобы он ничего там не вводил."
+            }
+          ]
+        },
+        {
+          "id": "benefit-page",
+          "label": "Помощь семьям: регистрация заканчивается сегодня",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "e-xidmet-fake",
+            "url": [
+              {
+                "text": "https://ailedestek-qeydiyyat.example.net",
+                "reveal": "ailedestek-qeydiyyat.example.net"
+              }
+            ]
+          },
+          "say": "На этот раз ссылку на пособие прислала соседка.",
+          "actions": [
+            {
+              "id": "register",
+              "label": "Зарегистрироваться",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Эта форма собирает данные карт. Для государственных пособий никогда не нужна регистрация по ссылке."
+            },
+            {
+              "id": "close",
+              "label": "Закрыть вкладку",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Правильно. Любое пособие проверяйте только на официальном портале."
+            },
+            {
+              "id": "report",
+              "label": "Сообщить о поддельном сайте",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Отлично. Ваше сообщение поможет заблокировать поддельный сайт, и он не обманет других."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "cp-match",
+      "prompt": "Сопоставьте то, что просит страница, с тем, что это означает.",
+      "pairs": [
+        {
+          "id": "pin",
+          "left": "ПИН-код карты",
+          "right": "Его никогда не просит ни одна страница оплаты"
+        },
+        {
+          "id": "sms-code",
+          "left": "Код из SMS от вашего банка",
+          "right": "Подтверждает платёж: сначала прочитайте сумму"
+        },
+        {
+          "id": "benefit-cvv",
+          "left": "Код с оборота карты для получения пособия",
+          "right": "Для получения денег не нужен"
+        },
+        {
+          "id": "discount",
+          "left": "Скидка, если оплатить сегодня",
+          "right": "Вас торопят заплатить без проверки"
+        }
+      ],
+      "explain": "Если сомневаетесь, не платите. Сами проверьте официальный портал или позвоните в полицию по номеру 102."
+    },
+    {
+      "type": "recap",
+      "id": "cp-recap",
+      "points": [
+        "Читайте адресную строку: логотип и значок замка ничего не доказывают.",
+        "Страница, которая просит ПИН-код или код с оборота карты ради пособия, — поддельная.",
+        "Если сомневаетесь: ETX 1654 или полиция 102."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

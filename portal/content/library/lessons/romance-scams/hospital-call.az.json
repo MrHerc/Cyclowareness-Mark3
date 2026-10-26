@@ -1,0 +1,509 @@
+{
+  "id": "hospital-call",
+  "title": "Xəstəxanadan zəng",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "hc-tutor",
+      "beats": [
+        {
+          "id": "hc-b1",
+          "say": "Bu dəfə fırıldaqçı zəng edir və özünü xaricdəki bir xəstəxananın həkimi kimi təqdim edir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "hc-b2",
+          "say": "O deyir ki, onlayn dostunuz qəzaya düşüb və əməliyyat üçün ona təcili pul lazımdır.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "w2e-nordhaven-klinika",
+              "caller": [
+                {
+                  "text": "Nordhaven Clinic"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+44 7700 900 418",
+                  "spot": "number"
+                }
+              ],
+              "label": "Beynəlxalq"
+            }
+          },
+          "highlight": "number"
+        },
+        {
+          "id": "hc-b3",
+          "say": "Təcililik, qorxu və sirr: bu üçü bir yerdədirsə, deməli, qarşınızda fırıldaq var.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "hc-b4",
+          "say": "Zəngi bitirin, nömrəni özünüz tapın və pul göndərməzdən əvvəl ailənizlə danışın.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "hc-choice",
+      "question": {
+        "prompt": "Zəng edən deyir ki, dostunuz xəstəxanadadır və bu gün pul lazımdır. İlk addımınız nədir?",
+        "options": [
+          {
+            "id": "hang-up",
+            "label": "Zəngi bitirərəm və xəstəxananın nömrəsini özüm taparam",
+            "correct": true,
+            "feedback": "Düzdür. Özünüz tapdığınız nömrəyə zəng etmək saxta həkimi dərhal ifşa edir."
+          },
+          {
+            "id": "pay",
+            "label": "Pulu tez göndərərəm, sonra soruşaram",
+            "correct": false,
+            "feedback": "Göndərdiyiniz pul geri qayıtmır. Təcililik məhz bunun üçün yaradılır."
+          },
+          {
+            "id": "card",
+            "label": "Kart məlumatlarımı verərəm ki, pulu özləri götürsünlər",
+            "correct": false,
+            "feedback": "Kart məlumatlarınızla istədikləri qədər pul çıxara bilərlər. Kart məlumatlarını heç vaxt telefonla verməyin."
+          },
+          {
+            "id": "secret",
+            "label": "Heç kimə deməyəcəyimə söz verərəm",
+            "correct": false,
+            "feedback": "Sirr saxlamaq fırıldaqçıya kömək edir. Ailəniz isə vəziyyətə soyuq başla baxır."
+          }
+        ]
+      },
+      "explain": "Telefonla təcili pul tələbi, xüsusən kriptovalyuta ilə, fırıldaq əlamətidir. Zəngi bitirin və məlumatı özünüz yoxlayın."
+    },
+    {
+      "type": "simulation",
+      "id": "hc-sim",
+      "environment": "call",
+      "title": "Gecə zəngi",
+      "intro": "Gecə saat birdə xaricdən zəng gəlir. Zəng edənin dediklərini oxuyun və cavabınızı seçin.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2e-nordhaven-klinika",
+            "caller": [
+              {
+                "text": "Nordhaven Clinic"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Beynəlxalq",
+            "voice": "woman"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab ver",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Zəngə cavab vermək təhlükəli deyil. Əsas məsələ nə dediyinizdir."
+            },
+            {
+              "id": "decline",
+              "label": "Rədd et",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olar. Narahatsınızsa, sonra nömrəni özünüz yoxlayın.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "doctor",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2e-nordhaven-klinika",
+            "caller": [
+              {
+                "text": "Nordhaven Clinic"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Beynəlxalq",
+            "voice": "woman"
+          },
+          "say": "Doktor Helena Mart, Nordhaven klinikasından zəng edirəm. Kamran Əliyev qəzaya düşüb və ən yaxın adamı kimi sizi göstərib.",
+          "spoken": "Doktor Helena Mart, <breath> Nordhaven klinikasından zəng edirəm. Kamran Əliyev qəzaya düşüb və ən yaxın adamı kimi sizi göstərib.",
+          "actions": [
+            {
+              "id": "video",
+              "label": "Kamranla video zəng istəyirəm",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Yaxşı yoxlamadır. Fırıldaqçı video zəngin mümkün olmaması üçün həmişə bəhanə tapacaq."
+            },
+            {
+              "id": "panic",
+              "label": "Nə lazımdır? Kömək edərəm",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Şok başa düşüləndir, amma bu sual pul tələbinə qapı açır. Əvvəlcə yoxlayın."
+            },
+            {
+              "id": "hang-up",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Yaxşı qərardır. Klinikanın nömrəsini özünüz tapıb zəng edə bilərsiniz.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "demand",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2e-nordhaven-klinika",
+            "caller": [
+              {
+                "text": "Nordhaven Clinic"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Beynəlxalq",
+            "voice": "woman"
+          },
+          "say": "O, huşsuz vəziyyətdədir. Əməliyyat üçün bu gün dörd min səkkiz yüz manat avans lazımdır, sığortası bunu ödəmir.",
+          "spoken": "O, huşsuz vəziyyətdədir. <breath> Əməliyyat üçün bu gün dörd min səkkiz yüz manat avans lazımdır, sığortası, ee, bunu ödəmir.",
+          "actions": [
+            {
+              "id": "pay",
+              "label": "Göndərərəm, rekvizitləri deyin",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Pul fırıldaqçıya getdi. Telefonla gələn təcili pul tələbini həmişə özünüz yoxlayın."
+            },
+            {
+              "id": "card",
+              "label": "Kart məlumatlarımı verim",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Kart məlumatlarınızla istədikləri qədər pul çıxara bilərlər. Onları heç vaxt telefonla deməyin."
+            },
+            {
+              "id": "check",
+              "label": "Klinikanın nömrəsini tapıb özüm zəng edəcəyəm",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Özünüz tapdığınız nömrə sizi yenidən fırıldaqçıya çıxarmır."
+            }
+          ]
+        },
+        {
+          "id": "push",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2e-nordhaven-klinika",
+            "caller": [
+              {
+                "text": "Nordhaven Clinic"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Beynəlxalq",
+            "voice": "woman"
+          },
+          "say": "Vaxt yoxdur! Kripto ilə də olar, pulqabının ünvanını SMS-lə göndərəcəyəm. Bu barədə heç kimə deməyin.",
+          "spoken": "Vaxt yoxdur! <breath> Kripto ilə də olar, pulqabının ünvanını SMS-lə göndərəcəyəm. Bu barədə heç kimə deməyin.",
+          "actions": [
+            {
+              "id": "crypto",
+              "label": "Kripto ilə ödəyəcəyəm",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Kripto köçürməsini heç kim geri qaytara bilməz. Telefonla təcili kripto tələbi fırıldaq əlamətidir."
+            },
+            {
+              "id": "sister",
+              "label": "Əvvəlcə bacımla danışmalıyam",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Əla. Fırıldaqçı ailənizdən qorxur, çünki onlar hiyləni görür."
+            },
+            {
+              "id": "hang-up",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Düzdür. Kripto, təzyiq və sirr bir yerdə fırıldaq deməkdir."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2e-nordhaven-klinika",
+            "caller": [
+              {
+                "text": "Nordhaven Clinic"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Beynəlxalq",
+            "voice": "woman"
+          },
+          "actions": [
+            {
+              "id": "call-back",
+              "label": "Bu nömrəyə geri zəng et",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "Bu nömrə fırıldaqçıya məxsusdur, o da eyni hekayəni danışacaq. Nömrəni özünüz tapın."
+            },
+            {
+              "id": "family",
+              "label": "Ailəmə xəbər ver",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Ailənizlə danışmaq təzyiqi dərhal azaldır."
+            },
+            {
+              "id": "block",
+              "label": "Nömrəni blokla",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Yaxşı. Nömrəni bloklayın, tanışlıq profilini də platformada bildirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "hc-swipe",
+      "prompt": "Hansı mesaj normaldır, hansı isə xəbərdarlıq əlamətidir?",
+      "cards": [
+        {
+          "id": "video-date",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Elçin"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Bu axşam saat 8-də video zəng edək? Sonra şənbə günü kafedə görüşərik."
+                  }
+                ],
+                "time": "18:20"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Video zəng və ictimai yerdə görüş təklif etmək normaldır. Fırıldaqçı məhz bundan qaçır."
+        },
+        {
+          "id": "visa",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Mark Leon"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Səni görməyə gəlmək üçün vizaya pul lazımdır, 600 AZN. Gələn kimi qaytaracağam, söz verirəm."
+                  }
+                ],
+                "time": "23:10"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Heç görmədiyiniz adamın bilet, viza və ya gömrük üçün pul istəməsi klassik fırıldaqdır."
+        },
+        {
+          "id": "withdraw-fee",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2e-kriptonova",
+            "app": "KriptoNova",
+            "title": [
+              {
+                "text": "Qazancınız: 2 340 AZN"
+              }
+            ],
+            "body": [
+              {
+                "text": "Pulunuzu çıxarmaq üçün əvvəlcə 15% vergi ödəyin."
+              }
+            ],
+            "time": "09:05"
+          },
+          "verdict": "threat",
+          "explain": "Pulu çıxarmazdan əvvəl ödəniş istəyən platforma saxtadır. Qazanc rəqəmi uydurmadır."
+        },
+        {
+          "id": "report-done",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2e-gorusek",
+            "app": "Görüşək",
+            "title": [
+              {
+                "text": "Şikayətinizə baxıldı"
+              }
+            ],
+            "body": [
+              {
+                "text": "Bildirdiyiniz profil saxta idi və bağlanıb. Təşəkkür edirik."
+              }
+            ],
+            "time": "14:30"
+          },
+          "verdict": "safe",
+          "explain": "Bu, adi platforma bildirişidir və heç nə istəmir. Saxta profili bildirmək başqalarını qoruyur."
+        },
+        {
+          "id": "secret",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Kamran Əliyev"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Ailənə demə, bizi başa düşməzlər. Bu, ikimizin sirridir."
+                  }
+                ],
+                "time": "22:45"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Sizi ailənizdən uzaqlaşdırmaq istəyən adam nəyisə gizlədir. Sirr saxlamaq xahişi xəbərdarlıqdır."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "hc-scenario",
+      "title": "Bacınız soruşur",
+      "start": "sister",
+      "nodes": [
+        {
+          "id": "sister",
+          "text": "Fikirli görünürsən. Nə olub, kimsə səni narahat edir?",
+          "speaker": "Nigar (bacınız)",
+          "voice": "woman-2",
+          "channel": "in-person",
+          "manner": "natural",
+          "spoken": "Fikirli görünürsən. <breath> Nə olub, kimsə səni narahat edir?",
+          "character": "nigar",
+          "choices": [
+            {
+              "label": "Ona hər şeyi danışıram və yazışmanı göstərirəm",
+              "next": "search",
+              "feedback": "Düzdür. Bu barədə danışmaq fırıldaqçının gücünü əlindən alır."
+            },
+            {
+              "label": "Heç nə, Kamran heç kimə deməməyimi xahiş edib",
+              "outcome": "risky",
+              "feedback": "Sirr saxlamaq fırıldaqçıya kömək edir. Yaxın adamla danışmaq ən güclü müdafiədir."
+            }
+          ]
+        },
+        {
+          "id": "search",
+          "text": "Gəl Kamranın fotosunu birlikdə şəkil üzrə axtarışla yoxlayaq. Bax, bu foto başqa adla, xarici bir modelin səhifəsində çıxır!",
+          "speaker": "Nigar (bacınız)",
+          "voice": "woman-2",
+          "channel": "in-person",
+          "manner": "natural",
+          "spoken": "Gəl Kamranın fotosunu birlikdə şəkil üzrə axtarışla yoxlayaq. <breath> Bax, bu foto başqa adla, xarici bir modelin səhifəsində çıxır!",
+          "character": "nigar",
+          "choices": [
+            {
+              "label": "Profili bildirib bloklayıram və bir daha pul göndərmirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Həm özünüzü, həm də başqalarını qorudunuz."
+            },
+            {
+              "label": "Bəlkə kimsə onun fotosunu oğurlayıb, yazışmağa davam edəcəyəm",
+              "outcome": "risky",
+              "feedback": "Saxta profillər oğurlanmış fotolar üzərində qurulur. Yoxlamanın göstərdiyinə inanın."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "hc-recap",
+      "points": [
+        "Telefonla təcili pul tələbi gəlirsə, zəngi bitirin və nömrəni özünüz tapın.",
+        "Kripto, təzyiq və sirr bir yerdə fırıldaq deməkdir.",
+        "Pul göndərməzdən əvvəl ailənizlə danışın və saxta profili bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

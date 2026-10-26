@@ -7,6 +7,8 @@ import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Mascot } from "@/components/mascot/mascot";
 import { cn } from "@/lib/cn";
+import { useVoiceAvailability } from "./narrator";
+import { VoiceNotice } from "./voice-notice";
 
 type SpeechRecognitionLike = {
   lang: string;
@@ -28,23 +30,40 @@ export function TutorPanel({
   lessonKey,
   sceneId,
   speak,
+  contentLocale,
+  speaking = false,
   voice = true,
+  soundOn = true,
 }: {
   open: boolean;
   onClose: () => void;
   slug: string;
   lessonKey: string;
   sceneId: string | null;
-  speak: (text: string) => void;
+  /** Reads `text` aloud with a voice of `lang`. */
+  speak: (text: string, lang: string) => void;
+  /** Language of the lesson text (default: the interface's): an offline answer quotes the lesson, so it is in this language. */
+  contentLocale?: string;
+  /** The narrator behind `speak` is reading aloud: the mascot talks. */
+  speaking?: boolean;
   /** The tenant's "tutor_voice" feature: microphone input and spoken answers. */
   voice?: boolean;
+  /** The narrator behind `speak` has sound on (otherwise answers are not read aloud anyway). */
+  soundOn?: boolean;
 }) {
   const t = useTranslations("player.tutor");
+  const tc = useTranslations("common");
   const locale = useLocale();
+  const lessonLocale = contentLocale ?? locale;
   const [question, setQuestion] = useState("");
   const [answer, setAnswer] = useState("");
   const [mode, setMode] = useState<string | null>(null);
-  const [state, setState] = useState<"idle" | "thinking" | "error">("idle");
+  // AI Sel answers in the interface language; an offline answer is lesson text, in the lesson's language.
+  // Each is read by a voice of its own language; without one it stays text only.
+  const answerLang = mode === "offline" ? lessonLocale : locale;
+  const voiceMissing = useVoiceAvailability(answerLang) === "missing";
+  // "limited": the question limit was reached (HTTP 429); the learner is told to wait instead of a generic failure.
+  const [state, setState] = useState<"idle" | "thinking" | "error" | "limited">("idle");
   const [listening, setListening] = useState(false);
   const rec = useRef<SpeechRecognitionLike | null>(null);
   const suggestions = t.raw("suggestions") as string[];
@@ -67,8 +86,13 @@ export function TutorPanel({
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ slug, lessonKey, sceneId, question: text, locale }),
       });
+      if (res.status === 429) {
+        setState("limited");
+        return;
+      }
       if (!res.ok || !res.body) throw new Error(String(res.status));
-      setMode(res.headers.get("x-tutor-mode"));
+      const answerMode = res.headers.get("x-tutor-mode");
+      setMode(answerMode);
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let full = "";
@@ -79,7 +103,7 @@ export function TutorPanel({
         setAnswer(full);
       }
       setState("idle");
-      if (voice) speak(full);
+      if (voice) speak(full, answerMode === "offline" ? lessonLocale : locale);
     } catch {
       setState("error");
     }
@@ -108,12 +132,13 @@ export function TutorPanel({
   return (
     <Dialog open={open} onClose={onClose} title={t("title")} size="md">
       <div className="flex items-start gap-3">
-        <Mascot mood={state === "thinking" ? "think" : answer ? "happy" : "curious"} talking={state === "thinking"} guide={{ listen: listening }} className="size-20 shrink-0" />
+        <Mascot mood={state === "thinking" ? "think" : answer ? "happy" : "curious"} talking={speaking && state !== "thinking"} guide={{ listen: listening }} className="size-20 shrink-0" />
         <div className="min-h-20 flex-1 rounded-2xl rounded-tl-sm bg-sunken px-4 py-3 text-body-sm">
-          {state === "thinking" && !answer ? <span className="text-ink-muted">{t("thinking")}</span> : state === "error" ? <span className="text-risk-700">{t("error")}</span> : answer || <span className="text-ink-muted">{t("placeholder")}</span>}
+          {state === "thinking" && !answer ? <span className="text-ink-muted">{t("thinking")}</span> : state === "error" ? <span className="text-risk-700">{t("error")}</span> : state === "limited" ? <span className="text-risk-700">{tc("errors.rateLimited")}</span> : answer ? <span lang={answerLang !== locale ? answerLang : undefined}>{answer}</span> : <span className="text-ink-muted">{t("empty")}</span>}
         </div>
       </div>
       {mode === "offline" && answer ? <p className="mt-2 text-tab text-ink-subtle">{t("offline")}</p> : null}
+      {voice && soundOn && voiceMissing && answer && state === "idle" ? <VoiceNotice lang={answerLang} className="mt-2" /> : null}
       <div className="mt-4 flex flex-wrap gap-2">
         {suggestions.map((s) => (
           <button key={s} type="button" onClick={() => ask(s)} className="rounded-pill bg-brand-50 px-3 py-1.5 text-caption font-semibold text-brand-700 hover:bg-brand-100 pointer-coarse:min-h-11">

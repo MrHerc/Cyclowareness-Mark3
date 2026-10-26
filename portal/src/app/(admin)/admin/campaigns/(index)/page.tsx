@@ -110,7 +110,7 @@ export default async function CampaignsPage({ searchParams }: PageProps<"/admin/
                         {c.launchedAt
                           ? tr("sentOn", { date: format.dateTime(c.launchedAt, { dateStyle: "medium" }) })
                           : c.status === "scheduled" && c.scheduledAt
-                            ? tr("plannedFor", { date: format.dateTime(c.scheduledAt, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }) })
+                            ? tr("plannedFor", { date: format.dateTime(c.scheduledAt, { dateStyle: "medium", timeStyle: "short" }) })
                             : tr("draftSaved")}
                       </span>
                     </p>

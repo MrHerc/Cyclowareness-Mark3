@@ -11,9 +11,11 @@ import { departmentKey } from "../../lib/departments";
 import { isUniqueViolation } from "../db/errors";
 import { audit } from "../services/audit";
 import { notifyUsers } from "../services/notify";
-import { assignmentTargets, coveringAssignments, departmentClosure, gainsCoverage } from "../services/assignments";
+import { assignmentTargets, coveringAssignments, departmentClosure, dueFor, gainsCoverage } from "../services/assignments";
 import { recomputeRisk } from "../services/risk";
-import { pick } from "../../i18n/config";
+import { getTranslations } from "next-intl/server";
+import { LOCALES, isLocale, pick } from "../../i18n/config";
+import type { PolicyText } from "../../lib/policy-text";
 
 /* ───────── departments ───────── */
 
@@ -232,8 +234,24 @@ export async function createAssignmentAction(input: z.infer<typeof assignSchema>
     const href = a.target === "module" ? `/learn/${title.slug}` : `/paths/${title.slug}`;
     // The title in each recipient's own language.
     const titleIn = (locale: string) => pick(title.title, locale);
+    // "N days after joining" gives everyone their own due day: one message per day, like the reminders.
+    const byDue = new Map<string, string[]>();
+    if (a.dueKind === "after_joining" && targets.length) {
+      // The whole organisation, filtered here: a large audience would not fit in one IN list.
+      const wanted = new Set(targets);
+      const people = await db()
+        .select({ id: t.users.id, departmentId: t.users.departmentId, createdAt: t.users.createdAt, activatedAt: t.users.activatedAt })
+        .from(t.users)
+        .where(eq(t.users.tenantId, v.tenant.id));
+      for (const u of people.filter((p) => wanted.has(p.id))) {
+        const due = dueFor({ dueKind: a.dueKind, dueDate: null, dueDays: a.dueDays }, u) ?? "";
+        byDue.set(due, [...(byDue.get(due) ?? []), u.id]);
+      }
+    } else byDue.set(a.dueKind === "fixed" ? (a.dueDate ?? "") : "", targets);
     // Deferred: the job runner sends the emails, so the request does not wait for the mail server once per person.
-    await notifyUsers(db(), v.tenant.id, targets, "assignment", { module: titleIn, dueDate: a.dueDate ?? undefined, link: href }, { title: titleIn, href }, { defer: true });
+    for (const [due, users] of byDue) {
+      await notifyUsers(db(), v.tenant.id, users, "assignment", { module: titleIn, dueDate: due || undefined, link: href }, { href }, { defer: true });
+    }
   }
   await recomputeRisk(db(), v.tenant.id, targets);
   refresh();
@@ -280,13 +298,19 @@ export async function createPolicyAction(title: string): Promise<{ ok: boolean; 
   return { ok: true, id: row.id };
 }
 
+const policyTextSchema = z.object({
+  title: z.string().trim().max(200),
+  summary: z.string().trim().max(600).optional(),
+  bodyMd: z.string().trim().max(200_000),
+});
+
 const versionSchema = z.object({
   policyId: z.string().uuid(),
   title: z.string().trim().min(2).max(200),
   summary: z.string().trim().max(600).optional(),
   bodyMd: z.string().trim().min(20).max(200_000),
-  enTitle: z.string().trim().max(200).optional(),
-  enBody: z.string().trim().max(200_000).optional(),
+  /** The same version in the organisation's other languages; a language left empty shows the base text. */
+  translations: z.partialRecord(z.enum(LOCALES), policyTextSchema).optional(),
 });
 
 export async function publishVersionAction(input: z.infer<typeof versionSchema>): Promise<{ ok: boolean; version?: number }> {
@@ -295,6 +319,14 @@ export async function publishVersionAction(input: z.infer<typeof versionSchema>)
   if (!p.success) return { ok: false };
   const [policy] = await db().select().from(t.policies).where(and(eq(t.policies.id, p.data.policyId), eq(t.policies.tenantId, v.tenant.id)));
   if (!policy) return { ok: false };
+  // The base text is in the organisation's default language; its marked copy records that (lib/policy-text.ts).
+  const base = v.tenant.settings.defaultLocale;
+  const translations: Record<string, PolicyText> = { [base]: { title: p.data.title, ...(p.data.summary ? { summary: p.data.summary } : {}), bodyMd: p.data.bodyMd, base: true } };
+  for (const [locale, x] of Object.entries(p.data.translations ?? {})) {
+    if (locale === base || !x?.bodyMd) continue;
+    if (x.bodyMd.length < 20) return { ok: false };
+    translations[locale] = { title: x.title || p.data.title, ...(x.summary ? { summary: x.summary } : {}), bodyMd: x.bodyMd };
+  }
   const [{ max }] = await db().select({ max: sql<number>`coalesce(max(${t.policyVersions.version}), 0)` }).from(t.policyVersions).where(eq(t.policyVersions.policyId, policy.id));
   const version = Number(max) + 1;
   await db()
@@ -305,13 +337,25 @@ export async function publishVersionAction(input: z.infer<typeof versionSchema>)
       title: p.data.title,
       summary: p.data.summary || null,
       bodyMd: p.data.bodyMd,
-      translations: p.data.enBody ? { en: { title: p.data.enTitle || p.data.title, bodyMd: p.data.enBody } } : null,
+      translations,
       publishedAt: new Date(),
     });
   await db().update(t.policies).set({ title: p.data.title }).where(eq(t.policies.id, policy.id));
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "policy.version_published", targetType: "policy", targetId: policy.id, meta: { version } });
-  const everyone = await db().select({ id: t.users.id }).from(t.users).where(and(eq(t.users.tenantId, v.tenant.id), eq(t.users.status, "active")));
-  await db().insert(t.notifications).values(everyone.map((u) => ({ tenantId: v.tenant.id, userId: u.id, kind: "policy", title: p.data.title, body: `v${version}`, href: `/policies/${policy.id}?from=%2F` })));
+  // Each person's notice in their language, with the title they will read.
+  const everyone = await db().select({ id: t.users.id, locale: t.users.locale }).from(t.users).where(and(eq(t.users.tenantId, v.tenant.id), eq(t.users.status, "active")));
+  const bodies = new Map<string, string>();
+  for (const locale of new Set(everyone.map((u) => (isLocale(u.locale) ? u.locale : base)))) bodies.set(locale, (await getTranslations({ locale, namespace: "admin.policies" }))("notifyBody", { version }));
+  if (everyone.length) {
+    await db()
+      .insert(t.notifications)
+      .values(
+        everyone.map((u) => {
+          const locale = isLocale(u.locale) ? u.locale : base;
+          return { tenantId: v.tenant.id, userId: u.id, kind: "policy", title: translations[locale]?.title ?? p.data.title, body: bodies.get(locale) ?? null, href: `/policies/${policy.id}?from=%2F` };
+        }),
+      );
+  }
   refresh();
   return { ok: true, version };
 }
@@ -334,7 +378,7 @@ export async function remindPolicyAction(versionId: string): Promise<{ count: nu
   const v = await actionViewer("policies.write");
   if (!isUuid(versionId)) return { count: 0 };
   const [version] = await db()
-    .select({ id: t.policyVersions.id, policyId: t.policyVersions.policyId, title: t.policyVersions.title, tenantId: t.policies.tenantId })
+    .select({ id: t.policyVersions.id, policyId: t.policyVersions.policyId, version: t.policyVersions.version, title: t.policyVersions.title, translations: t.policyVersions.translations, tenantId: t.policies.tenantId })
     .from(t.policyVersions)
     .innerJoin(t.policies, eq(t.policies.id, t.policyVersions.policyId))
     .where(eq(t.policyVersions.id, versionId));
@@ -342,7 +386,12 @@ export async function remindPolicyAction(versionId: string): Promise<{ count: nu
   const signed = new Set((await db().select({ userId: t.policySignoffs.userId }).from(t.policySignoffs).where(eq(t.policySignoffs.versionId, versionId))).map((s) => s.userId));
   const people = await db().select({ id: t.users.id }).from(t.users).where(and(eq(t.users.tenantId, v.tenant.id), eq(t.users.status, "active")));
   const targets = people.filter((p) => !signed.has(p.id)).map((p) => p.id);
-  const count = await notifyUsers(db(), v.tenant.id, targets, "policy_reminder", { module: version.title, link: `/policies/${version.policyId}?from=%2F` }, { title: version.title, href: `/policies/${version.policyId}?from=%2F` }, { defer: true });
+  // The title each person reads, and an in-app note in their language; the notice's title is the subject ("Signature needed: …").
+  const title = (locale: string) => version.translations?.[locale]?.title ?? version.title;
+  const bodies = new Map(await Promise.all(LOCALES.map(async (l) => [l, (await getTranslations({ locale: l, namespace: "admin.policies" }))("notifyBody", { version: version.version })] as const)));
+  const body = (locale: string) => bodies.get(isLocale(locale) ? locale : "en") ?? "";
+  const href = `/policies/${version.policyId}?from=%2F`;
+  const count = await notifyUsers(db(), v.tenant.id, targets, "policy_reminder", { module: title, link: href }, { body, href }, { defer: true });
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "policy.reminder", targetType: "policy", targetId: version.policyId, meta: { count } });
   return { count };
 }

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Textarea } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
+import type { Locale } from "@/i18n/config";
 
 export function NewPolicy() {
   const t = useTranslations("admin.policies");
@@ -46,11 +47,25 @@ export function NewPolicy() {
   );
 }
 
-export function VersionEditor({ policyId, nextVersion, initial }: { policyId: string; nextVersion: number; initial: { title: string; summary: string; bodyMd: string; enTitle: string; enBody: string } }) {
+type PolicyDraft = { title: string; summary: string; bodyMd: string };
+
+/**
+ * A new version: the base text in the organisation's default language (`base`) and, folded away, one
+ * translation per other enabled language. A language left empty shows its readers the base text.
+ */
+export function VersionEditor({ policyId, nextVersion, base, initial }: { policyId: string; nextVersion: number; base: Locale; initial: PolicyDraft & { translations: Partial<Record<Locale, PolicyDraft>> } }) {
   const t = useTranslations("admin.policies");
   const tc = useTranslations("common");
+  // Language names as the reader's notice uses them ("in Azerbaijani", «на русском»).
+  const tp = useTranslations("player.policy");
   const router = useRouter();
   const [v, setV] = useState(initial);
+  const languages = Object.keys(initial.translations) as Locale[];
+  // A translation is either left empty or a real text (the same 20-character minimum as the base text).
+  const tooShort = languages.some((l) => {
+    const n = v.translations[l]?.bodyMd.trim().length ?? 0;
+    return n > 0 && n < 20;
+  });
   const [confirm, setConfirm] = useState(false);
   const [pending, start] = useTransition();
   return (
@@ -65,15 +80,28 @@ export function VersionEditor({ policyId, nextVersion, initial }: { policyId: st
       <Field label={t("editorBody")} htmlFor="v-body">
         <Textarea id="v-body" value={v.bodyMd} onChange={(e) => setV({ ...v, bodyMd: e.target.value })} className="min-h-80 font-mono text-caption" />
       </Field>
-      <details className="rounded-lg border border-line p-3">
-        <summary className="cursor-pointer text-caption font-semibold">{t("translation")}</summary>
-        <div className="mt-3 grid gap-3">
-          <Input value={v.enTitle} onChange={(e) => setV({ ...v, enTitle: e.target.value })} placeholder={t("editorTitle")} aria-label={`${t("editorTitle")} (EN)`} />
-          <Textarea value={v.enBody} onChange={(e) => setV({ ...v, enBody: e.target.value })} className="min-h-48 font-mono text-caption" aria-label={`${t("text")} (EN)`} />
-        </div>
-      </details>
+      <p className="text-caption text-ink-muted">{t("baseLanguage", { language: tp(`language.${base}`) })}</p>
+      {languages.length ? (
+        <details className="rounded-lg border border-line p-3">
+          <summary className="cursor-pointer text-caption font-semibold">{t("translation")}</summary>
+          <p className="mt-2 text-caption text-ink-muted">{t("translationHint")}</p>
+          {languages.map((l) => {
+            const x = v.translations[l] ?? { title: "", summary: "", bodyMd: "" };
+            const set = (patch: Partial<PolicyDraft>) => setV({ ...v, translations: { ...v.translations, [l]: { ...x, ...patch } } });
+            const language = tc(`languages.${l}`);
+            return (
+              <fieldset key={l} className="mt-3 grid gap-3 border-t border-line pt-3">
+                <legend className="text-caption font-semibold">{language}</legend>
+                <Input lang={l} value={x.title} onChange={(e) => set({ title: e.target.value })} maxLength={200} placeholder={t("editorTitle")} aria-label={t("translationTitle", { language })} />
+                <Input lang={l} value={x.summary} onChange={(e) => set({ summary: e.target.value })} maxLength={600} placeholder={t("editorSummary")} aria-label={t("translationSummary", { language })} />
+                <Textarea lang={l} value={x.bodyMd} onChange={(e) => set({ bodyMd: e.target.value })} className="min-h-48 font-mono text-caption" aria-label={t("translationText", { language })} />
+              </fieldset>
+            );
+          })}
+        </details>
+      ) : null}
       <div className="flex justify-end">
-        <Button icon={<Send />} disabled={v.title.trim().length < 2 || v.bodyMd.trim().length < 20} onClick={() => setConfirm(true)}>
+        <Button icon={<Send />} disabled={v.title.trim().length < 2 || v.bodyMd.trim().length < 20 || tooShort} onClick={() => setConfirm(true)}>
           {t("publish")}
         </Button>
       </div>

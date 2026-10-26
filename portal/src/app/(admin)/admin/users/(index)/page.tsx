@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getFormatter, getTranslations } from "next-intl/server";
 import { Download } from "lucide-react";
 import { allowed, requirePermission } from "@/server/auth/viewer";
 import { getDepartments, listPeople, scopeDepartmentIds } from "@/server/queries/admin";
@@ -9,6 +9,7 @@ import { PageHeader } from "@/components/ui/layout";
 import { AddPerson, ImportPeople, PeopleFilters, PeopleTable } from "@/components/admin/people-client";
 import { DeletionRequests } from "@/components/admin/deletion-requests";
 import { InviteLinksButton } from "@/components/admin/invite-links-button";
+import { searchFold } from "@/components/secops/search-fold";
 import { riskBand } from "@/lib/domain/risk";
 import { pageParam } from "@/lib/page-param";
 
@@ -22,15 +23,15 @@ export async function generateMetadata() {
 export default async function PeoplePage({ searchParams }: PageProps<"/admin/users">) {
   const v = await requirePermission("people.read");
   const sp = await searchParams;
-  const tr = await getTranslations("admin.people");
+  const [tr, tc, format] = await Promise.all([getTranslations("admin.people"), getTranslations("common"), getFormatter()]);
   const str = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : "");
   const [all, departments, scope] = await Promise.all([listPeople(v, { includeDeleted: str("status") === "deleted" }), getDepartments(v.tenant.id), scopeDepartmentIds(v)]);
   const visibleDepartments = scope ? departments.filter((d) => scope.has(d.id)) : departments;
   const closure = departmentClosure(departments);
-  const q = str("q").toLocaleLowerCase();
+  const q = searchFold(str("q"));
   const filtered = all.filter(
     (p) =>
-      (!q || p.name.toLocaleLowerCase().includes(q) || p.email.includes(q)) &&
+      (!q || searchFold(p.name).includes(q) || searchFold(p.email).includes(q)) &&
       (!str("dept") || (p.departmentId && closure.get(str("dept"))?.has(p.departmentId))) &&
       (!str("role") || p.role === str("role")) &&
       (!str("status") || p.status === str("status")) &&
@@ -63,7 +64,7 @@ export default async function PeoplePage({ searchParams }: PageProps<"/admin/use
               <>
                 <InviteLinksButton label={tr("inviteLinks")} />
                 <ImportPeople />
-                <AddPerson departments={visibleDepartments.map((d) => ({ id: d.id, name: d.name }))} />
+                <AddPerson departments={visibleDepartments.map((d) => ({ id: d.id, name: d.name }))} defaultLocale={v.tenant.settings.defaultLocale} locales={v.tenant.settings.locales} />
               </>
             ) : null}
           </>
@@ -85,7 +86,7 @@ export default async function PeoplePage({ searchParams }: PageProps<"/admin/use
           status: p.status,
           departmentName: p.departmentName,
           riskScore: p.riskScore,
-          xp: p.xp,
+          xp: format.number(p.xp),
           lastActiveAt: p.lastActiveAt?.toISOString() ?? null,
           awaiting: p.awaiting,
           avatarUrl: p.avatarUrl,
@@ -94,7 +95,7 @@ export default async function PeoplePage({ searchParams }: PageProps<"/admin/use
       {filtered.length > PAGE ? (
         <nav className="flex items-center justify-center gap-3 text-caption">
           {page > 1 ? (
-            <Link href={pageHref(page - 1)} className="rounded-pill border border-line px-4 py-2 font-semibold hover:bg-sunken">
+            <Link href={pageHref(page - 1)} aria-label={tc("previousPage")} className="rounded-pill border border-line px-4 py-2 font-semibold hover:bg-sunken">
               ‹
             </Link>
           ) : null}
@@ -102,7 +103,7 @@ export default async function PeoplePage({ searchParams }: PageProps<"/admin/use
             {page} / {Math.ceil(filtered.length / PAGE)}
           </span>
           {page * PAGE < filtered.length ? (
-            <Link href={pageHref(page + 1)} className="rounded-pill border border-line px-4 py-2 font-semibold hover:bg-sunken">
+            <Link href={pageHref(page + 1)} aria-label={tc("nextPage")} className="rounded-pill border border-line px-4 py-2 font-semibold hover:bg-sunken">
               ›
             </Link>
           ) : null}

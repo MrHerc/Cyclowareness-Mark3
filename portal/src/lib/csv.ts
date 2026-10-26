@@ -1,4 +1,5 @@
 /** RFC 4180 CSV parsing and writing (quotes, embedded commas and newlines, ; or , delimiter). */
+import { bakuParts } from "./baku-clock";
 
 export function parseCsv(input: string): string[][] {
   const text = input.replace(/^﻿/, "");
@@ -38,9 +39,15 @@ export function parseCsv(input: string): string[][] {
   return rows;
 }
 
+/** A moment as Baku wall-clock time, "2026-10-25 12:13": what the app shows, and what spreadsheets read as a date in any language. */
+function bakuDateTime(d: Date): string {
+  const p = bakuParts(d);
+  return `${p.date} ${p.time}`;
+}
+
 function cell(v: unknown): string {
   if (v === null || v === undefined) return "";
-  let s = v instanceof Date ? v.toISOString() : String(v);
+  let s = v instanceof Date ? bakuDateTime(v) : String(v);
   // Neutralise spreadsheet formulas (CSV injection). An international phone number (+ and digits
   // only) cannot call anything, and the apostrophe would end up in the number when the file comes back.
   if (/^[=+\-@\t\r]/.test(s) && !/^\+\d{8,15}$/.test(s)) s = `'${s}`;

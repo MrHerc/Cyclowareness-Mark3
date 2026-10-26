@@ -1,0 +1,320 @@
+{
+  "id": "web-traps",
+  "title": "Veb tələlər",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "padlock",
+          "say": "Ünvan sətrindəki qıfıl işarəsi yalnız bir şeyi bildirir: bağlantı şifrələnib. Saytı kimin idarə etdiyini isə göstərmir.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "read-domain",
+          "say": "Fırıldaqçı saytların çoxunda da qıfıl işarəsi olur. Ona görə də domenin özünü oxuyun.",
+          "mood": "think",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "sahilbank-giris.info",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/login"
+                }
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "search-ads",
+          "say": "Axtarışdakı ilk nəticə reklam ola bilər. Fırıldaqçılar tanınmış saytların adından reklam yerləşdirirlər.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "fake-update",
+          "say": "Veb-sayt brauzerinizin köhnəldiyini deyib yeniləmə yükləməyi təklif edirsə, bu, tələdir. Brauzerlər özləri yenilənir.",
+          "mood": "alert",
+          "visual": {
+            "kind": "illustration",
+            "id": "update"
+          }
+        },
+        {
+          "id": "warnings",
+          "say": "Brauzer qırmızı xəbərdarlıq göstərirsə, geri qayıdın. O, sizi qorumaq üçün dayandırır.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "fake-portal",
+      "prompt": "Bu giriş səhifəsində şübhəli yerləri tapın.",
+      "artifact": {
+        "kind": "login",
+        "brand": "DövlətPortal",
+        "url": [
+          {
+            "text": "https://",
+            "spot": "padlock"
+          },
+          {
+            "text": "dovletportal-az",
+            "spot": "lookalike"
+          },
+          {
+            "text": ".online",
+            "spot": "tld"
+          },
+          {
+            "text": "/giris"
+          }
+        ],
+        "fields": [
+          "FİN kod",
+          "Parol"
+        ],
+        "button": "Daxil ol"
+      },
+      "spots": [
+        {
+          "id": "padlock",
+          "label": "Qıfıl işarəsi",
+          "explain": "Qıfıl işarəsi var, amma bu, yalnız şifrələmə deməkdir. Saytın əsl olduğunu sübut etmir."
+        },
+        {
+          "id": "lookalike",
+          "label": "Oxşar ad",
+          "explain": "Rəsmi ada tire və «az» əlavə edilib. Bu, rəsmi ada oxşayan saxta domendir."
+        },
+        {
+          "id": "tld",
+          "label": "Yanlış sonluq",
+          "explain": "Domen .online ilə bitir. Rəsmi portal isə dovletportal.az ünvanındadır."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "swipe",
+      "id": "click-or-not",
+      "prompt": "Hansı linkləri açmaq təhlükəsizdir?",
+      "cards": [
+        {
+          "id": "free-download",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://free-download-pdf.top/Sened_pulsuz.exe"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Pulsuz yükləmə saytından gələn proqram faylı çox vaxt zərərli olur. Proqramları İT dəstəyi vasitəsilə alın."
+        },
+        {
+          "id": "official",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://dovletportal.az/xidmetler/arayis"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Domen rəsmi portalın özüdür: dovletportal.az. Əlavə söz və ya tire yoxdur."
+        },
+        {
+          "id": "subdomain-trick",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://sahilbank.az.hesab-yoxla.info/login"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Əsl domen sonuncu hissədir: hesab-yoxla.info. Əvvəldəki sahilbank.az sadəcə yemdir."
+        },
+        {
+          "id": "update-exe",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://brauzer-yenile.top/update.exe"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Brauzer yeniləmələri veb-saytlardan yüklənmir. Brauzer özü yenilənir."
+        },
+        {
+          "id": "bank-path",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://www.sahilbank.az/az/kartlar"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Domen: sahilbank.az. Qalan hissə sadəcə səhifəyə gedən yoldur."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "padlock-meaning",
+      "question": {
+        "prompt": "Ünvan sətrində qıfıl işarəsi var. Bu nə deməkdir?",
+        "options": [
+          {
+            "id": "safe-site",
+            "label": "Sayt yoxlanılıb və təhlükəsizdir",
+            "correct": false,
+            "feedback": "Xeyr. Saxta saytlar da asanlıqla qıfıl işarəsi alır."
+          },
+          {
+            "id": "encrypted",
+            "label": "Sizinlə sayt arasındakı bağlantı şifrələnib",
+            "correct": true,
+            "feedback": "Düzdür. Amma sayt yenə də saxta ola bilər."
+          },
+          {
+            "id": "state-approved",
+            "label": "Sayt dövlət tərəfindən təsdiqlənib",
+            "correct": false,
+            "feedback": "Qıfıl işarəsi heç bir dövlət təsdiqi demək deyil."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://"
+              },
+              {
+                "text": "sahilbank-giris.info",
+                "spot": "domain"
+              },
+              {
+                "text": "/login"
+              }
+            ]
+          }
+        }
+      },
+      "explain": "Qıfıl işarəsi lazımdır, amma kifayət deyil. Həmişə domenin özünü oxuyun."
+    },
+    {
+      "type": "scenario",
+      "id": "sudden-popup",
+      "title": "Qəfil açılan pəncərə",
+      "start": "popup",
+      "nodes": [
+        {
+          "id": "popup",
+          "text": "Xəbər saytında məqalə oxuyursunuz. Birdən ekranı qırmızı pəncərə tutur: kompüteriniz yoluxub, +994 12 000 04 19 nömrəsinə zəng edin. Həyəcan siqnalı səslənir.",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          },
+          "choices": [
+            {
+              "label": "Nömrəyə zəng et",
+              "next": "operator",
+              "feedback": "Bu, saxta texniki dəstək fırıldağıdır. Görək, sonra nə olacaq."
+            },
+            {
+              "label": "«Təmizlə» düyməsini bas",
+              "outcome": "compromised",
+              "feedback": "Düymə zərərli proqram yüklədi. Belə pəncərədə heç nəyə klikləməyin."
+            },
+            {
+              "label": "Vərəqi, lazım olsa, bütün brauzeri bağla",
+              "next": "restore",
+              "feedback": "Düzdür. O pəncərə sadəcə veb-səhifədir, kompüteriniz yoluxmayıb."
+            }
+          ]
+        },
+        {
+          "id": "operator",
+          "text": "Kompüterinizə uzaqdan qoşulmalıyıq. Bu proqramı quraşdırın və ekrandakı kodu mənə oxuyun.",
+          "speaker": "Operator",
+          "voice": "man",
+          "channel": "phone",
+          "spoken": "Kompüterinizə uzaqdan qoşulmalıyıq. <breath> Bu proqramı quraşdırın və ekrandakı kodu mənə oxuyun.",
+          "choices": [
+            {
+              "label": "Proqramı quraşdır",
+              "outcome": "compromised",
+              "feedback": "İndi fırıldaqçının kompüterinizə tam girişi var. Kompüteri şəbəkədən ayırın və dərhal bildirin."
+            },
+            {
+              "label": "Zəngi bitir və İT dəstəyinə bildir",
+              "outcome": "risky",
+              "feedback": "Vaxtında dayandınız. Amma belə pəncərədəki nömrəyə heç vaxt zəng etməyin."
+            }
+          ]
+        },
+        {
+          "id": "restore",
+          "text": "Brauzeri yenidən açırsınız. O, əvvəlki vərəqləri bərpa etməyi təklif edir.",
+          "choices": [
+            {
+              "label": "Bərpa etmə, İT dəstəyinə qısaca bildir",
+              "outcome": "safe",
+              "feedback": "Əla. Pəncərə heç nə quraşdırmadı, İT dəstəyi də məsələdən xəbərdardır."
+            },
+            {
+              "label": "Vərəqləri bərpa et",
+              "outcome": "risky",
+              "feedback": "Eyni saxta pəncərə yenidən açıla bilər. Bərpadan imtina edin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Qıfıl işarəsi yalnız şifrələmə deməkdir: domeni oxuyun.",
+        "Reklamlara yox, əlfəcinlərə və ya özünüz yazdığınız ünvanlara etibar edin.",
+        "«İndi yeniləyin» və ya «kompüteriniz yoluxub» deyən pəncərələr tələdir."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

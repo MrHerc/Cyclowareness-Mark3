@@ -1,0 +1,387 @@
+{
+  "id": "after-mistake",
+  "title": "Səhvdən sonra",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Hər kəs yanıla bilər: kimsə linkə toxunur, kimsə kodu deyir. Ən vacibi növbəti beş dəqiqədir.",
+          "mood": "talk",
+          "gesture": "nod",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Səhvi gizlətməyin və onu təkbaşına düzəltməyə çalışmayın. Gizli qalan səhv hücumçuya vaxt qazandırır.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Hər şeyi olduğu kimi deyin: nəyə toxundunuz, nə yazdınız, nə dediniz. Mütəxəssis bunu bilməlidir.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Sonra mütəxəssislər hesabı kilidləyir və cihazı yoxlayır. Məqsəd günahkar axtarmaq deyil, ziyanı dayandırmaqdır.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "gave-code",
+      "title": "Kodu dediniz",
+      "start": "call-ended",
+      "nodes": [
+        {
+          "id": "call-ended",
+          "text": "Zəng edən özünü İT dəstəyinin əməkdaşı kimi təqdim etdi və siz telefonunuza gələn kodu ona dediniz. Zəngdən sonra şübhələndiniz.",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [
+                {
+                  "text": "İT dəstəyi"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 50 000 38 17"
+                }
+              ],
+              "label": "Mobil"
+            }
+          },
+          "choices": [
+            {
+              "label": "Bildiyim dəstək nömrəsinə dərhal zəng edirəm",
+              "next": "honest",
+              "feedback": "Düzdür. Hər dəqiqə vacibdir, hücumçu artıq hesabınıza daxil ola bilər."
+            },
+            {
+              "label": "Utanıram və heç kimə demirəm",
+              "outcome": "compromised",
+              "feedback": "Hücumçu artıq hesabınızdadır və heç kim bundan xəbərsizdir. Susmaq vəziyyəti daha da pisləşdirir."
+            },
+            {
+              "label": "Parolu özüm dəyişirəm, bu kifayətdir",
+              "outcome": "risky",
+              "feedback": "Yaxşı addımdır, amma kifayət deyil. Hücumçu açıq sessiyada qala bilər və onu yalnız mütəxəssis bağlaya bilər."
+            }
+          ]
+        },
+        {
+          "id": "honest",
+          "text": "Kodu nə vaxt verdiniz və zəng edən daha nə istədi?",
+          "speaker": "Təhlükəsizlik komandası",
+          "voice": "woman",
+          "channel": "phone",
+          "manner": "firm",
+          "spoken": "Kodu nə vaxt verdiniz <breath> və zəng edən daha nə istədi?",
+          "choices": [
+            {
+              "label": "Hər şeyi olduğu kimi danışıram, kodu verdiyimi də",
+              "next": "manager",
+              "feedback": "Düzdür. Hər şeyi olduğu kimi dediyiniz üçün mütəxəssis nəyi kilidləməli olduğunu dəqiq bilir."
+            },
+            {
+              "label": "Deyirəm ki, sadəcə zəng olub, kod verməmişəm",
+              "outcome": "risky",
+              "feedback": "Yarımçıq məlumatla mütəxəssis hesabın ələ keçirildiyini bilmir. Dürüstlük vaxta qənaət edir."
+            }
+          ]
+        },
+        {
+          "id": "manager",
+          "text": "Mütəxəssis bütün sessiyaları bağladı və sizdən yeni parol təyin etməyi xahiş etdi. Rəhbəriniz soruşur: nə baş verdi?",
+          "choices": [
+            {
+              "label": "Komanda da xəbərdar olsun deyə açıq danışıram",
+              "outcome": "safe",
+              "feedback": "Əla. Sizin danışdıqlarınız həmkarlarınızı eyni zəngdən qoruyur."
+            },
+            {
+              "label": "Heç nə olmadığını deyirəm",
+              "outcome": "risky",
+              "feedback": "Eyni zəng həmkarlarınıza da gələ bilər. Danışmaq onları qoruyur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "next-day-inbox",
+      "environment": "inbox",
+      "title": "Ertəsi gün",
+      "intro": "Dünən saxta linki açdınız və bunu bildirdiniz. Bu gün gələnlər qutunuzda üç məktub gözləyir.",
+      "steps": [
+        {
+          "id": "ticket",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-tehlukesizlik",
+            "from": {
+              "name": [
+                {
+                  "text": "İT Təhlükəsizlik"
+                }
+              ],
+              "address": [
+                {
+                  "text": "security@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Bildirişiniz: INC-2026-0412"
+              }
+            ],
+            "time": "08:20",
+            "body": [
+              [
+                {
+                  "text": "Bildirdiyiniz üçün təşəkkür edirik. Hesabınızdakı bütün açıq sessiyalar bağlanıb."
+                }
+              ],
+              [
+                {
+                  "text": "Bu gün parolunuzu təşkilatın portalında dəyişin. Biz link göndərmirik: portalı özünüz açın."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "safe",
+              "label": "Təhlükəsiz kimi işarələ",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Düzdür. Ünvan təşkilatınıza məxsusdur, link yoxdur və heç nə istənmir."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Ehtiyatlı olmaq yaxşıdır, amma bu məktub həqiqidir: ünvan təşkilatınızındır və link yoxdur."
+            }
+          ]
+        },
+        {
+          "id": "second-trap",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-tehlukesizlik-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "İT Təhlükəsizlik"
+                }
+              ],
+              "address": [
+                {
+                  "text": "security@idare-secure.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Təcili: hesabınız sındırılıb"
+              }
+            ],
+            "time": "09:02",
+            "body": [
+              [
+                {
+                  "text": "Dünənki insidentdən sonra hesabınızı bir saat ərzində yenidən təsdiqləyin."
+                }
+              ],
+              [
+                {
+                  "text": "Təsdiqləmək üçün: "
+                },
+                {
+                  "text": "idare-secure.example.net/yoxla",
+                  "link": {
+                    "label": "idare-secure.example.net/yoxla",
+                    "href": "https://idare-secure.example.net/yoxla"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Hücumçular bəzən ikinci dəfə yazır.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür, ünvan təşkilatınızın domenində deyil. Hücumçular tez-tez eyni adamı yenidən hədəfə alır."
+            },
+            {
+              "id": "click",
+              "label": "Linki aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Bu, ikinci tələ idi. Əsl komanda parolu portalda özünüz dəyişməyinizi xahiş etmişdi."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Siz təhlükədən uzaqsınız, amma bu məktub hücumun hələ davam etdiyini göstərir. Onu bildirin."
+            }
+          ]
+        },
+        {
+          "id": "colleague",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Nigar Quliyeva"
+                }
+              ],
+              "address": [
+                {
+                  "text": "n.quliyeva@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Sizdən qəribə məktub gəldi"
+              }
+            ],
+            "time": "09:40",
+            "body": [
+              [
+                {
+                  "text": "Salam, dünən axşam ünvanınızdan «Hesab-faktura» adlı, içində link olan bir məktub gəldi. Onu siz göndərmisiniz?"
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "forward",
+              "label": "Təhlükəsizlik komandasına yönləndir",
+              "kind": "forward",
+              "outcome": "safe",
+              "feedback": "Düzdür. Hücumçu hesabınızdan başqalarına yazıbsa, mütəxəssislər bunu bilməlidir."
+            },
+            {
+              "id": "reply",
+              "label": "Cavab ver: mən göndərməmişəm, açmayın",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Yaxşıdır, həmkarınızı xəbərdar etdiniz. Məktubu təhlükəsizlik komandasına da yönləndirin."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Həmkarınız linki aça bilər, mütəxəssis isə hücumun yayıldığından xəbər tutmaz."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "what-happens-next",
+      "prompt": "Bildirdikdən sonra adətən nə baş verir? Sıraya düzün.",
+      "items": [
+        {
+          "id": "report",
+          "label": "Siz bildirirsiniz"
+        },
+        {
+          "id": "lock",
+          "label": "Mütəxəssis hesabı kilidləyir və sessiyaları bağlayır"
+        },
+        {
+          "id": "check",
+          "label": "Kompüter və poçt qutusu yoxlanılır"
+        },
+        {
+          "id": "back",
+          "label": "Yeni parol təyin edib işə qayıdırsınız"
+        }
+      ],
+      "explain": "Bu, adi prosedurdur. Nə qədər tez bildirsəniz, bir o qədər tez başa çatar."
+    },
+    {
+      "type": "choice",
+      "id": "fear-of-blame",
+      "question": {
+        "prompt": "Həmkarınız deyir: «Bildirsəm, məni danlayacaqlar.» Nə cavab verirsiniz?",
+        "options": [
+          {
+            "id": "report",
+            "label": "Tez bildirmək ziyanı azaldır, gizlətmək isə onu böyüdür",
+            "correct": true,
+            "feedback": "Düzdür. Tez və dürüst məlumat mütəxəssislər üçün ən dəyərli köməkdir."
+          },
+          {
+            "id": "hide",
+            "label": "Haqlısan, qoy heç kim bilməsin",
+            "correct": false,
+            "feedback": "Gizlədilən səhv böyüyür və bütün təşkilata ziyan vura bilər."
+          },
+          {
+            "id": "fix",
+            "label": "Əvvəlcə özün düzəltməyə çalış",
+            "correct": false,
+            "feedback": "Təkbaşına düzəltmək izləri məhv edə və vaxt itkisinə səbəb ola bilər."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "handshake"
+        }
+      },
+      "explain": "Təhlükəni səhv deyil, susqunluq böyüdür."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Yanılmısınızsa, dərhal bildirin və heç nəyi gizlətməyin.",
+        "Sonrakı məktublara diqqət edin: hücumçu yenidən yaza bilər.",
+        "Məqsəd günahkar axtarmaq deyil, ziyanı dayandırmaqdır."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

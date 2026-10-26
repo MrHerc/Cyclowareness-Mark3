@@ -7,6 +7,7 @@ import { getViewer } from "@/server/auth/viewer";
 import { brandStyle } from "@/lib/color";
 import { Toaster } from "@/components/ui/toast";
 import { ServiceWorkerRegister } from "@/components/sw-register";
+import { AzNumbersGate } from "@/components/az-numbers-gate";
 import { env } from "@/server/env";
 import "./globals.css";
 
@@ -24,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { default: "Cyclowareness", template: "%s · Cyclowareness" },
     applicationName: "Cyclowareness",
     description: t("appDescription"),
-    icons: { icon: [{ url: "/favicon.ico" }, { url: "/icons/icon.svg", type: "image/svg+xml" }], apple: "/icons/icon-192.png" },
+    icons: { icon: [{ url: "/favicon.ico" }, { url: "/icons/icon.svg", type: "image/svg+xml" }], apple: "/icons/apple-touch-icon.png" },
     formatDetection: { telephone: false, email: false, address: false },
   };
 }
@@ -43,9 +44,11 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
     <html lang={locale} className={`${geologica.variable} ${georgian.variable}`} data-motion={viewer?.user.motion ?? "full"} style={style}>
       <body>
         <NextIntlClientProvider>
-          {children}
-          <Toaster />
-          <ServiceWorkerRegister />
+          <AzNumbersGate>
+            {children}
+            <Toaster />
+            <ServiceWorkerRegister />
+          </AzNumbersGate>
         </NextIntlClientProvider>
       </body>
     </html>

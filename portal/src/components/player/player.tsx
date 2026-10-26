@@ -15,7 +15,9 @@ import { ProblemForm } from "@/components/learner/problem-form";
 import { BrandsProvider } from "./artifacts";
 import { answerIdsOf, lessonStateKey, parseLesson, serializeLesson, type SavedLesson } from "./resume";
 import { useNarrator } from "./narrator";
+import { ContentLangProvider } from "./rich";
 import { TutorPanel } from "./tutor-panel";
+import { VoiceNotice } from "./voice-notice";
 import {
   ChoiceScene,
   HotspotScene,
@@ -139,6 +141,9 @@ export function LessonPlayer(p: PlayerProps) {
   const answers = useRef<PlayerAnswer[]>([]);
   const started = useRef<number>(0);
   const narrator = useNarrator({ enabled: soundOn, rate: speed, lang: p.contentLocale });
+  // No voice for the lesson's language in this browser: as with the sound off, every text shows in
+  // full and the learner moves on by hand; a notice says why and where natural voices exist.
+  const voiceMissing = soundOn && narrator.voice === "missing";
 
   const scenes = p.lesson.scenes;
   const scene = scenes[index];
@@ -197,7 +202,7 @@ export function LessonPlayer(p: PlayerProps) {
         answers: answers.current.slice(0, 400),
       });
       if (!res.ok) {
-        toast(t("tutor.error"), "error");
+        toast(t("recap.saveError"), "error");
         return;
       }
       // No router.refresh() here: every link on the done screen leads to a freshly rendered page,
@@ -209,7 +214,7 @@ export function LessonPlayer(p: PlayerProps) {
       setPhase("done");
     } catch {
       // A rejected action (offline, server error) must not leave the recap stuck on "Saving".
-      toast(t("tutor.error"), "error");
+      toast(t("recap.saveError"), "error");
     } finally {
       setSaving(false);
     }
@@ -217,7 +222,8 @@ export function LessonPlayer(p: PlayerProps) {
 
   const env: SceneEnv = {
     narrator,
-    soundOn,
+    uiLocale: locale,
+    soundOn: soundOn && !voiceMissing,
     still: motion === "still",
     topic: p.topic,
     timer: p.timeLimitSeconds,
@@ -242,6 +248,10 @@ export function LessonPlayer(p: PlayerProps) {
     void setPreferencesAction({ soundOn: v });
   };
   const cycleSpeed = () => writeSpeed(SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length]);
+  // Azerbaijani and Russian write a decimal comma; spelled out rather than Intl (no az data in Chromium).
+  const speedLabel = locale === "en" ? String(speed) : String(speed).replace(".", ",");
+  // Lesson text in another language than the interface (a missing translation) carries its own `lang`.
+  const contentLang = p.contentLocale !== locale ? p.contentLocale : undefined;
 
   return (
     <BrandsProvider brands={p.brands}>
@@ -260,8 +270,8 @@ export function LessonPlayer(p: PlayerProps) {
                 <span>{t("ask")}</span>
               </button>
             ) : null}
-            <button type="button" onClick={cycleSpeed} aria-label={t("speed", { speed })} className="h-10 min-w-12 rounded-full px-2.5 text-caption font-bold tabular-nums hover:bg-sunken">
-              {speed}×
+            <button type="button" onClick={cycleSpeed} aria-label={t("speed", { speed: speedLabel })} className="h-10 min-w-12 rounded-full px-2.5 text-caption font-bold tabular-nums hover:bg-sunken">
+              {speedLabel}×
             </button>
             <button type="button" onClick={toggleSound} aria-label={soundOn ? t("soundOff") : t("soundOn")} aria-pressed={soundOn} className="grid size-10 place-items-center rounded-full hover:bg-sunken">
               {soundOn ? <Volume2 className="size-4.5" /> : <VolumeX className="size-4.5 text-ink-subtle" />}
@@ -306,7 +316,9 @@ export function LessonPlayer(p: PlayerProps) {
                     {p.completedBefore ? t("review") : t("start")}
                   </Button>
                 )}
-                {soundOn ? (
+                {voiceMissing ? (
+                  <VoiceNotice lang={p.contentLocale} className="mx-auto mt-4 max-w-md justify-center text-left" />
+                ) : soundOn ? (
                   <p className="mx-auto mt-4 flex items-center justify-center gap-2 text-caption font-semibold text-ink-muted">
                     <Headphones className="size-4" />
                     {t("soundHint")}
@@ -320,19 +332,22 @@ export function LessonPlayer(p: PlayerProps) {
               </div>
             </div>
           ) : phase === "playing" ? (
-            <div key={scene.id} className="flex flex-1 animate-reveal flex-col">
-              {scene.type === "tutor" ? <TutorScene scene={scene} env={env} onBack={index > 0 && scenes[index - 1].type === "tutor" ? previousScene : undefined} /> : null}
-              {scene.type === "intro" ? <IntroScene scene={scene} env={env} /> : null}
-              {scene.type === "simulation" ? <SimulationScene scene={scene} env={env} /> : null}
-              {scene.type === "choice" ? <ChoiceScene scene={scene} env={env} /> : null}
-              {scene.type === "hotspot" ? <HotspotScene scene={scene} env={env} /> : null}
-              {scene.type === "swipe" ? <SwipeScene scene={scene} env={env} /> : null}
-              {scene.type === "match" ? <MatchScene scene={scene} env={env} /> : null}
-              {scene.type === "order" ? <OrderScene scene={scene} env={env} /> : null}
-              {scene.type === "scenario" ? <ScenarioScene scene={scene} env={env} /> : null}
-              {scene.type === "password" ? <PasswordScene scene={scene} env={env} /> : null}
-              {scene.type === "recap" ? <RecapScene scene={scene} env={env} saving={saving} onFinish={finish} /> : null}
-            </div>
+            <ContentLangProvider value={contentLang}>
+              {voiceMissing ? <VoiceNotice lang={p.contentLocale} className="mb-4" /> : null}
+              <div key={scene.id} className="flex flex-1 animate-reveal flex-col">
+                {scene.type === "tutor" ? <TutorScene scene={scene} env={env} onBack={index > 0 && scenes[index - 1].type === "tutor" ? previousScene : undefined} /> : null}
+                {scene.type === "intro" ? <IntroScene scene={scene} env={env} /> : null}
+                {scene.type === "simulation" ? <SimulationScene scene={scene} env={env} /> : null}
+                {scene.type === "choice" ? <ChoiceScene scene={scene} env={env} /> : null}
+                {scene.type === "hotspot" ? <HotspotScene scene={scene} env={env} /> : null}
+                {scene.type === "swipe" ? <SwipeScene scene={scene} env={env} /> : null}
+                {scene.type === "match" ? <MatchScene scene={scene} env={env} /> : null}
+                {scene.type === "order" ? <OrderScene scene={scene} env={env} /> : null}
+                {scene.type === "scenario" ? <ScenarioScene scene={scene} env={env} /> : null}
+                {scene.type === "password" ? <PasswordScene scene={scene} env={env} /> : null}
+                {scene.type === "recap" ? <RecapScene scene={scene} env={env} saving={saving} onFinish={finish} /> : null}
+              </div>
+            </ContentLangProvider>
           ) : (
             <DoneScreen
               p={p}
@@ -359,7 +374,7 @@ export function LessonPlayer(p: PlayerProps) {
           />
           <ProblemSection context={`lesson:${p.slug}/${p.lesson.key}${scene ? `#${scene.id}` : ""}`} onSent={() => setOptionsOpen(false)} />
         </Dialog>
-        <TutorPanel open={tutorOpen} onClose={() => setTutorOpen(false)} slug={p.slug} lessonKey={p.lesson.key} sceneId={phase === "playing" ? scene.id : null} speak={(text) => narrator.speak(text, { lang: locale })} voice={p.tutorVoice !== false} />
+        <TutorPanel open={tutorOpen} onClose={() => setTutorOpen(false)} slug={p.slug} lessonKey={p.lesson.key} sceneId={phase === "playing" ? scene.id : null} speak={(text, lang) => narrator.speak(text, { lang })} speaking={narrator.speaking} contentLocale={p.contentLocale} voice={p.tutorVoice !== false} soundOn={soundOn} />
       </div>
     </BrandsProvider>
   );
@@ -476,14 +491,14 @@ function DoneScreen({ p, result, initialToken, still, onAttested }: { p: PlayerP
           ) : null}
           {p.next && !awaiting ? (
             <ButtonLink href={`/learn/${p.slug}/${p.next.key}`} size="lg" iconRight={<ChevronRight />} className="min-w-56">
-              {t("nextLesson")}: {p.next.title}
+              {t("nextLessonTitle", { title: p.next.title })}
             </ButtonLink>
           ) : null}
           <div className="flex gap-3">
             <ButtonLink href={`/learn/${p.slug}`} variant="secondary">
               {t("backToModule")}
             </ButtonLink>
-            <ButtonLink href="/" variant="ghost" icon={<Home />}>
+            <ButtonLink href="/app" variant="ghost" icon={<Home />}>
               {t("home")}
             </ButtonLink>
           </div>

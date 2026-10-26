@@ -1,0 +1,323 @@
+{
+  "id": "left-and-found",
+  "title": "Unudulan və tapılan",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "usb",
+          "say": "Dəhlizdə tapılan fleş kart hədiyyə deyil. Onu heç vaxt kompüterə taxmayın, təhlükəsizlik komandasına verin.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "usb"
+          }
+        },
+        {
+          "id": "shoulder",
+          "say": "Kimsə arxadan ekranınıza və klaviaturanıza baxa bilər. Parol yazanda ətrafınıza nəzər salın.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "laptop",
+          "say": "Noutbuku heç vaxt maşında və ya kafedə nəzarətsiz qoymayın. Bu, oğru üçün ən asan qənimətdir.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "travel"
+          }
+        },
+        {
+          "id": "check",
+          "say": "Getməzdən əvvəl masanızı yoxlayın: sənədlər kilid altında, cihazlar kilidli, çap olunanlar götürülüb.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "desk-pc",
+      "environment": "desktop",
+      "title": "İş masanızda",
+      "intro": "İş masanızdasınız. Tapılmış fleş kart, çapa göndərdiyiniz sənəd və yerinizdən qalxarkən nə edəcəyiniz barədə qərar verin.",
+      "steps": [
+        {
+          "id": "usb-found",
+          "label": "Liftin yanında tapılıb",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Ixtisar_siyahisi_2026.xlsx"
+              }
+            ],
+            "type": "lnk",
+            "size": "3 KB",
+            "source": [
+              {
+                "text": "USB: ARXIV (F:)"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "plug",
+              "label": "Kompüterə taxıb bax",
+              "kind": "plug-in",
+              "outcome": "risky",
+              "feedback": "Fayl adı marağınızı oyatmaq üçün yemdir. Tapılmış fleş kartı kompüterə taxmayın."
+            },
+            {
+              "id": "hand-in",
+              "label": "Təhlükəsizlik komandasına ver",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Tapılmış cihazı heç vaxt kompüterə taxmayın, onu mütəxəssislərə verin.",
+              "next": "print-done"
+            }
+          ]
+        },
+        {
+          "id": "usb-file",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Ixtisar_siyahisi_2026.xlsx"
+              }
+            ],
+            "type": "lnk",
+            "size": "3 KB",
+            "source": [
+              {
+                "text": "USB: ARXIV (F:)"
+              }
+            ]
+          },
+          "say": "Faylın əsl növünə baxın.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Bu, cədvəl deyil, qısayoldur. Onu açmaq gizli əmri işə salır."
+            },
+            {
+              "id": "eject",
+              "label": "Cihazı çıxar",
+              "kind": "eject",
+              "outcome": "safe",
+              "feedback": "Düzgün qərardır. Heç nə açmadan cihazı çıxarın və təhlükəsizlik komandasına verin."
+            }
+          ]
+        },
+        {
+          "id": "print-done",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "db-cap-xidmeti",
+            "app": "Çap xidməti",
+            "title": [
+              {
+                "text": "Sənədiniz çap olundu"
+              }
+            ],
+            "body": [
+              {
+                "text": "Vetendas_muracietleri.pdf, ümumi printer, 3-cü mərtəbə"
+              }
+            ],
+            "time": "11:20"
+          },
+          "actions": [
+            {
+              "id": "collect",
+              "label": "İndi gedib götürürəm",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Düzdür. Ümumi printerin yanından keçən hər kəs orada qalan sənədi oxuya bilər."
+            },
+            {
+              "id": "later",
+              "label": "Axşam götürərəm",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Vətəndaşların məlumatları saatlarla printerdə qalacaq. Çap olunanları dərhal götürün."
+            }
+          ]
+        },
+        {
+          "id": "leave-desk",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Ekranda vətəndaşların məlumatları açıqdır"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Kompüter 15 dəqiqədən sonra avtomatik kilidlənəcək."
+                }
+              ]
+            ],
+            "buttons": [
+              "Ekranı kilidlə",
+              "Belə qalsın"
+            ]
+          },
+          "say": "Printerə getmək üçün yerinizdən qalxırsınız.",
+          "actions": [
+            {
+              "id": "lock",
+              "label": "Ekranı kilidlə",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Windows düyməsi ilə L hərfini basanda ekran bir saniyədə kilidlənir."
+            },
+            {
+              "id": "leave",
+              "label": "Belə qalsın, iki dəqiqəyə qayıdıram",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "İki dəqiqə kiminsə məlumatları oxuması və ya göndərməsi üçün kifayətdir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "cafe-laptop",
+      "title": "Kafedə noutbuk",
+      "start": "cafe",
+      "nodes": [
+        {
+          "id": "cafe",
+          "text": "Kafedə iş noutbukunuzla çalışırsınız. Sifarişinizi götürmək üçün piştaxtaya getməlisiniz.",
+          "visual": {
+            "kind": "illustration",
+            "id": "travel"
+          },
+          "choices": [
+            {
+              "label": "Açıq qoyuram, cəmi bir dəqiqəlikdir",
+              "outcome": "compromised",
+              "feedback": "Bir dəqiqə onu oğurlamaq üçün kifayətdir, açıq ekran isə məlumatları hər kəsə göstərir."
+            },
+            {
+              "label": "Qonşu masada oturandan noutbuka göz-qulaq olmasını xahiş edirəm",
+              "outcome": "risky",
+              "feedback": "Tanımadığınız adam cihazınızın keşikçisi deyil. Noutbuku özünüzlə götürün."
+            },
+            {
+              "label": "Noutbuku bağlayıb özümlə götürürəm",
+              "next": "neighbour",
+              "feedback": "Düzdür. Cihaz həmişə yanınızda olmalıdır."
+            }
+          ]
+        },
+        {
+          "id": "neighbour",
+          "text": "Bağışlayın, ekranınızda gördüm ki, agentlikdə işləyirsiniz. Rəhbərinizin adı nədir? Orada bir işim var.",
+          "speaker": "Qonşu masadakı kişi",
+          "voice": "man-2",
+          "channel": "in-person",
+          "spoken": "Bağışlayın, ekranınızda gördüm ki, agentlikdə işləyirsiniz. <breath> Rəhbərinizin adı nədir? Orada bir işim var.",
+          "choices": [
+            {
+              "label": "Rəhbərimin adını və daxili nömrəsini deyirəm",
+              "outcome": "risky",
+              "feedback": "Daxili məlumatları tanımadığınız adama verməyin. Belə məlumatlar sonra saxta zəng və ya məktub üçün yem olur."
+            },
+            {
+              "label": "Onu rəsmi saytdakı resepsiya nömrəsinə yönləndirirəm",
+              "outcome": "safe",
+              "feedback": "Həm nəzakətli oldunuz, həm də heç bir daxili məlumat vermədiniz, afərin. Ekranınızı da başqalarının gözündən uzaq tutun."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "found-usb",
+      "prompt": "Dəhlizdə fleş kart tapdınız. Addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "no-plug",
+          "label": "Onu heç bir kompüterə taxmayın"
+        },
+        {
+          "id": "note",
+          "label": "Harada və nə vaxt tapdığınızı qeyd edin"
+        },
+        {
+          "id": "hand-in",
+          "label": "Təhlükəsizlik komandasına təhvil verin"
+        },
+        {
+          "id": "warn",
+          "label": "Həmkarlarınızı xəbərdar edin ki, belə fleş kartları taxmasınlar"
+        }
+      ],
+      "explain": "Tapılmış cihaz sübutdur: onu açmadan, olduğu kimi təhvil verin."
+    },
+    {
+      "type": "match",
+      "id": "left-behind",
+      "prompt": "Hər vəziyyəti düzgün addımla uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "car",
+          "left": "Noutbuk maşının oturacağında qalıb",
+          "right": "Onu özünüzlə götürün"
+        },
+        {
+          "id": "draft",
+          "left": "Məxfi sənədin qaralama vərəqi",
+          "right": "Onu doğrayıcıda məhv edin"
+        },
+        {
+          "id": "watcher",
+          "left": "Kimsə ekranınıza baxır",
+          "right": "Ekranı başqa tərəfə çevirin və ya kilidləyin"
+        },
+        {
+          "id": "badge-desk",
+          "left": "Giriş kartınız masanın üstündədir",
+          "right": "Onu həmişə üzərinizdə saxlayın"
+        }
+      ],
+      "explain": "Nəzarətsiz qalan hər şey hücumçu üçün fürsətdir."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Tapılmış fleş kartı heç vaxt kompüterə taxmayın, onu təhlükəsizlik komandasına verin.",
+        "Yerinizdən qalxanda ekranı kilidləyin, çap olunanları dərhal götürün.",
+        "Noutbukları və sənədləri heç vaxt nəzarətsiz qoymayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

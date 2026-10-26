@@ -1,0 +1,887 @@
+{
+  "id": "spot-the-phish",
+  "title": "Fişinqi tapın",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "meet-the-phish",
+      "beats": [
+        {
+          "id": "hello",
+          "say": "Salam! Mən sizin təhlükəsizlik köməkçinizəm. Bu gün saxta məktubu bir neçə saniyədə tanımağı öyrənəcəksiniz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "sender",
+          "say": "Əvvəlcə göndərənin ünvanını yoxlayın. Burada bir hərf dəyişdirilib və bunu görmək çətindir.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "xidmet-agentliyi-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Mühasibatlıq"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@"
+                  },
+                  {
+                    "text": "xidmetagentIiyi.az",
+                    "spot": "sender-domain"
+                  }
+                ]
+              },
+              "to": "e.mammadov@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "Sentyabr ayının əmək haqqı vərəqəsi"
+                }
+              ],
+              "time": "09:12",
+              "body": [
+                [
+                  {
+                    "text": "Hörmətli istifadəçi,",
+                    "spot": "greeting"
+                  }
+                ],
+                [
+                  {
+                    "text": "Sentyabr ayının əmək haqqı vərəqəsi hazırdır. "
+                  },
+                  {
+                    "text": "24 saat ərzində təsdiq etməsəniz, ödənişiniz dayandırılacaq.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "Vərəqəyə baxın",
+                    "spot": "link",
+                    "link": {
+                      "label": "Vərəqəyə baxın",
+                      "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+                    }
+                  }
+                ],
+                [
+                  {
+                    "text": "Mühasibatlıq şöbəsi"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "sender-domain",
+          "checkpoint": {
+            "prompt": "Şübhəli məktubda ilk olaraq nəyi yoxlayırsınız?",
+            "options": [
+              {
+                "id": "address",
+                "label": "Göndərənin ünvanını",
+                "correct": true,
+                "feedback": "Düzdür. Saxta məktubu çox vaxt ən tez ünvan ələ verir."
+              },
+              {
+                "id": "logo",
+                "label": "Loqonu və dizaynı",
+                "correct": false,
+                "feedback": "Loqonu və dizaynı köçürmək asandır. Ünvanı yoxlayın."
+              },
+              {
+                "id": "time",
+                "label": "Göndərilmə vaxtını",
+                "correct": false,
+                "feedback": "Vaxtdan heç nə bilinmir. Fırıldaqçılar istənilən saatda yazır."
+              }
+            ]
+          }
+        },
+        {
+          "id": "urgency",
+          "say": "Son tarix və hədə. Məktub sizi tələsdirirsə, bu, dayanmaq üçün siqnaldır.",
+          "mood": "alert",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "xidmet-agentliyi-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Mühasibatlıq"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@"
+                  },
+                  {
+                    "text": "xidmetagentIiyi.az",
+                    "spot": "sender-domain"
+                  }
+                ]
+              },
+              "to": "e.mammadov@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "Sentyabr ayının əmək haqqı vərəqəsi"
+                }
+              ],
+              "time": "09:12",
+              "body": [
+                [
+                  {
+                    "text": "Hörmətli istifadəçi,",
+                    "spot": "greeting"
+                  }
+                ],
+                [
+                  {
+                    "text": "Sentyabr ayının əmək haqqı vərəqəsi hazırdır. "
+                  },
+                  {
+                    "text": "24 saat ərzində təsdiq etməsəniz, ödənişiniz dayandırılacaq.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "Vərəqəyə baxın",
+                    "spot": "link",
+                    "link": {
+                      "label": "Vərəqəyə baxın",
+                      "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+                    }
+                  }
+                ],
+                [
+                  {
+                    "text": "Mühasibatlıq şöbəsi"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "urgency"
+        },
+        {
+          "id": "link",
+          "say": "Linkə toxunmayın. Kompüterdə ünvanı görmək üçün kursoru linkin üzərinə gətirin, telefonda isə saytı özünüz açın.",
+          "mood": "talk",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "xidmet-agentliyi-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Mühasibatlıq"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@"
+                  },
+                  {
+                    "text": "xidmetagentIiyi.az",
+                    "spot": "sender-domain"
+                  }
+                ]
+              },
+              "to": "e.mammadov@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "Sentyabr ayının əmək haqqı vərəqəsi"
+                }
+              ],
+              "time": "09:12",
+              "body": [
+                [
+                  {
+                    "text": "Hörmətli istifadəçi,",
+                    "spot": "greeting"
+                  }
+                ],
+                [
+                  {
+                    "text": "Sentyabr ayının əmək haqqı vərəqəsi hazırdır. "
+                  },
+                  {
+                    "text": "24 saat ərzində təsdiq etməsəniz, ödənişiniz dayandırılacaq.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "Vərəqəyə baxın",
+                    "spot": "link",
+                    "link": {
+                      "label": "Vərəqəyə baxın",
+                      "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+                    }
+                  }
+                ],
+                [
+                  {
+                    "text": "Mühasibatlıq şöbəsi"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "link"
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "morning-inbox",
+      "environment": "inbox",
+      "title": "Səhər poçtu",
+      "intro": "Səhər saat doqquzdur, sizi beş yeni məktub gözləyir. Hər birini açın və düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "payslip",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "Mühasibatlıq"
+                }
+              ],
+              "address": [
+                {
+                  "text": "muhasibat@xidmetagentIiyi.az",
+                  "reveal": "«agent» sözündən sonra kiçik «l» deyil, böyük latın «I» hərfi gəlir"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Sentyabr ayının əmək haqqı vərəqəsi"
+              }
+            ],
+            "time": "09:02",
+            "body": [
+              [
+                {
+                  "text": "Hörmətli istifadəçi,"
+                }
+              ],
+              [
+                {
+                  "text": "Əmək haqqı vərəqəniz hazırdır. 24 saat ərzində təsdiq etməsəniz, ödəniş dayandırılacaq."
+                }
+              ],
+              [
+                {
+                  "text": "Vərəqəyə baxın",
+                  "link": {
+                    "label": "Vərəqəyə baxın",
+                    "href": "https://maas-portal.info/giris"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Göndərənin ünvanını hərf-hərf oxuyun.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Ünvanda kiçik «l» əvəzinə böyük «I» yazılıb: bu, oxşar domendir."
+            },
+            {
+              "id": "click",
+              "label": "Linki aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Link agentliyə deyil, maas-portal.info saytına aparır. Orada yazılan parol birbaşa fırıldaqçıya gedir."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Siz təhlükədən uzaqsınız, amma bu məktub həmkarlarınıza da gəlib. Bildirin ki, təhlükəsizlik komandası onu hamının poçtundan silsin."
+            }
+          ]
+        },
+        {
+          "id": "report-draft",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "Elvin Məmmədov"
+                }
+              ],
+              "address": [
+                {
+                  "text": "e.mammadov@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Hesabatın son versiyası"
+              }
+            ],
+            "time": "08:47",
+            "body": [
+              [
+                {
+                  "text": "Salam, Aynur,"
+                }
+              ],
+              [
+                {
+                  "text": "Müzakirə etdiyimiz hesabatın son versiyasını daxili portala yüklədim. Baxandan sonra mənə xəbər verin."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "reply",
+              "label": "Cavab ver",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Düzdür. Tanış həmkar, agentliyin domeni, nə link var, nə də tələsdirmə."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Bu məktub həqiqidir: domen düzgündür və heç bir xahiş yoxdur."
+            }
+          ]
+        },
+        {
+          "id": "sign-request",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "docusfera-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "DocuSfera"
+                }
+              ],
+              "address": [
+                {
+                  "text": "noreply@docusfera-imza.test"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Sənəd imzanızı gözləyir"
+              }
+            ],
+            "time": "08:31",
+            "body": [
+              [
+                {
+                  "text": "Rəhbərlik sizə imzalamaq üçün «Muqavile_2025.pdf» sənədini göndərib."
+                }
+              ],
+              [
+                {
+                  "text": "Sənədə baxmaq üçün iş e-poçtunuzla daxil olun."
+                }
+              ],
+              [
+                {
+                  "text": "Sənədə baxın",
+                  "link": {
+                    "label": "Sənədə baxın",
+                    "href": "https://docusfera-imza.test/doc"
+                  }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "click",
+              "label": "Linki aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Domen xidmətin özününkü deyil, docusfera-imza.test idi. Açılan səhifə iş parolunuzu oğurlamaq üçün hazırlanıb."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür: qəribə domendən gözlənilməz imza sorğusu gəlib. Əmin deyilsinizsə, göndərənin sizə məlum olan nömrəsinə zəng edin."
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "İT dəstəyi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Planlı texniki işlər"
+              }
+            ],
+            "time": "08:15",
+            "body": [
+              [
+                {
+                  "text": "Şənbə günü saat 20:00-dan 22:00-dək e-poçt işləməyəcək. Sizdən heç bir addım tələb olunmur."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "ok",
+              "label": "Təhlükəsiz kimi qeyd et",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Düzdür. Rəsmi ünvan, link yoxdur və sizdən heç nə istənmir."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Bu məktub həqiqidir: sadəcə məlumat verir və heç nə istəmir."
+            }
+          ]
+        },
+        {
+          "id": "bonus-list",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "Kadrlar şöbəsi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "kadrlar@xidmetagentliyi-az.com"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Bayram mükafatı alanların siyahısı"
+              }
+            ],
+            "time": "07:58",
+            "body": [
+              [
+                {
+                  "text": "Hörmətli əməkdaş,"
+                }
+              ],
+              [
+                {
+                  "text": "Mükafat alacaq əməkdaşların siyahısı qoşmadadır. Adınızı bu gün yoxlayın."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Mukafat_siyahisi.html"
+                  }
+                ],
+                "size": "12 KB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Qoşmanı aç",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "Siyahı saxta giriş səhifəsi göstərən .html faylıdır. Üstəlik, domen -az.com ilə bitir."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür: qəribə domen, cəlbedici mövzu və .html qoşması. Mükafatlar barədə kadrlar şöbəsindən özünüz soruşun."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "find-the-signs",
+      "prompt": "Saxta məktubun əlamətlərinə toxunun.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "e-xidmet-fake",
+        "from": {
+          "name": [
+            {
+              "text": "E-Xidmet Portal",
+              "reveal": "bildiris@e-xidmet-portal.info"
+            }
+          ],
+          "address": [
+            {
+              "text": "bildiris@"
+            },
+            {
+              "text": "e-xidmet-portal.info",
+              "spot": "sender-domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Ödənilməmiş cərimə: son xəbərdarlıq"
+          }
+        ],
+        "time": "11:47",
+        "body": [
+          [
+            {
+              "text": "Hörmətli vətəndaş,",
+              "spot": "greeting"
+            }
+          ],
+          [
+            {
+              "text": "Adınıza 40 AZN məbləğində yol hərəkəti cəriməsi yazılıb."
+            }
+          ],
+          [
+            {
+              "text": "48 saat ərzində ödənilməsə, məbləğ iki dəfə artacaq və iş məhkəməyə göndəriləcək.",
+              "spot": "threat"
+            }
+          ],
+          [
+            {
+              "text": "Cəriməni ödəyin",
+              "spot": "link",
+              "link": {
+                "label": "Cəriməni ödəyin",
+                "href": "https://e-xidmet-portal.info/cerime?id=58213"
+              }
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender-domain",
+          "label": "Naməlum domen",
+          "explain": "Rəsmi xidmət belə ünvandan yazmır. Ad rəsmi görünsün deyə uydurulub."
+        },
+        {
+          "id": "greeting",
+          "label": "Ümumi müraciət",
+          "explain": "Əsl bildirişdə adətən adınız və işin nömrəsi göstərilir."
+        },
+        {
+          "id": "threat",
+          "label": "Hədə və son tarix",
+          "explain": "Qorxu və qısa müddət sizi yoxlamadan ödəməyə tələsdirir."
+        },
+        {
+          "id": "link",
+          "label": "Saxta link",
+          "explain": "Link kart məlumatlarınızı toplayan səhifəyə aparır. Cərimələri rəsmi portalı özünüz açaraq yoxlayın."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "first-move",
+      "question": {
+        "prompt": "Şübhəli məktubla nə edirsiniz?",
+        "options": [
+          {
+            "id": "report",
+            "label": "«Fişinqi bildir» düyməsini basıram",
+            "correct": true,
+            "feedback": "Düzdür. Belə düymə yoxdursa, məktubu təhlükəsizlik komandasına yönləndirin. Komanda onu hamı üçün bloklaya bilər."
+          },
+          {
+            "id": "click",
+            "label": "Yoxlamaq üçün linki açıram",
+            "correct": false,
+            "feedback": "Bir klik zərərli səhifəni aça bilər. Bunun əvəzinə ünvanı yoxlayın."
+          },
+          {
+            "id": "reply",
+            "label": "Cavab yazıb göndərəndən soruşuram",
+            "correct": false,
+            "feedback": "Cavabınız birbaşa fırıldaqçıya gedir. O, təbii ki, hər şeyin qaydasında olduğunu deyəcək."
+          },
+          {
+            "id": "forward",
+            "label": "Baxsınlar deyə həmkarlarıma yönləndirirəm",
+            "correct": false,
+            "feedback": "Bu, təhlükəni yayır. Bildirin, təhlükəsizlik komandası özü baxacaq."
+          }
+        ]
+      },
+      "explain": "Bildirmək həm sizi, həm də həmkarlarınızı qoruyur. Poçtunuzda «Fişinqi bildir» düyməsi yoxdursa, məktubu təhlükəsizlik komandasına yönləndirin."
+    },
+    {
+      "type": "swipe",
+      "id": "safe-or-phish",
+      "prompt": "Təhlükəsizdir, yoxsa tələ?",
+      "cards": [
+        {
+          "id": "card-blocked",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ulduzbank-fake",
+            "sender": [
+              {
+                "text": "UlduzBank"
+              }
+            ],
+            "time": "08:03",
+            "messages": [
+              [
+                {
+                  "text": "UlduzBank: Kartınız bloklanıb. Blokdan çıxarmaq üçün daxil olun: "
+                },
+                {
+                  "text": "https://ulduzbank-az.info/kart"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Göndərənin adını saxtalaşdırmaq olar, link isə bankın saytı deyil. Şübhə yaranarsa, kartın arxasındakı nömrəyə zəng edin."
+        },
+        {
+          "id": "meeting",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "Elvin Məmmədov"
+                }
+              ],
+              "address": [
+                {
+                  "text": "e.mammadov@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Sabahkı görüş"
+              }
+            ],
+            "time": "10:21",
+            "body": [
+              [
+                {
+                  "text": "Salam, Aynur,"
+                }
+              ],
+              [
+                {
+                  "text": "Sabah saat 10:00-da 3 nömrəli otaqda görüşürük. Gündəlik dünənki məktubdadır."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Tanış həmkar, düzgün ünvan, nə link var, nə də xahiş. Adi iş məktubudur."
+        },
+        {
+          "id": "courier",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "cevikkargo-fake",
+            "sender": [
+              {
+                "text": "+994 70 000 88 31"
+              }
+            ],
+            "time": "13:40",
+            "messages": [
+              [
+                {
+                  "text": "ÇevikKargo: Bağlamanız anbarda saxlanılır. 1,20 AZN xidmət haqqını ödəyin: "
+                },
+                {
+                  "text": "https://cevik-kargo.info/odenis"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Kiçik məbləğ ayıqlığınızı azaldır. Əsl məqsəd kart məlumatlarınızı oğurlamaqdır."
+        },
+        {
+          "id": "holidays",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "Kadrlar şöbəsi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "kadrlar@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Bayram günləri"
+              }
+            ],
+            "time": "16:05",
+            "body": [
+              [
+                {
+                  "text": "Hörmətli həmkarlar,"
+                }
+              ],
+              [
+                {
+                  "text": "Noyabr bayramları üçün iş qrafiki daxili portaldadır."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ümumi müraciət həmişə təhdid demək deyil. Ünvan düzgündür, link və tələsdirmə yoxdur."
+        },
+        {
+          "id": "mailbox-full",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "İT dəstəyi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it-destek@xidmetagentliyi-az.com"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Poçt qutunuz doludur"
+              }
+            ],
+            "time": "07:58",
+            "body": [
+              [
+                {
+                  "text": "Poçt qutunuz 98% doludur. Məktubları itirməmək üçün girişinizi bu gün təsdiq edin."
+                }
+              ],
+              [
+                {
+                  "text": "Girişi təsdiq edin",
+                  "link": {
+                    "label": "Girişi təsdiq edin",
+                    "href": "https://xidmetagentliyi-az.com/poct"
+                  }
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Ünvanın sonuna -az.com artırılıb, agentliyin domeni isə belə deyil. Giriş heç vaxt link vasitəsilə təsdiqlənmir."
+        },
+        {
+          "id": "card-payment",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ulduzbank",
+            "sender": [
+              {
+                "text": "UlduzBank"
+              }
+            ],
+            "time": "19:12",
+            "messages": [
+              [
+                {
+                  "text": "UlduzBank: Kartınızla 23,40 AZN məbləğində ödəniş edildi. Bunu siz etməmisinizsə, kartın arxasındakı nömrəyə zəng edin."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Link yoxdur və sizi artıq bildiyiniz nömrəyə yönləndirir. Adi bildirişdir."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Ünvanı yoxlayın: hətta bir fərqli hərf də saxta məktub deməkdir.",
+        "Tələsdirmə və hədə dayanmaq üçün siqnaldır.",
+        "Linkə toxunmazdan əvvəl onu yoxlayın, şübhə yarananda isə bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

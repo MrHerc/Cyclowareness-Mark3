@@ -1,4 +1,4 @@
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { CalendarDays, Trophy } from "lucide-react";
 import { db } from "@/server/db";
 import { allowed, requirePermission } from "@/server/auth/viewer";
@@ -20,16 +20,18 @@ export async function generateMetadata() {
 
 export default async function AdminLeague() {
   const v = await requirePermission("league.read");
-  const [tr, tl, tc, format] = await Promise.all([getTranslations("admin.league"), getTranslations("learner.league"), getTranslations("common"), getFormatter()]);
+  const [tr, tl, tc, format, locale] = await Promise.all([getTranslations("admin.league"), getTranslations("learner.league"), getTranslations("common"), getFormatter(), getLocale()]);
   const rows = await departmentLeague(db(), v.tenant.id);
   const now = new Date();
+  // az and ru month names are lowercase ("oktyabr 2026", "октябрь 2026 г."); this one starts the line.
+  const month = format.dateTime(now, { month: "long", year: "numeric" });
   return (
     <div id="league-board" className="grid grid-cols-[minmax(0,1fr)] gap-6 bg-canvas">
       <div className="grid gap-3">
         <div>
           <h1 className="text-headline font-bold">{tr("title")}</h1>
           <p className="mt-1 flex flex-wrap items-center gap-3 text-body font-semibold text-ink">
-            {format.dateTime(now, { month: "long", year: "numeric" })}
+            {month.charAt(0).toLocaleUpperCase(locale) + month.slice(1)}
             <Pill tone="brand">
               <CalendarDays />
               {tc("time.daysLeft", { count: daysLeftInMonth(now) })}

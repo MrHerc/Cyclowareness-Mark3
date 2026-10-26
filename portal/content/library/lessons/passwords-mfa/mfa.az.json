@@ -1,0 +1,403 @@
+{
+  "id": "mfa",
+  "title": "İki addımlı doğrulama",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "second-step",
+      "beats": [
+        {
+          "id": "why",
+          "say": "Parolunuz oğurlansa belə, ikinci addım hesabı qoruya bilər. Buna iki addımlı doğrulama deyilir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        },
+        {
+          "id": "best",
+          "say": "Ən güclüləri giriş açarları və təhlükəsizlik açarlarıdır. Onlar saxta saytlarda işləmir.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "code",
+          "say": "Kod yalnız sizin üçündür. Onu istəyən hər kəs, hətta bankınızın adından danışsa belə, fırıldaqçıdır.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "brandRef": "ulduzbank",
+              "sender": [
+                {
+                  "text": "UlduzBank"
+                }
+              ],
+              "time": "14:02",
+              "messages": [
+                [
+                  {
+                    "text": "Giriş kodu: 482 913. "
+                  },
+                  {
+                    "text": "Bu kodu heç kimə, hətta bank əməkdaşlarına da deməyin.",
+                    "spot": "code-warning"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "code-warning"
+        },
+        {
+          "id": "prompts",
+          "say": "Gözləmədiyiniz təsdiq sorğuları ardıcıl gəlirsə, deməli, kimsə parolunuzla daxil olmağa çalışır.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          },
+          "checkpoint": {
+            "prompt": "Gözlənilməz sorğu ilə nə edirsiniz?",
+            "options": [
+              {
+                "id": "approve",
+                "label": "Təsdiqləyirəm ki, dayansın",
+                "correct": false,
+                "feedback": "Təsdiqləsəniz, hücumçu içəri girəcək."
+              },
+              {
+                "id": "deny",
+                "label": "Rədd edirəm və parolumu dəyişirəm",
+                "correct": true,
+                "feedback": "Düzdür. Sonra təhlükəsizlik komandasına da bildirin."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "night-push",
+      "environment": "phone",
+      "title": "Gecə sorğuları",
+      "intro": "Gecə saat ikidir, siz yatırsınız. Telefonunuz isə dayanmadan girişi təsdiqləməyinizi istəyir.",
+      "steps": [
+        {
+          "id": "push-1",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "tesdiqleyici",
+            "app": "Təsdiqləyici",
+            "title": [
+              {
+                "text": "Girişi təsdiqləyirsiniz?"
+              }
+            ],
+            "body": [
+              {
+                "text": "Xidmət Agentliyi portalı. Windows kompüteri."
+              }
+            ],
+            "time": "02:14"
+          },
+          "say": "Siz heç yerə daxil olmursunuz.",
+          "actions": [
+            {
+              "id": "approve",
+              "label": "Təsdiqlə",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Siz daxil olmursunuz, deməli, bu, başqasıdır. Təsdiqləsəniz, parolunuzu bilən şəxs içəri girəcək."
+            },
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Gözləmədiyiniz sorğunu həmişə rədd edin."
+            }
+          ]
+        },
+        {
+          "id": "push-5",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "tesdiqleyici",
+            "app": "Təsdiqləyici",
+            "title": [
+              {
+                "text": "Girişi təsdiqləyirsiniz?"
+              }
+            ],
+            "body": [
+              {
+                "text": "Beşinci sorğu. Windows kompüteri."
+              }
+            ],
+            "time": "02:16"
+          },
+          "say": "Sorğular gəlməyə davam edir.",
+          "actions": [
+            {
+              "id": "approve",
+              "label": "Təsdiqlə ki, dayansın",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Bildiriş bombardmanı məhz buna hesablanıb: yorulub təsdiqləyəcəyinizə. Təsdiqləsəniz, hesab açılır."
+            },
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Təkrarlanan sorğular o deməkdir ki, kimsə parolunuzu bilir."
+            },
+            {
+              "id": "report",
+              "label": "Bu, mən deyiləm, bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Bildirdiyiniz üçün təhlükəsizlik komandası hücumdan dərhal xəbər tutur."
+            }
+          ]
+        },
+        {
+          "id": "fake-it-chat",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek-fake",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "İT dəstəyi"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam, gecə yoxlaması aparılır. Hesabınız bloklanmasın deyə son sorğunu təsdiqləyin."
+                  }
+                ],
+                "time": "02:17"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "agree",
+              "label": "Yaxşı, təsdiqləyirəm",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "İT dəstəyi heç vaxt sorğunu təsdiqləməyinizi istəmir. Bu, hücumun ikinci yarısıdır."
+            },
+            {
+              "id": "block",
+              "label": "Blokla və bildir",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Düzdür. Gecə yazan naməlum nömrə dəstək deyil, hücumçudur."
+            }
+          ]
+        },
+        {
+          "id": "change-now",
+          "label": "Portalı özünüz açdınız",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/profil/parol"
+              }
+            ],
+            "fields": [
+              "Köhnə parol",
+              "Yeni parol ifadəsi"
+            ],
+            "button": "Dəyiş"
+          },
+          "say": "Parolunuz oğurlanıb. İndi nə edirsiniz?",
+          "actions": [
+            {
+              "id": "change",
+              "label": "Parolu indi dəyiş",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Düzdür. Sonra təhlükəsizlik komandasına bildirin ki, bütün açıq sessiyaları bağlasınlar."
+            },
+            {
+              "id": "later",
+              "label": "Səhər baxaram",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Hücumçu parolunuzu bilir və yenidən cəhd edəcək. Parolu indi dəyişin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "strongest-factor",
+      "question": {
+        "prompt": "Hansı ikinci addım fişinqə qarşı ən dayanıqlıdır?",
+        "options": [
+          {
+            "id": "sms",
+            "label": "SMS kodu",
+            "correct": false,
+            "feedback": "Saxta sayt kodu soruşa bilər, nömrənizi isə başqasının SIM kartına keçirmək mümkündür."
+          },
+          {
+            "id": "app",
+            "label": "Autentifikator tətbiqi",
+            "correct": false,
+            "feedback": "SMS-dən yaxşıdır, amma kodu yenə də saxta sayta yaza bilərsiniz."
+          },
+          {
+            "id": "key",
+            "label": "Giriş açarı (passkey) və ya təhlükəsizlik açarı",
+            "correct": true,
+            "feedback": "Düzdür. Açar yalnız əsl saytla işləyir."
+          },
+          {
+            "id": "email",
+            "label": "E-poçtla göndərilən kod",
+            "correct": false,
+            "feedback": "E-poçtunuz ələ keçirilsə, kod da hücumçunun əlinə keçər."
+          }
+        ]
+      },
+      "explain": "İstənilən ikinci addım tək paroldan yaxşıdır. İmkan olanda açar seçin."
+    },
+    {
+      "type": "hotspot",
+      "id": "code-request",
+      "prompt": "Bu mesajlarda təhlükəni tapın.",
+      "artifact": {
+        "kind": "chat",
+        "app": "whatsapp",
+        "contact": [
+          {
+            "text": "+994 50 000 26 43",
+            "spot": "unknown-number",
+            "reveal": "Kontaktlarınızda yoxdur"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Salam, Aynur! Mən Nigaram, bu mənim yeni nömrəmdir."
+              }
+            ],
+            "time": "20:31"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Səhvən sənin nömrənə kod göndərdim.",
+                "spot": "mistake"
+              }
+            ],
+            "time": "20:31"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Zəhmət olmasa, indicə gələn altırəqəmli kodu mənə göndər.",
+                "spot": "ask-code"
+              }
+            ],
+            "time": "20:32"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Tez ol, iki dəqiqəyə vaxtı bitir.",
+                "spot": "urgency"
+              }
+            ],
+            "time": "20:32"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "unknown-number",
+          "label": "Naməlum nömrə",
+          "explain": "Ad tanışdır, amma nömrə yenidir. Yoxlamaq üçün dostunuzun köhnə nömrəsinə zəng edin."
+        },
+        {
+          "id": "mistake",
+          "label": "«Səhvən göndərdim»",
+          "explain": "Kod nömrənizə səhvən gəlmir. Kimsə hesabınıza daxil olmağa çalışır."
+        },
+        {
+          "id": "ask-code",
+          "label": "Kod tələbi",
+          "explain": "Bu kodu versəniz, fırıldaqçı hesabınızı ələ keçirəcək və sizin adınızdan dostlarınıza yazacaq."
+        },
+        {
+          "id": "urgency",
+          "label": "Tələsdirmə",
+          "explain": "Vaxtın az olması düşünməyə imkan vermir. Kodu heç vaxt heç kimə göndərməyin."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "order",
+      "id": "setup-authenticator",
+      "prompt": "Autentifikator tətbiqini quraşdırmaq üçün addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "turn-on",
+          "label": "Hesab ayarlarında iki addımlı doğrulamanı aktivləşdirin"
+        },
+        {
+          "id": "scan",
+          "label": "Ekrandakı QR kodu tətbiqlə skan edin"
+        },
+        {
+          "id": "enter-code",
+          "label": "Tətbiqin göstərdiyi kodu daxil edin"
+        },
+        {
+          "id": "backup",
+          "label": "Ehtiyat kodları təhlükəsiz yerdə saxlayın"
+        }
+      ],
+      "explain": "Telefonunuzu itirsəniz, ehtiyat kodlar hesabınıza yenidən daxil olmağa kömək edir."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "İmkan olanda giriş açarı və ya autentifikator tətbiqi seçin.",
+        "Kodu heç vaxt heç kimə deməyin və göndərməyin.",
+        "Gözlənilməz sorğuları rədd edin, parolu dəyişin və bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

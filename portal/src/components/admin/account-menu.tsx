@@ -46,7 +46,7 @@ export function AccountMenu() {
             <User className="size-[1.15rem] shrink-0 text-ink-subtle" />
             {t("profile")}
           </Link>
-          <Link href="/" role="menuitem" onClick={() => setOpen(false)} className={item}>
+          <Link href="/app" role="menuitem" onClick={() => setOpen(false)} className={item}>
             <BookOpenCheck className="size-[1.15rem] shrink-0 text-ink-subtle" />
             {t("learnerView")}
           </Link>

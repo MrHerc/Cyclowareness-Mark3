@@ -1,0 +1,474 @@
+{
+  "id": "safe-video-calls",
+  "title": "Təhlükəsiz video zənglər",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "vc-tutor",
+      "beats": [
+        {
+          "id": "vc-b1",
+          "say": "Salam! Video zəngdə iki sual vacibdir: sizi kim dinləyir və ekranınızda nə var?",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "vc-b2",
+          "say": "Tanımadığınız ad və ya nömrə görsəniz, görüşün təşkilatçısından soruşun. Bu aydınlaşana qədər məxfi mövzulara keçməyin.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "gorus",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "İştirakçılar (6)"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Rəşad Məmmədov (təşkilatçı)"
+                  }
+                ],
+                [
+                  {
+                    "text": "Leyla Rzayeva"
+                  }
+                ],
+                [
+                  {
+                    "text": "Kamal Nəbiyev"
+                  }
+                ],
+                [
+                  {
+                    "text": "iPhone (qonaq)",
+                    "spot": "unknown"
+                  }
+                ],
+                [
+                  {
+                    "text": "Telefonla qoşulub: +994 70 000 55 12",
+                    "spot": "dial-in"
+                  }
+                ],
+                [
+                  {
+                    "text": "Qonaq 4821: görüşü yazıya alır",
+                    "spot": "recording"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Bağla"
+              ]
+            }
+          },
+          "highlight": "unknown"
+        },
+        {
+          "id": "vc-b3",
+          "say": "Bütün ekranı paylaşanda açıq vərəqlər və gələn bildirişlər hamıya görünür.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "vc-b4",
+          "say": "Gözləmə otağını aktivləşdirin, yalnız lazım olan pəncərəni paylaşın və bildirişləri söndürün.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "vc-sim",
+      "environment": "desktop",
+      "title": "Görüş başlayır",
+      "intro": "Bu görüşün təşkilatçısı sizsiniz. İştirakçıları içəri buraxın və təqdimatınızı paylaşın.",
+      "steps": [
+        {
+          "id": "lobby-unknown",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "gorus",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Gözləmə otağı"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Qoşulmaq istəyir: iPhone"
+                }
+              ],
+              [
+                {
+                  "text": "Dəvət siyahısında yoxdur"
+                }
+              ]
+            ],
+            "buttons": [
+              "İçəri burax",
+              "Rədd et"
+            ]
+          },
+          "say": "Gözləmə otağında kimsə var.",
+          "actions": [
+            {
+              "id": "admit",
+              "label": "İçəri burax",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "Kim olduğunu bilmədən birini içəri buraxdınız. Kənar şəxs məxfi söhbəti eşidə bilər."
+            },
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Gözləmə otağı məhz bunun üçündür."
+            },
+            {
+              "id": "ask",
+              "label": "Adını bildirməsini xahiş et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Yaxşı addımdır. Dəvət siyahısında olan bir ad desə, onu içəri buraxın."
+            }
+          ]
+        },
+        {
+          "id": "lobby-known",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "gorus",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Gözləmə otağı"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Qoşulmaq istəyir: Leyla Rzayeva"
+                }
+              ],
+              [
+                {
+                  "text": "Dəvət siyahısındadır"
+                }
+              ]
+            ],
+            "buttons": [
+              "İçəri burax",
+              "Rədd et"
+            ]
+          },
+          "actions": [
+            {
+              "id": "admit",
+              "label": "İçəri burax",
+              "kind": "allow",
+              "outcome": "safe",
+              "feedback": "Düzdür. Leyla dəvət olunub və adı siyahıdadır."
+            },
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "risky",
+              "feedback": "Leyla dəvət olunub. Lüzumsuz ehtiyatkarlıq da işə mane olur."
+            }
+          ]
+        },
+        {
+          "id": "share-pick",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "gorus",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Nəyi paylaşmaq istəyirsiniz?"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bütün ekran"
+                }
+              ],
+              [
+                {
+                  "text": "Pəncərə: Teqdimat_oktyabr.pptx"
+                }
+              ],
+              [
+                {
+                  "text": "Açıq brauzer vərəqi: Maaş cədvəli 2026",
+                  "spot": "tab"
+                }
+              ]
+            ],
+            "buttons": [
+              "Paylaş"
+            ]
+          },
+          "say": "Nəyi paylaşacağınızı seçin.",
+          "actions": [
+            {
+              "id": "whole",
+              "label": "Bütün ekranı paylaş",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "İndi hamı açıq vərəqlərinizi, poçtunuzu və bildirişlərinizi görür. Maaş cədvəli də ekrandadır."
+            },
+            {
+              "id": "window",
+              "label": "Yalnız təqdimat pəncərəsini paylaş",
+              "kind": "share",
+              "outcome": "safe",
+              "feedback": "Düzdür. İştirakçılar yalnız lazım olanı görür."
+            }
+          ]
+        },
+        {
+          "id": "popup",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "ispoct",
+            "app": "İşPoçt",
+            "title": [
+              {
+                "text": "Kadrlar şöbəsi"
+              }
+            ],
+            "body": [
+              {
+                "text": "İxtisar siyahısı (məxfi) qoşmadadır"
+              }
+            ],
+            "time": "10:14"
+          },
+          "say": "Ekranı paylaşdığınız vaxt yeni məktub gəldi.",
+          "actions": [
+            {
+              "id": "pause",
+              "label": "Paylaşmanı dayandır və bildirişləri söndür",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür: bütün ekran paylaşılanda belə bildirişi hamı görür. «Narahat etməyin» rejimi bunun qarşısını alır."
+            },
+            {
+              "id": "go-on",
+              "label": "Davam et",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Bütün ekran paylaşılıbsa, məxfi mövzunu hamı görür. Paylaşmazdan əvvəl bildirişləri söndürün."
+            }
+          ]
+        },
+        {
+          "id": "recording",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "gorus",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Görüş bitdi"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Görüşün video yazısı hazırdır."
+                }
+              ],
+              [
+                {
+                  "text": "Paylaşma: linki olan hər kəs baxa bilər",
+                  "spot": "link"
+                }
+              ]
+            ],
+            "buttons": [
+              "Linki kopyala",
+              "Girişi dəyiş"
+            ]
+          },
+          "actions": [
+            {
+              "id": "public",
+              "label": "Linki ümumi qrupa göndər",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Video yazıda məxfi müzakirə var. Link yayıldıqca ona nəzarəti itirirsiniz."
+            },
+            {
+              "id": "limit",
+              "label": "Girişi yalnız iştirakçılara aç",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Video yazını yalnız ona ehtiyacı olanlar görməlidir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "vc-hotspot",
+      "prompt": "İştirakçı siyahısında nə şübhəli görünür?",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "gorus",
+        "tone": "app",
+        "title": [
+          {
+            "text": "İştirakçılar (6)"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Rəşad Məmmədov (təşkilatçı)"
+            }
+          ],
+          [
+            {
+              "text": "Leyla Rzayeva"
+            }
+          ],
+          [
+            {
+              "text": "Kamal Nəbiyev"
+            }
+          ],
+          [
+            {
+              "text": "iPhone (qonaq)",
+              "spot": "unknown"
+            }
+          ],
+          [
+            {
+              "text": "Telefonla qoşulub: +994 70 000 55 12",
+              "spot": "dial-in"
+            }
+          ],
+          [
+            {
+              "text": "Qonaq 4821: görüşü yazıya alır",
+              "spot": "recording"
+            }
+          ]
+        ],
+        "buttons": [
+          "Bağla"
+        ]
+      },
+      "spots": [
+        {
+          "id": "unknown",
+          "label": "Adsız cihaz",
+          "explain": "«iPhone» ad deyil. Kim olduğunu bilmirsinizsə, təşkilatçıdan soruşun."
+        },
+        {
+          "id": "dial-in",
+          "label": "Naməlum nömrə",
+          "explain": "Telefonla qoşulan nömrə tanış deyilsə, kimə məxsus olduğunu yoxlayın."
+        },
+        {
+          "id": "recording",
+          "label": "İcazəsiz yazıya alma",
+          "explain": "Qonaq görüşü yazıya alır. Təşkilatçı bunu dayandırmalı və səbəbini soruşmalıdır."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "order",
+      "id": "vc-order",
+      "prompt": "Məxfi görüşə hazırlaşın. Addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "lobby",
+          "label": "Gözləmə otağını və görüş parolunu aktivləşdirin"
+        },
+        {
+          "id": "tabs",
+          "label": "Lazım olmayan vərəqləri və faylları bağlayın"
+        },
+        {
+          "id": "dnd",
+          "label": "Bildirişləri söndürün"
+        },
+        {
+          "id": "window",
+          "label": "Yalnız təqdimat pəncərəsini paylaşın"
+        }
+      ],
+      "explain": "Əvvəlcə kimin qoşula biləcəyinə, sonra isə onların nə görə biləcəyinə nəzarət edin."
+    },
+    {
+      "type": "choice",
+      "id": "vc-choice",
+      "question": {
+        "prompt": "Görüşdə tanımadığınız biri var, təşkilatçı da onu tanımır. Nə edirsiniz?",
+        "options": [
+          {
+            "id": "remove",
+            "label": "Təşkilatçıdan onu çıxarmağı xahiş edirəm, sonra davam edirik",
+            "correct": true,
+            "feedback": "Düzdür. Kənar şəxs çıxarıldıqdan sonra müzakirəni davam etdirmək olar."
+          },
+          {
+            "id": "ignore",
+            "label": "Fikir vermirəm, yəqin kimsə telefonla qoşulub",
+            "correct": false,
+            "feedback": "«Yəqin» kifayət deyil. Kənar şəxs məxfi söhbəti eşidə bilər."
+          },
+          {
+            "id": "leave",
+            "label": "Sakitcə görüşdən çıxıram",
+            "correct": false,
+            "feedback": "Siz çıxsanız da, başqaları qalır. Hamının qorunması üçün təşkilatçıya xəbər verin."
+          }
+        ]
+      },
+      "explain": "Sizi kimin dinlədiyini bilmirsinizsə, məxfi məsələləri müzakirə etməyin."
+    },
+    {
+      "type": "recap",
+      "id": "vc-recap",
+      "points": [
+        "Yalnız tanıdığınız iştirakçıları içəri buraxın",
+        "Bütün ekranı yox, yalnız lazım olan pəncərəni paylaşın",
+        "Paylaşmazdan əvvəl bildirişləri söndürün"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

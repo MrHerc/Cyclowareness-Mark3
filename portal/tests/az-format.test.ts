@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatAzDate, formatAzRelative, relativeUnit } from "../src/lib/az-format";
+import { formatAzDate, formatAzNumber, formatAzRelative, relativeUnit } from "../src/lib/az-format";
 
 // Node has full ICU, so it is the reference the hand-written Azerbaijani patterns must match.
 const TZ = "Asia/Baku";
@@ -33,8 +33,14 @@ describe("formatAzDate matches ICU az", () => {
   });
 });
 
-describe("formatAzRelative matches ICU az (numeric: auto)", () => {
-  const rtf = new Intl.RelativeTimeFormat("az", { numeric: "auto" });
+describe("formatAzRelative matches ICU az (numeric: auto) with «əvvəl» / «sonra» for counts", () => {
+  const icuRtf = new Intl.RelativeTimeFormat("az", { numeric: "auto" });
+  const rtf = { format: (n: number, unit: Parameters<typeof formatAzRelative>[1]) => icuRtf.format(n, unit).replace(/ öncə$/, " əvvəl").replace(/ ərzində$/, " sonra") };
+  it("words counts the way the interface does", () => {
+    expect(formatAzRelative(-5, "day")).toBe("5 gün əvvəl");
+    expect(formatAzRelative(2, "day")).toBe("2 gün sonra");
+    expect(formatAzRelative(-1, "day")).toBe("dünən");
+  });
   const cases: [number, Parameters<typeof formatAzRelative>[1]][] = [
     [0, "second"], [-5, "second"], [-1, "minute"], [-3, "minute"], [-1, "hour"], [-6, "hour"], [-1, "day"], [-2, "day"],
     [-1, "week"], [-3, "week"], [-1, "month"], [-4, "month"], [-1, "year"], [-2, "year"], [1, "day"], [2, "day"], [1, "week"], [3, "hour"], [1, "month"], [1, "year"],
@@ -55,5 +61,15 @@ describe("relativeUnit", () => {
     expect(relativeUnit(-45 * 86_400)).toEqual([-2, "month"]);
     expect(relativeUnit(-800 * 86_400)).toEqual([-2, "year"]);
     expect(relativeUnit(3 * 3600)).toEqual([3, "hour"]);
+  });
+});
+
+describe("formatAzNumber matches ICU az", () => {
+  const cases: [number, Intl.NumberFormatOptions | undefined][] = [
+    [0, undefined], [7, undefined], [1234, undefined], [1234.5, undefined], [-98765.4321, undefined], [1_234_567, undefined],
+    [0.25, { style: "percent" }], [12.345, { maximumFractionDigits: 1 }], [3, { minimumFractionDigits: 2 }],
+  ];
+  it.each(cases)("%s %o", (n, o) => {
+    expect(formatAzNumber(n, o)).toBe(new Intl.NumberFormat("az", o).format(n));
   });
 });

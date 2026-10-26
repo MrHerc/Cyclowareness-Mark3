@@ -1,0 +1,540 @@
+{
+  "id": "outsider-requests",
+  "title": "Kənar sorğular",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l3-tutor",
+      "beats": [
+        {
+          "id": "l3-b1",
+          "say": "Jurnalistlər, auditorlar, başqa nazirliklər: hamısı məlumat istəyə bilər. Fırıldaqçılar da onların adından yazır.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        },
+        {
+          "id": "l3-b2",
+          "say": "Auditordan gələn məktubda ünvanı yoxlayın. Əsl yoxlama barədə rəhbərlik əvvəlcədən xəbər verir.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "etalon-audit-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Etalon Audit"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "yoxlama@"
+                  },
+                  {
+                    "text": "etalon-audit-az.test",
+                    "spot": "domain"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "Planlı yoxlama: sənədlər"
+                }
+              ],
+              "time": "11:40",
+              "body": [
+                [
+                  {
+                    "text": "Rəhbərliyinizlə razılaşdırılıb. Kadr və maliyyə sənədlərini bu gün göndərin."
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "l3-b3",
+          "say": "Təcililik, şəxsi poçt qutusu və «rəhbərinizə deməyin» sözləri ciddi xəbərdarlıq əlamətləridir.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "l3-b4",
+          "say": "Sorğunu əvvəlcədən bildiyiniz nömrəyə zəng edib yoxlayın. Cavabı rəhbərlik və ya mətbuat xidməti verir.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l3-sim",
+      "environment": "call",
+      "title": "Nazirlikdən zəng",
+      "intro": "Kimsə zəng edib başqa nazirlikdə işlədiyini deyir. Dediklərini oxuyun və cavabınızı seçin.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "regional-nazirlik-fake",
+            "caller": [
+              {
+                "text": "Regional Əlaqələr Nazirliyi"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 36 18"
+              }
+            ],
+            "label": "Nazirlik",
+            "voice": "man-2"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab ver",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Zəngə cavab vermək təhlükəli deyil. Əsas məsələ hansı məlumatı verəcəyinizdir."
+            },
+            {
+              "id": "decline",
+              "label": "Rədd et",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olar. Lazım olsa, nazirliyin rəsmi nömrəsinə özünüz zəng edin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "ask",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "regional-nazirlik-fake",
+            "caller": [
+              {
+                "text": "Regional Əlaqələr Nazirliyi"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 36 18"
+              }
+            ],
+            "label": "Nazirlik",
+            "voice": "man-2"
+          },
+          "say": "Salam, mən Regional Əlaqələr Nazirliyindən Samir Quliyevəm. Birgə layihə üçün bizə şöbənizin əməkdaşlarının siyahısı mobil nömrələri ilə birlikdə lazımdır.",
+          "spoken": "Salam, <breath> mən Regional Əlaqələr Nazirliyindən Samir Quliyevəm. Birgə layihə üçün, ee, bizə şöbənizin əməkdaşlarının siyahısı mobil nömrələri ilə birlikdə lazımdır.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Siyahını göndərəcəyəm",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Əməkdaşların məlumatları şəxsiyyətini yoxlamadığınız adama verilmir."
+            },
+            {
+              "id": "verify",
+              "label": "Zəhmət olmasa, rəsmi məktub göndərin",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Qurumlararası sorğular rəsmi məktubla gəlir, cavabı isə rəhbərlik verir."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Yaxşı qərardır. İndi sorğunu rəsmi kanal vasitəsilə yoxlayın.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "push",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "regional-nazirlik-fake",
+            "caller": [
+              {
+                "text": "Regional Əlaqələr Nazirliyi"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 36 18"
+              }
+            ],
+            "label": "Nazirlik",
+            "voice": "man-2"
+          },
+          "say": "Məktuba vaxt yoxdur, nazir müavini bunu bu gün istəyir. Şəxsi e-poçtuma göndərin, ünvanı deyəcəyəm.",
+          "spoken": "Məktuba vaxt yoxdur, nazir müavini bunu bu gün istəyir. <breath> Şəxsi e-poçtuma göndərin, ünvanı deyəcəyəm.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Yaxşı, indi göndərirəm",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Siyahı naməlum ünvana getdi. Onun köməyi ilə hər həmkarınıza hədəflənmiş fişinq məktubu göndərilə bilər."
+            },
+            {
+              "id": "keep",
+              "label": "Rəhbərimin icazəsi olmadan heç nə paylaşmıram",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Təzyiq və şəxsi poçt qutusu fırıldağın əsas əlamətləridir."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Düzdür. Təzyiq artanda zəngi bitirmək ən sadə qorunma yoludur.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Zəng bitdi. İndi nə etməli?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "regional-nazirlik-fake",
+            "caller": [
+              {
+                "text": "Regional Əlaqələr Nazirliyi"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 36 18"
+              }
+            ],
+            "label": "Nazirlik",
+            "voice": "man-2"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "Nazirliyin rəsmi saytındakı nömrəyə zəng et",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Düzdür. Nömrəni özünüz tapanda saxta zəng dərhal üzə çıxır."
+            },
+            {
+              "id": "report",
+              "label": "Rəhbərə və təhlükəsizlik komandasına bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Belə zənglər adətən bir neçə həmkara gəlir, bildiriş hamısını qoruyur."
+            },
+            {
+              "id": "ignore",
+              "label": "Heç nə etmə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Zəng edən eyni fəndi başqa həmkarınızda sınayacaq. Bildirmək onları da qoruyur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l3-hotspot",
+      "prompt": "Bu saxta auditor məktubunda xəbərdarlıq əlamətlərini tapın.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "etalon-audit-fake",
+        "from": {
+          "name": [
+            {
+              "text": "Etalon Audit"
+            }
+          ],
+          "address": [
+            {
+              "text": "audit.etalon@"
+            },
+            {
+              "text": "poct-mail.example",
+              "spot": "free-mail"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Planlı yoxlama: "
+          },
+          {
+            "text": "bu gün saat 17:00-dək cavab verin",
+            "spot": "deadline"
+          }
+        ],
+        "time": "10:12",
+        "body": [
+          [
+            {
+              "text": "Hörmətli həmkar, nazirlik adından qurumunuzda audit aparırıq."
+            }
+          ],
+          [
+            {
+              "text": "Sistemi uzaqdan yoxlamaq üçün cavab məktubunda "
+            },
+            {
+              "text": "istifadəçi adınızı və parolunuzu",
+              "spot": "credentials"
+            },
+            {
+              "text": " yazın."
+            }
+          ],
+          [
+            {
+              "text": "Audit məxfidir, rəhbərinizə məlumat verməyin.",
+              "spot": "secrecy"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "free-mail",
+          "label": "Pulsuz poçt ünvanı",
+          "explain": "Audit şirkəti öz domenindən yazır. Rəsmi yoxlamalar şəxsi poçt qutusundan gəlmir."
+        },
+        {
+          "id": "deadline",
+          "label": "Sərt son tarix",
+          "explain": "Tələsdirmə sizi yoxlamadan cavab verməyə vadar etmək üçündür."
+        },
+        {
+          "id": "credentials",
+          "label": "Parol tələbi",
+          "explain": "Heç bir auditor parolunuzu istəmir. Giriş lazımdırsa, onu İT dəstəyi rəsmi qaydada verir."
+        },
+        {
+          "id": "secrecy",
+          "label": "Rəhbərdən gizlətmək",
+          "explain": "Əsl audit rəhbərliklə razılaşdırılır. Məxfilik tələbi fırıldaq əlamətidir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "l3-swipe",
+      "prompt": "Bu sorğu təhlükəsizdir, yoxsa təhlükəli?",
+      "cards": [
+        {
+          "id": "journalist-docs",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "paytaxt-xeber",
+            "from": {
+              "name": [
+                {
+                  "text": "Leyla Abbasova, Paytaxt Xəbər"
+                }
+              ],
+              "address": [
+                {
+                  "text": "l.abbasova@paytaxtxeber.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Anonim şərh"
+              }
+            ],
+            "time": "12:15",
+            "body": [
+              [
+                {
+                  "text": "Adınızı çəkməyəcəyik. Yoxlama aktının surətini mənə göndərə bilərsinizmi?"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Jurnalistlərlə qurum adından mətbuat xidməti danışır. Daxili sənədləri özbaşına verməyin."
+        },
+        {
+          "id": "press-stats",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Mətbuat xidməti"
+                }
+              ],
+              "address": [
+                {
+                  "text": "press@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "İllik statistika"
+              }
+            ],
+            "time": "12:40",
+            "body": [
+              [
+                {
+                  "text": "Zəhmət olmasa, saytda dərc olunmuş illik statistikanın son versiyasını göndərin, jurnalistin sorğusuna cavab hazırlayırıq."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Öz mətbuat xidmətiniz açıq məlumat istəyir. Bu, adi iş prosesidir."
+        },
+        {
+          "id": "registered-letter",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "senedaxini",
+            "from": {
+              "name": [
+                {
+                  "text": "SənədAxını"
+                }
+              ],
+              "address": [
+                {
+                  "text": "bildiris@senedaxini.idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Daxil olan məktub № 1847"
+              }
+            ],
+            "time": "13:05",
+            "body": [
+              [
+                {
+                  "text": "Regional Əlaqələr Nazirliyindən gələn rəsmi sorğu dəftərxanada qeydiyyata alınıb və icra üçün sizə göndərilib."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Sorğu rəsmi qeydiyyatdan keçib və daxili sistemlə gəlib. Cavab da eyni yolla göndərilir."
+        },
+        {
+          "id": "telegram-ministry",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Kamran | Nazirlik"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam, qərar layihəsini bu gün bura at, rəsmi məktub sabah gələcək."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Rəsmi sənədlər messencerlə istənilmir. «Məktub sonra gələcək» sözləri təzyiq fəndidir."
+        },
+        {
+          "id": "auditor-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "etalon-audit-fake",
+            "sender": [
+              {
+                "text": "EtalonAudit"
+              }
+            ],
+            "time": "14:20",
+            "messages": [
+              [
+                {
+                  "text": "Audit üçün sistemə giriş lazımdır. Bu SMS-ə parolunuzla cavab verin."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Heç bir auditor parol istəmir. Belə mesajı təhlükəsizlik komandasına bildirin."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l3-choice",
+      "question": {
+        "prompt": "Jurnalist zəng edir və qurumunuzdakı yoxlama barədə şərh verməyinizi xahiş edir.",
+        "options": [
+          {
+            "id": "comment",
+            "label": "Adımı çəkməsələr, bildiklərimi danışıram",
+            "correct": false,
+            "feedback": "Anonim şərh də qurumun məlumatıdır. Qurum adından yalnız səlahiyyətli şəxs danışır."
+          },
+          {
+            "id": "press",
+            "label": "Nəzakətlə mətbuat xidmətinə yönləndirirəm",
+            "correct": true,
+            "feedback": "Düzdür. Mətbuat xidməti sorğunu qeydə alır və rəsmi cavab verir."
+          },
+          {
+            "id": "hang",
+            "label": "Heç nə demədən dəstəyi qoyuram",
+            "correct": false,
+            "feedback": "Heç nə sızmır, amma jurnalist cavabsız qalır. Mətbuat xidmətinin əlaqə məlumatını vermək daha yaxşıdır."
+          }
+        ]
+      },
+      "explain": "Kənar sorğulara siz şəxsən yox, qurum cavab verir. Əvvəlcə sorğu göndərənin şəxsiyyətini rəsmi kanal vasitəsilə yoxlayın."
+    },
+    {
+      "type": "recap",
+      "id": "l3-recap",
+      "points": [
+        "Kənar sorğuları özünüz tapdığınız rəsmi nömrə ilə yoxlayın.",
+        "Təcililik, şəxsi poçt qutusu və «rəhbərinizə deməyin» sözləri fırıldaq əlamətləridir.",
+        "Qurum adından rəhbərlik və ya mətbuat xidməti cavab verir."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

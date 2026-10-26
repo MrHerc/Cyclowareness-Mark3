@@ -2,14 +2,14 @@
   "stages": {
     "intake": "Qəbul",
     "analysis": "Analiz",
-    "conversion": "Çevirmə",
+    "conversion": "Materiala çevirmə",
     "approval": "Təsdiq",
     "targeting": "Hədəfləmə",
     "training": "Təlim",
     "feedback": "Rəy"
   },
   "stageHelp": {
-    "intake": "Bildiriş, sandbox nəticəsi, insident və ya kəşfiyyat məlumatı daxil oldu.",
+    "intake": "Bildiriş, yoxlama mühitinin nəticəsi, insident və ya kəşfiyyat məlumatı daxil oldu.",
     "analysis": "Analitik bunun nə olduğunu və nə qədər təhlükəli olduğunu yoxlayır.",
     "conversion": "Nəticə dərsə və ya dəstək materialına çevrilir.",
     "approval": "Materialı kimsə görməzdən əvvəl onu bir insan təsdiqləyir.",
@@ -25,7 +25,7 @@
   },
   "sources": {
     "report": "Əməkdaş bildirişi",
-    "sandbox": "Sandbox",
+    "sandbox": "Yoxlama mühiti",
     "incident": "İnsident",
     "intel": "Kəşfiyyat",
     "simulation": "Simulyasiya",
@@ -35,6 +35,14 @@
   "unknownPerson": "Keçmiş əməkdaş",
   "anonymous": "Anonim",
   "people": "{count} nəfər",
+  "iocTypes": {
+    "domain": "Domen",
+    "url": "URL",
+    "ip": "IP",
+    "sha256": "SHA-256",
+    "email": "E-poçt",
+    "filename": "Fayl adı"
+  },
   "ops": {
     "subtitle": "Bu gün təhlükəsizlik qərarı tələb edən hər şey bir yerdə.",
     "newReports": "Yeni bildirişlər",
@@ -46,7 +54,7 @@
     "activeLoops": "Açıq dövrələr",
     "activeLoopsHint": "30 gündə {count} bağlanıb",
     "timeToClose": "Dövrənin bağlanmasına sərf olunan median vaxt",
-    "timeToCloseValue": "{hours} saat",
+    "timeToCloseValue": "{hours, number} saat",
     "timeToCloseEmpty": "Hələ bağlanmış dövrə yoxdur",
     "reportsChart": "Əməkdaş bildirişləri, son 14 gün",
     "reportsHeaders": {
@@ -54,14 +62,14 @@
       "value": "Bildirişlər"
     },
     "pipeline": "Mərhələyə görə dövrələr",
-    "sandbox": "Sandbox nəticələri, 30 gün",
+    "sandbox": "Yoxlama mühitinin nəticələri, son 30 gün",
     "live": "Canlı və yüksək ciddilikli insidentlər",
     "liveEmpty": "Canlı və ya yüksək ciddilikli insident yoxdur. Yaxşıdır.",
     "feed": "Son fəaliyyət",
     "feedEmpty": "Hələ heç nə baş verməyib.",
     "feedKinds": {
       "report": "Bildiriş TR-{number}",
-      "sandbox": "Sandbox SB-{number}",
+      "sandbox": "Yoxlama mühiti SB-{number}",
       "incident": "İnsident IR-{number}",
       "loop": "Dövrə «{stage}» mərhələsinə keçdi",
       "decision": "Material {decision}"
@@ -88,7 +96,7 @@
     "note": "Qeyd (istəyə görə)",
     "notePlaceholder": "Nə qərar verildi və niyə",
     "close": "Dövrəni bağla",
-    "closeBody": "Bağlama nəticəni qeydə alır. Dövrə rəy mərhələsinə keçir və açıq siyahıdan çıxır.",
+    "closeBody": "Bağlandıqda nəticə qeydə alınır: dövrə rəy mərhələsinə keçir və açıq siyahıdan çıxır.",
     "setVerdict": "Nəticə",
     "linked": "Əlaqəli işlər",
     "incident": "İnsident IR-{number}",
@@ -108,7 +116,7 @@
       "dismissed": "Rədd edilib"
     },
     "simulation": "Bizim simulyasiyamız",
-    "simulationHint": "Fişinq simulyasiyası ilə uyğunlaşdı: əməkdaş düzgün hərəkət edib.",
+    "simulationHint": "Fişinq simulyasiyasına uyğun gəlir: əməkdaş düzgün hərəkət edib.",
     "reporter": "Bildirən",
     "channel": "Kanal",
     "empty": "Bu statusda bildiriş yoxdur.",
@@ -120,11 +128,16 @@
     "alsoIncident": "İnsident də aç",
     "dismiss": "Rədd et",
     "dismissBody": "Təhdid deyil. Bildiriş tarixçədə qalır.",
-    "analyze": "Linki Sandbox-da yoxla",
-    "analyzed": "Sandbox SB-{number}: {verdict}",
+    "analyze": "Linki yoxlama mühitində yoxla",
+    "analyzed": "Yoxlama mühiti SB-{number}: {verdict}",
     "triaged": "Bildiriş triaj edildi",
+    "notifyTitle": "Yeni təhdid bildirişi TR-{number}",
     "converted": "Dövrə açıldı",
-    "dismissed": "Bildiriş rədd edildi"
+    "dismissed": "Bildiriş rədd edildi",
+    "errors": {
+      "already": "Bu bildirişdən artıq dövrə açılıb.",
+      "plan": "Qapalı dövrələr planınıza daxil deyil."
+    }
   },
   "approvals": {
     "subtitle": "Heç bir Sİ və ya şablon materialı insan təsdiqi olmadan əməkdaşlara çatmır.",
@@ -147,6 +160,7 @@
     "secondApprove": "Təsdiqlə (ikinci)",
     "reject": "Rədd et",
     "rejectReason": "Niyə rədd edilir?",
+    "reasonQuoted": "«{reason}»",
     "edit": "Redaktə et",
     "saveEdit": "Dəyişiklikləri saxla",
     "title": "Başlıq",
@@ -181,28 +195,34 @@
     },
     "empty": "Bu statusda insident yoxdur.",
     "confidential": "Məxfi",
-    "confidentialHint": "Əməkdaşlar yalnız nömrəni görür, təfərrüatları heç vaxt görmür. Webhook-lara təfərrüat getmir.",
+    "confidentialHint": "Əməkdaşlar yalnız nömrəni görür, təfərrüatları heç vaxt görmür. Vebhuklara təfərrüat getmir.",
     "live": "Canlı",
     "liveHint": "Həll olunanadək əməliyyat mərkəzinin yuxarısında göstərilir.",
     "title": "Başlıq",
     "description": "Nə baş verdi",
     "severity": "Ciddilik",
     "source": "Mənbə",
-    "iocs": "İndikatorlar (hər sətirdə bir)",
-    "iocsHint": "Domenlər, URL-lər, IP ünvanları, heşlər və ya fayl adları. Zərərsizləşdirilmiş formada saxlanılır.",
+    "iocs": "İndikatorlar (hər sətirdə biri)",
+    "iocsHint": "Domenlər, URL-lər, IP ünvanları, heşlər və ya fayl adları. Təsadüfən açılmasın deyə zərərsizləşdirilmiş formada (example[.]com) göstərilir.",
     "mitre": "MITRE ATT&CK texnikaları",
-    "mitreHint": "Məsələn T1566.002, vergüllə ayırın",
+    "mitreHint": "Məsələn, T1566.002; bir neçəsini vergüllə ayırın",
     "training": "İnsidentdən sonra təlim",
     "module": "Dərs",
     "noModule": "Təlim yoxdur",
     "minScore": "Keçid balı (%)",
+    "minScoreValue": "Keçid balı: {score}%",
     "due": "Son tarix",
+    "dueValue": "Son tarix: {date}",
     "targets": "Kimə lazımdır",
     "targetsHint": "Cəlb olunmuş şəxslər və şöbələr",
     "department": "Bütün şöbə",
+    "noDepartment": "Şöbə seçilməyib",
     "people": "Şəxslər",
     "pickPeople": "Şəxs axtar",
-    "selected": "{count} seçilib",
+    "selected": "{count} nəfər seçilib:",
+    "removePerson": "Çıxar: {name}",
+    "markLive": "Canlı kimi qeyd et",
+    "unmarkLive": "Canlı qeydini götür",
     "autoTraining": "Təlimi indi təyin et",
     "create": "İnsident yarat",
     "created": "İnsident IR-{number} yaradıldı",
@@ -216,7 +236,7 @@
     "notAssigned": "Təlim hələ təyin edilməyib.",
     "assignNow": "Təlimi təyin et",
     "assigned": "Təlim {count} nəfərə təyin edildi",
-    "person": "Şəxs",
+    "person": "Əməkdaş",
     "progress": "İrəliləyiş",
     "score": "Bal",
     "passed": "Keçib",
@@ -228,7 +248,7 @@
       "completed": "Tamamlanıb"
     },
     "linked": "Əlaqəli",
-    "sandboxLink": "Sandbox SB-{number}",
+    "sandboxLink": "Yoxlama mühiti SB-{number}",
     "reportLink": "Bildiriş TR-{number}",
     "noIocs": "İndikator qeyd edilməyib.",
     "copyIocs": "İndikatorları kopyala",
@@ -257,7 +277,7 @@
     "stix": "STIX 2.1 yüklə",
     "createIncident": "İnsident aç",
     "incidentLinked": "IR-{number} ilə əlaqəlidir",
-    "size": "{kb} KB",
+    "size": "{kb, number} KB",
     "sha": "SHA-256"
   },
   "risk": {
@@ -268,7 +288,7 @@
       "medium": "Orta",
       "low": "Aşağı"
     },
-    "person": "Şəxs",
+    "person": "Əməkdaş",
     "score": "Bal",
     "why": "Niyə",
     "openRisks": "Açıq risklər",
@@ -280,7 +300,7 @@
       "knowledge": "Bilik"
     },
     "distribution": "Bölgü",
-    "average": "Orta {score}",
+    "average": "Orta bal: {score}",
     "empty": "Bu filtrlərə uyğun şəxs yoxdur.",
     "explain": "Aşağı bal daha yaxşıdır. Bal bitməmiş təlimi, gecikmiş işləri, simulyasiyalardakı riskli hərəkətləri, açıq riskləri və ilk cəhddə cavab dəqiqliyini toplayır."
   },
@@ -319,13 +339,13 @@
   "leadership": {
     "subtitle": "Rəhbərlik üçün təhlükəsizlik mənzərəsi, sadə rəqəmlərlə.",
     "print": "Çap et və ya PDF kimi saxla",
-    "riskTrend": "Orta insan riski, 30 gün",
+    "riskTrend": "İnsan riskinin orta balı, 30 gün",
     "riskHeaders": {
       "date": "Tarix",
-      "value": "Orta risk"
+      "value": "Orta risk balı"
     },
     "now": "İndi {value}",
-    "change": "30 gündə {delta} bal",
+    "change": "30 gündə {sign}{abs} bal",
     "noChange": "30 gündə dəyişiklik yoxdur",
     "completion": "Təlimin tamamlanması",
     "reportRate": "Simulyasiyaların bildirilmə dərəcəsi",
@@ -333,12 +353,12 @@
     "policyCoverage": "Siyasətlərin imzalanması",
     "departments": "Riskə görə şöbələr",
     "department": "Şöbə",
-    "avgRisk": "Orta risk",
+    "avgRisk": "Orta risk balı",
     "completionShort": "Tamamlanma",
     "headcount": "Nəfər",
     "incidents": "İnsidentlər, 30 gün",
-    "opened": "Açılıb",
-    "resolved": "Həll edilib",
+    "opened": "açılıb",
+    "resolved": "həll edilib",
     "loops": "Bağlanmış dövrələr, 30 gün",
     "trained": "Real təhdidlərdən sonra təlim keçən şəxslər",
     "topRisks": "Ən yüksək açıq risklər",
@@ -372,7 +392,7 @@
     "unpublish": "Qaralamalara keçir",
     "preview": "Önizləmə",
     "delete": "Sil",
-    "deleteBody": "Dərs təyinatları ilə birlikdə həmişəlik silinir. Yalnız heç kimin başlamadığı dərsi silmək olar: kimsə onu keçməyə başlayıbsa, təsdiqləyibsə və ya sertifikat alıbsa, kimdəsə bu dərslə bağlanan açıq risk varsa və ya insident təlim üçün bu dərsdən istifadə edirsə, onu «Qaralamalara keçir» ilə gizlədin. Bu halda nəticələr və sertifikat keçidləri qorunur.",
+    "deleteBody": "Dərs təyinatları ilə birlikdə həmişəlik silinir. Yalnız heç kimin başlamadığı dərsi silmək olar: kimsə onu keçməyə başlayıbsa, təsdiqləyibsə və ya sertifikat alıbsa, kimdəsə bu dərslə bağlanan açıq risk varsa və ya insident təlim üçün bu dərsdən istifadə edirsə, onu «Qaralamalara keçir» ilə gizlədin. Bu halda nəticələr və sertifikat linkləri qorunur.",
     "deleteInUse": "Bu dərs silinmədi: artıq irəliləyiş, təsdiq və ya sertifikat var, kimdəsə bu dərslə bağlanan açıq risk var və ya insident təlim üçün bu dərsdən istifadə edir. Onu silmək əvəzinə «Qaralamalara keçir» seçin.",
     "form": {
       "title": "Başlıq",
@@ -382,13 +402,14 @@
       "difficulty": "Çətinlik",
       "minutes": "Dəqiqə",
       "intro": "Giriş mətni",
-      "points": "Əsas fikirlər (hər sətirdə bir)",
+      "points": "Əsas fikirlər (hər sətirdə biri)",
       "pointsHint": "AI Sel hər fikri dərsin bir addımı kimi səsləndirir.",
       "question": "Yoxlama sualı",
       "options": "Cavablar",
+      "optionN": "Cavab {n}",
       "correct": "Düzgün",
       "optionFeedback": "Niyə (cavabdan sonra göstərilir)",
-      "recap": "Xülasə (hər sətirdə bir)",
+      "recap": "Xülasə (hər sətirdə biri)",
       "save": "Qaralama kimi saxla",
       "aiTopic": "Dərs nəyi öyrətməlidir?",
       "aiTopicPlaceholder": "Məsələn: bu həftə əməkdaşlarımıza gələn saxta kuryer SMS-i",
@@ -421,7 +442,7 @@
     "edit": "Redaktə et",
     "duplicate": "Surətini çıxarıb redaktə et",
     "delete": "Sil",
-    "deleteBody": "Bu yolun təyinatları da silinir. Yol üzrə sertifikat verilibsə, yolu silmək olmur: sertifikatlar və onların açıq keçidləri uyğunluq sübutudur.",
+    "deleteBody": "Bu yolun təyinatları da silinir. Yol üzrə sertifikat verilibsə, yolu silmək olmur: sertifikatlar və onların açıq linkləri uyğunluq sübutudur.",
     "deleteInUse": "Bu yol silinmədi: onun üzrə artıq sertifikat verilib.",
     "modules": "{count} dərs",
     "mandatory": "Məcburi",
@@ -436,11 +457,12 @@
       "modules": "Ardıcıllıqla dərslər",
       "add": "Dərs əlavə et",
       "search": "Dərs axtar",
-      "up": "Yuxarı",
-      "down": "Aşağı",
-      "remove": "Çıxar",
+      "up": "Yuxarı köçür",
+      "down": "Aşağı köçür",
+      "removeItem": "Çıxar: {title}",
       "save": "Yolu saxla"
     },
+    "unavailableLesson": "Əlçatan olmayan dərs",
     "saved": "Yol saxlanıldı",
     "deleted": "Yol silindi",
     "assign": "Təyin et"
@@ -448,16 +470,16 @@
   "sessions": {
     "subtitle": "Canlı nümayişlər, brifinqlər və sual-cavab sessiyaları.",
     "new": "Yeni sessiya",
-    "upcoming": "Qarşıdakı",
+    "upcoming": "Qarşıdakılar",
     "past": "Keçmiş",
     "empty": "Sessiya yoxdur.",
-    "registered": "{count} qeydiyyat",
-    "capacity": "{capacity} yerdən",
+    "registered": "Qeydiyyat: {count}",
+    "registeredOf": "Qeydiyyat: {count} / {capacity}",
     "attended": "{count} iştirak edib",
     "form": {
       "title": "Başlıq",
       "description": "Təsvir",
-      "startsAt": "Başlayır",
+      "startsAt": "Başlama vaxtı",
       "duration": "Müddət (dəqiqə)",
       "location": "Yer və ya link",
       "host": "Aparıcı",
@@ -469,7 +491,7 @@
     },
     "attendance": "İştirak",
     "noRegistrations": "Hələ qeydiyyat yoxdur.",
-    "present": "İştirak edib",
+    "presentFor": "{name} iştirak edib",
     "delete": "Sessiyanı sil",
     "deleteBody": "Qeydiyyatdan keçənlərə sessiyanın ləğv edildiyi bildirilir.",
     "saved": "Sessiya saxlanıldı",
@@ -492,7 +514,7 @@
     },
     "category": {
       "training": "Təlim",
-      "technical": "Texniki",
+      "technical": "Texniki məsələ",
       "account": "Hesab",
       "security": "Təhlükəsizlik",
       "other": "Digər"
@@ -504,7 +526,12 @@
     "empty": "Bu statusda müraciət yoxdur.",
     "setStatus": "Status",
     "updated": "Müraciət yeniləndi",
-    "back": "Bütün müraciətlər"
+    "back": "Bütün müraciətlər",
+    "notifyTitle": "Müraciət #{number}: {subject}",
+    "notifyBody": {
+      "answered": "Müraciətinizə cavab verildi.",
+      "closed": "Müraciətiniz bağlandı."
+    }
   },
   "feedback": {
     "subtitle": "Əməkdaşların dərslər və platforma haqqında fikirləri.",
@@ -522,5 +549,162 @@
     "markReviewed": "Baxıldı kimi qeyd et",
     "reviewed": "Baxılıb",
     "empty": "Hələ rəy yoxdur."
+  },
+  "aiTrainer": {
+    "title": "Sİ ilə təlim yarat",
+    "subtitle": "Əməkdaşların nə öyrənməli olduğunu yazın. Sİ dərsləri hazırlayır və avtomatik yoxlayır, siz isə qaralamanı başqaları görməzdən əvvəl nəzərdən keçirirsiniz.",
+    "connected": "Sİ qoşulub",
+    "notConnected": "Sİ qoşulmayıb",
+    "offlineTitle": "Sİ qoşulmayıb",
+    "offlineBody": "Administrator serverdə ANTHROPIC_API_KEY təyin etməlidir. O vaxtadək qaralamanı kitabxanadakı ən yaxın dərsdən qura bilərsiniz: o da eyni format və təhlükəsizlik yoxlamalarından keçir, yalnız Sİ rəyi olmadan.",
+    "prompt": "Təlim nəyi öyrətməlidir?",
+    "promptHint": "Mövzu, auditoriya və ton, bir-iki cümlə ilə.",
+    "promptPlaceholder": "Məsələn: anbar işçilərinə saxta çatdırılma SMS-lərini tanımağı öyrət. Sakit, səmimi ton, gündəlik nümunələr.",
+    "language": "Dil",
+    "category": "Kateqoriya",
+    "difficulty": "Çətinlik",
+    "minutes": "Dəqiqə (təxminən)",
+    "lessons": "Dərslər",
+    "generate": "Sİ ilə hazırla",
+    "fromLibrary": "Kitabxanadan hazırla",
+    "generating": "Sİ təlimi yazır və yoxlayır. Bu bir-iki dəqiqə çəkə bilər…",
+    "building": "Kitabxanadan qaralama qurulur və yoxlanılır…",
+    "howTitle": "Necə işləyir",
+    "how": {
+      "write": "Siz təsvir edirsiniz",
+      "check": "Avtomatik yoxlamalar",
+      "review": "Sİ rəyi",
+      "publish": "Siz dərc edirsiniz"
+    },
+    "howHelp": {
+      "write": "Mövzu, auditoriya, ton, dil və uzunluq.",
+      "check": "Dərs formatı, linklər, əlaqə məlumatları, ifadələr və cavablar.",
+      "review": "İkinci Sİ baxışı faktları və aydınlığı yoxlayır. Problemlər bir dəfə avtomatik düzəldilir.",
+      "publish": "Təlim qaralama kimi saxlanılır. Onu pleyerdə açın, sonra siyahıdan dərc edin."
+    },
+    "errors": {
+      "invalid": "Mövzunu ən azı bir cümlə ilə təsvir edin.",
+      "offline": "Sİ qoşulmayıb. ANTHROPIC_API_KEY təyin edin və ya kitabxanadan qurun.",
+      "failed": "Təlimi hazırlamaq alınmadı. Yenidən cəhd edin və ya sorğunu başqa sözlərlə yazın.",
+      "noMatch": "Bu sorğuya uyğun kitabxana dərsi tapılmadı. Başqa açar sözlər və ya kateqoriya seçin."
+    },
+    "steps": {
+      "schema": "Format",
+      "safety": "Təhlükəsizlik qaydaları",
+      "review": "Sİ rəyi"
+    },
+    "stepHelp": {
+      "schema": "Dərsin quruluşu, səhnə növləri və addımlar arasındakı keçidlər.",
+      "safety": "Yalnız test domenləri; real e-poçt ünvanı, telefon nömrəsi və təhqiramiz söz yoxdur; cavablar düzgün, illüstrasiyalar mövcuddur.",
+      "review": "Faktlar, texniki biliyi olmayan əməkdaşlar üçün aydınlıq və təlimin istədiyinizi öyrədib-öyrətmədiyi."
+    },
+    "status": {
+      "pass": "Keçdi",
+      "fail": "Keçmədi",
+      "skipped": "İcra olunmadı"
+    },
+    "notes": {
+      "offline": "İcra olunmadı: Sİ qoşulmayıb.",
+      "blocked": "Əvvəlki yoxlamalar keçənədək icra olunmur.",
+      "unavailable": "Rəyçi cavab vermədi. Məzmunu özünüz nəzərdən keçirin."
+    },
+    "verdict": {
+      "verified": "Yoxlanılıb",
+      "needs_review": "İnsan baxışı lazımdır"
+    },
+    "verdictHelp": {
+      "verified": "Hər üç yoxlama keçdi. Pleyerdə bir dəfə oxuyun, sonra dərc edin.",
+      "needs_review": "Bəzi yoxlamalar keçmədi və ya icra olunmadı. Dərc etməzdən əvvəl aşağıdakı qeydlərə baxın."
+    },
+    "regenerated": "İlk variantda problemlər var idi, ona görə də həmin qeydlər nəzərə alınaraq bir dəfə yenidən yazıldı.",
+    "severity": {
+      "blocking": "Ciddi",
+      "minor": "Kiçik"
+    },
+    "issuesNone": "Problem tapılmadı.",
+    "moreIssues": "Daha {count} qeydi göstər",
+    "sourceAi": "Sİ tərəfindən yazılıb",
+    "sourceLibrary": "Kitabxanadan: {title}",
+    "contentLanguage": "Bu kitabxana modulunun dərs mətni {language} dilindədir.",
+    "contentLanguageName": {
+      "az": "Azərbaycan",
+      "en": "ingilis",
+      "ru": "rus"
+    },
+    "issues": {
+      "missing": "Məcburi sahə doldurulmayıb.",
+      "wrongType": "Bu sahədəki dəyərin növü düzgün deyil.",
+      "textShort": "Mətn çox qısadır: ən azı {min} simvol olmalıdır.",
+      "textLong": "Mətn çox uzundur: ən çoxu {max} simvol ola bilər.",
+      "fewItems": "Elementlər azdır: ən azı {min} olmalıdır.",
+      "manyItems": "Elementlər çoxdur: ən çoxu {max} ola bilər.",
+      "numberSmall": "Ədəd çox kiçikdir: ən azı {min} olmalıdır.",
+      "numberLarge": "Ədəd çox böyükdür: ən çoxu {max} ola bilər.",
+      "badValue": "Bu dəyər burada dəstəklənmir.",
+      "badFormat": "Bu hissə dərs formatına uyğun deyil.",
+      "duplicateSceneId": "İki səhnənin identifikatoru eynidir: «{id}».",
+      "startMissing": "Ssenari mövcud olmayan «{node}» addımından başlayır.",
+      "nextMissing": "Seçimlərdən biri mövcud olmayan «{next}» addımına aparır.",
+      "noCorrectOption": "Sualın düzgün cavabı yoxdur.",
+      "minToFindTooHigh": "Səhnə olduğundan çox əlamət tapmağı tələb edir.",
+      "structure": "Dərsin quruluşunda problem var.",
+      "emailOutside": "Test domenlərindən kənar e-poçt ünvanı: {value}",
+      "realDomain": "Real görünən domen və ya link: {value}",
+      "phone": "Telefon nömrəsi yazmaq olmaz: {value}",
+      "profanity": "Nalayiq söz: {value}",
+      "unknownIllustration": "Naməlum illüstrasiya: «{id}».",
+      "optionIdsRepeat": "İki cavabın identifikatoru eynidir.",
+      "multiFewCorrect": "Bir neçə düzgün cavabı olan sualda ən azı 2 düzgün cavab olmalıdır, burada isə {count}.",
+      "multiNoWrong": "Bir neçə düzgün cavabı olan sualda səhv cavab yoxdur.",
+      "singleCorrectCount": "Bir düzgün cavabı olan sualda yalnız 1 düzgün cavab olmalıdır, burada isə {count}.",
+      "spotNotMarked": "«{spot}» əlaməti nümunə materialda işarələnməyib.",
+      "orderIdsRepeat": "Sıraya düzüləcək iki bəndin identifikatoru eynidir.",
+      "swipeNoThreat": "«Təhlükəsiz, yoxsa təhlükə» kartlarında heç bir təhlükə yoxdur."
+    },
+    "where": {
+      "lessons": "Dərslərin siyahısı",
+      "lesson": "Dərs {n}",
+      "scene": "Səhnə {n}",
+      "sceneOf": "Səhnə {n}: {type}",
+      "option": "Cavab {n}",
+      "beat": "Addım {n}",
+      "card": "Kart {n}",
+      "item": "Bənd {n}",
+      "pair": "Cüt {n}",
+      "spot": "Əlamət {n}",
+      "point": "Əsas fikir {n}",
+      "node": "Mərhələ {n}",
+      "step": "Mərhələ {n}",
+      "choice": "Seçim {n}",
+      "action": "Hərəkət {n}",
+      "artifact": "Nümunə material",
+      "titleField": "Başlıq",
+      "title": "Təlimin adı",
+      "subtitle": "Təlimin alt başlığı"
+    },
+    "lessonN": "Dərs {n}",
+    "scene": {
+      "intro": "Giriş",
+      "tutor": "Köməkçi",
+      "choice": "Sual",
+      "swipe": "Təhlükəsiz, yoxsa təhlükə",
+      "order": "Sıraya düz",
+      "match": "Cütləri tap",
+      "hotspot": "Əlamətləri tap",
+      "recap": "Xülasə",
+      "simulation": "Simulyasiya",
+      "scenario": "Ssenari",
+      "password": "Parol"
+    },
+    "correct": "düzgün cavab",
+    "verdictCard": {
+      "threat": "Təhlükə",
+      "safe": "Təhlükəsiz"
+    },
+    "save": "Qaralama kimi saxla",
+    "saved": "Qaralama kimi saxlanıldı. Siyahıdan dərc edənədək heç kim görmür.",
+    "draftNotice": "Saxladıqda qaralama yaranır. Dərc edənədək əməkdaşlar onu görmür.",
+    "openPlayer": "Pleyerdə aç",
+    "reset": "Yenidən başla"
   }
 }

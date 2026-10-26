@@ -3,21 +3,21 @@
 const STAND = P({ sag: 5, arch: 3.5 });
 const SIT = P({ hipY: 12, shY: 41, bodyL: 40, shift: -2, arch: 5, sag: 0.5, neckA: 78, neckL: 16, faceCam: 0.72,
   nfx: 14, ffx: 16.5, nhx: -2, nha: 1.45, fhx: 0.5, fha: 1.45,
-  tailA: -70, tailCurl: 9, tailTip: 40, tailWave: 3, tailSpd: 0.9, tailFront: 1, earRot: 0.3, smile: 0.4 });
+  tailA: -70, tailCurl: 9, tailTip: 40, tailWave: 3, tailSpd: 0.9, tailFront: 1, tailRoot: 0.08, earRot: 0.3, smile: 0.4 });
 const PRESENT = Object.assign({}, SIT, { theta: 0.8, faceCam: 0.85, legZ: 6.5, nfx: 14, ffx: 14, nhx: -2, fhx: -2, smile: 0.45 });
 const LOAF = P({ hipY: 12, shY: 14, bodyL: 44, arch: 7, sag: 0, neckA: 50, neckL: 13, faceCam: 0.7, lid: 0.6,
   nfx: 22, nfy: 0, nfa: -0.2, ffx: 24, ffy: 0.5, nhx: -6, nha: 1.5, fhx: -4, fhy: 0.5, fha: 1.5,
-  tailA: -172, tailCurl: 1.6, tailTip: 42, tailWave: 1.5, tailSpd: 0.6, tailFront: 1, earRot: -0.1 });
+  tailA: -172, tailCurl: 1.6, tailTip: 42, tailWave: 1.5, tailSpd: 0.6, tailFront: 1, tailRoot: 0.05, earRot: -0.1 });
 // the owner's photo: lying on the side in a C, back and bull's-eye on top, white belly and hind legs
 // toward the viewer with the toe beans showing, front paws reaching to them, head tucked, tail round the front
 const CURL = P({ hipY: 12, shY: 14, bodyL: 40, shift: -4, arch: 9, sag: 0, curl: 1, bodyR: 1.02, neckA: -10, neckL: 17, faceCam: 0.82,
   headRoll: -14, headPitch: 0.85, headScale: 0.86, headDY: 2, lid: 1, earRot: -0.3, smile: 0.35, blush: 0.8,
   elbow: 1, nfx: 13, nfy: 1, nfa: 3.14, ffx: 16, ffy: 1, ffa: 3.0, nhx: -6, nhy: 15, nha: 2.6, fhx: 1, fhy: 15, fha: 2.4, legZ: 7,
   sole: 1, beansH: 1, splay: 0.4,
-  tailA: -178, tailCurl: 1.2, tailTip: 60, tailWave: 1.2, tailSpd: 0.5, tailFront: 0.5, tailLen: 0.9, tailDX: 5, tailDY: 2 });
+  tailA: -178, tailCurl: 1.2, tailTip: 60, tailWave: 1.2, tailSpd: 0.5, tailFront: 0.5, tailLen: 0.9, tailDX: 5, tailDY: 2, tailRoot: 0.05 });
 const CROUCH = P({ hipY: 24, shY: 19, bodyL: 48, shift: -2, arch: 1, sag: -1, neckA: 18, neckL: 14, faceCam: 0.2, headPitch: -0.1,
   earRot: 1, pupil: 1, eyeOpen: 1.1, whisk: 1, smile: 0,
-  nfx: 24, ffx: 26, nhx: -17, nha: 0.9, fhx: -15, fha: 0.9, tailA: -8, tailCurl: 1.5, tailTip: 18, tailWave: 3, tailSpd: 3.2 });
+  nfx: 24, ffx: 26, nhx: -17, nha: 0.9, fhx: -15, fha: 0.9, tailA: -8, tailCurl: 1.5, tailTip: 18, tailWave: 3, tailSpd: 3.2, tailRoot: 0.7 });
 const POUNCE = P({ hipY: 30, shY: 34, bodyL: 54, arch: -3, neckA: 30, neckL: 15, faceCam: 0.18, earRot: 0.9, pupil: 1, eyeOpen: 1.15, mouth: 0.18,
   nfx: 60, nfy: 17, nfa: -0.3, ffx: 55, ffy: 14, ffa: -0.3, pawFront: 1, nhx: -42, nhy: 6, nha: 1.3, fhx: -38, fhy: 4, fha: 1.2,
   tailA: 20, tailCurl: -1, tailTip: -10, splay: 1, smile: 0 });
@@ -157,7 +157,6 @@ function idleDetails(p, u, T) {
   const sb = env(u, 0.54, 0.6, 0.66, 0.75); p.lid = Math.max(p.lid, 0.86 * sb); p.smile += 0.3 * sb; // slow "cat kiss" blink
   p.whiskT += Math.sin(T * 23) * env(u, 0.4, 0.42, 0.45, 0.47);                                       // whisker twitch
   const ht = env(u, 0.78, 0.83, 0.93, 0.99); p.headRoll += 9 * ht; p.lookY -= 0.55 * ht; p.lookX += 0.3 * ht; p.earL -= 0.2 * ht;
-  p.tailTip += 11 * Math.sin(T * 2.2);
   return p;
 }
 
@@ -573,10 +572,12 @@ const GEST = {
   cheer(p, u, tl, c) { const e = env(u, 0, 0.15, 0.82, 1), bob = Math.abs(Math.sin(tl * 7)); GEST._cheer(p, e, c, bob);
     if (e > 0.5) p.lid = 1; p.happyEyes = 1; p.mouth = Math.max(p.mouth, 0.55 * e); p.smile = lerp(p.smile, 1, e); p.earRot = lerp(p.earRot, 0.8, e); },
   think(p, u, tl, c) { const e = env(u, 0, 0.2, 0.8, 1); GEST._chin(p, e, c); p.lookX += -0.7 * e; p.lookY += -0.8 * e; p.brow = lerp(p.brow, -0.25, e); p.browUp = lerp(p.browUp, 0.5, e); p.smile = lerp(p.smile, -0.1, e); p.tailTip += 12 * Math.sin(tl * 2) * e; },
-  'point-left'(p, u, tl, c) { GEST._point(p, u, -1, c); },
-  'point-right'(p, u, tl, c) { GEST._point(p, u, 1, c); },
+  // left and right on screen: c.mir is -1 when the drawing is mirrored (a mascot facing left)
+  'point-left'(p, u, tl, c) { GEST._point(p, u, -c.mir, c); },
+  'point-right'(p, u, tl, c) { GEST._point(p, u, c.mir, c); },
+  // pointing behind itself, the near paw reaches across the chest and out past the body, not onto the chest
   _point(p, u, want, c) { const e = env(u, 0, 0.18, 0.8, 1), S = c.S, fwd = want === c.facing, K = fwd ? c.kF : c.k;
-    if (fwd) paw(p, K, S[0] + 30, S[1] - 9, -0.15, e, K === 'ff' ? 1 : 0); else paw(p, K, S[0] - 20, S[1] - 13, PI + 0.25, e, K === 'ff' ? 1 : 0);
+    if (fwd) paw(p, K, S[0] + 30, S[1] - 9, -0.15, e, K === 'ff' ? 1 : 0); else paw(p, K, S[0] - 38, S[1] - 6, PI - 0.1, e, K === 'ff' ? 1 : 0);
     p.beans = 0; p.lookX += want * 0.9 * e; p.lookTurn += want * 0.25 * e * c.facing; p.headRoll += want * c.facing * 4 * e;
     p.earRot = lerp(p.earRot, 0.8, e); p.browUp = lerp(p.browUp, 0.5, e); p.smile = lerp(p.smile, 0.7, e); },
   'point-down'(p, u, tl, c) { const e = env(u, 0, 0.18, 0.8, 1), S = c.S; paw(p, c.kF, S[0] + 26, 9, -0.6, e, c.kF === 'ff' ? 1 : 0); p.headPitch += 0.45 * e; p.lookY += 1 * e; p.earRot = lerp(p.earRot, 0.8, e); },
@@ -584,4 +585,87 @@ const GEST = {
   'lean-in'(p, u) { const e = env(u, 0, 0.2, 0.75, 1); p.shift += 3 * e; p.shY -= 1.5 * e; p.neckA -= 10 * e; p.headDX += 4 * e; p.headScale = 1 + 0.08 * e; p.eyeOpen = lerp(p.eyeOpen, 1.08, e); p.pupil = lerp(p.pupil, 0.85, e); p.browUp = lerp(p.browUp, 0.5, e); p.earRot = lerp(p.earRot, 0.9, e); },
   'shield-up'(p, u, tl, c) { const e = env(u, 0, 0.18, 0.82, 1), Hb = c.Hb; paw(p, c.k, Hb[0] - 0.5, Hb[1] - 21, 1.5, e, c.far); p.glint = Math.max(p.glint, seg(u, 0.3, 0.62)); p.smile = lerp(p.smile, 0.85, e); p.headPitch -= 0.15 * e; p.earRot = lerp(p.earRot, 0.75, e); p.lidLow = Math.max(p.lidLow, 0.35 * e); p.browUp = lerp(p.browUp, 0.4, e); },
   bow(p, u) { const e = env(u, 0, 0.25, 0.7, 1); p.shY -= 9 * e; p.hipY -= e; p.neckA -= 35 * e; p.headPitch += 0.5 * e; if (e > 0.5) { p.lid = 1; p.happyEyes = 1; } p.earRot = lerp(p.earRot, 0.4, e); p.smile = lerp(p.smile, 0.8, e); }
+};
+
+/* ============================ catching the pointer (mascot mode) ============================ */
+// Where a pointer at (x, y) is for a mascot cat in a W x H box (local px, origin top-left). near is 0 at the
+// box centre and 1 on the edge of the box grown to 1.5x around it; interest ramps from 0 at near 1.25 to 1
+// at near 0.85; reach ({ x, y, r } in local px) is the circle the paws can strike; side is the screen side
+// of the pointer (-1 left, 1 right) from the reach centre (or the box centre).
+function catchZone(x, y, W, H, reach) {
+  const near = Math.max(Math.abs(x - W / 2) / (W * 0.75), Math.abs(y - H / 2) / (H * 0.75));
+  const inReach = !!reach && Math.hypot(x - reach.x, y - reach.y) <= reach.r;
+  return { zone: inReach ? 'reach' : near <= 1 ? 'near' : 'far', near, interest: clamp((1.25 - near) / 0.4), side: x < (reach ? reach.x : W / 2) ? -1 : 1 };
+}
+// A paw (wrist) target in the body frame (cat units, y up) kept within the shoulder S's reach: out front for
+// the forward paw, across the chest and behind for the near paw; never above the cheek, never into the floor.
+function reachTarget(bx, by, S, fwd) {
+  let dx = fwd ? clamp(bx - S[0], 8, 34) : clamp(bx - S[0], -36, -12), dy = clamp(by, 6.2, S[1] + 8) - S[1];
+  const d = Math.hypot(dx, dy), m = 38;
+  if (d > m) { dx *= m / d; dy *= m / d; }
+  return [S[0] + dx, Math.max(6.2, S[1] + dy)];
+}
+// Watching a pointer near by (I 0..1): crouched a little, ears forward, pupils wide, the tail tip twitching;
+// staring at a still pointer in reach (st 0..1) adds a lower crouch, a butt wiggle and a faster twitch.
+function huntPose(p, I, st, T, seed) {
+  if (I < 0.005) return p;
+  st *= I;
+  p.shY -= (1.4 + 2.2 * st) * I; p.neckA -= 8 * I; p.headDY -= 0.6 * I; p.headPitch += 0.08 * I;
+  p.earRot = lerp(p.earRot, 1, I); p.pupil = lerp(p.pupil, 0.88 + 0.12 * st, I); p.eyeOpen = lerp(p.eyeOpen, 1.1, I);
+  p.whisk = lerp(p.whisk, 0.9, I); p.smile = lerp(p.smile, 0.1, I);
+  p.tailTip += I * 14 * noise(T * 2.4 + seed) + 10 * st * Math.sin(T * 10);
+  if (st > 0.02) { const wg = Math.sin(T * 18) * st; p.hipY += 0.8 * wg; p.shift -= 0.5 * wg; }
+  return p;
+}
+// One strike of a paw (sw.K) at sw.tgt (body frame), u seconds after it started. Phases [anticipation,
+// strike, hold, return] in seconds: a bat cocks the paw beside the chest and strikes; a swipe sweeps through
+// the target along sw.dir with almost no wind-up; a pounce raises the paw high, slams it down and pins.
+const SWAT = { bat: [0.16, 0.1, 0.08, 0.3], swipe: [0.05, 0.09, 0.03, 0.26], pounce: [0.3, 0.1, 0.45, 0.36] };
+const swatDur = (k) => SWAT[k].reduce((a, b) => a + b, 0);
+function swatPose(p, sw, u) {
+  const [a, s, h, r] = SWAT[sw.kind], t = sw.tgt, S = sw.S, fw = sw.fwd ? 1 : -1;
+  let C = [S[0] + fw * 14, S[1] - (sw.fwd ? 4 : 9)], E = t, a0 = 1.5, a1 = -0.35; // cocked beside the chest, below the chin
+  if (sw.kind === 'swipe') { C = [t[0] - sw.dir * 14, t[1] + 3]; E = [t[0] + sw.dir * 10, Math.max(6.2, t[1] - 1)]; a0 = 0.6; a1 = -0.1; }
+  else if (sw.kind === 'pounce') { C = [lerp(S[0], t[0], 0.5), Math.max(t[1], S[1] - 6) + 13]; a0 = 1.3; a1 = 0.05; }
+  let w = C, ang = a0, e = 1, k = 0, cock = 0;
+  if (u < a) { e = sstep(u / a); cock = e; }
+  else if (u < a + s) { const f = (u - a) / s; k = sw.kind === 'pounce' ? eIn(f) : eOut(f); w = mid(C, E, k); ang = lerp(a0, a1, k); cock = 1 - k; }
+  else if (u < a + s + h) { k = 1; w = E; ang = a1; }
+  else { k = 1; w = E; ang = a1; e = 1 - sstep((u - a - s - h) / r); }
+  e *= sw.fade == null ? 1 : sw.fade;
+  paw(p, sw.K, w[0], w[1], ang, e, sw.far);
+  p.beans = Math.max(p.beans, cock * e * 0.9); p.splay = Math.max(p.splay, k * e);
+  // the body goes with the paw: weight back while cocking, a lean into the strike, a press while pinning
+  p.shift += fw * (2.4 * k - 1.4 * cock) * e;
+  p.shY += (sw.kind === 'pounce' ? 2.4 * cock - 2.2 * k : 0.6 * cock - 1.2 * k) * e;
+  p.headDY -= 0.8 * k * e; p.earRot = lerp(p.earRot, 1, e); p.pupil = lerp(p.pupil, 1, e); p.mouth = Math.max(p.mouth, 0.14 * k * e);
+  return p;
+}
+
+/* ============================ jump (for a host that carries the cat along an arc) ============================ */
+// Crouch → takeoff stretch → airborne tuck (paws reaching for the landing: down or up) → landing squash →
+// settle back to sitting. The cat stays in place (a little lift only): the host moves the box between
+// takeoff and landing, which B.jumpAt gives in seconds from the start.
+const J_CROUCH = { hipY: 10, shY: 31, bodyL: 42, arch: 6, neckA: 58, neckL: 14, headPitch: 0.15, earRot: 0.9, pupil: 0.85, eyeOpen: 1.08, nfx: 17, ffx: 17.5, tailA: -30, tailCurl: 4, tailTip: 20, tailRoot: 0.3, smile: 0.2 };
+const J_PUSH = { hipY: 24, shY: 44, bodyL: 54, arch: -2, neckA: 66, neckL: 16, headPitch: -0.15, nfx: 26, nfy: 10, nfa: -0.5, ffx: 28, ffy: 8, ffa: -0.5, nhx: -14, nhy: 0, nha: 0.1, fhx: -12, fhy: 0, fha: 0.1, tailA: 20, tailCurl: -2, tailTip: -6, tailRoot: 0.8, earRot: 0.6, eyeOpen: 1.15, pupil: 0.9, mouth: 0.1 };
+const J_TUCK = { hipY: 26, shY: 32, bodyL: 44, arch: 7, neckA: 55, neckL: 14, headPitch: 0.1, nfx: 20, nfy: 12, nfa: 1.0, ffx: 22, ffy: 11, ffa: 1.0, nhx: -10, nhy: 10, nha: 1.5, fhx: -8, fhy: 9, fha: 1.5, tailA: 32, tailCurl: -4, tailTip: -12, tailRoot: 0.8, earRot: 0.4, eyeOpen: 1.12, pupil: 0.95, smile: 0.3 };
+const J_REACH = {
+  down: { hipY: 31, shY: 28, bodyL: 48, arch: 4, neckA: 40, headPitch: 0.3, lookY: 0.6, nfx: 28, nfy: 1, nfa: -0.4, ffx: 30, ffy: 1, ffa: -0.4, nhx: -12, nhy: 8, nha: 1.4, fhx: -10, fhy: 7, fha: 1.4, tailA: 38, tailCurl: -5, tailTip: -16, earRot: 0.7, splay: 1 },
+  up: { hipY: 22, shY: 38, bodyL: 50, arch: 1, neckA: 62, headPitch: -0.2, lookY: -0.5, nfx: 26, nfy: 15, nfa: -0.6, ffx: 28, ffy: 14, ffa: -0.6, nhx: -12, nhy: 6, nha: 1.2, fhx: -10, fhy: 5, fha: 1.2, tailA: 30, tailCurl: -3, tailTip: -10, earRot: 0.8, splay: 1 }
+};
+const J_LAND = { hipY: 26, shY: 22, bodyL: 46, arch: 3, neckA: 40, neckL: 14, headPitch: 0.25, squish: 0.5, nfx: 24, nfy: 0, nfa: 0, ffx: 26, ffy: 0, ffa: 0, nhx: -16, nhy: 0, nha: 0.6, fhx: -14, fhy: 0, fha: 0.6, tailA: 18, tailCurl: -3, tailTip: -10, earRot: 0.7, pupil: 0.8, splay: 1 };
+BEH.jump = (cat, o, demo) => {
+  const x = demo ? cat.Wu * 0.7 : cat.x, th = sitTheta(cat, demo ? 0 : cat.th), base = sitBase(cat);
+  const dir = o.dir === 'up' ? 'up' : 'down', hang = clamp(o.hang != null ? +o.hang / 1000 : 0.45, 0.15, 2);
+  const L = cat.mode === 'mascot' ? 0.6 : 3; // lift scale: the host carries a mascot; a roaming cat hops for real
+  const pose = (q) => at(Object.assign({}, base, q), x, th);
+  const CR = pose(J_CROUCH), PU = pose(J_PUSH), TU = pose(J_TUCK), RE = pose(Object.assign({}, J_TUCK, J_REACH[dir])), LA = pose(J_LAND), SI = at(base, x, th);
+  const segs = [
+    { d: 0.28, b: 0.25, f: (u) => mix(SI, CR, eIO(u)) },
+    { d: 0.12, b: 0.06, f: (u) => { const p = mix(CR, PU, eOut(u)); p.lift = 6 * L * eOut(u); return p; } },
+    { d: hang, b: 0.08, f: (u) => { const p = u < 0.45 ? mix(PU, TU, eIO(u / 0.45)) : mix(TU, RE, eIO((u - 0.45) / 0.55)); p.lift = L * (6 + 3 * Math.sin(PI * u) - 4 * sstep(seg(u, 0.5, 1))); return p; } },
+    { d: 0.16, b: 0.05, f: (u) => { const p = mix(RE, LA, eOut(u)); p.lift = 2 * L * (1 - eOut(u)); return p; } },
+    { d: 0.6, b: 0.1, f: (u) => { const p = mix(LA, SI, eIO(seg(u, 0.1, 1))); p.shY -= 1.6 * hump(u, 0.25, 0.7); p.headDY += 0.8 * hump(u, 0.3, 0.75); p.earL -= 0.4 * hump(u, 0.55, 0.75); p.earR -= 0.4 * hump(u, 0.6, 0.8); return p; } }
+  ];
+  return { busy: true, sitting: false, jump: true, jumpAt: { takeoff: 0.4, land: 0.4 + hang, end: 0.4 + hang + 0.76 }, segs };
 };

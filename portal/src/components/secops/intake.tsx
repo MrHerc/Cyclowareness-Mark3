@@ -116,7 +116,7 @@ export function ReportActions({
                 onClick={() =>
                   start(async () => {
                     const res = await convertReportAction(report.id, { title, severity: sev as "medium", incident });
-                    if (!res.ok) return toast(tc("errors.generic"), "error");
+                    if (!res.ok) return toast(res.error === "already" || res.error === "plan" ? t(`errors.${res.error}`) : tc("errors.generic"), "error");
                     setOpen(false);
                     toast(t("converted"));
                     router.push(res.incidentId ? `/admin/incidents/${res.incidentId}` : `/admin/loops/${res.loopId}`);
@@ -324,6 +324,7 @@ export function IntelActions({
   canReview: boolean;
 }) {
   const t = useTranslations("secops.intel");
+  const ts = useTranslations("secops");
   const tc = useTranslations("common");
   const [pending, start] = useTransition();
   const [open, setOpen] = useState(false);
@@ -382,7 +383,7 @@ export function IntelActions({
         <div className="grid gap-4">
           <Field label={t("module")} htmlFor={`intel-mod-${id}`}>
             <Select id={`intel-mod-${id}`} value={moduleId} onChange={(e) => setModuleId(e.target.value)}>
-              <option value="">—</option>
+              <option value="">{ts("approvals.noModule")}</option>
               {modules.map((m) => (
                 <option key={m.id} value={m.id}>
                   {m.label}

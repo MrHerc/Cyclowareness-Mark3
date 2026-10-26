@@ -23,6 +23,7 @@ import { analyzeFile, analyzeUrl } from "../src/server/sandbox/analyze";
 import { TEMPLATE_BY_KEY } from "../src/lib/campaigns/templates";
 import { DEFAULT_ATTESTATION, defaultSettings } from "../src/lib/tenant-defaults";
 import { departmentKey } from "../src/lib/departments";
+import { encodeRiskTitle } from "../src/lib/risk-title";
 import { REPORT_BONUS_XP, LAB_XP, dayKey } from "../src/lib/domain/gamification";
 import { DEMO_DOMAIN, DEPARTMENTS, PEOPLE, emailFor, mulberry32, type DeptKey, type SeedPerson } from "./seed-data";
 
@@ -76,7 +77,7 @@ async function main() {
 
   const lib = await syncLibrary(db);
   const pathCount = await syncPaths(db);
-  console.log(`Library: ${lib.modules} modules, ${lib.lessons} lessons, ${pathCount} paths`);
+  console.log(`Library: ${lib.modules} modules, ${lib.lessons} lessons (texts: en ${lib.locales.en}, az ${lib.locales.az}, ru ${lib.locales.ru}), ${pathCount} paths`);
 
   /* ───────── modules & lessons in memory ───────── */
   const modRows = await db.select().from(t.modules);
@@ -302,24 +303,35 @@ async function main() {
   /* ───────── policies ───────── */
   const aupEn = fs.readFileSync(path.join(process.cwd(), "content", "policies", "acceptable-use.en.md"), "utf8").replace(/^<!--[\s\S]*?-->\s*/, "");
   const aupAzFile = path.join(process.cwd(), "content", "policies", "acceptable-use.az.md");
-  const aupAz = fs.existsSync(aupAzFile) ? fs.readFileSync(aupAzFile, "utf8") : null;
+  const aupAz = fs.existsSync(aupAzFile) ? fs.readFileSync(aupAzFile, "utf8").replace(/^<!--[\s\S]*?-->\s*/, "") : null;
   const pwAz = fs.readFileSync(path.join(process.cwd(), "content", "policies", "passwords.az.md"), "utf8");
   const pwEn = fs.readFileSync(path.join(process.cwd(), "content", "policies", "passwords.en.md"), "utf8");
+  // Russian copies come from content/policies/<name>.ru.md; a policy without one shows Russian readers the base text with a notice.
+  const ruPolicy = (name: string, title: string, summary: string): Record<string, { title: string; summary: string; bodyMd: string }> => {
+    const file = path.join(process.cwd(), "content", "policies", `${name}.ru.md`);
+    return fs.existsSync(file) ? { ru: { title, summary, bodyMd: fs.readFileSync(file, "utf8").replace(/^<!--[\s\S]*?-->\s*/, "") } } : {};
+  };
   const policySpecs = [
     {
       title: "İnformasiya resurslarından məqbul istifadə siyasəti",
       created: daysAgo(16),
       body: aupAz ?? aupEn,
       summary: "Hesablar, e-poçt, internet, cihazlar, məlumat və Sİ xidmətlərindən təhlükəsiz və qanuni istifadə qaydaları.",
-      translations: { en: { title: "Acceptable Use of Information Resources Policy", summary: "Rules for the secure and lawful use of accounts, email, internet, devices, data and AI services.", bodyMd: aupEn } },
+      translations: {
+        en: { title: "Acceptable Use of Information Resources Policy", summary: "Rules for the secure and lawful use of accounts, email, internet, devices, data and AI services.", bodyMd: aupEn },
+        ...ruPolicy("acceptable-use", "Политика допустимого использования информационных ресурсов", "Правила безопасного и законного использования учётных записей, электронной почты, интернета, устройств, данных и сервисов ИИ."),
+      },
       signRate: 0.55,
     },
     {
       title: "Parol və hesab təhlükəsizliyi siyasəti",
       created: daysAgo(6),
       body: pwAz,
-      summary: "Parollar, iki addımlı giriş və parol meneceri qaydaları.",
-      translations: { en: { title: "Password and Account Security Policy", summary: "Rules for passwords, two-step sign-in and the password manager.", bodyMd: pwEn } },
+      summary: "Parollar, iki addımlı doğrulama və parol meneceri qaydaları.",
+      translations: {
+        en: { title: "Password and Account Security Policy", summary: "Rules for passwords, two-step verification and the password manager.", bodyMd: pwEn },
+        ...ruPolicy("passwords", "Политика паролей и безопасности учётных записей", "Правила для паролей, двухэтапной проверки и менеджера паролей."),
+      },
       signRate: 0.3,
     },
   ];
@@ -342,7 +354,7 @@ async function main() {
   const campaignSpecs = [
     { name: "Sentyabr maaş vərəqəsi simulyasiyası", template: "payslip", audience: "all" as const, launched: 38, status: "completed" as const },
     { name: "Maliyyə şöbəsi: bank rekvizitləri dəyişikliyi", template: "bank-details", audience: "department" as const, dept: "fin" as DeptKey, launched: 26, status: "completed" as const },
-    { name: "Yay kargo SMS kampaniyası", template: "parcel-sms", audience: "all" as const, launched: 20, status: "completed" as const },
+    { name: "Yay kuryer SMS kampaniyası", template: "parcel-sms", audience: "all" as const, launched: 20, status: "completed" as const },
     { name: "HR maaş portalı (L-2041)", template: "mfa-qr", audience: "all" as const, launched: 4, status: "running" as const },
     { name: "Rəhbərlər üçün konfrans dəvəti", template: "keynote", audience: "department" as const, dept: "exec" as DeptKey, status: "draft" as const },
     { name: "Kuryer bağlaması və USB testi", template: "usb-parcel", audience: "all" as const, status: "scheduled" as const, scheduledIn: 6 },
@@ -409,7 +421,11 @@ async function main() {
           userId: p.id,
           moduleId: mod(tpl.moduleSlug).id,
           at: clickedAt,
-          title: `«${c.name}» fişinq simulyasiyasındakı keçidi açmısınız.`,
+          title: encodeRiskTitle({
+            az: `«${c.name}» fişinq simulyasiyasındakı linki açmısınız.`,
+            en: `You opened the link in the “${c.name}” phishing simulation.`,
+            ru: `Вы открыли ссылку в фишинговой симуляции «${c.name}».`,
+          }),
           severity: submitted ? "high" : "medium",
           ref: camp.id,
         });
@@ -440,13 +456,18 @@ async function main() {
   /* ───────── other open risks (breach, path) ───────── */
   const learner = byEmailKey("learner");
   const pwModule = mod("password-managers-work");
+  const breachTitle = encodeRiskTitle({
+    az: "E-poçt ünvanınız ictimai məlumat sızıntısında aşkarlanıb. Buna görə sizə «İşdə parol menecerləri» təlimi təyin olunub.",
+    en: "Your email address was found in a public data breach, so you have been given the “Password managers at work” training.",
+    ru: "Ваш адрес электронной почты обнаружен в публичной утечке данных, поэтому вам назначено обучение «Менеджеры паролей на работе».",
+  });
   await db.insert(t.behaviorRisks).values([
     {
       tenantId,
       userId: learner.id,
       kind: "breach",
       severity: "high",
-      title: "E-poçt ünvanınız ictimai məlumat sızıntısında aşkarlanıb. Buna görə sizə «Parol menecerləri» təlimi təyin olunub.",
+      title: breachTitle,
       sourceRef: "breach-monitor",
       moduleId: pwModule.id,
       dueDate: iso(new Date(NOW.getTime() + 2 * DAY)),
@@ -457,7 +478,11 @@ async function main() {
       userId: learner.id,
       kind: "path",
       severity: "high",
-      title: "Təlim yolunun bir hissəsidir: «Ödəniş fırıldaqları və BEC-dən müdafiə».",
+      title: encodeRiskTitle({
+        az: "Təlim yolunun bir hissəsidir: «Ödəniş fırıldaqları və BEC-dən müdafiə».",
+        en: "Part of the learning path “Payment fraud and BEC defence”.",
+        ru: "Входит в учебный путь «Защита от платёжного мошенничества и BEC».",
+      }),
       sourceRef: "path:finance-bec",
       moduleId: mod("vendor-email-compromise").id,
       dueDate: iso(new Date(NOW.getTime() + 8 * DAY)),
@@ -468,7 +493,7 @@ async function main() {
       userId: byEmailKey("samir").id,
       kind: "breach",
       severity: "high",
-      title: "E-poçt ünvanınız ictimai məlumat sızıntısında aşkarlanıb. Buna görə sizə «Parol menecerləri» təlimi təyin olunub.",
+      title: breachTitle,
       sourceRef: "breach-monitor",
       moduleId: pwModule.id,
       dueDate: iso(new Date(NOW.getTime() + 5 * DAY)),
@@ -589,7 +614,7 @@ async function main() {
           userId: uid,
           kind: "incident",
           severity: s.severity,
-          title: `İnsident IR-${s.n}: ${s.title}`,
+          title: `IR-${s.n}: ${s.title}`,
           sourceRef: `IR-${s.n}`,
           moduleId: mod(s.module).id,
           status: s.status === "resolved" ? "closed" : "open",
@@ -607,7 +632,7 @@ async function main() {
     { by: "sevinc", ch: "sms" as const, subject: "Kuryerdən «bağlama saxlanılıb» SMS-i", url: "http://track-delivery-az.info/izle", status: "converted" as const, sev: "medium" as const, d: 5 },
     { by: "gulnar", ch: "email" as const, subject: "«Maaş yenilənməsi» adlı HTML əlavəli məktub", status: "converted" as const, sev: "high" as const, d: 5 },
     { by: "murad", ch: "call" as const, subject: "Zəng: «bank təhlükəsizlik xidməti» SMS kodunu istədi", status: "triaged" as const, sev: "medium" as const, d: 3 },
-    { by: "fidan", ch: "in_person" as const, subject: "3-cü mərtəbədə sahibsiz USB fləş kart tapıldı", status: "converted" as const, sev: "medium" as const, d: 9 },
+    { by: "fidan", ch: "in_person" as const, subject: "3-cü mərtəbədə sahibsiz USB fleş kart tapıldı", status: "converted" as const, sev: "medium" as const, d: 9 },
     { by: "xeyale", ch: "email" as const, subject: "Microsoft 365 «parolunuzun müddəti bitir» məktubu", url: "http://m365-login-verify.top/common/oauth2/signin", status: "new" as const, sev: null, d: 0 },
     { by: "elnare", ch: "other" as const, subject: "WhatsApp-da baş direktorun adından «təcili köçürmə» mesajı", status: "new" as const, sev: null, d: 0 },
   ];

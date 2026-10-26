@@ -1,4 +1,4 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { and, count, eq, ne } from "drizzle-orm";
 import { db, t } from "@/server/db";
 import { requirePermission } from "@/server/auth/viewer";
@@ -13,7 +13,7 @@ export async function generateMetadata() {
 
 export default async function DepartmentsPage() {
   const v = await requirePermission("departments.write");
-  const tr = await getTranslations("admin.departments");
+  const [tr, locale] = await Promise.all([getTranslations("admin.departments"), getLocale()]);
   const [departments, counts, people] = await Promise.all([
     getDepartments(v.tenant.id),
     db()
@@ -32,7 +32,7 @@ export default async function DepartmentsPage() {
     <div className="grid gap-5">
       <PageHeader title={tr("title")} subtitle={tr("count", { count: departments.length })} />
       <DepartmentsTree
-        people={people.sort((a, b) => a.name.localeCompare(b.name))}
+        people={people.sort((a, b) => a.name.localeCompare(b.name, locale))}
         departments={departments.map((d) => ({
           id: d.id,
           name: d.name,

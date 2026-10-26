@@ -1,0 +1,469 @@
+{
+  "id": "event-wifi-charging",
+  "title": "Tədbirdə Wi-Fi və şarj",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Tədbirlərdə yüzlərlə insan eyni şəbəkəyə qoşulur. Hücumçu eyni adla başqa bir şəbəkə qura bilər.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "wifi"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Oxşar adlı, açıq və güclü şəbəkə tələ ola bilər. Düzgün adı qeydiyyat masasından soruşun.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "wifi",
+              "networks": [
+                {
+                  "ssid": [
+                    {
+                      "text": "ReqemYol-Forum"
+                    }
+                  ],
+                  "secured": true,
+                  "signal": 3
+                },
+                {
+                  "ssid": [
+                    {
+                      "text": "ReqemYol-Forum-FREE",
+                      "spot": "twin"
+                    }
+                  ],
+                  "secured": false,
+                  "signal": 4
+                }
+              ]
+            }
+          },
+          "highlight": "twin"
+        },
+        {
+          "id": "b3",
+          "say": "İş üçün mobil internetdən və ya təşkilatınızın VPN-indən istifadə edin. Wi-Fi giriş səhifəsində iş parolunuzu heç vaxt yazmayın.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "vpn"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "İctimai şarj stansiyası əvəzinə öz adapterinizi rozetkaya qoşun və ya öz pauerbankınızdan istifadə edin.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "usb"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "forum-wifi",
+      "environment": "browser",
+      "title": "Forumun Wi-Fi şəbəkəsi",
+      "intro": "Forumda açıq şəbəkəyə qoşuldunuz və brauzer açıldı. Hər səhifədə düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "portal-login",
+          "label": "ReqemYol-Forum-FREE",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "nc-reqemyol-fake",
+            "brand": "RəqəmYol Forum Wi-Fi",
+            "url": [
+              {
+                "text": "http://wifi-reqemyol-forum.example.net/login"
+              }
+            ],
+            "fields": [
+              "İş e-poçtu",
+              "İş e-poçtunun parolu"
+            ],
+            "button": "İnternetə qoşul"
+          },
+          "say": "Bu Wi-Fi səhifəsi sizdən nə istəyir?",
+          "actions": [
+            {
+              "id": "login",
+              "label": "İnternetə qoşul",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Wi-Fi səhifəsinə iş parolunuz heç vaxt lazım olmur. Bu açıq şəbəkəni idarə edən şəxs artıq onu görür."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Şəbəkədən çıxın və düzgün adı qeydiyyat masasından soruşun."
+            },
+            {
+              "id": "disconnect",
+              "label": "Şəbəkədən çıx",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Əla. Naməlum açıq şəbəkədən çıxmaq ən sürətli qorunma üsuludur."
+            }
+          ]
+        },
+        {
+          "id": "cert-warning",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Bağlantınız təhlükəsiz deyil"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "poct.idare.example üçün sertifikat etibarsızdır."
+                }
+              ],
+              [
+                {
+                  "text": "Kimsə məlumatlarınızı oxumağa çalışa bilər."
+                }
+              ]
+            ],
+            "buttons": [
+              "Geri qayıt",
+              "Yenə də davam et"
+            ]
+          },
+          "say": "İş poçtunu açırsınız və brauzer xəbərdarlıq göstərir.",
+          "actions": [
+            {
+              "id": "back",
+              "label": "Geri qayıt",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bu xəbərdarlıq kiminsə sizinlə sayt arasına girdiyini göstərə bilər, ona görə mobil internetə keçin."
+            },
+            {
+              "id": "proceed",
+              "label": "Yenə də davam et",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Xəbərdarlığı görməzdən gəlsəniz, parolunuz araya girən şəxsin əlinə keçə bilər. Geri qayıdın və şəbəkəni dəyişin."
+            }
+          ]
+        },
+        {
+          "id": "setup-download",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "nc-reqemyol-fake",
+            "name": [
+              {
+                "text": "ReqemYol_WiFi_Setup.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "4,1 MB",
+            "source": [
+              {
+                "text": "wifi-reqemyol-forum.example.net"
+              }
+            ]
+          },
+          "say": "Səhifə Wi-Fi üçün proqram təklif edir.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Faylı aç",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Wi-Fi şəbəkəsinə qoşulmaq üçün heç bir proqram lazım deyil. Bu fayl kompüterə zərərli proqram quraşdırır."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Düzdür. Tədbir şəbəkəsi heç vaxt proqram quraşdırmağı tələb etmir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "network-list",
+      "prompt": "Tədbirdəki hansı şəbəkələr şübhəli görünür? Onları tapın.",
+      "artifact": {
+        "kind": "wifi",
+        "networks": [
+          {
+            "ssid": [
+              {
+                "text": "ReqemYol-Forum"
+              }
+            ],
+            "secured": true,
+            "signal": 3
+          },
+          {
+            "ssid": [
+              {
+                "text": "ReqemYol-Forum-FREE",
+                "spot": "free"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "ReqemYol_Forum",
+                "spot": "twin"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "Pulsuz_Sarj_WiFi",
+                "spot": "charge"
+              }
+            ],
+            "secured": false,
+            "signal": 2
+          },
+          {
+            "ssid": [
+              {
+                "text": "Lumera-Guest"
+              }
+            ],
+            "secured": true,
+            "signal": 1
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "free",
+          "label": "«FREE» əlavəsi",
+          "explain": "Şəbəkə açıqdır və adına «FREE» sözü əlavə olunub. Şəbəkənin rəsmi adını qeydiyyat masasında öyrənmək olar."
+        },
+        {
+          "id": "twin",
+          "label": "Oxşar ad",
+          "explain": "Ad rəsmi ada çox bənzəyir, yalnız bir simvol fərqlidir. Bu, hücumçunun qurduğu saxta «əkiz» şəbəkə ola bilər."
+        },
+        {
+          "id": "charge",
+          "label": "Cəlbedici ad",
+          "explain": "Pulsuz bir şey vəd edən açıq şəbəkə tələnin klassik əlamətidir."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "choice",
+      "id": "charging",
+      "question": {
+        "prompt": "Telefonunuzun şarjı 5 faizə düşüb, zalda isə ictimai USB şarj stansiyası var. Nə edirsiniz?",
+        "options": [
+          {
+            "id": "own-adapter",
+            "label": "Öz adapterimi divardakı rozetkaya qoşuram",
+            "correct": true,
+            "feedback": "Düzdür. Rozetka yalnız enerji verir, məlumat ötürmür."
+          },
+          {
+            "id": "powerbank",
+            "label": "Öz pauerbankımdan şarj edirəm",
+            "correct": true,
+            "feedback": "Düzdür. Öz pauerbankınız sizin nəzarətinizdə qalır."
+          },
+          {
+            "id": "trust",
+            "label": "Stansiyaya qoşulub «Etibar et» düyməsinə basıram",
+            "correct": false,
+            "feedback": "Etibar etmək cihaza telefonunuzdakı məlumatlara giriş verir. Şarj üçün buna ehtiyac yoxdur."
+          },
+          {
+            "id": "stranger-cable",
+            "label": "Yanımdakı qonağın kabelindən istifadə edirəm",
+            "correct": false,
+            "feedback": "Naməlum kabelin içində çip gizlənə bilər. Öz kabelinizi və adapterinizi yanınızda gəzdirin."
+          }
+        ],
+        "multi": true,
+        "visual": {
+          "kind": "illustration",
+          "id": "usb"
+        }
+      },
+      "explain": "Rozetkaya qoşulmuş öz adapteriniz və ya öz pauerbankınız ən təhlükəsiz yoldur. Telefon soruşsa, «Etibar etmə» seçin."
+    },
+    {
+      "type": "swipe",
+      "id": "event-messages",
+      "prompt": "Tədbir zamanı gələn mesaj və bildirişlər. Təhlükəsizdir, yoxsa tələ?",
+      "cards": [
+        {
+          "id": "badge-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "nc-reqemyol",
+            "sender": [
+              {
+                "text": "ReqemYol"
+              }
+            ],
+            "time": "08:30",
+            "messages": [
+              [
+                {
+                  "text": "Yaxa kartınız hazırdır. Şəxsiyyət vəsiqənizlə qeydiyyat masasına yaxınlaşın."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Link yoxdur, nə ödəniş, nə də məlumat daxil etmək tələb olunur. Bu, adi xatırlatmadır."
+        },
+        {
+          "id": "cert-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "nc-reqemyol-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "RəqəmYol Forum"
+                }
+              ],
+              "address": [
+                {
+                  "text": "sertifikat@reqemyol-forum.example.info"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "İştirak sertifikatınız"
+              }
+            ],
+            "time": "17:05",
+            "body": [
+              [
+                {
+                  "text": "Sertifikatı yükləmək üçün iş e-poçtunuzla daxil olun: "
+                },
+                {
+                  "text": "reqemyol-forum.example.info/certificate",
+                  "link": {
+                    "label": "reqemyol-forum.example.info/certificate",
+                    "href": "https://reqemyol-forum.example.info/certificate"
+                  }
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Rəsmi sayt reqemyol-forum.example ünvanındadır, bu isə başqa domendir. Sertifikat üçün iş parolunuz heç vaxt lazım olmur."
+        },
+        {
+          "id": "qr-table",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Masadakı stiker: pulsuz Wi-Fi üçün skan edin"
+              }
+            ],
+            "destination": [
+              {
+                "text": "http://wifi-giris.example.info/connect"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Stikeri hər kəs yapışdıra bilər, ünvan da forumun deyil. Şəbəkənin adını qeydiyyat masasından soruşun."
+        },
+        {
+          "id": "session-note",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "nc-reqemyol",
+            "app": "RəqəmYol Forum",
+            "title": [
+              {
+                "text": "Sessiya 15 dəqiqəyə başlayır"
+              }
+            ],
+            "body": [
+              {
+                "text": "Kibertəhlükəsizlik paneli, B zalı."
+              }
+            ],
+            "time": "13:45"
+          },
+          "verdict": "safe",
+          "explain": "Bu bildiriş rəsmi mağazadan quraşdırdığınız tətbiqdən gəlir. Nə link var, nə də tələb."
+        },
+        {
+          "id": "trust-prompt",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Bu cihaza etibar edilsin?"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Qoşulmuş cihaz telefonunuzdakı fayllara giriş istəyir."
+                }
+              ]
+            ],
+            "buttons": [
+              "Etibar etmə",
+              "Etibar et"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Şarj stansiyası fayllarınızı istəməməlidir. «Etibar etmə» düyməsini seçin, şarj yenə də davam edəcək."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Şəbəkənin adını qeydiyyat masasından soruşun, iş üçün isə mobil internetdən və ya VPN-dən istifadə edin.",
+        "Wi-Fi səhifəsində iş parolunuzu heç vaxt yazmayın və sertifikat xəbərdarlığını görməzdən gəlməyin.",
+        "Telefonu rozetkaya qoşulmuş öz adapterinizlə və ya öz pauerbankınızla şarj edin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

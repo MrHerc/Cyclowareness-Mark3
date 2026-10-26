@@ -1,0 +1,281 @@
+{
+  "id": "unknown-usb",
+  "title": "Naməlum fleş kart",
+  "minutes": 2,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "curiosity",
+          "say": "Tapılmış fleş kart insanda maraq oyadır. Hücumçular da məhz buna arxalanır.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "usb"
+          }
+        },
+        {
+          "id": "plug-is-enough",
+          "say": "Onu kompüterə qoşmaq kifayət edə bilər. Bəzi cihazlar özünü klaviatura kimi göstərir və əmrləri öz-özünə yazır.",
+          "mood": "alert",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "hand-over",
+          "say": "Ona görə də tapılmış fleş kartı heç vaxt qoşmayın. Onu təhlükəsizlik komandasına təhvil verin.",
+          "mood": "happy",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        },
+        {
+          "id": "approved",
+          "say": "İşdə yalnız İT dəstəyinin verdiyi və ya təsdiqlədiyi fleş kartlardan istifadə edin.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "charging",
+          "say": "İctimai yerlərdə telefonu öz adapterinizlə, divardakı rozetkadan şarj edin. Telefon «Bu cihaza etibar edilsin?» deyə soruşsa, imtina edin.",
+          "mood": "think",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "courier-sms",
+      "prompt": "Bu mesajda xəbərdarlıq əlamətlərini tapın.",
+      "artifact": {
+        "kind": "sms",
+        "sender": [
+          {
+            "text": "+994 51 000 77 63",
+            "spot": "number"
+          }
+        ],
+        "time": "09:48",
+        "messages": [
+          [
+            {
+              "text": "Salam, mən direktorun yeni köməkçisi Nigaram."
+            }
+          ],
+          [
+            {
+              "text": "Masanızın üstünə fleş kart qoymuşuq, "
+            },
+            {
+              "text": "direktorun təqdimatıdır.",
+              "spot": "authority"
+            }
+          ],
+          [
+            {
+              "text": "Xahiş edirəm, onu indi kompüterə qoşub faylı açın, ",
+              "spot": "action"
+            },
+            {
+              "text": "iclas 10 dəqiqəyə başlayır.",
+              "spot": "urgent"
+            }
+          ],
+          [
+            {
+              "text": "Heç kimə deməyin, sürprizdir.",
+              "spot": "secret"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "number",
+          "label": "Naməlum nömrə",
+          "explain": "İş tapşırığı tanımadığınız şəxsi nömrədən gəlir."
+        },
+        {
+          "id": "authority",
+          "label": "Direktorun adı",
+          "explain": "Direktorun adı ona görə çəkilir ki, tələsəsiniz və heç nəyi yoxlamayasınız."
+        },
+        {
+          "id": "action",
+          "label": "«Qoşun və açın»",
+          "explain": "Naməlum fleş kartı qoşmaq tələbi əsas təhlükədir."
+        },
+        {
+          "id": "urgent",
+          "label": "Vaxt təzyiqi",
+          "explain": "On dəqiqə sizə düşünməyə vaxt qoymur."
+        },
+        {
+          "id": "secret",
+          "label": "Gizlilik",
+          "explain": "Gizli saxlamaq xahişi yoxlamağınıza mane olur."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "scenario",
+      "id": "car-park-drive",
+      "title": "Dayanacaqda tapılan fleş kart",
+      "start": "found",
+      "nodes": [
+        {
+          "id": "found",
+          "text": "Səhər avtomobil dayanacağında üzərində «Maaşlar 2026, məxfi» yazılmış fleş kart tapırsınız.",
+          "visual": {
+            "kind": "illustration",
+            "id": "usb"
+          },
+          "choices": [
+            {
+              "label": "İş kompüterimə qoşub nə olduğuna baxım",
+              "outcome": "compromised",
+              "feedback": "Fleş kart zərərli proqramı işə saldı. «Məxfi» yazısı sizi şirnikləndirmək üçün idi."
+            },
+            {
+              "label": "Ev kompüterimdə yoxlayım",
+              "outcome": "risky",
+              "feedback": "Ev cihazınız da yoluxa bilər, üstəlik orada iş hesablarınız ola bilər."
+            },
+            {
+              "label": "Təhlükəsizlik komandasına aparım",
+              "next": "colleague",
+              "feedback": "Düzgün seçim."
+            }
+          ]
+        },
+        {
+          "id": "colleague",
+          "text": "Ver mənə, baxım. Kompüterimdə antivirus var.",
+          "speaker": "Tural, həmkarınız",
+          "voice": "man-2",
+          "channel": "in-person",
+          "manner": "natural",
+          "spoken": "Ver mənə, baxım. <breath> Kompüterimdə antivirus var.",
+          "choices": [
+            {
+              "label": "Verim, antivirus onu qoruyar",
+              "outcome": "risky",
+              "feedback": "Antivirus hər hücumu aşkarlamır, xüsusən klaviatura kimi davranan cihazları."
+            },
+            {
+              "label": "Nəzakətlə imtina edim və təhvil verim",
+              "next": "security",
+              "feedback": "Əla. Qayda hamı üçün eynidir."
+            }
+          ]
+        },
+        {
+          "id": "security",
+          "text": "Təşəkkür edirik. Belə cihazları ayrıca, şəbəkədən təcrid olunmuş kompüterdə yoxlayırıq.",
+          "speaker": "Təhlükəsizlik komandası",
+          "voice": "woman",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Təşəkkür edirik. <breath> Belə cihazları ayrıca, şəbəkədən təcrid olunmuş kompüterdə yoxlayırıq.",
+          "choices": [
+            {
+              "label": "Onu harada və nə vaxt tapdığımı deyim",
+              "outcome": "safe",
+              "feedback": "Əla. Bu, onlara başqa fleş kartları da axtarmağa kömək edir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "airport-charging",
+      "question": {
+        "prompt": "Hava limanında telefonunuzun batareyası bitmək üzrədir. Hansı variantlar təhlükəsizdir?",
+        "options": [
+          {
+            "id": "own-adapter",
+            "label": "Öz adapterimi divardakı rozetkaya qoşmaq",
+            "correct": true,
+            "feedback": "Ən sadə və ən təhlükəsiz yol."
+          },
+          {
+            "id": "power-bank",
+            "label": "Öz pauerbankımdan şarj etmək",
+            "correct": true,
+            "feedback": "Əla, burada heç bir naməlum cihaz yoxdur."
+          },
+          {
+            "id": "strangers-cable",
+            "label": "Yad adamın verdiyi kabeldən istifadə etmək",
+            "correct": false,
+            "feedback": "Yad adamın kabelinin içində cihaz gizlənə bilər."
+          },
+          {
+            "id": "trust-yes",
+            "label": "«Bu cihaza etibar edilsin?» sualında «Bəli» düyməsinə toxunmaq",
+            "correct": false,
+            "feedback": "Bu, cihaza məlumatlarınıza giriş imkanı verir. Şarj üçün etibar icazəsi lazım deyil."
+          }
+        ],
+        "multi": true,
+        "visual": {
+          "kind": "illustration",
+          "id": "phone-lock"
+        }
+      },
+      "explain": "İctimai USB portları vasitəsilə hücumlar nadir hallarda baş verir, amma qorunmaq asandır: öz adapterinizdən istifadə edin və naməlum cihaza etibar etməyin."
+    },
+    {
+      "type": "match",
+      "id": "media-rules",
+      "prompt": "Hər vəziyyəti düzgün addımla uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "gift-drive",
+          "left": "Konfransda hədiyyə verilən fleş kart",
+          "right": "Əvvəlcə İT dəstəyinə yoxlatın"
+        },
+        {
+          "id": "carry-files",
+          "left": "İş fayllarını evə aparmalısınız",
+          "right": "Təsdiqlənmiş daşıyıcıdan və ya təsdiqlənmiş buluddan istifadə edin"
+        },
+        {
+          "id": "courier",
+          "left": "Kuryer direktor üçün fleş kart gətirir",
+          "right": "Onu təhlükəsizlik komandasına təhvil verin"
+        },
+        {
+          "id": "lost",
+          "left": "İş fleş kartınızı itirmisiniz",
+          "right": "Dərhal bildirin"
+        }
+      ],
+      "explain": "Naməlum daşıyıcılar heç vaxt qoşulmur, iş məlumatları isə yalnız təsdiqlənmiş vasitələrlə ötürülür."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Tapılmış və ya naməlum fleş kartı heç vaxt qoşmayın, onu təhvil verin.",
+        "İşdə yalnız təsdiqlənmiş daşıyıcılardan istifadə edin.",
+        "Öz adapterinizlə şarj edin və naməlum cihazlara heç vaxt etibar etməyin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

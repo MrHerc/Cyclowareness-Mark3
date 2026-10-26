@@ -30,6 +30,7 @@ export function AnalysisResult({
   stixHref?: string;
 }) {
   const t = useTranslations("security");
+  const ts = useTranslations("secops");
   const Icon = a.verdict === "clean" ? ShieldCheck : a.verdict === "suspicious" ? ShieldAlert : ShieldX;
   return (
     <Card className={cn("overflow-hidden", a.verdict === "malicious" ? "border-risk-100" : a.verdict === "suspicious" ? "border-warn-100" : "border-safe-100")}>
@@ -67,7 +68,7 @@ export function AnalysisResult({
             <ul className="grid gap-1.5">
               {a.iocs.slice(0, 12).map((i, k) => (
                 <li key={k} className="flex gap-2 font-mono text-tab">
-                  <span className="w-16 shrink-0 text-ink-subtle uppercase">{i.type}</span>
+                  <span className="w-24 shrink-0 text-ink-subtle">{ts(`iocTypes.${i.type as "domain"}`)}</span>
                   <span className="min-w-0 break-all">{i.type === "url" || i.type === "domain" ? defang(i.value) : i.value}</span>
                 </li>
               ))}
@@ -94,7 +95,7 @@ export function AnalysisResult({
           ) : null}
           {stixHref ? (
             <a href={stixHref} className="inline-flex h-9 items-center gap-1.5 rounded-pill border border-line-strong px-3.5 text-caption font-semibold hover:bg-sunken pointer-coarse:h-11">
-              STIX 2.1
+              {ts("sandbox.stix")}
             </a>
           ) : null}
         </div>

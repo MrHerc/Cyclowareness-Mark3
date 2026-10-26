@@ -1,6 +1,7 @@
 import { getLocale } from "next-intl/server";
 import { db } from "@/server/db";
-import { allowed, apiViewer } from "@/server/auth/viewer";
+import { allowed } from "@/server/auth/viewer";
+import { apiViewer, deniedResponse } from "@/server/auth/api";
 import { buildReport } from "@/server/reports/build";
 import { toXlsx } from "@/server/reports/xlsx";
 import { audit } from "@/server/services/audit";
@@ -14,10 +15,10 @@ import { todayInBaku } from "@/lib/time";
 /** Report download: /api/admin/reports/{kind}?format=csv|xlsx&from&to&d */
 export async function GET(request: Request, { params }: RouteContext<"/api/admin/reports/[kind]">) {
   const { kind } = await params;
-  const v = await apiViewer("reports.read");
+  const v = await apiViewer("reports.read", request);
   if (v instanceof Response) return v;
   if (!(REPORT_KINDS as readonly string[]).includes(kind)) return new Response("Not found", { status: 404 });
-  if (kind === "secops" && !allowed(v, "secops.read")) return new Response("Forbidden", { status: 403 });
+  if (kind === "secops" && !allowed(v, "secops.read")) return deniedResponse(request, 403);
   const url = new URL(request.url);
   // Filters reach the report queries and the audit entry, so only well-formed values pass; an empty
   // parameter means "no filter", anything else malformed is refused rather than silently widened.

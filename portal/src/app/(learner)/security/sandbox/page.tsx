@@ -1,4 +1,5 @@
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
+import { getAppFormatter } from "@/i18n/server-format";
 import { and, desc, eq } from "drizzle-orm";
 import { FlaskConical, Info } from "lucide-react";
 import { db, t } from "@/server/db";
@@ -15,7 +16,7 @@ export async function generateMetadata() {
 
 export default async function LearnerSandboxPage() {
   const v = await requireFeature("sandbox");
-  const [tr, tn, format] = await Promise.all([getTranslations("security.sandbox"), getTranslations("security"), getFormatter()]);
+  const [tr, tn, format] = await Promise.all([getTranslations("security.sandbox"), getTranslations("security"), getAppFormatter()]);
   const recent = await db()
     .select()
     .from(t.sandboxAnalyses)

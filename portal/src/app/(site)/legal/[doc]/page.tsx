@@ -103,7 +103,7 @@ export default async function LegalPage({ params, searchParams }: PageProps<"/le
         <div className="mt-10 grid gap-10 lg:grid-cols-[16rem_minmax(0,1fr)]">
           <nav aria-label={tr("contents")} className="lg:sticky lg:top-24 lg:self-start">
             <p className="mb-2 text-tab font-bold tracking-wider text-ink-subtle uppercase">{tr("contents")}</p>
-            <ol className="grid gap-1 text-caption">
+            <ol lang={d.lang} className="grid gap-1 text-caption">
               {toc.map((h) => (
                 <li key={h.id}>
                   <a href={`#${h.id}`} className="flex items-center rounded-md px-2 py-1.5 text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:min-h-11">

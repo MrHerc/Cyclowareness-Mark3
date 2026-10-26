@@ -238,8 +238,8 @@ describe("XP constants", () => {
     expect(REPORT_BONUS_DAILY_CAP).toBe(5);
   });
 
-  it("prices the four lab games", () => {
-    expect(LAB_XP).toEqual({ "inbox-triage": 20, "link-detective": 15, "password-forge": 15, "mfa-fatigue": 15 });
+  it("prices the four lab games and the three virtual-machine labs", () => {
+    expect(LAB_XP).toEqual({ "inbox-triage": 20, "link-detective": 15, "password-forge": 15, "mfa-fatigue": 15, "phishing-anatomy": 30, "process-hunt": 30, "fake-signin": 25 });
   });
 });
 

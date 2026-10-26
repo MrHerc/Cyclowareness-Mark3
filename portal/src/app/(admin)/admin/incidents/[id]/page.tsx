@@ -95,7 +95,17 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
             <CardHeader
               title={tr("trainingProgress")}
               icon={<GraduationCap />}
-              description={mod[0] ? `${pick(mod[0].title, locale)}${inc.minScore ? ` · ${tr("minScore")}: ${inc.minScore}` : ""}${inc.dueDate ? ` · ${tr("due")}: ${format.dateTime(new Date(`${inc.dueDate}T12:00:00`), { dateStyle: "medium" })}` : ""}` : tr("noModule")}
+              description={
+                mod[0]
+                  ? [
+                      pick(mod[0].title, locale),
+                      inc.minScore ? tr("minScoreValue", { score: inc.minScore }) : null,
+                      inc.dueDate ? tr("dueValue", { date: format.dateTime(new Date(`${inc.dueDate}T12:00:00`), { dateStyle: "medium" }) }) : null,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")
+                  : tr("noModule")
+              }
               action={
                 <span className="flex flex-wrap items-center gap-2">
                   {inc.autoTrainingAt ? <Pill tone="safe">{tr("assignedOn", { date: format.dateTime(inc.autoTrainingAt, { dateStyle: "medium" }) })}</Pill> : null}
@@ -187,7 +197,7 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
                 <ul className="grid gap-1.5">
                   {inc.iocs.map((i, k) => (
                     <li key={k} className="flex gap-2 font-mono text-tab">
-                      <span className="w-16 shrink-0 text-ink-subtle uppercase">{i.type}</span>
+                      <span className="w-24 shrink-0 text-ink-subtle">{ts(`iocTypes.${i.type}`)}</span>
                       <span className="min-w-0 break-all">{i.type === "sha256" || i.type === "filename" ? i.value : defang(i.value)}</span>
                     </li>
                   ))}

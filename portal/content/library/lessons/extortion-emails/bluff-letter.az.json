@@ -1,0 +1,510 @@
+{
+  "id": "bluff-letter",
+  "title": "Blef məktubu",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "bl-tutor",
+      "beats": [
+        {
+          "id": "bl-b1",
+          "say": "Salam! Bəzən qorxulu bir məktub gəlir: «Kameranızı sındırdım. Pul ödəməsəniz, şəxsi videolarınızı yayacağam».",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "bl-b2",
+          "say": "Məktubda hətta köhnə parollarınızdan biri də göstərilir. Bu parol adətən illər əvvəlki məlumat sızmasından götürülür.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "from": {
+                "name": [
+                  {
+                    "text": "Anonim"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "anonim.7781@mail-relay.example.net"
+                  }
+                ]
+              },
+              "to": "you@idare.example",
+              "subject": [
+                {
+                  "text": "Parolunuz: "
+                },
+                {
+                  "text": "Gunes2019",
+                  "spot": "password"
+                },
+                {
+                  "text": ". 48 saatınız var"
+                }
+              ],
+              "time": "08:47",
+              "body": [
+                [
+                  {
+                    "text": "Cihazınıza girmişəm və kameranızla şəxsi videolarınızı çəkmişəm."
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "password"
+        },
+        {
+          "id": "bl-b3",
+          "say": "Belə məktublar eyni anda minlərlə insana göndərilir. Kameranızdan çəkilmiş heç bir video yoxdur.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        },
+        {
+          "id": "bl-b4",
+          "say": "Qayda belədir: pul ödəməyin, cavab yazmayın və parolu dəyişin. Məktub iş poçtunuza gəlibsə, təhlükəsizlik komandasına bildirin.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "bl-hotspot",
+      "prompt": "Bu məktubda fırıldaqçının fəndlərini tapın.",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": [
+            {
+              "text": "Anonim"
+            }
+          ],
+          "address": [
+            {
+              "text": "anonim.7781@mail-relay.example.net"
+            }
+          ]
+        },
+        "to": "you@idare.example",
+        "subject": [
+          {
+            "text": "Parolunuz: "
+          },
+          {
+            "text": "Gunes2019",
+            "spot": "password"
+          },
+          {
+            "text": ". 48 saatınız var"
+          }
+        ],
+        "time": "08:47",
+        "body": [
+          [
+            {
+              "text": "Cihazınıza girmişəm və kameranızla şəxsi videolarınızı çəkmişəm.",
+              "spot": "camera"
+            }
+          ],
+          [
+            {
+              "text": "Sübut olaraq parolunuzu yazıram. Videoların yayılmasını istəmirsinizsə, bu ünvana 1500 AZN dəyərində bitkoin göndərin:"
+            }
+          ],
+          [
+            {
+              "text": "bc1q000000000000000000000000000000demo",
+              "spot": "btc"
+            }
+          ],
+          [
+            {
+              "text": "Ödəmək üçün 48 saatınız var. Bu məktubu heç kimə göstərməyin.",
+              "spot": "timer"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "password",
+          "label": "Köhnə parol",
+          "explain": "Bu parol köhnə məlumat sızmasından götürülüb. Bu, cihazınızın sındırıldığını sübut etmir, amma həmin paroldan hələ də istifadə etdiyiniz hər yerdə onu dəyişin."
+        },
+        {
+          "id": "camera",
+          "label": "Kamera iddiası",
+          "explain": "Bu, blefdir. Eyni mətn minlərlə ünvana göndərilir və heç bir video yoxdur."
+        },
+        {
+          "id": "btc",
+          "label": "Bitkoin ünvanı",
+          "explain": "Kriptovalyuta ilə edilən ödənişi geri qaytarmaq olmur. Ödəsəniz, ardınca yeni tələb gələcək."
+        },
+        {
+          "id": "timer",
+          "label": "48 saat",
+          "explain": "Son müddət sizi qorxutmaq və düşünməyə qoymamaq üçündür. Pul ödəməyin və cavab yazmayın."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "match",
+      "id": "bl-match",
+      "prompt": "Məktubdakı hər iddianı həqiqətlə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "camera",
+          "left": "Kameranızı sındırdım",
+          "right": "Sübut yoxdur, mətn kütləvi göndərilir"
+        },
+        {
+          "id": "password",
+          "left": "Parolunuz budur",
+          "right": "Köhnə məlumat sızmasından götürülüb"
+        },
+        {
+          "id": "house",
+          "left": "Evinizin fotosu qoşmadadır",
+          "right": "Ünvan sızmadan, foto isə internetdəki xəritədən götürülüb"
+        },
+        {
+          "id": "timer",
+          "left": "48 saatınız var",
+          "right": "Qorxutmaq üçün saxta son müddət"
+        }
+      ],
+      "explain": "Fırıldaqçının bildiyi hər şey ya hamıya açıq, ya da sızmış məlumatlardır. Bunlar sizi qorxutmaq üçün bir araya gətirilib."
+    },
+    {
+      "type": "simulation",
+      "id": "bl-sim",
+      "environment": "inbox",
+      "title": "İş poçtunuz",
+      "intro": "Nazirlikdəki iş poçtunuzu açırsınız. Dörd məktubun hər biri üçün düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "sextortion",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "Anonim"
+                }
+              ],
+              "address": [
+                {
+                  "text": "anonim.7781@mail-relay.example.net"
+                }
+              ]
+            },
+            "to": "you@idare.example",
+            "subject": [
+              {
+                "text": "Parolunuz: Gunes2019. 48 saatınız var"
+              }
+            ],
+            "time": "08:47",
+            "body": [
+              [
+                {
+                  "text": "Cihazınıza girmişəm və kameranızla şəxsi videolarınızı çəkmişəm."
+                }
+              ],
+              [
+                {
+                  "text": "Videoların yayılmasını istəmirsinizsə, bu ünvana 1500 AZN dəyərində bitkoin göndərin: bc1q000000000000000000000000000000demo"
+                }
+              ],
+              [
+                {
+                  "text": "Ödəmək üçün 48 saatınız var."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Təhlükəsizlik komandası eyni məktubu digər həmkarlarınızın poçt qutularından da silə bilər."
+            },
+            {
+              "id": "reply",
+              "label": "Cavab yaz: sübut göstər",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Cavab ünvanınızın aktiv olduğunu göstərir və daha çox məktub gəlməsinə səbəb olur. Cavab yazmayın."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Silmək olar. Amma iş poçtunda əvvəlcə bildirmək daha yaxşıdır."
+            }
+          ]
+        },
+        {
+          "id": "house-photo",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "Müşahidəçi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "watcher.0042@anon-post.example.net"
+                }
+              ]
+            },
+            "to": "you@idare.example",
+            "subject": [
+              {
+                "text": "Evinizin fotosunu görürsünüz?"
+              }
+            ],
+            "time": "09:05",
+            "body": [
+              [
+                {
+                  "text": "Bu, sizin evinizdir. Ünvanınızı da, parolunuzu da bilirəm."
+                }
+              ],
+              [
+                {
+                  "text": "1500 AZN dəyərində bitkoin göndərin, yoxsa videolar yayılacaq."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "ev_unvan.jpg"
+                  }
+                ],
+                "size": "212 KB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Evin fotosu internetdəki xəritədən götürülüb, deməli, bu da kütləvi blefdir."
+            },
+            {
+              "id": "open",
+              "label": "Fotonu aç",
+              "kind": "open-attachment",
+              "outcome": "risky",
+              "feedback": "Foto sizi daha çox qorxutmaq üçündür. Şübhəli qoşmanı açmayın, məktubu bildirin."
+            },
+            {
+              "id": "promise",
+              "label": "Cavab yaz: pulu ödəyəcəyəm",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Ödəmək və ya ödəməyə söz vermək yeni tələblər gətirir. Pul ödəməyin və cavab yazmayın."
+            }
+          ]
+        },
+        {
+          "id": "security-notice",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-tehlukesizlik",
+            "from": {
+              "name": [
+                {
+                  "text": "İT Təhlükəsizlik"
+                }
+              ],
+              "address": [
+                {
+                  "text": "security@idare.example"
+                }
+              ]
+            },
+            "to": "you@idare.example",
+            "subject": [
+              {
+                "text": "Xəbərdarlıq: şantaj məktubları"
+              }
+            ],
+            "time": "09:20",
+            "body": [
+              [
+                {
+                  "text": "Bu gün bəzi həmkarlarımıza köhnə parolu göstərən şantaj məktubları gəlib."
+                }
+              ],
+              [
+                {
+                  "text": "Pul ödəməyin və cavab yazmayın. Məktubu «Bildir» düyməsi ilə göndərin."
+                }
+              ],
+              [
+                {
+                  "text": "Həmin paroldan hələ də istifadə edirsinizsə, onu dəyişin."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "safe",
+              "label": "Təhlükəsiz kimi qeyd et",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bu məktub heç nə istəmir, sadəcə düzgün qaydaları xatırladır."
+            },
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Ehtiyatlı olmaq yaxşıdır, amma bu məktub təşkilatınızın öz ünvanından gəlib və heç nə istəmir."
+            }
+          ]
+        },
+        {
+          "id": "fake-reset",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-tehlukesizlik-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "İT Təhlükəsizlik"
+                }
+              ],
+              "address": [
+                {
+                  "text": "security@idare-support.example.net"
+                }
+              ]
+            },
+            "to": "you@idare.example",
+            "subject": [
+              {
+                "text": "Hesabınız sındırılıb: parolu dərhal dəyişin"
+              }
+            ],
+            "time": "09:34",
+            "body": [
+              [
+                {
+                  "text": "Şantaj məktubu almısınız? Hesabınız təhlükədədir."
+                }
+              ],
+              [
+                {
+                  "text": "Parolu burada dəyişin",
+                  "link": {
+                    "label": "Parolu burada dəyişin",
+                    "href": "https://idare-support.example.net/parol"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "30 dəqiqə ərzində dəyişməsəniz, hesabınız bloklanacaq."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Fişinqi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Bu, qorxudan istifadə edən ikinci tələdir, üstəlik domen təşkilatınıza aid deyil."
+            },
+            {
+              "id": "click",
+              "label": "Linki aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Saxta səhifə parolunuzu oğurlayardı. Parolu yalnız özünüz açdığınız rəsmi sistemdə dəyişin."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Silmək olar. Amma bildirsəniz, digər həmkarlarınız da qorunar."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "bl-choice",
+      "question": {
+        "prompt": "Şantaj məktubunda ünvanınız və evinizin xəritədən götürülmüş fotosu var. Bu nə deməkdir?",
+        "options": [
+          {
+            "id": "public",
+            "label": "Ünvan sızmadan, foto isə internetdəki xəritədən götürülüb",
+            "correct": true,
+            "feedback": "Düzdür. Ünvanınızı bilmələri kameranızın sındırıldığını göstərmir."
+          },
+          {
+            "id": "real",
+            "label": "Məni həqiqətən izləyirlər, deməli, ödəməliyəm",
+            "correct": false,
+            "feedback": "Ödəniş heç nəyi bitirmir, yalnız yeni tələb gətirir. Məktubu bildirin."
+          },
+          {
+            "id": "ask",
+            "label": "Cavab yazıb kim olduqlarını soruşmalıyam",
+            "correct": false,
+            "feedback": "Cavab ünvanınızın aktiv olduğunu göstərir. Fırıldaqçı daha çox məktub göndərəcək."
+          }
+        ]
+      },
+      "explain": "Fırıldaqçı qorxu yaratmaq üçün hamıya açıq və sızmış məlumatları birləşdirir. Pul ödəməyin, cavab yazmayın. Özünüzü təhlükədə hiss edirsinizsə, polisə müraciət edin."
+    },
+    {
+      "type": "recap",
+      "id": "bl-recap",
+      "points": [
+        "«Kameranızı sındırdım» deyən kütləvi məktub blefdir: pul ödəməyin, cavab yazmayın.",
+        "Məktubdakı köhnə paroldan hələ də istifadə edirsinizsə, onu hər yerdə dəyişin.",
+        "İş poçtunda belə məktubu təhlükəsizlik komandasına bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

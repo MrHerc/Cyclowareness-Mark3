@@ -154,7 +154,7 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
               <div>
                 <dt className="mb-1 text-caption text-ink-muted">{tr("language")}</dt>
                 <dd>
-                  <LanguageSwitcher />
+                  <LanguageSwitcher locales={v.tenant.settings.locales} />
                 </dd>
               </div>
             </dl>

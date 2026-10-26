@@ -1,0 +1,335 @@
+{
+  "id": "the-copied-command",
+  "title": "Kopyalanan əmr",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "fc2-tutor",
+      "beats": [
+        {
+          "id": "fc2-b1",
+          "say": "Bu dəfə saxta səhifə sizdən mətni kopyalayıb «İcra et» (Run) pəncərəsinə yapışdırmağı istəyir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        },
+        {
+          "id": "fc2-b2",
+          "say": "Bu mətn əslində gizli əmrdir və işə düşəndə zərərli proqram quraşdırır.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "ransomware"
+          }
+        },
+        {
+          "id": "fc2-b3",
+          "say": "Sayt nəyi kopyalamağı desə də, onu heç vaxt «İcra et» pəncərəsinə yapışdırmayın.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        },
+        {
+          "id": "fc2-b4",
+          "say": "Artıq yapışdırmısınızsa, kompüteri şəbəkədən ayırın və dərhal İT dəstəyinə bildirin.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "fc2-sim",
+      "environment": "desktop",
+      "title": "«İcra et» pəncərəsi",
+      "intro": "Bir səhifə sənədin açılmadığını deyib sizi bura gətirdi. Hər dəfə düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "run-box",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "İcra et"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Saytın kopyaladığı mətn xanaya yapışdırılıb:"
+                }
+              ],
+              [
+                {
+                  "text": "[saytın kopyaladığı naməlum mətn]"
+                }
+              ]
+            ],
+            "buttons": [
+              "Ləğv et",
+              "OK"
+            ]
+          },
+          "say": "«İcra et» pəncərəsi açıqdır və içində saytın kopyaladığı naməlum mətn var.",
+          "actions": [
+            {
+              "id": "cancel",
+              "label": "Ləğv et və bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Ləğv etmək mətnin işə düşməsinin qarşısını alır. Sonra baş verənləri İT dəstəyinə danışın."
+            },
+            {
+              "id": "run",
+              "label": "OK ilə işə sal",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Əmr işə düşdü və arxa planda zərərli proqram quraşdırdı. Belə pəncərədə heç vaxt heç nəyi işə salmayın."
+            },
+            {
+              "id": "report",
+              "label": "İT dəstəyinə bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Yaxşı seçimdir. İT dəstəyi nə baş verdiyini araşdıra bilər."
+            }
+          ]
+        },
+        {
+          "id": "script-window",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Naməlum skript"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Naməlum skript işə düşməyə çalışır. Davam edilsin?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Dayandır",
+              "Davam et"
+            ]
+          },
+          "say": "İndi naməlum pəncərə açılır və davam etmək üçün icazə istəyir.",
+          "actions": [
+            {
+              "id": "stop",
+              "label": "Dayandır",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Gözləmədiyiniz skripti dayandırmaq ziyanın qarşısını alır."
+            },
+            {
+              "id": "continue",
+              "label": "Davam et",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Skript davam etdi və zərərli proqram quraşdırdı. Naməlum skriptə icazə verməyin."
+            }
+          ]
+        },
+        {
+          "id": "real-update",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "sistem-yenileme",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Sistem yeniləməsi hazırdır"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Yeniləməni indi tətbiq etmək istəyirsiniz?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Sonra",
+              "Yenilə"
+            ]
+          },
+          "say": "Bu, sistemin öz yeniləmə pəncərəsidir.",
+          "actions": [
+            {
+              "id": "update",
+              "label": "Yenilə",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Düzdür. Sistemin öz yeniləməsi təhlükəsizdir və heç vaxt sizdən əmr istəmir."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "safe",
+              "feedback": "Bu da olar. Yeniləməni sizə rahat olan vaxtda tətbiq edə bilərsiniz."
+            },
+            {
+              "id": "report",
+              "label": "Şübhəli kimi bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Buna ehtiyac yoxdur. Bu, sistemin adi yeniləmə bildirişidir."
+            }
+          ]
+        },
+        {
+          "id": "beacon",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "it-tehlukesizlik",
+            "app": "İT Təhlükəsizlik",
+            "title": [
+              {
+                "text": "Qeyri-adi şəbəkə fəallığı"
+              }
+            ],
+            "body": [
+              {
+                "text": "Kompüteriniz naməlum serverə məlumat göndərir."
+              }
+            ],
+            "time": "14:20"
+          },
+          "say": "Bildirişdə deyilir ki, kompüter naməlum ünvana qoşulur.",
+          "actions": [
+            {
+              "id": "disconnect",
+              "label": "İnterneti kəs",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bağlantını kəsmək məlumatların kənara çıxmasını dayandırır."
+            },
+            {
+              "id": "report",
+              "label": "İT dəstəyinə bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. İndi İT dəstəyi kompüteri yoxlayıb təmizləyə bilər."
+            },
+            {
+              "id": "ignore",
+              "label": "Bağla və işə davam et",
+              "kind": "ignore",
+              "outcome": "compromised",
+              "feedback": "Proqram məlumat göndərməyə davam edir. Belə bildirişə heç vaxt göz yummayın."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "fc2-order",
+      "prompt": "Saytın verdiyi əmri işə saldınız. Addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "disconnect",
+          "label": "Kabeli çıxarın və ya Wi-Fi bağlantısını söndürün"
+        },
+        {
+          "id": "report",
+          "label": "Dərhal İT dəstəyinə zəng edin"
+        },
+        {
+          "id": "tell",
+          "label": "Nəyi və harada yapışdırdığınızı deyin"
+        },
+        {
+          "id": "password",
+          "label": "Parolları başqa, təmiz cihazdan dəyişin"
+        }
+      ],
+      "explain": "Əvvəlcə bağlantını kəsin, sonra dərhal zəng edin. Prosedurunuz başqa cür tələb etmirsə, kompüteri söndürməyin."
+    },
+    {
+      "type": "choice",
+      "id": "fc2-choice",
+      "question": {
+        "prompt": "Sayt sizdən mətni kopyalayıb «İcra et» pəncərəsinə yapışdırmağı istəyir. Nə edirsiniz?",
+        "options": [
+          {
+            "id": "refuse",
+            "label": "Bunu etmirəm və səhifəni bağlayıram",
+            "correct": true,
+            "feedback": "Düzdür. Heç bir sayt sizdən əmr işə salmağı istəmir, deməli, bu, tələdir."
+          },
+          {
+            "id": "paste",
+            "label": "Davam edə bilmək üçün yapışdırıram",
+            "correct": false,
+            "feedback": "Bu mətn gizli əmrdir və zərərli proqram quraşdırır. Onu heç vaxt yapışdırmayın."
+          },
+          {
+            "id": "official",
+            "label": "Sayt rəsmi görünürsə, yapışdırıram",
+            "correct": false,
+            "feedback": "Rəsmi görünüşü saxtalaşdırmaq asandır. Qayda sadədir: belə mətni heç vaxt işə salmayın."
+          }
+        ]
+      },
+      "explain": "Saytın kopyalamağınızı istədiyi mətn gizli əmrdir. Onu yapışdırmayın, səhifəni bağlayın."
+    },
+    {
+      "type": "match",
+      "id": "fc2-match",
+      "prompt": "Hər vəziyyəti düzgün reaksiya ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "robot",
+          "left": "Yoxlama düymələri basmağı istəyir",
+          "right": "Bu, saxtadır, səhifəni bağlayın"
+        },
+        {
+          "id": "pdf",
+          "left": "«Sənəd açılmır, əmri işə salın»",
+          "right": "Eyni tələdir, bunu etməyin"
+        },
+        {
+          "id": "real",
+          "left": "Əsl yoxlama",
+          "right": "Şəkil seçmək və ya xananı işarələmək"
+        },
+        {
+          "id": "done",
+          "left": "Əmri artıq işə salmısınız",
+          "right": "Bağlantını kəsin və bildirin"
+        }
+      ],
+      "explain": "Əmr istəyən hər səhifə saxtadır. Əmri artıq işə salmısınızsa, bağlantını kəsin və İT dəstəyinə bildirin."
+    },
+    {
+      "type": "recap",
+      "id": "fc2-recap",
+      "points": [
+        "Saytdan götürülən mətni heç vaxt «İcra et» pəncərəsinə yapışdırmayın",
+        "Əmr istəyən hər səhifə saxtadır",
+        "Bunu etmisinizsə, bağlantını kəsin və İT dəstəyinə bildirin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

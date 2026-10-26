@@ -1,0 +1,532 @@
+{
+  "id": "ai-lures-fake-apps",
+  "title": "Süni intellektlə qurulan tələlər",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l2-tutor",
+      "beats": [
+        {
+          "id": "l2-b1",
+          "say": "Süni intellekt fırıldaqçılara da kömək edir: qüsursuz məktublar, inandırıcı səslər, saxta tətbiqlər.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          }
+        },
+        {
+          "id": "l2-b2",
+          "say": "Fişinq məktubunda artıq heç bir dil səhvi olmaya bilər. Qrammatikanı deyil, göndərəni və tələbi yoxlayın.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "idare-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Nərmin Hüseynova"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "n.huseynova@"
+                  },
+                  {
+                    "text": "idare-mail.test",
+                    "spot": "domain"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "Hesabat üçün məlumatlar"
+                }
+              ],
+              "time": "09:10",
+              "body": [
+                [
+                  {
+                    "text": "Hörmətli həmkar, nazirliyə təqdim edəcəyimiz hesabatla bağlı sizdən kiçik bir xahişim var."
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "l2-b3",
+          "say": "Pulsuz «Pro» çatbot tətbiqləri və brauzer genişlənmələri məlumatlarınızı oğurlaya bilər.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        },
+        {
+          "id": "l2-b4",
+          "say": "Tətbiq və genişlənmələri yalnız qurumunuzun təsdiq etdiyi mənbədən quraşdırın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l2-sim",
+      "environment": "browser",
+      "title": "Pulsuz Pro versiyası",
+      "intro": "Reklamda pulsuz «Pro» çatbot təklif olunurdu. Səhifələri yoxlayın və hər addımda qərar verin.",
+      "steps": [
+        {
+          "id": "pro-page",
+          "label": "NeyroSöhbət Pro: bütün funksiyalar pulsuz",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "neyrosohbet-fake",
+            "url": [
+              {
+                "text": "https://neyrosohbet-pro.test",
+                "reveal": "neyrosohbet-pro.test"
+              }
+            ]
+          },
+          "say": "Ünvan sətrinə baxın.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "Genişlənməni quraşdır",
+              "kind": "install",
+              "outcome": "risky",
+              "feedback": "Qeyri-rəsmi saytdan genişlənmə quraşdırmaq risklidir. Genişlənmələri yalnız qurumunuzun icazə verdiyi mənbədən götürün."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Xidmətin «pulsuz Pro» versiyası yad saytda paylanmır.",
+              "next": "fake-login"
+            }
+          ]
+        },
+        {
+          "id": "extension",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "neyrosohbet-fake",
+            "tone": "system",
+            "title": [
+              {
+                "text": "«NeyroSöhbət Pro» əlavə edilsin?"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bu genişlənmə açdığınız bütün saytlarda bütün məlumatlarınızı oxuya və dəyişə bilər."
+                }
+              ]
+            ],
+            "buttons": [
+              "Ləğv et",
+              "Genişlənməni əlavə et"
+            ]
+          },
+          "actions": [
+            {
+              "id": "add",
+              "label": "Genişlənməni əlavə et",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Genişlənmə indi iş e-poçtunuzu və açdığınız hər səhifəni görür. Onu silin və təhlükəsizlik komandasına bildirin."
+            },
+            {
+              "id": "cancel",
+              "label": "Ləğv et",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Çatbot genişlənməsinin bütün saytları oxumasına ehtiyac yoxdur."
+            }
+          ]
+        },
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "neyrosohbet-fake",
+            "brand": "NeyroSöhbət",
+            "url": [
+              {
+                "text": "https://neyrosohbet.login-pro.test",
+                "reveal": "login-pro.test"
+              }
+            ],
+            "fields": [
+              "İş e-poçtu",
+              "Parol"
+            ],
+            "button": "Daxil ol"
+          },
+          "actions": [
+            {
+              "id": "login",
+              "label": "Daxil ol",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "İş parolunuz fırıldaqçının əlinə keçdi. Onu dərhal dəyişin və bildirin."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bu ünvan xidmətin öz domeni deyil."
+            },
+            {
+              "id": "report",
+              "label": "Saytı bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Saxta saytı bildirmək başqalarını da qoruyur."
+            }
+          ]
+        },
+        {
+          "id": "setup-file",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "zeka-foto",
+            "name": [
+              {
+                "text": "ZekaFoto_AI_Setup.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "48 MB",
+            "source": [
+              {
+                "text": "zeka-foto-free.test"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "Proqram rəsmi mənbədən deyil və zərərli ola bilər. İş kompüterlərinə proqramları İT dəstəyi quraşdırır."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Düzdür. Pulsuz «süni intellekt» proqramları adı altında çox vaxt zərərli proqram gizlənir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l2-hotspot",
+      "prompt": "Dili qüsursuz olan bu məktubda tələləri tapın.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "idare-fake",
+        "from": {
+          "name": [
+            {
+              "text": "Nərmin Hüseynova"
+            }
+          ],
+          "address": [
+            {
+              "text": "n.huseynova@"
+            },
+            {
+              "text": "idare-mail.test",
+              "spot": "domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Təcili: "
+          },
+          {
+            "text": "bu gün saat 15:00-dək",
+            "spot": "deadline"
+          }
+        ],
+        "time": "09:10",
+        "body": [
+          [
+            {
+              "text": "Hörmətli həmkar, nazirlik üçün hesabat hazırlayırıq."
+            }
+          ],
+          [
+            {
+              "text": "Şöbədəki bütün əməkdaşların FİN kodlarını və telefon nömrələrini",
+              "spot": "request"
+            },
+            {
+              "text": " "
+            },
+            {
+              "text": "bu formaya",
+              "spot": "link",
+              "link": {
+                "label": "bu formaya",
+                "href": "https://forma-yukle.test/idare"
+              }
+            },
+            {
+              "text": " yükləyin."
+            }
+          ],
+          [
+            {
+              "text": "Zəng etməyin, iclasdayam.",
+              "spot": "no-call"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Yad domen",
+          "explain": "Rəhbərin adı tanışdır, amma domen quruma məxsus deyil. Qüsursuz dil bunu gizlətmir."
+        },
+        {
+          "id": "deadline",
+          "label": "Sərt son tarix",
+          "explain": "Təcililik yoxlamağa vaxt qoymur."
+        },
+        {
+          "id": "request",
+          "label": "Şəxsi məlumat tələbi",
+          "explain": "Həmkarların FİN kodları və telefon nömrələri kənar formaya yüklənmir."
+        },
+        {
+          "id": "link",
+          "label": "Kənar forma",
+          "explain": "Forma qurumun sistemində deyil. Məlumatların kimin əlinə keçəcəyi bilinmir."
+        },
+        {
+          "id": "no-call",
+          "label": "Zəng etməyin",
+          "explain": "Bu xahiş sizi yoxlamaqdan çəkindirmək üçündür. Məhz buna görə bildiyiniz nömrəyə zəng edin."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "l2-swipe",
+      "prompt": "Təhlükəsizdir, yoxsa tələ?",
+      "cards": [
+        {
+          "id": "voice-note",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Rəhbər"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam, mənəm. Təsdiq kodunu dərhal bu nömrəyə göndər, sonra izah edəcəyəm."
+                  }
+                ],
+                "voice": "man-2",
+                "spoken": "Salam, mənəm. <breath> Təsdiq kodunu dərhal bu nömrəyə göndər, sonra izah edəcəyəm."
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Səsi süni intellektlə təqlid etmək olar. Rəhbərinizin bildiyiniz nömrəsinə özünüz zəng edin."
+        },
+        {
+          "id": "photo-perms",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "zeka-foto",
+            "app": "Zəka Foto",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Kamera"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Foto qalereyası"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Kontaktlar"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "SMS-ləri oxumaq"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Foto redaktoruna kontaktlar və ya SMS lazım deyil. Lazımsız icazələr istəyən tətbiqi quraşdırmayın."
+        },
+        {
+          "id": "komekci-notif",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "idare-komekci",
+            "app": "İdarə Köməkçisi",
+            "title": [
+              {
+                "text": "Xülasəniz hazırdır"
+              }
+            ],
+            "body": [
+              {
+                "text": "Onu daxili portalda aça bilərsiniz."
+              }
+            ],
+            "time": "11:05"
+          },
+          "verdict": "safe",
+          "explain": "Qurumun təsdiq olunmuş aləti gözlənilən bildiriş göndərir və nə link, nə də kod istəyir."
+        },
+        {
+          "id": "pro-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "neyrosohbet-fake",
+            "sender": [
+              {
+                "text": "NeyroPro"
+              }
+            ],
+            "time": "12:30",
+            "messages": [
+              [
+                {
+                  "text": "NeyroSöhbət Pro 1 il pulsuz! Burada aktivləşdirin: neyrosohbet-pro.test"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Pulsuz Pro təklifi tələ ola bilər. Abunəliyinizi yalnız xidmətin rəsmi tətbiqində yoxlayın."
+        },
+        {
+          "id": "approved-list",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "İT dəstəyi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "destek@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Təsdiq olunmuş süni intellekt alətləri"
+              }
+            ],
+            "time": "14:00",
+            "body": [
+              [
+                {
+                  "text": "Siyahı daxili portaldadır. Yeni alət lazımdırsa, bizə sorğu göndərin."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Məktub daxili ünvandan gəlib, içində link və ya fayl yoxdur. Bu, faydalı məlumatdır."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l2-choice",
+      "question": {
+        "prompt": "Brauzer genişlənməsi «bütün saytlarda bütün məlumatlarınızı oxumaq» icazəsi istəyir. Bu nə deməkdir?",
+        "options": [
+          {
+            "id": "normal",
+            "label": "Bütün genişlənmələr bunu istəyir, normaldır",
+            "correct": false,
+            "feedback": "Bu, ən geniş icazədir. Genişlənmə e-poçtunuzu və parol yazdığınız səhifələri görə bilər."
+          },
+          {
+            "id": "sees-all",
+            "label": "İş e-poçtu da daxil olmaqla açdığım hər səhifəni görə bilər",
+            "correct": true,
+            "feedback": "Düzdür. Belə genişlənməni yalnız qurumunuz onu yoxlayıb təsdiq edibsə quraşdırın."
+          },
+          {
+            "id": "only-ai",
+            "label": "Yalnız çatbot səhifəsini görəcək",
+            "correct": false,
+            "feedback": "Xeyr. «Bütün saytlar» həqiqətən bütün saytlar deməkdir."
+          }
+        ]
+      },
+      "explain": "Genişlənmə nə qədər faydalı görünsə də, onun nə edə biləcəyini icazələri göstərir."
+    },
+    {
+      "type": "recap",
+      "id": "l2-recap",
+      "points": [
+        "Qüsursuz dil məktubun əsl olduğunu göstərmir: göndərəni və tələbi yoxlayın.",
+        "«Pro» tətbiqləri və genişlənmələri yalnız təsdiq olunmuş mənbədən götürün.",
+        "Tanış səs pul və ya kod istəyirsə, bildiyiniz nömrəyə özünüz zəng edin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

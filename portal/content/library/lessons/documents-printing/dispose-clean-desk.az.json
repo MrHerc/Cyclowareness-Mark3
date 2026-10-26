@@ -1,0 +1,346 @@
+{
+  "id": "dispose-clean-desk",
+  "title": "Məhvetmə və təmiz masa",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Zibil qutusundakı vərəq və masada qalmış sənəd hücumçu üçün hazır məlumatdır.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "desk"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Vərəqi əllə cırmaq kifayət deyil. Parçaları yenidən birləşdirmək asandır.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Məxfi kağızları kağız doğrayıcıda məhv edin, köhnə fleş kartları və noutbukları isə İT dəstəyinə təhvil verin.",
+          "mood": "talk",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Masanızdan uzaqlaşanda ekranı kilidləyin, sənədləri isə kilidli şkafa qoyun.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "before-you-leave",
+      "environment": "desktop",
+      "title": "Masadan qalxmazdan əvvəl",
+      "intro": "Gün ərzində bir neçə dəfə masanızdan uzaqlaşırsınız. Açılan pəncərələrə baxın və qərar verin.",
+      "steps": [
+        {
+          "id": "lock-screen",
+          "label": "15 dəqiqəlik görüşə gedirsiniz",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Ekran kilidi"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Kompüteriniz 15 dəqiqə nəzarətsiz qalacaq. İndi kilidlənsin?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Sonra",
+              "Kilidlə"
+            ]
+          },
+          "actions": [
+            {
+              "id": "lock",
+              "label": "Kilidlə",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Kilidlənməmiş kompüterdə istənilən adam sizin poçt qutunuzdan məktub yaza və ya faylları götürə bilər."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Bir neçə dəqiqə kifayətdir. Hər dəfə yerinizdən qalxanda ekranı kilidləyin."
+            }
+          ]
+        },
+        {
+          "id": "old-usb",
+          "label": "Köhnə fleş kartı atmaq istəyirsiniz",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Fleş kart (E:) formatlansın?"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Sürətli formatlama: faylların yeri boş kimi işarələnəcək."
+                }
+              ]
+            ],
+            "buttons": [
+              "Ləğv et",
+              "Formatla"
+            ]
+          },
+          "say": "Fleş kartda köhnə işçi siyahıları var.",
+          "actions": [
+            {
+              "id": "hand-over",
+              "label": "Çıxar və İT dəstəyinə ver",
+              "kind": "eject",
+              "outcome": "safe",
+              "feedback": "Düzdür. İT dəstəyi fleş kartı tam təmizləyir və ya məhv edir."
+            },
+            {
+              "id": "quick-format",
+              "label": "Sürətli formatla və at",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Sürətli formatlama faylları silmir, sadəcə gizlədir. Adi proqramla onları bərpa etmək olar."
+            }
+          ]
+        },
+        {
+          "id": "laptop-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Səbinə Hüseynova"
+                }
+              ],
+              "address": [
+                {
+                  "text": "s.huseynova@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Köhnə noutbuk"
+              }
+            ],
+            "time": "16:12",
+            "body": [
+              [
+                {
+                  "text": "Salam, köhnə iş noutbukumu qohumuma verə bilərəmmi? Faylları silmişəm, zibil qutusunu da boşaltmışam."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "no",
+              "label": "Cavab ver: Xeyr, İT dəstəyinə təhvil verin",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Düzdür. İş cihazı təşkilata məxsusdur, diski isə İT dəstəyi təmizləyir."
+            },
+            {
+              "id": "yes",
+              "label": "Cavab ver: Olar, fayllar silinib",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Zibil qutusunu boşaltmaq diski təmizləmir. Silinmiş faylları xüsusi proqramla bərpa etmək olar."
+            }
+          ]
+        },
+        {
+          "id": "queued-print",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "nc-capmerkezi",
+            "app": "Çap Mərkəzi",
+            "title": [
+              {
+                "text": "Təhlükəsiz çap: 3 sənəd"
+              }
+            ],
+            "body": [
+              {
+                "text": "Adınıza 3 sənəd növbədədir. Götürülməsə, saat 18:00-da silinəcək."
+              }
+            ],
+            "time": "17:30"
+          },
+          "actions": [
+            {
+              "id": "collect",
+              "label": "Printerə gedib götür",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Düzdür. Lazım olanı götürün, lazım olmayanı isə növbə özü silsin."
+            },
+            {
+              "id": "print-all",
+              "label": "Hamısını birbaşa çapa göndər",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Birbaşa çapda vərəqlər siz gəlməmiş printerdən çıxıb orada qalır. Təhlükəsiz çap məhz buna görə var."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "how-to-dispose",
+      "prompt": "Hər əşyanı onu məhv etməyin düzgün üsulu ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "id-copy",
+          "left": "Şəxsiyyət vəsiqəsinin surəti",
+          "right": "Kağız doğrayıcı"
+        },
+        {
+          "id": "draft",
+          "left": "Məxfi layihənin qaralaması",
+          "right": "Məxfi tullantılar üçün kilidli qutu"
+        },
+        {
+          "id": "laptop",
+          "left": "Köhnə iş noutbuku",
+          "right": "İT dəstəyinə təhvil vermək"
+        },
+        {
+          "id": "flyer",
+          "left": "Tədbirin reklam vərəqəsi",
+          "right": "Adi kağız təkrar emalı"
+        }
+      ],
+      "explain": "Məxfi kağız heç vaxt adi zibil qutusuna atılmır. Cihazları yalnız İT dəstəyi təmizləyir və məhv edir."
+    },
+    {
+      "type": "scenario",
+      "id": "clean-desk",
+      "title": "On dəqiqəlik fasilə",
+      "start": "leave",
+      "nodes": [
+        {
+          "id": "leave",
+          "text": "Çay içməyə çıxırsınız. Masada müqavilə qovluğu, monitorda isə parol yazılmış yapışqanlı qeyd kağızı qalıb.",
+          "choices": [
+            {
+              "label": "Qovluğu şkafa qoyub kilidləyirəm, qeydi də götürürəm",
+              "next": "visitor",
+              "feedback": "Düzdür. On dəqiqə bir şəkil çəkmək üçün kifayətdən də çoxdur."
+            },
+            {
+              "label": "Tez qayıdacağam, qoy qalsın",
+              "outcome": "risky",
+              "feedback": "Otağa qonaq, kuryer və ya təmirçi girə bilər. Sənədi yığışdırın, parolu isə heç vaxt yapışqanlı kağızda saxlamayın."
+            }
+          ]
+        },
+        {
+          "id": "visitor",
+          "text": "Rəhbərinizlə görüşüm var. Bu qovluqdakı sənədə baxa bilərəmmi?",
+          "speaker": "Qonaq (masanızın yanında)",
+          "voice": "man-2",
+          "channel": "in-person",
+          "spoken": "Rəhbərinizlə görüşüm var. <breath> Bu qovluqdakı sənədə baxa bilərəmmi?",
+          "choices": [
+            {
+              "label": "Nəzakətlə imtina edirəm və rəhbərimə zəng edirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Sənədi yalnız buna səlahiyyəti olan şəxs görməlidir."
+            },
+            {
+              "label": "Göstərirəm, axı o, rəhbərin qonağıdır",
+              "outcome": "risky",
+              "feedback": "Onun şəxsiyyəti və səlahiyyəti yoxlanmayıb. Əvvəlcə rəhbərinizlə dəqiqləşdirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "shredder",
+      "question": {
+        "prompt": "Məxfi kağızı hansı üsul ən etibarlı şəkildə məhv edir?",
+        "options": [
+          {
+            "id": "cross-cut",
+            "label": "Kağızı xırda hissəciklərə kəsən doğrayıcı",
+            "correct": true,
+            "feedback": "Düzdür. Xırda hissəcikləri yenidən birləşdirmək praktiki olaraq mümkün deyil."
+          },
+          {
+            "id": "strip-cut",
+            "label": "Kağızı uzun zolaqlara kəsən doğrayıcı",
+            "correct": false,
+            "feedback": "Zolaqları yan-yana düzüb vərəqi bərpa etmək olar. Kağızı xırda hissələrə kəsən doğrayıcı seçin."
+          },
+          {
+            "id": "tear",
+            "label": "Əllə dörd yerə cırmaq",
+            "correct": false,
+            "feedback": "Dörd parçanı lentlə yapışdırmaq bir dəqiqə çəkir. Məxfi kağızları doğrayıcıda məhv edin."
+          },
+          {
+            "id": "bin",
+            "label": "Üzüaşağı çevirib adi zibil qutusuna atmaq",
+            "correct": false,
+            "feedback": "Zibil binadan çıxarılır, orada isə onu istənilən adam açıb baxa bilər."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "folder"
+        }
+      },
+      "explain": "Məxfi kağız üçün xırda hissəciklərə kəsən doğrayıcıdan və ya məxfi tullantılar qutusundan istifadə edin."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Məxfi kağızları doğrayıcıda məhv edin, cihazları isə İT dəstəyinə təhvil verin.",
+        "Faylları silmək və sürətli formatlamaq məlumatları yox etmir.",
+        "Masanızdan uzaqlaşanda ekranı kilidləyin və sənədləri yığışdırın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

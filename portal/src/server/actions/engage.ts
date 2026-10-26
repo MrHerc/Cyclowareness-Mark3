@@ -112,7 +112,12 @@ export async function replyTicketAction(ticketId: string, body: string): Promise
     .set({ status, updatedAt: new Date(), ...(reopened ? { slaDueAt: new Date(Date.now() + SLA_HOURS[ticket.priority] * 3_600_000) } : {}) })
     .where(eq(t.supportTickets.id, ticketId));
   if (staff && ticket.userId !== v.user.id) {
-    await db().insert(t.notifications).values({ tenantId: v.tenant.id, userId: ticket.userId, kind: "ticket", title: `#${ticket.number}`, body: text.slice(0, 140), href: `/help/tickets/${ticket.id}` });
+    // Titled in the requester's interface language, not the agent's; the reply itself is the body.
+    const [requester] = await db().select({ locale: t.users.locale }).from(t.users).where(eq(t.users.id, ticket.userId));
+    const tr = await getTranslations({ locale: requester?.locale ?? v.tenant.settings.defaultLocale, namespace: "secops.support" });
+    await db()
+      .insert(t.notifications)
+      .values({ tenantId: v.tenant.id, userId: ticket.userId, kind: "ticket", title: tr("notifyTitle", { number: ticket.number, subject: ticket.subject.slice(0, 80) }), body: text.slice(0, 140), href: `/help/tickets/${ticket.id}` });
     await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "ticket.replied", targetType: "ticket", targetId: ticket.id });
   }
   refresh();

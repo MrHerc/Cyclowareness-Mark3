@@ -8,6 +8,7 @@ import { allowed, requireViewer } from "@/server/auth/viewer";
 import { getCatalog } from "@/server/queries/catalog";
 import { LessonPlayer } from "@/components/player/player";
 import type { Brand, Scene } from "@/lib/content/types";
+import { pickLessonContent } from "@/lib/content/lesson-locale";
 import { CATEGORY_TOPIC } from "@/lib/domain/catalog";
 import { DEFAULT_ATTESTATION } from "@/lib/tenant-defaults";
 import { pick } from "@/i18n/config";
@@ -48,8 +49,9 @@ export default async function LessonPage({ params }: PageProps<"/learn/[slug]/[l
   const lesson = m?.lessons.find((l) => l.key === lessonId);
   if (!m || !lesson) notFound();
   // The viewer's language, then English, then whatever the lesson was written in (own studio lessons).
+  // contentLocale below tells the narrator which language the chosen text is in.
   const contents = await db().select({ scenes: t.lessonContents.scenes, locale: t.lessonContents.locale }).from(t.lessonContents).where(eq(t.lessonContents.lessonId, lesson.id));
-  const fallback = contents.find((c) => c.locale === locale) ?? contents.find((c) => c.locale === "en") ?? contents[0];
+  const fallback = pickLessonContent(contents, locale);
   if (!fallback) notFound();
   const scenes = fallback.scenes as Scene[];
   const idx = m.lessons.findIndex((l) => l.key === lessonId);

@@ -1,0 +1,469 @@
+{
+  "id": "event-wifi-charging",
+  "title": "Wi-Fi и зарядка на мероприятиях",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "На мероприятиях к одной сети подключаются сотни людей. Злоумышленник может создать ещё одну с тем же названием.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "wifi"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Открытая сеть с сильным сигналом и похожим названием может оказаться ловушкой. Уточните правильное название на стойке регистрации.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "wifi",
+              "networks": [
+                {
+                  "ssid": [
+                    {
+                      "text": "ReqemYol-Forum"
+                    }
+                  ],
+                  "secured": true,
+                  "signal": 3
+                },
+                {
+                  "ssid": [
+                    {
+                      "text": "ReqemYol-Forum-FREE",
+                      "spot": "twin"
+                    }
+                  ],
+                  "secured": false,
+                  "signal": 4
+                }
+              ]
+            }
+          },
+          "highlight": "twin"
+        },
+        {
+          "id": "b3",
+          "say": "Для работы пользуйтесь мобильным интернетом или VPN вашей организации. Никогда не вводите рабочий пароль на странице входа в Wi-Fi.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "vpn"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Вместо общественной зарядной станции подключите свой адаптер к розетке или воспользуйтесь своим внешним аккумулятором.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "usb"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "forum-wifi",
+      "environment": "browser",
+      "title": "Wi-Fi на форуме",
+      "intro": "На форуме вы подключились к открытой сети, и открылся браузер. На каждой странице выберите правильный шаг.",
+      "steps": [
+        {
+          "id": "portal-login",
+          "label": "ReqemYol-Forum-FREE",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "nc-reqemyol-fake",
+            "brand": "RəqəmYol Forum Wi-Fi",
+            "url": [
+              {
+                "text": "http://wifi-reqemyol-forum.example.net/login"
+              }
+            ],
+            "fields": [
+              "Рабочая почта",
+              "Пароль от рабочей почты"
+            ],
+            "button": "Подключиться к интернету"
+          },
+          "say": "Что запрашивает эта страница Wi-Fi?",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Подключиться к интернету",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Странице Wi-Fi никогда не нужен ваш рабочий пароль. Теперь его видит тот, кто управляет этой открытой сетью."
+            },
+            {
+              "id": "close",
+              "label": "Закрыть вкладку",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Правильно. Отключитесь от сети и узнайте правильное название на стойке регистрации."
+            },
+            {
+              "id": "disconnect",
+              "label": "Отключиться от сети",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Отлично. Отключиться от незнакомой открытой сети — самая быстрая защита."
+            }
+          ]
+        },
+        {
+          "id": "cert-warning",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Подключение не защищено"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Сертификат сайта poct.idare.example недействителен."
+                }
+              ],
+              [
+                {
+                  "text": "Возможно, кто-то пытается перехватить ваши данные."
+                }
+              ]
+            ],
+            "buttons": [
+              "Назад",
+              "Всё равно продолжить"
+            ]
+          },
+          "say": "Вы открываете рабочую почту, и браузер показывает предупреждение.",
+          "actions": [
+            {
+              "id": "back",
+              "label": "Назад",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Правильно. Такое предупреждение может означать, что кто-то вклинился в ваше подключение. Переключитесь на мобильный интернет."
+            },
+            {
+              "id": "proceed",
+              "label": "Всё равно продолжить",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Если проигнорировать предупреждение, ваш пароль может достаться тому, кто перехватывает подключение. Вернитесь назад и смените сеть."
+            }
+          ]
+        },
+        {
+          "id": "setup-download",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "nc-reqemyol-fake",
+            "name": [
+              {
+                "text": "ReqemYol_WiFi_Setup.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "4,1 МБ",
+            "source": [
+              {
+                "text": "wifi-reqemyol-forum.example.net"
+              }
+            ]
+          },
+          "say": "Страница предлагает программу для подключения к Wi-Fi.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Открыть файл",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Чтобы подключиться к Wi-Fi, никакие программы не нужны. Этот файл устанавливает на компьютер вредоносную программу."
+            },
+            {
+              "id": "delete",
+              "label": "Удалить",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Правильно. Сеть мероприятия никогда не требует устанавливать программы."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "network-list",
+      "prompt": "Какие сети на мероприятии выглядят подозрительно? Найдите их.",
+      "artifact": {
+        "kind": "wifi",
+        "networks": [
+          {
+            "ssid": [
+              {
+                "text": "ReqemYol-Forum"
+              }
+            ],
+            "secured": true,
+            "signal": 3
+          },
+          {
+            "ssid": [
+              {
+                "text": "ReqemYol-Forum-FREE",
+                "spot": "free"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "ReqemYol_Forum",
+                "spot": "twin"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "Pulsuz_Sarj_WiFi",
+                "spot": "charge"
+              }
+            ],
+            "secured": false,
+            "signal": 2
+          },
+          {
+            "ssid": [
+              {
+                "text": "Lumera-Guest"
+              }
+            ],
+            "secured": true,
+            "signal": 1
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "free",
+          "label": "Приписка FREE",
+          "explain": "Сеть открытая, а к названию добавлено FREE. Официальное название сообщают на стойке регистрации."
+        },
+        {
+          "id": "twin",
+          "label": "Похожее название",
+          "explain": "Название почти совпадает с официальным, отличается всего один символ. Это может быть «злой двойник» — поддельная точка доступа."
+        },
+        {
+          "id": "charge",
+          "label": "Заманчивое название",
+          "explain": "Открытая сеть, которая обещает что-то бесплатное, — классический признак ловушки."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "choice",
+      "id": "charging",
+      "question": {
+        "prompt": "У телефона осталось 5 % заряда, а в зале есть общественная USB-зарядка. Что вы сделаете?",
+        "options": [
+          {
+            "id": "own-adapter",
+            "label": "Подключу свой адаптер к розетке",
+            "correct": true,
+            "feedback": "Правильно. Через розетку идёт только питание, а не данные."
+          },
+          {
+            "id": "powerbank",
+            "label": "Заряжу телефон от своего внешнего аккумулятора",
+            "correct": true,
+            "feedback": "Верно. Свой внешний аккумулятор остаётся под вашим контролем."
+          },
+          {
+            "id": "trust",
+            "label": "Подключусь к станции и нажму «Доверять»",
+            "correct": false,
+            "feedback": "Если нажать «Доверять», устройство получит доступ к данным телефона. Для зарядки это не нужно."
+          },
+          {
+            "id": "stranger-cable",
+            "label": "Одолжу кабель у соседа по залу",
+            "correct": false,
+            "feedback": "В незнакомом кабеле может быть спрятан чип. Носите с собой свой кабель и адаптер."
+          }
+        ],
+        "multi": true,
+        "visual": {
+          "kind": "illustration",
+          "id": "usb"
+        }
+      },
+      "explain": "Безопаснее всего — свой адаптер в розетке или свой внешний аккумулятор. Если телефон спрашивает, доверять ли устройству, — не доверяйте."
+    },
+    {
+      "type": "swipe",
+      "id": "event-messages",
+      "prompt": "Сообщения и запросы во время мероприятия. Безопасно или угроза?",
+      "cards": [
+        {
+          "id": "badge-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "nc-reqemyol",
+            "sender": [
+              {
+                "text": "ReqemYol"
+              }
+            ],
+            "time": "08:30",
+            "messages": [
+              [
+                {
+                  "text": "Ваш бейдж готов. Подойдите на стойку регистрации с удостоверением личности."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ни ссылки, ни оплаты, и вводить ничего не нужно. Это обычное напоминание."
+        },
+        {
+          "id": "cert-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "nc-reqemyol-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "RəqəmYol Forum"
+                }
+              ],
+              "address": [
+                {
+                  "text": "sertifikat@reqemyol-forum.example.info"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Ваш сертификат участника"
+              }
+            ],
+            "time": "17:05",
+            "body": [
+              [
+                {
+                  "text": "Чтобы скачать сертификат, войдите с помощью рабочей почты: "
+                },
+                {
+                  "text": "reqemyol-forum.example.info/certificate",
+                  "link": {
+                    "label": "reqemyol-forum.example.info/certificate",
+                    "href": "https://reqemyol-forum.example.info/certificate"
+                  }
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Официальный сайт — reqemyol-forum.example, а здесь другой домен. Для сертификата никогда не нужен ваш рабочий пароль."
+        },
+        {
+          "id": "qr-table",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Наклейка на столе: «Отсканируйте для бесплатного Wi-Fi»"
+              }
+            ],
+            "destination": [
+              {
+                "text": "http://wifi-giris.example.info/connect"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Наклейку может приклеить кто угодно, а адрес не принадлежит форуму. Узнайте название сети на стойке регистрации."
+        },
+        {
+          "id": "session-note",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "nc-reqemyol",
+            "app": "RəqəmYol Forum",
+            "title": [
+              {
+                "text": "Сессия начнётся через 15 минут"
+              }
+            ],
+            "body": [
+              {
+                "text": "Панельная дискуссия по кибербезопасности, зал B."
+              }
+            ],
+            "time": "13:45"
+          },
+          "verdict": "safe",
+          "explain": "Уведомление пришло из приложения, которое вы установили из официального магазина. Ни ссылки, ни просьб."
+        },
+        {
+          "id": "trust-prompt",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Доверять этому устройству?"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Подключённое устройство запрашивает доступ к файлам на вашем телефоне."
+                }
+              ]
+            ],
+            "buttons": [
+              "Не доверять",
+              "Доверять"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Зарядной станции незачем запрашивать ваши файлы. Выберите «Не доверять» — зарядка при этом продолжится."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Название сети узнавайте на стойке регистрации, а для работы пользуйтесь мобильным интернетом или VPN.",
+        "Никогда не вводите рабочий пароль на странице Wi-Fi и не игнорируйте предупреждения о сертификате.",
+        "Заряжайте телефон через свой адаптер в розетке или от своего внешнего аккумулятора."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

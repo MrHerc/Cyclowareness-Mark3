@@ -26,7 +26,7 @@ export function TemplatePreview({ tpl, locale, compact = false }: { tpl: Campaig
           <Icon className="size-3.5" />
           {templateText(tpl.sender.name, locale)} · {tpl.sender.address}
         </p>
-        <p className={cn("mt-1.5 text-caption italic", compact && "line-clamp-3")}>“{body}”</p>
+        <p className={cn("mt-1.5 text-caption italic", compact && "line-clamp-3")}>{locale === "en" ? `“${body}”` : `«${body}»`}</p>
       </div>
     );
   }
@@ -42,7 +42,7 @@ export function TemplatePreview({ tpl, locale, compact = false }: { tpl: Campaig
       {tpl.attachment ? (
         <p className="mt-2 inline-flex items-center gap-1 rounded-md bg-sunken px-2 py-1 text-tab">
           <Paperclip className="size-3" />
-          {tpl.attachment.name} · {tpl.attachment.size}
+          {templateText(tpl.attachment.name, locale)} · {templateText(tpl.attachment.size, locale)}
         </p>
       ) : null}
       {tpl.qr ? <QrCode className="mt-2 size-14 text-ink" strokeWidth={1.2} /> : null}

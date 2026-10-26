@@ -2,6 +2,8 @@
 
 The shield-shaped robot that greets learners on Home, narrates tutor beats in the lesson player, reacts in feedback sheets and the tutor panel, walks the learner through the onboarding tour, and leads the public landing tour. One Rive file, one React wrapper, five call sites. All paths are repo-relative; `portal/` is the app.
 
+> **Since 2026-10-21 the live mascot is the cat** (a Canvas 2D rig, same props): see [section 6](#6-cat-implementation-2026-10-21). Sections 1–5 describe the Rive robot, which is kept and comes back by editing one line.
+
 ## Table of contents
 
 1. [What the original Cylosof did](#1-what-the-original-cylosof-did)
@@ -23,6 +25,7 @@ The shield-shaped robot that greets learners on Home, narrates tutor beats in th
 3. [Conventions and gotchas](#3-conventions-and-gotchas)
 4. [Recipes](#4-recipes)
 5. [Gaps vs the original](#5-gaps-vs-the-original)
+6. [Cat implementation (2026-10-21)](#6-cat-implementation-2026-10-21)
 
 ---
 
@@ -73,7 +76,7 @@ Sources: `docs/audit/00-overview.md`, `docs/audit/02-learner-app.md`, `docs/audi
 | `portal/src/components/site/landing-tour.tsx` | Hero mascot button, attract moves, nap, travel between chapters, `GuideDock` |
 | `portal/src/components/site/scenes.tsx` | Landing chapters calling `guide.say(line, { gesture })` |
 | `portal/src/components/site/teachable.tsx` | Teachable moment after a simulated phishing click (`alert` + `shield-up`) |
-| `portal/src/app/(learner)/page.tsx` | Mounts `HomeMascot` with the viewer's motion/sound/feature flags |
+| `portal/src/app/(learner)/app/page.tsx` | Home (route `/app`): mounts `HomeMascot` with the viewer's motion/sound/feature flags |
 | `portal/src/app/(learner)/layout.tsx` | Mounts `Tour` while `users.tourDone` is false |
 | `portal/src/app/(focus)/learn/[slug]/[lessonId]/page.tsx` | Passes `topic={CATEGORY_TOPIC[m.category]}` and `motion={v.user.motion}` to the player |
 | `portal/src/app/(public)/t/[token]/page.tsx`, `q/[token]/page.tsx` | Teachable-moment pages |
@@ -177,26 +180,29 @@ Other scenes: `ChoiceScene` shows `mood={speaking ? "talk" : "idle"}` with the t
 
 ### 2.5 Narration and karaoke sync
 
-`useNarrator` (`portal/src/components/player/narrator.ts`) wraps the Web Speech API (ADR-007: "browser speech synthesis first, a TTS provider later; `speak()` can be replaced without UI changes"). `speak(text, { voice, lang, onWord, onEnd, onError })` fires `onWord(i)` from `onboundary` events, or from a 165-wpm estimate when the engine sends none; `speaking` is a React state flag. The `Karaoke` component in `scenes.tsx` paints words by `onWord`; the mascot only receives `talking={narrator.speaking}` (a boolean), so the `talkbody_0..3` amplitude animations in the .riv are never selected by code. With sound off `speak` returns at once, `onEnd` is not called and the learner continues by hand, so the mascot stays `idle` through silent beats.
+`useNarrator` (`portal/src/components/player/narrator.ts`) wraps the Web Speech API (ADR-007: "browser speech synthesis first, a TTS provider later; `speak()` can be replaced without UI changes"). `speak(text, { voice, lang, onWord, onEnd, onError })` fires `onWord(i)` from `onboundary` events, or from a 165-wpm estimate when the engine sends none; `speaking` is a React state flag. The `Karaoke` component in `scenes.tsx` paints words by `onWord`; the mascot only receives `talking={narrator.speaking}` (a boolean), so the `talkbody_0..3` amplitude animations in the .riv are never selected by code. With sound off `speak` returns at once, `onEnd` is not called and the learner continues by hand, so the mascot stays `idle` through silent beats (a `celebrate` beat stays `celebrate`). The same happens when the browser has no voice for the text's language (Azerbaijani in Chrome on Windows): a text is never read by another language's voice, `speak` calls `onError("language-unavailable")` instead, and the player treats the lesson as sound off with a `<VoiceNotice>` (lesson-engine.md §3.4).
 
 ### 2.6 Home mascot
 
-`portal/src/components/learner/home-mascot.tsx`, mounted by `portal/src/app/(learner)/page.tsx`:
+`portal/src/components/learner/home-mascot.tsx`, mounted by `portal/src/app/(learner)/app/page.tsx` (Home, route `/app`):
 
 ```tsx
-<HomeMascot label={t("talk")} still={v.user.motion === "still"} soundOn={v.user.soundOn}
-  tutor={v.tenant.features.has("ai_tutor") && current ? { slug: current.slug, lessonKey: nextLesson(current).key } : undefined}
-  tutorVoice={v.tenant.features.has("tutor_voice")} />
+const tutorLesson = v.tenant.features.has("ai_tutor") && current ? nextLesson(current) : null;
+const tutorRows = tutorLesson ? await db().select({ locale: schema.lessonContents.locale }).from(schema.lessonContents).where(eq(schema.lessonContents.lessonId, tutorLesson.id)) : [];
+const tutor = current && tutorLesson ? { slug: current.slug, lessonKey: tutorLesson.key, contentLocale: pickLessonContent(tutorRows, locale)?.locale } : undefined;
+// …
+<HomeMascot label={tutor ? t("talk") : t("mascot")} still={v.user.motion === "still"} soundOn={v.user.soundOn}
+  tutor={tutor} tutorVoice={v.tenant.features.has("tutor_voice")} />
 ```
 
-- A `<button aria-label={label} aria-haspopup={tutor ? "dialog" : undefined}>` wraps the mascot (`size-32 sm:size-40`, class `animate-float`). `label` is `learner.home.talk` ("Talk to AI Sel").
+- A `<button aria-label={label} aria-haspopup={tutor ? "dialog" : undefined}>` wraps the mascot (`size-32 sm:size-40`, class `animate-float`). `label` is `learner.home.talk` ("Talk to AI Sel") when the tutor is on, otherwise `learner.home.mascot` ("AI Sel, the Cyclowareness cat").
 - `REACTIONS` cycle on each click: `happy/wave`, `excited/hop`, `proud/shield-up`, `laughing/cheer`, `curious/ponder`; the first (wave) plays 600 ms after mount (`tick`), so the server and first client render agree on `idle`.
 - Idle acts timed from the last wake: `apple` after `APPLE_MS = 45_000`, `nap` after `NAP_MS = 180_000`; hovering (`onPointerEnter`) or clicking wakes it; none when `still`.
-- A click also opens `TutorPanel` (when `tutor` is set) with `sceneId: null`; answers are spoken through its own `useNarrator({ enabled: soundOn ?? true, rate: 1, lang: locale })` (only when `tutorVoice`, see 2.7).
+- A click also opens `TutorPanel` (when `tutor` is set) with `sceneId: null` and `contentLocale={tutor.contentLocale}`, the language of the lesson row the tutor route will pick (`pickLessonContent` over the next lesson's `lesson_contents` rows, computed by the page above). Answers are spoken through its own `useNarrator({ enabled: soundOn ?? true, rate: 1, lang: locale })` (only when `tutorVoice`, see 2.7), lent as `speak={(text, lang) => narrator.speak(text, { lang })}` like in the player: an AI answer is read with the UI language's voice, an offline one with the lesson row's (lesson-engine.md §3.4, recipe 6.9). Closing the panel calls `narrator.stop()`.
 
 ### 2.7 Tutor panel
 
-`portal/src/components/player/tutor-panel.tsx` (`Dialog` titled `player.tutor.title` = "Ask AI Sel"): `<Mascot mood={state === "thinking" ? "think" : answer ? "happy" : "curious"} talking={state === "thinking"} guide={{ listen: listening }} className="size-20" />`. `listening` is the Web Speech *recognition* state (mic button shown only when `voice` and the browser has `SpeechRecognition`). The answer streams from `POST /api/tutor` (ADR-008, Claude; `x-tutor-mode: offline` when no key) and is spoken via the `speak` prop when `voice` is on. No `still` prop is passed here.
+`portal/src/components/player/tutor-panel.tsx` (`Dialog` titled `player.tutor.title` = "Ask AI Sel"): `<Mascot mood={state === "thinking" ? "think" : answer ? "happy" : "curious"} talking={speaking && state !== "thinking"} guide={{ listen: listening }} className="size-20 shrink-0" />` (`speaking` is the lending narrator's flag). `listening` is the Web Speech *recognition* state (mic button shown only when `voice` and the browser has `SpeechRecognition`). The answer streams from `POST /api/tutor` (ADR-008, Claude; `x-tutor-mode: offline` without a key or when the model fails before its first text) and is spoken via the `speak(text, lang)` prop when `voice` is on; in the player and on Home (2.6) that is the answer's language (UI language for AI answers, the lesson's for offline ones); without a voice for it the mascot does not talk and a `<VoiceNotice>` appears (lesson-engine.md §3.4, §4). No `still` prop is passed here.
 
 ### 2.8 Onboarding tour (learner)
 
@@ -268,8 +274,8 @@ No `still` prop reaches the landing mascots: there is no signed-in viewer, so on
 ### 2.13 Accessibility and i18n keys
 
 - Standalone mascots carry `role="img"` + `aria-label` (`label` prop); mascots beside text are `aria-hidden`. Clickable mascots are wrapped in a `<button>` with its own `aria-label`.
-- `messages/{az,en,ru}/learner.json`: `home.greeting` ("Hello, {name}"), `home.talk` ("Talk to AI Sel"), `profile.soundBody` ("AI Sel reads lessons aloud."), `profile.motion`, `profile.motionBody`, `profile.motionFull`, `profile.motionCalm`, `profile.motionStill`, `profile.tour`, `profile.tourReset`, `tour.label` ("Quick tour"), `tour.stepOf`, `tour.next`, `tour.back`, `tour.done`, `tour.skip`, `tour.steps.{welcome,home,learn,league,progress,profile,streak,xp,continue,path}.{title,body}`.
-- `messages/{az,en,ru}/player.json`: `askLabel` ("Ask AI Sel a question"), `ask`, `soundHint` ("Turn the sound on to hear AI Sel"), `motion`, `options`, `tutor.{title,placeholder,send,listen,listening,thinking,suggestions[],privacy,offline,error}`.
+- `messages/{az,en,ru}/learner.json`: `home.greeting` ("Hello, {name}"), `home.talk` ("Talk to AI Sel"), `home.mascot` ("AI Sel, the Cyclowareness cat", the label without a tutor), `profile.soundBody` ("AI Sel reads lessons aloud."), `profile.motion`, `profile.motionBody`, `profile.motionFull`, `profile.motionCalm`, `profile.motionStill`, `profile.tour`, `profile.tourReset`, `tour.label` ("Quick tour"), `tour.stepOf`, `tour.next`, `tour.back`, `tour.done`, `tour.skip`, `tour.steps.{welcome,home,learn,league,progress,profile,streak,xp,continue,path}.{title,body}`.
+- `messages/{az,en,ru}/player.json`: `askLabel` ("Ask AI Sel a question"), `ask`, `soundHint` ("Turn the sound on to hear AI Sel"), `motion`, `options`, `tutor.{title,placeholder,empty,send,listen,listening,thinking,suggestions[],privacy,offline,error}`.
 - Landing copy (`portal/content/landing/*.json`, 10 languages plus `site.json`, parity checked by `tests/landing.test.ts`), all under the top-level `copy` object: `ui.captionLabel`, `attract.tapPrompt`, `attract.greeting`, `attract.greetings.{morning,day,evening,night}`, `attract.idle[].{move,line}`, `attract.nudge`, `rapport.{returning,score,fast,role,quietOn}`, `tour.beats.{hero,phone,tutor,languages,admin,deploy,demo}`.
 
 ### 2.14 Tests
@@ -296,7 +302,7 @@ No `still` prop reaches the landing mascots: there is no signed-in viewer, so on
 - **Three UI languages via the Edit tool** (`messages/{az,en,ru}`); the tutor is **AI Sel** everywhere; landing copy lives in `portal/content/landing/*.json` for ten languages and `tests/landing.test.ts` fails on a missing key.
 - **`docs/audit/` is read-only**; `docs/audit/assets/mascot.riv` is the reference copy of the asset.
 - `--animate-blink` is defined in `globals.css` and cleared under "calm", but no component applies `.animate-blink`: blinking comes from the .riv's Blink layer. `.animate-float` is applied to the home and intro mascots, the content-shield icon and the main glyph of lesson illustrations (`player/illustrations.tsx`).
-- Azerbaijani dates: never format with `Intl` on the client (ADR-017); not a mascot concern unless a caption shows a date.
+- Azerbaijani dates and numbers: never format with `Intl` on the client, use `useClientFormat()` (ADR-017, ADR-024; SKILL.md ground rules); not a mascot concern unless a caption shows a date or a number.
 
 ---
 
@@ -314,7 +320,7 @@ No `still` prop reaches the landing mascots: there is no signed-in viewer, so on
 
 1. Pick the call site: home (`home-mascot.tsx`), player scene (`scenes.tsx`), done screen (`player.tsx` `DoneScreen`), tour (`tour.tsx`) or landing (`site/scenes.tsx` via `guide.say`).
 2. For a one-shot move use `fire={{ name, key }}` with a counter in state (copy `move()` in `guide.tsx`: `setFire(f => ({ name, key: (f?.key ?? 0) + 1 }))`); for a pose use `mood` + `gesture` + a changing `gestureKey`. Only names from `MascotTrigger` / `mapping.ts`.
-3. Server data (streak, XP) reaches the mascot as props from the server page, e.g. extend `HomeMascot`'s props in `portal/src/app/(learner)/page.tsx` (`liveStreak`, `levelFor` are already computed there) and add a `REACTIONS` entry or a dedicated effect.
+3. Server data (streak, XP) reaches the mascot as props from the server page, e.g. extend `HomeMascot`'s props in `portal/src/app/(learner)/app/page.tsx` (`liveStreak`, `levelFor` are already computed there) and add a `REACTIONS` entry or a dedicated effect.
 4. Respect `still` (acts/triggers already stop under reduced motion; pause-level stillness needs the prop) and `soundOn` for any spoken line (recipe 6).
 5. Strings go into `messages/{az,en,ru}/*.json`; verify in all three languages at 375 px.
 
@@ -350,7 +356,7 @@ No `still` prop reaches the landing mascots: there is no signed-in viewer, so on
 
 ### 4.6 Give the mascot a voice line
 
-- In the learner app: get `const narrator = useNarrator({ enabled: soundOn, rate: 1, lang: locale })` (or reuse `env.narrator` inside a scene), call `narrator.speak(text, { onWord, onEnd })` from an effect or handler, and pass `talking={narrator.speaking}` to the mascot. The text comes from `messages/{az,en,ru}` (UI) or from lesson JSON (`say`); `soundOn` is `v.user.soundOn`. Pick `mood` to match (e.g. `talk`).
+- In the learner app: get `const narrator = useNarrator({ enabled: soundOn, rate: 1, lang: locale })` (or reuse `env.narrator` inside a scene), call `narrator.speak(text, { onWord, onEnd })` from an effect or handler, and pass `talking={narrator.speaking}` to the mascot. The text comes from `messages/{az,en,ru}` (UI) or from lesson JSON (`say`); `soundOn` is `v.user.soundOn`. Pick `mood` to match (e.g. `talk`). Speak a text in its own language: UI strings with the UI locale (`{ lang: env.uiLocale }` inside a scene), lesson text with the lesson's (`p.contentLocale`, the player narrator's default). Without a voice for that language nothing is spoken and `onEnd` never fires, so do not wait on it; show `<VoiceNotice lang>` (`src/components/player/voice-notice.tsx`) where silence would puzzle the learner (lesson-engine.md §3.4).
 - On the landing: add a `Line` (`{ id, text, emotion?, voice?, spoken? }`) to every `portal/content/landing/*.json` and call `guide.say(line, { gesture, move, whisper, aim, lang })`; `emotion` drives the mood through `EMOTION_MOOD`, `voice: "caller"` makes the mascot `listen`.
 - Tutor answers are spoken by the `speak` prop of `TutorPanel` only when `tutorVoice` (`tutor_voice` feature) is on.
 - Test: `npx vitest run tests/landing.test.ts` for landing copy; manual listening for the rest (Web Speech output cannot be unit-tested).
@@ -366,7 +372,7 @@ No `still` prop reaches the landing mascots: there is no signed-in viewer, so on
 
 ## 5. Gaps vs the original
 
-- **Voice.** The original played pre-generated TTS clips with per-word timing (06 §1); the portal uses the browser's Web Speech API with estimated timing when no boundaries arrive (ADR-007). Consequences: voice quality and `az` support depend on the visitor's OS voices; the `talkbody_0..3` amplitude animations are never driven (only the `talking` bool).
+- **Voice.** The original played pre-generated TTS clips with per-word timing (06 §1); the portal uses the browser's Web Speech API with estimated timing when no boundaries arrive (ADR-007). Consequences: voice quality and `az` support depend on the visitor's OS voices (without an Azerbaijani voice the az lessons and answers stay silent and the mascot does not talk, since no text is read by another language's voice); the `talkbody_0..3` amplitude animations are never driven (only the `talking` bool).
 - **Intro scenes.** The spec's `intro` scene has a `mood`; `IntroScene` renders no mascot, so that mood is ignored.
 - **Pointing.** The original mascot pointed at on-screen elements during narration; the portal does this only in `TutorScene` for `beat.highlight` spots. Choice, hotspot and simulation scenes do not aim.
 - **Unused inputs.** `react`/`reactGo`, `perch`, `trace`, `wipe`, the `read` act, `tap-left`/`tap-right`/`toss`/`eureka`/`attention` gestures and the `sad`/`surprised`/`sleepy` moods have no code path. The particle effects (Burst / AhaSpark / PokeSpark) are whatever the state machine does on its own; nothing triggers them explicitly (verify).
@@ -378,3 +384,70 @@ No `still` prop reaches the landing mascots: there is no signed-in viewer, so on
 - **Performance.** No offscreen pausing; the player remounts a canvas per scene.
 - **Rail logo / shield.** The original used the mascot logo in the rail and the content shield; the portal uses the static shield SVG (`/icons/icon.svg`), which matches the spec's "mascot logo" but is not the Rive character.
 - **Home "Talk to the tutor".** The original opened a voice tutor directly; the portal opens the text-plus-mic `TutorPanel` (voice only with `tutor_voice`), scoped to the current module's next lesson.
+
+---
+
+## 6. Cat implementation (2026-10-21)
+
+Since 2026-10-21 AI Sel is drawn as the owner's grey tabby-and-white cat on every placement (the owner asked to see the cat everywhere before deciding; OPEN-QUESTIONS 21, ADR-022). Sections 1–5 describe the Rive robot, which is kept and comes back with a one-line change. The `Mascot` props, the call sites and the persona name ("AI Sel") are the same; the cat adds one optional prop, `facing`.
+
+### 6.1 File map
+
+| Path | Role |
+|---|---|
+| `portal/src/components/mascot/mascot.tsx` | The switch: one line, `export { Mascot, angleBetween, type MascotAim, … } from "./cat-mascot"` |
+| `portal/src/components/mascot/cat-mascot.tsx` | The cat wrapper: same props as Rive plus `facing`; creates the engine on its inner host div after mount (static import), maps props in effects, destroys it on unmount |
+| `portal/src/components/mascot/cat/engine.js` | The Canvas 2D rig, vendored from `design/mascot-cat/source/p2.js + p3.js + p4.js` without the demo page wiring; its header lists every integration change. Excluded from ESLint (`portal/eslint.config.mjs`) |
+| `portal/src/components/mascot/cat/engine.d.ts` | Hand-written types of the public API (`createCat`, `CatInstance`, mood / gesture / behaviour names) |
+| `portal/src/components/mascot/cat/props.ts` | Pure tables and functions from the Rive props to the engine (`MOOD_TO_CAT`, `GESTURE_TO_CAT`, `ACT_TO_CAT`, `FIRE_TO_CAT`, `aimGesture`, `heldGesture`, `lookDirection`, `fireDue`, `HOPS`, keyframes) |
+| `portal/src/components/mascot/rive-mascot.tsx` | The Rive wrapper as it was (it also accepts `facing` and ignores it, so both share one API) |
+| `portal/src/components/mascot/mapping.ts` | Unchanged: the prop unions both wrappers use |
+| `portal/tests/mascot-cat.test.ts` | The mapping, `fireDue`, the hop keyframes, and that the engine imports without a DOM |
+| `design/mascot-cat/source/` → `sh source/build.sh` → `final.html` | The design source of truth (README there lists the API) |
+
+### 6.2 Prop → engine
+
+| Prop | Engine call |
+|---|---|
+| `mood` | `setMood(same name)`; the 14 names are identical. `guide.listen` shows `curious` |
+| `talking`, `guide.whisper` | `setTalking(on, whisper ? 0.45 : 1)` (mouth level) |
+| `gesture` + `gestureKey` | `play(GESTURE_TO_CAT[g])` on mount and on every key change. 28 names on 12 gestures: lecture/explain/present/tap-right → point-right, tap-left → point-left, point-up/wave → wave, hop/eureka/cheer → cheer, inspect → lean-in, ponder → think, recite/count/attention/reassure/nod → nod, facepalm → shake, toss → shrug, rest → nothing. `hop` also jumps the whole cat (host `animate()`, 560 ms) |
+| `aim` `{ angle }` | `hold(point-down \| point-left \| point-right)` (225° < a < 315° down, 90° < a ≤ 225° left, else right; no upward point) and `lookToward(cos a, −sin a)`; `null` lowers the paw |
+| `guide.peer`, `guide.listen` | `hold("lean-in")` |
+| `guide.travel` | a sideways hop of the host (520 ms) and a look to that side (no walk) |
+| `act` | `do()`: rest → present, nap → sleep, apple → groom, read → look; none while motion is off |
+| `fire` `{ name, key }` | bounce → host hop, huff → shake, poke / touch → `poke()` (head tilt, purr, hearts), knock / tap → point-down, wipe → groom. Fires on every key change; on first sight only `key: 0` fires (`fireDue`), so a remounted mascot does not replay an old move |
+| `aimAt` | `lookToward(x, y)` |
+| `still`, `html[data-motion=still]`, OS reduced motion | `setStill(true)`: a still frame with blinks; the mood, a held gesture (the point) and the look direction are kept as one static pose |
+| `facing` | `createCat({ facing })`: "left" mirrors the drawing; points still follow the screen side. Fixed per instance (a change re-creates the cat). Used by the landing hero (faces the phone) |
+| `label`, `onPoke`, `className` | on the wrapper div (`role="img"` + `aria-label` only with a label); a press on the box also pets the cat (the engine listens on its host div) |
+| `topic`, `aim.hand`, `fire.zone`, `guide.wait` / `perch` / `trace` | accepted, ignored (the cat has no topic props or poke zones) |
+
+Engine rules worth knowing (all in `engine.js`): a held point replaces a running point at once (cross-faded over 0.3 s, already at its peak), and `play()` of a point while a point is held returns false, so a beat's own `point-*` gesture never points away from its `highlight`; any other one-shot gesture interrupts a held pose, which comes back when it ends; while a point is held with a look direction, the pointer does not pull the eyes away; no slow "cat kiss" blink while a gesture is held or the cat talks; every new gesture cross-fades from the one it replaces. Framing: below 80 px the cat is a head-and-collar crop (`bust`), below 72 px a simplified drawing (`lod`), below 130 px it draws at 30 fps (20 fps while only idling), sleeps between frames and drops the "mrr…" text bubble (hearts only). One shared `requestAnimationFrame` loop; an IntersectionObserver pauses offscreen cats; still cats redraw only on change.
+
+### 6.3 Switching back to Rive
+
+1. `portal/src/components/mascot/mascot.tsx`: change `"./cat-mascot"` to `"./rive-mascot"` (and the comment). Nothing imports `cat-mascot.tsx` or the engine otherwise, so the cat leaves the bundle.
+2. `npx tsc --noEmit` passes as is (`facing` is accepted by both). `/rive/` assets, the wasm CSP and the cache rules were never removed.
+3. Call-site changes made for the cat that are harmless with Rive but can be reverted: the rounded tiles around the FeedbackCard and Lens mascots (`scenes.tsx`), the 80 px tour mascot with `aim` (`tour.tsx`), the hero's `facing="left"`, `pointer-events-none` button and body hit area (`landing-tour.tsx`), the tutor panel's `speaking` prop, the delayed tutor dialog and `still={still || open}` on Home (`home-mascot.tsx`). Keep `tests/mascot-cat.test.ts` or delete it with `cat/`.
+
+### 6.4 Gotchas
+
+- **The engine is a hand port.** Change drawing, poses or gestures in `design/mascot-cat/source`, rebuild `final.html` (`sh source/build.sh`), then make the same edit in `cat/engine.js` (2026-10-21: the cross-body point reaching out past the body, mirror-aware points, the thought-dot halo were changed in both). Integration-only changes (`hold`, `lookToward`, still pose, frame scheduling, fx clamping) exist only in the port; its header lists them.
+- **No side effects at module load.** The engine is imported statically and evaluated during SSR; browser globals start with the first `createCat`. `tests/mascot-cat.test.ts` imports it in Node and fails if that breaks.
+- **Small boxes.** Below 80 px only the head and collar show, cut flat at the box edges; give such a mascot the design's tile (`overflow-hidden rounded-md bg-surface ring-1 ring-line`, as FeedbackCard and the Lens do) or make it at least `size-20` (the tour). Arm gestures are invisible in the crop.
+- **Pointing has three directions.** Left, right, down; a target above is pointed at sideways. On a right-facing cat, point-left is the near paw reaching across the chest; for a placement that always points one way, `facing` can turn the cat toward it.
+- **Content gesture first, then the aim.** A tutor beat's own gesture plays on mount and its `aim` arrives a frame later: a point gives way at once; other gestures (wave 1.9 s, cheer 1.8 s) finish first.
+- **Motion off is a still frame**, unlike Rive (which only stopped acts, travel and triggers): no gestures, talking or acts, but the mood, the held point and the look stay visible.
+- **One canvas per `Mascot`.** The Home cat goes still while its tutor dialog is open; a hidden (`display: none`) or offscreen cat costs nothing.
+- **Fire keys.** Use `key: 0` for a move that should play on mount; counters that start at 1 only fire on later changes.
+- **Hit areas.** The landing hero button is `pointer-events-none` with a span over the cat's body (`inset-x-[22%] inset-y-[6%]`), so the box's transparent strip does not cover the phone's "open" button; hover and tap on the span still reach the button.
+- **Close-up checks.** Engine poses can be checked without the app: serve `cat/engine.js` to a blank page (e.g. Playwright `page.route`), `createCat(div, { mode: "mascot" })`, then `hold()`, `setMood()`, `setStill()` and screenshot. In the app, `canvas.parentElement.catInstance` exposes the instance (`cur.name`, `mood`, `gest`, `holdName`, `lookDir`, `still`, `bust`, `cap`).
+
+### 6.5 Additions after the first port (2026-10-21, later)
+
+- **Pointer catching (mascot mode).** One shared `pointermove`/`pointerdown` listener drives every cat. A pointer inside about 1.5x the box makes the cat watch it (head, pupils, ears forward). Within paw reach it bats with the near paw, a fast pass triggers a quick swipe, and a resting pointer gets a stare and then a pounce. A click or tap still pets it. Catching is suppressed while a narration gesture is held or the cat talks; under still or reduced motion only the eyes follow. Details in `design/mascot-cat/README.md`.
+- **Jump.** `cat.jump({ dir, hang, onTakeoff, onLand, onDone })` (also `cat.do('jump', ...)`): crouch, takeoff, airborne tuck for `hang` ms, landing squash, settle. The container moves the cat along its arc between `onTakeoff` and `onLand`. `renderAt('jump', t, { dir })` gives deterministic frames.
+- **Landing scroll cat.** `src/components/site/scroll-cat.tsx` with perch maths in `src/components/site/perch.ts`: one fixed-position cat sits on perches (headings, cards, the phone mockup, marked with data attributes on the landing page) and jumps from perch to perch as the visitor scrolls, back up when scrolling up; where no perch fits without covering text it rides off screen and drops back in. Reduced motion fades instead of jumping. It replaces the separate dock cat; the narration caption dock stays.
+- **Tail.** The sitting tail now sways as one smooth S-curve with follow-through; to make the whole tail sweep more, raise `tailRoot` and `tailWave` in the SIT pose.
+- **Static brand mark.** `public/icons/icon.svg` is now a cat head (old robot kept as `icon-robot.svg`); favicon, PWA and Apple icons were regenerated from it.

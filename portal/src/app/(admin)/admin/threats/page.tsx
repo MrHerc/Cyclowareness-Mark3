@@ -1,5 +1,6 @@
 import { desc, eq } from "drizzle-orm";
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
+import { getAppFormatter } from "@/i18n/server-format";
 import { Inbox, Link2, ShieldCheck } from "lucide-react";
 import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
@@ -23,7 +24,7 @@ export default async function ThreatsPage({ searchParams }: PageProps<"/admin/th
   const sp = await searchParams;
   const status = STATUSES.includes(sp.status as "new") ? (sp.status as (typeof STATUSES)[number]) : "new";
   const focus = typeof sp.focus === "string" ? sp.focus : null;
-  const [tr, tn, tc, tch, format] = await Promise.all([getTranslations("secops.threats"), getTranslations("admin.nav"), getTranslations("common"), getTranslations("security.report.channels"), getFormatter()]);
+  const [tr, ts, tn, tc, tch, format] = await Promise.all([getTranslations("secops.threats"), getTranslations("secops"), getTranslations("admin.nav"), getTranslations("common"), getTranslations("security.report.channels"), getAppFormatter()]);
   const all = await db().select().from(t.threatReports).where(eq(t.threatReports.tenantId, v.tenant.id)).orderBy(desc(t.threatReports.createdAt)).limit(500);
   const list = all.filter((r) => status === "all" || r.status === status || r.id === focus);
   const people = await peopleById(v.tenant.id, list.map((r) => r.reporterId));
@@ -44,7 +45,8 @@ export default async function ThreatsPage({ searchParams }: PageProps<"/admin/th
                   <div className="min-w-0 flex-1">
                     <p className="text-body font-semibold break-words">{r.subject}</p>
                     <p className="mt-1 text-caption text-ink-muted">
-                      {tr("reporter")}: {who?.name ?? tc("notSet")}
+                      {/* Every report is filed by a signed-in employee; no reporter means the account was deleted since. */}
+                      {tr("reporter")}: {who?.name ?? ts("unknownPerson")}
                       {who?.departmentName ? ` · ${who.departmentName}` : ""} · {tch(r.channel)} · {format.relativeTime(r.createdAt)}
                     </p>
                   </div>

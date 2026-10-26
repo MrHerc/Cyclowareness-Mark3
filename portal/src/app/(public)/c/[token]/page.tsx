@@ -11,7 +11,17 @@ import { pick } from "@/i18n/config";
 import { brandStyle } from "@/lib/color";
 import { PrintButton } from "./print-button";
 
-export const metadata: Metadata = { robots: { index: false, follow: false }, referrer: "no-referrer" };
+export async function generateMetadata(): Promise<Metadata> {
+  const tr = await getTranslations("learner.certificate");
+  return { title: tr("title"), robots: { index: false, follow: false }, referrer: "no-referrer" };
+}
+
+/** Default wording of a learning-path certificate (DEFAULT_CERTIFICATE_TEXT speaks of a module). */
+const DEFAULT_PATH_CERTIFICATE_TEXT: Record<string, string> = {
+  az: "{date} tarixində {name} «{module}» təlim yolunu uğurla tamamladı və kibergigiyena qaydalarına əməl edəcəyini təsdiqlədi.",
+  en: "On {date}, {name} successfully completed the learning path “{module}” and confirmed that they will follow the rules of cyber hygiene.",
+  ru: "{date} {name} успешно завершил(а) траекторию обучения «{module}» и подтвердил(а), что будет соблюдать правила кибергигиены.",
+};
 
 export default async function CertificatePage({ params }: PageProps<"/c/[token]">) {
   const { token } = await params;
@@ -33,10 +43,11 @@ export default async function CertificatePage({ params }: PageProps<"/c/[token]"
   const locale = await getLocale();
   const [tr, format] = await Promise.all([getTranslations("learner.certificate"), getFormatter()]);
   const c = settings.certificate;
-  const title = c.title || tr("title");
+  // The organisation's own wording in the page's language, else the default one of that language.
+  const title = c.title?.[locale]?.trim() || tr("title");
   const subject = pick(row.moduleTitle ?? row.pathTitle, locale);
   const date = format.dateTime(row.cert.issuedAt, { dateStyle: "long" });
-  const template = (c.text && c.text.trim()) || pick(DEFAULT_CERTIFICATE_TEXT, locale);
+  const template = c.text?.[locale]?.trim() || pick(row.moduleTitle ? DEFAULT_CERTIFICATE_TEXT : DEFAULT_PATH_CERTIFICATE_TEXT, locale);
   const text = template.replaceAll("{name}", row.user.name).replaceAll("{module}", subject).replaceAll("{date}", date);
   const verifyUrl = `${appUrl()}/c/${token}`;
 

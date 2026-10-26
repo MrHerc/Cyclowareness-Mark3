@@ -113,6 +113,8 @@ export async function requestDemoAction(_: DemoState, form: FormData): Promise<D
         subject: `Demo request: ${d.organisation}`,
         text: `${d.name} <${d.email}>\n${d.organisation} · ${d.country} · ${d.employees}\n\n${d.message ?? ""}`,
         kind: "demo",
+        // Internal mail to the platform's sales inbox, written in English.
+        lang: "en",
       }, { defer: true });
     }
     return { ok: true };

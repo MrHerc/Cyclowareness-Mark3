@@ -71,7 +71,7 @@ export function TeachableMoment({
           <div>
             <p className="inline-flex items-center gap-1.5 rounded-pill bg-reward-100 px-3 py-1 text-caption font-semibold text-reward-ink">
               <ShieldAlert className="size-4" />
-              {qr ? t("qr") : "!"}
+              {qr ? t("qr") : t("badge")}
             </p>
             <h1 className="mt-2 text-headline font-bold text-balance">{t("title")}</h1>
             <p className="mt-1 text-body text-ink-muted">{t("sub", { org })}</p>
@@ -98,11 +98,11 @@ export function TeachableMoment({
           <p className="text-title-sm font-bold">{t("learn")}</p>
           <p className="mt-1 opacity-90">{t("learnBody")}</p>
           <Link href={`/learn/${moduleSlug}`} className={buttonClass("accent", "lg", "mt-5")}>
-            {t("learn")}
+            {t("learnCta")}
             <ChevronRight />
           </Link>
         </section>
-        <p className="text-center text-caption text-ink-muted">{t("report")}</p>
+        <p className="text-center text-caption text-ink-muted">{t(qr ? "reportQr" : "report")}</p>
       </div>
     </div>
   );

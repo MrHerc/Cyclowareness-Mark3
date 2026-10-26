@@ -2,9 +2,9 @@
   "console": "Admin console",
   "nav": {
     "workspace": "Workspace",
+    "training": "People & training",
+    "phishing": "Phishing simulations",
     "secops": "Security operations",
-    "intel": "Intelligence",
-    "content": "Content",
     "insights": "Insights",
     "service": "Service",
     "platform": "Platform",
@@ -40,10 +40,70 @@
     "signOut": "Sign out",
     "accountMenu": "Account menu"
   },
+  "tour": {
+    "label": "Admin guide",
+    "open": "Guide",
+    "openHint": "Show the admin guide",
+    "stepOf": "{current} of {total}",
+    "next": "Next",
+    "back": "Back",
+    "done": "Got it",
+    "skip": "Skip the guide",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to the admin console",
+        "body": "A one-minute walk through where everything lives. The Guide button at the top brings it back any time."
+      },
+      "menu": {
+        "title": "All sections",
+        "body": "Open the menu here. Sections are grouped by job: people and training, phishing, security operations, insights and settings."
+      },
+      "training": {
+        "title": "People & training",
+        "body": "Add people and departments, assign trainings, build learning paths and create new trainings in the studio."
+      },
+      "phishing": {
+        "title": "Phishing simulations",
+        "body": "Launch phishing campaigns and see who clicked, who reported it and who needs a refresher."
+      },
+      "secops": {
+        "title": "Security operations",
+        "body": "Incidents, reported threats, intelligence and the sandbox. Click a group's title to fold it away; the console remembers."
+      },
+      "insights": {
+        "title": "Insights",
+        "body": "Reports, the department league, the leadership view and the audit log of every change in the console."
+      },
+      "settings": {
+        "title": "Settings",
+        "body": "Branding, email, sign-in rules and everything else about your organisation."
+      },
+      "quick": {
+        "title": "Quick actions",
+        "body": "Everyday tasks in one click. With \"Create training with AI\" you describe a topic, AI drafts the training and you check it before anyone sees it."
+      },
+      "setup": {
+        "title": "Setup checklist",
+        "body": "Finish these steps to get your organisation ready. Each one is ticked as soon as it is done."
+      },
+      "guide": {
+        "title": "Replay any time",
+        "body": "This button starts the guide again whenever you want a refresher."
+      }
+    }
+  },
   "overview": {
     "title": "Overview",
     "subtitle": "Whole organisation",
     "showFor": "Show data for",
+    "quickActions": "Quick actions",
+    "quick": {
+      "addPerson": "Add person",
+      "assign": "Assign training",
+      "aiTraining": "Create training with AI",
+      "campaign": "Launch campaign",
+      "reports": "Reports"
+    },
     "setupTitle": "Set up your organisation",
     "setupDone": "{done} of {total} done",
     "hide": "Hide",
@@ -78,7 +138,7 @@
         "body": "Share your acceptable use policy for sign-off."
       },
       "twofa": {
-        "title": "Require two-step sign-in",
+        "title": "Require two-step verification",
         "body": "Protect admin accounts with a second step."
       },
       "directory": {
@@ -128,14 +188,15 @@
     "ofTotal": "{done} of {total}",
     "waitingPeople": "{count, plural, one {# person} other {# people}}",
     "remindWaiting": "Remind everyone waiting to confirm {module}",
-    "reminded": "Reminder sent to {count} people.",
+    "reminded": "{count, plural, one {Reminder sent to # person.} other {Reminder sent to # people.}}",
+    "confirmReminderBody": "Confirm the module you have finished.",
     "insights": "What to do next",
     "insight": {
-      "highRisk": "{count} people are high risk. Look at their open risks and assign a refresher.",
-      "overdue": "{count} assigned modules are overdue. Send a reminder.",
+      "highRisk": "{count, plural, one {# person is} other {# people are}} high risk. Look at their open risks and assign a refresher.",
+      "overdue": "{count, plural, one {# assigned module is} other {# assigned modules are}} overdue. Send a reminder.",
       "lowReport": "Only {value}% of simulations are reported. Remind people of the Report button.",
-      "awaiting": "{count} people finished a module but haven't confirmed it.",
-      "unsigned": "{count} policy signatures are missing."
+      "awaiting": "{count, plural, one {# person finished a module but hasn't confirmed it.} other {# people finished a module but haven't confirmed it.}}",
+      "unsigned": "{count, plural, one {# policy signature is} other {# policy signatures are}} missing."
     }
   },
   "people": {
@@ -176,7 +237,7 @@
     "addTitle": "Add person",
     "addBody": "They get the assignments of their department right away and a welcome email once sending is on.",
     "fullName": "Full name",
-    "fullNamePh": "Aysel Məmmədova",
+    "fullNamePh": "Alex Morgan",
     "workEmail": "Work email",
     "workEmailPh": "name@organisation.az",
     "phone": "Mobile number",
@@ -195,7 +256,7 @@
       "review": "Review",
       "done": "Done"
     },
-    "importColumns": "Columns: name, email, department, job_title, role, manager_email, phone",
+    "importColumns": "Columns: name, email, department, job_title, role, manager_email, phone, language",
     "importTemplate": "Download template",
     "checkFile": "Check file",
     "importRows": "{count, plural, one {# person ready} other {# people ready}}",
@@ -203,6 +264,7 @@
     "importLine": "Line {line}: {problem}",
     "importConfirm": "Import",
     "imported": "{count, plural, one {# person imported} other {# people imported}}",
+    "importNewDepartments": "{count, plural, one {This department will be created: {names}} other {These departments will be created: {names}}}",
     "importErrors": {
       "header": "The first line must contain the column names.",
       "name": "name is missing",
@@ -216,7 +278,8 @@
       "department": "unknown department (it will be created)",
       "departmentTaken": "someone has just created this department: check the file again",
       "departmentAmbiguous": "more than one department matches this name: rename or merge them first",
-      "tooMany": "The file has more than 5,000 rows."
+      "tooMany": "The file has more than 5,000 rows.",
+      "language": "unknown language, or one your organisation has not switched on: use az, en or ru"
     },
     "deletionRequests": "Account deletion requests",
     "approve": "Approve",
@@ -232,12 +295,12 @@
     "suspend": "Suspend",
     "reactivate": "Reactivate",
     "delete": "Delete person",
-    "resetTwoFactor": "Reset two-step sign-in",
-    "resetTwoFactorTitle": "Reset two-step sign-in for {name}?",
+    "resetTwoFactor": "Reset two-step verification",
+    "resetTwoFactorTitle": "Reset two-step verification for {name}?",
     "resetTwoFactorBody": "Their authenticator and backup codes stop working and every device is signed out. They set it up again from their profile.",
-    "twoFactorReset": "Two-step sign-in reset. Their sessions were signed out.",
-    "twoFactorResetTitle": "Two-step sign-in was reset",
-    "twoFactorResetBody": "An administrator reset your two-step sign-in. Set it up again in your profile.",
+    "twoFactorReset": "Two-step verification reset. Their sessions were signed out.",
+    "twoFactorResetTitle": "Two-step verification was reset",
+    "twoFactorResetBody": "An administrator reset your two-step verification. Set it up again in your profile.",
     "deletionRequestedBody": "Asked for their account to be deleted.",
     "deleteTitle": "Delete {name}?",
     "deleteBody": "Their name, email and sign-in data are removed. Learning results stay without their name. This can't be undone.",
@@ -246,7 +309,15 @@
     "xp": "XP",
     "level": "Level",
     "streak": "Day streak",
-    "longest": "Longest {count}",
+    "longest": "Longest: {count, plural, one {# day} other {# days}}",
+    "twoFactorOn": "Two-step verification on",
+    "hours": "{hours} h",
+    "quotedText": "“{text}”",
+    "xpReason": {
+      "lesson": "Lesson completed",
+      "lab": "Security lab",
+      "report": "Threat reported"
+    },
     "badges": "Badges",
     "certificates": "Certificates",
     "learning": "Learning",
@@ -290,7 +361,7 @@
     "noActivity30": "No activity in the last 30 days.",
     "noPath": "No learning path assigned.",
     "noBadges": "No badges yet.",
-    "pathProgress": "{done} of {total} modules done"
+    "pathProgress": "{done} of {total, plural, one {# module} other {# modules}} done"
   },
   "departments": {
     "title": "Departments",
@@ -314,6 +385,7 @@
     "deleteBody": "People in it keep their accounts and move to “No department”. Sub-departments move up one level. Assignments and scheduled reports for this department are removed. Campaigns aimed at it that have not started go back to drafts without an audience: choose a new audience for them. Results of campaigns that already ran are kept.",
     "mergeTitle": "Merge {name} into…",
     "mergeTarget": "Target department",
+    "mergePick": "Choose a department",
     "mergeBody": "People, sub-departments, assignments, campaign audiences and scheduled reports move to the target department. {name} is deleted.",
     "mergeConfirm": "Merge",
     "created": "Department created",
@@ -333,7 +405,7 @@
     "person": "Person",
     "noDue": "No due date",
     "due": "Due {date}",
-    "afterJoining": "{days} days after joining",
+    "afterJoining": "{days, plural, one {# day} other {# days}} after joining",
     "completedOf": "{done} of {total} completed",
     "editDue": "Edit due date",
     "remove": "Remove",
@@ -351,7 +423,8 @@
     "dueDate": "Due date",
     "fixedDate": "Fixed date",
     "afterJoin": "After joining",
-    "days": "Days",
+    "days": "Number of days",
+    "daysUnit": "{count, plural, one {day after joining} other {days after joining}}",
     "assign": "Assign",
     "assigned": "Assigned. {count, plural, one {# person} other {# people}} will see it.",
     "updated": "Due date updated",
@@ -363,7 +436,7 @@
     "count": "{count, plural, one {# campaign} other {# campaigns}}",
     "new": "New campaign",
     "reportRate": "Report rate",
-    "reportedOf": "{reported} of {sent} recipients reported the simulation",
+    "reportedOf": "{reported} of {sent, plural, one {# recipient} other {# recipients}} reported the simulation",
     "acrossCampaigns": "Across {count, plural, one {# campaign} other {# campaigns}} with results",
     "sent": "Sent",
     "opened": "Opened",
@@ -389,6 +462,12 @@
       "voice": "Voice call",
       "usb": "USB drop"
     },
+    "usbKitCols": {
+      "drive": "Drive",
+      "labelFor": "Label for",
+      "fileName": "File name",
+      "fileContents": "File contents"
+    },
     "channelBody": {
       "email": "A phishing email in the work inbox",
       "sms": "A text message to the work phone",
@@ -399,7 +478,7 @@
     "difficulty": "Difficulty: {level}",
     "allCampaigns": "All campaigns",
     "results": "Results",
-    "resultsSub": "Shares of the messages sent",
+    "resultsSub": "As a share of messages sent",
     "audienceTiming": "Audience and timing",
     "audience": "Audience",
     "peopleInAudience": "People in the audience",
@@ -409,7 +488,7 @@
     "launch": "Launch now",
     "launchTitle": "Launch this campaign?",
     "launchBody": "{count, plural, one {# person} other {# people}} will receive the simulation now. People who click see a short explanation and a training.",
-    "launched": "Campaign launched",
+    "launchedCount": "{count, plural, one {Campaign launched: the simulation went to # person.} other {Campaign launched: the simulation went to # people.}}",
     "launchBlocked": "Can't launch: {reason}",
     "lastLaunchBlocked": "The launch on {date} did not go ahead",
     "lastLaunchBlockedBody": "Reason: {reason}. A scheduled campaign is moved back to drafts and is not retried automatically: fix the cause, then launch or schedule the campaign again.",
@@ -435,6 +514,7 @@
       "wholeOrgBody": "Every active person in the organisation",
       "oneDepartment": "One department",
       "oneDepartmentBody": "A department and its sub-departments",
+      "pickDepartment": "Choose a department",
       "notYet": "Not yet",
       "notYetBody": "Save the draft and launch it when you are ready",
       "onDate": "On a set date",
@@ -493,7 +573,12 @@
     "editorTitle": "Title",
     "editorSummary": "Summary",
     "editorBody": "Text (Markdown: ## headings, - lists, **bold**)",
-    "translation": "English translation (optional)",
+    "translation": "Translations (optional)",
+    "translationHint": "People whose language has no translation read the main text.",
+    "translationTitle": "{language}: title",
+    "translationSummary": "{language}: summary",
+    "translationText": "{language}: text",
+    "baseLanguage": "The main text is in {language}, the organisation's default language.",
     "publish": "Publish version",
     "publishTitle": "Publish version {version}?",
     "publishBody": "Everyone will be asked to sign this version.",
@@ -501,10 +586,15 @@
     "signedBy": "Signed",
     "notSigned": "Not signed",
     "remind": "Remind people who haven't signed",
-    "reminded": "Reminder sent to {count} people.",
+    "reminded": "{count, plural, one {Reminder sent to # person.} other {Reminder sent to # people.}}",
     "downloadSignoffs": "Download sign-offs (CSV)",
     "signedAt": "Signed at",
-    "empty": "No policies yet."
+    "empty": "No policies yet.",
+    "notifyBody": "Version {version} is waiting for your signature."
+  },
+  "managerAlert": {
+    "failedSimulations": "{count, plural, one {# simulation} other {# simulations}} with a risky action in the last 30 days",
+    "overdueTrainings": "{count, plural, one {# assigned module is} other {# assigned modules are}} more than {days, plural, one {# day} other {# days}} overdue"
   },
   "problems": {
     "title": "Problem reports",
@@ -521,11 +611,14 @@
     "from": "From {name}",
     "anonymous": "Unknown",
     "context": "Where",
-    "move": "Move to",
+    "contextLesson": "lesson “{lesson}” in “{module}”",
+    "contextPage": "page {path}",
+    "move": "Change status",
     "changed": "Status changed",
     "emailSubject": "Problem report: {context}",
     "emailSubjectPlain": "Problem report",
-    "emailFrom": "Reported by {name} ({email})"
+    "emailFrom": "Reported by {name} ({email})",
+    "emailButton": "Open problem reports"
   },
   "reports": {
     "title": "Reports",
@@ -539,7 +632,7 @@
       },
       "risk": {
         "title": "Risk",
-        "body": "Risk score per person and department, with the 30 day change."
+        "body": "Risk score per person and department, with the 30-day change."
       },
       "people": {
         "title": "People",
@@ -576,8 +669,10 @@
       "settings": "Security settings",
       "crosscheck": "Cross-check: completed modules without a confirmation",
       "none": "None found.",
+      "settingCol": "Setting",
+      "valueCol": "Enabled",
       "settingRows": {
-        "twofa": "Two-step sign-in required for admins",
+        "twofa": "Two-step verification required for admins",
         "protection": "Content protection",
         "watermark": "Leak-check watermark",
         "timeLimits": "Timed questions",
@@ -587,6 +682,12 @@
       }
     },
     "generate": "Generate PDF",
+    "downloadAs": "Download “{report}” as {format}",
+    "mail": {
+      "subject": "Your report is ready: {report}",
+      "body": "The “{report}” report is ready.\n\nFor security the file is not attached: sign in to the console to download it.\n\n{link}",
+      "button": "Download the report"
+    },
     "moduleFeedback": "Module feedback",
     "moduleFeedbackSub": "Anonymous ratings learners give after finishing a module. Lowest first.",
     "ratings": "{count, plural, one {# rating} other {# ratings}}",
@@ -676,7 +777,12 @@
       "incident": "Incident",
       "sandbox": "Sandbox analysis",
       "loop": "Closed loop",
-      "average": "Department average"
+      "average": "Department average",
+      "escalated": "Sent to incident response",
+      "policy": "Policy",
+      "version": "Version",
+      "signed": "Signed",
+      "signedAt": "Signed at"
     },
     "print": "Print or save as PDF",
     "generatedAt": "Generated {date}",
@@ -706,7 +812,7 @@
       "time": "Time",
       "who": "Who",
       "action": "Action",
-      "change": "Change",
+      "change": "Event code",
       "ip": "IP address"
     },
     "system": "System",
@@ -719,9 +825,9 @@
     "auth_device_limit": "Device signed out by the limit",
     "auth_password_reset_requested": "Password reset requested",
     "auth_password_set": "Password set",
-    "auth_2fa_on": "Two-step sign-in turned on",
-    "auth_2fa_off": "Two-step sign-in turned off",
-    "auth_2fa_reset": "Two-step sign-in reset",
+    "auth_2fa_on": "Two-step verification turned on",
+    "auth_2fa_off": "Two-step verification turned off",
+    "auth_2fa_reset": "Two-step verification reset",
     "auth_backup_codes": "New backup codes created",
     "auth_other_devices_signed_out": "Other devices signed out",
     "sso_tested": "Single sign-on connection tested",
@@ -839,7 +945,7 @@
     "slug": "Address",
     "slugHint": "Lowercase letters, digits and dashes. Used in sign-in links.",
     "plan": "Plan",
-    "people": "{count} people",
+    "people": "{count, plural, one {# person} other {# people}}",
     "created": "Created {date}",
     "plans": {
       "essentials": "Essentials",
@@ -847,6 +953,7 @@
       "enterprise_hrm": "Enterprise HRM"
     },
     "features": "Features",
+    "overridesCount": "{count, plural, one {# override} other {# overrides}}",
     "featuresBody": "Overrides on top of the plan. Plan default follows the plan.",
     "featureState": {
       "default": "Plan default",
@@ -896,6 +1003,7 @@
       "export": "Export CSV",
       "employees": "Employees",
       "country": "Country",
+      "language": "Language",
       "received": "Received {date}",
       "consent": "Consent {version}",
       "deleted": "Request deleted"

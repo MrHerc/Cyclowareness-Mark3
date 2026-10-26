@@ -1,0 +1,431 @@
+{
+  "id": "selling-safely",
+  "title": "Siz satanda",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ss-tutor",
+      "beats": [
+        {
+          "id": "ss-b1",
+          "say": "İndi satıcı sizsiniz. Elanlar saytında köhnə uşaq arabasını 260 manata satırsınız.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        },
+        {
+          "id": "ss-b2",
+          "say": "Alıcı artıq ödədiyini yazır və pulu almaq üçün bu linki açmağınızı xahiş edir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "app": "whatsapp",
+              "contact": [
+                {
+                  "text": "Rəna (alıcı)"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Salam, arabanı alıram! «AlSat Təhlükəsiz Sövdələşmə» ilə ödədim."
+                    }
+                  ],
+                  "time": "19:40"
+                },
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Pulu almaq üçün kartınızı burada təsdiqləyin: "
+                    },
+                    {
+                      "text": "alsat-odenis.example.net/qebul",
+                      "spot": "link",
+                      "link": {
+                        "label": "alsat-odenis.example.net/qebul",
+                        "href": "https://alsat-odenis.example.net/qebul"
+                      }
+                    }
+                  ],
+                  "time": "19:41"
+                }
+              ]
+            }
+          },
+          "highlight": "link"
+        },
+        {
+          "id": "ss-b3",
+          "say": "Pulu almaq üçün yalnız kart nömrəsi kifayətdir. Kartın arxasındakı üç rəqəm və SMS kodu heç vaxt lazım olmur.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "ss-b4",
+          "say": "Belə link gəlsə, oraya heç nə daxil etməyin. Alıcı ilə yalnız saytın öz mesajlaşma bölməsində yazışın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "ss-hotspot",
+      "prompt": "Bu səhifədə xəbərdarlıq əlamətlərini tapın.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2e-alsat-fake",
+        "tone": "app",
+        "title": [
+          {
+            "text": "AlSat Təhlükəsiz Sövdələşmə"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Səhifə: "
+            },
+            {
+              "text": "alsat-odenis.example.net/qebul",
+              "spot": "domain"
+            }
+          ],
+          [
+            {
+              "text": "Alıcı 260,00 AZN ödəyib. Pulu almaq üçün kartınızı təsdiqləyin."
+            }
+          ],
+          [
+            {
+              "text": "Kart nömrəsini, bitmə tarixini və CVV kodunu daxil edin",
+              "spot": "cvv"
+            }
+          ],
+          [
+            {
+              "text": "Bankınızdan gələn SMS kodunu daxil edin",
+              "spot": "otp"
+            }
+          ],
+          [
+            {
+              "text": "Sövdələşmə 15 dəqiqədən sonra ləğv olunacaq",
+              "spot": "timer"
+            }
+          ]
+        ],
+        "buttons": [
+          "Ləğv et",
+          "Pulu al"
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Qəribə ünvan",
+          "explain": "Bu, elanlar saytının öz ünvanı deyil. Tanış ad başqa domenə əlavə edilib."
+        },
+        {
+          "id": "cvv",
+          "label": "Kartın arxasındakı kod",
+          "explain": "Bu kod kartınızdan pul çıxarmaq üçündür. Pul almaq üçün heç vaxt lazım olmur."
+        },
+        {
+          "id": "otp",
+          "label": "SMS kodu",
+          "explain": "SMS kodu ödənişi təsdiqləyir. Onu yazsanız, kartınızdan pul çıxacaq."
+        },
+        {
+          "id": "timer",
+          "label": "Təzyiq",
+          "explain": "Geri sayım düşünməyinizə mane olmaq üçündür. Əsl sayt satıcını tələsdirmir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "ss-sim",
+      "environment": "browser",
+      "title": "Alıcının linki",
+      "intro": "Alıcının göndərdiyi linki açdınız. Brauzerdə hər addımda düzgün qərarı seçin.",
+      "steps": [
+        {
+          "id": "landing",
+          "label": "Pulunuz sizi gözləyir: 260,00 AZN",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2e-alsat-fake",
+            "url": [
+              {
+                "text": "https://alsat-odenis.example.net/qebul",
+                "reveal": "alsat-odenis.example.net"
+              }
+            ]
+          },
+          "say": "Ünvan sətrinə baxın.",
+          "actions": [
+            {
+              "id": "receive",
+              "label": "Pulu al",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Bu düymə sizə pul ödəmir, kart məlumatlarını istəyən forma açır. Ünvan da elanlar saytına aid deyil."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Ünvan qəribə idi, ona görə o səhifədə heç nə daxil etməyin.",
+              "next": "real-site"
+            },
+            {
+              "id": "own",
+              "label": "Saytı özüm açaram",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Əla. Saytı özünüz açanda saxta səhifəyə düşmürsünüz.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "card-form",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2e-alsat-fake",
+            "brand": "AlSat Ödəniş",
+            "url": [
+              {
+                "text": "https://alsat-odenis.example.net/kart",
+                "reveal": "alsat-odenis.example.net"
+              }
+            ],
+            "fields": [
+              "Kart nömrəsi",
+              "Bitmə tarixi",
+              "CVV"
+            ],
+            "button": "Təsdiqlə"
+          },
+          "say": "Forma kartın arxasındakı kodu da istəyir.",
+          "actions": [
+            {
+              "id": "enter",
+              "label": "Təsdiqlə",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Bu məlumatlarla fırıldaqçı kartınızdan ödəniş edə bilər. Pul almaq üçün bu kod lazım deyil."
+            },
+            {
+              "id": "cancel",
+              "label": "Ləğv et",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Kartın arxasındakı kodu istəyən səhifə pul vermir, pul alır.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "sms-code",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2e-alsat-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "SMS kodunu daxil edin"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bankınız 6 rəqəmli kod göndərdi."
+                }
+              ],
+              [
+                {
+                  "text": "SMS-də «ödəniş» yazılıbsa, narahat olmayın: bu, pulun qəbulu əməliyyatıdır."
+                }
+              ]
+            ],
+            "buttons": [
+              "Ləğv et",
+              "Kodu təsdiqlə"
+            ]
+          },
+          "say": "Bankın mesajında «ödəniş» yazılıb, səhifə isə bunun pulun qəbulu olduğunu deyir.",
+          "actions": [
+            {
+              "id": "confirm",
+              "label": "Kodu təsdiqlə",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Kod ödənişi təsdiqlədi və kartınızdan pul çıxdı. Dərhal bankınıza zəng edin."
+            },
+            {
+              "id": "stop",
+              "label": "Ləğv et",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. SMS kodu ödəniş üçündür, onu heç vaxt səhifəyə yazmayın və heç kimə deməyin."
+            }
+          ]
+        },
+        {
+          "id": "real-site",
+          "label": "AlSat: alıcı ilə yazışma",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2e-alsat",
+            "url": [
+              {
+                "text": "https://alsat.example/mesajlar",
+                "reveal": "alsat.example"
+              }
+            ]
+          },
+          "say": "Bu, elanlar saytının özüdür.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Alıcını bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Sayt fırıldaqçı hesabı bağlayacaq və digər satıcıları qoruyacaq."
+            },
+            {
+              "id": "cash",
+              "label": "Alıcıya yaz: görüşəndə nağd",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Yaxşı. Görüşüb nağd pul almaq ən sadə və təhlükəsiz yoldur."
+            },
+            {
+              "id": "photo",
+              "label": "Kartın hər iki üzünün fotosunu göndər",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Fotoda arxadakı kod da görünür. Bu, kartınızı fırıldaqçıya vermək deməkdir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "ss-choice",
+      "question": {
+        "prompt": "Alıcı kartınıza pul köçürmək istəyir. Ona nəyi vermək kifayətdir?",
+        "options": [
+          {
+            "id": "number",
+            "label": "Yalnız kart nömrəsini və ya hesab nömrəsini",
+            "correct": true,
+            "feedback": "Düzdür. Pul almaq üçün başqa heç nə lazım deyil."
+          },
+          {
+            "id": "cvv",
+            "label": "Kart nömrəsini, bitmə tarixini və arxadakı kodu",
+            "correct": false,
+            "feedback": "Bu məlumatlarla kartınızdan ödəniş etmək olar. Arxadakı kodu heç vaxt verməyin."
+          },
+          {
+            "id": "otp",
+            "label": "Bankdan gələn SMS kodunu",
+            "correct": false,
+            "feedback": "SMS kodu pul çıxarmaq üçündür. Onu istəyən alıcı fırıldaqçıdır."
+          },
+          {
+            "id": "photo",
+            "label": "Kartın hər iki üzünün fotosunu",
+            "correct": false,
+            "feedback": "Fotoda hər şey var, arxadakı kod da. Bu, kartı öz əlinizlə vermək kimidir."
+          }
+        ]
+      },
+      "explain": "Pul almaq üçün heç vaxt kartın arxasındakı kod və ya SMS kodu lazım olmur. Bunları istəyən hər kəs fırıldaqçıdır."
+    },
+    {
+      "type": "scenario",
+      "id": "ss-scenario",
+      "title": "Kodu yazdınız",
+      "start": "charged",
+      "nodes": [
+        {
+          "id": "charged",
+          "text": "Tələsik kart məlumatlarınızı və SMS kodunu yazdınız. Bir dəqiqə sonra bankdan SMS gəlir: kartınızdan 389 manat çıxıb.",
+          "choices": [
+            {
+              "label": "Dərhal kartdakı nömrə ilə banka zəng et və kartı blokla",
+              "next": "bank",
+              "feedback": "Düzdür. Kartı tez bloklamaq sonrakı ödənişlərin qarşısını alır."
+            },
+            {
+              "label": "Alıcıya yaz və pulu geri istə",
+              "outcome": "risky",
+              "feedback": "Fırıldaqçı pulu qaytarmayacaq, vaxt isə keçir. Əvvəlcə banka zəng edin."
+            },
+            {
+              "label": "Utanıram, heç kimə demirəm",
+              "outcome": "compromised",
+              "feedback": "Susmaq fırıldaqçıya vaxt qazandırır. Banklar və polis belə hallarla hər gün qarşılaşır."
+            }
+          ]
+        },
+        {
+          "id": "bank",
+          "text": "Kartınız bloklandı. Başqa nə etmək istərdiniz?",
+          "speaker": "Gülnar (bank operatoru)",
+          "voice": "woman",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Kartınız bloklandı. <breath> Başqa nə etmək istərdiniz?",
+          "choices": [
+            {
+              "label": "Skrinşotları saxla, polisə və elanlar saytına bildir",
+              "outcome": "safe",
+              "feedback": "Əla. Sübutlar polisə kömək edir, sayt isə fırıldaqçı hesabı bağlayır."
+            },
+            {
+              "label": "Unutmaq üçün yazışmanı sil",
+              "outcome": "risky",
+              "feedback": "Yazışma sübutdur. Onu silməyin, polisə göstərin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "ss-recap",
+      "points": [
+        "Pul almaq üçün heç vaxt kartın arxasındakı kod və ya SMS kodu lazım olmur.",
+        "Alıcının göndərdiyi ödəniş səhifəsinə heç nə daxil etməyin.",
+        "Kodu yazmısınızsa, dərhal kartın üzərindəki nömrə ilə bankınıza zəng edin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

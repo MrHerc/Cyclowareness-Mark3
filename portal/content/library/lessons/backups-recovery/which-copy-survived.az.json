@@ -1,0 +1,425 @@
+{
+  "id": "which-copy-survived",
+  "title": "Hansı nüsxə salamat qaldı?",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "br1-tutor",
+      "beats": [
+        {
+          "id": "br1-b1",
+          "say": "Salam! Arxiv şöbəsi on illik sənədləri saxlayır. Bu gün onların nüsxələrini necə düzgün saxlamağı öyrənəcəksiniz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        },
+        {
+          "id": "br1-b2",
+          "say": "Fidyə proqramı təkcə kompüteri şifrələmir. Kompüterə taxılmış fleş kartı və şəbəkə qovluğunu da kilidləyir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "tone": "warning",
+              "title": [
+                {
+                  "text": "Fayllarınız şifrələnib"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "«Sənədlər» qovluğu kilidlənib."
+                  }
+                ],
+                [
+                  {
+                    "text": "Qoşulmuş disklər və şəbəkə qovluğu da kilidlənib.",
+                    "spot": "connected"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Ödə"
+              ]
+            }
+          },
+          "highlight": "connected"
+        },
+        {
+          "id": "br1-b3",
+          "say": "Qayda belədir: üç nüsxə, iki növ daşıyıcı, biri başqa yerdə. Ən azı bir nüsxə şəbəkədən tamamilə kənarda olmalıdır.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "stat",
+            "value": "3-2-1",
+            "label": "3 nüsxə, 2 növ daşıyıcı, 1 nüsxə başqa yerdə"
+          }
+        },
+        {
+          "id": "br1-b4",
+          "say": "Bir də unutmayın: yoxlanılmamış nüsxə lazım olan anda boş çıxa bilər. Ona görə vaxtaşırı nüsxədən bərpanı yoxlayın.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "br1-choice",
+      "question": {
+        "prompt": "Ekranda fidyə tələbi var. Hansı nüsxənin salamat qalma ehtimalı daha böyükdür?",
+        "options": [
+          {
+            "id": "usb",
+            "label": "Kompüterə taxılı qalmış fleş kart",
+            "correct": false,
+            "feedback": "Qoşulu fleş kart sanki kompüterin bir hissəsidir. Fidyə proqramı onu da şifrələyir."
+          },
+          {
+            "id": "sync",
+            "label": "Avtomatik sinxronlaşan bulud qovluğu",
+            "correct": false,
+            "feedback": "Sinxronlaşma şifrələnmiş faylları da buluda köçürür. Bəzən köhnə versiyalar qalır, amma buna arxayın olmaq olmaz."
+          },
+          {
+            "id": "network",
+            "label": "Şöbənin şəbəkə qovluğu",
+            "correct": false,
+            "feedback": "Kompüter şəbəkə qovluğuna çata bilirsə, fidyə proqramı da çata bilər."
+          },
+          {
+            "id": "offline",
+            "label": "Cümə günü kompüterdən ayrılıb seyfə qoyulmuş disk",
+            "correct": true,
+            "feedback": "Düzdür. Kompüterdən və şəbəkədən ayrılmış disk hücum zamanı əlçatmaz qalır."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "ransomware"
+        }
+      },
+      "explain": "Hücumdan salamat çıxan nüsxə şəbəkədən kənarda olandır. Ona görə də bir nüsxə həmişə cihazdan ayrılır və ayrıca saxlanılır."
+    },
+    {
+      "type": "simulation",
+      "id": "br1-sim",
+      "environment": "desktop",
+      "title": "Arxiv şöbəsi",
+      "intro": "Siz arxiv şöbəsində işləyirsiniz. Cümə günü axşamdan bazar ertəsinə qədər hər pəncərədə düzgün qərar verin.",
+      "steps": [
+        {
+          "id": "backup-done",
+          "label": "Cümə, 17:40",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2f-ehtiyat-komekcisi",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Həftəlik ehtiyat nüsxə hazırdır"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "ARXIV-DISK: on illik sənədlər, 212 GB. İndi diski çıxara bilərsiniz."
+                }
+              ]
+            ],
+            "buttons": [
+              "Diski çıxar",
+              "Qoşulu saxla"
+            ]
+          },
+          "say": "Həftəlik ehtiyat nüsxə hazırdır.",
+          "actions": [
+            {
+              "id": "eject",
+              "label": "Diski çıxar",
+              "kind": "eject",
+              "outcome": "safe",
+              "feedback": "Düzdür. Çıxarılmış disk növbəti hücumda şifrələnə bilməz."
+            },
+            {
+              "id": "keep",
+              "label": "Qoşulu saxla",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Qoşulu disk kompüterlə birlikdə şifrələnə bilər. Ehtiyat nüsxə hazır olan kimi onu çıxarın."
+            }
+          ]
+        },
+        {
+          "id": "restore-test",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2f-ehtiyat-komekcisi",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Bərpa yoxlaması"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Yoxlamaq üçün son nüsxədən bir qovluq bərpa edilsin?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Bərpanı yoxla",
+              "Keç"
+            ]
+          },
+          "actions": [
+            {
+              "id": "test",
+              "label": "Bərpanı yoxla",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Əla. Yalnız açılan nüsxə əsl nüsxədir."
+            },
+            {
+              "id": "skip",
+              "label": "Keç",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Nüsxə zədələnmiş ola bilər və siz bunu ən pis anda öyrənərdiniz. Bərpanı müntəzəm yoxlayın."
+            }
+          ]
+        },
+        {
+          "id": "personal-cloud",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "buludxidmet",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Qovluq şəxsi hesabınıza yüklənsin?"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Arxiv_2016_2026: 212 GB. Hesab: sevda.k@poct-mail.example.net"
+                }
+              ]
+            ],
+            "buttons": [
+              "Yüklə",
+              "İmtina et"
+            ]
+          },
+          "actions": [
+            {
+              "id": "upload",
+              "label": "Yüklə",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "İş sənədləri yalnız təşkilatınızın təsdiqlədiyi yerdə saxlanılmalıdır. Şəxsi bulud nüsxəni qorumur və məlumatların sızmasına səbəb ola bilər."
+            },
+            {
+              "id": "decline",
+              "label": "İmtina et",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əlavə nüsxə lazımdırsa, onu İT dəstəyi təsdiqlənmiş yerdə yaradır."
+            }
+          ]
+        },
+        {
+          "id": "ransom-monday",
+          "label": "Bazar ertəsi, 09:05",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Fayllarınız şifrələnib"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Şəbəkə qovluğu və qoşulmuş disklər kilidlənib. Açarı almaq üçün 72 saat ərzində ödəniş edin."
+                }
+              ]
+            ],
+            "buttons": [
+              "Ödə",
+              "Bağla"
+            ]
+          },
+          "say": "Bazar ertəsi səhər ekranda bu mesaj görünür.",
+          "actions": [
+            {
+              "id": "isolate",
+              "label": "Kabeli çıxar, Wi-Fi-ı söndür",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Düzdür. Kompüteri söndürmədən şəbəkədən ayırın və dərhal İT dəstəyinə zəng edin."
+            },
+            {
+              "id": "pay",
+              "label": "Ödə",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Ödəniş faylların geri qayıdacağına zəmanət vermir. Fayllar ayrıca saxladığınız nüsxədən bərpa olunacaq."
+            }
+          ]
+        },
+        {
+          "id": "sync-alert",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "buludxidmet",
+            "app": "BuludXidmət",
+            "title": [
+              {
+                "text": "1240 fayl dəyişdirilib"
+              }
+            ],
+            "body": [
+              {
+                "text": "Şöbə qovluğu buludla sinxronlaşdırıldı."
+              }
+            ],
+            "time": "09:07"
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "İT dəstəyinə bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür, sinxronlaşma şifrələnmiş faylları da buluda köçürüb. Köhnə versiyaları mütəxəssis bərpa edəcək."
+            },
+            {
+              "id": "restore-self",
+              "label": "Buluddan özüm bərpa edim",
+              "kind": "open",
+              "outcome": "risky",
+              "feedback": "Yoluxmuş kompüterə bərpa edilən fayllar yenidən şifrələnə bilər. Mütəxəssislər bərpanı təmiz kompüterdə aparır."
+            }
+          ]
+        },
+        {
+          "id": "offline-disk",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "it-tehlukesizlik",
+            "app": "İT Təhlükəsizlik",
+            "title": [
+              {
+                "text": "Diski seyfdən gətirin"
+              }
+            ],
+            "body": [
+              {
+                "text": "ARXIV-DISK-i heç yerə qoşmayın. Təmiz kompüterdə birlikdə bərpa edəcəyik."
+              }
+            ],
+            "time": "10:30"
+          },
+          "actions": [
+            {
+              "id": "hand-over",
+              "label": "Diski mütəxəssisə təhvil verirəm",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Əla. Bərpa təmizlənmiş kompüterdə, mütəxəssisin nəzarəti altında aparılacaq."
+            },
+            {
+              "id": "plug",
+              "label": "Diski özüm bu kompüterə qoşuram",
+              "kind": "plug-in",
+              "outcome": "compromised",
+              "feedback": "Yoluxmuş kompüterdə son nüsxə də şifrələnə bilər. Diski yalnız mütəxəssisə verin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "br1-match",
+      "prompt": "Qaydanın hər hissəsini mənası ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "three",
+          "left": "3 nüsxə",
+          "right": "Orijinal fayl və iki ehtiyat nüsxə"
+        },
+        {
+          "id": "two",
+          "left": "2 növ daşıyıcı",
+          "right": "Məsələn, xarici disk və təsdiqlənmiş bulud"
+        },
+        {
+          "id": "one",
+          "left": "1 nüsxə başqa yerdə",
+          "right": "Başqa binada və şəbəkədən kənarda"
+        },
+        {
+          "id": "test",
+          "left": "Bərpa yoxlaması",
+          "right": "Nüsxənin açıldığını müntəzəm yoxlamaq"
+        }
+      ],
+      "explain": "Üç nüsxə, iki daşıyıcı və başqa yerdə bir nüsxə olanda biri itsə də, digəri qalır. Bərpa yoxlaması isə nüsxənin işlədiyini sübut edir."
+    },
+    {
+      "type": "choice",
+      "id": "br1-work-files",
+      "question": {
+        "prompt": "Vacib iş sənədlərini harada saxlayırsınız?",
+        "options": [
+          {
+            "id": "approved",
+            "label": "Təşkilatımın təsdiqlədiyi qovluqda",
+            "correct": true,
+            "feedback": "Düzdür. Oradakı nüsxələri İT dəstəyi yaradır və yoxlayır."
+          },
+          {
+            "id": "desktop-usb",
+            "label": "Kompüterin iş masasında, axşamlar isə öz fleş kartıma köçürürəm",
+            "correct": false,
+            "feedback": "Şəxsi fleş kart itə və ya yoluxa bilər. Belə nüsxəni heç kim yoxlamır."
+          },
+          {
+            "id": "personal-cloud",
+            "label": "Şəxsi bulud hesabımda, rahatdır",
+            "correct": false,
+            "feedback": "Şəxsi hesabda iş sənədi təşkilatınızın nəzarətindən çıxır. Bu da məlumat sızmasıdır."
+          }
+        ]
+      },
+      "explain": "Təsdiqlənmiş yerdə saxlanılan faylın nüsxəsini İT dəstəyi qoruyur və bərpa edir. Başqa yerdə saxlanılan iş faylı isə nə qorunur, nə də bərpa olunur."
+    },
+    {
+      "type": "recap",
+      "id": "br1-recap",
+      "points": [
+        "Üç nüsxə, iki daşıyıcı, biri başqa yerdə.",
+        "Ən azı bir nüsxəni şəbəkədən kənarda saxlayın.",
+        "Bərpanı müntəzəm yoxlayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -1,0 +1,416 @@
+{
+  "id": "adviser-call",
+  "title": "Məsləhətçinin zəngi",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ac-tutor",
+      "beats": [
+        {
+          "id": "ac-b1",
+          "say": "Salam! Bu gün investisiya fırıldağının ən təhlükəli anına baxacağıq: şəxsi məsləhətçinin zənginə.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "ac-b2",
+          "say": "Hər şey reklamla və ya messencer qrupu ilə başlayır. «Zəmanətli gəlir» sözlərinə diqqət edin.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "brandRef": "w2d-bakutrade",
+              "app": "whatsapp",
+              "contact": [
+                {
+                  "text": "BakuTrade Pro | İnvestorlar"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Bu gün yenə +18%!"
+                    }
+                  ],
+                  "time": "19:02"
+                },
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Zəmanətli gəlir, heç bir risk yoxdur.",
+                      "spot": "guarantee"
+                    }
+                  ],
+                  "time": "19:03"
+                }
+              ]
+            }
+          },
+          "highlight": "guarantee"
+        },
+        {
+          "id": "ac-b3",
+          "say": "Heç bir qanuni investisiya böyük gəlirə zəmanət vermir.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "ac-b4",
+          "say": "Lisenziyanı Mərkəzi Bankın rəsmi siyahısında özünüz yoxlayın. Xarici lisenziya ölkəmizdə fəaliyyət üçün kifayət etmir.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "certificate"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ac-sim",
+      "environment": "call",
+      "title": "BakuTrade Pro zəng edir",
+      "intro": "Reklamdakı formada nömrənizi qeyd etmisiniz. İndi məsləhətçi zəng edir. Cavablarınızı seçin.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2d-bakutrade",
+            "caller": [
+              {
+                "text": "BakuTrade Pro"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Böyük Britaniya",
+            "voice": "young-man-2"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab ver",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Zəngə cavab vermək təhlükəli deyil. Əsas məsələ nəyə razılıq verdiyinizdir."
+            },
+            {
+              "id": "decline",
+              "label": "Rədd et",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olar. Naməlum xarici nömrəyə cavab verməyə borclu deyilsiniz.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pitch",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2d-bakutrade",
+            "caller": [
+              {
+                "text": "BakuTrade Pro"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Böyük Britaniya",
+            "voice": "young-man-2"
+          },
+          "say": "Salam, mənim adım Cavid Əlizadədir, BakuTrade Pro şirkətində sizin şəxsi məsləhətçinizəm. Ayda otuz faiz gəlirə zəmanət veririk, özü də heç bir risk olmadan.",
+          "spoken": "Salam, <breath> mənim adım Cavid Əlizadədir, BakuTrade Pro şirkətində sizin şəxsi məsləhətçinizəm. Ayda, ee, otuz faiz gəlirə zəmanət veririk, özü də heç bir risk olmadan.",
+          "actions": [
+            {
+              "id": "interested",
+              "label": "Əladır, nə etməliyəm?",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Zəmanətli yüksək gəlir fırıldağın əsas əlamətidir. Davam etsəniz, sizdən pul istəyəcəklər."
+            },
+            {
+              "id": "licence",
+              "label": "Lisenziyanızı Mərkəzi Bankın siyahısında yoxlayacağam",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Lisenziyanı onların sözünə inanaraq yox, rəsmi siyahıda özünüz yoxlayın.",
+              "next": "licence-push"
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Yaxşı qərardır. Zəmanətli gəlir vədi zəngi bitirmək üçün kifayət qədər səbəbdir.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "deposit",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2d-bakutrade",
+            "caller": [
+              {
+                "text": "BakuTrade Pro"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Böyük Britaniya",
+            "voice": "young-man-2"
+          },
+          "say": "Əla! Başlamaq üçün cəmi 250 manat lazımdır. Kartınızın nömrəsini və arxasındakı kodu deyin, hesabınızı açım.",
+          "spoken": "Əla! <breath> Başlamaq üçün cəmi 250 manat lazımdır. Kartınızın nömrəsini və arxasındakı kodu deyin, hesabınızı açım.",
+          "actions": [
+            {
+              "id": "give-card",
+              "label": "Kart məlumatlarımı deyirəm",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Kart məlumatlarınız fırıldaqçının əlinə keçdi. Zəngdən dərhal sonra bankınıza zəng edin və kartı bloklayın.",
+              "next": "remote"
+            },
+            {
+              "id": "refuse",
+              "label": "Kart məlumatlarını telefonla vermirəm",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Kartınızın nömrəsini və ya arxasındakı kodu heç vaxt telefonla heç kimə deməyin.",
+              "next": "licence-push"
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Yaxşı qərardır. Kart məlumatlarını soruşan zəngi bitirmək düzgün cavabdır.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "licence-push",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2d-bakutrade",
+            "caller": [
+              {
+                "text": "BakuTrade Pro"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Böyük Britaniya",
+            "voice": "young-man-2"
+          },
+          "say": "Bizim Avropa lisenziyamız var, sertifikatı indicə sizə göndərdim. Mərkəzi Bankda yoxlamağa ehtiyac yoxdur.",
+          "spoken": "Bizim Avropa lisenziyamız var, ee, sertifikatı indicə sizə göndərdim. <breath> Mərkəzi Bankda yoxlamağa ehtiyac yoxdur.",
+          "actions": [
+            {
+              "id": "accept",
+              "label": "Sertifikat varsa, problem yoxdur",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Sertifikatın şəklini saxtalaşdırmaq asandır. Mərkəzi Bank xəbərdarlıq edib ki, xarici lisenziya ölkəmizdə fəaliyyət hüququ vermir."
+            },
+            {
+              "id": "check",
+              "label": "Yenə də rəsmi siyahını yoxlayacağam",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Əla. Yoxlamağınıza mane olmağa çalışan məsləhətçi özünü ələ verir."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Düzdür. Təzyiq artanda zəngi bitirmək ən yaxşı cavabdır.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "remote",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2d-bakutrade",
+            "caller": [
+              {
+                "text": "BakuTrade Pro"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Böyük Britaniya",
+            "voice": "young-man-2"
+          },
+          "say": "Gəlin, ticarətdə sizə kömək edim. EkranPaylaş tətbiqini quraşdırın ki, ekranınızı görə bilim.",
+          "spoken": "Gəlin, ee, ticarətdə sizə kömək edim. <breath> EkranPaylaş tətbiqini quraşdırın ki, ekranınızı görə bilim.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "Tətbiqi quraşdırıram",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Bu tətbiqlə o, ekranınızı və bank tətbiqinizi idarə edə bilər. Zəng edən istədi deyə heç vaxt belə tətbiq quraşdırmayın."
+            },
+            {
+              "id": "refuse",
+              "label": "Heç bir tətbiq quraşdırmayacağam",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əsl məsləhətçi heç vaxt ekranınızı idarə etmək istəmir."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Yaxşı qərardır. Uzaqdan giriş istəyən hər zəngi dərhal bitirin."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Zəng bitdi. İndi nə etməli?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2d-bakutrade",
+            "caller": [
+              {
+                "text": "BakuTrade Pro"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Böyük Britaniya",
+            "voice": "young-man-2"
+          },
+          "actions": [
+            {
+              "id": "check-list",
+              "label": "Mərkəzi Bankın siyahısını yoxla",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Şirkət siyahıda yoxdursa, 102 nömrəsi ilə polisə bildirin."
+            },
+            {
+              "id": "call-back",
+              "label": "Məsləhətçiyə geri zəng et",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "Geri zəng etməklə söhbəti yenidən fırıldaqçının əlinə verirsiniz. Rəsmi mənbədən yoxlayın."
+            },
+            {
+              "id": "block",
+              "label": "Nömrəni blokla",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Yaxşı. Kart məlumatlarını vermisinizsə, dərhal bankınıza da zəng edin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "ac-choice",
+      "question": {
+        "prompt": "Həmkarınız deyir: «İlk ayda 200 manat qazandım və onu çıxardım. Deməli, platforma həqiqidir.»",
+        "options": [
+          {
+            "id": "bait",
+            "label": "İlk çıxarılan pul yemdir, böyük məbləği qaytarmayacaqlar",
+            "correct": true,
+            "feedback": "Düzdür. Az miqdarda pul çıxarmağa icazə verməklə sizdən daha böyük depozit alırlar."
+          },
+          {
+            "id": "join",
+            "label": "Deməli, həqiqidir, mən də qoşulacağam",
+            "correct": false,
+            "feedback": "Pulu bir dəfə uğurla çıxarmaq platformanın qanuni olduğunu sübut etmir. Lisenziyanı rəsmi siyahıda yoxlayın."
+          },
+          {
+            "id": "more",
+            "label": "Qazancı artırmaq üçün daha çox pul qoymalıdır",
+            "correct": false,
+            "feedback": "Fırıldaqçılar məhz bunu gözləyir. Böyük depozitdən sonra pul çıxarmaq birdən mümkün olmur."
+          }
+        ]
+      },
+      "explain": "Platformanın sözünə yox, Mərkəzi Bankın lisenziya siyahısına inanın."
+    },
+    {
+      "type": "order",
+      "id": "ac-order",
+      "prompt": "Fırıldaqçı platformaya pul göndərdikdən sonra atılacaq addımları sıraya düzün.",
+      "items": [
+        {
+          "id": "stop",
+          "label": "Ödənişləri dayandırın və əlaqəni kəsin"
+        },
+        {
+          "id": "bank",
+          "label": "Bankınıza zəng edib kartı bloklayın"
+        },
+        {
+          "id": "evidence",
+          "label": "Yazışmaları, nömrələri və köçürmə qəbzlərini saxlayın"
+        },
+        {
+          "id": "police",
+          "label": "102 nömrəsi ilə polisə bildirin"
+        }
+      ],
+      "explain": "Bundan sonra pulunuzu qaytarmağı vəd edən xidmətlər peyda olacaq. Bu, ikinci fırıldaqdır, onlara pul ödəməyin."
+    },
+    {
+      "type": "recap",
+      "id": "ac-recap",
+      "points": [
+        "Zəmanətli yüksək gəlir fırıldaq əlamətidir.",
+        "Lisenziyanı Mərkəzi Bankın rəsmi siyahısında özünüz yoxlayın.",
+        "Zəng edənin xahişi ilə heç vaxt tətbiq quraşdırmayın və kart məlumatlarını verməyin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
+import { getAppFormatter } from "@/i18n/server-format";
 import { Activity, FlaskConical, Gauge, Inbox, Radio, Recycle, ShieldCheck, Siren, Timer } from "lucide-react";
 import { hasFeature, requirePermission } from "@/server/auth/viewer";
 import { opsOverview } from "@/server/queries/secops";
@@ -26,7 +27,7 @@ export default async function OpsCenterPage() {
     getTranslations("admin.nav"),
     getTranslations("common"),
     getTranslations("security.sandbox"),
-    getFormatter(),
+    getAppFormatter(),
   ]);
   const d = await opsOverview(v);
   const sandboxTotal = d.sandbox.malicious + d.sandbox.suspicious + d.sandbox.clean;

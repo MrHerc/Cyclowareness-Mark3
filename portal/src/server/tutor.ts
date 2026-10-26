@@ -77,7 +77,7 @@ export function lessonContext(moduleTitle: string, lessonTitle: string, scenes: 
 
 /** Answer without the AI model: the most relevant explanation from the lesson itself. */
 export function offlineAnswer(scenes: Scene[], sceneId: string | null | undefined, question: string): string {
-  const q = question.toLowerCase();
+  const q = fold(question);
   const scene = scenes.find((s) => s.id === sceneId) ?? scenes[0];
   const pool: string[] = [];
   const push = (x?: string | null) => x && pool.push(x);
@@ -94,7 +94,10 @@ export function offlineAnswer(scenes: Scene[], sceneId: string | null | undefine
   }
   // Letters of any script: \W would also split Azerbaijani and Russian words apart.
   const words = q.split(/[^\p{L}\p{N}]+/u).filter((w) => w.length > 3);
-  const scored = [...new Set(pool)].map((p) => ({ p, s: words.reduce((n, w) => n + (p.toLowerCase().includes(w) ? 1 : 0), 0) }));
+  const scored = [...new Set(pool)].map((p) => {
+    const text = fold(p);
+    return { p, s: words.reduce((n, w) => n + (text.includes(w) ? 1 : 0), 0) };
+  });
   scored.sort((a, b) => b.s - a.s);
   // The two best explanations, sentence by sentence. Lessons repeat a sentence across scenes (a beat
   // and its recap point, often inside a longer text): each sentence is said once, and an explanation
@@ -118,6 +121,14 @@ export function offlineAnswer(scenes: Scene[], sceneId: string | null | undefine
   return answer.length ? answer.join(" ") : plain(pool[0] ?? "");
 }
 
+/**
+ * Lower case for matching question words against translated lessons: "İ".toLowerCase() is "i" plus a
+ * combining dot (which would also split the word), and Azerbaijani ı / Russian ё compare as i / е.
+ */
+function fold(text: string): string {
+  return text.toLowerCase().replace(/̇/g, "").replace(/ı/g, "i").replace(/ё/g, "е");
+}
+
 /** Sentences of an explanation, split after closing punctuation (the punctuation stays with its sentence). */
 function sentences(text: string): string[] {
   return text
@@ -138,10 +149,25 @@ function sentenceKey(sentence: string): string {
 
 export const TUTOR_LANGUAGE: Record<string, string> = { az: "Azerbaijani", en: "English", ru: "Russian" };
 
+/**
+ * How text in each interface language must read: the app's own terms, address and quotes, so that
+ * generated lessons and tutor answers sound like the rest of the portal. Appended to every model prompt.
+ */
+export const LANGUAGE_STYLE: Record<string, string> = {
+  az: "Write standard literary Azerbaijani in Latin script, never Turkish words. Address the learner formally with «siz». Write artificial intelligence as «Sİ» (süni intellekt), never as «AI» and never with a dotted «İ» after «A»; the tutor's own name stays «AI Sel». Use «…» quotes and these terms: fişinq, fişinq məktubu, parol, parol meneceri, iki addımlı doğrulama, təhlükəsizlik komandası, bildirmək, qoşma, göndərən, hesab, daxil olmaq, cihaz, tətbiq.",
+  en: "Use plain, neutral British English; the tutor is called AI Sel.",
+  ru: "Address the learner with lowercase «вы», use «…» quotes and ё where standard, and these terms: фишинг, фишинговое письмо, пароль, менеджер паролей, двухэтапная проверка, служба безопасности, учётная запись, вложение, отправитель, войти, устройство, приложение. The tutor's name stays «AI Sel».",
+};
+
+export function languageStyle(locale: string): string {
+  return LANGUAGE_STYLE[locale] ?? LANGUAGE_STYLE.en;
+}
+
 export function tutorSystemPrompt(locale: string): string {
   return [
-    "You are the friendly security tutor inside a cyber-hygiene training app for employees.",
+    "You are AI Sel, the friendly security tutor inside a cyber-hygiene training app for employees.",
     `Always answer in ${TUTOR_LANGUAGE[locale] ?? "English"}, in at most four short, plain sentences a non-technical employee understands.`,
+    languageStyle(locale),
     "Ground every answer in the lesson context you are given. Explain why something is suspicious and the one safe step to take.",
     "Never ask for or repeat passwords, codes or personal data. If the question is not about staying safe at work or online, say briefly that you can only help with this lesson's topic.",
     "Do not use markdown headings or lists; write normal sentences.",

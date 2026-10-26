@@ -1,0 +1,423 @@
+{
+  "id": "update-turns",
+  "title": "Dəyişən genişlənmə",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ut-tutor",
+      "beats": [
+        {
+          "id": "ut-b1",
+          "say": "Genişlənmə illərlə etibarlı işləyə bilər. Sonra onun sahibi dəyişir və bir yeniləmə onu casusa çevirir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "update"
+          }
+        },
+        {
+          "id": "ut-b2",
+          "say": "Belə yeniləmələr milyonlarla brauzerə avtomatik olaraq yükləndi. İstifadəçilər heç nə hiss etmədi.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "stat",
+            "value": "4,3 milyon",
+            "label": "cihazda çoxdan etibar edilən genişlənmələr 2025-ci ildə casus proqrama çevrildi"
+          }
+        },
+        {
+          "id": "ut-b3",
+          "say": "Genişlənmə birdən yeni icazələr istəyirsə, axtarış sisteminiz dəyişibsə və ya reklamlar çoxalıbsa, diqqətli olun.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2c-pdf-ustasi",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "«PDF Ustası» söndürüldü"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Yeni versiya daha çox icazə istəyir:"
+                  }
+                ],
+                [
+                  {
+                    "text": "Bütün saytlarda bütün məlumatlarınızı oxumaq və dəyişmək",
+                    "spot": "new-perm"
+                  }
+                ]
+              ],
+              "buttons": [
+                "İcazələri qəbul et",
+                "Genişlənməni sil"
+              ]
+            }
+          },
+          "highlight": "new-perm"
+        },
+        {
+          "id": "ut-b4",
+          "say": "Belə olanda genişlənməni silin, İT dəstəyinə bildirin və onların göstərdiyi parolları dəyişin.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "ut-scenario",
+      "title": "«PDF Ustası» dəyişdi",
+      "start": "n1",
+      "nodes": [
+        {
+          "id": "n1",
+          "text": "Səhər brauzeri açırsınız. Küncdə bildiriş görünür: «PDF Ustası» yeni icazələr istədiyi üçün söndürülüb.",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2c-pdf-ustasi",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "«PDF Ustası» söndürüldü"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Yeni versiya daha çox icazə istəyir."
+                  }
+                ]
+              ],
+              "buttons": [
+                "İcazələrə bax",
+                "Genişlənməni sil"
+              ]
+            }
+          },
+          "choices": [
+            {
+              "label": "İcazələri qəbul edirəm, ondan bir ildir istifadə edirəm",
+              "next": "n2-bad",
+              "outcome": "compromised",
+              "feedback": "Köhnə etibar yeni icazəni təhlükəsiz etmir. Bu yeniləmə genişlənməni casusa çevirmiş ola bilər."
+            },
+            {
+              "label": "Əvvəlcə hansı icazələri istədiyinə baxıram",
+              "next": "n2",
+              "outcome": "safe",
+              "feedback": "Düzdür. Yeni icazələr genişlənmənin indi nə etmək istədiyini göstərir."
+            }
+          ]
+        },
+        {
+          "id": "n2",
+          "text": "Yeni icazələr: bütün saytlarda məlumatları oxumaq və dəyişmək, kopyaladıqlarınızı oxumaq. PDF açmaq üçün bunların heç biri lazım deyil.",
+          "choices": [
+            {
+              "label": "Genişlənməni silirəm və İT dəstəyinə yazıram",
+              "next": "n3",
+              "outcome": "safe",
+              "feedback": "Düzdür. İT dəstəyi bu genişlənmənin başqa kompüterlərdə olub-olmadığını da yoxlayacaq."
+            },
+            {
+              "label": "Söndürülmüş halda saxlayıram, sonra baxaram",
+              "next": "n3",
+              "outcome": "risky",
+              "feedback": "Söndürülmüş genişlənmə brauzerdə qalır və bir kliklə yenidən işə düşə bilər. Silmək daha təhlükəsizdir."
+            }
+          ]
+        },
+        {
+          "id": "n2-bad",
+          "text": "Bir həftə sonra axtarış sisteminiz öz-özünə dəyişib, saytlarda isə naməlum reklamlar görünür.",
+          "choices": [
+            {
+              "label": "Genişlənməni silirəm və İT dəstəyinə zəng edirəm",
+              "next": "n3",
+              "outcome": "safe",
+              "feedback": "Gec olsa da, düzgün addımdır. İT dəstəyi nəyin sızdığını yoxlayacaq."
+            },
+            {
+              "label": "Reklamlara öyrəşirəm",
+              "outcome": "compromised",
+              "feedback": "Genişlənmə açdığınız hər səhifəni hələ də görür. Reklamlar onun işlədiyinin əlamətidir."
+            }
+          ]
+        },
+        {
+          "id": "n3",
+          "text": "Təşəkkür edirəm. Bu genişlənmə bütün saytlarda məlumat toplayıb. İş poçtunuzun və portalın parollarını dəyişin, biz də açıq sessiyaları bağlayacağıq.",
+          "speaker": "Aytən, İT dəstəyi",
+          "voice": "woman-2",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Təşəkkür edirəm. <breath> Bu genişlənmə bütün saytlarda məlumat toplayıb. İş poçtunuzun və portalın parollarını dəyişin, biz də açıq sessiyaları bağlayacağıq.",
+          "choices": [
+            {
+              "label": "Parolları indi dəyişirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Genişlənmənin topladığı köhnə parollar artıq heç nəyə yaramır."
+            },
+            {
+              "label": "Genişlənməni sildim, bu kifayətdir",
+              "outcome": "risky",
+              "feedback": "Genişlənmə silinib, amma topladığı məlumatlar fırıldaqçının əlindədir. Parollar mütləq dəyişdirilməlidir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ut-sim",
+      "environment": "desktop",
+      "title": "İş kompüteri",
+      "intro": "İş kompüterinizdə qəribə şeylər baş verir. Hər xəbərdarlığa düzgün cavab verin.",
+      "steps": [
+        {
+          "id": "ad-tab",
+          "label": "Təbriklər! Siz telefon qazandınız",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://endirim-kupon.example.info/hediyye",
+                "reveal": "endirim-kupon.example.info"
+              }
+            ]
+          },
+          "say": "Brauzer öz-özünə yeni vərəq açdı.",
+          "actions": [
+            {
+              "id": "claim",
+              "label": "Hədiyyəni al",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Öz-özünə açılan və hədiyyə vəd edən vərəq tələdir. Səhifə kart məlumatlarınızı istəyəcəkdi."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Öz-özünə açılan vərəqlər çox vaxt zərərli genişlənmənin işidir, gəlin səbəbi tapaq."
+            }
+          ]
+        },
+        {
+          "id": "search-changed",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "db-xezri-brauzer",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Axtarış sisteminiz dəyişdirildi"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Axtarışlarınız indi axtar-tez.example.info saytına gedir."
+                }
+              ],
+              [
+                {
+                  "text": "Dəyişdirən: «Kupon Tapan» genişlənməsi"
+                }
+              ]
+            ],
+            "buttons": [
+              "Dəyişikliyi saxla",
+              "Əvvəlki kimi qaytar"
+            ]
+          },
+          "say": "Brauzer axtarış parametrinizin dəyişdirildiyini bildirir.",
+          "actions": [
+            {
+              "id": "keep",
+              "label": "Dəyişikliyi saxla",
+              "kind": "mark-safe",
+              "outcome": "risky",
+              "feedback": "Axtarışlarınız indi yad sayta gedir və o, yazdığınız hər şeyi görür. Əvvəlki vəziyyəti qaytarın."
+            },
+            {
+              "id": "restore",
+              "label": "Əvvəlki kimi qaytar",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. İndi bunu edən genişlənməyə baxaq."
+            }
+          ]
+        },
+        {
+          "id": "ext-list",
+          "label": "Genişlənmələr: Kupon Tapan, Ekran Şəkli, Qısa Qeyd",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "db-xezri-brauzer",
+            "url": [
+              {
+                "text": "https://magaza.xezri.example/elavelerim",
+                "reveal": "xezri.example"
+              }
+            ]
+          },
+          "say": "Siyahıda heç vaxt quraşdırmadığınız bir genişlənmə var.",
+          "actions": [
+            {
+              "id": "remove",
+              "label": "Kupon Tapan genişlənməsini sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Düzdür. Tanımadığınız genişlənmə brauzerinizdə qalmamalıdır."
+            },
+            {
+              "id": "keep",
+              "label": "Hamısını saxla",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "«Kupon Tapan» axtarışınızı dəyişdi və vərəqlər açır. Onu saxlasanız, məlumatlarınız ona açıq qalar."
+            }
+          ]
+        },
+        {
+          "id": "bundle-file",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "w2c-kupon-tapan",
+            "name": [
+              {
+                "text": "Pulsuz_PDF_Cevirici_setup.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "6,2 MB",
+            "source": [
+              {
+                "text": "pulsuz-pdf-cevir.example.info"
+              }
+            ]
+          },
+          "say": "«Yükləmələr» qovluğunuz genişlənmənin haradan gəldiyini göstərir.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Bu pulsuz çevirici genişlənməni gizlicə quraşdırıb. Onu yenidən açsanız, genişlənmə geri qayıdacaq."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bu fayl pulsuz proqramla birlikdə gəlib və genişlənməni icazəsiz quraşdırıb."
+            }
+          ]
+        },
+        {
+          "id": "av-alert",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "qoruyucu",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Qoruyucu: təhlükə aşkarlandı"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "«Kupon Tapan» genişlənməsi brauzer məlumatlarını naməlum serverə göndərirdi."
+                }
+              ],
+              [
+                {
+                  "text": "Genişlənmə silindi."
+                }
+              ]
+            ],
+            "buttons": [
+              "İT dəstəyinə bildir",
+              "Bağla"
+            ]
+          },
+          "say": "Antivirus da nəsə tapdı.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "İT dəstəyinə bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. İT dəstəyi nəyin sızdığını yoxlayacaq və parolları dəyişməyə kömək edəcək."
+            },
+            {
+              "id": "close",
+              "label": "Bağla",
+              "kind": "cancel",
+              "outcome": "risky",
+              "feedback": "Genişlənmə silinib, amma topladığı məlumatlar artıq əldən çıxıb. Mütləq bildirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "ut-match",
+      "prompt": "Hər icazəni onun imkan verdiyi işlə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "all-sites",
+          "left": "Bütün saytlarda məlumatları oxumaq və dəyişmək",
+          "right": "Poçtunuzu oxumaq, ödəniş səhifəsini dəyişmək"
+        },
+        {
+          "id": "clipboard",
+          "left": "Kopyaladıqlarınızı oxumaq",
+          "right": "Kopyaladığınız parolu və ya kart nömrəsini görmək"
+        },
+        {
+          "id": "history",
+          "left": "Brauzer tarixçəsini oxumaq",
+          "right": "Hansı saytlara girdiyinizi bilmək"
+        },
+        {
+          "id": "downloads",
+          "left": "Yükləmələri idarə etmək",
+          "right": "Sizin adınızdan fayl yükləmək"
+        }
+      ],
+      "explain": "Hər icazə bir səlahiyyətdir. Genişlənməyə onun işi üçün lazım olmayan səlahiyyət verməyin."
+    },
+    {
+      "type": "recap",
+      "id": "ut-recap",
+      "points": [
+        "Yeniləmədən sonra yeni icazələr istəyən genişlənməni silin",
+        "Öz-özünə dəyişən axtarış sistemi, yeni reklamlar və vərəqlər xəbərdarlıq əlamətləridir",
+        "Genişlənməni silin, İT dəstəyinə bildirin, parollarınızı dəyişin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

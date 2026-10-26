@@ -91,12 +91,14 @@ export async function requestDeletionAction(): Promise<{ ok: boolean }> {
   await db().update(t.users).set({ deletionRequestedAt: new Date() }).where(eq(t.users.id, v.user.id));
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.deletion_requested", targetType: "user", targetId: v.user.id });
   const admins = await db()
-    .select({ id: t.users.id })
+    .select({ id: t.users.id, locale: t.users.locale })
     .from(t.users)
     .where(and(eq(t.users.tenantId, v.tenant.id), eq(t.users.role, "tenant_admin"), eq(t.users.status, "active")));
   if (admins.length) {
-    const tr = await getTranslations({ locale: v.tenant.settings.defaultLocale, namespace: "admin.person" });
-    await db().insert(t.notifications).values(admins.map((a) => ({ tenantId: v.tenant.id, userId: a.id, kind: "deletion", title: v.user.name, body: tr("deletionRequestedBody"), href: `/admin/users/${v.user.id}` })));
+    // Each administrator reads it in their own interface language.
+    const body = new Map<string, string>();
+    for (const locale of new Set(admins.map((a) => a.locale))) body.set(locale, (await getTranslations({ locale, namespace: "admin.person" }))("deletionRequestedBody"));
+    await db().insert(t.notifications).values(admins.map((a) => ({ tenantId: v.tenant.id, userId: a.id, kind: "deletion", title: v.user.name, body: body.get(a.locale), href: `/admin/users/${v.user.id}` })));
   }
   refresh();
   return { ok: true };

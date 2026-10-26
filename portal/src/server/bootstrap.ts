@@ -25,6 +25,13 @@ import { DEFAULT_LOCALE } from "../i18n/config";
  */
 const PLATFORM_SLUG = "platform";
 
+/** A display name from an address's local part: "safar.safarli" → "Safar Safarli" (the address itself when that gives too little). */
+function operatorName(email: string): string {
+  const words = email.split("@")[0].split(/[._-]+/).filter(Boolean);
+  const name = words.map((w) => w.charAt(0).toLocaleUpperCase("en") + w.slice(1)).join(" ");
+  return (name.length >= 2 ? name : email).slice(0, 120);
+}
+
 async function locked<T>(fn: (tx: DB) => Promise<T>): Promise<T> {
   if (dbHandle().driver !== "pg") return fn(db());
   return db().transaction(async (tx) => {
@@ -53,6 +60,8 @@ async function ensureOperator(tx: DB, email: string): Promise<string | null> {
     console.info("[bootstrap] a platform operator already exists; BOOTSTRAP_OPERATOR_EMAIL is not used.");
     return null;
   }
+  // Greeted and audited under a name taken from the address ("safar.safarli@…" is Safar Safarli) until they change it in their profile.
+  const name = operatorName(email);
   const [platform] = await tx.select({ id: t.tenants.id }).from(t.tenants).where(eq(t.tenants.slug, PLATFORM_SLUG));
   let tenantId: string;
   let adminId: string;
@@ -60,20 +69,20 @@ async function ensureOperator(tx: DB, email: string): Promise<string | null> {
     tenantId = platform.id;
     [{ id: adminId }] = await tx
       .insert(t.users)
-      .values({ tenantId, email, name: "Platform Operator", role: "super_admin", status: "invited", locale: DEFAULT_LOCALE })
+      .values({ tenantId, email, name, role: "super_admin", status: "invited", locale: DEFAULT_LOCALE })
       .returning({ id: t.users.id });
   } else {
     ({ tenantId, adminId } = await createTenantWithAdmin(tx, {
       slug: PLATFORM_SLUG,
-      name: "Cyclowareness Platform",
+      name: "Cyclowareness",
       plan: "enterprise_hrm",
       locale: DEFAULT_LOCALE,
-      adminName: "Platform Operator",
+      adminName: name,
       adminEmail: email,
       adminRole: "super_admin",
     }));
   }
-  await audit(tx, { tenantId, actorId: null, action: "tenant.created", targetType: "tenant", targetId: tenantId, meta: { name: "Cyclowareness Platform", by: "bootstrap", operator: email } });
+  await audit(tx, { tenantId, actorId: null, action: "tenant.created", targetType: "tenant", targetId: tenantId, meta: { name: "Cyclowareness", by: "bootstrap", operator: email } });
   console.info(`[bootstrap] platform operator ${email} created.`);
   return adminId;
 }
@@ -83,7 +92,7 @@ export async function bootstrap(): Promise<void> {
   const pending = await locked(async (tx) => {
     const lib = await syncLibrary(tx);
     const paths = await syncPaths(tx);
-    console.info(`[bootstrap] library synced: ${lib.modules} modules, ${lib.lessons} lessons, ${paths} paths.`);
+    console.info(`[bootstrap] library synced: ${lib.modules} modules, ${lib.lessons} lessons (texts: en ${lib.locales.en}, az ${lib.locales.az}, ru ${lib.locales.ru}), ${paths} paths.`);
     return email ? ensureOperator(tx, email) : null;
   });
   // After the commit: the link's token row refers to the operator created above.

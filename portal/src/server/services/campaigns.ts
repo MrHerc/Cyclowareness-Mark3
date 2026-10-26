@@ -12,6 +12,7 @@ import { appUrl, env } from "../env";
 import { TEMPLATE_BY_KEY, templateText, type CampaignTemplate } from "../../lib/campaigns/templates";
 import { withDefaults } from "../../lib/tenant-defaults";
 import { bakuDayPlus } from "../../lib/time";
+import { encodeRiskTitle } from "../../lib/risk-title";
 
 const DAY = 86_400_000;
 
@@ -43,7 +44,7 @@ export async function launchBlocker(db: DB, tenantId: string, channel: CampaignT
   return null;
 }
 
-function emailHtml(tpl: CampaignTemplate, locale: string, token: string): { subject: string; text: string; html: string } {
+function emailHtml(tpl: CampaignTemplate, locale: string, token: string): { subject: string; text: string; html: string; lang: string } {
   const link = `${appUrl()}/t/${token}`;
   const subject = templateText(tpl.subject, locale);
   const body = templateText(tpl.body, locale);
@@ -54,12 +55,14 @@ function emailHtml(tpl: CampaignTemplate, locale: string, token: string): { subj
     .map((p) => `<p style="margin:0 0 14px;line-height:1.55">${esc(p).replace(/\n/g, "<br>")}</p>`)
     .join("");
   const qr = tpl.qr ? `<p style="margin:18px 0"><img src="${appUrl()}/api/qr/${token}" width="180" height="180" alt="QR"></p>` : "";
-  const attachment = tpl.attachment ? `<p style="margin:16px 0;padding:10px 14px;border:1px solid #ddd;border-radius:8px;display:inline-block">📎 <a href="${link}">${esc(tpl.attachment.name)}</a> · ${tpl.attachment.size}</p>` : "";
+  const attachment = tpl.attachment ? `<p style="margin:16px 0;padding:10px 14px;border:1px solid #ddd;border-radius:8px;display:inline-block">📎 <a href="${link}">${esc(templateText(tpl.attachment.name, locale))}</a> · ${esc(templateText(tpl.attachment.size, locale))}</p>` : "";
   const button = cta ? `<p style="margin:22px 0"><a href="${link}" style="background:#1f6feb;color:#fff;text-decoration:none;padding:11px 20px;border-radius:6px;font-weight:600">${esc(cta)}</a></p>` : "";
   const pixel = `<img src="${appUrl()}/api/t/${token}/open" width="1" height="1" alt="" style="display:block;border:0">`;
-  const html = `<!doctype html><html><body style="margin:0;font-family:Segoe UI,Arial,sans-serif;color:#222;background:#fff"><div style="max-width:600px;padding:24px">${paragraphs}${attachment}${qr}${button}${pixel}</div></body></html>`;
+  // The language templateText fell back to, so mail clients read and spell-check the text in it.
+  const lang = locale in tpl.body ? locale : "en";
+  const html = `<!doctype html><html lang="${lang}"><body style="margin:0;font-family:Segoe UI,Arial,sans-serif;color:#222;background:#fff"><div style="max-width:600px;padding:24px">${paragraphs}${attachment}${qr}${button}${pixel}</div></body></html>`;
   const text = `${body}\n\n${cta ? `${cta}: ` : ""}${link}`;
-  return { subject, text, html };
+  return { subject, text, html, lang };
 }
 
 /** Creates recipients and queues the simulation (the job runner sends mail and SMS). Returns the number of people it goes to. */
@@ -89,7 +92,7 @@ export async function launchCampaign(db: DB, campaignId: string, actorId: string
       const m = emailHtml(tpl, u.locale, token);
       // Display name is the template's; the address is the organisation's own sending domain.
       // Deferred: the job runner sends the batch, so Launch does not wait for one SMTP round-trip per person.
-      await queueEmail(db, c.tenantId, { to: u.email, kind: "simulation", subject: m.subject, text: m.text, html: m.html, fromName: templateText(tpl.sender.name, u.locale) }, { defer: true });
+      await queueEmail(db, c.tenantId, { to: u.email, kind: "simulation", subject: m.subject, text: m.text, html: m.html, fromName: templateText(tpl.sender.name, u.locale), lang: m.lang }, { defer: true });
     } else if (sms && !u.phone) {
       continue;
     }
@@ -99,10 +102,13 @@ export async function launchCampaign(db: DB, campaignId: string, actorId: string
   return { ok: true, count };
 }
 
-function clickTitle(name: string, locale: string): string {
-  if (locale === "en") return `You opened the link in the “${name}” phishing simulation.`;
-  if (locale === "ru") return `Вы открыли ссылку в фишинговой симуляции «${name}».`;
-  return `«${name}» fişinq simulyasiyasındakı keçidi açmısınız.`;
+/** In every UI language: the person may switch languages before the risk closes, and admins read it in theirs. */
+function clickTitle(name: string): string {
+  return encodeRiskTitle({
+    az: `«${name}» fişinq simulyasiyasındakı linki açmısınız.`,
+    en: `You opened the link in the “${name}” phishing simulation.`,
+    ru: `Вы открыли ссылку в фишинговой симуляции «${name}».`,
+  });
 }
 
 /** A recipient opened the simulated message (tracking pixel). Frozen once the campaign is cancelled, like clicks. */
@@ -144,7 +150,7 @@ export async function recordClick(db: DB, token: string, via: "link" | "qr") {
       userId: row.user.id,
       kind: "phishing_click",
       severity: "medium",
-      title: clickTitle(row.c.name, row.user.locale),
+      title: clickTitle(row.c.name),
       sourceRef: row.c.id,
       moduleId: mod?.id ?? null,
       dueDate: bakuDayPlus(14, now),

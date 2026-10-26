@@ -39,7 +39,7 @@ export function NotificationsButton({ items }: { items: NotificationItem[] }) {
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        aria-label={`${t("nav.notifications")}${unread ? ` (${unread})` : ""}`}
+        aria-label={unread ? t("notifications.buttonUnread", { count: unread }) : t("nav.notifications")}
         className="relative grid size-10 place-items-center rounded-full border border-line bg-surface text-ink-muted hover:text-ink pointer-coarse:size-11"
       >
         <Bell className="size-[1.15rem]" />

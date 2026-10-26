@@ -1,0 +1,527 @@
+{
+  "id": "voice-clones",
+  "title": "Klonlanmış səslər",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "few-seconds",
+          "say": "Süni intellekt insanın səsini qısa səs yazısından, bəzən cəmi bir neçə saniyəlik yazıdan kopyalaya bilər.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          }
+        },
+        {
+          "id": "the-ask",
+          "say": "Fırıldaqçı rəhbərinizin və ya qohumunuzun səsi ilə zəng edir və təcili pul, kod və ya sənəd istəyir.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [
+                {
+                  "text": "Kamran Babayev"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 70 000 18 42",
+                  "spot": "number"
+                }
+              ],
+              "label": "Mobil"
+            }
+          }
+        },
+        {
+          "id": "spoofed-number",
+          "say": "Nömrəni də saxtalaşdırmaq olar. Ekranınızdakı ad və nömrə sübut deyil.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [
+                {
+                  "text": "Kamran Babayev"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 70 000 18 42",
+                  "spot": "number"
+                }
+              ],
+              "label": "Mobil"
+            }
+          },
+          "highlight": "number"
+        },
+        {
+          "id": "code-word",
+          "say": "Ailənizlə və komandanızla gizli yoxlama sözü barədə razılaşın. Saxta səs bu sözü bilməyəcək.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "boss-call",
+      "title": "Rəhbərdən zəng",
+      "start": "call",
+      "nodes": [
+        {
+          "id": "call",
+          "text": "Salam, iclasdayam, çox danışa bilmirəm. Podratçıya təcili 18 min manat köçürməliyik. Heç kimə deməyin, sonra izah edərəm.",
+          "speaker": "Kamran Babayevin səsi",
+          "voice": "older-man",
+          "channel": "phone",
+          "spoken": "Salam, <breath> iclasdayam, çox danışa bilmirəm. Podratçıya təcili 18 min manat köçürməliyik. Heç kimə deməyin, ee, sonra izah edərəm.",
+          "character": "kamran",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [
+                {
+                  "text": "Kamran Babayev"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 70 000 18 42",
+                  "spot": "number"
+                }
+              ],
+              "label": "Mobil"
+            }
+          },
+          "choices": [
+            {
+              "label": "Dərhal köçürürəm",
+              "outcome": "compromised",
+              "feedback": "Pul fırıldaqçıya getdi. Təcililik və məxfilik tələbi birlikdə ən güclü xəbərdarlıq əlamətidir."
+            },
+            {
+              "label": "Yoxlama sözünü soruşuram",
+              "next": "pressure",
+              "feedback": "Yaxşı fikir. Görək necə cavab verəcək."
+            },
+            {
+              "label": "Özüm geri zəng edəcəyimi deyirəm",
+              "next": "callback",
+              "feedback": "Doğrudur. Artıq bildiyiniz nömrəyə zəng edin."
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "text": "Hansı söz? Vaxtım yoxdur! Məni tanımırsınız?",
+          "speaker": "Kamran Babayevin səsi",
+          "voice": "older-man",
+          "channel": "phone",
+          "spoken": "Hansı söz? Vaxtım yoxdur! <short pause> Məni tanımırsınız?",
+          "character": "kamran",
+          "choices": [
+            {
+              "label": "Üzr istəyib köçürürəm",
+              "outcome": "compromised",
+              "feedback": "Təzyiq fırıldaqçının əsas alətidir. Əsl rəhbər yoxlamanı başa düşər."
+            },
+            {
+              "label": "Zəngi bitirib özüm geri zəng edirəm",
+              "next": "callback",
+              "feedback": "Doğrudur. Söz yoxdursa, köçürmə də yoxdur."
+            }
+          ]
+        },
+        {
+          "id": "callback",
+          "text": "Yox, mən sizə heç zəng etməmişəm.",
+          "speaker": "Kamran Babayev (kontaktlarınızdakı nömrə)",
+          "voice": "older-man",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Yox, <breath> mən sizə heç zəng etməmişəm.",
+          "character": "kamran",
+          "choices": [
+            {
+              "label": "Təhlükəsizlik komandasına bildirirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Onlar həmkarlarınızı da xəbərdar edəcəklər."
+            },
+            {
+              "label": "Heç kimə demirəm, axı pul itməyib",
+              "outcome": "risky",
+              "feedback": "Fırıldaqçı başqasını sınayacaq. Bildirmək hamını qoruyur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "voice-message",
+      "prompt": "Bu yazışmada xəbərdarlıq əlamətlərini tapın.",
+      "artifact": {
+        "kind": "chat",
+        "app": "whatsapp",
+        "contact": [
+          {
+            "text": "+994 55 000 40 17"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Salam, mənəm, Elvin. "
+              },
+              {
+                "text": "Telefonum xarab olub, bu, yeni nömrəmdir.",
+                "spot": "new-number"
+              }
+            ],
+            "time": "21:04"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Mənəm, Elvin. Eşidirsən? Başım bəlaya düşüb, təcili köməyin lazımdır.",
+                "spot": "voice"
+              }
+            ],
+            "time": "21:04",
+            "voice": "young-man",
+            "manner": "natural",
+            "spoken": "Mənəm, Elvin. <breath> Eşidirsən? Başım bəlaya düşüb, təcili köməyin lazımdır."
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Mənə təcili 600 manat lazımdır, elə bu gün.",
+                "spot": "urgent"
+              },
+              {
+                "text": " "
+              },
+              {
+                "text": "Xahiş edirəm, evdə heç kimə demə.",
+                "spot": "secret"
+              }
+            ],
+            "time": "21:05"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Bu karta göndər, dostumun kartıdır.",
+                "spot": "card"
+              }
+            ],
+            "time": "21:05"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "new-number",
+          "label": "Yeni nömrə",
+          "explain": "«Yeni nömrə» hekayəsi köhnə nömrəyə zəng edib yoxlamağınızın qarşısını alır."
+        },
+        {
+          "id": "voice",
+          "label": "Səsli mesaj",
+          "explain": "Səs tanış gələ bilər, amma yenə də saxta ola bilər. Onu kopyalamaq üçün qısa səs yazısı kifayətdir."
+        },
+        {
+          "id": "urgent",
+          "label": "Təcili pul",
+          "explain": "Təcili pul istəmək fırıldağın əsas əlamətidir."
+        },
+        {
+          "id": "secret",
+          "label": "Məxfilik",
+          "explain": "«Heç kimə demə» xahişinin məqsədi yoxlamağınızın qarşısını almaqdır."
+        },
+        {
+          "id": "card",
+          "label": "Başqasının kartı",
+          "explain": "Pul başqasının kartına gedir. Bu, izi gizlədir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "relative-call",
+      "environment": "call",
+      "title": "Axşam zəngi",
+      "intro": "Axşam naməlum nömrədən zəng gəlir. Səs çox tanışdır. Nə edirsiniz?",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Naməlum nömrə"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 73 26"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "child"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab ver",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Cavab vermək təhlükəli deyil. Əsas məsələ sonra nə edəcəyinizdir."
+            },
+            {
+              "id": "decline",
+              "label": "Rədd et",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olar. Narahatsınızsa, qohumunuzun bildiyiniz nömrəsinə özünüz zəng edin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "plea",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Naməlum nömrə"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 73 26"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "child"
+          },
+          "say": "Alo, mənəm, Nərmin! Qəza olub, polis məni saxlayıb. İndi 900 manat lazımdır, ailəyə demə!",
+          "spoken": "Alo, <breath> mənəm, Nərmin! Qəza olub, polis məni, ee, saxlayıb. İndi 900 manat lazımdır, <breath> ailəyə demə!",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Hara göndərim?",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Fırıldaqçıya məhz sizin dərhal razılaşmağınız lazımdır. Əvvəlcə yoxlayın."
+            },
+            {
+              "id": "code-word",
+              "label": "Bizim yoxlama sözümüz nədir?",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Klonlanmış səs razılaşdığınız sözü bilməyəcək."
+            },
+            {
+              "id": "hang-up",
+              "label": "Zəngi bitirib özüm geri zəng edirəm",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Düzdür. Nərminin bildiyiniz köhnə nömrəsinə zəng edin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Naməlum nömrə"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 73 26"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "child"
+          },
+          "say": "Hansı söz? Mən ağlayıram, sən sözdən danışırsan! Polis gözləyir, tez ol!",
+          "spoken": "Hansı söz? <breath> Mən ağlayıram, sən sözdən danışırsan! Polis gözləyir, <breath> tez ol!",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Yaxşı, pulu göndərirəm",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Pul fırıldaqçıya getdi. Göz yaşı və tələsdirmə yoxlamanı unutdurmaq üçündür."
+            },
+            {
+              "id": "hang-up",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Yoxlama sözü yoxdursa, söhbət də yoxdur."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Zəng bitdi. İndi nə etməli?",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Naməlum nömrə"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 73 26"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "child"
+          },
+          "actions": [
+            {
+              "id": "call-back",
+              "label": "Nərminin köhnə nömrəsinə zəng et",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Doğrudur: Nərmin evdədir və heç nə olmayıb. Ailəni də xəbərdar edin."
+            },
+            {
+              "id": "ignore",
+              "label": "Heç nə etmə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Fırıldaqçı yenə zəng edə və ya başqa qohumu sınaya bilər. Ailəyə xəbər verin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "verify-steps",
+      "prompt": "Şübhəli zəngdən sonrakı addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "hang-up",
+          "label": "Heç nə vəd etmədən zəngi bitirin"
+        },
+        {
+          "id": "call-known",
+          "label": "Kontaktlarınızdakı nömrəyə özünüz zəng edin"
+        },
+        {
+          "id": "confirm",
+          "label": "Bu xahişin həqiqi olub-olmadığını soruşun"
+        },
+        {
+          "id": "report",
+          "label": "Təhlükəsizlik komandasına bildirin"
+        }
+      ],
+      "explain": "Sübut ekranda deyil, özünüz etdiyiniz ikinci zəngdədir."
+    },
+    {
+      "type": "match",
+      "id": "tricks",
+      "prompt": "Hər fəndə uyğun reaksiyanı tapın.",
+      "pairs": [
+        {
+          "id": "boss-voice",
+          "left": "Rəhbərin səsi ilə təcili köçürmə",
+          "right": "Bildiyiniz nömrəyə geri zəng edin"
+        },
+        {
+          "id": "new-number",
+          "left": "Qohumun yeni nömrəsi",
+          "right": "Yoxlamaq üçün köhnə nömrəyə zəng edin"
+        },
+        {
+          "id": "video-face",
+          "left": "Video zəngdə tanış üz",
+          "right": "Yoxlama sözünü soruşun"
+        },
+        {
+          "id": "keep-secret",
+          "left": "Sirr saxlamaq xahişi",
+          "right": "Mütləq ikinci bir şəxsə deyin"
+        }
+      ],
+      "explain": "Hər fəndin sadə yoxlaması var. Yoxlamağı vərdişə çevirin."
+    },
+    {
+      "type": "choice",
+      "id": "exec-video",
+      "question": {
+        "prompt": "Video zəngdə direktor məxfi hesabatı şəxsi e-poçta göndərməyinizi xahiş edir. Nə edirsiniz?",
+        "options": [
+          {
+            "id": "send",
+            "label": "Göndərirəm, onu ekranda görürəm",
+            "correct": false,
+            "feedback": "Görüntü saxta ola bilər. Üz sübut deyil."
+          },
+          {
+            "id": "verify",
+            "label": "Rəsmi kanal vasitəsilə ayrıca təsdiq alıram",
+            "correct": true,
+            "feedback": "Düzdür. Məxfi fayllar yalnız rəsmi kanallarla və yalnız təsdiqdən sonra göndərilir."
+          },
+          {
+            "id": "wave",
+            "label": "Ondan kamera qarşısında əlini yelləməsini xahiş edirəm",
+            "correct": false,
+            "feedback": "Bu, bəzi saxta görüntüləri ifşa edə bilər, amma etibarlı yoxlama deyil."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "ceo"
+        }
+      },
+      "explain": "Nə qədər real görünsə də, qeyri-adi xahişi başqa kanalla yoxlayın."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Tanış səs, üz və ya nömrə sübut deyil.",
+        "Zəngi bitirin və bildiyiniz nömrəyə geri zəng edin.",
+        "Ailəniz və komandanızla yoxlama sözü barədə razılaşın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

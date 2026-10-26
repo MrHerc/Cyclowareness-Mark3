@@ -1,0 +1,530 @@
+{
+  "id": "pin-and-codes",
+  "title": "PIN və kodlar",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l1-tutor",
+      "beats": [
+        {
+          "id": "l1-b1",
+          "say": "Mobil ID və elektron imza sizin rəqəmsal imzanızdır. PIN kodunuzla imzalanan sənəd sizin imzaladığınız sənəd sayılır.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "l1-b2",
+          "say": "Fırıldaqçılar «sertifikatınızın müddəti bitir» deyə zəng edib PIN kodunuzu və ya SMS kodunu istəyirlər.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "mohurid-fake",
+              "caller": [
+                {
+                  "text": "MöhürID Dəstək",
+                  "spot": "caller-name"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 12 000 77 40"
+                }
+              ],
+              "label": "Dəstək"
+            }
+          },
+          "highlight": "caller-name"
+        },
+        {
+          "id": "l1-b3",
+          "say": "PIN kodunuz və SMS kodları heç kimə deyilmir: nə dəstək xidmətinə, nə həmkarlarınıza, nə də rəhbərinizə.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "l1-b4",
+          "say": "Sertifikatı yeniləmək lazımdırsa, bunu rəsmi saytda və ya xidmət mərkəzində özünüz edirsiniz.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "certificate"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l1-sim",
+      "environment": "call",
+      "title": "Sertifikat zəngi",
+      "intro": "Kimsə zəng edib imza xidmətinin dəstək əməkdaşı olduğunu deyir. Dediklərini oxuyun və cavabınızı seçin.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "mohurid-fake",
+            "caller": [
+              {
+                "text": "MöhürID Dəstək"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 77 40"
+              }
+            ],
+            "label": "Dəstək",
+            "voice": "young-man"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab ver",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Zəngə cavab vermək təhlükəli deyil. Əsas məsələ nə deyəcəyinizdir."
+            },
+            {
+              "id": "decline",
+              "label": "Rədd et",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olar. Narahatsınızsa, xidmətin rəsmi nömrəsinə özünüz zəng edin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "expire",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "mohurid-fake",
+            "caller": [
+              {
+                "text": "MöhürID Dəstək"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 77 40"
+              }
+            ],
+            "label": "Dəstək",
+            "voice": "young-man"
+          },
+          "say": "Salam, MöhürID dəstək xidmətindən zəng edirik. Mobil imza sertifikatınızın, bağışlayın, müddəti bu gün bitir və yeniləməsəniz, bloklanacaq.",
+          "spoken": "Salam, <breath> MöhürID dəstək xidmətindən zəng edirik. Mobil imza sertifikatınızın <cough> bağışlayın, müddəti bu gün bitir və yeniləməsəniz, bloklanacaq.",
+          "actions": [
+            {
+              "id": "comply",
+              "label": "Necə yeniləyim?",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Zəng edən prosesi idarə etməyə başlayır. Sertifikatın müddətini rəsmi saytda özünüz yoxlayın."
+            },
+            {
+              "id": "verify",
+              "label": "Rəsmi nömrəyə özüm zəng edəcəyəm",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Düzdür. Xidmətin nömrəsini onun rəsmi saytında özünüz tapın.",
+              "next": "after"
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Yaxşı qərardır. Sizi tələsdirən zəngi bitirə bilərsiniz.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "sms-code",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "mohurid-fake",
+            "caller": [
+              {
+                "text": "MöhürID Dəstək"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 77 40"
+              }
+            ],
+            "label": "Dəstək",
+            "voice": "young-man"
+          },
+          "say": "Yeniləmə üçün sizə SMS gələcək. Kodu mənə oxuyun, sistemə özüm daxil edəcəyəm.",
+          "spoken": "Yeniləmə üçün sizə SMS gələcək. <breath> Kodu mənə oxuyun, sistemə özüm daxil edəcəyəm.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Kodu oxuyuram",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Bu kodla sizin adınızdan daxil olurlar. Kod yalnız sizin ekranınız üçündür."
+            },
+            {
+              "id": "keep",
+              "label": "Kodları heç kimlə paylaşmıram",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əsl dəstək xidməti heç vaxt kod istəmir."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Düzdür. Kod istənilən kimi zəngi bitirin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pin-sign",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "mohurid-fake",
+            "caller": [
+              {
+                "text": "MöhürID Dəstək"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 77 40"
+              }
+            ],
+            "label": "Dəstək",
+            "voice": "young-man"
+          },
+          "say": "Kod işləmədi. İndi telefonunuzda sorğu görünəcək, PIN kodunuzu daxil edib təsdiqləyin.",
+          "spoken": "Kod işləmədi. <sigh> İndi telefonunuzda sorğu görünəcək, PIN kodunuzu daxil edib təsdiqləyin.",
+          "actions": [
+            {
+              "id": "confirm",
+              "label": "PIN kodumu daxil edib təsdiqləyirəm",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Bu, yeniləmə deyildi, onların hazırladığı sənədi imzaladınız. Dərhal imza xidmətinin rəsmi nömrəsinə zəng edin."
+            },
+            {
+              "id": "deny",
+              "label": "Sorğunu rədd edirəm",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Özünüz başlatmadığınız sorğunu heç vaxt təsdiqləməyin."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Düzdür. Zəngi bitirin və sorğunu rədd edin."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Zəng bitdi. İndi nə etməli?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "mohurid-fake",
+            "caller": [
+              {
+                "text": "MöhürID Dəstək"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 77 40"
+              }
+            ],
+            "label": "Dəstək",
+            "voice": "young-man"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "Xidmətin rəsmi nömrəsinə zəng et",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Düzdür. Rəsmi dəstək xidməti sertifikatınızın əsl vəziyyətini deyə bilər."
+            },
+            {
+              "id": "report",
+              "label": "Təhlükəsizlik komandasına bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Belə zənglər adətən bir neçə həmkara gəlir."
+            },
+            {
+              "id": "ignore",
+              "label": "Heç nə etmə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Zəng edən yenə cəhd edəcək. Bildirmək həmkarlarınızı qoruyur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l1-hotspot",
+      "prompt": "Bu mesajdakı tələləri tapın.",
+      "artifact": {
+        "kind": "sms",
+        "brandRef": "mohurid-fake",
+        "sender": [
+          {
+            "text": "MohurID"
+          }
+        ],
+        "time": "08:55",
+        "messages": [
+          [
+            {
+              "text": "Mobil imza sertifikatınızın "
+            },
+            {
+              "text": "müddəti bu gün saat 18:00-da bitir",
+              "spot": "deadline"
+            },
+            {
+              "text": ". Yeniləmək üçün "
+            },
+            {
+              "text": "PIN kodunuzu daxil edin",
+              "spot": "pin"
+            },
+            {
+              "text": ": "
+            },
+            {
+              "text": "mohurid-yenile.test",
+              "spot": "link"
+            },
+            {
+              "text": ". "
+            },
+            {
+              "text": "Əks halda imzanız ləğv ediləcək.",
+              "spot": "threat"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "deadline",
+          "label": "Bu gün bitir",
+          "explain": "Təcililik yoxlamağa vaxt qoymur. Sertifikatın müddətini rəsmi saytda özünüz görə bilərsiniz."
+        },
+        {
+          "id": "link",
+          "label": "Naməlum ünvan",
+          "explain": "Bu, xidmətin rəsmi saytı deyil. Rəsmi ünvanı özünüz yazın."
+        },
+        {
+          "id": "pin",
+          "label": "PIN kod tələbi",
+          "explain": "PIN kod heç vaxt «yeniləmək» üçün sayta yazılmır. O, yalnız özünüz başlatdığınız girişi və ya imzanı təsdiqləyir."
+        },
+        {
+          "id": "threat",
+          "label": "Ləğv təhdidi",
+          "explain": "Qorxutmaq geniş yayılmış fırıldaq üsuludur. Narahatsınızsa, rəsmi nömrəyə zəng edin."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "l1-swipe",
+      "prompt": "Bu mesaj təhlükəsizdir, yoxsa təhlükəli?",
+      "cards": [
+        {
+          "id": "own-code",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "mohurid",
+            "sender": [
+              {
+                "text": "MohurID"
+              }
+            ],
+            "time": "09:10",
+            "messages": [
+              [
+                {
+                  "text": "Təsdiq kodu: 482913. Bu kodu heç kimə deməyin. Bu sorğunu siz göndərməmisinizsə, onu rədd edin."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Özünüz daxil olanda gələn adi mesajdır. Link yoxdur və kodu gizli saxlamağı xatırladır."
+        },
+        {
+          "id": "renew-link",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "mohurid-fake",
+            "sender": [
+              {
+                "text": "MohurID"
+              }
+            ],
+            "time": "09:42",
+            "messages": [
+              [
+                {
+                  "text": "Sertifikatınız bloklanıb. Onu burada bərpa edin: mohurid-yenile.test"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Link xidmətin rəsmi saytına aparmır. Yoxlamaq üçün rəsmi saytı özünüz açın."
+        },
+        {
+          "id": "colleague-pin",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Elvin (Maliyyə)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Məzuniyyətdəyəm. PIN kodum 4471-dir, bu sənədləri mənim əvəzimə imzala."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Başqasının PIN kodu ilə imzalamaq onun adından imza atmaq deməkdir. Səlahiyyət rəsmi qaydada həvalə edilir."
+        },
+        {
+          "id": "hr-reminder",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Kadrlar şöbəsi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "kadr@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Sertifikatınızın müddəti 30 gün sonra bitir"
+              }
+            ],
+            "time": "10:15",
+            "body": [
+              [
+                {
+                  "text": "Yeniləmək üçün imza xidmətinin rəsmi saytına özünüz daxil olun və ya xidmət mərkəzinə yaxınlaşın."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Nə link, nə PIN kod, nə də SMS kodu istənilir. Sertifikatı rəsmi yolla özünüz yeniləyirsiniz."
+        },
+        {
+          "id": "unexpected-request",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "mohurid",
+            "app": "MöhürID",
+            "title": [
+              {
+                "text": "İmza sorğusu"
+              }
+            ],
+            "body": [
+              {
+                "text": "Etibarname_tam_selahiyyet.pdf imzanızı gözləyir"
+              }
+            ],
+            "time": "10:31"
+          },
+          "verdict": "threat",
+          "explain": "Bu sorğunu siz başlatmamısınız. Onu rədd edin və təhlükəsizlik komandasına bildirin."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l1-choice",
+      "question": {
+        "prompt": "Xəstəlik məzuniyyətində olan həmkarınız təcili sənədi onun PIN kodu ilə imzalamağınızı xahiş edir.",
+        "options": [
+          {
+            "id": "do",
+            "label": "İmzalayıram, o özü icazə verib",
+            "correct": false,
+            "feedback": "Elektron imza yalnız sahibinə məxsusdur. Onun PIN kodu ilə imzalamaq qaydaları pozur."
+          },
+          {
+            "id": "refuse",
+            "label": "İmtina edirəm və rəhbərdən səlahiyyəti rəsmi qaydada həvalə etməyi xahiş edirəm",
+            "correct": true,
+            "feedback": "Düzdür. Qurum səlahiyyəti əvəzedici şəxsə rəsmi qaydada həvalə edir."
+          },
+          {
+            "id": "keep",
+            "label": "Lazım olar deyə onun PIN kodunu yazıb saxlayıram",
+            "correct": false,
+            "feedback": "Başqasının PIN kodunu saxlamaq da risklidir. PIN kod sahibində qalmalıdır."
+          }
+        ]
+      },
+      "explain": "PIN kod imzanın özüdür. Onu heç vaxt başqasına vermirsiniz və başqasınınkını götürmürsünüz."
+    },
+    {
+      "type": "recap",
+      "id": "l1-recap",
+      "points": [
+        "PIN kodunuzu və SMS kodunu heç kimə, o cümlədən dəstək xidmətinə deməyin.",
+        "Sertifikatı yalnız rəsmi saytda və ya xidmət mərkəzində yeniləyin.",
+        "Özünüz başlatmadığınız istənilən imza sorğusunu rədd edin və bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

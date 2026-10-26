@@ -157,6 +157,7 @@ export function Preferences({ soundOn, motion, timerPref }: { soundOn: boolean; 
           </div>
           <Segmented
             name="motion"
+            ariaLabel={t("motion")}
             value={m}
             onChange={(v) => {
               setM(v as typeof m);
@@ -237,7 +238,7 @@ function CodesList({ codes, onDone }: { codes: string[]; onDone: () => void }) {
           onClick={() => {
             const a = document.createElement("a");
             a.href = URL.createObjectURL(new Blob([`${text}\n`], { type: "text/plain" }));
-            a.download = "backup-codes.txt";
+            a.download = t("codesFile");
             a.click();
           }}
         >
@@ -278,7 +279,7 @@ export function TwoFactor({ enabled, required }: { enabled: boolean; required: b
     setError(null);
     router.refresh();
   };
-  const err = (e: string) => setError(e === "wrongPassword" ? t("errors.wrongPassword") : e === "wrongCode" ? t("errors.wrongCode") : e === "required" ? t("requiredNote") : "—");
+  const err = (e: string) => setError(e === "wrongPassword" ? t("errors.wrongPassword") : e === "wrongCode" ? t("errors.wrongCode") : e === "required" ? t("requiredNote") : tc("errors.generic"));
 
   return (
     <div>
@@ -331,7 +332,7 @@ export function TwoFactor({ enabled, required }: { enabled: boolean; required: b
           >
             <p className="text-body-sm font-semibold">{t("passwordTitle")}</p>
             <p className="text-caption text-ink-muted">{t("passwordBody")}</p>
-            <Field label={tp("security")} htmlFor="pw" error={error}>
+            <Field label={t("passwordLabel")} htmlFor="pw" error={error}>
               <Input id="pw" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />
             </Field>
             <Button type="submit" disabled={!password || pending}>
@@ -383,7 +384,7 @@ export function TwoFactor({ enabled, required }: { enabled: boolean; required: b
             });
           }}
         >
-          <Field label={t("passwordTitle")} htmlFor="pw-off" error={error}>
+          <Field label={t("passwordLabel")} htmlFor="pw-off" error={error}>
             <Input id="pw-off" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />
           </Field>
           <Button type="submit" variant="danger" disabled={!password || pending}>
@@ -408,7 +409,7 @@ export function TwoFactor({ enabled, required }: { enabled: boolean; required: b
               });
             }}
           >
-            <Field label={t("passwordTitle")} htmlFor="pw-codes" error={error}>
+            <Field label={t("passwordLabel")} htmlFor="pw-codes" error={error}>
               <Input id="pw-codes" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} autoFocus />
             </Field>
             <Button type="submit" disabled={!password || pending}>

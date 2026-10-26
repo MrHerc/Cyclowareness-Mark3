@@ -16,6 +16,7 @@ import { PrintButton } from "@/components/admin/print-toolbar";
 import { riskBand } from "@/lib/domain/risk";
 import { requestNow } from "@/lib/time";
 import { cn } from "@/lib/cn";
+import { riskTitle } from "@/lib/risk-title";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.nav");
@@ -88,7 +89,7 @@ export default async function LeadershipPage() {
                 ) : (
                   <span className={cn("inline-flex items-center gap-1 font-semibold", k.avgRiskDelta < 0 ? "text-safe-700" : "text-risk-600")}>
                     {k.avgRiskDelta < 0 ? <ArrowDownRight className="size-3.5" /> : <ArrowUpRight className="size-3.5" />}
-                    {tr("change", { delta: k.avgRiskDelta > 0 ? `+${k.avgRiskDelta}` : `${k.avgRiskDelta}` })}
+                    {tr("change", { sign: k.avgRiskDelta > 0 ? "+" : "−", abs: Math.abs(k.avgRiskDelta) })}
                   </span>
                 )}
               </span>
@@ -188,7 +189,7 @@ export default async function LeadershipPage() {
                   <li key={r.id} className="flex items-start gap-3 py-2.5">
                     <Pill tone="risk">{tc(`severity.${r.severity}`)}</Pill>
                     <span className="min-w-0 flex-1">
-                      <b className="block truncate text-caption">{r.title}</b>
+                      <b className="block truncate text-caption">{riskTitle(r.title, locale)}</b>
                       <span className="block text-tab text-ink-subtle">
                         {people.get(r.userId)?.departmentName ?? tc("noDepartment")} · {format.dateTime(r.createdAt, { dateStyle: "medium" })}
                       </span>

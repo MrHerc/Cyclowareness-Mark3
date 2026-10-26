@@ -24,7 +24,9 @@ export default async function DemoRequestsPage({ searchParams }: PageProps<"/sup
   const all = await db().select().from(t.demoRequests).orderBy(desc(t.demoRequests.createdAt));
   const list = all.filter((d) => status === "all" || d.status === status);
   const regions = new Intl.DisplayNames([locale, "en"], { type: "region" });
-  const ranges: Record<string, string> = { lt100: "< 100", "100to500": "100–500", "500to2000": "500–2 000", gt2000: "> 2 000" };
+  const languages = new Intl.DisplayNames([locale, "en"], { type: "language" });
+  const n = (x: number) => format.number(x);
+  const ranges: Record<string, string> = { lt100: `< ${n(100)}`, "100to500": `${n(100)}–${n(500)}`, "500to2000": `${n(500)}–${n(2000)}`, gt2000: `> ${n(2000)}` };
 
   return (
     <div className="grid gap-5">
@@ -60,7 +62,7 @@ export default async function DemoRequestsPage({ searchParams }: PageProps<"/sup
                       </a>
                     </p>
                     <p className="mt-1 text-tab text-ink-subtle">
-                      {td("country")}: {regions.of(d.country) ?? d.country} · {td("employees")}: {ranges[d.employees] ?? d.employees} · {d.locale.toUpperCase()} · {td("received", { date: format.dateTime(d.createdAt, { dateStyle: "medium", timeStyle: "short" }) })} · {td("consent", { version: d.consentVersion })}
+                      {td("country")}: {regions.of(d.country) ?? d.country} · {td("employees")}: {ranges[d.employees] ?? d.employees} · {td("language")}: {languages.of(d.locale) ?? d.locale} ·{td("received", { date: format.dateTime(d.createdAt, { dateStyle: "medium", timeStyle: "short" }) })} · {td("consent", { version: d.consentVersion })}
                     </p>
                     {d.message ? <p className="mt-2 rounded-md bg-sunken px-3 py-2 text-caption whitespace-pre-line">{d.message}</p> : null}
                   </div>

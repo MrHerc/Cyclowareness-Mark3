@@ -183,11 +183,3 @@ export async function actionViewer(permission?: Permission): Promise<Viewer> {
   if (permission && twoFactorGap(v)) throw new Error("TWO_FACTOR_REQUIRED");
   return v;
 }
-
-/** For route handlers: the viewer, or the response to send when the checks fail. */
-export async function apiViewer(permission: Permission): Promise<Viewer | Response> {
-  const v = await getViewer();
-  if (!v) return new Response("Unauthorized", { status: 401 });
-  if (!allowed(v, permission) || twoFactorGap(v)) return new Response("Forbidden", { status: 403 });
-  return v;
-}

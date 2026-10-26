@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { getFormatter, getLocale, getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { getAppFormatter } from "@/i18n/server-format";
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Lightbulb, Monitor, Plus, Star } from "lucide-react";
 import { allowed, requireViewer } from "@/server/auth/viewer";
 import { overviewData, setupState } from "@/server/queries/admin";
@@ -14,6 +15,7 @@ import { PageHeader, SortHeader } from "@/components/ui/layout";
 import { Avatar } from "@/components/ui/avatar";
 import { ModuleIcon } from "@/components/learner/module-icon";
 import { CountUp, DepartmentFilter, RemindButton, SetupGuide } from "@/components/admin/overview-client";
+import { QuickActions, type QuickActionKey } from "@/components/admin/quick-actions";
 import { riskBand } from "@/lib/domain/risk";
 import { daysLeftInMonth } from "@/lib/domain/league";
 import type { Category } from "@/lib/domain/catalog";
@@ -59,7 +61,7 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
   if (!allowed(v, "overview.read")) redirect(allowed(v, "leadership.read") ? "/admin/leadership" : "/admin/reports");
   const sp = await searchParams;
   const locale = await getLocale();
-  const [tr, tc, format] = await Promise.all([getTranslations("admin.overview"), getTranslations("common"), getFormatter()]);
+  const [tr, tc, format] = await Promise.all([getTranslations("admin.overview"), getTranslations("common"), getAppFormatter()]);
   const d = await overviewData(v, locale, typeof sp.d === "string" ? sp.d : null);
   const setup = await setupState(v);
   const k = d.kpis;
@@ -102,7 +104,26 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
         actions={<DepartmentFilter departments={d.departments.map((x) => ({ id: x.id, name: x.name }))} label={tr("showFor")} />}
       />
 
-      {!v.tenant.settings.setupHidden && allowed(v, "settings.write") ? <SetupGuide steps={setup} skipped={v.tenant.settings.setupSkipped ?? []} canEdit /> : null}
+      <QuickActions
+        title={tr("quickActions")}
+        actions={(
+          [
+            ["addPerson", allowed(v, "people.write")],
+            ["assign", allowed(v, "assignments.write")],
+            ["aiTraining", allowed(v, "studio.write")],
+            ["campaign", allowed(v, "campaigns.write")],
+            ["reports", allowed(v, "reports.read") && v.tenant.features.has("reports")],
+          ] as [QuickActionKey, boolean][]
+        )
+          .filter(([, ok]) => ok)
+          .map(([key]) => ({ key, label: tr(`quick.${key}`) }))}
+      />
+
+      {!v.tenant.settings.setupHidden && allowed(v, "settings.write") ? (
+        <div data-tour="admin-setup">
+          <SetupGuide steps={setup} skipped={v.tenant.settings.setupSkipped ?? []} canEdit />
+        </div>
+      ) : null}
 
       <section className="grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-line bg-line shadow-xs sm:grid-cols-2 xl:grid-cols-5">
         <div className="bg-surface p-5">
@@ -360,7 +381,7 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
                       {m.rating ? (
                         <span className="inline-flex items-center gap-1 tabular-nums">
                           <Star className="size-4 fill-laurel-500 text-laurel-600" />
-                          {m.rating.toFixed(1)}
+                          {format.number(m.rating, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                         </span>
                       ) : (
                         <span className="text-ink-subtle">—</span>

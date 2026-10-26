@@ -61,7 +61,7 @@ export default async function FeedbackPage({ searchParams }: PageProps<"/admin/f
             <CardHeader title={tr("average")} />
             <CardBody className="grid gap-4 pt-3">
               <div className="flex items-end gap-3">
-                <span className="text-display font-bold tabular-nums">{avg.toFixed(1)}</span>
+                <span className="text-display font-bold tabular-nums">{format.number(avg, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
                 <span className="pb-2">
                   <Stars value={avg} label={tr("stars", { value: Math.round(avg * 10) / 10 })} />
                   <span className="block text-caption text-ink-muted">{tr("count", { count: all.length })}</span>
@@ -89,8 +89,8 @@ export default async function FeedbackPage({ searchParams }: PageProps<"/admin/f
                   <li key={m.id} className="flex items-center gap-3 py-2 text-caption">
                     <span className="min-w-0 flex-1 truncate font-semibold">{m.title}</span>
                     <Stars value={m.avg} label={tr("stars", { value: Math.round(m.avg * 10) / 10 })} />
-                    <span className="w-8 text-right tabular-nums">{m.avg.toFixed(1)}</span>
-                    <span className="w-8 text-right text-ink-subtle tabular-nums">×{m.n}</span>
+                    <span className="w-8 text-right tabular-nums">{format.number(m.avg, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                    <span className="shrink-0 text-right whitespace-nowrap text-ink-subtle tabular-nums">{tr("count", { count: m.n })}</span>
                   </li>
                 ))}
               </ul>

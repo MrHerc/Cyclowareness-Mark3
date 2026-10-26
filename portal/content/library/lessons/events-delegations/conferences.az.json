@@ -1,0 +1,455 @@
+{
+  "id": "conferences",
+  "title": "Konfranslar və nümayəndə heyətləri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Konfranslar və rəsmi görüşlər əlaqə qurmaq üçündür. Amma orada kimsə məlumat da toplaya bilər.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Hədiyyə edilən fleş kartı, pauerbankı və ya qulaqlığı iş kompüterinə qoşmayın. Onlarda zərərli proqram ola bilər.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "usb"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Yaxa kartınızda adınız, vəzifəniz və QR kod var. Onu şəkillərdə göstərməyin, tədbirdən çıxanda isə gizlədin.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "brandRef": "kontakto",
+              "app": "generic",
+              "contact": [
+                {
+                  "text": "Kontakto: yeni paylaşım"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "me",
+                  "body": [
+                    {
+                      "text": "Forumdayam! "
+                    },
+                    {
+                      "text": "Yaxa kartımla foto",
+                      "spot": "badge"
+                    }
+                  ],
+                  "time": "10:15"
+                }
+              ]
+            }
+          },
+          "highlight": "badge"
+        },
+        {
+          "id": "b4",
+          "say": "Hədiyyə edilən hər cihazı əvvəlcə İT dəstəyinə göstərin. Onlar yoxlayıb qərar verəcəklər.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "after-forum",
+      "environment": "desktop",
+      "title": "Forumdan sonra",
+      "intro": "Forumdan qayıtmısınız. Masanızda hədiyyələr, gələnlər qutunuzda isə yeni məktublar var.",
+      "steps": [
+        {
+          "id": "gift-usb",
+          "label": "Qonaq nümayəndə heyətinin hədiyyəsi",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "nc-nordvale",
+            "name": [
+              {
+                "text": "Emekdasliq_teqdimati.pdf"
+              }
+            ],
+            "type": "lnk",
+            "size": "2 KB",
+            "source": [
+              {
+                "text": "USB: NORDVALE (E:)"
+              }
+            ]
+          },
+          "say": "Nümayəndə heyəti təqdimatını sizə fleş kartda verdi.",
+          "actions": [
+            {
+              "id": "plug",
+              "label": "Kompüterə qoş",
+              "kind": "plug-in",
+              "outcome": "risky",
+              "feedback": "Hədiyyə edilən cihazda nə olduğunu bilmirsiniz. Əvvəlcə onu İT dəstəyi yoxlamalıdır."
+            },
+            {
+              "id": "hand-over",
+              "label": "İT dəstəyinə ver",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. İT dəstəyi cihazı ayrıca kompüterdə yoxlayır və lazım olsa, faylı sizə ötürür.",
+              "next": "partner-mail"
+            }
+          ]
+        },
+        {
+          "id": "usb-file",
+          "label": "Fleş kartda bir fayl var",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "nc-nordvale",
+            "name": [
+              {
+                "text": "Emekdasliq_teqdimati.pdf"
+              }
+            ],
+            "type": "lnk",
+            "size": "2 KB",
+            "source": [
+              {
+                "text": "USB: NORDVALE (E:)"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Bu, PDF deyil, qısayoldur. Onu açmaq gizli əmri işə sala bilər."
+            },
+            {
+              "id": "eject",
+              "label": "Cihazı çıxar",
+              "kind": "eject",
+              "outcome": "safe",
+              "feedback": "Düzgün qərar. Faylı açmadan cihazı çıxarın və İT dəstəyinə verin."
+            }
+          ]
+        },
+        {
+          "id": "partner-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "nc-nordvale",
+            "from": {
+              "name": [
+                {
+                  "text": "Stefan Morgan"
+                }
+              ],
+              "address": [
+                {
+                  "text": "s.morgan.nordvale@mail.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Görüşümüz üçün təşəkkür"
+              }
+            ],
+            "time": "10:24",
+            "body": [
+              [
+                {
+                  "text": "Hörmətli həmkar, forumda sizinlə tanış olduğuma çox şadam."
+                }
+              ],
+              [
+                {
+                  "text": "Növbəti görüşümüzü planlaşdırmaq üçün şöbənizin əməkdaşlarının siyahısını vəzifələri və telefon nömrələri ilə birlikdə göndərə bilərsinizmi?"
+                }
+              ],
+              [
+                {
+                  "text": "Rəhbərinizin gələn həftəki iş qrafiki də faydalı olardı."
+                }
+              ]
+            ]
+          },
+          "say": "Forumda tanış olduğunuz qonaq sizə yazır.",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Siyahını və qrafiki göndər",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Əməkdaşların siyahısı və rəhbərin qrafiki növbəti hücum üçün hazır xəritədir. Belə məlumatlar yalnız rəsmi kanallarla və təsdiq alındıqdan sonra verilir."
+            },
+            {
+              "id": "forward",
+              "label": "Rəhbərə və təhlükəsizlik komandasına yönləndir",
+              "kind": "forward",
+              "outcome": "safe",
+              "feedback": "Düzdür. Məktub şəxsi ünvandan gəlib, kənar tərəflərin sorğuları isə rəsmi kanallarla aparılır."
+            },
+            {
+              "id": "official",
+              "label": "Cavab ver: Zəhmət olmasa, rəsmi sorğu göndərin",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Yaxşı. Rəsmi sorğunu səlahiyyətli şəxs yoxlayır və cavablandırır."
+            }
+          ]
+        },
+        {
+          "id": "bt-pair",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Bluetooth: qoşulma sorğusu"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "«Forum Qulaqlığı» bu kompüterə qoşulmaq istəyir."
+                }
+              ],
+              [
+                {
+                  "text": "Kod: 482 913"
+                }
+              ]
+            ],
+            "buttons": [
+              "Rədd et",
+              "Qoşul"
+            ]
+          },
+          "actions": [
+            {
+              "id": "deny",
+              "label": "Rədd et",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Düzdür. Özünüz başlatmadığınız qoşulma sorğusunu heç vaxt qəbul etməyin."
+            },
+            {
+              "id": "allow",
+              "label": "Qoşul",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "Naməlum cihaz özünü klaviatura kimi təqdim edib əmrlər yaza bilər. Belə sorğuları rədd edin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "forum-post",
+      "prompt": "Bu paylaşımda açıqlanmamalı olan məlumatları tapın.",
+      "artifact": {
+        "kind": "chat",
+        "brandRef": "kontakto",
+        "app": "generic",
+        "contact": [
+          {
+            "text": "Kontakto: yeni paylaşım"
+          }
+        ],
+        "messages": [
+          {
+            "from": "me",
+            "body": [
+              {
+                "text": "RəqəmYol Forumundayam! "
+              },
+              {
+                "text": "Yaxa kartımla foto.",
+                "spot": "badge"
+              },
+              {
+                "text": " Sabah saat 10:00-da "
+              },
+              {
+                "text": "nümayəndə heyətimiz nazirliyin 3 saylı binasında görüşür.",
+                "spot": "schedule"
+              },
+              {
+                "text": " Hazırda "
+              },
+              {
+                "text": "Lumera Hotel-də, 512 nömrəli otaqdayam",
+                "spot": "room"
+              },
+              {
+                "text": ", sabah görüşərik!"
+              }
+            ],
+            "time": "21:40"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "badge",
+          "label": "Yaxa kartı",
+          "explain": "Yaxa kartında ad, vəzifə və girişi açan QR kod görünür. Bununla saxta kart hazırlamaq və ya sizi hədəfə almaq olar."
+        },
+        {
+          "id": "schedule",
+          "label": "Görüşün vaxtı və yeri",
+          "explain": "Nümayəndə heyətinin görüş vaxtı və yeri təhlükəsizlik məlumatıdır. Görüşdən sonra da bu barədə yalnız ümumi şəkildə yazın."
+        },
+        {
+          "id": "room",
+          "label": "Otel otağı",
+          "explain": "Otaq nömrəsi kimin harada qaldığını göstərir. Onu heç yerdə paylaşmayın."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "choice",
+      "id": "gift-tablet",
+      "question": {
+        "prompt": "Qonaq nümayəndə heyəti sizə planşet hədiyyə edir. Nə edirsiniz?",
+        "options": [
+          {
+            "id": "register",
+            "label": "Rəhbərimə xəbər verirəm və yoxlamaq üçün İT dəstəyinə təhvil verirəm",
+            "correct": true,
+            "feedback": "Düzdür. Hədiyyə cihaz təşkilatınızın qaydalarına görə yoxlanır və iş şəbəkəsinə yalnız icazə ilə qoşulur."
+          },
+          {
+            "id": "work-mail",
+            "label": "Dərhal iş poçtumu onda quraşdırıram",
+            "correct": false,
+            "feedback": "Yoxlanmamış cihazda casus proqram ola bilər. İş hesablarını yalnız təşkilatınızın cihazlarında açın."
+          },
+          {
+            "id": "home",
+            "label": "Şəxsi istifadə üçün evə aparıram",
+            "correct": false,
+            "feedback": "Cihaz ev şəbəkənizə və şəxsi hesablarınıza da yol aça bilər. Əvvəlcə onu yoxlatdırın."
+          },
+          {
+            "id": "office-wifi",
+            "label": "Yoxlamaq üçün ofisin Wi-Fi şəbəkəsinə qoşuram",
+            "correct": false,
+            "feedback": "Yoxlanmamış cihazı iş şəbəkəsinə qoşmaq daxili sistemlərə yol açır."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "handshake"
+        }
+      },
+      "explain": "Yoxlanana qədər hədiyyə cihaz yad adamın cihazıdır. Rəhbərinizə xəbər verin və onu İT dəstəyinə təhvil verin."
+    },
+    {
+      "type": "scenario",
+      "id": "delegation-visit",
+      "title": "Ofisdə nümayəndə heyəti",
+      "start": "slides",
+      "nodes": [
+        {
+          "id": "slides",
+          "text": "Təqdimatım fleş kartdadır. Kompüterinizə qoşaq?",
+          "speaker": "Qonaq (görüşdə)",
+          "voice": "man",
+          "channel": "in-person",
+          "spoken": "Təqdimatım fleş kartdadır. <breath> Kompüterinizə qoşaq?",
+          "character": "guest",
+          "choices": [
+            {
+              "label": "Gəlin onu İT dəstəyinin hazırladığı ayrıca kompüterdə açaq",
+              "next": "wifi",
+              "feedback": "Düzdür. Qonağın faylları iş kompüterinə və şəbəkəsinə düşmür."
+            },
+            {
+              "label": "Buyurun, vaxt azdır",
+              "outcome": "risky",
+              "feedback": "Kənar fleş kart iş kompüterinə zərərli proqram gətirə bilər. Qonaqlar üçün ayrıca kompüterdən istifadə edin."
+            }
+          ]
+        },
+        {
+          "id": "wifi",
+          "text": "Bir şey də soruşum, ofisin Wi-Fi parolu nədir? Poçtuma baxmalıyam.",
+          "speaker": "Qonaq",
+          "voice": "man",
+          "channel": "in-person",
+          "spoken": "Bir şey də soruşum, ee, ofisin Wi-Fi parolu nədir? Poçtuma baxmalıyam.",
+          "character": "guest",
+          "choices": [
+            {
+              "label": "Qonaq şəbəkəsinə giriş verirəm",
+              "next": "walk",
+              "feedback": "Düzdür. Qonaq şəbəkəsi daxili sistemlərdən ayrıdır."
+            },
+            {
+              "label": "İş şəbəkəsinin parolunu deyirəm",
+              "outcome": "risky",
+              "feedback": "İş şəbəkəsində daxili sistemlər işləyir. Qonaqlara yalnız qonaq şəbəkəsi verilir."
+            }
+          ]
+        },
+        {
+          "id": "walk",
+          "text": "Narahat olmayın, ofisi özüm gəzərəm.",
+          "speaker": "Qonaq (fasilədə)",
+          "voice": "man",
+          "channel": "in-person",
+          "spoken": "Narahat olmayın, <breath> ofisi özüm gəzərəm.",
+          "character": "guest",
+          "choices": [
+            {
+              "label": "Qonağı müşayiət edirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Qonaqlar ofisdə həmişə müşayiətlə gəzir."
+            },
+            {
+              "label": "Qoy gəzsin, qonağımızdır",
+              "outcome": "risky",
+              "feedback": "Müşayiətsiz qonaq açıq otaqları və masalardakı sənədləri görə bilər."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Hədiyyə cihazları qoşmadan İT dəstəyinə təhvil verin.",
+        "Yaxa kartınızı, otaq nömrənizi və iş qrafikinizi paylaşmayın.",
+        "Qonaqlara ayrıca kompüter, qonaq şəbəkəsi və müşayiətçi verilir."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

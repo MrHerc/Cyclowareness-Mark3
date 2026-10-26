@@ -1,0 +1,481 @@
+{
+  "id": "accidental-insider",
+  "title": "Diqqətsizlik səhvləri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ai-tutor",
+      "beats": [
+        {
+          "id": "ai-b1",
+          "say": "Salam! Məlumat sızmalarının çoxu pis niyyətdən deyil, adi bir səhvdən başlayır.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "desk"
+          }
+        },
+        {
+          "id": "ai-b2",
+          "say": "Avtomatik tamamlama səhv ünvanı seçə bilər. Göndərməzdən əvvəl alıcının ünvanına bir daha baxın.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "ispoct",
+              "tone": "system",
+              "title": [
+                {
+                  "text": "Xarici alıcı"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Bu məktub təşkilatdan kənara gedir: "
+                  },
+                  {
+                    "text": "rauf.aliyev@kur-tikinti.example",
+                    "spot": "wrong"
+                  }
+                ],
+                [
+                  {
+                    "text": "Qoşma: Maas_cedveli_2026.xlsx"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Yenə də göndər",
+                "Ləğv et"
+              ]
+            }
+          },
+          "highlight": "wrong"
+        },
+        {
+          "id": "ai-b3",
+          "say": "İş fayllarını şəxsi buluda və ya təşkilatınızın təsdiqləmədiyi tətbiqlərə yükləməyin.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "cloud"
+          }
+        },
+        {
+          "id": "ai-b4",
+          "say": "Səhv etmisinizsə, gizlətməyin. Tez bildirmək zərəri məhdudlaşdırır, gizlətmək isə vəziyyəti ağırlaşdırır.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ai-sim",
+      "environment": "desktop",
+      "title": "Adi iş günü",
+      "intro": "Bu gün bir neçə xahiş daxil olub. Hər biri üçün məlumatı necə qoruyacağınızı seçin.",
+      "steps": [
+        {
+          "id": "personal-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Nigar Əliyeva"
+                }
+              ],
+              "address": [
+                {
+                  "text": "nigar.aliyeva@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Hesabat üçün siyahı"
+              }
+            ],
+            "time": "09:20",
+            "body": [
+              [
+                {
+                  "text": "Salam, bu axşam evdən işləyəcəyəm."
+                }
+              ],
+              [
+                {
+                  "text": "Xahiş edirəm, əməkdaşların siyahısını (FİN kodları, telefon nömrələri) şəxsi poçtuma göndərin: nigar.84@poctam.example"
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "forward",
+              "label": "Siyahını onun şəxsi poçtuna göndər",
+              "kind": "forward",
+              "outcome": "risky",
+              "feedback": "Şəxsi məlumatlar təşkilatınızın nəzarətindən çıxdı. Şəxsi poçt qutusu qorunmur və oradan məlumat sıza bilər."
+            },
+            {
+              "id": "reply",
+              "label": "Cavab ver: şəxsi poçta göndərə bilmərəm",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Düzdür. Evdən işləmək üçün təsdiqlənmiş vasitələrdən, məsələn, VPN üzərindən iş poçtundan istifadə olunur."
+            }
+          ]
+        },
+        {
+          "id": "shadow-it",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "fayldasi",
+            "tone": "app",
+            "title": [
+              {
+                "text": "FaylDaşı: pulsuz fayl ötürmə"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Layihe_smeta.xlsx (2,4 GB) yükləndi."
+                }
+              ],
+              [
+                {
+                  "text": "Linki olan hər kəs faylı yükləyə bilər.",
+                  "spot": "public"
+                }
+              ]
+            ],
+            "buttons": [
+              "Linki kopyala",
+              "Ləğv et"
+            ]
+          },
+          "say": "Fayl e-poçt üçün çox böyük idi, ona görə də pulsuz bir sayt tapdınız.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Linki kopyalayıb tərəfdaşa göndər",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Linki alan hər kəs faylı aça bilər. Təşkilatınızın bu xidmət üzərində heç bir nəzarəti yoxdur."
+            },
+            {
+              "id": "cancel",
+              "label": "Ləğv et və İT dəstəyindən təsdiqlənmiş yolu soruş",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. İT dəstəyi böyük faylı təhlükəsiz göndərməyin təsdiqlənmiş yolunu göstərəcək."
+            }
+          ]
+        },
+        {
+          "id": "wrong-recipient",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Xarici alıcı"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bu məktub təşkilatdan kənara gedir: "
+                },
+                {
+                  "text": "rauf.aliyev@kur-tikinti.example",
+                  "spot": "wrong"
+                }
+              ],
+              [
+                {
+                  "text": "Qoşma: Maas_cedveli_2026.xlsx"
+                }
+              ]
+            ],
+            "buttons": [
+              "Yenə də göndər",
+              "Ləğv et"
+            ]
+          },
+          "say": "Maaş cədvəlini Raufa göndərirsiniz. Ünvanı yoxlayın.",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Yenə də göndər",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Maaş cədvəli kənar şirkətə getdi. Bu, şəxsi məlumatların sızmasıdır."
+            },
+            {
+              "id": "cancel",
+              "label": "Ləğv et və alıcını yoxla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Həmkarınız Rauf Əlizadədir, avtomatik tamamlama isə tərəfdaş şirkətdən Rauf Əliyevi seçib."
+            }
+          ]
+        },
+        {
+          "id": "sent-wrong",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "ispoct",
+            "app": "İşPoçt",
+            "title": [
+              {
+                "text": "Məktub göndərildi"
+              }
+            ],
+            "body": [
+              {
+                "text": "Rüblük hesabat: aysel.quliyeva@poctam.example (şəxsi ünvan)"
+              }
+            ],
+            "time": "16:41"
+          },
+          "say": "Başqa bir məktub artıq səhv ünvana gedib.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Dərhal təhlükəsizlik komandasına bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Nə qədər tez bildirsəniz, məktubu geri çağırmaq və zərəri məhdudlaşdırmaq şansı bir o qədər çox olar."
+            },
+            {
+              "id": "ask",
+              "label": "Alıcıya yaz: xahiş edirəm, silin",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Xahiş etmək yaxşıdır, amma kifayət deyil. Əvvəlcə təhlükəsizlik komandasına bildirin, sonrakı addımları onlar deyəcək."
+            },
+            {
+              "id": "hide",
+              "label": "Heç kimə demə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Gizlədilən səhv böyüyür. Bildirmək peşəkar davranışdır."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "ai-swipe",
+      "prompt": "Təhlükəsizdir, yoxsa riskli?",
+      "cards": [
+        {
+          "id": "badge-photo",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "kontakto",
+            "app": "Kontakto",
+            "title": [
+              {
+                "text": "Paylaşımınız yayımlandı"
+              }
+            ],
+            "body": [
+              {
+                "text": "«İlk iş günüm!» Fotoda vəsiqəniz və ekrandakı daxili sistem görünür."
+              }
+            ],
+            "time": "12:10"
+          },
+          "verdict": "threat",
+          "explain": "Vəsiqə və iş ekranı hücumçulara saxta vəsiqə hazırlamaq və hədəf seçmək üçün lazım olanı verir."
+        },
+        {
+          "id": "portal-share",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Leyla Rzayeva"
+                }
+              ],
+              "address": [
+                {
+                  "text": "leyla.rzayeva@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Smeta paylaşıldı"
+              }
+            ],
+            "time": "10:05",
+            "body": [
+              [
+                {
+                  "text": "Faylı daxili portalda yalnız şöbəmizlə paylaşdım."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Təsdiqlənmiş daxili məkan və məhdud giriş. Paylaşmağın düzgün yolu budur."
+        },
+        {
+          "id": "group-password",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "sohbet",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Ofis qrupu (34 nəfər)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "me",
+                "body": [
+                  {
+                    "text": "Ümumi sistemin parolu: Arxiv#2026"
+                  }
+                ],
+                "time": "09:02"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Qrupda parol çox adama, bəzən kənar şəxslərə də çatır. Parollar heç vaxt paylaşılmır."
+        },
+        {
+          "id": "personal-cloud",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "buludxidmet",
+            "name": [
+              {
+                "text": "Layihe_budce_2027.xlsx"
+              }
+            ],
+            "type": "xls",
+            "size": "1,4 MB",
+            "source": [
+              {
+                "text": "Şəxsi bulud qovluğu: linki olan hər kəs baxa bilər"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Şəxsi buludda iş faylı təşkilatınızın nəzarətindən çıxır, açıq link isə hər kəsi içəri buraxır."
+        },
+        {
+          "id": "locked-screen",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "idare",
+            "app": "İdarə",
+            "title": [
+              {
+                "text": "Ekran kilidləndi"
+              }
+            ],
+            "body": [
+              {
+                "text": "Masanızdan ayrılanda ekranı kilidlədiniz."
+              }
+            ],
+            "time": "13:00"
+          },
+          "verdict": "safe",
+          "explain": "Düzdür. Kilidli ekran kiminsə sizin adınızdan iş görməsinə imkan vermir."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "ai-match",
+      "prompt": "Hər riski düzgün vərdişlə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "autocomplete",
+          "left": "Avtomatik tamamlama",
+          "right": "Göndərməzdən əvvəl alıcını yoxlayın"
+        },
+        {
+          "id": "cloud",
+          "left": "Şəxsi bulud və pulsuz saytlar",
+          "right": "Yalnız təsdiqlənmiş paylaşma vasitələri"
+        },
+        {
+          "id": "photo",
+          "left": "Ofisdən foto paylaşmaq",
+          "right": "Kadrda ekran, vəsiqə və ya sənəd olmasın"
+        },
+        {
+          "id": "sent",
+          "left": "Səhv şəxsə göndərilmiş məktub",
+          "right": "Dərhal təhlükəsizlik komandasına bildirin"
+        }
+      ],
+      "explain": "Bu vərdişlər diqqətsizlikdən yaranan sızmaların çoxunun qarşısını alır."
+    },
+    {
+      "type": "choice",
+      "id": "ai-choice",
+      "question": {
+        "prompt": "Həmkarınız deyir: «Bu pulsuz tətbiq işi sürətləndirir, quraşdır, İT-yə demə». Nə edirsiniz?",
+        "options": [
+          {
+            "id": "ask-it",
+            "label": "Bu tətbiq və ya təsdiqlənmiş alternativ barədə İT dəstəyindən soruşuram",
+            "correct": true,
+            "feedback": "Düzdür. İT dəstəyi tətbiqin təhlükəsiz olub-olmadığını yoxlaya və ya sizə təsdiqlənmiş alternativ təqdim edə bilər."
+          },
+          {
+            "id": "install",
+            "label": "Quraşdırıram, hamı istifadə edir",
+            "correct": false,
+            "feedback": "Yoxlanılmamış tətbiq iş məlumatlarını kənara göndərə bilər. «Hamı istifadə edir» təhlükəsiz demək deyil."
+          },
+          {
+            "id": "home-pc",
+            "label": "Faylları şəxsi noutbukuma köçürüb orada işləyirəm",
+            "correct": false,
+            "feedback": "Bu da kölgə İT-dir: məlumatlar qorunmayan cihaza keçir."
+          }
+        ]
+      },
+      "explain": "Təşkilatınızın təsdiqləmədiyi tətbiq və cihazlara «kölgə İT» (shadow IT) deyilir. Nəyəsə ehtiyacınız varsa, İT dəstəyindən təsdiqlənmiş yolu soruşun."
+    },
+    {
+      "type": "recap",
+      "id": "ai-recap",
+      "points": [
+        "Göndərməzdən əvvəl alıcını yoxlayın",
+        "İş fayllarını yalnız təsdiqlənmiş sistemlərdə saxlayın",
+        "Səhv etmisiniz? Dərhal bildirin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

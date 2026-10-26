@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { desc, eq } from "drizzle-orm";
-import { getFormatter, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
+import { getAppFormatter } from "@/i18n/server-format";
 import { LifeBuoy } from "lucide-react";
 import { hasFeature, requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
@@ -24,7 +25,7 @@ export default async function SupportDeskPage({ searchParams }: PageProps<"/admi
   if (!hasFeature(v, "support")) notFound();
   const sp = await searchParams;
   const status = STATUSES.includes(sp.status as "open") ? (sp.status as (typeof STATUSES)[number]) : "open";
-  const [tr, tn, format] = await Promise.all([getTranslations("secops.support"), getTranslations("admin.nav"), getFormatter()]);
+  const [tr, tn, format] = await Promise.all([getTranslations("secops.support"), getTranslations("admin.nav"), getAppFormatter()]);
   const all = await db().select().from(t.supportTickets).where(eq(t.supportTickets.tenantId, v.tenant.id)).orderBy(desc(t.supportTickets.updatedAt));
   const list = all.filter((x) => status === "all" || x.status === status).sort((a, b) => (status === "open" || status === "in_progress" ? a.slaDueAt.getTime() - b.slaDueAt.getTime() : 0));
   const people = await peopleById(v.tenant.id, list.map((x) => x.userId));

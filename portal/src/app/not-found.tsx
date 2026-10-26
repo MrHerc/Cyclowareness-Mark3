@@ -3,6 +3,11 @@ import { getTranslations } from "next-intl/server";
 import { Compass } from "lucide-react";
 import { BrandMark } from "@/components/brand";
 
+export async function generateMetadata() {
+  const tc = await getTranslations("common");
+  return { title: tc("errors.notFoundTitle") };
+}
+
 export default async function NotFound() {
   const tc = await getTranslations("common");
   return (

@@ -86,9 +86,9 @@ export function Illustration({ id, className }: { id: string; className?: string
   );
 }
 
-export function Stat({ value, label }: { value: string; label: string }) {
+export function Stat({ value, label, lang }: { value: string; label: string; lang?: string }) {
   return (
-    <div className="grid aspect-square w-full max-w-80 place-items-center rounded-full bg-brand-50 p-8 text-center">
+    <div lang={lang} className="grid aspect-square w-full max-w-80 place-items-center rounded-full bg-brand-50 p-8 text-center">
       <div>
         <p className="font-display text-[clamp(2.5rem,7vw,4.5rem)] leading-none font-bold tracking-tight text-brand-600">{value}</p>
         <p className="mt-3 text-body font-semibold text-ink-muted">{label}</p>

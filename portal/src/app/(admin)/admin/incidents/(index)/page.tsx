@@ -63,8 +63,8 @@ export default async function IncidentsPage({ searchParams }: PageProps<"/admin/
                 {i.live && i.status !== "resolved" ? <Pill tone="risk">{tr("live")}</Pill> : null}
                 {i.autoTrainingAt ? (
                   <Pill tone="safe">
-                    <GraduationCap className="size-3.5" />
-                    {format.dateTime(i.autoTrainingAt, { day: "numeric", month: "short" })}
+                    <GraduationCap aria-hidden className="size-3.5" />
+                    {tr("assignedOn", { date: format.dateTime(i.autoTrainingAt, { day: "numeric", month: "short" }) })}
                   </Pill>
                 ) : null}
                 <Pill tone={SEV_TONE[i.severity]}>{tc(`severity.${i.severity}`)}</Pill>

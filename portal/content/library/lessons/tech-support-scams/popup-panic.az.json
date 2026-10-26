@@ -1,0 +1,398 @@
+{
+  "id": "popup-panic",
+  "title": "Ekranda panika",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ts1-tutor",
+      "beats": [
+        {
+          "id": "ts1-b1",
+          "say": "Salam! Bu gün ekranınızda qəfil açılan qorxulu xəbərdarlıqları tanımağı öyrənəcəyik.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "ts1-b2",
+          "say": "Belə pəncərə sizi qorxudub hansısa nömrəyə zəng etdirmək istəyir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2a-sistem-muhafize",
+              "tone": "warning",
+              "title": [
+                {
+                  "text": "Kompüteriniz bloklanıb"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Sistem dörd virus aşkar etdi.",
+                    "spot": "virus"
+                  }
+                ],
+                [
+                  {
+                    "text": "Dəstək xətti: +994 12 000 70 05",
+                    "spot": "phone"
+                  }
+                ]
+              ],
+              "buttons": [
+                "İndi zəng et"
+              ]
+            }
+          },
+          "highlight": "phone"
+        },
+        {
+          "id": "ts1-b3",
+          "say": "Əsl xəbərdarlıq heç vaxt telefon nömrəsi vermir və sizi tələsdirmir.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        },
+        {
+          "id": "ts1-b4",
+          "say": "Qayda sadədir: zəng etməyin, pəncərəni bağlayın, lazım olsa, brauzeri məcburi bağlayın.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "ts1-hotspot",
+      "prompt": "Bu pəncərənin tələ olduğunu göstərən əlamətləri tapın.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2a-sistem-muhafize",
+        "tone": "warning",
+        "title": [
+          {
+            "text": "Diqqət: kompüteriniz bloklanıb"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Sistem dörd virus aşkar etdi və şəxsi məlumatlarınız təhlükədədir."
+            }
+          ],
+          [
+            {
+              "text": "Bu pəncərəni bağlamayın, əks halda bütün fayllarınız silinəcək.",
+              "spot": "dont-close"
+            }
+          ],
+          [
+            {
+              "text": "Dəstək xəttinə indi zəng edin: +994 12 000 70 05",
+              "spot": "phone"
+            }
+          ],
+          [
+            {
+              "text": "Qalan vaxt: 04:58",
+              "spot": "timer"
+            }
+          ]
+        ],
+        "buttons": [
+          "İndi zəng et"
+        ]
+      },
+      "spots": [
+        {
+          "id": "dont-close",
+          "label": "Bağlamaq olmaz",
+          "explain": "Əsl sistem heç vaxt pəncərəni bağlamağı qadağan etmir. Bu, sizi ekran qarşısında saxlamaq üçün qorxutmadır."
+        },
+        {
+          "id": "phone",
+          "label": "Telefon nömrəsi",
+          "explain": "Əməliyyat sistemi ekranda heç vaxt dəstək nömrəsi göstərmir. Bu nömrə fırıldaqçıya məxsusdur."
+        },
+        {
+          "id": "timer",
+          "label": "Geri sayım",
+          "explain": "Taymer sizi tələsdirmək üçündür. Düşünməyə vaxt verməyən xəbərdarlıq saxtadır."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "simulation",
+      "id": "ts1-sim",
+      "environment": "browser",
+      "title": "Xəbər oxuyarkən",
+      "intro": "Xəbər saytını oxuyursunuz və qəfildən pəncərələr açılır. Hər biri üçün düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "popup-appears",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-sistem-muhafize",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Təhlükə aşkarlandı"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Kompüterinizdə zərərli proqram var. Dəstəyə indi zəng edin: +994 12 000 70 05"
+                }
+              ]
+            ],
+            "buttons": [
+              "İndi zəng et",
+              "Skan et"
+            ]
+          },
+          "say": "İndicə qırmızı xəbərdarlıq açıldı.",
+          "actions": [
+            {
+              "id": "close",
+              "label": "Pəncərəni bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Belə pəncərəni sadəcə bağlamaq ən doğru addımdır."
+            },
+            {
+              "id": "call",
+              "label": "Göstərilən nömrəyə zəng et",
+              "kind": "call-back",
+              "outcome": "compromised",
+              "feedback": "Saxta operator sizi daha da qorxudacaq. Bu nömrəyə heç vaxt zəng etməyin."
+            },
+            {
+              "id": "scan",
+              "label": "«Skan et» düyməsinə bas",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Bu düymə daha bir saxta səhifə açır. Pəncərədə heç nəyə toxunmayın."
+            }
+          ]
+        },
+        {
+          "id": "fullscreen-lock",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-sistem-muhafize",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Ekran kilidlənib"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Kompüteri söndürməyin. Bu pəncərəni dəstəksiz bağlasanız, məlumatlarınız itəcək."
+                }
+              ]
+            ],
+            "buttons": [
+              "Dəstəyə zəng et"
+            ]
+          },
+          "say": "İndi pəncərə bütün ekranı tutub və səs çıxarır.",
+          "actions": [
+            {
+              "id": "force-quit",
+              "label": "Brauzeri məcburi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Brauzeri məcburi bağlayanda bu saxta ekran da yox olur."
+            },
+            {
+              "id": "call",
+              "label": "Dəstəyə zəng et",
+              "kind": "call-back",
+              "outcome": "compromised",
+              "feedback": "Səs və tam ekran yalnız sizi qorxutmaq üçündür. Zəng etsəniz, cihazınızı ələ keçirməyə çalışacaqlar."
+            }
+          ]
+        },
+        {
+          "id": "real-update",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Brauzer yeniləməyə hazırdır"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Dəyişikliklərin qüvvəyə minməsi üçün brauzeri yenidən başladın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Sonra",
+              "Yenilə"
+            ]
+          },
+          "say": "Bu, brauzerin öz sakit bildirişidir.",
+          "actions": [
+            {
+              "id": "update",
+              "label": "Yenilə",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əsl yeniləmə sakitdir, nömrə vermir və sizi tələsdirmir."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "safe",
+              "feedback": "Bu da olar. İstədiyiniz vaxt yeniləyə bilərsiniz, heç bir təhlükə yoxdur."
+            },
+            {
+              "id": "call",
+              "label": "Hər ehtimala qarşı dəstəyə zəng et",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "Buna ehtiyac yoxdur. Adi yeniləmə bildirişi heç kimə zəng etməyi tələb etmir."
+            }
+          ]
+        },
+        {
+          "id": "popup-returns",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-sistem-muhafize",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Təhlükə davam edir"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Problem həll olunmayıb. Kömək üçün indi zəng edin."
+                }
+              ]
+            ],
+            "buttons": [
+              "İndi zəng et"
+            ]
+          },
+          "say": "Pəncərəni bağladınız, amma o yenidən açıldı.",
+          "actions": [
+            {
+              "id": "close-all",
+              "label": "Brauzeri tam bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Brauzeri tam bağlayanda bu səhifələr də yox olur."
+            },
+            {
+              "id": "report",
+              "label": "İT dəstəyinə bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Yaxşı addımdır. Öz İT dəstəyinizə zəng edib bu barədə soruşa bilərsiniz."
+            },
+            {
+              "id": "call",
+              "label": "Nömrəyə zəng et",
+              "kind": "call-back",
+              "outcome": "compromised",
+              "feedback": "Pəncərənin yenidən açılması tələnin bir hissəsidir. O nömrəyə zəng etməyin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "ts1-match",
+      "prompt": "Hər əlaməti düzgün reaksiya ilə uyğunlaşdırın.",
+      "pairs": [
+        {
+          "id": "fullscreen",
+          "left": "Bütün ekranı tutan pəncərə",
+          "right": "Brauzeri məcburi bağlayın"
+        },
+        {
+          "id": "phone",
+          "left": "Ekranda dəstək nömrəsi",
+          "right": "Əsl xəbərdarlıq nömrə vermir"
+        },
+        {
+          "id": "timer",
+          "left": "Geri sayan saat",
+          "right": "Vaxt məhdudiyyəti yalandır"
+        },
+        {
+          "id": "sound",
+          "left": "Həyəcan siqnalı və bip səsi",
+          "right": "Sizi qorxutmaq üçündür"
+        }
+      ],
+      "explain": "Bu əlamətlərin hamısı sizi qorxutmaq üçündür. Sakit olun və pəncərəni bağlayın."
+    },
+    {
+      "type": "choice",
+      "id": "ts1-choice",
+      "question": {
+        "prompt": "Ekranda pəncərə açılır və sizdən hansısa nömrəyə zəng etməyi tələb edir. İlk addım nədir?",
+        "options": [
+          {
+            "id": "close",
+            "label": "Pəncərəni bağlayıram, lazım olsa, brauzeri məcburi bağlayıram",
+            "correct": true,
+            "feedback": "Düzdür. Belə xəbərdarlıq zərərsizdir və bağlayanda yox olur."
+          },
+          {
+            "id": "call",
+            "label": "Hər ehtimala qarşı göstərilən nömrəyə zəng edirəm",
+            "correct": false,
+            "feedback": "Bu nömrə fırıldaqçıya məxsusdur. Zəng etsəniz, cihazınızı ələ keçirməyə çalışacaqlar."
+          },
+          {
+            "id": "restart",
+            "label": "Kompüteri dərhal söndürürəm",
+            "correct": false,
+            "feedback": "Buna ehtiyac yoxdur. Pəncərəni və ya brauzeri bağlamaq kifayətdir."
+          }
+        ]
+      },
+      "explain": "Qorxulu pəncərə sizi zəng etməyə məcbur etmək istəyir. Zəng etməyin, sadəcə pəncərəni bağlayın."
+    },
+    {
+      "type": "recap",
+      "id": "ts1-recap",
+      "points": [
+        "Qəfildən açılan qorxulu pəncərəyə inanmayın",
+        "Onun göstərdiyi nömrəyə heç vaxt zəng etməyin",
+        "Pəncərəni bağlayın, lazım olsa, brauzeri məcburi bağlayın"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

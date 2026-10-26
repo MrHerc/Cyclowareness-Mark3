@@ -1,0 +1,417 @@
+{
+  "id": "qr-traps",
+  "title": "QR tələləri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "hidden-link",
+          "say": "Salam! QR kod sadəcə gizlədilmiş linkdir. Ona baxmaqla hara apardığını bilmək olmur.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "qr"
+          }
+        },
+        {
+          "id": "stickers",
+          "say": "Fırıldaqçılar parkomatların, menyuların və afişaların üzərinə öz QR stikerlərini yapışdırırlar.",
+          "mood": "think",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "qr",
+              "caption": [
+                {
+                  "text": "ShaharPark. Ödəmək üçün skan edin"
+                }
+              ],
+              "destination": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "seherpark-odenis.info",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/pay"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "check-domain",
+          "say": "Telefonunuz kodu oxuyanda ünvanı göstərir. Açmazdan əvvəl domeni yoxlayın: o, həqiqətən həmin təşkilata məxsusdurmu?",
+          "mood": "talk",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "qr",
+              "caption": [
+                {
+                  "text": "ShaharPark. Ödəmək üçün skan edin"
+                }
+              ],
+              "destination": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "seherpark-odenis.info",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/pay"
+                }
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "email-qr",
+          "say": "Məktubdakı QR kod da tələ ola bilər. Açılan səhifə parolunuzu və ya kart məlumatlarınızı istəyirsə, dayanın.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "scan-or-not",
+      "prompt": "Hansı QR kodları açmaq təhlükəsizdir?",
+      "cards": [
+        {
+          "id": "parking-fine",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Parkomat. Cəriməniz var, skan edib ödəyin"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://seherpark-cerime.info/pay"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Cərimələr stikerlər vasitəsilə toplanmır. Cərimələri yalnız rəsmi portalda və ya tətbiqdə yoxlayın."
+        },
+        {
+          "id": "cafe-menu",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "«Çinar» çayxanası. Menyu"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://cinar-cayxana.az/menyu"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Domen çayxananın adına uyğundur və səhifə yalnız menyunu göstərir. Heç nə istənmir."
+        },
+        {
+          "id": "mfa-email",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Hesabınızın təsdiq müddəti bitir. Yeniləmək üçün skan edin"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://rxagentlik-login.info/verify"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Hesabı təsdiqləmək üçün QR kod göndərilən məktub klassik tələdir. Portalı özünüz əlfəcindən açın."
+        },
+        {
+          "id": "certificate-check",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "DövlətPortal arayışı. Həqiqiliyini yoxlayın"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://dovletportal.az/yoxla/7F3K2"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Kod sənədi verən portalın öz ünvanına aparır və heç bir məlumat istəmir."
+        },
+        {
+          "id": "free-wifi",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Pulsuz Wi-Fi. Qoşulmaq üçün skan edin"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://free-wifi-baku.top/login?card=1"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Pulsuz internet üçün heç vaxt kart lazım olmur. Naməlum domen və kart tələbi birlikdə tələ deməkdir."
+        },
+        {
+          "id": "donation",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Uşaqlara kömək edin. İanə üçün skan edin"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://qisalt.info/x7Qa"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Qısaldılmış link əsl ünvanı gizlədir. İanəni yalnız xeyriyyə təşkilatının rəsmi saytında edin."
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "email-qr",
+      "prompt": "Bu məktubda şübhəli yerləri tapın.",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": [
+            {
+              "text": "İT dəstəyi"
+            }
+          ],
+          "address": [
+            {
+              "text": "it-destek@rxagentlik-support.info",
+              "spot": "sender"
+            }
+          ]
+        },
+        "to": "aynur.mammadova@rxagentlik.az",
+        "subject": [
+          {
+            "text": "TƏCİLİ: ",
+            "spot": "urgent"
+          },
+          {
+            "text": "iki addımlı doğrulamanı yeniləyin"
+          }
+        ],
+        "time": "09:12",
+        "body": [
+          [
+            {
+              "text": "Hörmətli həmkar,"
+            }
+          ],
+          [
+            {
+              "text": "Təhlükəsizlik sistemimiz yenilənir. "
+            },
+            {
+              "text": "24 saat ərzində təsdiqləməsəniz, hesabınız bloklanacaq.",
+              "spot": "threat"
+            }
+          ],
+          [
+            {
+              "text": "Aşağıdakı QR kodu telefonunuzla skan edin.",
+              "spot": "qr"
+            }
+          ],
+          [
+            {
+              "text": "Hörmətlə, İT dəstəyi"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender",
+          "label": "Yad domen",
+          "explain": "Göndərənin domeni bizim deyil: bu, rxagentlik.az deyil."
+        },
+        {
+          "id": "urgent",
+          "label": "Təcililik",
+          "explain": "«Təcili» sözü sizi düşünmədən hərəkət etməyə təhrik edir."
+        },
+        {
+          "id": "threat",
+          "label": "Hədə",
+          "explain": "Bloklama hədəsi sizə təzyiq göstərmək üçündür. Əsl dəstək xidməti nadir hallarda belə yazır."
+        },
+        {
+          "id": "qr",
+          "label": "QR kod",
+          "explain": "QR kod linki poçt filtrindən gizlədir və sizi daha zəif qorunan telefona keçməyə yönəldir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "fine-notice",
+      "question": {
+        "prompt": "Avtomobilinizin ön şüşəsində QR kodlu cərimə bildirişi var. Nə edirsiniz?",
+        "options": [
+          {
+            "id": "scan-pay",
+            "label": "Skan edib dərhal ödəyirəm",
+            "correct": false,
+            "feedback": "Saxta səhifə kart məlumatlarınızı oğurlaya bilər."
+          },
+          {
+            "id": "official",
+            "label": "Cəriməni özüm rəsmi portalda yoxlayıram",
+            "correct": true,
+            "feedback": "Düzdür. Cərimə həqiqidirsə, orada görünəcək."
+          },
+          {
+            "id": "call-number",
+            "label": "Bildirişdəki nömrəyə zəng edirəm",
+            "correct": false,
+            "feedback": "Bu nömrə də fırıldaqçılara məxsus ola bilər."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Cərimə bildirişi. 3 gün ərzində ödəyin"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://seherpark-cerime.info/odenis"
+              }
+            ]
+          }
+        }
+      },
+      "explain": "Bildirişdəki heç bir əlaqə vasitəsinə etibar etməyin. Rəsmi kanalı özünüz açın."
+    },
+    {
+      "type": "scenario",
+      "id": "payment-sticker",
+      "title": "Ödəniş stikeri",
+      "start": "counter",
+      "nodes": [
+        {
+          "id": "counter",
+          "text": "Kafenin kassasında sürətli ödəniş üçün QR stiker var. Stiker bir az əyri yapışdırılıb.",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "qr",
+              "caption": [
+                {
+                  "text": "Sürətli ödəniş"
+                }
+              ],
+              "destination": [
+                {
+                  "text": "https://sahilpay-odenis.top/p/1942"
+                }
+              ]
+            }
+          },
+          "choices": [
+            {
+              "label": "Skan et, amma əvvəlcə ünvanı yoxla",
+              "next": "address",
+              "feedback": "Yaxşı başlanğıc. Ünvanı yoxlamaq vacibdir."
+            },
+            {
+              "label": "Skan et və dərhal ödə",
+              "outcome": "compromised",
+              "feedback": "Ünvan saxta idi. Kart məlumatlarınız fırıldaqçıların əlinə keçdi."
+            },
+            {
+              "label": "Kassirdən stikerin onlara aid olub-olmadığını soruş",
+              "next": "cashier",
+              "feedback": "Əla fikir. Soruşmaq ən sadə yoxlamadır."
+            }
+          ]
+        },
+        {
+          "id": "address",
+          "text": "Telefonunuz ünvanı göstərir: sahilpay-odenis.top. Kafenin adı heç yerdə yoxdur.",
+          "choices": [
+            {
+              "label": "Yenə də ödə, tələsirəm",
+              "outcome": "compromised",
+              "feedback": "Tələsik edilən ödəniş fırıldaqçıya getdi. Qəribə ünvan kifayət qədər xəbərdarlıq idi."
+            },
+            {
+              "label": "Açma və kassirə xəbər ver",
+              "next": "cashier",
+              "feedback": "Düzgün qərar."
+            }
+          ]
+        },
+        {
+          "id": "cashier",
+          "text": "Bu, bizim stikerimiz deyil! Zəhmət olmasa, terminalda kartla ödəyin.",
+          "speaker": "Kassir",
+          "voice": "young-woman",
+          "channel": "in-person",
+          "manner": "firm",
+          "spoken": "Bu, bizim stikerimiz deyil! <short pause> Zəhmət olmasa, terminalda kartla ödəyin.",
+          "choices": [
+            {
+              "label": "Terminalda ödə",
+              "outcome": "safe",
+              "feedback": "Əla. Həm özünüzü, həm də sonrakı müştəriləri qorudunuz."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "QR kod gizlədilmiş linkdir: açmazdan əvvəl ünvanı yoxlayın.",
+        "Cərimələri və digər ödənişləri yalnız rəsmi kanallarla edin.",
+        "QR kodla açılan səhifədə heç vaxt parol və ya kart məlumatı daxil etməyin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

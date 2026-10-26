@@ -1,0 +1,441 @@
+{
+  "id": "links-cloud",
+  "title": "Ссылки и облачные папки",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Облачные папки удобны, но одна неверная настройка может открыть файл всему интернету.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "cloud"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "При настройке «Все, у кого есть ссылка» файл смогут открыть и посторонние, если ссылку кому-то передадут.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "rxagentlik-disk",
+              "url": [
+                {
+                  "text": "https://disk.rxagentlik.az/qovluq/budce-2027?paylasim="
+                },
+                {
+                  "text": "hamiya-acik",
+                  "spot": "public"
+                }
+              ]
+            }
+          },
+          "highlight": "public"
+        },
+        {
+          "id": "b3",
+          "say": "Правильная настройка: только указанные люди, доступ на просмотр и ограниченный срок.",
+          "mood": "talk",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Не загружайте рабочие файлы в личное облако. Там организация не сможет их защитить или восстановить.",
+          "mood": "think",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "share-folder",
+      "environment": "browser",
+      "title": "Поделитесь файлом",
+      "intro": "Нужно отправить проект бюджета внешнему партнёру. Настройте доступ сами на облачном диске.",
+      "steps": [
+        {
+          "id": "file-page",
+          "label": "Проект бюджета 2027.xlsx",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "rxagentlik-disk",
+            "url": [
+              {
+                "text": "https://disk.rxagentlik.az/fayllar/Budce_layihesi_2027.xlsx",
+                "reveal": "rxagentlik.az"
+              }
+            ]
+          },
+          "say": "Как вы поделитесь файлом?",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Поделиться",
+              "kind": "share",
+              "outcome": "safe",
+              "feedback": "Хорошо, файл остаётся на рабочем диске. Теперь посмотрите на настройки доступа."
+            },
+            {
+              "id": "personal",
+              "label": "Перенести в личное облако",
+              "kind": "open",
+              "outcome": "risky",
+              "feedback": "Личная учётная запись находится вне контроля организации. Рабочие файлы должны оставаться на рабочем диске."
+            }
+          ]
+        },
+        {
+          "id": "who-can-open",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Поделиться: Проект бюджета 2027.xlsx"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Кто может открыть файл?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Все, у кого есть ссылка",
+              "Только указанные люди"
+            ]
+          },
+          "actions": [
+            {
+              "id": "named",
+              "label": "Только указанные люди",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Правильно. Файл откроется только у тех, кого вы выбрали."
+            },
+            {
+              "id": "anyone",
+              "label": "Все, у кого есть ссылка",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Ссылку могут переслать, или она попадёт не туда. Тогда файл сможет открыть кто угодно."
+            }
+          ]
+        },
+        {
+          "id": "rights",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Кому и как?"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Получатель: e.rzayev@merkez-konsalting.example"
+                }
+              ],
+              [
+                {
+                  "text": "Доступ: просмотр или редактирование"
+                }
+              ],
+              [
+                {
+                  "text": "Срок: 7 дней или бессрочно"
+                }
+              ]
+            ],
+            "buttons": [
+              "Редактирование, бессрочно",
+              "Просмотр, 7 дней"
+            ]
+          },
+          "actions": [
+            {
+              "id": "view",
+              "label": "Просмотр, 7 дней",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Отлично. Партнёр может смотреть файл, но не менять его, а доступ закончится через неделю."
+            },
+            {
+              "id": "edit",
+              "label": "Редактирование, бессрочно",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Партнёру не нужно редактировать файл, а бессрочный доступ останется открытым годами."
+            }
+          ]
+        },
+        {
+          "id": "fake-share",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "rxagentlik-disk-fake",
+            "brand": "RXAgentlik Disk",
+            "url": [
+              {
+                "text": "https://rxagentlik-disk.example.net/giris",
+                "reveal": "rxagentlik-disk.example.net"
+              }
+            ],
+            "fields": [
+              "Электронная почта",
+              "Пароль"
+            ],
+            "button": "Войти"
+          },
+          "say": "Через час открывается страница с общим файлом. Проверьте адрес.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Войти",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Это не домен вашего рабочего диска. Общий файл — лишь предлог, чтобы украсть пароль."
+            },
+            {
+              "id": "close",
+              "label": "Закрыть вкладку",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Правильно. Открывайте общие файлы только на disk.rxagentlik.az."
+            },
+            {
+              "id": "report",
+              "label": "Сообщить о сайте",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Отлично. Сообщив о поддельной странице, вы защищаете и коллег."
+            }
+          ]
+        },
+        {
+          "id": "old-links",
+          "label": "Мои общие файлы: 4 файла открыты для всех",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "rxagentlik-disk",
+            "url": [
+              {
+                "text": "https://disk.rxagentlik.az/paylasimlar",
+                "reveal": "rxagentlik.az"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "close-links",
+              "label": "Закрыть открытые ссылки",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Правильно. Закрывать доступ, который больше не нужен, — самая простая защита."
+            },
+            {
+              "id": "later",
+              "label": "Позже",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Каждый день, пока ссылка открыта, — это новый риск."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "link-settings",
+      "prompt": "Безопасна ли эта настройка доступа?",
+      "cards": [
+        {
+          "id": "anyone-forever",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Настройка доступа"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Таблица зарплат: все, у кого есть ссылка, редактирование, бессрочно"
+                }
+              ]
+            ],
+            "buttons": [
+              "Готово"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Конфиденциальный файл открыт для всех и без срока. Если ссылка разойдётся, отменить это уже не получится."
+        },
+        {
+          "id": "named-week",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Настройка доступа"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Отчёт по проекту: 2 человека, просмотр, 7 дней"
+                }
+              ]
+            ],
+            "buttons": [
+              "Готово"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Доступ только у двух человек, только просмотр и ограниченный срок. Это правильная настройка."
+        },
+        {
+          "id": "whole-org",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Настройка доступа"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Кадровый список: вся организация"
+                }
+              ]
+            ],
+            "buttons": [
+              "Готово"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Конфиденциальный документ предназначен не для всей организации, а только для указанных людей."
+        },
+        {
+          "id": "public-ad",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Настройка доступа"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Объявление о вакансии: все, у кого есть ссылка"
+                }
+              ]
+            ],
+            "buttons": [
+              "Готово"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Объявление общедоступно и уже есть на сайте. Здесь открытая ссылка допустима."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "who-needs-what",
+      "prompt": "Подберите правильную настройку для каждой задачи.",
+      "pairs": [
+        {
+          "id": "partner",
+          "left": "Партнёру нужно прочитать документ",
+          "right": "Просмотр, для указанного человека, 7 дней"
+        },
+        {
+          "id": "coauthor",
+          "left": "Коллега пишет документ вместе с вами",
+          "right": "Редактирование, только для этого человека"
+        },
+        {
+          "id": "public",
+          "left": "Объявление, опубликованное на сайте",
+          "right": "Открытая ссылка для всех"
+        }
+      ],
+      "explain": "Давайте минимально необходимый доступ: продумайте, кому, с какими правами и на какой срок."
+    },
+    {
+      "type": "choice",
+      "id": "personal-cloud",
+      "question": {
+        "prompt": "Можно ли загрузить конфиденциальный файл в личное облако, чтобы поработать из дома?",
+        "options": [
+          {
+            "id": "strong",
+            "label": "Да, у меня надёжный пароль",
+            "correct": false,
+            "feedback": "Надёжный пароль не возвращает файл под контроль организации."
+          },
+          {
+            "id": "work",
+            "label": "Нет, я пользуюсь рабочим диском или способом, который разрешает организация",
+            "correct": true,
+            "feedback": "Правильно. На рабочем диске файл защищён, и его можно восстановить."
+          },
+          {
+            "id": "delete-later",
+            "label": "Да, потом удалю",
+            "correct": false,
+            "feedback": "Удалённый файл часто остаётся в корзине и на других устройствах."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "cloud"
+        }
+      },
+      "explain": "Рабочие файлы должны оставаться в рабочих системах. Если сомневаетесь, спросите ИТ-поддержку."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Никогда не используйте «Все, у кого есть ссылка» для конфиденциальных файлов.",
+        "Делитесь только с указанными людьми, только на просмотр и с ограниченным сроком.",
+        "Регулярно закрывайте доступ к старым общим файлам."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

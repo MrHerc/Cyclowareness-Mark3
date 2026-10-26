@@ -1,0 +1,498 @@
+{
+  "id": "fake-video-call",
+  "title": "Saxta video zəng",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "live-fake",
+          "say": "Artıq video zəngdə canlı saxta üz də ola bilər. O, danışır, gülümsəyir və əsl insan kimi görünür.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          }
+        },
+        {
+          "id": "traces",
+          "say": "Bəzən üzün kənarları bulanıq olur, dodaqlar səslə üst-üstə düşmür. Amma yaxşı saxta görüntü bu izləri gizlədir.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "the-ask",
+          "say": "Gözlərinizə yox, qaydaya etibar edin: sizdən pul, kod və ya sənəd istənirsə, başqa yolla yoxlayın.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "rule",
+          "say": "Zəngi bitirin və həmin şəxsin bildiyiniz nömrəsinə özünüz zəng edin.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "colleague-video",
+      "environment": "phone",
+      "title": "Həmkardan video zəng",
+      "intro": "Həmkarınız sizə yazır, sonra video zəng edir. Hər addımda qərar verin.",
+      "steps": [
+        {
+          "id": "new-account",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Aynur Guliyeva (yeni hesab)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam! Köhnə hesabım bağlandı, bu, yeni hesabımdır.",
+                    "spot": "new"
+                  }
+                ],
+                "time": "16:40"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "İndi sizə video zəng edirəm, təcili bir sənəd lazımdır.",
+                    "spot": "urgent"
+                  }
+                ],
+                "time": "16:40"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "wait",
+              "label": "Yaxşı, gözləyirəm",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Yeni hesabın özü xəbərdarlıq əlamətidir. Əvvəlcə köhnə nömrəyə zəng edib yoxlamaq daha yaxşıdır."
+            },
+            {
+              "id": "verify",
+              "label": "Əvvəlcə köhnə nömrənizə zəng edəcəyəm",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğrudur. «Yeni hesab» hekayəsi yoxlamağınızın qarşısını almaq üçündür.",
+              "next": "real-aynur"
+            }
+          ]
+        },
+        {
+          "id": "video-ring",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Aynur Guliyeva (yeni hesab)"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 55 000 62 19"
+              }
+            ],
+            "label": "Video zəng",
+            "voice": "young-woman"
+          },
+          "say": "Ekranda Aynurun üzü görünür.",
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab ver",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Cavab vermək hələ ziyan vurmur. Əsas məsələ onun sizdən nə istəyəcəyidir."
+            },
+            {
+              "id": "decline",
+              "label": "Rədd et",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olar. Aynurun bildiyiniz nömrəsinə özünüz zəng edin.",
+              "next": "real-aynur"
+            }
+          ]
+        },
+        {
+          "id": "the-ask",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Aynur Guliyeva (yeni hesab)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Məni gördünüz, həqiqətən mənəm. Vətəndaş müraciətlərinin siyahısını bura göndərin, rəis gözləyir."
+                  }
+                ],
+                "time": "16:44"
+              }
+            ]
+          },
+          "say": "Zəngdən sonra xahiş gəlir.",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Faylı göndər",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Video saxta idi və siyahı fırıldaqçıya getdi. Üz sübut deyil, başqa yolla yoxlayın."
+            },
+            {
+              "id": "verify",
+              "label": "Əvvəlcə həmişəki nömrənizə zəng edəcəyəm",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğrudur. Əsl həmkar yoxlamanı başa düşər."
+            },
+            {
+              "id": "report",
+              "label": "Bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Yaxşı addım. Hesabdan şikayət edin və təhlükəsizlik komandasına da bildirin."
+            }
+          ]
+        },
+        {
+          "id": "real-aynur",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Aynur Quliyeva"
+              }
+            ],
+            "messages": [
+              {
+                "from": "me",
+                "body": [
+                  {
+                    "text": "Aynur, indicə mənə video zəng etdiniz?"
+                  }
+                ],
+                "time": "16:47"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Xeyr! İclasdayam. Kimsə mənim adımdan yazır?"
+                  }
+                ],
+                "time": "16:48"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Təhlükəsizlik komandasına bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Onlar digər həmkarları da xəbərdar edəcəklər."
+            },
+            {
+              "id": "delete",
+              "label": "Yazışmanı sil və unut",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Fırıldaqçı başqa həmkarı sınayacaq. Bildirmək hamını qoruyur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "reliable-checks",
+      "question": {
+        "prompt": "Video zəngdə kimin olduğunu hansı yoxlamalar etibarlı şəkildə təsdiqləyir?",
+        "options": [
+          {
+            "id": "callback",
+            "label": "Bildiyiniz nömrəyə özünüz zəng etmək",
+            "correct": true,
+            "feedback": "Bu zəngi özünüz edirsiniz, ona görə fırıldaqçı ona nəzarət edə bilmir."
+          },
+          {
+            "id": "code-word",
+            "label": "Razılaşdığınız yoxlama sözü",
+            "correct": true,
+            "feedback": "Saxta görüntü bu sözü bilmir."
+          },
+          {
+            "id": "face",
+            "label": "Üz və səs tanışdır",
+            "correct": false,
+            "feedback": "Üzü və səsi saxtalaşdırmaq olar."
+          },
+          {
+            "id": "quality",
+            "label": "Görüntü aydındır",
+            "correct": false,
+            "feedback": "Aydın görüntü heç nəyi sübut etmir. Saxta görüntü də aydın ola bilər."
+          },
+          {
+            "id": "account",
+            "label": "Zəng tanış adlı hesabdan gəlir",
+            "correct": false,
+            "feedback": "Hesabı ələ keçirmək və ya saxta hesab yaratmaq olar."
+          }
+        ],
+        "multi": true,
+        "visual": {
+          "kind": "illustration",
+          "id": "deepfake"
+        }
+      },
+      "explain": "Etibarlı sübut görüntüdə deyil, özünüz başlatdığınız ikinci əlaqədədir."
+    },
+    {
+      "type": "swipe",
+      "id": "follow-or-check",
+      "prompt": "Bu xahiş normaldır, yoxsa təhlükəli?",
+      "cards": [
+        {
+          "id": "card-code",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Tural (qohum)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Məni videoda gördün, mənəm. Kartına indicə gələn kodu de, bilet üçündür."
+                  }
+                ],
+                "time": "20:15"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Heç kim, hətta qohumunuz da, kart kodunuzu istəməməlidir. Video sübut deyil."
+        },
+        {
+          "id": "meeting",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Səbinə Əliyeva"
+                }
+              ],
+              "address": [
+                {
+                  "text": "s.aliyeva@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Sabah saat 10:00-da komanda görüşü"
+              }
+            ],
+            "time": "11:05",
+            "body": [
+              [
+                {
+                  "text": "Görüşün linki daxili təqvimdədir. Gündəlik əlavə olunmayıb, sadəcə vaxtı qeyd edin."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Adi görüş dəvətidir: domen agentliyə məxsusdur və heç nə istənmir."
+        },
+        {
+          "id": "hr-video",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "İnsan resursları"
+                }
+              ],
+              "address": [
+                {
+                  "text": "hr@idare-hr.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Maaş kartının yenilənməsi"
+              }
+            ],
+            "time": "09:30",
+            "body": [
+              [
+                {
+                  "text": "15 dəqiqəlik video görüşə qoşulun və kartınızı kameraya göstərin."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Heç bir şöbə kartınızı kameraya göstərməyinizi istəmir. Domen də agentliyə məxsus deyil."
+        },
+        {
+          "id": "operator",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "kehkesan-mobil",
+            "sender": [
+              {
+                "text": "Kehkesan"
+              }
+            ],
+            "time": "13:10",
+            "messages": [
+              [
+                {
+                  "text": "Balansınız 5 manatdan azdır. Artırmaq üçün mobil tətbiqdən istifadə edin."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Nə link, nə də kod istənir. Operatorun adi bildirişidir."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "abroad-relative",
+      "title": "Xaricdən video zəng",
+      "start": "call",
+      "nodes": [
+        {
+          "id": "call",
+          "text": "Salam! Gömrükdə məni saxlayıblar, telefonumu da götürüblər. Dostumun hesabından zəng edirəm. 1200 manat göndər, qaytararam.",
+          "speaker": "Tural videoda",
+          "voice": "man-3",
+          "channel": "video",
+          "manner": "worried",
+          "spoken": "Salam! <breath> Gömrükdə məni saxlayıblar, telefonumu da götürüblər. Dostumun hesabından zəng edirəm. 1200 manat göndər, ee, qaytararam.",
+          "character": "tural",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          },
+          "choices": [
+            {
+              "label": "Pulu dərhal göndərirəm",
+              "outcome": "compromised",
+              "feedback": "Pul fırıldaqçıya getdi. Başqasının hesabı və təcili pul tələbi xəbərdarlıq əlamətidir."
+            },
+            {
+              "label": "Yoxlama sözümüzü soruşuram",
+              "next": "dodge",
+              "feedback": "Yaxşı addım. Görək nə deyəcək."
+            },
+            {
+              "label": "Əvvəlcə ailədən soruşub yoxlayacağımı deyirəm",
+              "next": "check",
+              "feedback": "Düzdür. Bildiyiniz nömrələrə zəng edib yoxlayın."
+            }
+          ]
+        },
+        {
+          "id": "dodge",
+          "text": "Xətt pisdir, səni eşitmirəm... Vaxt yoxdur, tez göndər!",
+          "speaker": "Tural videoda (görüntü donur)",
+          "voice": "man-3",
+          "channel": "video",
+          "manner": "worried",
+          "spoken": "Xətt pisdir, səni eşitmirəm... <short pause> Vaxt yoxdur, tez göndər!",
+          "character": "tural",
+          "choices": [
+            {
+              "label": "Yaxşı, göndərirəm",
+              "outcome": "compromised",
+              "feedback": "«Xətt pisdir» bəhanəsi sualınızdan yayınmaq üçündür. Yoxlama sözü yoxdursa, pul da yoxdur."
+            },
+            {
+              "label": "Zəngi bitirib ailəyə zəng edirəm",
+              "next": "check",
+              "feedback": "Düzgün qərar."
+            }
+          ]
+        },
+        {
+          "id": "check",
+          "text": "Turalın həyat yoldaşı deyir ki, o, bu gün işdədir və telefonu da yanındadır.",
+          "choices": [
+            {
+              "label": "Polisə bildirirəm və ailəni xəbərdar edirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Fırıldaqçı ailənin digər üzvlərini də sınaya bilər."
+            },
+            {
+              "label": "Heç nə etmirəm, axı pul itməyib",
+              "outcome": "risky",
+              "feedback": "Fırıldaqçı yenidən cəhd edəcək. Ailəni xəbərdar etmək hamını qoruyur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Videodakı üz və səs sübut deyil.",
+        "Pul, kod və ya sənəd istəyirlər? Özünüz geri zəng edin.",
+        "Saxta zəngi təhlükəsizlik komandasına və ya polisə bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

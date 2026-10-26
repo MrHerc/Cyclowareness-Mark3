@@ -1,19 +1,23 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { eq, sql } from "drizzle-orm";
-import { Gamepad2, Inbox, KeyRound, Link2, Play, ShieldCheck, Sparkles, Info } from "lucide-react";
+import { Gamepad2, GlobeLock, Inbox, KeyRound, Link2, MailWarning, Monitor, Play, ShieldCheck, Sparkles, SquareTerminal, Info } from "lucide-react";
 import { db, t } from "@/server/db";
 import { requireFeature } from "@/server/auth/viewer";
 import { GAMES } from "@/server/lab/games";
+import { LAB_MAX, VM_LAB_IDS, VM_LABS } from "@/components/lab/model/labs";
 import { Notice, PageHeader } from "@/components/ui/layout";
 import { Pill } from "@/components/ui/pill";
 
-const ICON = { "inbox-triage": Inbox, "link-detective": Link2, "password-forge": KeyRound, "mfa-fatigue": ShieldCheck } as const;
+const ICON = { "inbox-triage": Inbox, "link-detective": Link2, "password-forge": KeyRound, "mfa-fatigue": ShieldCheck, "phishing-anatomy": MailWarning, "process-hunt": SquareTerminal, "fake-signin": GlobeLock } as const;
 const TINT = {
   "inbox-triage": "from-[#efe9ff] bg-[#6d28d9]",
   "link-detective": "from-[#e3f6fb] bg-[#0891b2]",
   "password-forge": "from-[#f3f6dc] bg-[#65a30d]",
   "mfa-fatigue": "from-[#ffece3] bg-[#ea580c]",
+  "phishing-anatomy": "from-[#e6edff] bg-[#1d4ed8]",
+  "process-hunt": "from-[#e9ecf2] bg-[#0f172a]",
+  "fake-signin": "from-[#e2f6f3] bg-[#0f766e]",
 } as const;
 
 export async function generateMetadata() {
@@ -25,11 +29,13 @@ export default async function LabPage() {
   const v = await requireFeature("lab");
   const tr = await getTranslations("learner.lab");
   const best = await db()
-    .select({ exercise: t.labAttempts.exercise, score: sql<number>`max(${t.labAttempts.score})` })
+    .select({ exercise: t.labAttempts.exercise, score: sql<number>`max(${t.labAttempts.score})`, share: sql<number>`max(${t.labAttempts.score}::float / nullif(${t.labAttempts.max}, 0))` })
     .from(t.labAttempts)
     .where(eq(t.labAttempts.userId, v.user.id))
     .groupBy(t.labAttempts.exercise);
   const bestMap = new Map(best.map((b) => [b.exercise, Number(b.score)]));
+  // Machine labs are scored in points out of 100; the share keeps older rows with another maximum comparable.
+  const bestShare = new Map(best.map((b) => [b.exercise, Number(b.share)]));
   return (
     <div className="grid gap-6">
       <PageHeader title={tr("title")} subtitle={tr("sub")} icon={<Gamepad2 />} />
@@ -68,6 +74,48 @@ export default async function LabPage() {
                   <span className="inline-flex items-center gap-1.5 rounded-pill bg-brand-600 px-3.5 py-2 text-caption font-semibold text-brand-on">
                     <Play className="size-3.5 fill-current" />
                     {tr("play")}
+                  </span>
+                </div>
+              </Link>
+            </li>
+          );
+        })}
+        {VM_LAB_IDS.map((g) => {
+          const Icon = ICON[g];
+          const [from, chip] = TINT[g].split(" ");
+          const b = bestShare.get(g);
+          return (
+            <li key={g}>
+              <Link href={`/lab/${g}`} className={`group flex h-full flex-col rounded-xl border border-line bg-gradient-to-br ${from} to-surface to-45% p-5 shadow-xs transition-shadow hover:shadow-raised`}>
+                <div className="flex items-start gap-3">
+                  <span className={`grid size-12 shrink-0 place-items-center rounded-md text-white shadow-raised ${chip}`}>
+                    <Icon className="size-6" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-body font-bold">{tr(`games.${g}.title`)}</p>
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      <Pill tone="cyan">
+                        <Monitor />
+                        {tr("vm.badge")}
+                      </Pill>
+                      <Pill>{tr(`games.${g}.tag`)}</Pill>
+                      <Pill tone="violet">
+                        <Sparkles />
+                        {tr("xp", { xp: VM_LABS[g].xp })}
+                      </Pill>
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-3 flex-1 text-body-sm text-ink-muted">{tr(`games.${g}.body`)}</p>
+                {/* Wraps as a whole: when the longer "start lab" label leaves no room, the button moves under the meta line instead of breaking it. */}
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                  <span className="text-caption text-ink-subtle">
+                    {tr("vm.objectives", { count: VM_LABS[g].objectives })}
+                    {b !== undefined && Number.isFinite(b) ? ` · ${tr("best", { score: Math.round(b * LAB_MAX), max: LAB_MAX })}` : ""}
+                  </span>
+                  <span className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-pill bg-brand-600 px-3.5 py-2 text-caption font-semibold text-brand-on">
+                    <Play className="size-3.5 fill-current" />
+                    {tr("vm.start")}
                   </span>
                 </div>
               </Link>

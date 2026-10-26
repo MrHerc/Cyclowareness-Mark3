@@ -10,6 +10,7 @@ import { TUTOR_BODY_LIMIT, lessonContext, offlineAnswer, tutorRequestSchema, tut
 import { env } from "@/server/env";
 import { pick } from "@/i18n/config";
 import type { Scene } from "@/lib/content/types";
+import { pickLessonContent } from "@/lib/content/lesson-locale";
 
 let client: Anthropic | null = null;
 
@@ -54,12 +55,16 @@ export async function POST(request: Request) {
     .from(t.lessons)
     .innerJoin(t.lessonContents, eq(t.lessonContents.lessonId, t.lessons.id))
     .where(and(eq(t.lessons.moduleId, mod.id), eq(t.lessons.key, lessonKey)));
-  const row = rows.find((r) => r.locale === "en") ?? rows[0];
+  // The lesson text in the learner's language when it exists (else English), so the context and the
+  // offline answer quote what the learner is reading.
+  const row = pickLessonContent(rows, locale);
   if (!row) return new Response("Not found", { status: 404 });
   const scenes = row.scenes as Scene[];
 
   const normalised = question.toLowerCase().replace(/\s+/g, " ").replace(/[?!.]+$/, "");
-  const cacheId = sha256Hex(`${locale}|${row.id}|${sceneId ?? ""}|${normalised}`);
+  // Answers grounded in a translation are cached apart from those grounded in the English text; the
+  // ids of the latter stay as they were.
+  const cacheId = sha256Hex(`${locale}|${row.id}|${sceneId ?? ""}|${normalised}${row.locale === "en" ? "" : `|${row.locale}`}`);
   const [cached] = await db().select().from(t.tutorCache).where(eq(t.tutorCache.id, cacheId));
   const headers = { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" };
   if (cached) return new Response(cached.answer, { headers: { ...headers, "x-tutor-mode": "cache" } });
@@ -69,7 +74,7 @@ export async function POST(request: Request) {
   }
 
   client ??= new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
-  const context = lessonContext(pick(mod.title, "en"), pick(row.title, "en"), scenes, sceneId);
+  const context = lessonContext(pick(mod.title, row.locale), pick(row.title, row.locale), scenes, sceneId);
   const stream = client.messages.stream({
     model: env.ANTHROPIC_MODEL,
     max_tokens: 2000,
@@ -77,12 +82,35 @@ export async function POST(request: Request) {
     messages: [{ role: "user", content: `Lesson context:\n${context}\n\nThe learner asks: ${question}` }],
   });
 
+  // Wait for the first words before answering: a model that fails before saying anything gets the
+  // offline answer marked as such, so the client reads it with a voice of the lesson's language and shows the offline note.
+  const events = stream[Symbol.asyncIterator]();
+  let first = "";
+  try {
+    for (;;) {
+      const next = await events.next();
+      if (next.done) break;
+      const event = next.value;
+      if (event.type === "content_block_delta" && event.delta.type === "text_delta" && event.delta.text) {
+        first = event.delta.text;
+        break;
+      }
+    }
+  } catch {
+    first = "";
+  }
+  if (!first) {
+    stream.abort();
+    return new Response(offlineAnswer(scenes, sceneId, question), { headers: { ...headers, "x-tutor-mode": "offline" } });
+  }
+
   const encoder = new TextEncoder();
-  let answer = "";
+  let answer = first;
   const body = new ReadableStream<Uint8Array>({
     async start(controller) {
       try {
-        for await (const event of stream) {
+        controller.enqueue(encoder.encode(first));
+        for await (const event of { [Symbol.asyncIterator]: () => events }) {
           if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
             answer += event.delta.text;
             controller.enqueue(encoder.encode(event.delta.text));

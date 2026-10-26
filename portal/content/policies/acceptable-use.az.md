@@ -45,7 +45,7 @@ Təşkilatın hesablarından, elektron poçtundan, internetdən, qurğularından
 - **Fərdi məlumatlar**: şəxsin birbaşa və ya dolayısı ilə müəyyən edilməsinə imkan verən istənilən məlumat;
 - **Məxfi informasiya**: qanunla və ya Təşkilatın qərarı ilə əldə edilməsi məhdudlaşdırılmış informasiya, o cümlədən məxfi fərdi məlumatlar və kommersiya sirri;
 - **İnsident**: informasiyanın məxfiliyinin, bütövlüyünün və ya əlçatanlığının pozulmasına səbəb olan və ya səbəb ola bilən hadisə, habelə belə hadisə barədə əsaslı şübhə;
-- **İkiaddımlı giriş (çoxfaktorlu autentifikasiya)**: şəxsiyyətin ən azı iki müstəqil amillə, məsələn, parol və mobil tətbiqdən alınan birdəfəlik kodla təsdiqi;
+- **İki addımlı doğrulama (çoxfaktorlu autentifikasiya)**: şəxsiyyətin ən azı iki müstəqil amillə, məsələn, parol və mobil tətbiqdən alınan birdəfəlik kodla təsdiqi;
 - **Parol**: yalnız istifadəçiyə məlum olan və hesaba daxil olmaq üçün istifadə edilən simvollar ardıcıllığı, o cümlədən bir neçə sözdən ibarət parol ifadəsi;
 - **Sosial mühəndislik**: şəxsi aldadaraq onu məlumatı açıqlamağa, keçidi açmağa, ödəniş etməyə və ya qaydanı pozmağa təhrik etmə üsulu, o cümlədən fişinq (saxta məktub və ya mesaj), vişinq (saxta telefon zəngi) və kvişinq (saxta QR kod);
 - **İctimai Sİ xidməti**: Təşkilatla müqaviləsi olmayan və ona daxil edilən məlumatları xidmət təminatçısının serverlərində işləyən ümumi təyinatlı süni intellekt xidməti.
@@ -63,7 +63,7 @@ Təşkilatın hesablarından, elektron poçtundan, internetdən, qurğularından
 6.2. Təşkilatda heç kim əməkdaşdan parol və ya birdəfəlik kod istəmir. Belə sorğu sosial mühəndislik əlaməti sayılır və bu barədə dərhal məlumat verilir.
 
 6.3. Parol:
-- ən azı 12 simvoldan, ikiaddımlı giriş olmayan sistemlərdə isə ən azı 15 simvoldan ibarət olur; bir neçə sözdən ibarət parol ifadəsi tövsiyə olunur;
+- ən azı 12 simvoldan, iki addımlı doğrulama olmayan sistemlərdə isə ən azı 15 simvoldan ibarət olur; bir neçə sözdən ibarət parol ifadəsi tövsiyə olunur;
 - ad, doğum tarixi, telefon nömrəsi, Təşkilatın adı, habelə "123456" kimi geniş yayılmış və ya sızmış paroldan ibarət olmur;
 - hər sistem üçün fərqli olur; iş parolu şəxsi hesablar üçün istifadə edilmir.
 
@@ -71,7 +71,7 @@ Təşkilatın hesablarından, elektron poçtundan, internetdən, qurğularından
 
 6.5. Parolun başqasına məlum olduğundan və ya saxta səhifəyə daxil edildiyindən şübhələnildikdə o, dərhal dəyişdirilir və hal insident kimi bildirilir.
 
-6.6. İkiaddımlı giriş mövcud olan bütün sistemlərdə, ilk növbədə elektron poçt, uzaqdan çıxış, bulud xidmətləri və administrator hesabları üçün istifadə olunur. Əməkdaş özünün başlatmadığı giriş sorğusunu təsdiq etmir və bu barədə dərhal məlumat verir.
+6.6. İki addımlı doğrulama mövcud olan bütün sistemlərdə, ilk növbədə elektron poçt, uzaqdan çıxış, bulud xidmətləri və administrator hesabları üçün istifadə olunur. Əməkdaş özünün başlatmadığı giriş sorğusunu təsdiq etmir və bu barədə dərhal məlumat verir.
 
 6.7. Əməkdaş iş yerini hətta qısa müddətə tərk etdikdə ekran hər dəfə kilidlənir (Windows: Win+L, macOS: Control+Command+Q). Qurğular 5 dəqiqədən çox olmayan fəaliyyətsizlikdən sonra avtomatik kilidlənir.
 

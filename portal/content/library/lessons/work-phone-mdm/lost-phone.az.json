@@ -1,0 +1,482 @@
+{
+  "id": "lost-phone",
+  "title": "İtmiş iş telefonu",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "İş telefonunuz itib və ya oğurlanıb? Utanmayın və gözləməyin. Hər dəqiqə dəyərlidir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Dərhal başqa telefondan İT dəstəyinə zəng edin. Onlar telefonu uzaqdan kilidləyə və harada olduğunu yoxlaya bilərlər.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Ardınca belə bir mesaj gələ bilər. Bu, parolunuzu oğurlamaq və telefonun kilidini açmaq cəhdidir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "sender": [
+                {
+                  "text": "Cihaz-Xidmet"
+                }
+              ],
+              "time": "20:14",
+              "messages": [
+                [
+                  {
+                    "text": "Telefonunuz tapılıb. Harada olduğunu görmək üçün daxil olun: "
+                  },
+                  {
+                    "text": "cihaz-tapildi.example.net",
+                    "spot": "link"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "link"
+        },
+        {
+          "id": "b4",
+          "say": "Zəng edən özünü İT dəstəyinin əməkdaşı kimi təqdim etsə belə, PIN kodunuzu və SMS kodunu heç kimə deməyin.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "first-steps",
+      "prompt": "İş telefonunuz itib. Addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "report",
+          "label": "Başqa telefondan İT dəstəyinə zəng edin"
+        },
+        {
+          "id": "lock",
+          "label": "Telefonu uzaqdan kilidləmələrini xahiş edin"
+        },
+        {
+          "id": "sim",
+          "label": "Operatora zəng edib SIM kartı bloklatdırın"
+        },
+        {
+          "id": "passwords",
+          "label": "Başqa cihazdan iş parollarınızı dəyişin"
+        },
+        {
+          "id": "wipe",
+          "label": "Telefon tapılmasa, məlumatları uzaqdan sildirin"
+        }
+      ],
+      "explain": "Bildirmək və kilidləmək bir neçə dəqiqə çəkir və zərərin çoxunun qarşısını alır. Silmə ən sona saxlanılır ki, telefonu hələ tapmaq mümkün olsun. Təşkilatınızın qaydası başqa ardıcıllıq nəzərdə tutursa, ona əməl edin."
+    },
+    {
+      "type": "simulation",
+      "id": "fake-support-call",
+      "environment": "call",
+      "title": "Dəstəkdən zəng",
+      "intro": "İş telefonunuz dünən axşam itib. Bu səhər şəxsi nömrənizə İT dəstəyindən zəng gəlir.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "it-destek-fake",
+            "caller": [
+              {
+                "text": "İT dəstəyi"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 45 17"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "young-man"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Cavab ver",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Zəngə cavab vermək təhlükəli deyil. Əsas məsələ nə dediyinizdir."
+            },
+            {
+              "id": "decline",
+              "label": "Rədd et",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olar. İT dəstəyinin rəsmi nömrəsinə özünüz zəng edin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "code",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "it-destek-fake",
+            "caller": [
+              {
+                "text": "İT dəstəyi"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 45 17"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "young-man"
+          },
+          "say": "Salam, İT dəstəyindən zəng edirəm. Telefonunuzu kilidləmək üçün sizə SMS kod göndərdik. Zəhmət olmasa, kodu deyin.",
+          "spoken": "Salam, <breath> İT dəstəyindən zəng edirəm. Telefonunuzu kilidləmək üçün sizə SMS kod göndərdik. Zəhmət olmasa, ee, kodu deyin.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Kodu de",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Bu kod hesabınıza giriş üçündür. Telefonu kilidləmək üçün dəstəyə sizin kodunuz lazım deyil."
+            },
+            {
+              "id": "verify",
+              "label": "Rəsmi nömrəyə özüm zəng edəcəyəm",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Əla. Rəsmi nömrəyə zəng edib yoxlamaq saxta zəngi dərhal üzə çıxarır.",
+              "next": "after"
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Düzdür. Əsl İT dəstəyi heç vaxt kod və ya parol istəmir.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pin",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "it-destek-fake",
+            "caller": [
+              {
+                "text": "İT dəstəyi"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 45 17"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "young-man"
+          },
+          "say": "Yaxşı, onda ekran kilidinin PIN kodunu deyin. Telefonun kilidini uzaqdan açıb məlumatlarınızı xilas edəcəyik.",
+          "spoken": "Yaxşı, <sigh> onda ekran kilidinin PIN kodunu deyin. Telefonun kilidini uzaqdan açıb məlumatlarınızı xilas edəcəyik.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "PIN kodu de",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Telefon kimdədirsə, bu PIN kodla onu açacaq. İdarəetmə sisteminə telefonu kilidləmək üçün PIN kodunuz heç vaxt lazım olmur."
+            },
+            {
+              "id": "keep",
+              "label": "PIN kodumu deməyəcəyəm",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Düzdür. PIN kodunuz yalnız sizə məxsusdur və heç kimlə paylaşılmır."
+            },
+            {
+              "id": "hang",
+              "label": "Zəngi bitir",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Düzgün qərar. Təzyiq artanda zəngi bitirmək doğru addımdır.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Zəng bitdi. İndi nə edirsiniz?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "it-destek-fake",
+            "caller": [
+              {
+                "text": "İT dəstəyi"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 45 17"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "young-man"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "İT dəstəyinin rəsmi nömrəsinə zəng et",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bu zəngi bildirin, çünki hücumçu adınızı və nömrənizi bilir."
+            },
+            {
+              "id": "ignore",
+              "label": "Heç nə etmə",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Hücumçu sonra başqa həmkarınıza zəng edəcək. Bildirsəniz, dəstək hamını xəbərdar edə bilər."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "after-loss",
+      "prompt": "Telefon itdikdən sonra gələn mesajlar. Təhlükəsizdir, yoxsa tələ?",
+      "cards": [
+        {
+          "id": "found-sms",
+          "artifact": {
+            "kind": "sms",
+            "sender": [
+              {
+                "text": "Cihaz-Xidmet"
+              }
+            ],
+            "time": "20:14",
+            "messages": [
+              [
+                {
+                  "text": "Telefonunuz tapılıb. Onu xəritədə görmək üçün daxil olun: "
+                },
+                {
+                  "text": "cihaz-tapildi.example.net/map",
+                  "link": {
+                    "label": "cihaz-tapildi.example.net/map",
+                    "href": "https://cihaz-tapildi.example.net/map"
+                  }
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Saxta «telefon tapıldı» mesajının məqsədi parolunuzu ələ keçirməkdir. Telefonun harada olduğunu yalnız İT dəstəyi yoxlayır."
+        },
+        {
+          "id": "sim-blocked",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "kehkesan-mobil",
+            "sender": [
+              {
+                "text": "Kehkesan"
+              }
+            ],
+            "time": "20:31",
+            "messages": [
+              [
+                {
+                  "text": "Müraciətinizə əsasən SIM kartınız bloklandı. Yenisini almaq üçün şəxsiyyət vəsiqənizlə satış ofisinə yaxınlaşın."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Link yoxdur, heç nə istənmir və mesaj sizin öz müraciətinizi təsdiqləyir. Bu, adi bildirişdir."
+        },
+        {
+          "id": "ticket-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "İT dəstəyi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it-support@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Müraciət 4471: telefon kilidləndi"
+              }
+            ],
+            "time": "20:40",
+            "body": [
+              [
+                {
+                  "text": "İş telefonunuz uzaqdan kilidlənib. Yeni cihaz üçün sabah saat 10:00-da 2-ci mərtəbəyə yaxınlaşın."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ünvan təşkilatınıza məxsusdur, link və parol tələbi yoxdur. Bu, sizin bildirişinizə cavabdır."
+        },
+        {
+          "id": "ransom-chat",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "+994 55 000 63 21"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Telefonun məndədir. 100 AZN köçür, qaytarım. Polisə desən, içindəkiləri yayacağam."
+                  }
+                ],
+                "time": "21:05"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Pul göndərməyin və yazışmanı silməyin. Onu İT dəstəyinə və polisə göstərin."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "taxi",
+      "title": "Taksidə unudulan telefon",
+      "start": "night",
+      "nodes": [
+        {
+          "id": "night",
+          "text": "Axşam evdə iş telefonunuzu taksidə unutduğunuzu anlayırsınız. Saat 22:00-dır.",
+          "choices": [
+            {
+              "label": "Elə indi İT dəstəyinə zəng edirəm",
+              "next": "morning",
+              "feedback": "Düzdür. Gecə də bildirmək olar və telefon dərhal kilidlənir."
+            },
+            {
+              "label": "Səhərə qədər gözləyirəm, bəlkə sürücü özü zəng edər",
+              "outcome": "risky",
+              "feedback": "Bir gecədə telefonla çox iş görmək olar. İndi bildirin, sürücü də zəng etsə, lap yaxşı."
+            }
+          ]
+        },
+        {
+          "id": "morning",
+          "text": "Salam, dünən axşam telefonunuzu taksimdə unutmusunuz. Gətirdim, kilidli idi, heç nəyə toxunmadım.",
+          "speaker": "Taksi sürücüsü (səhər, ofisdə)",
+          "voice": "older-man",
+          "channel": "in-person",
+          "manner": "natural",
+          "spoken": "Salam, dünən axşam telefonunuzu taksimdə unutmusunuz. <breath> Gətirdim, kilidli idi, heç nəyə toxunmadım.",
+          "choices": [
+            {
+              "label": "Yoxlamaq üçün telefonu İT dəstəyinə verirəm",
+              "outcome": "safe",
+              "feedback": "Əla. Əlinizdən çıxmış telefon yoxlanmalıdır, qərarı isə mütəxəssis verir."
+            },
+            {
+              "label": "Kilidini açıb dərhal işə qayıdıram",
+              "outcome": "risky",
+              "feedback": "Telefon bir gecə başqasının əlində olub. Əvvəlcə onu İT dəstəyinə yoxlatdırın."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "best-lock",
+      "question": {
+        "prompt": "Telefon itəndə məlumatlarınızı ən yaxşı nə qoruyur?",
+        "options": [
+          {
+            "id": "pin-bio",
+            "label": "Ən azı 6 rəqəmli PIN kod və barmaq izi",
+            "correct": true,
+            "feedback": "Düzdür. Uzun PIN kodu təxmin etmək çətindir, barmaq izi isə gündəlik istifadəni asanlaşdırır."
+          },
+          {
+            "id": "birth-year",
+            "label": "Doğum ilinizdən ibarət 4 rəqəmli PIN kod",
+            "correct": false,
+            "feedback": "Doğum ilini sosial şəbəkələrdə tapmaq asandır. Ən azı 6 təsadüfi rəqəm seçin."
+          },
+          {
+            "id": "pattern",
+            "label": "Sadə kilid açma naxışı",
+            "correct": false,
+            "feedback": "Sadə naxışı ekrandakı izlərdən və ya çiyninizin üstündən baxaraq görmək olar."
+          },
+          {
+            "id": "none",
+            "label": "Kilid yoxdur, telefon həmişə yanımdadır",
+            "correct": false,
+            "feedback": "Telefonu bir anda itirmək olar. Kilid olmasa, iş poçtunuz hər kəs üçün açıqdır."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "lock"
+        }
+      },
+      "explain": "Güclü ekran kilidi itmiş telefondakı məlumatları qoruyan ilk maneədir."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Telefon itsə, dərhal başqa telefondan İT dəstəyinə zəng edin.",
+        "Kim zəng edirsə etsin, kodu, PIN kodu və ya parolu heç kimə deməyin.",
+        "Geri qaytarılan telefonu istifadə etməzdən əvvəl İT dəstəyinə yoxlatdırın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

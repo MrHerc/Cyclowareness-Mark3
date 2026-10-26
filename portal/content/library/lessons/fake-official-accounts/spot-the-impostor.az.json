@@ -1,0 +1,518 @@
+{
+  "id": "spot-the-impostor",
+  "title": "Saxtakarı tapın",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Fırıldaqçılar nazirliklərin və vəzifəli şəxslərin adından saxta səhifələr və kanallar açırlar.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Ada yox, ünvana baxın: artıq bir hərf, söz və ya rəqəm saxta hesabı ələ verir.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "nd-sxn-fake",
+              "url": [
+                {
+                  "text": "https://kontakto.example/"
+                },
+                {
+                  "text": "sxn.rasmi.az2",
+                  "spot": "handle"
+                }
+              ]
+            }
+          },
+          "highlight": "handle"
+        },
+        {
+          "id": "b3",
+          "say": "Saxta hesab sizi tələsdirir, pul və ya kart məlumatları istəyir, ya da linkə klikləməyə çağırır.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Şübhə yaranarsa, təşkilatın saytını özünüz açın və rəsmi hesabların siyahısını yoxlayın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "official-messages",
+      "environment": "phone",
+      "title": "Rəsmi ad altında mesajlar",
+      "intro": "Telefonunuza nazirlik adından mesajlar gəlir. Hər biri üçün düzgün addımı seçin.",
+      "steps": [
+        {
+          "id": "aid-channel",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "nd-sxn-fake",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Sosial Xidmətlər Nazirliyi | Rəsmi"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hörmətli vətəndaş! Hər ailəyə 300 AZN məbləğində birdəfəlik dövlət ödənişi təyin edilib."
+                  }
+                ],
+                "time": "10:02"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Ödənişi almaq üçün kart məlumatlarınızı bu gün daxil edin: "
+                  },
+                  {
+                    "text": "sxn-yardim.example.net/qeydiyyat",
+                    "link": {
+                      "label": "sxn-yardim.example.net/qeydiyyat",
+                      "href": "https://sxn-yardim.example.net/qeydiyyat"
+                    }
+                  }
+                ],
+                "time": "10:02"
+              }
+            ]
+          },
+          "say": "Kanalın adı rəsmi görünür. Bəs link hara aparır?",
+          "actions": [
+            {
+              "id": "click",
+              "label": "Linki aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Bu səhifə kart məlumatlarını oğurlayır. Nazirlik yardım ödəmək üçün mesajla kartınızın tam məlumatlarını istəmir."
+            },
+            {
+              "id": "report",
+              "label": "Kanaldan şikayət et",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Ünvan nazirliyin saytı deyil, şikayət isə kanalın daha tez bağlanmasına kömək edir."
+            },
+            {
+              "id": "block",
+              "label": "Blokla",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Yaxşı, kanal sizə bir daha yaza bilməyəcək. Başqaları da qorunsun deyə ondan şikayət də edin."
+            },
+            {
+              "id": "share",
+              "label": "Ailə qrupuna göndər",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Yoxlanmamış mesajı paylaşmaq ailənizi də tələyə salır. Əvvəlcə rəsmi saytı yoxlayın."
+            }
+          ]
+        },
+        {
+          "id": "real-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "nd-sxn",
+            "sender": [
+              {
+                "text": "SXN"
+              }
+            ],
+            "time": "11:30",
+            "messages": [
+              [
+                {
+                  "text": "2026-118 nömrəli müraciətiniz qəbul olundu. Statusunu sxn.example saytındakı şəxsi kabinetinizdə görə bilərsiniz."
+                }
+              ]
+            ]
+          },
+          "say": "Keçən həftə nazirliyə müraciət göndərmişdiniz.",
+          "actions": [
+            {
+              "id": "safe",
+              "label": "Təhlükəsiz kimi işarələ",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Düzdür. Mesaj göndərdiyiniz müraciətə uyğundur, link yoxdur və heç nə istəmir."
+            },
+            {
+              "id": "report",
+              "label": "Bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Ehtiyatlı olmaq yaxşıdır, amma bu mesaj həqiqidir: heç nə istəmir və saytı özünüz açmağa imkan verir."
+            }
+          ]
+        },
+        {
+          "id": "boss-new-number",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "İdarə rəisi (yeni nömrə)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Salam. Bu, mənim yeni nömrəmdir. İclasdayam, zəng edə bilmirəm."
+                  }
+                ],
+                "time": "12:15"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Bu səhərki rəsmi məktubun surətini təcili bura göndərin."
+                  }
+                ],
+                "time": "12:16"
+              }
+            ]
+          },
+          "say": "Tanış vəzifə, amma tanımadığınız nömrə.",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Məktubu göndər",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Rəsmi sənəd naməlum nömrəyə getdi. Fırıldaqçılar rəhbər adından tez-tez məhz belə yazırlar."
+            },
+            {
+              "id": "verify",
+              "label": "Rəhbərin bildiyim nömrəsinə zəng et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Afərin. Yeni nömrəni həmişə artıq bildiyiniz kanal vasitəsilə yoxlayın."
+            },
+            {
+              "id": "report",
+              "label": "Şikayət et və blokla",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Təhlükəsizlik komandasına da bildirin: həmkarlarınıza da eyni mesaj gələ bilər."
+            },
+            {
+              "id": "ask",
+              "label": "Siz kimsiniz?",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Cavab yazmaq söhbəti uzadır, fırıldaqçının isə inandırıcı cavabı hazırdır. Telefonla yoxlayın."
+            }
+          ]
+        },
+        {
+          "id": "giveaway-page",
+          "label": "Sosial Xidmətlər Nazirliyi: 1000 pulsuz noutbuk! Qeydiyyat haqqı 5 AZN",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "nd-sxn-fake",
+            "url": [
+              {
+                "text": "https://kontakto.example/sxn.resmi.official"
+              }
+            ]
+          },
+          "say": "Dostunuz bu səhifəni paylaşıb.",
+          "actions": [
+            {
+              "id": "join",
+              "label": "İştirak et",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Dövlət qurumu uduş üçün heç vaxt ödəniş istəmir. Bu saxta səhifə kart məlumatlarını toplayır."
+            },
+            {
+              "id": "report",
+              "label": "Səhifədən şikayət et",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Düzdür. Ünvandakı artıq söz saxtalığı ələ verir, şikayət isə səhifənin silinməsinə kömək edir."
+            },
+            {
+              "id": "verify",
+              "label": "Nazirliyin saytında yoxla",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Əla vərdişdir. Saytda belə müsabiqə yoxdursa, səhifədən şikayət edin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "fake-channel-signs",
+      "prompt": "Saxta kanalın əlamətlərinə toxunun.",
+      "artifact": {
+        "kind": "chat",
+        "brandRef": "nd-sxn-fake",
+        "app": "telegram",
+        "contact": [
+          {
+            "text": "Sosial Xidmətlər Nazirliyi"
+          },
+          {
+            "text": " @sxn_rasmi",
+            "spot": "handle"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Bu gün son gündür! ",
+                "spot": "urgent"
+              },
+              {
+                "text": "Kompensasiya ödənişinizi almaq üçün "
+              },
+              {
+                "text": "5 AZN qeydiyyat haqqı ödəyin",
+                "spot": "fee"
+              },
+              {
+                "text": ": "
+              },
+              {
+                "text": "sxn-kompensasiya.example.net",
+                "spot": "link",
+                "link": {
+                  "label": "sxn-kompensasiya.example.net",
+                  "href": "https://sxn-kompensasiya.example.net"
+                }
+              }
+            ],
+            "time": "16:40"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Şərhlər bağlıdır, sual verməyin.",
+                "spot": "no-questions"
+              }
+            ],
+            "time": "16:41"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "handle",
+          "label": "İstifadəçi adı",
+          "explain": "Rəsmi istifadəçi adı belədir: @sxn_resmi. Burada bir hərf dəyişdirilib."
+        },
+        {
+          "id": "urgent",
+          "label": "Tələsdirmə",
+          "explain": "Fırıldaqçılar sizi tələsdirirlər ki, düşünməyə vaxtınız qalmasın."
+        },
+        {
+          "id": "fee",
+          "label": "Haqq tələbi",
+          "explain": "Dövlət ödənişini almaq üçün heç vaxt pul ödəmək lazım deyil."
+        },
+        {
+          "id": "link",
+          "label": "Link",
+          "explain": "Bu domen nazirliyin sxn.example domeni deyil."
+        },
+        {
+          "id": "no-questions",
+          "label": "Bağlı şərhlər",
+          "explain": "Şərhləri bağlamaqla başqalarını xəbərdar edə biləcək insanların səsini kəsirlər."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "real-or-fake",
+      "prompt": "Rəsmidir, yoxsa saxta?",
+      "cards": [
+        {
+          "id": "official-list",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "nd-sxn",
+            "url": [
+              {
+                "text": "https://sxn.example/elaqe/sosial-sebekeler"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Bu, nazirliyin öz saytıdır. Rəsmi hesabların siyahısını belə səhifədən götürün."
+        },
+        {
+          "id": "extra-word",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "nd-sxn-fake",
+            "url": [
+              {
+                "text": "https://kontakto.example/sxn.resmi.official"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Sondakı artıq söz saxta hesabın tipik əlamətidir. Rəsmi ünvanda isə yalnız sxn.resmi yazılır."
+        },
+        {
+          "id": "job-fee",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "nd-sxn-fake",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Sosial Xidmətlər Nazirliyi | Kadrlar"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "İş müsahibəsinə yazılmaq üçün 20 AZN ödəniş tələb olunur. Ödənişdən sonra yeriniz sizin üçün saxlanılır."
+                  }
+                ],
+                "time": "13:05"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Dövlət qurumu müsahibə və ya müraciət üçün mesajla pul istəmir."
+        },
+        {
+          "id": "post-to-site",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "kontakto",
+            "app": "Kontakto",
+            "title": [
+              {
+                "text": "Sosial Xidmətlər Nazirliyi"
+              }
+            ],
+            "body": [
+              {
+                "text": "Qəbul saatları dəyişib. Ətraflı məlumat sxn.example saytında."
+              }
+            ],
+            "time": "09:10"
+          },
+          "verdict": "safe",
+          "explain": "Heç nə istəmir və rəsmi sayta yönləndirir. Yenə də təfərrüatları saytın özündə dəqiqləşdirin."
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "verify-account",
+      "prompt": "Hesabın rəsmi olduğunu necə yoxlayırsınız? Addımları düzgün sıraya düzün.",
+      "items": [
+        {
+          "id": "open-site",
+          "label": "Təşkilatın saytının ünvanını brauzerə özünüz yazın"
+        },
+        {
+          "id": "find-list",
+          "label": "Saytda onun rəsmi hesablarına aparan linkləri tapın"
+        },
+        {
+          "id": "compare",
+          "label": "Hesabın ünvanını hərf-hərf müqayisə edin"
+        },
+        {
+          "id": "report",
+          "label": "Uyğun gəlmirsə, hesabdan platformaya şikayət edin"
+        }
+      ],
+      "explain": "Yoxlamaya həmişə təşkilatın öz saytından başlayın, heç vaxt mesajdakı linkdən yox."
+    },
+    {
+      "type": "choice",
+      "id": "badge",
+      "question": {
+        "prompt": "Hesabın adının yanında təsdiq nişanı var. Bu, onun rəsmi olduğunu sübut edirmi?",
+        "options": [
+          {
+            "id": "yes",
+            "label": "Bəli, nişan zəmanətdir",
+            "correct": false,
+            "feedback": "Bəzi platformalarda nişanı satın almaq olur, saxta hesablar isə nişan simvolunu adın içinə yazırlar."
+          },
+          {
+            "id": "followers",
+            "label": "Bəli, izləyicisi çoxdursa",
+            "correct": false,
+            "feedback": "İzləyiciləri satın almaq olar, köhnə səhifənin isə sadəcə adını dəyişmək mümkündür."
+          },
+          {
+            "id": "site",
+            "label": "Xeyr, onu təşkilatın saytındakı linklə tutuşdururam",
+            "correct": true,
+            "feedback": "Düzdür. Təşkilatın öz saytındakı link ən etibarlı yoxlamadır."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "badge-id"
+        }
+      },
+      "explain": "Nişanı, izləyiciləri və səliqəli loqonu saxtalaşdırmaq olar. Təşkilatın öz saytını isə yox."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Ada yox, hesabın ünvanına baxın: bir hərf fərqli ola bilər.",
+        "Rəsmi qurumlar mesajla kart məlumatları, haqq və ya təcili ödəniş istəmir.",
+        "Şübhə yaranarsa, saytı özünüz açın və saxta hesabdan şikayət edin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

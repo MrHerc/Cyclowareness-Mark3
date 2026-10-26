@@ -11,7 +11,11 @@ import { PrintToolbar } from "@/components/admin/print-toolbar";
 import { Notice } from "@/components/ui/layout";
 import { pick } from "@/i18n/config";
 
-export const metadata = { robots: { index: false } };
+/** The title is what the browser's "Save as PDF" suggests as the file name. */
+export async function generateMetadata() {
+  const tr = await getTranslations("admin.reports");
+  return { title: tr("compliance.title"), robots: { index: false } };
+}
 
 /** Compliance pack: one document for auditors. */
 export default async function CompliancePack({ searchParams }: PageProps<"/print/compliance">) {
@@ -65,18 +69,21 @@ export default async function CompliancePack({ searchParams }: PageProps<"/print
   const gaps = completed.filter((c) => !attested.has(`${c.userId}:${c.moduleId}`)).map((c) => [names.get(c.userId) ?? "", pick(c.title, locale)]);
   if (allowed(v, "reports.read")) await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "report.compliance_pack", meta: filters });
   const fd = (d: Date) => format.dateTime(d, { dateStyle: "short", timeStyle: "short" });
-  const period = filters.from || filters.to ? tr("period", { from: filters.from ?? "…", to: filters.to ?? "…" }) : tr("allTime");
+  const fdy = (d: Date) => format.dateTime(d, { dateStyle: "short" });
+  const fn = (n: number) => format.number(n);
+  const day = (s?: string) => (s ? format.dateTime(new Date(`${s}T12:00:00+04:00`), { dateStyle: "long" }) : "…");
+  const period = filters.from || filters.to ? tr("period", { from: day(filters.from), to: day(filters.to) }) : tr("allTime");
   return (
     <>
       <PrintToolbar label={tr("print")} />
       <main className="mx-auto max-w-5xl px-8 py-8 print:max-w-none print:p-0">
         <DocHeader org={v.tenant.name} title={tr("compliance.title")} sub={`${period} · ${tr("generatedAt", { date: format.dateTime(new Date(), { dateStyle: "long", timeStyle: "short" }) })}`} logo={v.tenant.branding.logoUrl} />
-        <ReportSection title={tr("compliance.settings")} headers={["", ""]} rows={settingRows} formatDate={fd} empty="—" />
-        <ReportSection title={tr("compliance.training")} headers={completion.headers} rows={completion.rows} formatDate={fd} empty={tr("compliance.none")} />
-        <ReportSection title={tr("compliance.confirmations")} headers={confirmations.headers} rows={confirmations.rows} formatDate={fd} empty={tr("compliance.none")} />
-        <ReportSection title={tr("compliance.crosscheck")} headers={[tr("cols.person"), tr("cols.module")]} rows={gaps} formatDate={fd} empty={tr("compliance.none")} />
-        <ReportSection title={tr("compliance.simulations")} headers={simulations.headers} rows={simulations.rows} formatDate={fd} empty={tr("compliance.none")} />
-        <ReportSection title={tr("compliance.risk")} headers={risk.headers} rows={risk.rows} formatDate={fd} empty={tr("compliance.none")} />
+        <ReportSection title={tr("compliance.settings")} headers={[tr("compliance.settingCol"), tr("compliance.valueCol")]} rows={settingRows} formatDate={fd} formatDay={fdy} formatNumber={fn} empty={tr("compliance.none")} />
+        <ReportSection title={tr("compliance.training")} headers={completion.headers} rows={completion.rows} formatDate={fd} formatDay={fdy} formatNumber={fn} empty={tr("compliance.none")} />
+        <ReportSection title={tr("compliance.confirmations")} headers={confirmations.headers} rows={confirmations.rows} formatDate={fd} formatDay={fdy} formatNumber={fn} empty={tr("compliance.none")} />
+        <ReportSection title={tr("compliance.crosscheck")} headers={[tr("cols.person"), tr("cols.module")]} rows={gaps} formatDate={fd} formatDay={fdy} formatNumber={fn} empty={tr("compliance.none")} />
+        <ReportSection title={tr("compliance.simulations")} headers={simulations.headers} rows={simulations.rows} formatDate={fd} formatDay={fdy} formatNumber={fn} empty={tr("compliance.none")} />
+        <ReportSection title={tr("compliance.risk")} headers={risk.headers} rows={risk.rows} formatDate={fd} formatDay={fdy} formatNumber={fn} empty={tr("compliance.none")} />
       </main>
     </>
   );

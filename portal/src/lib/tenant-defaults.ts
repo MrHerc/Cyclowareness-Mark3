@@ -12,7 +12,7 @@ export const DEFAULT_ATTESTATION: Record<string, string> = {
 
 export const DEFAULT_CERTIFICATE_TEXT: Record<string, string> = {
   az: "{date} tarixində {name} «{module}» modulunu uğurla tamamladı və kibergigiyena qaydalarına əməl edəcəyini təsdiqlədi.",
-  en: 'On {date}, {name} successfully completed the module "{module}" and confirmed that they will follow the rules of cyber hygiene.',
+  en: "On {date}, {name} successfully completed the module “{module}” and confirmed that they will follow the rules of cyber hygiene.",
   ru: "{date} {name} успешно завершил(а) модуль «{module}» и подтвердил(а), что будет соблюдать правила кибергигиены.",
 };
 
@@ -20,7 +20,7 @@ export const DEFAULT_TEMPLATES: Record<TemplateKind, Record<string, { subject: s
   assignment: {
     az: { subject: "Yeni təlim: {{module}}", body: "Salam, {{name}}!\n\nSizə «{{module}}» təlimi təyin edilib. Son tarix: {{dueDate}}.\n\n{{link}}" },
     en: { subject: "New training: {{module}}", body: "Hello {{name}},\n\nYou have been assigned “{{module}}”. Due date: {{dueDate}}.\n\n{{link}}" },
-    ru: { subject: "Новое обучение: {{module}}", body: "Здравствуйте, {{name}}!\n\nВам назначено обучение «{{module}}». Срок: {{dueDate}}.\n\n{{link}}" },
+    ru: { subject: "Новое обучение: {{module}}", body: "Здравствуйте, {{name}}!\n\nВам назначено обучение «{{module}}». Срок выполнения: {{dueDate}}.\n\n{{link}}" },
   },
   reminder: {
     az: { subject: "Xatırlatma: {{module}}", body: "Salam, {{name}}!\n\n«{{module}}» təlimini {{dueDate}} tarixinədək tamamlamağı unutmayın. Bir neçə dəqiqə kifayətdir.\n\n{{link}}" },
@@ -33,14 +33,31 @@ export const DEFAULT_TEMPLATES: Record<TemplateKind, Record<string, { subject: s
     ru: { subject: "Срок истёк: {{module}}", body: "Здравствуйте, {{name}}!\n\nСрок обучения «{{module}}» ({{dueDate}}) истёк. Пожалуйста, завершите его сегодня.\n\n{{link}}" },
   },
   manager: {
-    az: { subject: "Komandanızda diqqət tələb edən hal", body: "Salam, {{name}}!\n\nKomandanızdan {{person}} üçün diqqət tələb olunur: {{reason}}.\n\n{{link}}" },
+    az: { subject: "Komandanızda diqqət tələb edən hal", body: "Salam, {{name}}!\n\nKomandanızdakı {{person}} ilə bağlı diqqət tələb edən hal var: {{reason}}.\n\n{{link}}" },
     en: { subject: "Someone in your team needs attention", body: "Hello {{name}},\n\n{{person}} in your team needs attention: {{reason}}.\n\n{{link}}" },
-    ru: { subject: "Сотруднику вашей команды нужно внимание", body: "Здравствуйте, {{name}}!\n\nСотруднику {{person}} нужно внимание: {{reason}}.\n\n{{link}}" },
+    ru: { subject: "Сотрудник вашей команды требует внимания", body: "Здравствуйте, {{name}}!\n\nСотрудник вашей команды {{person}} требует внимания: {{reason}}.\n\n{{link}}" },
   },
   welcome: {
-    az: { subject: "Xoş gəlmisiniz", body: "Salam, {{name}}!\n\n{{organisation}} sizi qısa kibergigiyena dərslərinə dəvət edir. Hesabınızı aktivləşdirmək üçün linkə keçin.\n\n{{link}}" },
-    en: { subject: "Welcome aboard", body: "Hello {{name}},\n\n{{organisation}} invites you to short cyber hygiene lessons. Use the link to set up your account.\n\n{{link}}" },
-    ru: { subject: "Добро пожаловать", body: "Здравствуйте, {{name}}!\n\n{{organisation}} приглашает вас на короткие уроки по кибергигиене. Перейдите по ссылке, чтобы активировать учётную запись.\n\n{{link}}" },
+    az: { subject: "{{organisation}}: kibergigiyena təliminə xoş gəlmisiniz", body: "Salam, {{name}}!\n\n{{organisation}} sizi qısa kibergigiyena dərslərinə dəvət edir. Hesabınızı aktivləşdirmək üçün linkə keçin. Link 14 gün etibarlıdır.\n\n{{link}}" },
+    en: { subject: "Welcome to {{organisation}}'s security awareness training", body: "Hello {{name}},\n\n{{organisation}} invites you to short cyber hygiene lessons. Use the link to set up your account. The link is valid for 14 days.\n\n{{link}}" },
+    ru: { subject: "{{organisation}}: добро пожаловать на обучение кибергигиене", body: "Здравствуйте, {{name}}!\n\n{{organisation}} приглашает вас на короткие уроки по кибергигиене. Перейдите по ссылке, чтобы активировать учётную запись. Ссылка действует 14 дней.\n\n{{link}}" },
+  },
+};
+
+/**
+ * The default assignment and reminder text when there is no due date (an assignment without one, or a reminder
+ * sent by hand for a module that has none): the dated wording would otherwise read "by —".
+ */
+export const DEFAULT_TEMPLATES_NO_DUE: Record<"assignment" | "reminder", Record<string, { subject: string; body: string }>> = {
+  assignment: {
+    az: { subject: DEFAULT_TEMPLATES.assignment.az.subject, body: "Salam, {{name}}!\n\nSizə «{{module}}» təlimi təyin edilib.\n\n{{link}}" },
+    en: { subject: DEFAULT_TEMPLATES.assignment.en.subject, body: "Hello {{name}},\n\nYou have been assigned “{{module}}”.\n\n{{link}}" },
+    ru: { subject: DEFAULT_TEMPLATES.assignment.ru.subject, body: "Здравствуйте, {{name}}!\n\nВам назначено обучение «{{module}}».\n\n{{link}}" },
+  },
+  reminder: {
+    az: { subject: DEFAULT_TEMPLATES.reminder.az.subject, body: "Salam, {{name}}!\n\n«{{module}}» təlimini tamamlamağı unutmayın. Bir neçə dəqiqə kifayətdir.\n\n{{link}}" },
+    en: { subject: DEFAULT_TEMPLATES.reminder.en.subject, body: "Hello {{name}},\n\nPlease finish “{{module}}”. It only takes a few minutes.\n\n{{link}}" },
+    ru: { subject: DEFAULT_TEMPLATES.reminder.ru.subject, body: "Здравствуйте, {{name}}!\n\nПожалуйста, завершите обучение «{{module}}». Это займёт несколько минут.\n\n{{link}}" },
   },
 };
 
@@ -52,14 +69,30 @@ export const FIXED_MESSAGES: Record<"policy_reminder" | "confirmation_reminder",
     ru: { subject: "Нужна подпись: {{module}}", body: "Здравствуйте, {{name}}!\n\nПожалуйста, прочитайте и подпишите «{{module}}». Это займёт несколько минут.\n\n{{link}}" },
   },
   confirmation_reminder: {
-    az: { subject: "Təsdiq gözlənilir: {{module}}", body: "Salam, {{name}}!\n\n«{{module}}» təlimini bitirmisiniz, təsdiq qalıb. Zəhmət olmasa təsdiqləyin — bir dəqiqə çəkir.\n\n{{link}}" },
+    az: { subject: "Təsdiq gözlənilir: {{module}}", body: "Salam, {{name}}!\n\n«{{module}}» təlimini bitirmisiniz, yalnız təsdiqləmək qalıb. Zəhmət olmasa təsdiqləyin: bir dəqiqə çəkir.\n\n{{link}}" },
     en: { subject: "Confirmation needed: {{module}}", body: "Hello {{name}},\n\nYou finished “{{module}}” but have not confirmed it yet. Please confirm — it takes a minute.\n\n{{link}}" },
     ru: { subject: "Нужно подтверждение: {{module}}", body: "Здравствуйте, {{name}}!\n\nВы завершили «{{module}}», осталось подтвердить. Пожалуйста, подтвердите — это займёт минуту.\n\n{{link}}" },
   },
 };
 
-/** Label of the button that a link on its own line becomes in notification emails. */
-export const EMAIL_BUTTON_LABEL: Record<string, string> = { az: "Aç", en: "Open", ru: "Открыть" };
+/** Label of the button that a link on its own line becomes in an email without a label of its own. */
+export const EMAIL_BUTTON_LABEL: Record<string, string> = { az: "Açın", en: "Open", ru: "Открыть" };
+
+/** The button of each notification email, saying what the link does. */
+const EMAIL_BUTTON_BY_KIND: Record<string, Record<string, string>> = {
+  assignment: { az: "Təlimə başlayın", en: "Start the training", ru: "Начать обучение" },
+  reminder: { az: "Təlimi davam etdirin", en: "Continue the training", ru: "Продолжить обучение" },
+  overdue: { az: "Təlimi davam etdirin", en: "Continue the training", ru: "Продолжить обучение" },
+  welcome: { az: "Hesabı aktivləşdirin", en: "Set up your account", ru: "Активировать учётную запись" },
+  policy_reminder: { az: "Siyasəti oxuyun", en: "Read the policy", ru: "Открыть политику" },
+  confirmation_reminder: { az: "Təsdiqləyin", en: "Confirm now", ru: "Подтвердить" },
+  manager: { az: "Əməkdaşın səhifəsini açın", en: "Open their profile", ru: "Открыть профиль сотрудника" },
+};
+
+export function emailButtonLabel(kind: string, lang: string): string {
+  const labels = EMAIL_BUTTON_BY_KIND[kind] ?? EMAIL_BUTTON_LABEL;
+  return labels[lang] ?? labels.en ?? EMAIL_BUTTON_LABEL.en;
+}
 
 export const WEBHOOK_EVENTS = [
   "qr.scanned",
@@ -93,6 +126,22 @@ export function defaultSettings(locale = "az"): TenantSettings {
 type Group = Record<string, unknown>;
 const group = (v: unknown): Group => (v && typeof v === "object" && !Array.isArray(v) ? (v as Group) : {});
 
+/** Texts per language; a single string saved by an older release belongs to the organisation's default language. */
+function perLocale(v: unknown, defaultLocale: string): Record<string, string> | undefined {
+  if (typeof v === "string") return v.trim() ? { [defaultLocale]: v } : undefined;
+  const entries = Object.entries(group(v)).filter((e): e is [string, string] => typeof e[1] === "string" && !!e[1].trim());
+  return entries.length ? Object.fromEntries(entries) : undefined;
+}
+
+function certificateWithDefaults(d: TenantSettings["certificate"], stored: Group, defaultLocale: string): TenantSettings["certificate"] {
+  const out = { ...d, ...stored } as TenantSettings["certificate"];
+  const title = perLocale(stored.title, defaultLocale);
+  const text = perLocale(stored.text, defaultLocale);
+  delete out.title;
+  delete out.text;
+  return { ...out, ...(title ? { title } : {}), ...(text ? { text } : {}) };
+}
+
 /**
  * Stored settings over the current defaults, group by group. A tenant row written by an older
  * release (or with a group missing) then reads like a complete one: a key added later gets its
@@ -110,7 +159,7 @@ export function withDefaults(raw: unknown): TenantSettings {
     protection: { ...d.protection, ...group(r.protection) },
     learning: { ...d.learning, ...group(r.learning) },
     attestationText: { ...d.attestationText, ...group(r.attestationText) } as Record<string, string>,
-    certificate: { ...d.certificate, ...group(r.certificate) },
+    certificate: certificateWithDefaults(d.certificate, group(r.certificate), d.defaultLocale),
     notifications: { ...d.notifications, ...group(r.notifications) },
     identity: { ...d.identity, ...group(r.identity) },
     email: { ...d.email, ...group(r.email) },

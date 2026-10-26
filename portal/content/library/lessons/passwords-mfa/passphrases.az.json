@@ -1,0 +1,366 @@
+{
+  "id": "passphrases",
+  "title": "Parol ifadələri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "long-beats-complex",
+      "beats": [
+        {
+          "id": "short",
+          "say": "Bu parol mürəkkəb görünür, amma ad, il və nida işarəsi hücumçuların ilk yoxladığı qəlibdir.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "stat",
+            "value": "Aynur1985!",
+            "label": "Mürəkkəb görünür, amma asan sındırılır"
+          }
+        },
+        {
+          "id": "phrase",
+          "say": "Daha yaxşısı dörd və ya daha çox təsadüfi sözdən ibarət parol ifadəsidir. Uzundur, yadda saxlamaq asandır, tapmaq isə çox çətindir.",
+          "mood": "happy",
+          "gesture": "nod",
+          "visual": {
+            "kind": "stat",
+            "value": "bənövşə kərpic dəniz saat",
+            "label": "Sadəcə nümunədir, özünüzünkünü yaradın"
+          },
+          "stage": "back"
+        },
+        {
+          "id": "length",
+          "say": "Uzunluq mürəkkəblikdən daha vacibdir. Parol ən azı on beş simvoldan ibarət olsun. Sözlərin arasına boşluq və ya defis qoymaq olar.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "stat",
+            "value": "15+",
+            "label": "simvol, tövsiyə olunan minimum"
+          },
+          "checkpoint": {
+            "prompt": "Hansı parol daha güclüdür?",
+            "options": [
+              {
+                "id": "swaps",
+                "label": "Pa$$w0rd2026",
+                "correct": false,
+                "feedback": "Hərf əvəzləmələri parol sındıran alətlərə yaxşı məlumdur."
+              },
+              {
+                "id": "words",
+                "label": "dəvə fənər limon bulud",
+                "correct": true,
+                "feedback": "Düzdür. Dörd təsadüfi söz həm uzundur, həm də gözlənilməzdir."
+              }
+            ]
+          }
+        },
+        {
+          "id": "stuffing",
+          "say": "Bir saytdan məlumat sızanda hücumçular həmin parolu başqa saytlarda da sınayır. Ona görə də hər hesabın öz parolu olmalıdır.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        }
+      ]
+    },
+    {
+      "type": "password",
+      "id": "make-passphrase",
+      "prompt": "Öz parol ifadənizi yaradın.",
+      "targetScore": 4,
+      "tips": [
+        "Buraya əsl parolunuzu yazmayın, bu, sadəcə məşqdir.",
+        "Dörd və ya daha çox təsadüfi söz seçin.",
+        "Mahnı sözlərindən, şeirlərdən və atalar sözlərindən istifadə etməyin.",
+        "Adları, tarixləri və iş yerinizin adını parola daxil etməyin."
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "leak-alert",
+      "prompt": "Bu sızma xəbərdarlığında saxtalıq əlamətlərini tapın.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "xidmet-agentliyi-fake",
+        "from": {
+          "name": [
+            {
+              "text": "Təhlükəsizlik Mərkəzi",
+              "reveal": "security@xidmetagentliyi-az.com"
+            }
+          ],
+          "address": [
+            {
+              "text": "security@"
+            },
+            {
+              "text": "xidmetagentliyi-az.com",
+              "spot": "sender-domain"
+            }
+          ]
+        },
+        "to": "a.hasanova@xidmetagentliyi.az",
+        "subject": [
+          {
+            "text": "Parolunuz sızan məlumatlar arasında tapılıb"
+          }
+        ],
+        "time": "08:47",
+        "body": [
+          [
+            {
+              "text": "Hörmətli istifadəçi,",
+              "spot": "greeting"
+            }
+          ],
+          [
+            {
+              "text": "Parolunuz internetdə yayılmış məlumat bazasında tapılıb."
+            }
+          ],
+          [
+            {
+              "text": "Hesabınızı qorumaq üçün "
+            },
+            {
+              "text": "bu formada köhnə və yeni parolunuzu daxil edin.",
+              "spot": "old-password"
+            }
+          ],
+          [
+            {
+              "text": "Formanı açın",
+              "spot": "link",
+              "link": {
+                "label": "Formanı açın",
+                "href": "https://parol-yenile.info/forma"
+              }
+            }
+          ],
+          [
+            {
+              "text": "Bir saat ərzində tədbir görməsəniz, hesabınız silinəcək.",
+              "spot": "urgency"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender-domain",
+          "label": "Saxta domen",
+          "explain": "Agentliyin domeni xidmetagentliyi.az ünvanıdır, sonunda -az.com olmur."
+        },
+        {
+          "id": "greeting",
+          "label": "Ümumi müraciət",
+          "explain": "Öz təhlükəsizlik komandanız sizə adınızla müraciət edərdi."
+        },
+        {
+          "id": "old-password",
+          "label": "Köhnə parolu istəyir",
+          "explain": "Əsl xidmət məktubdakı formaya köhnə parolunuzu yazmağı istəmir. Parolu bildiyiniz saytda özünüz dəyişin."
+        },
+        {
+          "id": "link",
+          "label": "Kənar link",
+          "explain": "Link agentliyin saytına deyil, başqa domenə aparır."
+        },
+        {
+          "id": "urgency",
+          "label": "Bir saatlıq hədə",
+          "explain": "Qısa müddət və hədə sizi düşünmədən hərəkət etməyə təhrik edir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "reset-page",
+      "environment": "browser",
+      "title": "Parolunuzu sıfırlayın",
+      "intro": "Sızma xəbərdarlığından sonra brauzerdə parol sıfırlama səhifəsi açılır. Ünvanı oxuyun və qərar verin.",
+      "steps": [
+        {
+          "id": "leak-page",
+          "label": "Parolunuz sızan məlumatlar arasında tapılıb",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi-fake",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "hesab-yoxla.info"
+              },
+              {
+                "text": "hesab-yoxla.info",
+                "spot": "real-domain"
+              },
+              {
+                "text": "/sizma"
+              }
+            ]
+          },
+          "say": "Səhifə sizi qorxudur və tələsdirir. Bu ünvan kimə məxsusdur?",
+          "actions": [
+            {
+              "id": "reset-here",
+              "label": "Parolu burada sıfırla",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Sızma xəbərdarlığından sonra linkə keçməyin. Parolu özünüz açdığınız saytda dəyişin."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla, portalı özüm açacağam",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür: hesab-yoxla.info agentliyin saytı deyil. Portalı əlfəcindən özünüz açın.",
+              "next": "real-reset"
+            }
+          ]
+        },
+        {
+          "id": "fake-reset",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi-fake",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "parol-yenile.info"
+              },
+              {
+                "text": "parol-yenile.info",
+                "spot": "real-domain"
+              },
+              {
+                "text": "/agentlik"
+              }
+            ],
+            "fields": [
+              "E-poçt",
+              "Köhnə parol",
+              "Yeni parol"
+            ],
+            "button": "Parolu sıfırla"
+          },
+          "say": "Forma köhnə parolunuzu da istəyir. Ünvanı yoxlayın.",
+          "actions": [
+            {
+              "id": "submit",
+              "label": "Parolu sıfırla",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Köhnə parolu istəyən saxta forma onu oğurlayır. Parolu dərhal rəsmi portalda dəyişin və bildirin."
+            },
+            {
+              "id": "close",
+              "label": "Vərəqi bağla",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Düzdür. Bu səhifə agentliyin deyil, parol-yenile.info domenindədir, ona görə burada heç nə yazmayın."
+            },
+            {
+              "id": "report",
+              "label": "Saytı bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Əla. Saxta saytı bildirmək onun başqaları üçün də bloklanmasına kömək edir."
+            }
+          ]
+        },
+        {
+          "id": "real-reset",
+          "label": "Portalı özünüz açdınız",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/profil/parol",
+                "reveal": "xidmetagentliyi.az"
+              }
+            ],
+            "fields": [
+              "Köhnə parol",
+              "Yeni parol ifadəsi"
+            ],
+            "button": "Dəyiş"
+          },
+          "say": "Bu, agentliyin öz portalıdır. İndi nə edirsiniz?",
+          "actions": [
+            {
+              "id": "change",
+              "label": "Parolu dəyiş",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Düzdür, parolu rəsmi portalda dəyişdiniz. Yeni parol başqa heç yerdə istifadə olunmayan uzun bir ifadə olsun."
+            },
+            {
+              "id": "later",
+              "label": "Sonra dəyişərəm",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Parol sızıbsa, kimsə artıq onunla daxil olmağa çalışa bilər. Onu indi rəsmi portalda dəyişin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "true-rules",
+      "question": {
+        "prompt": "Hansı qaydalar doğrudur?",
+        "options": [
+          {
+            "id": "length",
+            "label": "Uzunluq mürəkkəblikdən daha vacibdir",
+            "correct": true,
+            "feedback": "Düzdür. Uzun parolu sındırmaq qat-qat çətindir."
+          },
+          {
+            "id": "unique",
+            "label": "Hər hesab üçün ayrıca parol",
+            "correct": true,
+            "feedback": "Düzdür. Onda bir sızma yalnız bir hesabı riskə atır."
+          },
+          {
+            "id": "monthly",
+            "label": "Parolu hər ay dəyişin",
+            "correct": false,
+            "feedback": "Səbəbsiz dəyişmək çox vaxt zəif və bir-birinə oxşar parollara gətirib çıxarır. Sızmadan şübhələnsəniz, parolu dərhal dəyişin."
+          },
+          {
+            "id": "birth-year",
+            "label": "Doğum ili parolu yadda saxlamağa kömək edir",
+            "correct": false,
+            "feedback": "Doğum ilini tapmaq asandır və hücumçular onu ilk növbədə yoxlayır."
+          }
+        ],
+        "multi": true
+      },
+      "explain": "Bugünkü tövsiyə belədir: hər hesab üçün ayrıca uzun parol, sızma olanda isə onu dərhal dəyişmək. Təşkilatınızın qaydaları fərqlidirsə, onlara əməl edin."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Uzun parol ifadəsi qısa və mürəkkəb paroldan daha güclüdür.",
+        "Hər hesab üçün ayrıca parol istifadə edin.",
+        "Sızmadan sonra parolu dərhal dəyişin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

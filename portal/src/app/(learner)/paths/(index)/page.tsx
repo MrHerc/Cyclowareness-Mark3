@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
+import { localizeStandard } from "@/lib/standards";
 import { BadgeCheck, ChevronRight, Route, Users, Repeat } from "lucide-react";
 import { requireFeature } from "@/server/auth/viewer";
 import { getPaths } from "@/server/queries/paths";
@@ -53,7 +54,7 @@ export default async function PathsPage() {
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {p.standards.map((s) => (
                   <span key={s} className="rounded-xs bg-sunken px-2 py-0.5 font-mono text-tab-sm text-ink-muted">
-                    {s}
+                    {localizeStandard(s, locale)}
                   </span>
                 ))}
               </div>

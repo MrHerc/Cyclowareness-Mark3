@@ -27,8 +27,9 @@ function colName(i: number): string {
   return s;
 }
 
+/** Excel's serial date of a moment, as Baku wall-clock time (fixed +04:00, no daylight saving; see lib/time.ts), the time the app shows. */
 function excelDate(d: Date): number {
-  return d.getTime() / 86_400_000 + 25569;
+  return (d.getTime() + 4 * 3_600_000) / 86_400_000 + 25569;
 }
 
 function sheetXml(headers: string[], rows: Cell[][]): string {

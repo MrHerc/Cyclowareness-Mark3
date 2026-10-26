@@ -1,15 +1,16 @@
 import { isUuid } from "@/lib/ids";
 import { and, desc, eq } from "drizzle-orm";
+import { getTranslations } from "next-intl/server";
 import { db, t } from "@/server/db";
-import { apiViewer } from "@/server/auth/viewer";
+import { apiViewer } from "@/server/auth/api";
 import { audit } from "@/server/services/audit";
 import { toCsv } from "@/lib/csv";
 import { todayInBaku } from "@/lib/time";
 
-/** Sign-off list of the current policy version, for auditors. */
-export async function GET(_: Request, { params }: RouteContext<"/api/admin/policies/[id]/signoffs">) {
+/** Sign-off list of the current policy version, for auditors, with columns and values in the admin's language. */
+export async function GET(request: Request, { params }: RouteContext<"/api/admin/policies/[id]/signoffs">) {
   const { id } = await params;
-  const v = await apiViewer("policies.read");
+  const v = await apiViewer("policies.read", request);
   if (v instanceof Response) return v;
   if (!isUuid(id)) return new Response("Not found", { status: 404 });
   const [policy] = await db().select().from(t.policies).where(and(eq(t.policies.id, id), eq(t.policies.tenantId, v.tenant.id)));
@@ -23,11 +24,12 @@ export async function GET(_: Request, { params }: RouteContext<"/api/admin/polic
   const signoffs = version ? await db().select().from(t.policySignoffs).where(eq(t.policySignoffs.versionId, version.id)) : [];
   const by = new Map(signoffs.map((s) => [s.userId, s]));
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "policy.signoffs_downloaded", targetType: "policy", targetId: id, meta: { version: version?.version ?? null, people: people.length } });
+  const tr = await getTranslations("admin.reports.cols");
   const csv = toCsv(
-    ["name", "email", "department", "policy", "version", "signed", "signed_at", "ip"],
+    [tr("person"), tr("email"), tr("department"), tr("policy"), tr("version"), tr("signed"), tr("signedAt"), "IP"],
     people.map((p) => {
       const s = by.get(p.id);
-      return [p.name, p.email, p.department ?? "", policy.title, version?.version ?? "", s ? "yes" : "no", s?.signedAt.toISOString() ?? "", s?.ip ?? ""];
+      return [p.name, p.email, p.department ?? "", policy.title, version?.version ?? "", s ? tr("yes") : tr("no"), s?.signedAt ?? null, s?.ip ?? ""];
     }),
   );
   return new Response(csv, { headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="policy-signoffs-${todayInBaku()}.csv"`, "cache-control": "no-store" } });
