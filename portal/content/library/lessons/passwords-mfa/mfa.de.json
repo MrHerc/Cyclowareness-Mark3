@@ -1,0 +1,403 @@
+{
+  "id": "mfa",
+  "title": "Zwei-Faktor-Authentisierung",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "second-step",
+      "beats": [
+        {
+          "id": "why",
+          "say": "Selbst wenn Ihr Passwort gestohlen wird, kann ein zweiter Schritt das Konto schützen. Das nennt man Zwei-Faktor-Authentisierung.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        },
+        {
+          "id": "best",
+          "say": "Am stärksten sind Passkeys und Sicherheitsschlüssel. Auf gefälschten Websites funktionieren sie nicht.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "code",
+          "say": "Der Code ist nur für Sie bestimmt. Wer danach fragt, will Sie betrügen, selbst wenn er sich als Ihre Bank ausgibt.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "brandRef": "ulduzbank",
+              "sender": [
+                {
+                  "text": "UlduzBank"
+                }
+              ],
+              "time": "14:02",
+              "messages": [
+                [
+                  {
+                    "text": "Anmeldecode: 482 913. "
+                  },
+                  {
+                    "text": "Geben Sie diesen Code an niemanden weiter, auch nicht an Mitarbeitende der Bank.",
+                    "spot": "code-warning"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "code-warning"
+        },
+        {
+          "id": "prompts",
+          "say": "Wenn immer wieder Anmeldeanfragen kommen, die Sie nicht erwartet haben, versucht jemand, sich mit Ihrem Passwort anzumelden.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          },
+          "checkpoint": {
+            "prompt": "Was tun Sie bei einer unerwarteten Anfrage?",
+            "options": [
+              {
+                "id": "approve",
+                "label": "Bestätigen, damit es aufhört",
+                "correct": false,
+                "feedback": "Wenn Sie bestätigen, kommt der Angreifer hinein."
+              },
+              {
+                "id": "deny",
+                "label": "Ablehnen und mein Passwort ändern",
+                "correct": true,
+                "feedback": "Richtig. Informieren Sie danach auch die IT-Sicherheit."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "night-push",
+      "environment": "phone",
+      "title": "Anfragen mitten in der Nacht",
+      "intro": "Es ist zwei Uhr nachts, und Sie schlafen. Ihr Smartphone fragt immer wieder, ob Sie eine Anmeldung bestätigen.",
+      "steps": [
+        {
+          "id": "push-1",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "tesdiqleyici",
+            "app": "Təsdiqləyici",
+            "title": [
+              {
+                "text": "Anmeldung bestätigen?"
+              }
+            ],
+            "body": [
+              {
+                "text": "Portal von Xidmət Agentliyi. Windows-Computer."
+              }
+            ],
+            "time": "02:14"
+          },
+          "say": "Sie melden sich gerade nirgendwo an.",
+          "actions": [
+            {
+              "id": "approve",
+              "label": "Bestätigen",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Sie melden sich nicht an, also ist das jemand anderes. Mit Ihrer Bestätigung lassen Sie die Person mit Ihrem Passwort hinein."
+            },
+            {
+              "id": "deny",
+              "label": "Ablehnen",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Richtig. Lehnen Sie eine Anfrage, die Sie nicht erwartet haben, immer ab."
+            }
+          ]
+        },
+        {
+          "id": "push-5",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "tesdiqleyici",
+            "app": "Təsdiqləyici",
+            "title": [
+              {
+                "text": "Anmeldung bestätigen?"
+              }
+            ],
+            "body": [
+              {
+                "text": "Fünfte Anfrage. Windows-Computer."
+              }
+            ],
+            "time": "02:16"
+          },
+          "say": "Die Anfragen hören nicht auf.",
+          "actions": [
+            {
+              "id": "approve",
+              "label": "Bestätigen, damit es aufhört",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Push-Bombing, also eine Flut von Anfragen, setzt genau darauf: dass Sie müde werden und bestätigen. Eine Bestätigung öffnet das Konto."
+            },
+            {
+              "id": "deny",
+              "label": "Ablehnen",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Richtig. Wiederholte Anfragen bedeuten, dass jemand Ihr Passwort kennt."
+            },
+            {
+              "id": "report",
+              "label": "Das bin ich nicht – melden",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Sehr gut. Durch Ihre Meldung sieht das Sicherheitsteam den Angriff sofort."
+            }
+          ]
+        },
+        {
+          "id": "fake-it-chat",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek-fake",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "IT-Support"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hallo, gerade läuft eine nächtliche Überprüfung. Bestätigen Sie die letzte Anfrage, damit Ihr Konto nicht gesperrt wird."
+                  }
+                ],
+                "time": "02:17"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "agree",
+              "label": "OK, ich bestätige",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Der IT-Support bittet Sie nie, eine Anfrage zu bestätigen. Das ist die zweite Hälfte des Angriffs."
+            },
+            {
+              "id": "block",
+              "label": "Blockieren und melden",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Richtig. Eine unbekannte Nummer, die nachts schreibt, ist nicht der Support, sondern der Angreifer."
+            }
+          ]
+        },
+        {
+          "id": "change-now",
+          "label": "Sie haben das Portal selbst geöffnet",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/profil/parol"
+              }
+            ],
+            "fields": [
+              "Altes Passwort",
+              "Neue Passphrase"
+            ],
+            "button": "Ändern"
+          },
+          "say": "Ihr Passwort wurde gestohlen. Was jetzt?",
+          "actions": [
+            {
+              "id": "change",
+              "label": "Passwort jetzt ändern",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Richtig. Informieren Sie danach das Sicherheitsteam, damit es Sie von allen offenen Sitzungen abmeldet."
+            },
+            {
+              "id": "later",
+              "label": "Ich sehe morgen früh nach",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Der Angreifer kennt Ihr Passwort und wird es wieder versuchen. Ändern Sie es jetzt."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "strongest-factor",
+      "question": {
+        "prompt": "Welcher zweite Schritt schützt am besten vor Phishing?",
+        "options": [
+          {
+            "id": "sms",
+            "label": "SMS-Code",
+            "correct": false,
+            "feedback": "Eine gefälschte Website kann nach dem Code fragen, und Ihre SIM-Karte kann auf jemand anderen übertragen werden."
+          },
+          {
+            "id": "app",
+            "label": "Authenticator-App",
+            "correct": false,
+            "feedback": "Besser als SMS, aber Sie können den Code trotzdem auf einer gefälschten Website eingeben."
+          },
+          {
+            "id": "key",
+            "label": "Passkey oder Sicherheitsschlüssel",
+            "correct": true,
+            "feedback": "Richtig. Ein solcher Schlüssel funktioniert nur mit der echten Website."
+          },
+          {
+            "id": "email",
+            "label": "Code per E-Mail",
+            "correct": false,
+            "feedback": "Wird Ihr E-Mail-Konto übernommen, ist auch der Code in fremden Händen."
+          }
+        ]
+      },
+      "explain": "Ein zweiter Schritt, ganz gleich welcher, ist besser als nur ein Passwort. Wählen Sie, wenn möglich, einen Schlüssel."
+    },
+    {
+      "type": "hotspot",
+      "id": "code-request",
+      "prompt": "Finden Sie die Gefahr in diesen Nachrichten.",
+      "artifact": {
+        "kind": "chat",
+        "app": "whatsapp",
+        "contact": [
+          {
+            "text": "+994 50 000 26 43",
+            "spot": "unknown-number",
+            "reveal": "Nicht in Ihren Kontakten"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Hallo Aynur! Ich bin’s, Nigar. Das ist meine neue Nummer."
+              }
+            ],
+            "time": "20:31"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Ich habe aus Versehen einen Code an deine Nummer geschickt.",
+                "spot": "mistake"
+              }
+            ],
+            "time": "20:31"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Schick mir bitte den sechsstelligen Code, den du gerade bekommen hast.",
+                "spot": "ask-code"
+              }
+            ],
+            "time": "20:32"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Schnell, er läuft in zwei Minuten ab.",
+                "spot": "urgency"
+              }
+            ],
+            "time": "20:32"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "unknown-number",
+          "label": "Unbekannte Nummer",
+          "explain": "Ein bekannter Name, aber eine neue Nummer. Rufen Sie zur Prüfung die alte Nummer Ihrer Freundin an."
+        },
+        {
+          "id": "mistake",
+          "label": "„Aus Versehen geschickt“",
+          "explain": "Ein Code landet nicht aus Versehen bei Ihrer Nummer. Jemand versucht, in Ihren Account zu gelangen."
+        },
+        {
+          "id": "ask-code",
+          "label": "Frage nach dem Code",
+          "explain": "Wenn Sie diesen Code weitergeben, übernehmen Kriminelle Ihren Account und schreiben in Ihrem Namen an Ihre Freundinnen und Freunde."
+        },
+        {
+          "id": "urgency",
+          "label": "Eile",
+          "explain": "Wenig Zeit lässt keinen Raum zum Nachdenken. Schicken Sie niemals jemandem einen Code."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "order",
+      "id": "setup-authenticator",
+      "prompt": "Bringen Sie die Schritte zur Einrichtung einer Authenticator-App in die richtige Reihenfolge.",
+      "items": [
+        {
+          "id": "turn-on",
+          "label": "Zwei-Faktor-Authentisierung in den Kontoeinstellungen einschalten"
+        },
+        {
+          "id": "scan",
+          "label": "Den QR-Code auf dem Bildschirm mit der App scannen"
+        },
+        {
+          "id": "enter-code",
+          "label": "Den Code eingeben, den die App anzeigt"
+        },
+        {
+          "id": "backup",
+          "label": "Die Backup-Codes an einem sicheren Ort aufbewahren"
+        }
+      ],
+      "explain": "Mit den Backup-Codes kommen Sie wieder in Ihr Konto, falls Sie Ihr Smartphone verlieren."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Wählen Sie, wenn möglich, einen Passkey oder eine Authenticator-App.",
+        "Nennen oder schicken Sie niemals jemandem einen Code.",
+        "Unerwartete Anfragen ablehnen, Passwort ändern, Vorfall melden."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

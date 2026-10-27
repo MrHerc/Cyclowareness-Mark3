@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
-import { isLocale } from "@/i18n/config";
+import { isLocale, langAttrs } from "@/i18n/config";
 import { loadMessages } from "@/i18n/messages";
 import { AzNumbersGate } from "@/components/az-numbers-gate";
 
@@ -18,7 +18,7 @@ export async function TeachableLocale({ view, children }: { view: object; childr
   return (
     <NextIntlClientProvider locale={locale} messages={{ site: messages.site, common: messages.common }}>
       <AzNumbersGate>
-        <div lang={locale}>{children}</div>
+        <div {...langAttrs(locale)}>{children}</div>
       </AzNumbersGate>
     </NextIntlClientProvider>
   );

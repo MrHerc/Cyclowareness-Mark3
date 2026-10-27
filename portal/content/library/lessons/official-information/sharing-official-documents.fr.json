@@ -1,0 +1,393 @@
+{
+ "id": "sharing-official-documents",
+ "title": "Partager des documents",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l2-tutor",
+   "beats": [
+    {
+     "id": "l2-b1",
+     "say": "Les documents officiels ne circulent que par les canaux officiels : la messagerie électronique professionnelle ou le système de gestion documentaire.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "l2-b2",
+     "say": "Les messageries instantanées et les adresses e-mail personnelles échappent au contrôle de l’institution. Un document peut s’y perdre ou fuiter.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Narmin Huseynova (perso)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "me",
+         "body": [
+          {
+           "text": "Emr_layihesi_2027.pdf",
+           "spot": "doc"
+          }
+         ],
+         "time": "19:42"
+        }
+       ]
+      }
+     },
+     "highlight": "doc"
+    },
+    {
+     "id": "l2-b3",
+     "say": "Relisez le destinataire avant d’envoyer. La saisie automatique peut proposer un nom très proche, qui appartient à quelqu’un d’autre.",
+     "mood": "think",
+     "gesture": "point-down",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Envoyer maintenant ?"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "À : "
+         },
+         {
+          "text": "aysel.mamedova@poct-mail.example",
+          "spot": "recipient"
+         }
+        ],
+        [
+         {
+          "text": "Pièce jointe : Kadr_siyahisi.xlsx"
+         }
+        ]
+       ],
+       "buttons": [
+        "Annuler",
+        "Envoyer"
+       ]
+      }
+     },
+     "highlight": "recipient"
+    },
+    {
+     "id": "l2-b4",
+     "say": "Dans le doute, n’envoyez pas : demandez. Si un document est parti au mauvais endroit, signalez-le immédiatement.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l2-hotspot",
+   "prompt": "Trouvez les erreurs dans cet e-mail avant qu’il ne parte.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "ispoct",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Prêt à l’envoi"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "À : "
+      },
+      {
+       "text": "rauf.huseynov@poct-mail.example",
+       "spot": "personal-address"
+      }
+     ],
+     [
+      {
+       "text": "Cc : "
+      },
+      {
+       "text": "Tout le personnel (212 personnes)",
+       "spot": "too-many"
+      }
+     ],
+     [
+      {
+       "text": "Pièce jointe : "
+      },
+      {
+       "text": "Vetendas_muracietleri_FIN.xlsx",
+       "spot": "personal-data"
+      }
+     ],
+     [
+      {
+       "text": "Message : si le fichier ne s’ouvre pas, "
+      },
+      {
+       "text": "mot de passe : Baki2026",
+       "spot": "password"
+      }
+     ]
+    ],
+    "buttons": [
+     "Modifier",
+     "Envoyer"
+    ]
+   },
+   "spots": [
+    {
+     "id": "personal-address",
+     "label": "Adresse e-mail personnelle",
+     "explain": "Les documents officiels vont à une adresse professionnelle ou dans le système documentaire. Une adresse e-mail personnelle échappe au contrôle de l’institution."
+    },
+    {
+     "id": "too-many",
+     "label": "Copie à tout le monde",
+     "explain": "Les 212 personnes n’ont pas toutes besoin de ce fichier. Choisissez uniquement celles qui en ont besoin."
+    },
+    {
+     "id": "personal-data",
+     "label": "Numéros d’identité des citoyens",
+     "explain": "Un fichier contenant des données personnelles ne va qu’aux personnes qui travaillent dessus, et reste de préférence dans le système."
+    },
+    {
+     "id": "password",
+     "label": "Mot de passe dans le même e-mail",
+     "explain": "Envoyer le mot de passe avec le fichier annule la protection. Communiquez le mot de passe par un autre canal."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "l2-sim",
+   "environment": "phone",
+   "title": "Loin du bureau",
+   "intro": "Vous n’êtes pas au bureau et des messages professionnels arrivent. Choisissez la bonne réaction pour chacun.",
+   "steps": [
+    {
+     "id": "manager-whatsapp",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Narmin Huseynova"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour, je ne suis pas au bureau. Envoyez-moi le projet d’arrêté sur WhatsApp, je le regarderai d’ici."
+         }
+        ],
+        "time": "18:10"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "share",
+       "label": "Envoyer le fichier sur WhatsApp",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Dans une messagerie instantanée personnelle, le document échappe au contrôle de l’institution. Les responsables disposent eux aussi d’un canal officiel."
+      },
+      {
+       "id": "reply",
+       "label": "Je vous l’envoie via SənədAxını",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Exact. Le document reste dans le système officiel, et votre responsable peut l’y ouvrir."
+      }
+     ]
+    },
+    {
+     "id": "old-colleague",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Nazim (ancien collègue)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Alors, le nouvel arrêté est sorti ? Envoie-moi une photo, je ne dirai rien à personne."
+         }
+        ],
+        "time": "18:25"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "keep",
+       "label": "Tu le verras sur le site une fois qu’il sera publié",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Un document non publié ne sort pas de l’institution."
+      },
+      {
+       "id": "share",
+       "label": "Prendre une photo et l’envoyer",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Vous ne contrôlez plus cette photo. Elle peut être diffusée n’importe où."
+      }
+     ]
+    },
+    {
+     "id": "wrong-recipient",
+     "label": "Vous vouliez écrire à votre collègue Aysel Mammadova",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "İşPoçt",
+      "title": [
+       {
+        "text": "E-mail envoyé"
+       }
+      ],
+      "body": [
+       {
+        "text": "À : aysel.mamedova@poct-mail.example. Pièce jointe : Kadr_siyahisi.xlsx"
+       }
+      ],
+      "time": "18:40"
+     },
+     "say": "Regardez attentivement l’adresse du destinataire.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Prévenir votre responsable et l’équipe sécurité",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Signaler vite, c’est gagner du temps pour limiter les dégâts."
+      },
+      {
+       "id": "ignore",
+       "label": "Laisser tomber, personne ne le remarquera",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Le fichier se trouve à une adresse externe. Le cacher aggrave les dégâts, le signaler protège."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "l2-choice",
+   "question": {
+    "prompt": "Comment emporter un document officiel chez vous pour y travailler ?",
+    "options": [
+     {
+      "id": "personal-mail",
+      "label": "Je l’envoie par e-mail à mon adresse personnelle",
+      "correct": false,
+      "feedback": "Une messagerie électronique personnelle échappe au contrôle de l’institution. Le document y reste et peut fuiter."
+     },
+     {
+      "id": "usb",
+      "label": "Je le copie sur ma propre clé USB",
+      "correct": false,
+      "feedback": "Une clé USB se perd facilement. N’emportez pas de documents officiels sans l’autorisation de votre institution."
+     },
+     {
+      "id": "approved",
+      "label": "Par la voie que l’institution autorise : ordinateur portable professionnel ou VPN",
+      "correct": true,
+      "feedback": "Exact. La voie autorisée protège le document et le garde sous contrôle."
+     }
+    ]
+   },
+   "explain": "Le télétravail suit les règles de l’institution. S’il n’existe aucune voie autorisée, le document reste au bureau."
+  },
+  {
+   "type": "scenario",
+   "id": "l2-scenario",
+   "title": "Imprimante partagée",
+   "start": "p1",
+   "nodes": [
+    {
+     "id": "p1",
+     "text": "Vous avez envoyé un rapport confidentiel à l’imprimante partagée du couloir. Au même moment, votre téléphone sonne.",
+     "choices": [
+      {
+       "label": "Je prends l’appel et j’irai à l’imprimante plus tard",
+       "next": "p2",
+       "outcome": "risky",
+       "feedback": "Le document reste dans l’imprimante, et n’importe qui peut le voir en passant."
+      },
+      {
+       "label": "Je récupère d’abord le document",
+       "next": "p2",
+       "outcome": "safe",
+       "feedback": "Exact. Si l’imprimante propose l’impression sécurisée par code PIN, utilisez-la."
+      }
+     ]
+    },
+    {
+     "id": "p2",
+     "text": "Un document marqué, qui appartient à quelqu’un d’autre, traîne aussi dans l’imprimante.",
+     "choices": [
+      {
+       "label": "Je le lis pour savoir à qui il appartient",
+       "outcome": "risky",
+       "feedback": "Inutile de le lire. Remettez-le à l’équipe sécurité ou au chef de service."
+      },
+      {
+       "label": "Je le jette à la poubelle",
+       "outcome": "risky",
+       "feedback": "Un papier se récupère facilement dans une poubelle ordinaire. Un document marqué se détruit au broyeur."
+      },
+      {
+       "label": "Je le remets à l’équipe sécurité, sans le lire",
+       "outcome": "safe",
+       "feedback": "Exact. Le document retrouve son propriétaire, et personne ne le lit."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "l2-recap",
+   "points": [
+    "Les documents officiels passent par les canaux officiels, jamais par une messagerie instantanée ou une adresse e-mail personnelle.",
+    "Vérifiez le destinataire et la pièce jointe avant d’envoyer, et signalez immédiatement toute erreur.",
+    "Ne laissez pas de document marqué dans l’imprimante et ne le jetez pas dans une poubelle ordinaire."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

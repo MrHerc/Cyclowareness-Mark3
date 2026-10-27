@@ -1,0 +1,469 @@
+{
+ "id": "event-wifi-charging",
+ "title": "WLAN und Ladestationen auf Veranstaltungen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Auf Veranstaltungen verbinden sich Hunderte Menschen mit demselben Netz. Angreifer können ein zweites Netz mit dem gleichen Namen einrichten.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Ein offenes Netz mit starkem Signal und ähnlichem Namen kann eine Falle sein. Fragen Sie an der Registrierung nach dem richtigen Namen.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "wifi",
+       "networks": [
+        {
+         "ssid": [
+          {
+           "text": "ReqemYol-Forum"
+          }
+         ],
+         "secured": true,
+         "signal": 3
+        },
+        {
+         "ssid": [
+          {
+           "text": "ReqemYol-Forum-FREE",
+           "spot": "twin"
+          }
+         ],
+         "secured": false,
+         "signal": 4
+        }
+       ]
+      }
+     },
+     "highlight": "twin"
+    },
+    {
+     "id": "b3",
+     "say": "Nutzen Sie für die Arbeit mobile Daten oder das VPN Ihrer Organisation. Geben Sie Ihr dienstliches Passwort niemals auf einer WLAN-Anmeldeseite ein.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "vpn"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Laden Sie nicht an einer öffentlichen Ladestation, sondern mit Ihrem eigenen Netzteil an der Steckdose oder mit Ihrer eigenen Powerbank.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "forum-wifi",
+   "environment": "browser",
+   "title": "Das WLAN beim Forum",
+   "intro": "Auf dem Forum haben Sie sich mit einem offenen Netz verbunden, und der Browser hat sich geöffnet. Wählen Sie auf jeder Seite den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "portal-login",
+     "label": "ReqemYol-Forum-FREE",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "nc-reqemyol-fake",
+      "brand": "RəqəmYol Forum Wi-Fi",
+      "url": [
+       {
+        "text": "http://wifi-reqemyol-forum.example.net/login"
+       }
+      ],
+      "fields": [
+       "Dienstliche E-Mail-Adresse",
+       "Passwort der dienstlichen E-Mail"
+      ],
+      "button": "Mit dem Internet verbinden"
+     },
+     "say": "Was verlangt diese WLAN-Seite?",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Mit dem Internet verbinden",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Eine WLAN-Seite braucht nie Ihr dienstliches Passwort. Wer dieses offene Netz betreibt, kennt es jetzt."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Trennen Sie die Verbindung zu diesem Netz und fragen Sie an der Registrierung nach dem richtigen Namen."
+      },
+      {
+       "id": "disconnect",
+       "label": "Verbindung trennen",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Ein unbekanntes offenes Netz zu verlassen ist der schnellste Schutz."
+      }
+     ]
+    },
+    {
+     "id": "cert-warning",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Dies ist keine sichere Verbindung"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Das Zertifikat für poct.idare.example ist ungültig."
+        }
+       ],
+       [
+        {
+         "text": "Möglicherweise versucht jemand, Ihre Daten mitzulesen."
+        }
+       ]
+      ],
+      "buttons": [
+       "Zurück",
+       "Trotzdem fortfahren"
+      ]
+     },
+     "say": "Sie öffnen Ihr dienstliches Postfach, und der Browser zeigt eine Warnung.",
+     "actions": [
+      {
+       "id": "back",
+       "label": "Zurück",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Diese Warnung kann bedeuten, dass sich jemand in Ihre Verbindung eingeklinkt hat. Wechseln Sie deshalb zu mobilen Daten."
+      },
+      {
+       "id": "proceed",
+       "label": "Trotzdem fortfahren",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Wenn Sie die Warnung übergehen, kann Ihr Passwort bei jemandem landen, der sich in Ihre Verbindung eingeklinkt hat. Gehen Sie zurück und wechseln Sie das Netz."
+      }
+     ]
+    },
+    {
+     "id": "setup-download",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-reqemyol-fake",
+      "name": [
+       {
+        "text": "ReqemYol_WiFi_Setup.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "4,1 MB",
+      "source": [
+       {
+        "text": "wifi-reqemyol-forum.example.net"
+       }
+      ]
+     },
+     "say": "Die Seite bietet Software für das WLAN an.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Datei öffnen",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Zum Verbinden mit einem WLAN braucht man keine Software. Diese Datei installiert Schadsoftware auf dem Computer."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein Veranstaltungsnetz verlangt nie, dass Sie Software installieren."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "network-list",
+   "prompt": "Welche Netze auf der Veranstaltung wirken verdächtig? Finden Sie sie.",
+   "artifact": {
+    "kind": "wifi",
+    "networks": [
+     {
+      "ssid": [
+       {
+        "text": "ReqemYol-Forum"
+       }
+      ],
+      "secured": true,
+      "signal": 3
+     },
+     {
+      "ssid": [
+       {
+        "text": "ReqemYol-Forum-FREE",
+        "spot": "free"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "ReqemYol_Forum",
+        "spot": "twin"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Pulsuz_Sarj_WiFi",
+        "spot": "charge"
+       }
+      ],
+      "secured": false,
+      "signal": 2
+     },
+     {
+      "ssid": [
+       {
+        "text": "Lumera-Guest"
+       }
+      ],
+      "secured": true,
+      "signal": 1
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "free",
+     "label": "Zusatz „FREE“",
+     "explain": "Das Netz ist offen, und an den Namen wurde FREE angehängt. Den offiziellen Namen erfahren Sie an der Registrierung."
+    },
+    {
+     "id": "twin",
+     "label": "Täuschend ähnlicher Name",
+     "explain": "Der Name entspricht fast dem offiziellen, nur ein Zeichen ist anders. Das kann ein sogenannter Evil Twin sein, ein gefälschter Zwilling des echten Netzes."
+    },
+    {
+     "id": "charge",
+     "label": "Verlockender Name",
+     "explain": "Ein offenes Netz, das etwas gratis verspricht („Pulsuz Sarj“ heißt „kostenloses Laden“), ist ein klassisches Warnsignal für eine Falle."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "choice",
+   "id": "charging",
+   "question": {
+    "prompt": "Ihr Smartphone hat noch 5 Prozent Akku, und in der Halle gibt es eine öffentliche USB-Ladestation. Was tun Sie?",
+    "options": [
+     {
+      "id": "own-adapter",
+      "label": "Mein eigenes Netzteil an eine Steckdose anschließen",
+      "correct": true,
+      "feedback": "Richtig. Eine Steckdose liefert nur Strom, keine Daten."
+     },
+     {
+      "id": "powerbank",
+      "label": "Mit meiner eigenen Powerbank laden",
+      "correct": true,
+      "feedback": "Richtig. Ihre eigene Powerbank bleibt unter Ihrer Kontrolle."
+     },
+     {
+      "id": "trust",
+      "label": "An die Station anschließen und auf „Vertrauen“ tippen",
+      "correct": false,
+      "feedback": "Mit „Vertrauen“ erhält das Gerät Zugriff auf die Daten Ihres Smartphones. Zum Laden ist das nicht nötig."
+     },
+     {
+      "id": "stranger-cable",
+      "label": "Das Kabel der Person neben mir ausleihen",
+      "correct": false,
+      "feedback": "In einem unbekannten Kabel kann ein Chip versteckt sein. Nehmen Sie Ihr eigenes Kabel und Netzteil mit."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "usb"
+    }
+   },
+   "explain": "Am sichersten sind Ihr eigenes Netzteil an der Steckdose oder Ihre eigene Powerbank. Wenn das Smartphone fragt, wählen Sie „Nicht vertrauen“."
+  },
+  {
+   "type": "swipe",
+   "id": "event-messages",
+   "prompt": "Was während der Veranstaltung ankommt. Sicher oder eine Bedrohung?",
+   "cards": [
+    {
+     "id": "badge-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "nc-reqemyol",
+      "sender": [
+       {
+        "text": "ReqemYol"
+       }
+      ],
+      "time": "08:30",
+      "messages": [
+       [
+        {
+         "text": "Ihr Teilnehmerausweis liegt bereit. Bringen Sie Ihren Ausweis zur Registrierung mit."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Kein Link, nichts zu bezahlen und nichts einzugeben. Das ist eine normale Erinnerung."
+    },
+    {
+     "id": "cert-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "nc-reqemyol-fake",
+      "from": {
+       "name": [
+        {
+         "text": "RəqəmYol Forum"
+        }
+       ],
+       "address": [
+        {
+         "text": "sertifikat@reqemyol-forum.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Ihr Teilnahmezertifikat"
+       }
+      ],
+      "time": "17:05",
+      "body": [
+       [
+        {
+         "text": "Melden Sie sich mit Ihrer dienstlichen E-Mail-Adresse an, um das Zertifikat herunterzuladen: "
+        },
+        {
+         "text": "reqemyol-forum.example.info/certificate",
+         "link": {
+          "label": "reqemyol-forum.example.info/certificate",
+          "href": "https://reqemyol-forum.example.info/certificate"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Die offizielle Website ist reqemyol-forum.example, und das hier ist eine andere Domain. Für ein Zertifikat brauchen Sie nie Ihr dienstliches Passwort."
+    },
+    {
+     "id": "qr-table",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Aufkleber auf dem Tisch: Scannen für kostenloses WLAN"
+       }
+      ],
+      "destination": [
+       {
+        "text": "http://wifi-giris.example.info/connect"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Einen Aufkleber kann jeder anbringen, und die Adresse gehört nicht zum Forum. Fragen Sie an der Registrierung nach dem Netzwerknamen."
+    },
+    {
+     "id": "session-note",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-reqemyol",
+      "app": "RəqəmYol Forum",
+      "title": [
+       {
+        "text": "Nächster Programmpunkt in 15 Minuten"
+       }
+      ],
+      "body": [
+       {
+        "text": "Podiumsdiskussion Cybersicherheit, Saal B."
+       }
+      ],
+      "time": "13:45"
+     },
+     "verdict": "safe",
+     "explain": "Die Benachrichtigung kommt aus der App, die Sie aus dem offiziellen App-Store installiert haben. Kein Link und keine Forderung."
+    },
+    {
+     "id": "trust-prompt",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Diesem Gerät vertrauen?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Das verbundene Gerät möchte auf die Dateien Ihres Smartphones zugreifen."
+        }
+       ]
+      ],
+      "buttons": [
+       "Nicht vertrauen",
+       "Vertrauen"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Eine Ladestation sollte nicht nach Ihren Dateien fragen. Wählen Sie „Nicht vertrauen“ – das Laden geht trotzdem weiter."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Fragen Sie an der Registrierung nach dem Netzwerknamen und nutzen Sie für die Arbeit mobile Daten oder ein VPN.",
+    "Geben Sie Ihr dienstliches Passwort nie auf einer WLAN-Seite ein und übergehen Sie keine Zertifikatswarnung.",
+    "Laden Sie mit Ihrem eigenen Netzteil an der Steckdose oder mit Ihrer eigenen Powerbank."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

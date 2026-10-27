@@ -1,0 +1,462 @@
+{
+ "id": "fake-dashboard",
+ "title": "Sahte kazanç paneli",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fd-tutor",
+   "beats": [
+    {
+     "id": "fd-b1",
+     "say": "Para yatırdıktan sonra platform size güzel bir grafik ve sürekli büyüyen bir bakiye gösterir.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "fd-b2",
+     "say": "Sahte bir platformda bu rakamlar ekrandaki yazılardan ibarettir, arkalarında hiçbir para yoktur.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2d-bakutrade",
+       "tone": "app",
+       "title": [
+        {
+         "text": "BakuTrade Pro | "
+        },
+        {
+         "text": "Bakiye: 12.480 AZN (+%312)",
+         "spot": "balance"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Para çekmek için önce %15 gelir vergisi ödeyin: 1.870 AZN",
+          "spot": "fee"
+         }
+        ]
+       ],
+       "buttons": [
+        "Vergiyi öde",
+        "Kapat"
+       ]
+      }
+     },
+     "highlight": "balance"
+    },
+    {
+     "id": "fd-b3",
+     "say": "Parayı çekmeye çalıştığınızda vergi, komisyon ya da sigorta isterler. Bu, dolandırıcılığın son aşamasıdır.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2d-bakutrade",
+       "tone": "app",
+       "title": [
+        {
+         "text": "BakuTrade Pro | "
+        },
+        {
+         "text": "Bakiye: 12.480 AZN (+%312)",
+         "spot": "balance"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Para çekmek için önce %15 gelir vergisi ödeyin: 1.870 AZN",
+          "spot": "fee"
+         }
+        ]
+       ],
+       "buttons": [
+        "Vergiyi öde",
+        "Kapat"
+       ]
+      }
+     },
+     "highlight": "fee"
+    },
+    {
+     "id": "fd-b4",
+     "say": "Para çekmek için önce ödeme yapmanız isteniyorsa durun ve tek bir manat bile daha göndermeyin.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fd-hotspot",
+   "prompt": "Bu paneldeki dolandırıcılık işaretlerini bulun.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2d-bakutrade",
+    "tone": "app",
+    "title": [
+     {
+      "text": "BakuTrade Pro | "
+     },
+     {
+      "text": "Bakiye: 12.480 AZN (+%312)",
+      "spot": "balance"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Garantili günlük kazanç: %3",
+       "spot": "guarantee"
+      }
+     ],
+     [
+      {
+       "text": "Para çekmek için önce %15 gelir vergisi ödeyin: 1.870 AZN",
+       "spot": "fee"
+      }
+     ],
+     [
+      {
+       "text": "Lisans: Uluslararası Finans Komisyonu, No: 00417",
+       "spot": "licence"
+      }
+     ],
+     [
+      {
+       "text": "Teklif 2 saat içinde sona eriyor. Mesajlaşma uygulamasından hesap yöneticinize yazın.",
+       "spot": "rush"
+      }
+     ]
+    ],
+    "buttons": [
+     "Vergiyi öde",
+     "Kapat"
+    ]
+   },
+   "spots": [
+    {
+     "id": "balance",
+     "label": "Mucize büyüme",
+     "explain": "Gerçek bir piyasada paranın birkaç ayda dört katına çıkması neredeyse hiç görülmez. Ekrana herkes istediği rakamı yazabilir."
+    },
+    {
+     "id": "guarantee",
+     "label": "Garantili kazanç",
+     "explain": "Yatırım kazancı garanti edilemez. Bu kelimenin kendisi bir uyarı işaretidir."
+    },
+    {
+     "id": "fee",
+     "label": "Para çekmek için ödeme",
+     "explain": "Gerçek bir platform, paranızı serbest bırakmak için sizden yeni para istemez. Öderseniz ardından başka bir bahane gelir."
+    },
+    {
+     "id": "licence",
+     "label": "Sahte lisans",
+     "explain": "Böyle bir kurum hiç var olmayabilir; üstelik yabancı bir lisans burada zaten hiçbir hak vermez. Merkez Bankasının listesine bakın."
+    },
+    {
+     "id": "rush",
+     "label": "Acele ettirme",
+     "explain": "Süre sınırı, düşünmeye ya da birine danışmaya vaktiniz kalmasın diye konur."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "fd-sim",
+   "environment": "browser",
+   "title": "Parayı çekme",
+   "intro": "Platformdaki bakiyeniz büyüdü ve parayı çekmek istiyorsunuz. Her adımda kararınızı verin.",
+   "steps": [
+    {
+     "id": "dashboard",
+     "label": "Bakiyeniz: 12.480 AZN. VIP hesaba geçin",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2d-bakutrade",
+      "url": [
+       {
+        "text": "https://bakutrade-pro.example.net/panel"
+       }
+      ]
+     },
+     "say": "Bakiye büyüdü. Şimdi parayı çekmeyi deneyin.",
+     "actions": [
+      {
+       "id": "withdraw",
+       "label": "Parayı çek",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Para çekmeyi denemek zarar vermez. Bir sonraki ekranda sizden ne istediklerine bakın."
+      },
+      {
+       "id": "vip",
+       "label": "500 AZN ekle, VIP ol",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Ekrandaki bakiye gerçek değil, yatıracağınız yeni para da kaybolur. Durun."
+      }
+     ]
+    },
+    {
+     "id": "fee",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2d-bakutrade",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Para çekme işlemi beklemede"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Para çekmek için %15 gelir vergisi ödenmesi gerekmektedir: 1.870 AZN."
+        }
+       ],
+       [
+        {
+         "text": "Vergi ödenmezse fonlarınız 48 saat içinde dondurulacaktır."
+        }
+       ]
+      ],
+      "buttons": [
+       "Vergiyi öde",
+       "İptal"
+      ]
+     },
+     "say": "Para çekmeden önce vergi istiyorlar.",
+     "actions": [
+      {
+       "id": "pay-tax",
+       "label": "Vergiyi öde",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Vergiden sonra sigorta, ardından komisyon isteyecekler. O bakiye asla çekilemeyecek."
+      },
+      {
+       "id": "cancel",
+       "label": "İptal",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. Para çekmek için ödeme istenmesi, platformun sahte olduğunu gösterir."
+      }
+     ]
+    },
+    {
+     "id": "recovery-page",
+     "label": "Kaybettiğiniz yatırımları 30 günde geri alıyoruz",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2d-fond-berpa",
+      "url": [
+       {
+        "text": "https://fondberpa-huquq.example.net"
+       }
+      ]
+     },
+     "say": "Birkaç gün sonra karşınıza bu reklam çıkıyor.",
+     "actions": [
+      {
+       "id": "apply",
+       "label": "Başvur",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Parayı geri alma vaadi ikinci bir tuzak olabilir. Bir sonraki adımda ne istediklerine bakın."
+      },
+      {
+       "id": "close",
+       "label": "Sekmeyi kapat",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. Paranızı geri almayı vaat eden bir hizmet çoğu zaman ikinci bir dolandırıcılıktır.",
+       "next": "report-site"
+      }
+     ]
+    },
+    {
+     "id": "recovery-form",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2d-fond-berpa",
+      "brand": "FondBərpa",
+      "url": [
+       {
+        "text": "https://fondberpa-huquq.example.net/muraciet"
+       }
+      ],
+      "fields": [
+       "Ad soyad",
+       "Telefon",
+       "Kart numarası",
+       "CVV"
+      ],
+      "button": "300 AZN öde ve başla"
+     },
+     "say": "Parayı geri almak için de önceden ödeme istiyorlar.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "300 AZN öde ve başla",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Bu ikinci bir dolandırıcılıktır; bazen aynı çete yürütür. Kartı bloke ettirin ve polise bildirin."
+      },
+      {
+       "id": "close",
+       "label": "Sekmeyi kapat",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "İyi karar. Paranın izini sürmek için bankanıza ve polise başvurun; bu tamamen ücretsizdir."
+      }
+     ]
+    },
+    {
+     "id": "report-site",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Bu siteyi bildir"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "bakutrade-pro.example.net dolandırıcı site olarak bildirilsin mi?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Bildir",
+       "Daha sonra"
+      ]
+     },
+     "say": "Tarayıcı, siteyi bildirmenizi öneriyor.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Harika, bildirmeniz sitenin başkaları için de engellenmesine yardımcı olur. Ayrıca 102'yi arayarak polise de başvurun."
+      },
+      {
+       "id": "later",
+       "label": "Daha sonra",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Bildirmezseniz dolandırıcılar yeni mağdurlar bulur. Bir dakikanızı ayırıp siteyi bildirin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "fd-scenario",
+   "title": "Yatırımcı grubu",
+   "start": "group",
+   "nodes": [
+    {
+     "id": "group",
+     "text": "Bak, 400 manat yatırdım, bugün 1.200 oldu. Sen de katıl!",
+     "speaker": "Günay, iş arkadaşınız (“Akıllı Yatırımcılar” grubu)",
+     "voice": "woman",
+     "channel": "message",
+     "manner": "natural",
+     "spoken": "Bak, 400 manat yatırdım, bugün 1.200 oldu. <breath> Sen de katıl!",
+     "character": "gunay",
+     "choices": [
+      {
+       "label": "Önce lisansı Merkez Bankasının listesinden kontrol edelim",
+       "next": "pressure",
+       "feedback": "Doğru. Bir arkadaşın tavsiyesi bile bir platformu yasal yapmaz."
+      },
+      {
+       "label": "Günay kazanıyorsa ben de varım",
+       "outcome": "compromised",
+       "feedback": "Günay'ın ekranındaki kazanç da sahte olabilir. Dolandırıcılar insanları tanıdıkları kişiler aracılığıyla ağlarına çeker."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Listeyi boş verin, yabancı lisansımız var. Sadece 3 kişilik yer kaldı!",
+     "speaker": "Grup yöneticisi",
+     "voice": "man-2",
+     "channel": "message",
+     "spoken": "Listeyi boş verin, <breath> yabancı lisansımız var. Sadece 3 kişilik yer kaldı!",
+     "choices": [
+      {
+       "label": "Yabancı lisans burada hiçbir hak vermez, ben yokum",
+       "next": "warn",
+       "feedback": "Doğru. Merkez Bankası, yabancı lisansın burada faaliyet gösterme hakkı vermediği konusunda uyarmıştır."
+      },
+      {
+       "label": "Yer bitmeden hemen katıl",
+       "outcome": "compromised",
+       "feedback": "Sınırlı yer, sizi acele ettirmek içindir. Bu tür bir baskı başlı başına bir dolandırıcılık işaretidir."
+      }
+     ]
+    },
+    {
+     "id": "warn",
+     "text": "Peki benim 400 manatım ne olacak? Çekmek istiyorum, vergi ödemem gerektiğini söylüyorlar.",
+     "speaker": "Günay",
+     "voice": "woman",
+     "channel": "message",
+     "manner": "worried",
+     "spoken": "Peki benim 400 manatım ne olacak? Çekmek istiyorum, <short pause> vergi ödemem gerektiğini söylüyorlar.",
+     "character": "gunay",
+     "choices": [
+      {
+       "label": "Hiçbir şey ödeme, bankanı ara, polise 102 üzerinden bildir",
+       "outcome": "safe",
+       "feedback": "Harika. Zamanında bildirmek kaybı durdurur ve başkalarını korur."
+      },
+      {
+       "label": "Vergiyi öde, sonra para gelir",
+       "outcome": "compromised",
+       "feedback": "Vergiden sonra yeni bir bahane çıkacak. Kayıp yalnızca büyür."
+      },
+      {
+       "label": "Gruba sor, yöneticiler yardım eder",
+       "outcome": "risky",
+       "feedback": "Yöneticiler, dolandırıcıların ta kendileri. Yalnızca yeni bir ödeme isterler."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "fd-recap",
+   "points": [
+    "Ekrandaki kazanç para değildir: para çekmek için ödeme isteniyorsa durun.",
+    "Paranızı geri almayı vaat eden hizmet ikinci bir dolandırıcılıktır.",
+    "Lisansı kontrol edin, dolandırıcılığı 102'yi arayarak polise bildirin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,5 +1,5 @@
 /**
- * Types for engine.js, the vendored Canvas 2D cat rig (origin: design/mascot-cat/source, README there).
+ * Types for engine.js, the Canvas 2D cat rig (the single source of the cat; design/mascot-cat/README.md).
  * Only the public API is typed; everything else in the engine is internal.
  */
 
@@ -22,7 +22,18 @@ export type CatMood =
 /** One-shot gestures (overlays on the current behaviour), as accepted by play() and hold(). */
 export type CatGesture = "wave" | "nod" | "shake" | "cheer" | "think" | "point-left" | "point-right" | "point-down" | "shrug" | "lean-in" | "shield-up" | "bow";
 
-/** Behaviours for do(); in mascot mode walk/turn/trot/rub/chase stay in the box (present, pet, lean-in). do("jump", opts) is jump(opts). */
+/**
+ * Behaviours for do(); in mascot mode walk/turn/trot/rub/chase stay in the box (present, pet, lean-in). do("jump", opts) is
+ * jump(opts), do("run", { distancePx, ... }) is run(opts) (without a distance: a gallop on the spot).
+ * The acts added on 2026-10-27 (mascot mode): doze (a loaf doze), blink (a slow "cat kiss"), tilt (a curious head tilt),
+ * stretch (front stretch with a yawn, then the back stretch), roll (on the back, paws in the air), chase-tail (sitting, it
+ * bats and pins the tip of its own tail), pounce (a stalk, a sprung leap, a peek under the paw, a lick of the paw), mouse
+ * and yarn (play with a toy; also play("mouse"), play("yarn")), laser (see laser()), run (see run()); knead treads a
+ * little blanket in a box of 80 px or more. The
+ * roomy ones are framed to fit their box: side-on with room to move in a box wider than tall, a compact 3/4 version in a
+ * square box. Still / reduced motion: stretch, run, mouse, yarn, laser, chase-tail, roll and pounce do not start (do()
+ * returns false); calm: only the laser (watching and crouching, no wiggle or pounce).
+ */
 export type CatBehaviour =
   | "sit"
   | "walk"
@@ -40,7 +51,24 @@ export type CatBehaviour =
   | "look"
   | "flick"
   | "present"
-  | "jump";
+  | "jump"
+  | "doze"
+  | "blink"
+  | "tilt"
+  | "run"
+  | "mouse"
+  | "yarn"
+  | "laser"
+  | "chase-tail"
+  | "roll"
+  | "pounce";
+
+/**
+ * A toy for play(): a grey toy mouse (the cat creeps up, springs on it, bats it, carries it home in its mouth, sets it
+ * down as a gift and pats it away out of the box) or a red yarn ball (hooked, flipped, pounced on and dribbled, then
+ * batted away; the cat licks a paw, flicks its tail and strolls back to its spot).
+ */
+export type CatToy = "mouse" | "yarn";
 
 /**
  * A jump for a host that carries the cat's box along an arc (the cat itself stays in its box, with a little
@@ -68,6 +96,28 @@ export type CatJumpOptions = {
  * timer 120 ms later when no frame runs.
  */
 export type CatJump = { takeoff: number; land: number; end: number; done: Promise<void> };
+
+/**
+ * A run across the page: the cat gallops in place in its box while the host moves the box (pattern: jump() with ScrollCat).
+ * Moments in ms from the call: rise 400 ms → `start` (move the box) → the gallop (it speeds up and slows down with the cat)
+ * → `stop` → settle and sit → `end`.
+ */
+export type CatRunOptions = {
+  /** Screen direction of the run (default right); a mirrored (facing left) cat still runs that way on screen. */
+  dir?: "left" | "right";
+  /** How far the host moves the box, in px; the gallop's footfalls match it. */
+  distancePx: number;
+  onStart?: () => void;
+  onStop?: () => void;
+  onDone?: () => void;
+};
+/**
+ * `offset(ms)`: px the box should be moved (signed: negative to the left) `ms` after run() was called; 0 before `start`,
+ * the whole distance after `stop`. Still, reduced motion, calm, asleep or no distance: all moments 0, every callback has
+ * already run and offset is the whole distance (move the box without the run). `done` resolves with onDone (also when a
+ * new run or jump replaces this one or the cat is destroyed).
+ */
+export type CatRun = { start: number; stop: number; end: number; done: Promise<void>; offset(ms: number): number };
 
 /** Where a pointer is for a mascot box (catchZone). */
 export type CatZone = {
@@ -105,8 +155,8 @@ export interface CatInstance {
   getMood(): CatMood;
   /** `level` scales the mouth: 1 full voice, lower for a whisper. */
   setTalking(on: boolean, level?: number): void;
-  /** Plays a gesture once; false when still, unknown, or a point while a point is held (the held target wins). */
-  play(gesture: CatGesture): boolean;
+  /** Plays a gesture once; false when still, unknown, or a point while a point is held (the held target wins). A toy ("mouse", "yarn") starts that play (do(toy)). */
+  play(gesture: CatGesture | CatToy): boolean;
   /** Keeps a gesture at its peak until hold(null); a held point replaces a running point at once. */
   hold(gesture: CatGesture | null): boolean;
   /** Looks at a viewport point for a few seconds. */
@@ -120,6 +170,16 @@ export interface CatInstance {
    * A still cat does not animate and returns zeros. Pointer catching pauses during the jump.
    */
   jump(opts?: CatJumpOptions): CatJump;
+  /** Gallops across: see CatRunOptions and CatRun. */
+  run(opts: CatRunOptions): CatRun;
+  /**
+   * The laser dot at a point in the cat's box (px from its top left; outside the box too, the cat looks there), null when it
+   * is gone. The engine draws the dot while it is inside the box: steady, never blinking. Sitting, the cat follows it with
+   * head and eyes; on the floor near by it crouches and turns to it, and a dot that rests gets a butt wiggle and a pounce (a
+   * stage box lets it leap across). A lost dot: a puzzled look round, then back to its spot. Calm: no wiggle or pounce.
+   * Still / reduced motion: only the eyes follow it. Feed it pointer positions (it is cheap to call on every move).
+   */
+  laser(target: { x: number; y: number } | null): void;
   /** Still: no behaviours, gestures or talking; only blinks, redrawn on demand. A held gesture and a kept look stay as a static pose. */
   setStill(on: boolean): void;
   isStill(): boolean;
@@ -148,3 +208,36 @@ export function catchZone(x: number, y: number, W: number, H: number, reach: { x
 export function reachTarget(bx: number, by: number, S: readonly [number, number] | number[], fwd: boolean): [number, number];
 /** Seconds of each strike: [anticipation, strike, hold, return]. */
 export const SWAT_PHASES: Readonly<Record<"bat" | "swipe" | "pounce", readonly [number, number, number, number]>>;
+
+/**
+ * The auto scheduler's weights (setAuto(true): decorative placements). calm: sitting, blink, groom, knead (and sleep
+ * after a long idle); bust (a head crop below 80 px): no body acts; stage (wider than tall): the toys too; idle: seconds
+ * since anyone was near (over 90: sleep and doze).
+ */
+export function mascotAutoWeights(o?: { calm?: boolean; stage?: boolean; bust?: boolean; idle?: number }): Partial<Record<CatBehaviour, number>>;
+/** Whether an act may start under a motion preference (still also stands for reduced motion). */
+export function actAllowed(name: CatBehaviour, motion: "full" | "calm" | "still"): boolean;
+/** A toy's position: x0 moved by kicks [time s, velocity] and slowed by linear drag k (1/s), at time t. */
+export function toyX(x0: number, kicks: ReadonlyArray<readonly [number, number]>, k: number, t: number): number;
+/** The laser logic's state (act units: x across the box, y up from the floor). */
+export type CatLaserState = {
+  x: number; th: number; thC: number; both: boolean; sit: boolean; cr: number; tgt: { x: number; y: number } | null; still: number; lost: number;
+  pounce: { t: number; x0: number; x1: number } | null; cool: number; t: number; done: boolean;
+};
+/** thC: the crouch's heading; both: it may also crouch facing -x (a stage box); sit: it only watches (the head crop). */
+export function laserState(thC?: number, both?: boolean, sit?: boolean): CatLaserState;
+/** One step of the laser logic; room: where a pounce may land facing +x (r) or -x (l). */
+export function laserStep(L: CatLaserState, dt: number, target: { x: number; y: number } | null, calm: boolean, room?: { r: [number, number]; l: [number, number] }): CatLaserState;
+/** How far (0..1) the host has moved the box t seconds after run(), for the moments of a run. */
+export function runProgress(t: number, at: { start: number; stop: number; r: number }): number;
+type CatGait = { duty: number; S: number; T: number; lf: number; lh: number; off: Record<"nf" | "ff" | "nh" | "fh", number> };
+/** The gaits (distance-driven footfalls): walk, trot and the gallop of run(). */
+export const GAITS: Readonly<Record<"walk" | "trot" | "gallop", CatGait>>;
+/** The leap's moments (s from its start): the load ends, the paws leave the floor, the paws land, the landing settles. */
+export const LEAP: Readonly<{ load: number; off: number; land: number; end: number }>;
+/** How far (0..1) from where it springs to where it lands the root is, tl seconds into the leap. */
+export function leapProg(tl: number): number;
+/** The leap's height tl seconds in, for an arc H high (0 on the floor). */
+export function leapLift(tl: number, H: number): number;
+/** One leg's footholds for Phi gait cycles: swings in phase (a..b) and floor x (xa → xb); end: where the last one is left from the standing pose. */
+export function planLeg(off: number, G: CatGait, Phi: number): { swings: { a: number; b: number; xa: number; xb: number }[]; end: number };

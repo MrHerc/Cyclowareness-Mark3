@@ -1,0 +1,518 @@
+{
+ "id": "opened-file-sent-wrong",
+ "title": "Fichiers et mauvais destinataires",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Vous avez ouvert un fichier suspect ou envoyé des données à la mauvaise personne ? Gardez votre calme, les étapes sont courtes.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Vous avez ouvert le fichier ? Coupez le Wi-Fi et débranchez le câble réseau. Laissez l’ordinateur allumé, sauf si votre procédure prévoit autre chose.",
+     "mood": "alert",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Ne supprimez ni le fichier ni l’e-mail : c’est grâce à eux que les spécialistes comprennent ce qu’a fait l’attaque.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "file",
+       "name": [
+        {
+         "text": "Akt_imzala"
+        },
+        {
+         "text": ".docm",
+         "spot": "ext"
+        }
+       ],
+       "type": "doc",
+       "size": "84 Ko",
+       "source": [
+        {
+         "text": "n.ismayilov@tender-akt.example.net"
+        }
+       ]
+      }
+     },
+     "highlight": "ext"
+    },
+    {
+     "id": "b4",
+     "say": "Signalez l’incident par téléphone, pas depuis l’ordinateur infecté. Et ne cachez jamais des données envoyées à la mauvaise personne.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "file-opened",
+   "environment": "desktop",
+   "title": "Vous avez ouvert le fichier",
+   "intro": "Vous avez ouvert la pièce jointe « Akt_imzala » et autorisé les macros. Depuis, des choses étranges se produisent.",
+   "steps": [
+    {
+     "id": "av-alert",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "qoruyucu",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Menace détectée"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Une macro malveillante a été trouvée dans Akt_imzala.docm. Le nettoyage n’a pas abouti."
+        }
+       ]
+      ],
+      "buttons": [
+       "Fermer",
+       "Détails"
+      ]
+     },
+     "say": "Votre antivirus donne l’alerte.",
+     "actions": [
+      {
+       "id": "disconnect",
+       "label": "Couper le Wi-Fi, débrancher le câble",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Exact. Hors du réseau, l’ordinateur ne peut ni propager les dégâts ni envoyer de données."
+      },
+      {
+       "id": "keep-working",
+       "label": "Fermer et continuer à travailler",
+       "kind": "cancel",
+       "outcome": "compromised",
+       "feedback": "Le nettoyage n’a pas abouti : le programme tourne peut-être encore. Chaque minute l’aide à se propager."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer le fichier",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Supprimer le fichier détruit des preuves et n’arrête pas ce qui s’est déjà exécuté. Déconnectez d’abord l’ordinateur du réseau."
+      }
+     ]
+    },
+    {
+     "id": "fake-helper",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "texkomek-24",
+      "app": "TexKömək 24",
+      "title": [
+       {
+        "text": "Votre ordinateur est infecté"
+       }
+      ],
+      "body": [
+       {
+        "text": "Donnez à TexKömək 24 un accès à distance pour le nettoyer immédiatement."
+       }
+      ],
+      "time": "10:07"
+     },
+     "say": "Une notification vous propose de l’aide.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Autoriser l’accès à distance",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Donner un accès à distance à une application inconnue, c’est livrer tout l’ordinateur à l’attaquant. L’aide ne peut venir que de votre propre support technique."
+      },
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. N’essayez pas de nettoyer vous-même ; attendez l’équipe sécurité."
+      }
+     ]
+    },
+    {
+     "id": "keep-evidence",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Akt_imzala.docm"
+       }
+      ],
+      "type": "doc",
+      "size": "84 Ko",
+      "source": [
+       {
+        "text": "Téléchargements"
+       }
+      ]
+     },
+     "say": "Le fichier est toujours dans le dossier Téléchargements.",
+     "actions": [
+      {
+       "id": "reopen",
+       "label": "Rouvrir",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Chaque ouverture peut relancer la macro. Ne touchez plus au fichier."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "L’équipe sécurité a besoin du fichier pour comprendre ce qu’il a fait. Ne le supprimez pas."
+      },
+      {
+       "id": "leave",
+       "label": "Le laisser tel quel",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Exact. Le fichier est une preuve ; l’équipe sécurité l’analysera sans risque."
+      }
+     ]
+    },
+    {
+     "id": "reconnect",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Aucune connexion réseau"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Le Wi-Fi est désactivé. Voulez-vous vous reconnecter ?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Rester hors ligne",
+       "Se connecter"
+      ]
+     },
+     "say": "Vous voulez consulter vos e-mails, mais il n’y a pas de réseau.",
+     "actions": [
+      {
+       "id": "connect",
+       "label": "Se connecter",
+       "kind": "connect",
+       "outcome": "risky",
+       "feedback": "Restez hors ligne jusqu’à ce que l’équipe sécurité vous dise le contraire : le programme pourrait chiffrer vos fichiers ou se propager."
+      },
+      {
+       "id": "stay",
+       "label": "Rester hors ligne",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Exact. Appelez maintenant l’équipe sécurité depuis votre téléphone et dites-lui ce que vous avez ouvert."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "power-off",
+   "question": {
+    "prompt": "L’ordinateur est infecté et hors ligne. Faut-il l’éteindre ?",
+    "options": [
+     {
+      "id": "leave-on",
+      "label": "Non, je le laisse allumé, sauf si notre procédure prévoit autre chose",
+      "correct": true,
+      "feedback": "Exact. Les traces en mémoire sont précieuses pour les spécialistes."
+     },
+     {
+      "id": "shut",
+      "label": "Oui, je l’éteins immédiatement",
+      "correct": false,
+      "feedback": "L’arrêt efface les traces en mémoire. La déconnexion du réseau suffit déjà à stopper la propagation."
+     },
+     {
+      "id": "keep-working",
+      "label": "Non, je continue à travailler dessus",
+      "correct": false,
+      "feedback": "Travailler sur un ordinateur infecté met en danger vos mots de passe et vos fichiers."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "alarm"
+    }
+   },
+   "explain": "Déconnectez l’ordinateur du réseau, laissez-le allumé, signalez par téléphone. Si la procédure de votre organisation est différente, suivez-la."
+  },
+  {
+   "type": "order",
+   "id": "after-file",
+   "prompt": "Vous avez ouvert un fichier suspect. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "isolate",
+     "label": "Déconnecter l’ordinateur du réseau"
+    },
+    {
+     "id": "call",
+     "label": "Appeler l’équipe sécurité depuis votre téléphone"
+    },
+    {
+     "id": "tell",
+     "label": "Dire précisément ce que vous avez ouvert, et quand"
+    },
+    {
+     "id": "passwords",
+     "label": "Changer vos mots de passe depuis un autre appareil, sain"
+    }
+   ],
+   "explain": "Ne changez jamais vos mots de passe sur l’ordinateur infecté : le programme pourrait lire aussi les nouveaux."
+  },
+  {
+   "type": "scenario",
+   "id": "wrong-recipient",
+   "title": "Mauvais destinataire",
+   "start": "sent",
+   "nodes": [
+    {
+     "id": "sent",
+     "text": "Au lieu de l’envoyer à votre collègue Kamran, vous avez envoyé la liste à une adresse externe qui porte le même nom. Elle contient des noms et des numéros de téléphone de citoyens.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "idare",
+       "from": {
+        "name": [
+         {
+          "text": "Vous"
+         }
+        ],
+        "address": [
+         {
+          "text": "r.mammadli@idare.example"
+         }
+        ]
+       },
+       "to": "kamran.h@poct-mail.example",
+       "subject": [
+        {
+         "text": "Demandes des citoyens : liste"
+        }
+       ],
+       "time": "15:20",
+       "body": [
+        [
+         {
+          "text": "Kamran, la liste est en pièce jointe."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Muracietler_sentyabr.xlsx"
+          }
+         ],
+         "size": "240 Ko"
+        }
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "Je préviens tout de suite mon responsable et l’équipe sécurité",
+       "next": "advice",
+       "feedback": "Exact. En cas de fuite de données personnelles, l’organisation doit le savoir à temps."
+      },
+      {
+       "label": "Je ne dis rien à personne, le destinataire ne l’ouvrira peut-être pas",
+       "outcome": "compromised",
+       "feedback": "Si la fuite reste cachée, l’organisation ne peut rien faire pour protéger les citoyens."
+      },
+      {
+       "label": "Je demande juste au destinataire de le supprimer, et c’est tout",
+       "outcome": "risky",
+       "feedback": "Le lui demander est utile, mais l’organisation doit quand même être informée de la fuite."
+      }
+     ]
+    },
+    {
+     "id": "advice",
+     "text": "Écrivez poliment au destinataire, demandez-lui de supprimer le fichier et de vous le confirmer.",
+     "speaker": "Équipe sécurité",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Écrivez poliment au destinataire, <breath> demandez-lui de supprimer le fichier et de vous le confirmer.",
+     "choices": [
+      {
+       "label": "J’écris au destinataire et je transfère sa réponse au spécialiste",
+       "outcome": "safe",
+       "feedback": "Excellent. La confirmation écrite prouve que la fuite a été maîtrisée."
+      },
+      {
+       "label": "Je renvoie le fichier à Kamran et je n’y pense plus",
+       "outcome": "risky",
+       "feedback": "L’envoyer à la bonne personne, c’est bien, mais la copie partie à la mauvaise adresse est toujours là."
+      },
+      {
+       "label": "Je supprime mon e-mail envoyé pour ne laisser aucune trace",
+       "outcome": "risky",
+       "feedback": "L’e-mail envoyé montre ce qui est parti, vers où et quand. Gardez-le."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "colleague-reactions",
+   "prompt": "La réaction de votre collègue est-elle la bonne ?",
+   "cards": [
+    {
+     "id": "farid",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Farid"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "J’ai ouvert un fichier bizarre. J’ai coupé le Wi-Fi et j’appelle l’équipe sécurité tout de suite."
+         }
+        ],
+        "time": "10:15"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Exact : d’abord se déconnecter du réseau, puis signaler par téléphone."
+    },
+    {
+     "id": "leyla",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Leyla"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "J’ai ouvert le fichier, puis je l’ai supprimé. Personne n’en saura rien."
+         }
+        ],
+        "time": "11:02"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Supprimer le fichier efface la piste, et cacher l’incident laisse du temps à l’attaque."
+    },
+    {
+     "id": "elvin",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Elvin"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Une alerte virus s’est affichée, alors j’ai téléchargé un logiciel de nettoyage gratuit sur internet."
+         }
+        ],
+        "time": "12:30"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Installer soi-même des outils peut effacer des traces et faire entrer de nouveaux logiciels malveillants."
+    },
+    {
+     "id": "narmin",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Narmin"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "J’ai envoyé par erreur un document à une adresse externe. J’ai tout de suite prévenu mon responsable et l’équipe sécurité."
+         }
+        ],
+        "time": "15:45"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Exact. Un signalement rapide limite les dégâts."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Vous avez ouvert un fichier dangereux ? Déconnectez l’ordinateur du réseau, laissez-le allumé sauf si votre procédure prévoit autre chose, et signalez par téléphone.",
+    "Ne supprimez ni le fichier ni l’e-mail, et n’essayez pas de nettoyer vous-même.",
+    "Vous avez envoyé quelque chose à la mauvaise personne ? Ne le cachez pas : prévenez tout de suite votre responsable et l’équipe sécurité."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

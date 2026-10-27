@@ -144,7 +144,7 @@ export default async function OpsCenterPage() {
                       <span className={cn("size-2.5 rounded-full", k === "malicious" ? "bg-risk-500" : k === "suspicious" ? "bg-warn-500" : "bg-safe-500")} />
                       <span className="flex-1">{tv(`verdict.${k}`)}</span>
                       <b className="tabular-nums">{d.sandbox[k]}</b>
-                      <span className="w-10 text-right text-ink-subtle tabular-nums">{sandboxTotal ? Math.round((d.sandbox[k] / sandboxTotal) * 100) : 0}%</span>
+                      <span className="w-10 text-end text-ink-subtle tabular-nums">{sandboxTotal ? Math.round((d.sandbox[k] / sandboxTotal) * 100) : 0}%</span>
                     </li>
                   ))}
                 </ul>
@@ -157,7 +157,7 @@ export default async function OpsCenterPage() {
           <CardHeader title={tr("feed")} icon={<Activity />} />
           <CardBody className="pt-3">
             {d.feed.length ? (
-              <ol className="relative grid gap-0.5 before:absolute before:top-2 before:bottom-2 before:left-[1.05rem] before:w-px before:bg-line">
+              <ol className="relative grid gap-0.5 before:absolute before:top-2 before:bottom-2 before:start-[1.05rem] before:w-px before:bg-line">
                 {d.feed.map((e) => {
                   const Icon = FEED_ICON[e.kind];
                   const label =
@@ -168,7 +168,7 @@ export default async function OpsCenterPage() {
                         : tr(`feedKinds.${e.kind}`, { number: e.number ?? 0 });
                   return (
                     <li key={`${e.kind}-${e.id}`}>
-                      <Link href={e.href} className="relative flex gap-3 rounded-md py-2 pr-2 hover:bg-sunken">
+                      <Link href={e.href} className="relative flex gap-3 rounded-md py-2 pe-2 hover:bg-sunken">
                         <span
                           className={cn(
                             "z-10 grid size-8 shrink-0 place-items-center rounded-full ring-4 ring-surface [&_svg]:size-4",

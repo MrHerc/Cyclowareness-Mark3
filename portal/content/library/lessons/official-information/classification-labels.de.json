@@ -1,0 +1,529 @@
+{
+ "id": "classification-labels",
+ "title": "Vertraulichkeitsstufen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l1-tutor",
+   "beats": [
+    {
+     "id": "l1-b1",
+     "say": "Die Kennzeichnung auf einem dienstlichen Dokument zeigt, wer es sehen darf. Lernen wir, sie richtig zu lesen.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "l1-b2",
+     "say": "Die Kennzeichnung steht im Betreff, oben auf dem Dokument oder im Dateinamen. Halten Sie kurz inne, bevor Sie etwas weitergeben.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "idare",
+       "from": {
+        "name": [
+         {
+          "text": "Finanzabteilung"
+         }
+        ],
+        "address": [
+         {
+          "text": "maliyye@idare.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "NUR FÜR DEN INTERNEN GEBRAUCH",
+         "spot": "label"
+        },
+        {
+         "text": ": Haushaltsentwurf 2027"
+        }
+       ],
+       "time": "09:20",
+       "body": [
+        [
+         {
+          "text": "Dieser Entwurf ist nur für die Abteilungsleitungen bestimmt. Leiten Sie ihn an niemanden sonst weiter."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Budce_layihesi_2027.xlsx"
+          }
+         ],
+         "size": "84 KB"
+        }
+       ]
+      }
+     },
+     "highlight": "label"
+    },
+    {
+     "id": "l1-b3",
+     "say": "Die Grundregel ist das Need-to-know-Prinzip: Nur wer das Dokument wirklich für die eigene Arbeit braucht, bekommt es zu sehen.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "l1-b4",
+     "say": "Rang, Freundschaft oder Neugier sind kein Grund. Auch ohne Kennzeichnung bleiben die Daten von Bürgerinnen und Bürgern geschützt.",
+     "mood": "talk",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "l1-match",
+   "prompt": "Ordnen Sie jeder Kennzeichnung ihre Bedeutung zu.",
+   "pairs": [
+    {
+     "id": "open",
+     "left": "Öffentlich",
+     "right": "Alle dürfen es sehen, zum Beispiel eine auf der Website veröffentlichte Bekanntmachung"
+    },
+    {
+     "id": "official-use",
+     "left": "Nur für den internen Gebrauch",
+     "right": "Nur innerhalb der Behörde und nur für Personen, die es für ihre Arbeit brauchen"
+    },
+    {
+     "id": "secret",
+     "left": "Vertraulich",
+     "right": "Nur für berechtigte Personen, nach besonderen Regeln"
+    },
+    {
+     "id": "no-label",
+     "left": "Keine Kennzeichnung, aber personenbezogene Daten",
+     "right": "Trotzdem geschützt: Daten von Bürgerinnen und Bürgern sind nicht öffentlich"
+    }
+   ],
+   "explain": "Bezeichnungen und Regeln der Stufen können sich von Behörde zu Behörde unterscheiden. Halten Sie sich immer an die Vorgaben Ihrer eigenen Behörde."
+  },
+  {
+   "type": "swipe",
+   "id": "l1-swipe",
+   "prompt": "Dürfen Sie dieser Bitte nachkommen oder nicht?",
+   "cards": [
+    {
+     "id": "curious-colleague",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Tural (Personalabteilung)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hi! Schick mir doch auch den Haushaltsentwurf, ich will nur wissen, wessen Gehalt steigt."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Neugier ist kein dienstlicher Bedarf. Wenn die Personalabteilung nicht mit diesem Dokument arbeitet, senden Sie es nicht."
+    },
+    {
+     "id": "manager-report",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Nərmin Hüseynova"
+        }
+       ],
+       "address": [
+        {
+         "text": "n.huseynova@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Quartalsbericht"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Bitte senden Sie mir den Bericht des Teams über SənədAxını, wir legen ihn morgen dem Ministerium vor."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Ihre Vorgesetzte arbeitet mit diesem Dokument und verlangt den Weg über das offizielle System. Das ist ganz normale Arbeit."
+    },
+    {
+     "id": "friend-order",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Samir (Freund)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ich hab gehört, du arbeitest an einem neuen Erlass. Mach schnell ein Foto vom Entwurf, das merkt keiner."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein unveröffentlichter Erlass verlässt die Behörde nicht. Freundschaft begründet keinen dienstlichen Bedarf."
+    },
+    {
+     "id": "press-public",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Pressestelle"
+        }
+       ],
+       "address": [
+        {
+         "text": "press@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Text der Bekanntmachung"
+       }
+      ],
+      "time": "11:30",
+      "body": [
+       [
+        {
+         "text": "Könnten Sie uns den Text der Bekanntmachung schicken, die gestern auf der Website veröffentlicht wurde?"
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Die Bekanntmachung ist bereits öffentlich. Öffentliche Informationen dürfen Sie weitergeben."
+    },
+    {
+     "id": "new-employee",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "+994 50 000 41 27"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hallo, ich bin neu hier. Schicken Sie mir bitte die Liste aller Mitarbeitenden der Abteilung mit ihren Telefonnummern."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Neue Mitarbeitende bekommen eine solche Liste über ihre Vorgesetzten. Senden Sie nichts an eine unbekannte Nummer."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "l1-sim",
+   "environment": "inbox",
+   "title": "Anfragen am Morgen",
+   "intro": "Sie haben vier E-Mails. Prüfen Sie bei jeder, wer was möchte, und entscheiden Sie dann.",
+   "steps": [
+    {
+     "id": "m1",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Tural Qasımov"
+        }
+       ],
+       "address": [
+        {
+         "text": "t.qasimov@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Haushaltsentwurf"
+       }
+      ],
+      "time": "09:05",
+      "body": [
+       [
+        {
+         "text": "Hi! Könntest du mir den Haushaltsentwurf von der Finanzabteilung weiterleiten? Ich will nur mal reinschauen."
+        }
+       ]
+      ]
+     },
+     "say": "Arbeitet Tural mit diesem Dokument?",
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Weiterleiten",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Tural arbeitet nicht mit diesem Dokument. Ein gekennzeichnetes Dokument geht nur an diejenigen, die es brauchen."
+      },
+      {
+       "id": "reply",
+       "label": "Antworten: Freigabe durch die Führungskraft nötig",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn es einen echten Bedarf gibt, genehmigt das eine Führungskraft auf dem offiziellen Weg."
+      }
+     ]
+    },
+    {
+     "id": "m2",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "senedaxini",
+      "from": {
+       "name": [
+        {
+         "text": "SənədAxını"
+        }
+       ],
+       "address": [
+        {
+         "text": "bildiris@senedaxini.idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Neue Aufgabe: Quartalsbericht"
+       }
+      ],
+      "time": "09:12",
+      "body": [
+       [
+        {
+         "text": "Nərmin Hüseynova hat Ihnen eine Aufgabe zugewiesen. Öffnen Sie SənədAxını, um sie anzusehen."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Als sicher markieren",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine erwartete Aufgabe aus dem internen System, ohne Link zum Anklicken."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Nicht jede E-Mail ist eine Bedrohung. Absender, Adresse und Inhalt entsprechen genau dem, was Sie erwarten."
+      }
+     ]
+    },
+    {
+     "id": "m3",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "regional-nazirlik-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Ministerium für regionale Beziehungen"
+        }
+       ],
+       "address": [
+        {
+         "text": "rel.nazirlik@poct-mail.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Dringend: Personalliste"
+       }
+      ],
+      "time": "09:40",
+      "body": [
+       [
+        {
+         "text": "Für ein gemeinsames Projekt senden Sie bitte noch heute die Namen, Funktionen und Mobilnummern der Mitarbeitenden Ihrer Abteilung an diese Adresse."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein Ministerium schreibt nicht über einen kostenlosen E-Mail-Dienst. Offizielle Anfragen kommen als förmliches Schreiben."
+      },
+      {
+       "id": "reply",
+       "label": "Liste senden",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Die Daten Ihrer Kolleginnen und Kollegen sind bei Kriminellen gelandet. Jetzt kann jede einzelne Person gezielt angeschrieben werden."
+      }
+     ]
+    },
+    {
+     "id": "m4",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Kamran Əliyev"
+        }
+       ],
+       "address": [
+        {
+         "text": "k.aliyev@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "VERTRAULICH: Prüfergebnisse"
+       }
+      ],
+      "time": "10:02",
+      "body": [
+       [
+        {
+         "text": "Rəşad, anbei die Ergebnisse."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Yoxlama_neticeleri.pdf"
+         }
+        ],
+        "size": "1,1 MB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Anhang öffnen",
+       "kind": "open-attachment",
+       "outcome": "risky",
+       "feedback": "Diese E-Mail war nicht für Sie bestimmt. Auch das Öffnen aus Neugier ist schon ein Datenleck."
+      },
+      {
+       "id": "forward",
+       "label": "An Rəşad weiterleiten",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Gut gemeint, aber so verbreiten Sie den Fehler weiter. Der Absender sollte ihn selbst korrigieren."
+      },
+      {
+       "id": "reply",
+       "label": "Absender informieren: falscher Empfänger",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Richtig. Informieren Sie den Absender, öffnen Sie den Anhang nicht und löschen Sie die E-Mail so, wie es Ihre Behörde vorschreibt."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "l1-choice",
+   "question": {
+    "prompt": "Eine befreundete Person aus einem anderen Ministerium bittet Sie um einen Bericht mit der Kennzeichnung „Nur für den internen Gebrauch“.",
+    "options": [
+     {
+      "id": "send",
+      "label": "Ich schicke ihn, schließlich arbeitet die Person auch im öffentlichen Dienst",
+      "correct": false,
+      "feedback": "Dass jemand im öffentlichen Dienst arbeitet, begründet noch keinen dienstlichen Bedarf. Anfragen anderer Behörden kommen als offizielles Schreiben."
+     },
+     {
+      "id": "official",
+      "label": "Ich bitte um eine offizielle Anfrage und informiere meine Führungskraft",
+      "correct": true,
+      "feedback": "Richtig. Die Leitung prüft die offizielle Anfrage, und die Behörde beantwortet sie."
+     },
+     {
+      "id": "verbal",
+      "label": "Ich schicke ihn nicht, nenne aber die wichtigsten Zahlen",
+      "correct": false,
+      "feedback": "Die Zahlen sind Teil des Dokuments. Wer sie mündlich weitergibt, gibt das Dokument ebenfalls weiter."
+     }
+    ]
+   },
+   "explain": "Entscheidend sind dienstlicher Bedarf und Berechtigung, nicht der Kanal. Die Leitung entscheidet auf dem offiziellen Weg."
+  },
+  {
+   "type": "recap",
+   "id": "l1-recap",
+   "points": [
+    "Die Kennzeichnung zeigt, wer ein Dokument sehen darf: Prüfen Sie sie, bevor Sie etwas weitergeben.",
+    "Zeigen Sie es nur denen, die es für ihre Arbeit brauchen, nicht aus Neugier oder Freundschaft.",
+    "Öffnen Sie kein Dokument, das Sie versehentlich bekommen haben, und informieren Sie den Absender."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

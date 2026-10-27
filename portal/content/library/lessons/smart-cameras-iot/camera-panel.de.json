@@ -1,0 +1,401 @@
+{
+ "id": "camera-panel",
+ "title": "Die Kameraverwaltung",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sc1-tutor",
+   "beats": [
+    {
+     "id": "sc1-b1",
+     "say": "Hallo! Kameras sind zu Hause und bei der Arbeit praktisch. Aber wenn das Passwort nie geändert wurde, können auch Fremde zuschauen.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "sc1-b2",
+     "say": "Die meisten neuen Kameras werden mit einem Standardpasswort ausgeliefert. Listen dieser Passwörter sind im Internet für jeden zugänglich.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2f-baxiskam",
+       "tone": "system",
+       "title": [
+        {
+         "text": "BaxışKam: erste Anmeldung"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Benutzername: admin"
+         }
+        ],
+        [
+         {
+          "text": "Passwort: admin",
+          "spot": "default-pass"
+         }
+        ]
+       ],
+       "buttons": [
+        "Anmelden"
+       ]
+      }
+     },
+     "highlight": "default-pass"
+    },
+    {
+     "id": "sc1-b3",
+     "say": "Im Jahr 2025 wurde in Aserbaidschan unbefugter Zugriff auf Kameras in Wohnungen und Büros festgestellt. Die Aufnahmen landeten auf ausländischen Websites.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "2025",
+      "label": "Unbefugter Zugriff auf Kameras in Wohnungen und Büros festgestellt"
+     }
+    },
+    {
+     "id": "sc1-b4",
+     "say": "Drei Schritte genügen: das Passwort ändern, die Firmware aktualisieren und den offenen Zugang aus dem Internet sperren.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "password",
+   "id": "sc1-password",
+   "prompt": "Erstellen Sie ein neues Passwort für die Kameraverwaltung.",
+   "targetScore": 4,
+   "tips": [
+    "Geben Sie hier nicht Ihr echtes Passwort ein, das ist nur eine Übung.",
+    "Wählen Sie eine Passphrase aus vier zufälligen Wörtern.",
+    "Verwenden Sie nicht noch einmal Ihr WLAN- oder E-Mail-Passwort.",
+    "Speichern Sie das Passwort in einem Passwort-Manager."
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "sc1-sim",
+   "environment": "browser",
+   "title": "Die Kamera einrichten",
+   "intro": "Sie richten eine neue Kamera ein. Sehen Sie sich jedes Fenster der Kameraverwaltung an und wählen Sie die richtige Schaltfläche.",
+   "steps": [
+    {
+     "id": "first-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-baxiskam",
+      "brand": "BaxışKam",
+      "url": [
+       {
+        "text": "http://192.168.1.64/login"
+       }
+      ],
+      "fields": [
+       "Benutzername",
+       "Passwort"
+      ],
+      "button": "Anmelden"
+     },
+     "say": "Sie melden sich zum ersten Mal in der Kameraverwaltung an.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Anmelden",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Richtig, das ist die eigene Adresse der Kamera in Ihrem Heimnetzwerk. Ändern Sie das Passwort direkt nach der ersten Anmeldung."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Ohne Anmeldung können Sie das Standardpasswort nicht ändern. Die Kamera bleibt für alle offen."
+      }
+     ]
+    },
+    {
+     "id": "change-default",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-baxiskam",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Standardpasswort wird verwendet"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ändern Sie zu Ihrer Sicherheit jetzt das Passwort."
+        }
+       ]
+      ],
+      "buttons": [
+       "Passwort ändern",
+       "Später erinnern"
+      ]
+     },
+     "actions": [
+      {
+       "id": "change",
+       "label": "Passwort ändern",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Das Standardpasswort zu ändern, ist bei einer Kamera der wichtigste Schritt überhaupt."
+      },
+      {
+       "id": "later",
+       "label": "Später erinnern",
+       "kind": "later",
+       "outcome": "compromised",
+       "feedback": "Mit einem Standardpasswort kommt jeder hinein, ganz ohne Fachwissen. Automatisierte Tools suchen ständig nach solchen Kameras."
+      }
+     ]
+    },
+    {
+     "id": "firmware",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-baxiskam",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Neue Firmware: 5.2.8"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Sicherheitslücken wurden geschlossen. Das Update dauert etwa drei Minuten."
+        }
+       ]
+      ],
+      "buttons": [
+       "Aktualisieren",
+       "Später"
+      ]
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "Aktualisieren",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Richtig. Angreifer kennen die Lücken alter Firmware sehr genau."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Ohne das Update bleiben bekannte Lücken offen. Aktualisieren Sie noch heute."
+      }
+     ]
+    },
+    {
+     "id": "remote-access",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-baxiskam",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Fernzugriff"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "UPnP und Portweiterleitung aktivieren, um die Kamera direkt über das Internet anzusehen?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Eingeschaltet lassen",
+       "Ausschalten"
+      ]
+     },
+     "say": "Jetzt bietet die Kamera direkten Zugriff aus dem Internet an.",
+     "actions": [
+      {
+       "id": "open-port",
+       "label": "Eingeschaltet lassen",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Mit einem offenen Port ist die Kamera für das gesamte Internet sichtbar. Angreifer finden solche offenen Geräte mit speziellen Suchmaschinen ganz leicht."
+      },
+      {
+       "id": "off",
+       "label": "Ausschalten",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn Sie aus der Ferne zuschauen müssen, verwenden Sie statt eines offenen Ports die offizielle App des Herstellers."
+      }
+     ]
+    },
+    {
+     "id": "public-link",
+     "label": "Öffentlichen Link zum Livestream erstellen? Jeder, der den Link hat, kann zuschauen.",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-baxiskam",
+      "url": [
+       {
+        "text": "http://192.168.1.64/paylas"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "share",
+       "label": "Link erstellen",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Sobald sich der Link verbreitet, wissen Sie nie, wer zuschaut. Fügen Sie Familienmitglieder lieber in der App mit eigenen Konten hinzu."
+      },
+      {
+       "id": "private",
+       "label": "Keinen öffentlichen Link erstellen",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. Das Bild sollten nur Ihnen nahestehende Menschen sehen, angemeldet mit ihren eigenen Konten."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "sc1-hotspot",
+   "prompt": "Finden Sie die riskanten Einstellungen im Statusfenster des Videorekorders.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2f-baxiskam",
+    "tone": "system",
+    "title": [
+     {
+      "text": "Eingang Bezirksamt: Videorekorder"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Modell: BX-DVR 8"
+      }
+     ],
+     [
+      {
+       "text": "Benutzername: admin, Passwort: Standard",
+       "spot": "default"
+      }
+     ],
+     [
+      {
+       "text": "Firmware: 2019, keine Updates",
+       "spot": "old-firmware"
+      }
+     ],
+     [
+      {
+       "text": "Portweiterleitung: an, 8000",
+       "spot": "open-port"
+      }
+     ],
+     [
+      {
+       "text": "Kamera 3: Personalabteilung, auf Bildschirme gerichtet",
+       "spot": "screens"
+      }
+     ],
+     [
+      {
+       "text": "Datum und Uhrzeit: korrekt"
+      }
+     ]
+    ],
+    "buttons": [
+     "Schließen"
+    ]
+   },
+   "spots": [
+    {
+     "id": "default",
+     "label": "Standardpasswort",
+     "explain": "Angreifer holen sich Standardpasswörter aus fertigen Listen. Es zu ändern, ist die erste Aufgabe."
+    },
+    {
+     "id": "old-firmware",
+     "label": "Alte Firmware",
+     "explain": "Ein Gerät, das seit sieben Jahren keine Updates bekommen hat, hat bekannte Lücken. Wenn keine Updates mehr erscheinen, muss das Gerät ersetzt werden."
+    },
+    {
+     "id": "open-port",
+     "label": "Offener Port",
+     "explain": "Ein offener Port macht den Rekorder für das gesamte Internet sichtbar. Wenn er nicht gebraucht wird, schließen Sie ihn."
+    },
+    {
+     "id": "screens",
+     "label": "Kamera auf Bildschirme gerichtet",
+     "explain": "Diese Kamera filmt dienstliche Bildschirme und Dokumente. Werden die Aufnahmen gestohlen, gehen vertrauliche Daten gleich mit."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "sc1-choice",
+   "question": {
+    "prompt": "Ein Kollege hat eine WLAN-Kamera von zu Hause mitgebracht und möchte sie bei der Arbeit anschließen. Was sagen Sie?",
+    "options": [
+     {
+      "id": "it-approved",
+      "label": "Der IT-Support muss sie genehmigen und anschließen",
+      "correct": true,
+      "feedback": "Richtig. Ins dienstliche Netzwerk kommen nur genehmigte Geräte."
+     },
+     {
+      "id": "password-enough",
+      "label": "In Ordnung, wenn er das Passwort ändert",
+      "correct": false,
+      "feedback": "Das Passwort ist wichtig, aber ein ungeprüftes Gerät kann eine Tür ins dienstliche Netzwerk öffnen. Die Entscheidung trifft der IT-Support."
+     },
+     {
+      "id": "guest-quiet",
+      "label": "Ab ins Gäste-WLAN damit, das merkt keiner",
+      "correct": false,
+      "feedback": "Ein Gerät, das ohne Absprache angeschlossen wird, ist ein Risiko für das ganze Büro. Jede Kamera läuft über den IT-Support."
+     }
+    ]
+   },
+   "explain": "Bei der Arbeit schließt nur der IT-Support Kameras und smarte Geräte an. Ein vergessenes Gerät bleibt jahrelang ohne Updates."
+  },
+  {
+   "type": "recap",
+   "id": "sc1-recap",
+   "points": [
+    "Ändern Sie das Standardpasswort gleich am ersten Tag.",
+    "Aktualisieren Sie die Firmware und schließen Sie offene Ports.",
+    "Bei der Arbeit nur genehmigte Geräte."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

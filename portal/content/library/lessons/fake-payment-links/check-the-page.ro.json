@@ -1,0 +1,383 @@
+{
+ "id": "check-the-page",
+ "title": "Verificați pagina",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "cp-tutor",
+   "beats": [
+    {
+     "id": "cp-b1",
+     "say": "O pagină de plată falsă poate fi o copie exactă a celei reale.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "cp-b2",
+     "say": "Sigla, culorile și butoanele sunt aceleași. Diferența se vede în bara de adrese și în ce vi se cere.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "e-xidmet-fake",
+       "brand": "e-Xidmət Portalı",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "e-xidmet-cerime.example.net",
+         "spot": "domain"
+        },
+        {
+         "text": "/odenis"
+        }
+       ],
+       "fields": [
+        "Numărul cardului",
+        "Data expirării",
+        "CVV",
+        "Cod primit prin SMS"
+       ],
+       "button": "Plătiți: 40 AZN"
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "cp-b3",
+     "say": "Nici lacătul nu dovedește nimic: majoritatea site-urilor false îl au.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "cp-b4",
+     "say": "Cea mai sigură cale: deschideți portalul din marcaje sau scrieți chiar dumneavoastră adresa.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "cp-swipe",
+   "prompt": "Pagina aceasta este autentică sau falsă?",
+   "cards": [
+    {
+     "id": "real-fines",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet",
+      "brand": "e-Xidmət Portalı",
+      "url": [
+       {
+        "text": "https://e-xidmet.example/cerimeler"
+       }
+      ],
+      "fields": [
+       "Cod personal de identificare",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "verdict": "safe",
+     "explain": "Acesta este domeniul propriu al portalului, iar pagina ați deschis-o chiar dumneavoastră. Aici se verifică amenzile."
+    },
+    {
+     "id": "fake-discount",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet-fake",
+      "brand": "e-Xidmət Portalı",
+      "url": [
+       {
+        "text": "https://e-xidmet-endirim.example.net/cerime"
+       }
+      ],
+      "fields": [
+       "Numărul cardului",
+       "Data expirării",
+       "CVV",
+       "Cod primit prin SMS"
+      ],
+      "button": "Plătiți cu 50% reducere"
+     },
+     "verdict": "threat",
+     "explain": "Domeniul este altul, iar pagina vrea totul deodată: cardul, codul de pe spatele lui și codul primit prin SMS. Este un formular făcut pentru furt."
+    },
+    {
+     "id": "app-notice",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "e-xidmet",
+      "app": "e-Xidmət",
+      "title": [
+       {
+        "text": "Notificare nouă"
+       }
+      ],
+      "body": [
+       {
+        "text": "Pe numele dumneavoastră este înregistrată 1 amendă. Detalii: secțiunea Amenzi din aplicație."
+       }
+      ],
+      "time": "09:15"
+     },
+     "verdict": "safe",
+     "explain": "Notificarea apare în aplicația oficială și nu conține niciun link. Verificați și plătiți amenda chiar acolo, în aplicație."
+    },
+    {
+     "id": "fake-benefit",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet-fake",
+      "brand": "Sprijin pentru familie",
+      "url": [
+       {
+        "text": "https://ailedestek-qeydiyyat.example.net"
+       }
+      ],
+      "fields": [
+       "Nume complet",
+       "Cod personal de identificare",
+       "Numărul cardului",
+       "CVV"
+      ],
+      "button": "Primiți ajutorul"
+     },
+     "verdict": "threat",
+     "explain": "Ca să primiți bani, nu aveți niciodată nevoie de codul de pe spatele cardului. Pentru ajutoarele sociale de stat nu este nevoie de înscriere printr-un link."
+    },
+    {
+     "id": "fake-gateway",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2d-manatpay-fake",
+      "brand": "ManatPay",
+      "url": [
+       {
+        "text": "https://manatpay-secure.example.net/3ds"
+       }
+      ],
+      "fields": [
+       "Numărul cardului",
+       "CVV",
+       "Cod primit prin SMS",
+       "PIN-ul cardului"
+      ],
+      "button": "Confirmați"
+     },
+     "verdict": "threat",
+     "explain": "Nicio pagină de plată nu vă cere vreodată PIN-ul cardului. PIN-ul se folosește doar la bancomate și la terminalele de plată cu cardul."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "cp-sim",
+   "environment": "browser",
+   "title": "Linkul cu amenda",
+   "intro": "Un prieten v-a trimis un link cu o amendă, iar dumneavoastră l-ați deschis. Luați decizia corectă la fiecare pas din browser.",
+   "steps": [
+    {
+     "id": "fake-fine-page",
+     "label": "Amendă neplătită: 80 AZN. Astăzi, 50% reducere",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "e-xidmet-fake",
+      "url": [
+       {
+        "text": "https://",
+        "reveal": "e-xidmet-cerime.example.net"
+       },
+       {
+        "text": "e-xidmet-cerime.example.net"
+       },
+       {
+        "text": "/odenis"
+       }
+      ]
+     },
+     "say": "Uitați-vă la bara de adrese.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Plătiți cu reducere",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Reducerea există ca să vă grăbească. Acum vedeți ce vă cere pagina."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect, acesta nu este domeniul propriu al portalului. Acum deschideți chiar dumneavoastră portalul.",
+       "next": "real-portal"
+      }
+     ]
+    },
+    {
+     "id": "card-form",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet-fake",
+      "brand": "e-Xidmət Portalı",
+      "url": [
+       {
+        "text": "https://e-xidmet-cerime.example.net",
+        "reveal": "e-xidmet-cerime.example.net"
+       }
+      ],
+      "fields": [
+       "Numărul cardului",
+       "Data expirării",
+       "CVV",
+       "Cod primit prin SMS"
+      ],
+      "button": "Plătiți: 40 AZN"
+     },
+     "say": "Pagina vrea în același timp cardul și codul primit prin SMS.",
+     "actions": [
+      {
+       "id": "submit",
+       "label": "Plătiți: 40 AZN",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Datele cardului au ajuns la escroci. Sunați acum la bancă, la numărul de pe card."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bună decizie. Nu ați introdus nimic, iar acum verificați amenda pe portalul oficial."
+      }
+     ]
+    },
+    {
+     "id": "real-portal",
+     "label": "Amenzi: nicio amendă activă",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "e-xidmet",
+      "url": [
+       {
+        "text": "https://e-xidmet.example/cerimeler",
+        "reveal": "e-xidmet.example"
+       }
+      ]
+     },
+     "say": "Ați deschis portalul din marcaje.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Vedeți amenzile",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. Portalul oficial nu arată nicio amendă, deci linkul era fals."
+      },
+      {
+       "id": "tell-friend",
+       "label": "Anunțați-vă prietenul",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Excelent. Spuneți-i prietenului care v-a trimis linkul să nu introducă nimic acolo."
+      }
+     ]
+    },
+    {
+     "id": "benefit-page",
+     "label": "Sprijin pentru familie: înscrierea se încheie astăzi",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "e-xidmet-fake",
+      "url": [
+       {
+        "text": "https://ailedestek-qeydiyyat.example.net",
+        "reveal": "ailedestek-qeydiyyat.example.net"
+       }
+      ]
+     },
+     "say": "De data aceasta, un vecin v-a trimis un link pentru un ajutor social.",
+     "actions": [
+      {
+       "id": "register",
+       "label": "Înscrieți-vă",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Acest formular colectează datele cardului. Pentru ajutoarele sociale de stat nu este nevoie niciodată de înscriere printr-un link."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Verificați orice ajutor social doar pe portalul oficial."
+      },
+      {
+       "id": "report",
+       "label": "Raportați site-ul fals",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Raportarea ajută la blocarea site-ului fals, ca să fie protejați și alții."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "cp-match",
+   "prompt": "Asociați ce cere pagina cu ce înseamnă.",
+   "pairs": [
+    {
+     "id": "pin",
+     "left": "PIN-ul cardului",
+     "right": "Nicio pagină de plată nu îl cere vreodată"
+    },
+    {
+     "id": "sms-code",
+     "left": "Codul primit prin SMS de la bancă",
+     "right": "Aprobă o plată: citiți mai întâi suma"
+    },
+    {
+     "id": "benefit-cvv",
+     "left": "Codul de pe spatele cardului, pentru un ajutor social",
+     "right": "Nu este necesar ca să primiți bani"
+    },
+    {
+     "id": "discount",
+     "left": "O reducere dacă plătiți astăzi",
+     "right": "Vă grăbește să plătiți fără să verificați"
+    }
+   ],
+   "explain": "Dacă aveți dubii, nu plătiți. Verificați chiar dumneavoastră portalul oficial sau sunați la poliție, la 102."
+  },
+  {
+   "type": "recap",
+   "id": "cp-recap",
+   "points": [
+    "Citiți bara de adrese: sigla și lacătul nu dovedesc nimic.",
+    "O pagină care vă cere PIN-ul sau codul cardului pentru un ajutor social este falsă.",
+    "Când aveți dubii: ETX 1654 sau poliția, la 102."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

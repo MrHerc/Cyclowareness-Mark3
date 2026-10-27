@@ -49,7 +49,7 @@ export default async function OperatorTenantsPage() {
                   <div className="flex flex-wrap items-start gap-3">
                     <div className="min-w-0 flex-1">
                       <p className="text-body font-semibold">
-                        {x.name} {x.id === v.tenant.id ? <Pill className="ml-1">{tr("you")}</Pill> : null}
+                        {x.name} {x.id === v.tenant.id ? <Pill className="ms-1">{tr("you")}</Pill> : null}
                       </p>
                       <p className="mt-1 text-caption text-ink-muted">
                         <span className="font-mono">{x.slug}</span>

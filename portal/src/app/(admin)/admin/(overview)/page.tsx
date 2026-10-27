@@ -234,7 +234,7 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
                   <span className={cn("grid size-8 shrink-0 place-items-center rounded-full text-caption font-bold", r.place === 1 ? "bg-reward-500 text-(--accent-on)" : "bg-sunken text-ink-muted")}>{r.place}</span>
                   <span className="w-36 shrink-0 truncate text-body-sm font-semibold sm:w-48">{r.name}</span>
                   <ProgressBar decorative value={r.points} tone={r.place === 1 ? "reward" : "brand"} size="sm" />
-                  <span className="w-8 shrink-0 text-right text-body-sm font-bold tabular-nums">{r.points}</span>
+                  <span className="w-8 shrink-0 text-end text-body-sm font-bold tabular-nums">{r.points}</span>
                 </li>
               ))}
             </ol>
@@ -305,20 +305,20 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
         <CardHeader title={tr("departmentsTable")} />
         <CardBody className="pt-3">
           <ScrollRegion label={tr("departmentsTable")}>
-            <table className="w-full min-w-[36rem] text-left text-body-sm">
+            <table className="w-full min-w-[36rem] text-start text-body-sm">
               <thead className="text-tab font-semibold text-ink-subtle">
                 <tr className="border-b border-line">
-                  <SortHeader label={tr("col.name")} active={deptKey === "name"} dir={deptDir} href={sortHref("d", "name")} className="py-2.5 pr-3 font-semibold" />
+                  <SortHeader label={tr("col.name")} active={deptKey === "name"} dir={deptDir} href={sortHref("d", "name")} className="py-2.5 pe-3 font-semibold" />
                   <SortHeader label={tr("col.learners")} active={deptKey === "learners"} dir={deptDir} href={sortHref("d", "learners")} className="px-3 py-2.5 font-semibold" />
                   <SortHeader label={tr("col.completion")} active={deptKey === "completion"} dir={deptDir} href={sortHref("d", "completion")} className="px-3 py-2.5 font-semibold" />
                   <SortHeader label={tr("col.reporting")} active={deptKey === "reportRate"} dir={deptDir} href={sortHref("d", "reportRate")} className="px-3 py-2.5 font-semibold" />
-                  <SortHeader label={tr("col.risk")} active={deptKey === "risk"} dir={deptDir} href={sortHref("d", "risk")} className="py-2.5 pl-3 text-right font-semibold" />
+                  <SortHeader label={tr("col.risk")} active={deptKey === "risk"} dir={deptDir} href={sortHref("d", "risk")} className="py-2.5 ps-3 text-end font-semibold" />
                 </tr>
               </thead>
               <tbody>
                 {deptRows.map((r) => (
                   <tr key={r.id} className="border-b border-line last:border-0">
-                    <td className="py-3 pr-3 font-semibold">{r.name}</td>
+                    <td className="py-3 pe-3 font-semibold">{r.name}</td>
                     <td className="px-3 py-3 tabular-nums">{r.learners}</td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-2">
@@ -327,7 +327,7 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
                       </div>
                     </td>
                     <td className="px-3 py-3 tabular-nums">{r.reportRate}%</td>
-                    <td className="py-3 pl-3 text-right">
+                    <td className="py-3 ps-3 text-end">
                       <Pill tone={riskBand(r.risk) === "low" ? "safe" : riskBand(r.risk) === "medium" ? "warn" : "risk"}>{r.risk}</Pill>
                     </td>
                   </tr>
@@ -351,20 +351,20 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
         />
         <CardBody className="pt-3">
           <ScrollRegion label={tr("modulesTable")}>
-            <table className="w-full min-w-[44rem] text-left text-body-sm">
+            <table className="w-full min-w-[44rem] text-start text-body-sm">
               <thead className="text-tab text-ink-subtle">
                 <tr className="border-b border-line">
-                  <SortHeader label={tr("col.module")} active={moduleKey === "title"} dir={moduleDir} href={sortHref("m", "title")} className="py-2.5 pr-3 font-semibold" />
+                  <SortHeader label={tr("col.module")} active={moduleKey === "title"} dir={moduleDir} href={sortHref("m", "title")} className="py-2.5 pe-3 font-semibold" />
                   <SortHeader label={tr("col.completed")} active={moduleKey === "completedBy"} dir={moduleDir} href={sortHref("m", "completedBy")} className="px-3 py-2.5 font-semibold" />
                   <SortHeader label={tr("col.awaiting")} active={moduleKey === "awaiting"} dir={moduleDir} href={sortHref("m", "awaiting")} className="px-3 py-2.5 font-semibold" />
                   <SortHeader label={tr("col.rating")} active={moduleKey === "rating"} dir={moduleDir} href={sortHref("m", "rating")} className="px-3 py-2.5 font-semibold" />
-                  <SortHeader label={tr("col.score")} active={moduleKey === "score"} dir={moduleDir} href={sortHref("m", "score")} className="py-2.5 pl-3 text-right font-semibold" />
+                  <SortHeader label={tr("col.score")} active={moduleKey === "score"} dir={moduleDir} href={sortHref("m", "score")} className="py-2.5 ps-3 text-end font-semibold" />
                 </tr>
               </thead>
               <tbody>
                 {moduleRows.map((m) => (
                   <tr key={m.moduleId} className="border-b border-line last:border-0">
-                    <td className="py-3 pr-3">
+                    <td className="py-3 pe-3">
                       <span className="flex items-center gap-3">
                         <ModuleIcon slug={m.slug} category={m.category as Category} size="sm" />
                         <span className="font-semibold">{m.title}</span>
@@ -387,7 +387,7 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
                         <span className="text-ink-subtle">—</span>
                       )}
                     </td>
-                    <td className="py-3 pl-3 text-right tabular-nums">{m.score !== null ? `${m.score}%` : "—"}</td>
+                    <td className="py-3 ps-3 text-end tabular-nums">{m.score !== null ? `${m.score}%` : "—"}</td>
                   </tr>
                 ))}
               </tbody>

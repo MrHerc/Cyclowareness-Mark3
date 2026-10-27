@@ -1,0 +1,460 @@
+{
+  "id": "why-a-manager",
+  "title": "Neden parola yöneticisi?",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Her hesabın kendine ait, uzun bir parolası olmalı. Ama hiç kimse bunların hepsini aklında tutamaz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Bir parolayı asla tekrar kullanmayın. Bir sitenin verileri sızdığında, saldırganlar aynı parolayı tüm hesaplarınızda dener.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Kurumunuzun parola yöneticisi, her hesap için güçlü bir parola oluşturur ve onu şifrelenmiş bir kasada saklar.",
+          "mood": "talk",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "parolseyf",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "Parola oluşturuldu"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "28 karakter, rastgele",
+                    "spot": "gen"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Kaydet"
+              ]
+            }
+          },
+          "highlight": "gen"
+        },
+        {
+          "id": "b4",
+          "say": "Siz yalnızca uzun bir ana parolayı hatırlarsınız ve kasayı iki adımlı doğrulamayla korursunuz.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "where-passwords-live",
+      "prompt": "Burası bir parola için güvenli bir yer mi?",
+      "cards": [
+        {
+          "id": "excel",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Parollar_hamisi.xlsx"
+              }
+            ],
+            "type": "xls",
+            "size": "18 KB",
+            "source": [
+              {
+                "text": "Masaüstü"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Dosya şifrelenmemiş: bilgisayara erişen herkes tüm parolaları bir anda görür."
+        },
+        {
+          "id": "vault",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "parolseyf",
+            "app": "ParolSeyf",
+            "title": [
+              {
+                "text": "Giriş bilgileri kasaya kaydedildi"
+              }
+            ],
+            "body": [
+              {
+                "text": "portal.idare.example"
+              }
+            ],
+            "time": "09:05"
+          },
+          "verdict": "safe",
+          "explain": "Parola şifrelenmiş kasada durur ve yalnızca sizin ana parolanızla açılır."
+        },
+        {
+          "id": "saved-messages",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Kayıtlı Mesajlar"
+              }
+            ],
+            "messages": [
+              {
+                "from": "me",
+                "body": [
+                  {
+                    "text": "E-posta parolası: Aysel1990"
+                  }
+                ],
+                "time": "08:31"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Mesajlaşma uygulaması bir kasa değildir. Telefon kaybolursa ya da hesap ele geçirilirse parolalar da elden gider."
+        },
+        {
+          "id": "shared-vault",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Paylaşılan kasa: Basın ofisi"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "3 üye. Web sitesi yönetim paneli, sosyal medya hesabı."
+                }
+              ]
+            ],
+            "buttons": [
+              "Kapat"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ekip parolaları şifrelenmiş bir kasada paylaşır ve erişim her an kaldırılabilir."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "password-requests",
+      "environment": "phone",
+      "title": "Parola istekleri",
+      "intro": "Bugün birkaç kişi sizden parola istiyor. Her birine telefonunuzdan yanıt verin.",
+      "steps": [
+        {
+          "id": "colleague-asks",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Sebine Hüseynova"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Merhaba! Web sitesinin yönetim paneli parolasını buraya yazar mısınız? Bugünün haberlerini yayımlayacağım."
+                  }
+                ],
+                "time": "10:12"
+              }
+            ]
+          },
+          "say": "Sebine Hanım sizin iş arkadaşınız ve bu erişime gerçekten ihtiyacı var.",
+          "actions": [
+            {
+              "id": "type",
+              "label": "Parolayı yaz",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Parola sohbette kalır ve bir telefon kaybolursa sızabilir. Parolayı kasadan paylaşın."
+            },
+            {
+              "id": "vault",
+              "label": "Kasada sizinle paylaşacağım",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Doğru. Kasada parola şifreli kalır ve gerektiğinde erişim kaldırılabilir."
+            },
+            {
+              "id": "sms",
+              "label": "SMS ile göndereceğim",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "SMS de şifrelenmez ve telefonda kalır. Parolaları yalnızca kasa üzerinden paylaşın."
+            }
+          ]
+        },
+        {
+          "id": "fake-share-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "parolseyf-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "ParolSeyf"
+                }
+              ],
+              "address": [
+                {
+                  "text": "no-reply@parolseyf-share.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Elnur Kerimov sizinle bir kasa paylaştı"
+              }
+            ],
+            "time": "11:40",
+            "body": [
+              [
+                {
+                  "text": "“Finans” kasasını görüntülemek için giriş yapın: "
+                },
+                {
+                  "text": "parolseyf-share.example.net/seyf",
+                  "link": {
+                    "label": "parolseyf-share.example.net/seyf",
+                    "href": "https://parolseyf-share.example.net/seyf"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Bir paylaşım beklemiyordunuz.",
+          "actions": [
+            {
+              "id": "click",
+              "label": "Bağlantıyı aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Gerçek bir paylaşım doğrudan ParolSeyf uygulamasının içinde görünür. Bu bağlantı ana parolanızın peşinde."
+            },
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru: bu adres ParolSeyf'e ait değil. Paylaşımları kontrol etmek için uygulamayı kendiniz açın."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Siz güvendesiniz, ama iş arkadaşlarınıza da aynı e-posta gelebilir. Bildirin."
+            }
+          ]
+        },
+        {
+          "id": "fake-support",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "parolseyf-fake",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "ParolSeyf Destek"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Kasanızda bir hata tespit ettik. Kasanızı geri yüklemek için ana parolanızı ve size gelecek kodu buraya yazın."
+                  }
+                ],
+                "time": "14:03"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "send",
+              "label": "Ana parolayı yaz",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Ana parola, tüm parolalarınızın kilidini açar. Hiçbir destek ekibi onu asla istemez."
+            },
+            {
+              "id": "block",
+              "label": "Engelle",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Doğru. Hiç kimse, teknik destek bile, ana parolanızı ya da kodunuzu istemez."
+            },
+            {
+              "id": "report",
+              "label": "Bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Harika. İş arkadaşlarınızı uyarabilmeleri için güvenlik ekibine de haber verin."
+            }
+          ]
+        },
+        {
+          "id": "reused-alert",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Bu parola 3 hesapta kullanılıyor"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Aynı parola İşPoçt, ofis portalı ve Kontakto sayfası için kayıtlı."
+                }
+              ]
+            ],
+            "buttons": [
+              "Daha sonra",
+              "Parolaları değiştir"
+            ]
+          },
+          "say": "ParolSeyf parolalarınızı kontrol etti.",
+          "actions": [
+            {
+              "id": "update",
+              "label": "Parolaları değiştir",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Doğru. Parola üreteci her hesap için ayrı bir parola oluşturur; böylece bir sızıntı başka hiçbir hesabı açmaz."
+            },
+            {
+              "id": "later",
+              "label": "Daha sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Tekrar kullanılan parola, saldırganların bayıldığı bir zayıflıktır. Tek bir sızıntı üç hesabın da kapısını açar."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "password",
+      "id": "master-password",
+      "prompt": "Bir ana parola oluşturun: en az 15 karakterden oluşan uzun bir parola cümlesi.",
+      "targetScore": 4,
+      "tips": [
+        "Dört ya da beş rastgele kelimeyi boşluklarla birleştirin",
+        "Bu parolayı başka hiçbir yerde kullanmayın",
+        "İsimlerden, doğum tarihlerinden ve ünlü sözlerden kaçının"
+      ]
+    },
+    {
+      "type": "match",
+      "id": "manager-terms",
+      "prompt": "Her terimi anlamıyla eşleştirin.",
+      "pairs": [
+        {
+          "id": "vault",
+          "left": "Kasa",
+          "right": "Parolalarınızın şifrelenmiş deposu"
+        },
+        {
+          "id": "master",
+          "left": "Ana parola",
+          "right": "Kasayı açan tek parola"
+        },
+        {
+          "id": "generator",
+          "left": "Parola üreteci",
+          "right": "Uzun, rastgele parolalar oluşturur"
+        },
+        {
+          "id": "shared",
+          "left": "Paylaşılan kasa",
+          "right": "Ekibin parolaları güvenle paylaşmasını sağlar"
+        }
+      ],
+      "explain": "Parolaları parola yöneticisi hatırlar; siz yalnızca ana parolayı korursunuz."
+    },
+    {
+      "type": "choice",
+      "id": "shared-account",
+      "question": {
+        "prompt": "Departmanınızda üç kişi aynı sosyal medya hesabını yönetiyor. Parolayı nasıl paylaşmalılar?",
+        "options": [
+          {
+            "id": "own",
+            "label": "Mümkünse herkese ayrı giriş, değilse paylaşılan bir kasa",
+            "correct": true,
+            "feedback": "Doğru. Biri ekipten ayrıldığında erişimi tek adımda kaldırılır."
+          },
+          {
+            "id": "group-chat",
+            "label": "Parolayı ekip sohbetinde paylaşmak",
+            "correct": false,
+            "feedback": "Grup sohbetine yazılan parola orada yıllarca kalır ve yeni üyeler de onu görür."
+          },
+          {
+            "id": "note",
+            "label": "Parolayı monitöre yapıştırılmış bir not kâğıdına yazmak",
+            "correct": false,
+            "feedback": "İçeri giren herkes parolayı görebilir ve fotoğrafını çekebilir."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "key"
+        }
+      },
+      "explain": "Ortak bir hesapta bile parola sohbetlerde ya da kâğıtta değil, kasada durur."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Her hesaba ayrı bir parola: parola yöneticisi onu oluşturur ve hatırlar.",
+        "Parolaları paylaşılan bir kasada paylaşın, sohbette asla.",
+        "Ana parolanızı asla kimseye söylemeyin ve kasayı iki adımlı doğrulamayla koruyun."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

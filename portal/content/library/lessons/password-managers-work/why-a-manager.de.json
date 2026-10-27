@@ -1,0 +1,460 @@
+{
+ "id": "why-a-manager",
+ "title": "Warum ein Passwort-Manager?",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Jedes Konto braucht ein eigenes, langes Passwort. Niemand kann sich all diese Passwörter merken.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Verwenden Sie ein Passwort nie mehrfach. Wird eine Website gehackt, probieren Angreifer das Passwort bei all Ihren Konten aus.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Der Passwort-Manager Ihrer Organisation erstellt für jedes Konto ein starkes Passwort und speichert es in einem verschlüsselten Tresor.",
+     "mood": "talk",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "parolseyf",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Passwort erstellt"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "28 Zeichen, zufällig",
+          "spot": "gen"
+         }
+        ]
+       ],
+       "buttons": [
+        "Speichern"
+       ]
+      }
+     },
+     "highlight": "gen"
+    },
+    {
+     "id": "b4",
+     "say": "Sie merken sich nur noch ein langes Masterpasswort und schützen den Tresor zusätzlich mit Zwei-Faktor-Authentisierung.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "where-passwords-live",
+   "prompt": "Ist das ein sicherer Ort für ein Passwort?",
+   "cards": [
+    {
+     "id": "excel",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Parollar_hamisi.xlsx"
+       }
+      ],
+      "type": "xls",
+      "size": "18 KB",
+      "source": [
+       {
+        "text": "Desktop"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Die Datei ist nicht verschlüsselt. Wer Zugriff auf den Computer bekommt, sieht auf einen Schlag alle Passwörter."
+    },
+    {
+     "id": "vault",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "parolseyf",
+      "app": "ParolSeyf",
+      "title": [
+       {
+        "text": "Zugangsdaten im Tresor gespeichert"
+       }
+      ],
+      "body": [
+       {
+        "text": "portal.idare.example"
+       }
+      ],
+      "time": "09:05"
+     },
+     "verdict": "safe",
+     "explain": "Das Passwort liegt im verschlüsselten Tresor und lässt sich nur mit Ihrem Masterpasswort öffnen."
+    },
+    {
+     "id": "saved-messages",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Gespeicherte Nachrichten"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "E-Mail-Passwort: Aysel1990"
+         }
+        ],
+        "time": "08:31"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein Messenger ist kein Tresor. Geht das Smartphone verloren oder wird der Account übernommen, fallen auch die Passwörter in fremde Hände."
+    },
+    {
+     "id": "shared-vault",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Gemeinsamer Tresor: Pressestelle"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "3 Mitglieder. Admin-Bereich der Website, Social-Media-Account."
+        }
+       ]
+      ],
+      "buttons": [
+       "Schließen"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Das Team teilt Passwörter in einem verschlüsselten Tresor, und der Zugriff lässt sich jederzeit entziehen."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "password-requests",
+   "environment": "phone",
+   "title": "Anfragen nach Passwörtern",
+   "intro": "Heute fragen gleich mehrere Personen bei Ihnen nach Passwörtern. Beantworten Sie jede Anfrage auf Ihrem Smartphone.",
+   "steps": [
+    {
+     "id": "colleague-asks",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Səbinə Hüseynova"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hi! Kannst du mir das Passwort für den Admin-Bereich der Website hier reinschreiben? Ich stelle heute die Neuigkeiten online."
+         }
+        ],
+        "time": "10:12"
+       }
+      ]
+     },
+     "say": "Səbinə ist Ihre Kollegin und braucht den Zugang wirklich.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "Passwort eintippen",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Das Passwort bleibt im Chat stehen und kann in falsche Hände geraten, wenn ein Smartphone verloren geht. Teilen Sie es über den Tresor."
+      },
+      {
+       "id": "vault",
+       "label": "Ich teile es über den Tresor mit dir",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Richtig. Im Tresor bleibt das Passwort verschlüsselt, und der Zugriff lässt sich bei Bedarf wieder entziehen."
+      },
+      {
+       "id": "sms",
+       "label": "Ich schicke es dir per SMS",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Auch eine SMS ist nicht verschlüsselt und bleibt auf dem Smartphone gespeichert. Teilen Sie Passwörter nur über den Tresor."
+      }
+     ]
+    },
+    {
+     "id": "fake-share-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "parolseyf-fake",
+      "from": {
+       "name": [
+        {
+         "text": "ParolSeyf"
+        }
+       ],
+       "address": [
+        {
+         "text": "no-reply@parolseyf-share.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Elnur Kərimov hat einen Tresor mit Ihnen geteilt"
+       }
+      ],
+      "time": "11:40",
+      "body": [
+       [
+        {
+         "text": "Melden Sie sich an, um den Tresor „Finanzen“ anzusehen: "
+        },
+        {
+         "text": "parolseyf-share.example.net/seyf",
+         "link": {
+          "label": "parolseyf-share.example.net/seyf",
+          "href": "https://parolseyf-share.example.net/seyf"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Mit einer Freigabe haben Sie nicht gerechnet.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Eine echte Freigabe sehen Sie direkt in der ParolSeyf-App. Dieser Link will Ihr Masterpasswort abgreifen."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig: Die Adresse gehört nicht zu ParolSeyf. Öffnen Sie die App selbst und sehen Sie dort nach, ob etwas mit Ihnen geteilt wurde."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Sie selbst sind sicher, aber Ihre Kolleginnen und Kollegen bekommen vielleicht dieselbe E-Mail. Melden Sie sie."
+      }
+     ]
+    },
+    {
+     "id": "fake-support",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "parolseyf-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "ParolSeyf-Support"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Wir haben einen Fehler in Ihrem Tresor festgestellt. Um ihn wiederherzustellen, schreiben Sie uns hier Ihr Masterpasswort und den Code, den Sie gleich erhalten."
+         }
+        ],
+        "time": "14:03"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "send",
+       "label": "Masterpasswort eintippen",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Das Masterpasswort ist der Schlüssel zu all Ihren Passwörtern. Kein Support-Team fragt jemals danach."
+      },
+      {
+       "id": "block",
+       "label": "Blockieren",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Richtig. Niemand, auch nicht der IT-Support, fragt nach Ihrem Masterpasswort oder einem Code."
+      },
+      {
+       "id": "report",
+       "label": "Melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Informieren Sie auch das Sicherheitsteam, damit es Ihre Kolleginnen und Kollegen warnen kann."
+      }
+     ]
+    },
+    {
+     "id": "reused-alert",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Dieses Passwort wird für 3 Konten verwendet"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Für İşPoçt, das Büroportal und die Kontakto-Seite ist dasselbe Passwort gespeichert."
+        }
+       ]
+      ],
+      "buttons": [
+       "Später",
+       "Passwörter ändern"
+      ]
+     },
+     "say": "ParolSeyf hat Ihre Passwörter überprüft.",
+     "actions": [
+      {
+       "id": "update",
+       "label": "Passwörter ändern",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Richtig. Der Generator erstellt für jedes Konto ein eigenes Passwort. So öffnet ein einzelnes Datenleck kein weiteres Konto."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Ein mehrfach verwendetes Passwort ist eine Schwachstelle, auf die Angreifer nur warten. Ein einziges Datenleck würde alle drei Konten öffnen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "password",
+   "id": "master-password",
+   "prompt": "Erstellen Sie ein Masterpasswort: eine lange Passphrase mit mindestens 15 Zeichen.",
+   "targetScore": 4,
+   "tips": [
+    "Verbinden Sie vier oder fünf zufällige Wörter mit Leerzeichen",
+    "Verwenden Sie dieses Passwort nirgendwo sonst",
+    "Vermeiden Sie Namen, Geburtstage und bekannte Zitate"
+   ]
+  },
+  {
+   "type": "match",
+   "id": "manager-terms",
+   "prompt": "Ordnen Sie jedem Begriff seine Bedeutung zu.",
+   "pairs": [
+    {
+     "id": "vault",
+     "left": "Tresor",
+     "right": "Verschlüsselter Speicher für Ihre Passwörter"
+    },
+    {
+     "id": "master",
+     "left": "Masterpasswort",
+     "right": "Das eine Passwort, das den Tresor öffnet"
+    },
+    {
+     "id": "generator",
+     "left": "Generator",
+     "right": "Erstellt lange, zufällige Passwörter"
+    },
+    {
+     "id": "shared",
+     "left": "Gemeinsamer Tresor",
+     "right": "Ermöglicht einem Team, Passwörter sicher zu teilen"
+    }
+   ],
+   "explain": "Der Manager merkt sich die Passwörter. Sie müssen nur das Masterpasswort schützen."
+  },
+  {
+   "type": "choice",
+   "id": "shared-account",
+   "question": {
+    "prompt": "Drei Personen in Ihrer Abteilung betreuen denselben Social-Media-Account. Wie sollten sie das Passwort teilen?",
+    "options": [
+     {
+      "id": "own",
+      "label": "Wenn möglich mit eigenen Zugängen, sonst über einen gemeinsamen Tresor",
+      "correct": true,
+      "feedback": "Richtig. Verlässt jemand das Team, lässt sich sein Zugriff mit einem Schritt entziehen."
+     },
+     {
+      "id": "group-chat",
+      "label": "Das Passwort im Team-Chat posten",
+      "correct": false,
+      "feedback": "Ein Passwort im Gruppenchat bleibt dort jahrelang stehen, und auch neue Mitglieder sehen es."
+     },
+     {
+      "id": "note",
+      "label": "Es auf einen Klebezettel am Monitor schreiben",
+      "correct": false,
+      "feedback": "Wer den Raum betritt, kann das Passwort sehen und abfotografieren."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "key"
+    }
+   },
+   "explain": "Auch bei einem gemeinsamen Account gehört das Passwort in den Tresor, nicht in Chats oder auf Papier."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Für jedes Konto ein eigenes Passwort: Der Manager erstellt es und merkt es sich.",
+    "Teilen Sie Passwörter über einen gemeinsamen Tresor, niemals im Chat.",
+    "Verraten Sie niemandem Ihr Masterpasswort, und schützen Sie den Tresor mit Zwei-Faktor-Authentisierung."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

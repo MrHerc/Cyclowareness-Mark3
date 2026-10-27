@@ -1,0 +1,423 @@
+{
+  "id": "update-turns",
+  "title": "Değişen uzantı",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ut-tutor",
+      "beats": [
+        {
+          "id": "ut-b1",
+          "say": "Bir tarayıcı uzantısı yıllarca dürüstçe çalışabilir. Sonra sahibi değişir ve tek bir güncelleme onu casusa dönüştürür.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "update"
+          }
+        },
+        {
+          "id": "ut-b2",
+          "say": "Bu tür güncellemeler milyonlarca tarayıcıya kendiliğinden ulaştı. Kullanıcılar hiçbir şey fark etmedi.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "stat",
+            "value": "4,3 milyon",
+            "label": "cihazda, uzun süredir güvenilen uzantılar 2025'te casus yazılıma dönüştü"
+          }
+        },
+        {
+          "id": "ut-b3",
+          "say": "Bir uzantı birden yeni izinler istiyorsa, arama motorunuz değiştiyse ya da reklamlar çoğaldıysa dikkatli olun.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2c-pdf-ustasi",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "PDF Ustası devre dışı bırakıldı"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Yeni sürüm daha fazla izin istiyor:"
+                  }
+                ],
+                [
+                  {
+                    "text": "Tüm web sitelerindeki tüm verilerinizi okuma ve değiştirme",
+                    "spot": "new-perm"
+                  }
+                ]
+              ],
+              "buttons": [
+                "İzinleri kabul et",
+                "Uzantıyı kaldır"
+              ]
+            }
+          },
+          "highlight": "new-perm"
+        },
+        {
+          "id": "ut-b4",
+          "say": "Böyle bir durumda uzantıyı kaldırın, BT destek ekibine haber verin ve söyledikleri parolaları değiştirin.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "ut-scenario",
+      "title": "PDF Ustası değişti",
+      "start": "n1",
+      "nodes": [
+        {
+          "id": "n1",
+          "text": "Sabah tarayıcıyı açıyorsunuz. Köşede bir uyarı beliriyor: PDF Ustası yeni izinler istediği için devre dışı bırakıldı.",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2c-pdf-ustasi",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "PDF Ustası devre dışı bırakıldı"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Yeni sürüm daha fazla izin istiyor."
+                  }
+                ]
+              ],
+              "buttons": [
+                "İzinleri gör",
+                "Uzantıyı kaldır"
+              ]
+            }
+          },
+          "choices": [
+            {
+              "label": "İzinleri kabul ederim, bir yıldır kullanıyorum",
+              "next": "n2-bad",
+              "outcome": "compromised",
+              "feedback": "Eski güven, yeni bir izni güvenli kılmaz. Bu güncelleme uzantıyı casusa dönüştürmüş olabilir."
+            },
+            {
+              "label": "Önce hangi izinleri istediğine bakarım",
+              "next": "n2",
+              "outcome": "safe",
+              "feedback": "Doğru. Yeni izinler, uzantının artık ne yapmak istediğini gösterir."
+            }
+          ]
+        },
+        {
+          "id": "n2",
+          "text": "Yeni izinler: tüm web sitelerindeki verileri okuma ve değiştirme, kopyaladıklarınızı okuma. PDF açmak için bunların hiçbiri gerekmez.",
+          "choices": [
+            {
+              "label": "Uzantıyı kaldırır ve BT destek ekibine yazarım",
+              "next": "n3",
+              "outcome": "safe",
+              "feedback": "Doğru. BT destek ekibi bu uzantıyı diğer bilgisayarlarda da kontrol edecek."
+            },
+            {
+              "label": "Devre dışı bırakıp sonra bakarım",
+              "next": "n3",
+              "outcome": "risky",
+              "feedback": "Devre dışı bırakılan uzantı hâlâ tarayıcıdadır ve tek tıkla geri döner. Kaldırmak daha güvenlidir."
+            }
+          ]
+        },
+        {
+          "id": "n2-bad",
+          "text": "Bir hafta sonra arama motorunuz kendiliğinden değişmiş, web sitelerinde tanımadığınız reklamlar çıkıyor.",
+          "choices": [
+            {
+              "label": "Uzantıyı kaldırır ve BT destek ekibini ararım",
+              "next": "n3",
+              "outcome": "safe",
+              "feedback": "Geç kaldınız ama doğru adım. BT destek ekibi nelerin sızdığını kontrol edecek."
+            },
+            {
+              "label": "Reklamlara alışırım",
+              "outcome": "compromised",
+              "feedback": "Uzantı açtığınız her sayfayı hâlâ görüyor. Reklamlar, onun çalıştığının işaretidir."
+            }
+          ]
+        },
+        {
+          "id": "n3",
+          "text": "Teşekkür ederim. Bu uzantı tüm web sitelerinde veri topluyormuş. İş e-postanızın ve portalın parolalarını değiştirin, açık oturumları da biz kapatacağız.",
+          "speaker": "Ayten, BT destek ekibi",
+          "voice": "woman-2",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Teşekkür ederim. <breath> Bu uzantı tüm web sitelerinde veri topluyormuş. İş e-postanızın ve portalın parolalarını değiştirin, açık oturumları da biz kapatacağız.",
+          "choices": [
+            {
+              "label": "Parolaları hemen değiştiriyorum",
+              "outcome": "safe",
+              "feedback": "Harika. Uzantının topladıkları artık işe yaramaz."
+            },
+            {
+              "label": "Uzantıyı kaldırdım, bu kadarı yeter",
+              "outcome": "risky",
+              "feedback": "Uzantı gitti, ama topladığı veriler dolandırıcının elinde. Parolaların değiştirilmesi şart."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ut-sim",
+      "environment": "desktop",
+      "title": "İş bilgisayarı",
+      "intro": "İş bilgisayarınızda tuhaf şeyler oluyor. Her uyarıya doğru şekilde karşılık verin.",
+      "steps": [
+        {
+          "id": "ad-tab",
+          "label": "Tebrikler! Bir telefon kazandınız",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://endirim-kupon.example.info/hediyye",
+                "reveal": "endirim-kupon.example.info"
+              }
+            ]
+          },
+          "say": "Tarayıcı kendiliğinden yeni bir sekme açtı.",
+          "actions": [
+            {
+              "id": "claim",
+              "label": "Ödülü al",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Kendiliğinden açılıp ödül vaat eden bir sekme tuzaktır. Sayfa sizden kart bilgilerinizi isteyecekti."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Kendiliğinden açılan sekmeler çoğu zaman zararlı bir uzantının işidir. Şimdi nedenini bulalım."
+            }
+          ]
+        },
+        {
+          "id": "search-changed",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "db-xezri-brauzer",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Arama motorunuz değiştirildi"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Aramalarınız artık axtar-tez.example.info adresine gidiyor."
+                }
+              ],
+              [
+                {
+                  "text": "Değiştiren: Kupon Tapan uzantısı"
+                }
+              ]
+            ],
+            "buttons": [
+              "Değişikliği koru",
+              "Geri al"
+            ]
+          },
+          "say": "Tarayıcı, arama ayarınızın değiştirildiğini söylüyor.",
+          "actions": [
+            {
+              "id": "keep",
+              "label": "Değişikliği koru",
+              "kind": "mark-safe",
+              "outcome": "risky",
+              "feedback": "Aramalarınız artık yabancı bir siteye gidiyor ve o site yazdığınız her şeyi görüyor. Değişikliği geri alın."
+            },
+            {
+              "id": "restore",
+              "label": "Geri al",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Şimdi bunu yapan uzantıya bakalım."
+            }
+          ]
+        },
+        {
+          "id": "ext-list",
+          "label": "Uzantılar: Kupon Tapan, Ekran Şəkli, Qısa Qeyd",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "db-xezri-brauzer",
+            "url": [
+              {
+                "text": "https://magaza.xezri.example/elavelerim",
+                "reveal": "xezri.example"
+              }
+            ]
+          },
+          "say": "Listede hiç yüklemediğiniz bir uzantı var.",
+          "actions": [
+            {
+              "id": "remove",
+              "label": "Kupon Tapan uzantısını kaldır",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Doğru. Tanımadığınız bir uzantı tarayıcınızda kalmamalı."
+            },
+            {
+              "id": "keep",
+              "label": "Hepsini tut",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Kupon Tapan arama ayarınızı değiştirdi ve sekmeler açıyor. Onu tutarsanız verileriniz ona açık kalır."
+            }
+          ]
+        },
+        {
+          "id": "bundle-file",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "w2c-kupon-tapan",
+            "name": [
+              {
+                "text": "Pulsuz_PDF_Cevirici_setup.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "6,2 MB",
+            "source": [
+              {
+                "text": "pulsuz-pdf-cevir.example.info"
+              }
+            ]
+          },
+          "say": "İndirilenler klasörünüz, uzantının nereden geldiğini gösteriyor.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Bu ücretsiz dönüştürücü, uzantıyı gizlice yükledi. Dosyayı yeniden açarsanız uzantı geri gelir."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Doğru. Bu dosya ücretsiz bir programla birlikte geldi ve uzantıyı size sormadan yükledi."
+            }
+          ]
+        },
+        {
+          "id": "av-alert",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "qoruyucu",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Qoruyucu: tehdit bulundu"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Kupon Tapan uzantısı, tarayıcı verilerini bilinmeyen bir sunucuya gönderiyordu."
+                }
+              ],
+              [
+                {
+                  "text": "Uzantı kaldırıldı."
+                }
+              ]
+            ],
+            "buttons": [
+              "BT destek ekibine haber ver",
+              "Kapat"
+            ]
+          },
+          "say": "Antivirüs programı da bir şey buldu.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "BT destek ekibine haber ver",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. BT destek ekibi nelerin sızdığını kontrol edecek ve parolalarınızı değiştirmenize yardımcı olacak."
+            },
+            {
+              "id": "close",
+              "label": "Kapat",
+              "kind": "cancel",
+              "outcome": "risky",
+              "feedback": "Uzantı gitti, ama topladığı veriler çoktan dışarı çıktı. Durumu mutlaka bildirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "ut-match",
+      "prompt": "Her izni, olanak tanıdığı şeyle eşleştirin.",
+      "pairs": [
+        {
+          "id": "all-sites",
+          "left": "Tüm web sitelerindeki verileri okuma ve değiştirme",
+          "right": "E-postalarınızı okumak, bir ödeme sayfasını değiştirmek"
+        },
+        {
+          "id": "clipboard",
+          "left": "Kopyaladıklarınızı okuma",
+          "right": "Kopyaladığınız bir parolayı ya da kart numarasını görmek"
+        },
+        {
+          "id": "history",
+          "left": "Tarama geçmişini okuma",
+          "right": "Hangi siteleri ziyaret ettiğinizi bilmek"
+        },
+        {
+          "id": "downloads",
+          "left": "İndirmeleri yönetme",
+          "right": "Sizin adınıza dosya indirmek"
+        }
+      ],
+      "explain": "Her izin bir yetkidir. Bir uzantıya, işinin gerektirmediği bir yetki vermeyin."
+    },
+    {
+      "type": "recap",
+      "id": "ut-recap",
+      "points": [
+        "Güncellemeden sonra yeni izinler isteyen uzantıyı kaldırın",
+        "Kendiliğinden değişen arama motoru, yeni reklamlar ve sekmeler birer uyarı işaretidir",
+        "Uzantıyı kaldırın, BT destek ekibine haber verin, parolalarınızı değiştirin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

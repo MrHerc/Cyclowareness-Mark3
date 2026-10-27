@@ -1,0 +1,527 @@
+{
+ "id": "voice-clones",
+ "title": "Voix clonées",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "few-seconds",
+     "say": "L’intelligence artificielle peut copier la voix d’une personne à partir d’un court enregistrement, parfois de quelques secondes seulement.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "the-ask",
+     "say": "Un escroc vous appelle avec la voix de votre responsable ou d’un proche, et vous demande en urgence de l’argent, un code ou un document.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Kamran Babayev"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 70 000 18 42",
+         "spot": "number"
+        }
+       ],
+       "label": "Mobile"
+      }
+     }
+    },
+    {
+     "id": "spoofed-number",
+     "say": "Le numéro aussi peut être falsifié. Le nom et le numéro affichés sur votre écran ne sont pas une preuve.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Kamran Babayev"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 70 000 18 42",
+         "spot": "number"
+        }
+       ],
+       "label": "Mobile"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "code-word",
+     "say": "Convenez d’un mot secret avec votre famille et avec votre équipe. Une fausse voix ne le connaîtra pas.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "boss-call",
+   "title": "L’appel du responsable",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "Bonjour, je suis en réunion et je ne peux pas parler longtemps. Nous devons virer de toute urgence 18 000 manats à un prestataire. N’en parlez à personne, je vous expliquerai plus tard.",
+     "speaker": "La voix de Kamran Babayev",
+     "voice": "older-man",
+     "channel": "phone",
+     "spoken": "Bonjour, <breath> je suis en réunion et je ne peux pas parler longtemps. Nous devons virer de toute urgence 18 000 manats à un prestataire. N’en parlez à personne, euh, je vous expliquerai plus tard.",
+     "character": "kamran",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Kamran Babayev"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 70 000 18 42",
+         "spot": "number"
+        }
+       ],
+       "label": "Mobile"
+      }
+     },
+     "choices": [
+      {
+       "label": "Faire le virement tout de suite",
+       "outcome": "compromised",
+       "feedback": "L’argent est parti chez un escroc. L’urgence associée au secret, c’est le signal d’alerte le plus fort."
+      },
+      {
+       "label": "Demander le mot secret",
+       "next": "pressure",
+       "feedback": "Bonne idée. Voyons ce qu’il répond."
+      },
+      {
+       "label": "Dire que je le rappelle moi-même",
+       "next": "callback",
+       "feedback": "Bon réflexe. Appelez un numéro que vous connaissez déjà."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Quel mot ? Je n’ai pas le temps ! Vous ne me reconnaissez pas ?",
+     "speaker": "La voix de Kamran Babayev",
+     "voice": "older-man",
+     "channel": "phone",
+     "spoken": "Quel mot ? Je n’ai pas le temps ! <short pause> Vous ne me reconnaissez pas ?",
+     "character": "kamran",
+     "choices": [
+      {
+       "label": "S’excuser et faire le virement",
+       "outcome": "compromised",
+       "feedback": "La pression est l’arme principale de l’escroc. Un vrai responsable comprend qu’on vérifie."
+      },
+      {
+       "label": "Raccrocher et rappeler moi-même",
+       "next": "callback",
+       "feedback": "Bon réflexe. Pas de mot secret, pas de virement."
+      }
+     ]
+    },
+    {
+     "id": "callback",
+     "text": "Non, je ne vous ai jamais téléphoné.",
+     "speaker": "Kamran Babayev (numéro de vos contacts)",
+     "voice": "older-man",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Non, <breath> je ne vous ai jamais téléphoné.",
+     "character": "kamran",
+     "choices": [
+      {
+       "label": "Le signaler à l’équipe sécurité",
+       "outcome": "safe",
+       "feedback": "Bravo. L’équipe préviendra aussi vos collègues."
+      },
+      {
+       "label": "N’en parler à personne, puisque rien n’a été perdu",
+       "outcome": "risky",
+       "feedback": "L’escroc va essayer avec quelqu’un d’autre. Le signaler protège tout le monde."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "voice-message",
+   "prompt": "Trouvez les signaux d’alerte dans cette conversation.",
+   "artifact": {
+    "kind": "chat",
+    "app": "whatsapp",
+    "contact": [
+     {
+      "text": "+994 55 000 40 17"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Salut, c’est moi, Elvin. "
+       },
+       {
+        "text": "Mon téléphone est cassé, voici mon nouveau numéro.",
+        "spot": "new-number"
+       }
+      ],
+      "time": "21:04"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "C’est moi, Elvin. Tu m’entends ? J’ai un problème, j’ai besoin de ton aide de toute urgence.",
+        "spot": "voice"
+       }
+      ],
+      "time": "21:04",
+      "voice": "young-man",
+      "manner": "natural",
+      "spoken": "C’est moi, Elvin. <breath> Tu m’entends ? J’ai un problème, j’ai besoin de ton aide de toute urgence."
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Il me faut 600 manats aujourd’hui, c’est urgent.",
+        "spot": "urgent"
+       },
+       {
+        "text": " "
+       },
+       {
+        "text": "S’il te plaît, n’en parle à personne à la maison.",
+        "spot": "secret"
+       }
+      ],
+      "time": "21:05"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Envoie-les sur cette carte, c’est celle d’un ami.",
+        "spot": "card"
+       }
+      ],
+      "time": "21:05"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "new-number",
+     "label": "Nouveau numéro",
+     "explain": "L’histoire du nouveau numéro vous empêche d’appeler l’ancien pour vérifier."
+    },
+    {
+     "id": "voice",
+     "label": "Message vocal",
+     "explain": "La voix peut sembler familière et pourtant être fausse. Un court enregistrement suffit pour la copier."
+    },
+    {
+     "id": "urgent",
+     "label": "Argent demandé en urgence",
+     "explain": "Une demande d’argent urgente est le signe typique d’une arnaque."
+    },
+    {
+     "id": "secret",
+     "label": "Le secret",
+     "explain": "Vous demander de n’en parler à personne sert à vous empêcher de vérifier."
+    },
+    {
+     "id": "card",
+     "label": "La carte d’un tiers",
+     "explain": "L’argent part sur la carte de quelqu’un d’autre. Cela brouille les pistes."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "relative-call",
+   "environment": "call",
+   "title": "Un appel le soir",
+   "intro": "Un numéro inconnu vous appelle le soir. La voix vous semble très familière. Que faites-vous ?",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Numéro inconnu"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 73 26"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "child"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Répondre",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Répondre n’a rien de dangereux. Ce qui compte, c’est ce que vous faites ensuite."
+      },
+      {
+       "id": "decline",
+       "label": "Refuser",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "C’est bien aussi. En cas de doute, appelez vous-même votre proche au numéro que vous connaissez.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "plea",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Numéro inconnu"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 73 26"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "child"
+     },
+     "say": "Allô, c’est moi, Narmin ! Il y a eu un accident et la police me retient. Il me faut 900 manats tout de suite, ne dis rien à la famille !",
+     "spoken": "Allô, <breath> c’est moi, Narmin ! Il y a eu un accident et la police, euh, me retient. Il me faut 900 manats tout de suite, <breath> ne dis rien à la famille !",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Où est-ce que j’envoie l’argent ?",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Accepter tout de suite, c’est exactement ce que veut l’escroc. Vérifiez d’abord."
+      },
+      {
+       "id": "code-word",
+       "label": "Quel est notre mot secret ?",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. Une voix clonée ne connaît pas votre mot secret."
+      },
+      {
+       "id": "hang-up",
+       "label": "Raccrocher et rappeler moi-même",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Exact. Appelez Narmin à son ancien numéro, celui que vous connaissez.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Numéro inconnu"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 73 26"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "child"
+     },
+     "say": "Quel mot ? Je pleure et toi, tu me parles d’un mot ! La police attend, dépêche-toi !",
+     "spoken": "Quel mot ? <breath> Je pleure et toi, tu me parles d’un mot ! La police attend, <breath> dépêche-toi !",
+     "actions": [
+      {
+       "id": "send",
+       "label": "D’accord, j’envoie l’argent",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "L’argent est parti chez un escroc. Les larmes et la précipitation sont là pour vous faire sauter la vérification."
+      },
+      {
+       "id": "hang-up",
+       "label": "Raccrocher",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. Pas de mot secret, pas de conversation."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "L’appel est terminé. Et maintenant ?",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Numéro inconnu"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 73 26"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "child"
+     },
+     "actions": [
+      {
+       "id": "call-back",
+       "label": "Appeler Narmin à son ancien numéro",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Bon réflexe : Narmin est chez elle, et il ne s’est rien passé. Prévenez aussi la famille."
+      },
+      {
+       "id": "ignore",
+       "label": "Ne rien faire",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "L’escroc peut rappeler ou essayer avec un autre proche. Prévenez la famille."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "verify-steps",
+   "prompt": "Remettez dans l’ordre les étapes à suivre après un appel suspect.",
+   "items": [
+    {
+     "id": "hang-up",
+     "label": "Raccrocher sans rien promettre"
+    },
+    {
+     "id": "call-known",
+     "label": "Appeler vous-même le numéro enregistré dans vos contacts"
+    },
+    {
+     "id": "confirm",
+     "label": "Vérifier que la demande est bien réelle"
+    },
+    {
+     "id": "report",
+     "label": "Le signaler à l’équipe sécurité"
+    }
+   ],
+   "explain": "La preuve n’est pas sur l’écran. Elle est dans le second appel, celui que vous passez vous-même."
+  },
+  {
+   "type": "match",
+   "id": "tricks",
+   "prompt": "Associez chaque ruse à la bonne réaction.",
+   "pairs": [
+    {
+     "id": "boss-voice",
+     "left": "Un virement urgent demandé avec la voix du responsable",
+     "right": "Rappeler à un numéro connu"
+    },
+    {
+     "id": "new-number",
+     "left": "Le nouveau numéro d’un proche",
+     "right": "Appeler l’ancien numéro pour vérifier"
+    },
+    {
+     "id": "video-face",
+     "left": "Un visage familier en appel vidéo",
+     "right": "Demander le mot secret"
+    },
+    {
+     "id": "keep-secret",
+     "left": "Une demande de garder le secret",
+     "right": "Toujours en parler à une deuxième personne"
+    }
+   ],
+   "explain": "Chaque ruse a sa parade simple. Prenez-en l’habitude."
+  },
+  {
+   "type": "choice",
+   "id": "exec-video",
+   "question": {
+    "prompt": "Pendant un appel vidéo, le directeur vous demande d’envoyer un rapport confidentiel vers une adresse e-mail personnelle. Que faites-vous ?",
+    "options": [
+     {
+      "id": "send",
+      "label": "L’envoyer, je le vois à l’écran",
+      "correct": false,
+      "feedback": "L’image peut être fausse. Un visage n’est pas une preuve."
+     },
+     {
+      "id": "verify",
+      "label": "Obtenir une confirmation séparée par un canal officiel",
+      "correct": true,
+      "feedback": "Exact. Les fichiers confidentiels ne passent que par les canaux officiels, après confirmation."
+     },
+     {
+      "id": "wave",
+      "label": "Lui demander de passer la main devant la caméra",
+      "correct": false,
+      "feedback": "Cela peut trahir certains faux, mais ce n’est pas une vérification fiable."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "ceo"
+    }
+   },
+   "explain": "Même si tout paraît vrai, vérifiez une demande inhabituelle par un autre canal."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Une voix, un visage ou un numéro familiers ne sont pas une preuve.",
+    "Raccrochez et rappelez à un numéro que vous connaissez.",
+    "Convenez d’un mot secret avec votre famille et votre équipe."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

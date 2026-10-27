@@ -1,0 +1,404 @@
+{
+ "id": "sim-renewal-call",
+ "title": "L’appel pour renouveler la SIM",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ss2-tutor",
+   "beats": [
+    {
+     "id": "ss2-b1",
+     "say": "Bonjour ! Voyons maintenant un appel passé au nom de l’opérateur : on vous propose de renouveler gratuitement votre carte SIM.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "ss2-b2",
+     "say": "L’écran peut afficher le nom de l’opérateur et un numéro familier. Les deux peuvent être falsifiés.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2b-sahiltel-fake",
+       "caller": [
+        {
+         "text": "Service client SahilTel"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 44 10",
+         "spot": "number"
+        }
+       ],
+       "label": "Bakou"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "ss2-b3",
+     "say": "Ne communiquez jamais un code reçu à la personne qui vous appelle, même si elle se présente comme l’opérateur, la banque ou la police.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "ss2-b4",
+     "say": "Si votre opérateur propose un code PIN pour votre compte client, créez-en un. Cela complique le détournement de carte SIM, aussi appelé SIM swapping.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ss2-choice",
+   "question": {
+    "prompt": "Une personne qui appelle de la part de l’opérateur vous dit : « Nous renouvelons votre carte SIM, lisez-moi le code. » Que faites-vous ?",
+    "options": [
+     {
+      "id": "hang-up",
+      "label": "Je raccroche et j’appelle moi-même le numéro officiel de l’opérateur",
+      "correct": true,
+      "feedback": "Exact. Quand vous appelez vous-même le numéro officiel, vous savez à qui vous parlez."
+     },
+     {
+      "id": "read-code",
+      "label": "C’est le numéro de l’opérateur, alors je lis le code",
+      "correct": false,
+      "feedback": "Le numéro affiché peut être falsifié. Ce code transfère votre numéro sur la carte de quelqu’un d’autre."
+     },
+     {
+      "id": "ask-id",
+      "label": "Je demande le nom et le matricule de la personne",
+      "correct": false,
+      "feedback": "Un criminel peut inventer un nom et un matricule. La seule vraie vérification, c’est un appel que vous passez vous-même."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2b-sahiltel-fake",
+      "caller": [
+       {
+        "text": "Service client SahilTel"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 44 10"
+       }
+      ],
+      "label": "Bakou"
+     }
+    }
+   },
+   "explain": "Un appel qui vous demande un code est le plus dangereux de tous. Raccrochez et appelez vous-même l’opérateur."
+  },
+  {
+   "type": "simulation",
+   "id": "ss2-sim",
+   "environment": "call",
+   "title": "Appel de SahilTel",
+   "intro": "Votre téléphone sonne. Lisez ce que dit la personne au bout du fil et choisissez votre réponse.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2b-sahiltel-fake",
+      "caller": [
+       {
+        "text": "Service client SahilTel"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 44 10"
+       }
+      ],
+      "label": "Bakou",
+      "voice": "young-woman"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Répondre",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Répondre n’a rien de dangereux. L’essentiel, c’est de ne donner aucun code."
+      },
+      {
+       "id": "decline",
+       "label": "Refuser",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Ça marche aussi. En cas de doute, appelez vous-même l’opérateur.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "offer",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2b-sahiltel-fake",
+      "caller": [
+       {
+        "text": "Service client SahilTel"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 44 10"
+       }
+      ],
+      "label": "Bakou",
+      "voice": "young-woman"
+     },
+     "say": "Bonjour, ici Gunel, de SahilTel. Les anciennes cartes SIM, excusez-moi, sont désactivées ce mois-ci, alors nous renouvelons la vôtre gratuitement.",
+     "spoken": "Bonjour, <breath> ici Gunel, de SahilTel. Les anciennes cartes SIM <cough> excusez-moi, sont désactivées ce mois-ci, alors nous renouvelons la vôtre gratuitement.",
+     "actions": [
+      {
+       "id": "go-on",
+       "label": "D’accord, que dois-je faire ?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Vous n’avez encore rien perdu, mais la conversation se dirige vers un code. Restez sur vos gardes."
+      },
+      {
+       "id": "own-call",
+       "label": "Je vais appeler moi-même le numéro officiel de l’opérateur",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Si le renouvellement est réel, la ligne officielle vous le confirmera.",
+       "next": "after"
+      },
+      {
+       "id": "hang",
+       "label": "Raccrocher",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bonne décision. Vérifiez toute offre inattendue auprès de la ligne officielle.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2b-sahiltel-fake",
+      "caller": [
+       {
+        "text": "Service client SahilTel"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 44 10"
+       }
+      ],
+      "label": "Bakou",
+      "voice": "young-woman"
+     },
+     "say": "Vous venez de recevoir un code à six chiffres sur votre téléphone. Lisez-le-moi pour que la nouvelle carte puisse être activée.",
+     "spoken": "Vous venez de recevoir un code à six chiffres sur votre téléphone. <breath> Lisez-le-moi pour que la nouvelle carte puisse être activée.",
+     "actions": [
+      {
+       "id": "read",
+       "label": "Je lis le code",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Avec ce code, votre numéro passe sur la carte du criminel. Désormais, c’est lui qui reçoit les codes de la banque."
+      },
+      {
+       "id": "refuse",
+       "label": "Je ne communique le code à personne",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Ce code n’est destiné qu’à vous, peu importe qui le demande."
+      },
+      {
+       "id": "hang",
+       "label": "Raccrocher",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bravo. Raccrocher quand on vous demande un code, c’est la meilleure réponse.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2b-sahiltel-fake",
+      "caller": [
+       {
+        "text": "Service client SahilTel"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 44 10"
+       }
+      ],
+      "label": "Bakou",
+      "voice": "young-woman"
+     },
+     "say": "Si vous ne me donnez pas le code, votre numéro sera désactivé ce soir. C’est la procédure standard, nous manquons de temps.",
+     "spoken": "Si vous ne me donnez pas le code, <breath> votre numéro sera désactivé ce soir. C’est, euh, la procédure standard, nous manquons de temps.",
+     "actions": [
+      {
+       "id": "give-in",
+       "label": "Bon, d’accord, je vous donne le code",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "La menace est là pour vous presser. Si vous donnez le code, votre numéro passera au criminel dès ce soir."
+      },
+      {
+       "id": "office",
+       "label": "Si nécessaire, je passerai moi-même dans une de vos boutiques",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Si une nouvelle carte SIM est un jour nécessaire, vous pourrez la changer vous-même dans une boutique de l’opérateur."
+      },
+      {
+       "id": "hang",
+       "label": "Raccrocher",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bien vu. Quand la pression monte, mettez fin à la conversation."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "L’appel est terminé. Que faites-vous maintenant ?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2b-sahiltel-fake",
+      "caller": [
+       {
+        "text": "Service client SahilTel"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 44 10"
+       }
+      ],
+      "label": "Bakou",
+      "voice": "young-woman"
+     },
+     "actions": [
+      {
+       "id": "official",
+       "label": "Appeler le numéro officiel de l’opérateur",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Exact. Signalez cet appel et demandez si vous pouvez créer un code PIN pour votre compte client."
+      },
+      {
+       "id": "redial",
+       "label": "Rappeler le numéro qui a appelé",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Ce numéro peut vous mener au criminel. Prenez le numéro sur le site officiel de l’opérateur."
+      },
+      {
+       "id": "nothing",
+       "label": "Ne rien faire",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Le criminel essaiera de nouveau par un autre moyen. En prévenant l’opérateur, vous protégez votre numéro."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ss2-match",
+   "prompt": "Associez chaque situation à la bonne action.",
+   "pairs": [
+    {
+     "id": "asks-code",
+     "left": "Une personne au téléphone vous demande un code",
+     "right": "Ne pas le donner et raccrocher"
+    },
+    {
+     "id": "no-service",
+     "left": "Votre téléphone affiche soudain « Aucun service »",
+     "right": "Appeler l’opérateur depuis un autre téléphone"
+    },
+    {
+     "id": "pin-offer",
+     "left": "Votre opérateur propose un code PIN pour votre compte client",
+     "right": "Le créer et ne le communiquer à personne"
+    },
+    {
+     "id": "sms-only",
+     "left": "Un compte important n’est protégé que par des codes SMS",
+     "right": "Passer à une application d’authentification ou à une clé d’accès"
+    }
+   ],
+   "explain": "Ne communiquez jamais un code à personne, réagissez vite quand votre numéro ne fonctionne plus, et ne laissez pas vos comptes importants dépendre des seuls SMS."
+  },
+  {
+   "type": "choice",
+   "id": "ss2-choice-code",
+   "question": {
+    "prompt": "Dans quel cas pouvez-vous communiquer à quelqu’un un code reçu sur votre téléphone ?",
+    "options": [
+     {
+      "id": "never",
+      "label": "Jamais : je le saisis seulement sur un site ou dans une application que j’ouvre moi-même",
+      "correct": true,
+      "feedback": "Exact. Un code, c’est comme votre signature : il doit rester entre vos seules mains."
+     },
+     {
+      "id": "knows-me",
+      "label": "Si la personne connaît mon nom et mon numéro d’identification personnel",
+      "correct": false,
+      "feedback": "Ces informations ont pu fuiter. Quelqu’un qui vous connaît et vous demande quand même le code est un fraudeur."
+     },
+     {
+      "id": "family",
+      "label": "Si un proche me le demande par message",
+      "correct": false,
+      "feedback": "Le compte de votre proche a peut-être été piraté lui aussi. Appelez-le vous-même, par téléphone."
+     }
+    ]
+   },
+   "explain": "Les banques et les administrations ne demandent pas de codes SMS. Peu importe qui vous demande le code, mettez fin à la conversation."
+  },
+  {
+   "type": "recap",
+   "id": "ss2-recap",
+   "points": [
+    "Ne communiquez jamais à personne un code reçu, peu importe qui appelle",
+    "En cas d’appel suspect, raccrochez et appelez vous-même le numéro officiel de l’opérateur",
+    "Si votre opérateur propose un code PIN pour votre compte client, créez-en un"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,447 @@
+{
+ "id": "unexpected-signing",
+ "title": "Une demande de signature inattendue",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l2-tutor",
+   "beats": [
+    {
+     "id": "l2-b1",
+     "say": "Quand une demande de signature arrive, posez-vous d’abord une question : est-ce moi qui ai lancé cette demande ?",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "certificate"
+     }
+    },
+    {
+     "id": "l2-b2",
+     "say": "La demande indique le nom du document et le service qui en est à l’origine. Refusez toute demande que vous n’attendiez pas.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "mohurid",
+       "app": "MöhürID",
+       "title": [
+        {
+         "text": "Demande de signature"
+        }
+       ],
+       "body": [
+        {
+         "text": "Document : "
+        },
+        {
+         "text": "Etibarname_tam_selahiyyet.pdf",
+         "spot": "doc"
+        },
+        {
+         "text": ". Service : imza-xidmet.test"
+        }
+       ],
+       "time": "07:58"
+      }
+     },
+     "highlight": "doc"
+    },
+    {
+     "id": "l2-b3",
+     "say": "Ne signez jamais sans lire. Le nom, le montant et le destinataire doivent correspondre à ce que vous attendez.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "l2-b4",
+     "say": "Dans le doute, ne signez pas, et prévenez l’équipe sécurité. Une signature est difficile à annuler.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "l2-sim",
+   "environment": "phone",
+   "title": "Demandes de signature",
+   "intro": "Au cours de la journée, des demandes de signature arrivent sur votre téléphone. Examinez-les une par une, puis décidez.",
+   "steps": [
+    {
+     "id": "unexpected",
+     "label": "Vous ne deviez rien signer",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "mohurid",
+      "app": "MöhürID",
+      "title": [
+       {
+        "text": "Demande de signature"
+       }
+      ],
+      "body": [
+       {
+        "text": "Document : Etibarname_avtomobil.pdf. Service : Bulud Notariat"
+       }
+      ],
+      "time": "07:58"
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir et signer",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Vous avez signé une procuration préparée par quelqu’un d’autre. Appelez immédiatement le service de signature et l’équipe sécurité."
+      },
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. Une demande que vous n’avez pas lancée signifie que quelqu’un essaie d’utiliser votre nom."
+      },
+      {
+       "id": "report",
+       "label": "Prévenir l’équipe sécurité",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bravo. Refuser et signaler, c’est arrêter l’attaque à temps."
+      }
+     ]
+    },
+    {
+     "id": "rush-colleague",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Elvin (Achats)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Je t’ai envoyé un contrat dans SənədAxını. Pas le temps de le lire, signe vite, le chef attend."
+         }
+        ],
+        "time": "10:20"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "read",
+       "label": "Je lis d’abord le document",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. La pression du temps n’est pas une raison pour sauter la lecture : la signature engage votre responsabilité."
+      },
+      {
+       "id": "rush",
+       "label": "D’accord, je signe sans lire",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Dans un document que vous n’avez pas lu, le montant ou le destinataire ont peut-être été modifiés."
+      }
+     ]
+    },
+    {
+     "id": "fake-portal-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "senedaxini-fake",
+      "from": {
+       "name": [
+        {
+         "text": "SənədAxını"
+        }
+       ],
+       "address": [
+        {
+         "text": "noreply@senedaxini-imza.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Votre signature est en attente : Qebul_akti.pdf"
+       }
+      ],
+      "time": "12:05",
+      "body": [
+       [
+        {
+         "text": "Pour signer le document, "
+        },
+        {
+         "text": "connectez-vous",
+         "link": {
+          "label": "connectez-vous",
+          "href": "https://senedaxini-imza.test/login"
+         }
+        },
+        {
+         "text": "."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "click",
+       "label": "Se connecter",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Une fausse page de connexion a récupéré votre mot de passe. Modifiez-le immédiatement et prévenez l’équipe sécurité."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Ce domaine n’est pas celui de SənədAxını : ouvrez le système vous-même."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Sans danger. Mais si vous le signalez, les autres sont protégés eux aussi."
+      }
+     ]
+    },
+    {
+     "id": "own-request",
+     "label": "Vous venez de lancer la signature de votre demande de congé sur le portail",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "mohurid",
+      "app": "MöhürID",
+      "title": [
+       {
+        "text": "Demande de signature"
+       }
+      ],
+      "body": [
+       {
+        "text": "Document : Mezuniyyet_erizesi.pdf. Service : SənədAxını"
+       }
+      ],
+      "time": "14:30"
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir et signer",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Exact. Vous avez lancé cette demande, et le document comme le service sont ceux que vous attendez."
+      },
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "Ce n’était pas nécessaire : la demande venait de vous et tout correspond. Vérifier ne veut pas dire tout refuser."
+      }
+     ]
+    },
+    {
+     "id": "mismatch",
+     "label": "Vous avez demandé une attestation de travail sur le portail",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "mohurid",
+      "app": "MöhürID",
+      "title": [
+       {
+        "text": "Demande de signature"
+       }
+      ],
+      "body": [
+       {
+        "text": "Document : Etibarname_bank_hesabi.pdf. Service : imza-xidmet.test"
+       }
+      ],
+      "time": "16:12"
+     },
+     "say": "Comparez le nom du document avec ce que vous attendez.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir et signer",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "C’était une procuration bancaire, pas votre attestation. Si le nom ne correspond pas, ne signez pas."
+      },
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. Ni le document ni le service ne sont ceux que vous attendez : refusez la demande et signalez-la."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l2-hotspot",
+   "prompt": "Avant de signer, trouvez ce qui ne va pas dans cette demande.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "mohurid",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Confirmer la signature"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Document : "
+      },
+      {
+       "text": "Procuration : pleins pouvoirs sur tous les comptes bancaires",
+       "spot": "doc"
+      }
+     ],
+     [
+      {
+       "text": "Au profit de : "
+      },
+      {
+       "text": "Huseyn Mammadli",
+       "spot": "person"
+      }
+     ],
+     [
+      {
+       "text": "Durée : "
+      },
+      {
+       "text": "3 ans",
+       "spot": "term"
+      }
+     ],
+     [
+      {
+       "text": "Demandeur : "
+      },
+      {
+       "text": "imza-xidmet.test",
+       "spot": "source"
+      }
+     ]
+    ],
+    "buttons": [
+     "Refuser",
+     "Saisir le code PIN"
+    ]
+   },
+   "spots": [
+    {
+     "id": "doc",
+     "label": "Pleins pouvoirs",
+     "explain": "Ce document donne à quelqu’un des droits étendus sur vos comptes. Un tel document ne devrait jamais arriver sans que vous l’attendiez."
+    },
+    {
+     "id": "person",
+     "label": "Une personne inconnue",
+     "explain": "Si vous ne savez pas qui reçoit ces pouvoirs, ne signez pas."
+    },
+    {
+     "id": "term",
+     "label": "Durée très longue",
+     "explain": "Avec une procuration de trois ans, les dégâts peuvent durer longtemps."
+    },
+    {
+     "id": "source",
+     "label": "Service inconnu",
+     "explain": "La demande vient d’un site inconnu, et non d’un système officiel que vous connaissez."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "l2-order",
+   "prompt": "Remettez dans l’ordre les étapes avant de signer.",
+   "items": [
+    {
+     "id": "started",
+     "label": "Vérifier que c’est vous qui avez lancé la demande"
+    },
+    {
+     "id": "read",
+     "label": "Ouvrir et lire le document"
+    },
+    {
+     "id": "details",
+     "label": "Vérifier le nom, le montant et le destinataire"
+    },
+    {
+     "id": "pin",
+     "label": "Seulement ensuite, saisir votre code PIN"
+    }
+   ],
+   "explain": "Si une étape ne correspond pas, arrêtez-vous et refusez. Signalez toute demande suspecte à l’équipe sécurité."
+  },
+  {
+   "type": "choice",
+   "id": "l2-choice",
+   "question": {
+    "prompt": "Vous avez signé par erreur un document suspect. Quelle est la première chose à faire ?",
+    "options": [
+     {
+      "id": "hide",
+      "label": "Je n’en parle à personne, il ne se passera peut-être rien",
+      "correct": false,
+      "feedback": "La signature est valable et peut être utilisée. La cacher aggrave les dégâts."
+     },
+     {
+      "id": "report",
+      "label": "J’appelle immédiatement le service de signature et l’équipe sécurité",
+      "correct": true,
+      "feedback": "Exact. Le service peut suspendre le certificat, et l’équipe sécurité examine les conséquences."
+     },
+     {
+      "id": "pin",
+      "label": "Je modifie seulement mon code PIN",
+      "correct": false,
+      "feedback": "C’est utile, mais le document signé reste valable. Signalez-le d’abord."
+     }
+    ]
+   },
+   "explain": "Après une signature faite par erreur, chaque minute compte. Signaler vite donne une chance d’empêcher l’utilisation du document."
+  },
+  {
+   "type": "recap",
+   "id": "l2-recap",
+   "points": [
+    "Ne confirmez une demande de signature que si vous l’avez lancée vous-même.",
+    "Lisez le document : le nom, le montant et le destinataire doivent correspondre à ce que vous attendez.",
+    "Si vous avez signé par erreur, prévenez immédiatement le service de signature et l’équipe sécurité."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

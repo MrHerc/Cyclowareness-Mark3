@@ -1,0 +1,403 @@
+{
+  "id": "mfa",
+  "title": "İki adımlı doğrulama",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "second-step",
+      "beats": [
+        {
+          "id": "why",
+          "say": "Parolanız çalınsa bile ikinci bir adım hesabınızı koruyabilir. Buna iki adımlı doğrulama denir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        },
+        {
+          "id": "best",
+          "say": "En güçlü yöntemler geçiş anahtarları ve güvenlik anahtarlarıdır. Bunlar sahte sitelerde çalışmaz.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "code",
+          "say": "Bu kod yalnızca sizin içindir. Bankanız adına bile olsa, bu kodu isteyen herkes dolandırıcıdır.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "brandRef": "ulduzbank",
+              "sender": [
+                {
+                  "text": "UlduzBank"
+                }
+              ],
+              "time": "14:02",
+              "messages": [
+                [
+                  {
+                    "text": "Giriş kodunuz: 482 913. "
+                  },
+                  {
+                    "text": "Bu kodu kimseyle, banka çalışanlarıyla bile paylaşmayınız.",
+                    "spot": "code-warning"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "code-warning"
+        },
+        {
+          "id": "prompts",
+          "say": "Beklemediğiniz onay istekleri gelmeye devam ediyorsa, birisi parolanızla giriş yapmaya çalışıyordur.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          },
+          "checkpoint": {
+            "prompt": "Beklenmedik bir istekle ne yaparsınız?",
+            "options": [
+              {
+                "id": "approve",
+                "label": "Kesilsin diye onaylarım",
+                "correct": false,
+                "feedback": "Onaylarsanız saldırgan içeri girer."
+              },
+              {
+                "id": "deny",
+                "label": "Reddederim ve parolamı değiştiririm",
+                "correct": true,
+                "feedback": "Doğru. Ardından BT güvenlik ekibine de haber verin."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "night-push",
+      "environment": "phone",
+      "title": "Gece gelen istekler",
+      "intro": "Saat gecenin ikisi ve uyuyorsunuz. Telefonunuz durmadan bir girişi onaylamanızı istiyor.",
+      "steps": [
+        {
+          "id": "push-1",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "tesdiqleyici",
+            "app": "Təsdiqləyici",
+            "title": [
+              {
+                "text": "Girişi onaylıyor musunuz?"
+              }
+            ],
+            "body": [
+              {
+                "text": "Xidmət Agentliyi portalı. Windows bilgisayar."
+              }
+            ],
+            "time": "02:14"
+          },
+          "say": "Şu anda hiçbir yere giriş yapmıyorsunuz.",
+          "actions": [
+            {
+              "id": "approve",
+              "label": "Onayla",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Siz giriş yapmıyorsunuz, demek ki bu başka biri. Onaylarsanız parolanızı bilen kişi içeri girer."
+            },
+            {
+              "id": "deny",
+              "label": "Reddet",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Doğru. Beklemediğiniz bir isteği her zaman reddedin."
+            }
+          ]
+        },
+        {
+          "id": "push-5",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "tesdiqleyici",
+            "app": "Təsdiqləyici",
+            "title": [
+              {
+                "text": "Girişi onaylıyor musunuz?"
+              }
+            ],
+            "body": [
+              {
+                "text": "Beşinci istek. Windows bilgisayar."
+              }
+            ],
+            "time": "02:16"
+          },
+          "say": "İstekler gelmeye devam ediyor.",
+          "actions": [
+            {
+              "id": "approve",
+              "label": "Kesilsin diye onayla",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Bildirim bombardımanı tam olarak buna güvenir: yorulup onaylamanıza. Onaylarsanız saldırgan hesabınıza girer."
+            },
+            {
+              "id": "deny",
+              "label": "Reddet",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Doğru. Tekrar tekrar gelen istekler, birinin parolanızı bildiği anlamına gelir."
+            },
+            {
+              "id": "report",
+              "label": "Bu ben değilim, bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Harika. Bildirmeniz, saldırıyı güvenlik ekibine anında gösterir."
+            }
+          ]
+        },
+        {
+          "id": "fake-it-chat",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek-fake",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "BT Destek"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Merhaba, gece kontrolü yapılıyor. Hesabınızın engellenmemesi için son isteği onaylayın."
+                  }
+                ],
+                "time": "02:17"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "agree",
+              "label": "Tamam, onaylıyorum",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "BT destek ekibi sizden asla bir isteği onaylamanızı istemez. Bu, saldırının ikinci yarısı."
+            },
+            {
+              "id": "block",
+              "label": "Engelle ve bildir",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Doğru. Gece yarısı yazan bilinmeyen bir numara destek ekibi değil, saldırganın kendisidir."
+            }
+          ]
+        },
+        {
+          "id": "change-now",
+          "label": "Portalı kendiniz açtınız",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/profil/parol"
+              }
+            ],
+            "fields": [
+              "Eski parola",
+              "Yeni parola cümlesi"
+            ],
+            "button": "Değiştir"
+          },
+          "say": "Parolanız çalınmış. Şimdi ne yaparsınız?",
+          "actions": [
+            {
+              "id": "change",
+              "label": "Parolayı hemen değiştir",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Doğru. Ardından güvenlik ekibine haber verin ki açık oturumların hepsini kapatsınlar."
+            },
+            {
+              "id": "later",
+              "label": "Sabah bakarım",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Saldırgan parolanızı biliyor ve yeniden deneyecek. Parolanızı hemen değiştirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "strongest-factor",
+      "question": {
+        "prompt": "Hangi ikinci adım oltalamaya (phishing) karşı en dayanıklıdır?",
+        "options": [
+          {
+            "id": "sms",
+            "label": "SMS kodu",
+            "correct": false,
+            "feedback": "Sahte bir site bu kodu isteyebilir, SIM kartınız da başkasına aktarılabilir."
+          },
+          {
+            "id": "app",
+            "label": "Kimlik doğrulama uygulaması",
+            "correct": false,
+            "feedback": "SMS'ten daha iyidir, ama kodu yine de sahte bir siteye yazabilirsiniz."
+          },
+          {
+            "id": "key",
+            "label": "Geçiş anahtarı ya da güvenlik anahtarı",
+            "correct": true,
+            "feedback": "Doğru. Anahtar yalnızca gerçek siteyle çalışır."
+          },
+          {
+            "id": "email",
+            "label": "E-postayla gönderilen kod",
+            "correct": false,
+            "feedback": "E-postanız ele geçirilirse kod da ele geçirilmiş olur."
+          }
+        ]
+      },
+      "explain": "Hangi ikinci adım olursa olsun, yalnızca paroladan iyidir. Mümkün olduğunda bir anahtar seçin."
+    },
+    {
+      "type": "hotspot",
+      "id": "code-request",
+      "prompt": "Bu mesajlardaki tehlikeyi bulun.",
+      "artifact": {
+        "kind": "chat",
+        "app": "whatsapp",
+        "contact": [
+          {
+            "text": "+994 50 000 26 43",
+            "spot": "unknown-number",
+            "reveal": "Kişilerinizde kayıtlı değil"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Selam Aynur! Ben Nigar, bu benim yeni numaram."
+              }
+            ],
+            "time": "20:31"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Yanlışlıkla numarana bir kod gönderdim.",
+                "spot": "mistake"
+              }
+            ],
+            "time": "20:31"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Az önce gelen altı haneli kodu bana gönderir misin?",
+                "spot": "ask-code"
+              }
+            ],
+            "time": "20:32"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Acele et, iki dakika içinde süresi doluyor.",
+                "spot": "urgency"
+              }
+            ],
+            "time": "20:32"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "unknown-number",
+          "label": "Bilinmeyen numara",
+          "explain": "Ad tanıdık, ama numara yeni. Doğrulamak için arkadaşınızın eski numarasını arayın."
+        },
+        {
+          "id": "mistake",
+          "label": "“Yanlışlıkla gönderdim”",
+          "explain": "Bir kod numaranıza yanlışlıkla gelmez. Birisi hesabınıza girmeye çalışıyor."
+        },
+        {
+          "id": "ask-code",
+          "label": "Kod talebi",
+          "explain": "Bu kodu verirseniz dolandırıcı hesabınızı ele geçirir ve arkadaşlarınıza sizin adınıza yazar."
+        },
+        {
+          "id": "urgency",
+          "label": "Acele",
+          "explain": "Kısa süre, düşünmeye fırsat bırakmaz. Kodu asla kimseye göndermeyin."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "order",
+      "id": "setup-authenticator",
+      "prompt": "Kimlik doğrulama uygulamasını kurmanın adımlarını sıraya koyun.",
+      "items": [
+        {
+          "id": "turn-on",
+          "label": "Hesap ayarlarınızdan iki adımlı doğrulamayı açın"
+        },
+        {
+          "id": "scan",
+          "label": "Ekrandaki QR kodu uygulamayla okutun"
+        },
+        {
+          "id": "enter-code",
+          "label": "Uygulamanın gösterdiği kodu girin"
+        },
+        {
+          "id": "backup",
+          "label": "Yedek kodları güvenli bir yerde saklayın"
+        }
+      ],
+      "explain": "Telefonunuzu kaybederseniz yedek kodlar, hesabınıza yeniden girmenizi sağlar."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Mümkün olduğunda geçiş anahtarını ya da kimlik doğrulama uygulamasını seçin.",
+        "Kodu asla kimseye söylemeyin, kimseye göndermeyin.",
+        "Beklenmedik istekleri reddedin, parolanızı değiştirin ve bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

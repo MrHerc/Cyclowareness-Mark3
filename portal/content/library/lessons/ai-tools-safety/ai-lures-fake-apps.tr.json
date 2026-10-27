@@ -1,0 +1,532 @@
+{
+  "id": "ai-lures-fake-apps",
+  "title": "Yapay zekâ ile kurulan tuzaklar",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l2-tutor",
+      "beats": [
+        {
+          "id": "l2-b1",
+          "say": "Yapay zekâ dolandırıcılara da yardım ediyor: kusursuz e-postalar, inandırıcı sesler, sahte uygulamalar.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          }
+        },
+        {
+          "id": "l2-b2",
+          "say": "Bir oltalama e-postasında, yani phishing e-postasında, artık hiç dil hatası olmayabilir. Dilbilgisine değil, gönderene ve talebe bakın.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "idare-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Nermin Hüseynova"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "n.huseynova@"
+                  },
+                  {
+                    "text": "idare-mail.test",
+                    "spot": "domain"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "Rapor için veriler"
+                }
+              ],
+              "time": "09:10",
+              "body": [
+                [
+                  {
+                    "text": "Değerli çalışma arkadaşım, bakanlığa sunacağımız rapor için sizden küçük bir ricam olacak."
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "l2-b3",
+          "say": "Ücretsiz “Pro” sohbet botu uygulamaları ve tarayıcı uzantıları verilerinizi çalabilir.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        },
+        {
+          "id": "l2-b4",
+          "say": "Uygulamaları ve uzantıları yalnızca kurumunuzun onayladığı bir kaynaktan yükleyin.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l2-sim",
+      "environment": "browser",
+      "title": "Ücretsiz Pro sürüm",
+      "intro": "Bir reklamda ücretsiz bir “Pro” sohbet botu sunuldu. Sayfaları kontrol edin ve her adımda karar verin.",
+      "steps": [
+        {
+          "id": "pro-page",
+          "label": "NeyroSöhbət Pro: tüm özellikler ücretsiz",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "neyrosohbet-fake",
+            "url": [
+              {
+                "text": "https://neyrosohbet-pro.test",
+                "reveal": "neyrosohbet-pro.test"
+              }
+            ]
+          },
+          "say": "Adres çubuğuna bakın.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "Uzantıyı yükle",
+              "kind": "install",
+              "outcome": "risky",
+              "feedback": "Resmî olmayan bir siteden uzantı yüklemek risklidir. Uzantıları yalnızca kurumunuzun izin verdiği bir kaynaktan alın."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Bir hizmetin “ücretsiz Pro” sürümü başka bir sitede dağıtılmaz.",
+              "next": "fake-login"
+            }
+          ]
+        },
+        {
+          "id": "extension",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "neyrosohbet-fake",
+            "tone": "system",
+            "title": [
+              {
+                "text": "“NeyroSöhbət Pro” eklensin mi?"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bu uzantı, ziyaret ettiğiniz tüm web sitelerindeki verilerinizi okuyabilir ve değiştirebilir."
+                }
+              ]
+            ],
+            "buttons": [
+              "İptal",
+              "Uzantı ekle"
+            ]
+          },
+          "actions": [
+            {
+              "id": "add",
+              "label": "Uzantı ekle",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Uzantı artık iş e-postanızı ve açtığınız her sayfayı görüyor. Uzantıyı kaldırın ve güvenlik ekibine haber verin."
+            },
+            {
+              "id": "cancel",
+              "label": "İptal",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Bir sohbet botu uzantısının her web sitesini okuması gerekmez."
+            }
+          ]
+        },
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "neyrosohbet-fake",
+            "brand": "NeyroSöhbət",
+            "url": [
+              {
+                "text": "https://neyrosohbet.login-pro.test",
+                "reveal": "login-pro.test"
+              }
+            ],
+            "fields": [
+              "İş e-postası",
+              "Parola"
+            ],
+            "button": "Giriş yap"
+          },
+          "actions": [
+            {
+              "id": "login",
+              "label": "Giriş yap",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "İş parolanız bir dolandırıcının eline geçti. Parolanızı hemen değiştirin ve durumu bildirin."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Adres, hizmetin kendi alan adı değil."
+            },
+            {
+              "id": "report",
+              "label": "Siteyi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Çok iyi. Sahte bir siteyi bildirmek başkalarını da korur."
+            }
+          ]
+        },
+        {
+          "id": "setup-file",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "zeka-foto",
+            "name": [
+              {
+                "text": "ZekaFoto_AI_Setup.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "48 MB",
+            "source": [
+              {
+                "text": "zeka-foto-free.test"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "Program resmî bir kaynaktan gelmiyor ve zararlı olabilir. İş bilgisayarlarına programları BT destek ekibi yükler."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Doğru. Ücretsiz “yapay zekâ” programları, zararlı yazılımların çok sık kullandığı bir kılıktır."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l2-hotspot",
+      "prompt": "Dili kusursuz olan bu e-postadaki tuzakları bulun.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "idare-fake",
+        "from": {
+          "name": [
+            {
+              "text": "Nermin Hüseynova"
+            }
+          ],
+          "address": [
+            {
+              "text": "n.huseynova@"
+            },
+            {
+              "text": "idare-mail.test",
+              "spot": "domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Acil: "
+          },
+          {
+            "text": "bugün saat 15:00'e kadar",
+            "spot": "deadline"
+          }
+        ],
+        "time": "09:10",
+        "body": [
+          [
+            {
+              "text": "Değerli çalışma arkadaşım, bakanlık için bir rapor hazırlıyoruz."
+            }
+          ],
+          [
+            {
+              "text": "Departmandaki herkesin kimlik ve telefon numaralarını",
+              "spot": "request"
+            },
+            {
+              "text": " "
+            },
+            {
+              "text": "bu forma",
+              "spot": "link",
+              "link": {
+                "label": "bu forma",
+                "href": "https://forma-yukle.test/idare"
+              }
+            },
+            {
+              "text": " yükleyin."
+            }
+          ],
+          [
+            {
+              "text": "Lütfen aramayın, toplantıdayım.",
+              "spot": "no-call"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Kuruma ait olmayan alan adı",
+          "explain": "Yöneticinin adı tanıdık, ama alan adı kurumun değil. Kusursuz dil bunu gizleyemez."
+        },
+        {
+          "id": "deadline",
+          "label": "Kesin son tarih",
+          "explain": "Aciliyet, kontrol etmeye zaman bırakmaz."
+        },
+        {
+          "id": "request",
+          "label": "Kişisel veri talebi",
+          "explain": "İş arkadaşlarınızın kimlik ve telefon numaraları dışarıdaki bir forma yüklenmez."
+        },
+        {
+          "id": "link",
+          "label": "Kurum dışında bir form",
+          "explain": "Form kurumun sisteminde değil. Verilerin kimin eline geçeceğini kimse bilemez."
+        },
+        {
+          "id": "no-call",
+          "label": "Aramayın",
+          "explain": "Bu, kontrol etmenizi engellemek içindir. Tam da bu yüzden bildiğiniz numarayı arayın."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "l2-swipe",
+      "prompt": "Güvenli mi, tuzak mı?",
+      "cards": [
+        {
+          "id": "voice-note",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Yöneticim"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Merhaba, benim. Onay kodunu hemen bu numaraya gönderin, sonra açıklarım."
+                  }
+                ],
+                "voice": "man-2",
+                "spoken": "Merhaba, benim. <breath> Onay kodunu hemen bu numaraya gönderin, sonra açıklarım."
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bir ses yapay zekâ ile taklit edilebilir. Yöneticinizi bildiğiniz numaradan kendiniz arayın."
+        },
+        {
+          "id": "photo-perms",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "zeka-foto",
+            "app": "Zəka Foto",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Kamera"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Fotoğraf galerisi"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Kişiler"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "SMS mesajlarını okuma"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bir fotoğraf düzenleyicinin kişi listesine ya da SMS'lere ihtiyacı yoktur. Gereğinden fazla izin isteyen bir uygulamayı yüklemeyin."
+        },
+        {
+          "id": "komekci-notif",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "idare-komekci",
+            "app": "İdarə Köməkçisi",
+            "title": [
+              {
+                "text": "Özetiniz hazır"
+              }
+            ],
+            "body": [
+              {
+                "text": "İç portalda açabilirsiniz."
+              }
+            ],
+            "time": "11:05"
+          },
+          "verdict": "safe",
+          "explain": "Kurumun onaylı aracı beklenen bir bildirim gönderiyor; ne bağlantı ne de kod istiyor."
+        },
+        {
+          "id": "pro-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "neyrosohbet-fake",
+            "sender": [
+              {
+                "text": "NeyroPro"
+              }
+            ],
+            "time": "12:30",
+            "messages": [
+              [
+                {
+                  "text": "NeyroSöhbət Pro 1 yıl ücretsiz! Hemen etkinleştir: neyrosohbet-pro.test"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Ücretsiz Pro teklifi bir tuzak olabilir. Aboneliğinizi yalnızca hizmetin resmî uygulamasından kontrol edin."
+        },
+        {
+          "id": "approved-list",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "BT destek"
+                }
+              ],
+              "address": [
+                {
+                  "text": "destek@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Onaylı yapay zekâ araçları"
+              }
+            ],
+            "time": "14:00",
+            "body": [
+              [
+                {
+                  "text": "Liste iç portalda. Yeni bir araca ihtiyacınız olursa bize talep gönderin."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "E-posta iç bir adresten geliyor; bağlantı ya da dosya içermiyor. Bu, yararlı bir bilgi."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l2-choice",
+      "question": {
+        "prompt": "Bir tarayıcı uzantısı, “her web sitesindeki tüm verilerinizi okuma” izni istiyor. Bu ne anlama gelir?",
+        "options": [
+          {
+            "id": "normal",
+            "label": "Her uzantı bunu ister, bu normal",
+            "correct": false,
+            "feedback": "Bu, var olan en geniş izindir. Uzantı e-postanızı ve parola yazdığınız sayfaları görebilir."
+          },
+          {
+            "id": "sees-all",
+            "label": "İş e-postam da dahil, açtığım her sayfayı görebilir",
+            "correct": true,
+            "feedback": "Doğru. Böyle bir uzantıyı yalnızca kurumunuz kontrol edip onayladıysa yükleyin."
+          },
+          {
+            "id": "only-ai",
+            "label": "Yalnızca sohbet botu sayfasını görür",
+            "correct": false,
+            "feedback": "Hayır. “Her web sitesi” gerçekten her web sitesi demektir."
+          }
+        ]
+      },
+      "explain": "Bir uzantı ne kadar yararlı görünürse görünsün, neler yapabileceğini izinleri gösterir."
+    },
+    {
+      "type": "recap",
+      "id": "l2-recap",
+      "points": [
+        "Kusursuz dil, bir e-postayı gerçek yapmaz: gönderene ve talebe bakın.",
+        "“Pro” uygulamaları ve uzantıları yalnızca onaylı bir kaynaktan edinin.",
+        "Tanıdık bir ses para ya da kod isterse, bildiğiniz numarayı kendiniz arayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

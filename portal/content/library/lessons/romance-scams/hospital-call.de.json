@@ -1,0 +1,509 @@
+{
+  "id": "hospital-call",
+  "title": "Anruf aus dem Krankenhaus",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "hc-tutor",
+      "beats": [
+        {
+          "id": "hc-b1",
+          "say": "Diesmal ruft eine Betrügerin an und gibt sich als Ärztin eines Krankenhauses im Ausland aus.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "hc-b2",
+          "say": "Angeblich hatte Ihre Online-Bekanntschaft einen Unfall und braucht dringend Geld für eine Operation.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "w2e-nordhaven-klinika",
+              "caller": [
+                {
+                  "text": "Nordhaven Clinic"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+44 7700 900 418",
+                  "spot": "number"
+                }
+              ],
+              "label": "Ausland"
+            }
+          },
+          "highlight": "number"
+        },
+        {
+          "id": "hc-b3",
+          "say": "Dringlichkeit, Angst und Geheimhaltung: Wenn alle drei zusammenkommen, haben Sie es mit Betrug zu tun.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "hc-b4",
+          "say": "Legen Sie auf, suchen Sie die Nummer selbst heraus und sprechen Sie mit Ihrer Familie, bevor Sie Geld schicken.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "hc-choice",
+      "question": {
+        "prompt": "Die Anruferin sagt, Ihre Bekanntschaft liege im Krankenhaus und das Geld werde noch heute gebraucht. Was ist Ihr erster Schritt?",
+        "options": [
+          {
+            "id": "hang-up",
+            "label": "Auflegen und die Nummer des Krankenhauses selbst heraussuchen",
+            "correct": true,
+            "feedback": "Richtig. Ein Anruf unter einer selbst gefundenen Nummer entlarvt die falsche Ärztin sofort."
+          },
+          {
+            "id": "pay",
+            "label": "Das Geld schnell schicken und später nachfragen",
+            "correct": false,
+            "feedback": "Überwiesenes Geld kommt nicht zurück. Genau dafür wird der Zeitdruck erzeugt."
+          },
+          {
+            "id": "card",
+            "label": "Meine Kartendaten nennen, damit sie abbuchen können",
+            "correct": false,
+            "feedback": "Mit Ihren Kartendaten können sie so viel abbuchen, wie sie wollen. Nennen Sie am Telefon nie Kartendaten."
+          },
+          {
+            "id": "secret",
+            "label": "Versprechen, niemandem etwas zu sagen",
+            "correct": false,
+            "feedback": "Geheimhaltung hilft den Kriminellen. Ihre Familie sieht die Lage mit kühlem Kopf."
+          }
+        ]
+      },
+      "explain": "Eine dringende Geldforderung am Telefon, besonders in Kryptowährung, ist ein Zeichen für Betrug. Legen Sie auf und prüfen Sie selbst."
+    },
+    {
+      "type": "simulation",
+      "id": "hc-sim",
+      "environment": "call",
+      "title": "Ein Anruf in der Nacht",
+      "intro": "Um ein Uhr nachts kommt ein Anruf aus dem Ausland. Lesen Sie, was die Anruferin sagt, und wählen Sie Ihre Antwort.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2e-nordhaven-klinika",
+            "caller": [
+              {
+                "text": "Nordhaven Clinic"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Ausland",
+            "voice": "woman"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Annehmen",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Den Anruf anzunehmen ist nicht gefährlich. Entscheidend ist, was Sie sagen."
+            },
+            {
+              "id": "decline",
+              "label": "Ablehnen",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Auch das ist in Ordnung. Wenn Sie sich Sorgen machen, prüfen Sie die Nummer später selbst.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "doctor",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2e-nordhaven-klinika",
+            "caller": [
+              {
+                "text": "Nordhaven Clinic"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Ausland",
+            "voice": "woman"
+          },
+          "say": "Hier spricht Doktor Helena Mart von der Nordhaven Clinic. Kamran Əliyev hatte einen Unfall und hat Sie als Notfallkontakt angegeben.",
+          "spoken": "Hier spricht Doktor Helena Mart, <breath> von der Nordhaven Clinic. Kamran Əliyev hatte einen Unfall, und er hat Sie als Notfallkontakt angegeben.",
+          "actions": [
+            {
+              "id": "video",
+              "label": "Ich möchte einen Videoanruf mit Kamran",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Eine gute Prüfung. Kriminelle finden immer einen Grund, warum ein Videoanruf nicht möglich ist."
+            },
+            {
+              "id": "panic",
+              "label": "Was brauchen Sie? Ich helfe Ihnen",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Der Schock ist verständlich, aber diese Frage öffnet einer Geldforderung die Tür. Prüfen Sie zuerst."
+            },
+            {
+              "id": "hang-up",
+              "label": "Auflegen",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Eine gute Entscheidung. Sie können die Nummer der Klinik selbst heraussuchen und dort anrufen.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "demand",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2e-nordhaven-klinika",
+            "caller": [
+              {
+                "text": "Nordhaven Clinic"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Ausland",
+            "voice": "woman"
+          },
+          "say": "Er ist bewusstlos. Für die Operation brauchen wir noch heute eine Vorauszahlung von viertausendachthundert Manat, seine Versicherung übernimmt das nicht.",
+          "spoken": "Er ist bewusstlos. <breath> Für die Operation brauchen wir noch heute eine Vorauszahlung von viertausendachthundert Manat, seine Versicherung, äh, übernimmt das nicht.",
+          "actions": [
+            {
+              "id": "pay",
+              "label": "Ich schicke es, geben Sie mir die Daten",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Das Geld ist bei den Kriminellen gelandet. Prüfen Sie eine dringende Geldforderung am Telefon immer selbst."
+            },
+            {
+              "id": "card",
+              "label": "Ich gebe meine Kartendaten durch",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Mit Ihren Kartendaten können sie so viel abbuchen, wie sie wollen. Nennen Sie sie nie am Telefon."
+            },
+            {
+              "id": "check",
+              "label": "Ich suche die Nummer der Klinik heraus und rufe dort an",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Richtig. Eine selbst gefundene Nummer führt nicht zurück zu den Kriminellen."
+            }
+          ]
+        },
+        {
+          "id": "push",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2e-nordhaven-klinika",
+            "caller": [
+              {
+                "text": "Nordhaven Clinic"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Ausland",
+            "voice": "woman"
+          },
+          "say": "Wir haben keine Zeit! Kryptowährung geht auch, ich schicke Ihnen die Adresse per SMS. Erzählen Sie niemandem davon.",
+          "spoken": "Wir haben keine Zeit! <breath> Kryptowährung geht auch, ich schicke Ihnen die Adresse per SMS. Erzählen Sie niemandem davon.",
+          "actions": [
+            {
+              "id": "crypto",
+              "label": "Ich zahle in Kryptowährung",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Eine Krypto-Überweisung kann niemand rückgängig machen. Eine dringende Krypto-Forderung am Telefon ist ein Zeichen für Betrug."
+            },
+            {
+              "id": "sister",
+              "label": "Ich muss zuerst mit meiner Schwester sprechen",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Gut gemacht. Kriminelle fürchten Ihre Familie, denn die durchschaut den Trick."
+            },
+            {
+              "id": "hang-up",
+              "label": "Auflegen",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Richtig. Kryptowährung, Druck und Geheimhaltung zusammen bedeuten Betrug."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2e-nordhaven-klinika",
+            "caller": [
+              {
+                "text": "Nordhaven Clinic"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Ausland",
+            "voice": "woman"
+          },
+          "actions": [
+            {
+              "id": "call-back",
+              "label": "Diese Nummer zurückrufen",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "Diese Nummer gehört den Kriminellen, und dort hören Sie dieselbe Geschichte. Suchen Sie die Nummer selbst heraus."
+            },
+            {
+              "id": "family",
+              "label": "Meiner Familie Bescheid sagen",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Richtig. Ein Gespräch mit Ihrer Familie nimmt sofort den Druck heraus."
+            },
+            {
+              "id": "block",
+              "label": "Nummer blockieren",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Gut. Blockieren Sie die Nummer und melden Sie auch das Dating-Profil auf der Plattform."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "hc-swipe",
+      "prompt": "Welche Nachricht ist normal und welche ein Warnsignal?",
+      "cards": [
+        {
+          "id": "video-date",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Elçin"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Wollen wir heute um 20 Uhr videotelefonieren? Und am Samstag treffen wir uns dann in einem Café."
+                  }
+                ],
+                "time": "18:20"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ein Videoanruf und ein Treffen an einem öffentlichen Ort sind normal. Genau das vermeiden Kriminelle."
+        },
+        {
+          "id": "visa",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Mark Leon"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Damit ich dich besuchen kann, brauche ich Geld für das Visum, 600 AZN. Ich zahle es dir zurück, sobald ich da bin, versprochen."
+                  }
+                ],
+                "time": "23:10"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Wenn jemand, den Sie nie getroffen haben, um Geld für Ticket, Visum oder Zoll bittet, ist das ein klassischer Betrug."
+        },
+        {
+          "id": "withdraw-fee",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2e-kriptonova",
+            "app": "KriptoNova",
+            "title": [
+              {
+                "text": "Ihr Gewinn: 2.340 AZN"
+              }
+            ],
+            "body": [
+              {
+                "text": "Zahlen Sie zuerst 15 % Steuer, um sich Ihr Geld auszahlen zu lassen."
+              }
+            ],
+            "time": "09:05"
+          },
+          "verdict": "threat",
+          "explain": "Eine Plattform, die vor der Auszahlung eine Zahlung verlangt, ist gefälscht. Der Gewinn ist frei erfunden."
+        },
+        {
+          "id": "report-done",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2e-gorusek",
+            "app": "Görüşək",
+            "title": [
+              {
+                "text": "Ihre Meldung wurde geprüft"
+              }
+            ],
+            "body": [
+              {
+                "text": "Das von Ihnen gemeldete Profil war gefälscht und wurde gesperrt. Vielen Dank."
+              }
+            ],
+            "time": "14:30"
+          },
+          "verdict": "safe",
+          "explain": "Das ist eine normale Benachrichtigung der Plattform, und es wird nichts verlangt. Wer ein gefälschtes Profil meldet, schützt andere."
+        },
+        {
+          "id": "secret",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Kamran Əliyev"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Erzähl deiner Familie nichts, sie würden uns nicht verstehen. Das ist nur unser Geheimnis."
+                  }
+                ],
+                "time": "22:45"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Wer Sie von Ihrer Familie abschotten will, hat etwas zu verbergen. Eine Bitte um Geheimhaltung ist ein Warnsignal."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "hc-scenario",
+      "title": "Ihre Schwester fragt nach",
+      "start": "sister",
+      "nodes": [
+        {
+          "id": "sister",
+          "text": "Du siehst besorgt aus. Was ist los, belästigt dich jemand?",
+          "speaker": "Nigar (Ihre Schwester)",
+          "voice": "woman-2",
+          "channel": "in-person",
+          "manner": "natural",
+          "spoken": "Du siehst besorgt aus. <breath> Was ist los, belästigt dich jemand?",
+          "character": "nigar",
+          "choices": [
+            {
+              "label": "Ich erzähle ihr alles und zeige ihr den Chat",
+              "next": "search",
+              "feedback": "Richtig. Wer darüber spricht, nimmt den Kriminellen die Macht."
+            },
+            {
+              "label": "Nichts, Kamran hat mich gebeten, niemandem davon zu erzählen",
+              "outcome": "risky",
+              "feedback": "Geheimhaltung hilft den Kriminellen. Ein Gespräch mit einem nahestehenden Menschen ist der beste Schutz."
+            }
+          ]
+        },
+        {
+          "id": "search",
+          "text": "Lass uns Kamrans Foto zusammen mit der umgekehrten Bildersuche prüfen. Schau, das Foto taucht unter einem anderen Namen auf, auf der Seite eines ausländischen Models!",
+          "speaker": "Nigar (Ihre Schwester)",
+          "voice": "woman-2",
+          "channel": "in-person",
+          "manner": "natural",
+          "spoken": "Lass uns Kamrans Foto zusammen mit der umgekehrten Bildersuche prüfen. <breath> Schau, das Foto taucht unter einem anderen Namen auf, auf der Seite eines ausländischen Models!",
+          "character": "nigar",
+          "choices": [
+            {
+              "label": "Ich melde und blockiere das Profil und schicke nie wieder Geld",
+              "outcome": "safe",
+              "feedback": "Gut gemacht. Sie haben sich selbst und auch andere Menschen geschützt."
+            },
+            {
+              "label": "Vielleicht hat jemand sein Foto gestohlen, ich chatte weiter",
+              "outcome": "risky",
+              "feedback": "Gefälschte Profile beruhen auf gestohlenen Fotos. Vertrauen Sie dem Ergebnis der Prüfung."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "hc-recap",
+      "points": [
+        "Wenn am Telefon dringend Geld gefordert wird, legen Sie auf und suchen Sie die Nummer selbst heraus.",
+        "Kryptowährung, Druck und Geheimhaltung zusammen bedeuten Betrug.",
+        "Sprechen Sie mit Ihrer Familie, bevor Sie Geld schicken, und melden Sie das gefälschte Profil."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

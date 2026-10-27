@@ -1,0 +1,228 @@
+{
+  "id": "share-with-care",
+  "title": "Partajați cu grijă",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Cloudul este foarte comod: fișierele se deschid de oriunde. Dar un link partajat greșit se deschide și el de oriunde.",
+          "mood": "talk",
+          "visual": { "kind": "illustration", "id": "cloud" }
+        },
+        {
+          "id": "b2",
+          "say": "Când creați un link, verificați trei lucruri: cine îl poate deschide, dacă poate modifica fișierul și până când rămâne activ.",
+          "mood": "think",
+          "visual": { "kind": "illustration", "id": "folder" }
+        },
+        {
+          "id": "b3",
+          "say": "Uneori nu vi se cere deloc parola, ci doar să permiteți accesul unei aplicații. Un singur clic îi poate da atacatorului cheia contului dumneavoastră.",
+          "mood": "alert",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "from": {
+                "name": [{ "text": "DocuSfera" }],
+                "address": [{ "text": "no-reply@docusfera-share.example.net" }]
+              },
+              "subject": [{ "text": "Leyla Guliyeva a partajat un document cu dumneavoastră" }],
+              "time": "10:41",
+              "body": [
+                [{ "text": "Document: Buget trimestrial, versiunea finală" }],
+                [{ "text": "Pentru a-l deschide, permiteți aplicației DocuSfera Viewer să vă acceseze contul.", "spot": "grant" }]
+              ]
+            }
+          },
+          "highlight": "grant"
+        },
+        {
+          "id": "b4",
+          "say": "Dacă ați permis accesul, s-ar putea ca schimbarea parolei să nu fie suficientă. Cereți imediat suportului IT să revoce accesul aplicației.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": { "kind": "illustration", "id": "key" }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "consent-prompt",
+      "prompt": "Găsiți permisiunile de care această aplicație nu are nevoie.",
+      "artifact": {
+        "kind": "permission",
+        "app": "PDF Merger Pro",
+        "permissions": [
+          { "label": [{ "text": "Vizualizarea numelui și a adresei de e-mail" }], "needed": true },
+          { "label": [{ "text": "Citirea, trimiterea și ștergerea e-mailurilor", "spot": "mail" }], "needed": false },
+          { "label": [{ "text": "Acces complet la toate fișierele", "spot": "files" }], "needed": false },
+          { "label": [{ "text": "Gestionarea persoanelor de contact", "spot": "contacts" }], "needed": false },
+          { "label": [{ "text": "Păstrarea accesului chiar și când nu folosiți aplicația", "spot": "offline" }], "needed": false }
+        ]
+      },
+      "spots": [
+        {
+          "id": "mail",
+          "label": "Acces complet la căsuța de e-mail",
+          "explain": "Pentru a combina fișiere PDF, aplicația nu are nevoie de e-mailurile dumneavoastră. Cu acest acces, cineva poate trimite e-mailuri în numele dumneavoastră."
+        },
+        {
+          "id": "files",
+          "label": "Toate fișierele",
+          "explain": "Aplicației îi trebuie doar fișierul pe care îl alegeți, nu tot cloudul."
+        },
+        {
+          "id": "contacts",
+          "label": "Persoane de contact",
+          "explain": "Lista dumneavoastră de contacte devine lista de ținte pentru următorul val de phishing."
+        },
+        {
+          "id": "offline",
+          "label": "Acces permanent",
+          "explain": "Aplicația poate continua să acceseze contul chiar și după ce nu o mai folosiți. Schimbarea parolei nu oprește întotdeauna acest acces."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "link-settings",
+      "question": {
+        "prompt": "Trimiteți un raport către doi colegi, ca să îl citească. Ce link alegeți?",
+        "options": [
+          {
+            "id": "anyone-edit",
+            "label": "Oricine are linkul, cu drept de editare",
+            "correct": false,
+            "feedback": "Dacă linkul ajunge unde nu trebuie, oricine poate deschide și modifica fișierul."
+          },
+          {
+            "id": "two-view",
+            "label": "Doar cei doi colegi, numai vizualizare, cu dată de expirare",
+            "correct": true,
+            "feedback": "Corect. Acces minim, risc minim."
+          },
+          {
+            "id": "org-edit",
+            "label": "Toți cei din organizație, cu drept de editare",
+            "correct": false,
+            "feedback": "Sute de persoane care nu au nevoie de el l-ar putea deschide și modifica."
+          }
+        ],
+        "visual": { "kind": "illustration", "id": "folder" }
+      },
+      "explain": "Acordați accesul minim: persoane anume, doar drepturile necesare și o dată de expirare."
+    },
+    {
+      "type": "swipe",
+      "id": "cloud-cards",
+      "prompt": "Această partajare este sigură sau riscantă?",
+      "cards": [
+        {
+          "id": "expected-share",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [{ "text": "DocuSfera" }],
+              "address": [{ "text": "no-reply@docusfera.example" }]
+            },
+            "subject": [{ "text": "Samir Babayev a partajat cu dumneavoastră fișierul Raport trimestrial" }],
+            "time": "09:15",
+            "body": [
+              [{ "text": "Samir: iată raportul despre care am vorbit ieri." }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Un coleg cunoscut, un fișier așteptat, domeniul propriu al serviciului. Totuși, verificați bara de adrese când se deschide."
+        },
+        {
+          "id": "salary-files",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [{ "text": "DocuSfera" }],
+              "address": [{ "text": "share@docusfera-files.example.info" }]
+            },
+            "subject": [{ "text": "Vi s-au trimis 3 fișiere: Majorare salarială 2027.pdf" }],
+            "time": "16:58",
+            "body": [
+              [{ "text": "Fișierele vor fi șterse în 24 de ore. Confirmați parola de e-mail pentru a le vizualiza." }]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Domeniu greșit, un subiect tentant, presiunea timpului și o cerere de parolă. O capcană clasică."
+        },
+        {
+          "id": "open-link",
+          "artifact": {
+            "kind": "url",
+            "url": [{ "text": "https://docusfera.example/s/Hx82kQ?access=anyone&role=editor" }]
+          },
+          "verdict": "threat",
+          "explain": "Acest link îi permite oricui să editeze. Schimbați nivelul de acces înainte să îl trimiteți."
+        },
+        {
+          "id": "personal-cloud",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [{ "text": "Gunay (din echipă)" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Am încărcat documentele în cloudul meu personal, ca să pot lucra de acasă." }],
+                "time": "18:40"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Un cloud personal nu se află sub controlul organizației. Păstrați fișierele de serviciu doar în serviciul aprobat."
+        },
+        {
+          "id": "cleanup-notice",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [{ "text": "Suport IT" }],
+              "address": [{ "text": "it-support@idare.example" }]
+            },
+            "subject": [{ "text": "Linkurile vechi cu acces deschis vor fi dezactivate" }],
+            "time": "11:00",
+            "body": [
+              [{ "text": "Vineri, linkurile cu acces deschis mai vechi de 90 de zile se vor dezactiva automat. Nu trebuie să faceți nimic." }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Adresă corectă, niciun link, nicio solicitare. Este o curățare utilă."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "access-levels",
+      "prompt": "Asociați fiecare nivel de acces cu ce înseamnă.",
+      "pairs": [
+        { "id": "viewer", "left": "Vizualizator", "right": "Poate doar să citească" },
+        { "id": "commenter", "left": "Comentator", "right": "Citește și lasă comentarii" },
+        { "id": "editor", "left": "Editor", "right": "Poate modifica fișierul" },
+        { "id": "anyone", "left": "Oricine are linkul", "right": "Îl pot deschide și persoane din afară" }
+      ],
+      "explain": "Drepturile de editare de care nu are nimeni nevoie cresc riscul de greșeli sau de modificări dăunătoare."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Partajați linkurile cu persoane anume și doar cu drepturile necesare.",
+        "Nu permiteți niciodată unei aplicații necunoscute să vă acceseze contul.",
+        "Nu păstrați fișierele de serviciu în clouduri personale."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

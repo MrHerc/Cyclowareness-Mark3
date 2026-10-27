@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { BrandMark } from "@/components/brand";
 import { LanguageSwitcher } from "@/components/language-switcher";
-import { LOCALES, LOCALE_NAMES, isLocale } from "@/i18n/config";
+import { LOCALES, LOCALE_NAMES, isLocale, langAttrs } from "@/i18n/config";
 import { Markdown, headingsOf } from "@/lib/markdown";
 
 const DOCS = ["privacy", "terms"] as const;
@@ -69,11 +69,11 @@ export default async function LegalPage({ params, searchParams }: PageProps<"/le
               {tr("version", { version: d.version, date: format.dateTime(new Date(`${d.effective}T12:00:00`), { day: "2-digit", month: "2-digit", year: "numeric" }) })}
             </p>
           ) : null}
-          <h1 lang={d.lang} className="font-display text-headline font-bold">
+          <h1 {...langAttrs(d.lang)} className="font-display text-headline font-bold">
             {title}
           </h1>
           {intro ? (
-            <div lang={d.lang}>
+            <div {...langAttrs(d.lang)}>
               <Markdown source={intro} />
             </div>
           ) : null}
@@ -84,7 +84,7 @@ export default async function LegalPage({ params, searchParams }: PageProps<"/le
                   <a
                     href={`/legal/${doc}?lang=${l}`}
                     hrefLang={l}
-                    lang={l}
+                    {...langAttrs(l)}
                     aria-current={l === want ? "page" : undefined}
                     className="inline-flex items-center gap-1 rounded-pill px-3 py-1.5 text-caption ring-1 ring-line hover:bg-sunken aria-[current=page]:bg-brand-50 aria-[current=page]:font-bold pointer-coarse:min-h-11"
                   >
@@ -94,16 +94,17 @@ export default async function LegalPage({ params, searchParams }: PageProps<"/le
               ))}
             </ul>
           </nav>
-          {d.lang !== want ? (
-            <p lang={locale} className="rounded-lg bg-brand-50 px-4 py-3 text-caption text-brand-700">
-              {tr("onlyAz")}
+          {want !== "az" ? (
+            <p {...langAttrs(locale)} className="rounded-lg bg-brand-50 px-4 py-3 text-caption text-brand-700">
+              {/* The az text is binding: say so on a translation, or that az is shown because there is none yet. */}
+              {tr(d.lang === "az" ? "onlyAz" : "translation")}
             </p>
           ) : null}
         </div>
         <div className="mt-10 grid gap-10 lg:grid-cols-[16rem_minmax(0,1fr)]">
           <nav aria-label={tr("contents")} className="lg:sticky lg:top-24 lg:self-start">
             <p className="mb-2 text-tab font-bold tracking-wider text-ink-subtle uppercase">{tr("contents")}</p>
-            <ol lang={d.lang} className="grid gap-1 text-caption">
+            <ol {...langAttrs(d.lang)} className="grid gap-1 text-caption">
               {toc.map((h) => (
                 <li key={h.id}>
                   <a href={`#${h.id}`} className="flex items-center rounded-md px-2 py-1.5 text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:min-h-11">
@@ -113,7 +114,7 @@ export default async function LegalPage({ params, searchParams }: PageProps<"/le
               ))}
             </ol>
           </nav>
-          <article lang={d.lang} className="min-w-0">
+          <article {...langAttrs(d.lang)} className="min-w-0">
             <Markdown source={rest} />
           </article>
         </div>

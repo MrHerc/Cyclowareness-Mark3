@@ -1,0 +1,553 @@
+{
+ "id": "shared-doc-login",
+ "title": "Un document partajat",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sd-tutor",
+   "beats": [
+    {
+     "id": "sd-b1",
+     "say": "O fereastră de conectare falsă începe adesea cu un e-mail: cineva v-a partajat un document și trebuie să vă conectați ca să îl vedeți.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "sd-b2",
+     "say": "Butonul vă propune să vă conectați cu un cont cunoscut. Fereastra care se deschide este desenată în interiorul site-ului.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "buludxidmet-fake",
+       "from": {
+        "name": [
+         {
+          "text": "BuludXidmet"
+         }
+        ],
+        "address": [
+         {
+          "text": "paylasim@buludxidmet-share.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Kamran Aliyev a partajat un document cu dumneavoastră"
+        }
+       ],
+       "time": "09:47",
+       "body": [
+        [
+         {
+          "text": "Kamran Aliyev a partajat cu dumneavoastră „Oferta_licitatie_2026.pdf”."
+         }
+        ],
+        [
+         {
+          "text": "Pentru a-l vizualiza: "
+         },
+         {
+          "text": "Conectați-vă cu IshPocht",
+          "spot": "signin-btn",
+          "link": {
+           "label": "Conectați-vă cu IshPocht",
+           "href": "https://buludxidmet-share.example.net/view?id=88213"
+          }
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "signin-btn"
+    },
+    {
+     "id": "sd-b3",
+     "say": "Și e-mailul care amenință că vă închide pagina biroului de pe rețelele sociale este aceeași capcană.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "sd-b4",
+     "say": "Regula este: nu vă conectați prin butonul din e-mail. Deschideți site-ul chiar dumneavoastră.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "sd-choice",
+   "question": {
+    "prompt": "Ați primit acest e-mail. Ce faceți?",
+    "options": [
+     {
+      "id": "signin",
+      "label": "Apăs butonul și mă conectez cu contul IshPocht",
+      "correct": false,
+      "feedback": "Butonul vă duce pe un site pe care nu îl cunoașteți. Fereastra de conectare de acolo poate fi falsă."
+     },
+     {
+      "id": "ask-colleague",
+      "label": "Îl sun pe Kamran la numărul pe care îl știu și îl întreb",
+      "correct": true,
+      "feedback": "Corect. Dacă documentul este real, Kamran îl va partaja din nou prin sistemul propriu al biroului."
+     },
+     {
+      "id": "forward",
+      "label": "Îl redirecționez colegilor, ca să se uite și ei",
+      "correct": false,
+      "feedback": "Atunci capcana ajunge și la alții. Trimiteți un e-mail suspect doar suportului IT."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "buludxidmet-fake",
+      "from": {
+       "name": [
+        {
+         "text": "BuludXidmet"
+        }
+       ],
+       "address": [
+        {
+         "text": "paylasim@buludxidmet-share.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Kamran Aliyev a partajat un document cu dumneavoastră"
+       }
+      ],
+      "time": "09:47",
+      "body": [
+       [
+        {
+         "text": "Kamran Aliyev a partajat cu dumneavoastră „Oferta_licitatie_2026.pdf”."
+        }
+       ],
+       [
+        {
+         "text": "Pentru a-l vizualiza: "
+        },
+        {
+         "text": "Conectați-vă cu IshPocht",
+         "link": {
+          "label": "Conectați-vă cu IshPocht",
+          "href": "https://buludxidmet-share.example.net/view?id=88213"
+         }
+        }
+       ],
+       [
+        {
+         "text": "Linkul este valabil 24 de ore."
+        }
+       ]
+      ]
+     }
+    }
+   },
+   "explain": "Dacă documentul este real, îl veți vedea când deschideți site-ul chiar dumneavoastră. Butonul de conectare din e-mail nu vă trebuie niciodată."
+  },
+  {
+   "type": "simulation",
+   "id": "sd-sim",
+   "environment": "inbox",
+   "title": "Poșta de serviciu",
+   "intro": "Dimineața vă așteaptă patru e-mailuri. Deschideți-le pe rând și alegeți acțiunea corectă.",
+   "steps": [
+    {
+     "id": "real-share",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "buludxidmet",
+      "from": {
+       "name": [
+        {
+         "text": "BuludXidmet"
+        }
+       ],
+       "address": [
+        {
+         "text": "bildiris@buludxidmet.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Narmin Hasanova a partajat un fișier cu dumneavoastră"
+       }
+      ],
+      "time": "08:55",
+      "body": [
+       [
+        {
+         "text": "Narmin Hasanova a partajat cu dumneavoastră „Buget_2027.xlsx”."
+        }
+       ],
+       [
+        {
+         "text": "Notă: tabelul cu bugetul despre care am discutat azi-dimineață."
+        }
+       ],
+       [
+        {
+         "text": "Deschideți fișierul",
+         "link": {
+          "label": "Deschideți fișierul",
+          "href": "https://buludxidmet.example/idare/budce-2027"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți fișierul",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Vă așteptați la acest fișier, iar linkul duce la adresa proprie a serviciului. Îl puteți deschide liniștit."
+      },
+      {
+       "id": "safe",
+       "label": "Marcați ca sigur",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Corect. O colegă cunoscută, un fișier așteptat și adresa proprie a serviciului."
+      },
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Prudența este bună, dar aici nu există semnale de alarmă. Narmin v-a spus de acest fișier azi-dimineață."
+      }
+     ]
+    },
+    {
+     "id": "fake-share",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "buludxidmet-fake",
+      "from": {
+       "name": [
+        {
+         "text": "BuludXidmet"
+        }
+       ],
+       "address": [
+        {
+         "text": "paylasim@buludxidmet-share.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Kamran Aliyev a partajat un document cu dumneavoastră"
+       }
+      ],
+      "time": "09:47",
+      "body": [
+       [
+        {
+         "text": "Kamran Aliyev a partajat cu dumneavoastră „Oferta_licitatie_2026.pdf”."
+        }
+       ],
+       [
+        {
+         "text": "Pentru a-l vizualiza: "
+        },
+        {
+         "text": "Conectați-vă cu IshPocht",
+         "link": {
+          "label": "Conectați-vă cu IshPocht",
+          "href": "https://buludxidmet-share.example.net/view?id=88213"
+         }
+        }
+       ],
+       [
+        {
+         "text": "Linkul este valabil 24 de ore."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Un domeniu diferit și un buton de conectare care ducea la o fereastră falsă."
+      },
+      {
+       "id": "click",
+       "label": "Conectați-vă cu IshPocht",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Pagina ar fi desenat o fereastră IshPocht și v-ar fi cerut parola. Nu apăsați astfel de butoane."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Și ștergerea este o soluție. Dacă îl raportați, suportul IT îi poate avertiza pe colegi."
+      }
+     ]
+    },
+    {
+     "id": "copyright",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2c-kontakto-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Centrul juridic Kontakto"
+        }
+       ],
+       "address": [
+        {
+         "text": "huquq@kontakto-support.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Pagina dumneavoastră va fi ștearsă în 24 de ore"
+       }
+      ],
+      "time": "10:12",
+      "body": [
+       [
+        {
+         "text": "Pe pagina oficială a biroului dumneavoastră a fost constatată o încălcare a drepturilor de autor."
+        }
+       ],
+       [
+        {
+         "text": "Pentru a depune o contestație, conectați-vă ca administrator al paginii: "
+        },
+        {
+         "text": "Contestați",
+         "link": {
+          "label": "Contestați",
+          "href": "https://kontakto-support.example.info/etiraz"
+         }
+        }
+       ],
+       [
+        {
+         "text": "Dacă nu primim un răspuns, pagina va fi închisă definitiv."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Un avertisment real ar apărea și în aplicația proprie a rețelei sociale."
+      },
+      {
+       "id": "click",
+       "label": "Contestați",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Pagina de contestație a desenat o fereastră Kontakto și a colectat parola și codul. Pagina biroului dumneavoastră ar ajunge la escroc."
+      },
+      {
+       "id": "reply",
+       "label": "Răspundeți: este o greșeală",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Escrocul citește răspunsul și trimite un link nou. În loc să răspundeți, raportați e-mailul."
+      }
+     ]
+    },
+    {
+     "id": "it-notice",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "Suport IT"
+        }
+       ],
+       "address": [
+        {
+         "text": "destek@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Actualizarea serverului de e-mail în această seară"
+       }
+      ],
+      "time": "11:30",
+      "body": [
+       [
+        {
+         "text": "Astăzi, între 19:00 și 20:00, poșta electronică de serviciu poate fi indisponibilă câteva minute."
+        }
+       ],
+       [
+        {
+         "text": "Nu trebuie să faceți nimic."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Marcați ca sigur",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Corect. Vine de la o adresă internă, nu are niciun link și nu vă cere parola."
+      },
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Acest e-mail nu are niciun link și nu vă cere nimic. Astfel de anunțuri țin de munca obișnuită."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Nicio problemă, e-mailul doar vă informează. Nu există niciun pericol."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "sd-hotspot",
+   "prompt": "Găsiți semnele care arată că această fereastră de conectare este falsă.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2c-kontakto-fake",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Kontakto: conectare"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Bara de adrese a browserului: "
+      },
+      {
+       "text": "kontakto-support.example.info/etiraz",
+       "spot": "real-address"
+      }
+     ],
+     [
+      {
+       "text": "Adresa din fereastră: "
+      },
+      {
+       "text": "https://kontakto.example/login",
+       "spot": "painted-bar"
+      }
+     ],
+     [
+      {
+       "text": "Telefon sau e-mail, parolă"
+      }
+     ],
+     [
+      {
+       "text": "Introduceți și codul primit prin SMS",
+       "spot": "code"
+      }
+     ],
+     [
+      {
+       "text": "Fereastra nu trece de marginea paginii",
+       "spot": "no-drag"
+      }
+     ],
+     [
+      {
+       "text": "Mai aveți 2 ore și 59 de minute pentru contestație",
+       "spot": "timer"
+      }
+     ]
+    ],
+    "buttons": [
+     "Conectați-vă"
+    ]
+   },
+   "spots": [
+    {
+     "id": "real-address",
+     "label": "Adresa reală",
+     "explain": "Bara de adrese proprie a browserului arată alt site. Uitați-vă la ea, nu la textul din fereastră."
+    },
+    {
+     "id": "painted-bar",
+     "label": "Adresă desenată",
+     "explain": "Această bară de adrese face parte din imaginea ferestrei. Escrocul poate scrie acolo orice."
+    },
+    {
+     "id": "code",
+     "label": "Cod de verificare",
+     "explain": "Vor codul ca să treacă de verificarea în doi pași. Nu introduceți niciodată un cod într-o astfel de fereastră."
+    },
+    {
+     "id": "no-drag",
+     "label": "Fereastră blocată",
+     "explain": "O fereastră reală poate fi trasă în afara browserului. Aceasta rămâne blocată în interiorul paginii."
+    },
+    {
+     "id": "timer",
+     "label": "Presiune",
+     "explain": "Numărătoarea inversă există ca să vă conectați fără să verificați."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "recap",
+   "id": "sd-recap",
+   "points": [
+    "Pentru un document partajat, deschideți site-ul chiar dumneavoastră",
+    "Un e-mail care amenință cu închiderea paginii este o capcană",
+    "Dacă v-ați introdus parola, schimbați-o acum și anunțați suportul IT"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

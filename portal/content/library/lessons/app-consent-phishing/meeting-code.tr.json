@@ -1,0 +1,451 @@
+{
+ "id": "meeting-code",
+ "title": "Toplantı kodu",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac2-tutor",
+   "beats": [
+    {
+     "id": "ac2-b1",
+     "say": "Merhaba! Şimdi uluslararası bir forumdan gelen bir davete ve bir toplantı koduna bakalım.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "ac2-b2",
+     "say": "Dolandırıcı size bir kod ve kurumunuzun gerçek giriş sayfasını gönderir.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2b-nordvale-fake",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Leyla K. | Nordvale Council"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Toplantıya katılmak için şu kodu girin: "
+          },
+          {
+           "text": "QK7-MN4P",
+           "spot": "code"
+          }
+         ],
+         "time": "10:04"
+        }
+       ]
+      }
+     },
+     "highlight": "code"
+    },
+    {
+     "id": "ac2-b3",
+     "say": "Kodu girerseniz, onun cihazı parolanıza hiç gerek kalmadan sizmiş gibi hesabınıza girer.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "ac2-b4",
+     "say": "Kural şu: girişi kendiniz başlatmadıysanız hiçbir yere kod girmeyin.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ac2-scenario",
+   "title": "Forum daveti",
+   "start": "invite",
+   "nodes": [
+    {
+     "id": "invite",
+     "text": "Merhaba! Kasım ayında Viyana'daki forumumuzda konuşmacı olmanızı çok isteriz. İlgilenir misiniz?",
+     "speaker": "Leyla, Nordvale Council (yeni mesaj)",
+     "voice": "young-woman",
+     "channel": "message",
+     "spoken": "Merhaba! <breath> Kasım ayında Viyana'daki forumumuzda konuşmacı olmanızı çok isteriz. İlgilenir misiniz?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Teşekkür ederim. Yönetimden onay alabilmem için resmî daveti lütfen iş e-posta adresime gönderin",
+       "next": "code",
+       "feedback": "Doğru. Resmî bir davet resmî bir kanaldan gelir ve onu kontrol edebilirsiniz."
+      },
+      {
+       "label": "Çok ilginç! Ne yapmam gerekiyor?",
+       "next": "code",
+       "feedback": "İlgi duymanız doğal. Ama tanımadığınız biriyle yapılan bir yazışmayı resmî bir kanala taşımak daha iyidir."
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "text": "Harika! Yarın kısa bir çevrim içi toplantı yapalım. Katılmak için kurumunuzun giriş sayfasına şu kodu girin: QK7-MN4P.",
+     "speaker": "Leyla, Nordvale Council",
+     "voice": "young-woman",
+     "channel": "message",
+     "spoken": "Harika! Yarın kısa bir çevrim içi toplantı yapalım. <breath> Katılmak için kurumunuzun giriş sayfasına şu kodu girin: QK7-MN4P.",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Bu girişi ben başlatmadım, o yüzden kodu hiçbir yere girmiyorum",
+       "next": "pressure",
+       "feedback": "Doğru. Kod size bir mesajla geldiyse o giriş başka birine aittir."
+      },
+      {
+       "label": "Sayfa kurumumun sayfası, yani güvenli. Kodu giriyorum",
+       "outcome": "compromised",
+       "feedback": "Sayfa gerçekti, ama girişi dolandırıcı başlattı. Artık onun cihazı posta kutunuzun içinde."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Vaktimiz çok az, bakanlığınız da onay verdi. Sadece kodu girin, iki dakikanızı alır.",
+     "speaker": "Leyla, Nordvale Council",
+     "voice": "young-woman",
+     "channel": "message",
+     "spoken": "Vaktimiz çok az, ee, bakanlığınız da onay verdi. Sadece kodu girin, iki dakikanızı alır.",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Forumun resmî sitesinden numarayı bulup kendim arayacağım, BT destek ekibine de haber vereceğim",
+       "outcome": "safe",
+       "feedback": "Çok iyi. Gerçek bir organizatör bu kontrolü memnuniyetle karşılar, dolandırıcı ise ortadan kaybolur."
+      },
+      {
+       "label": "Peki, giriyorum",
+       "outcome": "compromised",
+       "feedback": "Baskı da tuzağın bir parçası. Kodu girdiğiniz anda hesabınız dolandırıcının cihazına açılır."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac2-sim",
+   "environment": "phone",
+   "title": "Telefonunuzdaki davet",
+   "intro": "Telefonunuza forum adına mesajlar geliyor. Her birini açın ve doğru adımı seçin.",
+   "steps": [
+    {
+     "id": "code-chat",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2b-nordvale-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Leyla K. | Nordvale Council"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Merhaba! Viyana forumundaki paneliniz onaylandı."
+         }
+        ],
+        "time": "10:02"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Toplantıya katılım kodu: QK7-MN4P"
+         }
+        ],
+        "time": "10:03"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Kodu şu sayfaya girin: "
+         },
+         {
+          "text": "giris.idare.example/cihaz",
+          "link": {
+           "label": "giris.idare.example/cihaz",
+           "href": "https://giris.idare.example/cihaz"
+          }
+         }
+        ],
+        "time": "10:03"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru. Girişi siz başlatmadıysanız mesajla gönderilen kod bir tuzaktır.",
+       "next": "slides"
+      },
+      {
+       "id": "official",
+       "label": "Lütfen resmî daveti iş e-posta adresime gönderin",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "İyi yanıt. Gerçek bir organizatör bunu yapabilir, dolandırıcı ise konuyu geçiştirir.",
+       "next": "slides"
+      },
+      {
+       "id": "open-page",
+       "label": "Sayfayı aç",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Sayfa gerçek, ama bu girişi başka biri başlattı. Bir sonraki ekrana dikkatle bakın."
+      }
+     ]
+    },
+    {
+     "id": "device-confirm",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Başka bir cihazda mı giriş yapıyorsunuz?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Kod: QK7-MN4P"
+        }
+       ],
+       [
+        {
+         "text": "Bu girişi kendiniz başlatmadıysanız devam etmeyin."
+        }
+       ]
+      ],
+      "buttons": [
+       "Devam et",
+       "İptal"
+      ]
+     },
+     "say": "Sayfa açıldı. Kodu girer girmez bu soru çıkıyor.",
+     "actions": [
+      {
+       "id": "continue",
+       "label": "Devam et",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Dolandırıcının cihazı artık hesabınızda. Hemen BT destek ekibini arayın."
+      },
+      {
+       "id": "cancel",
+       "label": "İptal",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Doğru. Sayfanın kendisi sizi uyardı: bu girişi siz başlatmadınız."
+      }
+     ]
+    },
+    {
+     "id": "slides",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-nordvale-slides",
+      "app": "Nordvale Slides",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Profilinizi görme"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "E-postalarınızı okuma ve gönderme"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Siz yokken de erişimi sürdürme"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Şimdi de organizatör sunumun bağlantısını gönderdi. O da izin istiyor.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Reddet",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Doğru. Sunumu görüntülemek için e-postanıza erişim gerekmez."
+      },
+      {
+       "id": "allow",
+       "label": "İzin ver",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Bu uygulama artık e-postalarınızı okuyor. İzni iptal etmesi için BT destek ekibine başvurun."
+      }
+     ]
+    },
+    {
+     "id": "tell-support",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "BT Destek"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Bir forum adına bana bir kod ve bir izin isteği geldi."
+         }
+        ],
+        "time": "10:20"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Teşekkürler! Kodu girdiniz mi ya da bir şeye izin verdiniz mi?"
+         }
+        ],
+        "time": "10:21"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "yes",
+       "label": "Evet, yanlışlıkla girdim",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Hemen haber vermeniz doğru. Bir uzman o girişi de izni de kapatacak."
+      },
+      {
+       "id": "no",
+       "label": "Hayır, hiçbir şey girmedim",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Çok iyi. Uzman diğer iş arkadaşlarınızı da uyaracak."
+      },
+      {
+       "id": "silent",
+       "label": "Yanıt verme",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Herkes hata yapabilir, ama hatayı saklamak zararı büyütür. Dürüst bir yanıt zaman kazandırır."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ac2-match",
+   "prompt": "Her durumu doğru adımla eşleştirin.",
+   "pairs": [
+    {
+     "id": "code-message",
+     "left": "Biri size mesajla bir kod gönderdi",
+     "right": "Kodu hiçbir yere girmeyin ve bildirin"
+    },
+    {
+     "id": "own-tv",
+     "left": "Televizyonda girişi kendiniz başlattınız",
+     "right": "Ekrandaki kodu girebilirsiniz"
+    },
+    {
+     "id": "unknown-app",
+     "left": "Tanımadığınız bir uygulama kalıcı erişim istiyor",
+     "right": "Reddedin"
+    },
+    {
+     "id": "mistake",
+     "left": "Yanlışlıkla bir kod girdiniz ya da bir uygulamaya izin verdiniz",
+     "right": "Hemen BT destek ekibini arayın"
+    }
+   ],
+   "explain": "Kod yalnızca girişi kendiniz başlattığınız bir cihazdan geliyorsa güvenlidir. Diğer tüm durumlarda durun ve bildirin."
+  },
+  {
+   "type": "choice",
+   "id": "ac2-choice",
+   "question": {
+    "prompt": "Organizatör şöyle diyor: “Sayfa sizin kendi kurumunuza ait, endişelenmeyin.” Bu, kodu girmek için bir neden mi?",
+    "options": [
+     {
+      "id": "no",
+      "label": "Hayır. Sayfa gerçek, ama girişi başka biri başlattı",
+      "correct": true,
+      "feedback": "Doğru. Bu tuzakta sayfa da kod da gerçektir, sahte olan yalnızca girişi başlatan kişidir."
+     },
+     {
+      "id": "real-address",
+      "label": "Evet, adres gerçekse tehlike yoktur",
+      "correct": false,
+      "feedback": "Adresi kontrol etmek parolayı korur, kodu değil. Kod, girişi kim başlattıysa onun cihazına gider."
+     },
+     {
+      "id": "famous",
+      "label": "Evet, organizatör tanınmış bir forumdansa",
+      "correct": false,
+      "feedback": "Tanınmış bir adı herkes yazabilir. Forumu resmî sitesinden kontrol edin."
+     }
+    ]
+   },
+   "explain": "Kod, girişi başlatan cihaza hesabınızın anahtarını verir. Girişi siz başlatmadıysanız kodu girmeyin."
+  },
+  {
+   "type": "recap",
+   "id": "ac2-recap",
+   "points": [
+    "Mesajla gelen bir kodu hiçbir giriş sayfasına girmeyin",
+    "Sayfa gerçek olsa bile girişi kimin başlattığını kontrol edin",
+    "Hata yaptıysanız hemen BT destek ekibine haber verin"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

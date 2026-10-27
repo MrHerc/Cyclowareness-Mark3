@@ -1,0 +1,558 @@
+{
+ "id": "drag-test",
+ "title": "Trageți fereastra",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "dt-tutor",
+   "beats": [
+    {
+     "id": "dt-b1",
+     "say": "Bună ziua! Unele site-uri deschid o fereastră mică în care vă conectați. Astăzi învățați să o recunoașteți pe cea falsă.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "dt-b2",
+     "say": "Escrocul desenează această fereastră în interiorul paginii, ca pe o imagine. Până și bara de adrese pare corectă.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "IshPocht: conectare"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "https://poct.idare.example/giris",
+          "spot": "fake-bar"
+         }
+        ],
+        [
+         {
+          "text": "Conectați-vă cu e-mailul de serviciu pentru a vedea documentul."
+         }
+        ]
+       ],
+       "buttons": [
+        "Conectați-vă",
+        "Anulați"
+       ]
+      }
+     },
+     "highlight": "fake-bar"
+    },
+    {
+     "id": "dt-b3",
+     "say": "Testul este simplu: apucați fereastra și trageți-o în afara browserului. O fereastră falsă nu poate ieși din pagină.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "dt-b4",
+     "say": "Dacă managerul de parole nu completează parola, opriți-vă. Deschideți o filă nouă și scrieți adresa chiar dumneavoastră.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "dt-swipe",
+   "prompt": "În care fereastră de conectare puteți avea încredere?",
+   "cards": [
+    {
+     "id": "edge-cut",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht: conectare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ați tras fereastra într-o parte."
+        }
+       ],
+       [
+        {
+         "text": "A ajuns la marginea paginii și a fost tăiată."
+        }
+       ]
+      ],
+      "buttons": [
+       "Conectați-vă"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O fereastră reală iese din browser și poate fi mutată oriunde pe ecran. Dacă este tăiată, este o imagine desenată în interiorul paginii."
+    },
+    {
+     "id": "moves-out",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht: conectare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ați tras fereastra într-o parte: a ieșit din browser și s-a mutat pe desktop."
+        }
+       ],
+       [
+        {
+         "text": "ParolSeyf a propus singur parola."
+        }
+       ]
+      ],
+      "buttons": [
+       "Conectați-vă"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Fereastra se mișcă separat de browser, iar managerul de parole recunoaște site-ul. Acestea sunt semnele unei ferestre reale."
+    },
+    {
+     "id": "no-fill",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Nu există nicio parolă salvată pentru acest site."
+        }
+       ],
+       [
+        {
+         "text": "Adresa scrisă în fereastră: poct.idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Închideți"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Managerul de parole verifică adresa reală a site-ului, nu textul din fereastră. Dacă nu găsește nicio parolă, site-ul este altul."
+    },
+    {
+     "id": "moves-along",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht: conectare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ați tras într-o parte chiar browserul."
+        }
+       ],
+       [
+        {
+         "text": "Fereastra de conectare s-a mutat odată cu el."
+        }
+       ]
+      ],
+      "buttons": [
+       "Conectați-vă"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O fereastră reală rămâne pe loc. Dacă se mișcă împreună cu browserul, face parte din pagină."
+    },
+    {
+     "id": "own-tab",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Filă nouă: poct.idare.example"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ați scris adresa chiar dumneavoastră."
+        }
+       ],
+       [
+        {
+         "text": "Managerul de parole a completat parola."
+        }
+       ]
+      ],
+      "buttons": [
+       "Conectați-vă"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Când scrieți adresa chiar dumneavoastră, o fereastră falsă nu are nicio șansă. Aceasta este metoda cea mai sigură."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "dt-sim",
+   "environment": "browser",
+   "title": "Documentul de licitație",
+   "intro": "Un furnizor v-a trimis un link către un document de licitație. Site-ul vă cere să vă conectați ca să vi-l arate. Procedați cu atenție.",
+   "steps": [
+    {
+     "id": "doc-page",
+     "label": "Document de licitație: achiziție de mobilier de birou",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tender-baza",
+      "url": [
+       {
+        "text": "https://tender-baza.example.net/sened/4471"
+       }
+      ]
+     },
+     "say": "Documentul este blocat. Site-ul vă propune să vă conectați cu contul de serviciu.",
+     "actions": [
+      {
+       "id": "open-login",
+       "label": "Conectați-vă cu IshPocht",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Apăsarea butonului nu este încă periculoasă. Adevăratul test este fereastra care se deschide acum."
+      },
+      {
+       "id": "check-address",
+       "label": "Verificați adresa",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Acesta este site-ul de licitații, nu poșta electronică de serviciu. Urmăriți foarte atent fereastra de conectare care se deschide în continuare."
+      },
+      {
+       "id": "close-tab",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "O alegere prudentă. Deschideți poșta electronică chiar dumneavoastră și cereți-i furnizorului documentul pe altă cale.",
+       "next": "own-tab"
+      }
+     ]
+    },
+    {
+     "id": "popup",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht: conectare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "https://poct.idare.example/giris"
+        }
+       ],
+       [
+        {
+         "text": "Conectați-vă cu e-mailul de serviciu pentru a vedea documentul."
+        }
+       ],
+       [
+        {
+         "text": "E-mail: aysel.quliyeva@idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Conectați-vă",
+       "Anulați"
+      ]
+     },
+     "say": "Fereastra arată adresa corectă. Dar asta nu dovedește încă nimic.",
+     "actions": [
+      {
+       "id": "drag",
+       "label": "Trageți fereastra în afara browserului",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Acesta este testul potrivit. Să vedem dacă fereastra poate ieși din browser."
+      },
+      {
+       "id": "autofill",
+       "label": "Completați cu ParolSeyf",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "O idee bună. Managerul de parole verifică adresa reală a site-ului.",
+       "next": "pm-check"
+      },
+      {
+       "id": "type-pass",
+       "label": "Introduceți parola și conectați-vă",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Bara de adrese din fereastră era doar o imagine. Parola dumneavoastră a ajuns la proprietarul site-ului de licitații.",
+       "next": "leaked"
+      },
+      {
+       "id": "cancel",
+       "label": "Anulați",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bine. Nu introduceți niciodată parola într-o fereastră care vă trezește îndoieli.",
+       "next": "own-tab"
+      }
+     ]
+    },
+    {
+     "id": "drag-result",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht: conectare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Fereastra a ajuns la marginea paginii și a fost tăiată."
+        }
+       ],
+       [
+        {
+         "text": "Nu a ieșit din browser."
+        }
+       ]
+      ],
+      "buttons": [
+       "Conectați-vă",
+       "Anulați"
+      ]
+     },
+     "say": "Fereastra a fost tăiată la marginea paginii. O fereastră reală nu face niciodată asta.",
+     "actions": [
+      {
+       "id": "close-it",
+       "label": "Închideți fereastra și fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. O fereastră care nu poate ieși din pagină este falsă, așa că nu scrieți nimic în ea.",
+       "next": "own-tab"
+      },
+      {
+       "id": "type-anyway",
+       "label": "Conectați-vă oricum",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Ați văzut deja că fereastra era falsă. Parola dumneavoastră a ajuns la escroc.",
+       "next": "leaked"
+      },
+      {
+       "id": "report",
+       "label": "Raportați site-ul suportului IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Suportul IT poate bloca site-ul și îi poate proteja și pe colegii dumneavoastră.",
+       "next": "own-tab"
+      }
+     ]
+    },
+    {
+     "id": "pm-check",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Nu există nicio parolă salvată pentru tender-baza.example.net."
+        }
+       ]
+      ],
+      "buttons": [
+       "Introduceți manual",
+       "Închideți"
+      ]
+     },
+     "say": "Managerul de parole nu a găsit nicio parolă pentru acest site.",
+     "actions": [
+      {
+       "id": "type-manual",
+       "label": "Introduceți parola manual",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Managerul de parole avea dreptate: acest site nu este poșta dumneavoastră. Parola introdusă a ajuns la escroc.",
+       "next": "leaked"
+      },
+      {
+       "id": "stop",
+       "label": "Opriți-vă și închideți fereastra",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Când managerul de parole nu completează parola, cel mai bine este să vă opriți."
+      }
+     ]
+    },
+    {
+     "id": "own-tab",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "IshPocht",
+      "url": [
+       {
+        "text": "https://poct.idare.example/giris"
+       }
+      ],
+      "fields": [
+       "E-mail de serviciu",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "say": "Ați scris adresa într-o filă nouă. Managerul de parole a completat parola.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Conectați-vă",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Corect. Când scrieți adresa chiar dumneavoastră, o fereastră falsă nu are nicio șansă.",
+       "next": "doc-page"
+      },
+      {
+       "id": "check",
+       "label": "Verificați adresa",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Aceasta este chiar poșta dumneavoastră de serviciu, iar managerul de parole a recunoscut-o. Vă puteți conecta în siguranță.",
+       "next": "doc-page"
+      }
+     ]
+    },
+    {
+     "id": "leaked",
+     "label": "Documentul nu a fost găsit",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tender-baza",
+      "url": [
+       {
+        "text": "https://tender-baza.example.net/sened/4471"
+       }
+      ]
+     },
+     "say": "Parola a fost furată, iar documentul nu s-a deschis deloc. Acum acționați repede.",
+     "actions": [
+      {
+       "id": "change-report",
+       "label": "Schimbați parola și sunați la suportul IT",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Schimbați parola într-o filă nouă și cereți suportului IT să închidă toate sesiunile deschise."
+      },
+      {
+       "id": "retry",
+       "label": "Conectați-vă din nou",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Site-ul vă colectează parola a doua oară. Este o capcană pentru parole, nu un document."
+      },
+      {
+       "id": "ignore",
+       "label": "Nu faceți nimic",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Cu această parolă, escrocul vă poate deschide deja poșta. Schimbați-o și raportați imediat."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "dt-order",
+   "prompt": "Ordonați pașii de urmat când o fereastră de conectare pare suspectă.",
+   "items": [
+    {
+     "id": "drag",
+     "label": "Trageți fereastra în afara browserului"
+    },
+    {
+     "id": "close",
+     "label": "Dacă nu poate ieși, închideți fereastra și fila"
+    },
+    {
+     "id": "own-tab",
+     "label": "Scrieți adresa într-o filă nouă și conectați-vă acolo"
+    },
+    {
+     "id": "report",
+     "label": "Raportați site-ul suportului IT"
+    }
+   ],
+   "explain": "Mai întâi testați, apoi închideți, apoi scrieți adresa chiar dumneavoastră. Raportați site-ul, ca să fie protejați și colegii."
+  },
+  {
+   "type": "recap",
+   "id": "dt-recap",
+   "points": [
+    "Trageți fereastra de conectare în afara browserului: una falsă nu poate ieși",
+    "Dacă managerul de parole nu completează parola, opriți-vă",
+    "Când aveți îndoieli, scrieți chiar dumneavoastră adresa într-o filă nouă"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

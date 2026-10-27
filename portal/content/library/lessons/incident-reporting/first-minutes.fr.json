@@ -1,0 +1,386 @@
+{
+ "id": "first-minutes",
+ "title": "Les premières minutes",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Les premières minutes sont décisives. L’attaquant est pressé, alors soyez plus rapide que lui.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Arrêtez-vous dès que quelque chose cloche : une connexion que vous ne reconnaissez pas, une fenêtre qui s’ouvre toute seule, des fichiers qui disparaissent.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "ispoct",
+       "app": "İşPoçt",
+       "title": [
+        {
+         "text": "Connexion depuis un nouvel appareil"
+        }
+       ],
+       "body": [
+        {
+         "text": "Quelqu’un s’est connecté à votre compte depuis "
+        },
+        {
+         "text": "Gandja, sur un appareil inconnu",
+         "spot": "place"
+        },
+        {
+         "text": ", à 03:12."
+        }
+       ],
+       "time": "08:31"
+      }
+     },
+     "highlight": "place"
+    },
+    {
+     "id": "b3",
+     "say": "En cas d’urgence, appelez le support technique ou l’équipe sécurité. L’e-mail peut attendre.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Si vous pensez que votre ordinateur est compromis, ne faites pas le signalement depuis celui-ci. L’attaquant peut lire votre messagerie, alors téléphonez plutôt.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "strange-morning",
+   "environment": "desktop",
+   "title": "Une matinée étrange",
+   "intro": "Le matin, vous allumez votre ordinateur et remarquez plusieurs choses étranges. Comment réagissez-vous à chacune ?",
+   "steps": [
+    {
+     "id": "new-login",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "İşPoçt",
+      "title": [
+       {
+        "text": "Connexion depuis un nouvel appareil"
+       }
+      ],
+      "body": [
+       {
+        "text": "Quelqu’un s’est connecté à votre compte depuis Gandja, sur un appareil inconnu, à 03:12."
+       }
+      ],
+      "time": "08:31"
+     },
+     "say": "Si cette connexion ne vient pas de vous, que faites-vous ?",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Ce n’était pas moi : signaler",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bonne réponse : une connexion inconnue signifie que quelqu’un a votre mot de passe. Un signalement rapide sauve le compte."
+      },
+      {
+       "id": "ignore",
+       "label": "Ignorer",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "L’attaquant est toujours dans votre compte et gagne du temps. Signalez immédiatement ce genre d’alerte."
+      }
+     ]
+    },
+    {
+     "id": "remote-request",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "texkomek-24",
+      "tone": "app",
+      "title": [
+       {
+        "text": "TexKomek 24 veut se connecter"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Un opérateur souhaite voir votre écran et prendre le contrôle de votre ordinateur."
+        }
+       ]
+      ],
+      "buttons": [
+       "Refuser",
+       "Autoriser"
+      ]
+     },
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Bonne réponse : vous n’avez pas demandé d’assistance. Signalez aussi ce genre de demande inattendue."
+      },
+      {
+       "id": "allow",
+       "label": "Autoriser",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "La personne à distance contrôle maintenant votre ordinateur. N’autorisez jamais une assistance que vous n’avez pas appelée vous-même."
+      },
+      {
+       "id": "report",
+       "label": "Refuser et signaler",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Une demande inattendue de prise en main à distance doit être signalée tout de suite."
+      }
+     ]
+    },
+    {
+     "id": "encrypted",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Vos fichiers sont chiffrés"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Payez sous 72 heures pour récupérer vos fichiers. Si vous éteignez l’ordinateur, les fichiers seront supprimés."
+        }
+       ]
+      ],
+      "buttons": [
+       "Page de paiement"
+      ]
+     },
+     "say": "Une demande de rançon s’affiche à l’écran. Que faites-vous en premier ?",
+     "actions": [
+      {
+       "id": "disconnect",
+       "label": "Débrancher le câble, couper le Wi-Fi",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Bonne réponse : couper la connexion arrête la propagation. Laissez l’ordinateur allumé et appelez tout de suite."
+      },
+      {
+       "id": "shutdown",
+       "label": "Éteindre l’ordinateur",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Éteindre l’ordinateur peut effacer des traces en mémoire. Sauf si votre procédure prévoit autre chose, coupez la connexion et laissez-le allumé."
+      },
+      {
+       "id": "pay",
+       "label": "Ouvrir la page de paiement",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Payer ne garantit pas de récupérer vos fichiers. Ne payez jamais, laissez la décision aux spécialistes."
+      }
+     ]
+    },
+    {
+     "id": "call-line",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "it-tehlukesizlik",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Ligne sécurité"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Incident urgent : +994 12 000 15 15"
+        }
+       ],
+       [
+        {
+         "text": "Non urgent : le bouton Signaler ou security@idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Plus tard",
+       "Appeler"
+      ]
+     },
+     "actions": [
+      {
+       "id": "call",
+       "label": "Appeler maintenant",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Signalez un incident urgent par téléphone : le spécialiste vous dit tout de suite quoi faire."
+      },
+      {
+       "id": "later",
+       "label": "Envoyer un e-mail demain",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Le chiffrement se propage et chaque minute compte. Cette messagerie n’est peut-être plus sûre non plus."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "who-to-tell",
+   "question": {
+    "prompt": "Un inconnu s’est connecté à votre compte. Qui prévenez-vous ?",
+    "options": [
+     {
+      "id": "security",
+      "label": "Le support technique ou l’équipe sécurité",
+      "correct": true,
+      "feedback": "Bonne réponse. Eux seuls peuvent verrouiller et vérifier le compte."
+     },
+     {
+      "id": "manager",
+      "label": "Mon responsable aussi",
+      "correct": true,
+      "feedback": "Bonne réponse. Votre responsable aide à organiser le travail, mais ne remplace pas le spécialiste."
+     },
+     {
+      "id": "colleagues",
+      "label": "Seulement les collègues de mon service",
+      "correct": false,
+      "feedback": "Vos collègues ne peuvent pas verrouiller le compte, et vous perdez du temps."
+     },
+     {
+      "id": "social",
+      "label": "Je le publie sur les réseaux sociaux pour que tout le monde soit au courant",
+      "correct": false,
+      "feedback": "Parler publiquement d’un incident aide l’attaquant et d’autres escrocs."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "badge-id"
+    }
+   },
+   "explain": "Le spécialiste règle le problème, votre responsable est informé, et personne d’autre n’a besoin de l’être."
+  },
+  {
+   "type": "match",
+   "id": "how-to-report",
+   "prompt": "Choisissez comment signaler chaque situation.",
+   "pairs": [
+    {
+     "id": "phish",
+     "left": "Un e-mail suspect est arrivé",
+     "right": "L’envoyer avec le bouton Signaler"
+    },
+    {
+     "id": "ransom",
+     "left": "Une demande de rançon s’affiche à l’écran",
+     "right": "Couper la connexion et téléphoner"
+    },
+    {
+     "id": "phone",
+     "left": "Le téléphone pro est perdu",
+     "right": "Appeler tout de suite pour qu’il soit verrouillé à distance"
+    },
+    {
+     "id": "misdirect",
+     "left": "Un fichier est parti à la mauvaise personne",
+     "right": "Prévenir votre responsable et l’équipe sécurité"
+    }
+   ],
+   "explain": "Si c’est urgent ou si cela se propage, téléphonez. Pour le reste, utilisez le bouton Signaler ou l’e-mail."
+  },
+  {
+   "type": "scenario",
+   "id": "colleague-says-wait",
+   "title": "Faut-il attendre ?",
+   "start": "window",
+   "nodes": [
+    {
+     "id": "window",
+     "text": "Ne t’inquiète pas, c’est sûrement une mise à jour. Pas la peine d’en faire toute une histoire.",
+     "speaker": "Tural (collègue), devant la fenêtre étrange",
+     "voice": "man-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Ne t’inquiète pas, euh, c’est sûrement une mise à jour. Pas la peine d’en faire toute une histoire.",
+     "choices": [
+      {
+       "label": "J’appelle quand même le support technique",
+       "next": "specialist",
+       "feedback": "Bonne réponse. Une fausse alerte n’est pas un problème, un signalement tardif, si."
+      },
+      {
+       "label": "J’attends, ça va peut-être passer",
+       "outcome": "risky",
+       "feedback": "Attendre laisse du temps à l’attaquant. En cas de doute, appelez."
+      }
+     ]
+    },
+    {
+     "id": "specialist",
+     "text": "Qu’avez-vous vu, et qu’avez-vous fait ?",
+     "speaker": "Support technique",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Qu’avez-vous vu <short pause> et qu’avez-vous fait ?",
+     "choices": [
+      {
+       "label": "Je vais à l’essentiel : quoi, quand, quel ordinateur, ce que j’ai fait",
+       "outcome": "safe",
+       "feedback": "Excellent. Avec des détails précis, le spécialiste peut agir tout de suite."
+      },
+      {
+       "label": "J’ai fermé la fenêtre, je ne me souviens plus",
+       "outcome": "risky",
+       "feedback": "Chaque détail compte. La prochaine fois, prenez l’écran en photo avec votre téléphone."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Quand quelque chose cloche, arrêtez-vous et signalez-le tout de suite.",
+    "En cas d’urgence, téléphonez. Ne signalez rien depuis un ordinateur suspect.",
+    "Une fausse alerte, ce n’est pas grave. Un retard, c’est dangereux."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

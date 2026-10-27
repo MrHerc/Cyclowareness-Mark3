@@ -60,7 +60,7 @@ export default async function ThreatsPage({ searchParams }: PageProps<"/admin/th
                   <Pill tone={STATUS_TONE[r.status]}>{tr(`statuses.${r.status}`)}</Pill>
                 </div>
                 {r.url ? (
-                  <p className="flex items-center gap-2 rounded-md bg-sunken px-3 py-2 font-mono text-caption break-all">
+                  <p dir="ltr" className="flex items-center gap-2 rounded-md bg-sunken px-3 py-2 font-mono text-caption break-all">
                     <Link2 className="size-4 shrink-0 text-ink-subtle" />
                     {defang(r.url)}
                   </p>

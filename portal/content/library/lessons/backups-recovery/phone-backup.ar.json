@@ -1,0 +1,478 @@
+{
+ "id": "phone-backup",
+ "title": "النسخ الاحتياطي للجوال",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "br2-tutor",
+   "beats": [
+    {
+     "id": "br2-b1",
+     "say": "عندما يضيع الجوال، تكون الخسارة الكبرى غالبًا صور العائلة. وحمايتها لا تستغرق سوى دقائق قليلة.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "br2-b2",
+     "say": "إذا رأيت إشعارًا كهذا، فصور الأشهر الأخيرة ليست لها أي نسخة.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2f-telefon-ayarlari",
+       "app": "الإعدادات",
+       "title": [
+        {
+         "text": "النسخ الاحتياطي متوقف"
+        }
+       ],
+       "body": [
+        {
+         "text": "آخر نسخة احتياطية: قبل 143 يومًا",
+         "spot": "days"
+        }
+       ],
+       "time": "21:10"
+      }
+     },
+     "highlight": "days"
+    },
+    {
+     "id": "br2-b3",
+     "say": "لكن انتبه: الرسالة التي تقول إن مساحة التخزين ممتلئة وإن صورك سيتم حذفها من حيل الاحتيال المفضلة.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "buludxidmet-fake",
+       "sender": [
+        {
+         "text": "BuludXidmet"
+        }
+       ],
+       "time": "10:02",
+       "messages": [
+        [
+         {
+          "text": "مساحة التخزين لديك ممتلئة. سيتم حذف صورك خلال 24 ساعة."
+         }
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "id": "br2-b4",
+     "say": "فعل النسخ الاحتياطي من إعدادات الجوال نفسه، ثم استعد صورة واحدة للتأكد من أنه يعمل.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "br2-order",
+   "prompt": "اضبط النسخ الاحتياطي على جوالك. رتب الخطوات بالترتيب الصحيح.",
+   "items": [
+    {
+     "id": "turn-on",
+     "label": "فعل النسخ الاحتياطي التلقائي في «الإعدادات»"
+    },
+    {
+     "id": "first-run",
+     "label": "اتصل بشبكة Wi-Fi وأوصل الجوال بالشاحن، ثم انتظر اكتمال أول نسخة احتياطية"
+    },
+    {
+     "id": "check-date",
+     "label": "تأكد من أن تاريخ آخر نسخة احتياطية هو اليوم"
+    },
+    {
+     "id": "test-restore",
+     "label": "افتح صورة واحدة على جهاز آخر لاختبار الاستعادة"
+    }
+   ],
+   "explain": "النسخة الاحتياطية لا تفيد إلا إذا كانت تعمل، لذا تحقق من التاريخ واستعد صورة واحدة. واحم الحساب السحابي بالتحقق بخطوتين أيضًا."
+  },
+  {
+   "type": "hotspot",
+   "id": "br2-hotspot",
+   "prompt": "ابحث عن علامات الاحتيال في هذه الرسالة.",
+   "artifact": {
+    "kind": "sms",
+    "brandRef": "buludxidmet-fake",
+    "sender": [
+     {
+      "text": "BuludXidmet"
+     }
+    ],
+    "time": "10:02",
+    "messages": [
+     [
+      {
+       "text": "مساحة التخزين لديك ممتلئة بنسبة 100%.",
+       "spot": "full"
+      }
+     ],
+     [
+      {
+       "text": "سيتم حذف جميع صورك خلال 24 ساعة.",
+       "spot": "deadline"
+      }
+     ],
+     [
+      {
+       "text": "قم بترقية باقتك مقابل 1.99 AZN فقط: ",
+       "spot": "small-fee"
+      },
+      {
+       "text": "buludxidmet-plan.example.info",
+       "spot": "link"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "full",
+     "label": "مساحة تخزين ممتلئة",
+     "explain": "عندما تمتلئ مساحة التخزين، تتوقف النسخ الاحتياطية الجديدة، لكن الصور القديمة تبقى ولا يتم حذفها فورًا. تحقق من مساحة التخزين بنفسك في إعدادات الجوال."
+    },
+    {
+     "id": "deadline",
+     "label": "المهلة",
+     "explain": "الخوف والمهلة يدفعانك إلى الدفع دون تفكير."
+    },
+    {
+     "id": "small-fee",
+     "label": "مبلغ صغير",
+     "explain": "المبلغ الصغير يضعف حذرك. والهدف الحقيقي بيانات بطاقتك."
+    },
+    {
+     "id": "link",
+     "label": "نطاق غريب",
+     "explain": "هذا ليس نطاق الخدمة السحابية. لا تغير باقتك إلا من إعدادات الجوال."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "br2-sim",
+   "environment": "phone",
+   "title": "أين صورك؟",
+   "intro": "على جوالك بعض الإشعارات. اختر لكل منها الخطوة التي تحمي صورك.",
+   "steps": [
+    {
+     "id": "backup-off",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-telefon-ayarlari",
+      "app": "الإعدادات",
+      "title": [
+       {
+        "text": "النسخ الاحتياطي متوقف"
+       }
+      ],
+      "body": [
+       {
+        "text": "آخر نسخة احتياطية: قبل 143 يومًا. هل تريد تفعيله الآن؟"
+       }
+      ],
+      "time": "21:10"
+     },
+     "actions": [
+      {
+       "id": "turn-on",
+       "label": "تفعيل النسخ الاحتياطي",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "صحيح. من الآن فصاعدًا، سيتم نسخ الصور تلقائيًا كل ليلة."
+      },
+      {
+       "id": "later",
+       "label": "لاحقًا",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "إذا ضاع الجوال اليوم، فستضيع معه صور خمسة أشهر. فعل النسخ الاحتياطي الآن."
+      }
+     ]
+    },
+    {
+     "id": "storage-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "buludxidmet-fake",
+      "sender": [
+       {
+        "text": "BuludXidmet"
+       }
+      ],
+      "time": "10:02",
+      "messages": [
+       [
+        {
+         "text": "مساحة التخزين لديك ممتلئة. سيتم حذف صورك خلال 24 ساعة. قم بترقية باقتك: "
+        },
+        {
+         "text": "buludxidmet-plan.example.info",
+         "link": {
+          "label": "buludxidmet-plan.example.info",
+          "href": "https://buludxidmet-plan.example.info/odenis"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "في الصباح، تصلك رسالة كهذه.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "فتح الرابط",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "الرابط لا يؤدي إلى موقع الخدمة السحابية. لا تتحقق من مساحة التخزين إلا في إعدادات الجوال.",
+       "next": "card-page"
+      },
+      {
+       "id": "report",
+       "label": "الإبلاغ عن رسالة غير مرغوب فيها",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "أحسنت. هذه رسالة مزيفة، فالخدمة الحقيقية لا تهدد بحذف صورك خلال يوم واحد.",
+       "next": "free-app"
+      },
+      {
+       "id": "delete",
+       "label": "حذف",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "صحيح. تحقق من مساحة التخزين بنفسك في الإعدادات.",
+       "next": "free-app"
+      }
+     ]
+    },
+    {
+     "id": "card-page",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "buludxidmet-fake",
+      "brand": "BuludXidmət",
+      "url": [
+       {
+        "text": "https://buludxidmet-plan.example.info/odenis"
+       }
+      ],
+      "fields": [
+       "رقم البطاقة",
+       "تاريخ الانتهاء",
+       "CVV"
+      ],
+      "button": "دفع 1.99 AZN"
+     },
+     "actions": [
+      {
+       "id": "pay",
+       "label": "دفع 1.99 AZN",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "وصلت بيانات بطاقتك إلى المحتال. اتصل فورًا بالبنك على الرقم المطبوع خلف البطاقة، واطلب إيقافها."
+      },
+      {
+       "id": "close",
+       "label": "إغلاق الصفحة",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "من الجيد أنك توقفت. لا تتحقق من باقة التخزين إلا في إعدادات الجوال."
+      }
+     ]
+    },
+    {
+     "id": "free-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2f-foto-ehtiyat",
+      "app": "Foto Ehtiyat Pulsuz",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "الصور ومقاطع الفيديو"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "جهات الاتصال"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "رسائل SMS"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "سجل المكالمات"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "وجدت في المتجر تطبيقًا مجانيًا للنسخ الاحتياطي.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "رفض",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "صحيح، فالنسخ الاحتياطي للصور لا يحتاج إلى الوصول إلى الرسائل النصية أو جهات الاتصال. والنسخ الاحتياطي المدمج في الجوال يكفي."
+      },
+      {
+       "id": "allow",
+       "label": "السماح",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "بالوصول إلى الرسائل النصية، يستطيع التطبيق قراءة الرموز التي يرسلها البنك. احذف تطبيقًا كهذا فورًا."
+      }
+     ]
+    },
+    {
+     "id": "lost-phone",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-telefon-ayarlari",
+      "app": "الإعدادات",
+      "title": [
+       {
+        "text": "هل تريد الاستعادة من النسخة الاحتياطية؟"
+       }
+      ],
+      "body": [
+       {
+        "text": "آخر نسخة احتياطية: أمس 02:10. الصور: 4,812"
+       }
+      ],
+      "time": "19:45"
+     },
+     "say": "بعد شهر، يضيع الجوال في المترو. فتسجل الدخول على جوال جديد.",
+     "actions": [
+      {
+       "id": "restore",
+       "label": "استعادة",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "أحسنت. لأن النسخ الاحتياطي كان مفعلًا، فصور العائلة كلها موجودة."
+      },
+      {
+       "id": "fresh",
+       "label": "الإعداد كجوال جديد",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "عندها لن تنتقل الصور إلى الجوال الجديد. استعدها من النسخة الاحتياطية."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "br2-scenario",
+   "title": "ضاع الجوال",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "في المساء، فقدت جوالك في المترو. ما أول ما تفعله عند وصولك إلى المنزل؟",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     },
+     "choices": [
+      {
+       "label": "أقفل الجوال من جهاز آخر، وأتحقق من مكانه",
+       "next": "n2",
+       "feedback": "صحيح. القفل يمنع من يجد الجوال من الوصول إلى صورك وحساباتك."
+      },
+      {
+       "label": "أنتظر حتى الصباح، فربما يتصل بي أحد",
+       "outcome": "risky",
+       "feedback": "حساباتك في خطر ما دام الجوال غير مقفل. أقفله فورًا."
+      },
+      {
+       "label": "أنشر رقمي وعنواني على وسائل التواصل الاجتماعي",
+       "outcome": "risky",
+       "feedback": "البيانات الشخصية تمنح المحتالين فرصة جديدة. أقفل الجوال أولًا."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "لم يعثر أحد على الجوال. وفي اليوم التالي تصلك رسالة نصية: «تم العثور على جوالك، سجل الدخول لتراه».",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "+994 50 000 64 18"
+        }
+       ],
+       "time": "11:20",
+       "messages": [
+        [
+         {
+          "text": "تم العثور على جوالك. سجل الدخول إلى حسابك لترى مكانه: cihaz-tap.example.info"
+         }
+        ]
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "أفتح الرابط وأسجل الدخول",
+       "outcome": "compromised",
+       "feedback": "هذا الفخ يستهدف من فقدوا جوالاتهم. وكلمة مرور حسابك تذهب مباشرة إلى المحتال."
+      },
+      {
+       "label": "لا أفتحه، وأستعيد بيانات الجوال الجديد من النسخة الاحتياطية",
+       "outcome": "safe",
+       "feedback": "أحسنت. الصور في أمان داخل النسخة الاحتياطية، ولا يمكن الوثوق برسالة كهذه."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "br2-recap",
+   "points": [
+    "فعل النسخ الاحتياطي التلقائي على جوالك.",
+    "استعد صورة واحدة للتحقق منه.",
+    "«مساحة التخزين ممتلئة»؟ تحقق من الإعدادات، لا من الرابط."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

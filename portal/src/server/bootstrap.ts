@@ -1,5 +1,5 @@
 import "server-only";
-import { and, eq, ne, sql } from "drizzle-orm";
+import { and, eq, gt, isNull, ne, sql } from "drizzle-orm";
 import { db, dbHandle, t, type DB } from "./db";
 import { env } from "./env";
 import { CONTENT_SYNC_LOCK_KEY, syncLibrary, syncPaths } from "./services/library";
@@ -17,8 +17,8 @@ import { DEFAULT_LOCALE } from "../i18n/config";
  *     image therefore brings its content changes with it.
  *  2. With BOOTSTRAP_OPERATOR_EMAIL set and no platform operator yet, the platform organisation and
  *     its operator (status "invited", no password) are created and a one-time invitation link is
- *     printed to the server log. While that operator has not activated the account, every start
- *     prints a fresh link.
+ *     printed to the server log, once. Later starts print a new link only when that one has expired
+ *     unused, so the log never holds more than one working link.
  *
  * Several replicas starting together take turns on a PostgreSQL advisory lock; the import runs in
  * one transaction, so a failed import changes nothing and stops the start (the container restarts).
@@ -92,12 +92,21 @@ export async function bootstrap(): Promise<void> {
   const pending = await locked(async (tx) => {
     const lib = await syncLibrary(tx);
     const paths = await syncPaths(tx);
-    console.info(`[bootstrap] library synced: ${lib.modules} modules, ${lib.lessons} lessons (texts: en ${lib.locales.en}, az ${lib.locales.az}, ru ${lib.locales.ru}), ${paths} paths.`);
+    console.info(`[bootstrap] library synced: ${lib.modules} modules, ${lib.lessons} lessons (texts: ${Object.entries(lib.locales).map(([l, n]) => `${l} ${n}`).join(", ")}), ${paths} paths.`);
     return email ? ensureOperator(tx, email) : null;
   });
   // After the commit: the link's token row refers to the operator created above.
   if (pending && email) {
+    const [live] = await db()
+      .select({ expiresAt: t.authTokens.expiresAt })
+      .from(t.authTokens)
+      .where(and(eq(t.authTokens.userId, pending), eq(t.authTokens.kind, "invite"), isNull(t.authTokens.usedAt), gt(t.authTokens.expiresAt, new Date())))
+      .limit(1);
+    if (live) {
+      console.info(`[bootstrap] ${email}: the operator password is not set yet. Use the one-time link printed when it was issued; it works until ${live.expiresAt.toISOString()}, and a start after that prints a new one.`);
+      return;
+    }
     const link = await issueAccountLink(pending, "invite");
-    console.info(`[bootstrap] ${email}: set the operator password with this one-time link (valid 14 days, keep it private): ${link}`);
+    console.info(`[bootstrap] ${email}: set the operator password with this one-time link (valid 14 days, printed only this once, keep it private): ${link}`);
   }
 }

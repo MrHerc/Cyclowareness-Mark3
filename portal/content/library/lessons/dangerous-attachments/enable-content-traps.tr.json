@@ -1,0 +1,468 @@
+{
+ "id": "enable-content-traps",
+ "title": "Düzenleme ve makro tuzakları",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ec-tutor",
+   "beats": [
+    {
+     "id": "ec-b1",
+     "say": "İnternetten gelen bir belge önce Korumalı Görünüm'de, salt okunur olarak açılır. Bu sizin kalkanınızdır.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "ec-b2",
+     "say": "Boş bir sayfada böyle bir yazı görürseniz durun. Gerçek bir belge sizden düğmelere basmanızı istemez.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "senedyaz",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Korumalı Görünüm: bu dosya internetten geldi"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Belge boş, yalnızca bir resim görünüyor:"
+         }
+        ],
+        [
+         {
+          "text": "“Metni görmek için önce ‘Düzenlemeyi Etkinleştir’, ardından ‘İçeriği Etkinleştir’ düğmesine tıklayın.”",
+          "spot": "lure"
+         }
+        ]
+       ],
+       "buttons": [
+        "Düzenlemeyi Etkinleştir",
+        "Kapat"
+       ]
+      }
+     },
+     "highlight": "lure"
+    },
+    {
+     "id": "ec-b3",
+     "say": "Makro, belgenin içine gizlenmiş bir komuttur. Bilgisayara zararlı yazılım yükleyebilir.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "ec-b4",
+     "say": "Bir belgeyi açmak için bir web sitesinden özel bir görüntüleyici indirmenizi isteyen teklifleri de asla kabul etmeyin.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ec-sim-doc",
+   "environment": "desktop",
+   "title": "Belge açılıyor",
+   "intro": "“İhale şartnamesi” adlı bir eki açtınız. Her pencereyi okuyun ve her adımda karar verin.",
+   "steps": [
+    {
+     "id": "protected-view",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedyaz",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Korumalı Görünüm: bu dosya internetten geldi"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Belge boş, yalnızca bir resim görünüyor:"
+        }
+       ],
+       [
+        {
+         "text": "“Metni görmek için önce ‘Düzenlemeyi Etkinleştir’, ardından ‘İçeriği Etkinleştir’ düğmesine tıklayın.”",
+         "spot": "lure"
+        }
+       ]
+      ],
+      "buttons": [
+       "Düzenlemeyi Etkinleştir",
+       "Kapat"
+      ]
+     },
+     "say": "Belge boş ve sizden tıklamanızı istiyor.",
+     "actions": [
+      {
+       "id": "enable",
+       "label": "Düzenlemeyi Etkinleştir",
+       "kind": "enable-content",
+       "outcome": "risky",
+       "feedback": "Korumalı Görünüm'den çıktınız. Bu mod, tam da böyle dosyalardan sizi korumak için var."
+      },
+      {
+       "id": "close",
+       "label": "Belgeyi kapat",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. Tıklamanızı isteyen boş bir sayfa tuzaktır.",
+       "next": "it-alert"
+      },
+      {
+       "id": "report",
+       "label": "BT güvenlik ekibine bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Harika. Düzenlemeyi etkinleştirmeden bildirdiniz.",
+       "next": "it-alert"
+      }
+     ]
+    },
+    {
+     "id": "macro-blocked",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedyaz",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Güvenlik riski: makrolar engellendi"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Dosya internetten geldiği için bu belgedeki makrolar engellendi."
+        }
+       ],
+       [
+        {
+         "text": "Belgede şöyle yazıyor: “Dosyanın özelliklerinden engellemeyi kaldırın ve makrolara izin verin.”",
+         "spot": "unblock"
+        }
+       ]
+      ],
+      "buttons": [
+       "Daha Fazla Bilgi",
+       "Kapat"
+      ]
+     },
+     "say": "Uygulama makroları engelledi. Belge ise sizden bu engeli kaldırmanızı istiyor.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Engeli kaldır ve makrolara izin ver",
+       "kind": "enable-content",
+       "outcome": "compromised",
+       "feedback": "Gizli makro çalıştı ve zararlı yazılım yükledi. Hemen ağ bağlantısını kesin ve BT güvenlik ekibini arayın."
+      },
+      {
+       "id": "close",
+       "label": "Belgeyi kapat",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Zamanında durdunuz. Uygulama sizi korudu, siz de bu korumayı aşmadınız."
+      }
+     ]
+    },
+    {
+     "id": "it-alert",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "it-destek",
+      "app": "BT Destek",
+      "title": [
+       {
+        "text": "Uyarı: sahte ihale belgeleri"
+       }
+      ],
+      "body": [
+       {
+        "text": "Zararlı “ihale şartnamesi” belgeleri yayılıyor. Size de geldiyse bildirin."
+       }
+      ],
+      "time": "11:02"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "E-postayı bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru. Bildirmeniz sayesinde BT ekibi e-postayı tüm posta kutularından kaldırabilir."
+      },
+      {
+       "id": "ignore",
+       "label": "Yok say",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Dosyayı kapattınız, ama e-posta hâlâ duruyor. İş arkadaşlarınız açmasın diye bildirin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ec-sim-viewer",
+   "environment": "browser",
+   "title": "Sahte PDF görüntüleyici",
+   "intro": "Bir e-postadaki bağlantı, belgeyi açmak için bir program öneriyor. Ne yaparsınız?",
+   "steps": [
+    {
+     "id": "viewer-page",
+     "label": "Bu belgeyi görüntülemek için Sənəd Oxu uygulamasını güncelleyin",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "senedoxu-fake",
+      "url": [
+       {
+        "text": "https://senedoxu-yenile.example.net/bax"
+       }
+      ]
+     },
+     "say": "Adres çubuğuna bakın.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "İndir ve yükle",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Sahte görüntüleyici zararlı yazılımdır. Tarayıcınız PDF dosyalarını kendisi açabilir."
+      },
+      {
+       "id": "close",
+       "label": "Sekmeyi kapat",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. Programlar yalnızca BT ekibi tarafından ya da kurumunuzun yazılım merkezinden yüklenir."
+      },
+      {
+       "id": "report",
+       "label": "Siteyi bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Harika. Siteyi bildirmek iş arkadaşlarınızı da korur."
+      }
+     ]
+    },
+    {
+     "id": "viewer-download",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "senedoxu-fake",
+      "name": [
+       {
+        "text": "SenedOxu_Yenileme.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "5,7 MB",
+      "source": [
+       {
+        "text": "senedoxu-yenile.example.net"
+       }
+      ]
+     },
+     "say": "İndirme kendiliğinden başladı. Dosya türünü kontrol edin.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Aç",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Bu, sahte bir siteden gelen bir program. Açarsanız bilgisayara zararlı yazılım bulaşır."
+      },
+      {
+       "id": "delete",
+       "label": "Sil",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Doğru. İstemediğiniz bir indirmeyi açmadan silin."
+      },
+      {
+       "id": "report",
+       "label": "BT'ye bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Harika. BT ekibi bu siteyi herkes için engelleyebilir."
+      }
+     ]
+    },
+    {
+     "id": "portal-pdf",
+     "label": "Telimat_2026.pdf",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "idare",
+      "url": [
+       {
+        "text": "https://portal.idare.example/senedler/telimat-2026.pdf"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Belgeyi aç",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Doğru. Kurum içi portal, dosya tarayıcıda açılıyor, hiçbir şey yüklemeniz gerekmiyor."
+      },
+      {
+       "id": "report",
+       "label": "Siteyi bildir",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Bu, kurumunuzun kendi portalı ve hiçbir şey yüklemenizi istemiyor. Bildirmeyi şüpheli durumlar için kullanın."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ec-hotspot",
+   "prompt": "Bu e-postadaki tuzak işaretlerini bulun.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "docusfera-fake",
+    "from": {
+     "name": [
+      {
+       "text": "DocuSfera"
+      }
+     ],
+     "address": [
+      {
+       "text": "imza@docusfera-sened.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "İmzanızı bekleyen sözleşme"
+     }
+    ],
+    "time": "15:47",
+    "body": [
+     [
+      {
+       "text": "Belge eski bir formatta oluşturulmuştur."
+      }
+     ],
+     [
+      {
+       "text": "Görüntülemek için önce “Düzenlemeyi Etkinleştir”, ardından “İçeriği Etkinleştir” düğmesine tıklayınız.",
+       "spot": "enable"
+      }
+     ],
+     [
+      {
+       "text": "Belge açılmazsa görüntüleyicinizi buradan güncelleyiniz: ",
+       "spot": "viewer"
+      },
+      {
+       "text": "Sənəd Oxu uygulamasını indir",
+       "spot": "viewer",
+       "link": {
+        "label": "Sənəd Oxu",
+        "href": "https://senedoxu-yenile.example.net/yukle"
+       }
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Muqavile_imza.xlsm",
+        "spot": "macro"
+       }
+      ],
+      "size": "210 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Farklı alan adı",
+     "explain": "Adres, imza hizmetinin adını kullanıyor ama alan adı farklı. Bildirin."
+    },
+    {
+     "id": "enable",
+     "label": "Etkinleştirme talebi",
+     "explain": "Gerçek bir belge, düzenlemeyi ya da makroları etkinleştirmeden de okunabilir."
+    },
+    {
+     "id": "macro",
+     "label": "Makrolu dosya",
+     "explain": "Uzantısı “m” ile biten bir Office dosyası (xlsm, docm) makro içerebilir."
+    },
+    {
+     "id": "viewer",
+     "label": "Program indirme bağlantısı",
+     "explain": "Bir belgeyi açmak için özel bir program istenmesi, sahte görüntüleyici belirtisidir."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "ec-order",
+   "prompt": "Bir belge makroları etkinleştirmenizi istiyor. Adımları doğru sıraya koyun.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Hiçbir düğmeye basmayın"
+    },
+    {
+     "id": "close",
+     "label": "Belgeyi kapatın"
+    },
+    {
+     "id": "report",
+     "label": "E-postayı BT güvenlik ekibine bildirin"
+    },
+    {
+     "id": "verify",
+     "label": "Belgeyi bekliyorsanız göndereni bildiğiniz bir numaradan arayıp sorun"
+    }
+   ],
+   "explain": "Önce durun ve belgeyi kapatın, sonra bildirin. Göndereni yalnızca zaten bildiğiniz bir numaradan arayarak kontrol edin."
+  },
+  {
+   "type": "recap",
+   "id": "ec-recap",
+   "points": [
+    "Tıklamanızı isteyen boş bir belge tuzaktır",
+    "Düzenlemeyi ya da makroları etkinleştirmeyin: kapatın ve bildirin",
+    "Belge açmak için bir siteden asla program indirmeyin"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

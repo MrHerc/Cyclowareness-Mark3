@@ -63,7 +63,7 @@ export default async function LoopPage({ params }: PageProps<"/admin/loops/[id]"
         <Card>
           <CardHeader title={tr("timeline")} />
           <CardBody className="pt-3">
-            <ol className="relative grid gap-4 before:absolute before:top-2 before:bottom-2 before:left-[0.45rem] before:w-px before:bg-line">
+            <ol className="relative grid gap-4 before:absolute before:top-2 before:bottom-2 before:start-[0.45rem] before:w-px before:bg-line">
               {events.map((e) => (
                 <li key={e.id} className="relative flex gap-3">
                   <span className="z-10 mt-1 size-[0.95rem] shrink-0 rounded-full border-2 border-surface bg-brand-500 ring-1 ring-brand-200" />

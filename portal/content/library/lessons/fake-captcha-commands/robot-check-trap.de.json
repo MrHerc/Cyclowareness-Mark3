@@ -1,0 +1,514 @@
+{
+ "id": "robot-check-trap",
+ "title": "Der Roboter-Check",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fc1-tutor",
+   "beats": [
+    {
+     "id": "fc1-b1",
+     "say": "Hallo! Heute lernen Sie, gefälschte Seiten zu erkennen, die sich als Roboter-Check ausgeben.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "fc1-b2",
+     "say": "Eine solche Seite gibt Ihnen drei Schritte vor: Tasten drücken, einen Text einfügen, bestätigen.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-xezer-forum-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Bestätigen Sie, dass Sie ein Mensch sind"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "1. Drücken Sie die angezeigten Tasten gleichzeitig."
+         }
+        ],
+        [
+         {
+          "text": "2. Fügen Sie den kopierten Text ein.",
+          "spot": "paste"
+         }
+        ],
+        [
+         {
+          "text": "3. Drücken Sie die Eingabetaste."
+         }
+        ]
+       ],
+       "buttons": [
+        "Ich bin kein Roboter"
+       ]
+      }
+     },
+     "highlight": "paste"
+    },
+    {
+     "id": "fc1-b3",
+     "say": "Eine echte Prüfung verlangt nie, dass Sie über die Tastatur einen Befehl eingeben.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "fc1-b4",
+     "say": "Die Regel lautet: Geben Sie nichts ein, was eine Website Ihnen vorschreibt, und schließen Sie die Seite.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fc1-hotspot",
+   "prompt": "Finden Sie die Warnsignale auf dieser Seite.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2a-xezer-forum-fake",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Bestätigen Sie, dass Sie ein Mensch sind"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Um fortzufahren, führen Sie die folgenden Schritte aus:"
+      }
+     ],
+     [
+      {
+       "text": "1. Drücken Sie die Tasten auf Ihrer Tastatur, die ein Fenster öffnen.",
+       "spot": "keys"
+      }
+     ],
+     [
+      {
+       "text": "2. Fügen Sie den kopierten Text in das Feld ein.",
+       "spot": "paste"
+      }
+     ],
+     [
+      {
+       "text": "3. Bestätigen Sie mit der Eingabetaste.",
+       "spot": "enter"
+      }
+     ],
+     [
+      {
+       "text": "Diese Prüfung ist nötig, um Bots zu erkennen.",
+       "spot": "excuse"
+      }
+     ]
+    ],
+    "buttons": [
+     "Ich bin kein Roboter"
+    ]
+   },
+   "spots": [
+    {
+     "id": "keys",
+     "label": "Tasten drücken",
+     "explain": "Eine echte Prüfung verlangt nie, dass Sie Tasten auf der Tastatur drücken. Auf diese Weise wird ein versteckter Befehl ausgeführt."
+    },
+    {
+     "id": "paste",
+     "label": "Einfügen",
+     "explain": "Der Text, den Sie einfügen, ist in Wahrheit ein versteckter Befehl. Fügen Sie nie etwas ein, nur weil eine Website es verlangt."
+    },
+    {
+     "id": "enter",
+     "label": "Die Eingabetaste",
+     "explain": "Sobald Sie bestätigen, wird der Befehl ausgeführt und Schadsoftware installiert. Führen Sie diesen Schritt nicht aus."
+    },
+    {
+     "id": "excuse",
+     "label": "Ein Vorwand",
+     "explain": "Die Bot-Erkennung ist nur ein Vorwand. Bei einer echten Prüfung wählen Sie Bilder aus oder klicken ein Kästchen an."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "simulation",
+   "id": "fc1-sim",
+   "environment": "browser",
+   "title": "Auf der Website des Forums",
+   "intro": "Auf der Website einer Konferenz stoßen Sie auf mehrere Prüfungen. Wählen Sie jeweils den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "clickfix",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Bestätigen Sie, dass Sie ein Mensch sind"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Um fortzufahren, drücken Sie die angezeigten Tasten und fügen Sie den Text ein."
+        }
+       ]
+      ],
+      "buttons": [
+       "Starten",
+       "Schließen"
+      ]
+     },
+     "say": "Die Seite fordert Sie auf, Tasten zu drücken und etwas einzufügen.",
+     "actions": [
+      {
+       "id": "close",
+       "label": "Seite schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine Prüfung, bei der Sie einen Befehl eingeben sollen, ist gefälscht. Die Seite zu schließen, ist der richtige Schritt."
+      },
+      {
+       "id": "do",
+       "label": "Die Schritte befolgen",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Der versteckte Befehl, den Sie eingefügt haben, hat Schadsoftware installiert. Befolgen Sie solche Schritte nie."
+      },
+      {
+       "id": "report",
+       "label": "Dem IT-Support melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Guter Schritt. Wenn Sie dem IT-Support diese Seite zeigen, schützen Sie auch Ihre Kolleginnen und Kollegen."
+      }
+     ]
+    },
+    {
+     "id": "real-captcha",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Bilder auswählen"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Wählen Sie alle Bilder mit Ampeln aus, um zu zeigen, dass Sie kein Roboter sind."
+        }
+       ]
+      ],
+      "buttons": [
+       "Bestätigen",
+       "Aktualisieren"
+      ]
+     },
+     "say": "Das ist eine gewöhnliche Bilderprüfung.",
+     "actions": [
+      {
+       "id": "complete",
+       "label": "Bilder auswählen und bestätigen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. So sieht eine echte Prüfung aus: Bilder auswählen oder ein Kästchen anklicken."
+      },
+      {
+       "id": "close",
+       "label": "Seite schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Auch das ist in Ordnung. Wenn Sie nicht weitermachen möchten, können Sie die Seite einfach schließen."
+      },
+      {
+       "id": "report",
+       "label": "Als Angriff melden",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Diese Prüfung ist sicher, Sie müssen sie nicht melden. Gefälscht sind nur Prüfungen, die Befehle verlangen."
+      }
+     ]
+    },
+    {
+     "id": "fix-pdf",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedoxu-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Das Dokument lässt sich nicht öffnen"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Das PDF konnte nicht angezeigt werden. Kopieren Sie zur Behebung den folgenden Befehl und führen Sie ihn aus."
+        }
+       ],
+       [
+        {
+         "text": "[von der Website kopierter, unbekannter Text]"
+        }
+       ]
+      ],
+      "buttons": [
+       "Beheben",
+       "Schließen"
+      ]
+     },
+     "say": "Diese Seite gibt Ihnen einen Befehl, mit dem sich angeblich ein Dokument öffnen lässt.",
+     "actions": [
+      {
+       "id": "close",
+       "label": "Seite schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine Seite, die behauptet, ein Dokument lasse sich nicht öffnen, ist dieselbe Falle. Schließen Sie sie."
+      },
+      {
+       "id": "fix",
+       "label": "Befehl ausführen",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Dieser Befehl hat Schadsoftware auf dem Computer installiert. Trauen Sie keiner Seite, die behauptet, ein Dokument lasse sich nicht öffnen."
+      },
+      {
+       "id": "report",
+       "label": "Dem IT-Support melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Gute Wahl. Der IT-Support kann die Seite prüfen und andere warnen."
+      }
+     ]
+    },
+    {
+     "id": "fix-meeting",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-gorus-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Meeting-Fehler"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Um am Meeting teilzunehmen, führen Sie diesen Befehl aus und laden Sie dann die Seite neu."
+        }
+       ]
+      ],
+      "buttons": [
+       "Befehl ausführen",
+       "Schließen"
+      ]
+     },
+     "say": "Jetzt heißt es, die Meeting-App habe einen Fehler.",
+     "actions": [
+      {
+       "id": "close",
+       "label": "Seite schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine Meeting-App verlangt nie, dass Sie einen Befehl ausführen. Auch das ist eine Falle."
+      },
+      {
+       "id": "fix",
+       "label": "Befehl ausführen",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Der Befehl hat Schadsoftware gestartet. Hinter jedem Befehl, der angeblich einen Fehler behebt, steckt derselbe Trick."
+      },
+      {
+       "id": "report",
+       "label": "Dem IT-Support melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Wenn Sie solche gefälschten Fehlerseiten dem IT-Support melden, hilft das allen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "fc1-swipe",
+   "prompt": "Ist diese Prüfung echt oder eine Falle?",
+   "cards": [
+    {
+     "id": "image-captcha",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Kästchen anklicken"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Klicken Sie das Kästchen „Ich bin kein Roboter“ an und fahren Sie fort."
+        }
+       ]
+      ],
+      "buttons": [
+       "Weiter"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Das ist eine gewöhnliche Prüfung. Ein Kästchen anzuklicken oder Bilder auszuwählen, ist sicher."
+    },
+    {
+     "id": "keystroke-captcha",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Prüfung abschließen"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Drücken Sie die Tasten, die ein Fenster öffnen, und fügen Sie den Text ein."
+        }
+       ]
+      ],
+      "buttons": [
+       "Starten"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Eine Prüfung, bei der Sie einen Befehl eingeben sollen, ist gefälscht. Schließen Sie die Seite."
+    },
+    {
+     "id": "letters-captcha",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Buchstaben eingeben"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Geben Sie die Buchstaben aus dem Bild in das Feld unten ein."
+        }
+       ]
+      ],
+      "buttons": [
+       "Bestätigen"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Das ist eine gewöhnliche Prüfung. Wenn Sie Buchstaben aus einem Bild abtippen, startet das nichts auf Ihrem Computer."
+    },
+    {
+     "id": "paste-run",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedoxu-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Um fortzufahren"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Kopieren Sie diesen Text und fügen Sie ihn in das Fenster „Ausführen“ ein."
+        }
+       ]
+      ],
+      "buttons": [
+       "Kopieren"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Führen Sie nie einen Text aus, den Sie auf Anweisung einer Website kopieren sollen. Dahinter steckt ein versteckter Befehl."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "fc1-choice",
+   "question": {
+    "prompt": "Was darf ein echter Roboter-Check von Ihnen verlangen? Wählen Sie alle zutreffenden Antworten.",
+    "options": [
+     {
+      "id": "tick",
+      "label": "Ein Kästchen anklicken",
+      "correct": true,
+      "feedback": "Richtig. Ein Kästchen anzuklicken ist eine gewöhnliche Prüfung und sicher."
+     },
+     {
+      "id": "images",
+      "label": "Bilder auswählen",
+      "correct": true,
+      "feedback": "Richtig. Auch das Auswählen von Bildern ist eine echte Prüfung."
+     },
+     {
+      "id": "letters",
+      "label": "Buchstaben aus einem Bild abtippen",
+      "correct": true,
+      "feedback": "Richtig. Das Abtippen von Buchstaben startet nichts auf Ihrem Computer."
+     },
+     {
+      "id": "keys",
+      "label": "Tasten drücken und einen Text einfügen",
+      "correct": false,
+      "feedback": "Das ist die Falle. Eine echte Prüfung schickt Sie nie in ein Fenster Ihres Betriebssystems."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Eine echte Prüfung bleibt innerhalb der Seite. Eine Prüfung, die Sie Tasten drücken und einen Text einfügen lässt, ist gefälscht."
+  },
+  {
+   "type": "recap",
+   "id": "fc1-recap",
+   "points": [
+    "Eine echte Prüfung verlangt nie, dass Sie einen Befehl eingeben",
+    "Fügen Sie nie einen Text ein, nur weil eine Website es verlangt",
+    "Schließen Sie eine solche Seite und melden Sie sie dem IT-Support"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

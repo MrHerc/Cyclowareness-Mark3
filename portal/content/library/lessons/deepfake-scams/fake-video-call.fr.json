@@ -1,0 +1,498 @@
+{
+ "id": "fake-video-call",
+ "title": "Faux appel vidéo",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "live-fake",
+     "say": "Aujourd’hui, un faux visage peut apparaître en direct dans un appel vidéo. Il parle, il sourit, et il a l’air réel.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "traces",
+     "say": "Des contours flous ou des lèvres mal synchronisées se voient parfois, mais un bon deepfake masque ces traces.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "the-ask",
+     "say": "Fiez-vous à la règle, pas à vos yeux : si l’on vous demande de l’argent, un code ou un document, vérifiez par un autre moyen.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "rule",
+     "say": "Raccrochez, puis appelez vous-même cette personne au numéro que vous connaissez.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "colleague-video",
+   "environment": "phone",
+   "title": "L’appel vidéo d’une collègue",
+   "intro": "Votre collègue vous écrit, puis lance un appel vidéo. Décidez à chaque étape.",
+   "steps": [
+    {
+     "id": "new-account",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Aynur Guliyeva (nouveau compte)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Salut ! Mon ancien compte a été fermé, voici mon nouveau.",
+          "spot": "new"
+         }
+        ],
+        "time": "16:40"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Je t’appelle en vidéo tout de suite, j’ai besoin d’un document en urgence.",
+          "spot": "urgent"
+         }
+        ],
+        "time": "16:40"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "wait",
+       "label": "D’accord, j’attends",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Un nouveau compte est déjà un signal d’alerte en soi. Mieux vaut d’abord vérifier sur l’ancien numéro."
+      },
+      {
+       "id": "verify",
+       "label": "Je t’appelle d’abord sur ton ancien numéro",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. L’histoire du nouveau compte sert à vous empêcher de vérifier.",
+       "next": "real-aynur"
+      }
+     ]
+    },
+    {
+     "id": "video-ring",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Aynur Guliyeva (nouveau compte)"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 62 19"
+       }
+      ],
+      "label": "Appel vidéo",
+      "voice": "young-woman"
+     },
+     "say": "Le visage d’Aynur apparaît à l’écran.",
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Répondre",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Répondre ne fait encore aucun mal. Ce qui compte, c’est ce qu’elle va demander."
+      },
+      {
+       "id": "decline",
+       "label": "Refuser",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Ça marche aussi. Appelez vous-même Aynur au numéro que vous connaissez.",
+       "next": "real-aynur"
+      }
+     ]
+    },
+    {
+     "id": "the-ask",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Aynur Guliyeva (nouveau compte)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Tu m’as vue, c’est vraiment moi. Envoie-moi ici la liste des demandes des citoyens, le chef attend."
+         }
+        ],
+        "time": "16:44"
+       }
+      ]
+     },
+     "say": "Après l’appel, la demande arrive.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Envoyer le fichier",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "La vidéo était fausse, et la liste est partie chez un escroc. Un visage n’est pas une preuve : vérifiez par un autre moyen."
+      },
+      {
+       "id": "verify",
+       "label": "Je t’appelle d’abord sur ton numéro habituel",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. Une vraie collègue comprendra la vérification."
+      },
+      {
+       "id": "report",
+       "label": "Signaler",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bonne décision. Signalez le compte et prévenez aussi l’équipe sécurité."
+      }
+     ]
+    },
+    {
+     "id": "real-aynur",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Aynur Guliyeva"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Aynur, tu viens de m’appeler en vidéo ?"
+         }
+        ],
+        "time": "16:47"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Non ! Je suis en réunion. Quelqu’un écrit en mon nom ?"
+         }
+        ],
+        "time": "16:48"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Prévenir l’équipe sécurité",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Parfait. L’équipe préviendra aussi les autres collègues."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer la conversation et oublier",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "L’escroc va essayer avec un autre collègue. Le signaler protège tout le monde."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "reliable-checks",
+   "question": {
+    "prompt": "Quelles vérifications confirment de façon fiable qui vous parle en appel vidéo ?",
+    "options": [
+     {
+      "id": "callback",
+      "label": "Appeler vous-même le numéro que vous connaissez",
+      "correct": true,
+      "feedback": "C’est vous qui lancez cet appel : l’escroc ne le contrôle pas."
+     },
+     {
+      "id": "code-word",
+      "label": "Le mot secret convenu à l’avance",
+      "correct": true,
+      "feedback": "Une fausse image ne connaît pas ce mot."
+     },
+     {
+      "id": "face",
+      "label": "Le visage et la voix semblent familiers",
+      "correct": false,
+      "feedback": "Les visages et les voix peuvent être truqués."
+     },
+     {
+      "id": "quality",
+      "label": "L’image est nette",
+      "correct": false,
+      "feedback": "Une image nette ne prouve rien. Les faux peuvent être nets eux aussi."
+     },
+     {
+      "id": "account",
+      "label": "L’appel vient d’un compte au nom familier",
+      "correct": false,
+      "feedback": "Un compte peut être piraté ou créé de toutes pièces."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "deepfake"
+    }
+   },
+   "explain": "La preuve fiable n’est pas dans l’image, mais dans le second contact, celui que vous lancez vous-même."
+  },
+  {
+   "type": "swipe",
+   "id": "follow-or-check",
+   "prompt": "Cette demande est-elle normale ou dangereuse ?",
+   "cards": [
+    {
+     "id": "card-code",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Tural (un proche)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Tu m’as vu en vidéo, c’est bien moi. Donne-moi le code que ta carte vient de recevoir, c’est pour un billet."
+         }
+        ],
+        "time": "20:15"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Personne, pas même un proche, ne doit vous demander le code de votre carte. La vidéo n’est pas une preuve."
+    },
+    {
+     "id": "meeting",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Sabina Aliyeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "s.aliyeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Réunion d’équipe demain à 10:00"
+       }
+      ],
+      "time": "11:05",
+      "body": [
+       [
+        {
+         "text": "Le lien de la réunion est dans le calendrier interne. Pas d’ordre du jour en pièce jointe, notez simplement l’heure."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Une invitation ordinaire à une réunion : le domaine de l’agence, et rien n’est demandé."
+    },
+    {
+     "id": "hr-video",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Ressources humaines"
+        }
+       ],
+       "address": [
+        {
+         "text": "hr@idare-hr.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Renouvellement de la carte de salaire"
+       }
+      ],
+      "time": "09:30",
+      "body": [
+       [
+        {
+         "text": "Rejoignez une réunion vidéo de 15 minutes et montrez votre carte à la caméra."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Aucun service ne vous demande de montrer votre carte à la caméra. Et le domaine n’est pas celui de l’agence."
+    },
+    {
+     "id": "operator",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "kehkesan-mobil",
+      "sender": [
+       {
+        "text": "Kehkesan"
+       }
+      ],
+      "time": "13:10",
+      "messages": [
+       [
+        {
+         "text": "Votre solde est inférieur à 5 manats. Rechargez depuis l’application mobile."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Aucun lien ni code n’est demandé. Un avis ordinaire de l’opérateur."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "abroad-relative",
+   "title": "Appel vidéo depuis l’étranger",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "Salut ! La douane m’a arrêté et m’a pris mon téléphone. Je t’appelle depuis le compte d’un ami. Envoie-moi 1 200 manats, je te rembourserai.",
+     "speaker": "Tural en vidéo",
+     "voice": "man-3",
+     "channel": "video",
+     "manner": "worried",
+     "spoken": "Salut ! <breath> La douane m’a arrêté et m’a pris mon téléphone. Je t’appelle depuis le compte d’un ami. Envoie-moi 1 200 manats, euh, je te rembourserai.",
+     "character": "tural",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     },
+     "choices": [
+      {
+       "label": "J’envoie l’argent tout de suite",
+       "outcome": "compromised",
+       "feedback": "L’argent est parti chez un escroc. Le compte de quelqu’un d’autre et une demande d’argent urgente, c’est un signal d’alerte."
+      },
+      {
+       "label": "Je demande notre mot secret",
+       "next": "dodge",
+       "feedback": "Bonne décision. Voyons ce qu’il répond."
+      },
+      {
+       "label": "Je dis que je vérifie d’abord auprès de la famille",
+       "next": "check",
+       "feedback": "Exact. Vérifiez en appelant des numéros que vous connaissez."
+      }
+     ]
+    },
+    {
+     "id": "dodge",
+     "text": "La ligne est mauvaise, je ne t’entends pas… Pas le temps, envoie vite !",
+     "speaker": "Tural en vidéo (l’image se fige)",
+     "voice": "man-3",
+     "channel": "video",
+     "manner": "worried",
+     "spoken": "La ligne est mauvaise, je ne t’entends pas… <short pause> Pas le temps, envoie vite !",
+     "character": "tural",
+     "choices": [
+      {
+       "label": "D’accord, j’envoie",
+       "outcome": "compromised",
+       "feedback": "L’excuse de la mauvaise ligne lui permet d’esquiver votre question. Pas de mot secret, pas d’argent."
+      },
+      {
+       "label": "Je raccroche et j’appelle la famille",
+       "next": "check",
+       "feedback": "La bonne décision."
+      }
+     ]
+    },
+    {
+     "id": "check",
+     "text": "La femme de Tural vous dit qu’il est au travail aujourd’hui et qu’il a son téléphone sur lui.",
+     "choices": [
+      {
+       "label": "Je le signale à la police et je préviens la famille",
+       "outcome": "safe",
+       "feedback": "Parfait. L’escroc peut aussi essayer avec d’autres membres de la famille."
+      },
+      {
+       "label": "Je ne fais rien, je n’ai rien perdu",
+       "outcome": "risky",
+       "feedback": "L’escroc va recommencer. Prévenir la famille protège tout le monde."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Un visage et une voix en vidéo ne sont pas une preuve.",
+    "On vous demande de l’argent, un code ou un document ? Rappelez vous-même.",
+    "Signalez le faux appel à l’équipe sécurité ou à la police."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

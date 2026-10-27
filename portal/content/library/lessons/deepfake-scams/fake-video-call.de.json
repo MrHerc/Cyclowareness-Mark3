@@ -1,0 +1,498 @@
+{
+  "id": "fake-video-call",
+  "title": "Gefälschter Videoanruf",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "live-fake",
+          "say": "Ein gefälschtes Gesicht kann heute live in einem Videoanruf erscheinen. Es spricht, lächelt und wirkt echt.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          }
+        },
+        {
+          "id": "traces",
+          "say": "Manchmal fallen unscharfe Ränder oder Lippen auf, die nicht zum Ton passen. Eine gute Fälschung verbirgt diese Spuren aber.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "the-ask",
+          "say": "Vertrauen Sie der Regel, nicht Ihren Augen: Geht es um Geld, einen Code oder ein Dokument, prüfen Sie auf einem anderen Weg.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "rule",
+          "say": "Beenden Sie den Anruf und rufen Sie die Person selbst unter der Nummer an, die Sie kennen.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "colleague-video",
+      "environment": "phone",
+      "title": "Videoanruf von einer Kollegin",
+      "intro": "Ihre Kollegin schreibt Ihnen und startet dann einen Videoanruf. Entscheiden Sie bei jedem Schritt.",
+      "steps": [
+        {
+          "id": "new-account",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Aynur Guliyeva (neuer Account)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hallo! Mein alter Account wurde deaktiviert, das hier ist mein neuer.",
+                    "spot": "new"
+                  }
+                ],
+                "time": "16:40"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Ich rufe dich gleich per Video an, ich brauche dringend ein Dokument.",
+                    "spot": "urgent"
+                  }
+                ],
+                "time": "16:40"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "wait",
+              "label": "Okay, ich warte",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Schon der neue Account ist ein Warnsignal. Besser ist es, zuerst unter der alten Nummer nachzufragen."
+            },
+            {
+              "id": "verify",
+              "label": "Ich rufe zuerst deine alte Nummer an",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Richtig. Die Geschichte vom neuen Account soll Sie davon abhalten, nachzuprüfen.",
+              "next": "real-aynur"
+            }
+          ]
+        },
+        {
+          "id": "video-ring",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Aynur Guliyeva (neuer Account)"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 55 000 62 19"
+              }
+            ],
+            "label": "Videoanruf",
+            "voice": "young-woman"
+          },
+          "say": "Aynurs Gesicht erscheint auf dem Bildschirm.",
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Annehmen",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Das Annehmen schadet noch nicht. Entscheidend ist, worum sie bittet."
+            },
+            {
+              "id": "decline",
+              "label": "Ablehnen",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Auch das ist in Ordnung. Rufen Sie Aynur selbst unter der Nummer an, die Sie kennen.",
+              "next": "real-aynur"
+            }
+          ]
+        },
+        {
+          "id": "the-ask",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Aynur Guliyeva (neuer Account)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Du hast mich gesehen, ich bin es wirklich. Schick mir hier die Liste mit den Bürgeranfragen, der Chef wartet."
+                  }
+                ],
+                "time": "16:44"
+              }
+            ]
+          },
+          "say": "Nach dem Anruf kommt die Bitte.",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Datei senden",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Das Video war gefälscht, und die Liste ging an einen Betrüger. Ein Gesicht ist kein Beweis – prüfen Sie auf einem anderen Weg."
+            },
+            {
+              "id": "verify",
+              "label": "Ich rufe zuerst deine gewohnte Nummer an",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Richtig. Eine echte Kollegin hat Verständnis für die Prüfung."
+            },
+            {
+              "id": "report",
+              "label": "Melden",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Gut gemacht. Melden Sie den Account und informieren Sie auch das Sicherheitsteam."
+            }
+          ]
+        },
+        {
+          "id": "real-aynur",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Aynur Quliyeva"
+              }
+            ],
+            "messages": [
+              {
+                "from": "me",
+                "body": [
+                  {
+                    "text": "Aynur, hast du mich gerade per Video angerufen?"
+                  }
+                ],
+                "time": "16:47"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Nein! Ich bin in einem Meeting. Schreibt da jemand in meinem Namen?"
+                  }
+                ],
+                "time": "16:48"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Das Sicherheitsteam informieren",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Sehr gut. Das Sicherheitsteam warnt auch die anderen Kolleginnen und Kollegen."
+            },
+            {
+              "id": "delete",
+              "label": "Chat löschen und vergessen",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Der Betrüger versucht es dann bei jemand anderem aus dem Team. Eine Meldung schützt alle."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "reliable-checks",
+      "question": {
+        "prompt": "Welche Prüfungen zeigen zuverlässig, wer in einem Videoanruf wirklich zu sehen ist?",
+        "options": [
+          {
+            "id": "callback",
+            "label": "Selbst die Nummer anrufen, die Sie kennen",
+            "correct": true,
+            "feedback": "Diesen Anruf starten Sie selbst, also hat der Betrüger keine Kontrolle darüber."
+          },
+          {
+            "id": "code-word",
+            "label": "Das vereinbarte Codewort",
+            "correct": true,
+            "feedback": "Ein gefälschtes Bild kennt dieses Wort nicht."
+          },
+          {
+            "id": "face",
+            "label": "Gesicht und Stimme wirken vertraut",
+            "correct": false,
+            "feedback": "Gesichter und Stimmen lassen sich fälschen."
+          },
+          {
+            "id": "quality",
+            "label": "Das Bild ist scharf",
+            "correct": false,
+            "feedback": "Ein scharfes Bild beweist nichts. Auch Fälschungen können scharf sein."
+          },
+          {
+            "id": "account",
+            "label": "Der Anruf kommt von einem Account mit bekanntem Namen",
+            "correct": false,
+            "feedback": "Accounts lassen sich kapern oder unter falschem Namen anlegen."
+          }
+        ],
+        "multi": true,
+        "visual": {
+          "kind": "illustration",
+          "id": "deepfake"
+        }
+      },
+      "explain": "Den zuverlässigen Beweis liefert nicht das Bild, sondern der zweite Kontakt, den Sie selbst herstellen."
+    },
+    {
+      "type": "swipe",
+      "id": "follow-or-check",
+      "prompt": "Ist diese Bitte normal oder gefährlich?",
+      "cards": [
+        {
+          "id": "card-code",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Tural (Verwandter)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Du hast mich im Video gesehen, ich bin’s. Sag mir den Code, den deine Karte gerade bekommen hat, er ist für ein Ticket."
+                  }
+                ],
+                "time": "20:15"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Niemand, nicht einmal Angehörige, sollte nach dem Code Ihrer Karte fragen. Ein Video ist kein Beweis."
+        },
+        {
+          "id": "meeting",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Səbinə Əliyeva"
+                }
+              ],
+              "address": [
+                {
+                  "text": "s.aliyeva@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Team-Meeting morgen um 10:00 Uhr"
+              }
+            ],
+            "time": "11:05",
+            "body": [
+              [
+                {
+                  "text": "Den Link zum Meeting finden Sie im internen Kalender. Eine Tagesordnung gibt es nicht, merken Sie sich einfach die Uhrzeit."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Eine normale Einladung zum Meeting: die Domain der Behörde, und es wird nichts verlangt."
+        },
+        {
+          "id": "hr-video",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "Personalabteilung"
+                }
+              ],
+              "address": [
+                {
+                  "text": "hr@idare-hr.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Erneuerung der Gehaltskarte"
+              }
+            ],
+            "time": "09:30",
+            "body": [
+              [
+                {
+                  "text": "Nehmen Sie an einem 15-minütigen Videomeeting teil und halten Sie Ihre Karte in die Kamera."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Keine Abteilung bittet Sie, Ihre Karte in die Kamera zu halten. Auch die Domain gehört nicht der Behörde."
+        },
+        {
+          "id": "operator",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "kehkesan-mobil",
+            "sender": [
+              {
+                "text": "Kəhkəşan"
+              }
+            ],
+            "time": "13:10",
+            "messages": [
+              [
+                {
+                  "text": "Ihr Guthaben liegt unter 5 Manat. Laden Sie es über die mobile App auf."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Es wird weder ein Link noch ein Code verlangt. Eine normale Mitteilung des Mobilfunkanbieters."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "abroad-relative",
+      "title": "Videoanruf aus dem Ausland",
+      "start": "call",
+      "nodes": [
+        {
+          "id": "call",
+          "text": "Hallo! Der Zoll hat mich angehalten und mir mein Handy abgenommen. Ich rufe über den Account eines Freundes an. Schick mir 1.200 Manat, ich zahle es dir zurück.",
+          "speaker": "Tural im Video",
+          "voice": "man-3",
+          "channel": "video",
+          "manner": "worried",
+          "spoken": "Hallo! <breath> Der Zoll hat mich angehalten und mir mein Handy abgenommen. Ich rufe über den Account eines Freundes an. Schick mir 1.200 Manat, äh, ich zahle es dir zurück.",
+          "character": "tural",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          },
+          "choices": [
+            {
+              "label": "Ich schicke das Geld sofort",
+              "outcome": "compromised",
+              "feedback": "Das Geld ging an einen Betrüger. Ein fremder Account plus eine dringende Bitte um Geld ist ein Warnsignal."
+            },
+            {
+              "label": "Ich frage nach unserem Codewort",
+              "next": "dodge",
+              "feedback": "Gut gemacht. Mal sehen, was er sagt."
+            },
+            {
+              "label": "Ich sage, dass ich mich zuerst bei der Familie erkundige",
+              "next": "check",
+              "feedback": "Richtig. Prüfen Sie das über Nummern, die Sie kennen."
+            }
+          ]
+        },
+        {
+          "id": "dodge",
+          "text": "Die Verbindung ist schlecht, ich höre dich nicht … Keine Zeit, schick es schnell!",
+          "speaker": "Tural im Video (das Bild friert ein)",
+          "voice": "man-3",
+          "channel": "video",
+          "manner": "worried",
+          "spoken": "Die Verbindung ist schlecht, ich höre dich nicht … <short pause> Keine Zeit, schick es schnell!",
+          "character": "tural",
+          "choices": [
+            {
+              "label": "Okay, ich schicke es",
+              "outcome": "compromised",
+              "feedback": "Die Ausrede mit der schlechten Verbindung weicht Ihrer Frage aus. Ohne Codewort kein Geld."
+            },
+            {
+              "label": "Ich beende den Anruf und rufe die Familie an",
+              "next": "check",
+              "feedback": "Die richtige Entscheidung."
+            }
+          ]
+        },
+        {
+          "id": "check",
+          "text": "Turals Frau sagt, dass er heute bei der Arbeit ist und sein Handy dabeihat.",
+          "choices": [
+            {
+              "label": "Ich melde es der Polizei und warne die Familie",
+              "outcome": "safe",
+              "feedback": "Sehr gut. Der Betrüger versucht es vielleicht auch bei anderen Familienmitgliedern."
+            },
+            {
+              "label": "Ich unternehme nichts, es ist ja kein Geld verloren",
+              "outcome": "risky",
+              "feedback": "Der Betrüger versucht es wieder. Wenn Sie die Familie warnen, schützen Sie alle."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Gesicht und Stimme im Video sind kein Beweis.",
+        "Jemand will Geld, einen Code oder ein Dokument? Rufen Sie selbst zurück.",
+        "Melden Sie den gefälschten Anruf dem Sicherheitsteam oder der Polizei."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

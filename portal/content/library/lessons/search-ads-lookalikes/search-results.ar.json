@@ -1,0 +1,411 @@
+{
+  "id": "search-results",
+  "title": "نتائج البحث",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "sr-tutor",
+      "beats": [
+        {
+          "id": "sr-b1",
+          "say": "مرحبًا! كثير من الناس يصلون إلى المواقع الرسمية عن طريق البحث، لا بكتابة العنوان. والمحتالون يعرفون ذلك أيضًا.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "sr-b2",
+          "say": "فهم يشترون إعلانات ليظهروا في أعلى النتائج. وبجانب نتيجة كهذه تظهر كلمة صغيرة: «برعاية».",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2c-tapan",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "Tapan: شهادة بوابة المواطن"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "برعاية",
+                    "spot": "ad-label"
+                  },
+                  {
+                    "text": "  vetendasportal-gov.example"
+                  }
+                ],
+                [
+                  {
+                    "text": "Vatandash Portal: احصل على شهادتك في 5 دقائق"
+                  }
+                ],
+                [
+                  {
+                    "text": "vetendasportal.gov.az"
+                  }
+                ],
+                [
+                  {
+                    "text": "Vatandash Portal: الشهادات الإلكترونية"
+                  }
+                ]
+              ],
+              "buttons": [
+                "بحث"
+              ]
+            }
+          },
+          "highlight": "ad-label"
+        },
+        {
+          "id": "sr-b3",
+          "say": "الموقع المزيف يشبه الموقع الحقيقي كثيرًا: حرف واحد مختلف، أو كلمة زائدة، أو نهاية أخرى للعنوان.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "sr-b4",
+          "say": "تحقق من العنوان الرسمي مرة واحدة واحفظه في الإشارات المرجعية، ثم افتحه من هناك دائمًا.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "sr-hotspot",
+      "prompt": "اعثر على المواضع الخطرة في نتائج البحث.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2c-tapan",
+        "tone": "app",
+        "title": [
+          {
+            "text": "Tapan: شهادة بوابة المواطن"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "برعاية",
+              "spot": "ad-label"
+            },
+            {
+              "text": "  "
+            },
+            {
+              "text": "vetendasportal-gov.example",
+              "spot": "lookalike"
+            }
+          ],
+          [
+            {
+              "text": "الموقع الرسمي. احصل على شهادتك في 5 دقائق",
+              "spot": "fake-official"
+            }
+          ],
+          [
+            {
+              "text": "برعاية  "
+            },
+            {
+              "text": "vetendaspotral.example.info",
+              "spot": "typo"
+            }
+          ],
+          [
+            {
+              "text": "Vatandash Portal: تسجيل الدخول والشهادات"
+            }
+          ],
+          [
+            {
+              "text": "vetendasportal.gov.az"
+            }
+          ],
+          [
+            {
+              "text": "Vatandash Portal: الشهادات الإلكترونية"
+            }
+          ]
+        ],
+        "buttons": [
+          "بحث"
+        ]
+      },
+      "spots": [
+        {
+          "id": "ad-label",
+          "label": "علامة الإعلان",
+          "explain": "هذه النتيجة مدفوعة لتظهر في الأعلى. والمحتالون أيضًا يستطيعون شراء الإعلانات، فلا تستخدم الإعلان أبدًا لتسجيل الدخول."
+        },
+        {
+          "id": "lookalike",
+          "label": "كلمة زائدة",
+          "explain": "أضيفت كلمة gov إلى العنوان، لكن نهايته مختلفة. فعنوان البوابة الرسمية ينتهي بالمقطع gov.az."
+        },
+        {
+          "id": "fake-official",
+          "label": "صفة رسمية مزيفة",
+          "explain": "يستطيع أي شخص أن يكتب عبارة «الموقع الرسمي». ونهاية العنوان هي التي تكشف ما هو رسمي، لا النص."
+        },
+        {
+          "id": "typo",
+          "label": "حرفان تبادلا مكانيهما",
+          "explain": "تبادل حرفان مكانيهما في كلمة portal. ومن الصعب ملاحظة ذلك عندما تكون في عجلة."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "sr-choice",
+      "question": {
+        "prompt": "تسجل الدخول إلى بوابة المواطن كثيرًا. ما الطريقة الأكثر أمانًا؟",
+        "options": [
+          {
+            "id": "bookmark",
+            "label": "أتحقق من العنوان الرسمي مرة واحدة وأحفظه في الإشارات المرجعية",
+            "correct": true,
+            "feedback": "صحيح. الإشارة المرجعية تفتح العنوان نفسه في كل مرة، فلا يبقى للإعلانات أي دور."
+          },
+          {
+            "id": "first-result",
+            "label": "أبحث في كل مرة وأضغط على النتيجة الأولى",
+            "correct": false,
+            "feedback": "قد تكون النتيجة الأولى إعلانًا. والمحتالون يعتمدون على هذه العادة تحديدًا."
+          },
+          {
+            "id": "sms-link",
+            "label": "أستخدم الرابط الذي وصلني في رسالة نصية",
+            "correct": false,
+            "feedback": "يستطيع أي شخص أن يرسل رابطًا في رسالة نصية. افتح الموقع الرسمي بنفسك."
+          }
+        ]
+      },
+      "explain": "احفظ المواقع التي تستخدمها كثيرًا في الإشارات المرجعية. وبذلك لن تخدعك نتائج البحث ولا الإعلانات."
+    },
+    {
+      "type": "simulation",
+      "id": "sr-sim",
+      "environment": "browser",
+      "title": "تنزيل برنامج",
+      "intro": "لديك اجتماع عبر الإنترنت غدًا، وتحتاج إلى تنزيل تطبيق Gorush. فتبدأ بالبحث.",
+      "steps": [
+        {
+          "id": "results",
+          "label": "تنزيل Gorush: نتائج البحث",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tapan",
+            "url": [
+              {
+                "text": "https://tapan.example/axtar?q=gorus+yukle",
+                "reveal": "tapan.example"
+              }
+            ]
+          },
+          "say": "في الأعلى إعلان، وتحته الموقع الخاص بالتطبيق.",
+          "actions": [
+            {
+              "id": "ad",
+              "label": "برعاية: gorus-app-download.example.net",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "نقلك الإعلان إلى موقع آخر. لم يفت الأوان بعد: انظر إلى العنوان.",
+              "next": "fake-site"
+            },
+            {
+              "id": "organic",
+              "label": "gorus.example: الموقع الرسمي",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "صحيح. تجاوزت الإعلان وفتحت الموقع الخاص بالتطبيق.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "fake-site",
+          "label": "Gorush: تنزيل مجاني",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-gorus-fake",
+            "url": [
+              {
+                "text": "https://gorus-app-download.example.net/yukle",
+                "reveal": "gorus-app-download.example.net"
+              }
+            ]
+          },
+          "say": "الصفحة تشبه الموقع الحقيقي كثيرًا. انظر إلى العنوان.",
+          "actions": [
+            {
+              "id": "download",
+              "label": "تنزيل",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "هذا الموقع لا يتبع الشركة المطورة للتطبيق، ولا يمكن الوثوق بأي ملف تثبيت يأتي منه.",
+              "next": "fake-file"
+            },
+            {
+              "id": "leave",
+              "label": "إغلاق علامة التبويب",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "لم يكن هذا العنوان هو الموقع الخاص بالتطبيق. انتقل إلى الموقع الرسمي بنفسك.",
+              "next": "real-site"
+            },
+            {
+              "id": "check",
+              "label": "التحقق من العنوان",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "الاسم يبدو مشابهًا، لكن النطاق مختلف. لا تثق بهذا الموقع.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "fake-file",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "w2c-gorus-fake",
+            "name": [
+              {
+                "text": "GorusSetup_2026.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "84 MB",
+            "source": [
+              {
+                "text": "gorus-app-download.example.net"
+              }
+            ]
+          },
+          "say": "اكتمل تنزيل الملف. هل ستفتحه؟",
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "يثبت ملف التثبيت هذا مع التطبيق برنامجًا يسرق كلمات المرور. لا تفتح أبدًا ملفًا من موقع مزيف.",
+              "next": "after-bad"
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "صحيح. احذف الملف، وأبلغ الدعم الفني، واحصل على التطبيق من الموقع الرسمي.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "after-bad",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "qoruyucu",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Qoruyucu: برنامج مشبوه"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "حاول الملف GorusSetup_2026.exe قراءة كلمات المرور المحفوظة في متصفحك."
+                }
+              ]
+            ],
+            "buttons": [
+              "عزل",
+              "إغلاق"
+            ]
+          },
+          "say": "اكتشف برنامج مكافحة الفيروسات شيئًا. تصرف بسرعة الآن.",
+          "actions": [
+            {
+              "id": "isolate",
+              "label": "فصل الجهاز عن الشبكة والاتصال بالدعم الفني",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "صحيح. ما لم تنص إجراءات جهتك على غير ذلك، افصل الجهاز عن الشبكة دون إيقاف تشغيله، واتصل فورًا."
+            },
+            {
+              "id": "ignore",
+              "label": "الإغلاق ومواصلة العمل",
+              "kind": "cancel",
+              "outcome": "compromised",
+              "feedback": "البرنامج يواصل العمل، وقد يرسل كلمات مرورك إلى الخارج. أبلغ عنه فورًا."
+            }
+          ]
+        },
+        {
+          "id": "real-site",
+          "label": "Gorush: التنزيل للحاسوب",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "gorus",
+            "url": [
+              {
+                "text": "https://gorus.example/yukle",
+                "reveal": "gorus.example"
+              }
+            ]
+          },
+          "say": "هذا هو الموقع الخاص بالتطبيق.",
+          "actions": [
+            {
+              "id": "ask-it",
+              "label": "طلب التثبيت من الدعم الفني",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "هذه أفضل طريقة. على جهاز العمل، الدعم الفني هو من يثبت البرامج.",
+              "next": "results"
+            },
+            {
+              "id": "download",
+              "label": "تنزيل",
+              "kind": "install",
+              "outcome": "safe",
+              "feedback": "صحيح، هذا هو الموقع الرسمي. لكن على جهاز العمل، راجع أولًا قواعد الدعم الفني.",
+              "next": "results"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "sr-recap",
+      "points": [
+        "لتسجيل الدخول، استخدم الإشارة المرجعية لا الإعلان",
+        "اقرأ نهاية العنوان وقارنها بالعنوان الرسمي",
+        "احصل على البرامج من الموقع الرسمي أو من الدعم الفني فقط"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

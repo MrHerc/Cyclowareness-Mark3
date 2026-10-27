@@ -1,0 +1,631 @@
+{
+ "id": "new-card-email",
+ "title": "Un nouveau numéro de carte",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pd1-tutor",
+   "beats": [
+    {
+     "id": "pd1-b1",
+     "say": "Bonjour ! Aujourd’hui, vous travaillez aux ressources humaines, et demain, c’est le jour de la paie.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "pd1-b2",
+     "say": "Un e-mail arrive au nom d’un salarié : ma carte a changé, versez mon salaire sur un nouveau compte.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Leyla Mammadova"
+         }
+        ],
+        "address": [
+         {
+          "text": "leyla.mammadova.88@poct-mail.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Urgent : ma carte bancaire a changé"
+        }
+       ],
+       "time": "16:40",
+       "body": [
+        [
+         {
+          "text": "Bonjour, j’ai perdu mon ancienne carte et la banque l’a bloquée."
+         }
+        ],
+        [
+         {
+          "text": "Merci de verser le salaire de demain sur ce compte : "
+         },
+         {
+          "text": "AZ00SAHL00000000000000004417",
+          "spot": "new-account"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "new-account"
+    },
+    {
+     "id": "pd1-b3",
+     "say": "Le nom vous est familier, mais l’adresse est celle d’une messagerie personnelle. Un escroc veut recevoir le salaire sur son propre compte.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "pd1-b4",
+     "say": "La règle est simple : ne modifiez jamais des coordonnées bancaires sur la seule base d’un e-mail. Appelez le salarié sur un numéro que vous connaissez déjà.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "pd1-hotspot",
+   "prompt": "Trouvez les signaux d’alerte dans cet e-mail.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Leyla Mammadova"
+      }
+     ],
+     "address": [
+      {
+       "text": "leyla.mammadova.88@poct-mail.example.net",
+       "spot": "personal-address"
+      }
+     ]
+    },
+    "to": "kadr@seherxidmetleri.example",
+    "subject": [
+     {
+      "text": "Urgent : ma carte bancaire a changé"
+     }
+    ],
+    "time": "16:40",
+    "body": [
+     [
+      {
+       "text": "Bonjour à l’équipe RH,"
+      }
+     ],
+     [
+      {
+       "text": "J’ai perdu mon ancienne carte et la banque l’a bloquée."
+      }
+     ],
+     [
+      {
+       "text": "Merci de verser le salaire de demain sur mon nouveau compte : ",
+       "spot": "new-account"
+      },
+      {
+       "text": "AZ00SAHL00000000000000004417",
+       "spot": "new-account"
+      }
+     ],
+     [
+      {
+       "text": "Je ne suis pas au travail aujourd’hui et mon téléphone est cassé. Répondez uniquement ici.",
+       "spot": "no-call"
+      }
+     ],
+     [
+      {
+       "text": "Merci de le faire d’ici demain matin, je dois payer mon loyer.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "Leyla Mammadova, Services techniques"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "personal-address",
+     "label": "Adresse e-mail personnelle",
+     "explain": "Les salariés écrivent en général depuis leur adresse professionnelle. N’importe qui peut ouvrir une messagerie personnelle sous n’importe quel nom."
+    },
+    {
+     "id": "new-account",
+     "label": "Nouveau compte",
+     "explain": "C’est le vrai but de l’e-mail. Une fois le salaire arrivé là, il est difficile de le récupérer."
+    },
+    {
+     "id": "no-call",
+     "label": "Impossible de l’appeler",
+     "explain": "Cette phrase sert à vous empêcher de vérifier. C’est justement pour cela qu’il faut appeler le salarié sur un numéro que vous connaissez."
+    },
+    {
+     "id": "urgency",
+     "label": "Pression",
+     "explain": "La pression juste avant la paie fait partie du scénario habituel de cette arnaque. Un appel ne prend que quelques minutes."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "pd1-sim",
+   "environment": "inbox",
+   "title": "Boîte de réception des RH",
+   "intro": "C’est la veille de la paie. Ouvrez les cinq e-mails et choisissez la bonne action pour chacun.",
+   "steps": [
+    {
+     "id": "fake-colleague",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-seher-xidmetleri",
+      "from": {
+       "name": [
+        {
+         "text": "Kamran Aliyev"
+        }
+       ],
+       "address": [
+        {
+         "text": "k.aliyev@seherxidmetleri-mail.example.net"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Changement de compte pour le versement de mon salaire"
+       }
+      ],
+      "time": "09:12",
+      "body": [
+       [
+        {
+         "text": "Bonjour, j’ai changé de banque."
+        }
+       ],
+       [
+        {
+         "text": "Merci de verser le salaire de septembre sur ce compte : AZ00ULDZ00000000000000007731"
+        }
+       ],
+       [
+        {
+         "text": "J’apporterai le formulaire plus tard. Kamran Aliyev, Service des transports"
+        }
+       ]
+      ]
+     },
+     "say": "Regardez le domaine de l’expéditeur.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Le domaine n’est pas celui de votre entreprise : un mot a été ajouté."
+      },
+      {
+       "id": "verify",
+       "label": "Appeler Kamran sur un numéro que je connais",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Bravo. Kamran dira qu’il n’a rien écrit, et vous signalerez l’e-mail."
+      },
+      {
+       "id": "change",
+       "label": "Répondre : compte mis à jour",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Le salaire partirait chez l’escroc. N’acceptez jamais un changement de coordonnées bancaires par e-mail."
+      }
+     ]
+    },
+    {
+     "id": "system-request",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-kadr-kabineti",
+      "from": {
+       "name": [
+        {
+         "text": "Kadr Kabineti"
+        }
+       ],
+       "address": [
+        {
+         "text": "noreply@kabinet.seherxidmetleri.example"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Nouvelle demande : modification des coordonnées bancaires, Ayten Huseynova"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Cette demande a été envoyée dans Kadr Kabineti par la salariée, connectée avec la double authentification."
+        }
+       ],
+       [
+        {
+         "text": "Consultez la demande dans le système : "
+        },
+        {
+         "text": "Voir la demande",
+         "link": {
+          "label": "Voir la demande",
+          "href": "https://kabinet.seherxidmetleri.example/sorgular/2187"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Voir la demande",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Exact. L’adresse est bien le domaine de votre entreprise et la demande vient de l’intérieur du système."
+      },
+      {
+       "id": "safe",
+       "label": "Marquer comme fiable",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Exact. Le système officiel est le bon canal pour ce type de demande."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "La prudence est une bonne chose, mais c’est le système de votre entreprise. Les changements de coordonnées bancaires doivent arriver exactement ainsi."
+      }
+     ]
+    },
+    {
+     "id": "portal-phish",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Kadr Kabineti"
+        }
+       ],
+       "address": [
+        {
+         "text": "kabinet@kadr-kabineti.example.net"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Votre mot de passe expire aujourd’hui"
+       }
+      ],
+      "time": "11:30",
+      "body": [
+       [
+        {
+         "text": "Votre accès au tableau des salaires sera coupé aujourd’hui."
+        }
+       ],
+       [
+        {
+         "text": "Pour conserver l’accès : "
+        },
+        {
+         "text": "Renouveler le mot de passe",
+         "link": {
+          "label": "Renouveler le mot de passe",
+          "href": "https://kadr-kabineti-giris.example.net/yenile"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Le lien ne mène pas au domaine de votre entreprise. S’il n’y a pas de bouton de signalement, transférez l’e-mail à l’équipe sécurité."
+      },
+      {
+       "id": "click",
+       "label": "Renouveler le mot de passe",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "C’est un faux portail. Avec un compte RH, un escroc peut modifier les coordonnées bancaires de tout le monde."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Pas mal. Mais si vous le signalez, vos collègues sont protégés eux aussi."
+      }
+     ]
+    },
+    {
+     "id": "payroll-sheet",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-seher-xidmetleri",
+      "from": {
+       "name": [
+        {
+         "text": "Sabina Gasimova"
+        }
+       ],
+       "address": [
+        {
+         "text": "s.qasimova@seherxidmetleri.example"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Paie de septembre : dernière vérification"
+       }
+      ],
+      "time": "12:15",
+      "body": [
+       [
+        {
+         "text": "Bonjour, le tableau est en pièce jointe. Merci de le relire avant 15:00. Sabina, Finances"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Maas_cedveli_2026_09.xlsx"
+         }
+        ],
+        "size": "96 Ko"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir la pièce jointe",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "Exact. Une collègue connue, le domaine de votre entreprise et un tableau attendu."
+      },
+      {
+       "id": "forward",
+       "label": "Envoyer à mon adresse e-mail personnelle",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Le tableau contient les données personnelles de tout le monde. N’envoyez pas de fichiers de travail vers une messagerie personnelle."
+      },
+      {
+       "id": "safe",
+       "label": "Marquer comme fiable",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Exact. Il n’y a ni nouveau compte ni pression."
+      }
+     ]
+    },
+    {
+     "id": "real-address-odd",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-seher-xidmetleri",
+      "from": {
+       "name": [
+        {
+         "text": "Narmin Safarova"
+        }
+       ],
+       "address": [
+        {
+         "text": "n.seferova@seherxidmetleri.example"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Nouveau compte"
+       }
+      ],
+      "time": "14:48",
+      "body": [
+       [
+        {
+         "text": "Versez mon salaire sur ce compte : AZ00SAHL00000000000000009260"
+        }
+       ],
+       [
+        {
+         "text": "N’appelez pas, je suis en réunion toute la journée."
+        }
+       ]
+      ]
+     },
+     "say": "L’adresse est bien la vraie. Restez tout de même sur vos gardes.",
+     "actions": [
+      {
+       "id": "verify",
+       "label": "Appeler son numéro interne",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Une messagerie peut être piratée, mais la vraie Narmin répondra au numéro que vous connaissez."
+      },
+      {
+       "id": "ask",
+       "label": "Répondre : est-ce bien vous ?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Si la messagerie est piratée, c’est l’escroc qui écrit la réponse. Seul un appel permet de vraiment vérifier."
+      },
+      {
+       "id": "safe",
+       "label": "Marquer comme fiable",
+       "kind": "mark-safe",
+       "outcome": "compromised",
+       "feedback": "L’adresse est la bonne, mais le compte a peut-être été piraté. Confirmez toujours par téléphone un changement de coordonnées bancaires."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "pd1-match",
+   "prompt": "Associez chaque demande à la bonne façon de la vérifier.",
+   "pairs": [
+    {
+     "id": "mail-account",
+     "left": "Nouveau compte bancaire dans un e-mail",
+     "right": "Appeler le salarié sur un numéro que vous connaissez"
+    },
+    {
+     "id": "system-request",
+     "left": "Demande dans Kadr Kabineti",
+     "right": "La consulter dans le système, appeler en cas de doute"
+    },
+    {
+     "id": "password-link",
+     "left": "Lien de renouvellement du mot de passe",
+     "right": "Saisir vous-même l’adresse du portail"
+    },
+    {
+     "id": "phone-request",
+     "left": "Un salarié appelle pour changer de compte",
+     "right": "Lui demander de passer par Kadr Kabineti"
+    }
+   ],
+   "explain": "Chaque changement se confirme dans le système ou par un canal que vous choisissez. Un numéro ou un lien contenu dans l’e-mail n’est pas une vérification."
+  },
+  {
+   "type": "scenario",
+   "id": "pd1-scenario",
+   "title": "Le salaire n’est pas arrivé",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Bonjour, mon salaire n’est pas arrivé sur ma carte aujourd’hui. Je n’ai jamais demandé à changer de compte !",
+     "speaker": "Leyla Mammadova",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Bonjour, mon salaire n’est pas arrivé sur ma carte aujourd’hui. <breath> Je n’ai jamais demandé à changer de compte !",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2f-seher-xidmetleri",
+       "caller": [
+        {
+         "text": "Leyla Mammadova"
+        }
+       ],
+       "number": [
+        {
+         "text": "Interne 4107"
+        }
+       ],
+       "label": "Appel interne"
+      }
+     },
+     "choices": [
+      {
+       "label": "La comptabilité appelle la banque, et je préviens l’équipe sécurité",
+       "next": "n2",
+       "feedback": "Exact. Plus le signalement est rapide, plus les chances de récupérer l’argent sont grandes."
+      },
+      {
+       "label": "Je remets discrètement l’ancien compte",
+       "outcome": "risky",
+       "feedback": "L’erreur doit être corrigée, mais pas cachée. La banque peut essayer d’arrêter le virement, et l’équipe sécurité retrace ce qui s’est passé."
+      },
+      {
+       "label": "Je lui dis que c’est elle qui a écrit l’e-mail",
+       "outcome": "risky",
+       "feedback": "Leyla n’a pas écrit cet e-mail. L’important est de limiter les dégâts, pas de chercher un coupable."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Ne supprimez pas l’e-mail, transférez-le-moi. Y a-t-il eu d’autres changements de coordonnées bancaires cette semaine ?",
+     "speaker": "Fidan Rzayeva, équipe sécurité",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "firm",
+     "spoken": "Ne supprimez pas l’e-mail, transférez-le-moi. <breath> Y a-t-il eu d’autres changements de coordonnées bancaires cette semaine ?",
+     "choices": [
+      {
+       "label": "Je transfère l’e-mail et je vérifie tous les changements de la semaine",
+       "outcome": "safe",
+       "feedback": "Bravo. Les escrocs écrivent en général au nom de plusieurs salariés."
+      },
+      {
+       "label": "Je l’ai déjà supprimé, il ne sert plus à rien",
+       "outcome": "risky",
+       "feedback": "L’e-mail est une preuve. Si vous l’avez supprimé, restaurez-le depuis les éléments supprimés et transférez-le."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "pd1-recap",
+   "points": [
+    "Les coordonnées bancaires ne changent jamais par e-mail.",
+    "Appelez le salarié sur un numéro que vous connaissez.",
+    "En cas de doute, suspendez le versement et signalez la demande."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

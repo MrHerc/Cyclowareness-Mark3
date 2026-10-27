@@ -252,7 +252,7 @@ function Tour({ copy, guide: timing, lang, countries, privacyLabel }: { copy: La
               rapport={{ score: copy.rapport.score, fast: copy.rapport.fast }}
               screenLabel={copy.ui.screenLabel}
               // The guide's first perch: peeking from the phone's edge (the cat is the ScrollCat below, sized like this box).
-              perch={<span aria-hidden data-perch="hero" data-perch-box className="pointer-events-none absolute top-[48%] -right-3 size-20 sm:-right-12 sm:size-28" />}
+              perch={<span aria-hidden data-perch="hero" data-perch-box className="pointer-events-none absolute top-[48%] -end-3 size-20 sm:-end-12 sm:size-28" />}
               onDone={(score, total) => setYou({ clicked: Math.round(((total - score) / total) * 100), reported: Math.round((score / total) * 100), learned: 100 })}
               onRole={(role) => {
                 const next: Chapter = role === "security" ? "deploy" : role === "people" ? "phone" : role === "leader" ? "admin" : "phone";
@@ -311,7 +311,7 @@ function GuideDock({ copy, current, index, seen, onNext, onSkip }: { copy: Landi
           </div>
         ) : null}
       </div>
-      <nav aria-label={copy.tour.railLabel} className="pointer-events-auto flex w-full max-w-xl items-center gap-3 rounded-pill bg-surface/95 py-2 pr-2 pl-5 shadow-overlay ring-1 ring-line backdrop-blur">
+      <nav aria-label={copy.tour.railLabel} className="pointer-events-auto flex w-full max-w-xl items-center gap-3 rounded-pill bg-surface/95 py-2 pe-2 ps-5 shadow-overlay ring-1 ring-line backdrop-blur">
         <ol className="flex min-w-0 flex-1 gap-1" aria-label={copy.tour.railLabel}>
           {CHAPTERS.map((c, i) => (
             <li key={c} className="flex-1" aria-current={i === index ? "step" : undefined}>

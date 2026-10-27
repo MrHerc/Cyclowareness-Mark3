@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { unstable_rethrow } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AlertTriangle, BookOpen, Check, CircleDashed, CircleSlash, Eye, Loader2, PlugZap, RotateCcw, Save, ShieldCheck, Sparkles, X } from "lucide-react";
 import { generateTrainingAction, libraryTrainingAction, saveTrainingDraftAction, type TrainingInput, type TrainingResult } from "@/server/actions/ai-training";
@@ -10,7 +11,7 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Field, Input, Segmented, Select, Textarea } from "@/components/ui/field";
 import { Pill } from "@/components/ui/pill";
 import { toast } from "@/components/ui/toast";
-import { LOCALE_NAMES } from "@/i18n/config";
+import { LOCALE_NAMES, langAttrs } from "@/i18n/config";
 import { cn } from "@/lib/cn";
 
 type Option = { id: string; label: string };
@@ -34,34 +35,58 @@ export function AiTrainer({ aiOn, locales, defaultLocale, categories }: { aiOn: 
   const [mode, setMode] = useState<"ai" | "library">("ai");
   const [result, setResult] = useState<TrainingResult | null>(null);
   const [saved, setSaved] = useState<{ href: string } | null>(null);
+  // The typed text, so "1" on the way to "15" is not clamped to 2; clamped on blur and on submit.
+  const [minutes, setMinutes] = useState(String(f.minutes));
   const valid = f.prompt.trim().length >= 10;
 
+  const fixMinutes = () => {
+    const n = Math.max(2, Math.min(45, Math.round(Number(minutes)) || 2));
+    setMinutes(String(n));
+    set("minutes", n);
+    return n;
+  };
+
   const run = (which: "ai" | "library") => {
+    const input = { ...f, minutes: fixMinutes() };
     setMode(which);
     setSaved(null);
     setResult(null);
     start(async () => {
-      const res = await (which === "ai" ? generateTrainingAction(f) : libraryTrainingAction(f));
-      setResult(res);
-      if (!res.ok) toast(res.error === "rateLimited" ? tc("errors.rateLimited") : t(`errors.${res.error ?? "failed"}`), "error");
+      try {
+        const res = await (which === "ai" ? generateTrainingAction(input) : libraryTrainingAction(input));
+        setResult(res);
+        if (!res.ok) toast(res.error === "rateLimited" ? tc("errors.rateLimited") : t(`errors.${res.error ?? "failed"}`), "error");
+      } catch (error) {
+        // A rejected action (connection, permission, database) stays on the page; redirects still go through.
+        unstable_rethrow(error);
+        toast(t("errors.failed"), "error");
+      }
     });
   };
+
+  // A library match keeps the language it was found in; an AI draft is written in the chosen one.
+  const contentLocale = result?.source?.kind === "library" ? (result.source as { contentLocale: Locale }).contentLocale : f.locale;
 
   const save = () => {
     const r = result;
     if (!r?.draft || !r.source || !r.verification) return;
     startSave(async () => {
-      const res = await saveTrainingDraftAction({
-        draft: r.draft,
-        contentLocale: r.source!.kind === "library" ? (r.source as { contentLocale: Locale }).contentLocale : f.locale,
-        category: f.category,
-        difficulty: f.difficulty,
-        origin: r.source!.kind,
-        verdict: r.verification!.verdict,
-      });
-      if (!res.ok || !res.slug) return toast(t("errors.failed"), "error");
-      setSaved({ href: `/learn/${res.slug}/${res.lessonKey ?? "lesson-1"}` });
-      toast(t("saved"));
+      try {
+        const res = await saveTrainingDraftAction({
+          draft: r.draft,
+          contentLocale,
+          category: f.category,
+          difficulty: f.difficulty,
+          origin: r.source!.kind,
+          verdict: r.verification!.verdict,
+        });
+        if (!res.ok || !res.slug) return toast(t("errors.failed"), "error");
+        setSaved({ href: `/learn/${res.slug}/${res.lessonKey ?? "lesson-1"}` });
+        toast(t("saved"));
+      } catch (error) {
+        unstable_rethrow(error);
+        toast(t("errors.failed"), "error");
+      }
     });
   };
 
@@ -124,7 +149,7 @@ export function AiTrainer({ aiOn, locales, defaultLocale, categories }: { aiOn: 
               </Select>
             </Field>
             <Field label={t("minutes")} htmlFor="ai-minutes">
-              <Input id="ai-minutes" type="number" inputMode="numeric" min={2} max={45} value={f.minutes} onChange={(e) => set("minutes", Math.max(2, Math.min(45, Number(e.target.value) || 2)))} />
+              <Input id="ai-minutes" type="number" inputMode="numeric" min={2} max={45} value={minutes} onChange={(e) => setMinutes(e.target.value)} onBlur={fixMinutes} />
             </Field>
           </div>
           <div className="grid gap-1.5">
@@ -181,7 +206,7 @@ export function AiTrainer({ aiOn, locales, defaultLocale, categories }: { aiOn: 
             <Verdict result={result} />
             {result.draft ? (
               <>
-                <Preview draft={result.draft} />
+                <Preview draft={result.draft} lang={contentLocale} />
                 <div className="flex flex-wrap items-center gap-3">
                   {saved ? (
                     <ButtonLink href={saved.href} variant="primary" icon={<Eye />}>
@@ -373,12 +398,13 @@ function IssueList({ issues, draft }: { issues: Issue[]; draft?: TrainingDraft }
   );
 }
 
-function Preview({ draft }: { draft: TrainingDraft }) {
+function Preview({ draft, lang }: { draft: TrainingDraft; lang: string }) {
   const t = useTranslations("secops.aiTrainer");
   const tc = useTranslations("common");
   return (
     <div className="grid gap-3">
-      <div>
+      {/* The draft is in its content language; the labels around it stay in the console's. */}
+      <div {...langAttrs(lang)}>
         <h3 className="text-body font-semibold break-words text-ink">{draft.title}</h3>
         {draft.subtitle ? <p className="mt-1 text-body-sm text-ink-muted">{draft.subtitle}</p> : null}
       </div>
@@ -388,7 +414,7 @@ function Preview({ draft }: { draft: TrainingDraft }) {
             <CircleDashed aria-hidden className="size-4 shrink-0 text-brand-600 group-open:hidden" />
             <Check aria-hidden className="hidden size-4 shrink-0 text-brand-600 group-open:block" />
             <span className="min-w-0 flex-1 break-words">
-              {t("lessonN", { n: li + 1 })} · {l.title}
+              {t("lessonN", { n: li + 1 })} · <span {...langAttrs(lang)}>{l.title}</span>
             </span>
             <span className="shrink-0 text-caption font-normal text-ink-subtle">{tc("units.min", { count: l.minutes })}</span>
           </summary>
@@ -398,7 +424,9 @@ function Preview({ draft }: { draft: TrainingDraft }) {
                 <Pill tone="brand" className="w-fit">
                   {t(`scene.${s.type}`)}
                 </Pill>
-                <SceneOutline scene={s} />
+                <div {...langAttrs(lang)}>
+                  <SceneOutline scene={s} />
+                </div>
               </li>
             ))}
           </ol>
@@ -481,7 +509,7 @@ function SceneOutline({ scene: s }: { scene: Scene }) {
           <ul className="grid gap-1">
             {s.pairs.map((p) => (
               <li key={p.id} className={text}>
-                {p.left} → {p.right}
+                {p.left} <span className="inline-block rtl:-scale-x-100">→</span> {p.right}
               </li>
             ))}
           </ul>

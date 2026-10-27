@@ -1,0 +1,425 @@
+{
+ "id": "which-copy-survived",
+ "title": "Welche Kopie hat überlebt?",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "br1-tutor",
+   "beats": [
+    {
+     "id": "br1-b1",
+     "say": "Hallo! Die Archivabteilung verwahrt Dokumente aus zehn Jahren. Heute lernen Sie, wie man Kopien davon richtig aufbewahrt.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "br1-b2",
+     "say": "Ransomware, also Erpressungssoftware, verschlüsselt nicht nur den Computer. Auch der angeschlossene USB-Stick und der Netzwerkordner werden gesperrt.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Ihre Dateien sind verschlüsselt"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Der Ordner „Dokumente“ ist gesperrt."
+         }
+        ],
+        [
+         {
+          "text": "Angeschlossene Laufwerke und der Netzwerkordner sind ebenfalls gesperrt.",
+          "spot": "connected"
+         }
+        ]
+       ],
+       "buttons": [
+        "Zahlen"
+       ]
+      }
+     },
+     "highlight": "connected"
+    },
+    {
+     "id": "br1-b3",
+     "say": "Die Regel lautet: drei Kopien, zwei verschiedene Speichermedien, eine Kopie an einem anderen Ort. Mindestens eine muss komplett vom Netzwerk getrennt sein.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "3-2-1",
+      "label": "3 Kopien, 2 Arten von Speichermedien, 1 Kopie außer Haus"
+     }
+    },
+    {
+     "id": "br1-b4",
+     "say": "Und denken Sie daran: Eine ungetestete Kopie kann sich im Ernstfall als leer erweisen. Testen Sie die Wiederherstellung von Zeit zu Zeit.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "br1-choice",
+   "question": {
+    "prompt": "Auf dem Bildschirm steht eine Lösegeldforderung. Welche Kopie hat höchstwahrscheinlich überlebt?",
+    "options": [
+     {
+      "id": "usb",
+      "label": "Der USB-Stick, der im Computer stecken geblieben ist",
+      "correct": false,
+      "feedback": "Ein angeschlossenes Laufwerk ist praktisch ein Teil des Computers. Die Ransomware verschlüsselt es mit."
+     },
+     {
+      "id": "sync",
+      "label": "Der Cloud-Ordner, der automatisch synchronisiert wird",
+      "correct": false,
+      "feedback": "Die Synchronisierung kopiert auch die verschlüsselten Dateien in die Cloud. Manchmal bleiben ältere Versionen erhalten, aber darauf können Sie sich nicht verlassen."
+     },
+     {
+      "id": "network",
+      "label": "Der Netzwerkordner der Abteilung",
+      "correct": false,
+      "feedback": "Wenn der Computer den Netzwerkordner erreicht, erreicht ihn auch die Ransomware."
+     },
+     {
+      "id": "offline",
+      "label": "Die externe Festplatte, die am Freitag abgezogen und im Tresor eingeschlossen wurde",
+      "correct": true,
+      "feedback": "Richtig. Eine Festplatte, die vom Computer und vom Netzwerk getrennt ist, bleibt bei einem Angriff unerreichbar."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "ransomware"
+    }
+   },
+   "explain": "Einen Angriff übersteht die Kopie, die nicht am Netzwerk hängt. Deshalb wird immer eine Kopie vom Gerät getrennt und separat aufbewahrt."
+  },
+  {
+   "type": "simulation",
+   "id": "br1-sim",
+   "environment": "desktop",
+   "title": "Archivabteilung",
+   "intro": "Sie arbeiten in der Archivabteilung. Entscheiden Sie von Freitagabend bis Montag in jedem Fenster richtig.",
+   "steps": [
+    {
+     "id": "backup-done",
+     "label": "Freitag, 17:40",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-ehtiyat-komekcisi",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Wöchentliches Backup ist fertig"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "ARXIV-DISK: Dokumente aus zehn Jahren, 212 GB. Sie können die Festplatte jetzt entfernen."
+        }
+       ]
+      ],
+      "buttons": [
+       "Festplatte auswerfen",
+       "Verbunden lassen"
+      ]
+     },
+     "say": "Das wöchentliche Backup ist fertig.",
+     "actions": [
+      {
+       "id": "eject",
+       "label": "Festplatte auswerfen",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine ausgeworfene Festplatte kann beim nächsten Angriff nicht verschlüsselt werden."
+      },
+      {
+       "id": "keep",
+       "label": "Verbunden lassen",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Eine angeschlossene Festplatte kann zusammen mit dem Computer verschlüsselt werden. Werfen Sie sie aus, sobald das Backup abgeschlossen ist."
+      }
+     ]
+    },
+    {
+     "id": "restore-test",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-ehtiyat-komekcisi",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Wiederherstellung prüfen"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Zum Test einen Ordner aus der neuesten Kopie wiederherstellen?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Wiederherstellung testen",
+       "Überspringen"
+      ]
+     },
+     "actions": [
+      {
+       "id": "test",
+       "label": "Wiederherstellung testen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Nur eine Kopie, die sich öffnen lässt, ist eine echte Kopie."
+      },
+      {
+       "id": "skip",
+       "label": "Überspringen",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Die Kopie könnte beschädigt sein, und Sie würden es im ungünstigsten Moment merken. Testen Sie die Wiederherstellung regelmäßig."
+      }
+     ]
+    },
+    {
+     "id": "personal-cloud",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "buludxidmet",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Ordner in Ihr privates Konto hochladen?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Arxiv_2016_2026: 212 GB. Konto: sevda.k@poct-mail.example.net"
+        }
+       ]
+      ],
+      "buttons": [
+       "Hochladen",
+       "Ablehnen"
+      ]
+     },
+     "actions": [
+      {
+       "id": "upload",
+       "label": "Hochladen",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Dienstliche Dokumente gehören nur an Orte, die Ihre Organisation genehmigt hat. Eine private Cloud schützt die Kopie nicht und kann zu einem Datenleck führen."
+      },
+      {
+       "id": "decline",
+       "label": "Ablehnen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn eine zusätzliche Kopie nötig ist, legt der IT-Support sie an einem genehmigten Ort an."
+      }
+     ]
+    },
+    {
+     "id": "ransom-monday",
+     "label": "Montag, 09:05",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Ihre Dateien sind verschlüsselt"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Der Netzwerkordner und angeschlossene Laufwerke sind gesperrt. Zahlen Sie innerhalb von 72 Stunden, um den Schlüssel zu erhalten."
+        }
+       ]
+      ],
+      "buttons": [
+       "Zahlen",
+       "Schließen"
+      ]
+     },
+     "say": "Am Montagmorgen steht diese Meldung auf dem Bildschirm.",
+     "actions": [
+      {
+       "id": "isolate",
+       "label": "Netzwerkkabel ziehen, WLAN ausschalten",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Richtig. Trennen Sie den Computer vom Netzwerk, ohne ihn herunterzufahren, und rufen Sie sofort den IT-Support an."
+      },
+      {
+       "id": "pay",
+       "label": "Zahlen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Eine Zahlung garantiert nicht, dass die Dateien zurückkommen. Wiederhergestellt wird aus der Kopie, die Sie getrennt aufbewahrt haben."
+      }
+     ]
+    },
+    {
+     "id": "sync-alert",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "buludxidmet",
+      "app": "BuludXidmət",
+      "title": [
+       {
+        "text": "1.240 Dateien geändert"
+       }
+      ],
+      "body": [
+       {
+        "text": "Der Abteilungsordner wurde mit der Cloud synchronisiert."
+       }
+      ],
+      "time": "09:07"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "IT-Support informieren",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig, die Synchronisierung hat auch die verschlüsselten Dateien kopiert. Eine Fachkraft stellt die älteren Versionen wieder her."
+      },
+      {
+       "id": "restore-self",
+       "label": "Selbst aus der Cloud wiederherstellen",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Dateien, die auf einem infizierten Computer wiederhergestellt werden, können erneut verschlüsselt werden. Fachleute stellen sie auf einem sauberen Computer wieder her."
+      }
+     ]
+    },
+    {
+     "id": "offline-disk",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "it-tehlukesizlik",
+      "app": "IT-Sicherheit",
+      "title": [
+       {
+        "text": "Bringen Sie die Festplatte aus dem Tresor"
+       }
+      ],
+      "body": [
+       {
+        "text": "Schließen Sie ARXIV-DISK nirgends an. Wir stellen die Daten gemeinsam auf einem sauberen Computer wieder her."
+       }
+      ],
+      "time": "10:30"
+     },
+     "actions": [
+      {
+       "id": "hand-over",
+       "label": "Ich übergebe die Festplatte der Fachkraft",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Die Wiederherstellung erfolgt auf einem bereinigten Computer unter Aufsicht einer Fachkraft."
+      },
+      {
+       "id": "plug",
+       "label": "Ich schließe die Festplatte selbst an diesen Computer an",
+       "kind": "plug-in",
+       "outcome": "compromised",
+       "feedback": "Auf einem infizierten Computer kann auch die letzte Kopie verschlüsselt werden. Geben Sie die Festplatte nur der Fachkraft."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "br1-match",
+   "prompt": "Ordnen Sie jedem Teil der Regel seine Bedeutung zu.",
+   "pairs": [
+    {
+     "id": "three",
+     "left": "3 Kopien",
+     "right": "Die Originaldatei und zwei Backups"
+    },
+    {
+     "id": "two",
+     "left": "2 Arten von Speichermedien",
+     "right": "Zum Beispiel eine externe Festplatte und eine genehmigte Cloud"
+    },
+    {
+     "id": "one",
+     "left": "1 Kopie außer Haus",
+     "right": "In einem anderen Gebäude und ohne Netzwerkverbindung"
+    },
+    {
+     "id": "test",
+     "left": "Wiederherstellungstest",
+     "right": "Regelmäßig prüfen, ob sich die Kopie öffnen lässt"
+    }
+   ],
+   "explain": "Mit drei Kopien auf zwei Medien, davon eine außer Haus, bleibt immer eine übrig, wenn eine verloren geht. Ein Wiederherstellungstest beweist, dass die Kopie funktioniert."
+  },
+  {
+   "type": "choice",
+   "id": "br1-work-files",
+   "question": {
+    "prompt": "Wo bewahren Sie wichtige dienstliche Dokumente auf?",
+    "options": [
+     {
+      "id": "approved",
+      "label": "Im genehmigten Ordner meiner Organisation",
+      "correct": true,
+      "feedback": "Richtig. Dort erstellt und prüft der IT-Support die Kopien."
+     },
+     {
+      "id": "desktop-usb",
+      "label": "Auf dem Desktop, und abends kopiere ich sie auf meinen eigenen USB-Stick",
+      "correct": false,
+      "feedback": "Ein privater USB-Stick kann verloren gehen oder infiziert werden. Eine solche Kopie prüft niemand."
+     },
+     {
+      "id": "personal-cloud",
+      "label": "In meinem privaten Cloud-Konto, das ist praktisch",
+      "correct": false,
+      "feedback": "In einem privaten Konto entzieht sich ein dienstliches Dokument der Kontrolle Ihrer Organisation. Auch das ist ein Datenleck."
+     }
+    ]
+   },
+   "explain": "Liegt eine Datei an einem genehmigten Ort, sichert der IT-Support die Kopie und stellt sie bei Bedarf wieder her. Eine dienstliche Datei an einem anderen Ort ist weder geschützt, noch lässt sie sich wiederherstellen."
+  },
+  {
+   "type": "recap",
+   "id": "br1-recap",
+   "points": [
+    "Drei Kopien, zwei Medien, eine außer Haus.",
+    "Bewahren Sie mindestens eine Kopie ohne Netzwerkverbindung auf.",
+    "Testen Sie die Wiederherstellung regelmäßig."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

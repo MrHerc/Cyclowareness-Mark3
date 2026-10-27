@@ -1,0 +1,549 @@
+{
+ "id": "wrong-recipient",
+ "title": "Destinatar greșit",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Un e-mail trimis persoanei greșite este una dintre cele mai frecvente scurgeri de date. De obicei, cauza este graba și completarea automată.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Același nume apare de două ori: una este adresa de serviciu, cealaltă este o adresă personală sau din afară. Verificați domeniul.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Către: Leyla"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Leyla Hasanova, leyla.hasanova@rxagentlik.az"
+         }
+        ],
+        [
+         {
+          "text": "Leyla Hasanova, "
+         },
+         {
+          "text": "leyla.hasanova85@poct.example",
+          "spot": "external"
+         }
+        ]
+       ],
+       "buttons": [
+        "Selectați"
+       ]
+      }
+     },
+     "highlight": "external"
+    },
+    {
+     "id": "b3",
+     "say": "Nu vă bazați pe retragerea mesajului după trimitere: de obicei nu funcționează pentru adresele din afară.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Înainte de trimitere, verificați trei lucruri: destinatarul, atașamentul și persoanele din copie.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "before-send",
+   "environment": "inbox",
+   "title": "Înainte de trimitere",
+   "intro": "Trei ciorne așteaptă să fie trimise, iar un răspuns a venit din afară. Verificați-le pe fiecare.",
+   "steps": [
+    {
+     "id": "autocomplete",
+     "label": "Ciornă",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Eu"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "Leyla Hasanova <leyla.hasanova85@poct.example>",
+      "subject": [
+       {
+        "text": "Lista cererilor"
+       }
+      ],
+      "time": "11:38",
+      "body": [
+       [
+        {
+         "text": "Leyla, îți trimit atașat lista pe care mi-ai cerut-o."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Cereri_2026.xlsx"
+         }
+        ],
+        "size": "310 KB"
+       }
+      ]
+     },
+     "say": "Citiți domeniul destinatarului până la capăt.",
+     "actions": [
+      {
+       "id": "fix",
+       "label": "Verificați și corectați destinatarul",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect: numele se potrivea, dar domeniul nu. Adresa de serviciu se termină în rxagentlik.az."
+      },
+      {
+       "id": "send",
+       "label": "Trimiteți",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Destinatarul era o căsuță de e-mail personală. O listă confidențială a ieșit din organizație."
+      }
+     ]
+    },
+    {
+     "id": "reply-all",
+     "label": "Ciornă",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Eu"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "layihe-qrupu@rxagentlik.az, e.rzayev@merkez-konsalting.example",
+      "subject": [
+       {
+        "text": "Re: Oferta de preț a partenerului"
+       }
+      ],
+      "time": "12:05",
+      "body": [
+       [
+        {
+         "text": "Dragi colegi, oferta Merkez Konsalting pare scumpă, haideți să vorbim și cu altă companie."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "remove",
+       "label": "Eliminați adresa din afară",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. „Răspundeți tuturor” păstrează toți destinatarii anteriori, inclusiv pe cei din afară."
+      },
+      {
+       "id": "send",
+       "label": "Trimiteți",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Partenerul este pe listă. Discuția internă ar fi ajuns și la el."
+      }
+     ]
+    },
+    {
+     "id": "correct-draft",
+     "label": "Ciornă",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Eu"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "kadrlar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Cerere de concediu"
+       }
+      ],
+      "time": "12:20",
+      "body": [
+       [
+        {
+         "text": "Bună ziua, vă trimit atașat cererea mea de concediu."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Erize.pdf"
+         }
+        ],
+        "size": "52 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "send",
+       "label": "Trimiteți",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Totul este în regulă: o adresă internă, fișierul corect, niciun destinatar în plus."
+      },
+      {
+       "id": "check",
+       "label": "Verificați din nou",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "O verificare nu strică niciodată. Acest e-mail era corect și poate fi trimis."
+      }
+     ]
+    },
+    {
+     "id": "partner-notice",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "merkez-konsalting",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Rzayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "e.rzayev@merkez-konsalting.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Am primit asta din greșeală?"
+       }
+      ],
+      "time": "13:10",
+      "body": [
+       [
+        {
+         "text": "Bună ziua, ieri departamentul dumneavoastră mi-a trimis tabelul cu salariile angajaților. Probabil este o greșeală. Ce ar trebui să fac?"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Redirecționați către echipa de securitate",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Corect. Un e-mail trimis greșit este un incident, iar specialistul vă va spune ce să faceți."
+      },
+      {
+       "id": "reply",
+       "label": "Răspundeți: vă rog să-l ștergeți",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Este corect să cereți ștergerea, dar anunțați mai întâi echipa de securitate."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Scurgerea de date nu dispare. Raportați-o, ca specialiștii să poată lua măsuri."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "recall",
+   "question": {
+    "prompt": "Un e-mail a plecat la o adresă greșită și l-ați retras. Este suficient?",
+    "options": [
+     {
+      "id": "enough",
+      "label": "Da, e-mailul va fi eliminat",
+      "correct": false,
+      "feedback": "De obicei, retragerea nu funcționează pentru adresele din afară, iar e-mailul poate fi deja citit."
+     },
+     {
+      "id": "report",
+      "label": "Nu, raportez oricum imediat echipei de securitate",
+      "correct": true,
+      "feedback": "Corect. Retragerea poate eșua, raportarea este obligatorie."
+     },
+     {
+      "id": "wait",
+      "label": "Aștept, poate nu îl deschid",
+      "correct": false,
+      "feedback": "Așteptarea nu reduce paguba. O raportare rapidă oferă mai multe opțiuni."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "inbox"
+    }
+   },
+   "explain": "Dacă ați trimis greșit, nu ascundeți: anunțați imediat managerul și echipa de securitate."
+  },
+  {
+   "type": "swipe",
+   "id": "recipient-check",
+   "prompt": "Lista de destinatari este corectă?",
+   "cards": [
+    {
+     "id": "hr",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Eu"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "kadrlar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Cerere pentru o adeverință"
+       }
+      ],
+      "time": "14:00",
+      "body": [
+       [
+        {
+         "text": "Bună ziua, am nevoie de o adeverință de angajat."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "O adresă internă, departamentul potrivit, niciun destinatar în plus."
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Eu"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "Rashad Aliyev <reshad.aliyev@rxagentlik-az.com>",
+      "subject": [
+       {
+        "text": "Tabelul bugetului"
+       }
+      ],
+      "time": "14:12",
+      "body": [
+       [
+        {
+         "text": "Rashad, îți trimit atașat tabelul."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Buget_2027.xlsx"
+         }
+        ],
+        "size": "180 KB"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "rxagentlik-az.com nu este domeniul dumneavoastră. Completarea automată v-a propus o adresă veche sau falsă."
+    },
+    {
+     "id": "all-staff",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Eu"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "butun-emekdaslar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Adeverința medicală a unui coleg"
+       }
+      ],
+      "time": "14:30",
+      "body": [
+       [
+        {
+         "text": "Vă trimit atașat adeverința."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Arayis.pdf"
+         }
+        ],
+        "size": "96 KB"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un document personal nu trebuie trimis tuturor angajaților. Trimiteți-l doar persoanei care are nevoie de el."
+    },
+    {
+     "id": "no-bcc",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Eu"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "40 de parteneri, toți în câmpul Către",
+      "subject": [
+       {
+        "text": "Felicitări de sărbători"
+       }
+      ],
+      "time": "15:00",
+      "body": [
+       [
+        {
+         "text": "Dragi parteneri, sărbători fericite!"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Într-un e-mail în masă, puneți adresele în câmpul Cci, ca destinatarii să nu se vadă unii pe alții."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "address-fields",
+   "prompt": "Puneți fiecare destinatar în câmpul potrivit.",
+   "pairs": [
+    {
+     "id": "to",
+     "left": "Destinatarul principal, de la care se așteaptă un răspuns",
+     "right": "Către"
+    },
+    {
+     "id": "cc",
+     "left": "Un coleg ținut la curent",
+     "right": "Cc"
+    },
+    {
+     "id": "bcc",
+     "left": "Mulți destinatari care nu se cunosc între ei",
+     "right": "Cci"
+    }
+   ],
+   "explain": "Câmpul potrivit îi împiedică pe cei din afară să vadă adrese de care nu au nevoie."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Înainte de trimitere, citiți domeniul destinatarului până la capăt.",
+    "Verificați „Răspundeți tuturor” și orice adresă din afară aflată în copie.",
+    "Dacă ați greșit, nu vă bazați pe retragerea mesajului, raportați imediat."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

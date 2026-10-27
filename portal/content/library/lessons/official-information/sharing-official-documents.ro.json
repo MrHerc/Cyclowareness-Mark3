@@ -1,0 +1,311 @@
+{
+  "id": "sharing-official-documents",
+  "title": "Transmiterea documentelor",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l2-tutor",
+      "beats": [
+        {
+          "id": "l2-b1",
+          "say": "Documentele de serviciu circulă doar prin canale oficiale: e-mailul de serviciu sau sistemul de gestionare a documentelor.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": { "kind": "illustration", "id": "inbox" }
+        },
+        {
+          "id": "l2-b2",
+          "say": "Aplicațiile de mesagerie personale și e-mailul personal sunt în afara controlului instituției. Acolo, un document se poate pierde sau poate ajunge în mâini străine.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "app": "whatsapp",
+              "contact": [{ "text": "Narmin Huseynova (personal)" }],
+              "messages": [
+                {
+                  "from": "me",
+                  "body": [{ "text": "Proiect_ordin_2027.pdf", "spot": "doc" }],
+                  "time": "19:42"
+                }
+              ]
+            }
+          },
+          "highlight": "doc"
+        },
+        {
+          "id": "l2-b3",
+          "say": "Citiți adresa destinatarului înainte să trimiteți. Completarea automată poate alege un nume asemănător, care aparține altcuiva.",
+          "mood": "think",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "ispoct",
+              "tone": "app",
+              "title": [{ "text": "Trimiteți acum?" }],
+              "body": [
+                [
+                  { "text": "Către: " },
+                  { "text": "aysel.mamedova@poct-mail.example", "spot": "recipient" }
+                ],
+                [{ "text": "Atașament: Lista_personal.xlsx" }]
+              ],
+              "buttons": ["Anulați", "Trimiteți"]
+            }
+          },
+          "highlight": "recipient"
+        },
+        {
+          "id": "l2-b4",
+          "say": "Când aveți dubii, nu trimiteți, ci întrebați. Dacă un document a ajuns unde nu trebuia, raportați imediat.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": { "kind": "illustration", "id": "shield" }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l2-hotspot",
+      "prompt": "Găsiți greșelile din acest e-mail înainte să fie trimis.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "ispoct",
+        "tone": "app",
+        "title": [{ "text": "Gata de trimitere" }],
+        "body": [
+          [
+            { "text": "Către: " },
+            { "text": "rauf.huseynov@poct-mail.example", "spot": "personal-address" }
+          ],
+          [
+            { "text": "Cc: " },
+            { "text": "Toți angajații (212 persoane)", "spot": "too-many" }
+          ],
+          [
+            { "text": "Atașament: " },
+            { "text": "Cereri_cetateni_FIN.xlsx", "spot": "personal-data" }
+          ],
+          [
+            { "text": "Text: Dacă fișierul nu se deschide, " },
+            { "text": "parola: Baki2026", "spot": "password" }
+          ]
+        ],
+        "buttons": ["Editați", "Trimiteți"]
+      },
+      "spots": [
+        {
+          "id": "personal-address",
+          "label": "Adresă de e-mail personală",
+          "explain": "Documentele de serviciu merg la o adresă de serviciu sau în sistemul de documente. E-mailul personal este în afara controlului instituției."
+        },
+        {
+          "id": "too-many",
+          "label": "Copie către toată lumea",
+          "explain": "Nu toate cele 212 persoane au nevoie de acest fișier. Alegeți doar destinatarii care chiar au nevoie de el."
+        },
+        {
+          "id": "personal-data",
+          "label": "Numerele de identificare ale cetățenilor",
+          "explain": "Un fișier cu date cu caracter personal ajunge doar la cine lucrează cu el și, ideal, nu iese din sistem."
+        },
+        {
+          "id": "password",
+          "label": "Parola în același e-mail",
+          "explain": "Dacă trimiteți parola împreună cu fișierul, protecția nu mai are niciun rost. Comunicați parola pe alt canal."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "l2-sim",
+      "environment": "phone",
+      "title": "În afara biroului",
+      "intro": "Nu sunteți la birou și primiți mesaje de serviciu. Alegeți pasul potrivit pentru fiecare.",
+      "steps": [
+        {
+          "id": "manager-whatsapp",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [{ "text": "Narmin Huseynova" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Bună, nu sunt la birou. Trimite-mi proiectul de ordin pe WhatsApp, mă uit peste el de aici." }],
+                "time": "18:10"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "share",
+              "label": "Trimiteți fișierul pe WhatsApp",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Într-o aplicație de mesagerie personală, documentul iese de sub controlul instituției. Și managerii au la dispoziție un canal oficial."
+            },
+            {
+              "id": "reply",
+              "label": "Vi-l trimit prin SənədAxını",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Corect. Documentul rămâne în sistemul oficial, iar managerul dumneavoastră îl poate deschide acolo."
+            }
+          ]
+        },
+        {
+          "id": "old-colleague",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [{ "text": "Nazim (fost coleg)" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "A ieșit ordinul vostru cel nou? Trimite-mi o poză, nu spun nimănui." }],
+                "time": "18:25"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "keep",
+              "label": "Îl vei vedea pe site după ce va fi publicat",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Corect. Un document nepublicat nu iese din instituție."
+            },
+            {
+              "id": "share",
+              "label": "Faceți o poză și trimiteți-o",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Fotografia nu mai este sub controlul dumneavoastră. Poate ajunge oriunde."
+            }
+          ]
+        },
+        {
+          "id": "wrong-recipient",
+          "label": "Ați vrut să îi scrieți colegei dumneavoastră Aysel Mammadova",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "ispoct",
+            "app": "IshPocht",
+            "title": [{ "text": "E-mail trimis" }],
+            "body": [{ "text": "Către: aysel.mamedova@poct-mail.example. Atașament: Lista_personal.xlsx" }],
+            "time": "18:40"
+          },
+          "say": "Uitați-vă atent la adresa destinatarului.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Anunțați managerul și echipa de securitate",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Corect. O raportare rapidă vă dă timp să limitați pagubele."
+            },
+            {
+              "id": "ignore",
+              "label": "Nu observă nimeni, lăsați așa",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Fișierul a ajuns la o adresă externă. Dacă ascundeți greșeala, paguba crește, iar raportarea vă protejează."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l2-choice",
+      "question": {
+        "prompt": "Cum puteți lua acasă un document de serviciu ca să lucrați la el?",
+        "options": [
+          {
+            "id": "personal-mail",
+            "label": "Mi-l trimit pe e-mail, la adresa personală",
+            "correct": false,
+            "feedback": "E-mailul personal este în afara controlului instituției. Documentul rămâne acolo și poate ajunge în mâini străine."
+          },
+          {
+            "id": "usb",
+            "label": "Îl copiez pe stickul meu USB",
+            "correct": false,
+            "feedback": "Stickurile USB se pierd ușor. Nu luați documente de serviciu cu dumneavoastră fără permisiunea instituției."
+          },
+          {
+            "id": "approved",
+            "label": "Așa cum permite instituția: pe laptopul de serviciu sau prin VPN",
+            "correct": true,
+            "feedback": "Corect. Calea aprobată protejează documentul și îl păstrează sub control."
+          }
+        ]
+      },
+      "explain": "Lucrul de acasă se face după regulile instituției. Dacă nu există o cale aprobată, documentul rămâne la birou."
+    },
+    {
+      "type": "scenario",
+      "id": "l2-scenario",
+      "title": "Imprimanta comună",
+      "start": "p1",
+      "nodes": [
+        {
+          "id": "p1",
+          "text": "Ați trimis un raport confidențial la imprimanta comună de pe hol. Chiar atunci vă sună telefonul.",
+          "choices": [
+            {
+              "label": "Răspund la telefon și merg la imprimantă mai târziu",
+              "next": "p2",
+              "outcome": "risky",
+              "feedback": "Foile rămân în imprimantă și le poate vedea oricine trece pe acolo."
+            },
+            {
+              "label": "Mai întâi iau foile de la imprimantă",
+              "next": "p2",
+              "outcome": "safe",
+              "feedback": "Corect. Dacă imprimanta are opțiunea de tipărire securizată cu PIN, folosiți-o."
+            }
+          ]
+        },
+        {
+          "id": "p2",
+          "text": "În imprimantă a rămas și un document cu etichetă al altcuiva.",
+          "choices": [
+            {
+              "label": "Îl citesc ca să aflu al cui este",
+              "outcome": "risky",
+              "feedback": "Nu este nevoie să îl citiți. Predați-l echipei de securitate sau șefului de departament."
+            },
+            {
+              "label": "Îl arunc la gunoi",
+              "outcome": "risky",
+              "feedback": "Foile se iau ușor dintr-un coș de gunoi obișnuit. Documentele cu etichetă se distrug cu distrugătorul de documente."
+            },
+            {
+              "label": "Îl predau echipei de securitate fără să îl citesc",
+              "outcome": "safe",
+              "feedback": "Corect. Documentul ajunge înapoi la proprietarul lui și nimeni nu îl citește."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "l2-recap",
+      "points": [
+        "Documentele de serviciu circulă prin canale oficiale, nu prin aplicații de mesagerie sau e-mailul personal.",
+        "Verificați destinatarul și atașamentul înainte de trimitere și raportați imediat orice greșeală.",
+        "Nu lăsați documente cu etichetă în imprimantă și nu le aruncați într-un coș de gunoi obișnuit."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

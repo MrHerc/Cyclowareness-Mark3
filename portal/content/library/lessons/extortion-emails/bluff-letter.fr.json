@@ -1,0 +1,510 @@
+{
+ "id": "bluff-letter",
+ "title": "L’e-mail qui bluffe",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "bl-tutor",
+   "beats": [
+    {
+     "id": "bl-b1",
+     "say": "Bonjour ! Parfois, un e-mail effrayant arrive : j’ai piraté votre caméra, payez ou je publie vos vidéos intimes.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "bl-b2",
+     "say": "L’e-mail affiche même l’un de vos anciens mots de passe. En général, il provient d’une fuite de données vieille de plusieurs années.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Anonyme"
+         }
+        ],
+        "address": [
+         {
+          "text": "anonim.7781@mail-relay.example.net"
+         }
+        ]
+       },
+       "to": "you@idare.example",
+       "subject": [
+        {
+         "text": "Votre mot de passe : "
+        },
+        {
+         "text": "Gunes2019",
+         "spot": "password"
+        },
+        {
+         "text": ". Vous avez 48 heures"
+        }
+       ],
+       "time": "08:47",
+       "body": [
+        [
+         {
+          "text": "J’ai pris le contrôle de votre appareil et enregistré des vidéos intimes avec votre caméra."
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "password"
+    },
+    {
+     "id": "bl-b3",
+     "say": "Ce genre d’e-mail part vers des milliers de personnes en même temps. Il n’existe aucune vidéo prise par votre caméra.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "bl-b4",
+     "say": "La règle : ne payez pas, ne répondez pas, changez le mot de passe et, dans la messagerie professionnelle, signalez l’e-mail à l’équipe sécurité.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "bl-hotspot",
+   "prompt": "Trouvez les ruses de l’escroc dans cet e-mail.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Anonyme"
+      }
+     ],
+     "address": [
+      {
+       "text": "anonim.7781@mail-relay.example.net"
+      }
+     ]
+    },
+    "to": "you@idare.example",
+    "subject": [
+     {
+      "text": "Votre mot de passe : "
+     },
+     {
+      "text": "Gunes2019",
+      "spot": "password"
+     },
+     {
+      "text": ". Vous avez 48 heures"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "J’ai pris le contrôle de votre appareil et enregistré des vidéos intimes avec votre caméra.",
+       "spot": "camera"
+      }
+     ],
+     [
+      {
+       "text": "Pour preuve, je vous donne votre mot de passe. Si vous ne voulez pas que les vidéos soient publiées, envoyez l’équivalent de 1 500 AZN en bitcoins à l’adresse suivante :"
+      }
+     ],
+     [
+      {
+       "text": "bc1q000000000000000000000000000000demo",
+       "spot": "btc"
+      }
+     ],
+     [
+      {
+       "text": "Vous avez 48 heures pour payer. Ne montrez cet e-mail à personne.",
+       "spot": "timer"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "password",
+     "label": "Ancien mot de passe",
+     "explain": "Ce mot de passe provient d’une ancienne fuite de données. Il ne prouve aucun piratage, mais changez-le partout où vous l’utilisez encore."
+    },
+    {
+     "id": "camera",
+     "label": "Prétendu piratage de la caméra",
+     "explain": "C’est du bluff. Le même texte part vers des milliers d’adresses, et il n’existe aucune vidéo."
+    },
+    {
+     "id": "btc",
+     "label": "Adresse bitcoin",
+     "explain": "Un paiement en cryptos ne peut pas être annulé. Si vous payez, une nouvelle demande suivra."
+    },
+    {
+     "id": "timer",
+     "label": "48 heures",
+     "explain": "Ce délai sert à vous faire peur et à vous empêcher de réfléchir. Ne payez pas et ne répondez pas."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "match",
+   "id": "bl-match",
+   "prompt": "Associez chaque affirmation de l’e-mail à la réalité.",
+   "pairs": [
+    {
+     "id": "camera",
+     "left": "J’ai piraté votre caméra",
+     "right": "Aucune preuve, le texte est envoyé en masse"
+    },
+    {
+     "id": "password",
+     "left": "Voici votre mot de passe",
+     "right": "Tiré d’une ancienne fuite de données"
+    },
+    {
+     "id": "house",
+     "left": "Une photo de votre maison est jointe",
+     "right": "Adresse issue d’une fuite, photo tirée d’une carte publique"
+    },
+    {
+     "id": "timer",
+     "left": "Vous avez 48 heures",
+     "right": "Un faux délai pour vous faire peur"
+    }
+   ],
+   "explain": "Tout ce que sait l’escroc vient de données publiques ou issues de fuites. Il les a rassemblées pour vous effrayer."
+  },
+  {
+   "type": "simulation",
+   "id": "bl-sim",
+   "environment": "inbox",
+   "title": "Votre messagerie professionnelle",
+   "intro": "Vous ouvrez votre boîte de réception professionnelle au ministère. Choisissez la bonne réaction pour chacun des quatre e-mails.",
+   "steps": [
+    {
+     "id": "sextortion",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Anonyme"
+        }
+       ],
+       "address": [
+        {
+         "text": "anonim.7781@mail-relay.example.net"
+        }
+       ]
+      },
+      "to": "you@idare.example",
+      "subject": [
+       {
+        "text": "Votre mot de passe : Gunes2019. Vous avez 48 heures"
+       }
+      ],
+      "time": "08:47",
+      "body": [
+       [
+        {
+         "text": "J’ai pris le contrôle de votre appareil et enregistré des vidéos intimes avec votre caméra."
+        }
+       ],
+       [
+        {
+         "text": "Si vous ne voulez pas que les vidéos soient publiées, envoyez l’équivalent de 1 500 AZN en bitcoins à : bc1q000000000000000000000000000000demo"
+        }
+       ],
+       [
+        {
+         "text": "Vous avez 48 heures pour payer."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. L’équipe sécurité peut aussi supprimer le même e-mail des boîtes de réception de vos collègues."
+      },
+      {
+       "id": "reply",
+       "label": "Répondre : montrez-moi une preuve",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Une réponse montre que votre adresse est active et vous attire encore plus d’e-mails. Ne répondez pas."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Supprimer l’e-mail, c’est bien. Mais dans la messagerie professionnelle, mieux vaut d’abord le signaler."
+      }
+     ]
+    },
+    {
+     "id": "house-photo",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "L’Observateur"
+        }
+       ],
+       "address": [
+        {
+         "text": "watcher.0042@anon-post.example.net"
+        }
+       ]
+      },
+      "to": "you@idare.example",
+      "subject": [
+       {
+        "text": "Vous voyez la photo de votre maison ?"
+       }
+      ],
+      "time": "09:05",
+      "body": [
+       [
+        {
+         "text": "C’est votre maison. Je connais votre adresse et votre mot de passe."
+        }
+       ],
+       [
+        {
+         "text": "Envoyez 1 500 AZN en bitcoins, sinon les vidéos seront publiées."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "ev_unvan.jpg"
+         }
+        ],
+        "size": "212 Ko"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. La photo de la maison vient d’une carte publique : c’est encore un bluff envoyé en masse."
+      },
+      {
+       "id": "open",
+       "label": "Ouvrir la photo",
+       "kind": "open-attachment",
+       "outcome": "risky",
+       "feedback": "La photo est là pour vous faire encore plus peur. N’ouvrez pas une pièce jointe suspecte, signalez l’e-mail."
+      },
+      {
+       "id": "promise",
+       "label": "Répondre : je vais payer",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Payer, ou promettre de payer, entraîne de nouvelles exigences. Ne payez pas et ne répondez pas."
+      }
+     ]
+    },
+    {
+     "id": "security-notice",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik",
+      "from": {
+       "name": [
+        {
+         "text": "Sécurité informatique"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare.example"
+        }
+       ]
+      },
+      "to": "you@idare.example",
+      "subject": [
+       {
+        "text": "Alerte : e-mails de chantage"
+       }
+      ],
+      "time": "09:20",
+      "body": [
+       [
+        {
+         "text": "Aujourd’hui, plusieurs collègues ont reçu des e-mails de chantage qui affichent un ancien mot de passe."
+        }
+       ],
+       [
+        {
+         "text": "Ne payez pas et ne répondez pas. Transmettez l’e-mail avec le bouton Signaler."
+        }
+       ],
+       [
+        {
+         "text": "Si vous utilisez encore ce mot de passe, changez-le."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Marquer comme fiable",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Exact. Cet e-mail ne demande rien, il rappelle simplement les bonnes règles."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "La prudence est une bonne chose, mais cet e-mail vient de l’adresse officielle de votre organisation et ne demande rien."
+      }
+     ]
+    },
+    {
+     "id": "fake-reset",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Sécurité informatique"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare-support.example.net"
+        }
+       ]
+      },
+      "to": "you@idare.example",
+      "subject": [
+       {
+        "text": "Votre compte est piraté : changez votre mot de passe maintenant"
+       }
+      ],
+      "time": "09:34",
+      "body": [
+       [
+        {
+         "text": "Vous avez reçu un e-mail de chantage ? Votre compte est en danger."
+        }
+       ],
+       [
+        {
+         "text": "Changez votre mot de passe ici",
+         "link": {
+          "label": "Changez votre mot de passe ici",
+          "href": "https://idare-support.example.net/parol"
+         }
+        }
+       ],
+       [
+        {
+         "text": "Si vous ne le changez pas d’ici 30 minutes, votre compte sera bloqué."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bravo. C’est un deuxième piège qui joue sur la peur, et le domaine n’est pas celui de votre organisation."
+      },
+      {
+       "id": "click",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "La fausse page aurait volé votre mot de passe. Changez-le uniquement dans le système officiel, que vous ouvrez vous-même."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Supprimer l’e-mail, c’est bien. Si vous le signalez, vos autres collègues sont protégés eux aussi."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "bl-choice",
+   "question": {
+    "prompt": "Un e-mail de chantage montre votre adresse et une photo de votre maison tirée d’une carte en ligne. Qu’est-ce que cela signifie ?",
+    "options": [
+     {
+      "id": "public",
+      "label": "L’adresse vient d’une fuite, la photo d’une carte publique",
+      "correct": true,
+      "feedback": "Exact. Connaître votre adresse ne veut pas dire que votre caméra a été piratée."
+     },
+     {
+      "id": "real",
+      "label": "On m’observe vraiment, je dois donc payer",
+      "correct": false,
+      "feedback": "Payer ne règle rien, cela entraîne une nouvelle demande. Signalez l’e-mail."
+     },
+     {
+      "id": "ask",
+      "label": "Je dois répondre et demander qui ils sont",
+      "correct": false,
+      "feedback": "Une réponse montre que votre adresse est active. L’escroc enverra encore plus d’e-mails."
+     }
+    ]
+   },
+   "explain": "L’escroc mélange données publiques et données issues de fuites pour faire peur. Ne payez pas, ne répondez pas et, si vous vous sentez en danger, contactez la police."
+  },
+  {
+   "type": "recap",
+   "id": "bl-recap",
+   "points": [
+    "Un e-mail de masse du type « j’ai piraté votre caméra » est du bluff : ne payez pas, ne répondez pas.",
+    "Si vous utilisez encore l’ancien mot de passe cité dans l’e-mail, changez-le partout.",
+    "Dans la messagerie professionnelle, signalez ce genre d’e-mail à l’équipe sécurité."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

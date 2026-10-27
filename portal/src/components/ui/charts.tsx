@@ -77,16 +77,17 @@ export function AreaChart({
   return (
     <figure>
       <div className="relative" style={{ height }}>
-        <div aria-hidden className="absolute inset-y-0 left-0 w-8">
+        <div aria-hidden className="absolute inset-y-0 start-0 w-8">
           {ticks.map((v) => (
-            <span key={v} className="absolute right-1.5 -translate-y-1/2 text-right text-tab-sm text-ink-subtle tabular-nums" style={{ top: `${(y(v) / H) * 100}%` }}>
+            <span key={v} className="absolute end-1.5 -translate-y-1/2 text-end text-tab-sm text-ink-subtle tabular-nums" style={{ top: `${(y(v) / H) * 100}%` }}>
               {format.number(v)}
               {suffix}
             </span>
           ))}
         </div>
-        <div className={cn("absolute inset-y-0 right-0", riskStrip ? "left-11" : "left-8")}>
-          <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="size-full overflow-visible" aria-hidden>
+        <div className={cn("absolute inset-y-0 end-0", riskStrip ? "start-11" : "start-8")}>
+          {/* Time runs in the reading direction: the plot mirrors with the axis and labels around it. */}
+          <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="size-full overflow-visible rtl:-scale-x-100" aria-hidden>
             <defs>
               <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={stroke} stopOpacity="0.22" />
@@ -101,8 +102,8 @@ export function AreaChart({
           </svg>
           {last ? (
             <span
-              className="absolute -translate-x-full -translate-y-1/2 rounded-pill bg-ink px-2 py-0.5 text-tab-sm font-bold text-white tabular-nums"
-              style={{ left: "100%", top: `${(y(last.value) / H) * 100}%` }}
+              className="absolute end-0 -translate-y-1/2 rounded-pill bg-ink px-2 py-0.5 text-tab-sm font-bold text-white tabular-nums"
+              style={{ top: `${(y(last.value) / H) * 100}%` }}
             >
               {format.number(last.value)}
               {suffix}
@@ -110,7 +111,7 @@ export function AreaChart({
           ) : null}
         </div>
         {riskStrip ? (
-          <div aria-hidden className="absolute top-0 bottom-0 left-8 w-1.5 overflow-hidden rounded-pill">
+          <div aria-hidden className="absolute top-0 bottom-0 start-8 w-1.5 overflow-hidden rounded-pill">
             <div className="h-1/3 bg-risk-500" />
             <div className="h-1/3 bg-warn-500" />
             <div className="h-1/3 bg-safe-500" />
@@ -118,7 +119,7 @@ export function AreaChart({
         ) : null}
       </div>
       {xLabels.length ? (
-        <div aria-hidden className={cn("mt-1.5 flex justify-between text-tab-sm text-ink-subtle", riskStrip ? "ml-11" : "ml-8")}>
+        <div aria-hidden className={cn("mt-1.5 flex justify-between text-tab-sm text-ink-subtle", riskStrip ? "ms-11" : "ms-8")}>
           {xLabels.map((p, i) => (
             <span key={i}>{p.label}</span>
           ))}
@@ -179,7 +180,7 @@ export function Sparkline({
   const stroke = { brand: "var(--brand)", risk: "#e5484d", safe: "#22a05c", warn: "#d97706" }[tone];
   const last = series[series.length - 1];
   const svg = (
-    <svg viewBox={`0 0 ${W} ${H}`} className={cn("h-8 w-28 overflow-visible", className)} aria-hidden>
+    <svg viewBox={`0 0 ${W} ${H}`} className={cn("h-8 w-28 overflow-visible rtl:-scale-x-100", className)} aria-hidden>
       <path d={d} fill="none" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       <circle cx={x(series.length - 1)} cy={y(last)} r="2.5" fill={stroke} />
     </svg>

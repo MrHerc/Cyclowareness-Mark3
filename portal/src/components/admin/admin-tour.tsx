@@ -139,10 +139,11 @@ export function AdminTour({ still = false }: { still?: boolean }) {
         Object.assign(spot.style, { top: `${box.top}px`, left: `${box.left}px`, width: `${box.width}px`, height: `${box.height}px`, opacity: "1" });
         const right = box.left + box.width;
         const bottom = box.top + box.height;
-        if (right < vw / 3 && right + GAP + bw + MARGIN <= vw) {
-          // Beside a sidebar group, level with its top part (a long group runs on below the bubble).
+        const rtl = getComputedStyle(bubble).direction === "rtl";
+        if (rtl ? box.left > (vw * 2) / 3 && box.left - GAP - bw >= MARGIN : right < vw / 3 && right + GAP + bw + MARGIN <= vw) {
+          // Beside a sidebar group (on the right in a right-to-left page), level with its top part (a long group runs on below the bubble).
           top = box.top + Math.min(box.height, 160) / 2 - bh / 2;
-          left = right + GAP;
+          left = rtl ? box.left - GAP - bw : right + GAP;
         } else if (bottom + GAP + bh + MARGIN <= vh) {
           top = bottom + GAP;
           left = box.left + box.width / 2 - bw / 2;
@@ -204,13 +205,15 @@ export function AdminTour({ still = false }: { still?: boolean }) {
     setIndex(Math.max(0, next));
   };
   const onKey = (e: KeyboardEvent) => {
+    // "Next" points the way the page reads.
+    const rtl = getComputedStyle(e.currentTarget).direction === "rtl";
     if (e.key === "Escape") {
       e.preventDefault();
       finish();
-    } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+    } else if (e.key === (rtl ? "ArrowLeft" : "ArrowRight") || e.key === "ArrowDown") {
       e.preventDefault();
       go(1);
-    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+    } else if (e.key === (rtl ? "ArrowRight" : "ArrowLeft") || e.key === "ArrowUp") {
       e.preventDefault();
       go(-1);
     } else if (e.key === "Tab") {
@@ -263,12 +266,12 @@ export function AdminTour({ still = false }: { still?: boolean }) {
               {t(`steps.${step.key}.body`)}
             </p>
           </div>
-          <button type="button" onClick={finish} aria-label={t("skip")} className="-mt-1 -mr-1 grid size-9 shrink-0 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:size-11">
+          <button type="button" onClick={finish} aria-label={t("skip")} className="-mt-1 -me-1 grid size-9 shrink-0 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:size-11">
             <X className="size-4.5" />
           </button>
         </div>
         <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={finish} className={cn("mr-auto", last && "hidden")}>
+          <Button variant="ghost" size="sm" onClick={finish} className={cn("me-auto", last && "hidden")}>
             {t("skip")}
           </Button>
           <div className="flex items-center gap-1.5">

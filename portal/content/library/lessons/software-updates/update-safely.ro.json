@@ -1,0 +1,374 @@
+{
+ "id": "update-safely",
+ "title": "Actualizați în siguranță",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Actualizările nu înseamnă doar butoane noi. Cele mai multe închid vulnerabilități de securitate pe care atacatorii le cunosc deja.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Imediat ce o vulnerabilitate devine publică, atacatorii încep să caute dispozitive neactualizate. Fiecare zi de amânare crește riscul.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "ransomware"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Dacă o fereastră pop-up vă anunță că browserul este învechit și vă cere să descărcați acum o actualizare, este o capcană. Browserele se actualizează din propriile setări.",
+     "mood": "think",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "brauzer-yenilenme-tecili.example.net",
+         "spot": "fake-domain"
+        },
+        {
+         "text": "/update.exe"
+        }
+       ]
+      }
+     },
+     "highlight": "fake-domain"
+    },
+    {
+     "id": "b4",
+     "say": "Actualizările reale vin din setările dispozitivului sau din magazinul oficial de aplicații. Dacă aveți dubii, mergeți chiar dumneavoastră acolo și verificați.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b5",
+     "say": "Nu amânați repornirea după o actualizare. Adesea, protecția devine activă abia după ce dispozitivul repornește.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "real-or-fake",
+   "prompt": "Actualizare reală sau capcană?",
+   "cards": [
+    {
+     "id": "sms-virus",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "Suport"
+       }
+      ],
+      "time": "07:55",
+      "messages": [
+       [
+        {
+         "text": "Pe telefonul dumneavoastră a fost detectat un virus! Descărcați actualizarea de securitate: fix-phone.example.info/app.apk"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Telefonul nu primește actualizări prin SMS. Acest link instalează o aplicație rău intenționată."
+    },
+    {
+     "id": "planned-update",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Suport IT"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Actualizare programată pentru diseară"
+       }
+      ],
+      "time": "14:10",
+      "body": [
+       [
+        {
+         "text": "Astăzi, după ora 19:00, computerele de serviciu se vor actualiza automat."
+        }
+       ],
+       [
+        {
+         "text": "Lăsați computerul pornit și doar salvați-vă documentele. Nu trebuie să descărcați nimic."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Niciun link, niciun fișier, nimic de descărcat. Mesajul doar vă informează."
+    },
+    {
+     "id": "player-update",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://video-pleyer-yenile.example.net/pleyer_setup.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un site care vă cere să vă actualizați playerul ca să vedeți un videoclip este o capcană clasică. Browserele redau singure clipurile video."
+    },
+    {
+     "id": "zip-update",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "System Center"
+        }
+       ],
+       "address": [
+        {
+         "text": "noreply@system-update-center.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Licența dumneavoastră expiră! Este necesară actualizarea"
+       }
+      ],
+      "time": "09:03",
+      "body": [
+       [
+        {
+         "text": "Instalați astăzi actualizarea atașată."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Update_KB5039.zip"
+         }
+        ],
+        "size": "1,8 MB"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Actualizările nu sosesc ca atașamente la e-mail. Arhiva poate ascunde malware."
+    },
+    {
+     "id": "remote-helper",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Suport IT (oficial)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ca să vă actualizez computerul de la distanță, instalați acest program și trimiteți-mi codul de pe ecran."
+         }
+        ],
+        "time": "16:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un program de control de la distanță îi dă atacatorului acces complet la computerul dumneavoastră. Sunați chiar dumneavoastră la suportul IT, la un număr pe care îl aveți deja."
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-update-email",
+   "prompt": "Găsiți semnalele de alarmă ale unui e-mail de actualizare fals.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Serviciul de actualizări Office"
+      }
+     ],
+     "address": [
+      {
+       "text": "security-update@"
+      },
+      {
+       "text": "idare-example.info",
+       "spot": "domain"
+      }
+     ]
+    },
+    "to": "mine",
+    "subject": [
+     {
+      "text": "URGENT: ",
+      "spot": "urgency"
+     },
+     {
+      "text": "Computerul dumneavoastră va fi blocat în 24 de ore"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Stimați colegi,"
+      }
+     ],
+     [
+      {
+       "text": "Pe computerul dumneavoastră lipsește o actualizare critică. Deschideți și instalați fișierul atașat."
+      }
+     ],
+     [
+      {
+       "text": "Dezactivați antivirusul în timpul instalării.",
+       "spot": "disable-av"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Actualizare_urgenta.exe",
+        "spot": "exe"
+       }
+      ],
+      "size": "2,1 MB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Domeniu greșit",
+     "explain": "Organizația dumneavoastră folosește idare.example. Acesta este un alt domeniu, scris cu cratimă."
+    },
+    {
+     "id": "urgency",
+     "label": "Urgență și amenințări",
+     "explain": "Amenințarea cu blocarea are scopul de a vă face să acționați fără să vă gândiți."
+    },
+    {
+     "id": "disable-av",
+     "label": "Dezactivarea antivirusului",
+     "explain": "Nicio actualizare reală nu vă cere să dezactivați protecția. Așa i se deschide drumul malware-ului."
+    },
+    {
+     "id": "exe",
+     "label": "Fișier executabil",
+     "explain": "Un fișier .exe pornește un program în momentul în care îl deschideți. Actualizările nu vin așa."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "update-steps",
+   "prompt": "Puneți pașii actualizării în ordinea corectă.",
+   "items": [
+    {
+     "id": "save",
+     "label": "Salvați-vă documentele"
+    },
+    {
+     "id": "settings",
+     "label": "Porniți actualizarea din Setări"
+    },
+    {
+     "id": "restart",
+     "label": "Reporniți dispozitivul"
+    },
+    {
+     "id": "check",
+     "label": "Verificați dacă totul funcționează"
+    }
+   ],
+   "explain": "Salvarea vă protejează documentele, iar repornirea finalizează actualizarea."
+  },
+  {
+   "type": "choice",
+   "id": "old-device",
+   "question": {
+    "prompt": "Telefonul vechi nu mai primește actualizări. Ce faceți acum?",
+    "options": [
+     {
+      "id": "antivirus",
+      "label": "Instalați un antivirus și continuați să folosiți telefonul",
+      "correct": false,
+      "feedback": "Antivirusul nu remediază vulnerabilitățile din chiar sistemul de operare."
+     },
+     {
+      "id": "move",
+      "label": "Eliminați conturile de serviciu și treceți la un dispozitiv care primește actualizări",
+      "correct": true,
+      "feedback": "Corect. Un dispozitiv fără suport nu va primi remedieri pentru vulnerabilitățile noi."
+     },
+     {
+      "id": "nothing",
+      "label": "Nimic, încă funcționează bine",
+      "correct": false,
+      "feedback": "Faptul că funcționează bine nu înseamnă că este sigur. Vulnerabilitățile noi vor rămâne deschise."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "update"
+    }
+   },
+   "explain": "Nu păstrați conturi sau date de serviciu pe un dispozitiv fără suport. Înainte să-l vindeți, resetați-l complet."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Instalați actualizările fără întârziere, apoi reporniți dispozitivul.",
+    "Actualizați doar din Setări sau din magazinul oficial.",
+    "Nu păstrați date de serviciu pe dispozitive fără suport."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

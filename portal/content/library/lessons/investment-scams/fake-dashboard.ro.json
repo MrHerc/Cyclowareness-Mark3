@@ -1,0 +1,462 @@
+{
+ "id": "fake-dashboard",
+ "title": "Panoul fals de profit",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fd-tutor",
+   "beats": [
+    {
+     "id": "fd-b1",
+     "say": "După ce depuneți bani, platforma vă arată un grafic frumos și un sold care tot crește.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "fd-b2",
+     "say": "Pe o platformă falsă, aceste cifre sunt doar text pe ecran. În spatele lor nu există niciun ban.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2d-bakutrade",
+       "tone": "app",
+       "title": [
+        {
+         "text": "BakuTrade Pro | "
+        },
+        {
+         "text": "Sold: 12.480 AZN (+312%)",
+         "spot": "balance"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Pentru retragere, plătiți mai întâi impozitul pe venit de 15%: 1.870 AZN",
+          "spot": "fee"
+         }
+        ]
+       ],
+       "buttons": [
+        "Plătiți impozitul",
+        "Închideți"
+       ]
+      }
+     },
+     "highlight": "balance"
+    },
+    {
+     "id": "fd-b3",
+     "say": "Când încercați să retrageți banii, vi se cere un impozit, un comision sau o asigurare. Aceasta este etapa finală a înșelătoriei.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2d-bakutrade",
+       "tone": "app",
+       "title": [
+        {
+         "text": "BakuTrade Pro | "
+        },
+        {
+         "text": "Sold: 12.480 AZN (+312%)",
+         "spot": "balance"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Pentru retragere, plătiți mai întâi impozitul pe venit de 15%: 1.870 AZN",
+          "spot": "fee"
+         }
+        ]
+       ],
+       "buttons": [
+        "Plătiți impozitul",
+        "Închideți"
+       ]
+      }
+     },
+     "highlight": "fee"
+    },
+    {
+     "id": "fd-b4",
+     "say": "Dacă pentru o retragere trebuie mai întâi să plătiți, opriți-vă și nu mai trimiteți niciun manat.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fd-hotspot",
+   "prompt": "Găsiți semnele de fraudă de pe acest panou.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2d-bakutrade",
+    "tone": "app",
+    "title": [
+     {
+      "text": "BakuTrade Pro | "
+     },
+     {
+      "text": "Sold: 12.480 AZN (+312%)",
+      "spot": "balance"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Randament zilnic garantat: 3%",
+       "spot": "guarantee"
+      }
+     ],
+     [
+      {
+       "text": "Pentru retragere, plătiți mai întâi impozitul pe venit de 15%: 1.870 AZN",
+       "spot": "fee"
+      }
+     ],
+     [
+      {
+       "text": "Licență: International Financial Commission, nr. 00417",
+       "spot": "licence"
+      }
+     ],
+     [
+      {
+       "text": "Oferta expiră în 2 ore. Contactați-vă managerul pe aplicația de mesagerie.",
+       "spot": "rush"
+      }
+     ]
+    ],
+    "buttons": [
+     "Plătiți impozitul",
+     "Închideți"
+    ]
+   },
+   "spots": [
+    {
+     "id": "balance",
+     "label": "Creștere miraculoasă",
+     "explain": "Pe o piață reală, o sumă aproape niciodată nu se împătrește în câteva luni. Oricine poate scrie o cifră pe un ecran."
+    },
+    {
+     "id": "guarantee",
+     "label": "Randament garantat",
+     "explain": "Randamentul unei investiții nu poate fi garantat. Cuvântul însuși este un semnal de alarmă."
+    },
+    {
+     "id": "fee",
+     "label": "Plată pentru retragere",
+     "explain": "O platformă reală nu vă cere să trimiteți bani noi ca să îi deblocheze pe ai dumneavoastră. Dacă plătiți, va urma o altă scuză."
+    },
+    {
+     "id": "licence",
+     "label": "Licență falsă",
+     "explain": "Un astfel de organism poate nici să nu existe, iar o licență străină oricum nu dă niciun drept aici. Consultați lista Băncii Centrale."
+    },
+    {
+     "id": "rush",
+     "label": "Vă grăbesc",
+     "explain": "Termenul-limită există ca să nu aveți timp să vă gândiți sau să întrebați pe cineva."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "fd-sim",
+   "environment": "browser",
+   "title": "Retragerea banilor",
+   "intro": "Soldul de pe platformă a crescut și vreți să retrageți banii. Decideți la fiecare pas.",
+   "steps": [
+    {
+     "id": "dashboard",
+     "label": "Soldul dumneavoastră: 12.480 AZN. Treceți la VIP",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2d-bakutrade",
+      "url": [
+       {
+        "text": "https://bakutrade-pro.example.net/panel"
+       }
+      ]
+     },
+     "say": "Soldul a crescut. Acum încercați să retrageți banii.",
+     "actions": [
+      {
+       "id": "withdraw",
+       "label": "Retrageți",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Încercarea de retragere nu face niciun rău. Vedeți ce vi se cere pe ecranul următor."
+      },
+      {
+       "id": "vip",
+       "label": "Adăugați 500 AZN și treceți la VIP",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Soldul de pe ecran nu este real, iar banii noi se vor pierde și ei. Opriți-vă."
+      }
+     ]
+    },
+    {
+     "id": "fee",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2d-bakutrade",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Retragere suspendată"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Pentru retragere este necesar un impozit pe venit de 15%: 1.870 AZN."
+        }
+       ],
+       [
+        {
+         "text": "Dacă impozitul nu este plătit, fondurile vor fi înghețate în 48 de ore."
+        }
+       ]
+      ],
+      "buttons": [
+       "Plătiți impozitul",
+       "Anulați"
+      ]
+     },
+     "say": "Înainte de retragere vi se cere un impozit.",
+     "actions": [
+      {
+       "id": "pay-tax",
+       "label": "Plătiți impozitul",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "După impozit vi se va cere o asigurare, apoi un comision. Soldul nu va putea fi retras niciodată."
+      },
+      {
+       "id": "cancel",
+       "label": "Anulați",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Faptul că vi se cer bani pentru retragere arată că platforma este falsă."
+      }
+     ]
+    },
+    {
+     "id": "recovery-page",
+     "label": "Recuperăm investițiile pierdute în 30 de zile",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2d-fond-berpa",
+      "url": [
+       {
+        "text": "https://fondberpa-huquq.example.net"
+       }
+      ]
+     },
+     "say": "Câteva zile mai târziu apare această reclamă.",
+     "actions": [
+      {
+       "id": "apply",
+       "label": "Depuneți o cerere",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Promisiunea de a vă recupera banii poate fi o a doua capcană. Vedeți ce vi se cere mai departe."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Un serviciu care promite să vă recupereze banii este adesea o a doua înșelătorie.",
+       "next": "report-site"
+      }
+     ]
+    },
+    {
+     "id": "recovery-form",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2d-fond-berpa",
+      "brand": "FondBərpa",
+      "url": [
+       {
+        "text": "https://fondberpa-huquq.example.net/muraciet"
+       }
+      ],
+      "fields": [
+       "Nume complet",
+       "Telefon",
+       "Numărul cardului",
+       "CVV"
+      ],
+      "button": "Plătiți 300 AZN și începeți"
+     },
+     "say": "Ca să vă recupereze banii, vor și ei o plată în avans.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Plătiți 300 AZN și începeți",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Aceasta este a doua înșelătorie, uneori pusă la cale de aceeași rețea. Blocați cardul și anunțați poliția."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bună decizie. Ca să urmăriți banii, adresați-vă băncii și poliției, iar asta nu costă nimic."
+      }
+     ]
+    },
+    {
+     "id": "report-site",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Raportați acest site"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Raportați bakutrade-pro.example.net ca site fraudulos?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Raportați",
+       "Mai târziu"
+      ]
+     },
+     "say": "Browserul vă propune să raportați site-ul.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Foarte bine, raportarea ajută la blocarea site-ului și pentru alții. Contactați și poliția, la 102."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Dacă nu raportați, escrocii își găsesc noi victime. Acordați-i un minut și raportați site-ul."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "fd-scenario",
+   "title": "Grupul de investitori",
+   "start": "group",
+   "nodes": [
+    {
+     "id": "group",
+     "text": "Uite, am pus 400 de manați și azi am 1.200. Intră și tu.",
+     "speaker": "Gunay, colega dumneavoastră (grupul „Investitori inteligenți”)",
+     "voice": "woman",
+     "channel": "message",
+     "manner": "natural",
+     "spoken": "Uite, am pus 400 de manați și azi am 1.200. <breath> Intră și tu.",
+     "character": "gunay",
+     "choices": [
+      {
+       "label": "Hai să verificăm mai întâi licența în lista Băncii Centrale",
+       "next": "pressure",
+       "feedback": "Corect. Nici recomandarea unei prietene nu face o platformă legală."
+      },
+      {
+       "label": "Dacă Gunay câștigă, intru și eu",
+       "outcome": "compromised",
+       "feedback": "Și profitul de pe ecranul lui Gunay poate fi fals. Escrocii atrag oameni prin cunoscuții lor."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Lăsați lista, avem licență străină. Au mai rămas doar 3 locuri!",
+     "speaker": "Administratorul grupului",
+     "voice": "man-2",
+     "channel": "message",
+     "spoken": "Lăsați lista, <breath> avem licență străină. Au mai rămas doar 3 locuri!",
+     "choices": [
+      {
+       "label": "O licență străină nu dă niciun drept aici, eu mă retrag",
+       "next": "warn",
+       "feedback": "Corect. Banca Centrală a avertizat că o licență străină nu dă dreptul de a activa aici."
+      },
+      {
+       "label": "Intru repede, până nu se termină locurile",
+       "outcome": "compromised",
+       "feedback": "Locurile limitate sunt menite să vă grăbească. O asemenea presiune este ea însăși un semn de fraudă."
+      }
+     ]
+    },
+    {
+     "id": "warn",
+     "text": "Și cu cei 400 de manați ai mei ce fac? Vreau să-i retrag și îmi spun că trebuie să plătesc un impozit.",
+     "speaker": "Gunay",
+     "voice": "woman",
+     "channel": "message",
+     "manner": "worried",
+     "spoken": "Și cu cei 400 de manați ai mei ce fac? Vreau să-i retrag, <short pause> și îmi spun că trebuie să plătesc un impozit.",
+     "character": "gunay",
+     "choices": [
+      {
+       "label": "Nu plăti nimic, sună la bancă și raportează la 102",
+       "outcome": "safe",
+       "feedback": "Foarte bine. O raportare la timp oprește pierderea și îi protejează pe ceilalți."
+      },
+      {
+       "label": "Plătește impozitul și apoi vin banii",
+       "outcome": "compromised",
+       "feedback": "După impozit va apărea o nouă scuză. Pierderea doar va crește."
+      },
+      {
+       "label": "Întreabă în grup, te ajută administratorii",
+       "outcome": "risky",
+       "feedback": "Administratorii sunt chiar escrocii. Îi vor cere doar încă o plată."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "fd-recap",
+   "points": [
+    "Profitul de pe ecran nu înseamnă bani: dacă pentru retragere vi se cere o plată, opriți-vă.",
+    "Un serviciu care promite să vă recupereze banii este o a doua înșelătorie.",
+    "Verificați licența și raportați frauda la poliție, la 102."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

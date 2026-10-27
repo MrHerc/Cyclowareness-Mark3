@@ -1,0 +1,505 @@
+{
+ "id": "fake-salary-portal",
+ "title": "ყალბი სახელფასო პორტალი",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pd2-tutor",
+   "beats": [
+    {
+     "id": "pd2-b1",
+     "say": "ახლა თქვენ რიგითი თანამშრომელი ხართ და სახელფასო უწყისის ნახვა გსურთ.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "pd2-b2",
+     "say": "ძიების პირველი შედეგი ხშირად რეკლამაა. თაღლითები ყალბ პორტალებს სწორედ იქ, რეკლამის სახით ათავსებენ.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "w2f-kadr-kabineti-fake",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "kadr-kabineti-giris.example.net",
+         "spot": "ad-domain"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "ad-domain"
+    },
+    {
+     "id": "pd2-b3",
+     "say": "ყალბი გვერდი ზუსტად ნამდვილს ჰგავს. თუ იქ პაროლს აკრეფთ, თაღლითი ჯერ თქვენს ანგარიშს მიიტაცებს, მერე კი სახელფასო ანგარიშსაც შეცვლის.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "w2f-kadr-kabineti-fake",
+       "brand": "Kadr Kabineti",
+       "url": [
+        {
+         "text": "https://kadr-kabineti-giris.example.net/giris"
+        }
+       ],
+       "fields": [
+        "სამსახურებრივი ელფოსტა",
+        "პაროლი"
+       ],
+       "button": "შესვლა"
+      }
+     }
+    },
+    {
+     "id": "pd2-b4",
+     "say": "პორტალის მისამართი თავად აკრიფეთ ან სანიშნეებიდან გახსენით. ორსაფეხურიანი დადასტურება კი ყოველთვის ჩართული გქონდეთ.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "pd2-choice",
+   "question": {
+    "prompt": "საძიებო სისტემაში „kadr kabineti“-ს ეძებთ. როგორ შეხვალთ პორტალზე?",
+    "options": [
+     {
+      "id": "ad",
+      "label": "რეკლამა: Kadr Kabineti, ოფიციალური შესვლა (kadr-kabineti-giris.example.net)",
+      "correct": false,
+      "feedback": "სარეკლამო ადგილი იყიდება, ამიტომ ყალბი საიტი შეიძლება სულ თავში აღმოჩნდეს. ეს დომენი თქვენი ოფისის დომენი არ არის."
+     },
+     {
+      "id": "lookalike",
+      "label": "kadr-kabineti.example.org: სახელფასო უწყისი",
+      "correct": false,
+      "feedback": "სახელი მსგავსია, მაგრამ დომენი თქვენი ოფისისა არ არის. მსგავსი სახელი ყველაზე გავრცელებული ხრიკია."
+     },
+     {
+      "id": "typed",
+      "label": "თავად ავკრეფ: kabinet.seherxidmetleri.example",
+      "correct": true,
+      "feedback": "სწორია. მისამართი, რომელსაც თავად კრეფთ ან სანიშნეში გაქვთ შენახული, რეკლამაზე არ არის დამოკიდებული."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-tapinti",
+      "url": [
+       {
+        "text": "https://axtar.example/?q=kadr+kabineti"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "თაღლითები ძიების რეკლამით ყალბ პორტალებს სიის თავში სწევენ. პორტალის მისამართი ერთხელ გადაამოწმეთ და სანიშნეში შეინახეთ."
+  },
+  {
+   "type": "simulation",
+   "id": "pd2-sim",
+   "environment": "browser",
+   "title": "სახელფასო უწყისი",
+   "intro": "სახელფასო უწყისის სანახავად ბრაუზერი გახსენით. თვალი ადევნეთ მისამართის ზოლს და ყოველ ეტაპზე სწორი გადაწყვეტილება მიიღეთ.",
+   "steps": [
+    {
+     "id": "search",
+     "label": "რეკლამა: Kadr Kabineti – სახელფასო უწყისი, ოფიციალური შესვლა",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-tapinti",
+      "url": [
+       {
+        "text": "https://axtar.example/?q=kadr+kabineti",
+        "reveal": "axtar.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "ad",
+       "label": "სარეკლამო შედეგის გახსნა",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "ეს რეკლამა ყალბ პორტალზე გადაგიყვანთ. მისამართის ზოლში თქვენი ოფისის დომენი არ ჩანს.",
+       "next": "fake-login"
+      },
+      {
+       "id": "bookmark",
+       "label": "Kadr Kabineti-ის გახსნა სანიშნეებიდან",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "სწორია. სანიშნე ყოველთვის ნამდვილ მისამართზე გადაგიყვანთ.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kadr-kabineti-giris.example.net/giris",
+        "reveal": "kadr-kabineti-giris.example.net"
+       }
+      ],
+      "fields": [
+       "სამსახურებრივი ელფოსტა",
+       "პაროლი"
+      ],
+      "button": "შესვლა"
+     },
+     "say": "მისამართის ზოლს დააკვირდით.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "შესვლა",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "თქვენი პაროლი თაღლითს ჩაუვარდა ხელში. ნამდვილ პორტალზე პაროლი დაუყოვნებლივ შეცვალეთ და ადამიანური რესურსების სამსახურს დაურეკეთ."
+      },
+      {
+       "id": "close",
+       "label": "ჩანართის დახურვა",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "სწორია, დომენი თქვენი ოფისისა არ არის. პორტალი სანიშნეებიდან გახსენით.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-code",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kadr-kabineti-giris.example.net/tesdiq",
+        "reveal": "kadr-kabineti-giris.example.net"
+       }
+      ],
+      "fields": [
+       "SMS-კოდი"
+      ],
+      "button": "დადასტურება"
+     },
+     "say": "ახლა საიტი ტელეფონზე გამოგზავნილ კოდს ითხოვს.",
+     "actions": [
+      {
+       "id": "code",
+       "label": "დადასტურება",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "კოდით თაღლითი თქვენს ანგარიშში სრულად შედის. კოდი მხოლოდ ნამდვილ საიტზე აკრიფეთ და მხოლოდ მაშინ, როცა შესვლას თავად ცდილობთ."
+      },
+      {
+       "id": "close",
+       "label": "ჩანართის დახურვა",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "კარგია, რომ შეჩერდით. ახლა ნამდვილ პორტალზე პაროლი შეცვალეთ და ადამიანური რესურსების სამსახურს აცნობეთ."
+      }
+     ]
+    },
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kabinet.seherxidmetleri.example/giris",
+        "reveal": "seherxidmetleri.example"
+       }
+      ],
+      "fields": [
+       "სამსახურებრივი ელფოსტა",
+       "პაროლი"
+      ],
+      "button": "შესვლა"
+     },
+     "say": "ეს თქვენი ოფისის საკუთარი მისამართია.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "შესვლა",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "სწორია. დომენი თქვენს ოფისს ეკუთვნის და გვერდი თავად გახსენით."
+      },
+      {
+       "id": "close",
+       "label": "ჩანართის დახურვა",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "ეს ნამდვილი პორტალია. როცა მისამართს გადაამოწმებთ, შესვლა უსაფრთხოა."
+      }
+     ]
+    },
+    {
+     "id": "mfa-offer",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-kadr-kabineti",
+      "tone": "app",
+      "title": [
+       {
+        "text": "ორსაფეხურიანი დადასტურება გამორთულია"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "ანგარიშის დასაცავად ახლავე ჩართეთ. ყოველ შესვლას თქვენი ტელეფონი დაადასტურებს."
+        }
+       ]
+      ],
+      "buttons": [
+       "ჩართვა",
+       "მოგვიანებით"
+      ]
+     },
+     "actions": [
+      {
+       "id": "enable",
+       "label": "ჩართვა",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "ყოჩაღ. პაროლი რომც მოგპარონ, მეორე საფეხური უცხო ადამიანს გზას გადაუკეტავს."
+      },
+      {
+       "id": "later",
+       "label": "მოგვიანებით",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "ორსაფეხურიანი დადასტურების გარეშე ერთი პაროლი ყველაფერს ხსნის. დღესვე ჩართეთ."
+      }
+     ]
+    },
+    {
+     "id": "bank-details",
+     "label": "თქვენი საბანკო რეკვიზიტები: ბოლოს შეცვალა ადამიანური რესურსების სამსახურმა, 14.03.2025",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-kadr-kabineti",
+      "url": [
+       {
+        "text": "https://kabinet.seherxidmetleri.example/rekvizitler",
+        "reveal": "seherxidmetleri.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "check",
+       "label": "საბანკო ანგარიშის შემოწმება",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "კარგი ჩვევაა. თუ ისეთ ცვლილებას დაინახავთ, რომელიც თქვენ არ გაგიკეთებიათ, ადამიანური რესურსების სამსახურს მაშინვე დაურეკეთ."
+      },
+      {
+       "id": "skip",
+       "label": "გასვლა შემოწმების გარეშე",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "თუ რეკვიზიტები უცხომ შეცვალა, ამას მხოლოდ ხელფასის დღეს გაიგებდით. სწრაფ შემოწმებას რამდენიმე წამი სჭირდება."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "pd2-swipe",
+   "prompt": "უსაფრთხოა თუ თაღლითობა?",
+   "cards": [
+    {
+     "id": "boss-gift-cards",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "საბინა ალიევა, ხელმძღვანელი"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "შეხვედრაზე ვარ და დარეკვა არ შემიძლია. სწრაფად იყიდეთ ხუთი 100-მანათიანი BonusMarket-ის სასაჩუქრე ბარათი და კოდები აქ გამომიგზავნეთ. ფულს დაგიბრუნებთ."
+         }
+        ],
+        "time": "11:02"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "სასაჩუქრე ბარათის კოდი ნაღდი ფულივითაა და უკან აღარასოდეს ბრუნდება. გადასამოწმებლად ხელმძღვანელს ნაცნობ ნომერზე დაურეკეთ."
+    },
+    {
+     "id": "salary-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "09:00",
+      "messages": [
+       [
+        {
+         "text": "თქვენს ბარათზე ჩაირიცხა ხელფასი: 1 240,00 AZN. ნაშთი: 1 386,50 AZN."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "ბმული არ არის და არაფერს ითხოვს. ეს ჩვეულებრივი საინფორმაციო შეტყობინებაა."
+    },
+    {
+     "id": "fake-hr-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "sender": [
+       {
+        "text": "KadrKabinet"
+       }
+      ],
+      "time": "08:41",
+      "messages": [
+       [
+        {
+         "text": "თქვენი ხელფასი შეჩერებულია. განაახლეთ საბანკო რეკვიზიტები: "
+        },
+        {
+         "text": "kadr-kabinet.example.info/yenile",
+         "link": {
+          "label": "kadr-kabinet.example.info/yenile",
+          "href": "https://kadr-kabinet.example.info/yenile"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "ადამიანური რესურსების სამსახური ხელფასს SMS-ში გამოგზავნილი ბმულით არასოდეს აღადგენს. პორტალი თავად გახსენით ან სამსახურს დაურეკეთ."
+    },
+    {
+     "id": "payslip-ready",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-kadr-kabineti",
+      "app": "Kadr Kabineti",
+      "title": [
+       {
+        "text": "სექტემბრის სახელფასო უწყისი მზადაა"
+       }
+      ],
+      "body": [
+       {
+        "text": "იხილეთ პორტალის განყოფილება „ხელფასი“."
+       }
+      ],
+      "time": "10:15"
+     },
+     "verdict": "safe",
+     "explain": "ამ შეტყობინებაში ბმული არ არის და ის ნაცნობ პორტალზე მიგითითებთ. პორტალი სანიშნეებიდან გახსენით."
+    },
+    {
+     "id": "colleague-code",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "გიუნელი, ბუღალტერია"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Kadr Kabineti-დან კოდი მოგივა, მითხარი, რომ სახელფასო ცხრილი გავასწორო."
+         }
+        ],
+        "time": "13:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "შესვლის კოდი მხოლოდ თქვენთვისაა. ვინც თქვენს კოდს მიიღებს, თქვენს ანგარიშშიც შევა."
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "pd2-order",
+   "prompt": "ყალბ პორტალზე პაროლი უკვე შეყვანილი გაქვთ. ნაბიჯები სწორი თანმიმდევრობით დაალაგეთ.",
+   "items": [
+    {
+     "id": "change-password",
+     "label": "ნამდვილ პორტალზე პაროლი ახლავე შეცვალეთ"
+    },
+    {
+     "id": "call",
+     "label": "ადამიანური რესურსებისა და უსაფრთხოების სამსახურებს დაურეკეთ"
+    },
+    {
+     "id": "check-details",
+     "label": "საბანკო რეკვიზიტები და ბოლო შესვლები ერთად გადაამოწმეთ"
+    },
+    {
+     "id": "enable-mfa",
+     "label": "ჩართეთ ორსაფეხურიანი დადასტურება"
+    }
+   ],
+   "explain": "ჯერ პაროლი შეცვალეთ, შემდეგ დარეკეთ, რომ საბანკო რეკვიზიტების ნებისმიერი ცვლილება შეჩერდეს. თუ კოდიც შეიყვანეთ, ეს აუცილებლად უთხარით."
+  },
+  {
+   "type": "recap",
+   "id": "pd2-recap",
+   "points": [
+    "პორტალი სანიშნეებიდან გახსენით და არა ძიების შედეგებიდან.",
+    "ორსაფეხურიანი დადასტურება ჩართული გქონდეთ.",
+    "სასაჩუქრე ბარათებისა და კოდების მოთხოვნები ტელეფონით გადაამოწმეთ."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

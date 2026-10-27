@@ -1,0 +1,553 @@
+{
+  "id": "shared-doc-login",
+  "title": "Paylaşılan belge",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "sd-tutor",
+      "beats": [
+        {
+          "id": "sd-b1",
+          "say": "Sahte giriş penceresi çoğu zaman bir e-postayla başlar: sizinle bir belge paylaşılmış, görmek için giriş yapmanız isteniyor.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        },
+        {
+          "id": "sd-b2",
+          "say": "Düğme, tanıdık bir hesapla giriş yapmayı önerir. Açılan pencere ise sitenin içine çizilmiştir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "buludxidmet-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "BuludXidmət"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "paylasim@buludxidmet-share.example.net"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "Kamran Aliyev sizinle bir belge paylaştı"
+                }
+              ],
+              "time": "09:47",
+              "body": [
+                [
+                  {
+                    "text": "Kamran Aliyev sizinle “Tender_teklifi_2026.pdf” dosyasını paylaştı."
+                  }
+                ],
+                [
+                  {
+                    "text": "Görüntülemek için: "
+                  },
+                  {
+                    "text": "İşPoçt ile giriş yap",
+                    "spot": "signin-btn",
+                    "link": {
+                      "label": "İşPoçt ile giriş yap",
+                      "href": "https://buludxidmet-share.example.net/view?id=88213"
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "signin-btn"
+        },
+        {
+          "id": "sd-b3",
+          "say": "Ofisinizin sosyal medya sayfasını kapatmakla tehdit eden bir e-posta da aynı tuzaktır.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "sd-b4",
+          "say": "Kural şu: e-postadaki düğmeyle giriş yapmayın. Siteyi kendiniz açın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "sd-choice",
+      "question": {
+        "prompt": "Size bu e-posta geldi. Ne yaparsınız?",
+        "options": [
+          {
+            "id": "signin",
+            "label": "Düğmeye basar ve İşPoçt hesabımla giriş yaparım",
+            "correct": false,
+            "feedback": "Düğme sizi tanımadığınız bir siteye götürür. Oradaki giriş penceresi sahte olabilir."
+          },
+          {
+            "id": "ask-colleague",
+            "label": "Kamran Bey'i bildiğim numaradan arar ve sorarım",
+            "correct": true,
+            "feedback": "Doğru. Belge gerçekse Kamran Bey onu ofisinizin kendi sisteminde yeniden paylaşır."
+          },
+          {
+            "id": "forward",
+            "label": "İş arkadaşlarım da baksın diye onlara iletirim",
+            "correct": false,
+            "feedback": "O zaman tuzak başkalarına da ulaşır. Şüpheli bir e-postayı yalnızca BT destek ekibine gönderin."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "buludxidmet-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "BuludXidmət"
+                }
+              ],
+              "address": [
+                {
+                  "text": "paylasim@buludxidmet-share.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Kamran Aliyev sizinle bir belge paylaştı"
+              }
+            ],
+            "time": "09:47",
+            "body": [
+              [
+                {
+                  "text": "Kamran Aliyev sizinle “Tender_teklifi_2026.pdf” dosyasını paylaştı."
+                }
+              ],
+              [
+                {
+                  "text": "Görüntülemek için: "
+                },
+                {
+                  "text": "İşPoçt ile giriş yap",
+                  "link": {
+                    "label": "İşPoçt ile giriş yap",
+                    "href": "https://buludxidmet-share.example.net/view?id=88213"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "Bağlantı 24 saat geçerlidir."
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "explain": "Belge gerçekse, siteyi kendiniz açtığınızda onu görürsünüz. E-postadaki giriş düğmesine hiçbir zaman ihtiyacınız olmaz."
+    },
+    {
+      "type": "simulation",
+      "id": "sd-sim",
+      "environment": "inbox",
+      "title": "İş e-postanız",
+      "intro": "Sabah gelen kutunuzda dört e-posta bekliyor. Her birini açın ve doğru işlemi seçin.",
+      "steps": [
+        {
+          "id": "real-share",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "buludxidmet",
+            "from": {
+              "name": [
+                {
+                  "text": "BuludXidmət"
+                }
+              ],
+              "address": [
+                {
+                  "text": "bildiris@buludxidmet.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Nermin Hasanova sizinle bir dosya paylaştı"
+              }
+            ],
+            "time": "08:55",
+            "body": [
+              [
+                {
+                  "text": "Nermin Hasanova sizinle “Budce_2027.xlsx” dosyasını paylaştı."
+                }
+              ],
+              [
+                {
+                  "text": "Not: Bu sabah konuştuğumuz bütçe tablosu."
+                }
+              ],
+              [
+                {
+                  "text": "Dosyayı aç",
+                  "link": {
+                    "label": "Dosyayı aç",
+                    "href": "https://buludxidmet.example/idare/budce-2027"
+                  }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Dosyayı aç",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "Bu dosyayı bekliyordunuz ve bağlantı hizmetin kendi adresine gidiyor. Açmanızda sakınca yok."
+            },
+            {
+              "id": "safe",
+              "label": "Güvenli olarak işaretle",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Doğru. Tanıdık bir iş arkadaşı, beklenen bir dosya ve hizmetin kendi adresi."
+            },
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Dikkatli olmak iyidir, ama burada hiçbir uyarı işareti yok. Nermin Hanım bu dosyadan size bu sabah bahsetmişti."
+            }
+          ]
+        },
+        {
+          "id": "fake-share",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "buludxidmet-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "BuludXidmət"
+                }
+              ],
+              "address": [
+                {
+                  "text": "paylasim@buludxidmet-share.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Kamran Aliyev sizinle bir belge paylaştı"
+              }
+            ],
+            "time": "09:47",
+            "body": [
+              [
+                {
+                  "text": "Kamran Aliyev sizinle “Tender_teklifi_2026.pdf” dosyasını paylaştı."
+                }
+              ],
+              [
+                {
+                  "text": "Görüntülemek için: "
+                },
+                {
+                  "text": "İşPoçt ile giriş yap",
+                  "link": {
+                    "label": "İşPoçt ile giriş yap",
+                    "href": "https://buludxidmet-share.example.net/view?id=88213"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "Bağlantı 24 saat geçerlidir."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. Farklı bir alan adı ve sizi sahte bir pencereye götüren bir giriş düğmesi."
+            },
+            {
+              "id": "click",
+              "label": "İşPoçt ile giriş yap",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Sayfa bir İşPoçt penceresi çizecek ve parolanızı isteyecekti. Bu tür düğmelere tıklamayın."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Silmek de işe yarar. Ama bildirirseniz BT destek ekibi iş arkadaşlarınızı uyarabilir."
+            }
+          ]
+        },
+        {
+          "id": "copyright",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "w2c-kontakto-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "Kontakto Hukuk Merkezi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "huquq@kontakto-support.example.info"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Sayfanız 24 saat içinde kaldırılacak"
+              }
+            ],
+            "time": "10:12",
+            "body": [
+              [
+                {
+                  "text": "Ofisinizin resmî sayfasında telif hakkı ihlali tespit edildi."
+                }
+              ],
+              [
+                {
+                  "text": "İtiraz etmek için sayfa yöneticisi olarak giriş yapın: "
+                },
+                {
+                  "text": "İtiraz et",
+                  "link": {
+                    "label": "İtiraz et",
+                    "href": "https://kontakto-support.example.info/etiraz"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "Yanıt vermezseniz sayfanız kalıcı olarak kapatılacaktır."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. Gerçek bir uyarı, sosyal ağın kendi uygulamasında da görünürdü."
+            },
+            {
+              "id": "click",
+              "label": "İtiraz et",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "İtiraz sayfası bir Kontakto penceresi çizip parolanızı da kodunuzu da toplardı. Ofisinizin sayfası dolandırıcının eline geçerdi."
+            },
+            {
+              "id": "reply",
+              "label": "Yanıtla: Bu bir hata",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Dolandırıcı yanıtınızı okur ve yeni bir bağlantı gönderir. Bunun yerine e-postayı bildirin."
+            }
+          ]
+        },
+        {
+          "id": "it-notice",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "BT Destek"
+                }
+              ],
+              "address": [
+                {
+                  "text": "destek@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Bu akşam e-posta sunucusu güncellenecek"
+              }
+            ],
+            "time": "11:30",
+            "body": [
+              [
+                {
+                  "text": "Bugün 19:00 ile 20:00 arasında iş e-postası birkaç dakika kullanılamayabilir."
+                }
+              ],
+              [
+                {
+                  "text": "Sizin herhangi bir işlem yapmanıza gerek yoktur."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "safe",
+              "label": "Güvenli olarak işaretle",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Doğru. Şirket içi bir adresten geliyor; ne bağlantı var ne de parola isteniyor."
+            },
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Bu e-postada bağlantı yok ve sizden hiçbir şey istemiyor. Bu tür duyurular işin olağan bir parçasıdır."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Sorun değil, e-posta yalnızca bilgi veriyor. Herhangi bir tehlike yok."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "sd-hotspot",
+      "prompt": "Bu giriş penceresinin sahte olduğunu gösteren işaretleri bulun.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2c-kontakto-fake",
+        "tone": "app",
+        "title": [
+          {
+            "text": "Kontakto: giriş"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Tarayıcının adres çubuğu: "
+            },
+            {
+              "text": "kontakto-support.example.info/etiraz",
+              "spot": "real-address"
+            }
+          ],
+          [
+            {
+              "text": "Penceredeki adres: "
+            },
+            {
+              "text": "https://kontakto.example/login",
+              "spot": "painted-bar"
+            }
+          ],
+          [
+            {
+              "text": "Telefon ya da e-posta, parola"
+            }
+          ],
+          [
+            {
+              "text": "SMS ile gelen kodu da girin",
+              "spot": "code"
+            }
+          ],
+          [
+            {
+              "text": "Pencere sayfanın kenarından öteye gitmiyor",
+              "spot": "no-drag"
+            }
+          ],
+          [
+            {
+              "text": "İtiraz için 2 saat 59 dakika kaldı",
+              "spot": "timer"
+            }
+          ]
+        ],
+        "buttons": [
+          "Giriş yap"
+        ]
+      },
+      "spots": [
+        {
+          "id": "real-address",
+          "label": "Gerçek adres",
+          "explain": "Tarayıcının kendi adres çubuğu başka bir site gösteriyor. Pencerenin içindeki yazıya değil, ona bakın."
+        },
+        {
+          "id": "painted-bar",
+          "label": "Çizilmiş adres",
+          "explain": "Bu adres çubuğu pencere resminin bir parçası. Dolandırıcı oraya istediğini yazabilir."
+        },
+        {
+          "id": "code",
+          "label": "Doğrulama kodu",
+          "explain": "Kodu, iki adımlı doğrulamayı aşmak için istiyorlar. Böyle bir pencereye asla kod yazmayın."
+        },
+        {
+          "id": "no-drag",
+          "label": "Sayfada takılı pencere",
+          "explain": "Gerçek pencere tarayıcının dışına sürüklenebilir. Bu ise sayfanın içinde takılı kalıyor."
+        },
+        {
+          "id": "timer",
+          "label": "Zaman baskısı",
+          "explain": "Geri sayım, sizi hiçbir şeyi kontrol etmeden giriş yapmaya zorlamak için konmuştur."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "recap",
+      "id": "sd-recap",
+      "points": [
+        "Paylaşılan belgeye, siteyi kendiniz açarak ulaşın",
+        "Sayfanızı kapatmakla tehdit eden e-posta bir tuzaktır",
+        "Parolanızı yazdıysanız hemen değiştirin ve BT destek ekibine haber verin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

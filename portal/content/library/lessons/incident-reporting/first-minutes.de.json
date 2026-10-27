@@ -1,0 +1,386 @@
+{
+ "id": "first-minutes",
+ "title": "Die ersten Minuten",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Die ersten Minuten sind die wichtigsten. Der Angreifer hat es eilig, also müssen Sie schneller sein.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Halten Sie inne, wenn Ihnen etwas merkwürdig vorkommt: eine Anmeldung, die Sie nicht kennen, ein Fenster, das sich von selbst öffnet, oder fehlende Dateien.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "ispoct",
+       "app": "İşPoçt",
+       "title": [
+        {
+         "text": "Anmeldung von einem neuen Gerät"
+        }
+       ],
+       "body": [
+        {
+         "text": "Jemand hat sich um 03:12 Uhr "
+        },
+        {
+         "text": "in Gəncə mit einem unbekannten Gerät",
+         "spot": "place"
+        },
+        {
+         "text": " bei Ihrem Konto angemeldet."
+        }
+       ],
+       "time": "08:31"
+      }
+     },
+     "highlight": "place"
+    },
+    {
+     "id": "b3",
+     "say": "Rufen Sie im Notfall den IT-Support oder das Sicherheitsteam an. Eine E-Mail kann warten.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Wenn Sie Ihrem Computer nicht mehr trauen, melden Sie den Vorfall nicht von diesem Gerät aus. Der Angreifer könnte Ihre E-Mails mitlesen. Rufen Sie deshalb lieber an.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "strange-morning",
+   "environment": "desktop",
+   "title": "Ein seltsamer Morgen",
+   "intro": "Sie schalten morgens Ihren Computer ein und bemerken einige seltsame Dinge. Wie reagieren Sie jeweils?",
+   "steps": [
+    {
+     "id": "new-login",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "İşPoçt",
+      "title": [
+       {
+        "text": "Anmeldung von einem neuen Gerät"
+       }
+      ],
+      "body": [
+       {
+        "text": "Jemand hat sich um 03:12 Uhr in Gəncə mit einem unbekannten Gerät bei Ihrem Konto angemeldet."
+       }
+      ],
+      "time": "08:31"
+     },
+     "say": "Wenn diese Anmeldung nicht von Ihnen stammt: Was tun Sie?",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Das war ich nicht – melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig: Eine unbekannte Anmeldung bedeutet, dass jemand Ihr Passwort kennt. Eine schnelle Meldung rettet das Konto."
+      },
+      {
+       "id": "ignore",
+       "label": "Schließen",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Der Angreifer ist weiterhin in Ihrem Konto und gewinnt Zeit. Melden Sie einen solchen Hinweis sofort."
+      }
+     ]
+    },
+    {
+     "id": "remote-request",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "texkomek-24",
+      "tone": "app",
+      "title": [
+       {
+        "text": "TexKömək 24 möchte eine Verbindung herstellen"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Jemand vom Support möchte Ihren Bildschirm sehen und Ihren Computer steuern."
+        }
+       ]
+      ],
+      "buttons": [
+       "Ablehnen",
+       "Zulassen"
+      ]
+     },
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Ablehnen",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Richtig, Sie haben keinen Support angefordert. Melden Sie auch eine solche unerwartete Anfrage."
+      },
+      {
+       "id": "allow",
+       "label": "Zulassen",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Die fremde Person steuert jetzt Ihren Computer. Lassen Sie nie einen Support-Zugriff zu, den Sie nicht selbst angefordert haben."
+      },
+      {
+       "id": "report",
+       "label": "Ablehnen und melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Eine unerwartete Anfrage für einen Fernzugriff muss sofort gemeldet werden."
+      }
+     ]
+    },
+    {
+     "id": "encrypted",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Ihre Dateien wurden verschlüsselt"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Zahlen Sie innerhalb von 72 Stunden, um Ihre Dateien zurückzubekommen. Wenn Sie den Computer ausschalten, werden die Dateien gelöscht."
+        }
+       ]
+      ],
+      "buttons": [
+       "Zur Zahlungsseite"
+      ]
+     },
+     "say": "Auf dem Bildschirm steht eine Lösegeldforderung. Was tun Sie zuerst?",
+     "actions": [
+      {
+       "id": "disconnect",
+       "label": "Kabel ziehen, WLAN ausschalten",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Richtig: Wer offline geht, stoppt die Ausbreitung. Lassen Sie den Computer eingeschaltet und rufen Sie sofort an."
+      },
+      {
+       "id": "shutdown",
+       "label": "Computer ausschalten",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Das Ausschalten kann Spuren im Arbeitsspeicher löschen. Sofern das Verfahren Ihrer Organisation nichts anderes vorsieht, gehen Sie offline und lassen das Gerät eingeschaltet."
+      },
+      {
+       "id": "pay",
+       "label": "Zahlungsseite öffnen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Eine Zahlung garantiert nicht, dass Sie Ihre Dateien zurückbekommen. Zahlen Sie nie und überlassen Sie die Entscheidung den Fachleuten."
+      }
+     ]
+    },
+    {
+     "id": "call-line",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "it-tehlukesizlik",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Sicherheits-Hotline"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Dringender Sicherheitsvorfall: +994 12 000 15 15"
+        }
+       ],
+       [
+        {
+         "text": "Nicht dringend: Schaltfläche „Phishing melden“ oder security@idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Später",
+       "Anrufen"
+      ]
+     },
+     "actions": [
+      {
+       "id": "call",
+       "label": "Jetzt anrufen",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Richtig. Einen dringenden Vorfall melden Sie telefonisch: Die Fachleute sagen Ihnen sofort, was zu tun ist."
+      },
+      {
+       "id": "later",
+       "label": "Morgen eine E-Mail schreiben",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Die Verschlüsselung breitet sich aus, und jede Minute zählt. Außerdem ist dieses Postfach womöglich nicht mehr sicher."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "who-to-tell",
+   "question": {
+    "prompt": "Eine fremde Person hat sich bei Ihrem Konto angemeldet. Wen informieren Sie?",
+    "options": [
+     {
+      "id": "security",
+      "label": "Den IT-Support oder das Sicherheitsteam",
+      "correct": true,
+      "feedback": "Richtig. Nur diese Stellen können das Konto sperren und überprüfen."
+     },
+     {
+      "id": "manager",
+      "label": "Zusätzlich meine Führungskraft",
+      "correct": true,
+      "feedback": "Richtig. Ihre Führungskraft hilft, die Arbeit zu organisieren, ersetzt aber nicht die Fachleute."
+     },
+     {
+      "id": "colleagues",
+      "label": "Nur Kolleginnen und Kollegen in meiner Abteilung",
+      "correct": false,
+      "feedback": "Kolleginnen und Kollegen können das Konto nicht sperren – so geht Zeit verloren."
+     },
+     {
+      "id": "social",
+      "label": "Ich poste es in den sozialen Medien, damit alle Bescheid wissen",
+      "correct": false,
+      "feedback": "Öffentliche Beiträge über einen Vorfall helfen dem Angreifer und anderen Kriminellen."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "badge-id"
+    }
+   },
+   "explain": "Die Fachleute beheben das Problem, Ihre Führungskraft wird informiert – sonst muss niemand Bescheid wissen."
+  },
+  {
+   "type": "match",
+   "id": "how-to-report",
+   "prompt": "Ordnen Sie jeder Situation den passenden Meldeweg zu.",
+   "pairs": [
+    {
+     "id": "phish",
+     "left": "Eine verdächtige E-Mail ist eingegangen",
+     "right": "Per Klick auf „Phishing melden“"
+    },
+    {
+     "id": "ransom",
+     "left": "Auf dem Bildschirm steht eine Lösegeldforderung",
+     "right": "Offline gehen und anrufen"
+    },
+    {
+     "id": "phone",
+     "left": "Das Diensthandy ist verloren",
+     "right": "Sofort anrufen, damit es aus der Ferne gesperrt wird"
+    },
+    {
+     "id": "misdirect",
+     "left": "Eine Datei ging an die falsche Person",
+     "right": "Führungskraft und Sicherheitsteam informieren"
+    }
+   ],
+   "explain": "Bei dringenden Fällen oder wenn sich etwas ausbreitet: anrufen. Alles andere melden Sie per Klick auf „Phishing melden“ oder per E-Mail."
+  },
+  {
+   "type": "scenario",
+   "id": "colleague-says-wait",
+   "title": "Sollen wir abwarten?",
+   "start": "window",
+   "nodes": [
+    {
+     "id": "window",
+     "text": "Keine Sorge, das ist bestimmt nur ein Update. Mach doch keine große Sache daraus.",
+     "speaker": "Tural (Kollege), schaut auf das seltsame Fenster",
+     "voice": "man-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Keine Sorge, äh, das ist bestimmt nur ein Update. Mach doch keine große Sache daraus.",
+     "choices": [
+      {
+       "label": "Ich rufe trotzdem den IT-Support an",
+       "next": "specialist",
+       "feedback": "Richtig. Ein Fehlalarm ist kein Problem, eine verspätete Meldung schon."
+      },
+      {
+       "label": "Ich warte ab, vielleicht verschwindet es von selbst",
+       "outcome": "risky",
+       "feedback": "Abwarten verschafft dem Angreifer Zeit. Rufen Sie im Zweifel an."
+      }
+     ]
+    },
+    {
+     "id": "specialist",
+     "text": "Was haben Sie gesehen und was haben Sie getan?",
+     "speaker": "IT-Support",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Was haben Sie gesehen <short pause> und was haben Sie getan?",
+     "choices": [
+      {
+       "label": "Ich fasse mich kurz: was, wann, an welchem Computer und was ich getan habe",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Mit genauen Angaben können die Fachleute sofort mit der Arbeit beginnen."
+      },
+      {
+       "label": "Ich habe das Fenster geschlossen und weiß es nicht mehr",
+       "outcome": "risky",
+       "feedback": "Jedes Detail hilft. Fotografieren Sie den Bildschirm beim nächsten Mal mit Ihrem Smartphone."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Wenn Ihnen etwas merkwürdig vorkommt: innehalten und sofort melden.",
+    "Rufen Sie im Notfall an. Melden Sie einen Vorfall nie von einem verdächtigen Computer aus.",
+    "Ein Fehlalarm ist in Ordnung, eine Verzögerung ist gefährlich."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

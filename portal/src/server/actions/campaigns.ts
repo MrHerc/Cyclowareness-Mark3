@@ -8,7 +8,7 @@ import { actionViewer } from "../auth/viewer";
 import { isUuid } from "../../lib/ids";
 import { audit } from "../services/audit";
 import { launchCampaign, recordSubmit, type LaunchBlock } from "../services/campaigns";
-import { TEMPLATE_BY_KEY } from "../../lib/campaigns/templates";
+import { TEMPLATE_BY_KEY, templateOnPlan } from "../../lib/campaigns/templates";
 
 const draftSchema = z.object({
   /** Set when editing a campaign that is still a draft or scheduled. */
@@ -30,7 +30,7 @@ export async function saveCampaignAction(input: z.infer<typeof draftSchema>): Pr
     if (!d) return { ok: false };
   }
   const tpl = TEMPLATE_BY_KEY.get(p.data.templateKey)!;
-  if ((tpl.channel === "sms" || tpl.channel === "voice") && !v.tenant.features.has("sms_voice")) return { ok: false };
+  if (!templateOnPlan(tpl, v.tenant.features)) return { ok: false };
   const scheduledAt = p.data.scheduledAt ? new Date(p.data.scheduledAt) : null;
   if (scheduledAt && scheduledAt.getTime() < Date.now() - 60_000) return { ok: false, reason: "past_date" };
   if (p.data.id) {

@@ -1,0 +1,330 @@
+{
+ "id": "links-cloud",
+ "title": "ბმულები და ღრუბლოვანი საქაღალდეები",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "ღრუბლოვანი საქაღალდეები მოსახერხებელია, მაგრამ ერთმა არასწორმა პარამეტრმა შეიძლება ფაილი მთელი ინტერნეტისთვის გახსნას.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": { "kind": "illustration", "id": "cloud" }
+    },
+    {
+     "id": "b2",
+     "say": "როცა წვდომა „ბმულის მქონე ნებისმიერ ადამიანს“ აქვს და ბმული ვინმეს გადაეცემა, ფაილს უცნობებიც გახსნიან.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "rxagentlik-disk",
+       "url": [
+        { "text": "https://disk.rxagentlik.az/qovluq/budce-2027?paylasim=" },
+        { "text": "hamiya-acik", "spot": "public" }
+       ]
+      }
+     },
+     "highlight": "public"
+    },
+    {
+     "id": "b3",
+     "say": "სწორი გზა ასეთია: მხოლოდ კონკრეტული ადამიანები, მხოლოდ ნახვის უფლება და დასრულების ვადა.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": { "kind": "illustration", "id": "lock" }
+    },
+    {
+     "id": "b4",
+     "say": "არ ატვირთოთ სამსახურის ფაილები პირად ღრუბლოვან ანგარიშზე. იქ ორგანიზაცია მათ ვერც დაიცავს და ვერც აღადგენს.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": { "kind": "illustration", "id": "folder" }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "share-folder",
+   "environment": "browser",
+   "title": "ფაილის გაზიარება",
+   "intro": "ბიუჯეტის პროექტი გარე პარტნიორს უნდა გაუგზავნოთ. გაზიარება ღრუბლოვან დისკზე თავად მოაწყვეთ.",
+   "steps": [
+    {
+     "id": "file-page",
+     "label": "ბიუჯეტის პროექტი 2027.xlsx",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "rxagentlik-disk",
+      "url": [
+       { "text": "https://disk.rxagentlik.az/fayllar/Budce_layihesi_2027.xlsx", "reveal": "rxagentlik.az" }
+      ]
+     },
+     "say": "როგორ გააზიარებთ ფაილს?",
+     "actions": [
+      {
+       "id": "share",
+       "label": "გაზიარება",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "კარგია, ფაილი სამსახურის დისკზე რჩება. ახლა გაზიარების პარამეტრებს დახედეთ."
+      },
+      {
+       "id": "personal",
+       "label": "პირად ღრუბელში გადატანა",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "პირადი ანგარიში ორგანიზაციის კონტროლის მიღმაა. სამსახურის ფაილები სამსახურის დისკზე უნდა დარჩეს."
+      }
+     ]
+    },
+    {
+     "id": "who-can-open",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [ { "text": "გაზიარება: ბიუჯეტის პროექტი 2027.xlsx" } ],
+      "body": [
+       [ { "text": "ვის შეუძლია გახსნა?" } ]
+      ],
+      "buttons": [ "ბმულის მქონე ნებისმიერ ადამიანს", "მხოლოდ კონკრეტულ ადამიანებს" ]
+     },
+     "actions": [
+      {
+       "id": "named",
+       "label": "მხოლოდ კონკრეტულ ადამიანებს",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "სწორია. ფაილს მხოლოდ ის ადამიანები გახსნიან, ვისაც თქვენ აირჩევთ."
+      },
+      {
+       "id": "anyone",
+       "label": "ბმულის მქონე ნებისმიერ ადამიანს",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "ბმული შეიძლება ვინმემ გადააგზავნოს ან არასწორ ადგილას აღმოჩნდეს. მაშინ ფაილს ნებისმიერი გახსნის."
+      }
+     ]
+    },
+    {
+     "id": "rights",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [ { "text": "ვის და როგორ?" } ],
+      "body": [
+       [ { "text": "ადრესატი: e.rzayev@merkez-konsalting.example" } ],
+       [ { "text": "წვდომა: ნახვა ან რედაქტირება" } ],
+       [ { "text": "ვადა: 7 დღეში ან უვადოდ" } ]
+      ],
+      "buttons": [ "რედაქტირება, უვადოდ", "ნახვა, 7 დღე" ]
+     },
+     "actions": [
+      {
+       "id": "view",
+       "label": "ნახვა, 7 დღე",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "შესანიშნავია. პარტნიორი ფაილს ნახავს, მაგრამ ვერ შეცვლის, წვდომა კი ერთ კვირაში დასრულდება."
+      },
+      {
+       "id": "edit",
+       "label": "რედაქტირება, უვადოდ",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "პარტნიორს რედაქტირება არ სჭირდება, უვადო წვდომა კი წლობით ღია რჩება."
+      }
+     ]
+    },
+    {
+     "id": "fake-share",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "rxagentlik-disk-fake",
+      "brand": "RXAgentlik Disk",
+      "url": [
+       { "text": "https://rxagentlik-disk.example.net/giris", "reveal": "rxagentlik-disk.example.net" }
+      ],
+      "fields": [ "ელფოსტა", "პაროლი" ],
+      "button": "შესვლა"
+     },
+     "say": "ერთი საათის შემდეგ გაზიარებული ფაილის გვერდი იხსნება. შეამოწმეთ მისამართი.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "შესვლა",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "ეს დომენი თქვენი სამსახურის დისკს არ ეკუთვნის. გაზიარებული ფაილი მხოლოდ საბაბია პაროლის მოსაპარად."
+      },
+      {
+       "id": "close",
+       "label": "ჩანართის დახურვა",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "სწორია. გაზიარებული ფაილები მხოლოდ disk.rxagentlik.az მისამართზე გახსენით."
+      },
+      {
+       "id": "report",
+       "label": "საიტის შესახებ შეტყობინება",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "შესანიშნავია. თუ ყალბი გვერდის შესახებ შეატყობინებთ, კოლეგებსაც დაიცავთ."
+      }
+     ]
+    },
+    {
+     "id": "old-links",
+     "label": "ჩემი გაზიარებები: 4 ფაილი ყველასთვის ღიაა",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "rxagentlik-disk",
+      "url": [
+       { "text": "https://disk.rxagentlik.az/paylasimlar", "reveal": "rxagentlik.az" }
+      ]
+     },
+     "actions": [
+      {
+       "id": "close-links",
+       "label": "ღია ბმულების გაუქმება",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "სწორია. ზედმეტი გაზიარებების გაუქმება დაცვის ყველაზე მარტივი გზაა."
+      },
+      {
+       "id": "later",
+       "label": "მოგვიანებით",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "ყოველი ღიად დატოვებული ბმული ყოველდღე ახალი რისკია."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "link-settings",
+   "prompt": "უსაფრთხოა გაზიარების ეს პარამეტრი?",
+   "cards": [
+    {
+     "id": "anyone-forever",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [ { "text": "გაზიარების პარამეტრი" } ],
+      "body": [
+       [ { "text": "ხელფასების ცხრილი: ბმულის მქონე ნებისმიერი ადამიანი, რედაქტირება, უვადოდ" } ]
+      ],
+      "buttons": [ "მზადაა" ]
+     },
+     "verdict": "threat",
+     "explain": "კონფიდენციალური ფაილი ყველასთვის ღიაა და ვადაც არ აქვს. თუ ბმული გავრცელდა, ამას ვეღარ გამოასწორებთ."
+    },
+    {
+     "id": "named-week",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [ { "text": "გაზიარების პარამეტრი" } ],
+      "body": [
+       [ { "text": "პროექტის ანგარიში: 2 ადამიანი, ნახვა, 7 დღე" } ]
+      ],
+      "buttons": [ "მზადაა" ]
+     },
+     "verdict": "safe",
+     "explain": "ვიწრო წვდომა, მხოლოდ ნახვა და დასრულების ვადა. სწორი პარამეტრია."
+    },
+    {
+     "id": "whole-org",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [ { "text": "გაზიარების პარამეტრი" } ],
+      "body": [
+       [ { "text": "HR-ის სია: ორგანიზაციის ყველა თანამშრომელი" } ]
+      ],
+      "buttons": [ "მზადაა" ]
+     },
+     "verdict": "threat",
+     "explain": "კონფიდენციალური დოკუმენტი მთელი ორგანიზაციისთვის არ არის, ის მხოლოდ კონკრეტული ადამიანებისთვისაა."
+    },
+    {
+     "id": "public-ad",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [ { "text": "გაზიარების პარამეტრი" } ],
+      "body": [
+       [ { "text": "ვაკანსიის განცხადება: ბმულის მქონე ნებისმიერი ადამიანი" } ]
+      ],
+      "buttons": [ "მზადაა" ]
+     },
+     "verdict": "safe",
+     "explain": "ის საჯაროა და საიტზე უკვე გამოქვეყნებულია. აქ ღია ბმული პრობლემა არ არის."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "who-needs-what",
+   "prompt": "იპოვეთ სწორი პარამეტრი თითოეული საჭიროებისთვის.",
+   "pairs": [
+    { "id": "partner", "left": "პარტნიორმა დოკუმენტი უნდა წაიკითხოს", "right": "ნახვა, კონკრეტულ ადამიანზე, 7 დღე" },
+    { "id": "coauthor", "left": "კოლეგა დოკუმენტს თქვენთან ერთად წერს", "right": "რედაქტირება, მხოლოდ ამ ადამიანისთვის" },
+    { "id": "public", "left": "საიტზე გამოქვეყნებული განცხადება", "right": "ღია ბმული ყველასთვის" }
+   ],
+   "explain": "გააზიარეთ რაც შეიძლება ვიწროდ: ვისთან, რა უფლებებით და რამდენი ხნით."
+  },
+  {
+   "type": "choice",
+   "id": "personal-cloud",
+   "question": {
+    "prompt": "შეგიძლიათ თუ არა კონფიდენციალური ფაილი პირად ღრუბელში ატვირთოთ, რომ სახლიდან იმუშაოთ?",
+    "options": [
+     {
+      "id": "strong",
+      "label": "დიახ, ჩემი პაროლი ძლიერია",
+      "correct": false,
+      "feedback": "ძლიერი პაროლი ფაილს ორგანიზაციის კონტროლის ქვეშ ვერ დააბრუნებს."
+     },
+     {
+      "id": "work",
+      "label": "არა, გამოვიყენებ სამსახურის დისკს ან ორგანიზაციის მიერ დაშვებულ სხვა გზას",
+      "correct": true,
+      "feedback": "სწორია. სამსახურის დისკზე ფაილი დაცულია და მისი აღდგენაც შესაძლებელია."
+     },
+     {
+      "id": "delete-later",
+      "label": "დიახ, მერე წავშლი",
+      "correct": false,
+      "feedback": "წაშლილი ფაილი ხშირად სანაგვე ყუთში და სხვა მოწყობილობებზე რჩება."
+     }
+    ],
+    "visual": { "kind": "illustration", "id": "cloud" }
+   },
+   "explain": "სამსახურის ფაილები სამსახურის სისტემებში უნდა დარჩეს. თუ დარწმუნებული არ ხართ, ჰკითხეთ ტექნიკურ მხარდაჭერას."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "კონფიდენციალური ფაილებისთვის არასოდეს გამოიყენოთ პარამეტრი „ბმულის მქონე ნებისმიერი ადამიანი“.",
+    "გააზიარეთ კონკრეტულ ადამიანებთან, მხოლოდ ნახვის უფლებით და ვადით.",
+    "ძველი გაზიარებები რეგულარულად გააუქმეთ."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

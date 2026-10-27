@@ -61,12 +61,26 @@ export const GESTURE_TO_CAT: Record<MascotGesture, CatGesture | null> = {
   present: "point-right",
 };
 
-/** Idle acts as behaviours: a nap dozes (a curl, or sitting up below 80 px), the apple becomes grooming. */
+/**
+ * Idle acts as behaviours: a nap dozes (a curl, or sitting up below 80 px), the apple becomes grooming; the cat's own acts
+ * have the engine's names (play-mouse and play-yarn are the toys). The lively ones do not start while motion is off (and
+ * the wrapper starts no act then); under calm only the laser does.
+ */
 export const ACT_TO_CAT: Record<MascotAct, CatBehaviour> = {
   rest: "present",
   nap: "sleep",
   apple: "groom",
   read: "look",
+  sleep: "sleep",
+  stretch: "stretch",
+  groom: "groom",
+  knead: "knead",
+  "play-mouse": "mouse",
+  "play-yarn": "yarn",
+  laser: "laser",
+  "chase-tail": "chase-tail",
+  roll: "roll",
+  run: "run",
 };
 
 /** What a one-shot trigger does: a gesture, a behaviour, a pet (head tilt and purr) or a hop of the whole cat. */
@@ -81,6 +95,16 @@ export const FIRE_TO_CAT: Record<MascotTrigger, CatCue> = {
   tap: { play: "point-down" },
   wipe: { do: "groom" },
 };
+
+const MIRROR: Record<string, string> = { left: "right", right: "left", "point-left": "point-right", "point-right": "point-left" };
+
+/**
+ * A right-to-left page mirrors the layout around the cat, so it sits the other way round and points to the
+ * other side (the engine's points follow the screen side). Aims stay as they are: they come from real rects.
+ */
+export function mirrorForRtl<T extends string>(name: T, rtl: boolean): T {
+  return rtl ? ((MIRROR[name] as T | undefined) ?? name) : name;
+}
 
 const clamp1 = (v: number) => Math.max(-1, Math.min(1, v));
 const degrees = (a: number) => ((a % 360) + 360) % 360;

@@ -32,12 +32,12 @@ export default async function LearnerLayout({ children }: { children: React.Reac
   ];
 
   return (
-    <div className="protected min-h-dvh lg:pl-(--rail-width)">
-      <a href="#main" className="sr-only z-90 rounded-pill bg-ink px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3">
+    <div className="protected min-h-dvh lg:ps-(--rail-width)">
+      <a href="#main" className="sr-only z-90 rounded-pill bg-ink px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:start-3">
         {tr("skip")}
       </a>
 
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-(--rail-width) flex-col overflow-y-auto border-r border-line bg-surface px-4 pt-6 pb-5 lg:flex">
+      <aside className="fixed inset-y-0 start-0 z-30 hidden w-(--rail-width) flex-col overflow-y-auto border-e border-line bg-surface px-4 pt-6 pb-5 lg:flex">
         <BrandMark href="/app" className="mb-8 px-3" byline />
         <RailNav showAdmin={allowed(v, "admin.access")} hidden={hidden} />
         <Link href="/profile" className="mt-4 flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-sunken">
@@ -75,7 +75,7 @@ export default async function LearnerLayout({ children }: { children: React.Reac
             <Flame className={streak ? "size-4.5 fill-reward-400 text-reward-600" : "size-4.5 text-ink-subtle"} />
             {streak}
             {freezes ? (
-              <span className="hidden items-center gap-0.5 border-l border-line pl-1.5 text-brand-700 sm:inline-flex">
+              <span className="hidden items-center gap-0.5 border-s border-line ps-1.5 text-brand-700 sm:inline-flex">
                 <Snowflake className="size-4" />
                 {freezes}
               </span>

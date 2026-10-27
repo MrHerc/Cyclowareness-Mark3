@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Skeleton } from "@/components/ui/skeleton";
 
-/** Path page placeholder: back link, header and the module roadmap on the left, the progress, standards and badge cards on the right. */
+/** Path page placeholder: back link, header, the module roadmap and its labs on the left, the progress, standards and badge cards on the right. */
 export default async function PathLoading() {
   const t = await getTranslations("common");
   return (
@@ -17,8 +17,18 @@ export default async function PathLoading() {
           </div>
         </div>
         <Skeleton className="mb-4 h-6 w-28 rounded-md" />
+        <Skeleton className="mb-3 h-5 w-24 rounded-md" />
         <div className="grid gap-3">
           {Array.from({ length: 5 }, (_, i) => (
+            <div key={i} className="flex gap-4">
+              <Skeleton className="mt-3 size-11 shrink-0 rounded-full" />
+              <Skeleton className="h-24 min-w-0 flex-1" />
+            </div>
+          ))}
+        </div>
+        <Skeleton className="mt-8 mb-3 h-5 w-32 rounded-md" />
+        <div className="grid gap-3">
+          {Array.from({ length: 2 }, (_, i) => (
             <div key={i} className="flex gap-4">
               <Skeleton className="mt-3 size-11 shrink-0 rounded-full" />
               <Skeleton className="h-20 min-w-0 flex-1" />

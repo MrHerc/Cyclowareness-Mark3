@@ -1,0 +1,499 @@
+{
+  "id": "task-trap",
+  "title": "Die Aufgabenfalle",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "tt-tutor",
+      "beats": [
+        {
+          "id": "tt-b1",
+          "say": "Hallo! Heute geht es um Jobangebote, die leichtes Geld von zu Hause aus versprechen.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "tt-b2",
+          "say": "Die Aufgabe ist einfach: liken, bewerten, einen Screenshot schicken. Und die Bezahlung ist verdächtig hoch.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "brandRef": "w2d-nergiz-market-fake",
+              "app": "whatsapp",
+              "contact": [
+                {
+                  "text": "Nərgiz Market HR | Aynur"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Hallo! Arbeit von zu Hause: Produkte liken und Bewertungen schreiben."
+                    }
+                  ],
+                  "time": "09:12"
+                },
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Verdienen Sie 40–120 AZN am Tag",
+                      "spot": "pay"
+                    }
+                  ],
+                  "time": "09:12"
+                }
+              ]
+            }
+          },
+          "highlight": "pay"
+        },
+        {
+          "id": "tt-b3",
+          "say": "Die ersten fünf Manat zahlen sie tatsächlich aus. Das ist der Köder, damit Sie später eine hohe Summe einzahlen.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "tt-b4",
+          "say": "Die Regel: Wenn Sie zahlen müssen, um anzufangen oder um sich Ihren Verdienst auszahlen zu lassen, ist es Betrug.",
+          "mood": "happy",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "tt-sim",
+      "environment": "phone",
+      "title": "Arbeit von zu Hause",
+      "intro": "Ein Jobangebot kommt von einer unbekannten Nummer. Wählen Sie Ihre Antwort auf jede Nachricht.",
+      "steps": [
+        {
+          "id": "offer",
+          "label": "09:12 Neue Nachricht",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "w2d-nergiz-market-fake",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Nərgiz Market HR | Aynur"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hallo! Wir haben Ihre Nummer aus Ihrem Profil auf einem Jobportal."
+                  }
+                ],
+                "time": "09:12"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Arbeit von zu Hause: 1–2 Stunden am Tag, 40–120 AZN. Interesse?"
+                  }
+                ],
+                "time": "09:12"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "interested",
+              "label": "Ja, erzählen Sie mir mehr",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Interesse zu zeigen, kostet Sie noch nichts. Doch dieser Chat läuft auf eine Zahlung hinaus. Achten Sie auf jeden Schritt."
+            },
+            {
+              "id": "block",
+              "label": "Blockieren und melden",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Richtig. Ein unerwartetes Angebot mit traumhaft hoher Bezahlung ist Warnsignal genug.",
+              "next": "end"
+            }
+          ]
+        },
+        {
+          "id": "first-task",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "w2d-nergiz-market-fake",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Nərgiz Market HR | Aynur"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Erste Aufgabe: Geben Sie diesen 3 Produkten 5 Sterne und schicken Sie einen Screenshot."
+                  }
+                ],
+                "time": "09:20"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "1,70 AZN pro Aufgabe."
+                  }
+                ],
+                "time": "09:20"
+              }
+            ]
+          },
+          "say": "Hier ist die erste Aufgabe.",
+          "actions": [
+            {
+              "id": "do-it",
+              "label": "Ich mache es und schicke den Screenshot",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Gefälschte Bewertungen führen andere Kaufende in die Irre. Außerdem sind sie der erste Schritt der Masche."
+            },
+            {
+              "id": "refuse",
+              "label": "Keine gefälschten Bewertungen – ich blockiere",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Richtig. Geld fürs Liken und Bewerten ist ein bekanntes Zeichen dieser Masche.",
+              "next": "end"
+            }
+          ]
+        },
+        {
+          "id": "first-pay",
+          "label": "10:03 SahilBank",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank",
+            "sender": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "time": "10:03",
+            "messages": [
+              [
+                {
+                  "text": "Gutschrift auf Ihre Karte: 5,10 AZN. Kontostand: 63,40 AZN."
+                }
+              ]
+            ]
+          },
+          "say": "Auf Ihrer Karte ist tatsächlich Geld eingegangen.",
+          "actions": [
+            {
+              "id": "trust",
+              "label": "Das Geld ist da, also ist der Job echt",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Eine kleine Auszahlung soll Ihr Vertrauen gewinnen. Später holen sich die Kriminellen ein Vielfaches davon zurück."
+            },
+            {
+              "id": "bait",
+              "label": "Das ist ein Köder. Ich höre hier auf",
+              "kind": "ignore",
+              "outcome": "safe",
+              "feedback": "Richtig. Die erste Auszahlung ist der Köder, im nächsten Schritt wollen sie Geld von Ihnen.",
+              "next": "end"
+            }
+          ]
+        },
+        {
+          "id": "vip-task",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "w2d-nergiz-market-fake",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Nərgiz Market VIP-Gruppe"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Herzlichen Glückwunsch, Sie haben die VIP-Stufe erreicht!"
+                  }
+                ],
+                "time": "10:40"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "VIP-Aufgabe: Zahlen Sie 50 AZN ein und erhalten Sie in 30 Minuten 130 AZN zurück."
+                  }
+                ],
+                "time": "10:41"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "In der Gruppe verdienen alle – schauen Sie, heute haben 47 Leute ihr Geld bekommen."
+                  }
+                ],
+                "time": "10:41"
+              }
+            ]
+          },
+          "say": "Jetzt hat man Sie in eine Telegram-Gruppe geholt.",
+          "actions": [
+            {
+              "id": "deposit",
+              "label": "Ich zahle 50 AZN ein",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Dieses Geld kommt nicht zurück. Die Gewinner in der Gruppe sind die Kriminellen selbst."
+            },
+            {
+              "id": "leave",
+              "label": "Gruppe verlassen und melden",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Richtig. Wenn Sie Geld einzahlen müssen, um zu arbeiten, ist das kein Job, sondern Betrug.",
+              "next": "end"
+            }
+          ]
+        },
+        {
+          "id": "negative",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "w2d-nergiz-market-fake",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Nərgiz Market VIP-Gruppe"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Systemfehler: Ihr Kontostand beträgt jetzt -86 AZN."
+                  }
+                ],
+                "time": "11:15"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Zahlen Sie 86 AZN, sonst wird Ihr Verdienst von 214 AZN gelöscht."
+                  }
+                ],
+                "time": "11:15"
+              }
+            ]
+          },
+          "say": "Nach Ihrer Zahlung ist der Kontostand plötzlich ins Minus gerutscht.",
+          "actions": [
+            {
+              "id": "pay-more",
+              "label": "Ich zahle auch die 86 AZN",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Nach jeder Zahlung kommt ein neuer Grund. Hören Sie auf und melden Sie den Fall Ihrer Bank und der Polizei unter 102."
+            },
+            {
+              "id": "stop",
+              "label": "Ich zahle nicht, ich blockiere und melde",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Richtig, eine Zahlung zur Freigabe des Verdienstes ist der letzte Schritt der Masche. Bewahren Sie den Chat als Beweis auf."
+            }
+          ]
+        },
+        {
+          "id": "end",
+          "label": "İşBazar: neues Stellenangebot",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2d-isbazar",
+            "app": "İşBazar",
+            "title": [
+              {
+                "text": "Xəzər Logistika: Disponent (m/w/d)"
+              }
+            ],
+            "body": [
+              {
+                "text": "Vorstellungsgespräch im Büro, Gehalt 850 AZN. Bewerben Sie sich auf der Website."
+              }
+            ],
+            "time": "12:30"
+          },
+          "say": "Und das hier ist ein echtes Stellenangebot.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Stellenangebot ansehen",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Richtig. Ein echtes Stellenangebot nennt das Unternehmen, sieht ein Vorstellungsgespräch und ein realistisches Gehalt vor und verlangt nie Geld von Ihnen."
+            },
+            {
+              "id": "later",
+              "label": "Später ansehen",
+              "kind": "ignore",
+              "outcome": "safe",
+              "feedback": "Das ist in Ordnung. Eine echte Stellenanzeige verschwindet nicht, Sie können sie in Ruhe prüfen."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "tt-scenario",
+      "title": "Leyla hat schon bezahlt",
+      "start": "call",
+      "nodes": [
+        {
+          "id": "call",
+          "text": "Ich habe 120 Manat in die Aufgaben gesteckt. Jetzt wollen sie 15 Prozent Steuer, damit ich mir das Geld auszahlen lassen kann. Soll ich zahlen?",
+          "speaker": "Leyla, Ihre Verwandte (am Telefon)",
+          "voice": "young-woman",
+          "channel": "phone",
+          "manner": "worried",
+          "spoken": "Ich habe 120 Manat in die Aufgaben gesteckt. <breath> Jetzt wollen sie 15 Prozent Steuer, damit ich mir das Geld auszahlen lassen kann. Soll ich zahlen?",
+          "character": "leyla",
+          "choices": [
+            {
+              "label": "Zahl nicht, das ist immer noch dieselbe Masche",
+              "next": "id-photo",
+              "feedback": "Richtig. Eine Steuer oder Gebühr für die Auszahlung des Verdienstes ist ein Zeichen für Betrug."
+            },
+            {
+              "label": "Zahl lieber, sonst sind die 120 Manat auch weg",
+              "outcome": "compromised",
+              "feedback": "Damit wird der Schaden nur größer. Nach der Steuer kommt die nächste Ausrede."
+            }
+          ]
+        },
+        {
+          "id": "id-photo",
+          "text": "Für die Registrierung habe ich ihnen auch ein Foto meines Personalausweises geschickt. Ist das ein Problem?",
+          "speaker": "Leyla",
+          "voice": "young-woman",
+          "channel": "phone",
+          "manner": "worried",
+          "spoken": "Für die Registrierung habe ich ihnen auch ein Foto meines Personalausweises geschickt. <breath> Ist das ein Problem?",
+          "character": "leyla",
+          "choices": [
+            {
+              "label": "Ja, das melden wir auch der Bank und der Polizei",
+              "next": "steps",
+              "feedback": "Richtig. Mit einem Ausweisfoto lassen sich auf Leylas Namen Konten eröffnen oder Kredite aufnehmen."
+            },
+            {
+              "label": "Nein, mit einem Foto können die nichts anfangen",
+              "next": "steps",
+              "outcome": "risky",
+              "feedback": "Im Gegenteil: Mit einem Ausweisfoto lassen sich betrügerische Konten auf Leylas Namen eröffnen. Melden Sie auch das."
+            }
+          ]
+        },
+        {
+          "id": "steps",
+          "text": "Und was mache ich jetzt?",
+          "speaker": "Leyla",
+          "voice": "young-woman",
+          "channel": "phone",
+          "manner": "worried",
+          "spoken": "<breath> Und was mache ich jetzt?",
+          "character": "leyla",
+          "choices": [
+            {
+              "label": "Ruf deine Bank an, melde es der Polizei unter 102 und heb den Chat auf",
+              "outcome": "safe",
+              "feedback": "Sehr gut. Die Bank kann versuchen, die Überweisung zu stoppen, und der Chat ist ein Beweis für die Polizei."
+            },
+            {
+              "label": "Lösch einfach alles und vergiss es",
+              "outcome": "risky",
+              "feedback": "Wer den Chat löscht, vernichtet die Beweise. Dafür muss sich niemand schämen – der Fall gehört einfach gemeldet."
+            },
+            {
+              "label": "Schreib dem Kanal, der verspricht, das Geld zurückzuholen",
+              "outcome": "compromised",
+              "feedback": "Hinter Angeboten, verlorenes Geld zurückzuholen, stecken oft dieselben Kriminellen. Zahlen Sie dort nichts."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "tt-match",
+      "prompt": "Ordnen Sie jede Formulierung aus dem Angebot ihrer wahren Bedeutung zu.",
+      "pairs": [
+        {
+          "id": "easy",
+          "left": "1 Stunde am Tag, 120 AZN",
+          "right": "Köder: So wird echte Arbeit nicht bezahlt"
+        },
+        {
+          "id": "deposit",
+          "left": "Einzahlung für eine VIP-Aufgabe",
+          "right": "Man nimmt Ihnen direkt Ihr Geld ab"
+        },
+        {
+          "id": "tax",
+          "left": "Steuer für die Auszahlung des Verdienstes",
+          "right": "Die nächste Zahlungsfalle"
+        },
+        {
+          "id": "group",
+          "left": "In der Gruppe verdienen alle",
+          "right": "Eingeschleuste Mitglieder und gefälschte Bewertungen"
+        }
+      ],
+      "explain": "Egal, wie die Zahlung heißt: Wenn Sie zahlen müssen, um zu arbeiten, ist es kein Job."
+    },
+    {
+      "type": "recap",
+      "id": "tt-recap",
+      "points": [
+        "Ein Job, bei dem Sie fürs Liken und Bewerten bezahlt werden, ist Betrug.",
+        "Die erste kleine Auszahlung ist der Köder – Einzahlungen und Steuern auf Auszahlungen sind die Falle.",
+        "Schon bezahlt? Bank anrufen, Polizei unter 102, Chat aufbewahren."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

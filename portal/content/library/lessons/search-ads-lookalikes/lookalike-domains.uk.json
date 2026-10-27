@@ -1,0 +1,333 @@
+{
+  "id": "lookalike-domains",
+  "title": "Схожі адреси",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ld-tutor",
+      "beats": [
+        {
+          "id": "ld-b1",
+          "say": "На телефоні адресний рядок короткий, і більша частина адреси прихована. Шахраї саме на це й розраховують.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "ld-b2",
+          "say": "Погляньте на цю адресу: спочатку йде офіційна назва, але справжній власник сайту — це частина в кінці.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "url": [
+                {
+                  "text": "https://vetendasportal.gov."
+                },
+                {
+                  "text": "az-arayis.example",
+                  "spot": "real-owner"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "real-owner"
+        },
+        {
+          "id": "ld-b3",
+          "say": "Є й інші хитрощі: переставлені літери, додане слово або схожа цифра замість літери.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "ld-b4",
+          "say": "Якщо адреса підозріла, нічого не вводьте, закрийте сторінку й повідомте техпідтримку.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "ld-match",
+      "prompt": "Зіставте кожну фальшиву адресу з офіційною, яку вона імітує.",
+      "pairs": [
+        {
+          "id": "gov",
+          "left": "vetendasportal.gov.az-arayis.example",
+          "right": "vetendasportal.gov.az"
+        },
+        {
+          "id": "sahil",
+          "left": "sahi1bank.example.info",
+          "right": "sahilbank.az"
+        },
+        {
+          "id": "ulduz",
+          "left": "ulduzbnak.example",
+          "right": "ulduzbank.az"
+        },
+        {
+          "id": "mail",
+          "left": "idare-poct-giris.example.info",
+          "right": "poct.idare.example"
+        }
+      ],
+      "explain": "Різниця невелика: офіційна назва на початку, цифра, дві переставлені літери чи зайве слово. Завжди читайте адресу з кінця."
+    },
+    {
+      "type": "simulation",
+      "id": "ld-sim",
+      "environment": "phone",
+      "title": "Довідка на телефоні",
+      "intro": "Ви хочете отримати довідку на телефоні. На кожному кроці дочитуйте адресу до самого кінця.",
+      "steps": [
+        {
+          "id": "search-ad",
+          "label": "Реклама: Vatandash Portal, офіційний сайт",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tapan",
+            "url": [
+              {
+                "text": "https://tapan.example/axtar?q=vetendas+portali+arayis",
+                "reveal": "tapan.example"
+              }
+            ]
+          },
+          "say": "Перший результат пошуку — реклама.",
+          "actions": [
+            {
+              "id": "ad",
+              "label": "Відкрити рекламу",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Реклама привела вас на інший сайт. Тепер уважно прочитайте адресу.",
+              "next": "fake-login"
+            },
+            {
+              "id": "official",
+              "label": "Відкрити результат vetendasportal.gov.az",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "Правильно. Ви пропустили рекламу й вибрали результат, адреса якого закінчується на gov.az.",
+              "next": "real-login"
+            }
+          ]
+        },
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2c-vetendas-portal-fake",
+            "brand": "Vatandash Portal",
+            "url": [
+              {
+                "text": "https://vetendasportal.gov.az-arayis.example/giris",
+                "reveal": "az-arayis.example"
+              }
+            ],
+            "fields": [
+              "FIN-код",
+              "Пароль"
+            ],
+            "button": "Увійти"
+          },
+          "say": "На телефоні видно лише початок адреси. Дочитайте її до кінця.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Увійти",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "На початку адреси було gov.az, але в кінці — ні. Ваш FIN-код і пароль потрапили до шахрая."
+            },
+            {
+              "id": "close",
+              "label": "Закрити сторінку",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Правильно. Справжній власник сайту — у кінці адреси, а ця адреса не закінчувалася на gov.az.",
+              "next": "real-login"
+            }
+          ]
+        },
+        {
+          "id": "new-login",
+          "label": "10:16 Vatandash Portal",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2c-vetendas-portal",
+            "app": "Vatandash Portal",
+            "title": [
+              {
+                "text": "Новий вхід"
+              }
+            ],
+            "body": [
+              {
+                "text": "Хтось увійшов у ваш обліковий запис із невідомого пристрою."
+              }
+            ],
+            "time": "10:16"
+          },
+          "say": "Через хвилину надійшло це сповіщення.",
+          "actions": [
+            {
+              "id": "fix",
+              "label": "Відкрию портал напряму й зміню пароль",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Правильно. Відкрийте портал із закладки, змініть пароль і вийдіть з усіх пристроїв."
+            },
+            {
+              "id": "later",
+              "label": "Подивлюся пізніше",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Шахрай уже у вашому обліковому записі. Кожна хвилина важлива."
+            }
+          ]
+        },
+        {
+          "id": "real-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2c-vetendas-portal",
+            "brand": "Vatandash Portal",
+            "url": [
+              {
+                "text": "https://vetendasportal.gov.az/giris",
+                "reveal": "vetendasportal.gov.az"
+              }
+            ],
+            "fields": [
+              "FIN-код",
+              "Пароль"
+            ],
+            "button": "Увійти"
+          },
+          "say": "Ця адреса закінчується на gov.az.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Увійти",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Правильно, це сам офіційний портал. Тепер додайте його в закладки."
+            },
+            {
+              "id": "check",
+              "label": "Перевірити адресу",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Чудова звичка. Домен закінчується на gov.az, і перед ним немає зайвого слова."
+            }
+          ]
+        },
+        {
+          "id": "bank-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank-fake",
+            "sender": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "time": "19:42",
+            "messages": [
+              [
+                {
+                  "text": "Вашу картку тимчасово заблоковано. Щоб розблокувати: "
+                },
+                {
+                  "text": "sahilbank.az-kart.example/ac",
+                  "link": {
+                    "label": "sahilbank.az-kart.example/ac",
+                    "href": "https://sahilbank.az-kart.example/ac"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Увечері надходить SMS нібито від імені банку.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Відкрити посилання",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Адреса починається з назви банку, але власник — це частина в кінці. Відкрийте застосунок банку самі."
+            },
+            {
+              "id": "report",
+              "label": "Повідомити про спам",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Правильно. Перевірте картку в застосунку банку або за номером на звороті картки."
+            },
+            {
+              "id": "delete",
+              "label": "Видалити",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Так теж можна. Якщо сумніваєтеся, самі зателефонуйте в банк за номером на звороті картки."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "ld-order",
+      "prompt": "Розташуйте в правильному порядку кроки перевірки адреси на телефоні.",
+      "items": [
+        {
+          "id": "tap",
+          "label": "Торкнутися адресного рядка, щоб побачити повну адресу"
+        },
+        {
+          "id": "end",
+          "label": "Знайти останню частину домену"
+        },
+        {
+          "id": "compare",
+          "label": "Порівняти її з офіційною адресою літеру за літерою"
+        },
+        {
+          "id": "leave",
+          "label": "Якщо щось відрізняється, закрити сторінку, нічого не вводячи"
+        }
+      ],
+      "explain": "На телефоні кінець адреси часто прихований, тому спершу відкрийте її повністю. Якщо в кінці немає офіційної назви, сайт фальшивий."
+    },
+    {
+      "type": "recap",
+      "id": "ld-recap",
+      "points": [
+        "На телефоні відкривайте повну адресу й читайте її з кінця",
+        "Навіть якщо офіційна назва стоїть на початку, справжній власник — це частина в кінці",
+        "Якщо ви ввели пароль, змініть його на офіційному сайті й повідомте про це"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

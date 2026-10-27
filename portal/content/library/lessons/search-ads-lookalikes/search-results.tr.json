@@ -1,0 +1,411 @@
+{
+  "id": "search-results",
+  "title": "Arama sonuçları",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "sr-tutor",
+      "beats": [
+        {
+          "id": "sr-b1",
+          "say": "Merhaba! Birçok kişi resmî sitelere adresi yazarak değil, arama yaparak ulaşır. Dolandırıcılar da bunu bilir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "sr-b2",
+          "say": "En üstte görünmek için reklam satın alırlar. Böyle bir sonucun yanında küçük bir kelime olur: Sponsorlu.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2c-tapan",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "Tapan: vatandaş portalı belge"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Sponsorlu",
+                    "spot": "ad-label"
+                  },
+                  {
+                    "text": "  vetendasportal-gov.example"
+                  }
+                ],
+                [
+                  {
+                    "text": "Vətəndaş Portalı: belgenizi 5 dakikada alın"
+                  }
+                ],
+                [
+                  {
+                    "text": "vetendasportal.gov.az"
+                  }
+                ],
+                [
+                  {
+                    "text": "Vətəndaş Portalı: çevrim içi belgeler"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Ara"
+              ]
+            }
+          },
+          "highlight": "ad-label"
+        },
+        {
+          "id": "sr-b3",
+          "say": "Sahte site, gerçeğine çok benzer: bir harf farklıdır, fazladan bir kelime eklenmiştir ya da adresin sonu başkadır.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "sr-b4",
+          "say": "Resmî adresi bir kez kontrol edin ve yer işaretlerine ekleyin. Sonra siteyi hep oradan açın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "sr-hotspot",
+      "prompt": "Arama sonuçlarındaki tehlikeli noktaları bulun.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2c-tapan",
+        "tone": "app",
+        "title": [
+          {
+            "text": "Tapan: vatandaş portalı belge"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Sponsorlu",
+              "spot": "ad-label"
+            },
+            {
+              "text": "  "
+            },
+            {
+              "text": "vetendasportal-gov.example",
+              "spot": "lookalike"
+            }
+          ],
+          [
+            {
+              "text": "Resmî site. Belgenizi 5 dakikada alın",
+              "spot": "fake-official"
+            }
+          ],
+          [
+            {
+              "text": "Sponsorlu  "
+            },
+            {
+              "text": "vetendaspotral.example.info",
+              "spot": "typo"
+            }
+          ],
+          [
+            {
+              "text": "Vətəndaş Portalı: giriş ve belgeler"
+            }
+          ],
+          [
+            {
+              "text": "vetendasportal.gov.az"
+            }
+          ],
+          [
+            {
+              "text": "Vətəndaş Portalı: çevrim içi belgeler"
+            }
+          ]
+        ],
+        "buttons": [
+          "Ara"
+        ]
+      },
+      "spots": [
+        {
+          "id": "ad-label",
+          "label": "Reklam etiketi",
+          "explain": "Bu sonucun en üstte çıkması için para ödenmiş. Dolandırıcılar da reklam satın alabilir, bu yüzden giriş yapmak için asla bir reklama tıklamayın."
+        },
+        {
+          "id": "lookalike",
+          "label": "Fazladan kelime",
+          "explain": "Adrese “gov” kelimesi eklenmiş, ama sonu farklı. Resmî portalın adresi gov.az ile biter."
+        },
+        {
+          "id": "fake-official",
+          "label": "Sahte “resmî” ibaresi",
+          "explain": "“Resmî site” sözünü herkes yazabilir. Neyin resmî olduğunu yazı değil, adresin sonu gösterir."
+        },
+        {
+          "id": "typo",
+          "label": "Yer değiştiren harfler",
+          "explain": "“portal” kelimesindeki iki harfin yeri değişmiş. Aceleniz varken bunu fark etmek zordur."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "sr-choice",
+      "question": {
+        "prompt": "Vatandaş portalına sık sık giriş yapıyorsunuz. En güvenli yol hangisi?",
+        "options": [
+          {
+            "id": "bookmark",
+            "label": "Resmî adresi bir kez kontrol eder ve yer işaretlerine eklerim",
+            "correct": true,
+            "feedback": "Doğru. Yer işareti her seferinde aynı adresi açar, reklamlar da devreden çıkar."
+          },
+          {
+            "id": "first-result",
+            "label": "Her seferinde arama yapar ve ilk sonuca tıklarım",
+            "correct": false,
+            "feedback": "İlk sonuç bir reklam olabilir. Dolandırıcılar tam da bu alışkanlığa güvenir."
+          },
+          {
+            "id": "sms-link",
+            "label": "SMS ile gelen bağlantıyı kullanırım",
+            "correct": false,
+            "feedback": "SMS ile herkes bağlantı gönderebilir. Resmî siteyi kendiniz açın."
+          }
+        ]
+      },
+      "explain": "Sık kullandığınız siteleri yer işaretlerine ekleyin. O zaman arama sonuçları ve reklamlar sizi kandıramaz."
+    },
+    {
+      "type": "simulation",
+      "id": "sr-sim",
+      "environment": "browser",
+      "title": "Program indirme",
+      "intro": "Yarın çevrim içi bir toplantınız var ve Görüş uygulamasını indirmeniz gerekiyor. İşe bir aramayla başlıyorsunuz.",
+      "steps": [
+        {
+          "id": "results",
+          "label": "Görüş indir: arama sonuçları",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tapan",
+            "url": [
+              {
+                "text": "https://tapan.example/axtar?q=gorus+yukle",
+                "reveal": "tapan.example"
+              }
+            ]
+          },
+          "say": "En üstte bir reklam, onun altında da uygulamanın kendi sitesi var.",
+          "actions": [
+            {
+              "id": "ad",
+              "label": "Sponsorlu: gorus-app-download.example.net",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Reklam sizi başka bir siteye götürdü. Henüz geç değil: adrese bakın.",
+              "next": "fake-site"
+            },
+            {
+              "id": "organic",
+              "label": "gorus.example: resmî site",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "Doğru. Reklamı atlayıp uygulamanın kendi sitesini açtınız.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "fake-site",
+          "label": "Görüş: ücretsiz indir",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-gorus-fake",
+            "url": [
+              {
+                "text": "https://gorus-app-download.example.net/yukle",
+                "reveal": "gorus-app-download.example.net"
+              }
+            ]
+          },
+          "say": "Sayfa gerçek siteye çok benziyor. Adrese bakın.",
+          "actions": [
+            {
+              "id": "download",
+              "label": "İndir",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Bu site uygulamanın yapımcısına ait değil. Buradan indirilen bir kurulum dosyasına güvenilemez.",
+              "next": "fake-file"
+            },
+            {
+              "id": "leave",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Bu adres uygulamanın kendi sitesi değildi. Resmî siteye kendiniz gidin.",
+              "next": "real-site"
+            },
+            {
+              "id": "check",
+              "label": "Adresi kontrol et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Site adı benzer ama alan adı farklı. Bu siteye güvenmeyin.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "fake-file",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "w2c-gorus-fake",
+            "name": [
+              {
+                "text": "GorusSetup_2026.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "84 MB",
+            "source": [
+              {
+                "text": "gorus-app-download.example.net"
+              }
+            ]
+          },
+          "say": "Dosya indirildi. Açacak mısınız?",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Bu kurulum dosyası, uygulamayla birlikte parolaları çalan bir program da kuruyor. Sahte bir siteden gelen dosyayı asla açmayın.",
+              "next": "after-bad"
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Doğru. Dosyayı silin, BT destek ekibine haber verin ve uygulamayı resmî siteden edinin.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "after-bad",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "qoruyucu",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Qoruyucu: şüpheli program"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "GorusSetup_2026.exe, tarayıcınızda kayıtlı parolaları okumaya çalıştı."
+                }
+              ]
+            ],
+            "buttons": [
+              "Karantinaya al",
+              "Kapat"
+            ]
+          },
+          "say": "Antivirüs programı bir şey buldu. Şimdi hızlı davranın.",
+          "actions": [
+            {
+              "id": "isolate",
+              "label": "Ağ bağlantısını kes ve BT destek ekibini ara",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Doğru. Prosedürünüz aksini söylemiyorsa bilgisayarı kapatmadan ağdan ayırın ve hemen arayın."
+            },
+            {
+              "id": "ignore",
+              "label": "Kapat ve çalışmaya devam et",
+              "kind": "cancel",
+              "outcome": "compromised",
+              "feedback": "Program çalışmaya devam ediyor ve parolalarınızı dışarı gönderebilir. Durumu hemen bildirin."
+            }
+          ]
+        },
+        {
+          "id": "real-site",
+          "label": "Görüş: bilgisayarınız için indirin",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "gorus",
+            "url": [
+              {
+                "text": "https://gorus.example/yukle",
+                "reveal": "gorus.example"
+              }
+            ]
+          },
+          "say": "Burası uygulamanın kendi sitesi.",
+          "actions": [
+            {
+              "id": "ask-it",
+              "label": "BT destek ekibinden kurmasını iste",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "En iyi yol bu. İş bilgisayarındaki programları BT destek ekibi kurar.",
+              "next": "results"
+            },
+            {
+              "id": "download",
+              "label": "İndir",
+              "kind": "install",
+              "outcome": "safe",
+              "feedback": "Doğru, burası resmî site. İş bilgisayarında önce BT destek ekibinin kurallarına bakın.",
+              "next": "results"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "sr-recap",
+      "points": [
+        "Giriş yapmak için reklamı değil, yer işaretini kullanın",
+        "Adresin sonunu okuyun ve resmî adresle karşılaştırın",
+        "Programları yalnızca resmî siteden ya da BT destek ekibinden edinin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

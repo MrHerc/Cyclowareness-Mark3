@@ -5,24 +5,26 @@ import { lessonFileSchema, lessonIntegrityErrors } from "../src/lib/content/vali
 import { APP_IDENTIFIERS, addressTokens, localeParityErrors } from "../src/lib/content/locale-parity";
 import { pickLessonContent, sharedContentLocale } from "../src/lib/content/lesson-locale";
 import { LESSON_TRANSLATIONS, readLibraryLesson } from "../src/server/services/library";
+import { LOCALES } from "../src/i18n/config";
 
 const root = path.join(__dirname, "..", "content", "library");
 const modules = JSON.parse(readFileSync(path.join(root, "modules.json"), "utf8")) as { slug: string; lessons: { id: string }[] }[];
 const lessonFile = (slug: string, id: string, locale: string) => path.join(root, "lessons", slug, `${id}.${locale}.json`);
 
-// Every library lesson has an az and a ru translation; each file that exists must pass. A missing one
-// fails `npx tsx scripts/check-lesson-locales.ts --coverage`, not this test.
+// Every library lesson has a translation in each other interface language; each file that exists must
+// pass. A missing one fails `npx tsx scripts/check-lesson-locales.ts --coverage`, not this test.
 const translations = modules
   .flatMap((m) => m.lessons.flatMap((l) => LESSON_TRANSLATIONS.map((locale) => ({ slug: m.slug, id: l.id, locale }))))
   .filter((x) => existsSync(lessonFile(x.slug, x.id, x.locale)));
 
 describe("lesson translations on disk", () => {
-  it("are named <lesson>.<en|az|ru>.json after a lesson listed in modules.json", () => {
+  it("are named <lesson>.<locale>.json after a lesson listed in modules.json", () => {
+    const name = new RegExp(`^(.+)\\.(${LOCALES.join("|")})\\.json$`);
     const stray = modules.flatMap((m) => {
       const ids = new Set(m.lessons.map((l) => l.id));
       return readdirSync(path.join(root, "lessons", m.slug))
         .filter((f) => {
-          const match = /^(.+)\.(en|az|ru)\.json$/.exec(f);
+          const match = name.exec(f);
           return !match || !ids.has(match[1]);
         })
         .map((f) => `${m.slug}/${f}`);
@@ -44,10 +46,11 @@ describe("lesson translations on disk", () => {
     for (const m of modules) {
       for (const l of m.lessons) {
         const { translations: read } = readLibraryLesson(m.slug, l.id);
-        expect(Object.keys(read).sort(), `${m.slug}/${l.id}`).toEqual(LESSON_TRANSLATIONS.filter((locale) => existsSync(lessonFile(m.slug, l.id, locale))));
+        expect(Object.keys(read).sort(), `${m.slug}/${l.id}`).toEqual(LESSON_TRANSLATIONS.filter((locale) => existsSync(lessonFile(m.slug, l.id, locale))).sort());
       }
     }
-  });
+    // Checks all 106 lessons in ten languages (about 1,000 files), longer than the default 5 s.
+  }, 60_000);
 });
 
 describe("localeParityErrors", () => {

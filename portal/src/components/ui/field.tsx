@@ -5,8 +5,16 @@ import { coarseHitArea } from "@/components/ui/button";
 const control =
   "w-full rounded-md border border-line-strong bg-surface px-3.5 text-body-sm text-ink placeholder:text-ink-disabled transition-[border-color,box-shadow] duration-(--duration-fast) hover:border-line-control focus:border-brand-600 focus:outline-none focus:ring-4 focus:ring-brand-100 disabled:bg-sunken disabled:text-ink-disabled aria-invalid:border-risk-500 aria-invalid:focus:ring-risk-100";
 
+const LTR_INPUT = ["email", "url", "tel", "password", "numeric"];
+
+/**
+ * Addresses, phone numbers, codes and passwords are typed left to right in every language. A caller that
+ * wraps such an input with a positioned icon puts dir="ltr" on the wrapper too, so the logical padding and
+ * the icon stay on the same side.
+ */
 export function Input({ className, ...props }: ComponentProps<"input">) {
-  return <input className={cn(control, "h-11", className)} {...props} />;
+  const ltr = LTR_INPUT.includes(props.type ?? "") || LTR_INPUT.includes(props.inputMode ?? "") || props.autoComplete === "one-time-code";
+  return <input dir={ltr ? "ltr" : undefined} className={cn(control, "h-11", className)} {...props} />;
 }
 
 export function Textarea({ className, ...props }: ComponentProps<"textarea">) {
@@ -18,7 +26,7 @@ export function Select({ className, children, ...props }: ComponentProps<"select
     <select
       className={cn(
         control,
-        "h-11 appearance-none bg-[length:1rem] bg-[right_0.85rem_center] bg-no-repeat pr-10",
+        "h-11 appearance-none bg-[length:1rem] bg-[right_0.85rem_center] bg-no-repeat pe-10 rtl:bg-[left_0.85rem_center]",
         "bg-[url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b6788' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")]",
         className,
       )}
@@ -99,7 +107,7 @@ export function Switch({ className, label, description, ...props }: ComponentPro
       <span className="relative mt-0.5 inline-flex shrink-0">
         <input type="checkbox" role="switch" className="peer sr-only" {...props} />
         <span className="h-7 w-12 rounded-pill bg-line-strong transition-colors duration-(--duration-base) peer-checked:bg-brand-600 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand-600 peer-disabled:opacity-50" />
-        <span className="pointer-events-none absolute top-1 left-1 size-5 rounded-full bg-white shadow-xs transition-transform duration-(--duration-base) ease-(--ease-out-expo) peer-checked:translate-x-5" />
+        <span className="pointer-events-none absolute top-1 start-1 size-5 rounded-full bg-white shadow-xs transition-transform duration-(--duration-base) ease-(--ease-out-expo) peer-checked:translate-x-5 rtl:peer-checked:-translate-x-5" />
       </span>
     </label>
   );

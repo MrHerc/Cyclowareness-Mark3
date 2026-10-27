@@ -1,0 +1,450 @@
+{
+ "id": "report-fast",
+ "title": "Schnell und besonnen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Ein Sicherheitsvorfall ist nicht nur ein großer Angriff. Auch ein angetippter verdächtiger Link, ein verlorenes Smartphone oder eine falsch adressierte E-Mail zählen dazu.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Fehler passieren jedem. Wer schnell meldet, verhindert, dass ein Problem größer wird. Je früher Sie Bescheid geben, desto geringer ist der Schaden.",
+     "mood": "happy",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Ermitteln Sie nicht auf eigene Faust und löschen Sie nichts. Die verdächtige E-Mail, Nachricht oder Datei ist ein Beweisstück für die Fachleute.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b5",
+     "say": "Halten Sie Ihre Meldung kurz: was passiert ist, wann, auf welchem Gerät und was Sie bereits unternommen haben.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "report-button",
+   "environment": "inbox",
+   "title": "Die Schaltfläche „Phishing melden“",
+   "intro": "In Ihrem Posteingang liegen zwei verdächtige E-Mails. Öffnen Sie beide nacheinander und wählen Sie jeweils den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "quota",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ispoct-fake",
+      "from": {
+       "name": [
+        {
+         "text": "İşPoçt-Administrator"
+        }
+       ],
+       "address": [
+        {
+         "text": "admin@ispoct-mail.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Ihr Postfach ist zu 98 % voll"
+       }
+      ],
+      "time": "08:47",
+      "body": [
+       [
+        {
+         "text": "Wenn Sie den Speicherplatz nicht erweitern, werden neue E-Mails in 24 Stunden gelöscht."
+        }
+       ],
+       [
+        {
+         "text": "Speicherplatz erweitern: "
+        },
+        {
+         "text": "ispoct-mail.example.net/kvota",
+         "link": {
+          "label": "ispoct-mail.example.net/kvota",
+          "href": "https://ispoct-mail.example.net/kvota"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Sehen Sie sich die Adresse des Absenders genau an.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Dank Ihrer Meldung können die Fachleute dieselbe E-Mail aus allen anderen Postfächern entfernen."
+      },
+      {
+       "id": "click",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Die Adresse gehörte nicht zur Domain Ihrer Organisation. Speicherplatz für ein Postfach wird nie über einen Link erweitert."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Sie selbst sind sicher, aber Ihre Kolleginnen und Kollegen bleiben im Visier, und das Beweisstück ist weg. Melden Sie die E-Mail, statt sie zu löschen."
+      },
+      {
+       "id": "forward",
+       "label": "An Kolleginnen und Kollegen weiterleiten",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Weiterleiten verbreitet die Bedrohung. Gibt es keine Schaltfläche zum Melden, leiten Sie die E-Mail nur an das Sicherheitsteam weiter."
+      }
+     ]
+    },
+    {
+     "id": "password-reply",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek-fake",
+      "from": {
+       "name": [
+        {
+         "text": "IT-Support"
+        }
+       ],
+       "address": [
+        {
+         "text": "support@idare-helpdesk.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Überprüfung Ihres Kontos"
+       }
+      ],
+      "time": "09:15",
+      "body": [
+       [
+        {
+         "text": "Das System wird gerade aktualisiert. Damit Ihr Konto aktiv bleibt, antworten Sie auf diese E-Mail mit Ihrem Benutzernamen und Ihrem Passwort."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig: Der echte IT-Support fragt nie nach Ihrem Passwort. Ihre Meldung warnt auch Ihre Kolleginnen und Kollegen."
+      },
+      {
+       "id": "reply",
+       "label": "Mit Passwort antworten",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Ihr Passwort ist beim Angreifer gelandet. Ändern Sie es in so einem Fall sofort und melden Sie den Vorfall."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Sie haben Ihr Passwort nicht verraten – andere vielleicht schon. Wenn Sie die E-Mail melden, können die Fachleute alle schützen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "is-it-incident",
+   "prompt": "Muss das gemeldet werden? Bedrohung oder ganz normal?",
+   "cards": [
+    {
+     "id": "wrong-recipient",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Sie"
+        }
+       ],
+       "address": [
+        {
+         "text": "l.aliyeva@idare.example"
+        }
+       ]
+      },
+      "to": "kamran.aliyev.1990@mail.example",
+      "subject": [
+       {
+        "text": "Personalliste"
+       }
+      ],
+      "time": "10:02",
+      "body": [
+       [
+        {
+         "text": "Anbei die gewünschte Liste."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "isciler_siyahisi.xlsx"
+         }
+        ],
+        "size": "240 KB"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Die Liste ging an eine private Adresse außerhalb der Organisation. Das ist ein Datenleck – melden Sie es sofort."
+    },
+    {
+     "id": "unasked-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ispoct",
+      "sender": [
+       {
+        "text": "İşPoçt"
+       }
+      ],
+      "time": "03:17",
+      "messages": [
+       [
+        {
+         "text": "Ihr Anmeldecode: 482913. Geben Sie ihn an niemanden weiter."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein Code, den Sie nicht angefordert haben, bedeutet: Jemand kennt Ihr Passwort. Ändern Sie es und melden Sie den Vorfall."
+    },
+    {
+     "id": "training-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "IT-Support"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Sicherheitsschulung am Freitag"
+       }
+      ],
+      "time": "12:30",
+      "body": [
+       [
+        {
+         "text": "Am Freitag um 11:00 Uhr findet im großen Saal eine kurze Schulung statt. Eine Anmeldung ist nicht nötig."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Richtige Adresse, kein Link, keine Aufforderung. Das ist eine ganz normale Mitteilung."
+    },
+    {
+     "id": "clicked-link",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Tural (Kollege)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ich habe gestern den Link aus dieser E-Mail geöffnet, aber nichts eingegeben. Ist bestimmt nicht schlimm, oder?"
+         }
+        ],
+        "time": "09:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Schon das Öffnen des Links kann Angreifern Informationen liefern oder einen Download starten. Das müssen Fachleute beurteilen – der Vorfall muss gemeldet werden."
+    },
+    {
+     "id": "lost-phone",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Leyla (Team)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ich habe mein Diensthandy im Taxi liegen lassen. Ich suche morgen danach, ist nicht dringend."
+         }
+        ],
+        "time": "19:45"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein verlorenes Diensthandy ist ein dringender Sicherheitsvorfall. Der IT-Support kann es aus der Ferne sperren oder löschen."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "first-step",
+   "question": {
+    "prompt": "Sie haben Ihr Passwort auf einer gefälschten Seite eingegeben. Was tun Sie zuerst?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Sofort melden und das Passwort ändern",
+      "correct": true,
+      "feedback": "Richtig. Jede Minute zählt. Mit diesen beiden Schritten sperren Sie den Angreifer aus."
+     },
+     {
+      "id": "silent",
+      "label": "Ich sage niemandem etwas, weil es mir peinlich ist",
+      "correct": false,
+      "feedback": "Schweigen verschafft dem Angreifer Zeit. Eine Meldung schützt Sie und die Organisation."
+     },
+     {
+      "id": "delete",
+      "label": "Ich lösche die E-Mail, damit keine Spur bleibt",
+      "correct": false,
+      "feedback": "Die E-Mail ist ein Beweisstück. Wenn Sie sie löschen, können die Fachleute nicht sehen, wer sonst noch angegriffen wurde."
+     },
+     {
+      "id": "recheck",
+      "label": "Ich öffne den Link noch einmal, um nachzusehen",
+      "correct": false,
+      "feedback": "Jedes erneute Öffnen erhöht das Risiko. Überlassen Sie die Untersuchung den Fachleuten."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "alarm"
+    }
+   },
+   "explain": "Schnell melden, Beweise aufbewahren und die Untersuchung den Fachleuten überlassen."
+  },
+  {
+   "type": "order",
+   "id": "strange-program",
+   "prompt": "Auf Ihrem Computer läuft ein seltsames Programm. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Die Arbeit sofort unterbrechen"
+    },
+    {
+     "id": "disconnect",
+     "label": "Vom Netzwerk trennen, nicht ausschalten"
+    },
+    {
+     "id": "call",
+     "label": "Den IT-Support telefonisch verständigen"
+    },
+    {
+     "id": "note",
+     "label": "Kurz notieren, was Sie gesehen haben"
+    }
+   ],
+   "explain": "Die Trennung vom Netzwerk stoppt die Ausbreitung, das Ausschalten dagegen kann Spuren im Arbeitsspeicher löschen. Wenn das Verfahren Ihrer Organisation etwas anderes vorsieht, halten Sie sich daran. Melden Sie den Vorfall telefonisch."
+  },
+  {
+   "type": "match",
+   "id": "good-report",
+   "prompt": "Ordnen Sie jeder Frage die passende Antwort in der Meldung zu.",
+   "pairs": [
+    {
+     "id": "what",
+     "left": "Was ist passiert?",
+     "right": "Ich habe mein Passwort auf einer gefälschten Seite eingegeben"
+    },
+    {
+     "id": "when",
+     "left": "Wann?",
+     "right": "Heute um 09:40 Uhr"
+    },
+    {
+     "id": "where",
+     "left": "Auf welchem Gerät?",
+     "right": "Dienstrechner, in der E-Mail-App"
+    },
+    {
+     "id": "done",
+     "left": "Was haben Sie unternommen?",
+     "right": "Passwort geändert, E-Mail aufbewahrt"
+    }
+   ],
+   "explain": "Eine kurze, genaue Meldung spart den Fachleuten Zeit."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Melden Sie im Zweifel sofort. Fehler sind keine Schande.",
+    "Ermitteln Sie nicht selbst und löschen Sie nichts.",
+    "Fassen Sie sich kurz: was, wann, wo und was Sie unternommen haben."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

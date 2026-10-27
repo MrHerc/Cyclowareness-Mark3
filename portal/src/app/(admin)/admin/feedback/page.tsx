@@ -75,7 +75,7 @@ export default async function FeedbackPage({ searchParams }: PageProps<"/admin/f
                     <span className="h-2 flex-1 overflow-hidden rounded-pill bg-sunken">
                       <span className="block h-full rounded-pill bg-reward-400" style={{ width: `${(d.n / all.length) * 100}%` }} />
                     </span>
-                    <span className="w-6 text-right text-ink-muted tabular-nums">{d.n}</span>
+                    <span className="w-6 text-end text-ink-muted tabular-nums">{d.n}</span>
                   </li>
                 ))}
               </ul>
@@ -89,8 +89,8 @@ export default async function FeedbackPage({ searchParams }: PageProps<"/admin/f
                   <li key={m.id} className="flex items-center gap-3 py-2 text-caption">
                     <span className="min-w-0 flex-1 truncate font-semibold">{m.title}</span>
                     <Stars value={m.avg} label={tr("stars", { value: Math.round(m.avg * 10) / 10 })} />
-                    <span className="w-8 text-right tabular-nums">{format.number(m.avg, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
-                    <span className="shrink-0 text-right whitespace-nowrap text-ink-subtle tabular-nums">{tr("count", { count: m.n })}</span>
+                    <span className="w-8 text-end tabular-nums">{format.number(m.avg, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>
+                    <span className="shrink-0 text-end whitespace-nowrap text-ink-subtle tabular-nums">{tr("count", { count: m.n })}</span>
                   </li>
                 ))}
               </ul>

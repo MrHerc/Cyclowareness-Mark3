@@ -62,7 +62,7 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { toast } from "@/components/ui/toast";
 import { BRAND_PALETTE, DEFAULT_ATTESTATION, DEFAULT_CERTIFICATE_TEXT, DEFAULT_TEMPLATES, WEBHOOK_EVENTS, emailButtonLabel } from "@/lib/tenant-defaults";
 import { parseEmailMarkup } from "@/lib/email-markup";
-import { LOCALES, LOCALE_NAMES, SITE_LOCALES } from "@/i18n/config";
+import { LOCALES, LOCALE_NAMES, langAttrs } from "@/i18n/config";
 import { readableOn } from "@/lib/color";
 import { cn } from "@/lib/cn";
 import { endpointKey } from "@/lib/stored-secret";
@@ -285,7 +285,7 @@ export function BrandingTab({
               <Input id="b-sn" value={senderName} onChange={(e) => setSenderName(e.target.value)} />
             </Field>
             <Field label={t("senderDomain")} htmlFor="b-sd" hint={t("senderHint")}>
-              <Input id="b-sd" value={senderDomain} onChange={(e) => setSenderDomain(e.target.value)} placeholder="agency.gov.az" />
+              <Input id="b-sd" dir="ltr" value={senderDomain} onChange={(e) => setSenderDomain(e.target.value)} placeholder="agency.gov.az" />
             </Field>
           </CardBody>
         </Card>
@@ -305,7 +305,7 @@ export function BrandingTab({
             )}
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={t("domain")} htmlFor="b-domain">
-                <Input id="b-domain" value={proofDomain} onChange={(e) => setProofDomain(e.target.value)} placeholder="agency.gov.az" autoComplete="off" spellCheck={false} />
+                <Input id="b-domain" dir="ltr" value={proofDomain} onChange={(e) => setProofDomain(e.target.value)} placeholder="agency.gov.az" autoComplete="off" spellCheck={false} />
               </Field>
               <Field label={t("txtRecord")} htmlFor="b-txt" hint={t("txtHint")}>
                 <div className="flex gap-2">
@@ -333,7 +333,7 @@ export function BrandingTab({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             {logo ? <img src={logo} alt="" className="h-7 w-auto max-w-32 object-contain" /> : <span className="size-7 shrink-0 rounded-sm" style={{ background: primary }} />}
             <span className="min-w-0 truncate text-caption font-semibold">{n}</span>
-            <Pill tone="reward" className="ml-auto">
+            <Pill tone="reward" className="ms-auto">
               <Flame />5
             </Pill>
           </div>
@@ -397,32 +397,26 @@ export function LanguagesTab({ defaultLocale, locales }: { defaultLocale: string
       <Card>
         <CardHeader title={t("availableTitle")} description={t("availableBody")} action={<Pill tone="brand">{t("onCount", { count: on.size, total: LOCALES.length })}</Pill>} />
         <CardBody className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-          {SITE_LOCALES.map((l) => {
-            const supported = (LOCALES as readonly string[]).includes(l);
-            return (
-              <label key={l} className={cn("flex items-start gap-3 rounded-lg border p-3.5", on.has(l) ? "border-brand-300 bg-brand-50/50" : "border-line", !supported && "opacity-60")}>
-                <input
-                  type="checkbox"
-                  className="mt-0.5 size-4 accent-(--brand)"
-                  disabled={!supported || l === def}
-                  checked={on.has(l)}
-                  onChange={(e) => setOn((s) => (e.target.checked ? new Set(s).add(l) : new Set([...s].filter((x) => x !== l))))}
-                />
-                <span>
-                  <span className="flex flex-wrap items-center gap-2 text-body-sm font-semibold">
-                    {LOCALE_NAMES[l]}
-                    {l === def ? (
-                      <Pill tone="brand">
-                        <Star />
-                        {tc("default")}
-                      </Pill>
-                    ) : null}
-                  </span>
-                  <span className="block text-tab text-ink-subtle">{supported ? t("lessonsInterface") : t("siteOnly")}</span>
-                </span>
-              </label>
-            );
-          })}
+          {LOCALES.map((l) => (
+            <label key={l} className={cn("flex items-start gap-3 rounded-lg border p-3.5", on.has(l) ? "border-brand-300 bg-brand-50/50" : "border-line")}>
+              <input
+                type="checkbox"
+                className="mt-0.5 size-4 accent-(--brand)"
+                disabled={l === def}
+                checked={on.has(l)}
+                onChange={(e) => setOn((s) => (e.target.checked ? new Set(s).add(l) : new Set([...s].filter((x) => x !== l))))}
+              />
+              <span className="flex flex-wrap items-center gap-2 text-body-sm font-semibold">
+                <span {...langAttrs(l)}>{LOCALE_NAMES[l]}</span>
+                {l === def ? (
+                  <Pill tone="brand">
+                    <Star />
+                    {tc("default")}
+                  </Pill>
+                ) : null}
+              </span>
+            </label>
+          ))}
         </CardBody>
       </Card>
       <SaveBar pending={pending} onSave={() => save(() => saveLanguagesAction(def, [...on]), { defaultLocale: "lg-default" })} />
@@ -549,10 +543,10 @@ export function IdentityTab({
         <CardHeader title={<Step n={3}>{t("step3Title")}</Step>} />
         <CardBody className="grid gap-4 sm:grid-cols-2">
           <Field label={t("issuer")} htmlFor="i-issuer" className="sm:col-span-2">
-            <Input id="i-issuer" value={sso.issuer} onChange={(e) => setSso({ issuer: e.target.value })} placeholder="https://login.example.az/realms/staff" />
+            <Input id="i-issuer" dir="ltr" value={sso.issuer} onChange={(e) => setSso({ issuer: e.target.value })} placeholder="https://login.example.az/realms/staff" />
           </Field>
           <Field label={t("clientId")} htmlFor="i-client">
-            <Input id="i-client" value={sso.clientId} onChange={(e) => setSso({ clientId: e.target.value })} />
+            <Input id="i-client" dir="ltr" value={sso.clientId} onChange={(e) => setSso({ clientId: e.target.value })} />
           </Field>
           <Field label={t("clientSecret")} htmlFor="i-secret" hint={ssoReenter ? t("secretReenter") : identity.sso?.hasClientSecret ? t("secretSet") : t("secretHint")}>
             <Input id="i-secret" type="password" autoComplete="new-password" value={sso.clientSecret} onChange={(e) => setSso({ clientSecret: e.target.value })} />
@@ -560,7 +554,7 @@ export function IdentityTab({
           {sso.protocol === "saml" ? (
             <>
               <Field label={t("samlEntryPoint")} htmlFor="i-saml-url" hint={t("samlEntryPointHint")} className="sm:col-span-2">
-                <Input id="i-saml-url" value={sso.samlEntryPoint} onChange={(e) => setSso({ samlEntryPoint: e.target.value })} placeholder="https://login.example.az/saml/sso" />
+                <Input id="i-saml-url" dir="ltr" value={sso.samlEntryPoint} onChange={(e) => setSso({ samlEntryPoint: e.target.value })} placeholder="https://login.example.az/saml/sso" />
               </Field>
               <Field label={t("samlCertificate")} htmlFor="i-saml-cert" hint={t("samlCertificateHint")} className="sm:col-span-2">
                 <Textarea
@@ -636,10 +630,10 @@ export function IdentityTab({
             {ldapHeading(1, t("ldapStep1"))}
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={t("server")} htmlFor="l-url" className="sm:col-span-2">
-                <Input id="l-url" value={ldap.url} onChange={(e) => setLdap({ url: e.target.value })} placeholder="ldaps://dc01.example.local:636" />
+                <Input id="l-url" dir="ltr" value={ldap.url} onChange={(e) => setLdap({ url: e.target.value })} placeholder="ldaps://dc01.example.local:636" />
               </Field>
               <Field label={t("bindDn")} htmlFor="l-dn">
-                <Input id="l-dn" value={ldap.bindDn} onChange={(e) => setLdap({ bindDn: e.target.value })} />
+                <Input id="l-dn" dir="ltr" value={ldap.bindDn} onChange={(e) => setLdap({ bindDn: e.target.value })} />
               </Field>
               <Field label={t("bindPassword")} htmlFor="l-pw" hint={ldapReenter ? t("secretReenter") : identity.ldap?.hasPassword ? t("secretSet") : t("secretHint")}>
                 <Input id="l-pw" type="password" autoComplete="new-password" value={ldap.password} onChange={(e) => setLdap({ password: e.target.value })} />
@@ -684,7 +678,7 @@ export function IdentityTab({
           <section className="grid gap-4">
             {ldapHeading(2, t("ldapStep2"))}
             <Field label={t("searchBase")} htmlFor="l-base">
-              <Input id="l-base" value={ldap.searchBase} onChange={(e) => setLdap({ searchBase: e.target.value })} placeholder="OU=Staff,DC=example,DC=local" />
+              <Input id="l-base" dir="ltr" value={ldap.searchBase} onChange={(e) => setLdap({ searchBase: e.target.value })} placeholder="OU=Staff,DC=example,DC=local" />
             </Field>
             <Field label={t("filter")} htmlFor="l-filter">
               <Input id="l-filter" value={ldap.filter} onChange={(e) => setLdap({ filter: e.target.value })} className="font-mono text-caption" />
@@ -826,7 +820,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
           <CardHeader title={t("server")} />
           <CardBody className="grid gap-4 sm:grid-cols-2">
             <Field label={t("host")} htmlFor="e-host">
-              <Input id="e-host" value={s.host} onChange={(e) => setS({ ...s, host: e.target.value })} placeholder="smtp.example.az" />
+              <Input id="e-host" dir="ltr" value={s.host} onChange={(e) => setS({ ...s, host: e.target.value })} placeholder="smtp.example.az" />
             </Field>
             <Field label={t("security")} htmlFor="e-sec">
               <Segmented name="sec" ariaLabel={t("security")} value={s.secure ? "ssl" : "starttls"} onChange={(v) => setS({ ...s, secure: v === "ssl", port: v === "ssl" ? 465 : 587 })} options={[{ value: "starttls", label: "STARTTLS" }, { value: "ssl", label: "SSL/TLS" }]} />
@@ -835,7 +829,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
               <Input id="e-port" type="number" value={s.port} onChange={(e) => setS({ ...s, port: Number(e.target.value) })} />
             </Field>
             <Field label={t("user")} htmlFor="e-user">
-              <Input id="e-user" value={s.user} onChange={(e) => setS({ ...s, user: e.target.value })} autoComplete="off" />
+              <Input id="e-user" dir="ltr" value={s.user} onChange={(e) => setS({ ...s, user: e.target.value })} autoComplete="off" />
             </Field>
             <Field label={t("password")} htmlFor="e-pw" hint={passwordReenter ? t("passwordReenter") : email.hasPassword ? t("passwordSet") : undefined}>
               <Input id="e-pw" type="password" value={s.password} onChange={(e) => setS({ ...s, password: e.target.value })} autoComplete="new-password" />
@@ -891,7 +885,7 @@ export function EmailTab({ email, viewerEmail, outbox, failedCount }: { email: E
                   <li key={m.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2 text-caption">
                     <Pill tone={m.status === "sent" ? "safe" : m.status === "failed" ? "risk" : m.status === "queued" ? "warn" : "neutral"}>{t(`status.${m.status as "sent"}`)}</Pill>
                     <span className="min-w-0 flex-1 truncate">
-                      <b>{m.subject}</b> → {m.to}
+                      <b>{m.subject}</b> <span className="inline-block rtl:-scale-x-100">→</span> <bdi>{m.to}</bdi>
                     </span>
                     <RelativeTime date={m.createdAt} className="text-ink-subtle" />
                     {m.cancelled ? (
@@ -984,6 +978,13 @@ const PREVIEW_VARS: Record<string, { name: string; to: string; module: string; d
   az: { name: "Aysel", to: "Aysel Hüseynova", module: "Fişinqi tapın", dueDate: "30 oktyabr 2026", person: "Elvin Məmmədov", reason: "Son 30 gündə 2 simulyasiyada riskli addım" },
   en: { name: "Aysel", to: "Aysel Huseynova", module: "Spot the phish", dueDate: "October 30, 2026", person: "Elvin Mammadov", reason: "2 simulations with risky actions in the last 30 days" },
   ru: { name: "Айсель", to: "Айсель Гусейнова", module: "Найдите фишинг", dueDate: "30 октября 2026 г.", person: "Эльвин Мамедов", reason: "2 симуляции с рискованными действиями за 30 дней" },
+  tr: { name: "Ayşe", to: "Ayşe Yılmaz", module: "Oltalamayı fark edin", dueDate: "30 Ekim 2026", person: "Mehmet Demir", reason: "Son 30 günde 2 simülasyonda riskli adım" },
+  ro: { name: "Ioana", to: "Ioana Popescu", module: "Recunoașteți phishingul", dueDate: "30 octombrie 2026", person: "Andrei Ionescu", reason: "2 simulări cu acțiuni riscante în ultimele 30 de zile" },
+  ka: { name: "ნინო", to: "ნინო ბერიძე", module: "ამოიცანით ფიშინგი", dueDate: "30 ოქტომბერი, 2026", person: "გიორგი კაპანაძე", reason: "ბოლო 30 დღეში 2 სიმულაციაში სარისკო ქმედება" },
+  uk: { name: "Олена", to: "Олена Коваленко", module: "Розпізнайте фішинг", dueDate: "30 жовтня 2026 р.", person: "Андрій Шевченко", reason: "2 симуляції з ризикованими діями за 30 днів" },
+  de: { name: "Anna", to: "Anna Schmidt", module: "Phishing erkennen", dueDate: "30. Oktober 2026", person: "Lukas Müller", reason: "2 Simulationen mit riskanten Aktionen in den letzten 30 Tagen" },
+  fr: { name: "Camille", to: "Camille Martin", module: "Repérez l’hameçonnage", dueDate: "30 octobre 2026", person: "Julien Bernard", reason: "2 simulations avec des actions risquées au cours des 30 derniers jours" },
+  ar: { name: "سارة", to: "سارة العتيبي", module: "اكتشف رسائل التصيد", dueDate: "30 أكتوبر 2026", person: "محمد القحطاني", reason: "محاكاتان تضمّنتا إجراءات خطرة خلال آخر 30 يومًا" },
 };
 
 export function NotificationsTab({ notifications, locales, emailReady, orgName }: { notifications: TenantSettings["notifications"]; locales: string[]; emailReady: boolean; orgName: string }) {
@@ -1070,7 +1071,7 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
                 </Select>
               </Field>
               <Field label={t("subject")} htmlFor="n-subject">
-                <Input id="n-subject" value={current.subject} onChange={(e) => setCurrent({ subject: e.target.value })} maxLength={200} />
+                <Input id="n-subject" {...langAttrs(lang)} value={current.subject} onChange={(e) => setCurrent({ subject: e.target.value })} maxLength={200} />
               </Field>
               <Field label={t("message")} htmlFor="n-body">
                 <div className="grid gap-1.5">
@@ -1088,7 +1089,7 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
                       <Pilcrow />
                     </Button>
                   </div>
-                  <Textarea ref={bodyRef} id="n-body" value={current.body} onChange={(e) => setCurrent({ body: e.target.value })} className="min-h-48" maxLength={5000} />
+                  <Textarea ref={bodyRef} id="n-body" {...langAttrs(lang)} value={current.body} onChange={(e) => setCurrent({ body: e.target.value })} className="min-h-48" maxLength={5000} />
                 </div>
               </Field>
               <div className="flex flex-wrap items-center gap-1.5">
@@ -1100,13 +1101,13 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
                   ] as const
                 ).map(([v, label]) => (
                   <Button key={v} size="sm" variant="secondary" onClick={() => edit(`{{${v}}}`, "", true)}>
-                    {label} <code className="font-mono text-tab text-ink-subtle">{`{{${v}}}`}</code>
+                    {label} <code dir="ltr" className="font-mono text-tab text-ink-subtle">{`{{${v}}}`}</code>
                   </Button>
                 ))}
                 <Button size="sm" variant="secondary" onClick={() => edit("{{link}}", "", true)}>
                   {t("varLink")}
                 </Button>
-                <TextButton size="tab" className="ml-auto" onClick={() => setCurrent(DEFAULT_TEMPLATES[kind][lang] ?? DEFAULT_TEMPLATES[kind].en)}>
+                <TextButton size="tab" className="ms-auto" onClick={() => setCurrent(DEFAULT_TEMPLATES[kind][lang] ?? DEFAULT_TEMPLATES[kind].en)}>
                   {t("resetTemplate")}
                 </TextButton>
               </div>
@@ -1126,8 +1127,10 @@ export function NotificationsTab({ notifications, locales, emailReady, orgName }
                     <dd className="min-w-0 truncate font-semibold text-ink">{(PREVIEW_VARS[lang] ?? PREVIEW_VARS.en).to}</dd>
                   </div>
                 </dl>
-                <p className="mt-3 text-body-sm font-bold">{preview.subject}</p>
-                <div className="mt-3 grid gap-3 text-caption">
+                <p {...langAttrs(lang)} className="mt-3 text-body-sm font-bold">
+                  {preview.subject}
+                </p>
+                <div {...langAttrs(lang)} className="mt-3 grid gap-3 text-caption">
                   {preview.paragraphs.map((p, i) =>
                     /^https?:\/\/\S+$/.test(p) ? (
                       <p key={i}>
@@ -1234,8 +1237,8 @@ export function AttestationTab({ texts, locales }: { texts: Record<string, strin
             </Select>
           </Field>
           <Field label={t("text")} htmlFor="a-text">
-            <Textarea id="a-text" value={value} onChange={(e) => setValue(e.target.value)} maxLength={600} />
-            <p className="text-right text-tab text-ink-subtle tabular-nums">{value.length} / 600</p>
+            <Textarea id="a-text" {...langAttrs(lang)} value={value} onChange={(e) => setValue(e.target.value)} maxLength={600} />
+            <p className="text-end text-tab text-ink-subtle tabular-nums">{value.length} / 600</p>
           </Field>
           <SaveBar pending={pending} onSave={() => save(() => saveAttestationAction(lang, value), { text: "a-text" })} />
         </CardBody>
@@ -1253,7 +1256,7 @@ export function AttestationTab({ texts, locales }: { texts: Record<string, strin
             </div>
           </div>
           <div className="mt-4 rounded-xl bg-brand-50 p-4 text-body font-semibold">
-            <p>{value}</p>
+            <p {...langAttrs(lang)}>{value}</p>
             <PenLine className="mt-3 size-4 text-ink-subtle" />
           </div>
           <span className="mt-4 flex h-12 items-center gap-3 rounded-pill border border-line-strong px-4 text-body font-semibold">
@@ -1309,10 +1312,10 @@ export function CertificateTab({ cert, orgName, logoUrl, locale, locales, verify
             ) : null}
             {!title && !own ? <Pill className="w-fit">{t("defaultText")}</Pill> : null}
             <Field label={t("title")} htmlFor="c-title" hint={t("titleHint")}>
-              <Input id="c-title" lang={lang} value={title} onChange={(e) => setS({ ...s, title: { ...s.title, [lang]: e.target.value } })} maxLength={60} placeholder={lang === locale ? tl("title") : undefined} />
+              <Input id="c-title" {...langAttrs(lang)} value={title} onChange={(e) => setS({ ...s, title: { ...s.title, [lang]: e.target.value } })} maxLength={60} placeholder={lang === locale ? tl("title") : undefined} />
             </Field>
             <Field label={t("text")} htmlFor="c-text">
-              <Textarea ref={textRef} id="c-text" lang={lang} value={own} onChange={(e) => setText(e.target.value)} maxLength={400} placeholder={DEFAULT_CERTIFICATE_TEXT[lang]} />
+              <Textarea ref={textRef} id="c-text" {...langAttrs(lang)} value={own} onChange={(e) => setText(e.target.value)} maxLength={400} placeholder={DEFAULT_CERTIFICATE_TEXT[lang]} />
               <div className="flex flex-wrap gap-2">
                 {(
                   [
@@ -1322,7 +1325,7 @@ export function CertificateTab({ cert, orgName, logoUrl, locale, locales, verify
                   ] as const
                 ).map(([placeholder, label]) => (
                   <Button key={placeholder} size="sm" variant="secondary" onClick={() => insert(placeholder)}>
-                    <code className="font-mono font-bold">{placeholder}</code> {t(label)}
+                    <code dir="ltr" className="font-mono font-bold">{placeholder}</code> {t(label)}
                   </Button>
                 ))}
               </div>
@@ -1366,12 +1369,12 @@ export function CertificateTab({ cert, orgName, logoUrl, locale, locales, verify
                 <ShieldCheck className="size-6" />
               </span>
             </div>
-            <p lang={title ? lang : undefined} className="mt-4 text-tab font-bold tracking-[0.25em] text-brand-600 uppercase">
+            <p {...(title ? langAttrs(lang) : {})} className="mt-4 text-tab font-bold tracking-[0.25em] text-brand-600 uppercase">
               {title || tl("title")}
             </p>
             <p className="mt-1 font-display text-headline font-bold">{t("sampleName")}</p>
             <span className="mt-2 block h-1 w-12 rounded-pill bg-reward-500" />
-            <p lang={lang} className="mt-3 text-caption text-ink-muted">
+            <p {...langAttrs(lang)} className="mt-3 text-caption text-ink-muted">
               {text}
             </p>
             <Pill tone="brand" className="mt-3">
@@ -1391,7 +1394,7 @@ export function CertificateTab({ cert, orgName, logoUrl, locale, locales, verify
                 <span className="text-ink-subtle">{t("serialLabel")}</span> {t("sampleSerial")}
               </p>
             </div>
-            {s.publicLink ? <p className="mt-3 font-mono text-tab text-ink-subtle">{verifyHost}/c/…</p> : null}
+            {s.publicLink ? <p dir="ltr" className="mt-3 font-mono text-tab text-ink-subtle">{verifyHost}/c/…</p> : null}
           </div>
         </div>
       </aside>
@@ -1632,7 +1635,7 @@ export function IntegrationsTab({ integrations, deliveries }: { integrations: In
               onChange={(e) => setS({ ...s, webhookEnabled: e.target.checked })}
             />
             <Field label={t("address")} htmlFor="w-url" hint={t("addressHint")}>
-              <Input id="w-url" value={s.webhookUrl} onChange={(e) => setS({ ...s, webhookUrl: e.target.value })} placeholder="https://siem.example.az/hooks/cyclowareness" />
+              <Input id="w-url" dir="ltr" value={s.webhookUrl} onChange={(e) => setS({ ...s, webhookUrl: e.target.value })} placeholder="https://siem.example.az/hooks/cyclowareness" />
             </Field>
             <div className="flex flex-wrap items-start gap-3 rounded-xl border border-line p-4">
               <KeyRound className="mt-0.5 size-5 shrink-0 text-ink-muted" />
@@ -1659,7 +1662,7 @@ export function IntegrationsTab({ integrations, deliveries }: { integrations: In
             <Switch label={t("sendEvents")} checked={s.syslogEnabled} onChange={(e) => setS({ ...s, syslogEnabled: e.target.checked })} />
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={t("server")} htmlFor="s-host">
-                <Input id="s-host" value={s.syslogHost} onChange={(e) => setS({ ...s, syslogHost: e.target.value })} placeholder="siem.example.local" />
+                <Input id="s-host" dir="ltr" value={s.syslogHost} onChange={(e) => setS({ ...s, syslogHost: e.target.value })} placeholder="siem.example.local" />
               </Field>
               <Field label={t("port")} htmlFor="s-port" hint={t("portHint", { ports: DESTINATION_PORTS.syslog.join(", ") })}>
                 <Input id="s-port" type="number" value={s.syslogPort} onChange={(e) => setS({ ...s, syslogPort: Number(e.target.value) })} />
@@ -1722,7 +1725,7 @@ export function IntegrationsTab({ integrations, deliveries }: { integrations: In
                     <code className="font-mono">{d.event}</code>
                     <span className="min-w-0 flex-1 truncate text-ink-muted">{d.target}</span>
                     {d.responseCode ? <span className="text-ink-subtle">HTTP {d.responseCode}</span> : null}
-                    <RelativeTime date={d.createdAt} className="ml-auto text-ink-subtle" />
+                    <RelativeTime date={d.createdAt} className="ms-auto text-ink-subtle" />
                   </li>
                 ))}
               </ul>

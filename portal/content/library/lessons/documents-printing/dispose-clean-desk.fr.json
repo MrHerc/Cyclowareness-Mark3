@@ -1,0 +1,346 @@
+{
+ "id": "dispose-clean-desk",
+ "title": "Destruction et bureau propre",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Une page jetée à la poubelle ou un document oublié sur le bureau, ce sont des informations toutes prêtes pour un attaquant.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Déchirer une page à la main ne suffit pas. Recoller les morceaux est facile.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Les papiers confidentiels vont au broyeur, et les vieilles clés USB et les anciens ordinateurs portables, au support technique.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Quand vous quittez votre bureau, verrouillez l’écran et rangez les documents dans une armoire fermée à clé.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "before-you-leave",
+   "environment": "desktop",
+   "title": "Avant de quitter votre bureau",
+   "intro": "Vous quittez votre bureau plusieurs fois par jour. Examinez les fenêtres qui s’ouvrent et décidez.",
+   "steps": [
+    {
+     "id": "lock-screen",
+     "label": "Vous partez pour une réunion de 15 minutes",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Verrouillage de l’écran"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Votre ordinateur va rester sans surveillance pendant 15 minutes. Le verrouiller maintenant ?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Plus tard",
+       "Verrouiller"
+      ]
+     },
+     "actions": [
+      {
+       "id": "lock",
+       "label": "Verrouiller",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Sur un écran déverrouillé, n’importe qui peut écrire depuis votre messagerie ou prendre des fichiers."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Quelques minutes suffisent. Verrouillez l’écran chaque fois que vous vous levez."
+      }
+     ]
+    },
+    {
+     "id": "old-usb",
+     "label": "Vous voulez jeter une vieille clé USB",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Formater la clé USB (E:) ?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Formatage rapide : l’espace occupé par les fichiers sera marqué comme libre."
+        }
+       ]
+      ],
+      "buttons": [
+       "Annuler",
+       "Formater"
+      ]
+     },
+     "say": "La clé contient d’anciennes listes du personnel.",
+     "actions": [
+      {
+       "id": "hand-over",
+       "label": "Éjecter la clé et la remettre au support technique",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Exact. Le support technique efface entièrement la clé ou la détruit."
+      },
+      {
+       "id": "quick-format",
+       "label": "Faire un formatage rapide et la jeter",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Un formatage rapide n’efface pas les fichiers, il les masque seulement. Un logiciel ordinaire peut les récupérer."
+      }
+     ]
+    },
+    {
+     "id": "laptop-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Sabina Huseynova"
+        }
+       ],
+       "address": [
+        {
+         "text": "s.huseynova@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Ancien ordinateur portable"
+       }
+      ],
+      "time": "16:12",
+      "body": [
+       [
+        {
+         "text": "Bonjour, est-ce que je peux donner mon ancien ordinateur portable professionnel à un proche ? J’ai supprimé les fichiers et vidé la corbeille."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "no",
+       "label": "Répondre : Non, remettez-le au support technique",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Exact. Un appareil professionnel appartient à l’organisation, et c’est le support technique qui nettoie le disque."
+      },
+      {
+       "id": "yes",
+       "label": "Répondre : D’accord, les fichiers sont supprimés",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Vider la corbeille ne nettoie pas le disque. Un logiciel spécialisé peut récupérer les fichiers supprimés."
+      }
+     ]
+    },
+    {
+     "id": "queued-print",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-capmerkezi",
+      "app": "Çap Mərkəzi",
+      "title": [
+       {
+        "text": "Impression sécurisée : 3 documents"
+       }
+      ],
+      "body": [
+       {
+        "text": "3 documents sont en file d’attente à votre nom. S’ils ne sont pas récupérés, ils seront supprimés à 18:00."
+       }
+      ],
+      "time": "17:30"
+     },
+     "actions": [
+      {
+       "id": "collect",
+       "label": "Aller les récupérer à l’imprimante",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Exact. Récupérez ce dont vous avez besoin, et laissez la file d’attente supprimer le reste."
+      },
+      {
+       "id": "print-all",
+       "label": "Tout envoyer en impression directe",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "En impression directe, les pages tombent dans le bac sans vous attendre. L’impression sécurisée existe justement pour cela."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "how-to-dispose",
+   "prompt": "Associez chaque objet à la bonne façon de s’en débarrasser.",
+   "pairs": [
+    {
+     "id": "id-copy",
+     "left": "Copie d’une carte d’identité",
+     "right": "Broyeur"
+    },
+    {
+     "id": "draft",
+     "left": "Brouillon d’un projet confidentiel",
+     "right": "Bac verrouillé pour documents confidentiels"
+    },
+    {
+     "id": "laptop",
+     "left": "Ancien ordinateur portable professionnel",
+     "right": "Remise au support technique"
+    },
+    {
+     "id": "flyer",
+     "left": "Prospectus publicitaire d’un événement",
+     "right": "Recyclage du papier ordinaire"
+    }
+   ],
+   "explain": "Les papiers confidentiels ne vont jamais dans la poubelle ordinaire. Seul le support technique efface et détruit les appareils."
+  },
+  {
+   "type": "scenario",
+   "id": "clean-desk",
+   "title": "Une pause de dix minutes",
+   "start": "leave",
+   "nodes": [
+    {
+     "id": "leave",
+     "text": "Vous sortez prendre un thé. Un dossier de contrats est posé sur le bureau, et une note autocollante avec un mot de passe est collée sur l’écran.",
+     "choices": [
+      {
+       "label": "Je range le dossier dans l’armoire fermée à clé et je prends la note",
+       "next": "visitor",
+       "feedback": "Exact. Dix minutes, c’est largement assez pour prendre une photo."
+      },
+      {
+       "label": "Je reviens vite, je laisse tout comme ça",
+       "outcome": "risky",
+       "feedback": "Un visiteur, un livreur ou un technicien peut entrer. Rangez le document, et ne gardez jamais un mot de passe sur une note autocollante."
+      }
+     ]
+    },
+    {
+     "id": "visitor",
+     "text": "J’ai rendez-vous avec votre responsable. Je peux jeter un œil au document qui est dans ce dossier ?",
+     "speaker": "Visiteur (à votre bureau)",
+     "voice": "man-2",
+     "channel": "in-person",
+     "spoken": "J’ai rendez-vous avec votre responsable. <breath> Je peux jeter un œil au document qui est dans ce dossier ?",
+     "choices": [
+      {
+       "label": "Je refuse poliment et j’appelle mon responsable",
+       "outcome": "safe",
+       "feedback": "Excellent. Seule une personne autorisée peut voir le document."
+      },
+      {
+       "label": "Je le lui montre, c’est l’invité de mon responsable",
+       "outcome": "risky",
+       "feedback": "Son identité et ses droits n’ont pas été vérifiés. Confirmez d’abord avec votre responsable."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "shredder",
+   "question": {
+    "prompt": "Quelle méthode détruit le plus sûrement les papiers confidentiels ?",
+    "options": [
+     {
+      "id": "cross-cut",
+      "label": "Un broyeur qui coupe en petites particules",
+      "correct": true,
+      "feedback": "Exact. Reconstituer de minuscules particules est pratiquement impossible."
+     },
+     {
+      "id": "strip-cut",
+      "label": "Un broyeur qui coupe en longues bandes",
+      "correct": false,
+      "feedback": "On peut aligner les bandes pour reconstituer la page. Choisissez un broyeur qui coupe en petits morceaux."
+     },
+     {
+      "id": "tear",
+      "label": "Le déchirer en quatre à la main",
+      "correct": false,
+      "feedback": "Recoller quatre morceaux avec du ruban adhésif prend une minute. Les papiers confidentiels vont au broyeur."
+     },
+     {
+      "id": "bin",
+      "label": "Dans la poubelle ordinaire, face cachée",
+      "correct": false,
+      "feedback": "Les déchets quittent le bâtiment, et dehors, n’importe qui peut les fouiller."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "folder"
+    }
+   },
+   "explain": "Pour les papiers confidentiels, utilisez un broyeur qui coupe en petites particules ou un bac pour documents confidentiels."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Les papiers confidentiels vont au broyeur, et les appareils au support technique.",
+    "Supprimer des fichiers ou faire un formatage rapide n’efface pas les données.",
+    "Quand vous quittez votre bureau, verrouillez l’écran et rangez vos documents."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,553 @@
+{
+  "id": "shared-doc-login",
+  "title": "مستند مشترك",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "sd-tutor",
+      "beats": [
+        {
+          "id": "sd-b1",
+          "say": "غالبًا ما تبدأ نافذة تسجيل الدخول المزيفة برسالة بريد إلكتروني: أحدهم شارك معك مستندًا، وعليك تسجيل الدخول لعرضه.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        },
+        {
+          "id": "sd-b2",
+          "say": "يعرض عليك الزر تسجيل الدخول بحساب مألوف، لكن النافذة التي تفتح مرسومة داخل الموقع.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "buludxidmet-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "BuludXidmet"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "paylasim@buludxidmet-share.example.net"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "كامران علييف شارك معك مستندًا"
+                }
+              ],
+              "time": "09:47",
+              "body": [
+                [
+                  {
+                    "text": "شارك كامران علييف معك الملف «Tender_teklifi_2026.pdf»."
+                  }
+                ],
+                [
+                  {
+                    "text": "لعرضه: "
+                  },
+                  {
+                    "text": "تسجيل الدخول عبر IshPocht",
+                    "spot": "signin-btn",
+                    "link": {
+                      "label": "تسجيل الدخول عبر IshPocht",
+                      "href": "https://buludxidmet-share.example.net/view?id=88213"
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "signin-btn"
+        },
+        {
+          "id": "sd-b3",
+          "say": "والرسالة التي تهددك بإغلاق صفحة جهتك على وسائل التواصل الاجتماعي هي الفخ نفسه.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "sd-b4",
+          "say": "القاعدة: لا تسجل الدخول عبر الزر الموجود في الرسالة. افتح الموقع بنفسك.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "sd-choice",
+      "question": {
+        "prompt": "وصلتك هذه الرسالة. ماذا تفعل؟",
+        "options": [
+          {
+            "id": "signin",
+            "label": "أضغط على الزر وأسجل الدخول بحسابي في IshPocht",
+            "correct": false,
+            "feedback": "الزر ينقلك إلى موقع لا تعرفه، وقد تكون نافذة تسجيل الدخول هناك مزيفة."
+          },
+          {
+            "id": "ask-colleague",
+            "label": "أتصل بكامران على الرقم الذي أعرفه وأسأله",
+            "correct": true,
+            "feedback": "صحيح. إذا كان المستند حقيقيًا، فسيشاركه كامران معك مرة أخرى عبر النظام الخاص بجهتك."
+          },
+          {
+            "id": "forward",
+            "label": "أعيد توجيهها إلى زملائي ليطلعوا عليها أيضًا",
+            "correct": false,
+            "feedback": "بهذا يصل الفخ إلى الآخرين أيضًا. أرسل الرسالة المشبوهة إلى الدعم الفني فقط."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "buludxidmet-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "BuludXidmet"
+                }
+              ],
+              "address": [
+                {
+                  "text": "paylasim@buludxidmet-share.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "كامران علييف شارك معك مستندًا"
+              }
+            ],
+            "time": "09:47",
+            "body": [
+              [
+                {
+                  "text": "شارك كامران علييف معك الملف «Tender_teklifi_2026.pdf»."
+                }
+              ],
+              [
+                {
+                  "text": "لعرضه: "
+                },
+                {
+                  "text": "تسجيل الدخول عبر IshPocht",
+                  "link": {
+                    "label": "تسجيل الدخول عبر IshPocht",
+                    "href": "https://buludxidmet-share.example.net/view?id=88213"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "الرابط صالح لمدة 24 ساعة."
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "explain": "إذا كان المستند حقيقيًا، فستجده عندما تفتح الموقع بنفسك. ولن تحتاج أبدًا إلى زر تسجيل الدخول الموجود في الرسالة."
+    },
+    {
+      "type": "simulation",
+      "id": "sd-sim",
+      "environment": "inbox",
+      "title": "بريد عملك",
+      "intro": "تنتظرك أربع رسائل في بريد الصباح. افتح كل رسالة واختر الإجراء الصحيح.",
+      "steps": [
+        {
+          "id": "real-share",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "buludxidmet",
+            "from": {
+              "name": [
+                {
+                  "text": "BuludXidmet"
+                }
+              ],
+              "address": [
+                {
+                  "text": "bildiris@buludxidmet.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "نرمين حسنوفا شاركت معك ملفًا"
+              }
+            ],
+            "time": "08:55",
+            "body": [
+              [
+                {
+                  "text": "شاركت نرمين حسنوفا معك الملف «Budce_2027.xlsx»."
+                }
+              ],
+              [
+                {
+                  "text": "ملاحظة: جدول الميزانية الذي ناقشناه صباح اليوم."
+                }
+              ],
+              [
+                {
+                  "text": "فتح الملف",
+                  "link": {
+                    "label": "فتح الملف",
+                    "href": "https://buludxidmet.example/idare/budce-2027"
+                  }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح الملف",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "كنت تنتظر هذا الملف، والرابط يؤدي إلى عنوان الخدمة نفسها. لا مانع من فتحه."
+            },
+            {
+              "id": "safe",
+              "label": "تمييزها كرسالة آمنة",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "صحيح. زميلة تعرفها، وملف كنت تنتظره، وعنوان الخدمة نفسها."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن تصيد",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "الحذر أمر جيد، لكن لا توجد هنا أي علامات تحذير. فقد أخبرتك نرمين بهذا الملف صباح اليوم."
+            }
+          ]
+        },
+        {
+          "id": "fake-share",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "buludxidmet-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "BuludXidmet"
+                }
+              ],
+              "address": [
+                {
+                  "text": "paylasim@buludxidmet-share.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "كامران علييف شارك معك مستندًا"
+              }
+            ],
+            "time": "09:47",
+            "body": [
+              [
+                {
+                  "text": "شارك كامران علييف معك الملف «Tender_teklifi_2026.pdf»."
+                }
+              ],
+              [
+                {
+                  "text": "لعرضه: "
+                },
+                {
+                  "text": "تسجيل الدخول عبر IshPocht",
+                  "link": {
+                    "label": "تسجيل الدخول عبر IshPocht",
+                    "href": "https://buludxidmet-share.example.net/view?id=88213"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "الرابط صالح لمدة 24 ساعة."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "الإبلاغ عن تصيد",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "صحيح. نطاق مختلف، وزر لتسجيل الدخول يقود إلى نافذة مزيفة."
+            },
+            {
+              "id": "click",
+              "label": "تسجيل الدخول عبر IshPocht",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "رسمت الصفحة نافذة IshPocht وطلبت كلمة مرورك. لا تضغط على مثل هذه الأزرار."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "الحذف يفي بالغرض أيضًا. لكن إذا أبلغت عنها، فسيتمكن الدعم الفني من تحذير زملائك."
+            }
+          ]
+        },
+        {
+          "id": "copyright",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "w2c-kontakto-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "مركز Kontakto القانوني"
+                }
+              ],
+              "address": [
+                {
+                  "text": "huquq@kontakto-support.example.info"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "سيتم حذف صفحتك خلال 24 ساعة"
+              }
+            ],
+            "time": "10:12",
+            "body": [
+              [
+                {
+                  "text": "تم رصد انتهاك لحقوق النشر على الصفحة الرسمية لجهتك."
+                }
+              ],
+              [
+                {
+                  "text": "لتقديم اعتراض، سجل الدخول بصفتك مشرف الصفحة: "
+                },
+                {
+                  "text": "تقديم اعتراض",
+                  "link": {
+                    "label": "تقديم اعتراض",
+                    "href": "https://kontakto-support.example.info/etiraz"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "في حال عدم الرد، سيتم إغلاق الصفحة نهائيًا."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "الإبلاغ عن تصيد",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "صحيح. التحذير الحقيقي كان سيظهر أيضًا داخل تطبيق الشبكة الاجتماعية نفسها."
+            },
+            {
+              "id": "click",
+              "label": "تقديم اعتراض",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "رسمت صفحة الاعتراض نافذة Kontakto وجمعت كلمة المرور والرمز. والآن قد تقع صفحة جهتك في يد المحتال."
+            },
+            {
+              "id": "reply",
+              "label": "الرد: هذا خطأ",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "يقرأ المحتال ردك ويرسل إليك رابطًا جديدًا. أبلغ عن الرسالة بدلًا من ذلك."
+            }
+          ]
+        },
+        {
+          "id": "it-notice",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "الدعم الفني"
+                }
+              ],
+              "address": [
+                {
+                  "text": "destek@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "تحديث خادم البريد الليلة"
+              }
+            ],
+            "time": "11:30",
+            "body": [
+              [
+                {
+                  "text": "اليوم بين الساعة 19:00 و20:00، قد يتعذر الوصول إلى بريد العمل لبضع دقائق."
+                }
+              ],
+              [
+                {
+                  "text": "لا يلزمك القيام بأي إجراء."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "safe",
+              "label": "تمييزها كرسالة آمنة",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "صحيح. جاءت الرسالة من عنوان داخلي، بلا رابط ولا طلب لكلمة المرور."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن تصيد",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "هذه الرسالة لا تحتوي على رابط ولا تطلب شيئًا. ومثل هذه الإشعارات جزء عادي من العمل."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "لا بأس، فالرسالة للعلم فقط ولا خطر فيها."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "sd-hotspot",
+      "prompt": "اعثر على العلامات التي تدل على أن نافذة تسجيل الدخول هذه مزيفة.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2c-kontakto-fake",
+        "tone": "app",
+        "title": [
+          {
+            "text": "Kontakto: تسجيل الدخول"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "شريط عنوان المتصفح: "
+            },
+            {
+              "text": "kontakto-support.example.info/etiraz",
+              "spot": "real-address"
+            }
+          ],
+          [
+            {
+              "text": "العنوان داخل النافذة: "
+            },
+            {
+              "text": "https://kontakto.example/login",
+              "spot": "painted-bar"
+            }
+          ],
+          [
+            {
+              "text": "رقم الجوال أو البريد الإلكتروني، كلمة المرور"
+            }
+          ],
+          [
+            {
+              "text": "أدخل أيضًا الرمز الذي وصلك في رسالة نصية",
+              "spot": "code"
+            }
+          ],
+          [
+            {
+              "text": "النافذة لا تتحرك إلى ما بعد حافة الصفحة",
+              "spot": "no-drag"
+            }
+          ],
+          [
+            {
+              "text": "بقي على انتهاء مهلة الاعتراض ساعتان و59 دقيقة",
+              "spot": "timer"
+            }
+          ]
+        ],
+        "buttons": [
+          "تسجيل الدخول"
+        ]
+      },
+      "spots": [
+        {
+          "id": "real-address",
+          "label": "العنوان الحقيقي",
+          "explain": "شريط العنوان الخاص بالمتصفح يعرض موقعًا آخر. انظر إليه، لا إلى النص داخل النافذة."
+        },
+        {
+          "id": "painted-bar",
+          "label": "عنوان مرسوم",
+          "explain": "شريط العنوان هذا جزء من صورة النافذة، ويستطيع المحتال أن يكتب فيه ما يشاء."
+        },
+        {
+          "id": "code",
+          "label": "رمز التحقق",
+          "explain": "يريدون الرمز لتجاوز التحقق بخطوتين. لا تكتب أي رمز في نافذة كهذه أبدًا."
+        },
+        {
+          "id": "no-drag",
+          "label": "نافذة عالقة",
+          "explain": "النافذة الحقيقية يمكن سحبها إلى خارج المتصفح، أما هذه فتبقى عالقة داخل الصفحة."
+        },
+        {
+          "id": "timer",
+          "label": "الاستعجال",
+          "explain": "العد التنازلي موجود ليدفعك إلى تسجيل الدخول دون أن تتحقق."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "recap",
+      "id": "sd-recap",
+      "points": [
+        "للوصول إلى مستند مشترك، افتح الموقع بنفسك",
+        "الرسالة التي تهدد بإغلاق صفحتك فخ",
+        "إذا كتبت كلمة المرور، فغيرها الآن وأبلغ الدعم الفني"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

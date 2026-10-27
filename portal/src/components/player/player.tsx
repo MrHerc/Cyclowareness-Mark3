@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Award, Check, ChevronRight, Clock, Headphones, Home, MessageCircleQuestion, MessageSquareWarning, Mic, MoreHorizontal, RotateCcw, Volume2, VolumeX, X, Zap } from "lucide-react";
 import type { Brand, Scene } from "@/lib/content/types";
+import type { NarrationClips } from "@/lib/tts/clips";
 import { Mascot } from "@/components/mascot/mascot";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
@@ -18,6 +19,7 @@ import { useNarrator } from "./narrator";
 import { ContentLangProvider } from "./rich";
 import { TutorPanel } from "./tutor-panel";
 import { VoiceNotice } from "./voice-notice";
+import { useClientFormat } from "@/lib/client-format";
 import {
   ChoiceScene,
   HotspotScene,
@@ -45,6 +47,8 @@ export type PlayerProps = {
   lesson: { key: string; title: string; minutes: number; scenes: Scene[] };
   /** Language the scenes are written in (may differ from the UI language); the narration voice follows it. */
   contentLocale: string;
+  /** Pre-generated narration of this lesson in contentLocale (src/server/narration.ts), or null. */
+  clips?: NarrationClips | null;
   completedBefore: boolean;
   next: { key: string; title: string } | null;
   brands: Record<string, Brand>;
@@ -125,6 +129,8 @@ export function LessonPlayer(p: PlayerProps) {
   const t = useTranslations("player");
   const tc = useTranslations("common");
   const locale = useLocale();
+  // The decimal mark of the interface language ("1,25" in az, ru, de…), Azerbaijani included where Chromium lacks its data.
+  const format = useClientFormat();
   const doneParam = useSearchParams().get("done") === "1";
   const [phase, setPhase] = useState<"intro" | "playing" | "done">("intro");
   const [index, setIndex] = useState(0);
@@ -140,7 +146,7 @@ export function LessonPlayer(p: PlayerProps) {
   const [result, setResult] = useState<LessonResult | null>(null);
   const answers = useRef<PlayerAnswer[]>([]);
   const started = useRef<number>(0);
-  const narrator = useNarrator({ enabled: soundOn, rate: speed, lang: p.contentLocale });
+  const narrator = useNarrator({ enabled: soundOn, rate: speed, lang: p.contentLocale, clips: p.clips });
   // No voice for the lesson's language in this browser: as with the sound off, every text shows in
   // full and the learner moves on by hand; a notice says why and where natural voices exist.
   const voiceMissing = soundOn && narrator.voice === "missing";
@@ -248,8 +254,7 @@ export function LessonPlayer(p: PlayerProps) {
     void setPreferencesAction({ soundOn: v });
   };
   const cycleSpeed = () => writeSpeed(SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length]);
-  // Azerbaijani and Russian write a decimal comma; spelled out rather than Intl (no az data in Chromium).
-  const speedLabel = locale === "en" ? String(speed) : String(speed).replace(".", ",");
+  const speedLabel = format.number(speed);
   // Lesson text in another language than the interface (a missing translation) carries its own `lang`.
   const contentLang = p.contentLocale !== locale ? p.contentLocale : undefined;
 
@@ -316,9 +321,8 @@ export function LessonPlayer(p: PlayerProps) {
                     {p.completedBefore ? t("review") : t("start")}
                   </Button>
                 )}
-                {voiceMissing ? (
-                  <VoiceNotice lang={p.contentLocale} className="mx-auto mt-4 max-w-md justify-center text-left" />
-                ) : soundOn ? (
+                <VoiceNotice show={voiceMissing} lang={p.contentLocale} className="mx-auto mt-4 max-w-md justify-center text-start" />
+                {voiceMissing ? null : soundOn ? (
                   <p className="mx-auto mt-4 flex items-center justify-center gap-2 text-caption font-semibold text-ink-muted">
                     <Headphones className="size-4" />
                     {t("soundHint")}
@@ -333,7 +337,7 @@ export function LessonPlayer(p: PlayerProps) {
             </div>
           ) : phase === "playing" ? (
             <ContentLangProvider value={contentLang}>
-              {voiceMissing ? <VoiceNotice lang={p.contentLocale} className="mb-4" /> : null}
+              <VoiceNotice show={voiceMissing} lang={p.contentLocale} className="mb-4" />
               <div key={scene.id} className="flex flex-1 animate-reveal flex-col">
                 {scene.type === "tutor" ? <TutorScene scene={scene} env={env} onBack={index > 0 && scenes[index - 1].type === "tutor" ? previousScene : undefined} /> : null}
                 {scene.type === "intro" ? <IntroScene scene={scene} env={env} /> : null}
@@ -448,7 +452,7 @@ function DoneScreen({ p, result, initialToken, still, onAttested }: { p: PlayerP
         </p>
 
         {awaiting ? (
-          <div className="mt-6 rounded-2xl border border-reward-200 bg-surface p-5 text-left shadow-raised">
+          <div className="mt-6 rounded-2xl border border-reward-200 bg-surface p-5 text-start shadow-raised">
             <p className="flex items-center gap-2 text-body font-bold">
               <Award className="size-5 text-reward-600" />
               {t("confirm")}

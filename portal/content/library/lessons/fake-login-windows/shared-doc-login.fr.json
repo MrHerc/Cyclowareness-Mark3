@@ -1,0 +1,553 @@
+{
+ "id": "shared-doc-login",
+ "title": "Le document partagé",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sd-tutor",
+   "beats": [
+    {
+     "id": "sd-b1",
+     "say": "Une fausse fenêtre de connexion commence souvent par un e-mail : un document a été partagé avec vous, connectez-vous pour le consulter.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "sd-b2",
+     "say": "Le bouton propose de vous connecter avec un compte que vous connaissez bien. La fenêtre qui s’ouvre est dessinée à l’intérieur du site.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "buludxidmet-fake",
+       "from": {
+        "name": [
+         {
+          "text": "BuludXidmet"
+         }
+        ],
+        "address": [
+         {
+          "text": "paylasim@buludxidmet-share.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Kamran Aliyev a partagé un document avec vous"
+        }
+       ],
+       "time": "09:47",
+       "body": [
+        [
+         {
+          "text": "Kamran Aliyev a partagé « Tender_teklifi_2026.pdf » avec vous."
+         }
+        ],
+        [
+         {
+          "text": "Pour le consulter : "
+         },
+         {
+          "text": "Se connecter avec IshPocht",
+          "spot": "signin-btn",
+          "link": {
+           "label": "Se connecter avec IshPocht",
+           "href": "https://buludxidmet-share.example.net/view?id=88213"
+          }
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "signin-btn"
+    },
+    {
+     "id": "sd-b3",
+     "say": "Un e-mail qui menace de fermer la page de votre organisation sur les réseaux sociaux, c’est le même piège.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "sd-b4",
+     "say": "La règle : ne vous connectez pas avec le bouton d’un e-mail. Ouvrez le site vous-même.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "sd-choice",
+   "question": {
+    "prompt": "Vous avez reçu cet e-mail. Que faites-vous ?",
+    "options": [
+     {
+      "id": "signin",
+      "label": "Je clique sur le bouton et je me connecte avec mon compte IshPocht",
+      "correct": false,
+      "feedback": "Le bouton vous emmène sur un site que vous ne connaissez pas. La fenêtre de connexion qui s’y ouvre peut être fausse."
+     },
+     {
+      "id": "ask-colleague",
+      "label": "J’appelle Kamran au numéro que je connais et je lui pose la question",
+      "correct": true,
+      "feedback": "Exact. Si le document existe vraiment, Kamran le partagera de nouveau dans l’outil interne de votre organisation."
+     },
+     {
+      "id": "forward",
+      "label": "Je le transfère à mes collègues pour qu’ils y jettent un œil aussi",
+      "correct": false,
+      "feedback": "Le piège atteint alors d’autres personnes. Un e-mail suspect ne s’envoie qu’au support technique."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "buludxidmet-fake",
+      "from": {
+       "name": [
+        {
+         "text": "BuludXidmet"
+        }
+       ],
+       "address": [
+        {
+         "text": "paylasim@buludxidmet-share.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Kamran Aliyev a partagé un document avec vous"
+       }
+      ],
+      "time": "09:47",
+      "body": [
+       [
+        {
+         "text": "Kamran Aliyev a partagé « Tender_teklifi_2026.pdf » avec vous."
+        }
+       ],
+       [
+        {
+         "text": "Pour le consulter : "
+        },
+        {
+         "text": "Se connecter avec IshPocht",
+         "link": {
+          "label": "Se connecter avec IshPocht",
+          "href": "https://buludxidmet-share.example.net/view?id=88213"
+         }
+        }
+       ],
+       [
+        {
+         "text": "Le lien est valable 24 heures."
+        }
+       ]
+      ]
+     }
+    }
+   },
+   "explain": "Si le document existe vraiment, vous le verrez en ouvrant le site vous-même. Vous n’avez jamais besoin du bouton de connexion de l’e-mail."
+  },
+  {
+   "type": "simulation",
+   "id": "sd-sim",
+   "environment": "inbox",
+   "title": "Votre messagerie professionnelle",
+   "intro": "Quatre e-mails vous attendent ce matin. Ouvrez-les un par un et choisissez la bonne action.",
+   "steps": [
+    {
+     "id": "real-share",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "buludxidmet",
+      "from": {
+       "name": [
+        {
+         "text": "BuludXidmet"
+        }
+       ],
+       "address": [
+        {
+         "text": "bildiris@buludxidmet.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Narmin Hasanova a partagé un fichier avec vous"
+       }
+      ],
+      "time": "08:55",
+      "body": [
+       [
+        {
+         "text": "Narmin Hasanova a partagé « Budce_2027.xlsx » avec vous."
+        }
+       ],
+       [
+        {
+         "text": "Note : le tableau budgétaire dont nous avons parlé ce matin."
+        }
+       ],
+       [
+        {
+         "text": "Ouvrir le fichier",
+         "link": {
+          "label": "Ouvrir le fichier",
+          "href": "https://buludxidmet.example/idare/budce-2027"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir le fichier",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Vous attendiez ce fichier, et le lien mène à l’adresse du service lui-même. Vous pouvez l’ouvrir."
+      },
+      {
+       "id": "safe",
+       "label": "Marquer comme fiable",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Exact. Une collègue connue, un fichier attendu et l’adresse du service lui-même."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "La prudence, c’est bien, mais il n’y a ici aucun signal d’alerte. Narmin vous a parlé de ce fichier ce matin."
+      }
+     ]
+    },
+    {
+     "id": "fake-share",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "buludxidmet-fake",
+      "from": {
+       "name": [
+        {
+         "text": "BuludXidmet"
+        }
+       ],
+       "address": [
+        {
+         "text": "paylasim@buludxidmet-share.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Kamran Aliyev a partagé un document avec vous"
+       }
+      ],
+      "time": "09:47",
+      "body": [
+       [
+        {
+         "text": "Kamran Aliyev a partagé « Tender_teklifi_2026.pdf » avec vous."
+        }
+       ],
+       [
+        {
+         "text": "Pour le consulter : "
+        },
+        {
+         "text": "Se connecter avec IshPocht",
+         "link": {
+          "label": "Se connecter avec IshPocht",
+          "href": "https://buludxidmet-share.example.net/view?id=88213"
+         }
+        }
+       ],
+       [
+        {
+         "text": "Le lien est valable 24 heures."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Un autre domaine, et un bouton de connexion qui menait à une fausse fenêtre."
+      },
+      {
+       "id": "click",
+       "label": "Se connecter avec IshPocht",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "La page aurait dessiné une fenêtre IshPocht et vous aurait demandé votre mot de passe. Ne touchez pas à ce genre de bouton."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Supprimer fonctionne aussi. Mais si vous le signalez, le support technique peut prévenir vos collègues."
+      }
+     ]
+    },
+    {
+     "id": "copyright",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2c-kontakto-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Centre juridique Kontakto"
+        }
+       ],
+       "address": [
+        {
+         "text": "huquq@kontakto-support.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Votre page sera supprimée sous 24 heures"
+       }
+      ],
+      "time": "10:12",
+      "body": [
+       [
+        {
+         "text": "Une violation du droit d’auteur a été constatée sur la page officielle de votre organisation."
+        }
+       ],
+       [
+        {
+         "text": "Pour contester, connectez-vous en tant qu’administrateur de la page : "
+        },
+        {
+         "text": "Contester",
+         "link": {
+          "label": "Contester",
+          "href": "https://kontakto-support.example.info/etiraz"
+         }
+        }
+       ],
+       [
+        {
+         "text": "Sans réponse de votre part, la page sera définitivement fermée."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Un vrai avertissement apparaîtrait aussi dans l’application du réseau social lui-même."
+      },
+      {
+       "id": "click",
+       "label": "Contester",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "La page de contestation a dessiné une fenêtre Kontakto et récupéré le mot de passe et le code. La page de votre organisation passerait aux mains de l’escroc."
+      },
+      {
+       "id": "reply",
+       "label": "Répondre : c’est une erreur",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "L’escroc lit la réponse et envoie un nouveau lien. Signalez plutôt l’e-mail."
+      }
+     ]
+    },
+    {
+     "id": "it-notice",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "Support informatique"
+        }
+       ],
+       "address": [
+        {
+         "text": "destek@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Mise à jour du serveur de messagerie ce soir"
+       }
+      ],
+      "time": "11:30",
+      "body": [
+       [
+        {
+         "text": "Aujourd’hui, entre 19:00 et 20:00, la messagerie professionnelle pourra être indisponible pendant quelques minutes."
+        }
+       ],
+       [
+        {
+         "text": "Aucune action n’est requise de votre part."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Marquer comme fiable",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Exact. Il vient d’une adresse interne, sans lien ni demande de mot de passe."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Cet e-mail ne contient aucun lien et ne demande rien. Ce genre d’annonce fait partie de la vie normale au travail."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Pas de problème, l’e-mail ne fait que vous informer. Il n’y a aucun danger."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "sd-hotspot",
+   "prompt": "Trouvez les signes qui montrent que cette fenêtre de connexion est fausse.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2c-kontakto-fake",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Kontakto : connexion"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Barre d’adresse du navigateur : "
+      },
+      {
+       "text": "kontakto-support.example.info/etiraz",
+       "spot": "real-address"
+      }
+     ],
+     [
+      {
+       "text": "Adresse dans la fenêtre : "
+      },
+      {
+       "text": "https://kontakto.example/login",
+       "spot": "painted-bar"
+      }
+     ],
+     [
+      {
+       "text": "Téléphone ou e-mail, mot de passe"
+      }
+     ],
+     [
+      {
+       "text": "Saisissez aussi le code reçu par SMS",
+       "spot": "code"
+      }
+     ],
+     [
+      {
+       "text": "La fenêtre ne dépasse pas le bord de la page",
+       "spot": "no-drag"
+      }
+     ],
+     [
+      {
+       "text": "Il vous reste 2 heures 59 minutes pour contester",
+       "spot": "timer"
+      }
+     ]
+    ],
+    "buttons": [
+     "Se connecter"
+    ]
+   },
+   "spots": [
+    {
+     "id": "real-address",
+     "label": "Adresse réelle",
+     "explain": "La barre d’adresse du navigateur lui-même affiche un autre site. C’est elle qu’il faut regarder, pas le texte dans la fenêtre."
+    },
+    {
+     "id": "painted-bar",
+     "label": "Adresse dessinée",
+     "explain": "Cette barre d’adresse fait partie de l’image de la fenêtre. L’escroc peut y écrire n’importe quoi."
+    },
+    {
+     "id": "code",
+     "label": "Code de vérification",
+     "explain": "Le code sert à contourner la double authentification. Ne saisissez jamais de code dans une fenêtre comme celle-ci."
+    },
+    {
+     "id": "no-drag",
+     "label": "Fenêtre bloquée",
+     "explain": "Une vraie fenêtre peut être déplacée hors du navigateur. Celle-ci reste bloquée dans la page."
+    },
+    {
+     "id": "timer",
+     "label": "Pression",
+     "explain": "Le compte à rebours est là pour vous pousser à vous connecter sans vérifier."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "recap",
+   "id": "sd-recap",
+   "points": [
+    "Pour trouver un document partagé, ouvrez le site vous-même",
+    "Un e-mail qui menace de fermer votre page est un piège",
+    "Si vous avez saisi votre mot de passe, modifiez-le tout de suite et prévenez le support technique"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

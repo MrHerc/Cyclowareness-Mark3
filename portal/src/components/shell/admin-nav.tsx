@@ -152,12 +152,12 @@ export function AdminNav({ groups, collapsedInitial = "", onNavigate }: { groups
                 onClick={toggle}
                 aria-expanded={open}
                 aria-controls={listId}
-                className="mb-0.5 flex min-h-8 w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-tab-sm leading-tight font-bold tracking-wider text-ink-subtle uppercase transition-colors hover:bg-sunken hover:text-ink pointer-coarse:min-h-11"
+                className="mb-0.5 flex min-h-8 w-full items-center gap-2 rounded-lg px-3 py-1.5 text-start text-tab-sm leading-tight font-bold tracking-wider text-ink-subtle uppercase transition-colors hover:bg-sunken hover:text-ink pointer-coarse:min-h-11"
               >
                 <span className="min-w-0 flex-1">{t(g.key as "workspace")}</span>
                 {!open && hasActive ? <span aria-hidden className="size-2 shrink-0 rounded-full bg-brand-600" /> : null}
                 {!open && badgeSum ? <span className="grid min-w-5 place-items-center rounded-pill bg-reward-500 px-1.5 text-tab-sm font-bold tracking-normal text-(--accent-on) tabular-nums normal-case">{badgeSum}</span> : null}
-                <ChevronDown aria-hidden className={cn("size-4 shrink-0 transition-transform duration-(--duration-fast)", !open && "-rotate-90")} />
+                <ChevronDown aria-hidden className={cn("size-4 shrink-0 transition-transform duration-(--duration-fast)", !open && "-rotate-90 rtl:rotate-90")} />
               </button>
             ) : null}
             <ul id={listId} hidden={!open} className="grid gap-0.5">
@@ -236,11 +236,11 @@ export function AdminMobileMenu({ groups, collapsedInitial, children }: { groups
         onClick={(e) => {
           if (e.target === ref.current) setOpen(false);
         }}
-        className="inset-y-0 right-auto left-0 m-0 h-dvh max-h-none w-[min(20rem,88vw)] max-w-none overflow-y-auto overscroll-contain border-0 bg-surface p-0 text-ink shadow-overlay backdrop:bg-ink/30 backdrop:backdrop-blur-sm open:animate-rise"
+        className="inset-y-0 end-auto start-0 m-0 h-dvh max-h-none w-[min(20rem,88vw)] max-w-none overflow-y-auto overscroll-contain border-0 bg-surface p-0 text-ink shadow-overlay backdrop:bg-ink/30 backdrop:backdrop-blur-sm open:animate-rise"
       >
         {open ? (
           <div className="flex min-h-full flex-col px-4 pt-[calc(var(--safe-top)+1rem)] pb-[calc(var(--safe-bottom)+1rem)]">
-            <button type="button" onClick={() => setOpen(false)} aria-label={t("close")} className="mb-3 ml-auto grid size-10 shrink-0 place-items-center rounded-full hover:bg-sunken pointer-coarse:size-11">
+            <button type="button" onClick={() => setOpen(false)} aria-label={t("close")} className="mb-3 ms-auto grid size-10 shrink-0 place-items-center rounded-full hover:bg-sunken pointer-coarse:size-11">
               <X className="size-5" />
             </button>
             <AdminNav groups={groups} collapsedInitial={collapsedInitial} onNavigate={() => setOpen(false)} />

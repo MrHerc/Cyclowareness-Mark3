@@ -1,0 +1,379 @@
+{
+ "id": "badge-sense",
+ "title": "Ihr Zugangsausweis",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "key",
+     "say": "Ihr Zugangsausweis ist ein Schlüssel zum Gebäude. Verleihen Sie ihn nie, auch nicht an Kolleginnen und Kollegen.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "photos",
+     "say": "Posten Sie keine Fotos, auf denen Ihr Ausweis zu sehen ist. Mit einem Foto lässt er sich leichter fälschen.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "uniform",
+     "say": "Angreifer können als Techniker, Kurier oder Prüfer verkleidet auftauchen. Eine Uniform ist kein Ausweis.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "lost",
+     "say": "Ausweis verloren? Melden Sie das sofort, damit er gesperrt wird. Und stecken Sie ihn weg, wenn Sie das Gebäude verlassen.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "badge-phone",
+   "environment": "phone",
+   "title": "Nachrichten zum Ausweis",
+   "intro": "Im Laufe des Tages kommen Nachrichten zu Ihrem Ausweis auf Ihr Smartphone. Reagieren Sie auf jede richtig.",
+   "steps": [
+    {
+     "id": "borrow",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Elnur Hüseynov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hi, ich habe meinen Ausweis zu Hause vergessen. Hinterleg deinen an der Pforte, ich gebe ihn dir heute Abend zurück."
+         }
+        ],
+        "time": "08:52"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "lend",
+       "label": "Okay, ich hinterlege ihn dort",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Jeder Zutritt mit Ihrem Ausweis wird auf Ihren Namen protokolliert. Verleihen Sie ihn nie."
+      },
+      {
+       "id": "decline",
+       "label": "Nein, hol dir an der Pforte einen Ersatzausweis",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. An der Pforte wird die Identität geprüft und ein Ersatzausweis ausgestellt."
+      }
+     ]
+    },
+    {
+     "id": "tagged",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Gülnar hat Sie auf einem Foto markiert"
+       }
+      ],
+      "body": [
+       {
+        "text": "„Erster Tag mit dem Team!“ 24 Likes"
+       }
+      ],
+      "time": "13:15"
+     },
+     "say": "Auf dem Foto ist Ihr Ausweis deutlich zu sehen.",
+     "actions": [
+      {
+       "id": "ask-remove",
+       "label": "Gülnar bitten, das Foto zu ändern",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Richtig. Mit einem Foto des Ausweises kann jemand ihn fälschen oder ins Gebäude gelangen."
+      },
+      {
+       "id": "like",
+       "label": "Liken und weiterscrollen",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Das Foto ist öffentlich und zeigt das Design des Ausweises und Ihren Namen. Teilen Sie keine Fotos von Ausweisen."
+      }
+     ]
+    },
+    {
+     "id": "recon-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "db-alov-servis-fake",
+      "sender": [
+       {
+        "text": "AlovServis"
+       }
+      ],
+      "time": "15:30",
+      "messages": [
+       [
+        {
+         "text": "Wir kommen morgen zur Prüfung der Feuerlöscher. In welchem Stock ist der Serverraum, und wann wechselt die Schicht beim Wachdienst?"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Antworten: 3. Stock, 20:00 Uhr",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Das ist Ausspähung zur Vorbereitung eines Angriffs. Geben Sie keine Details über das Gebäude preis."
+      },
+      {
+       "id": "report",
+       "label": "An das Sicherheitsteam melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein echter Dienstleister fragt so etwas nicht per SMS."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Sie haben nichts verraten, das ist gut. Eine Meldung schützt aber auch Ihre Kolleginnen und Kollegen."
+      }
+     ]
+    },
+    {
+     "id": "badge-phish",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "idare-fake",
+      "sender": [
+       {
+        "text": "Idare"
+       }
+      ],
+      "time": "17:05",
+      "messages": [
+       [
+        {
+         "text": "Ihr Zugangsausweis läuft ab. Aktualisieren Sie Ihre Daten, damit er nicht gesperrt wird: "
+        },
+        {
+         "text": "kart-yenile.example.net",
+         "link": {
+          "label": "kart-yenile.example.net",
+          "href": "https://kart-yenile.example.net"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Der Link führt zu einer gefälschten Seite, die Ihr dienstliches Passwort abgreifen will. Ausweise verlängert nur die Pforte."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Klären Sie alles rund um Ihren Ausweis persönlich an der Pforte."
+      },
+      {
+       "id": "block",
+       "label": "Blockieren",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Gut. Noch besser: Informieren Sie zusätzlich das Sicherheitsteam."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "uniform",
+   "title": "Der Besucher in Uniform",
+   "start": "door",
+   "nodes": [
+    {
+     "id": "door",
+     "text": "Guten Tag, wir sind von Alov Servis und prüfen die Feuerlöscher. Machen Sie den Serverraum auf, da drin hängt auch einer.",
+     "speaker": "Mann in Uniform",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Guten Tag, wir sind von Alov Servis und prüfen die Feuerlöscher. <breath> Machen Sie den Serverraum auf, da drin hängt auch einer.",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     },
+     "choices": [
+      {
+       "label": "Ich öffne den Serverraum",
+       "outcome": "compromised",
+       "feedback": "Uniform und Werkzeugkoffer sind kein Ausweis. Niemand betritt den Serverraum ungeprüft."
+      },
+      {
+       "label": "Ich frage nach dem Besucherausweis und dem Auftrag",
+       "next": "paper",
+       "feedback": "Gut. Mal sehen, was er vorzeigt."
+      },
+      {
+       "label": "Ich rufe den Wachdienst",
+       "next": "guard",
+       "feedback": "Richtig. Die Entscheidung liegt beim Wachdienst."
+      }
+     ]
+    },
+    {
+     "id": "paper",
+     "text": "Die Unterlagen sind im Wagen. Wir kommen doch jeden Monat, erkennen Sie mich nicht?",
+     "speaker": "Mann in Uniform",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Die Unterlagen sind im Wagen. <short pause> Wir kommen doch jeden Monat, erkennen Sie mich nicht?",
+     "choices": [
+      {
+       "label": "Ach ja, gehen Sie ruhig rein",
+       "outcome": "compromised",
+       "feedback": "Das Gefühl, jemanden zu kennen, gehört zum Trick. Ohne Besucherausweis kein Zutritt."
+      },
+      {
+       "label": "Ich rufe den Wachdienst",
+       "next": "guard",
+       "feedback": "Richtig. Die Entscheidung liegt beim Wachdienst."
+      }
+     ]
+    },
+    {
+     "id": "guard",
+     "text": "Für diesen Monat ist keine Prüfung durch Alov Servis geplant. Der Mann ist in Richtung Ausgang gegangen.",
+     "speaker": "Wachmann",
+     "voice": "older-man",
+     "channel": "in-person",
+     "manner": "firm",
+     "spoken": "Für diesen Monat ist keine Prüfung durch Alov Servis geplant. <breath> Der Mann ist in Richtung Ausgang gegangen.",
+     "character": "guard",
+     "choices": [
+      {
+       "label": "Ich schicke dem Sicherheitsteam eine Personenbeschreibung",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Das Team prüft die Kameraaufnahmen und warnt die anderen Eingänge."
+      },
+      {
+       "label": "Er ist weg, also gibt es kein Problem",
+       "outcome": "risky",
+       "feedback": "Er kann an einem anderen Tag oder durch eine andere Tür wiederkommen. Die Meldung ist wichtig."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "badge-rules",
+   "prompt": "Ordnen Sie jeder Situation den richtigen Schritt zu.",
+   "pairs": [
+    {
+     "id": "lend",
+     "left": "Jemand aus dem Team will Ihren Ausweis leihen",
+     "right": "An die Pforte verweisen"
+    },
+    {
+     "id": "photo",
+     "left": "Es wird ein Teamfoto gemacht",
+     "right": "Vorher den Ausweis wegstecken"
+    },
+    {
+     "id": "outside",
+     "left": "Sie gehen nach der Arbeit einkaufen",
+     "right": "Den Ausweis in die Tasche stecken"
+    },
+    {
+     "id": "no-badge",
+     "left": "Ein Techniker in Uniform hat keinen Besucherausweis",
+     "right": "Den Wachdienst rufen"
+    }
+   ],
+   "explain": "Ihr Ausweis ist Ihre Identität. Verwenden Sie ihn nur im Gebäude und nur persönlich."
+  },
+  {
+   "type": "choice",
+   "id": "why-hide",
+   "question": {
+    "prompt": "Warum sollten Sie Ihren Ausweis außerhalb des Gebäudes wegstecken?",
+    "options": [
+     {
+      "id": "dirt",
+      "label": "Damit er nicht schmutzig wird",
+      "correct": false,
+      "feedback": "Es geht um Sicherheit, nicht um Sauberkeit."
+     },
+     {
+      "id": "target",
+      "label": "Er zeigt Ihren Namen und Ihren Arbeitgeber und kann gestohlen werden",
+      "correct": true,
+      "feedback": "Richtig: Ein sichtbarer Ausweis verrät Angreifern, wen sie ansprechen können. Manche Ausweise lassen sich aus der Nähe sogar kopieren."
+     },
+     {
+      "id": "rule",
+      "label": "Das ist einfach die Regel",
+      "correct": false,
+      "feedback": "Die Regel hat einen Grund: Der Ausweis schützt Sie und das Gebäude."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "badge-id"
+    }
+   },
+   "explain": "Tragen Sie den Ausweis im Gebäude sichtbar und stecken Sie ihn weg, wenn Sie gehen."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Verleihen Sie Ihren Ausweis nie und posten Sie keine Fotos davon.",
+    "Eine Uniform ist kein Ausweis – ohne Besucherausweis kein Zutritt.",
+    "Ausweis verloren? Melden Sie den Verlust sofort."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

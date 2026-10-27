@@ -1,14 +1,14 @@
 import type { MetadataRoute } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
-import { isLocale } from "@/i18n/config";
+import { dirOf, isLocale } from "@/i18n/config";
 
 /**
  * PWA manifest (as on the original site: standalone, start at /start). Browsers fetch it without
- * cookies, so the language usually comes from Accept-Language; site-only languages fall back to
- * English, the same as the interface messages.
+ * cookies, so the language usually comes from Accept-Language.
  */
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const locale = await getLocale();
+  const lang = isLocale(locale) ? locale : "en";
   const t = await getTranslations("common");
   return {
     name: "Cyclowareness",
@@ -20,7 +20,8 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     display_override: ["standalone", "minimal-ui"],
     background_color: "#f7f6fb",
     theme_color: "#f7f6fb",
-    lang: isLocale(locale) ? locale : "en",
+    lang,
+    dir: dirOf(lang),
     categories: ["education", "productivity"],
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },

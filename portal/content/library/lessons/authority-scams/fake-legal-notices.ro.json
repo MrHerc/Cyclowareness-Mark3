@@ -1,0 +1,376 @@
+{
+  "id": "fake-legal-notices",
+  "title": "Notificări false",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l1-tutor",
+      "beats": [
+        {
+          "id": "l1-b1",
+          "say": "Dosar penal, citație la instanță, datorie la fisc. Astfel de cuvinte îi sperie pe oameni, iar escrocii se bazează pe asta.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": { "kind": "illustration", "id": "alarm" }
+        },
+        {
+          "id": "l1-b2",
+          "say": "Astfel de e-mailuri ajung și la adresele instituțiilor de stat. În atașament se ascunde adesea un malware.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "istintaq-buro-fake",
+              "from": {
+                "name": [{ "text": "Biroul Central de Investigații" }],
+                "address": [{ "text": "bildiris@istintaq-buro-gov.test" }]
+              },
+              "subject": [{ "text": "Notificare privind un dosar penal" }],
+              "time": "08:47",
+              "body": [
+                [{ "text": "Numele dumneavoastră apare într-un dosar penal. Materialele sunt atașate." }]
+              ],
+              "attachments": [
+                {
+                  "name": [{ "text": "Materiale_dosar.zip", "spot": "archive" }],
+                  "size": "312 KB"
+                }
+              ]
+            }
+          },
+          "highlight": "archive"
+        },
+        {
+          "id": "l1-b3",
+          "say": "Altele cer plata imediată a unei datorii sau a unei amenzi, printr-un link.",
+          "mood": "think",
+          "gesture": "point-right",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "brandRef": "vergi-nezaret-fake",
+              "sender": [{ "text": "VergiNezaret" }],
+              "time": "09:15",
+              "messages": [
+                [
+                  { "text": "Aveți o datorie fiscală de 186,40 AZN. Plătiți astăzi: " },
+                  { "text": "vergi-borc-odenis.test", "spot": "pay-link" }
+                ]
+              ]
+            }
+          },
+          "highlight": "pay-link"
+        },
+        {
+          "id": "l1-b4",
+          "say": "Verificați chiar dumneavoastră notificarea, sunând la numărul de pe site-ul oficial al autorității sau intrând pe portalul ei oficial.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": { "kind": "illustration", "id": "shield" }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l1-hotspot",
+      "prompt": "Găsiți semnele de fraudă din această notificare.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "istintaq-buro-fake",
+        "from": {
+          "name": [{ "text": "Biroul Central de Investigații" }],
+          "address": [
+            { "text": "bildiris@" },
+            { "text": "istintaq-buro-gov.test", "spot": "domain" }
+          ]
+        },
+        "subject": [{ "text": "Notificare privind dosarul penal nr. 2026/4471" }],
+        "time": "08:47",
+        "body": [
+          [{ "text": "Stimate cetățean,", "spot": "generic" }],
+          [
+            { "text": "figurați în calitate de suspect într-un dosar penal. " },
+            { "text": "Dacă nu răspundeți în 24 de ore, se va emite un mandat de arestare.", "spot": "threat" }
+          ],
+          [{ "text": "Deschideți atașamentul pentru a citi materialele dosarului." }],
+          [{ "text": "Nu spuneți nimănui despre acest e-mail.", "spot": "secrecy" }]
+        ],
+        "attachments": [
+          {
+            "name": [{ "text": "Materiale_dosar.zip", "spot": "archive" }],
+            "size": "312 KB"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Domeniu fals",
+          "explain": "Domeniul pare oficial, dar nu este. Deschideți chiar dumneavoastră site-ul autorității și comparați."
+        },
+        {
+          "id": "generic",
+          "label": "Formulă de adresare generică",
+          "explain": "O notificare reală, adresată personal, conține numele dumneavoastră, nu „stimate cetățean”."
+        },
+        {
+          "id": "threat",
+          "label": "Amenințarea cu arestarea și cele 24 de ore",
+          "explain": "Frica și un termen scurt vă împing să acționați fără să vă gândiți."
+        },
+        {
+          "id": "secrecy",
+          "label": "Nu spuneți nimănui",
+          "explain": "Vor să vă izoleze de orice ajutor. Dimpotrivă, anunțați imediat echipa de securitate."
+        },
+        {
+          "id": "archive",
+          "label": "Fișier de arhivă",
+          "explain": "O arhivă poate conține malware. Nu deschideți o arhivă la care nu vă așteptați."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "l1-sim",
+      "environment": "inbox",
+      "title": "E-mailuri amenințătoare",
+      "intro": "În căsuța de e-mail aveți patru mesaje trimise în numele unor autorități. Verificați-le pe fiecare și decideți.",
+      "steps": [
+        {
+          "id": "m1",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "istintaq-buro-fake",
+            "from": {
+              "name": [{ "text": "Biroul Central de Investigații" }],
+              "address": [{ "text": "bildiris@istintaq-buro-gov.test" }]
+            },
+            "subject": [{ "text": "Notificare privind un dosar penal" }],
+            "time": "08:47",
+            "body": [
+              [{ "text": "Numele dumneavoastră apare într-un dosar penal. Citiți materialele atașate în cel mult 24 de ore." }]
+            ],
+            "attachments": [
+              {
+                "name": [{ "text": "Materiale_dosar.zip" }],
+                "size": "312 KB"
+              }
+            ]
+          },
+          "say": "Uitați-vă la domeniul expeditorului.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Corect. Domeniu fals, amenințări și o arhivă: raportarea îi protejează și pe colegii dumneavoastră."
+            },
+            {
+              "id": "open",
+              "label": "Deschideți atașamentul",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "Fișierul din arhivă a pornit un malware. Deconectați computerul de la rețea și raportați imediat."
+            },
+            {
+              "id": "reply",
+              "label": "Răspundeți",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Un răspuns îi arată escrocului că adresa dumneavoastră este activă. Vor urma și alte amenințări."
+            }
+          ]
+        },
+        {
+          "id": "m2",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "adalet-mehkemesi-fake",
+            "from": {
+              "name": [{ "text": "Tribunalul Capitalei" }],
+              "address": [{ "text": "cagiris@mehkeme-cagiris.test" }]
+            },
+            "subject": [{ "text": "Citație la instanță" }],
+            "time": "09:30",
+            "body": [
+              [
+                { "text": "Trebuie să vă prezentați mâine, la ora 10:00, în fața instanței. " },
+                {
+                  "text": "Descărcați citația de aici",
+                  "link": { "label": "Descărcați citația de aici", "href": "https://mehkeme-cagiris.test/vereqe" }
+                },
+                { "text": "." }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "click",
+              "label": "Descărcați citația",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Linkul a descărcat un fișier rău intenționat. Citația trebuia verificată la numărul oficial al instanței."
+            },
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Corect. Raportați o citație venită de pe un domeniu străin și, dacă este nevoie, sunați chiar dumneavoastră la instanță."
+            },
+            {
+              "id": "delete",
+              "label": "Ștergeți",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Este o variantă sigură. Dar dacă îl raportați, îi protejați și pe colegii dumneavoastră."
+            }
+          ]
+        },
+        {
+          "id": "m3",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "vergi-nezaret-fake",
+            "from": {
+              "name": [{ "text": "Centrul de Control Fiscal" }],
+              "address": [{ "text": "info@vergi-borc-odenis.test" }]
+            },
+            "subject": [{ "text": "Ultimul avertisment: datorie fiscală de 186,40 AZN" }],
+            "time": "10:05",
+            "body": [
+              [
+                { "text": "Dacă nu plătiți astăzi, conturile dumneavoastră bancare vor fi blocate. " },
+                {
+                  "text": "Plătiți online",
+                  "link": { "label": "Plătiți online", "href": "https://vergi-borc-odenis.test/pay" }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "click",
+              "label": "Plătiți online",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Pagina de plată falsă v-a furat datele cardului. Sunați acum la bancă și blocați cardul."
+            },
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Corect. Verificați orice datorie doar conectându-vă chiar dumneavoastră la portalul oficial."
+            }
+          ]
+        },
+        {
+          "id": "m4",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Departamentul juridic" }],
+              "address": [{ "text": "huquq@idare.example" }]
+            },
+            "subject": [{ "text": "Atenție: notificări false din partea instanțelor" }],
+            "time": "10:40",
+            "body": [
+              [{ "text": "Săptămâna aceasta, angajații primesc e-mailuri false despre „dosare penale”. Nu deschideți atașamentele și raportați astfel de e-mailuri ca phishing." }]
+            ]
+          },
+          "actions": [
+            {
+              "id": "safe",
+              "label": "Marcați ca sigur",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Corect. Este un avertisment de la departamentul juridic al instituției, fără link sau atașament."
+            },
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Nu orice e-mail este o amenințare. Acesta este un avertisment util din partea propriei instituții."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l1-choice",
+      "question": {
+        "prompt": "E-mailul spune că dosarul va fi închis dacă plătiți astăzi jumătate din amendă.",
+        "options": [
+          {
+            "id": "pay",
+            "label": "Plătesc, ca să nu se complice lucrurile",
+            "correct": false,
+            "feedback": "Autoritățile nu „închid” dosare în schimbul unei plăți printr-un link. Banii ajung direct la escroc."
+          },
+          {
+            "id": "call-letter",
+            "label": "Sun la numărul din e-mail ca să întreb",
+            "correct": false,
+            "feedback": "Numărul acela este al escrocului. Nu va face decât să vă sperie și mai tare."
+          },
+          {
+            "id": "verify",
+            "label": "Caut numărul autorității pe site-ul ei oficial și sun",
+            "correct": true,
+            "feedback": "Corect. Când găsiți chiar dumneavoastră datele de contact, o notificare falsă iese imediat la iveală."
+          }
+        ]
+      },
+      "explain": "Amenințările, urgența și cererea de plată, toate la un loc, înseamnă fraudă. Raportați e-mailul și echipei de securitate."
+    },
+    {
+      "type": "match",
+      "id": "l1-match",
+      "prompt": "Asociați fiecare truc cu scopul lui.",
+      "pairs": [
+        {
+          "id": "arrest",
+          "left": "Amenințarea cu arestarea sau cu un dosar penal",
+          "right": "Să vă sperie, ca să nu mai aveți timp de gândit"
+        },
+        {
+          "id": "secret",
+          "left": "„Nu spuneți nimănui”",
+          "right": "Să vă împiedice să cereți un sfat"
+        },
+        {
+          "id": "fee",
+          "left": "„Plătiți astăzi ca să se închidă dosarul”",
+          "right": "Să vă ia banii direct"
+        },
+        {
+          "id": "archive",
+          "left": "O arhivă sau un link atașat",
+          "right": "Să vă instaleze malware pe computer"
+        }
+      ],
+      "explain": "Oricât de gravă ar părea amenințarea, pașii sunt aceiași: opriți-vă, verificați pe un canal oficial și raportați."
+    },
+    {
+      "type": "recap",
+      "id": "l1-recap",
+      "points": [
+        "Amenințările, urgența și cererile de plată sunt semnele unei notificări false.",
+        "Nu deschideți atașamente sau linkuri neașteptate și raportați e-mailul ca phishing.",
+        "Verificați chiar dumneavoastră notificarea, la numărul de pe site-ul oficial al autorității."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

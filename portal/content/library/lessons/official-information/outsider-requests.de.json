@@ -1,0 +1,540 @@
+{
+ "id": "outsider-requests",
+ "title": "Anfragen von außen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l3-tutor",
+   "beats": [
+    {
+     "id": "l3-b1",
+     "say": "Presse, Prüfer, andere Ministerien: Alle dürfen um Informationen bitten. Doch auch Kriminelle schreiben in ihrem Namen.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "l3-b2",
+     "say": "Achten Sie bei der E-Mail eines Prüfers auf die Adresse. Eine echte Prüfung kündigt die Leitung vorher an.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "etalon-audit-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Etalon Audit"
+         }
+        ],
+        "address": [
+         {
+          "text": "yoxlama@"
+         },
+         {
+          "text": "etalon-audit-az.test",
+          "spot": "domain"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Geplante Prüfung: Unterlagen"
+        }
+       ],
+       "time": "11:40",
+       "body": [
+        [
+         {
+          "text": "Mit Ihrer Leitung abgestimmt. Senden Sie die Personal- und Finanzunterlagen noch heute."
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "l3-b3",
+     "say": "Zeitdruck, ein privates Postfach und die Worte „Sagen Sie Ihrer Führungskraft nichts“ sind ernste Warnsignale.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "l3-b4",
+     "say": "Prüfen Sie die Anfrage über eine Nummer, die Sie bereits kennen. Die Antwort gibt die Leitung oder die Pressestelle.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "l3-sim",
+   "environment": "call",
+   "title": "Ein Ministerium ruft an",
+   "intro": "Jemand ruft an und gibt an, in einem anderen Ministerium zu arbeiten. Lesen Sie, was die Person sagt, und wählen Sie Ihre Antwort.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "regional-nazirlik-fake",
+      "caller": [
+       {
+        "text": "Ministerium für regionale Beziehungen"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 36 18"
+       }
+      ],
+      "label": "Ministerium",
+      "voice": "man-2"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Annehmen",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Den Anruf anzunehmen ist nicht gefährlich. Entscheidend ist, was Sie preisgeben."
+      },
+      {
+       "id": "decline",
+       "label": "Ablehnen",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Auch das ist in Ordnung. Rufen Sie bei Bedarf selbst die offizielle Nummer des Ministeriums an.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "ask",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "regional-nazirlik-fake",
+      "caller": [
+       {
+        "text": "Ministerium für regionale Beziehungen"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 36 18"
+       }
+      ],
+      "label": "Ministerium",
+      "voice": "man-2"
+     },
+     "say": "Guten Tag, hier ist Samir Quliyev vom Ministerium für regionale Beziehungen. Für ein gemeinsames Projekt brauchen wir die Personalliste Ihrer Abteilung mit den Mobilnummern.",
+     "spoken": "Guten Tag, <breath> hier ist Samir Quliyev vom Ministerium für regionale Beziehungen. Für ein gemeinsames Projekt brauchen wir, äh, die Personalliste Ihrer Abteilung mit den Mobilnummern.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Ich schicke Ihnen die Liste",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Geben Sie Personaldaten nie an jemanden weiter, dessen Identität Sie nicht geprüft haben."
+      },
+      {
+       "id": "verify",
+       "label": "Bitte schicken Sie ein offizielles Schreiben",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Anfragen zwischen Behörden kommen als offizielles Schreiben, und die Leitung antwortet darauf."
+      },
+      {
+       "id": "hang",
+       "label": "Auflegen",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Gute Entscheidung. Prüfen Sie die Anfrage jetzt über einen offiziellen Kanal.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "push",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "regional-nazirlik-fake",
+      "caller": [
+       {
+        "text": "Ministerium für regionale Beziehungen"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 36 18"
+       }
+      ],
+      "label": "Ministerium",
+      "voice": "man-2"
+     },
+     "say": "Für ein Schreiben ist keine Zeit, der stellvertretende Minister will die Liste heute haben. Schicken Sie sie an meine private E-Mail-Adresse, ich nenne sie Ihnen gleich.",
+     "spoken": "Für ein Schreiben ist keine Zeit, der stellvertretende Minister will die Liste heute haben. <breath> Schicken Sie sie an meine private E-Mail-Adresse, ich nenne sie Ihnen gleich.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Gut, ich schicke sie sofort",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Die Liste ist an eine unbekannte Adresse gegangen. Damit kann jede Kollegin und jeder Kollege gezielte Phishing-Mails bekommen."
+      },
+      {
+       "id": "keep",
+       "label": "Ohne Zustimmung meiner Führungskraft gebe ich nichts weiter",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. Druck und ein privates Postfach sind die wichtigsten Warnsignale für Betrug."
+      },
+      {
+       "id": "hang",
+       "label": "Auflegen",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn der Druck steigt, ist Auflegen der einfachste Schutz.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Das Gespräch ist beendet. Was jetzt?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "regional-nazirlik-fake",
+      "caller": [
+       {
+        "text": "Ministerium für regionale Beziehungen"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 36 18"
+       }
+      ],
+      "label": "Ministerium",
+      "voice": "man-2"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "Nummer von der offiziellen Website des Ministeriums anrufen",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn Sie die Nummer selbst heraussuchen, fliegt ein Betrugsanruf sofort auf."
+      },
+      {
+       "id": "report",
+       "label": "Führungskraft und Sicherheitsteam informieren",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Solche Anrufe erreichen meist mehrere Kolleginnen und Kollegen. Eine Meldung schützt alle."
+      },
+      {
+       "id": "ignore",
+       "label": "Nichts tun",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Der Anrufer versucht es dann bei jemand anderem. Eine Meldung schützt auch die anderen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l3-hotspot",
+   "prompt": "Finden Sie die Warnsignale in dieser E-Mail eines falschen Prüfers.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "etalon-audit-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Etalon Audit"
+      }
+     ],
+     "address": [
+      {
+       "text": "audit.etalon@"
+      },
+      {
+       "text": "poct-mail.example",
+       "spot": "free-mail"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Geplante Prüfung: "
+     },
+     {
+      "text": "Antwort bis heute 17:00 Uhr",
+      "spot": "deadline"
+     }
+    ],
+    "time": "10:12",
+    "body": [
+     [
+      {
+       "text": "Sehr geehrte Kollegin, sehr geehrter Kollege, im Auftrag des Ministeriums führen wir eine Prüfung Ihrer Behörde durch."
+      }
+     ],
+     [
+      {
+       "text": "Damit wir das System aus der Ferne prüfen können, schreiben Sie bitte "
+      },
+      {
+       "text": "Ihren Benutzernamen und Ihr Passwort",
+       "spot": "credentials"
+      },
+      {
+       "text": " in Ihre Antwort."
+      }
+     ],
+     [
+      {
+       "text": "Die Prüfung ist vertraulich. Informieren Sie Ihre Führungskraft nicht.",
+       "spot": "secrecy"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "free-mail",
+     "label": "Kostenlose E-Mail-Adresse",
+     "explain": "Eine Prüfungsfirma schreibt von ihrer eigenen Domain. Offizielle Prüfungen kommen nicht aus einem privaten Postfach."
+    },
+    {
+     "id": "deadline",
+     "label": "Harte Frist",
+     "explain": "Der Zeitdruck soll Sie zu einer Antwort drängen, bevor Sie etwas nachprüfen."
+    },
+    {
+     "id": "credentials",
+     "label": "Frage nach dem Passwort",
+     "explain": "Kein Prüfer fragt nach Ihrem Passwort. Wenn ein Zugang nötig ist, richtet ihn der IT-Support auf dem offiziellen Weg ein."
+    },
+    {
+     "id": "secrecy",
+     "label": "Geheimhaltung vor der Führungskraft",
+     "explain": "Eine echte Prüfung ist mit der Leitung abgestimmt. Die Forderung nach Geheimhaltung ist ein Zeichen für Betrug."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "l3-swipe",
+   "prompt": "Ist diese Anfrage sicher oder gefährlich?",
+   "cards": [
+    {
+     "id": "journalist-docs",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "paytaxt-xeber",
+      "from": {
+       "name": [
+        {
+         "text": "Leyla Abbasova, Paytaxt Xəbər"
+        }
+       ],
+       "address": [
+        {
+         "text": "l.abbasova@paytaxtxeber.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Anonymer Kommentar"
+       }
+      ],
+      "time": "12:15",
+      "body": [
+       [
+        {
+         "text": "Wir nennen Ihren Namen nicht. Könnten Sie mir eine Kopie des Prüfberichts schicken?"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Für die Behörde spricht die Pressestelle mit Journalisten. Geben Sie interne Dokumente nicht selbst heraus."
+    },
+    {
+     "id": "press-stats",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Pressestelle"
+        }
+       ],
+       "address": [
+        {
+         "text": "press@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Jahresstatistik"
+       }
+      ],
+      "time": "12:40",
+      "body": [
+       [
+        {
+         "text": "Bitte schicken Sie uns die neueste Fassung der Jahresstatistik, die auf der Website veröffentlicht ist. Wir beantworten gerade eine Presseanfrage."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Ihre eigene Pressestelle fragt nach öffentlichen Informationen. Das ist ein ganz normaler Ablauf."
+    },
+    {
+     "id": "registered-letter",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "senedaxini",
+      "from": {
+       "name": [
+        {
+         "text": "SənədAxını"
+        }
+       ],
+       "address": [
+        {
+         "text": "bildiris@senedaxini.idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Eingangsschreiben Nr. 1847"
+       }
+      ],
+      "time": "13:05",
+      "body": [
+       [
+        {
+         "text": "Eine offizielle Anfrage des Ministeriums für regionale Beziehungen wurde von der Registratur erfasst und Ihnen zugewiesen."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Die Anfrage wurde offiziell erfasst und kam über das interne System. Die Antwort geht denselben Weg."
+    },
+    {
+     "id": "telegram-ministry",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Kamran | Ministerium"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hallo, schicken Sie mir den Beschlussentwurf heute einfach hier, das offizielle Schreiben kommt morgen nach."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Dienstliche Dokumente werden nicht per Messenger angefordert. „Das Schreiben kommt nach“ ist ein Trick, um Druck zu machen."
+    },
+    {
+     "id": "auditor-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "etalon-audit-fake",
+      "sender": [
+       {
+        "text": "EtalonAudit"
+       }
+      ],
+      "time": "14:20",
+      "messages": [
+       [
+        {
+         "text": "Für die Prüfung brauchen wir Zugang zum System. Antworten Sie auf diese SMS mit Ihrem Passwort."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Kein Prüfer fragt nach einem Passwort. Melden Sie eine solche Nachricht dem Sicherheitsteam."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "l3-choice",
+   "question": {
+    "prompt": "Jemand von der Presse ruft an und bittet Sie, eine Prüfung in Ihrer Behörde zu kommentieren.",
+    "options": [
+     {
+      "id": "comment",
+      "label": "Ich erzähle, was ich weiß, wenn mein Name nicht genannt wird",
+      "correct": false,
+      "feedback": "Auch ein anonymer Kommentar gibt Informationen der Behörde preis. Für die Behörde spricht nur, wer dazu befugt ist."
+     },
+     {
+      "id": "press",
+      "label": "Ich verweise höflich an die Pressestelle",
+      "correct": true,
+      "feedback": "Richtig. Die Pressestelle nimmt die Anfrage auf und gibt eine offizielle Antwort."
+     },
+     {
+      "id": "hang",
+      "label": "Ich lege wortlos auf",
+      "correct": false,
+      "feedback": "Es gelangt nichts nach außen, aber die Presse bekommt keine Antwort. Besser ist es, die Kontaktdaten der Pressestelle zu nennen."
+     }
+    ]
+   },
+   "explain": "Anfragen von außen beantwortet die Behörde, nicht Sie persönlich. Prüfen Sie zuerst die Identität über einen offiziellen Kanal."
+  },
+  {
+   "type": "recap",
+   "id": "l3-recap",
+   "points": [
+    "Prüfen Sie Anfragen von außen über eine offizielle Nummer, die Sie selbst heraussuchen.",
+    "Zeitdruck, ein privates Postfach und „Sagen Sie Ihrer Führungskraft nichts“ sind Zeichen für Betrug.",
+    "Für die Behörde antwortet die Leitung oder die Pressestelle."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

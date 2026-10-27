@@ -1,0 +1,459 @@
+{
+  "id": "parcel-fee",
+  "title": "رسوم الشحنة",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "pf-tutor",
+      "beats": [
+        {
+          "id": "pf-b1",
+          "say": "مرحبًا! سنرى اليوم كيف يتحول رابط دفع صغير إلى خسارة كبيرة.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "pf-b2",
+          "say": "الرسوم ليست سوى 1.20 مانات. المحتال لا يريد الرسوم، بل يريد بيانات بطاقتك.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "brandRef": "w2d-tezkuryer-fake",
+              "sender": [
+                {
+                  "text": "+994 51 000 83 17"
+                }
+              ],
+              "time": "10:47",
+              "messages": [
+                [
+                  {
+                    "text": "TezKuryer: شحنتك محتجزة في الجمارك. "
+                  },
+                  {
+                    "text": "ادفع رسومًا بقيمة 1.20 AZN: ",
+                    "spot": "fee"
+                  },
+                  {
+                    "text": "tezkuryer-gomruk.example.net/odenis",
+                    "link": {
+                      "label": "tezkuryer-gomruk.example.net/odenis",
+                      "href": "https://tezkuryer-gomruk.example.net/odenis"
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "fee"
+        },
+        {
+          "id": "pf-b3",
+          "say": "شحنة، أو مخالفة، أو دعم مالي: مهما كان الأمر، لا تدفع أبدًا عبر رابط في رسالة نصية.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "pf-b4",
+          "say": "بدلًا من ذلك، افتح التطبيق الرسمي أو البوابة الرسمية بنفسك، وتحقق من هناك.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "pf-hotspot",
+      "prompt": "ابحث عن علامات الاحتيال في هذه الرسالة النصية.",
+      "artifact": {
+        "kind": "sms",
+        "brandRef": "w2d-tezkuryer-fake",
+        "sender": [
+          {
+            "text": "+994 51 000 83 17",
+            "spot": "sender"
+          }
+        ],
+        "time": "10:47",
+        "messages": [
+          [
+            {
+              "text": "TezKuryer: شحنتك TZ48120577AZ محتجزة في الجمارك. يجب دفع "
+            },
+            {
+              "text": "رسوم جمركية بقيمة 1.20 AZN",
+              "spot": "small-fee"
+            },
+            {
+              "text": "."
+            }
+          ],
+          [
+            {
+              "text": "ادفع من هنا: "
+            },
+            {
+              "text": "tezkuryer-gomruk.example.net/odenis",
+              "spot": "link",
+              "link": {
+                "label": "tezkuryer-gomruk.example.net/odenis",
+                "href": "https://tezkuryer-gomruk.example.net/odenis"
+              }
+            }
+          ],
+          [
+            {
+              "text": "إذا لم تدفع خلال 24 ساعة، فستعاد الشحنة إلى المرسل.",
+              "spot": "deadline"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender",
+          "label": "رقم جوال عادي",
+          "explain": "رسائل الشركات تصل عادة باسم الشركة. لكن الاسم أيضًا يمكن تزييفه، فلا تعتمد على هذه العلامة وحدها أبدًا."
+        },
+        {
+          "id": "small-fee",
+          "label": "مبلغ زهيد",
+          "explain": "المبلغ الزهيد يخفف حذرك. والهدف الحقيقي هو رقم بطاقتك، والرمز المكتوب على ظهرها، والرمز الذي يصلك في رسالة نصية."
+        },
+        {
+          "id": "link",
+          "label": "عنوان مزيف",
+          "explain": "هذا ليس الموقع الرسمي لشركة الشحن، فقد أضيفت كلمات إلى الاسم. لا تضغط عليه، وافتح التطبيق الرسمي بنفسك."
+        },
+        {
+          "id": "deadline",
+          "label": "الاستعجال",
+          "explain": "المهلة موجودة لتمنعك من التفكير. وشركة الشحن الحقيقية تمنحك الوقت للتحقق."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "pf-sim",
+      "environment": "phone",
+      "title": "رسائل على مدار اليوم",
+      "intro": "تصل إلى جوالك عدة رسائل خلال اليوم. اختر التصرف الصحيح مع كل منها.",
+      "steps": [
+        {
+          "id": "redeliver-sms",
+          "label": "10:47 رسالة نصية جديدة",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "w2d-tezkuryer-fake",
+            "sender": [
+              {
+                "text": "+994 51 000 83 17"
+              }
+            ],
+            "time": "10:47",
+            "messages": [
+              [
+                {
+                  "text": "TezKuryer: لم يتمكن مندوبنا من الوصول إليك. ادفع 0.90 AZN لإعادة التوصيل: "
+                },
+                {
+                  "text": "tezkuryer-catdirilma.example.net/odenis",
+                  "link": {
+                    "label": "tezkuryer-catdirilma.example.net/odenis",
+                    "href": "https://tezkuryer-catdirilma.example.net/odenis"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "اسم شركة شحن مألوف، ومبلغ صغير.",
+          "actions": [
+            {
+              "id": "open-link",
+              "label": "فتح الرابط",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "الصفحة تشبه موقع شركة الشحن، لكن العنوان مزيف. والآن انظر إلى ما تطلبه.",
+              "next": "bank-code"
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن رسالة غير مرغوب فيها",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "صحيح. أبلغ عن الرسالة، ثم تحقق من الشحنة في التطبيق الرسمي.",
+              "next": "real-app"
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "أحسنت. وإذا كنت تنتظر شحنة، فتحقق منها في التطبيق الرسمي.",
+              "next": "real-app"
+            }
+          ]
+        },
+        {
+          "id": "bank-code",
+          "label": "طلبت الصفحة بيانات البطاقة والرمز المرسل في رسالة نصية",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank",
+            "sender": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "time": "10:49",
+            "messages": [
+              [
+                {
+                  "text": "الرمز: 518204. عملية دفع بقيمة 412.00 AZN لصالح TZK GLOBAL PAY. لا تشارك هذا الرمز مع أحد أبدًا."
+                }
+              ]
+            ]
+          },
+          "say": "أرسل إليك البنك رمزًا. انظر إلى المبلغ.",
+          "actions": [
+            {
+              "id": "type-code",
+              "label": "إدخال الرمز في الموقع",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "بهذا الرمز توافق على دفع 412 مانات، وليس مانات واحدًا. اتصل بالبنك فورًا على الرقم المكتوب على ظهر بطاقتك."
+            },
+            {
+              "id": "call-bank",
+              "label": "الاتصال بالبنك على الرقم المكتوب على البطاقة",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "صحيح. المبلغ المذكور بجانب الرمز أعلى بكثير مما ذكرته الصفحة، فاطلب إيقاف البطاقة فورًا."
+            },
+            {
+              "id": "ignore",
+              "label": "عدم إدخال الرمز في أي مكان",
+              "kind": "ignore",
+              "outcome": "safe",
+              "feedback": "أحسنت، لم تتم عملية الدفع. لكن بيانات بطاقتك أصبحت لدى ذلك الموقع، فاتصل بالبنك وأوقف البطاقة."
+            }
+          ]
+        },
+        {
+          "id": "real-app",
+          "label": "تطبيق TezKuryer الرسمي",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2d-tezkuryer",
+            "app": "TezKuryer",
+            "title": [
+              {
+                "text": "TZ77015342AZ: في الطريق إليك"
+              }
+            ],
+            "body": [
+              {
+                "text": "التوصيل في 4 أكتوبر. لا يلزم أي دفع إضافي."
+              }
+            ],
+            "time": "11:05"
+          },
+          "say": "هذا الإشعار من التطبيق الرسمي.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "الفتح في التطبيق",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "صحيح. التطبيق الرسمي لا يعرض أي رسوم إضافية، إذن فالرسالة النصية كانت مزيفة."
+            },
+            {
+              "id": "later",
+              "label": "النظر في الأمر لاحقًا",
+              "kind": "ignore",
+              "outcome": "safe",
+              "feedback": "لا بأس. لو كانت هناك رسوم مستحقة، لظهرت لك في التطبيق الرسمي أيضًا."
+            }
+          ]
+        },
+        {
+          "id": "fine-sms",
+          "label": "13:20 رسالة نصية جديدة",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "w2d-yol-nezaret-fake",
+            "sender": [
+              {
+                "text": "YolNezaret"
+              }
+            ],
+            "time": "13:20",
+            "messages": [
+              [
+                {
+                  "text": "صدرت بحقك مخالفة تجاوز السرعة بقيمة 80 AZN. ادفع اليوم واحصل على خصم 50%: "
+                },
+                {
+                  "text": "yolnezaret-cerime.example.net/endirim",
+                  "link": {
+                    "label": "yolnezaret-cerime.example.net/endirim",
+                    "href": "https://yolnezaret-cerime.example.net/endirim"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "والآن مخالفة. انتبه إلى الخصم.",
+          "actions": [
+            {
+              "id": "pay",
+              "label": "الدفع مع الخصم",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "الخصم موجود ليجعلك تستعجل. والصفحة التي يفتحها الرابط تجمع بيانات البطاقات."
+            },
+            {
+              "id": "verify",
+              "label": "سأتحقق من المخالفات في البوابة بنفسي",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "صحيح. إذا كانت المخالفة حقيقية، فستجدها في البوابة الرسمية."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن رسالة غير مرغوب فيها",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "أحسنت. وإذا لم تكن متأكدًا، فاتصل بالشرطة على الرقم 102 واسأل."
+            }
+          ]
+        },
+        {
+          "id": "aunt-chat",
+          "label": "16:02 العمة سابينا",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "العمة سابينا"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "الجار أرسل لي هذا الرابط، يقولون إنهم يقدمون دعمًا للأسر، واليوم هو آخر يوم."
+                  }
+                ],
+                "time": "16:01"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "ailedestek-qeydiyyat.example.net",
+                    "link": {
+                      "label": "ailedestek-qeydiyyat.example.net",
+                      "href": "https://ailedestek-qeydiyyat.example.net"
+                    }
+                  }
+                ],
+                "time": "16:01"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "هل أدخل بيانات بطاقتي؟"
+                  }
+                ],
+                "time": "16:02"
+              }
+            ]
+          },
+          "say": "قريبة لك تطلب نصيحتك.",
+          "actions": [
+            {
+              "id": "advise-stop",
+              "label": "لا تفعلي، لنتحقق من البوابة الرسمية معًا",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "رائع. الدعم الحكومي لا يحتاج أبدًا إلى تسجيل عبر رابط، ويمكن التحقق منه في البوابة الرسمية."
+            },
+            {
+              "id": "advise-go",
+              "label": "أسرعي، إنه اليوم الأخير",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "نجحت خدعة «اليوم الأخير». ستسرق الصفحة بيانات بطاقتها، لذا يجب أن تتصل ببنكها فورًا."
+            },
+            {
+              "id": "open-it",
+              "label": "دعيني أفتح الرابط",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "فتح الرابط للتحقق منه خطر أيضًا. والعنوان على أي حال ليس البوابة الرسمية."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "pf-choice",
+      "question": {
+        "prompt": "سبق أن كتبت بيانات بطاقتك في صفحة مزيفة. ما الخطوة الأولى؟",
+        "options": [
+          {
+            "id": "call-bank",
+            "label": "الاتصال بالبنك على الرقم المكتوب على ظهر البطاقة وإيقافها",
+            "correct": true,
+            "feedback": "صحيح. كلما أسرعت في إيقاف البطاقة، قلت خسارتك."
+          },
+          {
+            "id": "wait",
+            "label": "الانتظار لمعرفة هل ستخرج أموال من الحساب",
+            "correct": false,
+            "feedback": "الانتظار يمنح المحتال وقتًا. وبعد أن تختفي الأموال، قد يكون الأوان قد فات."
+          },
+          {
+            "id": "reply-sms",
+            "label": "الرد على الرسالة وطلب استرداد المال",
+            "correct": false,
+            "feedback": "لن يعيد المحتال المال، بل سيطلب منك رمزًا جديدًا. اقطع التواصل معه."
+          }
+        ]
+      },
+      "explain": "بعد ذلك، أبلغ الشرطة على الرقم 102، واحتفظ بالرسالة دليلًا."
+    },
+    {
+      "type": "recap",
+      "id": "pf-recap",
+      "points": [
+        "شحنة، أو مخالفة، أو دعم مالي: لا تدفع أبدًا عبر رابط في رسالة نصية.",
+        "افتح التطبيق الرسمي أو البوابة الرسمية بنفسك للتحقق.",
+        "كتبت بيانات بطاقتك؟ اتصل بالبنك فورًا، ثم بالشرطة على الرقم 102."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

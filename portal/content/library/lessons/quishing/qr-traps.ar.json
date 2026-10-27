@@ -1,0 +1,417 @@
+{
+  "id": "qr-traps",
+  "title": "فخاخ رموز QR",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "hidden-link",
+          "say": "مرحبًا! رمز QR ليس إلا رابطًا مخفيًا. ولا يمكنك أن تعرف إلى أين يقودك بمجرد النظر إليه.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "qr"
+          }
+        },
+        {
+          "id": "stickers",
+          "say": "يلصق المحتالون ملصقات رموز QR خاصة بهم على عدادات المواقف وقوائم الطعام واللوحات الإعلانية.",
+          "mood": "think",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "qr",
+              "caption": [
+                {
+                  "text": "ShaharPark. امسح الرمز للدفع"
+                }
+              ],
+              "destination": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "seherpark-odenis.info",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/pay"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "check-domain",
+          "say": "عندما يقرأ جوالك الرمز، يعرض لك العنوان. وقبل أن تفتحه، تحقق من النطاق: هل يعود فعلًا إلى تلك الجهة؟",
+          "mood": "talk",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "qr",
+              "caption": [
+                {
+                  "text": "ShaharPark. امسح الرمز للدفع"
+                }
+              ],
+              "destination": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "seherpark-odenis.info",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/pay"
+                }
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "email-qr",
+          "say": "رمز QR في رسالة بريد إلكتروني قد يكون فخًا أيضًا. إذا طلبت الصفحة كلمة المرور أو بيانات بطاقتك، فتوقف.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "scan-or-not",
+      "prompt": "أي رموز QR آمنة للفتح؟",
+      "cards": [
+        {
+          "id": "parking-fine",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "عداد المواقف. عليك مخالفة، امسح الرمز وادفع"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://seherpark-cerime.info/pay"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "لا يتم تحصيل المخالفات عبر الملصقات. تحقق من مخالفاتك على البوابة الرسمية أو التطبيق الرسمي فقط."
+        },
+        {
+          "id": "cafe-menu",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "مقهى Chinar للشاي. قائمة الطعام"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://cinar-cayxana.az/menyu"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "النطاق يطابق اسم المقهى، والصفحة تعرض قائمة الطعام فقط ولا تطلب أي شيء."
+        },
+        {
+          "id": "mfa-email",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "ينتهي التحقق من حسابك قريبًا. امسح الرمز للتجديد"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://rxagentlik-login.info/verify"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "رسالة البريد الإلكتروني التي تحمل رمز QR للتحقق من حسابك فخ معروف. افتح البوابة بنفسك من الإشارات المرجعية."
+        },
+        {
+          "id": "certificate-check",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "شهادة DovletPortal. تحقق من صحتها"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://dovletportal.az/yoxla/7F3K2"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "الرمز يقود إلى عنوان البوابة نفسها التي أصدرت الشهادة، ولا يطلب أي بيانات."
+        },
+        {
+          "id": "free-wifi",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "شبكة Wi-Fi مجانية. امسح الرمز للاتصال"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://free-wifi-baku.top/login?card=1"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "الإنترنت المجاني لا يحتاج أبدًا إلى بطاقتك. نطاق غير معروف مع طلب بيانات البطاقة يعني أنه فخ."
+        },
+        {
+          "id": "donation",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "ساعد الأطفال. امسح الرمز للتبرع"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://qisalt.info/x7Qa"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "الرابط المختصر يخفي العنوان الحقيقي. تبرع عبر الموقع الرسمي للجمعية الخيرية فقط."
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "email-qr",
+      "prompt": "ابحث عن الأجزاء المشبوهة في هذه الرسالة.",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": [
+            {
+              "text": "الدعم الفني"
+            }
+          ],
+          "address": [
+            {
+              "text": "it-destek@rxagentlik-support.info",
+              "spot": "sender"
+            }
+          ]
+        },
+        "to": "aynur.mammadova@rxagentlik.az",
+        "subject": [
+          {
+            "text": "عاجل: ",
+            "spot": "urgent"
+          },
+          {
+            "text": "جدد التحقق بخطوتين"
+          }
+        ],
+        "time": "09:12",
+        "body": [
+          [
+            {
+              "text": "عزيزي الزميل،"
+            }
+          ],
+          [
+            {
+              "text": "يجري حاليًا تحديث نظامنا الأمني. "
+            },
+            {
+              "text": "إذا لم تؤكد بياناتك خلال 24 ساعة، فسيتم حظر حسابك.",
+              "spot": "threat"
+            }
+          ],
+          [
+            {
+              "text": "امسح رمز QR أدناه بجوالك.",
+              "spot": "qr"
+            }
+          ],
+          [
+            {
+              "text": "مع التحية، الدعم الفني"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender",
+          "label": "نطاق غريب",
+          "explain": "نطاق المرسل ليس نطاقنا: إنه ليس rxagentlik.az."
+        },
+        {
+          "id": "urgent",
+          "label": "الاستعجال",
+          "explain": "كلمة «عاجل» تدفعك إلى التصرف دون تفكير."
+        },
+        {
+          "id": "threat",
+          "label": "التهديد",
+          "explain": "التهديد بالحظر غرضه الضغط عليك. والدعم الفني الحقيقي نادرًا ما يكتب بهذه الطريقة."
+        },
+        {
+          "id": "qr",
+          "label": "رمز QR",
+          "explain": "رمز QR يخفي الرابط عن نظام تصفية البريد، وينقلك إلى الجوال الأقل حماية."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "fine-notice",
+      "question": {
+        "prompt": "وجدت على الزجاج الأمامي لسيارتك إشعار مخالفة عليه رمز QR. ماذا تفعل؟",
+        "options": [
+          {
+            "id": "scan-pay",
+            "label": "أمسح الرمز وأدفع فورًا",
+            "correct": false,
+            "feedback": "قد تسرق الصفحة المزيفة بيانات بطاقتك."
+          },
+          {
+            "id": "official",
+            "label": "أتحقق من المخالفة بنفسي على البوابة الرسمية",
+            "correct": true,
+            "feedback": "صحيح. إذا كانت المخالفة حقيقية، فستجدها هناك."
+          },
+          {
+            "id": "call-number",
+            "label": "أتصل بالرقم المكتوب على الإشعار",
+            "correct": false,
+            "feedback": "قد يكون الرقم تابعًا للمحتالين أيضًا."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "إشعار مخالفة. ادفع خلال 3 أيام"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://seherpark-cerime.info/odenis"
+              }
+            ]
+          }
+        }
+      },
+      "explain": "لا تثق بأي وسيلة تواصل مذكورة في الإشعار. افتح القناة الرسمية بنفسك."
+    },
+    {
+      "type": "scenario",
+      "id": "payment-sticker",
+      "title": "ملصق الدفع",
+      "start": "counter",
+      "nodes": [
+        {
+          "id": "counter",
+          "text": "على طاولة الدفع في المقهى ملصق رمز QR للدفع السريع، وهو مثبت بشكل مائل قليلًا.",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "qr",
+              "caption": [
+                {
+                  "text": "الدفع السريع"
+                }
+              ],
+              "destination": [
+                {
+                  "text": "https://sahilpay-odenis.top/p/1942"
+                }
+              ]
+            }
+          },
+          "choices": [
+            {
+              "label": "أمسح الرمز وأتحقق من العنوان أولًا",
+              "next": "address",
+              "feedback": "بداية جيدة. التحقق من العنوان مهم."
+            },
+            {
+              "label": "أمسح الرمز وأدفع فورًا",
+              "outcome": "compromised",
+              "feedback": "كان العنوان مزيفًا، ووصلت بيانات بطاقتك إلى المحتالين."
+            },
+            {
+              "label": "أسأل موظفة الصندوق إن كان الملصق تابعًا للمقهى",
+              "next": "cashier",
+              "feedback": "فكرة رائعة. السؤال أبسط طريقة للتحقق."
+            }
+          ]
+        },
+        {
+          "id": "address",
+          "text": "يعرض جوالك العنوان: sahilpay-odenis.top. ولا أثر فيه لاسم المقهى.",
+          "choices": [
+            {
+              "label": "أدفع على أي حال، ليس لدي وقت",
+              "outcome": "compromised",
+              "feedback": "بسبب الاستعجال ذهب المال إلى محتال. وكان العنوان الغريب تحذيرًا كافيًا."
+            },
+            {
+              "label": "لا أفتحه، وأخبر موظفة الصندوق",
+              "next": "cashier",
+              "feedback": "قرار صحيح."
+            }
+          ]
+        },
+        {
+          "id": "cashier",
+          "text": "هذا ليس ملصقنا! من فضلك ادفع بالبطاقة عبر جهاز الدفع.",
+          "speaker": "موظفة الصندوق",
+          "voice": "young-woman",
+          "channel": "in-person",
+          "manner": "firm",
+          "spoken": "هذا ليس ملصقنا! <short pause> من فضلك ادفع بالبطاقة عبر جهاز الدفع.",
+          "choices": [
+            {
+              "label": "أدفع عبر جهاز الدفع",
+              "outcome": "safe",
+              "feedback": "أحسنت. حميت نفسك والعملاء الذين سيأتون بعدك."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "رمز QR رابط مخفي: تحقق من العنوان قبل فتحه.",
+        "ادفع المخالفات والفواتير عبر القنوات الرسمية فقط.",
+        "لا تدخل أبدًا كلمة المرور أو بيانات البطاقة في صفحة فتحتها عبر رمز QR."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

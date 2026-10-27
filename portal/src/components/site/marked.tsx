@@ -5,8 +5,12 @@ import { cn } from "@/lib/cn";
  * Landing copy markup: [[…]] marks the part to look at, {{…}} the suspicious bit inside it.
  * With `reveal` off the text reads plainly (the visitor has to find it first).
  */
-export function Marked({ text, reveal, className }: { text: string; reveal: boolean; className?: string }) {
-  return <span className={className}>{parseMarked(text, reveal)}</span>;
+export function Marked({ text, reveal, className, dir }: { text: string; reveal: boolean; className?: string; dir?: "ltr" }) {
+  return (
+    <span dir={dir} className={className}>
+      {parseMarked(text, reveal)}
+    </span>
+  );
 }
 
 // A plain function, not a component: the recursive-descent cursor is mutated while it runs.

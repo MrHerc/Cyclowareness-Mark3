@@ -1,6 +1,7 @@
 import { createTOTPKeyURI, verifyTOTPWithGracePeriod } from "@oslojs/otp";
 import { decodeBase32IgnorePadding, encodeBase32UpperCaseNoPadding } from "@oslojs/encoding";
-import { decryptSecret, encryptSecret, sha256Hex } from "../crypto";
+import { decryptSecret, encryptSecret, hmac, sha256Hex } from "../crypto";
+import { env } from "../env";
 
 export const TOTP_PERIOD = 30;
 export const TOTP_DIGITS = 6;
@@ -35,6 +36,14 @@ export function newBackupCodes(): { codes: string[]; hashes: string[] } {
   return { codes, hashes: codes.map(hashBackupCode) };
 }
 
+const normalised = (code: string) => code.trim().toLowerCase().replace(/\s/g, "");
+
+/** An HMAC keyed from APP_SECRET (like the stored TOTP keys), so a copy of the database alone cannot be searched offline. */
 export function hashBackupCode(code: string): string {
-  return sha256Hex(`backup:${code.trim().toLowerCase().replace(/\s/g, "")}`);
+  return hmac(`backup:${normalised(code)}`, sha256Hex(`backup-codes:${env.secret}`));
+}
+
+/** How codes made before the keyed hash were stored (plain SHA-256); they stay valid until used or replaced. */
+export function legacyBackupHash(code: string): string {
+  return sha256Hex(`backup:${normalised(code)}`);
 }

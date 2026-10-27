@@ -12,8 +12,8 @@ import { Textarea } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/cn";
 
-/** "Confirm the module" (attestation) dialog. Opens automatically from ?confirm=1. */
-export function AttestCard({ slug, moduleTitle, text, autoOpen }: { slug: string; moduleTitle: string; text: string; autoOpen: boolean }) {
+/** "Confirm the module" (attestation) dialog. Opens automatically from ?confirm=1; once confirmed it returns to `returnHref` (the page without it). */
+export function AttestCard({ slug, moduleTitle, text, autoOpen, returnHref }: { slug: string; moduleTitle: string; text: string; autoOpen: boolean; returnHref: string }) {
   const t = useTranslations("learner");
   const router = useRouter();
   const [open, setOpen] = useState(autoOpen);
@@ -54,7 +54,7 @@ export function AttestCard({ slug, moduleTitle, text, autoOpen }: { slug: string
               if (res.ok) {
                 toast(t("attest.done"));
                 setOpen(false);
-                router.replace(`/learn/${slug}`);
+                router.replace(returnHref);
               } else toast(t("attest.error"), "error");
             })
           }

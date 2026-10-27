@@ -1,0 +1,887 @@
+{
+ "id": "spot-the-phish",
+ "title": "Знайдіть фішинг",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "meet-the-phish",
+   "beats": [
+    {
+     "id": "hello",
+     "say": "Вітаю! Я ваш помічник із безпеки. Сьогодні ви навчитеся за лічені секунди розпізнавати фальшивий лист.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "sender",
+     "say": "Спершу перевірте адресу відправника. Тут підмінили одну літеру, і помітити це непросто.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "xidmet-agentliyi-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Бухгалтерія"
+         }
+        ],
+        "address": [
+         {
+          "text": "muhasibat@"
+         },
+         {
+          "text": "xidmetagentIiyi.az",
+          "spot": "sender-domain"
+         }
+        ]
+       },
+       "to": "e.mammadov@xidmetagentliyi.az",
+       "subject": [
+        {
+         "text": "Розрахунковий листок за вересень"
+        }
+       ],
+       "time": "09:12",
+       "body": [
+        [
+         {
+          "text": "Шановний користувачу!",
+          "spot": "greeting"
+         }
+        ],
+        [
+         {
+          "text": "Ваш розрахунковий листок за вересень готовий. "
+         },
+         {
+          "text": "Якщо ви не підтвердите дані протягом 24 годин, виплату буде зупинено.",
+          "spot": "urgency"
+         }
+        ],
+        [
+         {
+          "text": "Переглянути розрахунковий листок",
+          "spot": "link",
+          "link": {
+           "label": "Переглянути розрахунковий листок",
+           "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+          }
+         }
+        ],
+        [
+         {
+          "text": "Бухгалтерія"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "sender-domain",
+     "checkpoint": {
+      "prompt": "Що ви перевіряєте насамперед у підозрілому листі?",
+      "options": [
+       {
+        "id": "address",
+        "label": "Адресу відправника",
+        "correct": true,
+        "feedback": "Правильно. Саме адреса найшвидше видає фальшивий лист."
+       },
+       {
+        "id": "logo",
+        "label": "Логотип і оформлення",
+        "correct": false,
+        "feedback": "Логотип і оформлення легко скопіювати. Перевірте адресу."
+       },
+       {
+        "id": "time",
+        "label": "Час надсилання",
+        "correct": false,
+        "feedback": "Час нічого не підкаже. Шахраї пишуть о будь-якій порі."
+       }
+      ]
+     }
+    },
+    {
+     "id": "urgency",
+     "say": "Стислий термін і погроза. Якщо лист вас квапить, це сигнал зупинитися.",
+     "mood": "alert",
+     "gesture": "point-down",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "xidmet-agentliyi-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Бухгалтерія"
+         }
+        ],
+        "address": [
+         {
+          "text": "muhasibat@"
+         },
+         {
+          "text": "xidmetagentIiyi.az",
+          "spot": "sender-domain"
+         }
+        ]
+       },
+       "to": "e.mammadov@xidmetagentliyi.az",
+       "subject": [
+        {
+         "text": "Розрахунковий листок за вересень"
+        }
+       ],
+       "time": "09:12",
+       "body": [
+        [
+         {
+          "text": "Шановний користувачу!",
+          "spot": "greeting"
+         }
+        ],
+        [
+         {
+          "text": "Ваш розрахунковий листок за вересень готовий. "
+         },
+         {
+          "text": "Якщо ви не підтвердите дані протягом 24 годин, виплату буде зупинено.",
+          "spot": "urgency"
+         }
+        ],
+        [
+         {
+          "text": "Переглянути розрахунковий листок",
+          "spot": "link",
+          "link": {
+           "label": "Переглянути розрахунковий листок",
+           "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+          }
+         }
+        ],
+        [
+         {
+          "text": "Бухгалтерія"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "urgency"
+    },
+    {
+     "id": "link",
+     "say": "Не натискайте на посилання. На комп’ютері наведіть на нього курсор і прочитайте адресу. На телефоні відкрийте сайт самостійно.",
+     "mood": "talk",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "xidmet-agentliyi-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Бухгалтерія"
+         }
+        ],
+        "address": [
+         {
+          "text": "muhasibat@"
+         },
+         {
+          "text": "xidmetagentIiyi.az",
+          "spot": "sender-domain"
+         }
+        ]
+       },
+       "to": "e.mammadov@xidmetagentliyi.az",
+       "subject": [
+        {
+         "text": "Розрахунковий листок за вересень"
+        }
+       ],
+       "time": "09:12",
+       "body": [
+        [
+         {
+          "text": "Шановний користувачу!",
+          "spot": "greeting"
+         }
+        ],
+        [
+         {
+          "text": "Ваш розрахунковий листок за вересень готовий. "
+         },
+         {
+          "text": "Якщо ви не підтвердите дані протягом 24 годин, виплату буде зупинено.",
+          "spot": "urgency"
+         }
+        ],
+        [
+         {
+          "text": "Переглянути розрахунковий листок",
+          "spot": "link",
+          "link": {
+           "label": "Переглянути розрахунковий листок",
+           "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+          }
+         }
+        ],
+        [
+         {
+          "text": "Бухгалтерія"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "link"
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "morning-inbox",
+   "environment": "inbox",
+   "title": "Ранкова пошта",
+   "intro": "Дев’ята ранку, і на вас чекають п’ять нових листів. Відкрийте кожен і виберіть правильну дію.",
+   "steps": [
+    {
+     "id": "payslip",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Бухгалтерія"
+        }
+       ],
+       "address": [
+        {
+         "text": "muhasibat@xidmetagentIiyi.az",
+         "reveal": "Після «agent» стоїть велика латинська «I», а не мала «l»"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Розрахунковий листок за вересень"
+       }
+      ],
+      "time": "09:02",
+      "body": [
+       [
+        {
+         "text": "Шановний користувачу!"
+        }
+       ],
+       [
+        {
+         "text": "Ваш розрахунковий листок готовий. Якщо ви не підтвердите дані протягом 24 годин, виплату буде зупинено."
+        }
+       ],
+       [
+        {
+         "text": "Переглянути розрахунковий листок",
+         "link": {
+          "label": "Переглянути розрахунковий листок",
+          "href": "https://maas-portal.info/giris"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Прочитайте адресу відправника літера за літерою.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Повідомити про фішинг",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Правильно. В адресі стоїть велика I замість малої l — це підроблений домен, схожий на справжній."
+      },
+      {
+       "id": "click",
+       "label": "Відкрити посилання",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Посилання веде на maas-portal.info, а не на сайт агентства. Пароль, введений там, потрапить до шахрая."
+      },
+      {
+       "id": "delete",
+       "label": "Видалити",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Ви в безпеці, але цей лист отримали й колеги. Повідомте про нього, щоб служба безпеки видалила його в усіх."
+      }
+     ]
+    },
+    {
+     "id": "report-draft",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi",
+      "from": {
+       "name": [
+        {
+         "text": "Ельвін Мамедов"
+        }
+       ],
+       "address": [
+        {
+         "text": "e.mammadov@xidmetagentliyi.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Остаточна версія звіту"
+       }
+      ],
+      "time": "08:47",
+      "body": [
+       [
+        {
+         "text": "Добрий день, Айнур!"
+        }
+       ],
+       [
+        {
+         "text": "Я завантажив на внутрішній портал остаточну версію звіту, який ми обговорювали. Дайте знати, коли переглянете."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "reply",
+       "label": "Відповісти",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Правильно. Знайомий колега, домен агентства, жодних посилань і жодного поспіху."
+      },
+      {
+       "id": "report",
+       "label": "Повідомити про фішинг",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Цей лист справжній: правильний домен і жодних прохань."
+      }
+     ]
+    },
+    {
+     "id": "sign-request",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "docusfera-fake",
+      "from": {
+       "name": [
+        {
+         "text": "DocuSfera"
+        }
+       ],
+       "address": [
+        {
+         "text": "noreply@docusfera-imza.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Документ очікує на ваш підпис"
+       }
+      ],
+      "time": "08:31",
+      "body": [
+       [
+        {
+         "text": "Керівництво надіслало вам на підпис «Muqavile_2025.pdf»."
+        }
+       ],
+       [
+        {
+         "text": "Щоб переглянути документ, увійдіть за допомогою робочої пошти."
+        }
+       ],
+       [
+        {
+         "text": "Переглянути документ",
+         "link": {
+          "label": "Переглянути документ",
+          "href": "https://docusfera-imza.test/doc"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "click",
+       "label": "Відкрити посилання",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Домен — docusfera-imza.test, а не справжній сервіс. Сторінка, яка відкриється, створена, щоб викрасти ваш робочий пароль."
+      },
+      {
+       "id": "report",
+       "label": "Повідомити про фішинг",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Правильно: несподіваний запит на підпис із дивного домену. Якщо сумніваєтеся, зателефонуйте відправникові за відомим вам номером."
+      }
+     ]
+    },
+    {
+     "id": "maintenance",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "ІТ-підтримка"
+        }
+       ],
+       "address": [
+        {
+         "text": "it@xidmetagentliyi.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Планові технічні роботи"
+       }
+      ],
+      "time": "08:15",
+      "body": [
+       [
+        {
+         "text": "У суботу з 20:00 до 22:00 електронна пошта буде недоступна. Від вас нічого робити не потрібно."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "ok",
+       "label": "Позначити як безпечний",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Правильно. Офіційна адреса, жодних посилань, і від вас нічого не вимагають."
+      },
+      {
+       "id": "report",
+       "label": "Повідомити про фішинг",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Цей лист справжній: він лише інформує й нічого не просить."
+      }
+     ]
+    },
+    {
+     "id": "bonus-list",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Відділ кадрів"
+        }
+       ],
+       "address": [
+        {
+         "text": "kadrlar@xidmetagentliyi-az.com"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Список святкових премій"
+       }
+      ],
+      "time": "07:58",
+      "body": [
+       [
+        {
+         "text": "Шановний працівнику!"
+        }
+       ],
+       [
+        {
+         "text": "Список одержувачів премії — у вкладенні. Перевірте сьогодні, чи є там ваше ім’я."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Mukafat_siyahisi.html"
+         }
+        ],
+        "size": "12 КБ"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Відкрити вкладення",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Цей «список» — файл .html, що відкриває фальшиву сторінку входу. А ще домен закінчувався на -az.com."
+      },
+      {
+       "id": "report",
+       "label": "Повідомити про фішинг",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Правильно: дивний домен, спокуслива тема та вкладення .html. Про премії запитайте у відділі кадрів самостійно."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "find-the-signs",
+   "prompt": "Натисніть на ознаки фальшивого листа.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "e-xidmet-fake",
+    "from": {
+     "name": [
+      {
+       "text": "E-Xidmet Portal",
+       "reveal": "bildiris@e-xidmet-portal.info"
+      }
+     ],
+     "address": [
+      {
+       "text": "bildiris@"
+      },
+      {
+       "text": "e-xidmet-portal.info",
+       "spot": "sender-domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Несплачений штраф: останнє попередження"
+     }
+    ],
+    "time": "11:47",
+    "body": [
+     [
+      {
+       "text": "Шановний громадянине!",
+       "spot": "greeting"
+      }
+     ],
+     [
+      {
+       "text": "На ваше ім’я виписано штраф 40 AZN за порушення правил дорожнього руху."
+      }
+     ],
+     [
+      {
+       "text": "Якщо його не сплатити протягом 48 годин, сума подвоїться, а справу передадуть до суду.",
+       "spot": "threat"
+      }
+     ],
+     [
+      {
+       "text": "Сплатити штраф",
+       "spot": "link",
+       "link": {
+        "label": "Сплатити штраф",
+        "href": "https://e-xidmet-portal.info/cerime?id=58213"
+       }
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender-domain",
+     "label": "Невідомий домен",
+     "explain": "Офіційна служба не пише з такої адреси. Назву вигадали, щоб вона здавалася офіційною."
+    },
+    {
+     "id": "greeting",
+     "label": "Загальне звертання",
+     "explain": "Справжнє повідомлення зазвичай містить ваше ім’я та номер справи."
+    },
+    {
+     "id": "threat",
+     "label": "Погроза й термін",
+     "explain": "Страх і стислий термін підштовхують заплатити, нічого не перевіривши."
+    },
+    {
+     "id": "link",
+     "label": "Фальшиве посилання",
+     "explain": "Посилання збирає дані вашої картки. Штрафи перевіряйте, самостійно відкривши офіційний портал."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "first-move",
+   "question": {
+    "prompt": "Що ви робите з підозрілим листом?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Натискаю кнопку «Повідомити про фішинг»",
+      "correct": true,
+      "feedback": "Правильно. Такої кнопки немає? Перешліть лист службі безпеки. Тоді вона зможе заблокувати його для всіх."
+     },
+     {
+      "id": "click",
+      "label": "Відкриваю посилання, щоб перевірити",
+      "correct": false,
+      "feedback": "Одне натискання може відкрити шкідливу сторінку. Краще перевірте адресу."
+     },
+     {
+      "id": "reply",
+      "label": "Відповідаю й запитую відправника",
+      "correct": false,
+      "feedback": "Ваша відповідь піде просто до шахрая. Звісно, він скаже, що все гаразд."
+     },
+     {
+      "id": "forward",
+      "label": "Пересилаю колегам, щоб вони подивилися",
+      "correct": false,
+      "feedback": "Так небезпека лише пошириться. Повідомте про лист, і служба безпеки його перевірить."
+     }
+    ]
+   },
+   "explain": "Повідомляючи про підозрілий лист, ви захищаєте себе й колег. Якщо у вашій пошті немає кнопки «Повідомити про фішинг», перешліть лист службі безпеки."
+  },
+  {
+   "type": "swipe",
+   "id": "safe-or-phish",
+   "prompt": "Безпечно чи небезпечно?",
+   "cards": [
+    {
+     "id": "card-blocked",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank-fake",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "08:03",
+      "messages": [
+       [
+        {
+         "text": "UlduzBank: Вашу картку заблоковано. Щоб розблокувати її, увійдіть: "
+        },
+        {
+         "text": "https://ulduzbank-az.info/kart"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ім’я відправника можна підробити, а посилання веде не на сайт банку. Якщо сумніваєтеся, зателефонуйте за номером на звороті картки."
+    },
+    {
+     "id": "meeting",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi",
+      "from": {
+       "name": [
+        {
+         "text": "Ельвін Мамедов"
+        }
+       ],
+       "address": [
+        {
+         "text": "e.mammadov@xidmetagentliyi.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Завтрашня зустріч"
+       }
+      ],
+      "time": "10:21",
+      "body": [
+       [
+        {
+         "text": "Добрий день, Айнур!"
+        }
+       ],
+       [
+        {
+         "text": "До зустрічі завтра о 10:00 у кімнаті 3. Порядок денний — у вчорашньому листі."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Знайомий колега, правильна адреса, жодних посилань і прохань. Звичайний робочий лист."
+    },
+    {
+     "id": "courier",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "cevikkargo-fake",
+      "sender": [
+       {
+        "text": "+994 70 000 88 31"
+       }
+      ],
+      "time": "13:40",
+      "messages": [
+       [
+        {
+         "text": "ÇevikKargo: Вашу посилку затримано на складі. Сплатіть збір 1,20 AZN: "
+        },
+        {
+         "text": "https://cevik-kargo.info/odenis"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Мізерна сума присипляє пильність. Справжня мета — викрасти дані вашої картки."
+    },
+    {
+     "id": "holidays",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi",
+      "from": {
+       "name": [
+        {
+         "text": "Відділ кадрів"
+        }
+       ],
+       "address": [
+        {
+         "text": "kadrlar@xidmetagentliyi.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Святкові дні"
+       }
+      ],
+      "time": "16:05",
+      "body": [
+       [
+        {
+         "text": "Шановні колеги!"
+        }
+       ],
+       [
+        {
+         "text": "Графік роботи на листопадові свята — на внутрішньому порталі."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Загальне звертання — ще не загроза. Адреса правильна, немає ні посилання, ні поспіху."
+    },
+    {
+     "id": "mailbox-full",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek-fake",
+      "from": {
+       "name": [
+        {
+         "text": "ІТ-підтримка"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-destek@xidmetagentliyi-az.com"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Ваша поштова скринька переповнена"
+       }
+      ],
+      "time": "07:58",
+      "body": [
+       [
+        {
+         "text": "Вашу поштову скриньку заповнено на 98 %. Підтвердьте вхід сьогодні, щоб не втратити листи."
+        }
+       ],
+       [
+        {
+         "text": "Підтвердити вхід",
+         "link": {
+          "label": "Підтвердити вхід",
+          "href": "https://xidmetagentliyi-az.com/poct"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Адреса закінчується зайвим -az.com, а це не домен агентства. Вхід не підтверджують через посилання."
+    },
+    {
+     "id": "card-payment",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "19:12",
+      "messages": [
+       [
+        {
+         "text": "UlduzBank: Вашою карткою здійснено платіж на 23,40 AZN. Якщо це були не ви, зателефонуйте за номером на звороті картки."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Посилання немає, а номер, за яким радять дзвонити, у вас уже є. Звичайне сповіщення."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Перевіряйте адресу: навіть одна змінена літера видає фальшивий лист.",
+    "Поспіх і погрози — сигнал зупинитися.",
+    "Перевіряйте посилання, перш ніж натиснути, а якщо сумніваєтеся — повідомляйте."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -237,7 +237,7 @@ export function Schedules({
             </Select>
           </Field>
           <Field label={t("recipients")} htmlFor="s-to" hint={t("recipientsHint")}>
-            <Input id="s-to" value={recipients} onChange={(e) => setRecipients(e.target.value)} placeholder="ciso@example.az, hr@example.az" />
+            <Input id="s-to" dir="ltr" value={recipients} onChange={(e) => setRecipients(e.target.value)} placeholder="ciso@example.az, hr@example.az" />
           </Field>
           <p className="text-caption text-ink-muted">{t("scheduleHint")}</p>
           <Button

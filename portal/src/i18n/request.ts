@@ -12,14 +12,15 @@ import { loadMessages } from "./messages";
  * gets that locale, not the request's.
  */
 export default getRequestConfig(async ({ locale: requested }) => {
-  if (isSiteLocale(requested)) {
-    return { locale: requested, messages: await loadMessages(isLocale(requested) ? requested : "en"), timeZone: "Asia/Baku", now: new Date() };
+  if (isLocale(requested)) {
+    return { locale: requested, messages: await loadMessages(requested), timeZone: "Asia/Baku", now: new Date() };
   }
   const [h, c] = await Promise.all([headers(), cookies()]);
   const site = h.get("x-site-locale");
-  if (isSiteLocale(site)) return { locale: site, messages: await loadMessages(isLocale(site) ? site : "en"), timeZone: "Asia/Baku", now: new Date() };
+  if (isSiteLocale(site)) return { locale: site, messages: await loadMessages(site), timeZone: "Asia/Baku", now: new Date() };
   const cookie = c.get(LOCALE_COOKIE)?.value;
-  const fromCookie = isLocale(cookie) ? cookie : cookie ? UI_ALIAS[cookie] : undefined;
+  // Own keys only: a cookie such as "constructor" or "__proto__" must not read Object.prototype.
+  const fromCookie = isLocale(cookie) ? cookie : cookie && Object.hasOwn(UI_ALIAS, cookie) ? UI_ALIAS[cookie] : undefined;
   // React-cached: pages that load the viewer do not query twice. A database outage must not take the
   // language (and with it every page, the error pages included) down: the cookie and browser still decide.
   // Imported when needed: next-intl loads this file while its own server module is still initialising.

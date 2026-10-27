@@ -1,0 +1,414 @@
+{
+ "id": "safe-trip",
+ "title": "رحلة آمنة",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "في السفر تتعرض أجهزتك لمخاطر أكثر مما في البيت: شبكات غير معروفة، وأيد غريبة، ولحظات استعجال.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "قبل أن تسافر، احذف بيانات العمل التي لن تحتاج إليها. وإن أمكن، فاستخدم جهازًا مخصصًا للسفر تقدمه جهتك.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "من السهل تزييف أسماء شبكات الفنادق والمؤتمرات. وعند العمل، شغل دائمًا الاتصال الآمن الذي توفره جهتك، أي الشبكة الافتراضية الخاصة.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "wifi",
+       "networks": [
+        {
+         "ssid": [
+          {
+           "text": "Lumera_Guest"
+          }
+         ],
+         "secured": true,
+         "signal": 3
+        },
+        {
+         "ssid": [
+          {
+           "text": "Lumera_Guest_FREE",
+           "spot": "twin"
+          }
+         ],
+         "secured": false,
+         "signal": 4
+        },
+        {
+         "ssid": [
+          {
+           "text": "Lumera_Lobby_Free_WiFi",
+           "spot": "open-lookalike"
+          }
+         ],
+         "secured": false,
+         "signal": 4
+        },
+        {
+         "ssid": [
+          {
+           "text": "Forum2026_Free",
+           "spot": "conf-open"
+          }
+         ],
+         "secured": false,
+         "signal": 3
+        }
+       ]
+      }
+     },
+     "highlight": "twin"
+    },
+    {
+     "id": "b4",
+     "say": "تجنب منافذ الشحن العامة في المطار. استخدم محولك الخاص في مقبس الحائط، أو بطارية الشحن المتنقلة الخاصة بك.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "b5",
+     "say": "عندما تعود، اطلب من الدعم الفني فحص الجهاز، وغير كلمات المرور للحسابات التي استخدمتها في الرحلة.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "border",
+   "question": {
+    "prompt": "على الحدود أخذوا حاسوبك المحمول منك لبعض الوقت. ماذا تفعل الآن؟",
+    "options": [
+     {
+      "id": "nothing",
+      "label": "لا شيء، فقد أعادوه إلي",
+      "correct": false,
+      "feedback": "إذا غاب الجهاز عن نظرك، فلا يمكنك أن تعرف ما الذي فعل به."
+     },
+     {
+      "id": "report",
+      "label": "لا أدخل إلى حسابات العمل، وأخبر فريق الأمن السيبراني",
+      "correct": true,
+      "feedback": "صحيح. لا تستخدمه في العمل حتى يفحصه مختص."
+     },
+     {
+      "id": "reset",
+      "label": "أعيد ضبط الجهاز بنفسي",
+      "correct": false,
+      "feedback": "إعادة الضبط تمحو الأدلة. دع المختص يقرر."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "travel"
+    }
+   },
+   "explain": "الجهاز الذي غاب عن نظرك لم يعد موثوقًا. ولهذا تسافر بأقل قدر ممكن من البيانات."
+  },
+  {
+   "type": "hotspot",
+   "id": "hotel-wifi",
+   "prompt": "ابحث عن الشبكات الخطرة.",
+   "artifact": {
+    "kind": "wifi",
+    "networks": [
+     {
+      "ssid": [
+       {
+        "text": "Lumera_Guest"
+       }
+      ],
+      "secured": true,
+      "signal": 3
+     },
+     {
+      "ssid": [
+       {
+        "text": "Lumera_Guest_FREE",
+        "spot": "twin"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Lumera_Lobby_Free_WiFi",
+        "spot": "open-lookalike"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Forum2026_Free",
+        "spot": "conf-open"
+       }
+      ],
+      "secured": false,
+      "signal": 3
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "twin",
+     "label": "شبكة «التوأم الشرير»",
+     "explain": "تنسخ اسم شبكة الفندق الحقيقية، لكنها بلا كلمة مرور. المهاجمون ينشئون شبكات توأم كهذه."
+    },
+    {
+     "id": "open-lookalike",
+     "label": "شبكة مجانية في بهو الفندق",
+     "explain": "وجود اسم الفندق فيها لا يثبت شيئًا. اسأل موظفي الاستقبال عن الاسم الدقيق."
+    },
+    {
+     "id": "conf-open",
+     "label": "شبكة مؤتمر مفتوحة",
+     "explain": "البيانات على الشبكة المفتوحة غير مشفرة. إذا اضطررت إلى الاتصال، فاستخدم بيانات جوالك عبر نقطة اتصال شخصية بدلًا منها."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "swipe",
+   "id": "on-the-road",
+   "prompt": "في الطريق: آمن أم فخ؟",
+   "cards": [
+    {
+     "id": "conf-qr",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "امسح الرمز لتنزيل مواد المنتدى"
+       }
+      ],
+      "destination": [
+       {
+        "text": "forum2026-materials.example.net/app.apk"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "ملف .apk يثبت تطبيقًا على جوالك. لا تحتاج إلى تطبيق لعرض الشرائح، تحقق من الموقع الرسمي."
+    },
+    {
+     "id": "booking-ok",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "فندق Lumera"
+        }
+       ],
+       "address": [
+        {
+         "text": "reservations@lumera-hotel.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "تم تأكيد حجزك"
+       }
+      ],
+      "time": "18:22",
+      "body": [
+       [
+        {
+         "text": "تسجيل الوصول بعد الساعة 14:00. والدفع يتم في مكتب الاستقبال."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "نطاق الفندق نفسه، ولا رابط، ولا طلب دفع. تأكيد عادي."
+    },
+    {
+     "id": "booking-scam",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "فندق Lumera"
+        }
+       ],
+       "address": [
+        {
+         "text": "billing@lumera-hotels-pay.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "سيتم إلغاء حجزك"
+       }
+      ],
+      "time": "23:51",
+      "body": [
+       [
+        {
+         "text": "أكد بيانات بطاقتك خلال ساعتين:"
+        }
+       ],
+       [
+        {
+         "text": "lumera-hotels-pay.example.info/card"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "نطاق مختلف وطلب دفع عاجل. اتصل بالفندق بنفسك لتتحقق من الحجز."
+    },
+    {
+     "id": "room-info",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "فندق Lumera"
+       }
+      ],
+      "time": "15:03",
+      "messages": [
+       [
+        {
+         "text": "أهلًا بك! الإفطار من 07:00 إلى 10:30 في الطابق الأرضي."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "لا رابط ولا طلب، مجرد معلومة."
+    },
+    {
+     "id": "passport-chat",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "اللجنة المنظمة للمنتدى"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "عزيزي المشارك، لإكمال التسجيل أرسل هنا صورة جواز سفرك ورقم غرفتك."
+         }
+        ],
+        "time": "08:10"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "تجمع بيانات الجوازات في صفحة التسجيل الرسمية، لا في محادثة مجهولة. ورقم الغرفة يكشف مكان وجودك."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "conference",
+   "title": "في المؤتمر",
+   "start": "coffee",
+   "nodes": [
+    {
+     "id": "coffee",
+     "text": "كانت كلمتك رائعة! هل يمكنك نسخ الشرائح على ذاكرة USB هذه؟",
+     "speaker": "أحد المشاركين (استراحة القهوة)",
+     "voice": "young-man",
+     "channel": "in-person",
+     "spoken": "كانت كلمتك رائعة! <breath> هل يمكنك نسخ الشرائح على ذاكرة USB هذه؟",
+     "choices": [
+      {
+       "label": "أعتذر بلطف وأعرض إرسالها عبر القنوات الرسمية",
+       "next": "lobby",
+       "feedback": "اختيار جيد. ذاكرة الغريب لا تلمس حاسوبك أبدًا."
+      },
+      {
+       "label": "أوصل الذاكرة بحاسوبي",
+       "outcome": "compromised",
+       "feedback": "ذاكرة الغريب قد تحمل برمجيات ضارة. أصبح حاسوبك وبيانات العمل في خطر الآن."
+      }
+     ]
+    },
+    {
+     "id": "lobby",
+     "text": "في المساء يقترب منك مرة أخرى في بهو الفندق، ويسألك عن خطط جهتك للعام القادم.",
+     "choices": [
+      {
+       "label": "أتحدث فقط عما هو معلن بالفعل",
+       "next": "room",
+       "feedback": "صحيح. الحديث اللطيف قد يكون أيضًا وسيلة لجمع المعلومات."
+      },
+      {
+       "label": "أشارك التفاصيل، فهي ليست سرية إلى هذا الحد",
+       "outcome": "risky",
+       "feedback": "التفاصيل الصغيرة تكون معًا صورة كبيرة. احتفظ لنفسك بكل ما ليس معلنًا."
+      }
+     ]
+    },
+    {
+     "id": "room",
+     "text": "ستخرج لتناول العشاء. أين يبقى الحاسوب المحمول؟",
+     "choices": [
+      {
+       "label": "آخذه معي، أو أطفئه وأقفل عليه في الخزنة",
+       "outcome": "safe",
+       "feedback": "أحسنت. الجهاز المطفأ والمشفر والذي تحت سيطرتك هو الأفضل حماية."
+      },
+      {
+       "label": "على المكتب، فالشاشة مقفلة",
+       "outcome": "risky",
+       "feedback": "قفل الشاشة يساعد، لكن أي شخص يدخل الغرفة يستطيع العبث بالجهاز."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "سافر بأقل قدر من البيانات، واطلب فحص الجهاز عند عودتك.",
+    "شغل الشبكة الافتراضية الخاصة (VPN) على الشبكات غير المعروفة، واستخدم شاحنك الخاص في الأماكن العامة.",
+    "لا تترك أجهزتك دون رقابة أبدًا، ولا توصل بها ذاكرة USB لشخص غريب."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

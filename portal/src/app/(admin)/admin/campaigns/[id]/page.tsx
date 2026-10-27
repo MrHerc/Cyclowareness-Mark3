@@ -49,7 +49,7 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
           .limit(1)
       : [];
   const blocked = last?.action === "campaign.launch_blocked" ? last : undefined;
-  const blockedReason = blocked && ["mail", "sms", "voice", "empty"].includes(String(blocked.meta?.reason)) ? (String(blocked.meta?.reason) as "mail") : null;
+  const blockedReason = blocked && ["mail", "sms", "voice", "empty", "plan"].includes(String(blocked.meta?.reason)) ? (String(blocked.meta?.reason) as "mail") : null;
   const s = stats.get(c.id) ?? { sent: 0, opened: 0, clicked: 0, submitted: 0, reported: 0 };
   const pct = (n: number) => (s.sent ? Math.round((n / s.sent) * 100) : 0);
   const mark = (d: Date | null, tone: "risk" | "safe" | "brand") =>
@@ -135,8 +135,8 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
               <table className="w-full min-w-[40rem] text-body-sm">
                 <thead className="text-tab text-ink-subtle">
                   <tr className="border-b border-line">
-                    <th className="py-2.5 pr-3 text-left font-semibold">{tr("col.person")}</th>
-                    <th className="px-3 py-2.5 text-left font-semibold">{tr("col.department")}</th>
+                    <th className="py-2.5 pe-3 text-start font-semibold">{tr("col.person")}</th>
+                    <th className="px-3 py-2.5 text-start font-semibold">{tr("col.department")}</th>
                     <th className="px-3 py-2.5 font-semibold">{tr("col.opened")}</th>
                     <th className="px-3 py-2.5 font-semibold">{tr("col.clicked")}</th>
                     <th className="px-3 py-2.5 font-semibold">{tr("col.reported")}</th>
@@ -145,7 +145,7 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
                 <tbody>
                   {recipients.map(({ r, name, avatar, department }) => (
                     <tr key={r.id} className="border-b border-line last:border-0">
-                      <td className="py-2.5 pr-3">
+                      <td className="py-2.5 pe-3">
                         <span className="flex items-center gap-2">
                           <Avatar name={name} src={avatar} size="xs" />
                           {name}

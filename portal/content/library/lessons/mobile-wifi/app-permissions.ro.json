@@ -1,0 +1,439 @@
+{
+ "id": "app-permissions",
+ "title": "Permisiunile aplicațiilor",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "a-tutor",
+   "beats": [
+    {
+     "id": "a-b1",
+     "say": "Telefonul dumneavoastră păstrează e-mailul de serviciu, mesajele și aplicația băncii. Când instalați o aplicație, verificați ce îi permiteți.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "a-b3",
+     "say": "De ce ar avea nevoie o lanternă să vă citească mesajele? Cu această permisiune, poate vedea și codurile trimise de bancă.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "fener-pro",
+       "app": "Torch Pro",
+       "permissions": [
+        { "label": [ { "text": "Lanternă" } ], "needed": true },
+        { "label": [ { "text": "Contacte", "spot": "contacts" } ], "needed": false },
+        { "label": [ { "text": "Mesaje SMS", "spot": "sms" } ], "needed": false },
+        { "label": [ { "text": "Locație exactă", "spot": "location" } ], "needed": false }
+       ]
+      }
+     },
+     "highlight": "sms",
+     "checkpoint": {
+      "prompt": "Aplicația Calculator vă cere acces la contacte. Ce faceți?",
+      "options": [
+       {
+        "id": "allow",
+        "label": "Permit accesul",
+        "correct": false,
+        "feedback": "O aplicație Calculator nu are nevoie de contacte. Poate fi o încercare de a vă colecta datele."
+       },
+       {
+        "id": "deny",
+        "label": "Refuz și șterg aplicația",
+        "correct": true,
+        "feedback": "Corect. Dacă o aplicație cere un acces de care nu are nevoie, este mai bine să o ștergeți."
+       }
+      ]
+     }
+    },
+    {
+     "id": "a-b4",
+     "say": "Accesibilitatea este cea mai puternică permisiune: citește ecranul și atinge butoanele în locul dumneavoastră. Acordați-o doar aplicațiilor în care aveți deplină încredere.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "a-b5",
+     "say": "Regula este simplă: permisiunea trebuie să se potrivească rolului aplicației. Aplicația de hărți are nevoie de locație, calculatorul nu.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "app-install",
+   "environment": "phone",
+   "title": "Un editor gratuit",
+   "intro": "Doriți un editor foto. Urmăriți ce vă arată telefonul și decideți la fiecare pas.",
+   "steps": [
+    {
+     "id": "offer",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [ { "text": "Grup de oferte" } ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         { "text": "FotoRedaktor Plus Pro este cu plată în magazin, dar aici îl descărcați gratis:" },
+         {
+          "text": "fotoredaktor-pro.test/app.apk",
+          "link": {
+           "label": "fotoredaktor-pro.test/app.apk",
+           "href": "https://fotoredaktor-pro.test/app.apk"
+          }
+         }
+        ],
+        "time": "13:05"
+       }
+      ]
+     },
+     "say": "Cineva a partajat într-un grup fișierul unei aplicații gratuite.",
+     "actions": [
+      {
+       "id": "download",
+       "label": "Descărcați fișierul",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "O aplicație cu plată oferită gratuit este o momeală cunoscută. Astfel de fișiere ascund adesea malware."
+      },
+      {
+       "id": "block",
+       "label": "Blocați și raportați",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Corect. Instalați aplicații numai din magazinul oficial al telefonului.",
+       "next": "store-app"
+      }
+     ]
+    },
+    {
+     "id": "unknown-source",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [ { "text": "Sursă necunoscută" } ],
+      "body": [
+       [
+        { "text": "Pentru securitatea dumneavoastră, telefonul nu permite instalarea aplicațiilor necunoscute din această sursă." }
+       ]
+      ],
+      "buttons": [
+       "Setări",
+       "Anulați"
+      ]
+     },
+     "actions": [
+      {
+       "id": "settings",
+       "label": "Permiteți din Setări",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Această protecție există tocmai pentru astfel de fișiere. Dacă o dezactivați, telefonul rămâne expus aplicațiilor rău intenționate."
+      },
+      {
+       "id": "cancel",
+       "label": "Anulați",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Instalarea din surse necunoscute trebuie să rămână dezactivată."
+      }
+     ]
+    },
+    {
+     "id": "fake-apk",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "fotoredaktor-plus-fake",
+      "name": [ { "text": "FotoRedaktor_Plus_Pro.apk" } ],
+      "type": "apk",
+      "size": "18 MB",
+      "source": [ { "text": "Telegram: Grup de oferte" } ]
+     },
+     "say": "Pictograma pare cunoscută. Citiți numele cu atenție.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Instalați",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Este o clonă a aplicației din magazin: numele diferă printr-un singur spațiu. Poate citi codurile primite prin SMS."
+      },
+      {
+       "id": "cancel",
+       "label": "Anulați",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Nu instalați un fișier .apk primit într-un mesaj; căutați aplicația în magazinul oficial."
+      }
+     ]
+    },
+    {
+     "id": "store-app",
+     "label": "Instalată din magazinul oficial",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "fotoredaktor-plus",
+      "app": "Foto Redaktor Plus",
+      "permissions": [
+       { "label": [ { "text": "Fotografii și videoclipuri" } ], "needed": true },
+       { "label": [ { "text": "Contacte" } ], "needed": false },
+       { "label": [ { "text": "Mesaje SMS" } ], "needed": false }
+      ]
+     },
+     "say": "Chiar și aplicația din magazin cere prea mult.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Permiteți",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Un editor foto nu are nevoie de contacte sau de SMS-uri. Accesul la SMS-uri îi permite aplicației să citească codurile trimise de bancă."
+      },
+      {
+       "id": "deny",
+       "label": "Nu permiteți",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Acordați doar ce cere funcția respectivă: aici, doar accesul la fotografii."
+      }
+     ]
+    },
+    {
+     "id": "fake-antivirus",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "qoruyucu-fake",
+      "app": "Qoruyucu Antivirus",
+      "permissions": [
+       { "label": [ { "text": "Accesibilitate: controlul ecranului" } ], "needed": false }
+      ]
+     },
+     "say": "Un antivirus vrea să vă controleze ecranul.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Permiteți",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Cu această permisiune, aplicația citește ecranul și atinge butoanele în locul dumneavoastră. Exact asta cer troienii bancari."
+      },
+      {
+       "id": "deny",
+       "label": "Nu permiteți",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Ștergeți și raportați aplicația care cere controlul ecranului sub pretextul unui antivirus."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "a-hotspot",
+   "prompt": "Găsiți permisiunile de care această aplicație nu are nevoie.",
+   "artifact": {
+    "kind": "permission",
+    "brandRef": "fotoredaktor-plus",
+    "app": "Photo Editor Plus",
+    "permissions": [
+     {
+      "label": [ { "text": "Fotografii și videoclipuri", "reveal": "Citește fotografiile și videoclipurile stocate pe acest telefon" } ],
+      "needed": true
+     },
+     {
+      "label": [ { "text": "Cameră", "reveal": "Face fotografii și înregistrează videoclipuri" } ],
+      "needed": true
+     },
+     {
+      "label": [ { "text": "Contacte", "spot": "contacts", "reveal": "Citește lista de contacte: nume, numere de telefon, adrese de e-mail" } ],
+      "needed": false
+     },
+     {
+      "label": [ { "text": "Trimiterea și citirea SMS-urilor", "spot": "sms", "reveal": "Citește toate SMS-urile de pe telefon și trimite altele noi" } ],
+      "needed": false
+     },
+     {
+      "label": [ { "text": "Accesibilitate: controlul ecranului", "spot": "accessibility", "reveal": "Vede tot ce apare pe ecran și atinge butoanele în locul dumneavoastră în alte aplicații" } ],
+      "needed": false
+     },
+     {
+      "label": [ { "text": "Istoricul apelurilor", "spot": "call-log", "reveal": "Citește lista apelurilor: cu cine, când și cât timp ați vorbit" } ],
+      "needed": false
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "contacts",
+     "label": "Contacte",
+     "explain": "Pentru editarea fotografiilor nu este nevoie de contactele dumneavoastră."
+    },
+    {
+     "id": "sms",
+     "label": "Acces la SMS-uri",
+     "explain": "Cu acces la SMS-uri, o aplicație poate citi codurile de la bancă și codurile de conectare."
+    },
+    {
+     "id": "accessibility",
+     "label": "Controlul ecranului",
+     "explain": "Astfel, aplicația poate citi ecranul și atinge butoanele în locul dumneavoastră. Exact asta cer aplicațiile rău intenționate."
+    },
+    {
+     "id": "call-log",
+     "label": "Istoricul apelurilor",
+     "explain": "Un editor foto nu are de ce să știe pe cine sunați."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "a-swipe",
+   "prompt": "Sigur sau capcană?",
+   "cards": [
+    {
+     "id": "bank-apk",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank-fake",
+      "sender": [ { "text": "+994 55 000 11 22" } ],
+      "time": "13:02",
+      "messages": [
+       [
+        { "text": "SahilBank are o aplicație nouă. Descărcați-o de aici: " },
+        { "text": "sahilbank-app.test/SahilBank.apk" }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Aplicația unei bănci se găsește în magazinul oficial. Un fișier de instalare trimis prin link poate fi periculos."
+    },
+    {
+     "id": "map-location",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "xerite-app",
+      "app": "Hărți",
+      "permissions": [
+       { "label": [ { "text": "Locație (doar când folosiți aplicația)" } ], "needed": true }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "O hartă are nevoie de locație ca să vă ghideze. Permisiunea acordată doar cât timp folosiți aplicația este o alegere bună."
+    },
+    {
+     "id": "torch-mic",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "fener-pro",
+      "app": "Lanternă",
+      "permissions": [
+       { "label": [ { "text": "Contacte" } ], "needed": false },
+       { "label": [ { "text": "Microfon" } ], "needed": false }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O lanternă nu are nevoie nici de contacte, nici de microfon."
+    },
+    {
+     "id": "video-call",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "videozeng-app",
+      "app": "Apel video",
+      "permissions": [
+       { "label": [ { "text": "Cameră" } ], "needed": true },
+       { "label": [ { "text": "Microfon" } ], "needed": true }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Un apel video chiar are nevoie de cameră și de microfon."
+    },
+    {
+     "id": "discount-apk",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [ { "text": "Canal de reduceri" } ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         { "text": "Instalați aplicația de reduceri din acest fișier. Permiteți sursele necunoscute din setări." }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Permiterea surselor necunoscute slăbește protecția telefonului. Nu vă încredeți într-un mesaj care vă cere asta."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "a-choice-store",
+   "question": {
+    "prompt": "De unde puteți instala aplicații în siguranță?",
+    "options": [
+     {
+      "id": "official-store",
+      "label": "Din magazinul oficial de aplicații al telefonului",
+      "correct": true,
+      "feedback": "Corect. Magazinul oficial verifică aplicațiile și reduce mult riscul."
+     },
+     {
+      "id": "sms-link",
+      "label": "Dintr-un link primit într-un mesaj",
+      "correct": false,
+      "feedback": "Un link dintr-un mesaj poate duce la o aplicație falsă."
+     },
+     {
+      "id": "cracked",
+      "label": "Dintr-o versiune piratată gratuită de pe un forum",
+      "correct": false,
+      "feedback": "Versiunile piratate conțin adesea malware."
+     },
+     {
+      "id": "work-portal",
+      "label": "Din catalogul de aplicații aprobat de organizația dumneavoastră",
+      "correct": true,
+      "feedback": "Corect. Un catalog gestionat de organizația dumneavoastră este tot o sursă oficială."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Un magazin oficial nu este o garanție deplină, dar reduce mult riscul. Uitați-vă și la recenzii, și la permisiuni."
+  },
+  {
+   "type": "recap",
+   "id": "a-recap",
+   "points": [
+    "Instalați aplicații numai din magazinul oficial",
+    "Permisiunea trebuie să se potrivească rolului aplicației",
+    "Acordați o atenție deosebită accesului la SMS-uri și la accesibilitate"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

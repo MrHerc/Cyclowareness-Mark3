@@ -1,0 +1,431 @@
+{
+ "id": "selling-safely",
+ "title": "Când vindeți",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ss-tutor",
+   "beats": [
+    {
+     "id": "ss-b1",
+     "say": "Acum dumneavoastră sunteți vânzătorul. Vindeți un cărucior vechi pentru copii pe un site de anunțuri, cu 260 de manați.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "ss-b2",
+     "say": "Cumpărătoarea vă scrie că a plătit deja și vă roagă să deschideți acest link ca să primiți banii.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Rena (cumpărătoare)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Bună ziua, iau căruciorul! Am plătit deja prin AlSat Tranzacție sigură."
+          }
+         ],
+         "time": "19:40"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Ca să primiți banii, confirmați-vă cardul aici: "
+          },
+          {
+           "text": "alsat-odenis.example.net/qebul",
+           "spot": "link",
+           "link": {
+            "label": "alsat-odenis.example.net/qebul",
+            "href": "https://alsat-odenis.example.net/qebul"
+           }
+          }
+         ],
+         "time": "19:41"
+        }
+       ]
+      }
+     },
+     "highlight": "link"
+    },
+    {
+     "id": "ss-b3",
+     "say": "Ca să primiți bani, este nevoie doar de numărul cardului. Cele trei cifre de pe spate și codul din SMS nu sunt necesare niciodată.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "ss-b4",
+     "say": "Dacă primiți un astfel de link, nu introduceți nimic. Vorbiți cu cumpărătorul doar prin mesajele site-ului.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ss-hotspot",
+   "prompt": "Găsiți semnalele de alarmă de pe această pagină.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2e-alsat-fake",
+    "tone": "app",
+    "title": [
+     {
+      "text": "AlSat Tranzacție sigură"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Pagina: "
+      },
+      {
+       "text": "alsat-odenis.example.net/qebul",
+       "spot": "domain"
+      }
+     ],
+     [
+      {
+       "text": "Cumpărătorul a plătit 260,00 AZN. Confirmați-vă cardul ca să primiți banii."
+      }
+     ],
+     [
+      {
+       "text": "Introduceți numărul cardului, data expirării și codul CVV",
+       "spot": "cvv"
+      }
+     ],
+     [
+      {
+       "text": "Introduceți codul primit prin SMS de la bancă",
+       "spot": "otp"
+      }
+     ],
+     [
+      {
+       "text": "Tranzacția va fi anulată în 15 minute",
+       "spot": "timer"
+      }
+     ]
+    ],
+    "buttons": [
+     "Anulați",
+     "Primiți banii"
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Adresă ciudată",
+     "explain": "Aceasta nu este adresa site-ului de anunțuri. Un nume cunoscut a fost adăugat la un alt domeniu."
+    },
+    {
+     "id": "cvv",
+     "label": "Codul de pe spatele cardului",
+     "explain": "Acest cod servește la scoaterea banilor de pe card. Pentru a primi bani nu este necesar niciodată."
+    },
+    {
+     "id": "otp",
+     "label": "Codul din SMS",
+     "explain": "Codul din SMS confirmă o plată. Dacă îl introduceți, banii pleacă de pe cardul dumneavoastră."
+    },
+    {
+     "id": "timer",
+     "label": "Presiune",
+     "explain": "Numărătoarea inversă există ca să nu vă lase să vă gândiți. Un site real nu grăbește vânzătorul."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "ss-sim",
+   "environment": "browser",
+   "title": "Linkul cumpărătorului",
+   "intro": "Ați deschis linkul trimis de cumpărător. În browser, alegeți varianta corectă la fiecare pas.",
+   "steps": [
+    {
+     "id": "landing",
+     "label": "Vă așteaptă o plată: 260,00 AZN",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2e-alsat-fake",
+      "url": [
+       {
+        "text": "https://alsat-odenis.example.net/qebul",
+        "reveal": "alsat-odenis.example.net"
+       }
+      ]
+     },
+     "say": "Uitați-vă la bara de adrese.",
+     "actions": [
+      {
+       "id": "receive",
+       "label": "Primiți banii",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Acest buton nu vă trimite bani, ci deschide un formular care vă cere datele cardului. Adresa nu este cea a site-ului de anunțuri."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Adresa era ciudată, așa că nu introduceți nimic pe acea pagină.",
+       "next": "real-site"
+      },
+      {
+       "id": "own",
+       "label": "Deschid eu site-ul",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Când deschideți chiar dumneavoastră site-ul, nu ajungeți pe o pagină falsă.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "card-form",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2e-alsat-fake",
+      "brand": "AlSat Plăți",
+      "url": [
+       {
+        "text": "https://alsat-odenis.example.net/kart",
+        "reveal": "alsat-odenis.example.net"
+       }
+      ],
+      "fields": [
+       "Numărul cardului",
+       "Data expirării",
+       "CVV"
+      ],
+      "button": "Confirmați"
+     },
+     "say": "Formularul cere și codul de pe spatele cardului.",
+     "actions": [
+      {
+       "id": "enter",
+       "label": "Confirmați",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Cu aceste date, escrocul poate plăti cu cardul dumneavoastră. Codul acesta nu este necesar ca să primiți bani."
+      },
+      {
+       "id": "cancel",
+       "label": "Anulați",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. O pagină care vă cere codul de pe spatele cardului nu vă dă bani, ci vi-i ia.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "sms-code",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2e-alsat-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Introduceți codul din SMS"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Banca dumneavoastră a trimis un cod din 6 cifre."
+        }
+       ],
+       [
+        {
+         "text": "Nu vă îngrijorați dacă în SMS scrie „plată”: este o operațiune de încasare."
+        }
+       ]
+      ],
+      "buttons": [
+       "Anulați",
+       "Confirmați codul"
+      ]
+     },
+     "say": "În mesajul băncii scrie „plată”, dar pagina vorbește despre încasare.",
+     "actions": [
+      {
+       "id": "confirm",
+       "label": "Confirmați codul",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Codul a aprobat o plată, iar banii au plecat de pe card. Sunați imediat la bancă."
+      },
+      {
+       "id": "stop",
+       "label": "Anulați",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Codul din SMS este pentru plăți, așa că nu îl introduceți niciodată pe o pagină și nu îl dați nimănui."
+      }
+     ]
+    },
+    {
+     "id": "real-site",
+     "label": "AlSat: mesaje cu cumpărătorul",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2e-alsat",
+      "url": [
+       {
+        "text": "https://alsat.example/mesajlar",
+        "reveal": "alsat.example"
+       }
+      ]
+     },
+     "say": "Acesta este chiar site-ul de anunțuri.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați cumpărătorul",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Site-ul va închide contul fraudulos și îi va proteja pe ceilalți vânzători."
+      },
+      {
+       "id": "cash",
+       "label": "Scrieți-i cumpărătorului: numerar, la întâlnire",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bine. Să vă întâlniți și să primiți numerar este cea mai simplă și mai sigură variantă."
+      },
+      {
+       "id": "photo",
+       "label": "Trimiteți o fotografie cu cardul, față-verso",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Fotografia arată și codul de pe spate. Asta înseamnă să îi dați escrocului cardul."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ss-choice",
+   "question": {
+    "prompt": "Cumpărătorul vrea să vă transfere banii pe card. Ce este suficient să îi dați?",
+    "options": [
+     {
+      "id": "number",
+      "label": "Doar numărul cardului sau numărul contului",
+      "correct": true,
+      "feedback": "Corect. Pentru a primi bani nu este nevoie de nimic altceva."
+     },
+     {
+      "id": "cvv",
+      "label": "Numărul cardului, data expirării și codul de pe spate",
+      "correct": false,
+      "feedback": "Cu aceste date, cineva poate plăti cu cardul dumneavoastră. Nu dați niciodată codul de pe spate."
+     },
+     {
+      "id": "otp",
+      "label": "Codul primit prin SMS de la bancă",
+      "correct": false,
+      "feedback": "Codul din SMS servește la scoaterea banilor. Un cumpărător care vi-l cere este un escroc."
+     },
+     {
+      "id": "photo",
+      "label": "O fotografie cu cardul, față-verso",
+      "correct": false,
+      "feedback": "Fotografia conține totul, inclusiv codul de pe spate. Este ca și cum ați preda cardul."
+     }
+    ]
+   },
+   "explain": "Pentru a primi bani nu este nevoie niciodată de codul de pe spatele cardului sau de codul din SMS. Cine vi le cere este un escroc."
+  },
+  {
+   "type": "scenario",
+   "id": "ss-scenario",
+   "title": "Ați introdus codul",
+   "start": "charged",
+   "nodes": [
+    {
+     "id": "charged",
+     "text": "În grabă, ați introdus datele cardului și codul din SMS. Un minut mai târziu, banca vă anunță prin SMS: de pe card au fost retrași 389 de manați.",
+     "choices": [
+      {
+       "label": "Sun imediat la bancă, la numărul de pe card, și blochez cardul",
+       "next": "bank",
+       "feedback": "Corect. Blocarea rapidă a cardului oprește alte plăți."
+      },
+      {
+       "label": "Îi scriu cumpărătorului și îi cer banii înapoi",
+       "outcome": "risky",
+       "feedback": "Escrocul nu vă va da banii înapoi, iar timpul trece. Sunați mai întâi la bancă."
+      },
+      {
+       "label": "Mi-e rușine și nu spun nimănui",
+       "outcome": "compromised",
+       "feedback": "Tăcerea îi dă timp escrocului. Băncile și poliția se ocupă zilnic de astfel de cazuri."
+      }
+     ]
+    },
+    {
+     "id": "bank",
+     "text": "Cardul dumneavoastră a fost blocat. Ce altceva doriți să faceți?",
+     "speaker": "Gulnar (operatoare bancară)",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Cardul dumneavoastră a fost blocat. <breath> Ce altceva doriți să faceți?",
+     "choices": [
+      {
+       "label": "Salvez capturile de ecran și raportez la poliție și pe site-ul de anunțuri",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Dovezile ajută poliția, iar site-ul închide contul fraudulos."
+      },
+      {
+       "label": "Șterg conversația ca să uit totul",
+       "outcome": "risky",
+       "feedback": "Conversația este o dovadă. Nu o ștergeți, arătați-o poliției."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "ss-recap",
+   "points": [
+    "Pentru a primi bani nu este nevoie niciodată de codul de pe spatele cardului sau de codul din SMS.",
+    "Nu introduceți nimic într-un link de plată trimis de un cumpărător.",
+    "Dacă ați introdus un cod, sunați imediat la bancă, la numărul de pe card."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

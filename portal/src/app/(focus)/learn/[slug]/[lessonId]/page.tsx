@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { db, t } from "@/server/db";
 import { allowed, requireViewer } from "@/server/auth/viewer";
 import { getCatalog } from "@/server/queries/catalog";
+import { loadNarrationClips } from "@/server/narration";
 import { LessonPlayer } from "@/components/player/player";
 import type { Brand, Scene } from "@/lib/content/types";
 import { pickLessonContent } from "@/lib/content/lesson-locale";
@@ -59,6 +60,8 @@ export default async function LessonPage({ params }: PageProps<"/learn/[slug]/[l
   const settings = v.tenant.settings;
   const timed = settings.learning.timeLimits && m.difficulty !== "Easy" && v.user.timerPref !== "off";
   const timeLimitSeconds = timed ? (v.user.timerPref === "more" ? 60 : 30) : null;
+  // Studio modules have no generated clips, even one that reuses a library slug.
+  const clips = m.origin === "library" ? loadNarrationClips(`${m.slug}/${lesson.key}`, fallback.locale) : null;
 
   return (
     <LessonPlayer
@@ -68,6 +71,7 @@ export default async function LessonPage({ params }: PageProps<"/learn/[slug]/[l
       topic={CATEGORY_TOPIC[m.category]}
       lesson={{ key: lesson.key, title: lesson.title, minutes: lesson.minutes, scenes }}
       contentLocale={fallback.locale}
+      clips={clips}
       completedBefore={lesson.completed}
       next={next ? { key: next.key, title: next.title } : null}
       brands={brandsFor(scenes)}

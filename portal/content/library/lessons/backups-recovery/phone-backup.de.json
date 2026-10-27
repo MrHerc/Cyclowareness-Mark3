@@ -1,0 +1,478 @@
+{
+ "id": "phone-backup",
+ "title": "Smartphone-Backup",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "br2-tutor",
+   "beats": [
+    {
+     "id": "br2-b1",
+     "say": "Wenn ein Smartphone verloren geht, sind die Familienfotos oft der größte Verlust. Um sie zu schützen, genügen wenige Minuten.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "br2-b2",
+     "say": "Wenn Sie eine solche Benachrichtigung gesehen haben, gibt es von den Fotos der letzten Monate keine Kopie.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2f-telefon-ayarlari",
+       "app": "Einstellungen",
+       "title": [
+        {
+         "text": "Backup ist ausgeschaltet"
+        }
+       ],
+       "body": [
+        {
+         "text": "Letztes Backup: vor 143 Tagen",
+         "spot": "days"
+        }
+       ],
+       "time": "21:10"
+      }
+     },
+     "highlight": "days"
+    },
+    {
+     "id": "br2-b3",
+     "say": "Aber Vorsicht: Eine Nachricht, Ihr Speicher sei voll und Ihre Fotos würden gelöscht, ist eine beliebte Betrugsmasche.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "buludxidmet-fake",
+       "sender": [
+        {
+         "text": "BuludXidmət"
+        }
+       ],
+       "time": "10:02",
+       "messages": [
+        [
+         {
+          "text": "Ihr Speicher ist voll. Ihre Fotos werden in 24 Stunden gelöscht."
+         }
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "id": "br2-b4",
+     "say": "Aktivieren Sie das Backup direkt in den Einstellungen des Smartphones und stellen Sie dann zur Probe ein Foto wieder her.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "br2-order",
+   "prompt": "Richten Sie ein Backup auf Ihrem Smartphone ein. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "turn-on",
+     "label": "Automatisches Backup in den Einstellungen aktivieren"
+    },
+    {
+     "id": "first-run",
+     "label": "Mit WLAN und Ladegerät verbinden und das erste Backup abwarten"
+    },
+    {
+     "id": "check-date",
+     "label": "Prüfen, ob das letzte Backup von heute ist"
+    },
+    {
+     "id": "test-restore",
+     "label": "Zum Test der Wiederherstellung ein Foto auf einem anderen Gerät öffnen"
+    }
+   ],
+   "explain": "Ein Backup hilft nur, wenn es funktioniert. Prüfen Sie deshalb das Datum und stellen Sie ein Foto wieder her. Schützen Sie auch das Cloud-Konto mit Zwei-Faktor-Authentisierung."
+  },
+  {
+   "type": "hotspot",
+   "id": "br2-hotspot",
+   "prompt": "Finden Sie die Warnsignale in dieser Nachricht.",
+   "artifact": {
+    "kind": "sms",
+    "brandRef": "buludxidmet-fake",
+    "sender": [
+     {
+      "text": "BuludXidmət"
+     }
+    ],
+    "time": "10:02",
+    "messages": [
+     [
+      {
+       "text": "Ihr Speicher ist zu 100 % voll.",
+       "spot": "full"
+      }
+     ],
+     [
+      {
+       "text": "Alle Ihre Fotos werden innerhalb von 24 Stunden gelöscht.",
+       "spot": "deadline"
+      }
+     ],
+     [
+      {
+       "text": "Erweitern Sie Ihren Tarif für nur 1,99 AZN: ",
+       "spot": "small-fee"
+      },
+      {
+       "text": "buludxidmet-plan.example.info",
+       "spot": "link"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "full",
+     "label": "Speicher voll",
+     "explain": "Wenn der Speicher voll ist, werden keine neuen Backups mehr erstellt, aber alte Fotos werden nicht sofort gelöscht. Prüfen Sie den Speicher selbst in den Einstellungen des Smartphones."
+    },
+    {
+     "id": "deadline",
+     "label": "Frist",
+     "explain": "Angst und eine Frist sollen Sie dazu bringen, ohne nachzudenken zu zahlen."
+    },
+    {
+     "id": "small-fee",
+     "label": "Kleiner Betrag",
+     "explain": "Ein kleiner Betrag lässt Sie unvorsichtig werden. Das eigentliche Ziel sind Ihre Kartendaten."
+    },
+    {
+     "id": "link",
+     "label": "Seltsame Domain",
+     "explain": "Das ist nicht die Domain des Cloud-Dienstes. Ändern Sie Ihren Tarif nur in den Einstellungen des Smartphones."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "br2-sim",
+   "environment": "phone",
+   "title": "Wo sind Ihre Fotos?",
+   "intro": "Auf Ihrem Smartphone sind einige Benachrichtigungen eingegangen. Wählen Sie bei jeder den Schritt, der Ihre Fotos schützt.",
+   "steps": [
+    {
+     "id": "backup-off",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-telefon-ayarlari",
+      "app": "Einstellungen",
+      "title": [
+       {
+        "text": "Backup ist ausgeschaltet"
+       }
+      ],
+      "body": [
+       {
+        "text": "Letztes Backup: vor 143 Tagen. Jetzt aktivieren?"
+       }
+      ],
+      "time": "21:10"
+     },
+     "actions": [
+      {
+       "id": "turn-on",
+       "label": "Backup aktivieren",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Ab jetzt werden die Fotos jede Nacht automatisch kopiert."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Wenn das Smartphone heute verloren geht, sind die Fotos von fünf Monaten mit weg. Aktivieren Sie das Backup jetzt."
+      }
+     ]
+    },
+    {
+     "id": "storage-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "buludxidmet-fake",
+      "sender": [
+       {
+        "text": "BuludXidmət"
+       }
+      ],
+      "time": "10:02",
+      "messages": [
+       [
+        {
+         "text": "Ihr Speicher ist voll. Ihre Fotos werden in 24 Stunden gelöscht. Erweitern Sie Ihren Tarif: "
+        },
+        {
+         "text": "buludxidmet-plan.example.info",
+         "link": {
+          "label": "buludxidmet-plan.example.info",
+          "href": "https://buludxidmet-plan.example.info/odenis"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Am Morgen kommt eine solche Nachricht.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Der Link führt nicht zur Website des Cloud-Dienstes. Prüfen Sie den Speicher nur in den Einstellungen des Smartphones.",
+       "next": "card-page"
+      },
+      {
+       "id": "report",
+       "label": "Als Spam melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Das ist eine Fälschung: Ein echter Dienst droht nicht damit, Ihre Fotos innerhalb eines Tages zu löschen.",
+       "next": "free-app"
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Richtig. Prüfen Sie Ihren Speicher selbst in den Einstellungen.",
+       "next": "free-app"
+      }
+     ]
+    },
+    {
+     "id": "card-page",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "buludxidmet-fake",
+      "brand": "BuludXidmət",
+      "url": [
+       {
+        "text": "https://buludxidmet-plan.example.info/odenis"
+       }
+      ],
+      "fields": [
+       "Kartennummer",
+       "Ablaufdatum",
+       "CVV"
+      ],
+      "button": "1,99 AZN bezahlen"
+     },
+     "actions": [
+      {
+       "id": "pay",
+       "label": "1,99 AZN bezahlen",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Ihre Kartendaten sind bei den Kriminellen gelandet. Rufen Sie sofort die Bank unter der Nummer auf der Kartenrückseite an und lassen Sie die Karte sperren."
+      },
+      {
+       "id": "close",
+       "label": "Seite schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Gut, dass Sie abgebrochen haben. Prüfen Sie Ihren Speichertarif nur in den Einstellungen des Smartphones."
+      }
+     ]
+    },
+    {
+     "id": "free-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2f-foto-ehtiyat",
+      "app": "Foto Ehtiyat Pulsuz",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Fotos und Videos"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Kontakte"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "SMS"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Anrufliste"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Sie haben im App-Store eine kostenlose Backup-App gefunden.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Ablehnen",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Richtig, ein Foto-Backup braucht keinen Zugriff auf SMS oder Kontakte. Das eingebaute Backup des Smartphones reicht aus."
+      },
+      {
+       "id": "allow",
+       "label": "Zulassen",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Mit Zugriff auf Ihre SMS kann die App Ihre Bankcodes mitlesen. Löschen Sie eine solche App sofort."
+      }
+     ]
+    },
+    {
+     "id": "lost-phone",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-telefon-ayarlari",
+      "app": "Einstellungen",
+      "title": [
+       {
+        "text": "Aus Backup wiederherstellen?"
+       }
+      ],
+      "body": [
+       {
+        "text": "Letztes Backup: gestern 02:10. Fotos: 4.812"
+       }
+      ],
+      "time": "19:45"
+     },
+     "say": "Einen Monat später geht das Smartphone in der Metro verloren. Sie melden sich auf einem neuen Smartphone an.",
+     "actions": [
+      {
+       "id": "restore",
+       "label": "Wiederherstellen",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Weil das Backup aktiviert war, sind alle Familienfotos noch da."
+      },
+      {
+       "id": "fresh",
+       "label": "Als neues Smartphone einrichten",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Dann kommen die Fotos nicht auf das neue Smartphone. Stellen Sie es aus dem Backup wieder her."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "br2-scenario",
+   "title": "Das Smartphone ist weg",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Am Abend haben Sie Ihr Smartphone in der Metro verloren. Was tun Sie zu Hause als Erstes?",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     },
+     "choices": [
+      {
+       "label": "Ich sperre das Smartphone von einem anderen Gerät aus und prüfe, wo es ist",
+       "next": "n2",
+       "feedback": "Richtig. Durch die Sperre kommt niemand, der das Smartphone findet, an Ihre Fotos und Konten."
+      },
+      {
+       "label": "Ich warte bis morgen, vielleicht ruft jemand an",
+       "outcome": "risky",
+       "feedback": "Auf einem ungesperrten Smartphone sind Ihre Konten in Gefahr. Sperren Sie es sofort."
+      },
+      {
+       "label": "Ich poste meine Nummer und Adresse in den sozialen Medien",
+       "outcome": "risky",
+       "feedback": "Persönliche Angaben geben Kriminellen eine neue Chance. Sperren Sie zuerst das Smartphone."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Das Smartphone wurde nicht gefunden. Am nächsten Tag kommt eine SMS: „Ihr Smartphone wurde gefunden, melden Sie sich an, um es zu sehen“.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "+994 50 000 64 18"
+        }
+       ],
+       "time": "11:20",
+       "messages": [
+        [
+         {
+          "text": "Ihr Smartphone wurde gefunden. Melden Sie sich in Ihrem Konto an, um zu sehen, wo es ist: cihaz-tap.example.info"
+         }
+        ]
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "Ich öffne den Link und melde mich an",
+       "outcome": "compromised",
+       "feedback": "Diese Falle zielt auf Menschen, die ihr Smartphone verloren haben. Ihr Kontopasswort geht direkt an die Kriminellen."
+      },
+      {
+       "label": "Ich öffne ihn nicht und stelle das neue Smartphone aus dem Backup wieder her",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Die Fotos sind im Backup sicher, und einer solchen Nachricht ist nicht zu trauen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "br2-recap",
+   "points": [
+    "Aktivieren Sie das automatische Backup auf Ihrem Smartphone.",
+    "Stellen Sie zur Probe ein Foto wieder her.",
+    "„Speicher voll“? Prüfen Sie die Einstellungen, nicht den Link."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

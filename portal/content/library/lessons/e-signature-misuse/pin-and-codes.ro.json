@@ -1,0 +1,400 @@
+{
+  "id": "pin-and-codes",
+  "title": "PIN-uri și coduri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l1-tutor",
+      "beats": [
+        {
+          "id": "l1-b1",
+          "say": "Semnătura mobilă și semnătura electronică sunt semnătura dumneavoastră digitală. Un document semnat cu PIN-ul dumneavoastră se consideră semnat chiar de dumneavoastră.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": { "kind": "illustration", "id": "key" }
+        },
+        {
+          "id": "l1-b2",
+          "say": "Escrocii sună, spun că „vă expiră certificatul” și vă cer PIN-ul sau codul primit prin SMS.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "mohurid-fake",
+              "caller": [{ "text": "Suport MöhürID", "spot": "caller-name" }],
+              "number": [{ "text": "+994 12 000 77 40" }],
+              "label": "Suport"
+            }
+          },
+          "highlight": "caller-name"
+        },
+        {
+          "id": "l1-b3",
+          "say": "PIN-ul și codurile primite prin SMS nu se spun nimănui: nici suportului, nici colegilor, nici managerului.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": { "kind": "illustration", "id": "lock" }
+        },
+        {
+          "id": "l1-b4",
+          "say": "Dacă certificatul trebuie reînnoit, îl reînnoiți chiar dumneavoastră, pe site-ul oficial sau la un centru de servicii.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": { "kind": "illustration", "id": "certificate" }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l1-sim",
+      "environment": "call",
+      "title": "Apel despre certificat",
+      "intro": "Vă sună cineva care spune că este de la suportul serviciului de semnătură. Citiți ce spune și alegeți răspunsul.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "mohurid-fake",
+            "caller": [{ "text": "Suport MöhürID" }],
+            "number": [{ "text": "+994 12 000 77 40" }],
+            "label": "Suport",
+            "voice": "young-man"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Răspundeți",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Nu este periculos să răspundeți. Contează ce spuneți."
+            },
+            {
+              "id": "decline",
+              "label": "Respingeți",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Și așa este bine. Dacă vă îngrijorează ceva, sunați chiar dumneavoastră la numărul oficial al serviciului.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "expire",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "mohurid-fake",
+            "caller": [{ "text": "Suport MöhürID" }],
+            "number": [{ "text": "+994 12 000 77 40" }],
+            "label": "Suport",
+            "voice": "young-man"
+          },
+          "say": "Bună ziua, vă sun de la suportul MöhürID. Certificatul dumneavoastră de semnătură mobilă, mă scuzați, expiră astăzi și va fi blocat dacă nu îl reînnoiți.",
+          "spoken": "Bună ziua, <breath> vă sun de la suportul MöhürID. Certificatul dumneavoastră de semnătură mobilă <cough> mă scuzați, expiră astăzi și va fi blocat dacă nu îl reînnoiți.",
+          "actions": [
+            {
+              "id": "comply",
+              "label": "Cum îl reînnoiesc?",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Apelantul începe să preia controlul. Verificați chiar dumneavoastră data certificatului pe site-ul oficial."
+            },
+            {
+              "id": "verify",
+              "label": "Sun chiar eu la numărul oficial",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Corect. Căutați chiar dumneavoastră numărul serviciului pe site-ul lui oficial.",
+              "next": "after"
+            },
+            {
+              "id": "hang",
+              "label": "Închideți apelul",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Bună decizie. Puteți încheia oricând un apel care vă grăbește.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "sms-code",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "mohurid-fake",
+            "caller": [{ "text": "Suport MöhürID" }],
+            "number": [{ "text": "+994 12 000 77 40" }],
+            "label": "Suport",
+            "voice": "young-man"
+          },
+          "say": "Pentru reînnoire veți primi un SMS. Citiți-mi codul, iar eu îl introduc în sistem în locul dumneavoastră.",
+          "spoken": "Pentru reînnoire veți primi un SMS. <breath> Citiți-mi codul, iar eu îl introduc în sistem în locul dumneavoastră.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Îi citesc codul",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Cu acest cod, ei se conectează în numele dumneavoastră. Un cod trebuie să rămână doar pe ecranul dumneavoastră."
+            },
+            {
+              "id": "keep",
+              "label": "Nu dau nimănui codurile",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Corect. Suportul adevărat nu cere niciodată un cod."
+            },
+            {
+              "id": "hang",
+              "label": "Închideți apelul",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Corect. Închideți imediat ce vi se cere un cod.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pin-sign",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "mohurid-fake",
+            "caller": [{ "text": "Suport MöhürID" }],
+            "number": [{ "text": "+994 12 000 77 40" }],
+            "label": "Suport",
+            "voice": "young-man"
+          },
+          "say": "Codul nu a funcționat. Acum o să vă apară o solicitare pe telefon: introduceți PIN-ul și confirmați.",
+          "spoken": "Codul nu a funcționat. <sigh> Acum o să vă apară o solicitare pe telefon: introduceți PIN-ul și confirmați.",
+          "actions": [
+            {
+              "id": "confirm",
+              "label": "Introduc PIN-ul și confirm",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Nu a fost o reînnoire: ați semnat un document pregătit de ei. Sunați imediat la numărul oficial al serviciului de semnătură."
+            },
+            {
+              "id": "deny",
+              "label": "Resping solicitarea",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Corect. Nu confirmați niciodată o solicitare pe care nu ați inițiat-o chiar dumneavoastră."
+            },
+            {
+              "id": "hang",
+              "label": "Închideți apelul",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Corect. Închideți și respingeți solicitarea."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Apelul s-a încheiat. Ce faceți acum?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "mohurid-fake",
+            "caller": [{ "text": "Suport MöhürID" }],
+            "number": [{ "text": "+994 12 000 77 40" }],
+            "label": "Suport",
+            "voice": "young-man"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "Sunați la numărul oficial al serviciului",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Corect. Suportul oficial vă poate spune care este situația reală a certificatului."
+            },
+            {
+              "id": "report",
+              "label": "Anunțați echipa de securitate",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Foarte bine. Astfel de apeluri ajung de obicei la mai mulți colegi."
+            },
+            {
+              "id": "ignore",
+              "label": "Nu faceți nimic",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Apelantul va încerca din nou. Raportarea îi protejează pe colegii dumneavoastră."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l1-hotspot",
+      "prompt": "Găsiți capcanele din acest mesaj.",
+      "artifact": {
+        "kind": "sms",
+        "brandRef": "mohurid-fake",
+        "sender": [{ "text": "MohurID" }],
+        "time": "08:55",
+        "messages": [
+          [
+            { "text": "Certificatul dumneavoastră de semnătură mobilă " },
+            { "text": "expiră astăzi la ora 18:00", "spot": "deadline" },
+            { "text": ". Pentru reînnoire, " },
+            { "text": "introduceți PIN-ul", "spot": "pin" },
+            { "text": " pe " },
+            { "text": "mohurid-yenile.test", "spot": "link" },
+            { "text": ". " },
+            { "text": "În caz contrar, semnătura dumneavoastră va fi revocată.", "spot": "threat" }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "deadline",
+          "label": "Expiră astăzi",
+          "explain": "Urgența nu vă lasă timp să verificați. Data certificatului o puteți vedea chiar dumneavoastră pe site-ul oficial."
+        },
+        {
+          "id": "link",
+          "label": "Adresă necunoscută",
+          "explain": "Acesta nu este site-ul oficial al serviciului. Tastați chiar dumneavoastră adresa oficială."
+        },
+        {
+          "id": "pin",
+          "label": "Cerere de PIN",
+          "explain": "PIN-ul nu se introduce niciodată pe un site ca să „reînnoiți” ceva. El confirmă doar o conectare sau o semnătură inițiată de dumneavoastră."
+        },
+        {
+          "id": "threat",
+          "label": "Amenințare cu revocarea",
+          "explain": "Intimidarea este o metodă frecventă de înșelătorie. Dacă vă îngrijorează ceva, sunați la numărul oficial."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "l1-swipe",
+      "prompt": "Acest mesaj este sigur sau periculos?",
+      "cards": [
+        {
+          "id": "own-code",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "mohurid",
+            "sender": [{ "text": "MohurID" }],
+            "time": "09:10",
+            "messages": [
+              [{ "text": "Cod de confirmare: 482913. Nu comunicați acest cod nimănui. Dacă nu ați trimis această solicitare, respingeți-o." }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Este un mesaj obișnuit atunci când vă conectați chiar dumneavoastră. Nu are link și vă amintește să păstrați codul secret."
+        },
+        {
+          "id": "renew-link",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "mohurid-fake",
+            "sender": [{ "text": "MohurID" }],
+            "time": "09:42",
+            "messages": [
+              [{ "text": "Certificatul dumneavoastră a fost blocat. Restabiliți-l aici: mohurid-yenile.test" }]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Linkul nu duce la site-ul oficial al serviciului. Deschideți chiar dumneavoastră site-ul oficial ca să verificați."
+        },
+        {
+          "id": "colleague-pin",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [{ "text": "Elvin (Financiar)" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Sunt în concediu. PIN-ul meu e 4471, semnează tu documentele astea în locul meu." }]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Dacă semnați cu PIN-ul altcuiva, semnați în numele lui. Împuternicirea se acordă pe calea oficială."
+        },
+        {
+          "id": "hr-reminder",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Departamentul de resurse umane" }],
+              "address": [{ "text": "kadr@idare.example" }]
+            },
+            "subject": [{ "text": "Certificatul dumneavoastră expiră în 30 de zile" }],
+            "time": "10:15",
+            "body": [
+              [{ "text": "Pentru reînnoire, conectați-vă chiar dumneavoastră pe site-ul oficial al serviciului de semnătură sau mergeți la un centru de servicii." }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Nu conține niciun link și nu vi se cere PIN sau cod. Reînnoiți chiar dumneavoastră, pe calea oficială."
+        },
+        {
+          "id": "unexpected-request",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "mohurid",
+            "app": "MöhürID",
+            "title": [{ "text": "Solicitare de semnătură" }],
+            "body": [{ "text": "Procura_puteri_depline.pdf așteaptă semnătura dumneavoastră" }],
+            "time": "10:31"
+          },
+          "verdict": "threat",
+          "explain": "Nu ați inițiat dumneavoastră această solicitare. Respingeți-o și anunțați echipa de securitate."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l1-choice",
+      "question": {
+        "prompt": "Un coleg aflat în concediu medical vă roagă să semnați un document urgent cu PIN-ul lui.",
+        "options": [
+          {
+            "id": "do",
+            "label": "Îl semnez, doar mi-a dat voie",
+            "correct": false,
+            "feedback": "Semnătura electronică îi aparține doar titularului. Dacă semnați cu PIN-ul lui, încălcați regulile."
+          },
+          {
+            "id": "refuse",
+            "label": "Refuz și îi cer managerului să delege oficial împuternicirea",
+            "correct": true,
+            "feedback": "Corect. Instituția deleagă împuternicirea unui înlocuitor pe calea oficială."
+          },
+          {
+            "id": "keep",
+            "label": "Îmi notez PIN-ul, în caz că am nevoie de el",
+            "correct": false,
+            "feedback": "Și păstrarea PIN-ului altcuiva este riscantă. PIN-ul rămâne la titularul lui."
+          }
+        ]
+      },
+      "explain": "PIN-ul este semnătura însăși. Nu îl dați nimănui și nu îl luați niciodată pe al altcuiva."
+    },
+    {
+      "type": "recap",
+      "id": "l1-recap",
+      "points": [
+        "Nu spuneți nimănui PIN-ul sau codul primit prin SMS, nici măcar suportului.",
+        "Reînnoiți certificatul doar pe site-ul oficial sau la un centru de servicii.",
+        "Respingeți și raportați orice solicitare de semnătură pe care nu ați inițiat-o."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

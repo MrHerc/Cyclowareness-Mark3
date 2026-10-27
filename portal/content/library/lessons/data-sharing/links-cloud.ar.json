@@ -1,0 +1,441 @@
+{
+  "id": "links-cloud",
+  "title": "الروابط والمجلدات السحابية",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "المجلدات السحابية مريحة، لكن إعدادًا خاطئًا واحدًا قد يفتح الملف للإنترنت كله.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "cloud"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "مع خيار «أي شخص لديه الرابط»، إذا انتقل الرابط إلى غيرك، يستطيع الغرباء أيضًا فتح الملف.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "rxagentlik-disk",
+              "url": [
+                {
+                  "text": "https://disk.rxagentlik.az/qovluq/budce-2027?paylasim="
+                },
+                {
+                  "text": "hamiya-acik",
+                  "spot": "public"
+                }
+              ]
+            }
+          },
+          "highlight": "public"
+        },
+        {
+          "id": "b3",
+          "say": "الطريقة الصحيحة: أشخاص محددون بالاسم فقط، وصلاحية العرض فقط، وتاريخ لانتهاء الصلاحية.",
+          "mood": "talk",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "لا ترفع ملفات العمل إلى حساب سحابي شخصي، فهناك لا تستطيع الجهة حمايتها أو استعادتها.",
+          "mood": "think",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "share-folder",
+      "environment": "browser",
+      "title": "مشاركة الملف",
+      "intro": "عليك أن ترسل مسودة الميزانية إلى شريك من خارج الجهة. اضبط إعدادات المشاركة بنفسك على القرص السحابي.",
+      "steps": [
+        {
+          "id": "file-page",
+          "label": "مسودة الميزانية 2027.xlsx",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "rxagentlik-disk",
+            "url": [
+              {
+                "text": "https://disk.rxagentlik.az/fayllar/Budce_layihesi_2027.xlsx",
+                "reveal": "rxagentlik.az"
+              }
+            ]
+          },
+          "say": "كيف ستشارك الملف؟",
+          "actions": [
+            {
+              "id": "share",
+              "label": "مشاركة",
+              "kind": "share",
+              "outcome": "safe",
+              "feedback": "جيد، فالملف يبقى على القرص السحابي للعمل. والآن انظر إلى إعدادات المشاركة."
+            },
+            {
+              "id": "personal",
+              "label": "النقل إلى حسابي السحابي الشخصي",
+              "kind": "open",
+              "outcome": "risky",
+              "feedback": "الحساب الشخصي خارج سيطرة الجهة. وملفات العمل مكانها القرص السحابي للعمل."
+            }
+          ]
+        },
+        {
+          "id": "who-can-open",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "مشاركة: مسودة الميزانية 2027.xlsx"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "من يمكنه فتح الملف؟"
+                }
+              ]
+            ],
+            "buttons": [
+              "أي شخص لديه الرابط",
+              "أشخاص محددون بالاسم فقط"
+            ]
+          },
+          "actions": [
+            {
+              "id": "named",
+              "label": "أشخاص محددون بالاسم فقط",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "صحيح. لن يفتح الملف إلا للأشخاص الذين تختارهم."
+            },
+            {
+              "id": "anyone",
+              "label": "أي شخص لديه الرابط",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "قد تتم إعادة توجيه الرابط، أو قد يصل إلى المكان الخطأ. وعندها يستطيع أي شخص فتح الملف."
+            }
+          ]
+        },
+        {
+          "id": "rights",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "لمن وكيف؟"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "المستلم: e.rzayev@merkez-konsalting.example"
+                }
+              ],
+              [
+                {
+                  "text": "الصلاحية: عرض أو تعديل"
+                }
+              ],
+              [
+                {
+                  "text": "انتهاء الصلاحية: بعد 7 أيام أو أبدًا"
+                }
+              ]
+            ],
+            "buttons": [
+              "تعديل، دون تاريخ انتهاء",
+              "عرض، 7 أيام"
+            ]
+          },
+          "actions": [
+            {
+              "id": "view",
+              "label": "عرض، 7 أيام",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "ممتاز. يستطيع الشريك رؤية الملف دون تعديله، وينتهي الوصول بعد أسبوع."
+            },
+            {
+              "id": "edit",
+              "label": "تعديل، دون تاريخ انتهاء",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "الشريك لا يحتاج إلى التعديل، والوصول غير المحدد بمدة يبقى مفتوحًا لسنوات."
+            }
+          ]
+        },
+        {
+          "id": "fake-share",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "rxagentlik-disk-fake",
+            "brand": "RXAgentlik Disk",
+            "url": [
+              {
+                "text": "https://rxagentlik-disk.example.net/giris",
+                "reveal": "rxagentlik-disk.example.net"
+              }
+            ],
+            "fields": [
+              "البريد الإلكتروني",
+              "كلمة المرور"
+            ],
+            "button": "تسجيل الدخول"
+          },
+          "say": "بعد ساعة تفتح صفحة لملف تمت مشاركته معك. تحقق من العنوان.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "تسجيل الدخول",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "هذا النطاق ليس القرص السحابي للعمل. والملف المشترك مجرد ذريعة لسرقة كلمة المرور."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق علامة التبويب",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. افتح الملفات المشتركة على disk.rxagentlik.az فقط."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن الموقع",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "ممتاز. الإبلاغ عن الصفحة المزيفة يحمي زملاءك أيضًا."
+            }
+          ]
+        },
+        {
+          "id": "old-links",
+          "label": "مشاركاتي: 4 ملفات مفتوحة لأي شخص",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "rxagentlik-disk",
+            "url": [
+              {
+                "text": "https://disk.rxagentlik.az/paylasimlar",
+                "reveal": "rxagentlik.az"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "close-links",
+              "label": "إغلاق الروابط المفتوحة",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "صحيح. إغلاق المشاركات التي لم تعد تحتاج إليها هو أبسط وسيلة للحماية."
+            },
+            {
+              "id": "later",
+              "label": "لاحقًا",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "كل رابط يبقى مفتوحًا خطر جديد كل يوم."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "link-settings",
+      "prompt": "هل إعداد المشاركة هذا آمن؟",
+      "cards": [
+        {
+          "id": "anyone-forever",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "إعداد المشاركة"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "جدول الرواتب: أي شخص لديه الرابط، تعديل، دون تاريخ انتهاء"
+                }
+              ]
+            ],
+            "buttons": [
+              "تم"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "ملف سري مفتوح لأي شخص دون تاريخ انتهاء. وبمجرد انتشار الرابط، لا مجال للتراجع."
+        },
+        {
+          "id": "named-week",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "إعداد المشاركة"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "تقرير المشروع: شخصان، عرض، 7 أيام"
+                }
+              ]
+            ],
+            "buttons": [
+              "تم"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "وصول محدود، وعرض فقط، وتاريخ انتهاء. هذا هو الإعداد الصحيح."
+        },
+        {
+          "id": "whole-org",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "إعداد المشاركة"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "قائمة الموارد البشرية: جميع موظفي الجهة"
+                }
+              ]
+            ],
+            "buttons": [
+              "تم"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "المستند السري ليس للجهة كلها، بل لأشخاص محددين بالاسم فقط."
+        },
+        {
+          "id": "public-ad",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "إعداد المشاركة"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "إعلان وظيفة: أي شخص لديه الرابط"
+                }
+              ]
+            ],
+            "buttons": [
+              "تم"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "الإعلان عام، وهو منشور على الموقع أصلًا. والرابط المفتوح مقبول هنا."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "who-needs-what",
+      "prompt": "اختر الإعداد المناسب لكل حالة.",
+      "pairs": [
+        {
+          "id": "partner",
+          "left": "شريك يحتاج إلى قراءة مستند",
+          "right": "عرض، بالاسم، 7 أيام"
+        },
+        {
+          "id": "coauthor",
+          "left": "زميل يشارك في كتابة المستند",
+          "right": "تعديل، لهذا الشخص فقط"
+        },
+        {
+          "id": "public",
+          "left": "إعلان منشور على الموقع الإلكتروني",
+          "right": "رابط مفتوح لأي شخص"
+        }
+      ],
+      "explain": "اجعل المشاركة في أضيق حدود ممكنة: حدد مع من، وبأي صلاحيات، وإلى متى."
+    },
+    {
+      "type": "choice",
+      "id": "personal-cloud",
+      "question": {
+        "prompt": "هل يجوز لك رفع ملف سري إلى حسابك السحابي الشخصي لتعمل من المنزل؟",
+        "options": [
+          {
+            "id": "strong",
+            "label": "نعم، فكلمة مروري قوية",
+            "correct": false,
+            "feedback": "كلمة المرور القوية لا تعيد الملف إلى سيطرة الجهة."
+          },
+          {
+            "id": "work",
+            "label": "لا، أستخدم القرص السحابي للعمل أو وسيلة تسمح بها الجهة",
+            "correct": true,
+            "feedback": "صحيح. على القرص السحابي للعمل يكون الملف محميًا، ويمكن استعادته."
+          },
+          {
+            "id": "delete-later",
+            "label": "نعم، وسأحذفه لاحقًا",
+            "correct": false,
+            "feedback": "الملف المحذوف كثيرًا ما يبقى في سلة المحذوفات وعلى أجهزة أخرى."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "cloud"
+        }
+      },
+      "explain": "ملفات العمل مكانها أنظمة العمل. وإن ساورك الشك، فاسأل الدعم الفني."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "لا تستخدم خيار «أي شخص لديه الرابط» مع الملفات السرية أبدًا.",
+        "شارك بالاسم، وبصلاحية العرض فقط، ومع تاريخ لانتهاء الصلاحية.",
+        "أغلق المشاركات القديمة بانتظام."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

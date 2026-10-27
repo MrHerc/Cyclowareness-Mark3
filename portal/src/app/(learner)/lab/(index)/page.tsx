@@ -1,24 +1,14 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { eq, sql } from "drizzle-orm";
-import { Gamepad2, GlobeLock, Inbox, KeyRound, Link2, MailWarning, Monitor, Play, ShieldCheck, Sparkles, SquareTerminal, Info } from "lucide-react";
+import { Gamepad2, Monitor, Play, Sparkles, Info } from "lucide-react";
 import { db, t } from "@/server/db";
 import { requireFeature } from "@/server/auth/viewer";
 import { GAMES } from "@/server/lab/games";
 import { LAB_MAX, VM_LAB_IDS, VM_LABS } from "@/components/lab/model/labs";
+import { LAB_ICON as ICON, LAB_TINT as TINT } from "@/components/learner/lab-visual";
 import { Notice, PageHeader } from "@/components/ui/layout";
 import { Pill } from "@/components/ui/pill";
-
-const ICON = { "inbox-triage": Inbox, "link-detective": Link2, "password-forge": KeyRound, "mfa-fatigue": ShieldCheck, "phishing-anatomy": MailWarning, "process-hunt": SquareTerminal, "fake-signin": GlobeLock } as const;
-const TINT = {
-  "inbox-triage": "from-[#efe9ff] bg-[#6d28d9]",
-  "link-detective": "from-[#e3f6fb] bg-[#0891b2]",
-  "password-forge": "from-[#f3f6dc] bg-[#65a30d]",
-  "mfa-fatigue": "from-[#ffece3] bg-[#ea580c]",
-  "phishing-anatomy": "from-[#e6edff] bg-[#1d4ed8]",
-  "process-hunt": "from-[#e9ecf2] bg-[#0f172a]",
-  "fake-signin": "from-[#e2f6f3] bg-[#0f766e]",
-} as const;
 
 export async function generateMetadata() {
   const tr = await getTranslations("learner.lab");
@@ -113,7 +103,7 @@ export default async function LabPage() {
                     {tr("vm.objectives", { count: VM_LABS[g].objectives })}
                     {b !== undefined && Number.isFinite(b) ? ` · ${tr("best", { score: Math.round(b * LAB_MAX), max: LAB_MAX })}` : ""}
                   </span>
-                  <span className="ml-auto inline-flex shrink-0 items-center gap-1.5 rounded-pill bg-brand-600 px-3.5 py-2 text-caption font-semibold text-brand-on">
+                  <span className="ms-auto inline-flex shrink-0 items-center gap-1.5 rounded-pill bg-brand-600 px-3.5 py-2 text-caption font-semibold text-brand-on">
                     <Play className="size-3.5 fill-current" />
                     {tr("vm.start")}
                   </span>

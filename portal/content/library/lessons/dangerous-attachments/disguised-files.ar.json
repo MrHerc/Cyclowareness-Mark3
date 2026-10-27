@@ -1,0 +1,512 @@
+{
+  "id": "disguised-files",
+  "title": "ملفات متنكرة",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "df-tutor",
+      "beats": [
+        {
+          "id": "df-b1",
+          "say": "مرحبًا! قد يكذب اسم الملف. سنتعلم اليوم كيف نعرف حقيقة المرفق.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        },
+        {
+          "id": "df-b2",
+          "say": "يبدو هذا الملف كأنه مستند PDF، لكن اسمه ينتهي في آخره بالامتداد exe، أي أنه برنامج.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "file",
+              "name": [
+                {
+                  "text": "Qerar_2026.pdf"
+                },
+                {
+                  "text": ".exe",
+                  "spot": "ext"
+                }
+              ],
+              "type": "exe",
+              "size": "1.8 MB",
+              "source": [
+                {
+                  "text": "مرفق في رسالة بريد إلكتروني"
+                }
+              ]
+            }
+          },
+          "highlight": "ext"
+        },
+        {
+          "id": "df-b3",
+          "say": "والملفات المضغوطة وصور الأقراص وملفات الاختصار قد تخفي هي الأخرى برنامجًا بداخلها.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        },
+        {
+          "id": "df-b4",
+          "say": "القاعدة بسيطة: تحقق من نوع الملف قبل فتح أي ملف غير متوقع، وأبلغ إذا ساورك الشك.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "df-sim-files",
+      "environment": "desktop",
+      "title": "مجلد التنزيلات",
+      "intro": "انظر إلى الملفات التي نزلتها من البريد الإلكتروني. أظهر امتدادات الملفات واختر ما تفعله بكل منها.",
+      "steps": [
+        {
+          "id": "decree-exe",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Qerar_2026.pdf.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "1.8 MB",
+            "source": [
+              {
+                "text": "التنزيلات: qerar@nazirlik-sened.example.net"
+              }
+            ]
+          },
+          "say": "أظهر الامتدادات. بماذا ينتهي الاسم؟",
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "هذا ليس مستندًا، بل برنامج، وقد يثبت برمجيات ضارة لحظة فتحه."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "صحيح. القرار الرسمي الحقيقي لا يكون برنامجًا أبدًا."
+            },
+            {
+              "id": "report",
+              "label": "إبلاغ فريق الأمن السيبراني",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "رائع. يستطيع فريق الأمن السيبراني أيضًا حذف الرسالة نفسها من صناديق بريد بقية الموظفين."
+            }
+          ]
+        },
+        {
+          "id": "report-iso",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Hesabat_sentyabr.iso"
+              }
+            ],
+            "type": "iso",
+            "size": "4.2 MB",
+            "source": [
+              {
+                "text": "التنزيلات: hesabat@audit-xidmet.example.net"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح",
+              "kind": "open",
+              "outcome": "risky",
+              "feedback": "ملف ISO يفتح كأنه قرص، وقد يحتوي على برنامج. ولا أحد يرسل التقارير على هيئة صور أقراص."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "صحيح. لا تفتح صورة قرص لم تكن تتوقعها."
+            },
+            {
+              "id": "report",
+              "label": "إبلاغ فريق الأمن السيبراني",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "رائع. ملف ISO متنكر في هيئة تقرير هجوم معتاد."
+            }
+          ]
+        },
+        {
+          "id": "photos-lnk",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Tedbir_fotolari"
+              }
+            ],
+            "type": "lnk",
+            "size": "3 KB",
+            "source": [
+              {
+                "text": "التنزيلات: مستخرج من ملف مضغوط"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "كان الملف اختصارًا، وقد شغل أمرًا مخفيًا. والصور لا يكون حجمها 3 KB أبدًا."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "صحيح. ملف الاختصار (.lnk) المتنكر في هيئة صور فخ."
+            },
+            {
+              "id": "report",
+              "label": "إبلاغ فريق الأمن السيبراني",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "رائع. الإبلاغ دون فتح الملف هو الطريقة الأكثر أمانًا."
+            }
+          ]
+        },
+        {
+          "id": "leave-pdf",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "idare",
+            "name": [
+              {
+                "text": "Mezuniyyet_qrafiki.pdf"
+              }
+            ],
+            "type": "pdf",
+            "size": "220 KB",
+            "source": [
+              {
+                "text": "التنزيلات: kadrlar@idare.example"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "صحيح. يمكن فتح ملف PDF متوقع وصل من عنوان داخلي."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "هذا الملف آمن: ملف PDF حقيقي من مرسل معروف. وليس كل ملف بحاجة إلى الحذف."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "df-hotspot",
+      "prompt": "ابحث عن علامات التحذير في هذه الرسالة.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "e-xidmet-fake",
+        "from": {
+          "name": [
+            {
+              "text": "بوابة e-Xidmət"
+            }
+          ],
+          "address": [
+            {
+              "text": "bildiris@e-xidmet-gov.example.net",
+              "spot": "domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "إشعار بغرامة مالية"
+          }
+        ],
+        "time": "09:31",
+        "body": [
+          [
+            {
+              "text": "صدرت بحقك غرامة إدارية، وتجد التفاصيل في المرفق."
+            }
+          ],
+          [
+            {
+              "text": "كلمة مرور الملف المضغوط: 2026",
+              "spot": "zip"
+            }
+          ],
+          [
+            {
+              "text": "إذا لم يتم السداد خلال 3 أيام، فسيتضاعف المبلغ.",
+              "spot": "urgency"
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Cerime_bildirisi.zip",
+                "spot": "zip"
+              }
+            ],
+            "size": "860 KB"
+          },
+          {
+            "name": [
+              {
+                "text": "Odenis_qebzi.html",
+                "spot": "html"
+              }
+            ],
+            "size": "14 KB"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "نطاق مزيف",
+          "explain": "يضيف العنوان «-gov» ونهاية مختلفة. تحقق بنفسك من نطاق البوابة الرسمية."
+        },
+        {
+          "id": "zip",
+          "label": "ملف مضغوط محمي بكلمة مرور",
+          "explain": "كلمة المرور تمنع برنامج مكافحة الفيروسات من فحص محتواه، والإشعارات الرسمية لا تصل بهذه الطريقة."
+        },
+        {
+          "id": "html",
+          "label": "مرفق HTML",
+          "explain": "مرفق HTML يفتح في المتصفح صفحة دفع أو تسجيل دخول مزيفة."
+        },
+        {
+          "id": "urgency",
+          "label": "تهديد واستعجال",
+          "explain": "الهدف من التخويف أن تفتح المرفق دون تحقق. تحقق من الغرامات عبر البوابة الرسمية فقط."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "df-swipe",
+      "prompt": "آمن أم فخ؟",
+      "cards": [
+        {
+          "id": "manual-pdf",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "idare",
+            "name": [
+              {
+                "text": "Telimat_2026.pdf"
+              }
+            ],
+            "type": "pdf",
+            "size": "310 KB",
+            "source": [
+              {
+                "text": "it@idare.example، دليل متوقع"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "عنوان داخلي، ومستند متوقع، وملف PDF عادي. يمكن فتحه بأمان."
+        },
+        {
+          "id": "salary-lnk",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Maas_cedveli.xlsx.lnk"
+              }
+            ],
+            "type": "lnk",
+            "size": "2 KB",
+            "source": [
+              {
+                "text": "مرسل غير معروف"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "ملف اختصار يحمل اسم جدول بيانات، وفتحه قد يشغل أمرًا مخفيًا."
+        },
+        {
+          "id": "order-img",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "cevikkargo-fake",
+            "name": [
+              {
+                "text": "Sifaris_1873.img"
+              }
+            ],
+            "type": "img",
+            "size": "3.6 MB",
+            "source": [
+              {
+                "text": "sifaris@cevik-kargo.example.net"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "ملف IMG صورة قرص، وتفاصيل الطلبات لا ترسل بهذه الطريقة أبدًا."
+        },
+        {
+          "id": "slides-ppt",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "ofistechizat",
+            "name": [
+              {
+                "text": "Teqdimat_oktyabr.pptx"
+              }
+            ],
+            "type": "ppt",
+            "size": "2.1 MB",
+            "source": [
+              {
+                "text": "سابينا كريموفا، عرض متفق عليه للاجتماع"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "عرض تقديمي متفق عليه بصيغة عادية. لا توجد علامات تحذير."
+        },
+        {
+          "id": "invoice-html",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "ofistechizat-fake",
+            "name": [
+              {
+                "text": "Faktura_oktyabr.html"
+              }
+            ],
+            "type": "html",
+            "size": "9 KB",
+            "source": [
+              {
+                "text": "faktura@ofistechizat-az.example.net"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "الفواتير لا تكون ملفات HTML. وهذا الملف القادم من نطاق مشابه يفتح صفحة تسجيل دخول."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "df-match",
+      "prompt": "طابق كل نوع ملف مع الخطر الذي يحمله.",
+      "pairs": [
+        {
+          "id": "exe",
+          "left": ".exe",
+          "right": "برنامج يعمل بمجرد فتحه"
+        },
+        {
+          "id": "lnk",
+          "left": ".lnk",
+          "right": "اختصار قد يشغل أمرًا مخفيًا"
+        },
+        {
+          "id": "iso",
+          "left": ".iso",
+          "right": "صورة قرص قد تخفي برنامجًا"
+        },
+        {
+          "id": "html",
+          "left": ".html",
+          "right": "قد يفتح صفحة تسجيل دخول مزيفة في المتصفح"
+        },
+        {
+          "id": "zip",
+          "left": ".zip (بكلمة مرور)",
+          "right": "لا يستطيع برنامج مكافحة الفيروسات فحص محتواه"
+        }
+      ],
+      "explain": "هذه الأنواع نادرة في بريد العمل. إذا وصلك ملف منها دون أن تتوقعه، فلا تفتحه وأبلغ عنه."
+    },
+    {
+      "type": "choice",
+      "id": "df-choice",
+      "question": {
+        "prompt": "يقول لك زميل: «فتحت الملف ولم يحدث شيء». بماذا تنصحه؟",
+        "options": [
+          {
+            "id": "report",
+            "label": "قطع الاتصال بالشبكة والاتصال بفريق الأمن السيبراني فورًا",
+            "correct": true,
+            "feedback": "صحيح. كثيرًا ما تعمل البرمجيات الضارة بصمت، والإبلاغ السريع يحد من الضرر."
+          },
+          {
+            "id": "wait",
+            "label": "الانتظار، ثم الإبلاغ إذا حدث شيء",
+            "correct": false,
+            "feedback": "عبارة «لم يحدث شيء» كثيرًا ما تكون انطباعًا خاطئًا، والانتظار يمنح المهاجم وقتًا."
+          },
+          {
+            "id": "shutdown",
+            "label": "إطفاء الحاسوب فورًا",
+            "correct": false,
+            "feedback": "قد يمحو الإطفاء الأدلة الموجودة في الذاكرة. ما لم تنص إجراءات جهتك على خلاف ذلك، اترك الجهاز يعمل، واقطع اتصاله بالشبكة، وأبلغ."
+          }
+        ]
+      },
+      "explain": "فتح ملف مشبوه حادثة أمنية: اقطع الاتصال بالشبكة، وأبق الحاسوب يعمل، وأبلغ فورًا."
+    },
+    {
+      "type": "recap",
+      "id": "df-recap",
+      "points": [
+        "انظر إلى آخر الاسم تمامًا: هناك يظهر النوع الحقيقي",
+        "لا تفتح ملفات مضغوطة أو ISO أو اختصارات أو HTML غير متوقعة",
+        "فتحته؟ اقطع الاتصال بالشبكة وأبلغ فورًا"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

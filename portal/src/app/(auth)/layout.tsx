@@ -14,7 +14,7 @@ export default async function AuthLayout({ children }: { children: React.ReactNo
   return (
     <div className="relative flex min-h-dvh flex-col lg:grid lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
       <BrandPanel />
-      <LanguageSwitcher className="absolute top-[calc(var(--safe-top)+1.25rem)] right-5 z-20 shadow-xs sm:right-8 lg:top-8 lg:right-10" />
+      <LanguageSwitcher className="absolute top-[calc(var(--safe-top)+1.25rem)] end-5 z-20 shadow-xs sm:end-8 lg:top-8 lg:end-10" />
 
       <div className="relative flex flex-1 flex-col">
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(48rem_28rem_at_85%_-10%,color-mix(in_oklab,var(--brand)_10%,transparent),transparent),radial-gradient(36rem_22rem_at_0%_110%,color-mix(in_oklab,var(--accent)_8%,transparent),transparent)] max-lg:hidden" />

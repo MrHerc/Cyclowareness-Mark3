@@ -1,0 +1,320 @@
+{
+ "id": "web-traps",
+ "title": "Вебпастки",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "padlock",
+     "say": "Замок в адресному рядку означає лише одне: з’єднання зашифроване. Він не показує, хто стоїть за сайтом.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "read-domain",
+     "say": "Більшість шахрайських сайтів теж мають замок. Тож читайте сам домен.",
+     "mood": "think",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "sahilbank-giris.info",
+         "spot": "domain"
+        },
+        {
+         "text": "/login"
+        }
+       ]
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "search-ads",
+     "say": "Перший результат пошуку може виявитися рекламою. Шахраї купують рекламу з назвами відомих сайтів.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "fake-update",
+     "say": "Якщо вебсайт пише, що ваш браузер застарів, і пропонує завантажити оновлення, — це пастка. Браузери оновлюються самі.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "warnings",
+     "say": "Якщо браузер показує червоне попередження, поверніться назад. Він зупиняє вас, щоб захистити.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-portal",
+   "prompt": "Знайдіть підозрілі деталі на цій сторінці входу.",
+   "artifact": {
+    "kind": "login",
+    "brand": "DövlətPortal",
+    "url": [
+     {
+      "text": "https://",
+      "spot": "padlock"
+     },
+     {
+      "text": "dovletportal-az",
+      "spot": "lookalike"
+     },
+     {
+      "text": ".online",
+      "spot": "tld"
+     },
+     {
+      "text": "/giris"
+     }
+    ],
+    "fields": [
+     "Ідентифікаційний код",
+     "Пароль"
+    ],
+    "button": "Увійти"
+   },
+   "spots": [
+    {
+     "id": "padlock",
+     "label": "Замок",
+     "explain": "Замок є, але він означає лише шифрування. Це не доводить, що сайт справжній."
+    },
+    {
+     "id": "lookalike",
+     "label": "Схожа назва",
+     "explain": "До офіційної назви додали дефіс і az. Це фальшивий домен-двійник."
+    },
+    {
+     "id": "tld",
+     "label": "Неправильне закінчення домену",
+     "explain": "Домен закінчується на .online. Офіційний портал розміщено за адресою dovletportal.az."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "swipe",
+   "id": "click-or-not",
+   "prompt": "Які посилання безпечно відкривати?",
+   "cards": [
+    {
+     "id": "free-download",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://free-download-pdf.top/Sened_pulsuz.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Виконуваний файл із сайту безкоштовних завантажень часто буває шкідливим. Отримуйте програми через техпідтримку."
+    },
+    {
+     "id": "official",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://dovletportal.az/xidmetler/arayis"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Домен — це сам офіційний портал: dovletportal.az. Жодних зайвих слів чи дефісів."
+    },
+    {
+     "id": "subdomain-trick",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://sahilbank.az.hesab-yoxla.info/login"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Справжній домен — остання частина: hesab-yoxla.info. А sahilbank.az на початку — лише приманка."
+    },
+    {
+     "id": "update-exe",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://brauzer-yenile.top/update.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Оновлення браузера не завантажують із вебсайтів. Браузер оновлюється сам."
+    },
+    {
+     "id": "bank-path",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://www.sahilbank.az/az/kartlar"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Домен — sahilbank.az. Решта — це лише шлях до сторінки."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "padlock-meaning",
+   "question": {
+    "prompt": "В адресному рядку є замок. Що це означає?",
+    "options": [
+     {
+      "id": "safe-site",
+      "label": "Сайт перевірений і безпечний",
+      "correct": false,
+      "feedback": "Ні. Фальшиві сайти теж легко отримують замок."
+     },
+     {
+      "id": "encrypted",
+      "label": "З’єднання між вами й сайтом зашифроване",
+      "correct": true,
+      "feedback": "Правильно. Але сайт усе одно може бути фальшивим."
+     },
+     {
+      "id": "state-approved",
+      "label": "Сайт схвалила держава",
+      "correct": false,
+      "feedback": "Замок не означає жодного схвалення від держави."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://"
+       },
+       {
+        "text": "sahilbank-giris.info",
+        "spot": "domain"
+       },
+       {
+        "text": "/login"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "Замок потрібен, але його недостатньо. Завжди читайте сам домен."
+  },
+  {
+   "type": "scenario",
+   "id": "sudden-popup",
+   "title": "Раптове спливаюче вікно",
+   "start": "popup",
+   "nodes": [
+    {
+     "id": "popup",
+     "text": "Ви читаєте новинний сайт. Раптом на весь екран з’являється червоне вікно: ваш комп’ютер заражено, телефонуйте за номером +994 12 000 04 19. Лунає сигнал тривоги.",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     },
+     "choices": [
+      {
+       "label": "Зателефонувати за номером",
+       "next": "operator",
+       "feedback": "Це шахрайство з фальшивою техпідтримкою. Подивімося, що буде далі."
+      },
+      {
+       "label": "Натиснути кнопку «Очистити»",
+       "outcome": "compromised",
+       "feedback": "Кнопка завантажила шкідливу програму. Нічого не натискайте в такому вікні."
+      },
+      {
+       "label": "Закрити вкладку, а якщо треба — увесь браузер",
+       "next": "restore",
+       "feedback": "Правильно. Це вікно — лише вебсторінка, ваш комп’ютер не заражено."
+      }
+     ]
+    },
+    {
+     "id": "operator",
+     "text": "Нам потрібно віддалено підключитися до вашого комп’ютера. Встановіть цю програму й продиктуйте мені код з екрана.",
+     "speaker": "Оператор",
+     "voice": "man",
+     "channel": "phone",
+     "spoken": "Нам потрібно віддалено підключитися до вашого комп’ютера. <breath> Встановіть цю програму й продиктуйте мені код з екрана.",
+     "choices": [
+      {
+       "label": "Встановити програму",
+       "outcome": "compromised",
+       "feedback": "Тепер шахрай має повний доступ до вашого комп’ютера. Від’єднайте комп’ютер від мережі й негайно повідомте."
+      },
+      {
+       "label": "Покласти слухавку й повідомити техпідтримку",
+       "outcome": "risky",
+       "feedback": "Ви вчасно зупинилися. Але ніколи не телефонуйте за номером із такого вікна."
+      }
+     ]
+    },
+    {
+     "id": "restore",
+     "text": "Ви знову відкриваєте браузер. Він пропонує відновити попередні вкладки.",
+     "choices": [
+      {
+       "label": "Не відновлювати й коротко написати техпідтримці",
+       "outcome": "safe",
+       "feedback": "Молодці. Вікно нічого не встановило, а техпідтримка в курсі."
+      },
+      {
+       "label": "Відновити вкладки",
+       "outcome": "risky",
+       "feedback": "Те саме фальшиве вікно може відкритися знову. Не відновлюйте вкладки."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Замок означає лише шифрування: читайте домен.",
+    "Довіряйте закладкам або адресам, які вводите самі, а не рекламі.",
+    "Спливаючі вікна на кшталт «Оновіть зараз» чи «Ваш комп’ютер заражено» — це пастки."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

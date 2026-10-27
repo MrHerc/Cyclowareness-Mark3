@@ -1,0 +1,569 @@
+{
+ "id": "phone-rules",
+ "title": "Les règles du téléphone pro",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Votre téléphone pro, c’est un morceau de votre organisation dans votre poche. Il contient vos e-mails professionnels, vos documents et vos contacts.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Le profil de gestion protège le téléphone. En cas de perte, le support technique peut le verrouiller et effacer les données professionnelles.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "nc-iscihaz",
+       "app": "İşCihaz",
+       "title": [
+        {
+         "text": "Téléphone protégé"
+        }
+       ],
+       "body": [
+        {
+         "text": "Cet appareil est géré selon les règles de sécurité de votre organisation."
+        }
+       ],
+       "time": "09:00"
+      }
+     }
+    },
+    {
+     "id": "b3",
+     "say": "N’installez jamais un profil à partir d’un lien reçu par message. Un faux profil peut livrer votre téléphone à un attaquant.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "it-destek-fake",
+       "sender": [
+        {
+         "text": "Support-IT"
+        }
+       ],
+       "time": "11:42",
+       "messages": [
+        [
+         {
+          "text": "Votre profil arrive à expiration. Installez le nouveau : "
+         },
+         {
+          "text": "iscihaz-profil.example.net",
+          "spot": "link"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "link"
+    },
+    {
+     "id": "b4",
+     "say": "N’installez des applications que depuis la boutique officielle ou l’application de gestion des appareils de votre organisation, et vérifiez chaque autorisation.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "new-phone",
+   "environment": "phone",
+   "title": "Votre nouveau téléphone pro",
+   "intro": "On vient de vous remettre un nouveau téléphone pro. Examinez chaque notification et prenez la bonne décision.",
+   "steps": [
+    {
+     "id": "enroll",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-iscihaz",
+      "app": "İşCihaz",
+      "title": [
+       {
+        "text": "Terminer l’inscription"
+       }
+      ],
+      "body": [
+       {
+        "text": "Le support technique a préparé votre appareil. Terminez l’inscription pour recevoir vos e-mails professionnels."
+       }
+      ],
+      "time": "09:05"
+     },
+     "say": "C’est le support technique lui-même qui a installé cette application.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir la notification",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Exact. L’inscription par l’application de votre propre organisation est la méthode la plus sûre."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Tant que l’inscription n’est pas terminée, le téléphone n’est pas protégé. Faites-la dès le premier jour."
+      }
+     ]
+    },
+    {
+     "id": "profile-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "it-destek-fake",
+      "sender": [
+       {
+        "text": "Support-IT"
+       }
+      ],
+      "time": "11:42",
+      "messages": [
+       [
+        {
+         "text": "Bonjour, votre profil MDM expire aujourd’hui. Installez le nouveau profil pour éviter le blocage de votre téléphone : "
+        },
+        {
+         "text": "iscihaz-profil.example.net/new",
+         "link": {
+          "label": "iscihaz-profil.example.net/new",
+          "href": "https://iscihaz-profil.example.net/new"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Vérifiez l’expéditeur et l’adresse du lien.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Ce n’est pas le domaine de votre organisation. Les profils ne viennent que de l’application İşCihaz ou du support technique.",
+       "next": "profile-install"
+      },
+      {
+       "id": "report",
+       "label": "Signaler",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Grâce à votre signalement, le support technique peut aussi prévenir tous les autres.",
+       "next": "qr-permission"
+      },
+      {
+       "id": "block",
+       "label": "Bloquer",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bien. Prévenez aussi le support technique pour que vos collègues soient avertis.",
+       "next": "qr-permission"
+      }
+     ]
+    },
+    {
+     "id": "profile-install",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-iscihaz-fake",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Installer le profil ?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "iscihaz-profil.example.net souhaite installer un profil de configuration."
+        }
+       ],
+       [
+        {
+         "text": "Le profil ajoutera un certificat, un VPN et des paramètres de messagerie."
+        }
+       ]
+      ],
+      "buttons": [
+       "Refuser",
+       "Autoriser"
+      ]
+     },
+     "say": "Le site veut installer un profil sur votre téléphone.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. Un tel profil peut faire passer tout votre trafic internet par le serveur de l’attaquant."
+      },
+      {
+       "id": "allow",
+       "label": "Autoriser",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Un faux profil donne le contrôle du téléphone à un inconnu. Appelez immédiatement le support technique."
+      }
+     ]
+    },
+    {
+     "id": "qr-permission",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-qr-oxuyucu",
+      "app": "QR Oxuyucu",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Appareil photo"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Contacts"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Position précise"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Accessibilité : contrôler l’écran"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "De quoi un lecteur de QR code a-t-il vraiment besoin ?",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Autoriser",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Un lecteur de QR code n’a besoin que de l’appareil photo. L’accessibilité permet à une application de lire l’écran et d’appuyer à votre place."
+      },
+      {
+       "id": "deny",
+       "label": "Ne pas autoriser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. N’accordez que ce dont la fonction a besoin : ici, uniquement l’appareil photo."
+      }
+     ]
+    },
+    {
+     "id": "chat-apk",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "sohbet",
+      "name": [
+       {
+        "text": "Planning_équipes.apk"
+       }
+      ],
+      "type": "apk",
+      "size": "5,4 Mo",
+      "source": [
+       {
+        "text": "Söhbət : Rashad Mammadov"
+       }
+      ]
+     },
+     "say": "Un collègue vous a envoyé un fichier sur la messagerie instantanée.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Installer",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Un planning ne devrait jamais être un fichier d’installation. Un fichier .apk envoyé dans une conversation installe un logiciel malveillant sur le téléphone."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Le compte de votre collègue a peut-être été piraté : prévenez le support technique."
+      }
+     ]
+    },
+    {
+     "id": "os-update",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sistem-yenileme",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Mise à jour du système"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Une mise à jour de sécurité est prête. Le téléphone va redémarrer pendant environ 10 minutes."
+        }
+       ]
+      ],
+      "buttons": [
+       "Plus tard",
+       "Mettre à jour maintenant"
+      ]
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "Mettre à jour maintenant",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Exact. Les mises à jour corrigent des failles que les attaquants connaissent déjà."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Chaque jour de retard laisse la faille ouverte. Faites la mise à jour ce soir au plus tard."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "app-asks",
+   "prompt": "Sur un téléphone pro, cette demande est-elle sans danger ou est-ce une menace ?",
+   "cards": [
+    {
+     "id": "map-location",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-yolxerite",
+      "app": "YolXəritə",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Position : uniquement quand l’application est ouverte"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Une application de cartes a besoin de la position, et seulement quand elle est ouverte. L’autorisation correspond à sa fonction."
+    },
+    {
+     "id": "game-sms",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-super-oyunlar",
+      "app": "Super Oyunlar",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Lire les SMS"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Contacts"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un jeu n’a besoin ni des SMS ni des contacts. L’accès aux SMS lui permettrait de lire vos codes de connexion."
+    },
+    {
+     "id": "battery-access",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-batareya",
+      "app": "Batareya Qoruyucu",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Accessibilité : contrôler l’écran"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Afficher par-dessus les autres applications"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Économiser la batterie ne demande pas de contrôler l’écran. Ce sont exactement les autorisations que réclament les chevaux de Troie bancaires."
+    },
+    {
+     "id": "lock-notice",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-iscihaz",
+      "app": "İşCihaz",
+      "title": [
+       {
+        "text": "Verrouillage de l’écran requis"
+       }
+      ],
+      "body": [
+       {
+        "text": "Définissez un code PIN d’au moins 6 chiffres pour utiliser votre messagerie professionnelle."
+       }
+      ],
+      "time": "09:20"
+     },
+     "verdict": "safe",
+     "explain": "C’est l’application de votre propre organisation, et elle n’envoie aucun lien. Un verrouillage d’écran robuste est la première défense en cas de perte du téléphone."
+    },
+    {
+     "id": "torch-notifications",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "fener-pro",
+      "app": "Fənər Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Accès aux notifications"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une lampe torche n’a pas besoin de lire les notifications. Avec cet accès, elle peut voir les codes et les messages que vous recevez."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "permission-power",
+   "prompt": "Associez chaque autorisation à ce qu’elle permet.",
+   "pairs": [
+    {
+     "id": "sms",
+     "left": "Lire les SMS",
+     "right": "Voir les codes bancaires et les codes de connexion"
+    },
+    {
+     "id": "accessibility",
+     "left": "Accessibilité",
+     "right": "Lire l’écran et appuyer à votre place"
+    },
+    {
+     "id": "notifications",
+     "left": "Accès aux notifications",
+     "right": "Lire les messages des messageries instantanées"
+    },
+    {
+     "id": "unknown-sources",
+     "left": "Installer des applications inconnues",
+     "right": "Installer des logiciels hors de la boutique officielle"
+    }
+   ],
+   "explain": "Ces quatre autorisations sont les plus puissantes. Ne les accordez qu’aux applications approuvées par le support technique."
+  },
+  {
+   "type": "choice",
+   "id": "slow-phone",
+   "question": {
+    "prompt": "Votre téléphone pro est lent, et un ami vous conseille d’en supprimer le profil de gestion. Que faites-vous ?",
+    "options": [
+     {
+      "id": "support",
+      "label": "Garder le profil et contacter le support technique",
+      "correct": true,
+      "feedback": "Exact. Le profil protège le téléphone, et le support réglera le problème."
+     },
+     {
+      "id": "remove",
+      "label": "Supprimer le profil pour accélérer le téléphone",
+      "correct": false,
+      "feedback": "Sans le profil, un téléphone perdu ne peut pas être verrouillé à distance. En général, la messagerie professionnelle cesse aussi de fonctionner."
+     },
+     {
+      "id": "reset",
+      "label": "Rétablir les paramètres d’usine du téléphone",
+      "correct": false,
+      "feedback": "Cela efface le profil et les données professionnelles à l’insu du support technique. Parlez-en d’abord au support."
+     },
+     {
+      "id": "friend",
+      "label": "Le confier à un ami doué en informatique pour qu’il le répare",
+      "correct": false,
+      "feedback": "Le téléphone contient des données professionnelles. Ne le confiez qu’au support technique."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "phone-lock"
+    }
+   },
+   "explain": "Le profil de gestion protège votre téléphone pro. Seul le support technique peut le modifier."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Les profils et les applications professionnelles ne viennent que de l’application İşCihaz ou du support technique.",
+    "Les autorisations doivent correspondre à la fonction de l’application. L’accès aux SMS et l’accessibilité sont les plus dangereux.",
+    "Le verrouillage de l’écran et les mises à jour sont la première défense de votre téléphone."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,719 @@
+{
+ "id": "vendor-bank-change",
+ "title": "Yeni banka bilgileri",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "vb-tutor",
+   "beats": [
+    {
+     "id": "vb-b1",
+     "say": "Merhaba! Bugün tanıdık bir tedarikçi adına gönderilen sahte ödeme taleplerini fark etmeyi öğreneceğiz.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "vb-b2",
+     "say": "En tehlikeli cümle şudur: banka bilgilerimiz değişti, sonraki faturayı yeni hesaba ödeyin.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "ofistechizat-fake",
+       "from": {
+        "name": [
+         {
+          "text": "OfisTechizat MMC Muhasebe"
+         }
+        ],
+        "address": [
+         {
+          "text": "muhasibat@ofistechizat-az.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Banka bilgilerimiz değişti"
+        }
+       ],
+       "time": "10:42",
+       "body": [
+        [
+         {
+          "text": "Değerli iş ortağımız,"
+         }
+        ],
+        [
+         {
+          "text": "Denetim nedeniyle hesabımızı UlduzBank'a taşıdık."
+         }
+        ],
+        [
+         {
+          "text": "Lütfen eylül faturasını (14.860 manat) yeni hesabımıza ödeyiniz: ",
+          "spot": "new-iban"
+         },
+         {
+          "text": "AZ00ULDZ00000000400520007731",
+          "spot": "new-iban"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "new-iban"
+    },
+    {
+     "id": "vb-b3",
+     "say": "Böyle bir e-posta tedarikçinin gerçek adresinden bile gelebilir. Çünkü onun posta kutusu ele geçirilmiş olabilir.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "vb-b4",
+     "say": "Kural basit: e-postadaki numarayı asla aramayın, zaten bildiğiniz bir numarayı arayın.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vb-hotspot",
+   "prompt": "Bu e-postadaki uyarı işaretlerini bulun.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "ofistechizat-fake",
+    "from": {
+     "name": [
+      {
+       "text": "OfisTechizat MMC Muhasebe"
+      }
+     ],
+     "address": [
+      {
+       "text": "muhasibat@ofistechizat-az.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Banka bilgilerimiz değişti"
+     }
+    ],
+    "time": "10:42",
+    "body": [
+     [
+      {
+       "text": "Değerli iş ortağımız,"
+      }
+     ],
+     [
+      {
+       "text": "Denetim nedeniyle hesabımızı UlduzBank'a taşıdık."
+      }
+     ],
+     [
+      {
+       "text": "Lütfen eylül faturasını (14.860 manat) yeni hesabımıza ödeyiniz: ",
+       "spot": "new-iban"
+      },
+      {
+       "text": "AZ00ULDZ00000000400520007731",
+       "spot": "new-iban"
+      }
+     ],
+     [
+      {
+       "text": "Ödemenin bugün saat 16:00'ya kadar yapılması gerekmektedir, eski hesabımız kapatılıyor.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "Sorularınız için yalnızca bu numarayı arayınız: +994 50 000 72 19",
+       "spot": "phone"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Farklı alan adı",
+     "explain": "Tedarikçinin adresi ofistechizat.example idi. Fazladan eklenen “-az” ve farklı alan adı uzantısı, adresi gerçeğinin taklidi yapıyor."
+    },
+    {
+     "id": "new-iban",
+     "label": "Yeni hesap numarası",
+     "explain": "Bu dolandırıcılığın bütün amacı banka bilgilerinin değiştirilmesidir. Oraya gönderilen parayı geri almak zordur."
+    },
+    {
+     "id": "urgency",
+     "label": "Zaman baskısı",
+     "explain": "Son tarih, kontrol etmeden ödeme yapmanız için sizi zorlar. Gerçek bir iş ortağı doğrulamanız için size zaman tanır."
+    },
+    {
+     "id": "phone",
+     "label": "E-postadaki numara",
+     "explain": "Bu numarayı ararsanız telefonu dolandırıcı açar. Bunun yerine numarayı sözleşmeden alın."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "vb-sim-inbox",
+   "environment": "inbox",
+   "title": "Muhasebe posta kutusu",
+   "intro": "Ödemelerle siz ilgileniyorsunuz. Dört e-postayı açın ve her biri için doğru adımı seçin.",
+   "steps": [
+    {
+     "id": "invoice-normal",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat",
+      "from": {
+       "name": [
+        {
+         "text": "OfisTechizat MMC"
+        }
+       ],
+       "address": [
+        {
+         "text": "satis@ofistechizat.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Eylül faturası"
+       }
+      ],
+      "time": "09:15",
+      "body": [
+       [
+        {
+         "text": "Merhaba, eylül faturası ektedir."
+        }
+       ],
+       [
+        {
+         "text": "Ödemeyi her zamanki gibi sözleşmemizdeki hesaba yapabilirsiniz. Saygılarımızla, Sebine Kerimova"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Fatura_2026_09.pdf"
+         }
+        ],
+        "size": "180 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Eki aç",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "Adres tanıdık, PDF fatura bekleniyordu ve hesap değişmiyor. Bu normal bir e-posta."
+      },
+      {
+       "id": "safe",
+       "label": "Güvenli olarak işaretle",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Doğru. Burada ne yeni bir hesap var ne de zaman baskısı."
+      },
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Dikkatli olmak iyidir, ama burada uyarı işareti yok. Beklenen bir faturayı sözleşmedeki hesaba ödeyebilirsiniz."
+      }
+     ]
+    },
+    {
+     "id": "bank-change-fake",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat-fake",
+      "from": {
+       "name": [
+        {
+         "text": "OfisTechizat MMC Muhasebe"
+        }
+       ],
+       "address": [
+        {
+         "text": "muhasibat@ofistechizat-az.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Banka bilgilerimiz değişti"
+       }
+      ],
+      "time": "10:42",
+      "body": [
+       [
+        {
+         "text": "Değerli iş ortağımız,"
+        }
+       ],
+       [
+        {
+         "text": "Denetim nedeniyle hesabımızı UlduzBank'a taşıdık."
+        }
+       ],
+       [
+        {
+         "text": "Lütfen eylül faturasını (14.860 manat) yeni hesabımıza ödeyiniz: ",
+         "spot": "new-iban"
+        },
+        {
+         "text": "AZ00ULDZ00000000400520007731",
+         "spot": "new-iban"
+        }
+       ],
+       [
+        {
+         "text": "Ödemenin bugün saat 16:00'ya kadar yapılması gerekmektedir, eski hesabımız kapatılıyor.",
+         "spot": "urgency"
+        }
+       ],
+       [
+        {
+         "text": "Sorularınız için yalnızca bu numarayı arayınız: +994 50 000 72 19",
+         "spot": "phone"
+        }
+       ]
+      ]
+     },
+     "say": "Gönderenin alan adına bakın.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru: taklit alan adı, yeni hesap ve son tarih. Bildirme düğmesi yoksa e-postayı BT güvenlik ekibine iletin."
+      },
+      {
+       "id": "confirm",
+       "label": "Yanıtla: yeni hesabı kabul ediyoruz",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Ödeme dolandırıcıya giderdi. Yeni banka bilgilerini asla yalnızca bir e-postaya dayanarak kabul etmeyin."
+      },
+      {
+       "id": "ask",
+       "label": "Yanıtla: bu doğru mu?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Dolandırıcı yanıt verir ve “evet” der. Bunu ancak zaten bildiğiniz bir numarayı arayarak doğrulayabilirsiniz."
+      }
+     ]
+    },
+    {
+     "id": "bank-change-real-box",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat",
+      "from": {
+       "name": [
+        {
+         "text": "Sebine Kerimova"
+        }
+       ],
+       "address": [
+        {
+         "text": "satis@ofistechizat.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: Eylül faturası"
+       }
+      ],
+      "time": "11:20",
+      "body": [
+       [
+        {
+         "text": "Kusura bakmayın, söylemeyi unutmuşuz."
+        }
+       ],
+       [
+        {
+         "text": "Lütfen bu faturayı yeni hesabımıza ödeyin: AZ00ULDZ00000000400520007731"
+        }
+       ],
+       [
+        {
+         "text": "Teyit için beni bu numaradan arayabilirsiniz: +994 55 000 31 84"
+        }
+       ]
+      ]
+     },
+     "say": "Adres gerçek. Yine de dikkatli olun.",
+     "actions": [
+      {
+       "id": "verify",
+       "label": "Sözleşmedeki numarayı ara",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru. Posta kutusu ele geçirilebilir, ama sözleşmenizdeki numara sizi gerçek tedarikçiye ulaştırır."
+      },
+      {
+       "id": "call-mail",
+       "label": "E-postadaki numarayı ara",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Bu numara dolandırıcıya ait, size her şeyi onaylar. Kendi kayıtlarınızdaki numarayı kullanın."
+      },
+      {
+       "id": "safe",
+       "label": "Güvenli olarak işaretle",
+       "kind": "mark-safe",
+       "outcome": "compromised",
+       "feedback": "Adres gerçek, ama posta kutusu ele geçirilmiş. Yeni banka bilgilerini her zaman ayrı bir kanaldan doğrulayın."
+      },
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "İyi bir adım. Güvenlik ekibi tedarikçiyi de uyarabilir."
+      }
+     ]
+    },
+    {
+     "id": "boss-urgent",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Anar Hüseynov"
+        }
+       ],
+       "address": [
+        {
+         "text": "anar.huseynov@idare-mail.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Acil: Kur Tikinti avansı"
+       }
+      ],
+      "time": "12:05",
+      "body": [
+       [
+        {
+         "text": "Kur Tikinti avansını bugün yeni hesaplarına ödeyin, bilgileri yarın gönderecekler."
+        }
+       ],
+       [
+        {
+         "text": "Toplantıdayım, aramayın. Anar"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru. Ad yöneticinizin adı, ama alan adı idare.example değil. “Aramayın” demesi de bir uyarı işaretidir."
+      },
+      {
+       "id": "verify",
+       "label": "Yöneticiyi bilinen bir numaradan ara",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Harika. Yöneticiniz toplantıda olsa bile bir dakikalık kontrol büyük bir kaybı önler."
+      },
+      {
+       "id": "pay",
+       "label": "Yanıtla: bugün ödüyoruz",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Para dolandırıcıya giderdi. Baskı ve gizlilik, ödemeyi durdurmak için birer nedendir."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "vb-sim-call",
+   "environment": "call",
+   "title": "Tedarikçiden gelen arama",
+   "intro": "Kısa süre sonra tedarikçi adına bir arama geliyor. Arayanın söylediklerini okuyun ve yanıtınızı seçin.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-2"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Yanıtla",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Telefonu açmak tehlikeli değil. Önemli olan, sonra ne söylediğiniz."
+      },
+      {
+       "id": "decline",
+       "label": "Reddet",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Bu da olur. Daha sonra tedarikçiyi sözleşmedeki numaradan kendiniz arayın.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pitch",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-2"
+     },
+     "say": "Merhaba, ben OfisTechizat'tan Zaur Guliyev. Yeni banka bilgilerimizi aldınız mı? Bugün ödeme yapmazsanız siparişiniz durdurulur.",
+     "spoken": "Merhaba, <breath> ben OfisTechizat'tan Zaur Guliyev. Yeni banka bilgilerimizi aldınız mı? Bugün ödeme yapmazsanız, ee, siparişiniz durdurulur.",
+     "actions": [
+      {
+       "id": "agree",
+       "label": "Tamam, bugün yeni hesaba ödüyoruz",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Bu arama da tuzağın bir parçası, e-postayı inandırıcı göstermek için yapılıyor. Arayanın numarası hiçbir şey kanıtlamaz."
+      },
+      {
+       "id": "own-check",
+       "label": "Değişikliği kendi yöntemimizle kontrol edeceğiz",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Gerçek bir tedarikçi doğrulama yapmanızı anlayışla karşılar."
+      },
+      {
+       "id": "hang",
+       "label": "Aramayı sonlandır",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "İyi bir seçim. Şimdi sözleşmedeki numarayı kendiniz arayın.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-2"
+     },
+     "say": "Yöneticiniz onayladı, kendisiyle konuştum. Kontrol edebilmem için ödeme talimatının fotoğrafını bana gönderin.",
+     "spoken": "Yöneticiniz onayladı, kendisiyle konuştum. <breath> Kontrol edebilmem için ödeme talimatının fotoğrafını bana gönderin.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Fotoğrafı gönderirim",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Ödeme talimatında hesap ve imza bilgileri bulunur. Dolandırıcılar bunları sahte belge hazırlamak için kullanır."
+      },
+      {
+       "id": "verify",
+       "label": "Yöneticimi kendim ararım",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Harika. “Yöneticiniz onayladı” sözünü ancak yöneticinizin kendisi doğrulayabilir."
+      },
+      {
+       "id": "hang",
+       "label": "Aramayı sonlandır",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Doğru. Baskı arttığında en iyi yanıt görüşmeyi bitirmektir."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Arama sona erdi. Şimdi ne yaparsınız?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-2"
+     },
+     "actions": [
+      {
+       "id": "contract",
+       "label": "Sözleşmedeki numarayı ara",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Doğru. Gerçek tedarikçi hiçbir şeyin değişmediğini söyleyecek, siz de dolandırıcılığı bildireceksiniz."
+      },
+      {
+       "id": "redial",
+       "label": "Arayan numarayı geri ara",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Bu numara sizi dolandırıcıya ulaştırır. Yalnızca kendi kayıtlarınızdaki bir numarayla doğrulayın."
+      },
+      {
+       "id": "ignore",
+       "label": "Hiçbir şey yapma",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Dolandırıcı başka bir iş arkadaşınızı deneyecek. Güvenlik ekibine haber verin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "vb-order",
+   "prompt": "Yeni banka bilgileri geldiğinde atılacak adımları doğru sıraya koyun.",
+   "items": [
+    {
+     "id": "pause",
+     "label": "Ödemeyi bekletin"
+    },
+    {
+     "id": "known-number",
+     "label": "Numarayı sözleşmeden veya önceki kayıtlardan alın"
+    },
+    {
+     "id": "call",
+     "label": "Arayıp değişikliği sorun"
+    },
+    {
+     "id": "second",
+     "label": "İkinci bir iş arkadaşınıza onaylatın"
+    },
+    {
+     "id": "update",
+     "label": "Bilgileri ancak bundan sonra güncelleyin"
+    }
+   ],
+   "explain": "Banka bilgileri ancak bilinen bir numaradan kontrol edildikten ve ikinci bir iş arkadaşı onayladıktan sonra değiştirilir."
+  },
+  {
+   "type": "choice",
+   "id": "vb-choice",
+   "question": {
+    "prompt": "Parayı yeni hesaba zaten gönderdiniz. İlk olarak ne yaparsınız?",
+    "options": [
+     {
+      "id": "call-bank",
+      "label": "Transferi durdurmak için hemen bankamı ararım ve güvenlik ekibine haber veririm",
+      "correct": true,
+      "feedback": "Doğru. Banka ne kadar erken haberdar olursa parayı durdurma şansı o kadar artar."
+     },
+     {
+      "id": "wait",
+      "label": "Tedarikçinin yanıt vermesini beklerim",
+      "correct": false,
+      "feedback": "Her geçen saat parayı biraz daha uzaklaştırır. Beklemek zaman kaybettirir."
+     },
+     {
+      "id": "email-again",
+      "label": "Aynı adrese e-posta yazıp parayı geri isterim",
+      "correct": false,
+      "feedback": "O posta kutusunu dolandırıcı okuyor. Parayı yalnızca banka durdurabilir."
+     }
+    ]
+   },
+   "explain": "Yanlış bir transferde zaman belirleyicidir: önce banka, sonra güvenlik ekibi. E-postaları kanıt olarak saklayın."
+  },
+  {
+   "type": "recap",
+   "id": "vb-recap",
+   "points": [
+    "Banka bilgileri değişiyorsa ödemeyi bekletin",
+    "E-postadaki numarayı değil, bildiğiniz numarayı arayın",
+    "Ödemeyi yaptınız mı? Hemen bankayı ve güvenlik ekibini arayın"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

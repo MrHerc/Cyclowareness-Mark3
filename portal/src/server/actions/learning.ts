@@ -113,6 +113,8 @@ export async function completeLessonAction(input: z.infer<typeof completeSchema>
   const v = await actionViewer();
   const p = completeSchema.safeParse(input);
   if (!p.success) return { ok: false, xp: 0 };
+  // Each call stores up to 400 answers and recomputes the risk score: far more than anyone finishes lessons.
+  if (!(await rateLimit(`lesson-complete:${v.user.id}`, 60, 10 * 60_000)).ok) return { ok: false, xp: 0 };
   const mod = await moduleBySlug(v, p.data.slug);
   if (!mod) return { ok: false, xp: 0 };
   const lessons = await db().select().from(t.lessons).where(eq(t.lessons.moduleId, mod.id));
@@ -166,7 +168,7 @@ export async function reportProblemAction(_: { ok?: boolean } | undefined, form:
       kind: "problem",
       subject: where ? tr("emailSubject", { context: where }) : tr("emailSubjectPlain"),
       text,
-      html: renderEmailHtml(text, { buttonLabel: tr("emailButton"), lang, brand: v.tenant.branding.primary, footer: v.tenant.name }),
+      html: renderEmailHtml(text, { buttonLabel: tr("emailButton"), button: link, lang, brand: v.tenant.branding.primary, footer: v.tenant.name }),
       lang,
     });
   }

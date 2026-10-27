@@ -1,0 +1,887 @@
+{
+  "id": "spot-the-phish",
+  "title": "كشف رسائل التصيد",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "meet-the-phish",
+      "beats": [
+        {
+          "id": "hello",
+          "say": "مرحبًا! أنا مساعدك في الأمن السيبراني. اليوم ستتعلم كيف تكشف الرسالة المزيفة خلال ثوان معدودة.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "sender",
+          "say": "أولًا، تحقق من عنوان المرسل. تم هنا تبديل حرف واحد بحرف آخر، ويصعب ملاحظة ذلك.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "xidmet-agentliyi-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "إدارة الحسابات"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@"
+                  },
+                  {
+                    "text": "xidmetagentIiyi.az",
+                    "spot": "sender-domain"
+                  }
+                ]
+              },
+              "to": "e.mammadov@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "كشف راتب سبتمبر"
+                }
+              ],
+              "time": "09:12",
+              "body": [
+                [
+                  {
+                    "text": "عزيزي المستخدم،",
+                    "spot": "greeting"
+                  }
+                ],
+                [
+                  {
+                    "text": "كشف راتبك لشهر سبتمبر جاهز. "
+                  },
+                  {
+                    "text": "إذا لم تؤكد خلال 24 ساعة، فسيتم إيقاف صرف راتبك.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "عرض كشف الراتب",
+                    "spot": "link",
+                    "link": {
+                      "label": "عرض كشف الراتب",
+                      "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+                    }
+                  }
+                ],
+                [
+                  {
+                    "text": "إدارة الحسابات"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "sender-domain",
+          "checkpoint": {
+            "prompt": "ما أول شيء تتحقق منه في رسالة مشبوهة؟",
+            "options": [
+              {
+                "id": "address",
+                "label": "عنوان المرسل",
+                "correct": true,
+                "feedback": "صحيح. غالبًا ما يكون العنوان أسرع ما يكشف الرسالة المزيفة."
+              },
+              {
+                "id": "logo",
+                "label": "الشعار والتصميم",
+                "correct": false,
+                "feedback": "نسخ الشعارات والتصميم أمر سهل. تحقق من العنوان."
+              },
+              {
+                "id": "time",
+                "label": "وقت إرسال الرسالة",
+                "correct": false,
+                "feedback": "الوقت لا يدل على شيء. المحتالون يكتبون في أي ساعة."
+              }
+            ]
+          }
+        },
+        {
+          "id": "urgency",
+          "say": "مهلة وتهديد. عندما تستعجلك رسالة ما، فهذه إشارة لك كي تتوقف.",
+          "mood": "alert",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "xidmet-agentliyi-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "إدارة الحسابات"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@"
+                  },
+                  {
+                    "text": "xidmetagentIiyi.az",
+                    "spot": "sender-domain"
+                  }
+                ]
+              },
+              "to": "e.mammadov@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "كشف راتب سبتمبر"
+                }
+              ],
+              "time": "09:12",
+              "body": [
+                [
+                  {
+                    "text": "عزيزي المستخدم،",
+                    "spot": "greeting"
+                  }
+                ],
+                [
+                  {
+                    "text": "كشف راتبك لشهر سبتمبر جاهز. "
+                  },
+                  {
+                    "text": "إذا لم تؤكد خلال 24 ساعة، فسيتم إيقاف صرف راتبك.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "عرض كشف الراتب",
+                    "spot": "link",
+                    "link": {
+                      "label": "عرض كشف الراتب",
+                      "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+                    }
+                  }
+                ],
+                [
+                  {
+                    "text": "إدارة الحسابات"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "urgency"
+        },
+        {
+          "id": "link",
+          "say": "لا تضغط على الرابط. على الحاسوب، مرر المؤشر فوقه لتقرأ العنوان، وعلى الجوال افتح الموقع بنفسك.",
+          "mood": "talk",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "xidmet-agentliyi-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "إدارة الحسابات"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@"
+                  },
+                  {
+                    "text": "xidmetagentIiyi.az",
+                    "spot": "sender-domain"
+                  }
+                ]
+              },
+              "to": "e.mammadov@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "كشف راتب سبتمبر"
+                }
+              ],
+              "time": "09:12",
+              "body": [
+                [
+                  {
+                    "text": "عزيزي المستخدم،",
+                    "spot": "greeting"
+                  }
+                ],
+                [
+                  {
+                    "text": "كشف راتبك لشهر سبتمبر جاهز. "
+                  },
+                  {
+                    "text": "إذا لم تؤكد خلال 24 ساعة، فسيتم إيقاف صرف راتبك.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "عرض كشف الراتب",
+                    "spot": "link",
+                    "link": {
+                      "label": "عرض كشف الراتب",
+                      "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+                    }
+                  }
+                ],
+                [
+                  {
+                    "text": "إدارة الحسابات"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "link"
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "morning-inbox",
+      "environment": "inbox",
+      "title": "صندوق الوارد في الصباح",
+      "intro": "الساعة التاسعة صباحًا، وخمس رسائل جديدة بانتظارك. افتح كل رسالة واختر الخطوة الصحيحة.",
+      "steps": [
+        {
+          "id": "payslip",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "إدارة الحسابات"
+                }
+              ],
+              "address": [
+                {
+                  "text": "muhasibat@xidmetagentIiyi.az",
+                  "reveal": "بعد «agent» يأتي حرف «I» لاتيني كبير، وليس حرف «l» صغيرًا"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "كشف راتب سبتمبر"
+              }
+            ],
+            "time": "09:02",
+            "body": [
+              [
+                {
+                  "text": "عزيزي المستخدم،"
+                }
+              ],
+              [
+                {
+                  "text": "كشف راتبك جاهز. إذا لم تؤكد خلال 24 ساعة، فسيتم إيقاف صرف الراتب."
+                }
+              ],
+              [
+                {
+                  "text": "عرض كشف الراتب",
+                  "link": {
+                    "label": "عرض كشف الراتب",
+                    "href": "https://maas-portal.info/giris"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "اقرأ عنوان المرسل حرفًا حرفًا.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "الإبلاغ عن تصيد",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "صحيح. في العنوان حرف I كبير بدلًا من حرف l صغير: إنه نطاق مشابه."
+            },
+            {
+              "id": "click",
+              "label": "فتح الرابط",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "الرابط يؤدي إلى maas-portal.info، وليس إلى موقع الوكالة. أي كلمة مرور تكتبها هناك تصل إلى المحتال."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "أنت في أمان، لكن زملاءك تلقوا الرسالة أيضًا. أبلغ عنها حتى يتمكن الفريق من حذفها لدى الجميع."
+            }
+          ]
+        },
+        {
+          "id": "report-draft",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "إلفين محمدوف"
+                }
+              ],
+              "address": [
+                {
+                  "text": "e.mammadov@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "النسخة النهائية من التقرير"
+              }
+            ],
+            "time": "08:47",
+            "body": [
+              [
+                {
+                  "text": "مرحبًا آينور،"
+                }
+              ],
+              [
+                {
+                  "text": "رفعت إلى البوابة الداخلية النسخة النهائية من التقرير الذي ناقشناه. أخبريني بعد أن تطلعي عليها."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "reply",
+              "label": "الرد",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "صحيح. زميل تعرفه، ونطاق الوكالة نفسها، ولا رابط ولا استعجال."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن تصيد",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "هذه الرسالة حقيقية: النطاق صحيح، ولا تطلب منك أي شيء."
+            }
+          ]
+        },
+        {
+          "id": "sign-request",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "docusfera-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "DocuSfera"
+                }
+              ],
+              "address": [
+                {
+                  "text": "noreply@docusfera-imza.test"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "مستند بانتظار توقيعك"
+              }
+            ],
+            "time": "08:31",
+            "body": [
+              [
+                {
+                  "text": "أرسلت إليك الإدارة المستند «Muqavile_2025.pdf» لتوقيعه."
+                }
+              ],
+              [
+                {
+                  "text": "سجل الدخول ببريد العمل الإلكتروني لعرضه."
+                }
+              ],
+              [
+                {
+                  "text": "عرض المستند",
+                  "link": {
+                    "label": "عرض المستند",
+                    "href": "https://docusfera-imza.test/doc"
+                  }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "click",
+              "label": "فتح الرابط",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "النطاق كان docusfera-imza.test، وليس نطاق الخدمة نفسها. الصفحة التي تفتح مصممة لسرقة كلمة مرور حساب العمل."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن تصيد",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "صحيح: طلب توقيع غير متوقع من نطاق غريب. إن ساورك الشك، فاتصل بالمرسل على رقم تعرفه."
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "الدعم الفني"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "صيانة مجدولة"
+              }
+            ],
+            "time": "08:15",
+            "body": [
+              [
+                {
+                  "text": "ستتوقف خدمة البريد الإلكتروني يوم السبت من 20:00 إلى 22:00. لا يلزمك اتخاذ أي إجراء."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "ok",
+              "label": "تمييزها كرسالة آمنة",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "صحيح. العنوان رسمي، ولا يوجد رابط، والرسالة لا تطلب منك أي شيء."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن تصيد",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "هذه الرسالة حقيقية: هي للإعلام فقط ولا تطلب شيئًا."
+            }
+          ]
+        },
+        {
+          "id": "bonus-list",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "إدارة الموارد البشرية"
+                }
+              ],
+              "address": [
+                {
+                  "text": "kadrlar@xidmetagentliyi-az.com"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "قائمة مكافآت الأعياد"
+              }
+            ],
+            "time": "07:58",
+            "body": [
+              [
+                {
+                  "text": "عزيزي الموظف،"
+                }
+              ],
+              [
+                {
+                  "text": "تجد في المرفق قائمة المستحقين للمكافأة. تحقق من وجود اسمك اليوم."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Mukafat_siyahisi.html"
+                  }
+                ],
+                "size": "12 KB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح المرفق",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "القائمة ملف بامتداد .html يعرض صفحة تسجيل دخول مزيفة. كما أن النطاق كان ينتهي بالمقطع -az.com."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن تصيد",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "صحيح: نطاق غريب، وموضوع جذاب، ومرفق بامتداد .html. اسأل الموارد البشرية عن المكافآت بنفسك."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "find-the-signs",
+      "prompt": "اضغط على علامات التزييف.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "e-xidmet-fake",
+        "from": {
+          "name": [
+            {
+              "text": "بوابة E-Xidmet",
+              "reveal": "bildiris@e-xidmet-portal.info"
+            }
+          ],
+          "address": [
+            {
+              "text": "bildiris@"
+            },
+            {
+              "text": "e-xidmet-portal.info",
+              "spot": "sender-domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "غرامة غير مدفوعة: إشعار نهائي"
+          }
+        ],
+        "time": "11:47",
+        "body": [
+          [
+            {
+              "text": "عزيزي المواطن،",
+              "spot": "greeting"
+            }
+          ],
+          [
+            {
+              "text": "صدرت باسمك مخالفة مرورية بقيمة 40 AZN."
+            }
+          ],
+          [
+            {
+              "text": "إذا لم يتم الدفع خلال 48 ساعة، فسيتضاعف المبلغ وستحال القضية إلى المحكمة.",
+              "spot": "threat"
+            }
+          ],
+          [
+            {
+              "text": "دفع الغرامة",
+              "spot": "link",
+              "link": {
+                "label": "دفع الغرامة",
+                "href": "https://e-xidmet-portal.info/cerime?id=58213"
+              }
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender-domain",
+          "label": "نطاق غير معروف",
+          "explain": "الخدمات الرسمية لا تراسلك من عنوان كهذا. الاسم مختلق ليبدو رسميًا."
+        },
+        {
+          "id": "greeting",
+          "label": "تحية عامة",
+          "explain": "الإشعار الحقيقي يذكر عادة اسمك ورقم القضية."
+        },
+        {
+          "id": "threat",
+          "label": "تهديد ومهلة",
+          "explain": "الخوف والمهلة القصيرة يدفعانك إلى الدفع دون تحقق."
+        },
+        {
+          "id": "link",
+          "label": "رابط مزيف",
+          "explain": "الرابط يجمع بيانات بطاقتك. تحقق من الغرامات بفتح البوابة الرسمية بنفسك."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "first-move",
+      "question": {
+        "prompt": "ماذا تفعل برسالة مشبوهة؟",
+        "options": [
+          {
+            "id": "report",
+            "label": "أضغط زر «الإبلاغ عن تصيد»",
+            "correct": true,
+            "feedback": "صحيح. لا يوجد زر كهذا؟ أعد توجيه الرسالة إلى فريق الأمن السيبراني، وعندها يستطيع الفريق حظرها لدى الجميع."
+          },
+          {
+            "id": "click",
+            "label": "أفتح الرابط لأتحقق منه",
+            "correct": false,
+            "feedback": "ضغطة واحدة قد تفتح صفحة ضارة. تحقق من العنوان بدلًا من ذلك."
+          },
+          {
+            "id": "reply",
+            "label": "أرد على المرسل وأسأله",
+            "correct": false,
+            "feedback": "ردك يصل مباشرة إلى المحتال، وبالطبع سيقول لك إن كل شيء على ما يرام."
+          },
+          {
+            "id": "forward",
+            "label": "أعيد توجيهها إلى زملائي ليلقوا نظرة عليها",
+            "correct": false,
+            "feedback": "هكذا ينتشر الخطر. أبلغ عنها، وسيتولى الفريق فحصها."
+          }
+        ]
+      },
+      "explain": "الإبلاغ يحميك ويحمي زملاءك. إذا لم يكن في بريدك زر «الإبلاغ عن تصيد»، فأعد توجيه الرسالة إلى فريق الأمن السيبراني."
+    },
+    {
+      "type": "swipe",
+      "id": "safe-or-phish",
+      "prompt": "آمن أم فخ؟",
+      "cards": [
+        {
+          "id": "card-blocked",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ulduzbank-fake",
+            "sender": [
+              {
+                "text": "UlduzBank"
+              }
+            ],
+            "time": "08:03",
+            "messages": [
+              [
+                {
+                  "text": "UlduzBank: تم حظر بطاقتك. لإلغاء الحظر، سجل الدخول: "
+                },
+                {
+                  "text": "https://ulduzbank-az.info/kart"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "يمكن تزوير اسم المرسل، والرابط ليس موقع البنك. إن ساورك الشك، فاتصل بالرقم المدون على ظهر بطاقتك."
+        },
+        {
+          "id": "meeting",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "إلفين محمدوف"
+                }
+              ],
+              "address": [
+                {
+                  "text": "e.mammadov@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "اجتماع الغد"
+              }
+            ],
+            "time": "10:21",
+            "body": [
+              [
+                {
+                  "text": "مرحبًا آينور،"
+                }
+              ],
+              [
+                {
+                  "text": "نلتقي غدًا الساعة 10:00 في القاعة 3. جدول الأعمال في رسالة الأمس."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "زميل تعرفه، والعنوان صحيح، ولا رابط ولا طلب. رسالة عمل عادية."
+        },
+        {
+          "id": "courier",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "cevikkargo-fake",
+            "sender": [
+              {
+                "text": "+994 70 000 88 31"
+              }
+            ],
+            "time": "13:40",
+            "messages": [
+              [
+                {
+                  "text": "ÇevikKargo: طردك محتجز في المستودع. ادفع رسومًا قدرها 1.20 AZN: "
+                },
+                {
+                  "text": "https://cevik-kargo.info/odenis"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "صغر المبلغ يضعف حذرك. الهدف الحقيقي هو سرقة بيانات بطاقتك."
+        },
+        {
+          "id": "holidays",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "إدارة الموارد البشرية"
+                }
+              ],
+              "address": [
+                {
+                  "text": "kadrlar@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "العطلات الرسمية"
+              }
+            ],
+            "time": "16:05",
+            "body": [
+              [
+                {
+                  "text": "زملائي الأعزاء،"
+                }
+              ],
+              [
+                {
+                  "text": "جدول العمل خلال عطلات نوفمبر منشور على البوابة الداخلية."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "التحية العامة ليست دائمًا علامة تهديد. العنوان صحيح، ولا رابط ولا استعجال."
+        },
+        {
+          "id": "mailbox-full",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "الدعم الفني"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it-destek@xidmetagentliyi-az.com"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "صندوق بريدك ممتلئ"
+              }
+            ],
+            "time": "07:58",
+            "body": [
+              [
+                {
+                  "text": "صندوق بريدك ممتلئ بنسبة 98%. أكد بيانات تسجيل الدخول اليوم حتى لا تفقد رسائلك."
+                }
+              ],
+              [
+                {
+                  "text": "تأكيد تسجيل الدخول",
+                  "link": {
+                    "label": "تأكيد تسجيل الدخول",
+                    "href": "https://xidmetagentliyi-az.com/poct"
+                  }
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "ينتهي العنوان بمقطع إضافي هو -az.com، وهذا ليس نطاق الوكالة. كما أن تأكيد تسجيل الدخول لا يتم عبر رابط."
+        },
+        {
+          "id": "card-payment",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ulduzbank",
+            "sender": [
+              {
+                "text": "UlduzBank"
+              }
+            ],
+            "time": "19:12",
+            "messages": [
+              [
+                {
+                  "text": "UlduzBank: تمت عملية دفع بقيمة 23.40 AZN ببطاقتك. إذا لم تكن أنت من أجراها، فاتصل بالرقم المدون على ظهر بطاقتك."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "لا يوجد رابط، والرسالة توجهك إلى رقم موجود لديك أصلًا. إشعار عادي."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "تحقق من العنوان: حتى حرف واحد مختلف يعني أن الرسالة مزيفة.",
+        "الاستعجال والتهديد إشارة لك كي تتوقف.",
+        "تحقق من الروابط قبل أن تضغط عليها، وأبلغ عند الشك."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

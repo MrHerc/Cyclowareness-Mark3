@@ -1,0 +1,558 @@
+{
+  "id": "drag-test",
+  "title": "اختبار سحب النافذة",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "dt-tutor",
+      "beats": [
+        {
+          "id": "dt-b1",
+          "say": "مرحبًا! بعض المواقع تفتح نافذة صغيرة لتسجيل الدخول. ستتعلم اليوم كيف تكشف النافذة المزيفة منها.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "dt-b2",
+          "say": "يرسم المحتال هذه النافذة داخل الصفحة كأنها صورة، حتى إن شريط العنوان فيها يبدو سليمًا.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "ispoct-fake",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "IshPocht: تسجيل الدخول"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "https://poct.idare.example/giris",
+                    "spot": "fake-bar"
+                  }
+                ],
+                [
+                  {
+                    "text": "سجل الدخول ببريد العمل الإلكتروني لعرض المستند."
+                  }
+                ]
+              ],
+              "buttons": [
+                "تسجيل الدخول",
+                "إلغاء"
+              ]
+            }
+          },
+          "highlight": "fake-bar"
+        },
+        {
+          "id": "dt-b3",
+          "say": "الاختبار بسيط: أمسك النافذة واسحبها إلى خارج المتصفح. النافذة المزيفة لا تستطيع مغادرة الصفحة.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "dt-b4",
+          "say": "إذا لم يملأ مدير كلمات المرور كلمة المرور، فتوقف. واكتب العنوان بنفسك في علامة تبويب جديدة.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "dt-swipe",
+      "prompt": "أي نافذة تسجيل دخول يمكنك الوثوق بها؟",
+      "cards": [
+        {
+          "id": "edge-cut",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "IshPocht: تسجيل الدخول"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "سحبت النافذة جانبًا."
+                }
+              ],
+              [
+                {
+                  "text": "فوصلت إلى حافة الصفحة واختفى جزء منها."
+                }
+              ]
+            ],
+            "buttons": [
+              "تسجيل الدخول"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "النافذة الحقيقية تخرج من المتصفح وتنتقل إلى أي مكان على الشاشة. وإذا اختفى جزء منها عند حافة الصفحة، فهي صورة مرسومة داخل الصفحة."
+        },
+        {
+          "id": "moves-out",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct",
+            "tone": "app",
+            "title": [
+              {
+                "text": "IshPocht: تسجيل الدخول"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "سحبت النافذة جانبًا، فخرجت من المتصفح وانتقلت إلى سطح المكتب."
+                }
+              ],
+              [
+                {
+                  "text": "واقترح ParolSeyf كلمة المرور من تلقاء نفسه."
+                }
+              ]
+            ],
+            "buttons": [
+              "تسجيل الدخول"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "النافذة تتحرك مستقلة عن المتصفح، ومدير كلمات المرور يتعرف على الموقع. هذه علامات النافذة الحقيقية."
+        },
+        {
+          "id": "no-fill",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "system",
+            "title": [
+              {
+                "text": "ParolSeyf"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "لا توجد كلمة مرور محفوظة لهذا الموقع."
+                }
+              ],
+              [
+                {
+                  "text": "العنوان المكتوب في النافذة: poct.idare.example"
+                }
+              ]
+            ],
+            "buttons": [
+              "إغلاق"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "مدير كلمات المرور يفحص العنوان الحقيقي للموقع، لا النص المكتوب في النافذة. وإذا لم يجد كلمة مرور، فأنت على موقع آخر."
+        },
+        {
+          "id": "moves-along",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "IshPocht: تسجيل الدخول"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "سحبت المتصفح نفسه جانبًا."
+                }
+              ],
+              [
+                {
+                  "text": "فتحركت نافذة تسجيل الدخول معه."
+                }
+              ]
+            ],
+            "buttons": [
+              "تسجيل الدخول"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "النافذة الحقيقية تبقى في مكانها. وإذا تحركت مع المتصفح، فهي جزء من الصفحة."
+        },
+        {
+          "id": "own-tab",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct",
+            "tone": "app",
+            "title": [
+              {
+                "text": "علامة تبويب جديدة: poct.idare.example"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "كتبت العنوان بنفسك."
+                }
+              ],
+              [
+                {
+                  "text": "وملأ مدير كلمات المرور كلمة المرور."
+                }
+              ]
+            ],
+            "buttons": [
+              "تسجيل الدخول"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "عندما تكتب العنوان بنفسك، لا تجد النافذة المزيفة طريقًا إليك. هذه هي الطريقة الأكثر موثوقية."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "dt-sim",
+      "environment": "browser",
+      "title": "مستند المناقصة",
+      "intro": "أرسل لك أحد الموردين رابطًا إلى مستند مناقصة، ويطلب الموقع منك تسجيل الدخول لعرضه. تصرف بحذر.",
+      "steps": [
+        {
+          "id": "doc-page",
+          "label": "مستند المناقصة: شراء أثاث مكتبي",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tender-baza",
+            "url": [
+              {
+                "text": "https://tender-baza.example.net/sened/4471"
+              }
+            ]
+          },
+          "say": "المستند مقفل، ويعرض عليك الموقع تسجيل الدخول بحساب العمل.",
+          "actions": [
+            {
+              "id": "open-login",
+              "label": "تسجيل الدخول عبر IshPocht",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "الضغط على الزر ليس خطيرًا بعد. الاختبار الحقيقي هو النافذة التي ستفتح الآن."
+            },
+            {
+              "id": "check-address",
+              "label": "التحقق من العنوان",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "هذا موقع المناقصات، وليس بريد العمل. راقب جيدًا نافذة تسجيل الدخول التي ستفتح بعد قليل."
+            },
+            {
+              "id": "close-tab",
+              "label": "إغلاق علامة التبويب",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "اختيار حذر. افتح بريدك بنفسك، واطلب المستند من المورد بطريقة أخرى.",
+              "next": "own-tab"
+            }
+          ]
+        },
+        {
+          "id": "popup",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "IshPocht: تسجيل الدخول"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "https://poct.idare.example/giris"
+                }
+              ],
+              [
+                {
+                  "text": "سجل الدخول ببريد العمل الإلكتروني لعرض المستند."
+                }
+              ],
+              [
+                {
+                  "text": "البريد الإلكتروني: aysel.quliyeva@idare.example"
+                }
+              ]
+            ],
+            "buttons": [
+              "تسجيل الدخول",
+              "إلغاء"
+            ]
+          },
+          "say": "تعرض النافذة العنوان الصحيح، لكن هذا لا يثبت شيئًا بعد.",
+          "actions": [
+            {
+              "id": "drag",
+              "label": "سحب النافذة إلى خارج المتصفح",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "هذا هو الاختبار الصحيح. لنتحقق الآن: هل تستطيع النافذة الخروج من المتصفح؟"
+            },
+            {
+              "id": "autofill",
+              "label": "الملء باستخدام ParolSeyf",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "فكرة جيدة. مدير كلمات المرور يفحص العنوان الحقيقي للموقع.",
+              "next": "pm-check"
+            },
+            {
+              "id": "type-pass",
+              "label": "كتابة كلمة المرور وتسجيل الدخول",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "شريط العنوان في النافذة كان مجرد صورة، ووصلت كلمة مرورك إلى صاحب موقع المناقصات.",
+              "next": "leaked"
+            },
+            {
+              "id": "cancel",
+              "label": "إلغاء",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "أحسنت. لا تكتب كلمة المرور أبدًا في نافذة تشك في أمرها.",
+              "next": "own-tab"
+            }
+          ]
+        },
+        {
+          "id": "drag-result",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "IshPocht: تسجيل الدخول"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "وصلت النافذة إلى حافة الصفحة واختفى جزء منها."
+                }
+              ],
+              [
+                {
+                  "text": "ولم تخرج من المتصفح."
+                }
+              ]
+            ],
+            "buttons": [
+              "تسجيل الدخول",
+              "إلغاء"
+            ]
+          },
+          "say": "اختفى جزء من النافذة عند حافة الصفحة. والنافذة الحقيقية لا يحدث لها ذلك أبدًا.",
+          "actions": [
+            {
+              "id": "close-it",
+              "label": "إغلاق النافذة وعلامة التبويب",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. النافذة التي لا تستطيع مغادرة الصفحة مزيفة، فلا تكتب فيها شيئًا.",
+              "next": "own-tab"
+            },
+            {
+              "id": "type-anyway",
+              "label": "تسجيل الدخول رغم ذلك",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "كنت قد رأيت بنفسك أن النافذة مزيفة. والآن وصلت كلمة مرورك إلى المحتال.",
+              "next": "leaked"
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن الموقع للدعم الفني",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "ممتاز. يستطيع الدعم الفني حظر الموقع وحماية زملائك أيضًا.",
+              "next": "own-tab"
+            }
+          ]
+        },
+        {
+          "id": "pm-check",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "system",
+            "title": [
+              {
+                "text": "ParolSeyf"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "لا توجد كلمة مرور محفوظة للموقع tender-baza.example.net."
+                }
+              ]
+            ],
+            "buttons": [
+              "الكتابة يدويًا",
+              "إغلاق"
+            ]
+          },
+          "say": "لم يجد مدير كلمات المرور أي كلمة مرور لهذا الموقع.",
+          "actions": [
+            {
+              "id": "type-manual",
+              "label": "كتابة كلمة المرور يدويًا",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "كان مدير كلمات المرور محقًا: هذا الموقع ليس بريدك. وكلمة المرور التي كتبتها وصلت إلى المحتال.",
+              "next": "leaked"
+            },
+            {
+              "id": "stop",
+              "label": "التوقف وإغلاق النافذة",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. عندما لا يملأ مدير كلمات المرور كلمة المرور، فالتوقف هو أفضل خطوة."
+            }
+          ]
+        },
+        {
+          "id": "own-tab",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "ispoct",
+            "brand": "IshPocht",
+            "url": [
+              {
+                "text": "https://poct.idare.example/giris"
+              }
+            ],
+            "fields": [
+              "بريد العمل الإلكتروني",
+              "كلمة المرور"
+            ],
+            "button": "تسجيل الدخول"
+          },
+          "say": "كتبت العنوان في علامة تبويب جديدة، وملأ مدير كلمات المرور كلمة المرور.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "تسجيل الدخول",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "صحيح. عندما تكتب العنوان بنفسك، لا تجد النافذة المزيفة طريقًا إليك.",
+              "next": "doc-page"
+            },
+            {
+              "id": "check",
+              "label": "التحقق من العنوان",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "هذا بريد عملك الحقيقي، وقد تعرف عليه مدير كلمات المرور. تسجيل الدخول هنا آمن.",
+              "next": "doc-page"
+            }
+          ]
+        },
+        {
+          "id": "leaked",
+          "label": "المستند غير موجود",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tender-baza",
+            "url": [
+              {
+                "text": "https://tender-baza.example.net/sened/4471"
+              }
+            ]
+          },
+          "say": "وقعت كلمة المرور في يد المحتال، ولم يظهر المستند أصلًا. تصرف بسرعة الآن.",
+          "actions": [
+            {
+              "id": "change-report",
+              "label": "تغيير كلمة المرور والاتصال بالدعم الفني",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "صحيح. غير كلمة المرور في علامة تبويب جديدة، واطلب من الدعم الفني إنهاء جميع الجلسات المفتوحة."
+            },
+            {
+              "id": "retry",
+              "label": "تسجيل الدخول مرة أخرى",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "الموقع يجمع كلمة مرورك مرة ثانية. إنه فخ لسرقة كلمات المرور، وليس مستندًا."
+            },
+            {
+              "id": "ignore",
+              "label": "عدم فعل أي شيء",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "يستطيع المحتال الآن فتح بريدك بكلمة المرور هذه. غيرها وأبلغ عن الحادثة فورًا."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "dt-order",
+      "prompt": "رتب الخطوات عندما تبدو نافذة تسجيل الدخول مشبوهة.",
+      "items": [
+        {
+          "id": "drag",
+          "label": "سحب النافذة إلى خارج المتصفح"
+        },
+        {
+          "id": "close",
+          "label": "إغلاق النافذة وعلامة التبويب إذا لم تخرج النافذة"
+        },
+        {
+          "id": "own-tab",
+          "label": "كتابة العنوان في علامة تبويب جديدة وتسجيل الدخول هناك"
+        },
+        {
+          "id": "report",
+          "label": "الإبلاغ عن الموقع للدعم الفني"
+        }
+      ],
+      "explain": "اختبر أولًا، ثم أغلق، ثم اكتب العنوان بنفسك. وأبلغ عن الموقع لتحمي زملاءك أيضًا."
+    },
+    {
+      "type": "recap",
+      "id": "dt-recap",
+      "points": [
+        "اسحب نافذة تسجيل الدخول إلى خارج المتصفح: النافذة المزيفة لا تستطيع الخروج",
+        "إذا لم يملأ مدير كلمات المرور كلمة المرور، فتوقف",
+        "عند الشك، اكتب العنوان بنفسك في علامة تبويب جديدة"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

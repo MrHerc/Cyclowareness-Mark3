@@ -1,0 +1,320 @@
+{
+ "id": "web-traps",
+ "title": "Les pièges du web",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "padlock",
+     "say": "Le cadenas dans la barre d’adresse ne dit qu’une chose : la connexion est chiffrée. Il ne dit pas qui gère le site.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "read-domain",
+     "say": "La plupart des sites frauduleux ont eux aussi un cadenas. Alors, lisez le nom de domaine lui-même.",
+     "mood": "think",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "sahilbank-giris.info",
+         "spot": "domain"
+        },
+        {
+         "text": "/login"
+        }
+       ]
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "search-ads",
+     "say": "Le premier résultat d’une recherche peut être une annonce. Les escrocs achètent des annonces au nom de sites bien connus.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "fake-update",
+     "say": "Si un site web vous dit que votre navigateur est obsolète et vous propose de télécharger une mise à jour, c’est un piège. Les navigateurs se mettent à jour tout seuls.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "warnings",
+     "say": "Si votre navigateur affiche un avertissement rouge, revenez en arrière. Il vous arrête pour vous protéger.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-portal",
+   "prompt": "Trouvez les éléments suspects de cette page de connexion.",
+   "artifact": {
+    "kind": "login",
+    "brand": "DövlətPortal",
+    "url": [
+     {
+      "text": "https://",
+      "spot": "padlock"
+     },
+     {
+      "text": "dovletportal-az",
+      "spot": "lookalike"
+     },
+     {
+      "text": ".online",
+      "spot": "tld"
+     },
+     {
+      "text": "/giris"
+     }
+    ],
+    "fields": [
+     "Code d’identification personnel",
+     "Mot de passe"
+    ],
+    "button": "Se connecter"
+   },
+   "spots": [
+    {
+     "id": "padlock",
+     "label": "Cadenas",
+     "explain": "Il y a bien un cadenas, mais il indique seulement que la connexion est chiffrée. Il ne prouve pas que le site est authentique."
+    },
+    {
+     "id": "lookalike",
+     "label": "Nom trompeur",
+     "explain": "Un tiret et « az » ont été ajoutés au nom officiel. C’est un domaine trompeur, qui imite le vrai."
+    },
+    {
+     "id": "tld",
+     "label": "Mauvaise extension",
+     "explain": "Le domaine se termine par .online. Le portail officiel se trouve à l’adresse dovletportal.az."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "swipe",
+   "id": "click-or-not",
+   "prompt": "Quels liens pouvez-vous ouvrir sans risque ?",
+   "cards": [
+    {
+     "id": "free-download",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://free-download-pdf.top/Sened_pulsuz.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un programme venant d’un site de téléchargement gratuit est souvent malveillant. Obtenez vos logiciels par le support technique."
+    },
+    {
+     "id": "official",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://dovletportal.az/xidmetler/arayis"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Le domaine est bien celui du portail officiel : dovletportal.az. Aucun mot ni tiret en plus."
+    },
+    {
+     "id": "subdomain-trick",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://sahilbank.az.hesab-yoxla.info/login"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Le vrai domaine, c’est la dernière partie : hesab-yoxla.info. Le sahilbank.az placé devant n’est qu’un appât."
+    },
+    {
+     "id": "update-exe",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://brauzer-yenile.top/update.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Les mises à jour du navigateur ne se téléchargent pas sur des sites web. Le navigateur se met à jour tout seul."
+    },
+    {
+     "id": "bank-path",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://www.sahilbank.az/az/kartlar"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Le domaine est sahilbank.az. Le reste n’est que le chemin de la page."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "padlock-meaning",
+   "question": {
+    "prompt": "Un cadenas s’affiche dans la barre d’adresse. Qu’est-ce que cela signifie ?",
+    "options": [
+     {
+      "id": "safe-site",
+      "label": "Le site est vérifié et sûr",
+      "correct": false,
+      "feedback": "Non. Les faux sites obtiennent eux aussi facilement un cadenas."
+     },
+     {
+      "id": "encrypted",
+      "label": "La connexion entre vous et le site est chiffrée",
+      "correct": true,
+      "feedback": "Exact. Mais le site peut quand même être faux."
+     },
+     {
+      "id": "state-approved",
+      "label": "Le site est agréé par l’État",
+      "correct": false,
+      "feedback": "Le cadenas n’est en aucun cas un agrément de l’État."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://"
+       },
+       {
+        "text": "sahilbank-giris.info",
+        "spot": "domain"
+       },
+       {
+        "text": "/login"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "Le cadenas est nécessaire, mais pas suffisant. Lisez toujours le nom de domaine lui-même."
+  },
+  {
+   "type": "scenario",
+   "id": "sudden-popup",
+   "title": "Une fenêtre pop-up surgit",
+   "start": "popup",
+   "nodes": [
+    {
+     "id": "popup",
+     "text": "Vous lisez un site d’actualités. Soudain, une fenêtre rouge envahit l’écran : votre ordinateur est infecté, appelez le +994 12 000 04 19. Une alarme retentit.",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     },
+     "choices": [
+      {
+       "label": "Appeler le numéro",
+       "next": "operator",
+       "feedback": "C’est une arnaque au faux support technique. Voyons la suite."
+      },
+      {
+       "label": "Cliquer sur le bouton Nettoyer",
+       "outcome": "compromised",
+       "feedback": "Le bouton a téléchargé un logiciel malveillant. Ne cliquez sur rien dans ce genre de fenêtre."
+      },
+      {
+       "label": "Fermer l’onglet, ou tout le navigateur si nécessaire",
+       "next": "restore",
+       "feedback": "Bon réflexe. Cette fenêtre n’est qu’une page web, votre ordinateur n’est pas infecté."
+      }
+     ]
+    },
+    {
+     "id": "operator",
+     "text": "Nous devons nous connecter à distance à votre ordinateur. Installez ce programme et lisez-moi le code affiché à l’écran.",
+     "speaker": "Opérateur",
+     "voice": "man",
+     "channel": "phone",
+     "spoken": "Nous devons nous connecter à distance à votre ordinateur. <breath> Installez ce programme et lisez-moi le code affiché à l’écran.",
+     "choices": [
+      {
+       "label": "Installer le programme",
+       "outcome": "compromised",
+       "feedback": "L’escroc a maintenant un accès complet à votre ordinateur. Déconnectez-le du réseau et signalez l’incident tout de suite."
+      },
+      {
+       "label": "Raccrocher et prévenir le support technique",
+       "outcome": "risky",
+       "feedback": "Vous avez réagi à temps. Mais n’appelez jamais un numéro affiché dans ce genre de fenêtre."
+      }
+     ]
+    },
+    {
+     "id": "restore",
+     "text": "Vous rouvrez le navigateur. Il propose de restaurer vos onglets précédents.",
+     "choices": [
+      {
+       "label": "Ne pas restaurer, et envoyer un petit mot au support technique",
+       "outcome": "safe",
+       "feedback": "Bravo. La fenêtre n’a rien installé, et le support technique est au courant."
+      },
+      {
+       "label": "Restaurer les onglets",
+       "outcome": "risky",
+       "feedback": "La même fausse fenêtre risque de se rouvrir. Ne restaurez pas les onglets."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Le cadenas signifie seulement que la connexion est chiffrée : lisez le nom de domaine.",
+    "Fiez-vous à vos favoris ou aux adresses que vous tapez, pas aux publicités.",
+    "Les fenêtres pop-up du type « mettez à jour maintenant » ou « votre ordinateur est infecté » sont des pièges."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

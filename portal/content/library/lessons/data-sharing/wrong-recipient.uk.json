@@ -1,0 +1,549 @@
+{
+ "id": "wrong-recipient",
+ "title": "Не той одержувач",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Лист, надісланий не тій людині, — один із найпоширеніших витоків. Зазвичай причина в поспіху й автозаповненні.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Те саме ім’я з’являється двічі: одна адреса робоча, інша — особиста або стороння. Перевірте домен.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Кому: Лейла"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Лейла Гасанова, leyla.hasanova@rxagentlik.az"
+         }
+        ],
+        [
+         {
+          "text": "Лейла Гасанова, "
+         },
+         {
+          "text": "leyla.hasanova85@poct.example",
+          "spot": "external"
+         }
+        ]
+       ],
+       "buttons": [
+        "Вибрати"
+       ]
+      }
+     },
+     "highlight": "external"
+    },
+    {
+     "id": "b3",
+     "say": "Не покладайтеся на відкликання листа після надсилання: для зовнішніх адрес воно зазвичай не спрацьовує.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Перед надсиланням перевірте три речі: одержувача, вкладення та імена в копії.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "before-send",
+   "environment": "inbox",
+   "title": "Перед надсиланням",
+   "intro": "Три чернетки чекають на надсилання, а ще один лист надійшов ззовні. Перевірте кожен.",
+   "steps": [
+    {
+     "id": "autocomplete",
+     "label": "Чернетка",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Ви"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "Лейла Гасанова <leyla.hasanova85@poct.example>",
+      "subject": [
+       {
+        "text": "Список звернень"
+       }
+      ],
+      "time": "11:38",
+      "body": [
+       [
+        {
+         "text": "Лейло, у вкладенні список, який ви просили."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Muracietler_2026.xlsx"
+         }
+        ],
+        "size": "310 КБ"
+       }
+      ]
+     },
+     "say": "Прочитайте домен одержувача до кінця.",
+     "actions": [
+      {
+       "id": "fix",
+       "label": "Перевірити й виправити одержувача",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Правильно: ім’я збіглося, а домен — ні. Робоча адреса закінчується на rxagentlik.az."
+      },
+      {
+       "id": "send",
+       "label": "Надіслати",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Одержувач — особиста поштова скринька. Конфіденційний список потрапив за межі організації."
+      }
+     ]
+    },
+    {
+     "id": "reply-all",
+     "label": "Чернетка",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Ви"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "layihe-qrupu@rxagentlik.az, e.rzayev@merkez-konsalting.example",
+      "subject": [
+       {
+        "text": "Re: Цінова пропозиція партнера"
+       }
+      ],
+      "time": "12:05",
+      "body": [
+       [
+        {
+         "text": "Колеги, пропозиція Merkez Konsalting здається дорогою, поговорімо ще з іншою компанією."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "remove",
+       "label": "Видалити зовнішню адресу",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Правильно. «Відповісти всім» зберігає всіх попередніх одержувачів, зокрема сторонніх."
+      },
+      {
+       "id": "send",
+       "label": "Надіслати",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Партнер є серед одержувачів. Внутрішнє обговорення дійшло б і до нього."
+      }
+     ]
+    },
+    {
+     "id": "correct-draft",
+     "label": "Чернетка",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Ви"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "kadrlar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Заява на відпустку"
+       }
+      ],
+      "time": "12:20",
+      "body": [
+       [
+        {
+         "text": "Добрий день! У вкладенні моя заява на відпустку."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Erize.pdf"
+         }
+        ],
+        "size": "52 КБ"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "send",
+       "label": "Надіслати",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Усе гаразд: внутрішня адреса, правильний файл, жодних зайвих одержувачів."
+      },
+      {
+       "id": "check",
+       "label": "Перевірити ще раз",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Перевірка ніколи не завадить. Цей лист правильний, його можна надсилати."
+      }
+     ]
+    },
+    {
+     "id": "partner-notice",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "merkez-konsalting",
+      "from": {
+       "name": [
+        {
+         "text": "Ельчин Рзаєв"
+        }
+       ],
+       "address": [
+        {
+         "text": "e.rzayev@merkez-konsalting.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Це надійшло мені помилково?"
+       }
+      ],
+      "time": "13:10",
+      "body": [
+       [
+        {
+         "text": "Добрий день! Учора ваш відділ надіслав мені таблицю зарплат працівників. Мабуть, це помилка. Що мені робити?"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Переслати службі безпеки",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Правильно. Лист, надісланий не туди, — це інцидент, а фахівець підкаже, що робити."
+      },
+      {
+       "id": "reply",
+       "label": "Відповісти: будь ласка, видаліть його",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Попросити видалити лист — правильно, але спершу повідомте службі безпеки."
+      },
+      {
+       "id": "delete",
+       "label": "Видалити",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Витік від цього не зникне. Повідомте про нього, щоб фахівці могли вжити заходів."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "recall",
+   "question": {
+    "prompt": "Лист пішов не на ту адресу, і ви його відкликали. Цього досить?",
+    "options": [
+     {
+      "id": "enough",
+      "label": "Так, лист буде видалено",
+      "correct": false,
+      "feedback": "Для зовнішніх адрес відкликання зазвичай не спрацьовує, а лист уже могли прочитати."
+     },
+     {
+      "id": "report",
+      "label": "Ні, я однаково негайно повідомляю службі безпеки",
+      "correct": true,
+      "feedback": "Правильно. Відкликання може не спрацювати, а повідомити потрібно обов’язково."
+     },
+     {
+      "id": "wait",
+      "label": "Я чекаю, може, лист не відкриють",
+      "correct": false,
+      "feedback": "Очікування не зменшує шкоди. Що швидше ви повідомите, то більше буде можливостей."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "inbox"
+    }
+   },
+   "explain": "Якщо надіслали не туди, не приховуйте цього: негайно повідомте керівникові й службі безпеки."
+  },
+  {
+   "type": "swipe",
+   "id": "recipient-check",
+   "prompt": "Чи правильний цей список одержувачів?",
+   "cards": [
+    {
+     "id": "hr",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Ви"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "kadrlar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Запит на довідку"
+       }
+      ],
+      "time": "14:00",
+      "body": [
+       [
+        {
+         "text": "Добрий день! Мені потрібна довідка з місця роботи."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Внутрішня адреса, потрібний відділ, жодних зайвих одержувачів."
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Ви"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "Рашад Алієв <reshad.aliyev@rxagentlik-az.com>",
+      "subject": [
+       {
+        "text": "Таблиця бюджету"
+       }
+      ],
+      "time": "14:12",
+      "body": [
+       [
+        {
+         "text": "Рашаде, таблиця у вкладенні."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Budce_2027.xlsx"
+         }
+        ],
+        "size": "180 КБ"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "rxagentlik-az.com — не ваш домен. Автозаповнення підставило стару або фальшиву адресу."
+    },
+    {
+     "id": "all-staff",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Ви"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "butun-emekdaslar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Медична довідка колеги"
+       }
+      ],
+      "time": "14:30",
+      "body": [
+       [
+        {
+         "text": "Довідка у вкладенні."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Arayis.pdf"
+         }
+        ],
+        "size": "96 КБ"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Особистий документ не можна надсилати всім працівникам. Надсилайте його лише тому, кому він потрібен."
+    },
+    {
+     "id": "no-bcc",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Ви"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "40 партнерів, усі в полі «Кому»",
+      "subject": [
+       {
+        "text": "Святкове привітання"
+       }
+      ],
+      "time": "15:00",
+      "body": [
+       [
+        {
+         "text": "Шановні партнери, зі святами!"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "У масовій розсилці вказуйте адреси в полі «Прихована копія», щоб одержувачі не бачили одне одного."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "address-fields",
+   "prompt": "Виберіть для кожного одержувача правильне поле.",
+   "pairs": [
+    {
+     "id": "to",
+     "left": "Основний одержувач, від якого чекають відповіді",
+     "right": "Кому"
+    },
+    {
+     "id": "cc",
+     "left": "Колега, якого тримають у курсі",
+     "right": "Копія"
+    },
+    {
+     "id": "bcc",
+     "left": "Багато одержувачів, які не знають одне одного",
+     "right": "Прихована копія"
+    }
+   ],
+   "explain": "Правильне поле не дає стороннім побачити адреси, які їм не потрібні."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Перед надсиланням прочитайте домен одержувача до кінця.",
+    "Перевіряйте «Відповісти всім» і зовнішні адреси в копії.",
+    "Якщо лист пішов не туди, не покладайтеся на відкликання, а негайно повідомте."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

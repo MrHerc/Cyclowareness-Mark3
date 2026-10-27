@@ -1,0 +1,447 @@
+{
+  "id": "unexpected-signing",
+  "title": "طلب توقيع غير متوقع",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l2-tutor",
+      "beats": [
+        {
+          "id": "l2-b1",
+          "say": "عندما يصلك طلب توقيع، اسأل نفسك أولًا: هل أنا من بدأ هذا الطلب؟",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "certificate"
+          }
+        },
+        {
+          "id": "l2-b2",
+          "say": "يعرض الطلب اسم المستند والخدمة التي تطلب التوقيع. ارفض أي طلب لم تكن تتوقعه.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "notification",
+              "brandRef": "mohurid",
+              "app": "MöhürID",
+              "title": [
+                {
+                  "text": "طلب توقيع"
+                }
+              ],
+              "body": [
+                {
+                  "text": "المستند: "
+                },
+                {
+                  "text": "Etibarname_tam_selahiyyet.pdf",
+                  "spot": "doc"
+                },
+                {
+                  "text": ". الخدمة: imza-xidmet.test"
+                }
+              ],
+              "time": "07:58"
+            }
+          },
+          "highlight": "doc"
+        },
+        {
+          "id": "l2-b3",
+          "say": "لا توقع دون أن تقرأ. يجب أن يتطابق اسم المستند والمبلغ والمستفيد مع ما تتوقعه.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "l2-b4",
+          "say": "إذا ساورك الشك، فلا توقع، وأبلغ فريق الأمن السيبراني. فالتراجع عن التوقيع صعب.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l2-sim",
+      "environment": "phone",
+      "title": "طلبات التوقيع",
+      "intro": "خلال اليوم تصل إلى جوالك طلبات توقيع. تحقق من كل طلب وقرر.",
+      "steps": [
+        {
+          "id": "unexpected",
+          "label": "لم تكن تنوي توقيع أي شيء",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "mohurid",
+            "app": "MöhürID",
+            "title": [
+              {
+                "text": "طلب توقيع"
+              }
+            ],
+            "body": [
+              {
+                "text": "المستند: Etibarname_avtomobil.pdf. الخدمة: Bulud Notariat"
+              }
+            ],
+            "time": "07:58"
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "الفتح والتوقيع",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "لقد وقعت توكيلًا أعده شخص آخر. اتصل فورًا بخدمة التوقيع وبفريق الأمن السيبراني."
+            },
+            {
+              "id": "deny",
+              "label": "رفض",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "صحيح. الطلب الذي لم تبدأه يعني أن هناك من يحاول استخدام اسمك."
+            },
+            {
+              "id": "report",
+              "label": "إبلاغ فريق الأمن السيبراني",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "أحسنت. الرفض والإبلاغ يوقفان الهجوم في الوقت المناسب."
+            }
+          ]
+        },
+        {
+          "id": "rush-colleague",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "إلفين (المشتريات)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "أرسلت إليك عقدًا عبر SənədAxını. لا وقت لقراءته، وقعه بسرعة فقط، فالمدير ينتظر."
+                  }
+                ],
+                "time": "10:20"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "read",
+              "label": "أقرأ المستند أولًا",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "صحيح. الاستعجال ليس مبررًا لتجاوز القراءة، فالتوقيع مسؤوليتك أنت."
+            },
+            {
+              "id": "rush",
+              "label": "حسنًا، أوقع دون أن أقرأ",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "قد يكون المبلغ أو المستفيد قد تغير في المستند الذي لم تقرأه."
+            }
+          ]
+        },
+        {
+          "id": "fake-portal-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "senedaxini-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "SənədAxını"
+                }
+              ],
+              "address": [
+                {
+                  "text": "noreply@senedaxini-imza.test"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "بانتظار توقيعك: Qebul_akti.pdf"
+              }
+            ],
+            "time": "12:05",
+            "body": [
+              [
+                {
+                  "text": "لتوقيع المستند، "
+                },
+                {
+                  "text": "سجل الدخول",
+                  "link": {
+                    "label": "سجل الدخول",
+                    "href": "https://senedaxini-imza.test/login"
+                  }
+                },
+                {
+                  "text": "."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "click",
+              "label": "تسجيل الدخول",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "استولت صفحة تسجيل دخول مزيفة على كلمة مرورك. غيرها الآن وأبلغ فريق الأمن السيبراني."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن تصيد",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "صحيح. النطاق ليس نطاق SənədAxını، فافتح النظام بنفسك."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "تصرف آمن. لكن إذا أبلغت عن الرسالة، فستحمي الآخرين أيضًا."
+            }
+          ]
+        },
+        {
+          "id": "own-request",
+          "label": "بدأت للتو توقيع طلب إجازتك عبر البوابة",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "mohurid",
+            "app": "MöhürID",
+            "title": [
+              {
+                "text": "طلب توقيع"
+              }
+            ],
+            "body": [
+              {
+                "text": "المستند: Mezuniyyet_erizesi.pdf. الخدمة: SənədAxını"
+              }
+            ],
+            "time": "14:30"
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "الفتح والتوقيع",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "صحيح. أنت من بدأ هذا الطلب، والمستند والخدمة كما تتوقع."
+            },
+            {
+              "id": "deny",
+              "label": "رفض",
+              "kind": "deny",
+              "outcome": "risky",
+              "feedback": "لا داعي لذلك: الطلب طلبك وكل شيء متطابق. التحقق لا يعني رفض كل شيء."
+            }
+          ]
+        },
+        {
+          "id": "mismatch",
+          "label": "طلبت شهادة عمل عبر البوابة",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "mohurid",
+            "app": "MöhürID",
+            "title": [
+              {
+                "text": "طلب توقيع"
+              }
+            ],
+            "body": [
+              {
+                "text": "المستند: Etibarname_bank_hesabi.pdf. الخدمة: imza-xidmet.test"
+              }
+            ],
+            "time": "16:12"
+          },
+          "say": "قارن اسم المستند بما تتوقعه.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "الفتح والتوقيع",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "كان هذا توكيلًا على حساب بنكي، لا شهادة العمل التي طلبتها. إذا لم يتطابق الاسم، فلا توقع."
+            },
+            {
+              "id": "deny",
+              "label": "رفض",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "صحيح. لا المستند ولا الخدمة كما تتوقع، فارفض الطلب وأبلغ عنه."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l2-hotspot",
+      "prompt": "قبل التوقيع، اعثر على ما هو غير سليم في هذا الطلب.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "mohurid",
+        "tone": "app",
+        "title": [
+          {
+            "text": "تأكيد التوقيع"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "المستند: "
+            },
+            {
+              "text": "توكيل: صلاحية كاملة على جميع الحسابات البنكية",
+              "spot": "doc"
+            }
+          ],
+          [
+            {
+              "text": "لصالح: "
+            },
+            {
+              "text": "حسين محمدلي",
+              "spot": "person"
+            }
+          ],
+          [
+            {
+              "text": "المدة: "
+            },
+            {
+              "text": "3 سنوات",
+              "spot": "term"
+            }
+          ],
+          [
+            {
+              "text": "الجهة الطالبة: "
+            },
+            {
+              "text": "imza-xidmet.test",
+              "spot": "source"
+            }
+          ]
+        ],
+        "buttons": [
+          "رفض",
+          "إدخال الرقم السري"
+        ]
+      },
+      "spots": [
+        {
+          "id": "doc",
+          "label": "صلاحية كاملة",
+          "explain": "هذا المستند يمنح شخصًا ما صلاحيات واسعة على حساباتك. ومثل هذا المستند لا ينبغي أن يصل فجأة أبدًا."
+        },
+        {
+          "id": "person",
+          "label": "شخص لا تعرفه",
+          "explain": "إذا كنت لا تعرف من سيحصل على الصلاحية، فلا توقع."
+        },
+        {
+          "id": "term",
+          "label": "مدة طويلة",
+          "explain": "التوكيل لمدة ثلاث سنوات يجعل الضرر يستمر طويلًا."
+        },
+        {
+          "id": "source",
+          "label": "خدمة غير معروفة",
+          "explain": "الطلب وارد من موقع غير معروف، لا من نظام رسمي تعرفه."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "order",
+      "id": "l2-order",
+      "prompt": "رتب الخطوات التي تسبق التوقيع.",
+      "items": [
+        {
+          "id": "started",
+          "label": "التأكد من أنك من بدأ الطلب"
+        },
+        {
+          "id": "read",
+          "label": "فتح المستند وقراءته"
+        },
+        {
+          "id": "details",
+          "label": "التحقق من الاسم والمبلغ والمستفيد"
+        },
+        {
+          "id": "pin",
+          "label": "بعد ذلك فقط، إدخال الرقم السري"
+        }
+      ],
+      "explain": "إذا لم تتطابق أي خطوة، فتوقف وارفض الطلب. وأبلغ فريق الأمن السيبراني عن أي طلب مشبوه."
+    },
+    {
+      "type": "choice",
+      "id": "l2-choice",
+      "question": {
+        "prompt": "وقعت مستندًا مشبوهًا بالخطأ. ما الخطوة الأولى؟",
+        "options": [
+          {
+            "id": "hide",
+            "label": "لا أخبر أحدًا، فربما لا يحدث شيء",
+            "correct": false,
+            "feedback": "التوقيع صالح ويمكن استخدامه. وإخفاء الأمر يزيد الضرر."
+          },
+          {
+            "id": "report",
+            "label": "أتصل فورًا بخدمة التوقيع وبفريق الأمن السيبراني",
+            "correct": true,
+            "feedback": "صحيح. الخدمة تستطيع إيقاف الشهادة مؤقتًا، وفريق الأمن السيبراني يتابع العواقب."
+          },
+          {
+            "id": "pin",
+            "label": "أكتفي بتغيير رقمي السري",
+            "correct": false,
+            "feedback": "خطوة مفيدة، لكن المستند الموقع لا يزال صالحًا. أبلغ عنه أولًا."
+          }
+        ]
+      },
+      "explain": "عند التوقيع الخاطئ، كل دقيقة مهمة. والإبلاغ السريع يتيح فرصة لمنع استخدام المستند."
+    },
+    {
+      "type": "recap",
+      "id": "l2-recap",
+      "points": [
+        "لا تؤكد طلب التوقيع إلا إذا كنت قد بدأته بنفسك.",
+        "اقرأ المستند: يجب أن يتطابق الاسم والمبلغ والمستفيد مع ما تتوقعه.",
+        "إذا وقعت بالخطأ، فأبلغ خدمة التوقيع وفريق الأمن السيبراني فورًا."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

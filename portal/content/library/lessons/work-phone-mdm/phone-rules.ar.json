@@ -1,0 +1,569 @@
+{
+ "id": "phone-rules",
+ "title": "قواعد جوال العمل",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "جوال العمل جزء من جهتك تحمله في جيبك. ففيه بريد العمل والمستندات وجهات الاتصال.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "ملف تعريف الإدارة يحمي الجوال. وإذا ضاع، يستطيع الدعم الفني قفله ومسح بيانات العمل منه.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "nc-iscihaz",
+       "app": "İşCihaz",
+       "title": [
+        {
+         "text": "الجوال محمي"
+        }
+       ],
+       "body": [
+        {
+         "text": "هذا الجهاز تديره جهتك وفق قواعدها للأمن السيبراني."
+        }
+       ],
+       "time": "09:00"
+      }
+     }
+    },
+    {
+     "id": "b3",
+     "say": "لا تثبت أبدًا ملف تعريف من رابط وصلك في رسالة. فملف التعريف المزيف قد يسلم جوالك للمهاجم.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "it-destek-fake",
+       "sender": [
+        {
+         "text": "IT-Support"
+        }
+       ],
+       "time": "11:42",
+       "messages": [
+        [
+         {
+          "text": "تنتهي صلاحية ملف التعريف الخاص بك قريبًا. ثبت ملفًا جديدًا: "
+         },
+         {
+          "text": "iscihaz-profil.example.net",
+          "spot": "link"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "link"
+    },
+    {
+     "id": "b4",
+     "say": "لا تثبت التطبيقات إلا من المتجر الرسمي أو من تطبيق إدارة الأجهزة التابع لجهتك، وراجع كل إذن يطلبه التطبيق.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "new-phone",
+   "environment": "phone",
+   "title": "جوال عملك الجديد",
+   "intro": "استلمت للتو جوال عمل جديدًا. انظر إلى كل إشعار واتخذ القرار الصحيح.",
+   "steps": [
+    {
+     "id": "enroll",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-iscihaz",
+      "app": "İşCihaz",
+      "title": [
+       {
+        "text": "إكمال تسجيل الجهاز"
+       }
+      ],
+      "body": [
+       {
+        "text": "جهز الدعم الفني جهازك. أكمل التسجيل لتصلك رسائل بريد العمل."
+       }
+      ],
+      "time": "09:05"
+     },
+     "say": "هذا التطبيق ثبته الدعم الفني بنفسه.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "فتح الإشعار",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "صحيح. التسجيل عبر تطبيق جهتك نفسها هو الطريقة الأكثر أمانًا."
+      },
+      {
+       "id": "later",
+       "label": "لاحقًا",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "الجوال غير المسجل غير محمي. سجله في يومك الأول."
+      }
+     ]
+    },
+    {
+     "id": "profile-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "it-destek-fake",
+      "sender": [
+       {
+        "text": "IT-Support"
+       }
+      ],
+      "time": "11:42",
+      "messages": [
+       [
+        {
+         "text": "عزيزي الزميل، تنتهي اليوم صلاحية ملف تعريف MDM الخاص بك. ثبت ملف التعريف الجديد تجنبًا لحظر جوالك: "
+        },
+        {
+         "text": "iscihaz-profil.example.net/new",
+         "link": {
+          "label": "iscihaz-profil.example.net/new",
+          "href": "https://iscihaz-profil.example.net/new"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "تحقق من المرسل ومن عنوان الرابط.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "فتح الرابط",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "هذا ليس نطاق جهتك. ملفات التعريف لا تأتي إلا من تطبيق İşCihaz أو من الدعم الفني.",
+       "next": "profile-install"
+      },
+      {
+       "id": "report",
+       "label": "الإبلاغ",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "صحيح. بلاغك يتيح للدعم الفني تحذير الجميع أيضًا.",
+       "next": "qr-permission"
+      },
+      {
+       "id": "block",
+       "label": "الحظر",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "جيد. وأبلغ الدعم الفني أيضًا ليحذر زملاءك.",
+       "next": "qr-permission"
+      }
+     ]
+    },
+    {
+     "id": "profile-install",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-iscihaz-fake",
+      "tone": "system",
+      "title": [
+       {
+        "text": "تثبيت ملف التعريف؟"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "يريد الموقع iscihaz-profil.example.net تثبيت ملف تعريف للتكوين."
+        }
+       ],
+       [
+        {
+         "text": "سيضيف ملف التعريف شهادة وإعدادات VPN وإعدادات البريد."
+        }
+       ]
+      ],
+      "buttons": [
+       "رفض",
+       "السماح"
+      ]
+     },
+     "say": "يريد الموقع تحميل ملف تعريف على جوالك.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "رفض",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "صحيح. ملف تعريف كهذا يمكنه تمرير كل حركة الإنترنت في جوالك عبر خادم المهاجم."
+      },
+      {
+       "id": "allow",
+       "label": "السماح",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "ملف التعريف المزيف يسلم التحكم في الجوال لشخص غريب. اتصل بالدعم الفني فورًا."
+      }
+     ]
+    },
+    {
+     "id": "qr-permission",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-qr-oxuyucu",
+      "app": "QR Oxuyucu",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "الكاميرا"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "جهات الاتصال"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "الموقع الدقيق"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "تسهيلات الاستخدام: التحكم في الشاشة"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "ما الذي يحتاج إليه قارئ رموز QR فعلًا؟",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "السماح",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "قارئ رموز QR لا يحتاج إلا إلى الكاميرا. أما تسهيلات الاستخدام فتتيح للتطبيق قراءة الشاشة والضغط بدلًا منك."
+      },
+      {
+       "id": "deny",
+       "label": "عدم السماح",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "صحيح. لا تمنح إلا ما تحتاج إليه الميزة، وهنا تكفي الكاميرا."
+      }
+     ]
+    },
+    {
+     "id": "chat-apk",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "sohbet",
+      "name": [
+       {
+        "text": "جدول_المناوبات.apk"
+       }
+      ],
+      "type": "apk",
+      "size": "5.4 MB",
+      "source": [
+       {
+        "text": "Söhbət: رشاد محمدوف"
+       }
+      ]
+     },
+     "say": "أرسل إليك زميل ملفًا في تطبيق المراسلة.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "تثبيت",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "جدول المناوبات لا يمكن أن يكون ملف تثبيت. وملف .apk يصلك في محادثة يجلب برمجيات ضارة إلى الجوال."
+      },
+      {
+       "id": "cancel",
+       "label": "إلغاء",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "صحيح. ربما تعرض حساب زميلك للاختراق، فأبلغ الدعم الفني."
+      }
+     ]
+    },
+    {
+     "id": "os-update",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sistem-yenileme",
+      "tone": "system",
+      "title": [
+       {
+        "text": "تحديث النظام"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "تحديث أمني جاهز للتثبيت. سيعاد تشغيل الجوال، وقد يستغرق ذلك نحو 10 دقائق."
+        }
+       ]
+      ],
+      "buttons": [
+       "لاحقًا",
+       "التحديث الآن"
+      ]
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "التحديث الآن",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "صحيح. التحديثات تسد الثغرات التي يعرفها المهاجمون بالفعل."
+      },
+      {
+       "id": "later",
+       "label": "لاحقًا",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "كل يوم تأخير يترك الثغرة مفتوحة. حدث جوالك الليلة على أبعد تقدير."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "app-asks",
+   "prompt": "هل هذا الطلب آمن على جوال العمل، أم أنه تهديد؟",
+   "cards": [
+    {
+     "id": "map-location",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-yolxerite",
+      "app": "YolXəritə",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "الموقع: أثناء فتح التطبيق فقط"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "تطبيق الخرائط يحتاج إلى الموقع، وأثناء فتحه فقط. الإذن يناسب وظيفته."
+    },
+    {
+     "id": "game-sms",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-super-oyunlar",
+      "app": "Super Oyunlar",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "قراءة الرسائل النصية"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "جهات الاتصال"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "اللعبة لا تحتاج إلى الرسائل النصية ولا إلى جهات الاتصال. والوصول إلى الرسائل النصية يتيح لها قراءة رموز تسجيل الدخول."
+    },
+    {
+     "id": "battery-access",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-batareya",
+      "app": "Batareya Qoruyucu",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "تسهيلات الاستخدام: التحكم في الشاشة"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "الظهور فوق التطبيقات الأخرى"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "توفير البطارية لا يتطلب التحكم في الشاشة. وهذه بالضبط الأذونات التي تطلبها أحصنة طروادة المصرفية."
+    },
+    {
+     "id": "lock-notice",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-iscihaz",
+      "app": "İşCihaz",
+      "title": [
+       {
+        "text": "قفل الشاشة مطلوب"
+       }
+      ],
+      "body": [
+       {
+        "text": "اضبط رقمًا سريًا (PIN) من 6 أرقام على الأقل لاستخدام بريد العمل."
+       }
+      ],
+      "time": "09:20"
+     },
+     "verdict": "safe",
+     "explain": "هذا تطبيق جهتك نفسها، ولا يرسل أي رابط. وقفل الشاشة القوي هو خط الدفاع الأول إذا ضاع الجوال."
+    },
+    {
+     "id": "torch-notifications",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "fener-pro",
+      "app": "Fənər Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "الوصول إلى الإشعارات"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "الكشاف لا يحتاج إلى قراءة الإشعارات. وبهذا الوصول يستطيع رؤية الرموز والرسائل الواردة."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "permission-power",
+   "prompt": "طابق كل إذن مع ما يتيحه.",
+   "pairs": [
+    {
+     "id": "sms",
+     "left": "قراءة الرسائل النصية",
+     "right": "رؤية رموز البنك ورموز تسجيل الدخول"
+    },
+    {
+     "id": "accessibility",
+     "left": "تسهيلات الاستخدام",
+     "right": "قراءة الشاشة والضغط بدلًا منك"
+    },
+    {
+     "id": "notifications",
+     "left": "الوصول إلى الإشعارات",
+     "right": "قراءة رسائل تطبيقات المراسلة"
+    },
+    {
+     "id": "unknown-sources",
+     "left": "تثبيت التطبيقات غير المعروفة",
+     "right": "تثبيت برامج من خارج المتجر"
+    }
+   ],
+   "explain": "هذه الأذونات الأربعة هي الأقوى. لا تمنحها إلا للتطبيقات التي وافق عليها الدعم الفني."
+  },
+  {
+   "type": "choice",
+   "id": "slow-phone",
+   "question": {
+    "prompt": "جوال عملك بطيء، وينصحك صديق بحذف ملف تعريف الإدارة منه. ماذا تفعل؟",
+    "options": [
+     {
+      "id": "support",
+      "label": "الإبقاء على ملف التعريف والتواصل مع الدعم الفني",
+      "correct": true,
+      "feedback": "صحيح. ملف التعريف هو ما يحمي الجوال، والدعم الفني سيحل المشكلة."
+     },
+     {
+      "id": "remove",
+      "label": "حذف ملف التعريف لتسريع الجوال",
+      "correct": false,
+      "feedback": "دون ملف التعريف لا يمكن قفل الجوال عن بعد إذا ضاع. وغالبًا يتوقف بريد العمل أيضًا."
+     },
+     {
+      "id": "reset",
+      "label": "إعادة ضبط الجوال على إعدادات المصنع",
+      "correct": false,
+      "feedback": "هذا يمسح ملف التعريف وبيانات العمل دون علم الدعم الفني. تحدث إلى الدعم الفني أولًا."
+     },
+     {
+      "id": "friend",
+      "label": "إعطاؤه لصديق خبير بالتقنية ليصلحه",
+      "correct": false,
+      "feedback": "في الجوال بيانات عمل. لا تسلمه إلا للدعم الفني."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "phone-lock"
+    }
+   },
+   "explain": "ملف تعريف الإدارة يحمي جوال عملك. والدعم الفني وحده من يغيره."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "ملفات التعريف وتطبيقات العمل لا تأتي إلا من تطبيق İşCihaz أو من الدعم الفني.",
+    "يجب أن تناسب الأذونات وظيفة التطبيق. وأخطرها الرسائل النصية وتسهيلات الاستخدام.",
+    "قفل الشاشة والتحديثات هما خط الدفاع الأول لجوالك."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

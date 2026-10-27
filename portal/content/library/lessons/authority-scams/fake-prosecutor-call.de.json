@@ -1,0 +1,513 @@
+{
+ "id": "fake-prosecutor-call",
+ "title": "Falsche Ermittler am Telefon",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l2-tutor",
+   "beats": [
+    {
+     "id": "l2-b1",
+     "say": "Auf eine gefälschte E-Mail folgt oft ein Anruf. Der Anrufer gibt sich als Ermittler oder als Staatsanwalt aus.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "l2-b2",
+     "say": "Auch eine offiziell wirkende Nummer auf dem Display kann gefälscht sein. Anrufer können die angezeigte Nummer ändern.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "istintaq-buro-fake",
+       "caller": [
+        {
+         "text": "Zentrales Ermittlungsbüro"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 10 02",
+         "spot": "number"
+        }
+       ],
+       "label": "Arbeit"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "l2-b3",
+     "say": "Echte Strafverfolgungsbehörden verlangen am Telefon nie Geld, Kartendaten oder einen SMS-Code.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "l2-b4",
+     "say": "Legen Sie auf, suchen Sie selbst die offizielle Nummer der Behörde heraus und informieren Sie Ihr Sicherheitsteam.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "l2-sim",
+   "environment": "call",
+   "title": "Ein Ermittler ruft an",
+   "intro": "Heute Morgen kam ein gefälschtes Schreiben, jetzt ruft jemand an. Lesen Sie, was der Anrufer sagt, und wählen Sie Ihre Antwort.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "istintaq-buro-fake",
+      "caller": [
+       {
+        "text": "Zentrales Ermittlungsbüro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 10 02"
+       }
+      ],
+      "label": "Arbeit",
+      "voice": "man"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Annehmen",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Den Anruf anzunehmen ist nicht gefährlich. Entscheidend ist, was Sie danach tun."
+      },
+      {
+       "id": "decline",
+       "label": "Ablehnen",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Auch das ist in Ordnung. Wenn Sie beunruhigt sind, rufen Sie selbst die offizielle Nummer der Behörde an.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "accuse",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "istintaq-buro-fake",
+      "caller": [
+       {
+        "text": "Zentrales Ermittlungsbüro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 10 02"
+       }
+      ],
+      "label": "Arbeit",
+      "voice": "man"
+     },
+     "say": "Hier spricht Ermittler Elçin Həsənov vom Zentralen Ermittlungsbüro. Sie haben die Benachrichtigung von heute Morgen ignoriert, und Ihr Name taucht in einem Strafverfahren auf.",
+     "spoken": "<breath> Hier spricht Ermittler Elçin Həsənov vom Zentralen Ermittlungsbüro. Sie haben die Benachrichtigung von heute Morgen ignoriert, äh, und Ihr Name taucht in einem Strafverfahren auf.",
+     "actions": [
+      {
+       "id": "comply",
+       "label": "Was soll ich tun? Sagen Sie es mir",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Wer aus Angst mitmacht, überlässt dem Anrufer die Kontrolle. Prüfen Sie zuerst, wer er wirklich ist."
+      },
+      {
+       "id": "verify",
+       "label": "Ich rufe selbst die offizielle Nummer des Büros an",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein echter Ermittler hat nichts dagegen, dass Sie das prüfen.",
+       "next": "after"
+      },
+      {
+       "id": "hang",
+       "label": "Auflegen",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Gute Entscheidung. Auf eine Drohung am Telefon müssen Sie nicht reagieren.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "prosecutor",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "istintaq-buro-fake",
+      "caller": [
+       {
+        "text": "Zentrales Ermittlungsbüro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 10 02"
+       }
+      ],
+      "label": "Arbeit",
+      "voice": "older-man"
+     },
+     "say": "Ich verbinde Sie mit dem Staatsanwalt. Hier spricht Staatsanwalt Tofiq Abbasov. Um Ihre Ersparnisse zu schützen, überweisen Sie sie für die Dauer der Prüfung auf ein sicheres Konto.",
+     "spoken": "Ich verbinde Sie mit dem Staatsanwalt. Hier spricht Staatsanwalt Tofiq Abbasov. Um Ihre Ersparnisse zu schützen, <breath> überweisen Sie sie für die Dauer der Prüfung auf ein sicheres Konto.",
+     "actions": [
+      {
+       "id": "transfer",
+       "label": "Geben Sie mir die Kontodaten, ich überweise",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Das „sichere Konto“ gehört den Kriminellen. Wenn Sie Geld überwiesen haben, rufen Sie sofort Ihre Bank an."
+      },
+      {
+       "id": "refuse",
+       "label": "Ich überweise kein Geld wegen eines Anrufs",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. Kein Staatsanwalt verlangt am Telefon, dass Sie Geld auf ein anderes Konto überweisen."
+      },
+      {
+       "id": "hang",
+       "label": "Auflegen",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Richtig. Dass Sie an einen „hohen Beamten“ weiterverbunden werden, soll den Druck erhöhen.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "secrecy",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "istintaq-buro-fake",
+      "caller": [
+       {
+        "text": "Zentrales Ermittlungsbüro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 10 02"
+       }
+      ],
+      "label": "Arbeit",
+      "voice": "older-man"
+     },
+     "say": "Es handelt sich um geheime Ermittlungen. Wenn Sie Ihrer Führungskraft oder Ihrer Familie davon erzählen, werden Sie dafür zur Verantwortung gezogen.",
+     "spoken": "Es handelt sich um geheime Ermittlungen. Wenn Sie Ihrer Führungskraft oder Ihrer Familie davon erzählen, <breath> werden Sie dafür zur Verantwortung gezogen.",
+     "actions": [
+      {
+       "id": "promise",
+       "label": "Gut, ich sage niemandem etwas",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Die Forderung nach Geheimhaltung schneidet Sie von Hilfe ab. Sprechen Sie stattdessen sofort darüber."
+      },
+      {
+       "id": "hang",
+       "label": "Auflegen",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Richtig. „Erzählen Sie niemandem davon“ ist das deutlichste Zeichen für Betrug.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "istintaq-buro-fake",
+      "caller": [
+       {
+        "text": "Zentrales Ermittlungsbüro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 10 02"
+       }
+      ],
+      "label": "Arbeit",
+      "voice": "older-man"
+     },
+     "say": "Ein letzter Schritt. Nennen Sie mir den Code, der gerade auf Ihr Smartphone gekommen ist, damit wir Sie im System erfassen können.",
+     "spoken": "<breath> Ein letzter Schritt. Nennen Sie mir den Code, der gerade auf Ihr Smartphone gekommen ist, damit wir Sie im System erfassen können.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Ich lese den Code vor",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Der Code ist der Schlüssel zu Ihrem Konto oder zu einer Zahlung. Sobald Sie ihn nennen, verlieren Sie die Kontrolle."
+      },
+      {
+       "id": "hang",
+       "label": "Auflegen",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Richtig. Keine Behörde fragt am Telefon nach einem SMS-Code."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Das Gespräch ist beendet. Was jetzt?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "istintaq-buro-fake",
+      "caller": [
+       {
+        "text": "Zentrales Ermittlungsbüro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 10 02"
+       }
+      ],
+      "label": "Arbeit",
+      "voice": "older-man"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "Nummer von der offiziellen Website des Büros anrufen",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Richtig. Nutzen Sie nach Möglichkeit ein anderes Telefon, damit die Leitung nicht offen gehalten werden kann."
+      },
+      {
+       "id": "report",
+       "label": "Führungskraft und Sicherheitsteam informieren",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Eine Meldung schützt Ihre Kolleginnen und Kollegen vor demselben Anruf."
+      },
+      {
+       "id": "ignore",
+       "label": "Nichts tun",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Die Kriminellen rufen wieder an. Eine Meldung schützt Sie und Ihre Kolleginnen und Kollegen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "l2-swipe",
+   "prompt": "Ist diese Nachricht sicher oder Betrug?",
+   "cards": [
+    {
+     "id": "fine-card",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "istintaq-buro-fake",
+      "sender": [
+       {
+        "text": "+994 70 000 52 19"
+       }
+      ],
+      "time": "11:02",
+      "messages": [
+       [
+        {
+         "text": "Zentrales Ermittlungsbüro: Überweisen Sie Ihr Bußgeld innerhalb von 2 Stunden auf diese Karte: 4169 **** 7731"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Strafverfolgungsbehörden ziehen keine Bußgelder über eine private Karte ein. Melden Sie diese Nachricht."
+    },
+    {
+     "id": "legal-dept",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Rechtsabteilung"
+        }
+       ],
+       "address": [
+        {
+         "text": "huquq@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Offizielles Schreiben für Sie"
+       }
+      ],
+      "time": "11:20",
+      "body": [
+       [
+        {
+         "text": "Ein offizielles Schreiben des Gerichts ist auf Ihren Namen eingegangen. Sie können es gegen Unterschrift in der Registratur abholen."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Das Schreiben kam über den eigenen Kanal Ihrer Behörde und verlangt weder Geld noch einen Klick auf einen Link."
+    },
+    {
+     "id": "video-id",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Staatsanwalt T. Abbasov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Wechseln Sie in einen Videoanruf und halten Sie Ihren Personalausweis in die Kamera, wir führen eine Überprüfung durch."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Mit einem Bild Ihres Ausweises lassen sich in Ihrem Namen betrügerische Konten eröffnen. Solche Überprüfungen laufen nicht über einen Messenger."
+    },
+    {
+     "id": "safe-account",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "istintaq-buro-fake",
+      "caller": [
+       {
+        "text": "Zentrales Ermittlungsbüro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 10 02"
+       }
+      ],
+      "label": "Verlangt, dass Sie Geld auf ein „sicheres Konto“ überweisen"
+     },
+     "verdict": "threat",
+     "explain": "Ein „sicheres Konto“ gibt es nicht. Es gehört den Kriminellen."
+    },
+    {
+     "id": "portal",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "dovletportal",
+      "app": "DövlətPortal",
+      "title": [
+       {
+        "text": "Neue Mitteilung"
+       }
+      ],
+      "body": [
+       {
+        "text": "In Ihrem persönlichen Bereich liegt ein neues Schreiben."
+       }
+      ],
+      "time": "12:10"
+     },
+     "verdict": "safe",
+     "explain": "Keine Zahlung und kein Link. Sie öffnen das Portal selbst, um das Schreiben zu lesen."
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "l2-order",
+   "prompt": "Bringen Sie die Schritte nach dem Anruf eines falschen „Staatsanwalts“ in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "hang",
+     "label": "Auflegen"
+    },
+    {
+     "id": "note",
+     "label": "Nummer, Uhrzeit und Gesprächsinhalt notieren"
+    },
+    {
+     "id": "verify",
+     "label": "Die offizielle Nummer der Behörde selbst heraussuchen und nachfragen"
+    },
+    {
+     "id": "report",
+     "label": "Führungskraft und Sicherheitsteam informieren"
+    }
+   ],
+   "explain": "Wenn Sie Geld überwiesen haben, rufen Sie zuerst Ihre Bank an. Ihre Notizen helfen dem Sicherheitsteam, den Angriff nachzuverfolgen."
+  },
+  {
+   "type": "choice",
+   "id": "l2-choice",
+   "question": {
+    "prompt": "Der Anrufer sagt: „Es handelt sich um geheime Ermittlungen, erzählen Sie niemandem davon.“ Was bedeutet das?",
+    "options": [
+     {
+      "id": "real",
+      "label": "Das ist ernst, ich muss schweigen",
+      "correct": false,
+      "feedback": "Genau dieses Schweigen wollen die Kriminellen. Wenn Sie darüber sprechen, fliegt der Trick schnell auf."
+     },
+     {
+      "id": "isolate",
+      "label": "Man will verhindern, dass ich mir Hilfe hole",
+      "correct": true,
+      "feedback": "Richtig. Genau deshalb informieren Sie sofort Ihre Führungskraft und das Sicherheitsteam."
+     },
+     {
+      "id": "family",
+      "label": "Ich erzähle es nur meiner Familie",
+      "correct": false,
+      "feedback": "Mit der Familie zu sprechen ist gut. Bei einem Anruf, der mit Ihrer Arbeit zu tun hat, sollte aber auch das Sicherheitsteam Bescheid wissen."
+     }
+    ]
+   },
+   "explain": "Geheimhaltung, Drohungen und eine Geldforderung zusammen sind ein bekanntes Betrugsmuster."
+  },
+  {
+   "type": "recap",
+   "id": "l2-recap",
+   "points": [
+    "Eine offizielle Nummer auf dem Display kann gefälscht sein: Legen Sie auf und prüfen Sie selbst.",
+    "Strafverfolgungsbehörden verlangen am Telefon nie Geld, Kartendaten oder Codes.",
+    "Heißt es „Erzählen Sie niemandem davon“, informieren Sie sofort das Sicherheitsteam."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

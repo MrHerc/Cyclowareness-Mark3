@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 import { describe, expect, it, vi } from "vitest";
-import { ASSIGNABLE_ROLES, PERMISSIONS, PERMISSION_FEATURE, PRIVILEGED_ROLES, can, isPrivileged, type Permission } from "@/server/auth/permissions";
+import { ASSIGNABLE_ROLES, PERMISSIONS, PERMISSION_FEATURE, PRIVILEGED_ROLES, can, isConsoleRole, isPrivileged, twoFactorRequired, type Permission } from "@/server/auth/permissions";
 import { decideSignInStep, emailDomain, ssoStartUrl, type SsoPerson, type SsoTenant } from "@/server/auth/sso-routing";
 import { ROLES, type Role } from "@/server/db/schema";
 import { DEFAULT_ATTESTATION, PLAN_FEATURES, defaultSettings, featuresFor, type Feature } from "@/lib/tenant-defaults";
@@ -86,6 +86,12 @@ describe("permissions", () => {
     for (const r of ["tenant_admin", "super_admin", "analyst", "campaign_manager"] as const) expect(isPrivileged(r), r).toBe(true);
     for (const r of ["learner", "department_head", "executive", "content_creator"] as const) expect(isPrivileged(r), r).toBe(false);
   });
+
+  it("requires two-step verification of every console role when the organisation does, and of the operator always", () => {
+    for (const r of ROLES) expect(isConsoleRole(r), r).toBe(r !== "learner");
+    for (const r of ROLES) expect(twoFactorRequired(r, true), r).toBe(r !== "learner");
+    for (const r of ROLES) expect(twoFactorRequired(r, false), r).toBe(r === "super_admin");
+  });
 });
 
 describe("tenant defaults: featuresFor", () => {
@@ -139,12 +145,13 @@ describe("tenant defaults: featuresFor", () => {
 });
 
 describe("tenant defaults: defaultSettings", () => {
-  it("defaults to Azerbaijani with all three interface languages", () => {
+  it("defaults to Azerbaijani with all ten interface languages", () => {
     const s = defaultSettings();
     expect(s.defaultLocale).toBe("az");
-    expect(s.locales).toEqual(["az", "en", "ru"]);
+    expect(s.locales).toEqual([...LOCALES]);
+    expect(s.locales).toHaveLength(10);
     expect(defaultSettings("en").defaultLocale).toBe("en");
-    expect(defaultSettings("ru").locales).toEqual(["az", "en", "ru"]);
+    expect(defaultSettings("ru").locales).toEqual([...LOCALES]);
   });
 
   it("has the documented shape and defaults", () => {
@@ -154,25 +161,26 @@ describe("tenant defaults: defaultSettings", () => {
     expect(s.learning).toEqual({ timeLimits: true, refresher: true, riskThreshold: 67, dailyGoalXp: 50 });
     expect(s.certificate).toEqual({ publicLink: true });
     expect(s.notifications).toEqual({ firstReminderDays: 3, urgentReminderHours: 24, overdueNotice: true, managerAlerts: true, failedSimulations: 2, overdueDays: 7 });
-    expect(s.identity).toEqual({ requireAdmin2fa: false, maxDevices: null, ssoEnabled: false });
+    expect(s.identity).toEqual({ requireAdmin2fa: true, maxDevices: null, ssoEnabled: false });
     expect(s.email).toEqual({ enabled: false });
     expect(s.integrations).toEqual({ webhookEnabled: false, webhookEvents: [], syslogEnabled: false });
   });
 
   it("copies the attestation text per interface language", () => {
     const s = defaultSettings();
-    expect(Object.keys(s.attestationText).sort()).toEqual(["az", "en", "ru"]);
+    expect(Object.keys(s.attestationText).sort()).toEqual([...LOCALES].sort());
     expect(s.attestationText).toEqual(DEFAULT_ATTESTATION);
     expect(s.attestationText).not.toBe(DEFAULT_ATTESTATION);
   });
 
   it("returns fresh objects, so editing one tenant's settings cannot leak into another's", () => {
     const a = defaultSettings();
-    a.locales.push("tr");
+    a.locales.pop();
     a.attestationText.az = "changed";
     a.integrations.webhookEvents.push("qr.scanned");
     const b = defaultSettings();
-    expect(b.locales).toEqual(["az", "en", "ru"]);
+    expect(b.locales).toEqual([...LOCALES]);
+    expect(LOCALES).toHaveLength(10);
     expect(b.attestationText.az).toBe(DEFAULT_ATTESTATION.az);
     expect(b.integrations.webhookEvents).toEqual([]);
     expect(DEFAULT_ATTESTATION.az).not.toBe("changed");
@@ -322,15 +330,17 @@ describe("color", () => {
 });
 
 describe("i18n config", () => {
-  it("knows which locales are app locales and which are site-only", () => {
+  it("serves the app and the public site in the same ten languages, Arabic instead of Italian", () => {
     for (const l of LOCALES) {
       expect(isLocale(l), l).toBe(true);
       expect(isSiteLocale(l), l).toBe(true);
     }
-    for (const l of SITE_LOCALES) expect(isSiteLocale(l), l).toBe(true);
-    expect(SITE_LOCALES).toHaveLength(10);
-    expect(isLocale("tr")).toBe(false);
-    expect(isSiteLocale("tr")).toBe(true);
+    expect([...SITE_LOCALES]).toEqual([...LOCALES]);
+    expect(LOCALES).toHaveLength(10);
+    for (const l of ["tr", "uk", "de", "ar"]) expect(isLocale(l), l).toBe(true);
+    expect(isLocale("it")).toBe(false);
+    expect(isSiteLocale("it")).toBe(false);
+    expect(isLocale("ar-SA")).toBe(false);
     expect(isSiteLocale("es")).toBe(false);
     expect(isLocale("EN")).toBe(false);
     expect(isLocale("")).toBe(false);
@@ -351,8 +361,9 @@ describe("i18n config", () => {
     });
 
     it("skips unsupported tags and q=0 entries, then falls back", () => {
-      expect(negotiate("tr,ru;q=0.5", LOCALES, "az")).toBe("ru");
-      expect(negotiate("fr-FR,de;q=0.9", LOCALES, "az")).toBe("az");
+      expect(negotiate("es,ru;q=0.5", LOCALES, "az")).toBe("ru");
+      expect(negotiate("it-IT,es;q=0.9", LOCALES, "az")).toBe("az");
+      expect(negotiate("ar-SA,en;q=0.8", LOCALES, "az")).toBe("ar");
       expect(negotiate("en;q=0,ru;q=0.1", LOCALES, "az")).toBe("ru");
       expect(negotiate("en;q=0", LOCALES, "az")).toBe("az");
       expect(negotiate("*", LOCALES, "ru")).toBe("ru");
@@ -526,7 +537,7 @@ describe("crypto", () => {
 
 describe("sso routing", () => {
   const tenant: SsoTenant = { id: "t1", slug: "agency", domain: "agency.gov.az", domainVerifiedAt: new Date("2026-10-14T00:00:00Z"), ssoEnabled: true, ssoFeature: true, ssoReady: true, autoCreate: true };
-  const learner: SsoPerson = { tenantId: "t1", role: "learner", status: "active" };
+  const learner: SsoPerson = { tenantId: "t1", role: "learner" };
   const sso = { step: "sso", url: "/api/sso/start?tenant=agency" };
   const password = { step: "password" };
 
@@ -546,7 +557,6 @@ describe("sso routing", () => {
 
   it("sends learners of a proven single sign-on domain to the provider", () => {
     expect(decideSignInStep("ali@agency.gov.az", tenant, learner)).toEqual(sso);
-    expect(decideSignInStep("ali@agency.gov.az", tenant, { ...learner, status: "invited" })).toEqual(sso);
     for (const role of ["department_head", "executive", "content_creator"] as const) expect(decideSignInStep("x@agency.gov.az", tenant, { ...learner, role }), role).toEqual(sso);
   });
 
@@ -580,8 +590,8 @@ describe("sso routing", () => {
     expect(decideSignInStep("not-an-email", tenant, null)).toEqual(password);
   });
 
-  it("ignores suspended people and people of another organisation", () => {
-    expect(decideSignInStep("ali@agency.gov.az", tenant, { ...learner, status: "suspended" })).toEqual(password);
+  it("answers alike for every account status (the callback refuses suspended people), and ignores people of another organisation", () => {
+    expect(decideSignInStep("ali@agency.gov.az", tenant, learner)).toEqual(decideSignInStep("new@agency.gov.az", tenant, null));
     expect(decideSignInStep("ali@agency.gov.az", tenant, { ...learner, tenantId: "t2" })).toEqual(password);
   });
 });

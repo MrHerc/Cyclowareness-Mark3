@@ -184,7 +184,7 @@ export function LoopActions({ id, next, verdict, closed }: { id: string; next: s
       </Select>
       {next ? (
         // The stage name can be long ("Перейти к этапу «Преобразование»"): let the label wrap on narrow phones.
-        <Button icon={<ChevronRight />} onClick={() => setMode("advance")} disabled={pending} className="h-auto min-h-10 max-w-full py-2 text-left whitespace-normal pointer-coarse:min-h-11">
+        <Button icon={<ChevronRight />} onClick={() => setMode("advance")} disabled={pending} className="h-auto min-h-10 max-w-full py-2 text-start whitespace-normal pointer-coarse:min-h-11">
           {t("next", { stage: ts(`stages.${next as "analysis"}`) })}
         </Button>
       ) : null}

@@ -1,0 +1,468 @@
+{
+ "id": "enable-content-traps",
+ "title": "Le piège des macros",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ec-tutor",
+   "beats": [
+    {
+     "id": "ec-b1",
+     "say": "Un document venu d’internet s’ouvre d’abord en Mode protégé, en lecture seule. C’est votre bouclier.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "ec-b2",
+     "say": "Si une page blanche affiche un texte comme celui-ci, arrêtez-vous. Un vrai document ne vous demande pas de cliquer sur des boutons.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "senedyaz",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Mode protégé : ce fichier provient d’internet"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Le document est vide, seule une image s’affiche :"
+         }
+        ],
+        [
+         {
+          "text": "« Pour voir le texte, cliquez sur Activer la modification, puis sur Activer le contenu. »",
+          "spot": "lure"
+         }
+        ]
+       ],
+       "buttons": [
+        "Activer la modification",
+        "Fermer"
+       ]
+      }
+     },
+     "highlight": "lure"
+    },
+    {
+     "id": "ec-b3",
+     "say": "Une macro est une commande cachée dans un document. Elle peut installer un logiciel malveillant sur l’ordinateur.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "ec-b4",
+     "say": "Et n’acceptez jamais de télécharger sur un site web un lecteur spécial pour ouvrir un document.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ec-sim-doc",
+   "environment": "desktop",
+   "title": "Ouverture d’un document",
+   "intro": "Vous avez ouvert une pièce jointe intitulée « conditions de l’appel d’offres ». Lisez chaque fenêtre et décidez à chaque étape.",
+   "steps": [
+    {
+     "id": "protected-view",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedyaz",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Mode protégé : ce fichier provient d’internet"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Le document est vide, seule une image s’affiche :"
+        }
+       ],
+       [
+        {
+         "text": "« Pour voir le texte, cliquez sur Activer la modification, puis sur Activer le contenu. »",
+         "spot": "lure"
+        }
+       ]
+      ],
+      "buttons": [
+       "Activer la modification",
+       "Fermer"
+      ]
+     },
+     "say": "Le document est vide et réclame un clic.",
+     "actions": [
+      {
+       "id": "enable",
+       "label": "Activer la modification",
+       "kind": "enable-content",
+       "outcome": "risky",
+       "feedback": "Vous avez quitté le Mode protégé. Ce mode existe justement pour vous protéger de fichiers comme celui-ci."
+      },
+      {
+       "id": "close",
+       "label": "Fermer le document",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Une page blanche qui réclame un clic est un piège.",
+       "next": "it-alert"
+      },
+      {
+       "id": "report",
+       "label": "Signaler à la Sécurité informatique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Très bien. Vous l’avez signalé sans activer la modification.",
+       "next": "it-alert"
+      }
+     ]
+    },
+    {
+     "id": "macro-blocked",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedyaz",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Risque de sécurité : macros bloquées"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Les macros de ce document sont bloquées, car le fichier provient d’internet."
+        }
+       ],
+       [
+        {
+         "text": "Le document indique : « Débloquez le fichier dans ses propriétés et autorisez les macros. »",
+         "spot": "unblock"
+        }
+       ]
+      ],
+      "buttons": [
+       "En savoir plus",
+       "Fermer"
+      ]
+     },
+     "say": "L’application a bloqué les macros. Le document vous demande de les débloquer.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Débloquer et autoriser les macros",
+       "kind": "enable-content",
+       "outcome": "compromised",
+       "feedback": "La macro cachée s’est exécutée et a installé un logiciel malveillant. Déconnectez l’appareil du réseau et appelez tout de suite la Sécurité informatique."
+      },
+      {
+       "id": "close",
+       "label": "Fermer le document",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Vous avez su vous arrêter à temps. L’application a joué son rôle de protection, et vous ne l’avez pas contournée."
+      }
+     ]
+    },
+    {
+     "id": "it-alert",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "it-destek",
+      "app": "Support informatique",
+      "title": [
+       {
+        "text": "Alerte : faux documents d’appel d’offres"
+       }
+      ],
+      "body": [
+       {
+        "text": "De faux documents « conditions de l’appel d’offres » circulent. Si vous en avez reçu un, signalez-le."
+       }
+      ],
+      "time": "11:02"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler l’e-mail",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Votre signalement aide le support informatique à retirer l’e-mail de toutes les boîtes de réception."
+      },
+      {
+       "id": "ignore",
+       "label": "Ignorer",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Vous avez fermé le fichier, mais l’e-mail est toujours là. Signalez-le pour que vos collègues ne l’ouvrent pas."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ec-sim-viewer",
+   "environment": "browser",
+   "title": "Faux lecteur PDF",
+   "intro": "Un lien dans un e-mail vous propose un programme pour ouvrir le document. Que faites-vous ?",
+   "steps": [
+    {
+     "id": "viewer-page",
+     "label": "Mettez à jour Sənəd Oxu pour afficher ce document",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "senedoxu-fake",
+      "url": [
+       {
+        "text": "https://senedoxu-yenile.example.net/bax"
+       }
+      ]
+     },
+     "say": "Regardez la barre d’adresse.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Télécharger et installer",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Ce faux lecteur est un logiciel malveillant. Votre navigateur sait ouvrir les fichiers PDF tout seul."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Seuls le support informatique ou le centre logiciel de votre organisation installent des programmes."
+      },
+      {
+       "id": "report",
+       "label": "Signaler le site",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Très bien. Signaler le site protège aussi vos collègues."
+      }
+     ]
+    },
+    {
+     "id": "viewer-download",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "senedoxu-fake",
+      "name": [
+       {
+        "text": "SenedOxu_Yenileme.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "5,7 Mo",
+      "source": [
+       {
+        "text": "senedoxu-yenile.example.net"
+       }
+      ]
+     },
+     "say": "Un téléchargement a démarré tout seul. Vérifiez le type du fichier.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "C’est un programme provenant d’un faux site. L’ouvrir infecte l’ordinateur."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Exact. Supprimez sans l’ouvrir un téléchargement que vous n’avez pas demandé."
+      },
+      {
+       "id": "report",
+       "label": "Signaler au support informatique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Très bien. Le support informatique peut bloquer ce site pour tout le monde."
+      }
+     ]
+    },
+    {
+     "id": "portal-pdf",
+     "label": "Telimat_2026.pdf",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "idare",
+      "url": [
+       {
+        "text": "https://portal.idare.example/senedler/telimat-2026.pdf"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir le document",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Exact. C’est le portail interne, le fichier s’ouvre dans le navigateur et il n’y a rien à installer."
+      },
+      {
+       "id": "report",
+       "label": "Signaler le site",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "C’est le portail de votre propre organisation, et il ne demande aucune installation. Réservez les signalements aux cas suspects."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ec-hotspot",
+   "prompt": "Trouvez les indices d’un piège dans cet e-mail.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "docusfera-fake",
+    "from": {
+     "name": [
+      {
+       "text": "DocuSfera"
+      }
+     ],
+     "address": [
+      {
+       "text": "imza@docusfera-sened.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Contrat en attente de signature"
+     }
+    ],
+    "time": "15:47",
+    "body": [
+     [
+      {
+       "text": "Le document a été créé dans un ancien format."
+      }
+     ],
+     [
+      {
+       "text": "Pour l’afficher, activez d’abord la modification, puis le contenu.",
+       "spot": "enable"
+      }
+     ],
+     [
+      {
+       "text": "S’il ne s’ouvre pas, mettez à jour votre lecteur ici : ",
+       "spot": "viewer"
+      },
+      {
+       "text": "Télécharger Sənəd Oxu",
+       "spot": "viewer",
+       "link": {
+        "label": "Sənəd Oxu",
+        "href": "https://senedoxu-yenile.example.net/yukle"
+       }
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Muqavile_imza.xlsm",
+        "spot": "macro"
+       }
+      ],
+      "size": "210 Ko"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Domaine différent",
+     "explain": "L’e-mail reprend le nom du service de signature, mais le domaine est différent. Signalez-le."
+    },
+    {
+     "id": "enable",
+     "label": "Demande d’activation",
+     "explain": "Un vrai document se lit sans activer la modification ni les macros."
+    },
+    {
+     "id": "macro",
+     "label": "Fichier à macros",
+     "explain": "Un fichier Office dont l’extension se termine par « m » (xlsm, docm) peut contenir des macros."
+    },
+    {
+     "id": "viewer",
+     "label": "Lien de téléchargement d’un programme",
+     "explain": "Devoir installer un programme spécial pour lire un document, c’est le signe d’un faux lecteur."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "ec-order",
+   "prompt": "Un document réclame les macros. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Ne cliquer sur aucun bouton"
+    },
+    {
+     "id": "close",
+     "label": "Fermer le document"
+    },
+    {
+     "id": "report",
+     "label": "Signaler l’e-mail à la Sécurité informatique"
+    },
+    {
+     "id": "verify",
+     "label": "Si le document était attendu, interroger l’expéditeur à un numéro que vous connaissez"
+    }
+   ],
+   "explain": "D’abord, arrêtez-vous et fermez le document, puis signalez l’e-mail. Ne vérifiez auprès de l’expéditeur qu’à un numéro que vous connaissez déjà."
+  },
+  {
+   "type": "recap",
+   "id": "ec-recap",
+   "points": [
+    "Un document vide qui réclame un clic est un piège",
+    "N’activez ni la modification ni les macros : fermez et signalez",
+    "Ne téléchargez jamais un programme sur un site pour ouvrir un document"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

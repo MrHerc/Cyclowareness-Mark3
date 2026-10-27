@@ -1,0 +1,358 @@
+{
+ "id": "conferences",
+ "title": "Conferințe și delegații",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Conferințele și întâlnirile oficiale sunt ocazii de a cunoaște oameni noi. Dar cineva de acolo poate să adune și informații.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": { "kind": "illustration", "id": "handshake" }
+    },
+    {
+     "id": "b2",
+     "say": "Un stick USB, o baterie externă sau niște căști primite cadou nu se conectează la computerul de serviciu. Pot ascunde malware.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": { "kind": "illustration", "id": "usb" }
+    },
+    {
+     "id": "b3",
+     "say": "Pe ecuson apar numele, funcția și un cod QR. Nu îl lăsați să apară în fotografii și ascundeți-l când ieșiți din incintă.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "kontakto",
+       "app": "generic",
+       "contact": [{ "text": "Kontakto: postare nouă" }],
+       "messages": [
+        {
+         "from": "me",
+         "body": [
+          { "text": "La forum! " },
+          { "text": "Fotografie cu ecusonul meu", "spot": "badge" }
+         ],
+         "time": "10:15"
+        }
+       ]
+      }
+     },
+     "highlight": "badge"
+    },
+    {
+     "id": "b4",
+     "say": "Orice dispozitiv primit cadou îl arătați mai întâi suportului IT. Colegii de acolo îl verifică și decid.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": { "kind": "illustration", "id": "badge-id" }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "after-forum",
+   "environment": "desktop",
+   "title": "După forum",
+   "intro": "V-ați întors de la forum. Pe birou vă așteaptă cadouri, iar în căsuța de e-mail, mesaje noi.",
+   "steps": [
+    {
+     "id": "gift-usb",
+     "label": "Un cadou de la delegația aflată în vizită",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-nordvale",
+      "name": [{ "text": "Prezentare_cooperare.pdf" }],
+      "type": "lnk",
+      "size": "2 KB",
+      "source": [{ "text": "USB: NORDVALE (E:)" }]
+     },
+     "say": "Delegația v-a dat prezentarea pe un stick USB.",
+     "actions": [
+      {
+       "id": "plug",
+       "label": "Conectați-l la computer",
+       "kind": "plug-in",
+       "outcome": "risky",
+       "feedback": "Nu știți ce se află pe un dispozitiv primit cadou. Suportul IT trebuie să îl verifice mai întâi."
+      },
+      {
+       "id": "hand-over",
+       "label": "Predați-l suportului IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Suportul IT verifică dispozitivul pe un computer separat și vă transmite fișierul, dacă este nevoie.",
+       "next": "partner-mail"
+      }
+     ]
+    },
+    {
+     "id": "usb-file",
+     "label": "Pe stick se află un singur fișier",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-nordvale",
+      "name": [{ "text": "Prezentare_cooperare.pdf" }],
+      "type": "lnk",
+      "size": "2 KB",
+      "source": [{ "text": "USB: NORDVALE (E:)" }]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Nu este un PDF, ci o comandă rapidă. Dacă o deschideți, poate rula o comandă ascunsă."
+      },
+      {
+       "id": "eject",
+       "label": "Scoateți dispozitivul",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Decizie corectă. Scoateți dispozitivul fără să deschideți fișierul și predați-l suportului IT."
+      }
+     ]
+    },
+    {
+     "id": "partner-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "nc-nordvale",
+      "from": {
+       "name": [{ "text": "Stefan Morgan" }],
+       "address": [{ "text": "s.morgan.nordvale@mail.example" }]
+      },
+      "subject": [{ "text": "Vă mulțumesc pentru întâlnire" }],
+      "time": "10:24",
+      "body": [
+       [{ "text": "Bună ziua! M-am bucurat foarte mult să vă cunosc la forum." }],
+       [{ "text": "Ca să planificăm următoarea întâlnire, mi-ați putea trimite lista angajaților din departamentul dumneavoastră, cu funcțiile și numerele lor de telefon?" }],
+       [{ "text": "Mi-ar fi de folos și programul managerului dumneavoastră pentru săptămâna viitoare." }]
+      ]
+     },
+     "say": "Vă scrie un invitat pe care l-ați cunoscut la forum.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Trimiteți lista și programul",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Lista angajaților și programul unui manager sunt o hartă pentru următorul atac. Astfel de date pleacă doar prin canale oficiale, cu aprobare."
+      },
+      {
+       "id": "forward",
+       "label": "Redirecționați-l managerului și echipei de securitate",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Corect. E-mailul vine de pe o adresă personală, iar cererile din afara organizației trec prin canale oficiale."
+      },
+      {
+       "id": "official",
+       "label": "Răspundeți: Vă rog să trimiteți o cerere oficială",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bine. O cerere oficială este verificată, iar răspunsul îl dă o persoană autorizată."
+      }
+     ]
+    },
+    {
+     "id": "bt-pair",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [{ "text": "Bluetooth: cerere de asociere" }],
+      "body": [
+       [{ "text": "„Forum Headset” vrea să se conecteze la acest computer." }],
+       [{ "text": "Cod: 482 913" }]
+      ],
+      "buttons": ["Refuzați", "Asociați"]
+     },
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Refuzați",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Nu acceptați niciodată o cerere de asociere pe care nu ați inițiat-o chiar dumneavoastră."
+      },
+      {
+       "id": "allow",
+       "label": "Asociați",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Un dispozitiv necunoscut se poate da drept tastatură și poate tasta comenzi. Refuzați astfel de cereri."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "forum-post",
+   "prompt": "Găsiți ce nu ar trebui să dezvăluie această postare.",
+   "artifact": {
+    "kind": "chat",
+    "brandRef": "kontakto",
+    "app": "generic",
+    "contact": [{ "text": "Kontakto: postare nouă" }],
+    "messages": [
+     {
+      "from": "me",
+      "body": [
+       { "text": "La RəqəmYol Forum! " },
+       { "text": "Fotografie cu ecusonul meu.", "spot": "badge" },
+       { "text": " Mâine la 10:00 " },
+       { "text": "delegația noastră are întâlnire în clădirea 3 a ministerului.", "spot": "schedule" },
+       { "text": " Acum " },
+       { "text": "sunt la Lumera Hotel, camera 512", "spot": "room" },
+       { "text": ", ne vedem mâine!" }
+      ],
+      "time": "21:40"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "badge",
+     "label": "Ecusonul",
+     "explain": "Pe ecuson apar numele, funcția și un cod QR de acces. Poate fi folosit pentru a falsifica un ecuson sau pentru a vă viza direct."
+    },
+    {
+     "id": "schedule",
+     "label": "Ora și locul întâlnirii",
+     "explain": "Ora și locul întâlnirilor unei delegații sunt informații de securitate. Chiar și după întâlnire, păstrați detaliile la nivel general."
+    },
+    {
+     "id": "room",
+     "label": "Camera de hotel",
+     "explain": "Numărul camerei arată cine unde stă. Nu îl dezvăluiți nicăieri."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "choice",
+   "id": "gift-tablet",
+   "question": {
+    "prompt": "Delegația aflată în vizită vă oferă cadou o tabletă. Ce faceți?",
+    "options": [
+     {
+      "id": "register",
+      "label": "Îi spun managerului și o predau suportului IT pentru verificare",
+      "correct": true,
+      "feedback": "Corect. Un dispozitiv primit cadou este verificat conform regulilor organizației și intră în rețeaua de serviciu doar cu aprobare."
+     },
+     {
+      "id": "work-mail",
+      "label": "Îmi configurez imediat pe ea e-mailul de serviciu",
+      "correct": false,
+      "feedback": "Un dispozitiv neverificat poate conține programe spion. Deschideți conturile de serviciu doar pe dispozitivele organizației."
+     },
+     {
+      "id": "home",
+      "label": "O iau acasă pentru uz personal",
+      "correct": false,
+      "feedback": "Dispozitivul ar putea deschide o cale și spre rețeaua de acasă, și spre conturile personale. Mai întâi, predați-l spre verificare."
+     },
+     {
+      "id": "office-wifi",
+      "label": "O conectez la Wi-Fi-ul biroului ca să o testez",
+      "correct": false,
+      "feedback": "Dacă conectați un dispozitiv neverificat la rețeaua de serviciu, deschideți o cale spre sistemele interne."
+     }
+    ],
+    "visual": { "kind": "illustration", "id": "handshake" }
+   },
+   "explain": "Până nu este verificat, un dispozitiv primit cadou este dispozitivul unui străin. Spuneți-i managerului și predați-l suportului IT."
+  },
+  {
+   "type": "scenario",
+   "id": "delegation-visit",
+   "title": "O delegație la birou",
+   "start": "slides",
+   "nodes": [
+    {
+     "id": "slides",
+     "text": "Prezentarea mea este pe un stick USB. Îl conectăm la computerul dumneavoastră?",
+     "speaker": "Invitat (la întâlnire)",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Prezentarea mea este pe un stick USB. <breath> Îl conectăm la computerul dumneavoastră?",
+     "character": "guest",
+     "choices": [
+      {
+       "label": "Să o deschidem pe computerul separat pregătit de suportul IT",
+       "next": "wifi",
+       "feedback": "Corect. Fișierele invitatului nu ajung nici pe computerul de serviciu, nici în rețea."
+      },
+      {
+       "label": "Conectați-l, avem puțin timp",
+       "outcome": "risky",
+       "feedback": "Un stick USB din afară poate aduce malware pe un computer de serviciu. Pentru invitați, folosiți un computer separat."
+      }
+     ]
+    },
+    {
+     "id": "wifi",
+     "text": "Încă ceva: care este parola de la Wi-Fi-ul biroului? Trebuie să-mi verific e-mailul.",
+     "speaker": "Invitat",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Încă ceva, ăă, care este parola de la Wi-Fi-ul biroului? Trebuie să-mi verific e-mailul.",
+     "character": "guest",
+     "choices": [
+      {
+       "label": "Îi dau acces la rețeaua pentru oaspeți",
+       "next": "walk",
+       "feedback": "Corect. Rețeaua pentru oaspeți este separată de sistemele interne."
+      },
+      {
+       "label": "Îi spun parola rețelei de serviciu",
+       "outcome": "risky",
+       "feedback": "Rețeaua de serviciu duce la sistemele interne. Invitații primesc acces doar la rețeaua pentru oaspeți."
+      }
+     ]
+    },
+    {
+     "id": "walk",
+     "text": "Nu vă faceți griji, mă uit singur prin birou.",
+     "speaker": "Invitat (în pauză)",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Nu vă faceți griji, <breath> mă uit singur prin birou.",
+     "character": "guest",
+     "choices": [
+      {
+       "label": "Îl însoțesc pe invitat",
+       "outcome": "safe",
+       "feedback": "Excelent. Invitații se deplasează prin birou doar însoțiți."
+      },
+      {
+       "label": "Îl las să se plimbe, doar e invitatul nostru",
+       "outcome": "risky",
+       "feedback": "Un invitat neînsoțit poate vedea birouri deschise și documente lăsate pe mese."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Predați dispozitivele primite cadou suportului IT, fără să le conectați.",
+    "Nu postați fotografii cu ecusonul și nu dezvăluiți numărul camerei sau programul.",
+    "Invitații primesc un computer separat, acces la rețeaua pentru oaspeți și un însoțitor."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

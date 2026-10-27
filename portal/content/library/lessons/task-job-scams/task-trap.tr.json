@@ -1,0 +1,499 @@
+{
+ "id": "task-trap",
+ "title": "Görev tuzağı",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "tt-tutor",
+   "beats": [
+    {
+     "id": "tt-b1",
+     "say": "Merhaba! Bugün evden kolay para kazanmayı vaat eden iş tekliflerine bakacağız.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "tt-b2",
+     "say": "Görev basit: beğenin, yorum yazın, ekran görüntüsü gönderin. Vaat edilen ücret ise şüphe uyandıracak kadar yüksek.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2d-nergiz-market-fake",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Nərgiz Market İK | Aynur"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Merhaba! Evden çalışma fırsatı: ürünleri beğenin ve yorum yazın."
+          }
+         ],
+         "time": "09:12"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Günde 40-120 AZN kazanın",
+           "spot": "pay"
+          }
+         ],
+         "time": "09:12"
+        }
+       ]
+      }
+     },
+     "highlight": "pay"
+    },
+    {
+     "id": "tt-b3",
+     "say": "İlk beş manatı gerçekten öderler. Bu, daha sonra sizden isteyecekleri büyük para için atılan bir yemdir.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "tt-b4",
+     "say": "Kural şu: başlamak ya da kazancınızı çekmek için ödeme yapmanız gerekiyorsa, bu bir dolandırıcılıktır.",
+     "mood": "happy",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "tt-sim",
+   "environment": "phone",
+   "title": "Evden çalışma",
+   "intro": "Bilinmeyen bir numaradan iş teklifi geliyor. Her mesaj için yanıtınızı seçin.",
+   "steps": [
+    {
+     "id": "offer",
+     "label": "09:12 Yeni mesaj",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Nərgiz Market İK | Aynur"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Merhaba! Numaranızı bir iş ilanı sitesindeki profilinizden aldık."
+         }
+        ],
+        "time": "09:12"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Evden çalışma: günde 1-2 saat, 40-120 AZN. İlgilenir misiniz?"
+         }
+        ],
+        "time": "09:12"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "interested",
+       "label": "Evet, biraz daha anlatın",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "İlgi göstermek henüz bir kayıp değil ama bu yazışma bir ödemeye doğru gidiyor. Her adımı dikkatle izleyin."
+      },
+      {
+       "id": "block",
+       "label": "Engelle ve bildir",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Doğru. Habersiz gelen ve uçuk ücret vaat eden bir teklif, tek başına yeterli bir uyarıdır.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "first-task",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Nərgiz Market İK | Aynur"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "İlk görev: bu 3 ürüne 5 yıldız verin ve ekran görüntüsünü gönderin."
+         }
+        ],
+        "time": "09:20"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Görev başına 1,70 AZN."
+         }
+        ],
+        "time": "09:20"
+       }
+      ]
+     },
+     "say": "İşte ilk görev.",
+     "actions": [
+      {
+       "id": "do-it",
+       "label": "Yapıyorum, ekran görüntüsünü gönderiyorum",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Sahte yorumlar diğer müşterileri yanıltır. Üstelik bu, dolandırıcılığın ilk basamağıdır."
+      },
+      {
+       "id": "refuse",
+       "label": "Sahte yorum yazmam, engelliyorum",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Doğru. Beğeni ve yorum karşılığında para almak bu dolandırıcılığın iyi bilinen bir işaretidir.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "first-pay",
+     "label": "10:03 SahilBank",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "10:03",
+      "messages": [
+       [
+        {
+         "text": "Kartınıza 5,10 AZN yatırıldı. Kullanılabilir bakiye: 63,40 AZN."
+        }
+       ]
+      ]
+     },
+     "say": "Kartınıza gerçekten para geldi.",
+     "actions": [
+      {
+       "id": "trust",
+       "label": "Para geldi, demek ki iş gerçek",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Küçük bir ödeme, güveninizi kazanmak için yapılır. Dolandırıcı daha sonra bunun kat kat fazlasını geri alır."
+      },
+      {
+       "id": "bait",
+       "label": "Bu bir yem, devam etmiyorum",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Doğru. İlk ödeme bir yemdir, bir sonraki adımda sizden para isterler.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "vip-task",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Nərgiz Market VIP grubu"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Tebrikler, VIP seviyesine ulaştınız!"
+         }
+        ],
+        "time": "10:40"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "VIP görev: 50 AZN yatırın, 30 dakika içinde 130 AZN geri alın."
+         }
+        ],
+        "time": "10:41"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Gruptaki herkes kazanıyor, bakın, bugün 47 kişiye ödeme yapıldı."
+         }
+        ],
+        "time": "10:41"
+       }
+      ]
+     },
+     "say": "Şimdi sizi bir Telegram grubuna aldılar.",
+     "actions": [
+      {
+       "id": "deposit",
+       "label": "50 AZN yatırıyorum",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "O para geri gelmeyecek. Gruptaki kazananlar dolandırıcıların ta kendileri."
+      },
+      {
+       "id": "leave",
+       "label": "Gruptan çık ve grubu bildir",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Doğru. Çalışmak için para yatırmanız gerekiyorsa bu bir iş değil, dolandırıcılıktır.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "negative",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Nərgiz Market VIP grubu"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Sistem hatası: bakiyeniz şu anda -86 AZN."
+         }
+        ],
+        "time": "11:15"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "86 AZN ödeyin, yoksa 214 AZN tutarındaki kazancınız silinecek."
+         }
+        ],
+        "time": "11:15"
+       }
+      ]
+     },
+     "say": "Ödeme yaptıktan sonra bakiye birden eksiye düştü.",
+     "actions": [
+      {
+       "id": "pay-more",
+       "label": "86 AZN daha ödüyorum",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Her ödemeden sonra yeni bir sebep çıkacak. Durun, bankanıza haber verin ve 102'yi arayarak polise bildirin."
+      },
+      {
+       "id": "stop",
+       "label": "Ödemiyorum, engelleyip bildiriyorum",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Doğru, kazancı serbest bırakmak için ödeme istenmesi dolandırıcılığın son basamağıdır. Yazışmayı delil olarak saklayın."
+      }
+     ]
+    },
+    {
+     "id": "end",
+     "label": "İşBazar: yeni iş ilanı",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2d-isbazar",
+      "app": "İşBazar",
+      "title": [
+       {
+        "text": "Xəzər Logistika: operatör"
+       }
+      ],
+      "body": [
+       {
+        "text": "Ofiste mülakat, maaş 850 AZN. Başvurular site üzerinden."
+       }
+      ],
+      "time": "12:30"
+     },
+     "say": "Bu ise gerçek bir iş ilanı.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "İlanı görüntüle",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Doğru. Gerçek bir ilanda şirketin adı, mülakat ve gerçekçi bir maaş yer alır; sizden asla ödeme istenmez."
+      },
+      {
+       "id": "later",
+       "label": "Sonra bak",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Bu da olur. Gerçek bir iş ilanı bir anda kaybolmaz, sakin sakin inceleyebilirsiniz."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "tt-scenario",
+   "title": "Leyla çoktan ödeme yaptı",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "Görevlere 120 manat yatırdım. Şimdi parayı çekebilmem için yüzde 15 vergi istiyorlar. Ödeyeyim mi?",
+     "speaker": "Leyla, akrabanız (telefonda)",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Görevlere 120 manat yatırdım. <breath> Şimdi parayı çekebilmem için yüzde 15 vergi istiyorlar. Ödeyeyim mi?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Sakın ödeme, bu aynı dolandırıcılığın devamı",
+       "next": "id-photo",
+       "feedback": "Doğru. Kazancı çekmek için vergi ya da ücret istenmesi dolandırıcılık işaretidir."
+      },
+      {
+       "label": "Öde, yoksa o 120 manat da gider",
+       "outcome": "compromised",
+       "feedback": "Bu yalnızca kaybı büyütür. Vergiden sonra yeni bir bahane çıkacak."
+      }
+     ]
+    },
+    {
+     "id": "id-photo",
+     "text": "Kayıt için kimlik kartımın fotoğrafını da gönderdim. Bu bir sorun mu?",
+     "speaker": "Leyla",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Kayıt için kimlik kartımın fotoğrafını da gönderdim. <breath> Bu bir sorun mu?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Evet, bunu da bankaya ve polise bildirelim",
+       "next": "steps",
+       "feedback": "Doğru. Kimlik fotoğrafıyla onun adına hesap açılabilir ya da kredi çekilebilir."
+      },
+      {
+       "label": "Hayır, fotoğraf onların işine yaramaz",
+       "next": "steps",
+       "outcome": "risky",
+       "feedback": "Tam tersine, kimlik fotoğrafıyla onun adına sahte hesaplar açılabilir. Bunu da bildirin."
+      }
+     ]
+    },
+    {
+     "id": "steps",
+     "text": "Peki şimdi ne yapayım?",
+     "speaker": "Leyla",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "<breath> Peki şimdi ne yapayım?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Bankanı ara, polise 102 üzerinden bildir, yazışmayı sakla",
+       "outcome": "safe",
+       "feedback": "Harika. Banka aktarımı durdurmaya çalışabilir, yazışma da polis için delildir."
+      },
+      {
+       "label": "Her şeyi sil ve unut",
+       "outcome": "risky",
+       "feedback": "Yazışmayı silmek delilleri yok eder. Bunda utanılacak bir şey yok, yalnızca bildirin."
+      },
+      {
+       "label": "Parayı geri almayı vaat eden kanala yaz",
+       "outcome": "compromised",
+       "feedback": "Parayı geri almayı vaat edenler çoğu zaman aynı dolandırıcılardır. Onlara hiçbir şey ödemeyin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "tt-match",
+   "prompt": "Teklifteki ifadeyi gerçek anlamıyla eşleştirin.",
+   "pairs": [
+    {
+     "id": "easy",
+     "left": "Günde 1 saat, 120 AZN",
+     "right": "Yem: gerçek bir iş böyle ödeme yapmaz"
+    },
+    {
+     "id": "deposit",
+     "left": "VIP görev için para yatırma",
+     "right": "Doğrudan paranızı almak"
+    },
+    {
+     "id": "tax",
+     "left": "Kazancı çekmek için vergi",
+     "right": "Bir sonraki ödeme tuzağı"
+    },
+    {
+     "id": "group",
+     "left": "Gruptaki herkes kazanıyor",
+     "right": "Gruba yerleştirilmiş üyeler ve sahte yorumlar"
+    }
+   ],
+   "explain": "Ödemenin adı ne olursa olsun, çalışmak için para ödüyorsanız bu bir iş değildir."
+  },
+  {
+   "type": "recap",
+   "id": "tt-recap",
+   "points": [
+    "Beğeni ve yorum karşılığında para ödeyen bir iş dolandırıcılıktır.",
+    "İlk küçük ödeme yemdir; asıl tuzak, para yatırma talepleri ve para çekme vergileridir.",
+    "Ödeme yaptınız mı? Bankanızı ve 102 polis hattını arayın, yazışmayı saklayın."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

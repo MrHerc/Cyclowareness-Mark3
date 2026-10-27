@@ -1,0 +1,512 @@
+{
+ "id": "disguised-files",
+ "title": "Fișiere deghizate",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "df-tutor",
+   "beats": [
+    {
+     "id": "df-b1",
+     "say": "Bună ziua! Numele unui fișier poate minți. Astăzi învățăm să vedem ce este de fapt un atașament.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "df-b2",
+     "say": "Acest fișier arată ca un PDF. Dar chiar la sfârșitul numelui scrie exe, deci este un program.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "file",
+       "name": [
+        {
+         "text": "Decizie_2026.pdf"
+        },
+        {
+         "text": ".exe",
+         "spot": "ext"
+        }
+       ],
+       "type": "exe",
+       "size": "1,8 MB",
+       "source": [
+        {
+         "text": "Atașament de e-mail"
+        }
+       ]
+      }
+     },
+     "highlight": "ext"
+    },
+    {
+     "id": "df-b3",
+     "say": "Arhivele, imaginile de disc și comenzile rapide pot ascunde și ele un program.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    },
+    {
+     "id": "df-b4",
+     "say": "Regula este simplă: înainte să deschideți un fișier neașteptat, verificați-i tipul, iar dacă aveți dubii, raportați-l.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "df-sim-files",
+   "environment": "desktop",
+   "title": "Folderul Descărcări",
+   "intro": "Uitați-vă la fișierele descărcate din e-mail. Afișați extensiile și alegeți ce faceți cu fiecare.",
+   "steps": [
+    {
+     "id": "decree-exe",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Decizie_2026.pdf.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "1,8 MB",
+      "source": [
+       {
+        "text": "Descărcări: qerar@nazirlik-sened.example.net"
+       }
+      ]
+     },
+     "say": "Afișați extensiile. Ce scrie la sfârșitul numelui?",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Nu este un document, ci un program. Poate instala malware chiar în clipa în care îl deschideți."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. O decizie oficială reală nu este niciodată un program."
+      },
+      {
+       "id": "report",
+       "label": "Raportați echipei de securitate IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Echipa de securitate poate șterge același e-mail și din căsuțele celorlalți colegi."
+      }
+     ]
+    },
+    {
+     "id": "report-iso",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Raport_septembrie.iso"
+       }
+      ],
+      "type": "iso",
+      "size": "4,2 MB",
+      "source": [
+       {
+        "text": "Descărcări: hesabat@audit-xidmet.example.net"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Un fișier ISO se deschide ca un disc și poate conține un program. Rapoartele nu se trimit ca imagini de disc."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. Nu deschideți o imagine de disc pe care nu o așteptați."
+      },
+      {
+       "id": "report",
+       "label": "Raportați echipei de securitate IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Un fișier ISO deghizat în raport este un atac tipic."
+      }
+     ]
+    },
+    {
+     "id": "photos-lnk",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Fotografii_eveniment"
+       }
+      ],
+      "type": "lnk",
+      "size": "3 KB",
+      "source": [
+       {
+        "text": "Descărcări: extras dintr-o arhivă"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Era o comandă rapidă, care a pornit pe ascuns un program. Fotografiile nu ocupă niciodată doar 3 KB."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. O comandă rapidă (.lnk) deghizată în fotografii este o capcană."
+      },
+      {
+       "id": "report",
+       "label": "Raportați echipei de securitate IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Cel mai sigur este să raportați fișierul fără să-l deschideți."
+      }
+     ]
+    },
+    {
+     "id": "leave-pdf",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [
+       {
+        "text": "Grafic_concedii.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "220 KB",
+      "source": [
+       {
+        "text": "Descărcări: kadrlar@idare.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. Un PDF așteptat, venit de la o adresă internă, se poate deschide."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Acest fișier este sigur: un PDF real de la un expeditor cunoscut. Nu orice fișier trebuie șters."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "df-hotspot",
+   "prompt": "Găsiți semnalele de alarmă din acest e-mail.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "e-xidmet-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Portalul e-Xidmət"
+      }
+     ],
+     "address": [
+      {
+       "text": "bildiris@e-xidmet-gov.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Notificare de amendă"
+     }
+    ],
+    "time": "09:31",
+    "body": [
+     [
+      {
+       "text": "Pe numele dumneavoastră a fost emisă o amendă contravențională. Detaliile se află în atașament."
+      }
+     ],
+     [
+      {
+       "text": "Parola arhivei: 2026",
+       "spot": "zip"
+      }
+     ],
+     [
+      {
+       "text": "Dacă nu este achitată în 3 zile, suma se dublează.",
+       "spot": "urgency"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Notificare_amenda.zip",
+        "spot": "zip"
+       }
+      ],
+      "size": "860 KB"
+     },
+     {
+      "name": [
+       {
+        "text": "Chitanta_de_plata.html",
+        "spot": "html"
+       }
+      ],
+      "size": "14 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Domeniu fals",
+     "explain": "Adresa adaugă „-gov” și o terminație diferită. Verificați chiar dumneavoastră domeniul portalului oficial."
+    },
+    {
+     "id": "zip",
+     "label": "Arhivă protejată cu parolă",
+     "explain": "Parola împiedică antivirusul să vadă ce este înăuntru. Notificările oficiale nu se trimit așa."
+    },
+    {
+     "id": "html",
+     "label": "Atașament HTML",
+     "explain": "Un atașament HTML deschide în browser o pagină falsă de plată sau de conectare."
+    },
+    {
+     "id": "urgency",
+     "label": "Amenințare și grabă",
+     "explain": "Scopul este să vă sperie, ca să deschideți fișierul fără să verificați. Verificați amenzile doar pe portalul oficial."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "df-swipe",
+   "prompt": "Sigur sau capcană?",
+   "cards": [
+    {
+     "id": "manual-pdf",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [
+       {
+        "text": "Instructiuni_2026.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "310 KB",
+      "source": [
+       {
+        "text": "it@idare.example, ghid așteptat"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Adresă internă, document așteptat, PDF obișnuit. Îl puteți deschide."
+    },
+    {
+     "id": "salary-lnk",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Tabel_salarii.xlsx.lnk"
+       }
+      ],
+      "type": "lnk",
+      "size": "2 KB",
+      "source": [
+       {
+        "text": "Expeditor necunoscut"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O comandă rapidă cu nume de tabel. Dacă o deschideți, poate porni pe ascuns un program."
+    },
+    {
+     "id": "order-img",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "cevikkargo-fake",
+      "name": [
+       {
+        "text": "Comanda_1873.img"
+       }
+      ],
+      "type": "img",
+      "size": "3,6 MB",
+      "source": [
+       {
+        "text": "sifaris@cevik-kargo.example.net"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "IMG este o imagine de disc. Detaliile unei comenzi nu se trimit niciodată așa."
+    },
+    {
+     "id": "slides-ppt",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "ofistechizat",
+      "name": [
+       {
+        "text": "Prezentare_octombrie.pptx"
+       }
+      ],
+      "type": "ppt",
+      "size": "2,1 MB",
+      "source": [
+       {
+        "text": "Sabina Karimova, convenită pentru ședință"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "O prezentare convenită dinainte, într-un format obișnuit. Niciun semnal de alarmă."
+    },
+    {
+     "id": "invoice-html",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "ofistechizat-fake",
+      "name": [
+       {
+        "text": "Factura_octombrie.html"
+       }
+      ],
+      "type": "html",
+      "size": "9 KB",
+      "source": [
+       {
+        "text": "faktura@ofistechizat-az.example.net"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Facturile nu sunt fișiere HTML. Acesta vine de pe un domeniu aproape identic și deschide o pagină de conectare."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "df-match",
+   "prompt": "Asociați fiecare tip de fișier cu riscul lui.",
+   "pairs": [
+    {
+     "id": "exe",
+     "left": ".exe",
+     "right": "Program care pornește când îl deschideți"
+    },
+    {
+     "id": "lnk",
+     "left": ".lnk",
+     "right": "Comandă rapidă care poate porni pe ascuns un program"
+    },
+    {
+     "id": "iso",
+     "left": ".iso",
+     "right": "Imagine de disc care poate ascunde un program"
+    },
+    {
+     "id": "html",
+     "left": ".html",
+     "right": "Poate deschide în browser o pagină de conectare falsă"
+    },
+    {
+     "id": "zip",
+     "left": ".zip (cu parolă)",
+     "right": "Antivirusul nu poate vedea ce este înăuntru"
+    }
+   ],
+   "explain": "Aceste tipuri apar rar în e-mailurile de serviciu. Dacă nu vă așteptați la un astfel de fișier, nu-l deschideți și raportați-l."
+  },
+  {
+   "type": "choice",
+   "id": "df-choice",
+   "question": {
+    "prompt": "Un coleg vă spune: „Am deschis fișierul și nu s-a întâmplat nimic.” Ce îl sfătuiți?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Să deconecteze computerul de la rețea și să sune imediat la echipa de securitate IT",
+      "correct": true,
+      "feedback": "Corect. Malware-ul lucrează adesea fără niciun semn, iar o raportare rapidă limitează pagubele."
+     },
+     {
+      "id": "wait",
+      "label": "Să aștepte și să raporteze dacă se întâmplă ceva",
+      "correct": false,
+      "feedback": "„Nu s-a întâmplat nimic” este adesea o impresie falsă. Așteptarea îi dă timp atacatorului."
+     },
+     {
+      "id": "shutdown",
+      "label": "Să oprească imediat computerul",
+      "correct": false,
+      "feedback": "Oprirea poate șterge dovezile din memorie. Dacă procedura internă nu prevede altceva, computerul rămâne pornit, se deconectează de la rețea și se raportează incidentul."
+     }
+    ]
+   },
+   "explain": "Un fișier suspect deschis este un incident: deconectați dispozitivul de la rețea, lăsați computerul pornit și raportați imediat."
+  },
+  {
+   "type": "recap",
+   "id": "df-recap",
+   "points": [
+    "Uitați-vă la sfârșitul numelui: acolo este tipul real",
+    "Nu deschideți arhive, fișiere ISO, comenzi rapide sau fișiere HTML neașteptate",
+    "L-ați deschis? Deconectați dispozitivul de la rețea și raportați imediat"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

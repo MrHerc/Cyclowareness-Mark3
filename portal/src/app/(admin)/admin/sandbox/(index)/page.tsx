@@ -40,14 +40,14 @@ export default async function AnalystSandboxPage({ searchParams }: PageProps<"/a
           <TabsNav items={FILTERS.map((f) => ({ href: `?f=${f}`, label: tr(`filters.${f}`), active: filter === f, count: f === "all" ? all.length : all.filter((a) => a.verdict === f || a.kind === f).length }))} />
           {list.length ? (
             <ScrollRegion label={tr("recent")}>
-              <table className="w-full min-w-[44rem] text-left text-caption">
+              <table className="w-full min-w-[44rem] text-start text-caption">
                 <thead className="text-tab text-ink-subtle">
                   <tr className="border-b border-line">
                     <th className="py-2 font-semibold">#</th>
                     <th className="py-2 font-semibold">{tr("object")}</th>
                     <th className="py-2 font-semibold">{tr("submittedBy")}</th>
                     <th className="py-2 font-semibold">{tr("verdict")}</th>
-                    <th className="py-2 text-right font-semibold">{tr("score")}</th>
+                    <th className="py-2 text-end font-semibold">{tr("score")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
@@ -61,7 +61,7 @@ export default async function AnalystSandboxPage({ searchParams }: PageProps<"/a
                       <td className="max-w-80 py-2.5">
                         <Link href={`/admin/sandbox/${a.id}`} className={textLinkClass("flex items-center gap-2 font-semibold hover:text-brand-700")}>
                           {a.kind === "url" ? <Link2 className="size-4 shrink-0 text-ink-subtle" /> : <FileText className="size-4 shrink-0 text-ink-subtle" />}
-                          <span className="truncate font-mono">{a.kind === "url" ? defang(a.objectName) : a.objectName}</span>
+                          <span dir="ltr" className="truncate font-mono">{a.kind === "url" ? defang(a.objectName) : a.objectName}</span>
                         </Link>
                         <span className="block text-tab text-ink-subtle">{format.dateTime(a.createdAt, { dateStyle: "medium", timeStyle: "short" })}</span>
                       </td>
@@ -69,7 +69,7 @@ export default async function AnalystSandboxPage({ searchParams }: PageProps<"/a
                       <td className="py-2.5">
                         <VerdictBadge verdict={a.verdict} />
                       </td>
-                      <td className="py-2.5 text-right font-semibold tabular-nums">{a.score}</td>
+                      <td className="py-2.5 text-end font-semibold tabular-nums">{a.score}</td>
                     </tr>
                   ))}
                 </tbody>

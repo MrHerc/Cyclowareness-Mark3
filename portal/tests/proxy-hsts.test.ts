@@ -17,7 +17,8 @@ afterEach(() => {
   vi.unstubAllEnvs();
 });
 
-const PATHS = ["/az", "/", "/admin", "/api/health", "/_next/static/chunks/main.js", "/robots.txt", "/sw.js", "/favicon.ico", "/brand/logo.svg"];
+const CLIP = `/generated/tts/az/${"a".repeat(64)}.mp3`;
+const PATHS = ["/az", "/", "/admin", "/api/health", "/_next/static/chunks/main.js", "/robots.txt", "/sw.js", "/favicon.ico", "/brand/logo.svg", CLIP];
 
 describe("Strict-Transport-Security", () => {
   it("is the same on pages, redirects, API routes and static files", async () => {
@@ -40,7 +41,7 @@ describe("Strict-Transport-Security", () => {
   });
 
   it("leaves API routes and assets without CSP, session redirect or cookies", async () => {
-    for (const path of ["/api/health", "/_next/static/chunks/main.js", "/sw.js"]) {
+    for (const path of ["/api/health", "/_next/static/chunks/main.js", "/sw.js", CLIP]) {
       const res = await run(path, {});
       expect(res.headers.get("content-security-policy")).toBeNull();
       expect(res.headers.get("location")).toBeNull();
@@ -50,10 +51,50 @@ describe("Strict-Transport-Security", () => {
     expect(page.headers.get("content-security-policy")).toContain("default-src 'self'");
   });
 
+  it("never renews the session cookie on narration clips, which are cached as immutable", async () => {
+    const signedIn = { cookie: "__Host-cy_session=token" };
+    expect((await run(CLIP, {}, signedIn)).headers.get("set-cookie")).toBeNull();
+    expect((await run("/learn", {}, signedIn)).headers.get("set-cookie")).toContain("__Host-cy_session=token");
+  });
+
+  it("never forwards a language header the client sent (i18n/request.ts trusts x-site-locale)", async () => {
+    // An API route, a prefetch of a page and a static file all take the passthrough branch.
+    for (const [path, extra] of [["/api/subtitles", {}], ["/learn", { "next-router-prefetch": "1" }], ["/_next/static/chunks/main.js", {}]] as const) {
+      const res = await run(path, {}, { "x-site-locale": "ar", ...extra });
+      // The proxy overrides the request headers (an empty list is an override too), and x-site-locale is not among them.
+      expect(res.headers.get("x-middleware-override-headers"), path).not.toBeNull();
+      expect(res.headers.get("x-middleware-override-headers")?.split(","), path).not.toContain("x-site-locale");
+      expect(res.headers.get("x-middleware-request-x-site-locale"), path).toBeNull();
+    }
+    const page = await run("/az", {}, { "x-site-locale": "ar" });
+    expect(page.headers.get("x-middleware-request-x-site-locale")).toBe("az");
+  });
+
   it("is not sent outside production", async () => {
     vi.resetModules();
     vi.stubEnv("NODE_ENV", "development");
     const { proxy } = await import("../src/proxy");
     for (const path of ["/az", "/api/health"]) expect(proxy(new NextRequest(`http://localhost:3000${path}`)).headers.get("strict-transport-security")).toBeNull();
+  });
+});
+
+describe("public site language", () => {
+  const root = async (headers: Record<string, string>) => new URL((await run("/", {}, headers)).headers.get("location")!).pathname;
+
+  it("sends / to the browser's language, then the country's, and ignores a cookie for a removed language", async () => {
+    expect(await root({ "accept-language": "ar-EG,ar;q=0.9" })).toBe("/ar");
+    expect(await root({ "cf-ipcountry": "SA" })).toBe("/ar");
+    expect(await root({ "cf-ipcountry": "IT", "accept-language": "it-IT,it;q=0.9" })).toBe("/az");
+    expect(await root({ cookie: "locale=it", "accept-language": "de-DE" })).toBe("/de");
+    expect(await root({ cookie: "locale=fr", "accept-language": "de-DE" })).toBe("/fr");
+  });
+
+  it("passes /ar on as the site language and remembers it, but not a removed language", async () => {
+    const ar = await run("/ar", {});
+    expect(ar.headers.get("x-middleware-request-x-site-locale")).toBe("ar");
+    expect(ar.headers.get("set-cookie")).toContain("locale=ar");
+    const italian = await run("/it", {});
+    expect(italian.headers.get("x-middleware-request-x-site-locale")).toBeNull();
+    expect(italian.headers.get("set-cookie") ?? "").not.toContain("locale=");
   });
 });

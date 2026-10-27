@@ -1,0 +1,387 @@
+{
+  "id": "fake-prosecutor-call",
+  "title": "Apelul procurorului fals",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l2-tutor",
+      "beats": [
+        {
+          "id": "l2-b1",
+          "say": "Un e-mail fals este urmat adesea de un apel. Apelantul se prezintă drept anchetator sau procuror.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": { "kind": "illustration", "id": "mask" }
+        },
+        {
+          "id": "l2-b2",
+          "say": "Chiar și un număr care pare oficial pe ecran poate fi fals. Apelanții pot schimba numărul afișat.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "istintaq-buro-fake",
+              "caller": [{ "text": "Biroul Central de Investigații" }],
+              "number": [{ "text": "+994 12 000 10 02", "spot": "number" }],
+              "label": "Serviciu"
+            }
+          },
+          "highlight": "number"
+        },
+        {
+          "id": "l2-b3",
+          "say": "Poliția și procuratura adevărate nu vă cer niciodată la telefon bani, datele cardului sau un cod primit prin SMS.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": { "kind": "illustration", "id": "lock" }
+        },
+        {
+          "id": "l2-b4",
+          "say": "Închideți, căutați chiar dumneavoastră numărul oficial al instituției și anunțați echipa de securitate.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": { "kind": "illustration", "id": "shield" }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l2-sim",
+      "environment": "call",
+      "title": "Vă sună un anchetator",
+      "intro": "Azi-dimineață ați primit o notificare falsă, iar acum vă sună cineva. Citiți ce spune și alegeți răspunsul.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "istintaq-buro-fake",
+            "caller": [{ "text": "Biroul Central de Investigații" }],
+            "number": [{ "text": "+994 12 000 10 02" }],
+            "label": "Serviciu",
+            "voice": "man"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Răspundeți",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Nu este periculos să răspundeți. Contează ce faceți mai departe."
+            },
+            {
+              "id": "decline",
+              "label": "Respingeți",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Și așa este bine. Dacă vă îngrijorează ceva, sunați chiar dumneavoastră la numărul oficial al instituției.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "accuse",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "istintaq-buro-fake",
+            "caller": [{ "text": "Biroul Central de Investigații" }],
+            "number": [{ "text": "+994 12 000 10 02" }],
+            "label": "Serviciu",
+            "voice": "man"
+          },
+          "say": "Sunt anchetatorul Elchin Hasanov, de la Biroul Central de Investigații. Ați ignorat notificarea de azi-dimineață, iar numele dumneavoastră apare într-un dosar penal.",
+          "spoken": "<breath> Sunt anchetatorul Elchin Hasanov, de la Biroul Central de Investigații. Ați ignorat notificarea de azi-dimineață, ăă, iar numele dumneavoastră apare într-un dosar penal.",
+          "actions": [
+            {
+              "id": "comply",
+              "label": "Ce trebuie să fac? Spuneți-mi",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Dacă cedați fricii, apelantul preia controlul. Mai întâi verificați cine este."
+            },
+            {
+              "id": "verify",
+              "label": "Sun chiar eu la numărul oficial al biroului",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Corect. Un anchetator adevărat nu va avea nimic împotrivă să verificați.",
+              "next": "after"
+            },
+            {
+              "id": "hang",
+              "label": "Închideți apelul",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Bună decizie. Nu este nevoie să reacționați la o amenințare primită la telefon.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "prosecutor",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "istintaq-buro-fake",
+            "caller": [{ "text": "Biroul Central de Investigații" }],
+            "number": [{ "text": "+994 12 000 10 02" }],
+            "label": "Serviciu",
+            "voice": "older-man"
+          },
+          "say": "Vă fac legătura cu procurorul. Sunt procurorul Tofiq Abbasov. Ca să vă protejați economiile, mutați-le într-un cont sigur pe durata verificării.",
+          "spoken": "Vă fac legătura cu procurorul. Sunt procurorul Tofiq Abbasov. Ca să vă protejați economiile, <breath> mutați-le într-un cont sigur pe durata verificării.",
+          "actions": [
+            {
+              "id": "transfer",
+              "label": "Dați-mi contul, fac transferul",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "„Contul sigur” este al escrocului. Dacă ați transferat bani, sunați imediat la bancă."
+            },
+            {
+              "id": "refuse",
+              "label": "Nu mut bani la cererea cuiva de la telefon",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Corect. Niciun procuror nu vă cere la telefon să mutați banii în alt cont."
+            },
+            {
+              "id": "hang",
+              "label": "Închideți apelul",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Corect. Când vi se face legătura cu un „oficial de rang înalt”, scopul este să crească presiunea.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "secrecy",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "istintaq-buro-fake",
+            "caller": [{ "text": "Biroul Central de Investigații" }],
+            "number": [{ "text": "+994 12 000 10 02" }],
+            "label": "Serviciu",
+            "voice": "older-man"
+          },
+          "say": "Este o anchetă secretă. Dacă îi spuneți managerului sau familiei, veți răspunde pentru asta.",
+          "spoken": "Este o anchetă secretă. Dacă îi spuneți managerului sau familiei, <breath> veți răspunde pentru asta.",
+          "actions": [
+            {
+              "id": "promise",
+              "label": "Bine, nu spun nimănui",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Cererea de a păstra secretul vă izolează de orice ajutor. Dimpotrivă, vorbiți imediat despre ce s-a întâmplat."
+            },
+            {
+              "id": "hang",
+              "label": "Închideți apelul",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Corect. „Nu spuneți nimănui” este cel mai clar semn de fraudă.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "code",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "istintaq-buro-fake",
+            "caller": [{ "text": "Biroul Central de Investigații" }],
+            "number": [{ "text": "+994 12 000 10 02" }],
+            "label": "Serviciu",
+            "voice": "older-man"
+          },
+          "say": "Un ultim pas. Spuneți-mi codul pe care tocmai l-ați primit pe telefon, ca să vă înregistrăm în sistem.",
+          "spoken": "<breath> Un ultim pas. Spuneți-mi codul pe care tocmai l-ați primit pe telefon, ca să vă înregistrăm în sistem.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Îi citesc codul",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Codul este o cheie către contul dumneavoastră sau către o plată. Odată ce îl spuneți, pierdeți controlul."
+            },
+            {
+              "id": "hang",
+              "label": "Închideți apelul",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Corect. Nicio instituție nu cere la telefon un cod primit prin SMS."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Apelul s-a încheiat. Ce faceți acum?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "istintaq-buro-fake",
+            "caller": [{ "text": "Biroul Central de Investigații" }],
+            "number": [{ "text": "+994 12 000 10 02" }],
+            "label": "Serviciu",
+            "voice": "older-man"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "Sunați la numărul de pe site-ul oficial al biroului",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Corect. Dacă puteți, folosiți alt telefon, ca linia să nu poată fi ținută deschisă."
+            },
+            {
+              "id": "report",
+              "label": "Anunțați managerul și echipa de securitate",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Foarte bine. Raportarea îi protejează pe colegi de același apel."
+            },
+            {
+              "id": "ignore",
+              "label": "Nu faceți nimic",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Escrocul va suna din nou. Raportarea vă protejează pe dumneavoastră și pe colegi."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "l2-swipe",
+      "prompt": "Acest mesaj este sigur sau este o înșelătorie?",
+      "cards": [
+        {
+          "id": "fine-card",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "istintaq-buro-fake",
+            "sender": [{ "text": "+994 70 000 52 19" }],
+            "time": "11:02",
+            "messages": [
+              [{ "text": "Biroul Central de Investigații: transferați amenda pe acest card în cel mult 2 ore: 4169 **** 7731" }]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Poliția și procuratura nu încasează amenzi pe un card personal. Raportați acest mesaj."
+        },
+        {
+          "id": "legal-dept",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Departamentul juridic" }],
+              "address": [{ "text": "huquq@idare.example" }]
+            },
+            "subject": [{ "text": "Scrisoare oficială pentru dumneavoastră" }],
+            "time": "11:20",
+            "body": [
+              [{ "text": "Pe numele dumneavoastră a sosit o scrisoare oficială de la instanță. O puteți ridica de la registratură, pe bază de semnătură." }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Scrisoarea a venit pe canalul propriu al instituției, nu cere bani și nu conține niciun link."
+        },
+        {
+          "id": "video-id",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [{ "text": "Procuror T. Abbasov" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Treceți pe apel video și arătați cartea de identitate la cameră, facem o verificare." }]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Cu imaginea actului de identitate se pot deschide conturi false pe numele dumneavoastră. Astfel de verificări nu se fac prin aplicații de mesagerie."
+        },
+        {
+          "id": "safe-account",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "istintaq-buro-fake",
+            "caller": [{ "text": "Biroul Central de Investigații" }],
+            "number": [{ "text": "+994 12 000 10 02" }],
+            "label": "Vă cere să mutați banii într-un „cont sigur”"
+          },
+          "verdict": "threat",
+          "explain": "Nu există niciun „cont sigur”. Contul este al escrocului."
+        },
+        {
+          "id": "portal",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "dovletportal",
+            "app": "DövlətPortal",
+            "title": [{ "text": "Notificare nouă" }],
+            "body": [{ "text": "Aveți o scrisoare nouă în contul personal." }],
+            "time": "12:10"
+          },
+          "verdict": "safe",
+          "explain": "Nicio plată și niciun link. Deschideți chiar dumneavoastră portalul ca să o citiți."
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "l2-order",
+      "prompt": "Puneți în ordine pașii de urmat după apelul unui „procuror” fals.",
+      "items": [
+        { "id": "hang", "label": "Închideți apelul" },
+        { "id": "note", "label": "Notați numărul, ora și ce vi s-a spus" },
+        { "id": "verify", "label": "Căutați chiar dumneavoastră numărul oficial al instituției și verificați" },
+        { "id": "report", "label": "Anunțați managerul și echipa de securitate" }
+      ],
+      "explain": "Dacă ați transferat bani, sunați mai întâi la bancă. Notițele dumneavoastră ajută echipa de securitate să urmărească atacul."
+    },
+    {
+      "type": "choice",
+      "id": "l2-choice",
+      "question": {
+        "prompt": "Apelantul spune: „Este o anchetă secretă, nu spuneți nimănui”. Ce înseamnă asta?",
+        "options": [
+          {
+            "id": "real",
+            "label": "Este grav, trebuie să tac",
+            "correct": false,
+            "feedback": "Tăcerea este exact ce vrea escrocul. Dacă vorbiți despre asta, trucul iese repede la iveală."
+          },
+          {
+            "id": "isolate",
+            "label": "Vor să mă împiedice să cer ajutor",
+            "correct": true,
+            "feedback": "Corect. Tocmai de aceea îi anunțați imediat pe manager și echipa de securitate."
+          },
+          {
+            "id": "family",
+            "label": "Le spun doar celor din familie",
+            "correct": false,
+            "feedback": "Este bine să le spuneți celor din familie, dar despre un apel legat de serviciu trebuie să afle și echipa de securitate."
+          }
+        ]
+      },
+      "explain": "Secretul, amenințările și cererea de bani, toate la un loc, formează un tipar de fraudă cunoscut."
+    },
+    {
+      "type": "recap",
+      "id": "l2-recap",
+      "points": [
+        "Un număr oficial afișat pe ecran poate fi fals: închideți și verificați chiar dumneavoastră.",
+        "Poliția și procuratura nu cer niciodată la telefon bani, datele cardului sau coduri.",
+        "Dacă vi se spune „nu spuneți nimănui”, anunțați imediat echipa de securitate."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

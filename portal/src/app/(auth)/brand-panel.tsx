@@ -34,8 +34,8 @@ export async function BrandPanel() {
       {/* Backdrop: a dot grid that fades out, two soft glows and the rings the cat sits in. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute inset-0" style={DOTS} />
-        <div className="absolute -top-24 -left-24 size-96 rounded-full bg-white/14 blur-3xl" />
-        <div className="absolute -right-32 -bottom-40 size-[28rem] rounded-full bg-brand-900/35 blur-3xl" />
+        <div className="absolute -top-24 -start-24 size-96 rounded-full bg-white/14 blur-3xl" />
+        <div className="absolute -end-32 -bottom-40 size-[28rem] rounded-full bg-brand-900/35 blur-3xl" />
       </div>
 
       {/* The panel grows with a tall form; its content stays in view while the page scrolls (overflow-clip keeps sticky working). */}
@@ -47,10 +47,10 @@ export async function BrandPanel() {
             <span aria-hidden className="absolute inset-[6%] rounded-full border border-white/15 bg-white/8 max-lg:hidden" />
             <span aria-hidden className="absolute -inset-[10%] rounded-full border border-white/10 max-lg:hidden" />
             <span aria-hidden className="absolute inset-x-[22%] bottom-[5%] h-[7%] rounded-[50%] bg-brand-900/45 blur-md" />
-            <Mascot mood="happy" gesture="wave" gestureKey="hello" label={t("mascot")} className="size-24 sm:size-28 lg:size-60 xl:size-68" />
+            <Mascot mood="happy" gesture="wave" gestureKey="hello" label={t("mascot")} className="size-24 sm:size-28 lg:size-60 xl:size-68" auto />
           </div>
           <p className="max-w-[26rem] font-display text-title-sm font-bold tracking-tight text-balance lg:text-[2.25rem] lg:leading-[1.1] xl:text-[2.5rem]">{t("tagline")}</p>
-          <ul className="mt-8 hidden w-fit gap-3 text-left lg:grid">
+          <ul className="mt-8 hidden w-fit gap-3 text-start lg:grid">
             {facts.map(({ Icon, text }) => (
               <li key={text} className="flex items-center gap-3 text-body-sm font-medium text-white/90">
                 <span className="grid size-9 shrink-0 place-items-center rounded-sm bg-white/12 ring-1 ring-white/20 ring-inset">

@@ -1,0 +1,420 @@
+{
+  "id": "data-in-care",
+  "title": "Ihnen anvertraute Daten",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "what-is",
+          "say": "Namen, Ausweisdokumente, Adressen und Telefonnummern von Bürgerinnen und Bürgern sowie von Kolleginnen und Kollegen sind personenbezogene Daten, die Ihnen für Ihre Arbeit anvertraut wurden.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        },
+        {
+          "id": "law",
+          "say": "In Aserbaidschan sind personenbezogene Daten gesetzlich geschützt. Nutzen Sie sie nur für einen rechtmäßigen Zweck und nur so viel wie nötig.",
+          "mood": "think",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "need-to-know",
+          "say": "Die Regel ist einfach: Was Sie für Ihre Arbeit nicht brauchen, sehen Sie nicht ein, erfragen Sie nicht und geben Sie nicht weiter.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "id-photos",
+          "say": "Schicken Sie keine Fotos von Ausweisen über Messenger. Solche Fotos bleiben jahrelang auf Smartphones gespeichert und gelangen irgendwann nach außen.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "request-check",
+      "prompt": "Welche Anfragen sind in Ordnung?",
+      "cards": [
+        {
+          "id": "fake-police",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "+994 50 000 22 90"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Guten Tag, ich bin von der Polizei. Schicken Sie mir die Meldeadresse und die Telefonnummer von Rəşad Əliyev, es ist dringend."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Behörden fordern Daten über offizielle Kanäle an, nicht per Nachricht von einer privaten Nummer."
+        },
+        {
+          "id": "hr-system",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "Personalabteilung"
+                }
+              ],
+              "address": [
+                {
+                  "text": "kadrlar@rxagentlik.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Urlaubsantrag"
+              }
+            ],
+            "time": "11:02",
+            "body": [
+              [
+                {
+                  "text": "Bitte unterschreiben Sie Ihren Antrag im internen Dokumentensystem. Weitere Unterlagen sind nicht nötig."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Die Domain stimmt, die E-Mail verweist auf das interne System und verlangt keine zusätzlichen Daten."
+        },
+        {
+          "id": "curious-colleague",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Elvin, Kollege"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Mein Nachbar hat bei uns einen Antrag gestellt. Was steht in seiner Akte? Schick mir ein Foto, ich bin neugierig."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Neugier ist kein dienstlicher Bedarf. Wenn die Arbeit es nicht erfordert, wird die Akte nicht weitergegeben."
+        },
+        {
+          "id": "personal-email",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "Leyla Həsənova"
+                }
+              ],
+              "address": [
+                {
+                  "text": "leyla.hasanova@rxagentlik.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Die Liste"
+              }
+            ],
+            "time": "11:02",
+            "body": [
+              [
+                {
+                  "text": "Schicken Sie alle ID-Nummern und Telefonnummern der Abteilung an meine private E-Mail-Adresse, ich arbeite von zu Hause: leyla.h.1990@mail.example"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Auch bei einer bekannten Kollegin dürfen personenbezogene Daten nicht in ein privates Postfach. Solche Daten bleiben in den dienstlichen Systemen."
+        },
+        {
+          "id": "portal-sms",
+          "artifact": {
+            "kind": "sms",
+            "sender": [
+              {
+                "text": "DövlətPortal"
+              }
+            ],
+            "time": "15:30",
+            "messages": [
+              [
+                {
+                  "text": "Ihr Antrag ist eingegangen. Das Ergebnis sehen Sie in Ihrem Benutzerkonto im Portal."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Kein Link, keine Aufforderung. Die Nachricht informiert Sie nur."
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "id-photo-chat",
+      "prompt": "Finden Sie die Risiken in diesem Chat.",
+      "artifact": {
+        "kind": "chat",
+        "app": "whatsapp",
+        "contact": [
+          {
+            "text": "Səbinə, Personalabteilung "
+          },
+          {
+            "text": "+994 77 000 19 55",
+            "spot": "number"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Hallo! Ihre Personalakte wird gerade aktualisiert. "
+              },
+              {
+                "text": "Schicken Sie hier Fotos von Vorder- und Rückseite Ihres Ausweises.",
+                "spot": "id-photo"
+              }
+            ],
+            "time": "16:10"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Bis 17:00 Uhr, sonst wird Ihr Gehalt später ausgezahlt.",
+                "spot": "threat"
+              }
+            ],
+            "time": "16:10"
+          },
+          {
+            "from": "me",
+            "body": [
+              {
+                "text": "Warum schreibt die Personalabteilung über WhatsApp?"
+              }
+            ],
+            "time": "16:12"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Das System ist ausgefallen, so geht es schneller.",
+                "spot": "excuse"
+              }
+            ],
+            "time": "16:12"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "number",
+          "label": "Private Nummer",
+          "explain": "Jemand schreibt im Namen der Personalabteilung von einer unbekannten privaten Nummer."
+        },
+        {
+          "id": "id-photo",
+          "label": "Ausweisfoto",
+          "explain": "Mit einem Foto Ihres Ausweises können Kriminelle in Ihrem Namen Kredite aufnehmen oder Konten eröffnen."
+        },
+        {
+          "id": "threat",
+          "label": "Drohung mit dem Gehalt",
+          "explain": "Die Drohung mit dem Gehalt soll Sie hetzen, damit Sie nichts prüfen."
+        },
+        {
+          "id": "excuse",
+          "label": "Ausrede",
+          "explain": "„Das System ist ausgefallen“ ist eine Ausrede, um den offiziellen Weg zu umgehen. Rufen Sie selbst bei der Personalabteilung an."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "scenario",
+      "id": "citizen-call",
+      "title": "Eine Bürgerin ruft an",
+      "start": "call",
+      "nodes": [
+        {
+          "id": "call",
+          "text": "Guten Tag, der Antrag meines Bruders liegt bei Ihnen. Er ist krank, bitte geben Sie mir seine Telefonnummer und Adresse, damit ich ihm helfen kann.",
+          "speaker": "Anruferin",
+          "voice": "older-woman",
+          "channel": "phone",
+          "manner": "worried",
+          "spoken": "Guten Tag, der Antrag meines Bruders liegt bei Ihnen. <breath> Er ist krank, bitte geben Sie mir seine Telefonnummer und Adresse, damit ich ihm helfen kann.",
+          "character": "citizen",
+          "choices": [
+            {
+              "label": "Er tut mir leid, ich gebe die Daten heraus",
+              "outcome": "compromised",
+              "feedback": "Sie wissen nicht, wer anruft. Die Daten sind jetzt in fremden Händen."
+            },
+            {
+              "label": "Nach der ID-Nummer des Bruders fragen, um die Anruferin zu überprüfen",
+              "outcome": "risky",
+              "feedback": "Eine ID-Nummer ist kein Geheimnis. Wer sie kennt, beweist damit gar nichts."
+            },
+            {
+              "label": "Erklären, dass ich solche Daten nicht am Telefon herausgeben darf",
+              "next": "pressure",
+              "feedback": "Richtig. Bleiben Sie höflich, aber bestimmt."
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "text": "Was sind Sie nur für ein Mensch? Er ist krank!",
+          "speaker": "Anruferin",
+          "voice": "older-woman",
+          "channel": "phone",
+          "manner": "worried",
+          "spoken": "Was sind Sie nur für ein Mensch? <short pause> Er ist krank!",
+          "character": "citizen",
+          "choices": [
+            {
+              "label": "Unter dem Druck eine Ausnahme machen",
+              "outcome": "compromised",
+              "feedback": "Emotionaler Druck ist der häufigste Trick."
+            },
+            {
+              "label": "Den offiziellen Weg erklären: Der Bruder selbst oder eine bevollmächtigte Person kann einen Antrag stellen",
+              "next": "after",
+              "feedback": "Sehr gut. Sie haben den richtigen Weg gezeigt und die Daten geschützt."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "text": "Das Gespräch ist beendet. Was jetzt?",
+          "choices": [
+            {
+              "label": "Den Anruf meiner Führungskraft und dem Sicherheitsteam melden",
+              "outcome": "safe",
+              "feedback": "Gut gemacht. Dieselbe Person ruft vielleicht auch bei Ihren Kolleginnen und Kollegen an."
+            },
+            {
+              "label": "Nichts, ich habe ja nichts verraten",
+              "outcome": "risky",
+              "feedback": "Sie sind standhaft geblieben, aber eine Meldung hilft Ihren Kolleginnen und Kollegen, vorbereitet zu sein."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "principles",
+      "prompt": "Ordnen Sie jedem Grundsatz seine Bedeutung zu.",
+      "pairs": [
+        {
+          "id": "purpose",
+          "left": "Zweckbindung",
+          "right": "Nur für eine klare, rechtmäßige Aufgabe verwenden"
+        },
+        {
+          "id": "minimum",
+          "left": "Datenminimierung",
+          "right": "Nicht mehr erheben als nötig"
+        },
+        {
+          "id": "need-to-know",
+          "left": "Need-to-know-Prinzip",
+          "right": "Nur wer die Daten für die Arbeit braucht, darf sie einsehen"
+        },
+        {
+          "id": "confidential",
+          "left": "Vertraulichkeit",
+          "right": "Ohne Rechtsgrundlage nie an Dritte weitergeben"
+        }
+      ],
+      "explain": "Diese Grundsätze helfen, die Daten der Bürgerinnen und Bürger im Arbeitsalltag zu schützen."
+    },
+    {
+      "type": "choice",
+      "id": "send-way",
+      "question": {
+        "prompt": "Wie dürfen Sie ein Dokument mit Bürgerdaten an eine Kollegin oder einen Kollegen schicken?",
+        "options": [
+          {
+            "id": "whatsapp",
+            "label": "Abfotografieren und über das private WhatsApp schicken",
+            "correct": false,
+            "feedback": "Das Foto bleibt auf Smartphones gespeichert und entzieht sich jeder Kontrolle."
+          },
+          {
+            "id": "internal",
+            "label": "Über das interne Dokumentensystem und nur an die Person, die es braucht",
+            "correct": true,
+            "feedback": "Richtig. Der Zugriff ist begrenzt und kontrolliert."
+          },
+          {
+            "id": "private-mail",
+            "label": "Über die private E-Mail, weil es schneller geht",
+            "correct": false,
+            "feedback": "Private E-Mail-Konten liegen außerhalb des Schutzes der Organisation."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "folder"
+        }
+      },
+      "explain": "Personenbezogene Daten sollten die freigegebenen Systeme der Organisation nie verlassen."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Nutzen Sie personenbezogene Daten nur, wenn die Arbeit es erfordert, und nur so viel wie nötig.",
+        "Schicken Sie nie Ausweisfotos oder Listen über Messenger.",
+        "Verweisen Sie Anrufende auf den offiziellen Antragsweg."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

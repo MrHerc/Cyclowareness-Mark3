@@ -67,8 +67,8 @@ export function AssignDialog({
               ]}
             />
             <label className="relative">
-              <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-ink-subtle" />
-              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("searchModule")} className="pl-10" aria-label={t("searchModule")} />
+              <Search className="pointer-events-none absolute top-1/2 start-3.5 size-4 -translate-y-1/2 text-ink-subtle" />
+              <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("searchModule")} className="ps-10" aria-label={t("searchModule")} />
             </label>
             <div role="radiogroup" className="grid max-h-60 gap-1 overflow-y-auto rounded-lg border border-line p-1.5">
               {list.map((m) => (

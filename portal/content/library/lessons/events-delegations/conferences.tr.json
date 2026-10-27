@@ -1,0 +1,455 @@
+{
+ "id": "conferences",
+ "title": "Konferanslar ve heyetler",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Konferanslar ve resmî toplantılar, yeni insanlarla tanışıp ilişkiler kurmak için iyi bir fırsattır. Ama orada bilgi toplayan biri de olabilir.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Hediye edilen bir USB bellek, taşınabilir şarj cihazı ya da kulaklık iş bilgisayarınıza takılmamalıdır. İçinde zararlı yazılım olabilir.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Yaka kartınızda adınız, unvanınız ve bir QR kod bulunur. Kartı fotoğraflarda göstermeyin, etkinlik alanından ayrılınca da gözden uzak tutun.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "kontakto",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Kontakto: yeni gönderi"
+        }
+       ],
+       "messages": [
+        {
+         "from": "me",
+         "body": [
+          {
+           "text": "Forumdayım! "
+          },
+          {
+           "text": "Yaka kartımla bir fotoğraf",
+           "spot": "badge"
+          }
+         ],
+         "time": "10:15"
+        }
+       ]
+      }
+     },
+     "highlight": "badge"
+    },
+    {
+     "id": "b4",
+     "say": "Hediye edilen her cihazı önce BT destek ekibine gösterin. Cihazı onlar kontrol eder ve karar verir.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "after-forum",
+   "environment": "desktop",
+   "title": "Forumdan sonra",
+   "intro": "Forumdan döndünüz. Masanızda hediyeler, gelen kutunuzda da yeni e-postalar var.",
+   "steps": [
+    {
+     "id": "gift-usb",
+     "label": "Ziyarete gelen heyetten bir hediye",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-nordvale",
+      "name": [
+       {
+        "text": "İş_birliği_sunumu.pdf"
+       }
+      ],
+      "type": "lnk",
+      "size": "2 KB",
+      "source": [
+       {
+        "text": "USB: NORDVALE (E:)"
+       }
+      ]
+     },
+     "say": "Heyet, sunumunu size bir USB bellekte verdi.",
+     "actions": [
+      {
+       "id": "plug",
+       "label": "Bilgisayara tak",
+       "kind": "plug-in",
+       "outcome": "risky",
+       "feedback": "Hediye edilen bir cihazda ne olduğunu bilemezsiniz. Önce BT destek ekibi kontrol etmelidir."
+      },
+      {
+       "id": "hand-over",
+       "label": "BT destek ekibine ver",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru. BT destek ekibi cihazı ayrı bir bilgisayarda kontrol eder ve gerekirse dosyayı size iletir.",
+       "next": "partner-mail"
+      }
+     ]
+    },
+    {
+     "id": "usb-file",
+     "label": "Bellekte tek bir dosya var",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-nordvale",
+      "name": [
+       {
+        "text": "İş_birliği_sunumu.pdf"
+       }
+      ],
+      "type": "lnk",
+      "size": "2 KB",
+      "source": [
+       {
+        "text": "USB: NORDVALE (E:)"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Aç",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Bu bir PDF değil, bir kısayol. Açarsanız gizli bir komut çalışabilir."
+      },
+      {
+       "id": "eject",
+       "label": "Cihazı çıkar",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Doğru karar. Dosyayı açmadan cihazı çıkarın ve BT destek ekibine verin."
+      }
+     ]
+    },
+    {
+     "id": "partner-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "nc-nordvale",
+      "from": {
+       "name": [
+        {
+         "text": "Stefan Morgan"
+        }
+       ],
+       "address": [
+        {
+         "text": "s.morgan.nordvale@mail.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Görüşmemiz için teşekkürler"
+       }
+      ],
+      "time": "10:24",
+      "body": [
+       [
+        {
+         "text": "Değerli meslektaşım, sizinle forumda tanıştığıma çok sevindim."
+        }
+       ],
+       [
+        {
+         "text": "Bir sonraki görüşmemizi planlayabilmemiz için departmanınızdaki çalışanların adlarını, unvanlarını ve telefon numaralarını içeren bir liste gönderebilir misiniz?"
+        }
+       ],
+       [
+        {
+         "text": "Yöneticinizin önümüzdeki haftaki programı da çok işimize yarar."
+        }
+       ]
+      ]
+     },
+     "say": "Forumda tanıştığınız bir misafir size yazıyor.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Listeyi ve programı gönder",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Çalışan listesi ve yöneticinin programı, bir sonraki saldırı için bir haritadır. Bu tür veriler yalnızca resmî kanallardan ve onayla paylaşılır."
+      },
+      {
+       "id": "forward",
+       "label": "Yöneticiye ve güvenlik ekibine ilet",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Doğru. E-posta kişisel bir adresten geldi, dış tarafların talepleri ise resmî kanallardan geçer."
+      },
+      {
+       "id": "official",
+       "label": "Yanıtla: Lütfen resmî bir talep gönderin",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Güzel. Resmî talebi yetkili bir kişi inceler ve yanıtlar."
+      }
+     ]
+    },
+    {
+     "id": "bt-pair",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Bluetooth: eşleştirme isteği"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "“Forum Headset” bu bilgisayara bağlanmak istiyor."
+        }
+       ],
+       [
+        {
+         "text": "Kod: 482 913"
+        }
+       ]
+      ],
+      "buttons": [
+       "Reddet",
+       "Eşleştir"
+      ]
+     },
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Reddet",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Doğru. Kendiniz başlatmadığınız bir eşleştirme isteğini asla kabul etmeyin."
+      },
+      {
+       "id": "allow",
+       "label": "Eşleştir",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Bilinmeyen bir cihaz kendini klavye gibi tanıtıp komut yazabilir. Bu tür istekleri reddedin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "forum-post",
+   "prompt": "Bu gönderinin açığa çıkarmaması gereken bilgileri bulun.",
+   "artifact": {
+    "kind": "chat",
+    "brandRef": "kontakto",
+    "app": "generic",
+    "contact": [
+     {
+      "text": "Kontakto: yeni gönderi"
+     }
+    ],
+    "messages": [
+     {
+      "from": "me",
+      "body": [
+       {
+        "text": "RəqəmYol Forumu'ndayım! "
+       },
+       {
+        "text": "Yaka kartımla bir fotoğraf.",
+        "spot": "badge"
+       },
+       {
+        "text": " Yarın saat 10:00'da "
+       },
+       {
+        "text": "heyetimiz bakanlığın 3 numaralı binasında toplanıyor.",
+        "spot": "schedule"
+       },
+       {
+        "text": " Şu an odamdayım: "
+       },
+       {
+        "text": "Lumera Hotel, oda 512",
+        "spot": "room"
+       },
+       {
+        "text": ". Yarın görüşmek üzere!"
+       }
+      ],
+      "time": "21:40"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "badge",
+     "label": "Yaka kartı",
+     "explain": "Yaka kartında ad, unvan ve giriş için bir QR kod yer alır. Bu bilgilerle sahte bir kart hazırlanabilir ya da siz hedef alınabilirsiniz."
+    },
+    {
+     "id": "schedule",
+     "label": "Toplantının yeri ve saati",
+     "explain": "Bir heyetin ne zaman ve nerede olacağı güvenlik bilgisidir. Toplantıdan sonra bile bundan yalnızca genel olarak söz edin."
+    },
+    {
+     "id": "room",
+     "label": "Otel odası",
+     "explain": "Oda numarası, kimin nerede kaldığını gösterir. Onu hiçbir yerde paylaşmayın."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "choice",
+   "id": "gift-tablet",
+   "question": {
+    "prompt": "Ziyarete gelen heyet size hediye olarak bir tablet veriyor. Ne yaparsınız?",
+    "options": [
+     {
+      "id": "register",
+      "label": "Yöneticime haber verir, kontrol etmesi için BT destek ekibine veririm",
+      "correct": true,
+      "feedback": "Doğru. Hediye edilen cihaz kurumunuzun kurallarına göre kontrol edilir ve iş ağına ancak onayla bağlanır."
+     },
+     {
+      "id": "work-mail",
+      "label": "Hemen üzerine iş e-postamı kurarım",
+      "correct": false,
+      "feedback": "Kontrol edilmemiş bir cihazda casus yazılım olabilir. İş hesaplarınızı yalnızca kurumunuzun cihazlarında açın."
+     },
+     {
+      "id": "home",
+      "label": "Kişisel kullanım için eve götürürüm",
+      "correct": false,
+      "feedback": "Cihaz, ev ağınıza ve kişisel hesaplarınıza da kapı açabilir. Önce kontrol ettirin."
+     },
+     {
+      "id": "office-wifi",
+      "label": "Denemek için ofisin Wi-Fi ağına bağlarım",
+      "correct": false,
+      "feedback": "Kontrol edilmemiş bir cihazı iş ağına bağlamak, iç sistemlere giden yolu açar."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "handshake"
+    }
+   },
+   "explain": "Kontrol edilene kadar hediye edilen cihaz, bir yabancının cihazıdır. Yöneticinize haber verin ve cihazı BT destek ekibine teslim edin."
+  },
+  {
+   "type": "scenario",
+   "id": "delegation-visit",
+   "title": "Ofiste heyet",
+   "start": "slides",
+   "nodes": [
+    {
+     "id": "slides",
+     "text": "Sunumum bir USB bellekte. Bilgisayarınıza takalım mı?",
+     "speaker": "Misafir (toplantıda)",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Sunumum bir USB bellekte. <breath> Bilgisayarınıza takalım mı?",
+     "character": "guest",
+     "choices": [
+      {
+       "label": "BT destek ekibinin hazırladığı ayrı bilgisayarda açalım",
+       "next": "wifi",
+       "feedback": "Doğru. Misafirin dosyaları ne iş bilgisayarına ne de iş ağına ulaşır."
+      },
+      {
+       "label": "Takın, vaktimiz az",
+       "outcome": "risky",
+       "feedback": "Dışarıdan gelen bir USB bellek, iş bilgisayarına zararlı yazılım bulaştırabilir. Misafirler için ayrı bir bilgisayar kullanın."
+      }
+     ]
+    },
+    {
+     "id": "wifi",
+     "text": "Bir şey daha, ofisin Wi-Fi parolası ne? E-postalarıma bakmam gerekiyor.",
+     "speaker": "Misafir",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Bir şey daha, ee, ofisin Wi-Fi parolası ne? E-postalarıma bakmam gerekiyor.",
+     "character": "guest",
+     "choices": [
+      {
+       "label": "Misafir ağına erişim veririm",
+       "next": "walk",
+       "feedback": "Doğru. Misafir ağı iç sistemlerden ayrı tutulur."
+      },
+      {
+       "label": "İş ağının parolasını söylerim",
+       "outcome": "risky",
+       "feedback": "İş ağında iç sistemler bulunur. Misafirler yalnızca misafir ağını kullanır."
+      }
+     ]
+    },
+    {
+     "id": "walk",
+     "text": "Siz zahmet etmeyin, ofisi kendim gezerim.",
+     "speaker": "Misafir (molada)",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Siz zahmet etmeyin, <breath> ofisi kendim gezerim.",
+     "character": "guest",
+     "choices": [
+      {
+       "label": "Misafire eşlik ederim",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Misafirler ofiste her zaman yanlarında biriyle dolaşır."
+      },
+      {
+       "label": "Bırakayım gezsin, sonuçta misafirimiz",
+       "outcome": "risky",
+       "feedback": "Yanında kimse olmayan bir misafir, açık odaları ve masalardaki belgeleri görebilir."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Hediye edilen cihazları takmadan BT destek ekibine teslim edin.",
+    "Yaka kartınızı, oda numaranızı ve programınızı paylaşmayın.",
+    "Misafirlere ayrı bir bilgisayar, misafir ağı ve eşlik edecek biri sağlayın."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -83,11 +83,20 @@ export async function invalidateUserSessions(userId: string, exceptId?: string):
     .where(exceptId ? and(eq(t.sessions.userId, userId), ne(t.sessions.id, exceptId)) : eq(t.sessions.userId, userId));
 }
 
-/** Sliding expiry: extend a session that is used and has less than half its life left. */
-export function shouldRenew(expiresAt: Date): boolean {
-  return expiresAt.getTime() - Date.now() < (SESSION_DAYS / 2) * DAY;
+/** Absolute lifetime: a session ends this long after sign-in at the latest, however often it is used. */
+export const SESSION_MAX_DAYS = 90;
+
+/**
+ * Sliding expiry inside the absolute lifetime: a used session with less than half its life left is extended, never past
+ * SESSION_MAX_DAYS after sign-in, so a copied cookie stops working by then too. Without the sign-in time (`createdAt`)
+ * nothing is extended and the session ends SESSION_DAYS after sign-in.
+ */
+export function shouldRenew(expiresAt: Date, createdAt?: Date): boolean {
+  if (!createdAt) return false;
+  return expiresAt.getTime() - Date.now() < (SESSION_DAYS / 2) * DAY && renewedExpiry(createdAt).getTime() > expiresAt.getTime();
 }
 
-export function renewedExpiry(): Date {
-  return new Date(Date.now() + SESSION_DAYS * DAY);
+export function renewedExpiry(createdAt?: Date): Date {
+  const sliding = Date.now() + SESSION_DAYS * DAY;
+  return new Date(createdAt ? Math.min(sliding, createdAt.getTime() + SESSION_MAX_DAYS * DAY) : sliding);
 }

@@ -42,7 +42,7 @@ export function PhoneForm({ next }: { next: string }) {
             <p className={authLead}>{t("phone.subtitle")}</p>
           </div>
           <Field label={t("phone.label")} htmlFor="phone" error={errorText}>
-            <div className="relative">
+            <div dir="ltr" className="relative">
               <Smartphone aria-hidden className={authInputIcon} />
               <Input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" autoFocus placeholder={t("phone.placeholder")} defaultValue={phone} aria-invalid={!!errorText} className={authInput} />
             </div>

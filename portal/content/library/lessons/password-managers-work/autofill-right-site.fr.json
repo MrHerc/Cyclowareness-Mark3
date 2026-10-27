@@ -1,0 +1,419 @@
+{
+ "id": "autofill-right-site",
+ "title": "Quand la saisie automatique reste muette",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Un gestionnaire de mots de passe repère un faux site mieux que vous : il vérifie l’adresse lettre par lettre.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Si l’adresse diffère, même très légèrement, le gestionnaire ne propose aucun mot de passe. C’est votre signal d’alerte.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "idare-fake",
+       "url": [
+        {
+         "text": "https://portal."
+        },
+        {
+         "text": "idare-giris.example.net",
+         "spot": "lookalike"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "lookalike"
+    },
+    {
+     "id": "b3",
+     "say": "Ne copiez pas le mot de passe depuis le coffre-fort pour le coller vous-même. Vérifiez d’abord l’adresse.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Refusez toute demande d’approbation inattendue : elle signifie que quelqu’un connaît votre mot de passe.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "autofill-check",
+   "environment": "browser",
+   "title": "La saisie automatique à l’épreuve",
+   "intro": "ParolSeyf fonctionne dans votre navigateur. Sur chaque page, regardez ce qu’il vous propose et vérifiez l’adresse.",
+   "steps": [
+    {
+     "id": "real-portal",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "idare",
+      "brand": "Portail de l’entreprise",
+      "url": [
+       {
+        "text": "https://portal.idare.example/giris",
+        "reveal": "idare.example"
+       }
+      ],
+      "fields": [
+       "Nom d’utilisateur",
+       "Mot de passe"
+      ],
+      "button": "Se connecter"
+     },
+     "say": "ParolSeyf vous propose vos identifiants. Vérifiez l’adresse.",
+     "actions": [
+      {
+       "id": "fill",
+       "label": "Remplir avec ParolSeyf",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Exact. L’adresse correspond aux identifiants enregistrés, c’est pour cela que le gestionnaire les a proposés."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "La prudence a du bon, mais c’est bien le vrai portail de l’entreprise, et le gestionnaire l’a reconnu."
+      }
+     ]
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "idare-fake",
+      "brand": "Portail de l’entreprise",
+      "url": [
+       {
+        "text": "https://portal.idare-giris.example.net/giris",
+        "reveal": "idare-giris.example.net"
+       }
+      ],
+      "fields": [
+       "Nom d’utilisateur",
+       "Mot de passe"
+      ],
+      "button": "Se connecter"
+     },
+     "say": "Un lien reçu par e-mail a ouvert cette page. ParolSeyf reste muet.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "Saisir le mot de passe à la main",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Le gestionnaire est resté muet parce que c’est un faux site. Changez tout de suite le mot de passe sur le vrai portail, et signalez le site.",
+       "next": "fake-vault"
+      },
+      {
+       "id": "search",
+       "label": "Le chercher dans ParolSeyf et remplir",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Le gestionnaire ne reconnaît pas ce site, et ce n’est pas un hasard. Lisez l’adresse avant d’aller plus loin."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Le domaine était idare-giris.example.net, pas celui du portail de l’entreprise.",
+       "next": "fake-vault"
+      },
+      {
+       "id": "report",
+       "label": "Signaler le site",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Votre signalement protège vos collègues contre le même lien.",
+       "next": "fake-vault"
+      }
+     ]
+    },
+    {
+     "id": "mismatch",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf : le site ne correspond pas"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Adresse enregistrée : portal.idare.example"
+        }
+       ],
+       [
+        {
+         "text": "Cette page : portal.idare-giris.example.net"
+        }
+       ]
+      ],
+      "buttons": [
+       "Annuler",
+       "Remplir quand même"
+      ]
+     },
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Annuler",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact, le gestionnaire a repéré la différence à votre place. Fermez la page et signalez-la."
+      },
+      {
+       "id": "fill",
+       "label": "Remplir quand même",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "En passant outre l’avertissement, vous avez livré votre mot de passe à un faux site. Changez-le tout de suite et signalez le site."
+      }
+     ]
+    },
+    {
+     "id": "fake-vault",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "parolseyf-fake",
+      "brand": "ParolSeyf",
+      "url": [
+       {
+        "text": "https://parolseyf-giris.example.net/seyf",
+        "reveal": "parolseyf-giris.example.net"
+       }
+      ],
+      "fields": [
+       "Adresse e-mail",
+       "Mot de passe principal"
+      ],
+      "button": "Ouvrir le coffre-fort"
+     },
+     "say": "Un lien reçu par e-mail vous mène à une page de connexion au coffre-fort.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "Ouvrir le coffre-fort",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Ne saisissez le mot de passe principal que dans l’application ParolSeyf elle-même. Ce site voulait votre coffre-fort tout entier."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Ouvrez le coffre-fort en lançant vous-même l’application, jamais par un lien."
+      },
+      {
+       "id": "report",
+       "label": "Signaler le site",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Ce site a peut-être été envoyé à plusieurs personnes."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vault-lure",
+   "prompt": "Appuyez sur les signes qui trahissent un faux e-mail.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "parolseyf-fake",
+    "from": {
+     "name": [
+      {
+       "text": "ParolSeyf"
+      }
+     ],
+     "address": [
+      {
+       "text": "security@parolseyf-alert.example.net",
+       "spot": "sender"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Votre coffre-fort sera supprimé dans 24 heures",
+      "spot": "deadline"
+     }
+    ],
+    "time": "07:58",
+    "body": [
+     [
+      {
+       "text": "Pour une mise à jour de sécurité, "
+      },
+      {
+       "text": "confirmez votre mot de passe principal",
+       "spot": "ask-master"
+      },
+      {
+       "text": "."
+      }
+     ],
+     [
+      {
+       "text": "Confirmez ici : "
+      },
+      {
+       "text": "parolseyf-alert.example.net/tesdiq",
+       "spot": "link",
+       "link": {
+        "label": "parolseyf-alert.example.net/tesdiq",
+        "href": "https://parolseyf-alert.example.net/tesdiq"
+       }
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Expéditeur",
+     "explain": "L’adresse imite celle de ParolSeyf, mais ce n’est pas son domaine."
+    },
+    {
+     "id": "deadline",
+     "label": "Délai",
+     "explain": "Une menace à 24 heures sert à vous empêcher de réfléchir."
+    },
+    {
+     "id": "ask-master",
+     "label": "Demande du mot de passe principal",
+     "explain": "Aucun service ne vous demande de confirmer votre mot de passe principal par e-mail."
+    },
+    {
+     "id": "link",
+     "label": "Lien",
+     "explain": "Le lien mène à un faux domaine. Ouvrez vous-même le coffre-fort depuis l’application."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "unexpected-push",
+   "question": {
+    "prompt": "En pleine nuit, ParolSeyf vous demande d’approuver une connexion, alors que vous n’êtes pas en train de vous connecter. Que faites-vous ?",
+    "options": [
+     {
+      "id": "deny",
+      "label": "Je refuse et je le signale à l’équipe sécurité",
+      "correct": true,
+      "feedback": "Exact. Quelqu’un connaît votre mot de passe principal : changez-le tout de suite et laissez l’équipe sécurité vérifier les sessions."
+     },
+     {
+      "id": "approve",
+      "label": "J’approuve pour que les demandes s’arrêtent",
+      "correct": false,
+      "feedback": "C’est du bombardement de notifications. Une seule approbation fait entrer l’attaquant dans le coffre-fort."
+     },
+     {
+      "id": "ignore",
+      "label": "J’ignore la demande et je regarde demain matin",
+      "correct": false,
+      "feedback": "La demande reste ouverte, et quelqu’un a déjà votre mot de passe principal. Refusez-la et signalez-la maintenant."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "parolseyf",
+      "app": "ParolSeyf",
+      "title": [
+       {
+        "text": "Approuver la connexion ?"
+       }
+      ],
+      "body": [
+       {
+        "text": "Nouvel appareil : Windows, 23:47"
+       }
+      ],
+      "time": "23:47"
+     }
+    }
+   },
+   "explain": "Une demande d’approbation inattendue signifie que votre mot de passe a fuité. Refusez, signalez, changez-le."
+  },
+  {
+   "type": "match",
+   "id": "autofill-rules",
+   "prompt": "Associez chaque situation à la bonne action.",
+   "pairs": [
+    {
+     "id": "silent",
+     "left": "Le gestionnaire ne propose aucun mot de passe",
+     "right": "Vérifier l’adresse, ne pas copier le mot de passe"
+    },
+    {
+     "id": "link",
+     "left": "Un lien dans un e-mail vous demande d’ouvrir le coffre-fort",
+     "right": "Lancer l’application directement"
+    },
+    {
+     "id": "shared-pc",
+     "left": "Vous êtes sur l’ordinateur de quelqu’un d’autre",
+     "right": "Ne pas y ouvrir votre coffre-fort"
+    },
+    {
+     "id": "push",
+     "left": "Une demande d’approbation inattendue",
+     "right": "La refuser et la signaler"
+    }
+   ],
+   "explain": "Le gestionnaire vérifie l’adresse ; vous, vous vous arrêtez dès qu’il se tait."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Si le gestionnaire ne propose aucun mot de passe, arrêtez-vous et vérifiez l’adresse.",
+    "Ne saisissez le mot de passe principal que dans l’application du gestionnaire, jamais par un lien.",
+    "Refusez les demandes d’approbation inattendues, et signalez-les."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

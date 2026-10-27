@@ -1,0 +1,569 @@
+{
+ "id": "phone-rules",
+ "title": "İş telefonu kuralları",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "İş telefonunuz, kurumunuzun cebinizdeki bir parçasıdır. İçinde iş e-postaları, belgeler ve kişi rehberi bulunur.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Telefonu yönetim profili korur. Telefon kaybolursa BT destek ekibi onu kilitleyebilir ve iş verilerini silebilir.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "nc-iscihaz",
+       "app": "İşCihaz",
+       "title": [
+        {
+         "text": "Telefon korunuyor"
+        }
+       ],
+       "body": [
+        {
+         "text": "Bu cihaz, kurumunuzun güvenlik kurallarına göre yönetilmektedir."
+        }
+       ],
+       "time": "09:00"
+      }
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Bir mesajdaki bağlantıdan asla profil yüklemeyin. Sahte bir profil, telefonunuzu saldırgana teslim edebilir.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "it-destek-fake",
+       "sender": [
+        {
+         "text": "BT-Destek"
+        }
+       ],
+       "time": "11:42",
+       "messages": [
+        [
+         {
+          "text": "Profilinizin süresi doluyor. Yenisini yükleyin: "
+         },
+         {
+          "text": "iscihaz-profil.example.net",
+          "spot": "link"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "link"
+    },
+    {
+     "id": "b4",
+     "say": "Uygulamaları yalnızca resmî mağazadan ya da kurumunuzun cihaz uygulamasından yükleyin ve her izni kontrol edin.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "new-phone",
+   "environment": "phone",
+   "title": "Yeni iş telefonunuz",
+   "intro": "Size az önce yeni bir iş telefonu verildi. Her bildirime bakın ve doğru kararı verin.",
+   "steps": [
+    {
+     "id": "enroll",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-iscihaz",
+      "app": "İşCihaz",
+      "title": [
+       {
+        "text": "Cihaz kaydını tamamlayın"
+       }
+      ],
+      "body": [
+       {
+        "text": "BT destek ekibi cihazınızı hazırladı. İş e-postalarınızı almak için kaydı tamamlayın."
+       }
+      ],
+      "time": "09:05"
+     },
+     "say": "Bu uygulamayı BT destek ekibi kendisi yükledi.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Bildirimi aç",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Doğru. Kaydı kurumunuzun kendi uygulamasıyla yapmak en güvenli yoldur."
+      },
+      {
+       "id": "later",
+       "label": "Sonra",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Kaydı yapılmamış bir telefon korumasızdır. İlk gün tamamlayın."
+      }
+     ]
+    },
+    {
+     "id": "profile-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "it-destek-fake",
+      "sender": [
+       {
+        "text": "BT-Destek"
+       }
+      ],
+      "time": "11:42",
+      "messages": [
+       [
+        {
+         "text": "Değerli çalışma arkadaşımız, MDM profilinizin süresi bugün doluyor. Telefonunuzun engellenmemesi için yeni profili yükleyiniz: "
+        },
+        {
+         "text": "iscihaz-profil.example.net/new",
+         "link": {
+          "label": "iscihaz-profil.example.net/new",
+          "href": "https://iscihaz-profil.example.net/new"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Göndereni ve bağlantının adresini kontrol edin.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Bağlantıyı aç",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Bu, kurumunuzun alan adı değil. Profiller yalnızca İşCihaz uygulamasından ya da BT destek ekibinden gelir.",
+       "next": "profile-install"
+      },
+      {
+       "id": "report",
+       "label": "Bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru. Mesajı bildirmeniz, BT destek ekibinin herkesi uyarmasını sağlar.",
+       "next": "qr-permission"
+      },
+      {
+       "id": "block",
+       "label": "Engelle",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Güzel. İş arkadaşlarınız da uyarılsın diye BT destek ekibine ayrıca haber verin.",
+       "next": "qr-permission"
+      }
+     ]
+    },
+    {
+     "id": "profile-install",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-iscihaz-fake",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Profil yüklensin mi?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "iscihaz-profil.example.net bir yapılandırma profili yüklemek istiyor."
+        }
+       ],
+       [
+        {
+         "text": "Bu profil sertifika, VPN ve e-posta ayarları ekleyecek."
+        }
+       ]
+      ],
+      "buttons": [
+       "Reddet",
+       "İzin ver"
+      ]
+     },
+     "say": "Site, telefonunuza bir profil yüklemek istiyor.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Reddet",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Doğru. Böyle bir profil, tüm internet trafiğinizi saldırganın sunucusu üzerinden geçirebilir."
+      },
+      {
+       "id": "allow",
+       "label": "İzin ver",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Sahte bir profil, telefonun kontrolünü bir yabancıya verir. Hemen BT destek ekibini arayın."
+      }
+     ]
+    },
+    {
+     "id": "qr-permission",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-qr-oxuyucu",
+      "app": "QR Oxuyucu",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Kamera"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Kişiler"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Hassas konum"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Erişilebilirlik: ekranı kontrol etme"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Bir QR okuyucunun gerçekten neye ihtiyacı var?",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "İzin ver",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Bir QR okuyucunun yalnızca kameraya ihtiyacı vardır. Erişilebilirlik izni, uygulamanın ekranı okumasına ve sizin yerinize dokunmasına olanak tanır."
+      },
+      {
+       "id": "deny",
+       "label": "İzin verme",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Doğru. Yalnızca özelliğin ihtiyaç duyduğu izni verin; burada bu yalnızca kamera erişimidir."
+      }
+     ]
+    },
+    {
+     "id": "chat-apk",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "sohbet",
+      "name": [
+       {
+        "text": "Vardiya_çizelgesi.apk"
+       }
+      ],
+      "type": "apk",
+      "size": "5,4 MB",
+      "source": [
+       {
+        "text": "Söhbət: Reşad Memmedov"
+       }
+      ]
+     },
+     "say": "Bir iş arkadaşınız, mesajlaşma uygulamasından size bir dosya gönderdi.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Yükle",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Vardiya çizelgesi asla bir kurulum dosyası olmaz. Sohbette gönderilen bir .apk dosyası telefona zararlı yazılım bulaştırır."
+      },
+      {
+       "id": "cancel",
+       "label": "İptal",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. İş arkadaşınızın hesabı ele geçirilmiş olabilir, bu yüzden BT destek ekibine haber verin."
+      }
+     ]
+    },
+    {
+     "id": "os-update",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sistem-yenileme",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Sistem güncellemesi"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Bir güvenlik güncellemesi hazır. Telefon yeniden başlatılacak, bu işlem yaklaşık 10 dakika sürer."
+        }
+       ]
+      ],
+      "buttons": [
+       "Sonra",
+       "Şimdi güncelle"
+      ]
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "Şimdi güncelle",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Doğru. Güncellemeler, saldırganların zaten bildiği açıkları kapatır."
+      },
+      {
+       "id": "later",
+       "label": "Sonra",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Güncellemeyi ertelediğiniz her gün güvenlik açığı kapanmadan kalır. En geç bu akşam güncelleyin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "app-asks",
+   "prompt": "Bu istek iş telefonunda güvenli mi, yoksa bir tehdit mi?",
+   "cards": [
+    {
+     "id": "map-location",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-yolxerite",
+      "app": "YolXəritə",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Konum: yalnızca uygulama açıkken"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Bir harita uygulamasının konuma ihtiyacı vardır, hem de yalnızca açık olduğu sürece. İzin, uygulamanın işine uygundur."
+    },
+    {
+     "id": "game-sms",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-super-oyunlar",
+      "app": "Super Oyunlar",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "SMS mesajlarını okuma"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Kişiler"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Bir oyunun ne SMS'lere ne de kişilere ihtiyacı vardır. SMS erişimi, oyunun giriş kodlarınızı okumasını sağlar."
+    },
+    {
+     "id": "battery-access",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-batareya",
+      "app": "Batareya Qoruyucu",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Erişilebilirlik: ekranı kontrol etme"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Diğer uygulamaların üzerinde gösterme"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Pil tasarrufu için ekranı kontrol etmek gerekmez. Bankacılık truva atlarının istediği izinler tam olarak bunlardır."
+    },
+    {
+     "id": "lock-notice",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-iscihaz",
+      "app": "İşCihaz",
+      "title": [
+       {
+        "text": "Ekran kilidi gerekli"
+       }
+      ],
+      "body": [
+       {
+        "text": "İş e-postalarını kullanmak için en az 6 haneli bir PIN belirleyin."
+       }
+      ],
+      "time": "09:20"
+     },
+     "verdict": "safe",
+     "explain": "Bu, kurumunuzun kendi uygulaması ve hiçbir bağlantı göndermiyor. Telefon kaybolursa ilk savunma hattı güçlü bir ekran kilididir."
+    },
+    {
+     "id": "torch-notifications",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "fener-pro",
+      "app": "Fənər Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Bildirim erişimi"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Bir el feneri uygulamasının bildirimleri okumasına gerek yoktur. Bu erişimle gelen kodları ve mesajları görebilir."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "permission-power",
+   "prompt": "Her izni, neye olanak tanıdığıyla eşleştirin.",
+   "pairs": [
+    {
+     "id": "sms",
+     "left": "SMS okuma",
+     "right": "Banka ve giriş kodlarını görme"
+    },
+    {
+     "id": "accessibility",
+     "left": "Erişilebilirlik",
+     "right": "Ekranı okuma ve sizin yerinize dokunma"
+    },
+    {
+     "id": "notifications",
+     "left": "Bildirim erişimi",
+     "right": "Mesajlaşma uygulamalarındaki mesajları okuma"
+    },
+    {
+     "id": "unknown-sources",
+     "left": "Bilinmeyen uygulamaları yükleme",
+     "right": "Mağaza dışından yazılım yükleme"
+    }
+   ],
+   "explain": "En güçlü izinler bu dördüdür. Bunları yalnızca BT destek ekibinin onayladığı uygulamalara verin."
+  },
+  {
+   "type": "choice",
+   "id": "slow-phone",
+   "question": {
+    "prompt": "Bir arkadaşınız, yavaşlayan iş telefonunuzdan yönetim profilini kaldırmanızı söylüyor. Ne yaparsınız?",
+    "options": [
+     {
+      "id": "support",
+      "label": "Profili kaldırmam ve BT destek ekibine başvururum",
+      "correct": true,
+      "feedback": "Doğru. Profil telefonun korumasıdır, sorunu da BT destek ekibi çözer."
+     },
+     {
+      "id": "remove",
+      "label": "Telefon hızlansın diye profili kaldırırım",
+      "correct": false,
+      "feedback": "Profil olmadan kaybolan bir telefon uzaktan kilitlenemez. Genellikle iş e-postaları da çalışmaz olur."
+     },
+     {
+      "id": "reset",
+      "label": "Telefonu fabrika ayarlarına sıfırlarım",
+      "correct": false,
+      "feedback": "Bu işlem, BT destek ekibinin haberi olmadan profili ve iş verilerini siler. Önce onlarla konuşun."
+     },
+     {
+      "id": "friend",
+      "label": "Tamir etmesi için teknolojiden anlayan bir arkadaşıma veririm",
+      "correct": false,
+      "feedback": "Telefonda iş verileri var. Onu yalnızca BT destek ekibine teslim edin."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "phone-lock"
+    }
+   },
+   "explain": "Yönetim profili iş telefonunuzu korur. Onu yalnızca BT destek ekibi değiştirir."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Profiller ve iş uygulamaları yalnızca İşCihaz uygulamasından ya da BT destek ekibinden gelir.",
+    "İzinler uygulamanın işine uygun olmalıdır. En tehlikelileri SMS ve erişilebilirlik izinleridir.",
+    "Ekran kilidi ve güncellemeler, telefonunuzun ilk savunma hattıdır."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

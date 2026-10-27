@@ -1,0 +1,433 @@
+{
+ "id": "admin-hygiene",
+ "title": "Admin-Hygiene",
+ "minutes": 4,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Ein Admin-Konto ist der Schlüssel, den Angreifer am meisten begehren. Mit einem einzigen Admin-Konto erreichen sie das gesamte Netzwerk.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Nutzen Sie für die tägliche Arbeit ein normales Konto und für die Administration ein separates. Lesen Sie mit dem Admin-Konto nie E-Mails und surfen Sie damit nie im Internet.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Passwörter und Schlüssel gehören nicht in Code, Chats oder Tickets. Dort bleiben sie jahrelang liegen. Speichern Sie sie stattdessen in einem Zugangsdaten-Tresor.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "telegram",
+       "contact": [
+        {
+         "text": "Infrastruktur-Team · 46 Mitglieder"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Zum Testen so mit der Datenbank verbinden: "
+          },
+          {
+           "text": "DB_PASSWORD=Pr0d!Baza2026",
+           "spot": "secret"
+          }
+         ],
+         "time": "23:14"
+        }
+       ]
+      }
+     },
+     "highlight": "secret"
+    },
+    {
+     "id": "b4",
+     "say": "Falsche Support-Anrufer verlangen oft, dass Sie ein Fernwartungstool installieren. Dann öffnen Sie ihnen das System mit Ihren eigenen Händen.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Hersteller-Support"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 01 23"
+        }
+       ],
+       "label": "Unbekannt"
+      }
+     }
+    },
+    {
+     "id": "b5",
+     "say": "Aktivieren Sie für Admin-Oberflächen, Fernzugriffe und Cloud-Konsolen eine gegen Phishing resistente Multi-Faktor-Authentisierung, zum Beispiel mit einem physischen Sicherheitsschlüssel.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "admin-phish",
+   "prompt": "Finden Sie die Warnsignale einer Phishing-Mail, die auf Admins zielt.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Benachrichtigungen der Cloud-Konsole"
+      }
+     ],
+     "address": [
+      {
+       "text": "alerts@"
+      },
+      {
+       "text": "cloudconsole-admin.example.info",
+       "spot": "domain"
+      }
+     ]
+    },
+    "to": "admin@idare.example",
+    "subject": [
+     {
+      "text": "Kritisch: Ihr Admin-Konto wird in 2 Stunden gesperrt",
+      "spot": "urgency"
+     }
+    ],
+    "time": "06:12",
+    "body": [
+     [
+      {
+       "text": "Sehr geehrte Administratorin, sehr geehrter Administrator,"
+      }
+     ],
+     [
+      {
+       "text": "bitte registrieren Sie die Multi-Faktor-Authentisierung für Ihren Mandanten neu."
+      }
+     ],
+     [
+      {
+       "text": "Melden Sie sich bei der Konsole an: "
+      },
+      {
+       "text": "console-login.example.info/admin",
+       "spot": "link"
+      }
+     ],
+     [
+      {
+       "text": "Lesen Sie anschließend den Bestätigungscode vor, wenn der Support Sie anruft.",
+       "spot": "code-share"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Falsche Domain",
+     "explain": "Benachrichtigungen eines Anbieters kommen von dessen eigener Domain. Öffnen Sie die Konsole immer über Ihr eigenes Lesezeichen."
+    },
+    {
+     "id": "urgency",
+     "label": "Drohende Sperrung",
+     "explain": "Die Frist von zwei Stunden soll Ihnen keine Zeit zum Prüfen lassen."
+    },
+    {
+     "id": "link",
+     "label": "Gefälschte Anmeldeseite",
+     "explain": "Diese Seite kann Ihr Passwort und Ihren Code in Echtzeit weiterleiten. Gewöhnliche Codes verhindern das nicht."
+    },
+    {
+     "id": "code-share",
+     "label": "Code vorlesen",
+     "explain": "Der echte Support fragt nie nach Ihrem Bestätigungscode. Wer ihn nennt, übergibt das Konto."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "remote-support",
+   "question": {
+    "prompt": "Der Support des Herstellers ruft an und möchte Fernzugriff auf einen Server. Was tun Sie?",
+    "options": [
+     {
+      "id": "call-back",
+      "label": "Ich lege auf und rufe die Nummer aus dem Vertrag an",
+      "correct": true,
+      "feedback": "Richtig. Prüfen Sie über einen Kanal, den Sie kennen, und gewähren Sie den Zugriff dann nur über das zugelassene Tool."
+     },
+     {
+      "id": "install",
+      "label": "Ich installiere das genannte Tool und lese den Code vor",
+      "correct": false,
+      "feedback": "Damit erhält der Anrufer vollen Zugriff auf das System. Genau so werden Fernwartungstools bei Angriffen missbraucht."
+     },
+     {
+      "id": "watch",
+      "label": "Ich lasse es zu, beobachte aber den Bildschirm",
+      "correct": false,
+      "feedback": "Zuschauen reicht nicht. Eine Hintertür ist in Sekunden eingerichtet."
+     }
+    ]
+   },
+   "explain": "Eine unerwartete Anfrage nach Fernzugriff wird immer über einen bekannten Kanal geprüft und nur über das zugelassene Tool gewährt."
+  },
+  {
+   "type": "swipe",
+   "id": "secrets",
+   "prompt": "Ist das ein sicheres Vorgehen?",
+   "cards": [
+    {
+     "id": "ticket-password",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Ticket 4821"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ich habe das Serverpasswort in die Kommentare geschrieben, damit die nächste Schicht es sieht."
+         }
+        ],
+        "time": "02:30"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Viele Menschen können Tickets einsehen, und sie bleiben im Archiv erhalten. Ändern Sie das Passwort und legen Sie es im Tresor ab."
+    },
+    {
+     "id": "vault-share",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "DevOps-Gruppe"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Ich habe den Schlüssel im Zugangsdaten-Tresor abgelegt und Lesezugriff für die Gruppe eingerichtet."
+         }
+        ],
+        "time": "11:20"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Im Chat steht nicht der Schlüssel selbst, sondern nur der Hinweis auf den Zugriff im Tresor. So ist es richtig."
+    },
+    {
+     "id": "env-in-repo",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://git.idare.example/infra/deploy/-/blob/main/.env"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Die .env-Datei wurde ins Repository eingecheckt. Die Schlüssel bleiben in der Versionshistorie, das Löschen der Datei reicht also nicht. Tauschen Sie die Schlüssel sofort aus."
+    },
+    {
+     "id": "keys-issued",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Sicherheitsteam"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Sicherheitsschlüssel für Admin-Konten"
+       }
+      ],
+      "time": "15:00",
+      "body": [
+       [
+        {
+         "text": "Ab Montag ist für die Anmeldung an Admin-Oberflächen ein physischer Schlüssel erforderlich. Holen Sie Ihren Schlüssel persönlich in Raum 305 ab."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Kein Link, nichts herunterzuladen oder einzugeben, der Schlüssel wird persönlich übergeben. Diese Änderung macht Sie sicherer."
+    },
+    {
+     "id": "shared-admin",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Kamran (Netzwerk)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ich bin ab heute im Urlaub. Hier ist mein Admin-Passwort, nutz es, wenn nötig."
+         }
+        ],
+        "time": "18:55"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Bei einem geteilten Admin-Konto lässt sich nicht nachvollziehen, wer was getan hat. Die Vertretung sollte befristete Rechte für das eigene Konto bekommen."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "right-account",
+   "prompt": "Ordnen Sie jeder Aufgabe das passende Konto zu.",
+   "pairs": [
+    {
+     "id": "mail",
+     "left": "E-Mails lesen",
+     "right": "Normales Konto für den Alltag"
+    },
+    {
+     "id": "config",
+     "left": "Serverkonfiguration",
+     "right": "Separates Admin-Konto"
+    },
+    {
+     "id": "script",
+     "left": "Automatisiertes Skript",
+     "right": "Service-Konto mit minimalen Rechten"
+    },
+    {
+     "id": "emergency",
+     "left": "Notfallzugriff",
+     "right": "Im Tresor verwahrtes, überwachtes Konto"
+    }
+   ],
+   "explain": "Geben Sie jeder Aufgabe nur die Rechte, die sie braucht. Je seltener ein Admin-Konto genutzt wird, desto kleiner ist die Angriffsfläche."
+  },
+  {
+   "type": "scenario",
+   "id": "night-prompt",
+   "title": "Anfrage in der Nacht",
+   "start": "prompt",
+   "nodes": [
+    {
+     "id": "prompt",
+     "text": "Es ist 02:00 Uhr. Ihr Smartphone zeigt eine Anmeldeanfrage für Ihr Admin-Konto, dabei haben Sie geschlafen.",
+     "choices": [
+      {
+       "label": "Ich lehne ab und alarmiere das Sicherheitsteam",
+       "next": "reuse",
+       "feedback": "Richtig. Eine unerwartete Anfrage bedeutet, dass jemand Ihr Passwort kennt."
+      },
+      {
+       "label": "Ich bestätige sie, damit die Anfragen aufhören",
+       "outcome": "compromised",
+       "feedback": "Der Angreifer ist jetzt in der Admin-Oberfläche. Diese Masche heißt Push-Bombing."
+      }
+     ]
+    },
+    {
+     "id": "reuse",
+     "text": "Haben Sie dieses Passwort auch anderswo verwendet?",
+     "speaker": "Sicherheitsteam",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Haben Sie dieses Passwort <short pause> auch anderswo verwendet?",
+     "choices": [
+      {
+       "label": "Ja, auch bei einem privaten Konto. Ich ändere beide",
+       "next": "harden",
+       "feedback": "Eine ehrliche Antwort. Passwörter aus Datenlecks anderer Websites werden oft genau so ausprobiert."
+      },
+      {
+       "label": "Es ist mir peinlich, ich sage nichts",
+       "outcome": "risky",
+       "feedback": "Dann findet das Team die Quelle des Lecks nicht. Ehrlichkeit beschleunigt die Untersuchung."
+      }
+     ]
+    },
+    {
+     "id": "harden",
+     "text": "Das Passwort ist geändert. Wie geht es weiter?",
+     "choices": [
+      {
+       "label": "Ich beende aktive Anmeldesitzungen und stelle das Konto auf einen physischen Schlüssel um",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Das Beenden der Sitzungen kappt jeden offenen Zugang, und ein physischer Schlüssel ist gegen Phishing gefeit."
+      },
+      {
+       "label": "Alles erledigt, ich arbeite weiter",
+       "outcome": "risky",
+       "feedback": "Offene Sitzungen und Tokens sind womöglich noch aktiv. Beenden Sie auch diese."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Admin-Arbeit mit dem Admin-Konto, Alltagsarbeit mit einem normalen Konto.",
+    "Zugangsdaten gehören nicht in Code und Chats – tauschen Sie sie bei einem Leck sofort aus.",
+    "Prüfen Sie unerwartete Anfragen nach Fernzugriff über einen bekannten Kanal."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

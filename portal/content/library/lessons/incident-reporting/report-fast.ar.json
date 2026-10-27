@@ -1,0 +1,450 @@
+{
+ "id": "report-fast",
+ "title": "بسرعة وهدوء",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "الحادثة الأمنية ليست هجومًا كبيرًا فقط. فالضغط على رابط مشبوه، أو فقدان الجوال، أو إرسال رسالة إلى المستلم الخطأ، كلها حوادث أيضًا.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "كلنا نخطئ. والإبلاغ السريع يمنع المشكلة من أن تكبر. كلما أبلغت مبكرًا، قل الضرر.",
+     "mood": "happy",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "لا تبدأ التحقيق بنفسك، ولا تحذف شيئًا. فالرسالة أو الملف المشبوه دليل يحتاج إليه المختص.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b5",
+     "say": "عند الإبلاغ، اختصر: ماذا حدث، ومتى، وعلى أي جهاز، وما الذي فعلته حتى الآن.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "report-button",
+   "environment": "inbox",
+   "title": "زر «الإبلاغ»",
+   "intro": "في صندوق الوارد رسالتان مشبوهتان. افتح كل واحدة منهما واختر الخطوة الصحيحة.",
+   "steps": [
+    {
+     "id": "quota",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ispoct-fake",
+      "from": {
+       "name": [
+        {
+         "text": "مسؤول نظام IshPocht"
+        }
+       ],
+       "address": [
+        {
+         "text": "admin@ispoct-mail.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "امتلأ صندوق بريدك بنسبة 98%"
+       }
+      ],
+      "time": "08:47",
+      "body": [
+       [
+        {
+         "text": "إذا لم تضف مساحة، فستحذف الرسائل الجديدة خلال 24 ساعة."
+        }
+       ],
+       [
+        {
+         "text": "لإضافة مساحة: "
+        },
+        {
+         "text": "ispoct-mail.example.net/kvota",
+         "link": {
+          "label": "ispoct-mail.example.net/kvota",
+          "href": "https://ispoct-mail.example.net/kvota"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "انظر إلى عنوان المرسل.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "الإبلاغ عن تصيد",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "صحيح. بلاغك يتيح للمختصين إزالة الرسالة نفسها من صناديق الوارد لدى الجميع."
+      },
+      {
+       "id": "click",
+       "label": "فتح الرابط",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "لم يكن العنوان من نطاق جهتك. ولا تضاف مساحة إلى صندوق البريد عبر رابط أبدًا."
+      },
+      {
+       "id": "delete",
+       "label": "حذف",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "أنت في أمان، لكن زملاءك ما زالوا مستهدفين، والدليل ضاع. أبلغ بدلًا من الحذف."
+      },
+      {
+       "id": "forward",
+       "label": "إعادة التوجيه إلى الزملاء",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "إعادة التوجيه تنشر التهديد. إذا لم يكن هناك زر «الإبلاغ»، فأعد توجيه الرسالة إلى فريق الأمن السيبراني فقط."
+      }
+     ]
+    },
+    {
+     "id": "password-reply",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek-fake",
+      "from": {
+       "name": [
+        {
+         "text": "الدعم الفني"
+        }
+       ],
+       "address": [
+        {
+         "text": "support@idare-helpdesk.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "التحقق من الحساب"
+       }
+      ],
+      "time": "09:15",
+      "body": [
+       [
+        {
+         "text": "يجري تحديث النظام. لكي يبقى حسابك مفعلًا، رد على هذه الرسالة باسم المستخدم وكلمة المرور."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "الإبلاغ عن تصيد",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "صحيح، الدعم الفني الحقيقي لا يطلب كلمة مرورك أبدًا. والإبلاغ ينبه زملاءك أيضًا."
+      },
+      {
+       "id": "reply",
+       "label": "الرد بكلمة المرور",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "وصلت كلمة مرورك إلى المهاجم. إذا حدث ذلك، فغيرها فورًا وأبلغ عن الأمر."
+      },
+      {
+       "id": "delete",
+       "label": "حذف",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "أنت لم تعط كلمة مرورك، لكن غيرك قد يعطيها. إذا أبلغت، فسيحمي المختصون الجميع."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "is-it-incident",
+   "prompt": "هل يجب الإبلاغ عن هذا؟ تهديد أم أمر عادي؟",
+   "cards": [
+    {
+     "id": "wrong-recipient",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "أنت"
+        }
+       ],
+       "address": [
+        {
+         "text": "l.aliyeva@idare.example"
+        }
+       ]
+      },
+      "to": "kamran.aliyev.1990@mail.example",
+      "subject": [
+       {
+        "text": "قائمة الموظفين"
+       }
+      ],
+      "time": "10:02",
+      "body": [
+       [
+        {
+         "text": "مرفقة القائمة التي طلبتها."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "isciler_siyahisi.xlsx"
+         }
+        ],
+        "size": "240 KB"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "ذهبت القائمة إلى عنوان شخصي خارج الجهة. هذا تسرب للبيانات، فأبلغ عنه الآن."
+    },
+    {
+     "id": "unasked-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ispoct",
+      "sender": [
+       {
+        "text": "IshPocht"
+       }
+      ],
+      "time": "03:17",
+      "messages": [
+       [
+        {
+         "text": "رمز تسجيل الدخول: 482913. لا تشاركه مع أي شخص."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "وصول رمز لم تطلبه يعني أن شخصًا ما يعرف كلمة مرورك. غيرها وأبلغ عن الأمر."
+    },
+    {
+     "id": "training-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "الدعم الفني"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "تدريب على الأمن السيبراني يوم الجمعة"
+       }
+      ],
+      "time": "12:30",
+      "body": [
+       [
+        {
+         "text": "يعقد تدريب قصير يوم الجمعة الساعة 11:00 في القاعة الرئيسية. لا حاجة إلى التسجيل."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "العنوان صحيح، ولا رابط، ولا طلب. هذا إشعار عادي."
+    },
+    {
+     "id": "clicked-link",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "تورال (زميل)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "أمس فتحت الرابط الذي في تلك الرسالة، لكنني لم أكتب أي شيء. لا مشكلة على الأرجح، أليس كذلك؟"
+         }
+        ],
+        "time": "09:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "مجرد فتح الرابط قد يكشف معلومات للمهاجم أو يبدأ تنزيلًا. دع المختص يقرر، فلا بد من الإبلاغ عنه."
+    },
+    {
+     "id": "lost-phone",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "ليلى (الفريق)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "نسيت جوال العمل في سيارة أجرة. سأبحث عنه غدًا، الأمر ليس عاجلًا."
+         }
+        ],
+        "time": "19:45"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "فقدان جوال العمل حادثة أمنية عاجلة. يستطيع الدعم الفني قفله أو مسحه عن بعد."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "first-step",
+   "question": {
+    "prompt": "أدخلت كلمة مرورك في صفحة مزيفة. ما الخطوة الأولى؟",
+    "options": [
+     {
+      "id": "report",
+      "label": "الإبلاغ فورًا وتغيير كلمة المرور",
+      "correct": true,
+      "feedback": "صحيح. كل دقيقة مهمة، وهاتان الخطوتان تغلقان الباب أمام المهاجم."
+     },
+     {
+      "id": "silent",
+      "label": "لا أخبر أحدًا لأنني أشعر بالحرج",
+      "correct": false,
+      "feedback": "الصمت يمنح المهاجم وقتًا. الإبلاغ يحميك ويحمي الجهة."
+     },
+     {
+      "id": "delete",
+      "label": "أحذف الرسالة حتى لا يبقى أي أثر",
+      "correct": false,
+      "feedback": "الرسالة دليل. إذا حذفتها، فلن يعرف المختصون من استهدف غيرك."
+     },
+     {
+      "id": "recheck",
+      "label": "أفتح الرابط مرة أخرى للتحقق",
+      "correct": false,
+      "feedback": "فتحه مرة أخرى يزيد الخطر. اترك التحقيق للمختصين."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "alarm"
+    }
+   },
+   "explain": "أبلغ بسرعة، واحتفظ بالدليل، واترك التحقيق للمختصين."
+  },
+  {
+   "type": "order",
+   "id": "strange-program",
+   "prompt": "برنامج غريب يعمل على حاسوبك. رتب الخطوات.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "توقف عما تفعله"
+    },
+    {
+     "id": "disconnect",
+     "label": "افصل الجهاز عن الشبكة، ولا تطفئه"
+    },
+    {
+     "id": "call",
+     "label": "اتصل بالدعم الفني هاتفيًا"
+    },
+    {
+     "id": "note",
+     "label": "اكتب باختصار ما رأيته"
+    }
+   ],
+   "explain": "فصل الجهاز عن الشبكة يوقف الانتشار، أما إطفاؤه فقد يمحو الآثار الموجودة في الذاكرة. إذا كان إجراء جهتك ينص على غير ذلك، فاتبعه. وأبلغ عبر الهاتف."
+  },
+  {
+   "type": "match",
+   "id": "good-report",
+   "prompt": "طابق كل سؤال مع إجابته في البلاغ.",
+   "pairs": [
+    {
+     "id": "what",
+     "left": "ماذا حدث؟",
+     "right": "أدخلت كلمة مروري في صفحة مزيفة"
+    },
+    {
+     "id": "when",
+     "left": "متى؟",
+     "right": "اليوم الساعة 09:40"
+    },
+    {
+     "id": "where",
+     "left": "على أي جهاز؟",
+     "right": "حاسوب العمل، في تطبيق البريد"
+    },
+    {
+     "id": "done",
+     "left": "ماذا فعلت؟",
+     "right": "غيرت كلمة المرور واحتفظت بالرسالة"
+    }
+   ],
+   "explain": "البلاغ القصير الدقيق يوفر وقت المختص."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "إذا شككت في شيء، فأبلغ فورًا. الخطأ ليس عيبًا.",
+    "لا تبدأ التحقيق بنفسك، ولا تحذف شيئًا.",
+    "اختصر: ماذا، ومتى، وأين، وما الذي فعلته."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

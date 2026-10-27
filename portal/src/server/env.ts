@@ -23,7 +23,10 @@ const schema = z
     /** Production refuses the embedded PGlite database unless this is 1 (single-process demos only). */
     ALLOW_EMBEDDED_DB: flag("0"),
     ANTHROPIC_API_KEY: z.preprocess(blank, z.string().optional()),
+    /** AI course generation in the studio. */
     ANTHROPIC_MODEL: z.preprocess(blank, z.string().default("claude-opus-5-5")),
+    /** AI tutor only: a small model keeps per-question cost within the price plans. */
+    ANTHROPIC_TUTOR_MODEL: z.preprocess(blank, z.string().default("claude-haiku-5-5")),
     JOBS_ENABLED: flag("1"),
     /** Development only: show one-time codes on screen instead of sending an SMS. */
     DEV_SHOW_OTP: flag("0"),

@@ -1,13 +1,17 @@
-/** Interface languages with full app translations. Every library lesson is served in each of them (`<lesson>.{en,az,ru}.json`). */
-export const LOCALES = ["az", "en", "ru"] as const;
+/**
+ * Interface languages with full app translations. Every library lesson is served in each of them
+ * (`<lesson>.<locale>.json`). Arabic is written right to left (`dirOf`) and formatted as "ar", not
+ * "ar-SA": Western digits and the Gregorian calendar; "ar-SA" is only the speech tag.
+ */
+export const LOCALES = ["az", "en", "ru", "tr", "ro", "ka", "uk", "de", "fr", "ar"] as const;
 export type Locale = (typeof LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = "az";
 
-/** The public site (landing tour) is translated into ten languages. */
-export const SITE_LOCALES = ["az", "en", "ru", "tr", "ro", "ka", "uk", "de", "fr", "it"] as const;
-export type SiteLocale = (typeof SITE_LOCALES)[number];
+/** The public site (landing tour) has the same ten languages. */
+export const SITE_LOCALES = LOCALES;
+export type SiteLocale = Locale;
 
-export const LOCALE_NAMES: Record<SiteLocale, string> = {
+export const LOCALE_NAMES: Record<Locale, string> = {
   az: "Azərbaycanca",
   en: "English",
   ru: "Русский",
@@ -17,10 +21,23 @@ export const LOCALE_NAMES: Record<SiteLocale, string> = {
   uk: "Українська",
   de: "Deutsch",
   fr: "Français",
-  it: "Italiano",
+  ar: "العربية",
 };
 
 export const LOCALE_COOKIE = "locale";
+
+/** Languages written right to left. */
+export const RTL_LOCALES: ReadonlySet<string> = new Set(["ar"]);
+
+/** Text direction of a locale or BCP-47 tag ("ar", "ar-SA"). */
+export function dirOf(locale: string): "rtl" | "ltr" {
+  return RTL_LOCALES.has(locale.split("-")[0].toLowerCase()) ? "rtl" : "ltr";
+}
+
+/** `lang` and `dir` for an element whose content language can differ from the page's. */
+export function langAttrs(locale: string): { lang: string; dir: "rtl" | "ltr" } {
+  return { lang: locale, dir: dirOf(locale) };
+}
 
 export function isLocale(value: unknown): value is Locale {
   return typeof value === "string" && (LOCALES as readonly string[]).includes(value);
@@ -49,11 +66,8 @@ export function negotiate<T extends string>(header: string | null | undefined, s
   return fallback;
 }
 
-/**
- * Browser and public-site languages without an interface translation, mapped to the closest one
- * (Turkish readers understand Azerbaijani, the post-Soviet languages fall back to Russian).
- */
-export const UI_ALIAS: Record<string, Locale> = { tr: "az", uk: "ru", be: "ru", kk: "ru", ky: "ru", uz: "ru" };
+/** Browser languages without an interface translation, mapped to the closest one (post-Soviet languages read Russian). */
+export const UI_ALIAS: Record<string, Locale> = { be: "ru", kk: "ru", ky: "ru", uz: "ru" };
 
 /**
  * The interface language of a signed-out visitor from the browser's languages. Outside Azerbaijan an

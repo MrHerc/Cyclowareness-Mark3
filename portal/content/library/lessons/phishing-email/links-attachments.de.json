@@ -1,0 +1,483 @@
+{
+  "id": "links-attachments",
+  "title": "Links und Anhänge",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "read-the-link",
+      "beats": [
+        {
+          "id": "intro",
+          "say": "Der Text eines Links sagt das eine, seine Adresse oft etwas ganz anderes. Lernen wir, die Adresse zu lesen.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "padlock",
+          "say": "Das Schloss-Symbol bedeutet nur, dass die Verbindung verschlüsselt ist. Auch gefälschte Websites zeigen dieses Schloss.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          },
+          "checkpoint": {
+            "prompt": "Beweist das Schloss-Symbol, dass eine Website echt ist?",
+            "options": [
+              {
+                "id": "yes",
+                "label": "Ja",
+                "correct": false,
+                "feedback": "Nein. Auch Kriminelle kommen ganz leicht an das Schloss-Symbol."
+              },
+              {
+                "id": "no",
+                "label": "Nein",
+                "correct": true,
+                "feedback": "Richtig. Prüfen Sie immer den Namen der Website."
+              }
+            ]
+          }
+        },
+        {
+          "id": "owner",
+          "say": "Der Name der Website endet am ersten einfachen Schrägstrich. Der letzte Teil davor, mit seiner Endung, zeigt, wem die Website gehört.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "xidmet-agentliyi-fake",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "xidmetagentliyi.az.",
+                  "spot": "decoy"
+                },
+                {
+                  "text": "hesab-yoxla.info",
+                  "spot": "real-domain"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "real-domain"
+        },
+        {
+          "id": "decoy",
+          "say": "Der vertraute Name am Anfang ist nur Fassade. Jeder kann ihn vor seine eigene Website setzen.",
+          "mood": "alert",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "xidmet-agentliyi-fake",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "xidmetagentliyi.az.",
+                  "spot": "decoy"
+                },
+                {
+                  "text": "hesab-yoxla.info",
+                  "spot": "real-domain"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "decoy"
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "whose-link",
+      "question": {
+        "prompt": "Wem gehört dieser Link wirklich?",
+        "options": [
+          {
+            "id": "bank",
+            "label": "UlduzBank",
+            "correct": false,
+            "feedback": "Der Name der Bank steht vorne, doch der Inhaber ist der Name am Ende."
+          },
+          {
+            "id": "owner",
+            "label": "az-giris.info",
+            "correct": true,
+            "feedback": "Richtig. Das Ende des Website-Namens zeigt den wahren Inhaber."
+          },
+          {
+            "id": "path",
+            "label": "kart",
+            "correct": false,
+            "feedback": "Das ist nicht der Name der Website, sondern der Pfad zur Seite nach dem Schrägstrich."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "ulduzbank-fake",
+            "url": [
+              {
+                "text": "https://ulduzbank.az-giris.info/kart"
+              }
+            ]
+          }
+        }
+      },
+      "explain": "Hier ist ulduzbank.az nur Fassade. Die Website gehört az-giris.info."
+    },
+    {
+      "type": "simulation",
+      "id": "link-to-login",
+      "environment": "browser",
+      "title": "Nach dem Klick",
+      "intro": "Sie haben einen Link aus einer E-Mail geöffnet. Lesen Sie die Adresse im Browser und entscheiden Sie, was zu tun ist.",
+      "steps": [
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi-fake",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://xidmetagentliyi.az.",
+                "reveal": "hesab-yoxla.info"
+              },
+              {
+                "text": "hesab-yoxla.info",
+                "spot": "real-domain"
+              },
+              {
+                "text": "/giris"
+              }
+            ],
+            "fields": [
+              "E-Mail",
+              "Passwort"
+            ],
+            "button": "Anmelden"
+          },
+          "say": "Sehen Sie sich das Ende der Adresse an: Wem gehört diese Seite wirklich?",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Anmelden",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Die Seite gehört hesab-yoxla.info, nicht der Agentur. Ändern Sie sofort Ihr Passwort und melden Sie den Vorfall."
+            },
+            {
+              "id": "close",
+              "label": "Tab schließen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig. Der vertraute Name vorne ist nur Fassade – die echte Domain war hesab-yoxla.info."
+            },
+            {
+              "id": "report",
+              "label": "Website melden",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Sehr gut. Ihre Meldung hilft, die gefälschte Website auch für alle anderen sperren zu lassen."
+            }
+          ]
+        },
+        {
+          "id": "download",
+          "label": "Rechnung wird heruntergeladen",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "ofistechizat-fake",
+            "name": [
+              {
+                "text": "Faktura_0925.pdf.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "2,1 MB",
+            "source": [
+              {
+                "text": "ofis-techizat.com"
+              }
+            ]
+          },
+          "say": "Der Browser hat eine Datei heruntergeladen. Prüfen Sie, wie ihr Name endet.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Öffnen",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "Der echte Dateityp ist .exe, also ein Programm. Eine Rechnung ist niemals ein Programm."
+            },
+            {
+              "id": "delete",
+              "label": "Löschen",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Richtig. Löschen Sie ein Programm, das sich als Dokument tarnt, und melden Sie die E-Mail."
+            },
+            {
+              "id": "scan",
+              "label": "Mit dem Antivirenprogramm prüfen",
+              "kind": "scan",
+              "outcome": "safe",
+              "feedback": "Gute Gewohnheit. Eine Datei mit der Endung .pdf.exe können Sie aber auch ohne Prüfung löschen."
+            }
+          ]
+        },
+        {
+          "id": "real-portal",
+          "label": "Sie haben das Portal über Ihr Lesezeichen geöffnet",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/giris",
+                "reveal": "xidmetagentliyi.az"
+              }
+            ],
+            "fields": [
+              "E-Mail",
+              "Passwort"
+            ],
+            "button": "Anmelden"
+          },
+          "say": "Diesmal haben Sie die Adresse selbst aufgerufen. Was nun?",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Anmelden",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Richtig. Das ist die offizielle Domain der Agentur, und Sie haben die Seite selbst aufgerufen."
+            },
+            {
+              "id": "report",
+              "label": "Website melden",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Das ist das offizielle Portal der Agentur. Einer Website, die Sie selbst über ein Lesezeichen öffnen, können Sie vertrauen."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "invoice-trap",
+      "prompt": "Finden Sie die Warnsignale in dieser E-Mail.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "ofistechizat-fake",
+        "from": {
+          "name": [
+            {
+              "text": "OfisTəchizat MMC",
+              "reveal": "hesab@ofis-techizat.com"
+            }
+          ],
+          "address": [
+            {
+              "text": "hesab@"
+            },
+            {
+              "text": "ofis-techizat.com",
+              "spot": "sender-domain"
+            }
+          ]
+        },
+        "to": "s.huseynova@xidmetagentliyi.az",
+        "subject": [
+          {
+            "text": "Rechnung Nr. 0925: Zahlung überfällig"
+          }
+        ],
+        "time": "14:32",
+        "body": [
+          [
+            {
+              "text": "Guten Tag,"
+            }
+          ],
+          [
+            {
+              "text": "die überfällige Rechnung finden Sie im Anhang. "
+            },
+            {
+              "text": "Öffnen Sie die Datei und aktivieren Sie Makros, sonst wird der Text nicht angezeigt.",
+              "spot": "enable-content"
+            }
+          ],
+          [
+            {
+              "text": "Falls sich die Datei nicht öffnen lässt, laden Sie sie hier herunter: "
+            },
+            {
+              "text": "https://qisa.example/f8Rt",
+              "spot": "short-link"
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Faktura_0925.pdf.zip",
+                "spot": "double-ext",
+                "reveal": "Dateityp: ZIP-Archiv (.zip)"
+              }
+            ],
+            "size": "312 KB"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender-domain",
+          "label": "Täuschend ähnliche Domain",
+          "explain": "Die Domain ähnelt der eines bekannten Lieferanten, ist aber eine andere. Prüfen Sie die echte Adresse in Ihren eigenen Unterlagen."
+        },
+        {
+          "id": "enable-content",
+          "label": "Makros aktivieren",
+          "explain": "Makros können versteckte Befehle ausführen. Office blockiert sie in Dateien aus dem Internet, und eine echte Rechnung verlangt nie, dass Sie diese Sperre umgehen."
+        },
+        {
+          "id": "short-link",
+          "label": "Kurzlink",
+          "explain": "Sie sehen nicht, wohin er führt. Wer Sie drängt, eine Datei über einen Link herunterzuladen, nutzt einen klassischen Trick."
+        },
+        {
+          "id": "double-ext",
+          "label": "Doppelte Endung",
+          "explain": "Der Name beginnt wie der einer PDF-Datei, tatsächlich ist es aber ein ZIP-Archiv. Darin kann sich ein Programm verstecken."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "link-check",
+      "prompt": "Ist dieser Link sicher oder eine Falle?",
+      "cards": [
+        {
+          "id": "home",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi",
+            "url": [
+              {
+                "text": "https://xidmetagentliyi.az/elanlar"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Der Name der Website entspricht genau der Adresse der Agentur."
+        },
+        {
+          "id": "portal",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/mezuniyyet"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Der Teil „portal“ vorne ist ein eigener Bereich der Agentur. Am Ende steht weiterhin xidmetagentliyi.az."
+        },
+        {
+          "id": "decoy",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi-fake",
+            "url": [
+              {
+                "text": "https://xidmetagentliyi.az-portal.info/giris"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Die Adresse endet auf az-portal.info. Der Name der Agentur steht nur davor."
+        },
+        {
+          "id": "swap",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi-fake",
+            "url": [
+              {
+                "text": "https://xidmetaqentliyi.az/maas"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Ein q ersetzt das g. Das ist eine völlig andere Website."
+        },
+        {
+          "id": "short",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://qisa.example/a8Zq"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Ein Kurzlink verbirgt, wohin er führt. Kam er unerwartet, öffnen Sie ihn nicht."
+        },
+        {
+          "id": "bank",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "ulduzbank",
+            "url": [
+              {
+                "text": "https://ulduzbank.az/kartlar"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Das ist die eigene Adresse der Bank, sie endet auf ulduzbank.az. Am besten tippen Sie die Adresse der Bank trotzdem selbst ein."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Der wahre Inhaber einer Website steht am Ende ihres Namens.",
+        "Prüfen Sie Kurzlinks und unerwartete Dateien, bevor Sie sie öffnen.",
+        "Verlangt eine Datei, dass Sie Makros aktivieren, schließen Sie sie und melden Sie den Fall."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

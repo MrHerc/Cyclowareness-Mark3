@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { lessonFileSchema, lessonIntegrityErrors } from "../lib/content/validate";
 import type { LessonFile } from "../lib/content/types";
+import { LOCALES } from "../i18n/config";
 
 /**
  * Verification of a generated (or library-assembled) training before it is saved as a draft:
@@ -15,7 +16,7 @@ export const ILLUSTRATION_IDS = [
   "update", "wifi", "ceo", "ransomware", "travel", "certificate", "vpn", "flag", "qr",
 ] as const;
 
-export const TRAINING_LOCALES = ["az", "en", "ru"] as const;
+export const TRAINING_LOCALES = LOCALES;
 
 export type TrainingRequest = {
   prompt: string;
@@ -133,10 +134,28 @@ const SAFE_SLD = /(^|\.)example\.(com|net|org)$/;
 /** "invoice.pdf" or "Node.js" look like domains to the pattern below; they are file names. */
 const FILE_EXT = new Set("pdf doc docx xls xlsx xlsm ppt pptx txt csv zip rar 7z exe msi bat cmd scr lnk iso img png jpg jpeg gif svg webp mp3 mp4 wav mov html htm js ts json xml eml ics apk dmg pkg vbs ps1 py sh jar dll".split(" "));
 const DOMAIN = /(?<![\p{L}\p{N}@._-])(?:https?:\/\/)?((?:[\p{L}\p{N}](?:[\p{L}\p{N}-]{0,61}[\p{L}\p{N}])?\.)+\p{L}{2,24})(?![\p{L}\p{N}@-])/gu;
-const EMAIL = /[\p{L}\p{N}._%+-]+@((?:[\p{L}\p{N}-]+\.)+\p{L}{2,24})/gu;
+/**
+ * Matched from the "@", with the local part (group 1) read backwards by the lookbehind, and at most 126
+ * labels (the DNS limit) in the domain (group 2): each character is scanned a bounded number of times.
+ * A pattern that starts with the local part re-scans a long run from every position (quadratic).
+ */
+const EMAIL = /@(?<=([\p{L}\p{N}._%+-]+)@)((?:[\p{L}\p{N}-]{1,63}\.){1,126}\p{L}{2,24})/gu;
 /** Nine or more digits in a row, optionally split by spaces, dots, dashes or brackets, as phone numbers are written. */
 const PHONE = /(?<![\p{N}])\+?\d(?:[\s().-]{0,2}\d){8,14}(?![\p{N}])/gu;
-const PROFANITY = /(?<!\p{L})(fuck\p{L}*|shit|bullshit|bitch\p{L}*|asshole|cunt|motherfucker|хуй\p{L}*|хуе\p{L}*|пизд\p{L}*|бля\p{L}*|еба\p{L}*|ёба\p{L}*|сука|мудак\p{L}*|sikim|sikdir\p{L}*|qəhbə\p{L}*|götveren|peysər\p{L}*|gijdıllaq)(?!\p{L})/giu;
+// Only unambiguous words per language (a false hit blocks saving a draft): en, ru/uk, az/tr, ro, ka, de, fr, ar.
+const PROFANITY = new RegExp(
+  `(?<!\\p{L})(${[
+    "fuck\\p{L}*|shit|bullshit|bitch\\p{L}*|asshole|cunt|motherfucker",
+    "хуй\\p{L}*|хуе\\p{L}*|пизд\\p{L}*|бля\\p{L}*|еба\\p{L}*|ёба\\p{L}*|йоб\\p{L}*|сука|мудак\\p{L}*|курв\\p{L}*",
+    "sikim|sikdir\\p{L}*|siktir\\p{L}*|orospu\\p{L}*|yarrak\\p{L}*|qəhbə\\p{L}*|götveren|peysər\\p{L}*|gijdıllaq",
+    "muie|pizd\\p{L}*|căcat",
+    "ყლე|ბოზი|ტრაკი|მუტელი",
+    "scheiße|scheisse|fick|ficken|fickt|gefickt|arschloch\\p{L}*|hurensohn|wichser|fotze",
+    "putain|merde\\p{L}*|connard\\p{L}*|connasse|salope\\p{L}*|encul\\p{L}*",
+    "شرموط\\p{L}*|منيوك\\p{L}*|كسمك|طيز\\p{L}*",
+  ].join("|")})(?!\\p{L})`,
+  "giu",
+);
 
 function safeDomain(host: string): boolean {
   const h = host.toLowerCase().replace(/\.$/, "");
@@ -179,7 +198,10 @@ export function safetyIssues(draft: TrainingDraft): Issue[] {
   for (const { path, text } of all) {
     // Defanged hosts ("bank[.]com") are still real hosts.
     const norm = text.replace(/\[\.\]|\(\.\)|\{\.\}/g, ".").replace(/hxxps?:\/\//gi, "https://");
-    for (const m of norm.matchAll(EMAIL)) if (!safeDomain(m[1])) add(`email address outside example domains: ${m[0]}`, path, "emailOutside", { value: m[0] });
+    for (const m of norm.matchAll(EMAIL)) {
+      const address = m[1] + m[0];
+      if (!safeDomain(m[2])) add(`email address outside example domains: ${address}`, path, "emailOutside", { value: address });
+    }
     for (const m of norm.matchAll(DOMAIN)) {
       const host = m[1];
       const tld = host.split(".").pop()!.toLowerCase();
@@ -287,8 +309,21 @@ function fold(s: string): string {
   return s.toLowerCase().replace(/ı/g, "i").normalize("NFD").replace(/\p{M}/gu, "");
 }
 
+// Words shorter than three letters are dropped anyway (see words()).
 const STOP = new Set(
-  "the and for with how what that this from into about your their them they you our are was were will can should training lesson lessons staff employees employee people course module teach teaches learn about və ilə üçün necə nədir bu bir olan olaraq təlim dərs işçilər işçilərə əməkdaşlar haqqında öyrət öyrətmək и в во на для как что это о об про с со по сотрудники сотрудников обучение урок курс научить"
+  [
+    "the and for with how what that this from into about your their them they you our are was were will can should training lesson lessons staff employees employee people course module teach teaches learn about",
+    "və ilə üçün necə nədir bu bir olan olaraq təlim dərs işçilər işçilərə əməkdaşlar haqqında öyrət öyrətmək",
+    "и в во на для как что это о об про с со по сотрудники сотрудников обучение урок курс научить",
+    "ile için nasıl nedir olan olarak eğitim eğitimi ders dersi çalışan çalışanlar çalışanlara personel hakkında öğret öğretin öğretmek kurs modül",
+    "pentru cum despre care este sunt acest această angajați angajaților angajatilor personal instruire curs lecție lecții modul învățați predați",
+    "როგორ არის ერთი შესახებ თანამშრომლები თანამშრომლებს თანამშრომლებისთვის ტრენინგი გაკვეთილი კურსი მოდული ასწავლეთ სწავლება",
+    "для про щодо цей ця це які який працівники працівників працівникам персонал навчання урок курс модуль навчити",
+    "und für mit wie was das die der den dem des ein eine einen über zum zur sind ist mitarbeitende mitarbeitenden mitarbeiter beschäftigte schulung lektion kurs modul lernen beibringen",
+    "les des pour avec comment quoi que qui est une sur aux dans leur leurs nos vos employés salariés personnel formation leçon cours module apprendre enseigner",
+    "إلى كيف هذا هذه التي الذي حول الموظفين الموظفون للموظفين تدريب التدريب درس دورة وحدة تعليم",
+  ]
+    .join(" ")
     .split(" ")
     .map(fold),
 );

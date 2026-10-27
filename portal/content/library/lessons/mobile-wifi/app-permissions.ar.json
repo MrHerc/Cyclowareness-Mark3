@@ -1,0 +1,601 @@
+{
+  "id": "app-permissions",
+  "title": "أذونات التطبيقات",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "a-tutor",
+      "beats": [
+        {
+          "id": "a-b1",
+          "say": "في جوالك بريد العمل والرسائل وتطبيقات البنك. عند تثبيت أي تطبيق، تحقق مما تسمح له به.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "a-b3",
+          "say": "لماذا يحتاج تطبيق الكشاف إلى قراءة رسائلك؟ بهذا الإذن يستطيع أيضًا أن يرى رموز التحقق التي يرسلها إليك البنك.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "permission",
+              "brandRef": "fener-pro",
+              "app": "Torch Pro",
+              "permissions": [
+                {
+                  "label": [
+                    {
+                      "text": "الكشاف"
+                    }
+                  ],
+                  "needed": true
+                },
+                {
+                  "label": [
+                    {
+                      "text": "جهات الاتصال",
+                      "spot": "contacts"
+                    }
+                  ],
+                  "needed": false
+                },
+                {
+                  "label": [
+                    {
+                      "text": "الرسائل النصية",
+                      "spot": "sms"
+                    }
+                  ],
+                  "needed": false
+                },
+                {
+                  "label": [
+                    {
+                      "text": "الموقع الدقيق",
+                      "spot": "location"
+                    }
+                  ],
+                  "needed": false
+                }
+              ]
+            }
+          },
+          "highlight": "sms",
+          "checkpoint": {
+            "prompt": "تطبيق الآلة الحاسبة يطلب الوصول إلى جهات اتصالك. ماذا تفعل؟",
+            "options": [
+              {
+                "id": "allow",
+                "label": "أسمح له",
+                "correct": false,
+                "feedback": "الآلة الحاسبة لا تحتاج إلى جهات الاتصال. قد تكون هذه محاولة لجمع بياناتك."
+              },
+              {
+                "id": "deny",
+                "label": "أرفض الطلب وأحذف التطبيق",
+                "correct": true,
+                "feedback": "صحيح. الأفضل أن تحذف أي تطبيق يطلب وصولًا لا يحتاج إليه."
+              }
+            ]
+          }
+        },
+        {
+          "id": "a-b4",
+          "say": "إذن «تسهيلات الاستخدام» هو أقوى الأذونات: فهو يقرأ شاشتك ويضغط بدلًا منك. لا تمنحه إلا لقلة من التطبيقات.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "a-b5",
+          "say": "القاعدة بسيطة: يجب أن يناسب الإذن وظيفة التطبيق. تطبيق الخرائط يحتاج إلى موقعك، أما الآلة الحاسبة فلا.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "app-install",
+      "environment": "phone",
+      "title": "محرر صور مجاني",
+      "intro": "تريد تطبيقًا لتحرير الصور. انظر إلى ما يعرضه جوالك، واتخذ قرارك في كل خطوة.",
+      "steps": [
+        {
+          "id": "offer",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "مجموعة العروض"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "تطبيق FotoRedaktor Plus Pro مدفوع في المتجر، احصل عليه مجانًا من هنا: "
+                  },
+                  {
+                    "text": "fotoredaktor-pro.test/app.apk",
+                    "link": {
+                      "label": "fotoredaktor-pro.test/app.apk",
+                      "href": "https://fotoredaktor-pro.test/app.apk"
+                    }
+                  }
+                ],
+                "time": "13:05"
+              }
+            ]
+          },
+          "say": "شارك أحدهم ملف تطبيق مجاني في مجموعة.",
+          "actions": [
+            {
+              "id": "download",
+              "label": "تنزيل الملف",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "عرض تطبيق مدفوع مجانًا طعم مألوف، وغالبًا ما تخفي هذه الملفات برمجيات ضارة."
+            },
+            {
+              "id": "block",
+              "label": "الحظر والإبلاغ",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "صحيح. لا تثبت التطبيقات إلا من المتجر الرسمي لجوالك.",
+              "next": "store-app"
+            }
+          ]
+        },
+        {
+          "id": "unknown-source",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "مصدر غير معروف"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "حفاظًا على أمانك، لا يسمح جوالك بتثبيت تطبيقات غير معروفة من هذا المصدر."
+                }
+              ]
+            ],
+            "buttons": [
+              "الإعدادات",
+              "إلغاء"
+            ]
+          },
+          "actions": [
+            {
+              "id": "settings",
+              "label": "السماح من الإعدادات",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "هذه الحماية موجودة من أجل ملفات كهذه تحديدًا. وإيقافها يفتح جوالك أمام التطبيقات الضارة."
+            },
+            {
+              "id": "cancel",
+              "label": "إلغاء",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. يجب أن يبقى التثبيت من مصادر غير معروفة متوقفًا."
+            }
+          ]
+        },
+        {
+          "id": "fake-apk",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "fotoredaktor-plus-fake",
+            "name": [
+              {
+                "text": "FotoRedaktor_Plus_Pro.apk"
+              }
+            ],
+            "type": "apk",
+            "size": "18 ميجابايت",
+            "source": [
+              {
+                "text": "مجموعة العروض في تيليجرام"
+              }
+            ]
+          },
+          "say": "الأيقونة تبدو مألوفة. اقرأ الاسم بعناية.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "تثبيت",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "هذه نسخة مقلدة من تطبيق المتجر، والفرق في الاسم مسافة واحدة فقط. ويمكنها قراءة رموز التحقق التي تصلك في الرسائل النصية."
+            },
+            {
+              "id": "cancel",
+              "label": "إلغاء",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. لا تثبت ملف .apk وصلك في رسالة، بل ابحث عن التطبيق في المتجر الرسمي."
+            }
+          ]
+        },
+        {
+          "id": "store-app",
+          "label": "تم التثبيت من المتجر الرسمي",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "fotoredaktor-plus",
+            "app": "Foto Redaktor Plus",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "الصور ومقاطع الفيديو"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "جهات الاتصال"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "الرسائل النصية"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "حتى تطبيق المتجر يطلب أكثر مما يلزم.",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "السماح",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "محرر الصور لا يحتاج إلى جهات الاتصال ولا إلى الرسائل النصية. والوصول إلى الرسائل النصية يتيح للتطبيق قراءة رموز التحقق الواردة من البنك."
+            },
+            {
+              "id": "deny",
+              "label": "عدم السماح",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "صحيح. لا تمنح إلا ما تحتاج إليه الميزة، وهنا يكفي الوصول إلى الصور."
+            }
+          ]
+        },
+        {
+          "id": "fake-antivirus",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "qoruyucu-fake",
+            "app": "Qoruyucu Antivirus",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "تسهيلات الاستخدام: التحكم في الشاشة"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "برنامج لمكافحة الفيروسات يريد التحكم في شاشتك.",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "السماح",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "بهذا الإذن يقرأ التطبيق الشاشة ويضغط بدلًا منك. وهذا تحديدًا ما تطلبه أحصنة طروادة المصرفية."
+            },
+            {
+              "id": "deny",
+              "label": "عدم السماح",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "صحيح. احذف أي تطبيق يطلب التحكم في الشاشة بحجة مكافحة الفيروسات، وأبلغ عنه."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "a-hotspot",
+      "prompt": "ابحث عن الأذونات التي لا يحتاج إليها هذا التطبيق.",
+      "artifact": {
+        "kind": "permission",
+        "brandRef": "fotoredaktor-plus",
+        "app": "Photo Editor Plus",
+        "permissions": [
+          {
+            "label": [
+              {
+                "text": "الصور ومقاطع الفيديو",
+                "reveal": "يقرأ الصور ومقاطع الفيديو المحفوظة على هذا الجوال"
+              }
+            ],
+            "needed": true
+          },
+          {
+            "label": [
+              {
+                "text": "الكاميرا",
+                "reveal": "يلتقط الصور ويسجل مقاطع الفيديو"
+              }
+            ],
+            "needed": true
+          },
+          {
+            "label": [
+              {
+                "text": "جهات الاتصال",
+                "spot": "contacts",
+                "reveal": "يقرأ قائمة جهات اتصالك: الأسماء والأرقام وعناوين البريد الإلكتروني"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "إرسال الرسائل النصية وقراءتها",
+                "spot": "sms",
+                "reveal": "يقرأ كل الرسائل النصية على الجوال ويرسل رسائل جديدة"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "تسهيلات الاستخدام: التحكم في الشاشة",
+                "spot": "accessibility",
+                "reveal": "يرى كل ما على الشاشة ويضغط بدلًا منك في التطبيقات الأخرى"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "سجل المكالمات",
+                "spot": "call-log",
+                "reveal": "يقرأ قائمة مكالماتك: مع من، ومتى، وكم استغرقت"
+              }
+            ],
+            "needed": false
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "contacts",
+          "label": "جهات الاتصال",
+          "explain": "تحرير الصور لا يحتاج إلى جهات اتصالك."
+        },
+        {
+          "id": "sms",
+          "label": "الوصول إلى الرسائل النصية",
+          "explain": "بالوصول إلى الرسائل النصية يستطيع التطبيق قراءة رموز التحقق الواردة من البنك ورموز تسجيل الدخول."
+        },
+        {
+          "id": "accessibility",
+          "label": "التحكم في الشاشة",
+          "explain": "هذا الإذن يتيح للتطبيق قراءة الشاشة والضغط بدلًا منك. وهو تحديدًا ما تطلبه التطبيقات الضارة."
+        },
+        {
+          "id": "call-log",
+          "label": "سجل المكالمات",
+          "explain": "محرر الصور لا يحتاج إلى معرفة من تتصل بهم."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "a-swipe",
+      "prompt": "آمن أم فخ؟",
+      "cards": [
+        {
+          "id": "bank-apk",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank-fake",
+            "sender": [
+              {
+                "text": "+994 55 000 11 22"
+              }
+            ],
+            "time": "13:02",
+            "messages": [
+              [
+                {
+                  "text": "أطلق SahilBank تطبيقًا جديدًا. يمكنك تنزيله من هنا: "
+                },
+                {
+                  "text": "sahilbank-app.test/SahilBank.apk"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "تطبيق البنك موجود في المتجر الرسمي. أما ملف التثبيت المرسل عبر رابط فقد يكون ضارًا."
+        },
+        {
+          "id": "map-location",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "xerite-app",
+            "app": "الخرائط",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "الموقع (أثناء استخدام التطبيق فقط)"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "تطبيق الخرائط يحتاج إلى موقعك ليرشدك إلى الطريق. والسماح بذلك أثناء الاستخدام فقط خيار ذكي."
+        },
+        {
+          "id": "torch-mic",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "fener-pro",
+            "app": "الكشاف",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "جهات الاتصال"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "الميكروفون"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "الكشاف لا يحتاج إلى جهات الاتصال ولا إلى الميكروفون."
+        },
+        {
+          "id": "video-call",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "videozeng-app",
+            "app": "مكالمة فيديو",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "الكاميرا"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "الميكروفون"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "مكالمة الفيديو تحتاج فعلًا إلى الكاميرا والميكروفون."
+        },
+        {
+          "id": "discount-apk",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "قناة التخفيضات"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "ثبت تطبيق التخفيضات من هذا الملف. واسمح بالتثبيت من مصادر غير معروفة في الإعدادات."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "السماح بالتثبيت من مصادر غير معروفة يضعف حماية جوالك. لا تثق بأي رسالة تطلب منك ذلك."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "a-choice-store",
+      "question": {
+        "prompt": "من أين يمكنك تثبيت التطبيقات بأمان؟",
+        "options": [
+          {
+            "id": "official-store",
+            "label": "متجر التطبيقات الرسمي لجوالك",
+            "correct": true,
+            "feedback": "صحيح. المتجر الرسمي يفحص التطبيقات ويقلل الخطر كثيرًا."
+          },
+          {
+            "id": "sms-link",
+            "label": "من رابط في رسالة",
+            "correct": false,
+            "feedback": "الرابط في الرسالة قد يقودك إلى تطبيق مزيف."
+          },
+          {
+            "id": "cracked",
+            "label": "نسخة مقرصنة مجانية من أحد المنتديات",
+            "correct": false,
+            "feedback": "غالبًا ما تحمل النسخ المقرصنة برمجيات ضارة."
+          },
+          {
+            "id": "work-portal",
+            "label": "كتالوج التطبيقات المعتمد في جهتك",
+            "correct": true,
+            "feedback": "صحيح. الكتالوج الذي تديره جهتك مصدر رسمي أيضًا."
+          }
+        ],
+        "multi": true
+      },
+      "explain": "المتجر الرسمي ليس ضمانًا كاملًا، لكنه يقلل الخطر كثيرًا. انظر أيضًا إلى التقييمات والأذونات."
+    },
+    {
+      "type": "recap",
+      "id": "a-recap",
+      "points": [
+        "لا تثبت التطبيقات إلا من المتجر الرسمي",
+        "يجب أن يناسب الإذن وظيفة التطبيق",
+        "انتبه جيدًا عند منح إذن الرسائل النصية وإذن تسهيلات الاستخدام"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

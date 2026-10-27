@@ -1,0 +1,269 @@
+{
+ "id": "dispose-clean-desk",
+ "title": "Distrugerea documentelor și biroul curat",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "O pagină aruncată la coș și un document lăsat pe birou sunt informații servite pe tavă unui atacator.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": { "kind": "illustration", "id": "desk" }
+    },
+    {
+     "id": "b2",
+     "say": "Nu este suficient să rupeți pagina cu mâna. Bucățile se pot pune la loc foarte ușor.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": { "kind": "illustration", "id": "eye" }
+    },
+    {
+     "id": "b3",
+     "say": "Documentele confidențiale merg la distrugătorul de documente, iar stickurile USB și laptopurile vechi, la suportul IT.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": { "kind": "illustration", "id": "lock" }
+    },
+    {
+     "id": "b4",
+     "say": "Când plecați de la birou, blocați ecranul și puneți documentele într-un dulap încuiat.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": { "kind": "illustration", "id": "folder" }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "before-you-leave",
+   "environment": "desktop",
+   "title": "Înainte să plecați de la birou",
+   "intro": "Plecați de la birou de mai multe ori pe zi. Analizați ferestrele care se deschid și decideți.",
+   "steps": [
+    {
+     "id": "lock-screen",
+     "label": "Plecați la o ședință de 15 minute",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [{ "text": "Blocarea ecranului" }],
+      "body": [
+       [{ "text": "Computerul va rămâne nesupravegheat 15 minute. Îl blocați acum?" }]
+      ],
+      "buttons": ["Mai târziu", "Blocați"]
+     },
+     "actions": [
+      {
+       "id": "lock",
+       "label": "Blocați",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Pe un ecran deblocat, oricine poate trimite e-mailuri în numele dumneavoastră sau poate lua fișiere."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Câteva minute sunt suficiente. Blocați ecranul de fiecare dată când vă ridicați de la birou."
+      }
+     ]
+    },
+    {
+     "id": "old-usb",
+     "label": "Vreți să aruncați un stick USB vechi",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [{ "text": "Formatați stickul USB (E:)?" }],
+      "body": [
+       [{ "text": "Formatare rapidă: spațiul ocupat de fișiere va fi marcat ca liber." }]
+      ],
+      "buttons": ["Anulați", "Formatați"]
+     },
+     "say": "Pe stick se află liste vechi cu angajați.",
+     "actions": [
+      {
+       "id": "hand-over",
+       "label": "Scoateți stickul și predați-l suportului IT",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Corect. Suportul IT șterge complet stickul sau îl distruge."
+      },
+      {
+       "id": "quick-format",
+       "label": "Formatați rapid și aruncați-l",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Formatarea rapidă nu șterge fișierele, doar le ascunde. Un program obișnuit le poate recupera."
+      }
+     ]
+    },
+    {
+     "id": "laptop-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [{ "text": "Sabina Huseynova" }],
+       "address": [{ "text": "s.huseynova@idare.example" }]
+      },
+      "subject": [{ "text": "Laptopul vechi" }],
+      "time": "16:12",
+      "body": [
+       [{ "text": "Bună, pot să-i dau unei rude laptopul meu vechi de serviciu? Am șters fișierele și am golit coșul de reciclare." }]
+      ]
+     },
+     "actions": [
+      {
+       "id": "no",
+       "label": "Răspundeți: Nu, predă-l suportului IT",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Corect. Un dispozitiv de serviciu aparține organizației, iar suportul IT curăță discul."
+      },
+      {
+       "id": "yes",
+       "label": "Răspundeți: Sigur, fișierele sunt șterse",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Golirea coșului de reciclare nu curăță discul. Fișierele șterse pot fi recuperate cu programe speciale."
+      }
+     ]
+    },
+    {
+     "id": "queued-print",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-capmerkezi",
+      "app": "Çap Mərkəzi",
+      "title": [{ "text": "Imprimare securizată: 3 documente" }],
+      "body": [{ "text": "3 documente așteaptă în coadă pe numele dumneavoastră. Dacă nu le ridicați, vor fi șterse la ora 18:00." }],
+      "time": "17:30"
+     },
+     "actions": [
+      {
+       "id": "collect",
+       "label": "Mergeți la imprimantă și ridicați-le",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. Ridicați ce vă trebuie, iar restul va fi șters automat din coadă."
+      },
+      {
+       "id": "print-all",
+       "label": "Trimiteți-le pe toate la imprimare directă",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "La imprimarea directă, paginile ies în tavă fără să vă aștepte. Imprimarea securizată există exact pentru asta."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "how-to-dispose",
+   "prompt": "Asociați fiecare obiect cu modul corect de eliminare.",
+   "pairs": [
+    { "id": "id-copy", "left": "Copia unui act de identitate", "right": "Distrugătorul de documente" },
+    { "id": "draft", "left": "Ciorna unui proiect confidențial", "right": "Cutia încuiată pentru deșeuri confidențiale" },
+    { "id": "laptop", "left": "Laptopul vechi de serviciu", "right": "Predarea către suportul IT" },
+    { "id": "flyer", "left": "Pliantul publicitar al unui eveniment", "right": "Reciclarea obișnuită a hârtiei" }
+   ],
+   "explain": "Documentele confidențiale nu ajung niciodată în coșul obișnuit. Dispozitivele sunt șterse și distruse doar de suportul IT."
+  },
+  {
+   "type": "scenario",
+   "id": "clean-desk",
+   "title": "O pauză de zece minute",
+   "start": "leave",
+   "nodes": [
+    {
+     "id": "leave",
+     "text": "Ieșiți să beți un ceai. Pe birou este un dosar cu contracte, iar pe monitor, un bilețel cu o parolă.",
+     "choices": [
+      {
+       "label": "Încui dosarul în dulap și iau bilețelul",
+       "next": "visitor",
+       "feedback": "Corect. Zece minute sunt mai mult decât suficiente pentru o fotografie."
+      },
+      {
+       "label": "Mă întorc repede, le las așa",
+       "outcome": "risky",
+       "feedback": "Poate intra un vizitator, un curier sau un tehnician. Puneți documentul deoparte și nu țineți niciodată parola pe un bilețel."
+      }
+     ]
+    },
+    {
+     "id": "visitor",
+     "text": "Am o întâlnire cu managerul dumneavoastră. Pot să mă uit la documentul din acest dosar?",
+     "speaker": "Vizitator (lângă biroul dumneavoastră)",
+     "voice": "man-2",
+     "channel": "in-person",
+     "spoken": "Am o întâlnire cu managerul dumneavoastră. <breath> Pot să mă uit la documentul din acest dosar?",
+     "choices": [
+      {
+       "label": "Refuz politicos și îl sun pe managerul meu",
+       "outcome": "safe",
+       "feedback": "Excelent. Documentul îl vede doar cine are acest drept."
+      },
+      {
+       "label": "Îi arăt documentul, este invitatul managerului",
+       "outcome": "risky",
+       "feedback": "Identitatea și drepturile lui nu au fost verificate. Confirmați mai întâi cu managerul dumneavoastră."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "shredder",
+   "question": {
+    "prompt": "Ce metodă distruge cel mai sigur documentele confidențiale?",
+    "options": [
+     {
+      "id": "cross-cut",
+      "label": "Un distrugător care taie hârtia în particule mici",
+      "correct": true,
+      "feedback": "Corect. Particulele minuscule practic nu mai pot fi puse la loc."
+     },
+     {
+      "id": "strip-cut",
+      "label": "Un distrugător care taie hârtia în fâșii lungi",
+      "correct": false,
+      "feedback": "Fâșiile pot fi puse cap la cap, iar pagina se reface. Alegeți un distrugător care taie hârtia în bucăți mici."
+     },
+     {
+      "id": "tear",
+      "label": "Ruperea cu mâna în patru bucăți",
+      "correct": false,
+      "feedback": "Patru bucăți se lipesc cu bandă adezivă într-un minut. Documentele confidențiale merg la distrugătorul de documente."
+     },
+     {
+      "id": "bin",
+      "label": "În coșul obișnuit, cu fața în jos",
+      "correct": false,
+      "feedback": "Gunoiul ajunge în afara clădirii, unde oricine poate scotoci prin el."
+     }
+    ],
+    "visual": { "kind": "illustration", "id": "folder" }
+   },
+   "explain": "Pentru documentele confidențiale, folosiți un distrugător care taie hârtia în particule mici sau o cutie pentru deșeuri confidențiale."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Documentele confidențiale merg la distrugătorul de documente, iar dispozitivele, la suportul IT.",
+    "Ștergerea și formatarea rapidă nu elimină datele.",
+    "Când plecați de la birou, blocați ecranul și puneți documentele deoparte."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

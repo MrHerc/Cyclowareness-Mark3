@@ -1,0 +1,398 @@
+{
+ "id": "phone-rules",
+ "title": "Regulile telefonului de serviciu",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Telefonul de serviciu este o parte din organizația dumneavoastră, pe care o purtați în buzunar. Pe el se află e-mailul de serviciu, documente și contacte.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": { "kind": "illustration", "id": "phone-lock" }
+    },
+    {
+     "id": "b2",
+     "say": "Profilul de gestionare protejează telefonul. Dacă pierdeți telefonul, suportul IT îl poate bloca și poate șterge datele de serviciu.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "nc-iscihaz",
+       "app": "İşCihaz",
+       "title": [{ "text": "Telefon protejat" }],
+       "body": [{ "text": "Acest dispozitiv este gestionat conform regulilor de securitate ale organizației dumneavoastră." }],
+       "time": "09:00"
+      }
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Nu instalați niciodată un profil dintr-un link primit prin mesaj. Un profil fals îi poate da unui atacator controlul asupra telefonului.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "it-destek-fake",
+       "sender": [{ "text": "Suport-IT" }],
+       "time": "11:42",
+       "messages": [
+        [
+         { "text": "Profilul dumneavoastră expiră. Instalați unul nou: " },
+         { "text": "iscihaz-profil.example.net", "spot": "link" }
+        ]
+       ]
+      }
+     },
+     "highlight": "link"
+    },
+    {
+     "id": "b4",
+     "say": "Instalați aplicații doar din magazinul oficial sau din aplicația organizației pentru gestionarea dispozitivelor și verificați fiecare permisiune.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": { "kind": "illustration", "id": "shield" }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "new-phone",
+   "environment": "phone",
+   "title": "Noul telefon de serviciu",
+   "intro": "Tocmai ați primit un telefon de serviciu nou. Analizați fiecare notificare și luați decizia corectă.",
+   "steps": [
+    {
+     "id": "enroll",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-iscihaz",
+      "app": "İşCihaz",
+      "title": [{ "text": "Finalizați înregistrarea" }],
+      "body": [{ "text": "Suportul IT v-a pregătit dispozitivul. Finalizați înregistrarea ca să primiți e-mailul de serviciu." }],
+      "time": "09:05"
+     },
+     "say": "Această aplicație a fost instalată chiar de suportul IT.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți notificarea",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. Înregistrarea prin aplicația proprie a organizației este calea cea mai sigură."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Un telefon neînregistrat nu este protejat. Faceți asta chiar din prima zi."
+      }
+     ]
+    },
+    {
+     "id": "profile-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "it-destek-fake",
+      "sender": [{ "text": "Suport-IT" }],
+      "time": "11:42",
+      "messages": [
+       [
+        { "text": "Stimați colegi, profilul MDM expiră astăzi. Instalați noul profil, altfel telefonul va fi blocat: " },
+        {
+         "text": "iscihaz-profil.example.net/new",
+         "link": { "label": "iscihaz-profil.example.net/new", "href": "https://iscihaz-profil.example.net/new" }
+        }
+       ]
+      ]
+     },
+     "say": "Verificați expeditorul și adresa linkului.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Deschideți linkul",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Acesta nu este domeniul organizației dumneavoastră. Profilurile vin doar din aplicația İşCihaz sau de la suportul IT.",
+       "next": "profile-install"
+      },
+      {
+       "id": "report",
+       "label": "Raportați",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Datorită raportării, suportul IT îi poate avertiza și pe ceilalți.",
+       "next": "qr-permission"
+      },
+      {
+       "id": "block",
+       "label": "Blocați",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bine. Anunțați și suportul IT, ca să fie avertizați și colegii.",
+       "next": "qr-permission"
+      }
+     ]
+    },
+    {
+     "id": "profile-install",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-iscihaz-fake",
+      "tone": "system",
+      "title": [{ "text": "Instalați profilul?" }],
+      "body": [
+       [{ "text": "iscihaz-profil.example.net vrea să instaleze un profil de configurare." }],
+       [{ "text": "Profilul va adăuga un certificat, setări VPN și setări de e-mail." }]
+      ],
+      "buttons": ["Refuzați", "Permiteți"]
+     },
+     "say": "Site-ul vrea să instaleze un profil pe telefonul dumneavoastră.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Refuzați",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Un astfel de profil poate trece tot traficul de internet prin serverul atacatorului."
+      },
+      {
+       "id": "allow",
+       "label": "Permiteți",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Un profil fals îi dă unui străin controlul asupra telefonului. Sunați imediat la suportul IT."
+      }
+     ]
+    },
+    {
+     "id": "qr-permission",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-qr-oxuyucu",
+      "app": "QR Oxuyucu",
+      "permissions": [
+       { "label": [{ "text": "Cameră" }], "needed": true },
+       { "label": [{ "text": "Contacte" }], "needed": false },
+       { "label": [{ "text": "Locație exactă" }], "needed": false },
+       { "label": [{ "text": "Accesibilitate: controlul ecranului" }], "needed": false }
+      ]
+     },
+     "say": "De ce are nevoie, de fapt, un cititor de coduri QR?",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Permiteți",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Un cititor de coduri QR are nevoie doar de cameră. Accesibilitatea îi permite aplicației să citească ecranul și să atingă butoanele în locul dumneavoastră."
+      },
+      {
+       "id": "deny",
+       "label": "Nu permiteți",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Acordați doar ce îi trebuie funcției: aici, doar camera."
+      }
+     ]
+    },
+    {
+     "id": "chat-apk",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "sohbet",
+      "name": [{ "text": "Program_ture.apk" }],
+      "type": "apk",
+      "size": "5,4 MB",
+      "source": [{ "text": "Söhbət: Rashad Mammadov" }]
+     },
+     "say": "Un coleg v-a trimis un fișier prin aplicația de mesagerie.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Instalați",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Un program de ture nu ar trebui să fie niciodată un fișier de instalare. Un fișier .apk primit într-un chat aduce malware pe telefon."
+      },
+      {
+       "id": "cancel",
+       "label": "Anulați",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Contul colegului poate fi compromis, așa că anunțați suportul IT."
+      }
+     ]
+    },
+    {
+     "id": "os-update",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sistem-yenileme",
+      "tone": "system",
+      "title": [{ "text": "Actualizare de sistem" }],
+      "body": [
+       [{ "text": "O actualizare de securitate este gata. Telefonul va reporni, iar procesul durează circa 10 minute." }]
+      ],
+      "buttons": ["Mai târziu", "Actualizați acum"]
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "Actualizați acum",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Corect. Actualizările remediază vulnerabilități pe care atacatorii le cunosc deja."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Fiecare zi de amânare lasă vulnerabilitatea deschisă. Actualizați cel târziu diseară."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "app-asks",
+   "prompt": "Pe un telefon de serviciu, această cerere este sigură sau este o amenințare?",
+   "cards": [
+    {
+     "id": "map-location",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-yolxerite",
+      "app": "YolXəritə",
+      "permissions": [
+       { "label": [{ "text": "Locație: doar cât timp aplicația este deschisă" }], "needed": true }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "O hartă are nevoie de locație, și doar cât timp este deschisă. Permisiunea se potrivește cu ce face aplicația."
+    },
+    {
+     "id": "game-sms",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-super-oyunlar",
+      "app": "Super Oyunlar",
+      "permissions": [
+       { "label": [{ "text": "Citirea mesajelor SMS" }], "needed": false },
+       { "label": [{ "text": "Contacte" }], "needed": false }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un joc nu are nevoie nici de SMS-uri, nici de contacte. Accesul la SMS-uri îi permite să vă citească codurile de conectare."
+    },
+    {
+     "id": "battery-access",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-batareya",
+      "app": "Batareya Qoruyucu",
+      "permissions": [
+       { "label": [{ "text": "Accesibilitate: controlul ecranului" }], "needed": false },
+       { "label": [{ "text": "Afișare peste alte aplicații" }], "needed": false }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Pentru economisirea bateriei nu este nevoie de controlul ecranului. Sunt exact permisiunile pe care le cer troienii bancari."
+    },
+    {
+     "id": "lock-notice",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-iscihaz",
+      "app": "İşCihaz",
+      "title": [{ "text": "Blocarea ecranului este obligatorie" }],
+      "body": [{ "text": "Setați un PIN de cel puțin 6 cifre ca să puteți folosi e-mailul de serviciu." }],
+      "time": "09:20"
+     },
+     "verdict": "safe",
+     "explain": "Este aplicația proprie a organizației și nu trimite niciun link. O blocare puternică a ecranului este prima apărare dacă pierdeți telefonul."
+    },
+    {
+     "id": "torch-notifications",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "fener-pro",
+      "app": "Fənər Pro",
+      "permissions": [
+       { "label": [{ "text": "Acces la notificări" }], "needed": false }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O lanternă nu are de ce să citească notificările. Cu acest acces poate vedea codurile și mesajele primite."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "permission-power",
+   "prompt": "Asociați fiecare permisiune cu ce îi permite aplicației.",
+   "pairs": [
+    { "id": "sms", "left": "Citirea SMS-urilor", "right": "Vede codurile de la bancă și codurile de conectare" },
+    { "id": "accessibility", "left": "Accesibilitate", "right": "Citește ecranul și atinge butoanele în locul dumneavoastră" },
+    { "id": "notifications", "left": "Acces la notificări", "right": "Citește mesajele din aplicațiile de mesagerie" },
+    { "id": "unknown-sources", "left": "Instalarea aplicațiilor necunoscute", "right": "Instalează programe din afara magazinului" }
+   ],
+   "explain": "Aceste patru permisiuni sunt cele mai puternice. Acordați-le doar aplicațiilor aprobate de suportul IT."
+  },
+  {
+   "type": "choice",
+   "id": "slow-phone",
+   "question": {
+    "prompt": "Telefonul de serviciu merge greu, iar un prieten vă sfătuiește să ștergeți profilul de gestionare. Ce faceți?",
+    "options": [
+     {
+      "id": "support",
+      "label": "Păstrez profilul și contactez suportul IT",
+      "correct": true,
+      "feedback": "Corect. Profilul este protecția telefonului, iar suportul IT va rezolva problema."
+     },
+     {
+      "id": "remove",
+      "label": "Șterg profilul ca telefonul să meargă mai repede",
+      "correct": false,
+      "feedback": "Fără profil, un telefon pierdut nu mai poate fi blocat de la distanță. De obicei nu mai funcționează nici e-mailul de serviciu."
+     },
+     {
+      "id": "reset",
+      "label": "Resetez telefonul la setările din fabrică",
+      "correct": false,
+      "feedback": "Așa ștergeți profilul și datele de serviciu fără știrea suportului IT. Vorbiți mai întâi cu suportul IT."
+     },
+     {
+      "id": "friend",
+      "label": "Îl dau unui prieten priceput la tehnologie să-l repare",
+      "correct": false,
+      "feedback": "Pe telefon sunt date de serviciu. Predați-l doar suportului IT."
+     }
+    ],
+    "visual": { "kind": "illustration", "id": "phone-lock" }
+   },
+   "explain": "Profilul de gestionare vă protejează telefonul de serviciu. Doar suportul IT îl modifică."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Profilurile și aplicațiile de serviciu vin doar din aplicația İşCihaz sau de la suportul IT.",
+    "Permisiunile trebuie să se potrivească rolului aplicației. Accesul la SMS-uri și Accesibilitatea sunt cele mai periculoase.",
+    "Blocarea ecranului și actualizările sunt prima apărare a telefonului."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

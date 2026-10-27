@@ -5,7 +5,7 @@ import { Award, ChevronRight, FileText, LogOut } from "lucide-react";
 import { db, t } from "@/server/db";
 import { requireViewer } from "@/server/auth/viewer";
 import { getPolicies } from "@/server/queries/learner";
-import { isPrivileged } from "@/server/auth/permissions";
+import { twoFactorRequired } from "@/server/auth/permissions";
 import { signOutAction } from "@/server/actions/auth";
 import { Card, CardBody } from "@/components/ui/card";
 import { Pill } from "@/components/ui/pill";
@@ -39,7 +39,7 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
   ]);
   const toSign = policies.filter((p) => !p.signedAt);
   const signed = policies.filter((p) => p.signedAt);
-  const required = v.tenant.settings.identity.requireAdmin2fa && isPrivileged(v.user.role);
+  const required = twoFactorRequired(v.user.role, v.tenant.settings.identity.requireAdmin2fa);
 
   return (
     <div className="mx-auto grid max-w-3xl gap-6">
@@ -139,7 +139,9 @@ export default async function ProfilePage({ searchParams }: PageProps<"/profile"
             <dl className="grid gap-4 sm:grid-cols-2">
               <div>
                 <dt className="text-caption text-ink-muted">{tc("email")}</dt>
-                <dd className="text-body-sm font-semibold break-all">{v.user.email}</dd>
+                <dd className="text-body-sm font-semibold break-all">
+                  <bdi>{v.user.email}</bdi>
+                </dd>
               </div>
               <div>
                 <dt className="text-caption text-ink-muted">{tr("organization")}</dt>

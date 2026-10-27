@@ -1,0 +1,482 @@
+{
+ "id": "lost-phone",
+ "title": "Téléphone pro perdu",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Votre téléphone pro est perdu ou volé ? N’ayez pas honte et n’attendez pas : chaque minute compte.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Appelez tout de suite le support technique depuis un autre téléphone. Il peut le verrouiller à distance et le localiser.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Ensuite, un message comme celui-ci peut arriver. C’est une tentative pour voler votre mot de passe et déverrouiller le téléphone.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "Service Appareils"
+        }
+       ],
+       "time": "20:14",
+       "messages": [
+        [
+         {
+          "text": "Votre téléphone a été retrouvé. Connectez-vous pour voir où il se trouve : "
+         },
+         {
+          "text": "cihaz-tapildi.example.net",
+          "spot": "link"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "link"
+    },
+    {
+     "id": "b4",
+     "say": "Même si la personne au bout du fil dit appeler du support technique, ne donnez jamais votre code PIN ni votre code SMS.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "first-steps",
+   "prompt": "Vous avez perdu votre téléphone pro. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "report",
+     "label": "Appeler le support technique depuis un autre téléphone"
+    },
+    {
+     "id": "lock",
+     "label": "Faire verrouiller le téléphone à distance"
+    },
+    {
+     "id": "sim",
+     "label": "Appeler votre opérateur et bloquer la carte SIM"
+    },
+    {
+     "id": "passwords",
+     "label": "Modifier vos mots de passe professionnels depuis un autre appareil"
+    },
+    {
+     "id": "wipe",
+     "label": "S’il reste introuvable, le faire effacer à distance"
+    }
+   ],
+   "explain": "Signaler et verrouiller ne prend que quelques minutes et évite l’essentiel des dégâts. L’effacement vient en dernier, pour que l’on puisse encore retrouver le téléphone. Si la procédure de votre organisation prévoit un autre ordre, suivez-la."
+  },
+  {
+   "type": "simulation",
+   "id": "fake-support-call",
+   "environment": "call",
+   "title": "Un appel du support",
+   "intro": "Votre téléphone pro a disparu hier soir. Ce matin, vous recevez sur votre numéro personnel un appel du support technique.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [
+       {
+        "text": "Support technique"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 45 17"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "young-man"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Répondre",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Répondre n’a rien de dangereux. Ce qui compte, c’est ce que vous dites."
+      },
+      {
+       "id": "decline",
+       "label": "Refuser",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "C’est possible aussi. Appelez vous-même le support technique au numéro officiel.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [
+       {
+        "text": "Support technique"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 45 17"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "young-man"
+     },
+     "say": "Bonjour, ici le support technique. Pour verrouiller votre téléphone, nous vous avons envoyé un code SMS. Pouvez-vous me le lire, s’il vous plaît ?",
+     "spoken": "Bonjour, <breath> ici le support technique. Pour verrouiller votre téléphone, nous vous avons envoyé un code SMS. Pouvez-vous, euh, me le lire, s’il vous plaît ?",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Lire le code à voix haute",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Ce code sert à se connecter à votre compte. Le support n’a pas besoin de votre code pour verrouiller un téléphone."
+      },
+      {
+       "id": "verify",
+       "label": "Je vais appeler moi-même le numéro officiel",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Excellent. Une vérification au numéro officiel démasque aussitôt un faux appel.",
+       "next": "after"
+      },
+      {
+       "id": "hang",
+       "label": "Raccrocher",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Exact. Le vrai support technique ne demande jamais de codes ni de mots de passe.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pin",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [
+       {
+        "text": "Support technique"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 45 17"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "young-man"
+     },
+     "say": "D’accord, alors donnez-moi le code PIN de verrouillage de votre écran. Nous allons déverrouiller le téléphone à distance et sauvegarder vos données.",
+     "spoken": "D’accord, <sigh> alors donnez-moi le code PIN de verrouillage de votre écran. Nous allons déverrouiller le téléphone à distance et sauvegarder vos données.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Donner le code PIN",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Avec ce code PIN, la personne qui détient le téléphone pourra l’ouvrir. Le système de gestion n’a jamais besoin de votre code PIN pour le verrouiller."
+      },
+      {
+       "id": "keep",
+       "label": "Je ne donne pas mon code PIN",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Votre code PIN n’appartient qu’à vous et ne se partage jamais."
+      },
+      {
+       "id": "hang",
+       "label": "Raccrocher",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bonne décision. Quand la pression monte, raccrocher est le bon réflexe.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "L’appel est terminé. Et maintenant ?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [
+       {
+        "text": "Support technique"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 45 17"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "young-man"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "Appeler le numéro officiel du support technique",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Exact. Signalez cet appel : l’attaquant connaît votre nom et votre numéro."
+      },
+      {
+       "id": "ignore",
+       "label": "Ne rien faire",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "L’attaquant appellera ensuite un autre collègue. Si vous signalez l’appel, le support peut prévenir tout le monde."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "after-loss",
+   "prompt": "Des messages reçus après la perte du téléphone. Sans danger ou menace ?",
+   "cards": [
+    {
+     "id": "found-sms",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "Service Appareils"
+       }
+      ],
+      "time": "20:14",
+      "messages": [
+       [
+        {
+         "text": "Votre téléphone a été retrouvé. Connectez-vous pour le voir sur la carte : "
+        },
+        {
+         "text": "cihaz-tapildi.example.net/map",
+         "link": {
+          "label": "cihaz-tapildi.example.net/map",
+          "href": "https://cihaz-tapildi.example.net/map"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ce faux message de téléphone retrouvé vise votre mot de passe. Seul le support technique vérifie où se trouve le téléphone."
+    },
+    {
+     "id": "sim-blocked",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "kehkesan-mobil",
+      "sender": [
+       {
+        "text": "Kehkesan"
+       }
+      ],
+      "time": "20:31",
+      "messages": [
+       [
+        {
+         "text": "Votre carte SIM a été bloquée à votre demande. Pour en obtenir une nouvelle, présentez votre carte d’identité dans l’une de nos boutiques."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Pas de lien, aucune demande, et le message confirme votre propre démarche. C’est une notification normale."
+    },
+    {
+     "id": "ticket-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "Support technique"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Ticket 4471 : téléphone verrouillé"
+       }
+      ],
+      "time": "20:40",
+      "body": [
+       [
+        {
+         "text": "Votre téléphone pro a été verrouillé à distance. Passez demain à 10:00 au 2e étage pour récupérer un nouvel appareil."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "L’adresse est celle de votre organisation, sans lien ni demande de mot de passe. C’est la réponse à votre signalement."
+    },
+    {
+     "id": "ransom-chat",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "+994 55 000 63 21"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "J’ai votre téléphone. Virez 100 AZN et je vous le rends. Si vous prévenez la police, je diffuse tout ce qu’il contient."
+         }
+        ],
+        "time": "21:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "N’envoyez pas d’argent et conservez la conversation. Montrez-la au support technique et à la police."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "taxi",
+   "title": "Oublié dans un taxi",
+   "start": "night",
+   "nodes": [
+    {
+     "id": "night",
+     "text": "Le soir, chez vous, vous vous rendez compte que vous avez oublié votre téléphone pro dans un taxi. Il est 22 h.",
+     "choices": [
+      {
+       "label": "J’appelle le support technique tout de suite",
+       "next": "morning",
+       "feedback": "Exact. On peut signaler la perte même la nuit, et le téléphone est verrouillé aussitôt."
+      },
+      {
+       "label": "J’attends le matin, le chauffeur appellera peut-être",
+       "outcome": "risky",
+       "feedback": "En une nuit, on peut faire beaucoup de choses avec un téléphone. Signalez la perte maintenant, et si le chauffeur appelle, tant mieux."
+      }
+     ]
+    },
+    {
+     "id": "morning",
+     "text": "Bonjour, vous avez oublié votre téléphone dans mon taxi hier soir. Je vous le rapporte. Il était verrouillé, je n’ai touché à rien.",
+     "speaker": "Chauffeur de taxi (le matin, au bureau)",
+     "voice": "older-man",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Bonjour, vous avez oublié votre téléphone dans mon taxi hier soir. <breath> Je vous le rapporte. Il était verrouillé, je n’ai touché à rien.",
+     "choices": [
+      {
+       "label": "Je le remets au support technique pour qu’il le vérifie",
+       "outcome": "safe",
+       "feedback": "Excellent. Un téléphone qui a quitté vos mains doit être vérifié, et c’est le spécialiste qui décide."
+      },
+      {
+       "label": "Je le déverrouille et je me remets aussitôt au travail",
+       "outcome": "risky",
+       "feedback": "Le téléphone a passé une nuit entre les mains de quelqu’un d’autre. Faites-le d’abord vérifier par le support technique."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "best-lock",
+   "question": {
+    "prompt": "Qu’est-ce qui protège le mieux vos données en cas de perte du téléphone ?",
+    "options": [
+     {
+      "id": "pin-bio",
+      "label": "Un code PIN d’au moins 6 chiffres et l’empreinte digitale",
+      "correct": true,
+      "feedback": "Exact. Un code PIN long est difficile à deviner, et l’empreinte digitale garde l’usage quotidien simple."
+     },
+     {
+      "id": "birth-year",
+      "label": "Un code PIN à 4 chiffres avec votre année de naissance",
+      "correct": false,
+      "feedback": "Une année de naissance se trouve facilement sur les réseaux sociaux. Choisissez au moins 6 chiffres au hasard."
+     },
+     {
+      "id": "pattern",
+      "label": "Un schéma de déverrouillage simple",
+      "correct": false,
+      "feedback": "Un schéma simple se devine grâce aux traces de doigts sur l’écran, ou en regardant par-dessus votre épaule."
+     },
+     {
+      "id": "none",
+      "label": "Aucun verrouillage, le téléphone ne me quitte jamais",
+      "correct": false,
+      "feedback": "Un téléphone se perd en un instant. Sans verrouillage, votre messagerie professionnelle est ouverte à tous."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "lock"
+    }
+   },
+   "explain": "Un verrouillage d’écran robuste est la première barrière qui protège les données d’un téléphone perdu."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Si vous perdez le téléphone, appelez tout de suite le support technique depuis un autre téléphone.",
+    "Ne donnez jamais de code, de code PIN ni de mot de passe, quelle que soit la personne qui appelle.",
+    "Faites vérifier un téléphone retrouvé par le support technique avant de vous en servir."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

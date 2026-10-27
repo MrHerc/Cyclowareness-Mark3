@@ -1,0 +1,475 @@
+{
+ "id": "device-and-votes",
+ "title": "Cihazlar ve oylamalar",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "mh2-tutor",
+   "beats": [
+    {
+     "id": "mh2-b1",
+     "say": "Hesap çalmanın sessiz bir yolu daha var: bir oylama bağlantısı ve gizlice bağlanmış bir cihaz.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "mh2-b2",
+     "say": "Böyle bir bildirim görürseniz, hesabınız başka bir cihazda da açık demektir.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "sohbet",
+       "app": "Söhbət",
+       "title": [
+        {
+         "text": "Yeni cihaz bağlandı",
+         "spot": "device"
+        }
+       ],
+       "body": [
+        {
+         "text": "Bilgisayar, Gence. Bu siz değilseniz bağlı cihazlarınızı kontrol edin."
+        }
+       ],
+       "time": "21:14"
+      }
+     },
+     "highlight": "device"
+    },
+    {
+     "id": "mh2-b3",
+     "say": "Oy vermeden önce mesajlaşma hesabınızla giriş yapmanızı isteyen bir sayfaya güvenmeyin.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "mh2-b4",
+     "say": "İki adımlı doğrulamayı açın ve bağlı cihazlarınızı zaman zaman kontrol edin.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "mh2-swipe",
+   "prompt": "Her bildirim güvenli mi, yoksa tehdit mi?",
+   "cards": [
+    {
+     "id": "unasked-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sohbet",
+      "sender": [
+       {
+        "text": "Söhbət"
+       }
+      ],
+      "time": "23:40",
+      "messages": [
+       [
+        {
+         "text": "Söhbət kodunuz: 418 205. Bu kodu kimseyle paylaşmayın."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Bu kodu siz istemediyseniz biri numaranızla giriş yapmaya çalışıyor. Kodu kimseye vermeyin."
+    },
+    {
+     "id": "linked",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "Yeni cihaz bağlandı"
+       }
+      ],
+      "body": [
+       {
+        "text": "Bilgisayar, Gence, 21:14"
+       }
+      ],
+      "time": "21:14"
+     },
+     "verdict": "threat",
+     "explain": "Bu cihazı siz bağlamadıysanız biri sohbetlerinizi okuyor. Onu hemen bağlı cihazlardan kaldırın."
+    },
+    {
+     "id": "vote-link",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Sevinc Aliyeva"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Kızım bir resim yarışmasına katıldı, ne olur oy verin: "
+         },
+         {
+          "text": "balaca-ressam.example.org/ses",
+          "link": {
+           "label": "balaca-ressam.example.org/ses",
+           "href": "https://balaca-ressam.example.org/ses"
+          }
+         }
+        ],
+        "time": "19:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Oylama bağlantıları, hesap çalmanın en sık kullanılan yollarından biridir. Bağlantıyı tanıdığınız biri gönderse bile o sayfada giriş yapmayın."
+    },
+    {
+     "id": "pin-on",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "İki adımlı doğrulama açıldı"
+       }
+      ],
+      "body": [
+       {
+        "text": "Hesabınız için ek koruma ayarladınız."
+       }
+      ],
+      "time": "12:30"
+     },
+     "verdict": "safe",
+     "explain": "Bu bildirim, sizin attığınız bir adımı onaylıyor. İki adımlı doğrulama hesabı kod hırsızlığına karşı korur."
+    },
+    {
+     "id": "meeting",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Departman grubu"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Kamran Ahmedov: Yarınki toplantı saat onda, iki yüz on dört numaralı odada."
+         }
+        ],
+        "time": "17:48"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Bu sıradan bir iş mesajı. Ne kod, ne para, ne de bağlantı istiyor."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "mh2-sim",
+   "environment": "browser",
+   "title": "Resim yarışması",
+   "intro": "Tanıdığınız biri, çocuklar için düzenlenen bir resim yarışmasında oy istiyor. Her sayfada doğru adımı seçin.",
+   "steps": [
+    {
+     "id": "vote-page",
+     "label": "Leyla'nın resmine oy verin",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2a-balaca-ressam",
+      "url": [
+       {
+        "text": "https://balaca-ressam.example.org/ses"
+       }
+      ]
+     },
+     "say": "Sayfa çok sevimli görünüyor ve üzerinde bir “Oy ver” düğmesi var.",
+     "actions": [
+      {
+       "id": "vote",
+       "label": "Oy ver",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "“Oy ver” düğmesi sizi bir giriş sayfasına götürüyor. Henüz bir şey kaybetmediniz, ama dikkatli olun."
+      },
+      {
+       "id": "close",
+       "label": "Sayfayı kapat",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. Oy için hesap isteyen bilinmeyen bir sayfayı kapatmak en güvenli adımdır.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2a-sohbet-fake",
+      "brand": "Söhbət",
+      "url": [
+       {
+        "text": "https://sohbet-giris.example.org"
+       }
+      ],
+      "fields": [
+       "Telefon numarası"
+      ],
+      "button": "Kod al"
+     },
+     "say": "Oy vermek için Söhbət ile giriş yapmanızı istiyor.",
+     "actions": [
+      {
+       "id": "enter",
+       "label": "Numarayı gir",
+       "kind": "enter-credentials",
+       "outcome": "risky",
+       "feedback": "Hırsız numaranızla sizin adınıza kod ister. Bir sonraki adımda da sizden o kodu isteyecek."
+      },
+      {
+       "id": "close",
+       "label": "Sayfayı kapat",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. Adres Söhbət'in kendi adresi değil, yani bu sahte bir giriş sayfası.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sohbet-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Kodu girin"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Telefonunuza gönderilen altı haneli Söhbət kodunu yazın."
+        }
+       ]
+      ],
+      "buttons": [
+       "Onayla",
+       "İptal"
+      ]
+     },
+     "say": "Şimdi de telefonunuza gelen kodu bu sayfaya yazmanızı istiyor.",
+     "actions": [
+      {
+       "id": "enter",
+       "label": "Kodu yaz",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Kodu yazdığınız anda hesabınız hırsızın telefonunda açıldı. Söhbət kodu hiçbir zaman bir web sitesine yazılmaz."
+      },
+      {
+       "id": "cancel",
+       "label": "İptal",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. Kod yalnızca Söhbət uygulamasının içinde gerekir, hiçbir zaman bir sayfada değil.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "pairing",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sohbet-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Oyunuzu onaylayın"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Söhbət uygulamasında “Bağlı cihazlar” bölümünü açın ve bu kodu girin:"
+        }
+       ],
+       [
+        {
+         "text": "[sayfanın verdiği kod]"
+        }
+       ]
+      ],
+      "buttons": [
+       "Tamam",
+       "İptal"
+      ]
+     },
+     "say": "Sayfa yeni bir şey istiyor: uygulamada bir cihaz bağlamanızı.",
+     "actions": [
+      {
+       "id": "pair",
+       "label": "Cihazı bağla",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Hırsızın bilgisayarını hesabınıza bağladınız. Artık tüm sohbetlerinizi görüyor."
+      },
+      {
+       "id": "cancel",
+       "label": "İptal",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. Oy vermek için hiçbir zaman cihaz bağlamak gerekmez."
+      }
+     ]
+    },
+    {
+     "id": "devices",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sohbet",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Bağlı cihazlar"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Bilgisayar, Gence. Son etkinlik: iki dakika önce."
+        }
+       ],
+       [
+        {
+         "text": "Bu cihazı siz mi bağladınız?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Çıkış yap",
+       "Bağlı bırak"
+      ]
+     },
+     "say": "Ne olur ne olmaz diye Söhbət'in kendi ayarlarından bağlı cihazları kontrol ediyorsunuz.",
+     "actions": [
+      {
+       "id": "logout",
+       "label": "Çıkış yap",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Doğru. Tanımadığınız bir cihazın oturumunu kapattığınızda o cihaz artık mesajlarınızı göremez."
+      },
+      {
+       "id": "keep",
+       "label": "Bağlı bırak",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Bu cihazı siz bağlamadınız. Bağlı bırakırsanız biri sohbetlerinizi okumaya devam eder."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "mh2-choice",
+   "question": {
+    "prompt": "Söhbət hesabınızı kod hırsızlığına karşı en iyi ne korur?",
+    "options": [
+     {
+      "id": "two-step",
+      "label": "İki adımlı doğrulamayı açmak",
+      "correct": true,
+      "feedback": "Doğru. Kod çalınsa bile sizin belirlediğiniz gizli rakamlar olmadan kimse hesabınıza giremez."
+     },
+     {
+      "id": "photo",
+      "label": "Profil fotoğrafını gizlemek",
+      "correct": false,
+      "feedback": "Fotoğrafı gizlemek iyidir, ama hesabı korumaz. Hesabı iki adımlı doğrulama korur."
+     },
+     {
+      "id": "delete-chats",
+      "label": "Sohbetleri sık sık silmek",
+      "correct": false,
+      "feedback": "Bu, hırsızın hesaba girmesini engellemez. İki adımlı doğrulamayı açın."
+     }
+    ]
+   },
+   "explain": "İki adımlı doğrulama hesabınıza ikinci bir kilit ekler. Bu kilidi yalnızca siz açabilirsiniz."
+  },
+  {
+   "type": "match",
+   "id": "mh2-match",
+   "prompt": "Her durumu doğru adımla eşleştirin.",
+   "pairs": [
+    {
+     "id": "code",
+     "left": "İstemediğiniz bir kod",
+     "right": "Kimseye vermeyin"
+    },
+    {
+     "id": "device",
+     "left": "Yeni cihaz bildirimi",
+     "right": "Bağlı cihazlardan kaldırın"
+    },
+    {
+     "id": "vote",
+     "left": "Oy vermek için giriş isteniyor",
+     "right": "Sayfayı kapatın"
+    },
+    {
+     "id": "money",
+     "left": "Bir arkadaşınız para istiyor",
+     "right": "Normal bir telefon aramasıyla kontrol edin"
+    }
+   ],
+   "explain": "Kod, cihazlar ve bağlantılar hesabınızın kapılarıdır. Her birini kendi denetiminizde tutun, hiçbirini başkalarına açmayın."
+  },
+  {
+   "type": "recap",
+   "id": "mh2-recap",
+   "points": [
+    "Oy vermek için Söhbət ile giriş yapmayın",
+    "Yeni cihaz bildirimi gelirse bağlı cihazları kontrol edin",
+    "İki adımlı doğrulamayı açın"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

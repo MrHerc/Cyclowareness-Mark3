@@ -1,0 +1,631 @@
+{
+ "id": "new-card-email",
+ "title": "رقم بطاقة جديد",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pd1-tutor",
+   "beats": [
+    {
+     "id": "pd1-b1",
+     "say": "مرحبًا! تعمل اليوم في الموارد البشرية، وغدًا موعد صرف الرواتب.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "pd1-b2",
+     "say": "تصل رسالة باسم إحدى الموظفات: تغيرت بطاقتي، فحولوا راتبي إلى حساب جديد.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "ليلى محمدوفا"
+         }
+        ],
+        "address": [
+         {
+          "text": "leyla.mammadova.88@poct-mail.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "عاجل: تغيرت بطاقة راتبي"
+        }
+       ],
+       "time": "16:40",
+       "body": [
+        [
+         {
+          "text": "مرحبًا، فقدت بطاقتي القديمة وأغلقها البنك."
+         }
+        ],
+        [
+         {
+          "text": "يرجى تحويل راتب الغد إلى هذا الحساب: "
+         },
+         {
+          "text": "AZ00SAHL00000000000000004417",
+          "spot": "new-account"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "new-account"
+    },
+    {
+     "id": "pd1-b3",
+     "say": "الاسم مألوف، لكن العنوان بريد شخصي. والمحتال يريد أن يصل الراتب إلى حسابه هو.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "pd1-b4",
+     "say": "القاعدة بسيطة: لا تغير البيانات البنكية أبدًا بسبب رسالة بريد إلكتروني. اتصل بالموظف على رقم تعرفه مسبقًا.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "pd1-hotspot",
+   "prompt": "ابحث عن علامات التحذير في هذه الرسالة.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "ليلى محمدوفا"
+      }
+     ],
+     "address": [
+      {
+       "text": "leyla.mammadova.88@poct-mail.example.net",
+       "spot": "personal-address"
+      }
+     ]
+    },
+    "to": "kadr@seherxidmetleri.example",
+    "subject": [
+     {
+      "text": "عاجل: تغيرت بطاقة راتبي"
+     }
+    ],
+    "time": "16:40",
+    "body": [
+     [
+      {
+       "text": "فريق الموارد البشرية المحترم،"
+      }
+     ],
+     [
+      {
+       "text": "فقدت بطاقتي القديمة وأغلقها البنك."
+      }
+     ],
+     [
+      {
+       "text": "يرجى تحويل راتب الغد إلى حسابي الجديد: ",
+       "spot": "new-account"
+      },
+      {
+       "text": "AZ00SAHL00000000000000004417",
+       "spot": "new-account"
+      }
+     ],
+     [
+      {
+       "text": "لست في العمل اليوم، وجوالي معطل. يرجى الرد هنا فقط.",
+       "spot": "no-call"
+      }
+     ],
+     [
+      {
+       "text": "أرجو إنجاز ذلك قبل صباح الغد، لأنني مضطرة إلى دفع الإيجار.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "ليلى محمدوفا، إدارة المرافق"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "personal-address",
+     "label": "عنوان بريد شخصي",
+     "explain": "يراسل الموظفون في العادة من بريد العمل. أما البريد الشخصي فيستطيع أي شخص إنشاءه بأي اسم."
+    },
+    {
+     "id": "new-account",
+     "label": "حساب جديد",
+     "explain": "هذا هو الهدف الحقيقي من الرسالة. فإذا وصل الراتب إلى هذا الحساب، يصعب استرداده."
+    },
+    {
+     "id": "no-call",
+     "label": "لا سبيل للاتصال",
+     "explain": "الغرض من هذا السطر منعك من التحقق. ولهذا السبب تحديدًا اتصل بالموظفة على رقم تعرفه."
+    },
+    {
+     "id": "urgency",
+     "label": "الضغط",
+     "explain": "الضغط قبيل موعد صرف الرواتب جزء معتاد من هذا الاحتيال. والمكالمة لا تستغرق سوى دقائق قليلة."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "pd1-sim",
+   "environment": "inbox",
+   "title": "بريد الموارد البشرية",
+   "intro": "غدًا موعد صرف الرواتب. افتح الرسائل الخمس، واختر الخطوة الصحيحة لكل رسالة.",
+   "steps": [
+    {
+     "id": "fake-colleague",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-seher-xidmetleri",
+      "from": {
+       "name": [
+        {
+         "text": "كامران علييف"
+        }
+       ],
+       "address": [
+        {
+         "text": "k.aliyev@seherxidmetleri-mail.example.net"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "تحديث حساب راتبي"
+       }
+      ],
+      "time": "09:12",
+      "body": [
+       [
+        {
+         "text": "مرحبًا، انتقلت إلى بنك آخر."
+        }
+       ],
+       [
+        {
+         "text": "يرجى تحويل راتب سبتمبر إلى هذا الحساب: AZ00ULDZ00000000000000007731"
+        }
+       ],
+       [
+        {
+         "text": "سأحضر النموذج لاحقًا. كامران علييف، وحدة النقل"
+        }
+       ]
+      ]
+     },
+     "say": "انظر إلى نطاق المرسل.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "الإبلاغ عن تصيد",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "صحيح. هذا ليس نطاق جهتك، فقد أضيفت إليه كلمة زائدة."
+      },
+      {
+       "id": "verify",
+       "label": "الاتصال بكامران على رقم أعرفه",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "أحسنت. سيخبرك كامران بأنه لم يكتبها، وستبلغ عن الرسالة."
+      },
+      {
+       "id": "change",
+       "label": "الرد: تم تحديث الحساب",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "كان الراتب سيذهب إلى المحتال. لا تقبل أبدًا تغيير البيانات البنكية عبر البريد الإلكتروني."
+      }
+     ]
+    },
+    {
+     "id": "system-request",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-kadr-kabineti",
+      "from": {
+       "name": [
+        {
+         "text": "Kadr Kabineti"
+        }
+       ],
+       "address": [
+        {
+         "text": "noreply@kabinet.seherxidmetleri.example"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "طلب جديد: تغيير البيانات البنكية، آيتن حسينوفا"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "أرسلت الموظفة هذا الطلب عبر Kadr Kabineti بعد تسجيل الدخول بالتحقق بخطوتين."
+        }
+       ],
+       [
+        {
+         "text": "راجع الطلب في النظام: "
+        },
+        {
+         "text": "عرض الطلب",
+         "link": {
+          "label": "عرض الطلب",
+          "href": "https://kabinet.seherxidmetleri.example/sorgular/2187"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "عرض الطلب",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "صحيح. العنوان على نطاق جهتك نفسها، والطلب صادر من داخل النظام."
+      },
+      {
+       "id": "safe",
+       "label": "تمييزها كرسالة آمنة",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "صحيح. الطلب الوارد من النظام الرسمي هو القناة الصحيحة."
+      },
+      {
+       "id": "report",
+       "label": "الإبلاغ عن تصيد",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "الحذر أمر جيد، لكن هذا نظام جهتك نفسها. وطلبات تغيير البيانات البنكية يجب أن تصل بهذه الطريقة تحديدًا."
+      }
+     ]
+    },
+    {
+     "id": "portal-phish",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Kadr Kabineti"
+        }
+       ],
+       "address": [
+        {
+         "text": "kabinet@kadr-kabineti.example.net"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "تنتهي صلاحية كلمة مرورك اليوم"
+       }
+      ],
+      "time": "11:30",
+      "body": [
+       [
+        {
+         "text": "سيتوقف وصولك إلى جدول الرواتب اليوم."
+        }
+       ],
+       [
+        {
+         "text": "للاحتفاظ بإمكانية الوصول: "
+        },
+        {
+         "text": "تجديد كلمة المرور",
+         "link": {
+          "label": "تجديد كلمة المرور",
+          "href": "https://kadr-kabineti-giris.example.net/yenile"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "الإبلاغ عن تصيد",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "الرابط لا يؤدي إلى نطاق جهتك. وإذا لم يتوفر زر «الإبلاغ»، فأعد توجيه الرسالة إلى فريق الأمن السيبراني."
+      },
+      {
+       "id": "click",
+       "label": "تجديد كلمة المرور",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "هذه بوابة مزيفة. وبحساب من الموارد البشرية، يستطيع المحتال تغيير البيانات البنكية لجميع الموظفين."
+      },
+      {
+       "id": "delete",
+       "label": "حذف",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "تصرف لا بأس به. لكن إذا أبلغت عن الرسالة، فستحمي زملاءك أيضًا."
+      }
+     ]
+    },
+    {
+     "id": "payroll-sheet",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-seher-xidmetleri",
+      "from": {
+       "name": [
+        {
+         "text": "سابينا قاسموفا"
+        }
+       ],
+       "address": [
+        {
+         "text": "s.qasimova@seherxidmetleri.example"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "رواتب سبتمبر: المراجعة النهائية"
+       }
+      ],
+      "time": "12:15",
+      "body": [
+       [
+        {
+         "text": "مرحبًا، الجدول مرفق. يرجى مراجعته قبل الساعة 15:00. سابينا، الإدارة المالية"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Maas_cedveli_2026_09.xlsx"
+         }
+        ],
+        "size": "96 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "فتح المرفق",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "صحيح. زميلة تعرفها، ونطاق جهتك، وجدول كنت تنتظره."
+      },
+      {
+       "id": "forward",
+       "label": "الإرسال إلى بريدي الشخصي",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "يحتوي الجدول على البيانات الشخصية لجميع الموظفين. لا ترسل ملفات العمل إلى بريد شخصي."
+      },
+      {
+       "id": "safe",
+       "label": "تمييزها كرسالة آمنة",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "صحيح. لا يوجد هنا حساب جديد ولا ضغط."
+      }
+     ]
+    },
+    {
+     "id": "real-address-odd",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-seher-xidmetleri",
+      "from": {
+       "name": [
+        {
+         "text": "نرمين صفروفا"
+        }
+       ],
+       "address": [
+        {
+         "text": "n.seferova@seherxidmetleri.example"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "حساب جديد"
+       }
+      ],
+      "time": "14:48",
+      "body": [
+       [
+        {
+         "text": "حولوا راتبي إلى هذا الحساب: AZ00SAHL00000000000000009260"
+        }
+       ],
+       [
+        {
+         "text": "لا تتصلوا بي، فأنا في اجتماعات طوال اليوم."
+        }
+       ]
+      ]
+     },
+     "say": "العنوان حقيقي، لكن كن يقظًا رغم ذلك.",
+     "actions": [
+      {
+       "id": "verify",
+       "label": "الاتصال برقمها الداخلي",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "صحيح. قد يستولي أحد على صندوق البريد، لكن نرمين الحقيقية هي من ترد على الرقم الذي تعرفه."
+      },
+      {
+       "id": "ask",
+       "label": "الرد: هل هذا صحيح؟",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "إذا تم الاستيلاء على صندوق البريد، فالمحتال هو من سيكتب الرد. المكالمة وحدها هي التحقق الفعلي."
+      },
+      {
+       "id": "safe",
+       "label": "تمييزها كرسالة آمنة",
+       "kind": "mark-safe",
+       "outcome": "compromised",
+       "feedback": "العنوان حقيقي، لكن قد يكون تم الاستيلاء على الحساب. تأكد دائمًا من أي تغيير في البيانات البنكية بمكالمة هاتفية."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "pd1-match",
+   "prompt": "طابق كل طلب مع الطريقة الصحيحة للتحقق منه.",
+   "pairs": [
+    {
+     "id": "mail-account",
+     "left": "حساب بنكي جديد في رسالة بريد إلكتروني",
+     "right": "اتصل بالموظف على رقم تعرفه"
+    },
+    {
+     "id": "system-request",
+     "left": "طلب في Kadr Kabineti",
+     "right": "راجعه في النظام، واتصل إذا ساورك شك"
+    },
+    {
+     "id": "password-link",
+     "left": "رابط لتجديد كلمة المرور",
+     "right": "اكتب عنوان البوابة بنفسك"
+    },
+    {
+     "id": "phone-request",
+     "left": "موظف يتصل لتغيير الحساب",
+     "right": "اطلب منه إرسال الطلب عبر Kadr Kabineti"
+    }
+   ],
+   "explain": "يجب تأكيد كل تغيير داخل النظام أو عبر قناة تختارها أنت. أما الرقم أو الرابط الوارد في الرسالة فليس وسيلة للتحقق."
+  },
+  {
+   "type": "scenario",
+   "id": "pd1-scenario",
+   "title": "الراتب لم يصل",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "مرحبًا، لم يصل راتبي إلى بطاقتي اليوم. لم أطلب أبدًا تغيير حسابي!",
+     "speaker": "ليلى محمدوفا",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "مرحبًا، لم يصل راتبي إلى بطاقتي اليوم. <breath> لم أطلب أبدًا تغيير حسابي!",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2f-seher-xidmetleri",
+       "caller": [
+        {
+         "text": "ليلى محمدوفا"
+        }
+       ],
+       "number": [
+        {
+         "text": "داخلي 4107"
+        }
+       ],
+       "label": "مكالمة داخلية"
+      }
+     },
+     "choices": [
+      {
+       "label": "تتصل إدارة الحسابات بالبنك، وأبلغ أنا فريق الأمن السيبراني",
+       "next": "n2",
+       "feedback": "صحيح. كلما أبلغت أسرع، زادت فرصة استرداد المال."
+      },
+      {
+       "label": "أعيد الحساب القديم دون أن أخبر أحدًا",
+       "outcome": "risky",
+       "feedback": "يجب تصحيح الخطأ، لا إخفاؤه. فالبنك قد يتمكن من إيقاف التحويل، وفريق الأمن السيبراني يتتبع ما حدث."
+      },
+      {
+       "label": "أقول لها إنها هي من كتبت الرسالة",
+       "outcome": "risky",
+       "feedback": "ليلى لم تكتب تلك الرسالة. المهم إيقاف الضرر، لا البحث عن شخص تلومه."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "لا تحذف الرسالة، بل أعد توجيهها إلى بريدي. هل جرت تغييرات أخرى على البيانات البنكية هذا الأسبوع؟",
+     "speaker": "فيدان رضاييفا، فريق الأمن السيبراني",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "firm",
+     "spoken": "لا تحذف الرسالة، بل أعد توجيهها إلى بريدي. <breath> هل جرت تغييرات أخرى على البيانات البنكية هذا الأسبوع؟",
+     "choices": [
+      {
+       "label": "أعيد توجيه الرسالة، وأراجع كل التغييرات التي جرت هذا الأسبوع",
+       "outcome": "safe",
+       "feedback": "أحسنت. فالمحتالون يراسلون في العادة بأسماء عدة موظفين."
+      },
+      {
+       "label": "حذفتها بالفعل، فلا حاجة إليها",
+       "outcome": "risky",
+       "feedback": "الرسالة دليل. إذا حذفتها، فاستعدها من «المهملات» وأعد توجيهها."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "pd1-recap",
+   "points": [
+    "البيانات البنكية لا تتغير عبر البريد الإلكتروني أبدًا.",
+    "اتصل بالموظف على رقم تعرفه.",
+    "إذا ساورك شك، فأوقف الدفع وأبلغ عن الأمر."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

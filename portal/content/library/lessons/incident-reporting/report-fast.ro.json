@@ -1,0 +1,310 @@
+{
+  "id": "report-fast",
+  "title": "Rapid și calm",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Un incident nu înseamnă doar un atac de amploare. Contează și un clic pe un link suspect, un telefon pierdut sau un e-mail trimis din greșeală altei persoane.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": { "kind": "illustration", "id": "alarm" }
+        },
+        {
+          "id": "b2",
+          "say": "Toată lumea greșește. O raportare rapidă împiedică problema să se extindă. Cu cât spuneți mai devreme, cu atât pagubele sunt mai mici.",
+          "mood": "happy",
+          "gesture": "nod",
+          "visual": { "kind": "illustration", "id": "handshake" }
+        },
+        {
+          "id": "b3",
+          "say": "Nu investigați pe cont propriu și nu ștergeți nimic. E-mailul, mesajul sau fișierul suspect este o probă pentru specialist.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": { "kind": "illustration", "id": "eye" }
+        },
+        {
+          "id": "b5",
+          "say": "Când raportați, spuneți pe scurt: ce s-a întâmplat, când, pe ce dispozitiv și ce ați făcut deja.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": { "kind": "illustration", "id": "inbox" }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "report-button",
+      "environment": "inbox",
+      "title": "Butonul „Raportați”",
+      "intro": "În căsuța de e-mail aveți două mesaje suspecte. Deschideți-le pe rând și alegeți pasul corect.",
+      "steps": [
+        {
+          "id": "quota",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "ispoct-fake",
+            "from": {
+              "name": [{ "text": "Administrator IshPocht" }],
+              "address": [{ "text": "admin@ispoct-mail.example.net" }]
+            },
+            "subject": [{ "text": "Căsuța dumneavoastră de e-mail este 98% plină" }],
+            "time": "08:47",
+            "body": [
+              [{ "text": "Dacă nu măriți spațiul de stocare, mesajele noi vor fi șterse în 24 de ore." }],
+              [
+                { "text": "Pentru a mări spațiul: " },
+                {
+                  "text": "ispoct-mail.example.net/kvota",
+                  "link": { "label": "ispoct-mail.example.net/kvota", "href": "https://ispoct-mail.example.net/kvota" }
+                }
+              ]
+            ]
+          },
+          "say": "Uitați-vă la adresa expeditorului.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Corect. Datorită raportării, specialiștii pot elimina același e-mail din căsuțele tuturor colegilor."
+            },
+            {
+              "id": "click",
+              "label": "Deschideți linkul",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Adresa nu aparținea domeniului organizației dumneavoastră. Spațiul din căsuța de e-mail nu se mărește niciodată printr-un link."
+            },
+            {
+              "id": "delete",
+              "label": "Ștergeți",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Dumneavoastră sunteți în siguranță, dar colegii rămân ținte, iar proba a dispărut. Raportați în loc să ștergeți."
+            },
+            {
+              "id": "forward",
+              "label": "Redirecționați mesajul colegilor",
+              "kind": "forward",
+              "outcome": "risky",
+              "feedback": "Redirecționarea răspândește amenințarea. Dacă nu aveți butonul „Raportați”, redirecționați mesajul doar către echipa de securitate."
+            }
+          ]
+        },
+        {
+          "id": "password-reply",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek-fake",
+            "from": {
+              "name": [{ "text": "Suport IT" }],
+              "address": [{ "text": "support@idare-helpdesk.example.net" }]
+            },
+            "subject": [{ "text": "Verificarea contului" }],
+            "time": "09:15",
+            "body": [
+              [{ "text": "Sistemul este în curs de actualizare. Pentru ca contul dumneavoastră să rămână activ, răspundeți la acest e-mail cu numele de utilizator și parola." }]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Corect, suportul IT real nu vă cere niciodată parola. Prin raportare îi avertizați și pe colegi."
+            },
+            {
+              "id": "reply",
+              "label": "Răspundeți cu parola",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Parola a ajuns la atacator. Dacă se întâmplă așa ceva, schimbați-o imediat și raportați."
+            },
+            {
+              "id": "delete",
+              "label": "Ștergeți",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Dumneavoastră nu v-ați dat parola, dar altcineva ar putea să o dea. Dacă raportați, specialiștii îi protejează pe toți."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "is-it-incident",
+      "prompt": "Trebuie raportat? Amenințare sau situație normală?",
+      "cards": [
+        {
+          "id": "wrong-recipient",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Eu" }],
+              "address": [{ "text": "l.aliyeva@idare.example" }]
+            },
+            "to": "kamran.aliyev.1990@mail.example",
+            "subject": [{ "text": "Lista angajaților" }],
+            "time": "10:02",
+            "body": [
+              [{ "text": "Vă trimit atașat lista pe care ați cerut-o." }]
+            ],
+            "attachments": [
+              {
+                "name": [{ "text": "lista_angajati.xlsx" }],
+                "size": "240 KB"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Lista a plecat către o adresă personală, din afara organizației. Este o scurgere de date: raportați-o imediat."
+        },
+        {
+          "id": "unasked-code",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ispoct",
+            "sender": [{ "text": "IshPocht" }],
+            "time": "03:17",
+            "messages": [
+              [{ "text": "Codul dumneavoastră de conectare: 482913. Nu îl comunicați nimănui." }]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Un cod pe care nu l-ați cerut înseamnă că cineva vă cunoaște parola. Schimbați-o și raportați."
+        },
+        {
+          "id": "training-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [{ "text": "Suport IT" }],
+              "address": [{ "text": "it-support@idare.example" }]
+            },
+            "subject": [{ "text": "Instruire în securitate cibernetică, vineri" }],
+            "time": "12:30",
+            "body": [
+              [{ "text": "Vineri, la 11:00, are loc o scurtă instruire în sala principală. Nu este nevoie de înscriere." }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Adresă corectă, niciun link, nicio solicitare. Este un anunț obișnuit."
+        },
+        {
+          "id": "clicked-link",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [{ "text": "Tural (coleg)" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Ieri am deschis linkul din e-mailul ăla, dar n-am introdus nimic. Probabil e în regulă, nu?" }],
+                "time": "09:20"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Simpla deschidere a linkului îi poate da informații atacatorului sau poate porni o descărcare. Decizia îi aparține specialistului, așa că incidentul trebuie raportat."
+        },
+        {
+          "id": "lost-phone",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [{ "text": "Leyla (din echipă)" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Mi-am uitat telefonul de serviciu într-un taxi. Îl caut mâine, nu e urgent." }],
+                "time": "19:45"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Un telefon de serviciu pierdut este un incident urgent. Suportul IT îl poate bloca sau șterge de la distanță."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "first-step",
+      "question": {
+        "prompt": "Ați introdus parola pe o pagină falsă. Care este primul pas?",
+        "options": [
+          {
+            "id": "report",
+            "label": "Raportez imediat și schimb parola",
+            "correct": true,
+            "feedback": "Corect. Fiecare minut contează. Acești doi pași îi blochează atacatorului accesul."
+          },
+          {
+            "id": "silent",
+            "label": "Nu spun nimănui, pentru că mi-e rușine",
+            "correct": false,
+            "feedback": "Tăcerea îi dă timp atacatorului. Raportarea vă protejează pe dumneavoastră și organizația."
+          },
+          {
+            "id": "delete",
+            "label": "Șterg e-mailul, ca să nu rămână nicio urmă",
+            "correct": false,
+            "feedback": "E-mailul este o probă. Dacă îl ștergeți, specialiștii nu mai pot vedea ce alte persoane au fost vizate."
+          },
+          {
+            "id": "recheck",
+            "label": "Deschid din nou linkul, ca să verific",
+            "correct": false,
+            "feedback": "Dacă îl deschideți din nou, riscul crește. Lăsați investigația în seama specialiștilor."
+          }
+        ],
+        "visual": { "kind": "illustration", "id": "alarm" }
+      },
+      "explain": "Raportați rapid, păstrați probele și lăsați investigația în seama specialiștilor."
+    },
+    {
+      "type": "order",
+      "id": "strange-program",
+      "prompt": "Pe computer rulează un program ciudat. Puneți pașii în ordine.",
+      "items": [
+        { "id": "stop", "label": "Întrerupeți ce faceți" },
+        { "id": "disconnect", "label": "Deconectați dispozitivul de la rețea, dar nu îl opriți" },
+        { "id": "call", "label": "Sunați la suportul IT" },
+        { "id": "note", "label": "Notați pe scurt ce ați văzut" }
+      ],
+      "explain": "Deconectarea de la rețea oprește răspândirea, în timp ce oprirea computerului poate șterge urmele din memorie. Dacă procedura organizației prevede altceva, respectați-o. Raportați telefonic."
+    },
+    {
+      "type": "match",
+      "id": "good-report",
+      "prompt": "Asociați fiecare întrebare cu răspunsul din raport.",
+      "pairs": [
+        { "id": "what", "left": "Ce s-a întâmplat?", "right": "Mi-am introdus parola pe o pagină falsă" },
+        { "id": "when", "left": "Când?", "right": "Astăzi, la 09:40" },
+        { "id": "where", "left": "Pe ce dispozitiv?", "right": "Computerul de serviciu, în aplicația de e-mail" },
+        { "id": "done", "left": "Ce ați făcut?", "right": "Am schimbat parola și am păstrat e-mailul" }
+      ],
+      "explain": "Un raport scurt și precis îi economisește timp specialistului."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Dacă aveți dubii, raportați imediat. Nu este o rușine să greșiți.",
+        "Nu investigați pe cont propriu și nu ștergeți nimic.",
+        "Raportați pe scurt: ce, când, unde și ce ați făcut."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

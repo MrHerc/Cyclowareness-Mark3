@@ -1,0 +1,383 @@
+{
+  "id": "check-the-page",
+  "title": "Sayfayı kontrol edin",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "cp-tutor",
+      "beats": [
+        {
+          "id": "cp-b1",
+          "say": "Sahte bir ödeme sayfası, gerçeğinin birebir kopyası olabilir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "cp-b2",
+          "say": "Logo, renkler ve düğmeler aynıdır. Fark, adres çubuğunda ve sayfanın sizden istediklerindedir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "login",
+              "brandRef": "e-xidmet-fake",
+              "brand": "e-Xidmət Portalı",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "e-xidmet-cerime.example.net",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/odenis"
+                }
+              ],
+              "fields": [
+                "Kart numarası",
+                "Son kullanma tarihi",
+                "CVV",
+                "SMS kodu"
+              ],
+              "button": "Öde: 40 AZN"
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "cp-b3",
+          "say": "Asma kilit simgesi de hiçbir şey kanıtlamaz: sahte sitelerin çoğunda o da vardır.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "cp-b4",
+          "say": "En güvenli yol şu: portalı yer işaretinizden açın ya da adresi kendiniz yazın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "cp-swipe",
+      "prompt": "Bu sayfa gerçek mi, sahte mi?",
+      "cards": [
+        {
+          "id": "real-fines",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet",
+            "brand": "e-Xidmət Portalı",
+            "url": [
+              {
+                "text": "https://e-xidmet.example/cerimeler"
+              }
+            ],
+            "fields": [
+              "FİN kodu",
+              "Parola"
+            ],
+            "button": "Giriş yap"
+          },
+          "verdict": "safe",
+          "explain": "Bu, portalın kendi alan adı ve sayfayı siz kendiniz açtınız. Cezaları kontrol etmeniz gereken yer burasıdır."
+        },
+        {
+          "id": "fake-discount",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet-fake",
+            "brand": "e-Xidmət Portalı",
+            "url": [
+              {
+                "text": "https://e-xidmet-endirim.example.net/cerime"
+              }
+            ],
+            "fields": [
+              "Kart numarası",
+              "Son kullanma tarihi",
+              "CVV",
+              "SMS kodu"
+            ],
+            "button": "%50 indirimle öde"
+          },
+          "verdict": "threat",
+          "explain": "Alan adı farklı ve sayfa her şeyi bir anda istiyor: kart, kartın arkasındaki kod ve SMS kodu. Bu, kart bilgilerinizi çalmak için hazırlanmış bir form."
+        },
+        {
+          "id": "app-notice",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "e-xidmet",
+            "app": "e-Xidmət",
+            "title": [
+              {
+                "text": "Yeni bildirim"
+              }
+            ],
+            "body": [
+              {
+                "text": "Adınıza kayıtlı 1 ceza var. Ayrıntılar: uygulamadaki Cezalar bölümü."
+              }
+            ],
+            "time": "09:15"
+          },
+          "verdict": "safe",
+          "explain": "Bildirim resmî uygulamanın içinde ve bağlantı içermiyor. Cezayı orada, uygulamanın içinde kontrol edip ödeyin."
+        },
+        {
+          "id": "fake-benefit",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet-fake",
+            "brand": "Aile desteği",
+            "url": [
+              {
+                "text": "https://ailedestek-qeydiyyat.example.net"
+              }
+            ],
+            "fields": [
+              "Ad soyad",
+              "FİN kodu",
+              "Kart numarası",
+              "CVV"
+            ],
+            "button": "Yardımı al"
+          },
+          "verdict": "threat",
+          "explain": "Para almak için kartınızın arkasındaki koda asla gerek yoktur. Devletin sosyal yardımları için bağlantı üzerinden kayıt istenmez."
+        },
+        {
+          "id": "fake-gateway",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2d-manatpay-fake",
+            "brand": "ManatPay",
+            "url": [
+              {
+                "text": "https://manatpay-secure.example.net/3ds"
+              }
+            ],
+            "fields": [
+              "Kart numarası",
+              "CVV",
+              "SMS kodu",
+              "Kart PIN kodu"
+            ],
+            "button": "Onayla"
+          },
+          "verdict": "threat",
+          "explain": "Hiçbir ödeme sayfası kartınızın PIN kodunu istemez. PIN yalnızca ATM'lerde ve kart terminallerinde kullanılır."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "cp-sim",
+      "environment": "browser",
+      "title": "Ceza bağlantısı",
+      "intro": "Bir arkadaşınız size bir ceza bağlantısı gönderdi ve siz de onu açtınız. Tarayıcıda her adımda doğru kararı verin.",
+      "steps": [
+        {
+          "id": "fake-fine-page",
+          "label": "Ödenmemiş ceza: 80 AZN. Bugün %50 indirim",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "e-xidmet-fake",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "e-xidmet-cerime.example.net"
+              },
+              {
+                "text": "e-xidmet-cerime.example.net"
+              },
+              {
+                "text": "/odenis"
+              }
+            ]
+          },
+          "say": "Adres çubuğuna bakın.",
+          "actions": [
+            {
+              "id": "pay",
+              "label": "İndirimli öde",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "İndirim sizi acele ettirmek için orada. Şimdi sayfanın sizden ne istediğine bakın."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru, bu portalın kendi alan adı değil. Şimdi portalı kendiniz açın.",
+              "next": "real-portal"
+            }
+          ]
+        },
+        {
+          "id": "card-form",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet-fake",
+            "brand": "e-Xidmət Portalı",
+            "url": [
+              {
+                "text": "https://e-xidmet-cerime.example.net",
+                "reveal": "e-xidmet-cerime.example.net"
+              }
+            ],
+            "fields": [
+              "Kart numarası",
+              "Son kullanma tarihi",
+              "CVV",
+              "SMS kodu"
+            ],
+            "button": "Öde: 40 AZN"
+          },
+          "say": "Sayfa kart bilgilerini ve SMS kodunu birlikte istiyor.",
+          "actions": [
+            {
+              "id": "submit",
+              "label": "Öde: 40 AZN",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Kart bilgileriniz dolandırıcılara gitti. Hemen kartınızın üzerindeki numaradan bankayı arayın."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru karar. Hiçbir şey yazmadınız; şimdi cezayı resmî portaldan kontrol edin."
+            }
+          ]
+        },
+        {
+          "id": "real-portal",
+          "label": "Cezalar: ödenmemiş ceza yok",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "e-xidmet",
+            "url": [
+              {
+                "text": "https://e-xidmet.example/cerimeler",
+                "reveal": "e-xidmet.example"
+              }
+            ]
+          },
+          "say": "Portalı yer işaretinizden açtınız.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Cezaları görüntüle",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Doğru. Resmî portal hiçbir ceza göstermiyor, demek ki bağlantı sahteydi."
+            },
+            {
+              "id": "tell-friend",
+              "label": "Arkadaşınıza haber ver",
+              "kind": "share",
+              "outcome": "safe",
+              "feedback": "Harika. Bağlantıyı gönderen arkadaşınıza oraya hiçbir şey yazmamasını söyleyin."
+            }
+          ]
+        },
+        {
+          "id": "benefit-page",
+          "label": "Aile desteği: kayıtlar bugün sona eriyor",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "e-xidmet-fake",
+            "url": [
+              {
+                "text": "https://ailedestek-qeydiyyat.example.net",
+                "reveal": "ailedestek-qeydiyyat.example.net"
+              }
+            ]
+          },
+          "say": "Bu kez bir komşunuz size sosyal yardım bağlantısı gönderdi.",
+          "actions": [
+            {
+              "id": "register",
+              "label": "Kayıt ol",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Bu form kart bilgilerini topluyor. Devletin sosyal yardımları için hiçbir zaman bağlantı üzerinden kayıt istenmez."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Her türlü sosyal yardımı yalnızca resmî portaldan kontrol edin."
+            },
+            {
+              "id": "report",
+              "label": "Sahte siteyi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Harika. Bildirmeniz, sahte sitenin başkaları için de engellenmesine yardımcı olur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "cp-match",
+      "prompt": "Sayfanın istediği bilgiyi, ne anlama geldiğiyle eşleştirin.",
+      "pairs": [
+        {
+          "id": "pin",
+          "left": "Kartın PIN kodu",
+          "right": "Hiçbir ödeme sayfası bunu istemez"
+        },
+        {
+          "id": "sms-code",
+          "left": "Bankanızdan gelen SMS kodu",
+          "right": "Bir ödemeyi onaylar: önce tutarı okuyun"
+        },
+        {
+          "id": "benefit-cvv",
+          "left": "Sosyal yardım almak için kartın arkasındaki kod",
+          "right": "Para almak için gerekmez"
+        },
+        {
+          "id": "discount",
+          "left": "Bugün öderseniz indirim",
+          "right": "Kontrol etmeden ödemeniz için acele ettirme"
+        }
+      ],
+      "explain": "Emin değilseniz ödeme yapmayın. Resmî portalı kendiniz kontrol edin ya da 102 numaralı hattan polisi arayın."
+    },
+    {
+      "type": "recap",
+      "id": "cp-recap",
+      "points": [
+        "Adres çubuğunu okuyun: logo ve asma kilit hiçbir şey kanıtlamaz.",
+        "PIN kodunuzu ya da sosyal yardım için kart kodunu isteyen sayfa sahtedir.",
+        "Emin değilseniz: ETX 1654 ya da polis 102."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

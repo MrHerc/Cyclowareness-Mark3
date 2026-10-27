@@ -1,6 +1,6 @@
 import { getLocale } from "next-intl/server";
 import { db } from "@/server/db";
-import { allowed } from "@/server/auth/viewer";
+import { allowed, hasFeature } from "@/server/auth/viewer";
 import { apiViewer, deniedResponse } from "@/server/auth/api";
 import { buildReport } from "@/server/reports/build";
 import { toXlsx } from "@/server/reports/xlsx";
@@ -17,7 +17,7 @@ export async function GET(request: Request, { params }: RouteContext<"/api/admin
   const { kind } = await params;
   const v = await apiViewer("reports.read", request);
   if (v instanceof Response) return v;
-  if (!(REPORT_KINDS as readonly string[]).includes(kind)) return new Response("Not found", { status: 404 });
+  if (!hasFeature(v, "reports") || !(REPORT_KINDS as readonly string[]).includes(kind)) return new Response("Not found", { status: 404 });
   if (kind === "secops" && !allowed(v, "secops.read")) return deniedResponse(request, 403);
   const url = new URL(request.url);
   // Filters reach the report queries and the audit entry, so only well-formed values pass; an empty

@@ -1,0 +1,425 @@
+{
+ "id": "which-copy-survived",
+ "title": "Quelle copie a survécu ?",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "br1-tutor",
+   "beats": [
+    {
+     "id": "br1-b1",
+     "say": "Bonjour ! Le service des archives conserve dix ans de documents. Aujourd’hui, vous apprenez à en garder les copies comme il faut.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "br1-b2",
+     "say": "Un rançongiciel chiffre bien plus que l’ordinateur. Il verrouille aussi la clé USB branchée dessus et le dossier réseau.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Vos fichiers sont chiffrés"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Le dossier Documents est verrouillé."
+         }
+        ],
+        [
+         {
+          "text": "Les disques connectés et le dossier réseau sont verrouillés eux aussi.",
+          "spot": "connected"
+         }
+        ]
+       ],
+       "buttons": [
+        "Payer"
+       ]
+      }
+     },
+     "highlight": "connected"
+    },
+    {
+     "id": "br1-b3",
+     "say": "La règle : trois copies, deux types de supports, une copie ailleurs. Au moins une doit être totalement hors ligne.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "3-2-1",
+      "label": "3 copies, 2 types de supports, 1 copie hors site"
+     }
+    },
+    {
+     "id": "br1-b4",
+     "say": "Et n’oubliez pas : une copie jamais testée peut se révéler vide au moment où vous en avez besoin. Testez une restauration de temps en temps.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "br1-choice",
+   "question": {
+    "prompt": "Une demande de rançon s’affiche à l’écran. Quelle copie a le plus de chances d’avoir survécu ?",
+    "options": [
+     {
+      "id": "usb",
+      "label": "La clé USB restée branchée sur l’ordinateur",
+      "correct": false,
+      "feedback": "Un disque connecté fait presque partie de l’ordinateur. Le rançongiciel le chiffre aussi."
+     },
+     {
+      "id": "sync",
+      "label": "Le dossier cloud qui se synchronise automatiquement",
+      "correct": false,
+      "feedback": "La synchronisation copie aussi les fichiers chiffrés dans le cloud. Il reste parfois d’anciennes versions, mais on ne peut pas compter dessus."
+     },
+     {
+      "id": "network",
+      "label": "Le dossier réseau du service",
+      "correct": false,
+      "feedback": "Si l’ordinateur peut accéder au dossier réseau, le rançongiciel le peut aussi."
+     },
+     {
+      "id": "offline",
+      "label": "Le disque débranché vendredi et rangé dans le coffre-fort",
+      "correct": true,
+      "feedback": "Exact. Un disque coupé de l’ordinateur et du réseau reste hors d’atteinte pendant une attaque."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "ransomware"
+    }
+   },
+   "explain": "La copie qui survit à une attaque est celle qui est hors ligne. C’est pourquoi une copie est toujours débranchée et conservée à part."
+  },
+  {
+   "type": "simulation",
+   "id": "br1-sim",
+   "environment": "desktop",
+   "title": "Service des archives",
+   "intro": "Vous travaillez au service des archives. Du vendredi soir au lundi, prenez la bonne décision dans chaque fenêtre.",
+   "steps": [
+    {
+     "id": "backup-done",
+     "label": "Vendredi, 17:40",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-ehtiyat-komekcisi",
+      "tone": "system",
+      "title": [
+       {
+        "text": "La sauvegarde hebdomadaire est prête"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "ARXIV-DISK : dix ans de documents, 212 Go. Vous pouvez retirer le disque maintenant."
+        }
+       ]
+      ],
+      "buttons": [
+       "Éjecter le disque",
+       "Laisser connecté"
+      ]
+     },
+     "say": "La sauvegarde hebdomadaire est prête.",
+     "actions": [
+      {
+       "id": "eject",
+       "label": "Éjecter le disque",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Exact. Un disque éjecté ne peut pas être chiffré lors de la prochaine attaque."
+      },
+      {
+       "id": "keep",
+       "label": "Laisser connecté",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Un disque connecté peut être chiffré en même temps que l’ordinateur. Éjectez-le dès que la sauvegarde est terminée."
+      }
+     ]
+    },
+    {
+     "id": "restore-test",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-ehtiyat-komekcisi",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Vérification de la restauration"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Restaurer un dossier à partir de la dernière copie, à titre de test ?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Tester la restauration",
+       "Passer"
+      ]
+     },
+     "actions": [
+      {
+       "id": "test",
+       "label": "Tester la restauration",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Bravo. Seule une copie qui s’ouvre est une vraie copie."
+      },
+      {
+       "id": "skip",
+       "label": "Passer",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "La copie est peut-être défectueuse, et vous ne le découvririez qu’au pire moment. Testez régulièrement la restauration."
+      }
+     ]
+    },
+    {
+     "id": "personal-cloud",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "buludxidmet",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Téléverser le dossier vers votre compte personnel ?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Arxiv_2016_2026 : 212 Go. Compte : sevda.k@poct-mail.example.net"
+        }
+       ]
+      ],
+      "buttons": [
+       "Téléverser",
+       "Refuser"
+      ]
+     },
+     "actions": [
+      {
+       "id": "upload",
+       "label": "Téléverser",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Les documents de travail n’ont leur place que dans les espaces approuvés par votre entreprise. Un cloud personnel ne protège pas la copie et peut provoquer une fuite de données."
+      },
+      {
+       "id": "decline",
+       "label": "Refuser",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Si une copie supplémentaire est nécessaire, le support technique la crée dans un endroit approuvé."
+      }
+     ]
+    },
+    {
+     "id": "ransom-monday",
+     "label": "Lundi, 09:05",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Vos fichiers sont chiffrés"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Le dossier réseau et les disques connectés sont verrouillés. Payez sous 72 heures pour obtenir la clé."
+        }
+       ]
+      ],
+      "buttons": [
+       "Payer",
+       "Fermer"
+      ]
+     },
+     "say": "Lundi matin, ce message s’affiche à l’écran.",
+     "actions": [
+      {
+       "id": "isolate",
+       "label": "Débrancher le câble, désactiver le Wi-Fi",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Exact. Coupez l’ordinateur du réseau sans l’éteindre, et appelez tout de suite le support technique."
+      },
+      {
+       "id": "pay",
+       "label": "Payer",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Payer ne garantit pas que les fichiers reviendront. Vous récupérerez vos fichiers grâce à la copie conservée à part."
+      }
+     ]
+    },
+    {
+     "id": "sync-alert",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "buludxidmet",
+      "app": "BuludXidmət",
+      "title": [
+       {
+        "text": "1 240 fichiers modifiés"
+       }
+      ],
+      "body": [
+       {
+        "text": "Le dossier du service a été synchronisé avec le cloud."
+       }
+      ],
+      "time": "09:07"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Prévenir le support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact : la synchronisation a aussi copié les fichiers chiffrés. Un spécialiste restaurera les anciennes versions."
+      },
+      {
+       "id": "restore-self",
+       "label": "Restaurer moi-même depuis le cloud",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Des fichiers restaurés sur un ordinateur infecté peuvent être chiffrés de nouveau. Les spécialistes restaurent sur un ordinateur sain."
+      }
+     ]
+    },
+    {
+     "id": "offline-disk",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "it-tehlukesizlik",
+      "app": "Sécurité informatique",
+      "title": [
+       {
+        "text": "Apportez le disque rangé dans le coffre-fort"
+       }
+      ],
+      "body": [
+       {
+        "text": "Ne branchez ARXIV-DISK nulle part. Nous ferons la restauration ensemble sur un ordinateur sain."
+       }
+      ],
+      "time": "10:30"
+     },
+     "actions": [
+      {
+       "id": "hand-over",
+       "label": "Je remets le disque au spécialiste",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Bravo. La restauration se fera sur un ordinateur nettoyé, sous le contrôle d’un spécialiste."
+      },
+      {
+       "id": "plug",
+       "label": "Je branche moi-même le disque sur cet ordinateur",
+       "kind": "plug-in",
+       "outcome": "compromised",
+       "feedback": "La dernière copie risque d’être chiffrée sur un ordinateur infecté. Ne confiez le disque qu’au spécialiste."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "br1-match",
+   "prompt": "Associez chaque élément de la règle à sa signification.",
+   "pairs": [
+    {
+     "id": "three",
+     "left": "3 copies",
+     "right": "Le fichier d’origine et deux sauvegardes"
+    },
+    {
+     "id": "two",
+     "left": "2 types de supports",
+     "right": "Par exemple, un disque externe et un cloud approuvé"
+    },
+    {
+     "id": "one",
+     "left": "1 copie hors site",
+     "right": "Dans un autre bâtiment et hors ligne"
+    },
+    {
+     "id": "test",
+     "left": "Test de restauration",
+     "right": "Vérifier régulièrement que la copie s’ouvre"
+    }
+   ],
+   "explain": "Avec trois copies, deux supports et une copie hors site, si l’une est perdue, il en reste une autre. Un test de restauration prouve que la copie fonctionne."
+  },
+  {
+   "type": "choice",
+   "id": "br1-work-files",
+   "question": {
+    "prompt": "Où conservez-vous vos documents de travail importants ?",
+    "options": [
+     {
+      "id": "approved",
+      "label": "Dans le dossier approuvé de mon entreprise",
+      "correct": true,
+      "feedback": "Exact. Le support technique y réalise et y vérifie les copies."
+     },
+     {
+      "id": "desktop-usb",
+      "label": "Sur le bureau, et je les copie le soir sur ma propre clé USB",
+      "correct": false,
+      "feedback": "Une clé USB personnelle peut être perdue ou infectée. Personne ne vérifie une copie de ce genre."
+     },
+     {
+      "id": "personal-cloud",
+      "label": "Dans mon compte cloud personnel, c’est pratique",
+      "correct": false,
+      "feedback": "Dans un compte personnel, un document de travail échappe au contrôle de votre entreprise. C’est aussi une fuite de données."
+     }
+    ]
+   },
+   "explain": "Le support technique protège et restaure la copie d’un fichier conservé dans un endroit approuvé. Un fichier de travail rangé ailleurs n’est ni protégé ni restauré."
+  },
+  {
+   "type": "recap",
+   "id": "br1-recap",
+   "points": [
+    "Trois copies, deux supports, une copie hors site.",
+    "Gardez au moins une copie hors ligne.",
+    "Testez régulièrement la restauration."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { TUTOR_BODY_LIMIT, offlineAnswer, tutorRequestSchema } from "../src/server/tutor";
+import { TUTOR_BODY_LIMIT, lessonContext, offlineAnswer, tutorRequest, tutorRequestSchema } from "../src/server/tutor";
 import type { Scene } from "../src/lib/content/types";
 import { readBodyCapped } from "../src/server/request-body";
 
@@ -157,5 +157,33 @@ describe("offlineAnswer", () => {
       }
     }
     expect(replayed).toBeGreaterThan(1000);
+  });
+});
+
+describe("tutorRequest", () => {
+  const scenes: Scene[] = [
+    { type: "tutor", id: "t", beats: [{ id: "t1", say: "Check the sender address.", mood: "happy" }] },
+    { type: "recap", id: "r", points: ["Report it with the button."] },
+  ];
+  const context = lessonContext("Phishing", "Spot the signs", scenes);
+
+  it("keeps the cached prefix the same for every scene and question of a lesson, with both after the breakpoint", () => {
+    const a = tutorRequest("claude-haiku-5-5", "en", context, scenes[0], "Why is this link unsafe?");
+    const b = tutorRequest("claude-haiku-5-5", "en", context, scenes[1], "What do I do now?");
+    const blocks = (r: typeof a) => r.messages[0].content as { text: string; cache_control?: unknown }[];
+    expect(a.system).toBe(b.system);
+    expect(blocks(a)[0]).toEqual(blocks(b)[0]);
+    expect(blocks(a)[0].cache_control).toEqual({ type: "ephemeral" });
+    expect(blocks(a)[1].cache_control).toBeUndefined();
+    expect(blocks(a)[1].text).toContain("Check the sender address.");
+    expect(blocks(a)[1].text).toContain("Why is this link unsafe?");
+    expect(blocks(b)[1].text).toContain("Report it with the button.");
+    expect(tutorRequest("m", "en", context, undefined, "Why?").messages[0].content).toHaveLength(2);
+  });
+
+  it("sends the tutor model with thinking off and a short answer cap", () => {
+    const r = tutorRequest("claude-haiku-5-5", "az", context, undefined, "Niyə?");
+    expect(r).toMatchObject({ model: "claude-haiku-5-5", thinking: { type: "disabled" }, output_config: { effort: "medium" } });
+    expect(r.max_tokens).toBeLessThanOrEqual(1024);
   });
 });

@@ -148,7 +148,7 @@ export default async function PolicyAdminPage({ params, searchParams }: PageProp
                       <Avatar name={p.name} src={p.avatarUrl} size="sm" className="row-span-2 sm:row-span-1" />
                       <span className="min-w-0">
                         <span className="block truncate text-body-sm font-semibold" title={p.name}>{p.name}</span>
-                        <span className="block truncate text-tab text-ink-subtle" title={p.email}>{p.email}</span>
+                        <span className="block truncate text-tab text-ink-subtle" title={p.email}><bdi>{p.email}</bdi></span>
                       </span>
                       {s ? (
                         <span className="col-start-2 inline-flex items-center gap-1.5 whitespace-nowrap text-caption text-safe-700 sm:col-start-3">

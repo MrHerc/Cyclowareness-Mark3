@@ -58,7 +58,7 @@ export default async function SupportTicketPage({ params }: PageProps<"/admin/su
           <CardBody className="grid gap-2 pt-3 text-caption">
             <p>
               <b className="text-body-sm">{who?.name ?? "—"}</b>
-              <span className="block text-ink-muted">{who?.email}</span>
+              <bdi className="block text-ink-muted">{who?.email}</bdi>
               <span className="block text-ink-muted">{who?.departmentName ?? tc("noDepartment")}</span>
             </p>
             <p className="flex flex-wrap items-center gap-2 border-t border-line pt-3">

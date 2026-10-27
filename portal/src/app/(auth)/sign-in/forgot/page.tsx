@@ -51,7 +51,7 @@ export default function ForgotPage() {
             </p>
           ) : null}
           <Field label={t("emailLabel")} htmlFor="email" error={error}>
-            <div className="relative">
+            <div dir="ltr" className="relative">
               <Mail aria-hidden className={authInputIcon} />
               <Input id="email" name="email" type="email" autoComplete="email" autoFocus defaultValue={state?.email} placeholder={t("emailPlaceholder")} aria-invalid={!!error} aria-describedby={error ? "email-error" : undefined} className={authInput} />
             </div>

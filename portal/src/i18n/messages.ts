@@ -24,6 +24,9 @@ export type Messages = {
 };
 
 export async function loadMessages(locale: Locale): Promise<Messages> {
+  // The bundler turns this import into a glob of the messages/<locale>/ folders found when it transforms
+  // this file; vitest's fsModuleCache keeps that list until the file changes, so a new language's folder
+  // needs one `npx vitest run --no-fsModuleCache` ("Unknown variable dynamic import" otherwise).
   const parts = await Promise.all(
     NAMESPACES.map(async (ns) => [ns, (await import(`../../messages/${locale}/${ns}.json`)).default] as const),
   );

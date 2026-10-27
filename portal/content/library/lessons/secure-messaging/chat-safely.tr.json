@@ -1,0 +1,416 @@
+{
+  "id": "chat-safely",
+  "title": "Güvenle yazışın",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Mesajlaşma uygulamaları kullanışlıdır. Ama kişisel bir hesaba gönderilen iş dosyası kurumunuzun kontrolünden çıkar, hem de bazen yıllarca.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Yeni bir numaradan yazan tanıdık bir isim aslında bir dolandırıcı olabilir. Zaten bildiğiniz eski numarayı arayarak kontrol edin.",
+          "mood": "alert",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "app": "whatsapp",
+              "contact": [
+                {
+                  "text": "+994 50 000 47 09",
+                  "spot": "unknown-number"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Merhaba Nermin Hanım, ben Elçin Gasımov."
+                    },
+                    {
+                      "text": "Bu benim yeni numaram, eskisini kaybettim.",
+                      "spot": "new-number"
+                    }
+                  ],
+                  "time": "09:12"
+                },
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Müdür acilen bir rapor istiyor. "
+                    },
+                    {
+                      "text": "Finans tablosunu hemen buraya gönderin.",
+                      "spot": "work-file"
+                    }
+                  ],
+                  "time": "09:13"
+                },
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Toplantıdayım, konuşamıyorum, sadece yazın.",
+                      "spot": "no-call"
+                    }
+                  ],
+                  "time": "09:13"
+                }
+              ]
+            }
+          },
+          "highlight": "new-number"
+        },
+        {
+          "id": "b3",
+          "say": "Kendiliğinden silinen mesajlar işe yarar, ama karşı taraf yine de ekran görüntüsü alabilir. Hassas bilgileri mesajlaşma uygulamalarına hiç yazmayın.",
+          "mood": "think",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "İş için kurumunuzun onayladığı aracı kullanın. Hangisi olduğundan emin değil misiniz? BT destek ekibinize sorun.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "new-number-chat",
+      "prompt": "Bu yazışmada şüpheli olan ne?",
+      "artifact": {
+        "kind": "chat",
+        "app": "whatsapp",
+        "contact": [
+          {
+            "text": "+994 50 000 47 09",
+            "spot": "unknown-number"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Merhaba Nermin Hanım, ben Elçin Gasımov."
+              },
+              {
+                "text": "Bu benim yeni numaram, eskisini kaybettim.",
+                "spot": "new-number"
+              }
+            ],
+            "time": "09:12"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Müdür acilen bir rapor istiyor. "
+              },
+              {
+                "text": "Finans tablosunu hemen buraya gönderin.",
+                "spot": "work-file"
+              }
+            ],
+            "time": "09:13"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Toplantıdayım, konuşamıyorum, sadece yazın.",
+                "spot": "no-call"
+              }
+            ],
+            "time": "09:13"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "unknown-number",
+          "label": "Kayıtlı olmayan numara",
+          "explain": "İsim yok, yalnızca bir numara var. Kim olduğuna dair tek kanıt, gönderenin kendi sözü."
+        },
+        {
+          "id": "new-number",
+          "label": "“Yeni numara” hikâyesi",
+          "explain": "Bu, en yaygın açılış cümlesidir. Kontrol etmek için eski numarayı arayın."
+        },
+        {
+          "id": "work-file",
+          "label": "Mesajlaşma uygulamasına iş dosyası",
+          "explain": "Finans belgeleri yalnızca onaylı bir iş kanalından gönderilir."
+        },
+        {
+          "id": "no-call",
+          "label": "Telefonla konuşmaktan kaçınıyor",
+          "explain": "Dolandırıcı, sesini duymanızı istemez. Telefonla konuşmayı reddeden her talebe karşı dikkatli olun."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "verify",
+      "question": {
+        "prompt": "Yazanın gerçekten Elçin olduğunu nasıl kontrol edersiniz?",
+        "options": [
+          {
+            "id": "call-new",
+            "label": "Yeni numarayı ararım",
+            "correct": false,
+            "feedback": "O numara dolandırıcıya ait. Telefonu kendisi açabilir ya da taklit edilmiş bir sesle yanıt verebilir."
+          },
+          {
+            "id": "call-known",
+            "label": "Onun eski numarasını ya da ofis hattını ararım",
+            "correct": true,
+            "feedback": "Doğru. Zaten bildiğiniz bir kanal, en güvenilir kontrol yöntemidir."
+          },
+          {
+            "id": "photo",
+            "label": "Profil fotoğrafına bakarım",
+            "correct": false,
+            "feedback": "İnternetten bir fotoğrafı kopyalamak bir dakika sürer."
+          },
+          {
+            "id": "ask-detail",
+            "label": "Ona ofisin adresini sorarım",
+            "correct": false,
+            "feedback": "Bu herkese açık bir bilgi. Herkes yanıtlayabilir."
+          }
+        ]
+      },
+      "explain": "Her zaman zaten bildiğiniz bir kanaldan doğrulayın: eski numara, ofis hattı ya da yüz yüze."
+    },
+    {
+      "type": "swipe",
+      "id": "what-goes-where",
+      "prompt": "Bu mesaj güvenli mi, yoksa riskli mi?",
+      "cards": [
+        {
+          "id": "family-group",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Aile grubu · 38 üye"
+              }
+            ],
+            "messages": [
+              {
+                "from": "me",
+                "body": [
+                  {
+                    "text": "Bütçe taslağı 2027, son hali.xlsx"
+                  }
+                ],
+                "time": "22:40"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bir iş dosyası aile grubuna düştü. Bu tür hatalar en çok acele ettiğimizde olur."
+        },
+        {
+          "id": "vpn-password",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Departman sohbeti · 214 üye"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Uzaktan erişim şifresi: Baki2026! Herkes bunu kullansın."
+                  }
+                ],
+                "time": "13:05"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Ortak bir parola büyük bir gruba yazılmış. Tek bir telefon kaybolsa erişim herkese açılır."
+        },
+        {
+          "id": "internal-link",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Samir Babayev · kurum içi iş sohbeti"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Son raporu kurum içi sisteme yükledim, lütfen oradan bakın."
+                  }
+                ],
+                "time": "10:30"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Dosyanın kendisi gönderilmiyor, kurum içi sistemde kalıyor. Doğru yol budur."
+        },
+        {
+          "id": "meeting-time",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Toplantı grubu"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Yarınki toplantı 10'a alındı."
+                  }
+                ],
+                "time": "18:02"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Hassas bir bilgi yok, yalnızca bir hatırlatma. Belgeleri ve rakamları onaylı kanalda tutun."
+        },
+        {
+          "id": "id-photo",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Muhasebe Bölümü"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Maaşınızı kontrol edebilmemiz için kimlik kartınızın ön ve arka yüzünün fotoğrafını gönderin."
+                  }
+                ],
+                "time": "11:48"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Muhasebede bilgileriniz zaten var. Kimlik fotoğrafı, sahte hesaplar açmak için kullanılır."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "wrong-group",
+      "title": "Yanlış grup",
+      "start": "sent",
+      "nodes": [
+        {
+          "id": "sent",
+          "text": "Personel telefon listesini yanlışlıkla 300 kişilik bir mahalle grubuna gönderdiniz. Üzerinden iki dakika geçti.",
+          "choices": [
+            {
+              "label": "Herkesten silerim ve hemen yöneticime haber veririm",
+              "next": "manager",
+              "feedback": "İyi bir başlangıç. Silmek yayılmayı yavaşlatır, bildirmek zararı sınırlar."
+            },
+            {
+              "label": "Sessizce silerim, nasılsa kimse görmemiştir",
+              "outcome": "risky",
+              "feedback": "Birisi dosyayı çoktan indirmiş olabilir. Sessiz kalırsanız kimse zamanında önlem alamaz."
+            },
+            {
+              "label": "Hiçbir şey yapmam, zaten çok geç",
+              "outcome": "compromised",
+              "feedback": "Dosya grupta kalır ve yayılır. Henüz geç değil, hemen harekete geçin."
+            }
+          ]
+        },
+        {
+          "id": "manager",
+          "text": "Dosyada tam olarak ne vardı?",
+          "speaker": "Yönetici",
+          "voice": "older-man",
+          "channel": "phone",
+          "manner": "firm",
+          "spoken": "<breath> Dosyada tam olarak ne vardı?",
+          "choices": [
+            {
+              "label": "Açıkça söylerim: 120 çalışanın adı ve cep numarası",
+              "next": "reply",
+              "feedback": "Dürüst ve net bir yanıt, müdahaleyi hızlandırır."
+            },
+            {
+              "label": "Önemsizmiş gibi gösteririm: sıradan bir tablo",
+              "outcome": "risky",
+              "feedback": "Neyin sızdığını bilmeyen bir ekip doğru karar veremez. İş arkadaşlarınız dolandırıcıların aramalarına hazırlıksız yakalanır."
+            }
+          ]
+        },
+        {
+          "id": "reply",
+          "text": "Gruptan biri şöyle yazıyor: “Dosyayı açtım, ilginçmiş.” Ne yaparsınız?",
+          "choices": [
+            {
+              "label": "Kibarca dosyayı silmesini rica eder, yöneticime haber veririm",
+              "outcome": "safe",
+              "feedback": "Tebrikler. Yayılmayı durdurmaya çalıştınız ve her şeyi açıkça bildirdiniz."
+            },
+            {
+              "label": "Onunla tartışır, tehdit ederim",
+              "outcome": "risky",
+              "feedback": "Tehditler gerginliği artırır ve dosyayı daha da ilginç kılar. Kibarca rica edin, gerisini kurumunuza bırakın."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "İş dosyalarını yalnızca onaylı araçla gönderin.",
+        "Yeni bir numarayı zaten bildiğiniz bir kanaldan kontrol edin.",
+        "Yanlış yere gönderdiyseniz hemen silin ve bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

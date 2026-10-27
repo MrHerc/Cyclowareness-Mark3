@@ -1,0 +1,369 @@
+{
+ "id": "share-smart",
+ "title": "Distribuiți cu discernământ",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Bună! Orice fotografie și orice propoziție pe care le postați pe rețelele sociale reprezintă o informație pentru cineva. Haideți să vedem împreună.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "O fotografie de la birou poate arăta ecusonul, un ecran deschis sau notițele de pe tablă. Pentru un atacator, acesta este material gata de folosit.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Nu anunțați călătoriile în avans: așa le spuneți tuturor că locuința e goală și că sunteți greu de contactat. Postați fotografiile după ce vă întoarceți.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Există și profiluri false. Un recrutor care vă oferă postul de vis poate aduna informații despre organizația dumneavoastră. Verificați vechimea profilului.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Rashad Mammadli"
+        },
+        {
+         "text": " · NovaHire Group, 3 conexiuni",
+         "spot": "profile"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Bună ziua! V-am văzut profilul. Un loc de muncă bine plătit în străinătate vi s-ar potrivi perfect."
+          }
+         ],
+         "time": "11:02"
+        }
+       ]
+      }
+     },
+     "highlight": "profile"
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "safe-post",
+   "question": {
+    "prompt": "Care postare este cea mai sigură?",
+    "options": [
+     {
+      "id": "badge-selfie",
+      "label": "Un selfie la birou cu noul meu ecuson",
+      "correct": false,
+      "feedback": "Se văd aspectul ecusonului, numele și funcția dumneavoastră. Este un model gata de copiat pentru un ecuson fals."
+     },
+     {
+      "id": "trip-plan",
+      "label": "Plec de mâine într-o săptămână de concediu",
+      "correct": false,
+      "feedback": "Le spune oamenilor când locuința dumneavoastră e goală și când sunteți greu de contactat."
+     },
+     {
+      "id": "after-trip",
+      "label": "O fotografie din natură, după ce m-am întors",
+      "correct": true,
+      "feedback": "Corect. Locul și momentul țin de trecut și nu se vede nimic legat de serviciu."
+     },
+     {
+      "id": "desk-photo",
+      "label": "Biroul meu, cu monitorul pornit în fundal",
+      "correct": false,
+      "feedback": "Un document, un e-mail sau numele unui sistem de pe ecran pot fi citite dacă se mărește imaginea."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "eye"
+    }
+   },
+   "explain": "Înainte să postați, verificați fundalul: ecusonul, ecranul, tabla, documentele."
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-recruiter",
+   "prompt": "Găsiți semnalele de alarmă ale unui recrutor fals.",
+   "artifact": {
+    "kind": "chat",
+    "app": "generic",
+    "contact": [
+     {
+      "text": "Rashad Mammadli"
+     },
+     {
+      "text": " · NovaHire Group, 3 conexiuni",
+      "spot": "profile"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Bună ziua! V-am văzut profilul. "
+       },
+       {
+        "text": "Vă așteaptă un post în străinătate plătit cu 6.000 de dolari pe lună.",
+        "spot": "too-good"
+       }
+      ],
+      "time": "11:02"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "O întrebare rapidă înainte de interviu: "
+       },
+       {
+        "text": "ce sistem de e-mail și ce programe folosește organizația dumneavoastră?",
+        "spot": "internal-info"
+       }
+      ],
+      "time": "11:03"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Completați formularul cu e-mailul de serviciu: "
+       },
+       {
+        "text": "novahire-careers.example.net/apply",
+        "spot": "link"
+       },
+       {
+        "text": " Locurile sunt limitate, formularul se închide azi.",
+        "spot": "urgency"
+       }
+      ],
+      "time": "11:04"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "profile",
+     "label": "Profil nou, puține conexiuni",
+     "explain": "Recrutorii reali au de obicei un istoric lung și contacte comune. Un profil cu trei conexiuni abia a fost creat."
+    },
+    {
+     "id": "too-good",
+     "label": "Prea frumos ca să fie adevărat",
+     "explain": "Un salariu mare înainte de orice interviu este o momeală. Entuziasmul vă slăbește vigilența."
+    },
+    {
+     "id": "internal-info",
+     "label": "Întrebări despre organizația dumneavoastră",
+     "explain": "Un recrutor nu are nevoie să știe ce sisteme folosește organizația dumneavoastră. Așa se culeg informații pentru un atac."
+    },
+    {
+     "id": "link",
+     "label": "Link extern care cere e-mailul de serviciu",
+     "explain": "Dacă introduceți e-mailul de serviciu într-un formular extern, adresa ajunge pe o listă de phishing. Formularul vă poate cere și parola."
+    },
+    {
+     "id": "urgency",
+     "label": "Presiune de a vă grăbi",
+     "explain": "„Se închide azi” este acolo ca să nu vă opriți să vă gândiți."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "messages",
+   "prompt": "Acest mesaj este sigur sau o amenințare?",
+   "cards": [
+    {
+     "id": "vote-code",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Gunel Rzayeva"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună! Fiica mea participă la un concurs, votează-o, te rog. O să primești un cod prin SMS, trimite-mi-l."
+         }
+        ],
+        "time": "20:14"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Acel cod este cheia contului dumneavoastră. Nu îl dați nimănui, chiar dacă mesajul vine din contul unui prieten."
+    },
+    {
+     "id": "login-alert",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "Kontakto"
+       }
+      ],
+      "time": "08:30",
+      "messages": [
+       [
+        {
+         "text": "Conectare nouă în contul dumneavoastră: Baku, telefon. Dacă nu ați fost dumneavoastră, deschideți secțiunea Securitate din aplicație."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Nu conține niciun link și nu cere niciun cod, ci vă trimite chiar în aplicație. Faceți verificarea din aplicație."
+    },
+    {
+     "id": "boss-number",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Kamran Aliyev · niciun contact comun"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună ziua, lucrăm în același domeniu. Mi-ați putea trimite numărul de mobil al șefului dumneavoastră de departament?"
+         }
+        ],
+        "time": "15:47"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un necunoscut caută o cale să ajungă la managerul dumneavoastră. Dați date de contact doar prin canalele oficiale."
+    },
+    {
+     "id": "meeting-moved",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Aysel Guliyeva (colegă)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ședința de mâine s-a mutat la ora 11, în aceeași sală."
+         }
+        ],
+        "time": "17:05"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "O colegă cunoscută, nicio cerere, nimic sensibil. Acest mesaj este sigur."
+    },
+    {
+     "id": "press-office",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Biroul de presă oficial"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Pentru verificarea contului, trimiteți-ne funcția, e-mailul de serviciu și data nașterii."
+         }
+        ],
+        "time": "10:21"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Instituțiile oficiale nu cer așa ceva pe rețelele sociale. Nu răspundeți și raportați profilul."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "privacy",
+   "prompt": "Asociați fiecare setare cu ceea ce vă oferă.",
+   "pairs": [
+    {
+     "id": "friends-only",
+     "left": "Profil vizibil doar pentru prieteni",
+     "right": "Necunoscuții nu vă văd fotografiile"
+    },
+    {
+     "id": "location-off",
+     "left": "Locație dezactivată",
+     "right": "Nimeni nu vede unde vă aflați"
+    },
+    {
+     "id": "tag-review",
+     "left": "Verificarea etichetărilor înainte de afișare",
+     "right": "Nimeni nu vă poate eticheta fără aprobarea dumneavoastră"
+    },
+    {
+     "id": "two-step",
+     "left": "Verificarea în doi pași",
+     "right": "Contul rămâne în siguranță chiar dacă parola ajunge la alții"
+    }
+   ],
+   "explain": "Verificați aceste setări din când în când. Funcțiile noi ale aplicațiilor le pot schimba."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Verificați fundalul: ecusonul, ecranul, documentele.",
+    "Postați fotografiile din călătorii după ce vă întoarceți.",
+    "Nu dați niciodată necunoscuților detalii despre serviciu sau coduri."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

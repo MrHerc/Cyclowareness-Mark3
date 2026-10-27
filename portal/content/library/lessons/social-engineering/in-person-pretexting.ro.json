@@ -1,0 +1,510 @@
+{
+ "id": "in-person-pretexting",
+ "title": "Trucuri față în față",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l3-tutor",
+   "beats": [
+    {
+     "id": "l3-b1",
+     "say": "Escrocul nu este mereu pe un ecran. Uneori stă la ușă, cu o cutie în brațe.",
+     "mood": "talk",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "l3-b2",
+     "say": "Nu țineți ușa deschisă pentru cineva care nu are ecuson de acces. Îndrumați-l politicos spre recepție.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "l3-b3",
+     "say": "Un așa-zis tehnician poate purta uniformă și vă poate grăbi. Verificați chiar dumneavoastră vizita la suportul IT.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     },
+     "checkpoint": {
+      "prompt": "Sosește un tehnician pe care nu îl așteptați. Ce faceți?",
+      "options": [
+       {
+        "id": "let-in",
+        "label": "Are uniformă, îl las să intre",
+        "correct": false,
+        "feedback": "Oricine poate purta o uniformă. Întrebați chiar dumneavoastră suportul IT despre vizită."
+       },
+       {
+        "id": "check",
+        "label": "Sun eu la suportul IT ca să verific",
+        "correct": true,
+        "feedback": "Corect. O vizită neașteptată se verifică pe canalul oficial."
+       }
+      ]
+     }
+    },
+    {
+     "id": "l3-b5",
+     "say": "Un singur obicei pentru orice situație: opriți-vă, verificați, raportați. Verificați pe calea oficială și semnalați-i echipei de securitate orice suspiciune.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "flag"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "visitor-at-door",
+   "environment": "phone",
+   "title": "Un tehnician la ușă",
+   "intro": "Este dimineață și sunteți la serviciu. Primiți mesaje despre un vizitator care vrea să intre în clădire.",
+   "steps": [
+    {
+     "id": "no-badge",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Suport IT (nou)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună ziua, am venit să vă repar imprimanta și sunt la intrare. Mi-am uitat ecusonul acasă, puteți coborî să-mi deschideți ușa?"
+         }
+        ],
+        "time": "09:12"
+       }
+      ]
+     },
+     "say": "Un tehnician necunoscut, fără ecuson.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Vin acum, vă deschid",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Dacă lăsați să intre pe cineva fără ecuson, deschideți ușa oricui. Îndrumați-l spre recepție."
+      },
+      {
+       "id": "verify",
+       "label": "Sun la numărul oficial al suportului IT",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Verificați dumneavoastră, pe canalul oficial, vizita neașteptată a unui tehnician."
+      }
+     ]
+    },
+    {
+     "id": "reception",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "idare",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Recepția"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "La recepție a venit un tehnician pe nume Orkhan, care spune că vine la dumneavoastră. Nu este programată nicio vizită. Îl lăsăm să intre?"
+         }
+        ],
+        "time": "09:15"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "let-in",
+       "label": "Lăsați-l să intre, eu l-am chemat",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Nu l-ați chemat dumneavoastră. Acum un străin circulă liber prin clădire, în numele dumneavoastră."
+      },
+      {
+       "id": "wait",
+       "label": "Să aștepte la recepție până verific",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Corect. Un vizitator se înregistrează la recepție și nu este lăsat singur până nu este verificat."
+      }
+     ]
+    },
+    {
+     "id": "boss-pressure",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Kamran Aliyev (număr nou)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Eu l-am chemat pe tehnician. Du-l chiar tu în camera serverelor. Sunt în ședință, nu mă suna."
+         }
+        ],
+        "time": "09:17"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "escort",
+       "label": "Bine, îl duc eu",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Numele șefului și regula „nu mă suna” au rolul de a vă împiedica să verificați. Străinii nu intră niciodată în camera serverelor."
+      },
+      {
+       "id": "verify",
+       "label": "Îmi sun șeful la numărul cunoscut",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Excelent. Când șeful vă scrie de pe un număr nou, verificați întotdeauna la numărul vechi, cunoscut."
+      },
+      {
+       "id": "block",
+       "label": "Blocați și raportați",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Corect. Apoi anunțați-l pe șeful dumneavoastră și echipa de securitate."
+      }
+     ]
+    },
+    {
+     "id": "real-it",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Suport IT"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Nu v-am trimis astăzi niciun tehnician. Bine că ne-ați scris; echipa de securitate merge acum la recepție."
+         }
+        ],
+        "time": "09:20"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "thanks",
+       "label": "Mulțumesc, anunț și recepția",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Corect. V-ați oprit, ați verificat și ați raportat: toți cei trei pași."
+      },
+      {
+       "id": "go-down",
+       "label": "Cobor să vorbesc eu cu el",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Nu confruntați fără sprijin o persoană suspectă. Se va ocupa echipa de securitate."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l3-hotspot-email",
+   "prompt": "Găsiți părțile suspecte din acest e-mail.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "idare-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Serviciul administrativ",
+       "reveal": "texnik@servis-idare.test"
+      }
+     ],
+     "address": [
+      {
+       "text": "texnik@servis-idare.test",
+       "spot": "outside-address"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "URGENT: ",
+      "spot": "urgent-subject"
+     },
+     {
+      "text": "reparație în camera serverelor"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Bună ziua,"
+      }
+     ],
+     [
+      {
+       "text": "Astăzi, la 15:00, tehnicianul Orkhan va verifica aerul condiționat din camera serverelor."
+      }
+     ],
+     [
+      {
+       "text": "Suntem în întârziere, așa că "
+      },
+      {
+       "text": "lăsați-l să intre neînsoțit",
+       "spot": "unescorted"
+      },
+      {
+       "text": "."
+      }
+     ],
+     [
+      {
+       "text": "Vă rugăm "
+      },
+      {
+       "text": "să nu redirecționați acest e-mail",
+       "spot": "no-forward"
+      },
+      {
+       "text": "."
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "outside-address",
+     "label": "Adresă externă",
+     "explain": "O echipă internă scrie de pe adresa de e-mail a organizației. Această adresă este de pe alt domeniu."
+    },
+    {
+     "id": "urgent-subject",
+     "label": "Urgență",
+     "explain": "Urgența scrisă cu majuscule vă împinge să acționați fără să verificați."
+    },
+    {
+     "id": "unescorted",
+     "label": "Acces fără însoțitor",
+     "explain": "Un vizitator este întotdeauna însoțit, mai ales în camera serverelor."
+    },
+    {
+     "id": "no-forward",
+     "label": "Cererea de a păstra secretul",
+     "explain": "Cererea de a nu spune nimănui are rolul de a împiedica orice verificare."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "l3-choice-tailgate",
+   "question": {
+    "prompt": "Un bărbat cu brațele pline de cutii vrea să intre după dumneavoastră, fără ecuson.",
+    "options": [
+     {
+      "id": "hold-door",
+      "label": "Îi țin ușa, are mâinile ocupate",
+      "correct": false,
+      "feedback": "Politețea este un lucru bun, dar așa un străin intră fără nicio verificare."
+     },
+     {
+      "id": "send-reception",
+      "label": "Îl îndrum politicos spre recepție",
+      "correct": true,
+      "feedback": "Corect. Recepția îl va verifica și îl va conduce la persoana potrivită."
+     },
+     {
+      "id": "ask-and-let",
+      "label": "Îl întreb cine este și îl las să intre",
+      "correct": false,
+      "feedback": "Nu aveți cum să-i verificați răspunsul. Lăsați recepția sau echipa de securitate să decidă."
+     }
+    ]
+   },
+   "explain": "Intrarea în clădire pe urmele altcuiva este cel mai simplu atac fizic. Fiecare folosește propriul ecuson, iar vizitatorii trec pe la recepție."
+  },
+  {
+   "type": "swipe",
+   "id": "l3-swipe",
+   "prompt": "Sigur sau capcană?",
+   "cards": [
+    {
+     "id": "no-badge-door",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Suport IT (nou)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună ziua, am venit să mă uit la imprimanta dumneavoastră. Mi-am uitat ecusonul acasă, puteți coborî să-mi deschideți ușa?"
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Nu lăsați să intre pe nimeni fără ecuson. Îndrumați persoana spre recepție."
+    },
+    {
+     "id": "planned-maintenance",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "Suport IT"
+        }
+       ],
+       "address": [
+        {
+         "text": "support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Lucrări programate sâmbătă"
+       }
+      ],
+      "time": "11:05",
+      "body": [
+       [
+        {
+         "text": "Poșta electronică nu va fi disponibilă sâmbătă, între 10:00 și 12:00. Nu trebuie să faceți nimic."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Nu cere nici clic pe vreun link, nici parole, nici acces. Este doar o notificare."
+    },
+    {
+     "id": "found-usb",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Samir (coleg)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Am găsit pe hol un stick USB cu eticheta „Salarii 2026”. Îl deschidem pe computerul tău?"
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un stick USB găsit poate conține malware. Nu îl deschideți, predați-l echipei de securitate."
+    },
+    {
+     "id": "guest-at-reception",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "idare",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Recepția"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Invitatul dumneavoastră, domnul Tural, s-a înregistrat la recepție și are ecuson de vizitator. Vă așteaptă."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Invitatul este înregistrat și așteaptă. Mergeți dumneavoastră să-l întâmpinați și însoțiți-l."
+    },
+    {
+     "id": "menu-qr",
+     "artifact": {
+      "kind": "qr",
+      "brandRef": "idare-fake",
+      "caption": [
+       {
+        "text": "Meniul cantinei: scanați și conectați-vă cu parola de serviciu"
+       }
+      ],
+      "destination": [
+       {
+        "text": "menyu-idare.test/login"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Nu aveți nevoie de parola de serviciu ca să vedeți un meniu. Un astfel de cod QR există ca să v-o fure."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "l3-recap",
+   "points": [
+    "Îndrumați spre recepție pe oricine nu are ecuson",
+    "Nu conectați niciodată la computer un stick USB găsit",
+    "Întotdeauna: opriți-vă, verificați, raportați"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

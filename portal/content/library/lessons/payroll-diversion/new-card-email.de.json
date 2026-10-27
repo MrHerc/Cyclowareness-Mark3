@@ -1,0 +1,631 @@
+{
+ "id": "new-card-email",
+ "title": "Eine neue Kartennummer",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pd1-tutor",
+   "beats": [
+    {
+     "id": "pd1-b1",
+     "say": "Hallo! Heute arbeiten Sie in der Personalabteilung, und morgen wird das Gehalt ausgezahlt.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "pd1-b2",
+     "say": "Im Namen einer Mitarbeiterin kommt eine E-Mail: Meine Karte hat sich geändert, zahlen Sie mein Gehalt auf ein neues Konto.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Leyla Məmmədova"
+         }
+        ],
+        "address": [
+         {
+          "text": "leyla.mammadova.88@poct-mail.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Dringend: Meine Gehaltskarte hat sich geändert"
+        }
+       ],
+       "time": "16:40",
+       "body": [
+        [
+         {
+          "text": "Hallo, ich habe meine alte Karte verloren, und die Bank hat sie gesperrt."
+         }
+        ],
+        [
+         {
+          "text": "Bitte zahlen Sie mein Gehalt morgen auf dieses Konto: "
+         },
+         {
+          "text": "AZ00SAHL00000000000000004417",
+          "spot": "new-account"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "new-account"
+    },
+    {
+     "id": "pd1-b3",
+     "say": "Der Name ist bekannt, aber die Adresse gehört zu einem privaten Postfach. Kriminelle wollen das Gehalt auf ihr eigenes Konto umleiten.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "pd1-b4",
+     "say": "Die Regel ist einfach: Ändern Sie eine Bankverbindung nie wegen einer E-Mail. Rufen Sie die Person unter einer Nummer an, die Sie bereits kennen.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "pd1-hotspot",
+   "prompt": "Finden Sie die Warnsignale in dieser E-Mail.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Leyla Məmmədova"
+      }
+     ],
+     "address": [
+      {
+       "text": "leyla.mammadova.88@poct-mail.example.net",
+       "spot": "personal-address"
+      }
+     ]
+    },
+    "to": "kadr@seherxidmetleri.example",
+    "subject": [
+     {
+      "text": "Dringend: Meine Gehaltskarte hat sich geändert"
+     }
+    ],
+    "time": "16:40",
+    "body": [
+     [
+      {
+       "text": "Liebes Team der Personalabteilung,"
+      }
+     ],
+     [
+      {
+       "text": "ich habe meine alte Karte verloren, und die Bank hat sie gesperrt."
+      }
+     ],
+     [
+      {
+       "text": "Bitte zahlen Sie mein Gehalt morgen auf mein neues Konto: ",
+       "spot": "new-account"
+      },
+      {
+       "text": "AZ00SAHL00000000000000004417",
+       "spot": "new-account"
+      }
+     ],
+     [
+      {
+       "text": "Ich bin heute nicht im Büro, und mein Smartphone ist kaputt. Antworten Sie bitte nur hier.",
+       "spot": "no-call"
+      }
+     ],
+     [
+      {
+       "text": "Bitte erledigen Sie das bis morgen früh, ich muss meine Miete bezahlen.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "Leyla Məmmədova, Abteilung Kommunale Versorgung"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "personal-address",
+     "label": "Private E-Mail-Adresse",
+     "explain": "Mitarbeitende schreiben normalerweise von ihrer dienstlichen Adresse. Ein privates Postfach kann jeder unter jedem beliebigen Namen anlegen."
+    },
+    {
+     "id": "new-account",
+     "label": "Neues Konto",
+     "explain": "Das ist das eigentliche Ziel der E-Mail. Ist das Gehalt erst einmal dort eingegangen, lässt es sich kaum zurückholen."
+    },
+    {
+     "id": "no-call",
+     "label": "Kein Anruf möglich",
+     "explain": "Dieser Satz soll Sie davon abhalten, nachzuprüfen. Genau deshalb rufen Sie die Person unter einer Nummer an, die Sie kennen."
+    },
+    {
+     "id": "urgency",
+     "label": "Zeitdruck",
+     "explain": "Druck kurz vor der Gehaltszahlung gehört bei dieser Masche dazu. Ein Anruf dauert nur wenige Minuten."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "pd1-sim",
+   "environment": "inbox",
+   "title": "Postfach der Personalabteilung",
+   "intro": "Morgen wird das Gehalt ausgezahlt. Öffnen Sie die fünf E-Mails und wählen Sie jeweils den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "fake-colleague",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-seher-xidmetleri",
+      "from": {
+       "name": [
+        {
+         "text": "Kamran Əliyev"
+        }
+       ],
+       "address": [
+        {
+         "text": "k.aliyev@seherxidmetleri-mail.example.net"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Aktualisierung meines Gehaltskontos"
+       }
+      ],
+      "time": "09:12",
+      "body": [
+       [
+        {
+         "text": "Hallo, ich habe die Bank gewechselt."
+        }
+       ],
+       [
+        {
+         "text": "Bitte zahlen Sie das Septembergehalt auf dieses Konto: AZ00ULDZ00000000000000007731"
+        }
+       ],
+       [
+        {
+         "text": "Das Formular bringe ich später vorbei. Kamran Əliyev, Abteilung Transport"
+        }
+       ]
+      ]
+     },
+     "say": "Achten Sie auf die Domain des Absenders.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Das ist nicht die Domain Ihrer Organisation – sie enthält ein zusätzliches Wort."
+      },
+      {
+       "id": "verify",
+       "label": "Kamran unter einer bekannten Nummer anrufen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Kamran wird sagen, dass er die E-Mail nie geschrieben hat, und Sie melden sie."
+      },
+      {
+       "id": "change",
+       "label": "Antworten: „Konto aktualisiert“",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Das Gehalt ginge an die Kriminellen. Akzeptieren Sie nie eine Änderung der Bankverbindung per E-Mail."
+      }
+     ]
+    },
+    {
+     "id": "system-request",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-kadr-kabineti",
+      "from": {
+       "name": [
+        {
+         "text": "Kadr Kabineti"
+        }
+       ],
+       "address": [
+        {
+         "text": "noreply@kabinet.seherxidmetleri.example"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Neue Anfrage: Änderung der Bankverbindung, Aytən Hüseynova"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Die Mitarbeiterin hat diese Anfrage in Kadr Kabineti gestellt und sich dafür mit Zwei-Faktor-Authentisierung angemeldet."
+        }
+       ],
+       [
+        {
+         "text": "Prüfen Sie die Anfrage im System: "
+        },
+        {
+         "text": "Anfrage ansehen",
+         "link": {
+          "label": "Anfrage ansehen",
+          "href": "https://kabinet.seherxidmetleri.example/sorgular/2187"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Anfrage ansehen",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Adresse ist die eigene Domain Ihrer Organisation, und die Anfrage kam direkt aus dem System."
+      },
+      {
+       "id": "safe",
+       "label": "Als sicher markieren",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine Anfrage aus dem offiziellen System ist der vorgesehene Weg."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Vorsicht ist gut, aber das ist das eigene System Ihrer Organisation. Genau so sollten Änderungen der Bankverbindung ankommen."
+      }
+     ]
+    },
+    {
+     "id": "portal-phish",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Kadr Kabineti"
+        }
+       ],
+       "address": [
+        {
+         "text": "kabinet@kadr-kabineti.example.net"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Ihr Passwort läuft heute ab"
+       }
+      ],
+      "time": "11:30",
+      "body": [
+       [
+        {
+         "text": "Ihr Zugriff auf die Gehaltsliste wird heute gesperrt."
+        }
+       ],
+       [
+        {
+         "text": "So behalten Sie den Zugriff: "
+        },
+        {
+         "text": "Passwort erneuern",
+         "link": {
+          "label": "Passwort erneuern",
+          "href": "https://kadr-kabineti-giris.example.net/yenile"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Der Link führt nicht zur Domain Ihrer Organisation. Wenn es keine Schaltfläche zum Melden gibt, leiten Sie die E-Mail an das Sicherheitsteam weiter."
+      },
+      {
+       "id": "click",
+       "label": "Passwort erneuern",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Das ist ein gefälschtes Portal. Mit einem Konto der Personalabteilung können Kriminelle die Bankverbindungen aller Mitarbeitenden ändern."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Nicht schlecht. Wenn Sie die E-Mail aber melden, sind auch Ihre Kolleginnen und Kollegen geschützt."
+      }
+     ]
+    },
+    {
+     "id": "payroll-sheet",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-seher-xidmetleri",
+      "from": {
+       "name": [
+        {
+         "text": "Səbinə Qasımova"
+        }
+       ],
+       "address": [
+        {
+         "text": "s.qasimova@seherxidmetleri.example"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Gehaltsliste September: letzte Prüfung"
+       }
+      ],
+      "time": "12:15",
+      "body": [
+       [
+        {
+         "text": "Hallo, die Liste ist im Anhang. Bitte prüfen Sie sie bis 15:00 Uhr. Səbinə, Finanzabteilung"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Maas_cedveli_2026_09.xlsx"
+         }
+        ],
+        "size": "96 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Anhang öffnen",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine bekannte Kollegin, die Domain Ihrer Organisation und eine Liste, die Sie erwartet haben."
+      },
+      {
+       "id": "forward",
+       "label": "An meine private E-Mail-Adresse senden",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Die Liste enthält personenbezogene Daten aller Mitarbeitenden. Senden Sie dienstliche Dateien nicht an ein privates Postfach."
+      },
+      {
+       "id": "safe",
+       "label": "Als sicher markieren",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Richtig. Hier gibt es weder ein neues Konto noch Zeitdruck."
+      }
+     ]
+    },
+    {
+     "id": "real-address-odd",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-seher-xidmetleri",
+      "from": {
+       "name": [
+        {
+         "text": "Nərmin Səfərova"
+        }
+       ],
+       "address": [
+        {
+         "text": "n.seferova@seherxidmetleri.example"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Neues Konto"
+       }
+      ],
+      "time": "14:48",
+      "body": [
+       [
+        {
+         "text": "Zahlen Sie mein Gehalt auf dieses Konto: AZ00SAHL00000000000000009260"
+        }
+       ],
+       [
+        {
+         "text": "Bitte nicht anrufen, ich bin den ganzen Tag in Meetings."
+        }
+       ]
+      ]
+     },
+     "say": "Die Adresse ist echt. Bleiben Sie trotzdem wachsam.",
+     "actions": [
+      {
+       "id": "verify",
+       "label": "Nərmin unter ihrer internen Nummer anrufen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein Postfach kann übernommen werden, aber unter der Nummer, die Sie kennen, meldet sich die echte Nərmin."
+      },
+      {
+       "id": "ask",
+       "label": "Antworten: „Ist das echt?“",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Wenn das Postfach übernommen wurde, schreiben die Kriminellen die Antwort. Nur ein Anruf ist eine echte Prüfung."
+      },
+      {
+       "id": "safe",
+       "label": "Als sicher markieren",
+       "kind": "mark-safe",
+       "outcome": "compromised",
+       "feedback": "Die Adresse ist echt, aber das Konto könnte übernommen worden sein. Bestätigen Sie Änderungen der Bankverbindung immer telefonisch."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "pd1-match",
+   "prompt": "Ordnen Sie jeder Anfrage die richtige Prüfung zu.",
+   "pairs": [
+    {
+     "id": "mail-account",
+     "left": "Neues Bankkonto in einer E-Mail",
+     "right": "Die Person unter einer bekannten Nummer anrufen"
+    },
+    {
+     "id": "system-request",
+     "left": "Anfrage in Kadr Kabineti",
+     "right": "Im System prüfen, im Zweifel anrufen"
+    },
+    {
+     "id": "password-link",
+     "left": "Link zum Erneuern des Passworts",
+     "right": "Die Adresse des Portals selbst eingeben"
+    },
+    {
+     "id": "phone-request",
+     "left": "Anruf mit der Bitte, das Konto zu ändern",
+     "right": "Um eine Anfrage über Kadr Kabineti bitten"
+    }
+   ],
+   "explain": "Jede Änderung wird im System bestätigt oder über einen Weg, den Sie selbst wählen. Eine Nummer oder ein Link aus der E-Mail ist keine Prüfung."
+  },
+  {
+   "type": "scenario",
+   "id": "pd1-scenario",
+   "title": "Das Gehalt ist nicht angekommen",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Hallo, mein Gehalt ist heute nicht auf meiner Karte angekommen. Ich habe nie darum gebeten, mein Konto zu ändern!",
+     "speaker": "Leyla Məmmədova",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Hallo, mein Gehalt ist heute nicht auf meiner Karte angekommen. <breath> Ich habe nie darum gebeten, mein Konto zu ändern!",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2f-seher-xidmetleri",
+       "caller": [
+        {
+         "text": "Leyla Məmmədova"
+        }
+       ],
+       "number": [
+        {
+         "text": "Intern 4107"
+        }
+       ],
+       "label": "Interner Anruf"
+      }
+     },
+     "choices": [
+      {
+       "label": "Die Buchhaltung ruft bei der Bank an, und ich melde den Fall dem Sicherheitsteam",
+       "next": "n2",
+       "feedback": "Richtig. Je früher Sie den Fall melden, desto größer ist die Chance, das Geld zurückzubekommen."
+      },
+      {
+       "label": "Ich stelle das Konto stillschweigend wieder zurück",
+       "outcome": "risky",
+       "feedback": "Der Fehler muss behoben, aber nicht vertuscht werden. Die Bank kann versuchen, die Überweisung zu stoppen, und das Sicherheitsteam klärt auf, was passiert ist."
+      },
+      {
+       "label": "Ich sage ihr, dass sie die E-Mail selbst geschrieben hat",
+       "outcome": "risky",
+       "feedback": "Leyla hat diese E-Mail nicht geschrieben. Wichtig ist, den Schaden zu begrenzen, nicht einen Schuldigen zu finden."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Löschen Sie die E-Mail nicht, leiten Sie sie an mich weiter. Wurden diese Woche noch andere Bankverbindungen geändert?",
+     "speaker": "Fidan Rzayeva, Sicherheitsteam",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "firm",
+     "spoken": "Löschen Sie die E-Mail nicht, leiten Sie sie an mich weiter. <breath> Wurden diese Woche noch andere Bankverbindungen geändert?",
+     "choices": [
+      {
+       "label": "Ich leite die E-Mail weiter und prüfe alle Änderungen dieser Woche",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Kriminelle schreiben meist im Namen mehrerer Mitarbeitender."
+      },
+      {
+       "label": "Ich habe sie schon gelöscht, sie wird nicht gebraucht",
+       "outcome": "risky",
+       "feedback": "Die E-Mail ist ein Beweismittel. Falls Sie sie gelöscht haben, stellen Sie sie aus dem Ordner „Gelöschte Elemente“ wieder her und leiten Sie sie weiter."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "pd1-recap",
+   "points": [
+    "Eine Bankverbindung wird nie per E-Mail geändert.",
+    "Rufen Sie die Person unter einer Nummer an, die Sie kennen.",
+    "Halten Sie die Zahlung im Zweifel an und melden Sie den Fall."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

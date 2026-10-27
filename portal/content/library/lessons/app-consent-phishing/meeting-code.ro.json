@@ -1,0 +1,451 @@
+{
+ "id": "meeting-code",
+ "title": "Codul întâlnirii",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac2-tutor",
+   "beats": [
+    {
+     "id": "ac2-b1",
+     "say": "Bună ziua! Acum să analizăm o invitație de la un forum internațional și un cod de întâlnire.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "ac2-b2",
+     "say": "Escroaca vă trimite un cod și pagina reală de conectare a organizației dumneavoastră.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2b-nordvale-fake",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Leyla K. | Nordvale Council"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Ca să vă alăturați întâlnirii, introduceți acest cod: "
+          },
+          {
+           "text": "QK7-MN4P",
+           "spot": "code"
+          }
+         ],
+         "time": "10:04"
+        }
+       ]
+      }
+     },
+     "highlight": "code"
+    },
+    {
+     "id": "ac2-b3",
+     "say": "Dacă introduceți codul, dispozitivul ei intră în contul dumneavoastră ca și cum ar fi al dumneavoastră, fără să mai aibă nevoie de parolă.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "ac2-b4",
+     "say": "Regula: dacă nu ați inițiat chiar dumneavoastră conectarea, nu introduceți niciodată un cod, nicăieri.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ac2-scenario",
+   "title": "Invitația la forum",
+   "start": "invite",
+   "nodes": [
+    {
+     "id": "invite",
+     "text": "Bună ziua! Ne-am bucura să luați cuvântul la forumul nostru de la Viena, în noiembrie. Vă interesează?",
+     "speaker": "Leyla, Nordvale Council (mesaj nou)",
+     "voice": "young-woman",
+     "channel": "message",
+     "spoken": "Bună ziua! <breath> Ne-am bucura să luați cuvântul la forumul nostru de la Viena, în noiembrie. Vă interesează?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Vă mulțumesc. Vă rog să trimiteți invitația oficială pe e-mailul meu de serviciu, ca să obțin acordul conducerii",
+       "next": "code",
+       "feedback": "Corect. O invitație oficială vine pe un canal oficial, iar dumneavoastră o puteți verifica."
+      },
+      {
+       "label": "Foarte interesant! Ce trebuie să fac?",
+       "next": "code",
+       "feedback": "Interesul este firesc. Dar este mai bine să mutați discuția cu o persoană necunoscută pe un canal oficial."
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "text": "Excelent! Haideți să facem mâine o scurtă întâlnire online. Ca să vă alăturați, introduceți acest cod pe pagina de conectare a organizației dumneavoastră: QK7-MN4P.",
+     "speaker": "Leyla, Nordvale Council",
+     "voice": "young-woman",
+     "channel": "message",
+     "spoken": "Excelent! Haideți să facem mâine o scurtă întâlnire online. <breath> Ca să vă alăturați, introduceți acest cod pe pagina de conectare a organizației dumneavoastră: QK7-MN4P.",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Nu eu am inițiat această conectare, așa că nu introduc codul nicăieri",
+       "next": "pressure",
+       "feedback": "Corect. Dacă un cod vă ajunge printr-un mesaj, conectarea îi aparține altcuiva."
+      },
+      {
+       "label": "Pagina este a organizației mele, deci este sigură. Îl introduc",
+       "outcome": "compromised",
+       "feedback": "Pagina era reală, dar conectarea a fost inițiată de escroacă. Acum dispozitivul ei este în căsuța dumneavoastră de e-mail."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Nu mai avem mult timp, iar ministerul dumneavoastră a fost de acord. Introduceți doar codul, durează două minute.",
+     "speaker": "Leyla, Nordvale Council",
+     "voice": "young-woman",
+     "channel": "message",
+     "spoken": "Nu mai avem mult timp, ăă, iar ministerul dumneavoastră a fost de acord. Introduceți doar codul, durează două minute.",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Caut numărul pe site-ul oficial al forumului, sun chiar eu și anunț suportul IT",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Un organizator real salută verificarea, iar un escroc dispare."
+      },
+      {
+       "label": "Bine, îl introduc",
+       "outcome": "compromised",
+       "feedback": "Presiunea face parte din capcană. Imediat ce introduceți codul, contul dumneavoastră se deschide pe dispozitivul escroacei."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac2-sim",
+   "environment": "phone",
+   "title": "Invitația de pe telefon",
+   "intro": "Pe telefon vă sosesc mesaje în numele forumului. Deschideți-le pe rând și alegeți pasul corect.",
+   "steps": [
+    {
+     "id": "code-chat",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2b-nordvale-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Leyla K. | Nordvale Council"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună ziua! Participarea dumneavoastră la panelul forumului de la Viena este confirmată."
+         }
+        ],
+        "time": "10:02"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Codul pentru a vă alătura întâlnirii: QK7-MN4P"
+         }
+        ],
+        "time": "10:03"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Introduceți codul pe această pagină: "
+         },
+         {
+          "text": "giris.idare.example/cihaz",
+          "link": {
+           "label": "giris.idare.example/cihaz",
+           "href": "https://giris.idare.example/cihaz"
+          }
+         }
+        ],
+        "time": "10:03"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă nu ați inițiat dumneavoastră conectarea, un cod trimis printr-un mesaj este o capcană.",
+       "next": "slides"
+      },
+      {
+       "id": "official",
+       "label": "Vă rog să trimiteți invitația oficială pe e-mailul meu de serviciu",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Un răspuns bun. Un organizator real poate face asta; un escroc se va eschiva.",
+       "next": "slides"
+      },
+      {
+       "id": "open-page",
+       "label": "Deschideți pagina",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Pagina este reală, dar această conectare a inițiat-o altcineva. Urmăriți cu atenție ecranul următor."
+      }
+     ]
+    },
+    {
+     "id": "device-confirm",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Vă conectați pe un alt dispozitiv?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Cod: QK7-MN4P"
+        }
+       ],
+       [
+        {
+         "text": "Dacă nu ați inițiat chiar dumneavoastră această conectare, nu continuați."
+        }
+       ]
+      ],
+      "buttons": [
+       "Continuați",
+       "Anulați"
+      ]
+     },
+     "say": "Pagina s-a deschis. Imediat ce introduceți codul, apare această întrebare.",
+     "actions": [
+      {
+       "id": "continue",
+       "label": "Continuați",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Dispozitivul escroacei este acum în contul dumneavoastră. Sunați imediat la suportul IT."
+      },
+      {
+       "id": "cancel",
+       "label": "Anulați",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Chiar pagina v-a avertizat: nu dumneavoastră ați inițiat această conectare."
+      }
+     ]
+    },
+    {
+     "id": "slides",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-nordvale-slides",
+      "app": "Nordvale Slides",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Vizualizarea profilului dumneavoastră"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Citirea și trimiterea e-mailurilor dumneavoastră"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Păstrarea accesului și în absența dumneavoastră"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Acum organizatoarea v-a trimis un link către prezentare. Și aici vi se cere o permisiune.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Nu permiteți",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Pentru a vedea o prezentare nu este nevoie de e-mailul dumneavoastră."
+      },
+      {
+       "id": "allow",
+       "label": "Permiteți",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Acum această aplicație vă citește e-mailurile. Cereți suportului IT să revoce permisiunea."
+      }
+     ]
+    },
+    {
+     "id": "tell-support",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Suport IT"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Am primit un cod și o cerere de permisiuni în numele unui forum."
+         }
+        ],
+        "time": "10:20"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Vă mulțumim! Ați introdus codul sau ați permis ceva?"
+         }
+        ],
+        "time": "10:21"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "yes",
+       "label": "Da, l-am introdus din greșeală",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Este corect să spuneți imediat. Un specialist va închide conectarea și va revoca permisiunea."
+      },
+      {
+       "id": "no",
+       "label": "Nu, nu am introdus nimic",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Un specialist îi va avertiza și pe ceilalți colegi."
+      },
+      {
+       "id": "silent",
+       "label": "Nu răspundeți",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Oricine poate greși, dar dacă ascundeți greșeala, paguba crește. Un răspuns sincer câștigă timp."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ac2-match",
+   "prompt": "Asociați fiecare situație cu pasul corect.",
+   "pairs": [
+    {
+     "id": "code-message",
+     "left": "Cineva v-a trimis un cod într-un mesaj",
+     "right": "Nu îl introduceți nicăieri și raportați"
+    },
+    {
+     "id": "own-tv",
+     "left": "Ați inițiat chiar dumneavoastră conectarea pe un televizor",
+     "right": "Puteți introduce codul afișat pe ecran"
+    },
+    {
+     "id": "unknown-app",
+     "left": "O aplicație necunoscută cere acces permanent",
+     "right": "Nu permiteți"
+    },
+    {
+     "id": "mistake",
+     "left": "Ați introdus un cod sau ați acordat acces unei aplicații din greșeală",
+     "right": "Sunați imediat la suportul IT"
+    }
+   ],
+   "explain": "Un cod este sigur doar când vine de pe un dispozitiv pe care ați inițiat chiar dumneavoastră conectarea. În orice alt caz, opriți-vă și raportați."
+  },
+  {
+   "type": "choice",
+   "id": "ac2-choice",
+   "question": {
+    "prompt": "Organizatoarea spune: „Pagina este chiar a organizației dumneavoastră, nu vă faceți griji.” Este acesta un motiv să introduceți codul?",
+    "options": [
+     {
+      "id": "no",
+      "label": "Nu. Pagina este reală, dar conectarea a inițiat-o altcineva",
+      "correct": true,
+      "feedback": "Corect. În această capcană, pagina și codul sunt reale; falsă este doar persoana care a inițiat conectarea."
+     },
+     {
+      "id": "real-address",
+      "label": "Da, dacă adresa este reală, nu există niciun pericol",
+      "correct": false,
+      "feedback": "Verificarea adresei protejează o parolă, nu un cod. Codul ajunge pe dispozitivul celui care a inițiat conectarea."
+     },
+     {
+      "id": "famous",
+      "label": "Da, dacă organizatoarea este de la un forum cunoscut",
+      "correct": false,
+      "feedback": "Oricine poate scrie un nume cunoscut. Verificați forumul pe site-ul lui oficial."
+     }
+    ]
+   },
+   "explain": "Un cod îi dă o cheie dispozitivului care a inițiat conectarea. Dacă nu dumneavoastră ați inițiat-o, nu introduceți codul."
+  },
+  {
+   "type": "recap",
+   "id": "ac2-recap",
+   "points": [
+    "Nu introduceți pe nicio pagină de conectare un cod primit într-un mesaj",
+    "Chiar și pe o pagină reală, verificați cine a inițiat conectarea",
+    "Dacă ați greșit, anunțați imediat suportul IT"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

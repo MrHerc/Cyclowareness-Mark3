@@ -1,0 +1,333 @@
+{
+ "id": "lookalike-domains",
+ "title": "Adrese aproape identice",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ld-tutor",
+   "beats": [
+    {
+     "id": "ld-b1",
+     "say": "Pe telefon, bara de adrese este scurtă, iar cea mai mare parte a adresei rămâne ascunsă. Escrocii se bazează pe asta.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "ld-b2",
+     "say": "Uitați-vă la această adresă: numele oficial apare la început, dar adevăratul proprietar al site-ului este partea de la final.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://vetendasportal.gov."
+        },
+        {
+         "text": "az-arayis.example",
+         "spot": "real-owner"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "real-owner"
+    },
+    {
+     "id": "ld-b3",
+     "say": "Mai există și alte trucuri: două litere își schimbă locul, se adaugă un cuvânt sau o cifră asemănătoare ia locul unei litere.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "ld-b4",
+     "say": "Pe o adresă suspectă nu scrieți nimic. Închideți pagina și anunțați suportul IT.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ld-match",
+   "prompt": "Asociați fiecare adresă falsă cu adresa oficială pe care o imită.",
+   "pairs": [
+    {
+     "id": "gov",
+     "left": "vetendasportal.gov.az-arayis.example",
+     "right": "vetendasportal.gov.az"
+    },
+    {
+     "id": "sahil",
+     "left": "sahi1bank.example.info",
+     "right": "sahilbank.az"
+    },
+    {
+     "id": "ulduz",
+     "left": "ulduzbnak.example",
+     "right": "ulduzbank.az"
+    },
+    {
+     "id": "mail",
+     "left": "idare-poct-giris.example.info",
+     "right": "poct.idare.example"
+    }
+   ],
+   "explain": "Diferența este mică: numele oficial pus în față, o cifră, două litere inversate sau un cuvânt în plus. Citiți întotdeauna adresa de la final."
+  },
+  {
+   "type": "simulation",
+   "id": "ld-sim",
+   "environment": "phone",
+   "title": "O adeverință pe telefon",
+   "intro": "Vreți să obțineți o adeverință de pe telefon. La fiecare pas, citiți adresa până la capăt.",
+   "steps": [
+    {
+     "id": "search-ad",
+     "label": "Sponsorizat: Vatandash Portal, site oficial",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tapan",
+      "url": [
+       {
+        "text": "https://tapan.example/axtar?q=vetendas+portali+arayis",
+        "reveal": "tapan.example"
+       }
+      ]
+     },
+     "say": "Primul rezultat al căutării este o reclamă.",
+     "actions": [
+      {
+       "id": "ad",
+       "label": "Deschideți reclama",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Reclama v-a dus pe alt site. Acum citiți cu atenție adresa.",
+       "next": "fake-login"
+      },
+      {
+       "id": "official",
+       "label": "Deschideți rezultatul vetendasportal.gov.az",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Corect. Ați sărit peste reclamă și ați ales rezultatul a cărui adresă se termină în gov.az.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2c-vetendas-portal-fake",
+      "brand": "Vatandash Portal",
+      "url": [
+       {
+        "text": "https://vetendasportal.gov.az-arayis.example/giris",
+        "reveal": "az-arayis.example"
+       }
+      ],
+      "fields": [
+       "Cod FIN",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "say": "Pe telefon se vede doar începutul adresei. Citiți-o până la capăt.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Conectați-vă",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Adresa începea cu gov.az, dar nu se termina așa. Codul FIN și parola au ajuns la escroc."
+      },
+      {
+       "id": "close",
+       "label": "Închideți pagina",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Adevăratul proprietar al unui site este la finalul adresei, iar aceasta nu se termina în gov.az.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "new-login",
+     "label": "10:16 Vatandash Portal",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2c-vetendas-portal",
+      "app": "Vatandash Portal",
+      "title": [
+       {
+        "text": "Conectare nouă"
+       }
+      ],
+      "body": [
+       {
+        "text": "Cineva s-a conectat la contul dumneavoastră de pe un dispozitiv necunoscut."
+       }
+      ],
+      "time": "10:16"
+     },
+     "say": "Un minut mai târziu a sosit această notificare.",
+     "actions": [
+      {
+       "id": "fix",
+       "label": "Deschid chiar eu portalul și schimb parola",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. Deschideți portalul din marcaje, schimbați parola și deconectați-vă de pe toate dispozitivele."
+      },
+      {
+       "id": "later",
+       "label": "Mă uit mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Escrocul este deja în contul dumneavoastră. Fiecare minut contează."
+      }
+     ]
+    },
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2c-vetendas-portal",
+      "brand": "Vatandash Portal",
+      "url": [
+       {
+        "text": "https://vetendasportal.gov.az/giris",
+        "reveal": "vetendasportal.gov.az"
+       }
+      ],
+      "fields": [
+       "Cod FIN",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "say": "Această adresă se termină în gov.az.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Conectați-vă",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Corect, acesta este chiar portalul oficial. Acum salvați-l în marcaje."
+      },
+      {
+       "id": "check",
+       "label": "Verificați adresa",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Un obicei excelent. Domeniul se termină în gov.az, fără niciun cuvânt în plus în față."
+      }
+     ]
+    },
+    {
+     "id": "bank-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank-fake",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "19:42",
+      "messages": [
+       [
+        {
+         "text": "Cardul dumneavoastră a fost blocat temporar. Pentru deblocare: "
+        },
+        {
+         "text": "sahilbank.az-kart.example/ac",
+         "link": {
+          "label": "sahilbank.az-kart.example/ac",
+          "href": "https://sahilbank.az-kart.example/ac"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Seara primiți un SMS în numele băncii.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți linkul",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Adresa începe cu numele băncii, dar proprietarul este partea de la final. Deschideți chiar dumneavoastră aplicația băncii."
+      },
+      {
+       "id": "report",
+       "label": "Raportați ca spam",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Verificați cardul în aplicația băncii sau sunând la numărul de pe spatele cardului."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Și așa este bine. Dacă aveți îndoieli, sunați chiar dumneavoastră la bancă, la numărul de pe spatele cardului."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "ld-order",
+   "prompt": "Ordonați pașii pentru verificarea unei adrese pe telefon.",
+   "items": [
+    {
+     "id": "tap",
+     "label": "Atingeți bara de adrese ca să vedeți adresa completă"
+    },
+    {
+     "id": "end",
+     "label": "Găsiți ultima parte a domeniului"
+    },
+    {
+     "id": "compare",
+     "label": "Comparați-o literă cu literă cu adresa oficială"
+    },
+    {
+     "id": "leave",
+     "label": "Dacă ceva diferă, închideți pagina fără să scrieți nimic"
+    }
+   ],
+   "explain": "Pe telefon, finalul adresei este adesea ascuns, așa că mai întâi afișați-o complet. Dacă numele oficial nu este la final, site-ul este fals."
+  },
+  {
+   "type": "recap",
+   "id": "ld-recap",
+   "points": [
+    "Pe telefon, afișați adresa completă și citiți-o de la final",
+    "Chiar dacă numele oficial apare primul, adevăratul proprietar este partea de la final",
+    "Dacă ați introdus o parolă, schimbați-o pe site-ul oficial și raportați incidentul"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

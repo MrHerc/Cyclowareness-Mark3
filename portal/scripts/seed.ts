@@ -20,7 +20,8 @@ import { recomputeRisk, tenantKpis } from "../src/server/services/risk";
 import { audit } from "../src/server/services/audit";
 import { hashPassword } from "../src/server/auth/password";
 import { analyzeFile, analyzeUrl } from "../src/server/sandbox/analyze";
-import { TEMPLATE_BY_KEY } from "../src/lib/campaigns/templates";
+import { TEMPLATE_BY_KEY, clickRiskTitle } from "../src/lib/campaigns/templates";
+import type { Locale } from "../src/i18n/config";
 import { DEFAULT_ATTESTATION, defaultSettings } from "../src/lib/tenant-defaults";
 import { departmentKey } from "../src/lib/departments";
 import { encodeRiskTitle } from "../src/lib/risk-title";
@@ -77,7 +78,7 @@ async function main() {
 
   const lib = await syncLibrary(db);
   const pathCount = await syncPaths(db);
-  console.log(`Library: ${lib.modules} modules, ${lib.lessons} lessons (texts: en ${lib.locales.en}, az ${lib.locales.az}, ru ${lib.locales.ru}), ${pathCount} paths`);
+  console.log(`Library: ${lib.modules} modules, ${lib.lessons} lessons (texts: ${Object.entries(lib.locales).map(([l, n]) => `${l} ${n}`).join(", ")}), ${pathCount} paths`);
 
   /* ───────── modules & lessons in memory ───────── */
   const modRows = await db.select().from(t.modules);
@@ -119,6 +120,9 @@ async function main() {
   const logoName = logoCandidates.find((f) => fs.existsSync(path.join(process.cwd(), "public", "brand", f)));
   const settings = defaultSettings("az");
   settings.email = { enabled: false, helpdesk: `helpdesk@${DEMO_DOMAIN}` };
+  // The fictional demo organisation only: its role accounts open the console with the shared demo password, no authenticator.
+  // Real organisations get the default (required); the platform operator above always needs it.
+  settings.identity.requireAdmin2fa = false;
   settings.setupSkipped = [];
   const [tenant] = await db
     .insert(t.tenants)
@@ -306,11 +310,15 @@ async function main() {
   const aupAz = fs.existsSync(aupAzFile) ? fs.readFileSync(aupAzFile, "utf8").replace(/^<!--[\s\S]*?-->\s*/, "") : null;
   const pwAz = fs.readFileSync(path.join(process.cwd(), "content", "policies", "passwords.az.md"), "utf8");
   const pwEn = fs.readFileSync(path.join(process.cwd(), "content", "policies", "passwords.en.md"), "utf8");
-  // Russian copies come from content/policies/<name>.ru.md; a policy without one shows Russian readers the base text with a notice.
-  const ruPolicy = (name: string, title: string, summary: string): Record<string, { title: string; summary: string; bodyMd: string }> => {
-    const file = path.join(process.cwd(), "content", "policies", `${name}.ru.md`);
-    return fs.existsSync(file) ? { ru: { title, summary, bodyMd: fs.readFileSync(file, "utf8").replace(/^<!--[\s\S]*?-->\s*/, "") } } : {};
-  };
+  // Other languages come from content/policies/<name>.<locale>.md; a language without its file (a translation still
+  // being written) is skipped, and its readers see the base text with a notice.
+  const policyTranslations = (name: string, texts: Record<Exclude<Locale, "az" | "en">, { title: string; summary: string }>): Record<string, { title: string; summary: string; bodyMd: string }> =>
+    Object.fromEntries(
+      Object.entries(texts).flatMap(([locale, text]) => {
+        const file = path.join(process.cwd(), "content", "policies", `${name}.${locale}.md`);
+        return fs.existsSync(file) ? [[locale, { ...text, bodyMd: fs.readFileSync(file, "utf8").replace(/^<!--[\s\S]*?-->\s*/, "") }]] : [];
+      }),
+    );
   const policySpecs = [
     {
       title: "İnformasiya resurslarından məqbul istifadə siyasəti",
@@ -319,7 +327,16 @@ async function main() {
       summary: "Hesablar, e-poçt, internet, cihazlar, məlumat və Sİ xidmətlərindən təhlükəsiz və qanuni istifadə qaydaları.",
       translations: {
         en: { title: "Acceptable Use of Information Resources Policy", summary: "Rules for the secure and lawful use of accounts, email, internet, devices, data and AI services.", bodyMd: aupEn },
-        ...ruPolicy("acceptable-use", "Политика допустимого использования информационных ресурсов", "Правила безопасного и законного использования учётных записей, электронной почты, интернета, устройств, данных и сервисов ИИ."),
+        ...policyTranslations("acceptable-use", {
+          ru: { title: "Политика допустимого использования информационных ресурсов", summary: "Правила безопасного и законного использования учётных записей, электронной почты, интернета, устройств, данных и сервисов ИИ." },
+          tr: { title: "Bilgi kaynaklarının kabul edilebilir kullanımı politikası", summary: "Hesapların, e-postanın, internetin, cihazların, verilerin ve yapay zekâ hizmetlerinin güvenli ve hukuka uygun kullanımına ilişkin kurallar." },
+          ro: { title: "Politica de utilizare acceptabilă a resurselor informaționale", summary: "Reguli pentru utilizarea sigură și legală a conturilor, a e-mailului, a internetului, a dispozitivelor, a datelor și a serviciilor AI." },
+          ka: { title: "ინფორმაციული რესურსების მისაღები გამოყენების პოლიტიკა", summary: "ანგარიშების, ელფოსტის, ინტერნეტის, მოწყობილობების, მონაცემებისა და ხელოვნური ინტელექტის სერვისების უსაფრთხო და კანონიერი გამოყენების წესები." },
+          uk: { title: "Політика прийнятного використання інформаційних ресурсів", summary: "Правила безпечного й законного використання облікових записів, електронної пошти, інтернету, пристроїв, даних і сервісів ШІ." },
+          de: { title: "Richtlinie zur zulässigen Nutzung von Informationsressourcen", summary: "Regeln für die sichere und rechtmäßige Nutzung von Konten, E-Mail, Internet, Geräten, Daten und KI-Diensten." },
+          fr: { title: "Politique d’utilisation acceptable des ressources informationnelles", summary: "Règles d’utilisation sûre et licite des comptes, de la messagerie électronique, d’internet, des appareils, des données et des services d’IA." },
+          ar: { title: "سياسة الاستخدام المقبول لموارد المعلومات", summary: "قواعد الاستخدام الآمن والمشروع للحسابات والبريد الإلكتروني والإنترنت والأجهزة والبيانات وخدمات الذكاء الاصطناعي." },
+        }),
       },
       signRate: 0.55,
     },
@@ -330,7 +347,16 @@ async function main() {
       summary: "Parollar, iki addımlı doğrulama və parol meneceri qaydaları.",
       translations: {
         en: { title: "Password and Account Security Policy", summary: "Rules for passwords, two-step verification and the password manager.", bodyMd: pwEn },
-        ...ruPolicy("passwords", "Политика паролей и безопасности учётных записей", "Правила для паролей, двухэтапной проверки и менеджера паролей."),
+        ...policyTranslations("passwords", {
+          ru: { title: "Политика паролей и безопасности учётных записей", summary: "Правила для паролей, двухэтапной проверки и менеджера паролей." },
+          tr: { title: "Parola ve hesap güvenliği politikası", summary: "Parolalara, iki adımlı doğrulamaya ve parola yöneticisine ilişkin kurallar." },
+          ro: { title: "Politica privind parolele și securitatea conturilor", summary: "Reguli privind parolele, verificarea în doi pași și managerul de parole." },
+          ka: { title: "პაროლებისა და ანგარიშების უსაფრთხოების პოლიტიკა", summary: "პაროლების, ორსაფეხურიანი დადასტურებისა და პაროლების მენეჯერის გამოყენების წესები." },
+          uk: { title: "Політика щодо паролів і безпеки облікових записів", summary: "Правила щодо паролів, двоетапної перевірки та менеджера паролів." },
+          de: { title: "Richtlinie zu Passwörtern und Kontosicherheit", summary: "Regeln für Passwörter, die Zwei-Faktor-Authentisierung und den Passwort-Manager." },
+          fr: { title: "Politique relative aux mots de passe et à la sécurité des comptes", summary: "Règles relatives aux mots de passe, à la double authentification et au gestionnaire de mots de passe." },
+          ar: { title: "سياسة كلمات المرور وأمن الحسابات", summary: "قواعد كلمات المرور والتحقق بخطوتين ومدير كلمات المرور." },
+        }),
       },
       signRate: 0.3,
     },
@@ -421,11 +447,7 @@ async function main() {
           userId: p.id,
           moduleId: mod(tpl.moduleSlug).id,
           at: clickedAt,
-          title: encodeRiskTitle({
-            az: `«${c.name}» fişinq simulyasiyasındakı linki açmısınız.`,
-            en: `You opened the link in the “${c.name}” phishing simulation.`,
-            ru: `Вы открыли ссылку в фишинговой симуляции «${c.name}».`,
-          }),
+          title: clickRiskTitle(c.name),
           severity: submitted ? "high" : "medium",
           ref: camp.id,
         });
@@ -456,11 +478,19 @@ async function main() {
   /* ───────── other open risks (breach, path) ───────── */
   const learner = byEmailKey("learner");
   const pwModule = mod("password-managers-work");
+  // The quoted module and path names are their titles in content/library (i18n.<locale>.json, paths.json).
   const breachTitle = encodeRiskTitle({
     az: "E-poçt ünvanınız ictimai məlumat sızıntısında aşkarlanıb. Buna görə sizə «İşdə parol menecerləri» təlimi təyin olunub.",
     en: "Your email address was found in a public data breach, so you have been given the “Password managers at work” training.",
     ru: "Ваш адрес электронной почты обнаружен в публичной утечке данных, поэтому вам назначено обучение «Менеджеры паролей на работе».",
-  });
+    tr: "E-posta adresiniz herkese açık bir veri sızıntısında bulundu. Bu nedenle size “İş yerinde parola yöneticileri” eğitimi atandı.",
+    ro: "Adresa dumneavoastră de e-mail a fost găsită într-o scurgere publică de date, de aceea vi s-a atribuit instruirea „Managerul de parole la serviciu”.",
+    ka: "თქვენი ელფოსტის მისამართი მონაცემთა საჯარო გაჟონვაში აღმოჩნდა, ამიტომ დაგენიშნათ ტრენინგი „პაროლების მენეჯერები სამსახურში“.",
+    uk: "Вашу адресу електронної пошти виявлено в публічному витоку даних, тому вам призначено навчання «Менеджери паролів на роботі».",
+    de: "Ihre E-Mail-Adresse wurde in einem öffentlichen Datenleck gefunden, deshalb wurde Ihnen die Schulung „Passwort-Manager bei der Arbeit“ zugewiesen.",
+    fr: "Votre adresse e-mail a été trouvée dans une fuite de données publique : la formation « Gestionnaires de mots de passe au travail » vous a donc été assignée.",
+    ar: "تم العثور على عنوان بريدك الإلكتروني في تسرب بيانات منشور، لذلك أسند إليك تدريب «مدير كلمات المرور في العمل».",
+  } satisfies Record<Locale, string>);
   await db.insert(t.behaviorRisks).values([
     {
       tenantId,
@@ -482,7 +512,14 @@ async function main() {
         az: "Təlim yolunun bir hissəsidir: «Ödəniş fırıldaqları və BEC-dən müdafiə».",
         en: "Part of the learning path “Payment fraud and BEC defence”.",
         ru: "Входит в учебный путь «Защита от платёжного мошенничества и BEC».",
-      }),
+        tr: "“Ödeme dolandırıcılığına ve BEC'ye karşı korunma” öğrenme yolunun bir parçasıdır.",
+        ro: "Face parte din parcursul de învățare „Protecție împotriva fraudelor la plăți și BEC”.",
+        ka: "სასწავლო გზის „დაცვა გადახდის თაღლითობისა და BEC-ისგან“ ნაწილია.",
+        uk: "Входить до навчального шляху «Захист від платіжного шахрайства та BEC».",
+        de: "Teil des Lernpfads „Schutz vor Zahlungsbetrug und BEC“.",
+        fr: "Fait partie du parcours de formation « Contrer la fraude aux paiements et le BEC ».",
+        ar: "جزء من المسار التدريبي «الحماية من الاحتيال في المدفوعات واختراق بريد الأعمال (BEC)».",
+      } satisfies Record<Locale, string>),
       sourceRef: "path:finance-bec",
       moduleId: mod("vendor-email-compromise").id,
       dueDate: iso(new Date(NOW.getTime() + 8 * DAY)),

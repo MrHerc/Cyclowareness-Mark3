@@ -1,0 +1,527 @@
+{
+ "id": "fake-shops",
+ "title": "La fausse boutique",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fs-tutor",
+   "beats": [
+    {
+     "id": "fs-b1",
+     "say": "Bonjour ! Dans cette leçon, vous allez apprendre à repérer les fausses boutiques sur les réseaux sociaux.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "fs-b2",
+     "say": "Regardez cette publicité : un climatiseur haut de gamme pour 299 manats seulement, valable aujourd’hui, à payer d’avance.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "kontakto",
+       "app": "Kontakto",
+       "title": [
+        {
+         "text": "Sponsorisé : Serin Klimat Promo"
+        }
+       ],
+       "body": [
+        {
+         "text": "Climatiseur à seulement 299 AZN au lieu de 1 199 ! "
+        },
+        {
+         "text": "Aujourd’hui uniquement, paiement 100 % à l’avance.",
+         "spot": "prepay"
+        }
+       ],
+       "time": "13:05"
+      }
+     },
+     "highlight": "prepay"
+    },
+    {
+     "id": "fs-b3",
+     "say": "L’escroc encaisse d’abord l’argent, puis il ferme la page et disparaît.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "fs-b4",
+     "say": "La règle est simple : ne payez jamais d’avance une page inconnue, et payez à la livraison chaque fois que c’est possible.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "fs-swipe",
+   "prompt": "Quelle offre de boutique est sûre, et laquelle est une menace ?",
+   "cards": [
+    {
+     "id": "rush",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Serin Klimat Promo"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "L’offre se termine aujourd’hui, plus que 3 en stock. Paiement uniquement par virement de carte à carte, 100 % d’avance."
+         }
+        ],
+        "time": "13:12"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "La pression, plus un paiement d’avance uniquement de carte à carte : c’est le principal signe d’une fausse boutique. Cet argent est très difficile à récupérer."
+    },
+    {
+     "id": "official",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Serin Klimat, depuis 2014"
+       }
+      ],
+      "body": [
+       {
+        "text": "Climatiseur à 1 149 AZN. Paiement à la livraison, en espèces ou par carte. Magasin et service après-vente à Narimanov."
+       }
+      ],
+      "time": "10:20"
+     },
+     "verdict": "safe",
+     "explain": "Un prix réaliste, une page qui existe depuis des années et le paiement à la livraison. Vous voyez d’abord la marchandise, vous payez ensuite."
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2e-serin-klimat-fake",
+      "url": [
+       {
+        "text": "https://serin-klimat-endirim.example.net/kampaniya"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ce n’est pas le site officiel de la boutique. Un mot ajouté au nom et un domaine étrange trahissent une fausse page."
+    },
+    {
+     "id": "cod",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Laman Handmade"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour ! J’envoie les commandes avec CevikKargo, vous payez le livreur à la réception."
+         }
+        ],
+        "time": "11:47"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Le paiement à la livraison vous protège. Vous ne payez jamais avant d’avoir vu la marchandise."
+    },
+    {
+     "id": "new-page",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Phone Outlet Baku"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Notre page est nouvelle, mais nous avons 20 000 abonnés. Nous avons fermé les commentaires à cause du spam. Envoyez un acompte de 50 AZN."
+         }
+        ],
+        "time": "16:30"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une page récente, des commentaires fermés et une demande d’acompte : réunis, c’est un signal d’alerte sérieux. Les abonnés, ça s’achète."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "fs-sim",
+   "environment": "phone",
+   "title": "L’offre de climatiseur",
+   "intro": "Vous avez vu sur Kontakto une publicité pour un climatiseur bon marché. Décidez étape par étape sur votre téléphone.",
+   "steps": [
+    {
+     "id": "ad",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Sponsorisé : Serin Klimat Promo"
+       }
+      ],
+      "body": [
+       {
+        "text": "Climatiseur à seulement 299 AZN au lieu de 1 199 ! Aujourd’hui uniquement, paiement 100 % à l’avance."
+       }
+      ],
+      "time": "13:05"
+     },
+     "say": "La publicité est très tentante. Regarder, ce n’est pas grave.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir la publicité",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Regarder n’a rien de dangereux. La vraie décision se prend avant de payer."
+      },
+      {
+       "id": "hide",
+       "label": "Masquer la publicité",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Bon choix. Un prix bien trop bas est souvent un appât.",
+       "next": "real-shop"
+      }
+     ]
+    },
+    {
+     "id": "prepay",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Serin Klimat Promo"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour ! L’offre se termine aujourd’hui à 18:00."
+         }
+        ],
+        "time": "13:12"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Envoyez votre nom et votre adresse, et virez 299 AZN sur cette carte : **** **** **** 0000. Livraison demain."
+         }
+        ],
+        "time": "13:12"
+       }
+      ]
+     },
+     "say": "Le vendeur demande tout de suite un paiement d’avance.",
+     "actions": [
+      {
+       "id": "ask-cod",
+       "label": "Je peux payer à la livraison ?",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bonne question. Une vraie boutique accepte généralement le paiement à la livraison."
+      },
+      {
+       "id": "pay",
+       "label": "Virer 299 AZN maintenant",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "L’argent est parti sur la carte d’un inconnu. Un paiement d’avance est très difficile à récupérer.",
+       "next": "gone"
+      },
+      {
+       "id": "report",
+       "label": "Signaler la page",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bravo. La page que vous avez signalée ne pourra plus tromper d’autres acheteurs.",
+       "next": "real-shop"
+      }
+     ]
+    },
+    {
+     "id": "deposit",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Serin Klimat Promo"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Je peux payer à la livraison ?"
+         }
+        ],
+        "time": "13:14"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Pas de paiement à la livraison au prix promo. Envoyez au moins un acompte de 50 AZN et payez le reste au livreur."
+         }
+        ],
+        "time": "13:15"
+       }
+      ]
+     },
+     "say": "Voici le prétexte : maintenant, on vous demande un acompte.",
+     "actions": [
+      {
+       "id": "pay-deposit",
+       "label": "Envoyer un acompte de 50 AZN",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Un acompte, c’est aussi un paiement d’avance. La fausse boutique l’encaisse et disparaît."
+      },
+      {
+       "id": "check",
+       "label": "Chercher moi-même la page officielle de la boutique",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Vérifier la page officielle et les avis des acheteurs ne prend que quelques minutes.",
+       "next": "real-shop"
+      },
+      {
+       "id": "block",
+       "label": "Bloquer",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bien. Un inconnu qui refuse de vendre sans paiement d’avance ne mérite pas qu’on discute avec lui.",
+       "next": "real-shop"
+      }
+     ]
+    },
+    {
+     "id": "gone",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Discussion indisponible"
+       }
+      ],
+      "body": [
+       {
+        "text": "Serin Klimat Promo n’existe plus ou a bloqué votre compte."
+       }
+      ],
+      "time": "09:30"
+     },
+     "say": "Le lendemain, aucun climatiseur n’est arrivé, et la page a disparu.",
+     "actions": [
+      {
+       "id": "bank",
+       "label": "Appeler la banque au numéro inscrit sur la carte",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Exact. Si la banque est prévenue vite, elle peut tenter de bloquer le virement."
+      },
+      {
+       "id": "evidence",
+       "label": "Garder des captures d’écran, prévenir la police",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bonne démarche. La discussion et le reçu du virement sont des preuves pour la police."
+      },
+      {
+       "id": "wait",
+       "label": "Attendre quelques jours",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Chaque heure compte. Attendre réduit les chances de récupérer l’argent."
+      }
+     ]
+    },
+    {
+     "id": "real-shop",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Serin Klimat"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour ! Ceci est notre seule page officielle. Climatiseur à 1 149 AZN, paiement à la livraison en espèces ou par carte."
+         }
+        ],
+        "time": "14:02"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Toute page qui demande un paiement d’avance en notre nom n’est pas la nôtre."
+         }
+        ],
+        "time": "14:02"
+       }
+      ]
+     },
+     "say": "Voici la page officielle de la boutique.",
+     "actions": [
+      {
+       "id": "order",
+       "label": "Commander avec paiement à la livraison",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Excellent choix. Vous payez après avoir vu et vérifié la marchandise."
+      },
+      {
+       "id": "tell",
+       "label": "Montrer la fausse page à la boutique",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Bien. La boutique peut signaler la fausse page et la faire supprimer."
+      },
+      {
+       "id": "back",
+       "label": "Revenir à la page bon marché",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Revenir sur la fausse page met votre argent en danger. Tenez-vous-en à la boutique officielle."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "fs-match",
+   "prompt": "Associez chaque signe à ce qu’il signifie.",
+   "pairs": [
+    {
+     "id": "age",
+     "left": "Page créée il y a une semaine",
+     "right": "Les fausses boutiques ouvrent vite et ferment vite"
+    },
+    {
+     "id": "reviews",
+     "left": "Commentaires désactivés",
+     "right": "On fait taire les acheteurs mécontents"
+    },
+    {
+     "id": "card",
+     "left": "Paiement d’avance uniquement de carte à carte",
+     "right": "L’argent est très difficile à récupérer"
+    },
+    {
+     "id": "price",
+     "left": "Prix trois fois inférieur à celui du marché",
+     "right": "Un appât pour vous faire agir dans la précipitation"
+    }
+   ],
+   "explain": "Un seul signe suffit pour s’arrêter. Vérifiez la boutique sur son site officiel et dans les avis des acheteurs."
+  },
+  {
+   "type": "choice",
+   "id": "fs-choice",
+   "question": {
+    "prompt": "Vous achetez dans une boutique en ligne que vous ne connaissez pas. Quel est le moyen de paiement le plus sûr ?",
+    "options": [
+     {
+      "id": "cod",
+      "label": "Payer à la livraison, au moment de recevoir la marchandise",
+      "correct": true,
+      "feedback": "Exact. Vous ne payez jamais avant d’avoir vu la marchandise, donc une fausse boutique n’obtient rien."
+     },
+     {
+      "id": "card",
+      "label": "Virer l’argent sur la carte personnelle du vendeur",
+      "correct": false,
+      "feedback": "Un virement sur une carte personnelle ne peut pas être annulé. C’est exactement ce que veulent les escrocs."
+     },
+     {
+      "id": "half",
+      "label": "Envoyer la moitié en acompte",
+      "correct": false,
+      "feedback": "Un acompte, c’est aussi un paiement d’avance. La fausse boutique l’encaisse et disparaît."
+     },
+     {
+      "id": "crypto",
+      "label": "Payer en cryptos",
+      "correct": false,
+      "feedback": "Personne ne peut annuler un virement en cryptos. Si une boutique vous le demande, passez votre chemin."
+     }
+    ]
+   },
+   "explain": "Si un paiement d’avance est exigé, ne payez qu’une boutique officielle que vous connaissez depuis longtemps. En cas de doute, n’achetez pas."
+  },
+  {
+   "type": "recap",
+   "id": "fs-recap",
+   "points": [
+    "Ne payez jamais d’avance une page que vous ne connaissez pas.",
+    "Payez à la livraison quand c’est possible : voyez d’abord la marchandise, payez ensuite.",
+    "Vérifiez l’ancienneté de la page et les avis, et méfiez-vous d’un prix bien trop bas."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

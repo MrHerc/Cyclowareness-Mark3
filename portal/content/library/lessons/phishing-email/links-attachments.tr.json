@@ -1,0 +1,483 @@
+{
+  "id": "links-attachments",
+  "title": "Bağlantılar ve ekler",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "read-the-link",
+      "beats": [
+        {
+          "id": "intro",
+          "say": "Bir bağlantının metni bir şey söyler, adresi başka bir şey. Haydi adresi okumayı öğrenelim.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "padlock",
+          "say": "Kilit simgesi yalnızca siteyle aranızdaki veri akışının şifreli olduğunu gösterir. Sahte sitelerde de kilit simgesi bulunur.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          },
+          "checkpoint": {
+            "prompt": "Kilit simgesi, sitenin gerçek olduğunu kanıtlar mı?",
+            "options": [
+              {
+                "id": "yes",
+                "label": "Evet",
+                "correct": false,
+                "feedback": "Hayır. Dolandırıcılar da kilit simgesini kolayca alabilir."
+              },
+              {
+                "id": "no",
+                "label": "Hayır",
+                "correct": true,
+                "feedback": "Doğru. Her zaman sitenin adını kontrol edin."
+              }
+            ]
+          }
+        },
+        {
+          "id": "owner",
+          "say": "Sitenin adı, ilk tek eğik çizgide biter. Bu adın son kısmı, uzantısıyla birlikte, sitenin gerçek sahibini gösterir.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "xidmet-agentliyi-fake",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "xidmetagentliyi.az.",
+                  "spot": "decoy"
+                },
+                {
+                  "text": "hesab-yoxla.info",
+                  "spot": "real-domain"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "real-domain"
+        },
+        {
+          "id": "decoy",
+          "say": "Öndeki tanıdık ad yalnızca bir süs. Herkes bu adı kendi sitesinin önüne yazabilir.",
+          "mood": "alert",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "xidmet-agentliyi-fake",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "xidmetagentliyi.az.",
+                  "spot": "decoy"
+                },
+                {
+                  "text": "hesab-yoxla.info",
+                  "spot": "real-domain"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "decoy"
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "whose-link",
+      "question": {
+        "prompt": "Bu bağlantı aslında kime ait?",
+        "options": [
+          {
+            "id": "bank",
+            "label": "UlduzBank",
+            "correct": false,
+            "feedback": "Banka adı başta yazıyor, ama asıl sahibi sondaki addır."
+          },
+          {
+            "id": "owner",
+            "label": "az-giris.info",
+            "correct": true,
+            "feedback": "Doğru. Site adının sonu, gerçek sahibi gösterir."
+          },
+          {
+            "id": "path",
+            "label": "kart",
+            "correct": false,
+            "feedback": "Bu, site adı değil; eğik çizgiden sonra gelen sayfa yolu."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "ulduzbank-fake",
+            "url": [
+              {
+                "text": "https://ulduzbank.az-giris.info/kart"
+              }
+            ]
+          }
+        }
+      },
+      "explain": "Burada ulduzbank.az yalnızca bir süs. Site aslında az-giris.info adresine ait."
+    },
+    {
+      "type": "simulation",
+      "id": "link-to-login",
+      "environment": "browser",
+      "title": "Tıkladıktan sonra",
+      "intro": "Bir e-postadaki bağlantıyı açtınız. Tarayıcıdaki adresi okuyun ve ne yapacağınıza karar verin.",
+      "steps": [
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi-fake",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://xidmetagentliyi.az.",
+                "reveal": "hesab-yoxla.info"
+              },
+              {
+                "text": "hesab-yoxla.info",
+                "spot": "real-domain"
+              },
+              {
+                "text": "/giris"
+              }
+            ],
+            "fields": [
+              "E-posta",
+              "Parola"
+            ],
+            "button": "Giriş yap"
+          },
+          "say": "Adresin sonuna bakın: sitenin gerçek sahibi kim?",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Giriş yap",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Sayfa kuruma değil, hesab-yoxla.info adresine ait. Parolanızı hemen değiştirin ve durumu bildirin."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Öndeki tanıdık ad bir süstü; gerçek alan adı hesab-yoxla.info idi."
+            },
+            {
+              "id": "report",
+              "label": "Siteyi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Harika. Bildirmeniz, sahte sitenin başkaları için de engellenmesine yardımcı olur."
+            }
+          ]
+        },
+        {
+          "id": "download",
+          "label": "Fatura indiriliyor",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "ofistechizat-fake",
+            "name": [
+              {
+                "text": "Faktura_0925.pdf.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "2,1 MB",
+            "source": [
+              {
+                "text": "ofis-techizat.com"
+              }
+            ]
+          },
+          "say": "Tarayıcı bir dosya indirdi. Dosya adının nasıl bittiğine bakın.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "Dosyanın gerçek türü .exe, yani bir program. Fatura asla bir program olmaz."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Doğru. Belge kılığına girmiş bir programı silin ve e-postayı bildirin."
+            },
+            {
+              "id": "scan",
+              "label": "Antivirüsle tara",
+              "kind": "scan",
+              "outcome": "safe",
+              "feedback": "İyi bir alışkanlık. Ama adı .pdf.exe ile biten bir dosyayı taramadan da silebilirsiniz."
+            }
+          ]
+        },
+        {
+          "id": "real-portal",
+          "label": "Portalı yer işaretinizden açtınız",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/giris",
+                "reveal": "xidmetagentliyi.az"
+              }
+            ],
+            "fields": [
+              "E-posta",
+              "Parola"
+            ],
+            "button": "Giriş yap"
+          },
+          "say": "Bu kez adresi kendiniz açtınız. Şimdi ne yaparsınız?",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Giriş yap",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Doğru. Bu, kurumun resmî alan adı; üstelik sayfayı kendiniz açtınız."
+            },
+            {
+              "id": "report",
+              "label": "Siteyi bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Bu, kurumun resmî portalı. Yer işaretinden kendiniz açtığınız bir siteye güvenebilirsiniz."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "invoice-trap",
+      "prompt": "Bu e-postadaki uyarı işaretlerini bulun.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "ofistechizat-fake",
+        "from": {
+          "name": [
+            {
+              "text": "OfisTəchizat MMC",
+              "reveal": "hesab@ofis-techizat.com"
+            }
+          ],
+          "address": [
+            {
+              "text": "hesab@"
+            },
+            {
+              "text": "ofis-techizat.com",
+              "spot": "sender-domain"
+            }
+          ]
+        },
+        "to": "s.huseynova@xidmetagentliyi.az",
+        "subject": [
+          {
+            "text": "0925 numaralı fatura: ödeme gecikti"
+          }
+        ],
+        "time": "14:32",
+        "body": [
+          [
+            {
+              "text": "Merhaba,"
+            }
+          ],
+          [
+            {
+              "text": "Vadesi geçmiş fatura ektedir. "
+            },
+            {
+              "text": "Dosyayı açıp makroları etkinleştirin, yoksa metin görünmez.",
+              "spot": "enable-content"
+            }
+          ],
+          [
+            {
+              "text": "Dosya açılmazsa buradan indirin: "
+            },
+            {
+              "text": "https://qisa.example/f8Rt",
+              "spot": "short-link"
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Faktura_0925.pdf.zip",
+                "spot": "double-ext",
+                "reveal": "Dosya türü: ZIP arşivi (.zip)"
+              }
+            ],
+            "size": "312 KB"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender-domain",
+          "label": "Benzer alan adı",
+          "explain": "Tanıdık bir tedarikçiye benziyor, ama alan adı farklı. Gerçek adresi kendi kayıtlarınızdan kontrol edin."
+        },
+        {
+          "id": "enable-content",
+          "label": "Makroları etkinleştirme isteği",
+          "explain": "Makrolar gizli komutlar çalıştırabilir. Office, internetten gelen dosyalardaki makroları engeller; gerçek bir fatura sizden bu engeli aşmanızı asla istemez."
+        },
+        {
+          "id": "short-link",
+          "label": "Kısa bağlantı",
+          "explain": "Nereye gittiğini göremezsiniz. Sizi bir bağlantı üzerinden dosya indirmeye zorlamak, klasik bir hiledir."
+        },
+        {
+          "id": "double-ext",
+          "label": "Çift uzantı",
+          "explain": "Ad bir PDF gibi başlıyor, ama dosya aslında bir zip arşivi. İçinde bir program gizlenmiş olabilir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "link-check",
+      "prompt": "Bu bağlantı güvenli mi, tehdit mi?",
+      "cards": [
+        {
+          "id": "home",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi",
+            "url": [
+              {
+                "text": "https://xidmetagentliyi.az/elanlar"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Site adı tam olarak kurumun adresi."
+        },
+        {
+          "id": "portal",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/mezuniyyet"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Baştaki portal kısmı, kurumun kendi bölümü. Adın sonu yine xidmetagentliyi.az."
+        },
+        {
+          "id": "decoy",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi-fake",
+            "url": [
+              {
+                "text": "https://xidmetagentliyi.az-portal.info/giris"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Adın sonu az-portal.info. Kurumun adı yalnızca başa yazılmış."
+        },
+        {
+          "id": "swap",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi-fake",
+            "url": [
+              {
+                "text": "https://xidmetaqentliyi.az/maas"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "“g” harfinin yerinde “q” var. Bu, tamamen farklı bir site."
+        },
+        {
+          "id": "short",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://qisa.example/a8Zq"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Kısaltılmış bağlantı, nereye gittiğini gizler. Beklemediğiniz bir bağlantıysa açmayın."
+        },
+        {
+          "id": "bank",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "ulduzbank",
+            "url": [
+              {
+                "text": "https://ulduzbank.az/kartlar"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Bu, bankanın kendi adresi ve ulduzbank.az ile bitiyor. Yine de en iyisi, bankanın adresini kendiniz yazmaktır."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Bir sitenin gerçek sahibi, adının sonunda görünür.",
+        "Kısa bağlantıları ve beklenmedik dosyaları açmadan önce kontrol edin.",
+        "Bir dosya sizden makroları etkinleştirmenizi istiyorsa onu kapatın ve bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

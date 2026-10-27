@@ -1,0 +1,375 @@
+{
+  "id": "classification-labels",
+  "title": "Etichete de confidențialitate",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l1-tutor",
+      "beats": [
+        {
+          "id": "l1-b1",
+          "say": "Eticheta de pe un document de serviciu arată cine are voie să îl vadă. Haideți să învățăm să citim aceste mențiuni.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": { "kind": "illustration", "id": "folder" }
+        },
+        {
+          "id": "l1-b2",
+          "say": "Eticheta apare în subiect, în partea de sus a documentului sau în numele fișierului. Opriți-vă o clipă înainte să îl partajați.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "idare",
+              "from": {
+                "name": [{ "text": "Departamentul financiar" }],
+                "address": [{ "text": "maliyye@idare.example" }]
+              },
+              "subject": [
+                { "text": "NUMAI PENTRU UZ INTERN", "spot": "label" },
+                { "text": ": proiectul de buget pe 2027" }
+              ],
+              "time": "09:20",
+              "body": [
+                [{ "text": "Acest proiect este destinat numai șefilor de departament. Nu îl trimiteți nimănui altcuiva." }]
+              ],
+              "attachments": [
+                {
+                  "name": [{ "text": "Proiect_buget_2027.xlsx" }],
+                  "size": "84 KB"
+                }
+              ]
+            }
+          },
+          "highlight": "label"
+        },
+        {
+          "id": "l1-b3",
+          "say": "Regula de bază este nevoia de a cunoaște: documentul îl văd doar persoanele care au cu adevărat nevoie de el în activitatea lor.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": { "kind": "illustration", "id": "eye" }
+        },
+        {
+          "id": "l1-b4",
+          "say": "Funcția, prietenia sau curiozitatea nu sunt un motiv. Chiar și fără etichetă, datele cetățenilor rămân protejate.",
+          "mood": "talk",
+          "gesture": "shake",
+          "visual": { "kind": "illustration", "id": "lock" }
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "l1-match",
+      "prompt": "Asociați fiecare etichetă cu semnificația ei.",
+      "pairs": [
+        {
+          "id": "open",
+          "left": "Public",
+          "right": "Îl poate vedea oricine, de exemplu un anunț publicat pe site"
+        },
+        {
+          "id": "official-use",
+          "left": "Numai pentru uz intern",
+          "right": "În interiorul instituției, doar cei care au nevoie de el în activitatea lor"
+        },
+        {
+          "id": "secret",
+          "left": "Confidențial",
+          "right": "Doar persoanele autorizate, după reguli speciale"
+        },
+        {
+          "id": "no-label",
+          "left": "Fără etichetă, dar conține date cu caracter personal",
+          "right": "Rămâne protejat: datele cetățenilor nu sunt publice"
+        }
+      ],
+      "explain": "Denumirile etichetelor și regulile pot diferi de la o instituție la alta. Urmați întotdeauna instrucțiunile instituției dumneavoastră."
+    },
+    {
+      "type": "swipe",
+      "id": "l1-swipe",
+      "prompt": "Puteți da curs acestei cereri sau nu?",
+      "cards": [
+        {
+          "id": "curious-colleague",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "sohbet",
+            "app": "generic",
+            "contact": [{ "text": "Tural (HR)" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Salut! Trimite-mi și mie proiectul de buget, sunt doar curios cui i se mărește salariul." }]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Curiozitatea nu este o nevoie. Dacă departamentul de resurse umane nu lucrează cu acest document, nu îl trimiteți."
+        },
+        {
+          "id": "manager-report",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Narmin Huseynova" }],
+              "address": [{ "text": "n.huseynova@idare.example" }]
+            },
+            "subject": [{ "text": "Raport trimestrial" }],
+            "time": "10:05",
+            "body": [
+              [{ "text": "Vă rog să-mi trimiteți raportul echipei prin SənədAxını, mâine îl prezentăm la minister." }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Managerul dumneavoastră lucrează cu acest document și cere să folosiți sistemul oficial. Este o sarcină normală de serviciu."
+        },
+        {
+          "id": "friend-order",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [{ "text": "Samir (prieten)" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Am auzit că pregătiți la voi un ordin nou. Fă o poză la proiect, nu află nimeni." }]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Un ordin nepublicat nu iese din instituție. Prietenia nu înseamnă nevoie de a cunoaște."
+        },
+        {
+          "id": "press-public",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Biroul de presă" }],
+              "address": [{ "text": "press@idare.example" }]
+            },
+            "subject": [{ "text": "Textul anunțului" }],
+            "time": "11:30",
+            "body": [
+              [{ "text": "Ne puteți trimite textul anunțului publicat ieri pe site?" }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Anunțul este deja public. Informațiile publice pot fi partajate."
+        },
+        {
+          "id": "new-employee",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [{ "text": "+994 50 000 41 27" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Bună ziua, sunt nou aici. Vă rog să-mi trimiteți lista tuturor colegilor din departament, cu numerele lor de telefon." }]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Un angajat nou primește o astfel de listă prin managerul său. Nu trimiteți nimic unui număr necunoscut."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l1-sim",
+      "environment": "inbox",
+      "title": "Solicitările de dimineață",
+      "intro": "Aveți patru e-mailuri. La fiecare, observați cine ce cere, apoi decideți.",
+      "steps": [
+        {
+          "id": "m1",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Tural Gasimov" }],
+              "address": [{ "text": "t.qasimov@idare.example" }]
+            },
+            "subject": [{ "text": "Proiectul de buget" }],
+            "time": "09:05",
+            "body": [
+              [{ "text": "Salut! Îmi poți redirecționa proiectul de buget primit de la Departamentul financiar? Vreau doar să arunc o privire." }]
+            ]
+          },
+          "say": "Lucrează Tural cu acest document?",
+          "actions": [
+            {
+              "id": "forward",
+              "label": "Redirecționați",
+              "kind": "forward",
+              "outcome": "risky",
+              "feedback": "Tural nu lucrează cu acest document. Un document cu etichetă ajunge doar la cei care au nevoie de el."
+            },
+            {
+              "id": "reply",
+              "label": "Răspundeți: este necesară aprobarea managerului",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Corect. Dacă există o nevoie reală, managerul o aprobă pe calea oficială."
+            }
+          ]
+        },
+        {
+          "id": "m2",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "senedaxini",
+            "from": {
+              "name": [{ "text": "SənədAxını" }],
+              "address": [{ "text": "bildiris@senedaxini.idare.example" }]
+            },
+            "subject": [{ "text": "Sarcină nouă: Raport trimestrial" }],
+            "time": "09:12",
+            "body": [
+              [{ "text": "Narmin Huseynova v-a trimis o sarcină. Deschideți SənədAxını ca să o vedeți." }]
+            ]
+          },
+          "actions": [
+            {
+              "id": "safe",
+              "label": "Marcați ca sigur",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Corect. Este o sarcină așteptată din sistemul intern și nu conține niciun link pe care să dați clic."
+            },
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Nu orice e-mail este o amenințare. Expeditorul, adresa și conținutul sunt exact cele la care vă așteptați."
+            }
+          ]
+        },
+        {
+          "id": "m3",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "regional-nazirlik-fake",
+            "from": {
+              "name": [{ "text": "Ministerul Relațiilor Regionale" }],
+              "address": [{ "text": "rel.nazirlik@poct-mail.example" }]
+            },
+            "subject": [{ "text": "Urgent: lista angajaților" }],
+            "time": "09:40",
+            "body": [
+              [{ "text": "Pentru un proiect comun, trimiteți astăzi, la această adresă, numele, funcțiile și numerele de mobil ale angajaților din departamentul dumneavoastră." }]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Corect. Un minister nu scrie de pe un serviciu de e-mail gratuit, iar solicitările vin prin scrisori oficiale."
+            },
+            {
+              "id": "reply",
+              "label": "Trimiteți lista",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Datele colegilor dumneavoastră au ajuns la un escroc. Acum fiecare dintre ei poate primi un mesaj de phishing țintit."
+            }
+          ]
+        },
+        {
+          "id": "m4",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Kamran Aliyev" }],
+              "address": [{ "text": "k.aliyev@idare.example" }]
+            },
+            "subject": [{ "text": "CONFIDENȚIAL: Rezultatele inspecției" }],
+            "time": "10:02",
+            "body": [
+              [{ "text": "Rashad, găsești rezultatele în atașament." }]
+            ],
+            "attachments": [
+              {
+                "name": [{ "text": "Rezultate_inspectie.pdf" }],
+                "size": "1,1 MB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Deschideți atașamentul",
+              "kind": "open-attachment",
+              "outcome": "risky",
+              "feedback": "Acest e-mail nu vă era destinat. Chiar și dacă îl deschideți din curiozitate, tot este o scurgere de informații."
+            },
+            {
+              "id": "forward",
+              "label": "Redirecționați-l lui Rashad",
+              "kind": "forward",
+              "outcome": "risky",
+              "feedback": "Intenția este bună, dar răspândiți și mai mult greșeala. Expeditorul este cel care trebuie să o corecteze."
+            },
+            {
+              "id": "reply",
+              "label": "Anunțați expeditorul că a ajuns la persoana greșită",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Corect. Anunțați expeditorul, nu deschideți atașamentul și ștergeți e-mailul, așa cum cere instituția dumneavoastră."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l1-choice",
+      "question": {
+        "prompt": "Un prieten care lucrează la alt minister vă cere un raport cu eticheta „Numai pentru uz intern”.",
+        "options": [
+          {
+            "id": "send",
+            "label": "Îl trimit, este și el funcționar public",
+            "correct": false,
+            "feedback": "Faptul că este funcționar public nu înseamnă că are nevoie de document. Solicitarea unei alte instituții vine printr-o scrisoare oficială."
+          },
+          {
+            "id": "official",
+            "label": "Îi cer o solicitare oficială și îl anunț pe managerul meu",
+            "correct": true,
+            "feedback": "Corect. Conducerea evaluează solicitarea oficială, iar instituția îi răspunde."
+          },
+          {
+            "id": "verbal",
+            "label": "Nu îl trimit, dar îi spun cifrele principale",
+            "correct": false,
+            "feedback": "Cifrele fac parte din document. Dacă i le spuneți, tot le divulgați."
+          }
+        ]
+      },
+      "explain": "Contează nevoia de a cunoaște și permisiunea, nu canalul prin care se cere documentul. Conducerea hotărăște pe calea oficială."
+    },
+    {
+      "type": "recap",
+      "id": "l1-recap",
+      "points": [
+        "Eticheta arată cine poate vedea un document: verificați-o înainte să îl partajați.",
+        "Arătați documentul doar celor care au nevoie de el în activitatea lor, nu din curiozitate sau din prietenie.",
+        "Nu deschideți un document primit din greșeală, ci anunțați expeditorul."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

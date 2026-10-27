@@ -1,0 +1,462 @@
+{
+  "id": "store-picks",
+  "title": "Mağazada seçim",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "sp-tutor",
+      "beats": [
+        {
+          "id": "sp-b1",
+          "say": "Merhaba! Tarayıcı uzantısı küçük bir programdır. Açtığınız sayfaları görebilir ve değiştirebilir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "sp-b2",
+          "say": "En geniş izin şudur: tüm web sitelerindeki tüm verilerinizi okuma ve değiştirme.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "permission",
+              "brandRef": "w2c-pulsuz-vpn",
+              "app": "Pulsuz VPN Sürət",
+              "permissions": [
+                {
+                  "label": [
+                    {
+                      "text": "Tüm web sitelerindeki tüm verilerinizi okuma ve değiştirme",
+                      "spot": "all-sites"
+                    }
+                  ],
+                  "needed": false
+                },
+                {
+                  "label": [
+                    {
+                      "text": "Proxy ayarlarınızı yönetme"
+                    }
+                  ],
+                  "needed": true
+                }
+              ]
+            }
+          },
+          "highlight": "all-sites"
+        },
+        {
+          "id": "sp-b3",
+          "say": "Bir uzantı bugün dürüst olabilir, yarın tek bir güncellemeyle casusa dönüşebilir.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "update"
+          }
+        },
+        {
+          "id": "sp-b4",
+          "say": "Yalnızca ihtiyacınız olanı, yalnızca resmî mağazadan yükleyin. İş bilgisayarında ise yalnızca BT destek ekibinin onayladıklarını yükleyin.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "sp-swipe",
+      "prompt": "Bu uzantıyı yükler misiniz, yoksa reddeder misiniz?",
+      "cards": [
+        {
+          "id": "free-vpn",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "w2c-pulsuz-vpn",
+            "app": "Pulsuz VPN Sürət",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Tüm web sitelerindeki tüm verilerinizi okuma ve değiştirme"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Tarama geçmişinizi okuma"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Proxy ayarlarınızı yönetme"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Ücretsiz VPN uzantısı tüm trafiğinizi görür ve çoğu zaman parasını verilerinizden kazanır. İş için yalnızca ofisinizin sağladığı VPN'i kullanın."
+        },
+        {
+          "id": "weather",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "w2c-hava",
+            "app": "Hava Bu Gün",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Bakü'nün hava durumu tahminini gösterme"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Tüm web sitelerindeki tüm verilerinizi okuma ve değiştirme"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Kopyalayıp yapıştırdığınız verileri okuma"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Hava durumu tahmininin sayfalarınıza ya da kopyaladıklarınıza ihtiyacı yoktur. İzin, işin gerektirdiğinden büyükse reddedin."
+        },
+        {
+          "id": "screenshot",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "w2c-ekran-sekli",
+            "app": "Ekran Şəkli",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Düğmeye bastığınızda yalnızca açık sayfayı görme"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Görüntüleri İndirilenler klasörüne kaydetme"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "İzinler işe uygun ve yalnızca düğmeye bastığınızda çalışıyor. Böyle bir uzantı gerçek bir risk getirmez."
+        },
+        {
+          "id": "outside-store",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://pulsuz-elaveler.example.info/pdf-ustasi-pro.zip"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Mağaza dışından gelen bir uzantı hiçbir denetimden geçmemiştir. Uzantıları yalnızca tarayıcının resmî mağazasından yükleyin."
+        },
+        {
+          "id": "notes",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "w2c-qisa-qeyd",
+            "app": "Qısa Qeyd",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Notlarınızı bu tarayıcıda saklama"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Uzantı sitelerinize erişmiyor ve notları yalnızca tarayıcının kendi depolama alanında tutuyor. Risk düşük."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "sp-choice",
+      "question": {
+        "prompt": "Yalnızca bir kez ihtiyaç duyduğunuz bir uzantı hâlâ tarayıcınızda duruyor. Ne yaparsınız?",
+        "options": [
+          {
+            "id": "remove",
+            "label": "Kaldırırım, gerekirse yeniden yüklerim",
+            "correct": true,
+            "feedback": "Doğru. Kullanmadığınız bir uzantı size hiçbir şey kazandırmaz, ama riski olduğu gibi kalır."
+          },
+          {
+            "id": "disable",
+            "label": "Yalnızca devre dışı bırakırım",
+            "correct": false,
+            "feedback": "Devre dışı bırakmak işe yarar, ama unutulan bir uzantı tek tıkla geri döner. İhtiyacınız yoksa kaldırın."
+          },
+          {
+            "id": "keep",
+            "label": "Tutarım, belki bir gün lazım olur",
+            "correct": false,
+            "feedback": "Uzantının sahibi değişebilir ve bir güncelleme onu casusa dönüştürebilir. İhtiyacınız olmayanı tutmayın."
+          }
+        ]
+      },
+      "explain": "Her uzantı, sayfalarınıza açılan bir kapıdır. Uzantı ne kadar azsa risk de o kadar azdır."
+    },
+    {
+      "type": "simulation",
+      "id": "sp-sim",
+      "environment": "browser",
+      "title": "Uzantı mağazası",
+      "intro": "Döviz kurlarını hızlıca gösteren bir uzantı istiyorsunuz. Her adımda ne yapacağınızı seçin.",
+      "steps": [
+        {
+          "id": "copy-store",
+          "label": "Məzənnə Pro: ücretsiz indir",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "db-xezri-brauzer-fake",
+            "url": [
+              {
+                "text": "https://xezri-elaveler.example.info/mezenne-pro",
+                "reveal": "xezri-elaveler.example.info"
+              }
+            ]
+          },
+          "say": "Aramada çıkan ilk sayfa mağazaya benziyor.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "Uzantıyı indir",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Burası resmî mağaza değil, onun bir kopyası. Buradan gelen hiçbir şey denetimden geçmemiştir."
+            },
+            {
+              "id": "check",
+              "label": "Adresi kontrol et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Bu alan adı mağazanın kendi adresi değil. Mağazayı tarayıcı menüsünden açın."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Uzantıları yalnızca tarayıcının kendi mağazasından yükleyin."
+            }
+          ]
+        },
+        {
+          "id": "store-page",
+          "label": "Məzənnə Pro: 4,1 yıldız, 80 bin kullanıcı",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "db-xezri-brauzer",
+            "url": [
+              {
+                "text": "https://magaza.xezri.example/elave/mezenne-pro",
+                "reveal": "xezri.example"
+              }
+            ]
+          },
+          "say": "Şimdi resmî mağazadasınız. Yüklemeden önce tarayıcı size izinleri gösterecek.",
+          "actions": [
+            {
+              "id": "add",
+              "label": "Tarayıcıya ekle",
+              "kind": "install",
+              "outcome": "safe",
+              "feedback": "Resmî mağaza iyi bir başlangıç. Şimdi izinleri dikkatle okuyun."
+            },
+            {
+              "id": "skip",
+              "label": "Gerek yok",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Bu da iyi bir seçim. Kurları bankanızın sitesinde görebilirsiniz.",
+              "next": "installed"
+            }
+          ]
+        },
+        {
+          "id": "perms",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "w2c-mezenne-pro",
+            "app": "Məzənnə Pro",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Döviz kurlarını gösterme"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Tüm web sitelerindeki tüm verilerinizi okuma ve değiştirme"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Sekmelerinizi ve tarama geçmişinizi görme"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "Döviz kurlarını göstermek için bu izinler gerekir mi?",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "Uzantı ekle",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "Döviz kurları için ne tüm web sitelerine ne de geçmişinize erişim gerekir. Bu kadar geniş bir izin casusluğa kapı açar."
+            },
+            {
+              "id": "deny",
+              "label": "Reddet",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Doğru. İzin işe uygun değilse uzantıyı yüklemeyin."
+            }
+          ]
+        },
+        {
+          "id": "installed",
+          "label": "Yüklü uzantılar: 7, son altı ayda kullanılmayan: 4",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "db-xezri-brauzer",
+            "url": [
+              {
+                "text": "https://magaza.xezri.example/elavelerim",
+                "reveal": "xezri.example"
+              }
+            ]
+          },
+          "say": "Tarayıcınızda eski uzantılar da var. Onlarla ne yaparsınız?",
+          "actions": [
+            {
+              "id": "remove-unused",
+              "label": "Kullanılmayan dört uzantıyı kaldır",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Harika. Kaldırdığınız her uzantı, sayfalarınıza açılan bir kapıyı kapatır."
+            },
+            {
+              "id": "keep-all",
+              "label": "Hepsini tut",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Kullanılmayan uzantılar da güncellenmeye ve sayfalarınızı görmeye devam eder. İhtiyacınız olmayanı kaldırın."
+            }
+          ]
+        },
+        {
+          "id": "malware-flag",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "db-xezri-brauzer",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Hava Bu Gün devre dışı bırakıldı"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bu uzantıda zararlı yazılım bulundu."
+                }
+              ],
+              [
+                {
+                  "text": "Uzantı mağazadan da kaldırıldı."
+                }
+              ]
+            ],
+            "buttons": [
+              "Tekrar etkinleştir",
+              "Kaldır"
+            ]
+          },
+          "say": "Tarayıcı, uzantılardan birini kendiliğinden devre dışı bıraktı.",
+          "actions": [
+            {
+              "id": "remove-report",
+              "label": "Kaldır ve BT destek ekibine haber ver",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. BT destek ekibi uzantının neleri topladığını kontrol eder ve parolalarınızı değiştirmenize yardımcı olur."
+            },
+            {
+              "id": "enable",
+              "label": "Tekrar etkinleştir",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Tarayıcı onu boşuna devre dışı bırakmadı. Yeniden etkinleştirilen uzantı veri toplamaya devam eder."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "sp-recap",
+      "points": [
+        "Uzantıyı yalnızca ihtiyacınız olduğunda ve yalnızca resmî mağazadan yükleyin",
+        "Tüm web sitelerindeki verilerinizi isteyen her uzantıya karşı dikkatli olun",
+        "Kullanmadığınız uzantıları kaldırın"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -1,0 +1,447 @@
+{
+ "id": "unexpected-signing",
+ "title": "Unerwartete Signaturanfrage",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l2-tutor",
+   "beats": [
+    {
+     "id": "l2-b1",
+     "say": "Wenn eine Signaturanfrage eintrifft, fragen Sie sich zuerst: Habe ich diese Anfrage selbst ausgelöst?",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "certificate"
+     }
+    },
+    {
+     "id": "l2-b2",
+     "say": "Die Anfrage zeigt den Namen des Dokuments und den Dienst, von dem sie kommt. Lehnen Sie eine Anfrage ab, die Sie nicht erwartet haben.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "mohurid",
+       "app": "MöhürID",
+       "title": [
+        {
+         "text": "Signaturanfrage"
+        }
+       ],
+       "body": [
+        {
+         "text": "Dokument: "
+        },
+        {
+         "text": "Etibarname_tam_selahiyyet.pdf",
+         "spot": "doc"
+        },
+        {
+         "text": ". Dienst: imza-xidmet.test"
+        }
+       ],
+       "time": "07:58"
+      }
+     },
+     "highlight": "doc"
+    },
+    {
+     "id": "l2-b3",
+     "say": "Unterschreiben Sie nichts ungelesen. Name, Betrag und Empfänger müssen dem entsprechen, was Sie erwarten.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "l2-b4",
+     "say": "Im Zweifel unterschreiben Sie nicht und informieren das Sicherheitsteam. Eine Signatur lässt sich nur schwer zurücknehmen.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "l2-sim",
+   "environment": "phone",
+   "title": "Signaturanfragen",
+   "intro": "Im Laufe des Tages kommen Signaturanfragen auf Ihr Smartphone. Prüfen Sie jede einzelne und entscheiden Sie.",
+   "steps": [
+    {
+     "id": "unexpected",
+     "label": "Sie wollten gerade nichts signieren",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "mohurid",
+      "app": "MöhürID",
+      "title": [
+       {
+        "text": "Signaturanfrage"
+       }
+      ],
+      "body": [
+       {
+        "text": "Dokument: Etibarname_avtomobil.pdf. Dienst: Bulud Notariat"
+       }
+      ],
+      "time": "07:58"
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Öffnen und signieren",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Sie haben eine Vollmacht unterschrieben, die jemand anderes vorbereitet hat. Rufen Sie sofort den Signaturdienst und das Sicherheitsteam an."
+      },
+      {
+       "id": "deny",
+       "label": "Ablehnen",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine Anfrage, die Sie nicht ausgelöst haben, bedeutet: Jemand versucht, Ihren Namen zu missbrauchen."
+      },
+      {
+       "id": "report",
+       "label": "Sicherheitsteam informieren",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Wer ablehnt und meldet, stoppt den Angriff rechtzeitig."
+      }
+     ]
+    },
+    {
+     "id": "rush-colleague",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Elvin (Einkauf)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ich hab dir in SənədAxını einen Vertrag geschickt. Keine Zeit zum Lesen, unterschreib einfach schnell, der Chef wartet."
+         }
+        ],
+        "time": "10:20"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "read",
+       "label": "Ich lese das Dokument zuerst",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Zeitdruck ist kein Grund, auf das Lesen zu verzichten. Für die Signatur sind Sie verantwortlich."
+      },
+      {
+       "id": "rush",
+       "label": "Gut, ich unterschreibe ungelesen",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "In einem ungelesenen Dokument können Betrag oder Empfänger geändert worden sein."
+      }
+     ]
+    },
+    {
+     "id": "fake-portal-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "senedaxini-fake",
+      "from": {
+       "name": [
+        {
+         "text": "SənədAxını"
+        }
+       ],
+       "address": [
+        {
+         "text": "noreply@senedaxini-imza.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Ihre Signatur steht aus: Qebul_akti.pdf"
+       }
+      ],
+      "time": "12:05",
+      "body": [
+       [
+        {
+         "text": "Um das Dokument zu signieren, "
+        },
+        {
+         "text": "melden Sie sich an",
+         "link": {
+          "label": "melden Sie sich an",
+          "href": "https://senedaxini-imza.test/login"
+         }
+        },
+        {
+         "text": "."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "click",
+       "label": "Anmelden",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Eine gefälschte Anmeldeseite hat Ihr Passwort abgegriffen. Ändern Sie es sofort und informieren Sie das Sicherheitsteam."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Domain gehört nicht zu SənədAxını. Öffnen Sie das System selbst."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Sicher. Wenn Sie die E-Mail aber melden, schützen Sie auch andere."
+      }
+     ]
+    },
+    {
+     "id": "own-request",
+     "label": "Sie haben gerade im Portal begonnen, Ihren Urlaubsantrag zu signieren",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "mohurid",
+      "app": "MöhürID",
+      "title": [
+       {
+        "text": "Signaturanfrage"
+       }
+      ],
+      "body": [
+       {
+        "text": "Dokument: Mezuniyyet_erizesi.pdf. Dienst: SənədAxını"
+       }
+      ],
+      "time": "14:30"
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Öffnen und signieren",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Sie haben die Anfrage selbst ausgelöst, und Dokument und Dienst entsprechen Ihrer Erwartung."
+      },
+      {
+       "id": "deny",
+       "label": "Ablehnen",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "Nicht nötig: Die Anfrage kam von Ihnen, und alles passt. Prüfen heißt nicht, alles abzulehnen."
+      }
+     ]
+    },
+    {
+     "id": "mismatch",
+     "label": "Sie haben im Portal eine Arbeitsbescheinigung angefordert",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "mohurid",
+      "app": "MöhürID",
+      "title": [
+       {
+        "text": "Signaturanfrage"
+       }
+      ],
+      "body": [
+       {
+        "text": "Dokument: Etibarname_bank_hesabi.pdf. Dienst: imza-xidmet.test"
+       }
+      ],
+      "time": "16:12"
+     },
+     "say": "Vergleichen Sie den Namen des Dokuments mit dem, was Sie erwarten.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Öffnen und signieren",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Das war eine Bankvollmacht, nicht Ihre Bescheinigung. Wenn der Name nicht passt, unterschreiben Sie nicht."
+      },
+      {
+       "id": "deny",
+       "label": "Ablehnen",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Richtig. Weder das Dokument noch der Dienst entsprechen Ihrer Erwartung. Lehnen Sie ab und melden Sie die Anfrage."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l2-hotspot",
+   "prompt": "Finden Sie vor dem Signieren heraus, was an dieser Anfrage nicht stimmt.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "mohurid",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Signatur bestätigen"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Dokument: "
+      },
+      {
+       "text": "Vollmacht: uneingeschränkte Verfügung über alle Bankkonten",
+       "spot": "doc"
+      }
+     ],
+     [
+      {
+       "text": "Zugunsten von: "
+      },
+      {
+       "text": "Hüseyn Məmmədli",
+       "spot": "person"
+      }
+     ],
+     [
+      {
+       "text": "Laufzeit: "
+      },
+      {
+       "text": "3 Jahre",
+       "spot": "term"
+      }
+     ],
+     [
+      {
+       "text": "Angefordert von: "
+      },
+      {
+       "text": "imza-xidmet.test",
+       "spot": "source"
+      }
+     ]
+    ],
+    "buttons": [
+     "Ablehnen",
+     "PIN eingeben"
+    ]
+   },
+   "spots": [
+    {
+     "id": "doc",
+     "label": "Uneingeschränkte Vollmacht",
+     "explain": "Dieses Dokument gibt jemandem weitreichende Rechte über Ihre Konten. So ein Dokument sollte nie unerwartet eintreffen."
+    },
+    {
+     "id": "person",
+     "label": "Eine unbekannte Person",
+     "explain": "Wenn Sie nicht wissen, wer die Vollmacht erhält, unterschreiben Sie nicht."
+    },
+    {
+     "id": "term",
+     "label": "Lange Laufzeit",
+     "explain": "Mit einer Vollmacht über drei Jahre kann der Schaden lange andauern."
+    },
+    {
+     "id": "source",
+     "label": "Unbekannter Dienst",
+     "explain": "Die Anfrage kommt von einer unbekannten Website, nicht aus einem offiziellen System, das Sie kennen."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "l2-order",
+   "prompt": "Bringen Sie die Schritte vor dem Signieren in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "started",
+     "label": "Prüfen, ob Sie die Anfrage selbst ausgelöst haben"
+    },
+    {
+     "id": "read",
+     "label": "Dokument öffnen und lesen"
+    },
+    {
+     "id": "details",
+     "label": "Name, Betrag und Empfänger prüfen"
+    },
+    {
+     "id": "pin",
+     "label": "Erst dann die PIN eingeben"
+    }
+   ],
+   "explain": "Wenn ein Schritt nicht passt, brechen Sie ab und lehnen Sie die Anfrage ab. Melden Sie eine verdächtige Anfrage dem Sicherheitsteam."
+  },
+  {
+   "type": "choice",
+   "id": "l2-choice",
+   "question": {
+    "prompt": "Sie haben versehentlich ein verdächtiges Dokument signiert. Was ist der erste Schritt?",
+    "options": [
+     {
+      "id": "hide",
+      "label": "Ich sage niemandem etwas, vielleicht passiert ja nichts",
+      "correct": false,
+      "feedback": "Die Signatur ist gültig und kann genutzt werden. Wer schweigt, vergrößert den Schaden."
+     },
+     {
+      "id": "report",
+      "label": "Ich rufe sofort den Signaturdienst und das Sicherheitsteam an",
+      "correct": true,
+      "feedback": "Richtig. Der Dienst kann das Zertifikat sperren, und das Sicherheitsteam klärt die Folgen."
+     },
+     {
+      "id": "pin",
+      "label": "Ich ändere nur meine PIN",
+      "correct": false,
+      "feedback": "Sinnvoll, aber das signierte Dokument bleibt gültig. Melden Sie den Vorfall zuerst."
+     }
+    ]
+   },
+   "explain": "Wenn Sie versehentlich signiert haben, zählt jede Minute. Wer schnell meldet, hat die Chance, den Missbrauch des Dokuments zu verhindern."
+  },
+  {
+   "type": "recap",
+   "id": "l2-recap",
+   "points": [
+    "Bestätigen Sie eine Signaturanfrage nur, wenn Sie sie selbst ausgelöst haben.",
+    "Lesen Sie das Dokument: Name, Betrag und Empfänger müssen Ihrer Erwartung entsprechen.",
+    "Wenn Sie versehentlich signiert haben, informieren Sie sofort den Signaturdienst und das Sicherheitsteam."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

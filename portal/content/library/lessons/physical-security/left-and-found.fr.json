@@ -1,0 +1,323 @@
+{
+ "id": "left-and-found",
+ "title": "Objets oubliés, objets trouvés",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "usb",
+     "say": "Une clé USB trouvée dans un couloir n’est pas un cadeau. Ne la branchez jamais, remettez-la à la sécurité.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "shoulder",
+     "say": "Quelqu’un peut regarder votre écran et votre clavier par-dessus votre épaule. Jetez un œil autour de vous quand vous tapez un mot de passe.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "laptop",
+     "say": "Ne laissez jamais un ordinateur portable seul dans une voiture ou dans un café. C’est la proie la plus facile pour un voleur.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     }
+    },
+    {
+     "id": "check",
+     "say": "Vérifiez votre bureau avant de partir : papiers rangés sous clé, appareils verrouillés, impressions récupérées.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "desk-pc",
+   "environment": "desktop",
+   "title": "À votre poste",
+   "intro": "Vous êtes à votre bureau. Décidez quoi faire d’une clé USB trouvée, d’une impression et de votre écran quand vous quittez votre place.",
+   "steps": [
+    {
+     "id": "usb-found",
+     "label": "Trouvée près de l’ascenseur",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Ixtisar_siyahisi_2026.xlsx"
+       }
+      ],
+      "type": "lnk",
+      "size": "3 Ko",
+      "source": [
+       {
+        "text": "USB: ARXIV (F:)"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "plug",
+       "label": "La brancher pour voir",
+       "kind": "plug-in",
+       "outcome": "risky",
+       "feedback": "Ce nom de fichier, une liste de licenciements, est un appât pour votre curiosité. Ne branchez pas une clé USB trouvée."
+      },
+      {
+       "id": "hand-in",
+       "label": "La remettre à la sécurité",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Ne branchez jamais un appareil trouvé, confiez-le aux spécialistes.",
+       "next": "print-done"
+      }
+     ]
+    },
+    {
+     "id": "usb-file",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Ixtisar_siyahisi_2026.xlsx"
+       }
+      ],
+      "type": "lnk",
+      "size": "3 Ko",
+      "source": [
+       {
+        "text": "USB: ARXIV (F:)"
+       }
+      ]
+     },
+     "say": "Regardez le vrai type du fichier.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Ce n’est pas un tableur, mais un raccourci. L’ouvrir lance une commande cachée."
+      },
+      {
+       "id": "eject",
+       "label": "Éjecter le périphérique",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "C’est la bonne décision. Éjectez-le sans rien ouvrir et remettez-le à la sécurité."
+      }
+     ]
+    },
+    {
+     "id": "print-done",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "db-cap-xidmeti",
+      "app": "Service d’impression",
+      "title": [
+       {
+        "text": "Votre document a été imprimé"
+       }
+      ],
+      "body": [
+       {
+        "text": "Vetendas_muracietleri.pdf, imprimante partagée, 3e étage"
+       }
+      ],
+      "time": "11:20"
+     },
+     "actions": [
+      {
+       "id": "collect",
+       "label": "Je vais le chercher tout de suite",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Exact. Toute personne qui passe devant une imprimante partagée peut lire ce qui y traîne."
+      },
+      {
+       "id": "later",
+       "label": "Je le récupérerai ce soir",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Les données des usagers vont rester des heures sur l’imprimante. Récupérez vos impressions tout de suite."
+      }
+     ]
+    },
+    {
+     "id": "leave-desk",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Des données d’usagers sont ouvertes à l’écran"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "L’ordinateur se verrouillera automatiquement dans 15 minutes."
+        }
+       ]
+      ],
+      "buttons": [
+       "Verrouiller l’écran",
+       "Laisser ouvert"
+      ]
+     },
+     "say": "Vous vous levez pour aller à l’imprimante.",
+     "actions": [
+      {
+       "id": "lock",
+       "label": "Verrouiller l’écran",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. La touche Windows et la lettre L verrouillent l’écran en une seconde."
+      },
+      {
+       "id": "leave",
+       "label": "Laisser ouvert, je reviens dans deux minutes",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Deux minutes suffisent pour que quelqu’un lise ou envoie les données."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "cafe-laptop",
+   "title": "Un ordinateur portable au café",
+   "start": "cafe",
+   "nodes": [
+    {
+     "id": "cafe",
+     "text": "Vous travaillez dans un café sur votre ordinateur portable professionnel. Vous devez aller au comptoir chercher votre commande.",
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     },
+     "choices": [
+      {
+       "label": "Je le laisse ouvert, j’en ai pour une minute",
+       "outcome": "compromised",
+       "feedback": "Une minute suffit pour le voler, et un écran ouvert expose les données."
+      },
+      {
+       "label": "Je demande à la personne de la table voisine de le surveiller",
+       "outcome": "risky",
+       "feedback": "Une personne inconnue n’est pas la gardienne de votre appareil. Emportez votre ordinateur avec vous."
+      },
+      {
+       "label": "Je ferme l’ordinateur et je l’emporte",
+       "next": "neighbour",
+       "feedback": "Exact. L’appareil doit toujours rester avec vous."
+      }
+     ]
+    },
+    {
+     "id": "neighbour",
+     "text": "Excusez-moi, j’ai vu sur votre écran que vous travaillez à l’agence. Comment s’appelle votre responsable ? J’ai affaire là-bas.",
+     "speaker": "L’homme de la table voisine",
+     "voice": "man-2",
+     "channel": "in-person",
+     "spoken": "Excusez-moi, j’ai vu sur votre écran que vous travaillez à l’agence. <breath> Comment s’appelle votre responsable ? J’ai affaire là-bas.",
+     "choices": [
+      {
+       "label": "Je donne le nom et le numéro de poste de mon responsable",
+       "outcome": "risky",
+       "feedback": "Ne donnez pas d’informations internes à un inconnu. Elles serviront d’appât pour un appel ou un e-mail plus tard."
+      },
+      {
+       "label": "Je lui indique le numéro de l’accueil sur le site officiel",
+       "outcome": "safe",
+       "feedback": "Poli, et sans aucun détail interne : bravo. Gardez aussi votre écran hors de la vue des autres."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "found-usb",
+   "prompt": "Vous avez trouvé une clé USB dans le couloir. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "no-plug",
+     "label": "Ne la brancher sur aucun ordinateur"
+    },
+    {
+     "id": "note",
+     "label": "Noter où et quand vous l’avez trouvée"
+    },
+    {
+     "id": "hand-in",
+     "label": "La remettre à l’équipe sécurité"
+    },
+    {
+     "id": "warn",
+     "label": "Demander à vos collègues de ne pas brancher de clés semblables"
+    }
+   ],
+   "explain": "Un appareil trouvé est une pièce à conviction : remettez-le tel quel, sans l’ouvrir."
+  },
+  {
+   "type": "match",
+   "id": "left-behind",
+   "prompt": "Associez chaque situation à la bonne action.",
+   "pairs": [
+    {
+     "id": "car",
+     "left": "L’ordinateur portable est sur le siège de la voiture",
+     "right": "L’emporter avec vous"
+    },
+    {
+     "id": "draft",
+     "left": "Le brouillon d’un document confidentiel",
+     "right": "Le détruire au broyeur"
+    },
+    {
+     "id": "watcher",
+     "left": "Quelqu’un regarde votre écran",
+     "right": "Tourner l’écran ou le verrouiller"
+    },
+    {
+     "id": "badge-desk",
+     "left": "Votre badge traîne sur le bureau",
+     "right": "Le garder sur vous en permanence"
+    }
+   ],
+   "explain": "Tout ce qui reste sans surveillance est une occasion pour un attaquant."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Ne branchez jamais une clé USB trouvée, remettez-la à la sécurité.",
+    "Verrouillez l’écran quand vous vous levez, et récupérez vos impressions tout de suite.",
+    "Ne laissez jamais un ordinateur portable ou des papiers sans surveillance."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

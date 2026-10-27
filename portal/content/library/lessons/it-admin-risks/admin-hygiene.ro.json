@@ -1,0 +1,315 @@
+{
+  "id": "admin-hygiene",
+  "title": "Igiena administratorului",
+  "minutes": 4,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Contul de administrator este cheia pe care atacatorii și-o doresc cel mai mult. Cu un singur cont de administrator pot ajunge în toată rețeaua.",
+          "mood": "think",
+          "visual": { "kind": "illustration", "id": "key" }
+        },
+        {
+          "id": "b2",
+          "say": "Folosiți un cont obișnuit pentru munca de zi cu zi și unul separat pentru administrare. Nu citiți niciodată e-mailuri și nu navigați pe internet ca administrator.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": { "kind": "illustration", "id": "badge-id" }
+        },
+        {
+          "id": "b3",
+          "say": "Nu lăsați parole și chei în cod, în chaturi sau în tichete. Rămân acolo ani la rând. Folosiți în schimb un seif de secrete.",
+          "mood": "alert",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "app": "telegram",
+              "contact": [{ "text": "Echipa de infrastructură · 46 de membri" }],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    { "text": "Pentru teste, conectați-vă la baza de date așa: " },
+                    { "text": "DB_PASSWORD=Pr0d!Baza2026", "spot": "secret" }
+                  ],
+                  "time": "23:14"
+                }
+              ]
+            }
+          },
+          "highlight": "secret"
+        },
+        {
+          "id": "b4",
+          "say": "Cei care se dau drept suport tehnic vă cer adesea, la telefon, să instalați un instrument de control de la distanță. Astfel, vă folosesc mâinile ca să intre în sistem.",
+          "mood": "alert",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [{ "text": "Suportul furnizorului" }],
+              "number": [{ "text": "+994 12 000 01 23" }],
+              "label": "Necunoscut"
+            }
+          }
+        },
+        {
+          "id": "b5",
+          "say": "Pentru panourile de administrare, accesul de la distanță și consolele cloud, activați o autentificare multifactor rezistentă la phishing, de exemplu o cheie de securitate fizică.",
+          "mood": "happy",
+          "visual": { "kind": "illustration", "id": "mfa-phone" }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "admin-phish",
+      "prompt": "Găsiți semnalele de alarmă ale unui atac de phishing care vizează administratorii.",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": [{ "text": "Notificări Cloud Console" }],
+          "address": [
+            { "text": "alerts@" },
+            { "text": "cloudconsole-admin.example.info", "spot": "domain" }
+          ]
+        },
+        "to": "admin@idare.example",
+        "subject": [{ "text": "Critic: contul dumneavoastră de administrator va fi suspendat în 2 ore", "spot": "urgency" }],
+        "time": "06:12",
+        "body": [
+          [{ "text": "Stimate administrator," }],
+          [{ "text": "Înregistrați din nou autentificarea multifactor pentru tenantul dumneavoastră." }],
+          [
+            { "text": "Conectați-vă la consolă: " },
+            { "text": "console-login.example.info/admin", "spot": "link" }
+          ],
+          [{ "text": "Apoi dictați codul de confirmare agentului de suport care vă va suna.", "spot": "code-share" }]
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Domeniu greșit",
+          "explain": "Notificările furnizorului vin de pe domeniul propriu al furnizorului. Deschideți întotdeauna consola din propriul marcaj."
+        },
+        {
+          "id": "urgency",
+          "label": "Amenințare cu suspendarea",
+          "explain": "Termenul de două ore este acolo ca să nu aveți timp să verificați."
+        },
+        {
+          "id": "link",
+          "label": "Pagină de conectare falsă",
+          "explain": "Această pagină poate transmite în timp real parola și codul dumneavoastră. Codurile obișnuite, de unică folosință, nu opresc acest lucru."
+        },
+        {
+          "id": "code-share",
+          "label": "Dictarea unui cod altcuiva",
+          "explain": "Suportul real nu vă cere niciodată codul de confirmare. Dacă îl spuneți, predați contul."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "remote-support",
+      "question": {
+        "prompt": "Suportul furnizorului vă sună și vrea acces de la distanță la un server. Ce faceți?",
+        "options": [
+          {
+            "id": "call-back",
+            "label": "Închid și sun la numărul din contract",
+            "correct": true,
+            "feedback": "Corect. Verificați printr-un canal cunoscut, apoi acordați accesul doar prin instrumentul aprobat."
+          },
+          {
+            "id": "install",
+            "label": "Instalez instrumentul pe care mi-l indică și dictez codul",
+            "correct": false,
+            "feedback": "Astfel îi dați apelantului acces complet la sistem. Exact așa sunt folosite abuziv în atacuri instrumentele de control de la distanță."
+          },
+          {
+            "id": "watch",
+            "label": "Permit accesul, dar urmăresc ecranul",
+            "correct": false,
+            "feedback": "Nu este suficient să urmăriți. O ușă din spate se instalează în câteva secunde."
+          }
+        ]
+      },
+      "explain": "O cerere neașteptată de acces de la distanță se verifică întotdeauna pe un canal cunoscut, iar accesul se acordă doar prin instrumentul aprobat."
+    },
+    {
+      "type": "swipe",
+      "id": "secrets",
+      "prompt": "Este o practică sigură?",
+      "cards": [
+        {
+          "id": "ticket-password",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [{ "text": "Tichetul 4821" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Am pus parola serverului în comentarii, ca s-o vadă tura următoare." }],
+                "time": "02:30"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Tichetele sunt văzute de multe persoane și rămân în arhivă. Schimbați parola și păstrați-o în seif."
+        },
+        {
+          "id": "vault-share",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [{ "text": "Grupul DevOps" }],
+            "messages": [
+              {
+                "from": "me",
+                "body": [{ "text": "Am adăugat cheia în seiful de secrete și v-am dat acces de citire." }],
+                "time": "11:20"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Cheia în sine nu se află în chat; s-a acordat doar acces la ea în seif. Acesta este modul corect."
+        },
+        {
+          "id": "env-in-repo",
+          "artifact": {
+            "kind": "url",
+            "url": [{ "text": "https://git.idare.example/infra/deploy/-/blob/main/.env" }]
+          },
+          "verdict": "threat",
+          "explain": "Fișierul .env a ajuns în repository printr-un commit. Cheile rămân în istoric, așa că ștergerea fișierului nu este suficientă. Schimbați-le acum."
+        },
+        {
+          "id": "keys-issued",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [{ "text": "Echipa de securitate" }],
+              "address": [{ "text": "security@idare.example" }]
+            },
+            "subject": [{ "text": "Chei de securitate pentru conturile de administrator" }],
+            "time": "15:00",
+            "body": [
+              [{ "text": "Începând de luni, conectarea la panoul de administrare necesită o cheie fizică. Ridicați-vă cheia personal, din biroul 305." }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Niciun link, nimic de descărcat sau de introdus, iar cheia se predă personal. Această schimbare vă protejează mai bine."
+        },
+        {
+          "id": "shared-admin",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [{ "text": "Kamran (echipa de rețea)" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Plec în concediu, uite parola mea de admin, folosește-o dacă e nevoie." }],
+                "time": "18:55"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Cu un cont de administrator partajat, nimeni nu mai poate ști cine ce a făcut. Înlocuitorul trebuie să primească drepturi temporare pe propriul cont."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "right-account",
+      "prompt": "Asociați fiecare sarcină cu contul potrivit.",
+      "pairs": [
+        { "id": "mail", "left": "Citirea e-mailurilor", "right": "Contul obișnuit, de zi cu zi" },
+        { "id": "config", "left": "Configurarea serverului", "right": "Contul separat de administrator" },
+        { "id": "script", "left": "Script automat", "right": "Cont de serviciu cu privilegii minime" },
+        { "id": "emergency", "left": "Acces de urgență", "right": "Cont păstrat în seif și monitorizat" }
+      ],
+      "explain": "Acordați fiecărei sarcini doar drepturile de care are nevoie. Cu cât un cont de administrator este folosit mai rar, cu atât ținta este mai mică."
+    },
+    {
+      "type": "scenario",
+      "id": "night-prompt",
+      "title": "Solicitare în miezul nopții",
+      "start": "prompt",
+      "nodes": [
+        {
+          "id": "prompt",
+          "text": "Este ora 02:00. Pe telefon apare o solicitare de aprobare a conectării la contul dumneavoastră de administrator, iar dumneavoastră dormeați.",
+          "choices": [
+            {
+              "label": "Refuz și alertez echipa de securitate",
+              "next": "reuse",
+              "feedback": "Corect. O solicitare neașteptată înseamnă că cineva vă cunoaște parola."
+            },
+            {
+              "label": "Aprob, ca să se oprească solicitările",
+              "outcome": "compromised",
+              "feedback": "Atacatorul este în panoul de administrare. Acest atac se numește push bombing: vă bombardează cu solicitări până când aprobați una."
+            }
+          ]
+        },
+        {
+          "id": "reuse",
+          "text": "Ați mai folosit această parolă și în altă parte?",
+          "speaker": "Echipa de securitate",
+          "voice": "man-3",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Ați mai folosit această parolă <short pause> și în altă parte?",
+          "choices": [
+            {
+              "label": "Da, și la un cont personal. Le schimb pe amândouă",
+              "next": "harden",
+              "feedback": "Un răspuns sincer. Parolele scurse de pe alte site-uri sunt încercate adesea exact așa."
+            },
+            {
+              "label": "Mi-e rușine și nu spun nimic",
+              "outcome": "risky",
+              "feedback": "Echipa nu poate găsi sursa scurgerii. Sinceritatea accelerează investigația."
+            }
+          ]
+        },
+        {
+          "id": "harden",
+          "text": "Parola a fost schimbată. Ce urmează?",
+          "choices": [
+            {
+              "label": "Închei sesiunile active și trec contul pe o cheie fizică",
+              "outcome": "safe",
+              "feedback": "Excelent. Închiderea sesiunilor taie orice acces deschis, iar o cheie fizică rezistă la phishing."
+            },
+            {
+              "label": "Totul e în regulă, mă întorc la lucru",
+              "outcome": "risky",
+              "feedback": "Sesiunile deschise și tokenurile pot fi încă active. Închideți-le și pe acestea."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Munca de administrare din contul de administrator, munca zilnică din contul obișnuit.",
+        "Nu țineți secrete în cod și în chaturi, iar un secret scurs se schimbă imediat.",
+        "Verificați pe un canal cunoscut cererile neașteptate de acces de la distanță."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

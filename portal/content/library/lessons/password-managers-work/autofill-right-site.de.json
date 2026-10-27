@@ -1,0 +1,419 @@
+{
+ "id": "autofill-right-site",
+ "title": "Wenn Autofill schweigt",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Ein Passwort-Manager erkennt eine gefälschte Website besser als Sie: Er prüft die Adresse Buchstabe für Buchstabe.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Weicht die Adresse auch nur ein wenig ab, bietet der Manager kein Passwort an. Das ist Ihr Warnsignal.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "idare-fake",
+       "url": [
+        {
+         "text": "https://portal."
+        },
+        {
+         "text": "idare-giris.example.net",
+         "spot": "lookalike"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "lookalike"
+    },
+    {
+     "id": "b3",
+     "say": "Kopieren Sie das Passwort dann nicht selbst aus dem Tresor, um es einzufügen. Prüfen Sie zuerst die Adresse.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Lehnen Sie jede Anmeldeanfrage ab, mit der Sie nicht gerechnet haben – denn dann kennt jemand Ihr Passwort.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "autofill-check",
+   "environment": "browser",
+   "title": "Autofill auf dem Prüfstand",
+   "intro": "ParolSeyf läuft in Ihrem Browser. Beobachten Sie auf jeder Seite, was ParolSeyf anbietet, und prüfen Sie die Adresse.",
+   "steps": [
+    {
+     "id": "real-portal",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "idare",
+      "brand": "Büroportal",
+      "url": [
+       {
+        "text": "https://portal.idare.example/giris",
+        "reveal": "idare.example"
+       }
+      ],
+      "fields": [
+       "Benutzername",
+       "Passwort"
+      ],
+      "button": "Anmelden"
+     },
+     "say": "ParolSeyf bietet Ihre Zugangsdaten an. Prüfen Sie die Adresse.",
+     "actions": [
+      {
+       "id": "fill",
+       "label": "Mit ParolSeyf ausfüllen",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Adresse stimmt mit den gespeicherten Zugangsdaten überein, deshalb hat der Manager sie angeboten."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Vorsicht schadet nicht, aber das ist das echte Büroportal, und der Manager hat es erkannt."
+      }
+     ]
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "idare-fake",
+      "brand": "Büroportal",
+      "url": [
+       {
+        "text": "https://portal.idare-giris.example.net/giris",
+        "reveal": "idare-giris.example.net"
+       }
+      ],
+      "fields": [
+       "Benutzername",
+       "Passwort"
+      ],
+      "button": "Anmelden"
+     },
+     "say": "Ein Link in einer E-Mail hat diese Seite geöffnet. ParolSeyf schweigt.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "Passwort von Hand eingeben",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Der Manager hat geschwiegen, weil die Website gefälscht ist. Ändern Sie jetzt das Passwort im echten Portal und melden Sie den Vorfall.",
+       "next": "fake-vault"
+      },
+      {
+       "id": "search",
+       "label": "In ParolSeyf suchen und ausfüllen",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Der Manager erkennt diese Website nicht, und das hat einen Grund. Lesen Sie die Adresse, bevor Sie weitermachen."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Domain war idare-giris.example.net, nicht das Büroportal.",
+       "next": "fake-vault"
+      },
+      {
+       "id": "report",
+       "label": "Website melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Ihre Meldung schützt Ihre Kolleginnen und Kollegen vor demselben Link.",
+       "next": "fake-vault"
+      }
+     ]
+    },
+    {
+     "id": "mismatch",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf: Website stimmt nicht überein"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Gespeicherte Adresse: portal.idare.example"
+        }
+       ],
+       [
+        {
+         "text": "Diese Seite: portal.idare-giris.example.net"
+        }
+       ]
+      ],
+      "buttons": [
+       "Abbrechen",
+       "Trotzdem ausfüllen"
+      ]
+     },
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Abbrechen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig, der Manager hat den Unterschied für Sie bemerkt. Schließen Sie die Seite und melden Sie sie."
+      },
+      {
+       "id": "fill",
+       "label": "Trotzdem ausfüllen",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Sie haben die Warnung übergangen und Ihr Passwort einer gefälschten Website gegeben. Ändern Sie es sofort und melden Sie den Vorfall."
+      }
+     ]
+    },
+    {
+     "id": "fake-vault",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "parolseyf-fake",
+      "brand": "ParolSeyf",
+      "url": [
+       {
+        "text": "https://parolseyf-giris.example.net/seyf",
+        "reveal": "parolseyf-giris.example.net"
+       }
+      ],
+      "fields": [
+       "E-Mail",
+       "Masterpasswort"
+      ],
+      "button": "Tresor öffnen"
+     },
+     "say": "Ein Link in einer E-Mail führt Sie zu einer Anmeldeseite für den Tresor.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "Tresor öffnen",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Geben Sie das Masterpasswort nur in der ParolSeyf-App selbst ein. Diese Website hatte es auf Ihren ganzen Tresor abgesehen."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Öffnen Sie den Tresor, indem Sie die App selbst starten, niemals über einen Link."
+      },
+      {
+       "id": "report",
+       "label": "Website melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Der Link zu dieser Website ging vielleicht an mehrere Personen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vault-lure",
+   "prompt": "Tippen Sie auf die Warnsignale, die zeigen, dass diese E-Mail gefälscht ist.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "parolseyf-fake",
+    "from": {
+     "name": [
+      {
+       "text": "ParolSeyf"
+      }
+     ],
+     "address": [
+      {
+       "text": "security@parolseyf-alert.example.net",
+       "spot": "sender"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Ihr Tresor wird in 24 Stunden gelöscht",
+      "spot": "deadline"
+     }
+    ],
+    "time": "07:58",
+    "body": [
+     [
+      {
+       "text": "Für ein Sicherheitsupdate "
+      },
+      {
+       "text": "bestätigen Sie bitte Ihr Masterpasswort",
+       "spot": "ask-master"
+      },
+      {
+       "text": "."
+      }
+     ],
+     [
+      {
+       "text": "Jetzt bestätigen: "
+      },
+      {
+       "text": "parolseyf-alert.example.net/tesdiq",
+       "spot": "link",
+       "link": {
+        "label": "parolseyf-alert.example.net/tesdiq",
+        "href": "https://parolseyf-alert.example.net/tesdiq"
+       }
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Absender",
+     "explain": "Die Adresse nutzt eine täuschend ähnliche Domain, nicht die von ParolSeyf."
+    },
+    {
+     "id": "deadline",
+     "label": "Frist",
+     "explain": "Die Drohung mit 24 Stunden soll Sie vom Nachdenken abhalten."
+    },
+    {
+     "id": "ask-master",
+     "label": "Abfrage des Masterpassworts",
+     "explain": "Kein Dienst fordert Sie per E-Mail auf, Ihr Masterpasswort zu bestätigen."
+    },
+    {
+     "id": "link",
+     "label": "Link",
+     "explain": "Der Link führt zu einer gefälschten Domain. Öffnen Sie den Tresor selbst über die App."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "unexpected-push",
+   "question": {
+    "prompt": "Nachts bittet ParolSeyf Sie, eine Anmeldung zu bestätigen, aber Sie melden sich gerade gar nicht an. Was tun Sie?",
+    "options": [
+     {
+      "id": "deny",
+      "label": "Ich lehne ab und melde es dem Sicherheitsteam",
+      "correct": true,
+      "feedback": "Richtig. Jemand kennt Ihr Masterpasswort: Ändern Sie es sofort und lassen Sie das Sicherheitsteam die Anmeldesitzungen prüfen."
+     },
+     {
+      "id": "approve",
+      "label": "Ich bestätige, damit die Anfragen aufhören",
+      "correct": false,
+      "feedback": "Das ist Push-Bombing. Eine einzige Bestätigung lässt den Angreifer in den Tresor."
+     },
+     {
+      "id": "ignore",
+      "label": "Ich ignoriere es und sehe morgen früh nach",
+      "correct": false,
+      "feedback": "Die Anfrage bleibt offen, und jemand hat bereits Ihr Masterpasswort. Lehnen Sie jetzt ab und melden Sie es."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "parolseyf",
+      "app": "ParolSeyf",
+      "title": [
+       {
+        "text": "Anmeldung bestätigen?"
+       }
+      ],
+      "body": [
+       {
+        "text": "Neues Gerät: Windows, 23:47"
+       }
+      ],
+      "time": "23:47"
+     }
+    }
+   },
+   "explain": "Eine unerwartete Anmeldeanfrage bedeutet, dass Ihr Passwort in fremde Hände geraten ist. Ablehnen, melden, ändern."
+  },
+  {
+   "type": "match",
+   "id": "autofill-rules",
+   "prompt": "Ordnen Sie jeder Situation den richtigen Schritt zu.",
+   "pairs": [
+    {
+     "id": "silent",
+     "left": "Der Manager bietet kein Passwort an",
+     "right": "Adresse prüfen, Passwort nicht kopieren"
+    },
+    {
+     "id": "link",
+     "left": "Eine E-Mail will, dass Sie den Tresor über einen Link öffnen",
+     "right": "Die App selbst öffnen"
+    },
+    {
+     "id": "shared-pc",
+     "left": "Sie sitzen an einem fremden Computer",
+     "right": "Den Tresor dort nicht öffnen"
+    },
+    {
+     "id": "push",
+     "left": "Eine Anmeldeanfrage, mit der Sie nicht gerechnet haben",
+     "right": "Ablehnen und melden"
+    }
+   ],
+   "explain": "Der Manager prüft die Adresse. Sie halten inne, sobald er schweigt."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Bietet der Manager kein Passwort an, halten Sie inne und prüfen Sie die Adresse.",
+    "Geben Sie das Masterpasswort nur in der App des Managers ein, niemals über einen Link.",
+    "Lehnen Sie Anmeldeanfragen ab, mit denen Sie nicht gerechnet haben, und melden Sie sie."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

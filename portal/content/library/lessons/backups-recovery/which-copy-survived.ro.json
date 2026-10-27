@@ -1,0 +1,425 @@
+{
+ "id": "which-copy-survived",
+ "title": "Care copie a supraviețuit?",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "br1-tutor",
+   "beats": [
+    {
+     "id": "br1-b1",
+     "say": "Bună ziua! Departamentul de arhivă păstrează documentele din ultimii zece ani. Astăzi învățați cum să le faceți corect copiile de rezervă.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "br1-b2",
+     "say": "Ransomware-ul nu criptează doar computerul. Blochează și stickul USB conectat la el, și folderul din rețea.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Fișierele dumneavoastră sunt criptate"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Folderul Documente este blocat."
+         }
+        ],
+        [
+         {
+          "text": "Unitățile conectate și folderul din rețea sunt și ele blocate.",
+          "spot": "connected"
+         }
+        ]
+       ],
+       "buttons": [
+        "Plătiți"
+       ]
+      }
+     },
+     "highlight": "connected"
+    },
+    {
+     "id": "br1-b3",
+     "say": "Regula este: trei copii, pe două tipuri de suport, dintre care una în altă locație. Cel puțin una trebuie să fie complet deconectată de la rețea.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "3-2-1",
+      "label": "3 copii, 2 tipuri de suport, 1 copie în altă locație"
+     }
+    },
+    {
+     "id": "br1-b4",
+     "say": "Și rețineți: o copie netestată se poate dovedi goală tocmai când aveți nevoie de ea. Testați din când în când restaurarea.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "br1-choice",
+   "question": {
+    "prompt": "Pe ecran a apărut un mesaj de răscumpărare. Care copie a supraviețuit cel mai probabil?",
+    "options": [
+     {
+      "id": "usb",
+      "label": "Stickul USB lăsat conectat la computer",
+      "correct": false,
+      "feedback": "O unitate conectată este ca o parte a computerului. Ransomware-ul o criptează și pe ea."
+     },
+     {
+      "id": "sync",
+      "label": "Folderul din cloud care se sincronizează automat",
+      "correct": false,
+      "feedback": "Sincronizarea copiază în cloud și fișierele criptate. Uneori rămân versiunile mai vechi, dar nu vă puteți baza pe asta."
+     },
+     {
+      "id": "network",
+      "label": "Folderul din rețea al departamentului",
+      "correct": false,
+      "feedback": "Dacă la folderul din rețea ajunge computerul, ajunge și ransomware-ul."
+     },
+     {
+      "id": "offline",
+      "label": "Discul deconectat vineri și încuiat în seif",
+      "correct": true,
+      "feedback": "Corect. Un disc separat de computer și de rețea rămâne la adăpost în timpul unui atac."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "ransomware"
+    }
+   },
+   "explain": "Copia care supraviețuiește unui atac este cea aflată în afara rețelei. De aceea, o copie este întotdeauna deconectată și păstrată separat."
+  },
+  {
+   "type": "simulation",
+   "id": "br1-sim",
+   "environment": "desktop",
+   "title": "Departamentul de arhivă",
+   "intro": "Lucrați în departamentul de arhivă. De vineri seara până luni, luați decizia corectă în fiecare fereastră.",
+   "steps": [
+    {
+     "id": "backup-done",
+     "label": "Vineri, 17:40",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-ehtiyat-komekcisi",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Copia de rezervă săptămânală este gata"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "ARXIV-DISK: documentele din ultimii zece ani, 212 GB. Acum puteți scoate discul."
+        }
+       ]
+      ],
+      "buttons": [
+       "Scoateți discul",
+       "Lăsați-l conectat"
+      ]
+     },
+     "say": "Copia de rezervă săptămânală este gata.",
+     "actions": [
+      {
+       "id": "eject",
+       "label": "Scoateți discul",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Corect. Un disc scos nu poate fi criptat la următorul atac."
+      },
+      {
+       "id": "keep",
+       "label": "Lăsați-l conectat",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Un disc conectat poate fi criptat odată cu computerul. Scoateți-l imediat ce se termină copierea."
+      }
+     ]
+    },
+    {
+     "id": "restore-test",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-ehtiyat-komekcisi",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Verificarea restaurării"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Restaurați un folder din cea mai recentă copie, ca test?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Testați restaurarea",
+       "Omiteți"
+      ]
+     },
+     "actions": [
+      {
+       "id": "test",
+       "label": "Testați restaurarea",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Doar o copie care se deschide este o copie adevărată."
+      },
+      {
+       "id": "skip",
+       "label": "Omiteți",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Copia poate fi deteriorată, iar dumneavoastră ați afla asta în cel mai prost moment. Testați restaurarea în mod regulat."
+      }
+     ]
+    },
+    {
+     "id": "personal-cloud",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "buludxidmet",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Încărcați folderul în contul personal?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Arxiv_2016_2026: 212 GB. Cont: sevda.k@poct-mail.example.net"
+        }
+       ]
+      ],
+      "buttons": [
+       "Încărcați",
+       "Refuzați"
+      ]
+     },
+     "actions": [
+      {
+       "id": "upload",
+       "label": "Încărcați",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Documentele de serviciu se păstrează doar acolo unde a aprobat organizația dumneavoastră. Un cloud personal nu protejează copia și poate duce la scurgerea datelor."
+      },
+      {
+       "id": "decline",
+       "label": "Refuzați",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă este nevoie de o copie suplimentară, suportul IT o creează într-un loc aprobat."
+      }
+     ]
+    },
+    {
+     "id": "ransom-monday",
+     "label": "Luni, 09:05",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Fișierele dumneavoastră sunt criptate"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Folderul din rețea și unitățile conectate sunt blocate. Plătiți în 72 de ore ca să primiți cheia."
+        }
+       ]
+      ],
+      "buttons": [
+       "Plătiți",
+       "Închideți"
+      ]
+     },
+     "say": "Luni dimineață, pe ecran apare acest mesaj.",
+     "actions": [
+      {
+       "id": "isolate",
+       "label": "Scoateți cablul, opriți Wi-Fi-ul",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Corect. Deconectați computerul de la rețea fără să îl închideți și sunați imediat la suportul IT."
+      },
+      {
+       "id": "pay",
+       "label": "Plătiți",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Plata nu garantează că veți primi fișierele înapoi. Recuperarea se va face din copia pe care ați păstrat-o separat."
+      }
+     ]
+    },
+    {
+     "id": "sync-alert",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "buludxidmet",
+      "app": "BuludXidmət",
+      "title": [
+       {
+        "text": "1.240 de fișiere modificate"
+       }
+      ],
+      "body": [
+       {
+        "text": "Folderul departamentului a fost sincronizat cu cloudul."
+       }
+      ],
+      "time": "09:07"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Anunțați suportul IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect, sincronizarea a copiat și fișierele criptate. Un specialist va restaura versiunile mai vechi."
+      },
+      {
+       "id": "restore-self",
+       "label": "Restaurați fișierele din cloud chiar dumneavoastră",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Fișierele restaurate pe un computer infectat pot fi criptate din nou. Specialiștii fac restaurarea pe un computer curat."
+      }
+     ]
+    },
+    {
+     "id": "offline-disk",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "it-tehlukesizlik",
+      "app": "Securitate IT",
+      "title": [
+       {
+        "text": "Aduceți discul din seif"
+       }
+      ],
+      "body": [
+       {
+        "text": "Nu conectați ARXIV-DISK nicăieri. Vom face restaurarea împreună, pe un computer curat."
+       }
+      ],
+      "time": "10:30"
+     },
+     "actions": [
+      {
+       "id": "hand-over",
+       "label": "Îi predau discul specialistului",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Restaurarea se va face pe un computer curățat, sub controlul unui specialist."
+      },
+      {
+       "id": "plug",
+       "label": "Conectez chiar eu discul la acest computer",
+       "kind": "plug-in",
+       "outcome": "compromised",
+       "feedback": "Ultima copie poate fi criptată pe un computer infectat. Predați discul doar specialistului."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "br1-match",
+   "prompt": "Asociați fiecare parte a regulii cu semnificația ei.",
+   "pairs": [
+    {
+     "id": "three",
+     "left": "3 copii",
+     "right": "Fișierul original și două copii de rezervă"
+    },
+    {
+     "id": "two",
+     "left": "2 tipuri de suport",
+     "right": "De exemplu, un disc extern și un cloud aprobat"
+    },
+    {
+     "id": "one",
+     "left": "1 copie în altă locație",
+     "right": "Într-o altă clădire și în afara rețelei"
+    },
+    {
+     "id": "test",
+     "left": "Testul de restaurare",
+     "right": "Verificarea periodică a faptului că copia se deschide"
+    }
+   ],
+   "explain": "Cu trei copii, două tipuri de suport și o copie în altă locație, dacă pierdeți una, vă rămâne alta. Testul de restaurare dovedește că o copie funcționează."
+  },
+  {
+   "type": "choice",
+   "id": "br1-work-files",
+   "question": {
+    "prompt": "Unde păstrați documentele de serviciu importante?",
+    "options": [
+     {
+      "id": "approved",
+      "label": "În folderul aprobat de organizația mea",
+      "correct": true,
+      "feedback": "Corect. Acolo, suportul IT face și verifică copiile."
+     },
+     {
+      "id": "desktop-usb",
+      "label": "Pe desktop, iar seara le copiez pe stickul meu USB",
+      "correct": false,
+      "feedback": "Un stick USB personal se poate pierde sau infecta. Nimeni nu verifică o astfel de copie."
+     },
+     {
+      "id": "personal-cloud",
+      "label": "În contul meu personal de cloud, e comod",
+      "correct": false,
+      "feedback": "Într-un cont personal, documentul de serviciu iese de sub controlul organizației. Și aceasta este o scurgere de date."
+     }
+    ]
+   },
+   "explain": "Suportul IT protejează și restaurează copia unui fișier păstrat într-un loc aprobat. Un fișier de serviciu păstrat în altă parte nu este nici protejat, nici restaurat."
+  },
+  {
+   "type": "recap",
+   "id": "br1-recap",
+   "points": [
+    "Trei copii, două tipuri de suport, una în altă locație.",
+    "Păstrați cel puțin o copie în afara rețelei.",
+    "Testați regulat restaurarea."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

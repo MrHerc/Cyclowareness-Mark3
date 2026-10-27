@@ -84,3 +84,17 @@ describe("translations", () => {
     });
   }
 });
+
+/** GSM 03.38: a text of only these characters goes out as GSM-7 (160 per SMS, the extension ones count twice); anything else as UCS-2 (70). */
+const GSM7 = "@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !\"#¤%&'()*+,-./0123456789:;<=>?¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà";
+const GSM7_EXTENSION = "^{}\[~]|€";
+
+describe("sign-in code SMS", () => {
+  it.each(LOCALES)("%s fits one SMS with a six-digit code", (locale) => {
+    const text = String(new IntlMessageFormat(load(locale, "auth").phone.smsText, locale).format({ code: "123456" }));
+    const chars = [...text];
+    const gsm = chars.every((c) => GSM7.includes(c) || GSM7_EXTENSION.includes(c));
+    const length = gsm ? chars.reduce((n, c) => n + (GSM7_EXTENSION.includes(c) ? 2 : 1), 0) : text.length;
+    expect(length, text).toBeLessThanOrEqual(gsm ? 160 : 70);
+  });
+});

@@ -44,7 +44,7 @@ export async function WizardPage({ v, campaign }: { v: Viewer; campaign: typeof 
       <PageHeader title={campaign ? tr("edit") : tr("new")} back={{ href: "/admin/campaigns", label: tr("allCampaigns") }} />
       <Card>
         <CardBody>
-          <CampaignWizard smsVoice={v.tenant.features.has("sms_voice")} departments={departments.map((d) => ({ id: d.id, name: d.name, people: reach(d.id) }))} initial={initial} />
+          <CampaignWizard smsVoice={v.tenant.features.has("sms_voice")} qrTrap={v.tenant.features.has("qr_trap")} departments={departments.map((d) => ({ id: d.id, name: d.name, people: reach(d.id) }))} initial={initial} />
         </CardBody>
       </Card>
     </div>

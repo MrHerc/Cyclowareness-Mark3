@@ -1,0 +1,373 @@
+{
+  "id": "ai-lures-fake-apps",
+  "title": "Capcane create cu AI",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l2-tutor",
+      "beats": [
+        {
+          "id": "l2-b1",
+          "say": "Și escrocii folosesc AI: e-mailuri impecabile, voci convingătoare, aplicații false.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": { "kind": "illustration", "id": "deepfake" }
+        },
+        {
+          "id": "l2-b2",
+          "say": "Un e-mail de phishing poate să nu mai aibă nicio greșeală de limbă. Verificați expeditorul și cererea, nu gramatica.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "idare-fake",
+              "from": {
+                "name": [{ "text": "Narmin Huseynova" }],
+                "address": [
+                  { "text": "n.huseynova@" },
+                  { "text": "idare-mail.test", "spot": "domain" }
+                ]
+              },
+              "subject": [{ "text": "Date pentru raport" }],
+              "time": "09:10",
+              "body": [
+                [{ "text": "Stimate coleg, aș vrea să vă cer o mică favoare în legătură cu raportul pe care îl prezentăm ministerului." }]
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "l2-b3",
+          "say": "Aplicațiile de chatbot „Pro” gratuite și extensiile de browser vă pot fura datele.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": { "kind": "illustration", "id": "download" }
+        },
+        {
+          "id": "l2-b4",
+          "say": "Instalați aplicații și extensii doar dintr-o sursă aprobată de instituție.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": { "kind": "illustration", "id": "shield" }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l2-sim",
+      "environment": "browser",
+      "title": "Versiunea Pro gratuită",
+      "intro": "O reclamă v-a oferit gratuit un chatbot „Pro”. Verificați paginile și decideți la fiecare pas.",
+      "steps": [
+        {
+          "id": "pro-page",
+          "label": "NeyroSöhbət Pro: toate funcțiile, gratuit",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "neyrosohbet-fake",
+            "url": [{ "text": "https://neyrosohbet-pro.test", "reveal": "neyrosohbet-pro.test" }]
+          },
+          "say": "Uitați-vă la bara de adrese.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "Instalați extensia",
+              "kind": "install",
+              "outcome": "risky",
+              "feedback": "Este riscant să instalați o extensie de pe un site neoficial. Luați extensii doar dintr-o sursă permisă de instituție."
+            },
+            {
+              "id": "close",
+              "label": "Închideți fila",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Corect. Versiunea „Pro gratuită” a unui serviciu nu se oferă pe un site străin.",
+              "next": "fake-login"
+            }
+          ]
+        },
+        {
+          "id": "extension",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "neyrosohbet-fake",
+            "tone": "system",
+            "title": [{ "text": "Adăugați „NeyroSöhbət Pro”?" }],
+            "body": [
+              [{ "text": "Această extensie poate citi și modifica toate datele dumneavoastră de pe toate site-urile pe care le vizitați." }]
+            ],
+            "buttons": ["Anulați", "Adăugați extensia"]
+          },
+          "actions": [
+            {
+              "id": "add",
+              "label": "Adăugați extensia",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Acum extensia vă vede e-mailul de serviciu și fiecare pagină pe care o deschideți. Eliminați-o și anunțați echipa de securitate."
+            },
+            {
+              "id": "cancel",
+              "label": "Anulați",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Corect. O extensie de chatbot nu are nevoie să citească toate site-urile."
+            }
+          ]
+        },
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "neyrosohbet-fake",
+            "brand": "NeyroSöhbət",
+            "url": [{ "text": "https://neyrosohbet.login-pro.test", "reveal": "login-pro.test" }],
+            "fields": ["E-mail de serviciu", "Parolă"],
+            "button": "Conectați-vă"
+          },
+          "actions": [
+            {
+              "id": "login",
+              "label": "Conectați-vă",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Parola de serviciu a ajuns la un escroc. Schimbați-o acum și raportați incidentul."
+            },
+            {
+              "id": "close",
+              "label": "Închideți fila",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Corect. Adresa nu este pe domeniul propriu al serviciului."
+            },
+            {
+              "id": "report",
+              "label": "Raportați site-ul",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Foarte bine. Raportarea unui site fals îi protejează și pe ceilalți."
+            }
+          ]
+        },
+        {
+          "id": "setup-file",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "zeka-foto",
+            "name": [{ "text": "ZekaFoto_AI_Setup.exe" }],
+            "type": "exe",
+            "size": "48 MB",
+            "source": [{ "text": "zeka-foto-free.test" }]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Deschideți",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "Programul nu provine dintr-o sursă oficială și poate fi rău intenționat. Pe calculatoarele de serviciu, programele le instalează suportul IT."
+            },
+            {
+              "id": "delete",
+              "label": "Ștergeți",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Corect. Programele „AI” gratuite sunt o deghizare foarte des folosită pentru malware."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l2-hotspot",
+      "prompt": "Găsiți capcanele din acest e-mail scris impecabil.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "idare-fake",
+        "from": {
+          "name": [{ "text": "Narmin Huseynova" }],
+          "address": [
+            { "text": "n.huseynova@" },
+            { "text": "idare-mail.test", "spot": "domain" }
+          ]
+        },
+        "subject": [
+          { "text": "Urgent: " },
+          { "text": "astăzi până la ora 15:00", "spot": "deadline" }
+        ],
+        "time": "09:10",
+        "body": [
+          [{ "text": "Stimate coleg, pregătim un raport pentru minister." }],
+          [
+            { "text": "Încărcați codurile de identificare și numerele de telefon ale tuturor colegilor din departament", "spot": "request" },
+            { "text": " " },
+            {
+              "text": "în acest formular",
+              "spot": "link",
+              "link": { "label": "în acest formular", "href": "https://forma-yukle.test/idare" }
+            },
+            { "text": "." }
+          ],
+          [{ "text": "Nu mă sunați, sunt în ședință.", "spot": "no-call" }]
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Domeniu străin",
+          "explain": "Numele managerului vă este cunoscut, dar domeniul nu este al instituției. Limba impecabilă nu ascunde acest lucru."
+        },
+        {
+          "id": "deadline",
+          "label": "Termen strict",
+          "explain": "Urgența nu vă lasă timp să verificați."
+        },
+        {
+          "id": "request",
+          "label": "Cerere de date cu caracter personal",
+          "explain": "Codurile de identificare și numerele de telefon ale colegilor nu se încarcă într-un formular extern."
+        },
+        {
+          "id": "link",
+          "label": "Formular extern",
+          "explain": "Formularul nu se află în sistemul instituției. Nimeni nu știe în mâinile cui ajung datele."
+        },
+        {
+          "id": "no-call",
+          "label": "Nu sunați",
+          "explain": "Fraza aceasta vrea să vă împiedice să verificați. Tocmai de aceea, sunați la numărul pe care îl cunoașteți."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "l2-swipe",
+      "prompt": "Sigur sau capcană?",
+      "cards": [
+        {
+          "id": "voice-note",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [{ "text": "Manager" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Bună, eu sunt. Trimite imediat codul de confirmare la numărul ăsta, îți explic mai târziu." }],
+                "voice": "man-2",
+                "spoken": "Bună, eu sunt. <breath> Trimite imediat codul de confirmare la numărul ăsta, îți explic mai târziu."
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "O voce poate fi imitată cu AI. Sunați chiar dumneavoastră la numărul cunoscut al managerului."
+        },
+        {
+          "id": "photo-perms",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "zeka-foto",
+            "app": "Zəka Foto",
+            "permissions": [
+              { "label": [{ "text": "Cameră" }], "needed": true },
+              { "label": [{ "text": "Galerie foto" }], "needed": true },
+              { "label": [{ "text": "Contacte" }], "needed": false },
+              { "label": [{ "text": "Citirea SMS-urilor" }], "needed": false }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Un editor foto nu are nevoie de contacte sau de SMS-uri. Nu instalați o aplicație care cere permisiuni în plus."
+        },
+        {
+          "id": "komekci-notif",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "idare-komekci",
+            "app": "İdarə Köməkçisi",
+            "title": [{ "text": "Rezumatul dumneavoastră este gata" }],
+            "body": [{ "text": "Îl puteți deschide pe portalul intern." }],
+            "time": "11:05"
+          },
+          "verdict": "safe",
+          "explain": "Instrumentul aprobat al instituției trimite o notificare așteptată, fără link și fără să ceară vreun cod."
+        },
+        {
+          "id": "pro-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "neyrosohbet-fake",
+            "sender": [{ "text": "NeyroPro" }],
+            "time": "12:30",
+            "messages": [
+              [{ "text": "NeyroSöhbət Pro gratuit timp de 1 an! Activați aici: neyrosohbet-pro.test" }]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "O ofertă Pro gratuită poate fi o capcană. Verificați-vă abonamentul doar în aplicația oficială a serviciului."
+        },
+        {
+          "id": "approved-list",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [{ "text": "Suport IT" }],
+              "address": [{ "text": "destek@idare.example" }]
+            },
+            "subject": [{ "text": "Instrumente AI aprobate" }],
+            "time": "14:00",
+            "body": [
+              [{ "text": "Lista se află pe portalul intern. Dacă aveți nevoie de un instrument nou, trimiteți-ne o solicitare." }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Vine de la o adresă internă, fără link sau fișier. Este o informație utilă."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l2-choice",
+      "question": {
+        "prompt": "O extensie de browser cere să „citească toate datele dumneavoastră de pe toate site-urile”. Ce înseamnă asta?",
+        "options": [
+          {
+            "id": "normal",
+            "label": "Toate extensiile cer asta, este normal",
+            "correct": false,
+            "feedback": "Aceasta este cea mai largă permisiune care există. Extensia vă poate vedea e-mailul și paginile în care introduceți parole."
+          },
+          {
+            "id": "sees-all",
+            "label": "Poate vedea fiecare pagină pe care o deschid, inclusiv e-mailul de serviciu",
+            "correct": true,
+            "feedback": "Corect. Instalați o astfel de extensie doar dacă instituția a verificat-o și a aprobat-o."
+          },
+          {
+            "id": "only-ai",
+            "label": "Va vedea doar pagina chatbotului",
+            "correct": false,
+            "feedback": "Nu. „Toate site-urile” înseamnă chiar toate site-urile."
+          }
+        ]
+      },
+      "explain": "Oricât de utilă ar părea o extensie, permisiunile ei arată ce poate face."
+    },
+    {
+      "type": "recap",
+      "id": "l2-recap",
+      "points": [
+        "Un limbaj impecabil nu face un e-mail autentic: verificați expeditorul și cererea.",
+        "Luați aplicații și extensii „Pro” doar dintr-o sursă aprobată.",
+        "Dacă o voce cunoscută vă cere bani sau un cod, sunați chiar dumneavoastră la numărul pe care îl știți."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

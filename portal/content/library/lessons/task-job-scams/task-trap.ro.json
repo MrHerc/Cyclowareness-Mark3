@@ -1,0 +1,499 @@
+{
+ "id": "task-trap",
+ "title": "Capcana sarcinilor",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "tt-tutor",
+   "beats": [
+    {
+     "id": "tt-b1",
+     "say": "Bună ziua! Astăzi vorbim despre ofertele de lucru de acasă care promit bani ușor câștigați.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "tt-b2",
+     "say": "Sarcina este simplă: un like, o recenzie, o captură de ecran. Iar plata este suspect de mare.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2d-nergiz-market-fake",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Nargiz Market HR | Aynur"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Bună ziua! Lucru de acasă: dați like produselor și scrieți recenzii."
+          }
+         ],
+         "time": "09:12"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Câștigați 40–120 AZN pe zi",
+           "spot": "pay"
+          }
+         ],
+         "time": "09:12"
+        }
+       ]
+      }
+     },
+     "highlight": "pay"
+    },
+    {
+     "id": "tt-b3",
+     "say": "Primii cinci manați chiar vi-i plătesc. Sunt momeala pentru o plată mare, mai târziu.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "tt-b4",
+     "say": "Regula este simplă: dacă trebuie să plătiți ca să începeți sau ca să vă retrageți câștigurile, este o înșelătorie.",
+     "mood": "happy",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "tt-sim",
+   "environment": "phone",
+   "title": "Lucru de acasă",
+   "intro": "O ofertă de muncă vine de la un număr necunoscut. Alegeți răspunsul la fiecare mesaj.",
+   "steps": [
+    {
+     "id": "offer",
+     "label": "09:12 Mesaj nou",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Nargiz Market HR | Aynur"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună ziua! Am luat numărul dumneavoastră din profilul de pe un site de locuri de muncă."
+         }
+        ],
+        "time": "09:12"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Lucru de acasă: 1–2 ore pe zi, 40–120 AZN. Vă interesează?"
+         }
+        ],
+        "time": "09:12"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "interested",
+       "label": "Da, spuneți-mi mai multe",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Interesul arătat nu înseamnă încă o pierdere, dar această conversație duce spre o plată. Urmăriți atent fiecare pas."
+      },
+      {
+       "id": "block",
+       "label": "Blocați și raportați",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Corect. O ofertă neașteptată, cu o plată exagerat de mare, este un semnal de alarmă suficient.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "first-task",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Nargiz Market HR | Aynur"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Prima sarcină: dați 5 stele acestor 3 produse și trimiteți o captură de ecran."
+         }
+        ],
+        "time": "09:20"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "1,70 AZN pentru fiecare sarcină."
+         }
+        ],
+        "time": "09:20"
+       }
+      ]
+     },
+     "say": "Iată prima sarcină.",
+     "actions": [
+      {
+       "id": "do-it",
+       "label": "Mă apuc și trimit captura de ecran",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Recenziile false îi induc în eroare pe ceilalți cumpărători. În plus, este prima treaptă a înșelătoriei."
+      },
+      {
+       "id": "refuse",
+       "label": "Nu scriu recenzii false, îi blochez",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Corect. Plata pentru like-uri și recenzii este un semn binecunoscut al acestei înșelătorii.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "first-pay",
+     "label": "10:03 SahilBank",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "10:03",
+      "messages": [
+       [
+        {
+         "text": "Ați primit pe card: 5,10 AZN. Sold disponibil: 63,40 AZN."
+        }
+       ]
+      ]
+     },
+     "say": "Banii chiar au ajuns pe cardul dumneavoastră.",
+     "actions": [
+      {
+       "id": "trust",
+       "label": "Au venit banii, deci jobul e real",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "O plată mică are rolul de a vă câștiga încrederea. Mai târziu, escrocul ia înapoi de multe ori mai mult."
+      },
+      {
+       "id": "bait",
+       "label": "E o momeală. Mă opresc aici",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Corect. Prima plată este momeala, iar pasul următor este să vi se ceară bani.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "vip-task",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Grupul VIP Nargiz Market"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Felicitări, ați ajuns la nivelul VIP!"
+         }
+        ],
+        "time": "10:40"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Sarcină VIP: depuneți 50 AZN și primiți înapoi 130 AZN în 30 de minute."
+         }
+        ],
+        "time": "10:41"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Toată lumea din grup câștigă, uitați-vă: 47 de oameni au fost plătiți azi."
+         }
+        ],
+        "time": "10:41"
+       }
+      ]
+     },
+     "say": "Acum v-au mutat într-un grup de Telegram.",
+     "actions": [
+      {
+       "id": "deposit",
+       "label": "Depun 50 AZN",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Banii aceștia nu se mai întorc. Câștigătorii din grup sunt chiar escrocii."
+      },
+      {
+       "id": "leave",
+       "label": "Ieșiți din grup și raportați-l",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă trebuie să depuneți bani ca să lucrați, nu este un loc de muncă, ci o înșelătorie.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "negative",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Grupul VIP Nargiz Market"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Eroare de sistem: soldul dumneavoastră este acum -86 AZN."
+         }
+        ],
+        "time": "11:15"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Plătiți 86 AZN, altfel câștigurile dumneavoastră de 214 AZN vor fi șterse."
+         }
+        ],
+        "time": "11:15"
+       }
+      ]
+     },
+     "say": "După ce ați plătit, soldul a devenit brusc negativ.",
+     "actions": [
+      {
+       "id": "pay-more",
+       "label": "Plătesc și cei 86 AZN",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "După fiecare plată va apărea un nou motiv. Opriți-vă și raportați totul băncii și poliției, la 102."
+      },
+      {
+       "id": "stop",
+       "label": "Nu plătesc, blochez și raportez",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Corect, plata pentru deblocarea câștigurilor este ultima treaptă a înșelătoriei. Păstrați conversația ca dovadă."
+      }
+     ]
+    },
+    {
+     "id": "end",
+     "label": "IshBazar: post vacant nou",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2d-isbazar",
+      "app": "IshBazar",
+      "title": [
+       {
+        "text": "Khazar Logistics: operator"
+       }
+      ],
+      "body": [
+       {
+        "text": "Interviu la birou, salariu de 850 AZN. Aplicați pe site."
+       }
+      ],
+      "time": "12:30"
+     },
+     "say": "Iar acesta este un post vacant real.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Vedeți anunțul",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. Un post real numește compania, presupune un interviu și un salariu real și nu vă cere niciodată să plătiți."
+      },
+      {
+       "id": "later",
+       "label": "Verificați mai târziu",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Este în regulă. Un anunț real de angajare nu dispare, îl puteți verifica liniștit."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "tt-scenario",
+   "title": "Leyla a plătit deja",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "Am depus 120 de manați pentru sarcini. Acum îmi cer un impozit de 15% ca să pot retrage banii. Să plătesc?",
+     "speaker": "Leyla, ruda dumneavoastră (la telefon)",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Am depus 120 de manați pentru sarcini. <breath> Acum îmi cer un impozit de 15 la sută ca să pot retrage banii. Să plătesc?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Nu plăti, e aceeași înșelătorie care continuă",
+       "next": "id-photo",
+       "feedback": "Corect. Un impozit sau un comision pentru retragerea câștigurilor este un semn de fraudă."
+      },
+      {
+       "label": "Plătește, altfel pierzi și cei 120 de manați",
+       "outcome": "compromised",
+       "feedback": "Asta doar mărește pierderea. După impozit va apărea o nouă scuză."
+      }
+     ]
+    },
+    {
+     "id": "id-photo",
+     "text": "Le-am trimis și o poză cu buletinul, ca să mă înregistrez. E o problemă?",
+     "speaker": "Leyla",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Le-am trimis și o poză cu buletinul, ca să mă înregistrez. <breath> E o problemă?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Da, hai să le spunem și asta băncii și poliției",
+       "next": "steps",
+       "feedback": "Corect. Cu fotografia unui act de identitate se pot deschide conturi sau credite pe numele ei."
+      },
+      {
+       "label": "Nu, o poză nu le folosește la nimic",
+       "next": "steps",
+       "outcome": "risky",
+       "feedback": "Dimpotrivă, cu fotografia unui act de identitate se pot deschide conturi false pe numele ei. Trebuie raportat și acest lucru."
+      }
+     ]
+    },
+    {
+     "id": "steps",
+     "text": "Și acum ce fac?",
+     "speaker": "Leyla",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "<breath> Și acum ce fac?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Sună la bancă, anunță poliția la 102 și păstrează conversația",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Banca poate încerca să oprească transferul, iar conversația este o dovadă pentru poliție."
+      },
+      {
+       "label": "Șterge tot și uită",
+       "outcome": "risky",
+       "feedback": "Ștergerea conversației distruge dovezile. Nu este nicio rușine, trebuie doar raportat."
+      },
+      {
+       "label": "Scrie-le celor de pe canalul care promite recuperarea banilor",
+       "outcome": "compromised",
+       "feedback": "Cei care promit recuperarea banilor sunt adesea aceiași escroci. Nu le plătiți nimic."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "tt-match",
+   "prompt": "Asociați fraza din ofertă cu ceea ce înseamnă de fapt.",
+   "pairs": [
+    {
+     "id": "easy",
+     "left": "1 oră pe zi, 120 AZN",
+     "right": "Momeală: munca reală nu se plătește așa"
+    },
+    {
+     "id": "deposit",
+     "left": "Depunere pentru o sarcină VIP",
+     "right": "Vă iau banii direct"
+    },
+    {
+     "id": "tax",
+     "left": "Impozit pentru retragerea câștigurilor",
+     "right": "Următoarea capcană de plată"
+    },
+    {
+     "id": "group",
+     "left": "Toată lumea din grup câștigă",
+     "right": "Membri puși de escroci și recenzii false"
+    }
+   ],
+   "explain": "Indiferent cum se numește plata, dacă plătiți ca să lucrați, nu este un loc de muncă."
+  },
+  {
+   "type": "recap",
+   "id": "tt-recap",
+   "points": [
+    "Un job care vă plătește pentru like-uri și recenzii este o înșelătorie.",
+    "Prima plată mică este momeala; depunerile și impozitele pe retragere sunt capcana.",
+    "Ați plătit deja? Sunați la bancă, la poliție (102) și păstrați conversația."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

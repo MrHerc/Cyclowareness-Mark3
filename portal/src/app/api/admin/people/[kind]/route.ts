@@ -2,7 +2,7 @@ import { and, eq, ne } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { db, t } from "@/server/db";
 import { allowed, getViewer, twoFactorGap } from "@/server/auth/viewer";
-import { apiViewer, deniedResponse } from "@/server/auth/api";
+import { apiViewer, deniedResponse, rscProbe } from "@/server/auth/api";
 import { issueAccountLink } from "@/server/auth/links";
 import { listPeople } from "@/server/queries/admin";
 import { audit } from "@/server/services/audit";
@@ -10,15 +10,25 @@ import { rateLimit } from "@/server/rate-limit";
 import { sameOrigin } from "@/server/request";
 import { toCsv } from "@/lib/csv";
 import { todayInBaku } from "@/lib/time";
+import { isLocale, type Locale } from "@/i18n/config";
 
-const TEMPLATE_SAMPLE: Record<string, string[]> = {
+const TEMPLATE_SAMPLE: Record<Locale, string[]> = {
   az: ["Aysel Məmmədova", "aysel@example.az", "Maliyyə", "Mühasib", "learner", "", "+994501234567", "az"],
   en: ["Aysel Mammadova", "aysel@example.com", "Finance", "Accountant", "learner", "", "+994501234567", "en"],
   ru: ["Айсель Мамедова", "aysel@example.com", "Финансы", "Бухгалтер", "learner", "", "+994501234567", "ru"],
+  tr: ["Aysel Memmedova", "aysel@example.com", "Finans", "Muhasebeci", "learner", "", "+994501234567", "tr"],
+  ro: ["Aysel Mammadova", "aysel@example.com", "Financiar", "Contabil", "learner", "", "+994501234567", "ro"],
+  ka: ["აისელ მამედოვა", "aysel@example.com", "ფინანსები", "ბუღალტერი", "learner", "", "+994501234567", "ka"],
+  uk: ["Айсель Мамедова", "aysel@example.com", "Фінанси", "Бухгалтер", "learner", "", "+994501234567", "uk"],
+  de: ["Aysel Mammadova", "aysel@example.com", "Finanzen", "Buchhalterin", "learner", "", "+994501234567", "de"],
+  fr: ["Aysel Mammadova", "aysel@example.com", "Finance", "Comptable", "learner", "", "+994501234567", "fr"],
+  ar: ["آيسل محمدوفا", "aysel@example.com", "المالية", "محاسبة", "learner", "", "+994501234567", "ar"],
 };
 
 /** People list export and bulk invite links, as CSV. */
 export async function GET(request: Request, { params }: RouteContext<"/api/admin/people/[kind]">) {
+  const probe = rscProbe(request);
+  if (probe) return probe;
   const { kind } = await params;
   const v = await getViewer();
   if (!v) return deniedResponse(request, 401);
@@ -43,7 +53,8 @@ export async function GET(request: Request, { params }: RouteContext<"/api/admin
 
   if (kind === "template") {
     // The column names are what the import reads; the sample row is in the admin's language.
-    const sample = TEMPLATE_SAMPLE[await getLocale()] ?? TEMPLATE_SAMPLE.en;
+    const locale = await getLocale();
+    const sample = isLocale(locale) ? TEMPLATE_SAMPLE[locale] : TEMPLATE_SAMPLE.en;
     return new Response(toCsv(["name", "email", "department", "job_title", "role", "manager_email", "phone", "language"], [sample]), {
       headers: { "content-type": "text/csv; charset=utf-8", "content-disposition": `attachment; filename="people-template.csv"` },
     });

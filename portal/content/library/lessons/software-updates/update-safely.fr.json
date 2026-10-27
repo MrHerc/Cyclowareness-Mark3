@@ -1,0 +1,374 @@
+{
+ "id": "update-safely",
+ "title": "Mettez à jour en sécurité",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Les mises à jour, ce ne sont pas seulement de nouveaux boutons. La plupart corrigent des failles de sécurité que les attaquants connaissent déjà.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Dès qu’une faille est rendue publique, les attaquants partent à la chasse aux appareils qui ne sont pas à jour. Chaque jour de retard augmente le risque.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "ransomware"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Une fenêtre pop-up qui vous dit que votre navigateur est obsolète et qu’il faut télécharger tout de suite, c’est un piège. Les navigateurs se mettent à jour depuis leurs propres paramètres.",
+     "mood": "think",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "brauzer-yenilenme-tecili.example.net",
+         "spot": "fake-domain"
+        },
+        {
+         "text": "/update.exe"
+        }
+       ]
+      }
+     },
+     "highlight": "fake-domain"
+    },
+    {
+     "id": "b4",
+     "say": "Les vraies mises à jour viennent des paramètres de l’appareil ou de la boutique d’applications officielle. En cas de doute, allez-y vous-même et vérifiez.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b5",
+     "say": "Ne repoussez pas le redémarrage après une mise à jour. Souvent, la protection ne s’applique qu’une fois l’appareil redémarré.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "real-or-fake",
+   "prompt": "Vraie mise à jour ou piège ?",
+   "cards": [
+    {
+     "id": "sms-virus",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "Service"
+       }
+      ],
+      "time": "07:55",
+      "messages": [
+       [
+        {
+         "text": "Virus détecté sur votre téléphone ! Téléchargez la mise à jour de sécurité : fix-phone.example.info/app.apk"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Votre téléphone n’envoie pas ses mises à jour par SMS. Ce lien installe une application malveillante."
+    },
+    {
+     "id": "planned-update",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Support technique"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Mise à jour prévue ce soir"
+       }
+      ],
+      "time": "14:10",
+      "body": [
+       [
+        {
+         "text": "Aujourd’hui, à partir de 19:00, les ordinateurs de travail se mettront à jour automatiquement."
+        }
+       ],
+       [
+        {
+         "text": "Laissez votre ordinateur allumé et pensez simplement à enregistrer votre travail. Vous n’avez rien à télécharger."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Pas de lien, pas de fichier, rien à télécharger. Ce message vous informe, c’est tout."
+    },
+    {
+     "id": "player-update",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://video-pleyer-yenile.example.net/pleyer_setup.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un site qui vous demande de mettre à jour votre lecteur pour regarder une vidéo, c’est un piège classique. Les navigateurs lisent les vidéos tout seuls."
+    },
+    {
+     "id": "zip-update",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Centre de mise à jour système"
+        }
+       ],
+       "address": [
+        {
+         "text": "noreply@system-update-center.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Votre licence expire ! Mise à jour obligatoire"
+       }
+      ],
+      "time": "09:03",
+      "body": [
+       [
+        {
+         "text": "Installez dès aujourd’hui la mise à jour jointe."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Update_KB5039.zip"
+         }
+        ],
+        "size": "1,8 Mo"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Les mises à jour n’arrivent pas en pièce jointe d’un e-mail. L’archive peut cacher un logiciel malveillant."
+    },
+    {
+     "id": "remote-helper",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Support technique (officiel)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Pour mettre à jour votre ordinateur à distance, installez ce programme et envoyez-moi le code affiché à l’écran."
+         }
+        ],
+        "time": "16:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un logiciel de prise en main à distance donne à l’attaquant un accès complet à votre ordinateur. Appelez vous-même le support, à un numéro que vous connaissez."
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-update-email",
+   "prompt": "Trouvez les signes d’un faux e-mail de mise à jour.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Service des mises à jour"
+      }
+     ],
+     "address": [
+      {
+       "text": "security-update@"
+      },
+      {
+       "text": "idare-example.info",
+       "spot": "domain"
+      }
+     ]
+    },
+    "to": "vous",
+    "subject": [
+     {
+      "text": "URGENT : ",
+      "spot": "urgency"
+     },
+     {
+      "text": "Votre ordinateur sera bloqué dans les 24 heures"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Madame, Monsieur,"
+      }
+     ],
+     [
+      {
+       "text": "Une mise à jour critique manque sur votre ordinateur. Ouvrez le fichier en pièce jointe et installez-le."
+      }
+     ],
+     [
+      {
+       "text": "Désactivez votre antivirus pendant l’installation.",
+       "spot": "disable-av"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Yenilenme_Tecili.exe",
+        "spot": "exe"
+       }
+      ],
+      "size": "2,1 Mo"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Mauvais domaine",
+     "explain": "Votre organisation utilise idare.example. Ici, c’est un autre domaine, écrit avec un tiret."
+    },
+    {
+     "id": "urgency",
+     "label": "Urgence et menaces",
+     "explain": "La menace de blocage est là pour vous faire agir sans réfléchir."
+    },
+    {
+     "id": "disable-av",
+     "label": "Désactiver l’antivirus",
+     "explain": "Aucune vraie mise à jour ne vous demande de couper votre protection. Cela ouvre la voie au logiciel malveillant."
+    },
+    {
+     "id": "exe",
+     "label": "Fichier exécutable",
+     "explain": "Un fichier .exe lance un programme dès que vous l’ouvrez. Les mises à jour n’arrivent pas de cette façon."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "update-steps",
+   "prompt": "Remettez les étapes de la mise à jour dans le bon ordre.",
+   "items": [
+    {
+     "id": "save",
+     "label": "Enregistrer votre travail"
+    },
+    {
+     "id": "settings",
+     "label": "Lancer la mise à jour depuis les Paramètres"
+    },
+    {
+     "id": "restart",
+     "label": "Redémarrer l’appareil"
+    },
+    {
+     "id": "check",
+     "label": "Vérifier que tout fonctionne"
+    }
+   ],
+   "explain": "L’enregistrement protège votre travail, et le redémarrage termine la mise à jour."
+  },
+  {
+   "type": "choice",
+   "id": "old-device",
+   "question": {
+    "prompt": "Votre ancien téléphone ne reçoit plus de mises à jour. Que faire ?",
+    "options": [
+     {
+      "id": "antivirus",
+      "label": "Installer un antivirus et continuer à l’utiliser",
+      "correct": false,
+      "feedback": "Un antivirus ne corrige pas les failles du système lui-même."
+     },
+     {
+      "id": "move",
+      "label": "Retirer les comptes professionnels et passer à un appareil encore pris en charge",
+      "correct": true,
+      "feedback": "Exact. Un appareil qui n’est plus pris en charge ne recevra pas de correctifs pour les nouvelles failles."
+     },
+     {
+      "id": "nothing",
+      "label": "Rien, il marche encore très bien",
+      "correct": false,
+      "feedback": "Bien marcher ne veut pas dire être sûr. Les nouvelles failles resteront ouvertes."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "update"
+    }
+   },
+   "explain": "Ne gardez ni compte ni données professionnels sur un appareil qui n’est plus pris en charge. Réinitialisez-le complètement avant de le vendre."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Installez les mises à jour sans attendre, puis redémarrez.",
+    "Mettez à jour uniquement depuis les Paramètres ou la boutique officielle.",
+    "Ne gardez aucune donnée professionnelle sur un appareil qui n’est plus pris en charge."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,19 +1,18 @@
 "use server";
 
-import { and, count, eq, gte, sql } from "drizzle-orm";
+import { and, count, eq } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { db, t } from "../db";
 import { actionViewer, allowed, hasFeature } from "../auth/viewer";
 import { isUuid } from "../../lib/ids";
-import { awardXp } from "../services/progress";
 import { insertNumbered } from "../services/threats";
 import { audit } from "../services/audit";
 import { rateLimit } from "../rate-limit";
 import { GAMES, INBOX, LINKS, MFA, isGame, tx } from "../lab/games";
+import { recordLabAttempt } from "../lab/attempts";
 import { PASSPHRASE_RULES, passphraseRules } from "../../lib/password-strength";
-import { dayKey } from "../../lib/domain/gamification";
 
 export type LabResult = { score: number; max: number; xp: number; items: { id: string; correct: boolean; answer: string; why: string }[] } | { error: string };
 
@@ -37,14 +36,7 @@ export async function playLabAction(game: string, answers: Record<string, string
   }
   const score = items.filter((i) => i.correct).length;
   const { max, xp: fullXp } = GAMES[game];
-  const today = dayKey(new Date());
-  const [{ n }] = await db()
-    .select({ n: count() })
-    .from(t.labAttempts)
-    .where(and(eq(t.labAttempts.userId, v.user.id), eq(t.labAttempts.exercise, game), gte(t.labAttempts.at, new Date(Date.now() - 2 * 86_400_000)), sql`to_char(${t.labAttempts.at} at time zone 'Asia/Baku', 'YYYY-MM-DD') = ${today}`));
-  const xp = Number(n) === 0 ? Math.round((fullXp * score) / max) : 0;
-  await db().insert(t.labAttempts).values({ tenantId: v.tenant.id, userId: v.user.id, exercise: game, score, max, xp });
-  if (xp > 0) await awardXp(db(), { tenantId: v.tenant.id, userId: v.user.id, amount: xp, reason: "lab", ref: game });
+  const xp = await recordLabAttempt(db(), { tenantId: v.tenant.id, userId: v.user.id, exercise: game, score, max, fullXp });
   refresh();
   return { score, max, xp, items };
 }
@@ -103,6 +95,8 @@ export async function replyTicketAction(ticketId: string, body: string): Promise
   const [ticket] = await db().select().from(t.supportTickets).where(and(eq(t.supportTickets.id, ticketId), eq(t.supportTickets.tenantId, v.tenant.id)));
   const staff = allowed(v, "support.manage");
   if (!ticket || (ticket.userId !== v.user.id && !staff)) return { ok: false };
+  // Requesters only: the support desk answers many tickets an hour.
+  if (!staff && !(await rateLimit(`ticket-reply:${v.user.id}`, 30, 60 * 60_000)).ok) return { ok: false };
   await db().insert(t.ticketMessages).values({ ticketId, authorId: v.user.id, body: text });
   const reopened = ticket.userId === v.user.id && (ticket.status === "answered" || ticket.status === "closed");
   const status = ticket.userId === v.user.id ? (reopened ? "open" : ticket.status) : "answered";

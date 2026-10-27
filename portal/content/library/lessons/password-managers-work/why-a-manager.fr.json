@@ -1,0 +1,460 @@
+{
+ "id": "why-a-manager",
+ "title": "Pourquoi un gestionnaire de mots de passe",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Chaque compte a besoin d’un mot de passe long, rien qu’à lui. Personne ne peut tous les retenir.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Ne réutilisez jamais un mot de passe : quand un site subit une fuite, les attaquants l’essaient sur tous vos comptes.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Le gestionnaire de mots de passe de l’organisation crée un mot de passe robuste pour chaque compte et le range dans un coffre-fort chiffré.",
+     "mood": "talk",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "parolseyf",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Mot de passe créé"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "28 caractères aléatoires",
+          "spot": "gen"
+         }
+        ]
+       ],
+       "buttons": [
+        "Enregistrer"
+       ]
+      }
+     },
+     "highlight": "gen"
+    },
+    {
+     "id": "b4",
+     "say": "Vous ne retenez qu’un seul mot de passe principal, bien long, et vous protégez le coffre-fort avec la double authentification.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "where-passwords-live",
+   "prompt": "Est-ce un endroit sûr pour ranger un mot de passe ?",
+   "cards": [
+    {
+     "id": "excel",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Parollar_hamisi.xlsx"
+       }
+      ],
+      "type": "xls",
+      "size": "18 Ko",
+      "source": [
+       {
+        "text": "Bureau"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Le fichier n’est pas chiffré : quiconque accède à l’ordinateur voit tous les mots de passe d’un coup."
+    },
+    {
+     "id": "vault",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "parolseyf",
+      "app": "ParolSeyf",
+      "title": [
+       {
+        "text": "Identifiants enregistrés dans le coffre-fort"
+       }
+      ],
+      "body": [
+       {
+        "text": "portal.idare.example"
+       }
+      ],
+      "time": "09:05"
+     },
+     "verdict": "safe",
+     "explain": "Le mot de passe est rangé dans le coffre-fort chiffré, qui ne s’ouvre qu’avec votre mot de passe principal."
+    },
+    {
+     "id": "saved-messages",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Messages enregistrés"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Mot de passe e-mail : Aysel1990"
+         }
+        ],
+        "time": "08:31"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une messagerie instantanée n’est pas un coffre-fort. Si le téléphone est perdu ou le compte piraté, les mots de passe partent avec."
+    },
+    {
+     "id": "shared-vault",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Coffre-fort partagé : Service de presse"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "3 membres. Interface d’administration du site, compte sur les réseaux sociaux."
+        }
+       ]
+      ],
+      "buttons": [
+       "Fermer"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "L’équipe partage ses mots de passe dans un coffre-fort chiffré, et l’accès peut être retiré à tout moment."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "password-requests",
+   "environment": "phone",
+   "title": "Demandes de mots de passe",
+   "intro": "Aujourd’hui, plusieurs personnes vous demandent des mots de passe. Répondez à chacune sur votre téléphone.",
+   "steps": [
+    {
+     "id": "colleague-asks",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Sabina Huseynova"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Salut ! Tu peux m’écrire ici le mot de passe de l’interface d’administration du site ? Je publie les actualités du jour."
+         }
+        ],
+        "time": "10:12"
+       }
+      ]
+     },
+     "say": "C’est votre collègue, et elle a vraiment besoin de cet accès.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "Écrire le mot de passe",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Le mot de passe reste dans la conversation et peut fuiter si un téléphone est perdu. Partagez-le depuis le coffre-fort."
+      },
+      {
+       "id": "vault",
+       "label": "Je le partage avec toi dans le coffre-fort",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Exact. Dans le coffre-fort, le mot de passe reste chiffré, et l’accès peut être retiré au besoin."
+      },
+      {
+       "id": "sms",
+       "label": "Je te l’envoie par SMS",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Le SMS n’est pas chiffré non plus et reste sur le téléphone. Ne partagez les mots de passe que par le coffre-fort."
+      }
+     ]
+    },
+    {
+     "id": "fake-share-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "parolseyf-fake",
+      "from": {
+       "name": [
+        {
+         "text": "ParolSeyf"
+        }
+       ],
+       "address": [
+        {
+         "text": "no-reply@parolseyf-share.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Elnur Karimov a partagé un coffre-fort avec vous"
+       }
+      ],
+      "time": "11:40",
+      "body": [
+       [
+        {
+         "text": "Connectez-vous pour consulter le coffre-fort « Finances » : "
+        },
+        {
+         "text": "parolseyf-share.example.net/seyf",
+         "link": {
+          "label": "parolseyf-share.example.net/seyf",
+          "href": "https://parolseyf-share.example.net/seyf"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Vous n’attendiez aucun partage.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Un vrai partage apparaît directement dans l’application ParolSeyf. Ce lien cherche à voler votre mot de passe principal."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact : l’adresse n’est pas celle de ParolSeyf. Ouvrez vous-même l’application pour vérifier les partages."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Vous êtes à l’abri, mais vos collègues peuvent recevoir le même e-mail. Signalez-le."
+      }
+     ]
+    },
+    {
+     "id": "fake-support",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "parolseyf-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Support ParolSeyf"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Nous avons détecté une erreur dans votre coffre-fort. Pour le restaurer, écrivez ici votre mot de passe principal et le code que vous allez recevoir."
+         }
+        ],
+        "time": "14:03"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "send",
+       "label": "Écrire le mot de passe principal",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Le mot de passe principal déverrouille tous vos mots de passe. Aucun support ne le demande jamais."
+      },
+      {
+       "id": "block",
+       "label": "Bloquer",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Exact. Personne, pas même le support technique, ne vous demande votre mot de passe principal ni votre code."
+      },
+      {
+       "id": "report",
+       "label": "Signaler",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Prévenez aussi l’équipe sécurité, pour qu’elle puisse alerter vos collègues."
+      }
+     ]
+    },
+    {
+     "id": "reused-alert",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Ce mot de passe est utilisé sur 3 comptes"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Le même mot de passe est enregistré pour İşPoçt, le portail de l’entreprise et la page Kontakto."
+        }
+       ]
+      ],
+      "buttons": [
+       "Plus tard",
+       "Modifier les mots de passe"
+      ]
+     },
+     "say": "ParolSeyf a vérifié vos mots de passe.",
+     "actions": [
+      {
+       "id": "update",
+       "label": "Modifier les mots de passe",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Exact. Le générateur crée un mot de passe distinct pour chaque compte : une fuite n’ouvre donc rien d’autre."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Un mot de passe réutilisé est une faille que les attaquants adorent. Une seule fuite ouvrirait les trois comptes."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "password",
+   "id": "master-password",
+   "prompt": "Créez un mot de passe principal : une longue phrase d’au moins 15 caractères.",
+   "targetScore": 4,
+   "tips": [
+    "Assemblez quatre ou cinq mots pris au hasard, séparés par des espaces",
+    "N’utilisez ce mot de passe nulle part ailleurs",
+    "Évitez les prénoms, les dates de naissance et les citations célèbres"
+   ]
+  },
+  {
+   "type": "match",
+   "id": "manager-terms",
+   "prompt": "Associez chaque terme à sa définition.",
+   "pairs": [
+    {
+     "id": "vault",
+     "left": "Coffre-fort",
+     "right": "Espace chiffré où sont rangés vos mots de passe"
+    },
+    {
+     "id": "master",
+     "left": "Mot de passe principal",
+     "right": "Le seul mot de passe qui ouvre le coffre-fort"
+    },
+    {
+     "id": "generator",
+     "left": "Générateur",
+     "right": "Crée des mots de passe longs et aléatoires"
+    },
+    {
+     "id": "shared",
+     "left": "Coffre-fort partagé",
+     "right": "Permet à une équipe de partager des mots de passe en toute sécurité"
+    }
+   ],
+   "explain": "Le gestionnaire retient les mots de passe ; vous, vous protégez seulement le mot de passe principal."
+  },
+  {
+   "type": "choice",
+   "id": "shared-account",
+   "question": {
+    "prompt": "Dans votre service, trois personnes gèrent le même compte sur les réseaux sociaux. Comment doivent-elles partager le mot de passe ?",
+    "options": [
+     {
+      "id": "own",
+      "label": "Des identifiants distincts si possible, sinon un coffre-fort partagé",
+      "correct": true,
+      "feedback": "Exact. Quand quelqu’un quitte l’équipe, son accès est retiré en une seule opération."
+     },
+     {
+      "id": "group-chat",
+      "label": "Publier le mot de passe dans la discussion de l’équipe",
+      "correct": false,
+      "feedback": "Un mot de passe publié dans une discussion de groupe y reste pendant des années, et les nouveaux membres le voient aussi."
+     },
+     {
+      "id": "note",
+      "label": "L’écrire sur un pense-bête collé à l’écran",
+      "correct": false,
+      "feedback": "Toute personne qui entre dans le bureau peut voir le mot de passe et le prendre en photo."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "key"
+    }
+   },
+   "explain": "Même pour un compte partagé, le mot de passe se range dans le coffre-fort, pas dans une discussion ni sur papier."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Un mot de passe distinct pour chaque compte : le gestionnaire le crée et le retient pour vous.",
+    "Partagez les mots de passe dans un coffre-fort partagé, jamais dans une discussion.",
+    "Ne communiquez jamais votre mot de passe principal à personne, et protégez le coffre-fort avec la double authentification."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

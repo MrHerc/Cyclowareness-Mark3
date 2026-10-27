@@ -11,7 +11,8 @@ import { createSession, setSessionCookie } from "@/server/auth/session";
 import { SSO_STATE_COOKIE, discover, exchangeCode, openState, verifyIdToken } from "@/server/auth/oidc";
 import { decryptSecret } from "@/server/crypto";
 import { audit } from "@/server/services/audit";
-import { clientIp, userAgent } from "@/server/request";
+import { clientIp, ipRateKey, userAgent } from "@/server/request";
+import { rateLimit } from "@/server/rate-limit";
 import { featuresFor, withDefaults } from "@/lib/tenant-defaults";
 import { TENANT_SLUG_RE } from "@/server/services/tenants";
 import { DEFAULT_LOCALE, LOCALE_COOKIE, isLocale, type Locale } from "@/i18n/config";
@@ -37,6 +38,11 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
   const failed = state?.test ? "/admin/settings?tab=identity&ssoTest=failed" : "/sign-in?error=sso";
   // The slug is checked before it reaches the database (a NUL byte or an over-long value would make the query throw).
   if (!state || state.tenant !== slug || !TENANT_SLUG_RE.test(slug) || url.searchParams.get("state") !== state.state) redirect(failed);
+  // Each return asks the provider for the token and its keys: limited per client and per organisation, like the start.
+  const ip = await clientIp();
+  if ((ip && !(await rateLimit(`sso-callback:${ipRateKey(ip)}`, 60, 60_000)).ok) || !(await rateLimit(`sso-callback:t:${slug}`, 600, 60_000)).ok) {
+    return new Response("Too many requests", { status: 429, headers: { "retry-after": "60" } });
+  }
 
   const [row] = await db()
     .select({ id: t.tenants.id, slug: t.tenants.slug, domain: t.tenants.domain, plan: t.tenants.plan, features: t.tenants.features, settings: t.tenants.settings })
@@ -45,7 +51,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
   const tenant = row ? { ...row, settings: withDefaults(row.settings) } : undefined;
   const sso = tenant?.settings.identity.sso;
   if (!tenant || !sso || sso.protocol !== "oidc" || !sso.issuer || !sso.clientId) redirect(failed);
-  const ip = await clientIp();
 
   let email: string | null = null;
   let name = "";
@@ -68,7 +73,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
     });
     const claims = await verifyIdToken(provider, idToken, { clientId: sso.clientId, nonce: state.nonce });
     const claimName = sso.emailClaim?.trim() || "email";
-    if (claimName === "email" && claims.email_verified === false) throw new Error("email_not_verified");
+    // The standard claim counts only when the provider vouches for it; naming another claim in Settings is the organisation's explicit trust in it.
+    if (claimName === "email" && claims.email_verified !== true) throw new Error("email_not_verified");
     const value = claims[claimName];
     const parsed = emailSchema.safeParse(typeof value === "string" ? value.trim().toLowerCase() : "");
     if (!parsed.success) throw new Error("no_email_claim");
@@ -123,5 +129,5 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
   await setSessionCookie(token, expiresAt);
   if (isLocale(user.locale)) jar.set(LOCALE_COOKIE, user.locale, { path: "/", maxAge: 365 * 86_400, sameSite: "lax" });
   await audit(db(), { tenantId: tenant.id, actorId: user.id, action: "auth.sign_in", ip, meta: { method: "sso" } });
-  redirect(user.totpEnabled ? "/sign-in/verify" : "/");
+  redirect(user.totpEnabled ? "/sign-in/verify" : "/app");
 }

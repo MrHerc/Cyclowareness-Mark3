@@ -1,0 +1,466 @@
+{
+ "id": "number-goes-dark",
+ "title": "Brusc, fără semnal",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ss1-tutor",
+   "beats": [
+    {
+     "id": "ss1-b1",
+     "say": "Bună ziua! Astăzi vorbim despre infractorii care vă preiau numărul de telefon și vă fură codurile primite prin SMS.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "ss1-b2",
+     "say": "Când un infractor păcălește operatorul să vă mute numărul pe propria lui cartelă SIM, telefonul dumneavoastră rămâne brusc fără semnal.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2b-sahiltel",
+       "app": "SahilTel",
+       "title": [
+        {
+         "text": "Fără serviciu",
+         "spot": "no-service"
+        }
+       ],
+       "body": [
+        {
+         "text": "Doar apeluri de urgență. Cartela SIM nu este recunoscută."
+        }
+       ],
+       "time": "00:14"
+      }
+     },
+     "highlight": "no-service"
+    },
+    {
+     "id": "ss1-b3",
+     "say": "În fiecare an, de pe carduri sunt furate milioane de manați, mai ales pentru că oamenii își divulgă codurile și datele cardului.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "Milioane de manați",
+      "label": "furate de pe carduri în fiecare an"
+     }
+    },
+    {
+     "id": "ss1-b4",
+     "say": "Dacă numărul vă rămâne fără semnal în timpul nopții, nu așteptați până dimineață. Sunați-vă operatorul de pe alt telefon.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ss1-sim",
+   "environment": "phone",
+   "title": "Ora unu noaptea",
+   "intro": "Este noapte, iar telefonul este lângă dumneavoastră. Uitați-vă la fiecare notificare și alegeți pasul corect.",
+   "steps": [
+    {
+     "id": "no-service",
+     "label": "00:14 Fără serviciu",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2b-sahiltel",
+      "app": "SahilTel",
+      "title": [
+       {
+        "text": "Fără serviciu"
+       }
+      ],
+      "body": [
+       {
+        "text": "Doar apeluri de urgență. Cartela SIM nu este recunoscută."
+       }
+      ],
+      "time": "00:14"
+     },
+     "actions": [
+      {
+       "id": "call-operator",
+       "label": "Sunați operatorul de pe alt telefon",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă numărul a fost mutat pe altă cartelă, operatorul îl poate bloca și vi-l poate da înapoi."
+      },
+      {
+       "id": "sleep",
+       "label": "Opriți telefonul și culcați-vă",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Exact pe asta contează infractorul. Toată noaptea, codurile primite prin SMS vor ajunge la el."
+      }
+     ]
+    },
+    {
+     "id": "bank-login",
+     "label": "00:27 UlduzBank Mobil",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ulduzbank-app",
+      "app": "UlduzBank Mobil",
+      "title": [
+       {
+        "text": "Conectare de pe un dispozitiv nou"
+       }
+      ],
+      "body": [
+       {
+        "text": "Android, Ganja, 00:27. Dacă nu ați fost dumneavoastră, blocați temporar cardul."
+       }
+      ],
+      "time": "00:27"
+     },
+     "say": "SIM-ul nu mai funcționează, dar aplicația băncii vă trimite în continuare notificări prin internetul de acasă.",
+     "actions": [
+      {
+       "id": "freeze",
+       "label": "Deschideți aplicația și blocați temporar cardul",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. De pe un card blocat temporar nu pleacă niciun ban, iar mai târziu îl puteți debloca împreună cu banca."
+      },
+      {
+       "id": "call-bank",
+       "label": "Sunați de pe alt telefon la numărul de pe spatele cardului",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Corect. Numărul de pe card este al băncii adevărate; cereți-le să vă blocheze cardul."
+      },
+      {
+       "id": "dismiss",
+       "label": "Închideți notificarea",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Infractorul vă primește deja codurile prin SMS. În câteva minute poate scoate banii din cont."
+      }
+     ]
+    },
+    {
+     "id": "push-request",
+     "label": "00:33 Təsdiqləyici",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "tesdiqleyici",
+      "app": "Təsdiqləyici",
+      "title": [
+       {
+        "text": "Cerere de conectare: IshPocht"
+       }
+      ],
+      "body": [
+       {
+        "text": "Ganja, 00:33. Dumneavoastră încercați să vă conectați?"
+       }
+      ],
+      "time": "00:33"
+     },
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Respingeți",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Infractorul are numărul dumneavoastră, dar această aprobare există doar pe telefonul dumneavoastră."
+      },
+      {
+       "id": "approve",
+       "label": "Aprobați",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "I-ați deschis ușa chiar dumneavoastră. Nu aprobați niciodată o cerere la care nu vă așteptați, mai ales noaptea."
+      }
+     ]
+    },
+    {
+     "id": "messenger-moved",
+     "label": "00:41 Söhbət",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "Contul dumneavoastră a fost deschis pe alt telefon"
+       }
+      ],
+      "body": [
+       {
+        "text": "Acest număr a fost înregistrat pe un dispozitiv nou."
+       }
+      ],
+      "time": "00:41"
+     },
+     "say": "Și contul de mesagerie este legat de numărul dumneavoastră.",
+     "actions": [
+      {
+       "id": "warn-family",
+       "label": "Avertizați-vă familia și prietenii pe altă cale",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Infractorul le poate cere bani rudelor în numele dumneavoastră, așa că avertizați-le înaintea lui."
+      },
+      {
+       "id": "ignore",
+       "label": "Ignorați",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Chiar în noaptea asta, prietenii ar putea primi, aparent de la dumneavoastră, o cerere urgentă de bani. Avertizați-i acum."
+      }
+     ]
+    },
+    {
+     "id": "recovery-sms",
+     "label": "08:05 UlduzBank",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank-fake",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "08:05",
+      "messages": [
+       [
+        {
+         "text": "Cardul dumneavoastră a fost blocat din cauza unor activități suspecte. Pentru a-l reactiva, introduceți datele cardului: "
+        },
+        {
+         "text": "ulduzbank-berpa.example",
+         "link": {
+          "label": "ulduzbank-berpa.example",
+          "href": "https://ulduzbank-berpa.example/kart"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Dimineața, numărul funcționează din nou. Uitați-vă la acest mesaj.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați ca spam",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Infractorii profită de un incident real ca să lovească a doua oară."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. Rezolvați problemele cardului doar în aplicația băncii sau la numărul de pe card."
+      },
+      {
+       "id": "open-link",
+       "label": "Deschideți linkul",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Acesta nu este site-ul băncii. Dacă introduceți datele cardului, pierdeți bani a doua oară."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "ss1-order",
+   "prompt": "Numărul dumneavoastră a rămas brusc fără semnal. Puneți pașii în ordine.",
+   "items": [
+    {
+     "id": "operator",
+     "label": "Sunați operatorul de pe alt telefon și recuperați-vă numărul"
+    },
+    {
+     "id": "bank",
+     "label": "Sunați banca la numărul de pe card și blocați temporar cardul"
+    },
+    {
+     "id": "passwords",
+     "label": "Schimbați parolele conturilor importante și treceți de la SMS la o aplicație de autentificare"
+    },
+    {
+     "id": "it",
+     "label": "Anunțați suportul IT în legătură cu conturile de serviciu"
+    },
+    {
+     "id": "police",
+     "label": "Dacă ați pierdut bani, sesizați poliția la 102"
+    }
+   ],
+   "explain": "Mai întâi recuperați numărul, ca noile coduri să nu mai ajungă la infractor. Imediat după aceea, cereți băncii să vă blocheze temporar cardul."
+  },
+  {
+   "type": "swipe",
+   "id": "ss1-swipe",
+   "prompt": "Care mesaj este normal și care este o amenințare? Glisați.",
+   "cards": [
+    {
+     "id": "own-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "14:02",
+      "messages": [
+       [
+        {
+         "text": "Codul dumneavoastră de conectare: 482193. Nu comunicați acest cod nimănui."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Dacă ați cerut chiar dumneavoastră acest cod, mesajul este normal. Introduceți codul chiar dumneavoastră, acolo unde l-ați cerut, și nicăieri altundeva."
+    },
+    {
+     "id": "sim-changed",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2b-sahiltel",
+      "sender": [
+       {
+        "text": "SahilTel"
+       }
+      ],
+      "time": "23:52",
+      "messages": [
+       [
+        {
+         "text": "Am primit o cerere de înlocuire a cartelei SIM pentru numărul dumneavoastră."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Dacă nu ați cerut un SIM nou, acesta este primul semn al unui atac. Sunați imediat operatorul."
+    },
+    {
+     "id": "tell-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank-fake",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "10:18",
+      "messages": [
+       [
+        {
+         "text": "Cardul dumneavoastră este blocat. Pentru deblocare, comunicați codul primit angajatului nostru care vă va suna."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O bancă nu vă cere niciodată să le comunicați un cod angajaților ei. Acest mesaj are un singur scop: să vă fure codul."
+    },
+    {
+     "id": "night-login",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ulduzbank-app",
+      "app": "UlduzBank Mobil",
+      "title": [
+       {
+        "text": "Conectare de pe un dispozitiv nou"
+       }
+      ],
+      "body": [
+       {
+        "text": "Android, Ganja, 02:14"
+       }
+      ],
+      "time": "02:14"
+     },
+     "verdict": "threat",
+     "explain": "Cineva s-a conectat de pe alt dispozitiv în timp ce dormeați. Blocați temporar cardul și sunați banca."
+    },
+    {
+     "id": "own-push",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "tesdiqleyici",
+      "app": "Təsdiqləyici",
+      "title": [
+       {
+        "text": "Cerere de conectare: IshPocht"
+       }
+      ],
+      "body": [
+       {
+        "text": "Baku, 09:01. Dumneavoastră încercați să vă conectați?"
+       }
+      ],
+      "time": "09:01"
+     },
+     "verdict": "safe",
+     "explain": "Dacă tocmai vă conectați, cererea este normală. Respingeți orice cerere la care nu vă așteptați."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ss1-choice",
+   "question": {
+    "prompt": "Ce protecție funcționează în continuare dacă numărul dumneavoastră ajunge la altcineva?",
+    "options": [
+     {
+      "id": "sms",
+      "label": "Un cod trimis prin SMS",
+      "correct": false,
+      "feedback": "Când numărul ajunge la un infractor, codurile prin SMS ajung odată cu el. Pentru conturile importante, aceasta este o protecție slabă."
+     },
+     {
+      "id": "app",
+      "label": "O aplicație de autentificare sau o cheie de acces",
+      "correct": true,
+      "feedback": "Corect. Acestea sunt legate de dispozitivul dumneavoastră, nu de cartela SIM."
+     },
+     {
+      "id": "long-password",
+      "label": "O parolă mai lungă",
+      "correct": false,
+      "feedback": "O parolă lungă este utilă, dar dacă poate fi resetată cu un cod primit prin SMS, infractorul tot intră în cont."
+     }
+    ]
+   },
+   "explain": "Pentru conturile importante, cum ar fi banca, e-mailul și serviciile publice online, alegeți, acolo unde se poate, o aplicație de autentificare sau o cheie de acces în locul SMS-ului."
+  },
+  {
+   "type": "recap",
+   "id": "ss1-recap",
+   "points": [
+    "Dacă numărul rămâne brusc fără semnal, sunați imediat operatorul de pe alt telefon",
+    "Apoi sunați banca și blocați temporar cardul",
+    "Pentru conturile importante, folosiți o aplicație de autentificare sau o cheie de acces în locul SMS-ului"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

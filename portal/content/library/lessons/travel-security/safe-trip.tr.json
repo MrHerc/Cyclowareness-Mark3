@@ -1,0 +1,414 @@
+{
+ "id": "safe-trip",
+ "title": "Güvenli yolculuk",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Seyahatteyken cihazlarınız evdekinden daha fazla risk altındadır: tanımadığınız ağlar, yabancı eller ve aceleyle geçen anlar.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Yola çıkmadan önce ihtiyacınız olmayacak iş verilerini cihazdan kaldırın. Mümkünse kurumunuzun verdiği ayrı bir seyahat cihazını kullanın.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Otel ve konferans ağlarının adlarını taklit etmek kolaydır. İş için her zaman kurumunuzun güvenli bağlantısını, yani VPN'i açın.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "wifi",
+       "networks": [
+        {
+         "ssid": [
+          {
+           "text": "Lumera_Guest"
+          }
+         ],
+         "secured": true,
+         "signal": 3
+        },
+        {
+         "ssid": [
+          {
+           "text": "Lumera_Guest_FREE",
+           "spot": "twin"
+          }
+         ],
+         "secured": false,
+         "signal": 4
+        },
+        {
+         "ssid": [
+          {
+           "text": "Lumera_Lobby_Free_WiFi",
+           "spot": "open-lookalike"
+          }
+         ],
+         "secured": false,
+         "signal": 4
+        },
+        {
+         "ssid": [
+          {
+           "text": "Forum2026_Free",
+           "spot": "conf-open"
+          }
+         ],
+         "secured": false,
+         "signal": 3
+        }
+       ]
+      }
+     },
+     "highlight": "twin"
+    },
+    {
+     "id": "b4",
+     "say": "Havalimanındaki halka açık USB şarj noktalarını kullanmayın. Kendi adaptörünüzü duvardaki prize takın ya da kendi taşınabilir şarj cihazınızı kullanın.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "b5",
+     "say": "Döndüğünüzde cihazınızı BT destek ekibine kontrol ettirin ve seyahatte kullandığınız hesapların parolalarını değiştirin.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "border",
+   "question": {
+    "prompt": "Sınırda dizüstü bilgisayarınız bir süreliğine elinizden alındı. Şimdi ne yaparsınız?",
+    "options": [
+     {
+      "id": "nothing",
+      "label": "Hiçbir şey, geri verdiler",
+      "correct": false,
+      "feedback": "Cihaz gözünüzden uzak kaldıysa ona ne yapıldığını bilemezsiniz."
+     },
+     {
+      "id": "report",
+      "label": "İş hesaplarıma girmem ve güvenlik ekibine haber veririm",
+      "correct": true,
+      "feedback": "Doğru. Bir uzman kontrol edene kadar cihazı iş için kullanmayın."
+     },
+     {
+      "id": "reset",
+      "label": "Cihazı kendim sıfırlarım",
+      "correct": false,
+      "feedback": "Sıfırlama kanıtları siler. Kararı bir uzman versin."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "travel"
+    }
+   },
+   "explain": "Gözünüzden uzak kalan bir cihaza artık güvenilemez. Bu yüzden seyahate olabildiğince az veriyle çıkın."
+  },
+  {
+   "type": "hotspot",
+   "id": "hotel-wifi",
+   "prompt": "Riskli ağları bulun.",
+   "artifact": {
+    "kind": "wifi",
+    "networks": [
+     {
+      "ssid": [
+       {
+        "text": "Lumera_Guest"
+       }
+      ],
+      "secured": true,
+      "signal": 3
+     },
+     {
+      "ssid": [
+       {
+        "text": "Lumera_Guest_FREE",
+        "spot": "twin"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Lumera_Lobby_Free_WiFi",
+        "spot": "open-lookalike"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Forum2026_Free",
+        "spot": "conf-open"
+       }
+      ],
+      "secured": false,
+      "signal": 3
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "twin",
+     "label": "Kötü ikiz (evil twin)",
+     "explain": "Gerçek otel ağının adını kopyalıyor ama parolası yok. Saldırganlar bu tür ikiz ağlar kurar."
+    },
+    {
+     "id": "open-lookalike",
+     "label": "Ücretsiz lobi ağı",
+     "explain": "Adında otelin adının geçmesi hiçbir şeyi kanıtlamaz. Ağın tam adını resepsiyona sorun."
+    },
+    {
+     "id": "conf-open",
+     "label": "Açık konferans ağı",
+     "explain": "Açık bir ağdaki trafik şifrelenmez. Bağlanmanız gerekiyorsa bunun yerine telefonunuzun mobil verisini paylaşın."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "swipe",
+   "id": "on-the-road",
+   "prompt": "Yolda: güvenli mi, tuzak mı?",
+   "cards": [
+    {
+     "id": "conf-qr",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Forum materyallerini indirmek için okutun"
+       }
+      ],
+      "destination": [
+       {
+        "text": "forum2026-materials.example.net/app.apk"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Uzantısı .apk olan bir dosya telefonunuza uygulama yükler. Sunumlar için uygulamaya ihtiyacınız yok, resmî siteyi kontrol edin."
+    },
+    {
+     "id": "booking-ok",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Lumera Hotel"
+        }
+       ],
+       "address": [
+        {
+         "text": "reservations@lumera-hotel.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Rezervasyonunuz onaylandı"
+       }
+      ],
+      "time": "18:22",
+      "body": [
+       [
+        {
+         "text": "Odaya giriş saat 14:00'ten sonra, ödeme resepsiyonda yapılır."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Otelin kendi alan adı, bağlantı yok, ödeme talebi yok. Sıradan bir onay e-postası."
+    },
+    {
+     "id": "booking-scam",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Lumera Hotel"
+        }
+       ],
+       "address": [
+        {
+         "text": "billing@lumera-hotels-pay.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Rezervasyonunuz iptal edilecek"
+       }
+      ],
+      "time": "23:51",
+      "body": [
+       [
+        {
+         "text": "Kart bilgilerinizi 2 saat içinde onaylayınız:"
+        }
+       ],
+       [
+        {
+         "text": "lumera-hotels-pay.example.info/card"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Farklı bir alan adı ve acil bir ödeme talebi. Rezervasyonu kontrol etmek için oteli kendiniz arayın."
+    },
+    {
+     "id": "room-info",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "Lumera Hotel"
+       }
+      ],
+      "time": "15:03",
+      "messages": [
+       [
+        {
+         "text": "Hoş geldiniz! Kahvaltı zemin katta 07:00 ile 10:30 arasında servis edilir."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Bağlantı yok, istek yok, yalnızca bilgi."
+    },
+    {
+     "id": "passport-chat",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Forum Organizasyon Komitesi"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Sayın katılımcı, kaydınızı tamamlamak için pasaportunuzun fotoğrafını ve oda numaranızı buraya gönderiniz."
+         }
+        ],
+        "time": "08:10"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Pasaportlar anonim bir sohbette değil, resmî kayıt sayfasında toplanır. Oda numarası da nerede kaldığınızı ele verir."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "conference",
+   "title": "Konferansta",
+   "start": "coffee",
+   "nodes": [
+    {
+     "id": "coffee",
+     "text": "Konuşmanız harikaydı! Sunumu bu USB belleğe kopyalayabilir misiniz?",
+     "speaker": "Katılımcı (kahve molası)",
+     "voice": "young-man",
+     "channel": "in-person",
+     "spoken": "Konuşmanız harikaydı! <breath> Sunumu bu USB belleğe kopyalayabilir misiniz?",
+     "choices": [
+      {
+       "label": "Kibarca reddedip sunumu resmî yoldan göndermeyi öneririm",
+       "next": "lobby",
+       "feedback": "İyi seçim. Yabancının USB belleği dizüstü bilgisayarınıza hiç takılmaz."
+      },
+      {
+       "label": "Belleği dizüstü bilgisayarıma takarım",
+       "outcome": "compromised",
+       "feedback": "Yabancı birinin USB belleğinde zararlı yazılım olabilir. Dizüstü bilgisayarınız ve iş verileriniz artık risk altında."
+      }
+     ]
+    },
+    {
+     "id": "lobby",
+     "text": "Akşam aynı kişi otel lobisinde yeniden yanınıza geliyor ve kurumunuzun gelecek yılki planlarını soruyor.",
+     "choices": [
+      {
+       "label": "Yalnızca zaten kamuya açık olan konulardan bahsederim",
+       "next": "room",
+       "feedback": "Doğru. Hoş bir sohbet de bilgi toplamanın bir yolu olabilir."
+      },
+      {
+       "label": "Ayrıntıları paylaşırım, o kadar da gizli değil",
+       "outcome": "risky",
+       "feedback": "Küçük ayrıntılar bir araya gelince büyük bir resim oluşturur. Kamuya açık olmayan konuları kendinize saklayın."
+      }
+     ]
+    },
+    {
+     "id": "room",
+     "text": "Akşam yemeğine çıkıyorsunuz. Dizüstü bilgisayar nerede kalacak?",
+     "choices": [
+      {
+       "label": "Yanıma alırım ya da kapatıp kasaya kilitlerim",
+       "outcome": "safe",
+       "feedback": "Çok iyi. Kapalı, şifreli ve sizin kontrolünüzdeki bir cihaz en iyi şekilde korunur."
+      },
+      {
+       "label": "Masanın üzerinde, ekranı kilitli",
+       "outcome": "risky",
+       "feedback": "Ekran kilidi işe yarar, ama odaya giren herkes cihaza müdahale edebilir."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Seyahate en az veriyle çıkın, dönüşte cihazınızı kontrol ettirin.",
+    "Tanımadığınız ağlarda VPN'i açın, halka açık yerlerde kendi şarj cihazınızı kullanın.",
+    "Cihazlarınızı asla gözetimsiz bırakmayın, yabancıların USB belleklerini takmayın."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

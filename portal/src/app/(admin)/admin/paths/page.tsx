@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { and, eq, isNotNull, isNull, or } from "drizzle-orm";
 import { getLocale, getTranslations } from "next-intl/server";
 import { localizeStandard } from "@/lib/standards";
-import { Route } from "lucide-react";
+import { Gamepad2, Route } from "lucide-react";
 import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
 import { db, t } from "@/server/db";
 import { formOptions } from "@/server/queries/secops-options";
@@ -12,6 +12,7 @@ import { EmptyState, PageHeader } from "@/components/ui/layout";
 import { DeletePath, PathEditor, type PathDraft } from "@/components/secops/studio";
 import { AssignDialog } from "@/components/admin/assign-dialog";
 import { pick } from "@/i18n/config";
+import { isLabId, LAB_IDS } from "@/lib/domain/labs";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.nav");
@@ -22,7 +23,7 @@ export default async function PathsAdminPage() {
   const v = await requirePermission("paths.write");
   if (!hasFeature(v, "paths")) notFound();
   const locale = await getLocale();
-  const [tr, tn, tc] = await Promise.all([getTranslations("secops.paths"), getTranslations("admin.nav"), getTranslations("common")]);
+  const [tr, tn, tc, tlab] = await Promise.all([getTranslations("secops.paths"), getTranslations("admin.nav"), getTranslations("common"), getTranslations("learner.lab")]);
   const [paths, modules, assignments, options] = await Promise.all([
     db().select().from(t.learningPaths).where(or(isNull(t.learningPaths.tenantId), eq(t.learningPaths.tenantId, v.tenant.id))),
     db()
@@ -34,6 +35,8 @@ export default async function PathsAdminPage() {
   ]);
   const titleBySlug = new Map(modules.map((m) => [m.slug, pick(m.title, locale)]));
   const moduleOptions = [...titleBySlug.entries()].map(([slug, label]) => ({ slug, label })).sort((a, b) => a.label.localeCompare(b.label, locale));
+  const labsOn = hasFeature(v, "lab");
+  const labOptions = labsOn ? LAB_IDS.map((id) => ({ id, label: tlab(`games.${id}.title`) })) : [];
   const assignedCount = new Map<string, number>();
   for (const a of assignments) if (a.pathId) assignedCount.set(a.pathId, (assignedCount.get(a.pathId) ?? 0) + 1);
   const draftOf = (p: (typeof paths)[number], copy: boolean): PathDraft => ({
@@ -46,6 +49,7 @@ export default async function PathsAdminPage() {
     standards: p.standards.join(", "),
     mandatory: p.mandatory,
     moduleSlugs: p.moduleSlugs.filter((s) => titleBySlug.has(s)),
+    labIds: p.labIds.filter(isLabId),
   });
   const canAssign = allowed(v, "assignments.write");
   const assignProps = {
@@ -61,7 +65,7 @@ export default async function PathsAdminPage() {
 
   return (
     <div className="grid gap-6">
-      <PageHeader title={tn("paths")} subtitle={tr("subtitle")} icon={<Route />} actions={<PathEditor initial={null} modules={moduleOptions} trigger="new" />} />
+      <PageHeader title={tn("paths")} subtitle={tr("subtitle")} icon={<Route />} actions={<PathEditor initial={null} modules={moduleOptions} labs={labOptions} trigger="new" />} />
       {groups.map((g) => (
         <section key={g.key} className="grid gap-3">
           <h2 className="text-title-sm font-semibold">{tr(g.key)}</h2>
@@ -78,7 +82,7 @@ export default async function PathsAdminPage() {
                             {localizeStandard(s, locale)}
                           </Pill>
                         ))}
-                        <span className="ml-auto text-tab text-ink-subtle">{tr("assigned", { count: assignedCount.get(p.id) ?? 0 })}</span>
+                        <span className="ms-auto text-tab text-ink-subtle">{tr("assigned", { count: assignedCount.get(p.id) ?? 0 })}</span>
                       </div>
                       <div>
                         <p className="text-body font-semibold">{pick(p.title, locale)}</p>
@@ -90,20 +94,29 @@ export default async function PathsAdminPage() {
                             {i + 1}. {titleBySlug.get(s) ?? tr("unavailableLesson")}
                           </li>
                         ))}
+                        {labsOn
+                          ? p.labIds.filter(isLabId).map((id, i) => (
+                              <li key={id} className="inline-flex items-center gap-1 rounded-pill bg-brand-50 px-2.5 py-1 text-brand-700">
+                                <Gamepad2 aria-hidden className="size-3.5" />
+                                {p.moduleSlugs.length + i + 1}. {tlab(`games.${id}.title`)}
+                              </li>
+                            ))
+                          : null}
                       </ol>
                       <div className="mt-auto flex flex-wrap items-center gap-2 border-t border-line pt-3">
-                        <span className="mr-auto text-caption text-ink-muted">
+                        <span className="me-auto text-caption text-ink-muted">
                           {tr("modules", { count: p.moduleSlugs.length })}
+                          {labsOn && p.labIds.length ? ` · ${tr("labs", { count: p.labIds.filter(isLabId).length })}` : ""}
                           {pick(p.recurrence, locale) ? ` · ${pick(p.recurrence, locale)}` : ""}
                         </span>
                         {canAssign ? <AssignDialog {...assignProps} preset={{ target: "path", targetId: p.id }} label={tr("assign")} /> : null}
                         {p.tenantId ? (
                           <>
-                            <PathEditor initial={draftOf(p, false)} modules={moduleOptions} trigger="edit" />
+                            <PathEditor initial={draftOf(p, false)} modules={moduleOptions} labs={labOptions} trigger="edit" />
                             <DeletePath id={p.id} />
                           </>
                         ) : (
-                          <PathEditor initial={draftOf(p, true)} modules={moduleOptions} trigger="duplicate" />
+                          <PathEditor initial={draftOf(p, true)} modules={moduleOptions} labs={labOptions} trigger="duplicate" />
                         )}
                       </div>
                     </CardBody>
@@ -113,7 +126,7 @@ export default async function PathsAdminPage() {
             </ul>
           ) : (
             <Card>
-              <EmptyState icon={<Route />} title={tr("new")} action={<PathEditor initial={null} modules={moduleOptions} trigger="new" />} />
+              <EmptyState icon={<Route />} title={tr("new")} action={<PathEditor initial={null} modules={moduleOptions} labs={labOptions} trigger="new" />} />
             </Card>
           )}
         </section>

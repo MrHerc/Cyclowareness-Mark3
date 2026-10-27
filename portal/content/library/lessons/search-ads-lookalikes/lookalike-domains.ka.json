@@ -1,0 +1,333 @@
+{
+ "id": "lookalike-domains",
+ "title": "მსგავსი მისამართები",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ld-tutor",
+   "beats": [
+    {
+     "id": "ld-b1",
+     "say": "ტელეფონზე მისამართის ზოლი მოკლეა და მისამართის უმეტესი ნაწილი დამალულია. თაღლითებს სწორედ ამის იმედი აქვთ.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "ld-b2",
+     "say": "შეხედეთ ამ მისამართს: ოფიციალური სახელი დასაწყისშია, მაგრამ საიტის ნამდვილ მფლობელზე ბოლო ნაწილი მიუთითებს.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://vetendasportal.gov."
+        },
+        {
+         "text": "az-arayis.example",
+         "spot": "real-owner"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "real-owner"
+    },
+    {
+     "id": "ld-b3",
+     "say": "სხვა ხრიკებიც არსებობს: ასოებს ადგილს უცვლიან, სიტყვას უმატებენ ან ასოს მისი მსგავსი ციფრით ცვლიან.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "ld-b4",
+     "say": "საეჭვო მისამართზე არაფერი აკრიფოთ, დახურეთ გვერდი და აცნობეთ ტექნიკურ მხარდაჭერას.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ld-match",
+   "prompt": "დაუკავშირეთ თითოეული ყალბი მისამართი იმ ოფიციალურს, რომელსაც ის ბაძავს.",
+   "pairs": [
+    {
+     "id": "gov",
+     "left": "vetendasportal.gov.az-arayis.example",
+     "right": "vetendasportal.gov.az"
+    },
+    {
+     "id": "sahil",
+     "left": "sahi1bank.example.info",
+     "right": "sahilbank.az"
+    },
+    {
+     "id": "ulduz",
+     "left": "ulduzbnak.example",
+     "right": "ulduzbank.az"
+    },
+    {
+     "id": "mail",
+     "left": "idare-poct-giris.example.info",
+     "right": "poct.idare.example"
+    }
+   ],
+   "explain": "განსხვავება მცირეა: დასაწყისში მიწერილი ოფიციალური სახელი, ციფრი, ადგილგაცვლილი ორი ასო ან ზედმეტი სიტყვა. მისამართი ყოველთვის ბოლოდან წაიკითხეთ."
+  },
+  {
+   "type": "simulation",
+   "id": "ld-sim",
+   "environment": "phone",
+   "title": "ცნობა ტელეფონით",
+   "intro": "გინდათ, ცნობა ტელეფონით აიღოთ. ყოველ ნაბიჯზე მისამართი ბოლომდე წაიკითხეთ.",
+   "steps": [
+    {
+     "id": "search-ad",
+     "label": "სპონსორირებული: Vatandash Portal, ოფიციალური საიტი",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tapan",
+      "url": [
+       {
+        "text": "https://tapan.example/axtar?q=vetendas+portali+arayis",
+        "reveal": "tapan.example"
+       }
+      ]
+     },
+     "say": "ძიების პირველი შედეგი რეკლამაა.",
+     "actions": [
+      {
+       "id": "ad",
+       "label": "რეკლამის გახსნა",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "რეკლამამ სხვა საიტზე გადაგიყვანათ. ახლა მისამართი ყურადღებით წაიკითხეთ.",
+       "next": "fake-login"
+      },
+      {
+       "id": "official",
+       "label": "შედეგის გახსნა: vetendasportal.gov.az",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "სწორია. რეკლამა გამოტოვეთ და აირჩიეთ შედეგი, რომლის მისამართიც gov.az-ით მთავრდება.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2c-vetendas-portal-fake",
+      "brand": "Vatandash Portal",
+      "url": [
+       {
+        "text": "https://vetendasportal.gov.az-arayis.example/giris",
+        "reveal": "az-arayis.example"
+       }
+      ],
+      "fields": [
+       "FIN-კოდი",
+       "პაროლი"
+      ],
+      "button": "შესვლა"
+     },
+     "say": "ტელეფონზე მისამართის მხოლოდ დასაწყისი ჩანს. ბოლომდე წაიკითხეთ.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "შესვლა",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "მისამართის დასაწყისში gov.az ეწერა, მაგრამ მისამართი gov.az-ით არ მთავრდებოდა. თქვენი FIN-კოდი და პაროლი თაღლითს გაეგზავნა."
+      },
+      {
+       "id": "close",
+       "label": "გვერდის დახურვა",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "სწორია. საიტის ნამდვილ მფლობელს მისამართის ბოლო ნაწილი აჩვენებს, ეს მისამართი კი gov.az-ით არ მთავრდებოდა.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "new-login",
+     "label": "10:16 Vatandash Portal",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2c-vetendas-portal",
+      "app": "Vatandash Portal",
+      "title": [
+       {
+        "text": "ახალი შესვლა"
+       }
+      ],
+      "body": [
+       {
+        "text": "ვიღაც თქვენს ანგარიშში უცნობი მოწყობილობიდან შევიდა."
+       }
+      ],
+      "time": "10:16"
+     },
+     "say": "ერთი წუთის შემდეგ ეს შეტყობინება მოვიდა.",
+     "actions": [
+      {
+       "id": "fix",
+       "label": "პორტალს თავად გავხსნი და პაროლს შევცვლი",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "სწორია. პორტალი სანიშნიდან გახსენით, პაროლი შეცვალეთ და ყველა მოწყობილობიდან გამოდით."
+      },
+      {
+       "id": "later",
+       "label": "მოგვიანებით ვნახავ",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "თაღლითი უკვე თქვენს ანგარიშშია. ყოველი წუთი ძვირფასია."
+      }
+     ]
+    },
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2c-vetendas-portal",
+      "brand": "Vatandash Portal",
+      "url": [
+       {
+        "text": "https://vetendasportal.gov.az/giris",
+        "reveal": "vetendasportal.gov.az"
+       }
+      ],
+      "fields": [
+       "FIN-კოდი",
+       "პაროლი"
+      ],
+      "button": "შესვლა"
+     },
+     "say": "ეს მისამართი gov.az-ით მთავრდება.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "შესვლა",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "სწორია, ეს თავად ოფიციალური პორტალია. ახლა სანიშნეებში შეინახეთ."
+      },
+      {
+       "id": "check",
+       "label": "მისამართის შემოწმება",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "შესანიშნავი ჩვევაა. დომენი gov.az-ით მთავრდება და წინ ზედმეტი სიტყვა არ უწერია."
+      }
+     ]
+    },
+    {
+     "id": "bank-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank-fake",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "19:42",
+      "messages": [
+       [
+        {
+         "text": "თქვენი ბარათი დროებით დაბლოკილია. განსაბლოკად: "
+        },
+        {
+         "text": "sahilbank.az-kart.example/ac",
+         "link": {
+          "label": "sahilbank.az-kart.example/ac",
+          "href": "https://sahilbank.az-kart.example/ac"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "საღამოს ბანკის სახელით SMS მოდის.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "ბმულის გახსნა",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "მისამართი ბანკის სახელით იწყება, მაგრამ მფლობელზე ბოლო ნაწილი მიუთითებს. ბანკის აპლიკაცია თავად გახსენით."
+      },
+      {
+       "id": "report",
+       "label": "სპამის შესახებ შეტყობინება",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "სწორია. ბარათი ბანკის აპლიკაციაში შეამოწმეთ ან დარეკეთ ბარათის უკანა მხარეს მითითებულ ნომერზე."
+      },
+      {
+       "id": "delete",
+       "label": "წაშლა",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "ესეც გამოდგება. თუ ეჭვი გეპარებათ, ბანკში თავად დარეკეთ ბარათის უკანა მხარეს მითითებულ ნომერზე."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "ld-order",
+   "prompt": "დაალაგეთ ტელეფონზე მისამართის შემოწმების ნაბიჯები.",
+   "items": [
+    {
+     "id": "tap",
+     "label": "დააჭირეთ მისამართის ზოლს, რომ სრული მისამართი დაინახოთ"
+    },
+    {
+     "id": "end",
+     "label": "იპოვეთ დომენის ბოლო ნაწილი"
+    },
+    {
+     "id": "compare",
+     "label": "ასო-ასო შეადარეთ ის ოფიციალურ მისამართს"
+    },
+    {
+     "id": "leave",
+     "label": "თუ რამე განსხვავდება, დახურეთ გვერდი და არაფერი აკრიფოთ"
+    }
+   ],
+   "explain": "ტელეფონზე მისამართის დაბოლოება ხშირად დამალულია, ამიტომ ჯერ ის სრულად გახსენით. თუ ოფიციალური სახელი ბოლოში არ არის, საიტი ყალბია."
+  },
+  {
+   "type": "recap",
+   "id": "ld-recap",
+   "points": [
+    "ტელეფონზე გახსენით სრული მისამართი და ბოლოდან წაიკითხეთ",
+    "თუნდაც ოფიციალური სახელი დასაწყისში იყოს, ნამდვილ მფლობელს ბოლო ნაწილი აჩვენებს",
+    "თუ პაროლი აკრიფეთ, ოფიციალურ საიტზე შეცვალეთ და მომხდარის შესახებ შეატყობინეთ"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

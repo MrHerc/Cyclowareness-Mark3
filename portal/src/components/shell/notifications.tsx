@@ -43,7 +43,7 @@ export function NotificationsButton({ items }: { items: NotificationItem[] }) {
         className="relative grid size-10 place-items-center rounded-full border border-line bg-surface text-ink-muted hover:text-ink pointer-coarse:size-11"
       >
         <Bell className="size-[1.15rem]" />
-        {unread ? <span className="absolute top-1.5 right-1.5 size-2.5 rounded-full border-2 border-surface bg-reward-500" /> : null}
+        {unread ? <span className="absolute top-1.5 end-1.5 size-2.5 rounded-full border-2 border-surface bg-reward-500" /> : null}
       </button>
       {open ? (
         // Phones: pinned to the viewport under the top bar, since the bell is not at the header's right edge everywhere
@@ -51,7 +51,7 @@ export function NotificationsButton({ items }: { items: NotificationItem[] }) {
         <div
           role="dialog"
           aria-label={t("notifications.title")}
-          className="fixed inset-x-4 top-[calc(var(--topbar-height)+var(--safe-top)+0.5rem)] z-50 animate-rise overflow-hidden rounded-xl border border-line bg-surface shadow-overlay sm:absolute sm:inset-x-auto sm:top-full sm:right-0 sm:mt-2 sm:w-[22rem]"
+          className="fixed inset-x-4 top-[calc(var(--topbar-height)+var(--safe-top)+0.5rem)] z-50 animate-rise overflow-hidden rounded-xl border border-line bg-surface shadow-overlay sm:absolute sm:inset-x-auto sm:top-full sm:end-0 sm:mt-2 sm:w-[22rem]"
         >
           <div className="flex items-center justify-between border-b border-line px-4 py-3">
             <p className="text-body-sm font-semibold">{t("notifications.title")}</p>

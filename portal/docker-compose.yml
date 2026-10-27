@@ -1,8 +1,9 @@
 # Production-style stack: PostgreSQL 16 + the portal image.
-#   1. cp .env.example .env   and set APP_SECRET (32+ random characters), APP_URL, TRUST_PROXY=1
-#      behind a proxy and, for a new installation, BOOTSTRAP_OPERATOR_EMAIL
+#   1. cp .env.example .env   and set APP_SECRET (32+ random characters), APP_URL, POSTGRES_PASSWORD,
+#      TRUST_PROXY=1 behind a proxy and, for a new installation, BOOTSTRAP_OPERATOR_EMAIL
 #   2. docker compose up -d --build
-#   3. docker compose logs app   shows the one-time invitation link of the platform operator
+#   3. docker compose logs app   shows the one-time invitation link of the platform operator (printed
+#      once; later starts show only its expiry, and a new link once it has expired)
 # The app imports the lesson library on every start (idempotent, progress is kept). The demo
 # organisation is optional and only for throwaway stacks: docker compose --profile tools run --rm seed
 # Values come from .env (both as interpolation source and env_file); DATABASE_URL always points at "db".
@@ -13,7 +14,7 @@ services:
     restart: unless-stopped
     environment:
       POSTGRES_USER: portal
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-portal}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
       POSTGRES_DB: portal
     volumes:
       - pgdata:/var/lib/postgresql/data
@@ -26,6 +27,9 @@ services:
   app:
     build: .
     restart: unless-stopped
+    # Runs as the node user with no Linux capabilities and no way to gain more (setuid binaries).
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
     depends_on:
       db:
         condition: service_healthy
@@ -33,7 +37,7 @@ services:
       - path: .env
         required: false
     environment:
-      DATABASE_URL: postgres://portal:${POSTGRES_PASSWORD:-portal}@db:5432/portal
+      DATABASE_URL: postgres://portal:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/portal
       APP_URL: ${APP_URL:?set APP_URL in .env to the public https:// address}
       APP_SECRET: ${APP_SECRET:?set APP_SECRET in .env (32+ random characters)}
       JOBS_ENABLED: ${JOBS_ENABLED:-1}
@@ -54,6 +58,10 @@ services:
       context: .
       target: builder
     restart: unless-stopped
+    # The builder stage has no USER line; run the worker without root.
+    user: node
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
     # On SIGTERM the worker finishes the tick in progress (each delivery step stops after 20 s) before
     # it exits; the default 10 s would kill it between sending a message and recording it.
     stop_grace_period: 90s
@@ -65,7 +73,7 @@ services:
         required: false
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgres://portal:${POSTGRES_PASSWORD:-portal}@db:5432/portal
+      DATABASE_URL: postgres://portal:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/portal
       APP_URL: ${APP_URL:?set APP_URL in .env to the public https:// address}
       APP_SECRET: ${APP_SECRET:?set APP_SECRET in .env (32+ random characters)}
     command: ["npm", "run", "jobs"]
@@ -85,11 +93,14 @@ services:
       - path: .env
         required: false
     environment:
-      DATABASE_URL: postgres://portal:${POSTGRES_PASSWORD:-portal}@db:5432/portal
+      DATABASE_URL: postgres://portal:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/portal
       APP_URL: ${APP_URL:-http://localhost:3000}
       APP_SECRET: ${APP_SECRET:?set APP_SECRET in .env (32+ random characters)}
       # The seed refuses to touch a DATABASE_URL without it.
       ALLOW_SEED: "1"
+    user: node
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
     command: ["npx", "tsx", "scripts/seed.ts"]
 
 volumes:

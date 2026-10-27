@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
+import { dirOf } from "@/i18n/config";
 import { ChevronLeft, ListChecks, Maximize2, Minimize2, Minus, MonitorSmartphone, SignalHigh, Volume2, Wifi, X, BatteryFull, LayoutGrid } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useClientFormat } from "@/lib/client-format";
@@ -23,7 +24,8 @@ function Clock({ stacked }: { stacked?: boolean }) {
   // Baku day in the UI language's numeric order (az/ru 25.10.2026, en 10/25/2026).
   const date = format.dateTime(secs * 1000, { day: "numeric", month: "numeric", year: "numeric" });
   return (
-    <span className={cn("text-right leading-tight tabular-nums", stacked ? "grid" : "")} aria-label={`${t("clock")} ${time}`}>
+    <span className={cn("text-right leading-tight tabular-nums", stacked ? "grid" : "")}>
+      <span className="sr-only">{t("clock")} </span>
       <span className="font-semibold">{time}</span>
       {stacked ? <span className="text-[0.6875rem] opacity-80">{date}</span> : null}
     </span>
@@ -189,6 +191,7 @@ function Desktop({ apps, wm, act, host }: { apps: VmApp[]; wm: WmState; act: (a:
 /** The phone layout: one full-screen app at a time and an app switcher at the bottom (with the mission as "Tasks"). */
 function Phone({ apps, wm, act, panel, tasksBadge }: { apps: VmApp[]; wm: WmState; act: (a: WmAction) => void; panel: ReactNode; tasksBadge?: string }) {
   const t = useTranslations("learner.lab.vm");
+  const locale = useLocale();
   const [tasks, setTasks] = useState(false);
   const current = wm.focus ? apps.find((a) => a.id === wm.focus) : undefined;
   const title = tasks ? t("apps.tasks") : (current?.label ?? t("home"));
@@ -225,7 +228,12 @@ function Phone({ apps, wm, act, panel, tasksBadge }: { apps: VmApp[]; wm: WmStat
         ) : null}
       </div>
       <div className="relative min-h-0 flex-1">
-        {tasks ? <div className="absolute inset-0 overflow-y-auto">{panel}</div> : null}
+        {/* The mission panel is the portal's own page, so it keeps the page's direction. */}
+        {tasks ? (
+          <div dir={dirOf(locale)} className="absolute inset-0 overflow-y-auto">
+            {panel}
+          </div>
+        ) : null}
         {apps.map((a) =>
           wm.wins[a.id].open ? (
             <section key={a.id} aria-label={a.label} hidden={tasks || wm.focus !== a.id} className="@container absolute inset-0 overflow-clip">
@@ -287,14 +295,16 @@ function Phone({ apps, wm, act, panel, tasksBadge }: { apps: VmApp[]; wm: WmStat
  * phone with one full-screen app and a bottom app switcher, where the mission panel becomes the Tasks app.
  */
 export function VmShell({ apps, wm, act, panel, phone, host, label, tasksBadge }: { apps: VmApp[]; wm: WmState; act: (a: WmAction) => void; panel: ReactNode; phone: boolean; host: string; label: string; tasksBadge?: string }) {
+  // A simulated left-to-right OS in every language: windows are placed by physical x, and only the content panes
+  // (mail body, web page, the phone's Tasks) take the learner's direction.
   if (phone)
     return (
-      <div role="region" aria-label={label} className="rounded-[2rem] bg-[#0f1222] p-1.5 shadow-overlay">
+      <div role="region" aria-label={label} dir="ltr" className="rounded-[2rem] bg-[#0f1222] p-1.5 shadow-overlay">
         <Phone apps={apps} wm={wm} act={act} panel={panel} tasksBadge={tasksBadge} />
       </div>
     );
   return (
-    <div role="region" aria-label={label} className="min-w-0">
+    <div role="region" aria-label={label} dir="ltr" className="min-w-0">
       <div className="relative rounded-[1.4rem] bg-[#0f1222] p-2.5 pt-4 shadow-overlay">
         <span aria-hidden className="absolute top-1.5 left-1/2 size-1.5 -translate-x-1/2 rounded-full bg-white/20" />
         <Desktop apps={apps} wm={wm} act={act} host={host} />

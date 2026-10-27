@@ -30,6 +30,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { langAttrs } from "@/i18n/config";
 
 /** The 29 lesson illustrations: two-tone (brand + accent) scenes on a circular stage. */
 const ILLUSTRATIONS: Record<string, { main: LucideIcon; badge?: LucideIcon }> = {
@@ -73,12 +74,12 @@ export function Illustration({ id, className }: { id: string; className?: string
       <div className="absolute inset-0 rounded-full bg-brand-50" />
       <div className="absolute inset-[11%] rounded-full bg-brand-100" />
       <div className="absolute inset-[24%] rounded-full bg-surface shadow-raised" />
-      <span className="absolute top-[9%] left-[16%] size-[7%] rounded-full bg-reward-400" />
-      <span className="absolute right-[10%] bottom-[22%] size-[5%] rounded-full bg-brand-400" />
-      <span className="absolute top-[30%] right-[6%] size-[3%] rounded-full bg-reward-500" />
+      <span className="absolute top-[9%] start-[16%] size-[7%] rounded-full bg-reward-400" />
+      <span className="absolute end-[10%] bottom-[22%] size-[5%] rounded-full bg-brand-400" />
+      <span className="absolute top-[30%] end-[6%] size-[3%] rounded-full bg-reward-500" />
       <Main className="relative size-[34%] animate-float text-brand-600" strokeWidth={1.5} />
       {Badge ? (
-        <span className="absolute right-[22%] bottom-[22%] grid size-[24%] place-items-center rounded-full bg-reward-500 text-(--accent-on) shadow-raised ring-4 ring-surface">
+        <span className="absolute end-[22%] bottom-[22%] grid size-[24%] place-items-center rounded-full bg-reward-500 text-(--accent-on) shadow-raised ring-4 ring-surface">
           <Badge className="size-1/2" strokeWidth={2} />
         </span>
       ) : null}
@@ -88,7 +89,7 @@ export function Illustration({ id, className }: { id: string; className?: string
 
 export function Stat({ value, label, lang }: { value: string; label: string; lang?: string }) {
   return (
-    <div lang={lang} className="grid aspect-square w-full max-w-80 place-items-center rounded-full bg-brand-50 p-8 text-center">
+    <div {...(lang ? langAttrs(lang) : {})} className="grid aspect-square w-full max-w-80 place-items-center rounded-full bg-brand-50 p-8 text-center">
       <div>
         <p className="font-display text-[clamp(2.5rem,7vw,4.5rem)] leading-none font-bold tracking-tight text-brand-600">{value}</p>
         <p className="mt-3 text-body font-semibold text-ink-muted">{label}</p>

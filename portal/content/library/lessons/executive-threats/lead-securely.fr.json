@@ -1,0 +1,610 @@
+{
+ "id": "lead-securely",
+ "title": "Diriger en sécurité",
+ "minutes": 4,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Les attaquants choisissent délibérément les dirigeants. Une seule signature ou un seul appel de votre part peut déplacer de grosses sommes et peser sur de grandes décisions.",
+     "mood": "think",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "ceo"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "C’est ce qu’on appelle le whaling, la chasse aux dirigeants. L’e-mail est taillé sur mesure, d’après votre poste et vos discours, et il est donc très convaincant.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Fonds de coopération internationale"
+         }
+        ],
+        "address": [
+         {
+          "text": "director@"
+         },
+         {
+          "text": "intl-cooperation-fund.example.net",
+          "spot": "domain"
+         }
+        ]
+       },
+       "to": "Anar Hasanov",
+       "subject": [
+        {
+         "text": "Pour vous personnellement : invitation comme orateur principal"
+        }
+       ],
+       "time": "08:05",
+       "body": [
+        [
+         {
+          "text": "Monsieur Hasanov,"
+         }
+        ],
+        [
+         {
+          "text": "Nous avons vu votre interview télévisée la semaine dernière et souhaiterions que vous soyez notre orateur principal.",
+          "spot": "public-info"
+         }
+        ],
+        [
+         {
+          "text": "Pour consulter le programme, connectez-vous avec votre compte professionnel : "
+         },
+         {
+          "text": "forum-portal.example.net/login",
+          "spot": "login-link"
+         }
+        ],
+        [
+         {
+          "text": "Cette invitation est confidentielle, merci de ne pas la transmettre à votre secrétariat.",
+          "spot": "bypass"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "public-info"
+    },
+    {
+     "id": "b3",
+     "say": "L’intelligence artificielle peut copier votre voix à partir d’un court enregistrement. Un appel de votre part à votre bras droit peut donc être un faux.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Votre secrétariat est lui aussi une cible. Convenez que toute demande d’argent ou de données soit vérifiée par un second canal, même si elle vient de vous.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "whaling-email",
+   "prompt": "Trouvez les signes d’un e-mail de whaling.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Fonds de coopération internationale"
+      }
+     ],
+     "address": [
+      {
+       "text": "director@"
+      },
+      {
+       "text": "intl-cooperation-fund.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "to": "Anar Hasanov",
+    "subject": [
+     {
+      "text": "Pour vous personnellement : invitation comme orateur principal"
+     }
+    ],
+    "time": "08:05",
+    "body": [
+     [
+      {
+       "text": "Monsieur Hasanov,"
+      }
+     ],
+     [
+      {
+       "text": "Nous avons vu votre interview télévisée la semaine dernière et souhaiterions que vous soyez notre orateur principal.",
+       "spot": "public-info"
+      }
+     ],
+     [
+      {
+       "text": "Pour consulter le programme, connectez-vous avec votre compte professionnel : "
+      },
+      {
+       "text": "forum-portal.example.net/login",
+       "spot": "login-link"
+      }
+     ],
+     [
+      {
+       "text": "Cette invitation est confidentielle, merci de ne pas la transmettre à votre secrétariat.",
+       "spot": "bypass"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Domaine inconnu",
+     "explain": "N’importe qui peut enregistrer un nom qui sonne officiel. Cherchez vous-même l’organisation et vérifiez."
+    },
+    {
+     "id": "public-info",
+     "label": "Confiance fondée sur des informations publiques",
+     "explain": "Votre interview est publique. La mentionner ne prouve pas que l’expéditeur vous connaît."
+    },
+    {
+     "id": "login-link",
+     "label": "Connexion au compte professionnel",
+     "explain": "Nul besoin d’un mot de passe professionnel pour lire une invitation. Le but est de voler le compte d’un dirigeant."
+    },
+    {
+     "id": "bypass",
+     "label": "Secrétariat mis à l’écart",
+     "explain": "Votre secrétariat est votre filet de vérification. Méfiez-vous de tout e-mail qui cherche à le contourner."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "scenario",
+   "id": "voice-call",
+   "title": "Une voix familière",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "Approuvez le paiement à notre partenaire ce soir, je vous enverrai les papiers plus tard.",
+     "speaker": "La voix du ministre (20 h 00)",
+     "voice": "older-man",
+     "channel": "phone",
+     "spoken": "Approuvez le paiement à notre partenaire ce soir, <breath> je vous enverrai les papiers plus tard.",
+     "character": "minister",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Numéro inconnu"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 70 000 22 65"
+        }
+       ],
+       "label": "Mobile"
+      }
+     },
+     "choices": [
+      {
+       "label": "Je raccroche et j’appelle moi-même le numéro connu du ministre",
+       "next": "check",
+       "feedback": "Bien vu. Une voix peut être imitée, alors qu’un numéro connu est une vérification fiable."
+      },
+      {
+       "label": "La voix m’est familière, j’approuve le paiement",
+       "outcome": "compromised",
+       "feedback": "Une voix familière n’est plus une preuve. L’argent est parti sur le compte d’un fraudeur."
+      }
+     ]
+    },
+    {
+     "id": "check",
+     "text": "Le ministre est dans l’avion et n’a appelé personne.",
+     "speaker": "L’assistant du ministre",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Le ministre est dans l’avion <breath> et n’a appelé personne.",
+     "character": "assistant",
+     "choices": [
+      {
+       "label": "Je le signale tout de suite à l’équipe sécurité et je préviens les Finances",
+       "next": "morning",
+       "feedback": "Bonne réponse. L’attaquant va peut-être essayer avec un autre collègue."
+      },
+      {
+       "label": "Rien, de toute façon je n’ai pas payé",
+       "outcome": "risky",
+       "feedback": "Vous n’avez rien perdu, mais votre bras droit pourrait être le prochain visé. Signaler protège tout le monde."
+      }
+     ]
+    },
+    {
+     "id": "morning",
+     "text": "Le lendemain matin, votre équipe vous demande : comment parler de ce qui s’est passé ?",
+     "choices": [
+      {
+       "label": "J’en parle ouvertement et je rappelle la règle de vérification à tout le monde",
+       "outcome": "safe",
+       "feedback": "Excellent. Quand le dirigeant en parle ouvertement, l’équipe prend la règle au sérieux."
+      },
+      {
+       "label": "On garde le silence, cela nuit à notre réputation",
+       "outcome": "risky",
+       "feedback": "Le silence laisse les autres sans protection. La transparence crée la confiance."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "assistant-requests",
+   "prompt": "Cette demande adressée à votre secrétariat est-elle sûre ?",
+   "cards": [
+    {
+     "id": "gift-cards",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Anar Hasanov (directeur)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Je suis en réunion, je ne peux pas appeler. Achetez 10 cartes cadeaux aujourd’hui et envoyez-moi ici les photos des codes."
+         }
+        ],
+        "time": "13:12"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Les codes de cartes cadeaux valent de l’argent liquide et ne se récupèrent pas. Éviter un appel est un autre signal d’alerte."
+    },
+    {
+     "id": "agenda",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Anar Hasanov"
+        }
+       ],
+       "address": [
+        {
+         "text": "a.hasanov@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Ordre du jour de la réunion de demain"
+       }
+      ],
+      "time": "17:30",
+      "body": [
+       [
+        {
+         "text": "L’ordre du jour est en pièce jointe. La réunion a lieu au 3e étage."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Gundelik.pdf"
+         }
+        ],
+        "size": "96 Ko"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Le bon domaine, un sujet attendu, aucune demande d’argent ni de données."
+    },
+    {
+     "id": "calendar",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "+994 55 000 19 04"
+       }
+      ],
+      "time": "21:48",
+      "messages": [
+       [
+        {
+         "text": "C’est votre directeur, j’ai un nouveau numéro. Envoyez-moi mon agenda et le lieu de mes réunions de demain."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "L’agenda d’un dirigeant révèle tous ses déplacements. Vérifiez un nouveau numéro par un canal que vous connaissez."
+    },
+    {
+     "id": "second-signature",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "idare-maliyye",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Finances · système interne"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "La demande de paiement a été créée dans le système interne et attend une seconde signature, comme l’exigent les règles."
+         }
+        ],
+        "time": "10:05"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "La demande passe par le système officiel et nécessite une seconde signature. C’est la bonne procédure."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "evening-payment",
+   "environment": "desktop",
+   "title": "Un paiement en soirée",
+   "intro": "Il est 19 h 52. Un paiement urgent attend votre approbation dans le système financier.",
+   "steps": [
+    {
+     "id": "approve",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "idare-maliyye",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Approbation de paiement : 48 000 AZN"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Bénéficiaire : Qafqaz Terefdash LLC, nouveau compte bancaire"
+        }
+       ],
+       [
+        {
+         "text": "Note : le ministre a demandé par téléphone, payer ce soir, documents plus tard."
+        }
+       ]
+      ],
+      "buttons": [
+       "Suspendre",
+       "Approuver"
+      ]
+     },
+     "say": "Regardez le bénéficiaire et la note.",
+     "actions": [
+      {
+       "id": "hold",
+       "label": "Suspendre et vérifier",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Un paiement urgent vers un nouveau compte se vérifie toujours par un canal que vous connaissez."
+      },
+      {
+       "id": "approve",
+       "label": "Approuver",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Un nouveau compte, l’urgence et des documents promis pour plus tard sont des signes de fraude. L’argent est parti sur un compte frauduleux."
+      }
+     ]
+    },
+    {
+     "id": "which-number",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "idare-maliyye",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Comment vérifier l’instruction ?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "La note indique un numéro de contact : +994 50 000 71 30"
+        }
+       ]
+      ],
+      "buttons": [
+       "Numéro de la note",
+       "Numéro que je connais"
+      ]
+     },
+     "actions": [
+      {
+       "id": "known",
+       "label": "Appeler l’assistant du ministre au numéro que je connais",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Un numéro que vous connaissez déjà démasque tout de suite une fausse instruction."
+      },
+      {
+       "id": "note",
+       "label": "Appeler le numéro de la note",
+       "kind": "call-back",
+       "outcome": "compromised",
+       "feedback": "Le numéro de la note appartient à l’attaquant, qui va « confirmer » l’ordre."
+      }
+     ]
+    },
+    {
+     "id": "confirmed-fake",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "it-tehlukesizlik",
+      "tone": "system",
+      "title": [
+       {
+        "text": "L’instruction était fausse"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "L’assistant indique que le ministre n’a donné aucun ordre de ce genre."
+        }
+       ]
+      ],
+      "buttons": [
+       "Annuler",
+       "Signaler"
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler à l’équipe sécurité",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. L’attaquant va maintenant essayer un autre signataire, et votre signalement prévient tout le monde."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler le paiement et passer à autre chose",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Bloquer le paiement est une bonne chose, mais l’attaquant va essayer avec quelqu’un d’autre. Signalez-le."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "first-hour",
+   "question": {
+    "prompt": "Que doit faire un dirigeant dans la première heure d’un incident ?",
+    "options": [
+     {
+      "id": "call-team",
+      "label": "Faire intervenir l’équipe sécurité immédiatement",
+      "correct": true,
+      "feedback": "Bonne réponse. Plus les spécialistes commencent tôt, moins il y a de dégâts."
+     },
+     {
+      "id": "separate-channel",
+      "label": "Choisir un moyen de communiquer en dehors de la messagerie professionnelle",
+      "correct": true,
+      "feedback": "Bonne réponse. L’attaquant lit peut-être les e-mails : utilisez le téléphone ou un canal distinct."
+     },
+     {
+      "id": "approve-isolation",
+      "label": "Approuver l’isolement des systèmes dès que les spécialistes le recommandent",
+      "correct": true,
+      "feedback": "Bonne réponse. Une décision rapide venue d’en haut arrête la propagation."
+     },
+     {
+      "id": "hide",
+      "label": "Cacher l’incident pour protéger la réputation",
+      "correct": false,
+      "feedback": "Le cacher cause plus de dégâts par la suite et peut enfreindre les obligations de déclaration."
+     },
+     {
+      "id": "pay-fast",
+      "label": "Répondre vite à la demande de rançon",
+      "correct": false,
+      "feedback": "Tout contact avec les attaquants se décide avec les spécialistes et les juristes."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "alarm"
+    }
+   },
+   "explain": "Dans la première heure, un dirigeant accélère les décisions et soutient son équipe."
+  },
+  {
+   "type": "order",
+   "id": "payment-check",
+   "prompt": "Vérifiez une demande de paiement urgente dans le bon ordre.",
+   "items": [
+    {
+     "id": "pause",
+     "label": "Mettre la demande en attente"
+    },
+    {
+     "id": "call-back",
+     "label": "Rappeler à un numéro que vous connaissez"
+    },
+    {
+     "id": "second",
+     "label": "Obtenir l’approbation d’une deuxième personne"
+    },
+    {
+     "id": "execute",
+     "label": "Seulement ensuite, exécuter le paiement"
+    }
+   ],
+   "explain": "L’urgence est l’arme principale de l’attaquant. Quelques minutes de vérification évitent une grosse perte."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Quel que soit le rang de la personne qui demande, vérifiez par un second canal.",
+    "Convenez à l’avance de la règle de vérification avec votre secrétariat.",
+    "En cas d’incident, décidez vite, dans le calme et en toute transparence."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

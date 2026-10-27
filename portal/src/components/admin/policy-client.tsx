@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Textarea } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
-import type { Locale } from "@/i18n/config";
+import { langAttrs, type Locale } from "@/i18n/config";
 
 export function NewPolicy() {
   const t = useTranslations("admin.policies");
@@ -72,13 +72,13 @@ export function VersionEditor({ policyId, nextVersion, base, initial }: { policy
     <div className="grid gap-4">
       <p className="text-caption text-ink-muted">{t("newVersionHint")}</p>
       <Field label={t("editorTitle")} htmlFor="v-title">
-        <Input id="v-title" value={v.title} onChange={(e) => setV({ ...v, title: e.target.value })} maxLength={200} />
+        <Input id="v-title" {...langAttrs(base)} value={v.title} onChange={(e) => setV({ ...v, title: e.target.value })} maxLength={200} />
       </Field>
       <Field label={t("editorSummary")} htmlFor="v-summary" optional={tc("optional")}>
-        <Input id="v-summary" value={v.summary} onChange={(e) => setV({ ...v, summary: e.target.value })} maxLength={600} />
+        <Input id="v-summary" {...langAttrs(base)} value={v.summary} onChange={(e) => setV({ ...v, summary: e.target.value })} maxLength={600} />
       </Field>
       <Field label={t("editorBody")} htmlFor="v-body">
-        <Textarea id="v-body" value={v.bodyMd} onChange={(e) => setV({ ...v, bodyMd: e.target.value })} className="min-h-80 font-mono text-caption" />
+        <Textarea id="v-body" {...langAttrs(base)} value={v.bodyMd} onChange={(e) => setV({ ...v, bodyMd: e.target.value })} className="min-h-80 font-mono text-caption" />
       </Field>
       <p className="text-caption text-ink-muted">{t("baseLanguage", { language: tp(`language.${base}`) })}</p>
       {languages.length ? (
@@ -92,9 +92,9 @@ export function VersionEditor({ policyId, nextVersion, base, initial }: { policy
             return (
               <fieldset key={l} className="mt-3 grid gap-3 border-t border-line pt-3">
                 <legend className="text-caption font-semibold">{language}</legend>
-                <Input lang={l} value={x.title} onChange={(e) => set({ title: e.target.value })} maxLength={200} placeholder={t("editorTitle")} aria-label={t("translationTitle", { language })} />
-                <Input lang={l} value={x.summary} onChange={(e) => set({ summary: e.target.value })} maxLength={600} placeholder={t("editorSummary")} aria-label={t("translationSummary", { language })} />
-                <Textarea lang={l} value={x.bodyMd} onChange={(e) => set({ bodyMd: e.target.value })} className="min-h-48 font-mono text-caption" aria-label={t("translationText", { language })} />
+                <Input {...langAttrs(l)} value={x.title} onChange={(e) => set({ title: e.target.value })} maxLength={200} placeholder={t("editorTitle")} aria-label={t("translationTitle", { language })} />
+                <Input {...langAttrs(l)} value={x.summary} onChange={(e) => set({ summary: e.target.value })} maxLength={600} placeholder={t("editorSummary")} aria-label={t("translationSummary", { language })} />
+                <Textarea {...langAttrs(l)} value={x.bodyMd} onChange={(e) => set({ bodyMd: e.target.value })} className="min-h-48 font-mono text-caption" aria-label={t("translationText", { language })} />
               </fieldset>
             );
           })}

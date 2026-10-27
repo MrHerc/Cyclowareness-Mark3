@@ -1,0 +1,419 @@
+{
+ "id": "autofill-right-site",
+ "title": "Коли автозаповнення мовчить",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Менеджер паролів розпізнає фальшивий сайт краще за вас: він перевіряє адресу буква за буквою.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Якщо адреса відрізняється хоч трохи, менеджер не пропонує пароль. Це ваша тривожна ознака.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "idare-fake",
+       "url": [
+        {
+         "text": "https://portal."
+        },
+        {
+         "text": "idare-giris.example.net",
+         "spot": "lookalike"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "lookalike"
+    },
+    {
+     "id": "b3",
+     "say": "Не копіюйте пароль зі сховища, щоб вставити його самостійно. Спершу перевірте адресу.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Відхиляйте будь-який запит на підтвердження, якого ви не очікували: це означає, що хтось знає ваш пароль.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "autofill-check",
+   "environment": "browser",
+   "title": "Перевірте автозаповнення",
+   "intro": "ParolSeyf працює у вашому браузері. На кожній сторінці дивіться, що він пропонує, і перевіряйте адресу.",
+   "steps": [
+    {
+     "id": "real-portal",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "idare",
+      "brand": "Офісний портал",
+      "url": [
+       {
+        "text": "https://portal.idare.example/giris",
+        "reveal": "idare.example"
+       }
+      ],
+      "fields": [
+       "Ім’я користувача",
+       "Пароль"
+      ],
+      "button": "Увійти"
+     },
+     "say": "ParolSeyf пропонує ваші дані для входу. Перевірте адресу.",
+     "actions": [
+      {
+       "id": "fill",
+       "label": "Заповнити через ParolSeyf",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Правильно. Адреса збігається зі збереженою, тому менеджер і запропонував дані для входу."
+      },
+      {
+       "id": "close",
+       "label": "Закрити вкладку",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Обережність не завадить, але це справжній офісний портал, і менеджер його впізнав."
+      }
+     ]
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "idare-fake",
+      "brand": "Офісний портал",
+      "url": [
+       {
+        "text": "https://portal.idare-giris.example.net/giris",
+        "reveal": "idare-giris.example.net"
+       }
+      ],
+      "fields": [
+       "Ім’я користувача",
+       "Пароль"
+      ],
+      "button": "Увійти"
+     },
+     "say": "Цю сторінку відкрило посилання з листа. ParolSeyf мовчить.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "Ввести пароль вручну",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Менеджер мовчав, бо це фальшивий сайт. Негайно змініть пароль на справжньому порталі й повідомте про інцидент.",
+       "next": "fake-vault"
+      },
+      {
+       "id": "search",
+       "label": "Знайти в ParolSeyf і заповнити",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Менеджер не впізнає цей сайт, і на це є причина. Прочитайте адресу, перш ніж продовжувати."
+      },
+      {
+       "id": "close",
+       "label": "Закрити вкладку",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Правильно. Домен був idare-giris.example.net, а не офісний портал.",
+       "next": "fake-vault"
+      },
+      {
+       "id": "report",
+       "label": "Повідомити про сайт",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Чудово. Ваше повідомлення захистить колег від того самого посилання.",
+       "next": "fake-vault"
+      }
+     ]
+    },
+    {
+     "id": "mismatch",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf: сайт не збігається"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Збережена адреса: portal.idare.example"
+        }
+       ],
+       [
+        {
+         "text": "Ця сторінка: portal.idare-giris.example.net"
+        }
+       ]
+      ],
+      "buttons": [
+       "Скасувати",
+       "Усе одно заповнити"
+      ]
+     },
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Скасувати",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Правильно, менеджер помітив різницю замість вас. Закрийте сторінку й повідомте про неї."
+      },
+      {
+       "id": "fill",
+       "label": "Усе одно заповнити",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Ви проігнорували попередження й віддали пароль фальшивому сайту. Негайно змініть його й повідомте про інцидент."
+      }
+     ]
+    },
+    {
+     "id": "fake-vault",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "parolseyf-fake",
+      "brand": "ParolSeyf",
+      "url": [
+       {
+        "text": "https://parolseyf-giris.example.net/seyf",
+        "reveal": "parolseyf-giris.example.net"
+       }
+      ],
+      "fields": [
+       "Електронна пошта",
+       "Головний пароль"
+      ],
+      "button": "Відкрити сховище"
+     },
+     "say": "Посилання з листа веде на сторінку входу до сховища.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "Відкрити сховище",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Вводьте головний пароль лише в самому застосунку ParolSeyf. Цей сайт полював на все ваше сховище."
+      },
+      {
+       "id": "close",
+       "label": "Закрити вкладку",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Правильно. Відкривайте сховище, запускаючи застосунок самостійно, і ніколи — через посилання."
+      },
+      {
+       "id": "report",
+       "label": "Повідомити про сайт",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Чудово. Посилання на цей сайт могли отримати й інші люди."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vault-lure",
+   "prompt": "Знайдіть ознаки того, що цей лист фальшивий.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "parolseyf-fake",
+    "from": {
+     "name": [
+      {
+       "text": "ParolSeyf"
+      }
+     ],
+     "address": [
+      {
+       "text": "security@parolseyf-alert.example.net",
+       "spot": "sender"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Ваше сховище буде видалено через 24 години",
+      "spot": "deadline"
+     }
+    ],
+    "time": "07:58",
+    "body": [
+     [
+      {
+       "text": "Щоб оновити налаштування безпеки, "
+      },
+      {
+       "text": "підтвердьте свій головний пароль",
+       "spot": "ask-master"
+      },
+      {
+       "text": "."
+      }
+     ],
+     [
+      {
+       "text": "Підтвердити: "
+      },
+      {
+       "text": "parolseyf-alert.example.net/tesdiq",
+       "spot": "link",
+       "link": {
+        "label": "parolseyf-alert.example.net/tesdiq",
+        "href": "https://parolseyf-alert.example.net/tesdiq"
+       }
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Відправник",
+     "explain": "Адреса лише схожа на справжню: це не домен ParolSeyf."
+    },
+    {
+     "id": "deadline",
+     "label": "Термін",
+     "explain": "Погроза з терміном у 24 години потрібна, щоб ви не встигли подумати."
+    },
+    {
+     "id": "ask-master",
+     "label": "Запит головного пароля",
+     "explain": "Жоден сервіс не просить підтвердити головний пароль електронною поштою."
+    },
+    {
+     "id": "link",
+     "label": "Посилання",
+     "explain": "Посилання веде на фальшивий домен. Відкрийте сховище із застосунку самостійно."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "unexpected-push",
+   "question": {
+    "prompt": "Уночі ParolSeyf просить підтвердити вхід, але ви нікуди не входите. Що ви зробите?",
+    "options": [
+     {
+      "id": "deny",
+      "label": "Відхилю запит і повідомлю службі безпеки",
+      "correct": true,
+      "feedback": "Правильно. Хтось знає ваш головний пароль: негайно змініть його, а служба безпеки перевірить сесії."
+     },
+     {
+      "id": "approve",
+      "label": "Підтверджу, щоб запити припинилися",
+      "correct": false,
+      "feedback": "Це push-бомбінг. Одне підтвердження — і зловмисник у вашому сховищі."
+     },
+     {
+      "id": "ignore",
+      "label": "Проігнорую й подивлюся зранку",
+      "correct": false,
+      "feedback": "Запит залишається відкритим, а хтось уже має ваш головний пароль. Відхиліть його й повідомте про інцидент просто зараз."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "parolseyf",
+      "app": "ParolSeyf",
+      "title": [
+       {
+        "text": "Підтвердити вхід?"
+       }
+      ],
+      "body": [
+       {
+        "text": "Новий пристрій: Windows, 23:47"
+       }
+      ],
+      "time": "23:47"
+     }
+    }
+   },
+   "explain": "Неочікуваний запит на підтвердження означає, що ваш пароль витік. Відхиліть, повідомте, змініть."
+  },
+  {
+   "type": "match",
+   "id": "autofill-rules",
+   "prompt": "Зіставте кожну ситуацію з правильним кроком.",
+   "pairs": [
+    {
+     "id": "silent",
+     "left": "Менеджер не пропонує пароль",
+     "right": "Перевірте адресу, не копіюйте пароль"
+    },
+    {
+     "id": "link",
+     "left": "Посилання в листі пропонує відкрити сховище",
+     "right": "Відкрийте застосунок самостійно"
+    },
+    {
+     "id": "shared-pc",
+     "left": "Ви за чужим комп’ютером",
+     "right": "Не відкривайте на ньому своє сховище"
+    },
+    {
+     "id": "push",
+     "left": "Запит на підтвердження, якого ви не чекали",
+     "right": "Відхиліть його й повідомте про нього"
+    }
+   ],
+   "explain": "Менеджер перевіряє адресу, а ви зупиняєтеся, щойно він замовкає."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Якщо менеджер не пропонує пароль, зупиніться й перевірте адресу.",
+    "Вводьте головний пароль лише в застосунку самого менеджера, ніколи — через посилання.",
+    "Відхиляйте неочікувані запити на підтвердження й повідомляйте про них."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

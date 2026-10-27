@@ -10,11 +10,12 @@ const h = vi.hoisted(() => ({
 vi.mock("../src/server/db", async () => {
   const query = (result: () => unknown[]) => {
     const q: Record<string, unknown> = {};
-    for (const m of ["from", "where", "limit", "orderBy", "values", "set", "innerJoin"]) q[m] = () => q;
+    for (const m of ["from", "where", "limit", "orderBy", "values", "set", "innerJoin", "returning"]) q[m] = () => q;
     q.then = (resolve: (v: unknown) => unknown, reject: (e: unknown) => unknown) => Promise.resolve().then(result).then(resolve, reject);
     return q;
   };
-  const fake = { select: () => query(() => h.selects.shift() ?? []), insert: () => query(() => []), update: () => query(() => []), delete: () => query(() => []) };
+  // An update answers with one changed row (the conditional updates of a one-time code then succeed).
+  const fake = { select: () => query(() => h.selects.shift() ?? []), insert: () => query(() => []), update: () => query(() => [{ id: "row" }]), delete: () => query(() => []) };
   return { db: () => fake, t: await import("../src/server/db/schema") };
 });
 vi.mock("../src/server/env", () => ({ env: { TRUST_PROXY: 0, showOtp: false } }));
@@ -28,6 +29,7 @@ vi.mock("../src/server/services/audit", () => ({ audit: h.audit }));
 vi.mock("../src/server/services/progress", () => ({ randomToken: () => "x".repeat(16) }));
 vi.mock("../src/server/auth/links", () => ({ issueAccountLink: async () => "" }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ set: () => undefined }), headers: async () => new Headers() }));
+vi.mock("next/server", () => ({ after: () => undefined }));
 
 const { requestPhoneCodeAction, signInAction, verifyPhoneCodeAction } = await import("../src/server/actions/auth");
 
@@ -49,11 +51,11 @@ describe("sign-in once the session exists", () => {
   it("still signs in with a password when the audit write fails", async () => {
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
     h.audit.mockRejectedValue(new Error("audit table unavailable"));
-    // failed attempts for the account, the user, the tenant settings
-    h.selects.push([{ n: 0 }], [user], []);
+    // failed attempts for the account, the user, the single sign-on domain lookup, the tenant settings
+    h.selects.push([{ n: 0 }], [user], [], []);
     await expect(signInAction(undefined, form({ email: user.email, password: "correct horse", next: "/learn" }))).rejects.toMatchObject(redirectTo("/learn"));
     expect(h.setSessionCookie).toHaveBeenCalledOnce();
-    expect(log).toHaveBeenCalledWith("[auth] audit write failed", expect.any(Error));
+    expect(log).toHaveBeenCalledWith("[auth] audit write failed", "Error", "", expect.stringMatching(/^\s+at /));
     log.mockRestore();
   });
 
@@ -61,11 +63,11 @@ describe("sign-in once the session exists", () => {
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
     h.audit.mockRejectedValue(new Error("audit table unavailable"));
     const token = { id: sha256Hex(`otp:${user.id}:123456`), userId: user.id, kind: "phone_otp", attempts: 0, expiresAt: new Date(Date.now() + 60_000), usedAt: null };
-    // failed attempts for the number, the user with that number, the latest code, the tenant settings
-    h.selects.push([{ n: 0 }], [user], [token], []);
+    // failed attempts for the number, the user with that number, the single sign-on domain lookup, the latest code, the tenant settings
+    h.selects.push([{ n: 0 }], [user], [], [token], []);
     await expect(verifyPhoneCodeAction(undefined, form({ phone: user.phone, code: "123456", next: "/learn" }))).rejects.toMatchObject(redirectTo("/learn"));
     expect(h.setSessionCookie).toHaveBeenCalledOnce();
-    expect(log).toHaveBeenCalledWith("[auth] audit write failed", expect.any(Error));
+    expect(log).toHaveBeenCalledWith("[auth] audit write failed", "Error", "", expect.stringMatching(/^\s+at /));
     log.mockRestore();
   });
 });
@@ -75,8 +77,9 @@ describe("phone code request refusals", () => {
     expect(await requestPhoneCodeAction(undefined, form({ phone: " 12345 " }))).toEqual({ error: "phoneInvalid", step: "phone", phone: "12345" });
     h.selects.push([{ n: 5 }]);
     expect(await requestPhoneCodeAction(undefined, form({ phone: "+994 50 123 45 67" }))).toEqual({ error: "locked", step: "phone", phone: "+994 50 123 45 67" });
-    // failed attempts for the number, codes sent in the window
-    h.selects.push([{ n: 0 }], [{ n: 6 }]);
-    expect(await requestPhoneCodeAction(undefined, form({ phone: "+994501234567" }))).toEqual({ error: "rateLimited", step: "phone", phone: "+994501234567" });
+    // five codes per number in the window (failed attempts for the number before each request)
+    for (let i = 0; i < 6; i++) h.selects.push([{ n: 0 }]);
+    for (let i = 0; i < 5; i++) expect(await requestPhoneCodeAction(undefined, form({ phone: "+994501234568" }))).toEqual({ step: "code", phone: "+994501234568" });
+    expect(await requestPhoneCodeAction(undefined, form({ phone: "+994501234568" }))).toEqual({ error: "rateLimited", step: "phone", phone: "+994501234568" });
   });
 });

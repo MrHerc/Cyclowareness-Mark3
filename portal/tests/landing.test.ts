@@ -38,6 +38,12 @@ describe("landing copy", () => {
     }
   });
 
+  it.each(SITE_LOCALES)("%s shows a sample in exactly the site languages", (locale) => {
+    const scene = read(locale).copy.scenes.find((s) => s.kind === "languages");
+    const samples = scene?.kind === "languages" ? scene.samples.map((s) => s.locale) : [];
+    expect(samples.sort()).toEqual([...SITE_LOCALES].sort());
+  });
+
   it("falls back to English per key without mixing spoken lines", () => {
     const en = read("en").copy;
     const de = read("de").copy;

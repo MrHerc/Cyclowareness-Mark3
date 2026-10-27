@@ -1,0 +1,462 @@
+{
+ "id": "fake-dashboard",
+ "title": "Le faux tableau des gains",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fd-tutor",
+   "beats": [
+    {
+     "id": "fd-b1",
+     "say": "Après votre dépôt, la plateforme vous montre un joli graphique et un solde qui grimpe.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "fd-b2",
+     "say": "Sur une fausse plateforme, ces chiffres ne sont que du texte affiché à l’écran, sans aucun argent derrière.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2d-bakutrade",
+       "tone": "app",
+       "title": [
+        {
+         "text": "BakuTrade Pro | "
+        },
+        {
+         "text": "Solde : 12 480 AZN (+312 %)",
+         "spot": "balance"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Pour retirer, payez d’abord 15 % d’impôt sur le revenu : 1 870 AZN",
+          "spot": "fee"
+         }
+        ]
+       ],
+       "buttons": [
+        "Payer l’impôt",
+        "Fermer"
+       ]
+      }
+     },
+     "highlight": "balance"
+    },
+    {
+     "id": "fd-b3",
+     "say": "Quand vous essayez de retirer, on vous réclame un impôt, des frais ou une assurance. C’est la dernière étape de l’arnaque.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2d-bakutrade",
+       "tone": "app",
+       "title": [
+        {
+         "text": "BakuTrade Pro | "
+        },
+        {
+         "text": "Solde : 12 480 AZN (+312 %)",
+         "spot": "balance"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Pour retirer, payez d’abord 15 % d’impôt sur le revenu : 1 870 AZN",
+          "spot": "fee"
+         }
+        ]
+       ],
+       "buttons": [
+        "Payer l’impôt",
+        "Fermer"
+       ]
+      }
+     },
+     "highlight": "fee"
+    },
+    {
+     "id": "fd-b4",
+     "say": "Si un retrait exige d’abord un paiement, arrêtez-vous et n’envoyez plus un seul manat.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fd-hotspot",
+   "prompt": "Trouvez les signes de fraude sur ce tableau de bord.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2d-bakutrade",
+    "tone": "app",
+    "title": [
+     {
+      "text": "BakuTrade Pro | "
+     },
+     {
+      "text": "Solde : 12 480 AZN (+312 %)",
+      "spot": "balance"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Rendement quotidien garanti : 3 %",
+       "spot": "guarantee"
+      }
+     ],
+     [
+      {
+       "text": "Pour retirer, payez d’abord 15 % d’impôt sur le revenu : 1 870 AZN",
+       "spot": "fee"
+      }
+     ],
+     [
+      {
+       "text": "Licence : Commission financière internationale, n° 00417",
+       "spot": "licence"
+      }
+     ],
+     [
+      {
+       "text": "Offre valable encore 2 heures. Contactez votre gestionnaire sur la messagerie instantanée.",
+       "spot": "rush"
+      }
+     ]
+    ],
+    "buttons": [
+     "Payer l’impôt",
+     "Fermer"
+    ]
+   },
+   "spots": [
+    {
+     "id": "balance",
+     "label": "Croissance miraculeuse",
+     "explain": "Multiplier sa mise par quatre en quelques mois n’arrive presque jamais sur un vrai marché. N’importe qui peut taper un chiffre à l’écran."
+    },
+    {
+     "id": "guarantee",
+     "label": "Rendement garanti",
+     "explain": "Le rendement d’un investissement ne peut pas être garanti. Ce mot, à lui seul, est un signal d’alerte."
+    },
+    {
+     "id": "fee",
+     "label": "Payer pour retirer",
+     "explain": "Une vraie plateforme ne vous demande pas d’envoyer de nouvel argent pour débloquer le vôtre. Payez, et un autre prétexte suivra."
+    },
+    {
+     "id": "licence",
+     "label": "Fausse licence",
+     "explain": "Cet organisme n’existe peut-être même pas, et de toute façon une licence étrangère ne donne aucun droit ici. Consultez la liste de la Banque centrale."
+    },
+    {
+     "id": "rush",
+     "label": "On vous presse",
+     "explain": "Le délai est là pour que vous n’ayez pas le temps de réfléchir ni de demander conseil à quelqu’un."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "fd-sim",
+   "environment": "browser",
+   "title": "Retirer l’argent",
+   "intro": "Votre solde sur la plateforme a augmenté et vous voulez retirer l’argent. Décidez à chaque étape.",
+   "steps": [
+    {
+     "id": "dashboard",
+     "label": "Votre solde : 12 480 AZN. Passez en VIP",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2d-bakutrade",
+      "url": [
+       {
+        "text": "https://bakutrade-pro.example.net/panel"
+       }
+      ]
+     },
+     "say": "Le solde a augmenté. Maintenant, essayez de retirer l’argent.",
+     "actions": [
+      {
+       "id": "withdraw",
+       "label": "Retirer",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Essayer de retirer ne fait aucun mal. Regardez ce qu’on vous demande à l’écran suivant."
+      },
+      {
+       "id": "vip",
+       "label": "Ajouter 500 AZN, passer en VIP",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Le solde affiché n’est pas réel, et le nouvel argent sera perdu lui aussi. Arrêtez-vous."
+      }
+     ]
+    },
+    {
+     "id": "fee",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2d-bakutrade",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Retrait suspendu"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Un impôt sur le revenu de 15 % est exigé pour le retrait : 1 870 AZN."
+        }
+       ],
+       [
+        {
+         "text": "Si l’impôt n’est pas payé, les fonds seront gelés sous 48 heures."
+        }
+       ]
+      ],
+      "buttons": [
+       "Payer l’impôt",
+       "Annuler"
+      ]
+     },
+     "say": "Ils exigent un impôt avant le retrait.",
+     "actions": [
+      {
+       "id": "pay-tax",
+       "label": "Payer l’impôt",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Après l’impôt, on vous demandera une assurance, puis une commission. Vous ne toucherez jamais ce solde."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Devoir payer pour retirer prouve que la plateforme est fausse."
+      }
+     ]
+    },
+    {
+     "id": "recovery-page",
+     "label": "Nous récupérons vos investissements perdus en 30 jours",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2d-fond-berpa",
+      "url": [
+       {
+        "text": "https://fondberpa-huquq.example.net"
+       }
+      ]
+     },
+     "say": "Quelques jours plus tard, cette publicité apparaît.",
+     "actions": [
+      {
+       "id": "apply",
+       "label": "Déposer une demande",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Une promesse de récupérer l’argent peut être un second piège. Regardez ce qu’on vous demande ensuite."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Un service qui promet de récupérer votre argent est souvent une deuxième arnaque.",
+       "next": "report-site"
+      }
+     ]
+    },
+    {
+     "id": "recovery-form",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2d-fond-berpa",
+      "brand": "FondBərpa",
+      "url": [
+       {
+        "text": "https://fondberpa-huquq.example.net/muraciet"
+       }
+      ],
+      "fields": [
+       "Nom et prénom",
+       "Téléphone",
+       "Numéro de carte",
+       "CVV"
+      ],
+      "button": "Payer 300 AZN et commencer"
+     },
+     "say": "Pour récupérer l’argent, ils exigent aussi un paiement d’avance.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Payer 300 AZN et commencer",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "C’est la deuxième arnaque, parfois menée par la même bande. Faites bloquer la carte et prévenez la police."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bien vu. Pour retrouver la trace de l’argent, adressez-vous à votre banque et à la police, et cela ne coûte rien."
+      }
+     ]
+    },
+    {
+     "id": "report-site",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Signaler ce site"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Signaler bakutrade-pro.example.net comme site frauduleux ?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Signaler",
+       "Plus tard"
+      ]
+     },
+     "say": "Le navigateur propose de signaler le site.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Très bien, le signalement aide à bloquer le site pour les autres. Contactez aussi la police au 102."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Ne pas signaler laisse les escrocs trouver de nouvelles victimes. Prenez une minute pour le faire."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "fd-scenario",
+   "title": "Le groupe d’investisseurs",
+   "start": "group",
+   "nodes": [
+    {
+     "id": "group",
+     "text": "Regarde, j’ai mis 400 manats, et aujourd’hui j’en ai 1 200. Rejoins-nous.",
+     "speaker": "Gunay, votre collègue (groupe « Investisseurs avisés »)",
+     "voice": "woman",
+     "channel": "message",
+     "manner": "natural",
+     "spoken": "Regarde, j’ai mis 400 manats, et aujourd’hui j’en ai mille deux cents. <breath> Rejoins-nous.",
+     "character": "gunay",
+     "choices": [
+      {
+       "label": "Vérifions d’abord la licence dans la liste de la Banque centrale",
+       "next": "pressure",
+       "feedback": "Exact. Même la recommandation d’une personne de confiance ne rend pas une plateforme légale."
+      },
+      {
+       "label": "Si Gunay gagne de l’argent, j’en suis",
+       "outcome": "compromised",
+       "feedback": "Les gains affichés sur l’écran de Gunay sont peut-être faux, eux aussi. Les escrocs attirent les gens par l’intermédiaire de personnes qu’ils connaissent."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Oubliez la liste, nous avons une licence étrangère. Il ne reste que 3 places !",
+     "speaker": "Admin du groupe",
+     "voice": "man-2",
+     "channel": "message",
+     "spoken": "Oubliez la liste, <breath> nous avons une licence étrangère. Il ne reste que trois places !",
+     "choices": [
+      {
+       "label": "Une licence étrangère ne donne aucun droit ici, je me retire",
+       "next": "warn",
+       "feedback": "Exact. La Banque centrale a prévenu qu’une licence étrangère ne donne pas le droit d’exercer ici."
+      },
+      {
+       "label": "Rejoindre vite le groupe avant qu’il n’y ait plus de place",
+       "outcome": "compromised",
+       "feedback": "Les places limitées sont là pour vous presser. Une telle pression est déjà, en soi, un signe de fraude."
+      }
+     ]
+    },
+    {
+     "id": "warn",
+     "text": "Et mes 400 manats ? Je veux les retirer, et ils disent que je dois payer un impôt.",
+     "speaker": "Gunay",
+     "voice": "woman",
+     "channel": "message",
+     "manner": "worried",
+     "spoken": "Et mes 400 manats ? Je veux les retirer, <short pause> et ils disent que je dois payer un impôt.",
+     "character": "gunay",
+     "choices": [
+      {
+       "label": "Ne paie rien, appelle ta banque et signale-le au 102",
+       "outcome": "safe",
+       "feedback": "Très bien. Signaler à temps arrête les pertes et protège les autres."
+      },
+      {
+       "label": "Paie l’impôt, et l’argent arrivera",
+       "outcome": "compromised",
+       "feedback": "Après l’impôt, il y aura un nouveau prétexte. La perte ne fera que grandir."
+      },
+      {
+       "label": "Demande dans le groupe, les admins vont t’aider",
+       "outcome": "risky",
+       "feedback": "Les admins sont les escrocs eux-mêmes. Ils ne feront que réclamer un autre paiement."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "fd-recap",
+   "points": [
+    "Un gain affiché à l’écran n’est pas de l’argent : si un retrait exige un paiement, arrêtez-vous.",
+    "Un service qui promet de récupérer votre argent est une deuxième arnaque.",
+    "Vérifiez la licence et signalez la fraude à la police au 102."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

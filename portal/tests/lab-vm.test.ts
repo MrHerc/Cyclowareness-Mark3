@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { LAB_XP } from "@/lib/domain/gamification";
+import { LOCALES } from "@/i18n/config";
 import { BEACON_IP, BEACON_PID, workstation } from "@/components/lab/model/machines";
 import { HINT_COST, MAX_EVENTS, PHISH_MAIL, SIGNIN_MAIL, VM_LAB_IDS, VM_LABS, huntLab, isVmLab, phishingLab, replay, scoreEvents, scoreRun, signinLab, step, startRun, type LabEvent } from "@/components/lab/model/labs";
 import { complete, exec, initialShell, prompt, resolvePath, type ShellState } from "@/components/lab/model/shell";
@@ -324,8 +325,8 @@ describe("window manager", () => {
 
 describe("lab texts", () => {
   const load = (l: string) => JSON.parse(fs.readFileSync(path.join(process.cwd(), "messages", l, "learner.json"), "utf8")).lab;
-  it("has every objective, rule, hint and mail text the labs look up, in az, en and ru", () => {
-    for (const locale of ["az", "en", "ru"]) {
+  it("has every objective, rule, hint and mail text the labs look up, in every interface language", () => {
+    for (const locale of LOCALES) {
       const lab = load(locale);
       for (const def of [phishingLab, huntLab, signinLab]) {
         const t = lab.vm.labs[def.id];

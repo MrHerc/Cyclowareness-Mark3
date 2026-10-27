@@ -1,0 +1,601 @@
+{
+  "id": "app-permissions",
+  "title": "Uygulama izinleri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "a-tutor",
+      "beats": [
+        {
+          "id": "a-b1",
+          "say": "Telefonunuzda iş e-postalarınız, mesajlarınız ve bankacılık uygulamalarınız bulunur. Bir uygulama yüklerken neye izin verdiğinizi kontrol edin.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "a-b3",
+          "say": "Bir el feneri uygulaması mesajlarınızı neden okusun? Bu izinle banka kodlarınızı da görebilir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "permission",
+              "brandRef": "fener-pro",
+              "app": "Torch Pro",
+              "permissions": [
+                {
+                  "label": [
+                    {
+                      "text": "El feneri"
+                    }
+                  ],
+                  "needed": true
+                },
+                {
+                  "label": [
+                    {
+                      "text": "Kişiler",
+                      "spot": "contacts"
+                    }
+                  ],
+                  "needed": false
+                },
+                {
+                  "label": [
+                    {
+                      "text": "SMS mesajları",
+                      "spot": "sms"
+                    }
+                  ],
+                  "needed": false
+                },
+                {
+                  "label": [
+                    {
+                      "text": "Kesin konum",
+                      "spot": "location"
+                    }
+                  ],
+                  "needed": false
+                }
+              ]
+            }
+          },
+          "highlight": "sms",
+          "checkpoint": {
+            "prompt": "Bir hesap makinesi kişi listenize erişmek istiyor. Ne yaparsınız?",
+            "options": [
+              {
+                "id": "allow",
+                "label": "İzin veririm",
+                "correct": false,
+                "feedback": "Hesap makinesinin kişi listenize ihtiyacı yoktur. Bu, verilerinizi toplama girişimi olabilir."
+              },
+              {
+                "id": "deny",
+                "label": "Reddeder, uygulamayı silerim",
+                "correct": true,
+                "feedback": "Doğru. İhtiyacı olmayan bir erişimi isteyen uygulamayı silmek en iyisidir."
+              }
+            ]
+          }
+        },
+        {
+          "id": "a-b4",
+          "say": "Erişilebilirlik en güçlü izindir: ekranınızı okur ve sizin yerinize dokunur. Bu izni çok az uygulamaya verin.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "a-b5",
+          "say": "Basit kural: izin, uygulamanın işine uygun olmalı. Harita uygulamasının konuma ihtiyacı vardır, hesap makinesinin yoktur.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "app-install",
+      "environment": "phone",
+      "title": "Ücretsiz bir fotoğraf düzenleyici",
+      "intro": "Bir fotoğraf düzenleme uygulaması arıyorsunuz. Telefonunuzun size gösterdiklerine bakın ve her adımda karar verin.",
+      "steps": [
+        {
+          "id": "offer",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Fırsatlar grubu"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "FotoRedaktor Plus Pro mağazada ücretli, buradan bedava indirin: "
+                  },
+                  {
+                    "text": "fotoredaktor-pro.test/app.apk",
+                    "link": {
+                      "label": "fotoredaktor-pro.test/app.apk",
+                      "href": "https://fotoredaktor-pro.test/app.apk"
+                    }
+                  }
+                ],
+                "time": "13:05"
+              }
+            ]
+          },
+          "say": "Bir grupta biri ücretsiz bir uygulama dosyası paylaştı.",
+          "actions": [
+            {
+              "id": "download",
+              "label": "Dosyayı indir",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Ücretli bir uygulamanın bedava sunulması bilindik bir tuzaktır. Bu tür dosyalar çoğu zaman zararlı yazılım gizler."
+            },
+            {
+              "id": "block",
+              "label": "Engelle ve bildir",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Doğru. Uygulamaları yalnızca telefonunuzun resmî mağazasından yükleyin.",
+              "next": "store-app"
+            }
+          ]
+        },
+        {
+          "id": "unknown-source",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Bilinmeyen kaynak"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Güvenliğiniz için telefonunuzun bu kaynaktan bilinmeyen uygulamalar yüklemesine izin verilmiyor."
+                }
+              ]
+            ],
+            "buttons": [
+              "Ayarlar",
+              "İptal"
+            ]
+          },
+          "actions": [
+            {
+              "id": "settings",
+              "label": "Ayarlardan izin ver",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "Bu koruma tam da böyle dosyalar için var. Onu kapatmak telefonunuzu zararlı uygulamalara açar."
+            },
+            {
+              "id": "cancel",
+              "label": "İptal",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Bilinmeyen kaynaklardan yükleme kapalı kalmalı."
+            }
+          ]
+        },
+        {
+          "id": "fake-apk",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "fotoredaktor-plus-fake",
+            "name": [
+              {
+                "text": "FotoRedaktor_Plus_Pro.apk"
+              }
+            ],
+            "type": "apk",
+            "size": "18 MB",
+            "source": [
+              {
+                "text": "Telegram: Fırsatlar grubu"
+              }
+            ]
+          },
+          "say": "Simge tanıdık görünüyor. Adı dikkatle okuyun.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "Yükle",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Bu, mağazadaki uygulamanın sahte bir kopyası: adında yalnızca bir boşluk farkı var. SMS kodlarınızı okuyabilir."
+            },
+            {
+              "id": "cancel",
+              "label": "İptal",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Mesajla gelen bir .apk dosyasını yüklemeyin; uygulamayı resmî mağazada bulun."
+            }
+          ]
+        },
+        {
+          "id": "store-app",
+          "label": "Resmî mağazadan yüklendi",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "fotoredaktor-plus",
+            "app": "Foto Redaktor Plus",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Fotoğraflar ve videolar"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Kişiler"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "SMS mesajları"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "Mağazadaki uygulama bile gereğinden fazlasını istiyor.",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "İzin ver",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "Bir fotoğraf düzenleyicinin kişilere ya da SMS'lere ihtiyacı yoktur. SMS erişimiyle bir uygulama banka kodlarını okuyabilir."
+            },
+            {
+              "id": "deny",
+              "label": "İzin verme",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Doğru. Yalnızca özelliğin ihtiyaç duyduğu izni verin: burada sadece fotoğraflar."
+            }
+          ]
+        },
+        {
+          "id": "fake-antivirus",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "qoruyucu-fake",
+            "app": "Qoruyucu Antivirus",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Erişilebilirlik: ekranı kontrol etme"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "Bir antivirüs uygulaması ekranınızı kontrol etmek istiyor.",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "İzin ver",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Bu izinle bir uygulama ekranı okur ve sizin yerinize dokunur. Bankacılık truva atları tam da bunu ister."
+            },
+            {
+              "id": "deny",
+              "label": "İzin verme",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Doğru. Antivirüs adı altında ekran kontrolü isteyen bir uygulamayı silin ve bildirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "a-hotspot",
+      "prompt": "Bu uygulamanın ihtiyaç duymadığı izinleri bulun.",
+      "artifact": {
+        "kind": "permission",
+        "brandRef": "fotoredaktor-plus",
+        "app": "Foto Redaktor Plus",
+        "permissions": [
+          {
+            "label": [
+              {
+                "text": "Fotoğraflar ve videolar",
+                "reveal": "Bu telefonda kayıtlı fotoğrafları ve videoları okur"
+              }
+            ],
+            "needed": true
+          },
+          {
+            "label": [
+              {
+                "text": "Kamera",
+                "reveal": "Fotoğraf çeker ve video kaydeder"
+              }
+            ],
+            "needed": true
+          },
+          {
+            "label": [
+              {
+                "text": "Kişiler",
+                "spot": "contacts",
+                "reveal": "Kişi listenizi okur: adlar, numaralar, e-posta adresleri"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "SMS gönderme ve okuma",
+                "spot": "sms",
+                "reveal": "Telefondaki tüm SMS mesajlarını okur ve yenilerini gönderir"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "Erişilebilirlik: ekranı kontrol etme",
+                "spot": "accessibility",
+                "reveal": "Ekrandaki her şeyi görür ve diğer uygulamalarda sizin yerinize dokunur"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "Arama geçmişi",
+                "spot": "call-log",
+                "reveal": "Aramalarınızın listesini okur: kiminle, ne zaman ve ne kadar süre görüştüğünüzü öğrenir"
+              }
+            ],
+            "needed": false
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "contacts",
+          "label": "Kişiler",
+          "explain": "Fotoğraf düzenlemek için kişilerinize gerek yoktur."
+        },
+        {
+          "id": "sms",
+          "label": "SMS erişimi",
+          "explain": "SMS erişimi olan bir uygulama banka ve giriş kodlarınızı okuyabilir."
+        },
+        {
+          "id": "accessibility",
+          "label": "Ekran kontrolü",
+          "explain": "Bu izinle bir uygulama ekranı okur ve sizin yerinize dokunur. Zararlı uygulamaların istediği tam da budur."
+        },
+        {
+          "id": "call-log",
+          "label": "Arama geçmişi",
+          "explain": "Bir fotoğraf düzenleyicinin kimi aradığınızı bilmesine gerek yoktur."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "a-swipe",
+      "prompt": "Güvenli mi, tehdit mi?",
+      "cards": [
+        {
+          "id": "bank-apk",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank-fake",
+            "sender": [
+              {
+                "text": "+994 55 000 11 22"
+              }
+            ],
+            "time": "13:02",
+            "messages": [
+              [
+                {
+                  "text": "SahilBank'ın yeni uygulaması çıktı. Buradan indirin: "
+                },
+                {
+                  "text": "sahilbank-app.test/SahilBank.apk"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Banka uygulaması resmî mağazada bulunur. Bağlantıyla gönderilen bir yükleme dosyası zararlı olabilir."
+        },
+        {
+          "id": "map-location",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "xerite-app",
+            "app": "Haritalar",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Konum (yalnızca uygulama kullanılırken)"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Harita uygulaması size yol göstermek için konumunuza ihtiyaç duyar. Yalnızca kullanım sırasında izin vermek akıllıca bir seçimdir."
+        },
+        {
+          "id": "torch-mic",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "fener-pro",
+            "app": "El feneri",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Kişiler"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Mikrofon"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bir el fenerinin ne kişi listesine ne de mikrofona ihtiyacı yoktur."
+        },
+        {
+          "id": "video-call",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "videozeng-app",
+            "app": "Görüntülü görüşme",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Kamera"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Mikrofon"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Görüntülü görüşme uygulamasının kameraya ve mikrofona gerçekten ihtiyacı vardır."
+        },
+        {
+          "id": "discount-apk",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "İndirim kanalı"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "İndirim uygulamasını bu dosyadan yükleyin. Ayarlardan bilinmeyen kaynaklara izin verin."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bilinmeyen kaynaklara izin vermek telefonunuzun korumasını zayıflatır. Bunu isteyen bir mesaja güvenmeyin."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "a-choice-store",
+      "question": {
+        "prompt": "Uygulamaları nereden yüklemek güvenlidir?",
+        "options": [
+          {
+            "id": "official-store",
+            "label": "Telefonunuzun resmî uygulama mağazası",
+            "correct": true,
+            "feedback": "Doğru. Resmî mağaza uygulamaları denetler ve riski büyük ölçüde azaltır."
+          },
+          {
+            "id": "sms-link",
+            "label": "Bir mesajdaki bağlantıdan",
+            "correct": false,
+            "feedback": "Mesajdaki bir bağlantı sizi sahte bir uygulamaya götürebilir."
+          },
+          {
+            "id": "cracked",
+            "label": "Bir forumdaki ücretsiz korsan sürüm",
+            "correct": false,
+            "feedback": "Korsan sürümler çoğu zaman zararlı yazılım taşır."
+          },
+          {
+            "id": "work-portal",
+            "label": "Kurumunuzun onaylı uygulama kataloğu",
+            "correct": true,
+            "feedback": "Doğru. Kurumunuzun yönettiği bir katalog da resmî bir kaynaktır."
+          }
+        ],
+        "multi": true
+      },
+      "explain": "Resmî mağaza tam bir güvence değildir ama riski çok azaltır. Yorumlara ve izinlere de bakın."
+    },
+    {
+      "type": "recap",
+      "id": "a-recap",
+      "points": [
+        "Uygulamaları yalnızca resmî mağazadan yükleyin",
+        "İzin, uygulamanın işine uygun olmalı",
+        "SMS ve erişilebilirlik izinlerinde özellikle dikkatli olun"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

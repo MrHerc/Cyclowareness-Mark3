@@ -1,0 +1,416 @@
+{
+ "id": "chat-safely",
+ "title": "Sicher chatten",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Messenger sind praktisch. Aber eine dienstliche Datei, die an einen privaten Account geht, entzieht sich der Kontrolle Ihrer Organisation – manchmal für Jahre.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Hinter einem bekannten Namen mit neuer Nummer können in Wahrheit Kriminelle stecken. Prüfen Sie das, indem Sie die alte Nummer anrufen, die Sie bereits kennen.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "+994 50 000 47 09",
+         "spot": "unknown-number"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hallo, Nərminə. Hier ist Elçin Qasımov. "
+          },
+          {
+           "text": "Das ist meine neue Nummer, die alte habe ich verloren.",
+           "spot": "new-number"
+          }
+         ],
+         "time": "09:12"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Der Direktor braucht dringend einen Bericht. "
+          },
+          {
+           "text": "Schicken Sie mir die Finanztabelle gleich hier im Chat.",
+           "spot": "work-file"
+          }
+         ],
+         "time": "09:13"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Ich bin im Meeting und kann nicht telefonieren, nur schreiben.",
+           "spot": "no-call"
+          }
+         ],
+         "time": "09:13"
+        }
+       ]
+      }
+     },
+     "highlight": "new-number"
+    },
+    {
+     "id": "b3",
+     "say": "Selbstlöschende Nachrichten helfen, aber Ihr Gegenüber kann trotzdem einen Screenshot machen. Sensible Informationen gehören überhaupt nicht in Messenger.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Nutzen Sie für die Arbeit das Tool, das Ihre Organisation freigegeben hat. Sie wissen nicht, welches? Fragen Sie Ihren IT-Support.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "new-number-chat",
+   "prompt": "Was ist an diesem Chat verdächtig?",
+   "artifact": {
+    "kind": "chat",
+    "app": "whatsapp",
+    "contact": [
+     {
+      "text": "+994 50 000 47 09",
+      "spot": "unknown-number"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Hallo, Nərminə. Hier ist Elçin Qasımov. "
+       },
+       {
+        "text": "Das ist meine neue Nummer, die alte habe ich verloren.",
+        "spot": "new-number"
+       }
+      ],
+      "time": "09:12"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Der Direktor braucht dringend einen Bericht. "
+       },
+       {
+        "text": "Schicken Sie mir die Finanztabelle gleich hier im Chat.",
+        "spot": "work-file"
+       }
+      ],
+      "time": "09:13"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Ich bin im Meeting und kann nicht telefonieren, nur schreiben.",
+        "spot": "no-call"
+       }
+      ],
+      "time": "09:13"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "unknown-number",
+     "label": "Nicht gespeicherte Nummer",
+     "explain": "Kein Name, nur eine Nummer. Den einzigen Beweis dafür, wer schreibt, liefert der Absender selbst."
+    },
+    {
+     "id": "new-number",
+     "label": "Die Geschichte mit der neuen Nummer",
+     "explain": "Das ist der häufigste Einstieg. Rufen Sie zur Prüfung die alte Nummer an."
+    },
+    {
+     "id": "work-file",
+     "label": "Dienstliche Datei per Messenger",
+     "explain": "Finanzunterlagen gehören nur in einen freigegebenen dienstlichen Kanal."
+    },
+    {
+     "id": "no-call",
+     "label": "Weicht einem Anruf aus",
+     "explain": "Kriminelle wollen nicht, dass Sie die Stimme hören. Seien Sie misstrauisch, wenn jemand etwas verlangt und dabei einen Anruf ablehnt."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "verify",
+   "question": {
+    "prompt": "Wie prüfen Sie, ob es wirklich Elçin ist?",
+    "options": [
+     {
+      "id": "call-new",
+      "label": "Ich rufe die neue Nummer an",
+      "correct": false,
+      "feedback": "Diese Nummer gehört den Kriminellen. Sie können selbst abheben oder mit einer geklonten Stimme antworten."
+     },
+     {
+      "id": "call-known",
+      "label": "Ich rufe seine alte Nummer oder seine Büronummer an",
+      "correct": true,
+      "feedback": "Richtig. Ein Kanal, den Sie bereits kennen, ist die zuverlässigste Prüfung."
+     },
+     {
+      "id": "photo",
+      "label": "Ich sehe mir das Profilbild an",
+      "correct": false,
+      "feedback": "Ein Foto aus dem Internet zu kopieren dauert eine Minute."
+     },
+     {
+      "id": "ask-detail",
+      "label": "Ich frage ihn nach der Büroadresse",
+      "correct": false,
+      "feedback": "Das ist eine öffentliche Information. Die kann jeder beantworten."
+     }
+    ]
+   },
+   "explain": "Prüfen Sie immer über einen Kanal, den Sie bereits kennen: die alte Nummer, die Büronummer oder persönlich."
+  },
+  {
+   "type": "swipe",
+   "id": "what-goes-where",
+   "prompt": "Ist diese Nachricht sicher oder eine Falle?",
+   "cards": [
+    {
+     "id": "family-group",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Familiengruppe · 38 Mitglieder"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Budgetentwurf 2027, final.xlsx"
+         }
+        ],
+        "time": "22:40"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Eine dienstliche Datei ist in der Familiengruppe gelandet. Solche Fehler passieren vor allem, wenn wir es eilig haben."
+    },
+    {
+     "id": "vpn-password",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Abteilungschat · 214 Mitglieder"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Passwort für den Fernzugriff: Baki2026! Bitte alle verwenden."
+         }
+        ],
+        "time": "13:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein gemeinsames Passwort in einer großen Gruppe. Geht ein einziges Smartphone verloren, steht der Zugang allen offen."
+    },
+    {
+     "id": "internal-link",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Samir Babayev · interner Arbeitschat"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ich habe den Abschlussbericht ins interne System hochgeladen, bitte dort nachsehen."
+         }
+        ],
+        "time": "10:30"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Die Datei selbst wird nicht verschickt, sie bleibt im internen System. So ist es richtig."
+    },
+    {
+     "id": "meeting-time",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Meeting-Gruppe"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Das Meeting morgen ist auf 10 Uhr verschoben."
+         }
+        ],
+        "time": "18:02"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Nichts Sensibles, nur eine Erinnerung. Dokumente und Zahlen gehören in den freigegebenen Kanal."
+    },
+    {
+     "id": "id-photo",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Buchhaltung"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Senden Sie zur Prüfung Ihres Gehalts Fotos von Vorder- und Rückseite Ihres Personalausweises."
+         }
+        ],
+        "time": "11:48"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Die Buchhaltung hat Ihre Daten bereits. Mit Ausweisfotos eröffnen Kriminelle Konten auf fremde Namen."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "wrong-group",
+   "title": "Falsche Gruppe",
+   "start": "sent",
+   "nodes": [
+    {
+     "id": "sent",
+     "text": "Sie haben versehentlich die Telefonliste der Belegschaft in eine Nachbarschaftsgruppe mit 300 Personen geschickt. Zwei Minuten sind vergangen.",
+     "choices": [
+      {
+       "label": "Ich lösche sie für alle und informiere sofort meine Führungskraft",
+       "next": "manager",
+       "feedback": "Ein guter Anfang. Das Löschen bremst die Verbreitung, die Meldung begrenzt den Schaden."
+      },
+      {
+       "label": "Ich lösche sie still und leise, bestimmt hat sie niemand gesehen",
+       "outcome": "risky",
+       "feedback": "Vielleicht hat sie schon jemand heruntergeladen. Wenn Sie schweigen, kann niemand rechtzeitig handeln."
+      },
+      {
+       "label": "Ich tue nichts, es ist sowieso zu spät",
+       "outcome": "compromised",
+       "feedback": "Die Datei bleibt in der Gruppe und verbreitet sich weiter. Es ist nicht zu spät – handeln Sie jetzt."
+      }
+     ]
+    },
+    {
+     "id": "manager",
+     "text": "Was genau war in der Datei?",
+     "speaker": "Vorgesetzter",
+     "voice": "older-man",
+     "channel": "phone",
+     "manner": "firm",
+     "spoken": "<breath> Was genau war in der Datei?",
+     "choices": [
+      {
+       "label": "Ich sage es genau: Namen und Handynummern von 120 Beschäftigten",
+       "next": "reply",
+       "feedback": "Eine ehrliche, genaue Antwort beschleunigt die Reaktion."
+      },
+      {
+       "label": "Ich spiele es herunter: nur eine unwichtige Tabelle",
+       "outcome": "risky",
+       "feedback": "Wer nicht weiß, was nach außen gelangt ist, kann nicht gut entscheiden. Ihre Kolleginnen und Kollegen sind dann nicht auf Betrugsanrufe vorbereitet."
+      }
+     ]
+    },
+    {
+     "id": "reply",
+     "text": "Jemand in der Gruppe schreibt: „Ich habe die Datei geöffnet, interessant.“ Was tun Sie?",
+     "choices": [
+      {
+       "label": "Ich bitte ihn höflich, sie zu löschen, und informiere meine Führungskraft",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Sie haben versucht, die Verbreitung zu stoppen, und alles offen gemeldet."
+      },
+      {
+       "label": "Ich streite mit ihm und drohe ihm",
+       "outcome": "risky",
+       "feedback": "Drohungen verschärfen die Lage und machen die Datei nur interessanter. Bitten Sie höflich und überlassen Sie den Rest Ihrer Organisation."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Versenden Sie dienstliche Dateien nur über das freigegebene Tool.",
+    "Prüfen Sie eine neue Nummer über einen Kanal, den Sie bereits kennen.",
+    "Etwas an die falsche Stelle geschickt? Sofort löschen und melden."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -17,8 +17,9 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { Checkbox, Field, Input, Select, Switch, Textarea } from "@/components/ui/field";
 import { toast } from "@/components/ui/toast";
-import { LOCALE_NAMES } from "@/i18n/config";
+import { LOCALE_NAMES, langAttrs } from "@/i18n/config";
 import type { Category } from "@/lib/domain/catalog";
+import type { LabId } from "@/lib/domain/labs";
 import { searchFold } from "./search-fold";
 
 type Option = { id: string; label: string };
@@ -56,6 +57,8 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
     recap: "",
   };
   const [f, setF] = useState(blank);
+  // The lesson fields are written in the lesson's language, which can differ from the console's.
+  const content = langAttrs(f.locale);
   const valid =
     f.title.trim().length >= 3 &&
     f.intro.trim().length >= 10 &&
@@ -175,21 +178,21 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label={t("form.title")} htmlFor="st-title">
-              <Input id="st-title" value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} maxLength={120} />
+              <Input id="st-title" {...content} value={f.title} onChange={(e) => setF({ ...f, title: e.target.value })} maxLength={120} />
             </Field>
             <Field label={t("form.subtitle")} htmlFor="st-sub">
-              <Input id="st-sub" value={f.subtitle} onChange={(e) => setF({ ...f, subtitle: e.target.value })} maxLength={200} />
+              <Input id="st-sub" {...content} value={f.subtitle} onChange={(e) => setF({ ...f, subtitle: e.target.value })} maxLength={200} />
             </Field>
           </div>
           <Field label={t("form.intro")} htmlFor="st-intro">
-            <Textarea id="st-intro" value={f.intro} onChange={(e) => setF({ ...f, intro: e.target.value })} maxLength={1200} />
+            <Textarea id="st-intro" {...content} value={f.intro} onChange={(e) => setF({ ...f, intro: e.target.value })} maxLength={1200} />
           </Field>
           <Field label={t("form.points")} htmlFor="st-points" hint={t("form.pointsHint")}>
-            <Textarea id="st-points" value={f.points} onChange={(e) => setF({ ...f, points: e.target.value })} className="min-h-32" />
+            <Textarea id="st-points" {...content} value={f.points} onChange={(e) => setF({ ...f, points: e.target.value })} className="min-h-32" />
           </Field>
           <fieldset className="grid gap-3 rounded-xl border border-line p-4">
             <legend className="px-1 text-body-sm font-semibold">{t("form.question")}</legend>
-            <Input aria-label={t("form.question")} value={f.prompt} onChange={(e) => setF({ ...f, prompt: e.target.value })} maxLength={400} />
+            <Input aria-label={t("form.question")} {...content} value={f.prompt} onChange={(e) => setF({ ...f, prompt: e.target.value })} maxLength={400} />
             <p className="text-caption font-semibold text-ink-muted">{t("form.options")}</p>
             {f.options.map((o, i) => (
               <div key={i} className="grid gap-2 rounded-lg bg-sunken p-3 sm:grid-cols-[auto_1fr_1fr]">
@@ -197,13 +200,13 @@ export function StudioLessonForm({ locales, defaultLocale, categories, aiOn }: {
                   <input type="radio" name="st-correct" checked={o.correct} onChange={() => setF({ ...f, options: f.options.map((x, j) => ({ ...x, correct: j === i })) })} className="size-4 accent-(--brand)" />
                   {t("form.correct")}
                 </label>
-                <Input aria-label={t("form.optionN", { n: i + 1 })} value={o.label} onChange={(e) => setF({ ...f, options: f.options.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)) })} maxLength={200} className="bg-surface" />
-                <Input aria-label={t("form.optionFeedback")} placeholder={t("form.optionFeedback")} value={o.feedback} onChange={(e) => setF({ ...f, options: f.options.map((x, j) => (j === i ? { ...x, feedback: e.target.value } : x)) })} maxLength={400} className="bg-surface" />
+                <Input aria-label={t("form.optionN", { n: i + 1 })} {...content} value={o.label} onChange={(e) => setF({ ...f, options: f.options.map((x, j) => (j === i ? { ...x, label: e.target.value } : x)) })} maxLength={200} className="bg-surface" />
+                <Input aria-label={t("form.optionFeedback")} {...content} placeholder={t("form.optionFeedback")} value={o.feedback} onChange={(e) => setF({ ...f, options: f.options.map((x, j) => (j === i ? { ...x, feedback: e.target.value } : x)) })} maxLength={400} className="bg-surface" />
               </div>
             ))}
           </fieldset>
           <Field label={t("form.recap")} htmlFor="st-recap">
-            <Textarea id="st-recap" value={f.recap} onChange={(e) => setF({ ...f, recap: e.target.value })} />
+            <Textarea id="st-recap" {...content} value={f.recap} onChange={(e) => setF({ ...f, recap: e.target.value })} />
           </Field>
         </div>
       </Dialog>
@@ -347,14 +350,15 @@ export function MaterialForm({ modules, departments }: { modules: Option[]; depa
 /* ───────── learning paths ───────── */
 
 /** `sourceId`: the library path a duplicate starts from, so its other translations are kept. */
-export type PathDraft = { id: string | null; sourceId?: string | null; title: string; description: string; audience: string; recurrence: string; standards: string; mandatory: boolean; moduleSlugs: string[] };
+export type PathDraft = { id: string | null; sourceId?: string | null; title: string; description: string; audience: string; recurrence: string; standards: string; mandatory: boolean; moduleSlugs: string[]; labIds: LabId[] };
 
-export function PathEditor({ initial, modules, trigger }: { initial: PathDraft | null; modules: { slug: string; label: string }[]; trigger: "new" | "edit" | "duplicate" }) {
+/** `labs`: the practice labs to offer (none when the tenant has no lab feature; a path keeps the labs it has). */
+export function PathEditor({ initial, modules, labs, trigger }: { initial: PathDraft | null; modules: { slug: string; label: string }[]; labs: { id: LabId; label: string }[]; trigger: "new" | "edit" | "duplicate" }) {
   const t = useTranslations("secops.paths");
   const tc = useTranslations("common");
   const [open, setOpen] = useState(false);
   const [pending, start] = useTransition();
-  const empty: PathDraft = { id: null, title: "", description: "", audience: "", recurrence: "", standards: "", mandatory: false, moduleSlugs: [] };
+  const empty: PathDraft = { id: null, title: "", description: "", audience: "", recurrence: "", standards: "", mandatory: false, moduleSlugs: [], labIds: [] };
   const [f, setF] = useState<PathDraft>(initial ?? empty);
   const [query, setQuery] = useState("");
   const bySlug = useMemo(() => new Map(modules.map((m) => [m.slug, m.label])), [modules]);
@@ -450,7 +454,7 @@ export function PathEditor({ initial, modules, trigger }: { initial: PathDraft |
                   <li key={m.slug}>
                     <button
                       type="button"
-                      className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-caption hover:bg-sunken"
+                      className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-start text-caption hover:bg-sunken"
                       onClick={() => {
                         setF({ ...f, moduleSlugs: [...f.moduleSlugs, m.slug] });
                         setQuery("");
@@ -464,6 +468,22 @@ export function PathEditor({ initial, modules, trigger }: { initial: PathDraft |
               </ul>
             ) : null}
           </div>
+          {labs.length ? (
+            <fieldset className="grid gap-2">
+              <legend className="text-caption font-semibold">{t("form.labs")}</legend>
+              <p className="text-caption text-ink-muted">{t("form.labsHint")}</p>
+              <div className="grid gap-2.5 pt-1 sm:grid-cols-2">
+                {labs.map((l) => (
+                  <Checkbox
+                    key={l.id}
+                    label={l.label}
+                    checked={f.labIds.includes(l.id)}
+                    onChange={(e) => setF({ ...f, labIds: e.target.checked ? [...f.labIds, l.id] : f.labIds.filter((id) => id !== l.id) })}
+                  />
+                ))}
+              </div>
+            </fieldset>
+          ) : null}
         </div>
       </Dialog>
     </>

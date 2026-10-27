@@ -1,0 +1,343 @@
+{
+ "id": "deepfake-meeting",
+ "title": "Sahte katılımcı",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "dm-tutor",
+   "beats": [
+    {
+     "id": "dm-b1",
+     "say": "Günümüzde yapay zekâ, görüntülü görüşmede tanıdık bir yüzü ve sesi taklit edebilir.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "dm-b2",
+     "say": "Acil para talebi, gizlilik ve olağan kuralların dışında bir istek: bunlar bir aradaysa alarm zilleri çalmalı.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "gorus",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Reşad Memmedov (Müdür)"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Kamera açık, ses dudak hareketlerinin biraz gerisinde kalıyor."
+         }
+        ],
+        [
+         {
+          "text": "“Bugün saat 15:00'e kadar yeni bir hesaba 46.000 manat aktarın. Bu gizli, kimseye söylemeyin.”",
+          "spot": "urgent"
+         }
+        ]
+       ],
+       "buttons": [
+        "Sesi aç",
+        "Ayrıl"
+       ]
+      }
+     },
+     "highlight": "urgent"
+    },
+    {
+     "id": "dm-b3",
+     "say": "Görüntü kusursuz görünebilir. Bu yüzden yüze değil, talebin kendisine bakın.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "dm-b4",
+     "say": "Toplantıdan ayrılın ve o kişiyi zaten bildiğiniz bir numaradan kendiniz arayın.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "dm-sim",
+   "environment": "desktop",
+   "title": "Acil toplantı",
+   "intro": "Müdürden acil bir toplantı daveti geldi ve toplantıya katıldınız. Sizden ne istendiğine bakın ve karar verin.",
+   "steps": [
+    {
+     "id": "the-ask",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Reşad Memmedov (Müdür)"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Kamera açık, ses dudak hareketlerinin biraz gerisinde kalıyor."
+        }
+       ],
+       [
+        {
+         "text": "“Bugün saat 15:00'e kadar yeni bir hesaba 46.000 manat aktarın. Bu gizli, kimseye söylemeyin.”",
+         "spot": "urgent"
+        }
+       ]
+      ],
+      "buttons": [
+       "Sesi aç",
+       "Ayrıl"
+      ]
+     },
+     "say": "Müdür kamerada ve sesi tanıdık geliyor.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Tamam, hemen aktarıyorum",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Görüntü sahteydi ve para bir dolandırıcıya gitti. Tanıdık bir yüz, ödeme talebini doğrulamaz."
+      },
+      {
+       "id": "verify",
+       "label": "Bildiğim numaradan sizi arayıp teyit edeceğim",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru. İkinci bir kanal sahteliği hızla ortaya çıkarır."
+      },
+      {
+       "id": "wave-test",
+       "label": "Lütfen kameraya el sallayın",
+       "kind": "verify",
+       "outcome": "risky",
+       "feedback": "Bu tür testler artık güvenilir değil, sahte görüntü de el sallayabilir. Ayrı bir kanaldan kontrol edin."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Toplantı sohbeti"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Reşad Memmedov: Aramayın, telefonum yanımda değil.",
+         "spot": "no-call"
+        }
+       ],
+       [
+        {
+         "text": "Sevda Kerimli (baş muhasebeci): Ben de buradayım, her şey yolunda."
+        }
+       ]
+      ],
+      "buttons": [
+       "Gönder"
+      ]
+     },
+     "say": "Şimdi tanıdık bir kişi daha bunu onaylıyor.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Herkes onaylıyorsa aktarırım",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Toplantıdaki her katılımcı sahte olabilir. Bu tür saldırılarda bazen toplantının tamamı sahtedir."
+      },
+      {
+       "id": "leave",
+       "label": "Toplantıdan ayrıl ve ödemeyi beklet",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Doğru. “Aramayın” sözü, aramak için en iyi nedendir."
+      }
+     ]
+    },
+    {
+     "id": "new-number",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "+994 50 000 64 27"
+       }
+      ],
+      "body": [
+       {
+        "text": "Reşad Memmedov: Bu benim yeni numaram. Aktarım yapıldı mı?"
+       }
+      ],
+      "time": "14:22"
+     },
+     "say": "Toplantıdan sonra bir mesaj geliyor.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Güvenlik ekibine bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru, dolandırıcı başka bir kanaldan baskı yapıyor. Mesajı saklayın, bu bir kanıttır."
+      },
+      {
+       "id": "reply",
+       "label": "Yanıtla: henüz değil, şimdi yapıyorum",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Yeni numara ancak bildiğiniz eski numara üzerinden doğrulanır. Bu, dolandırıcının numarası."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "dm-scenario",
+   "title": "Kontrol araması",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Reşad Bey bugün Gence'de, bütün gün oturumlarda. Herhangi bir toplantı düzenlemedi.",
+     "speaker": "Asistan Aygün Rehimova (dahili numara)",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Reşad Bey bugün Gence'de, <breath> bütün gün oturumlarda. Herhangi bir toplantı düzenlemedi.",
+     "choices": [
+      {
+       "label": "Hemen güvenlik ekibine ve finans departmanına haber veririm",
+       "next": "n2",
+       "feedback": "Doğru. Saldırgan başka çalışanları da hedef alabilir."
+      },
+      {
+       "label": "Muhtemelen unutmuştur, aktarımı yaparım",
+       "outcome": "compromised",
+       "feedback": "Asistan böyle bir toplantı olmadığını doğruladı. Para bir dolandırıcıya gidecekti."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Teşekkürler. Daveti, toplantı sohbetini ve mesajı sakladınız mı?",
+     "speaker": "Güvenlik ekibi",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Teşekkürler. <breath> Daveti, toplantı sohbetini ve mesajı sakladınız mı?",
+     "choices": [
+      {
+       "label": "Hepsini sakladım, size gönderiyorum",
+       "outcome": "safe",
+       "feedback": "Harika. Bu kanıtlar incelemeye yardımcı olur ve diğer çalışanları uyarmayı sağlar."
+      },
+      {
+       "label": "Utandığım için hepsini sildim",
+       "outcome": "risky",
+       "feedback": "Kanıt olmadan inceleme zorlaşır. Bir dahaki sefere hiçbir şeyi silmeyin, bunda utanılacak bir şey yok."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "dm-choice",
+   "question": {
+    "prompt": "Toplantıdaki “müdürü” doğrulamanın en güvenilir yolu nedir?",
+    "options": [
+     {
+      "id": "known",
+      "label": "Toplantıdan ayrılır, onu zaten bildiğim numaradan ararım",
+      "correct": true,
+      "feedback": "Doğru. Dolandırıcı o kanalı kontrol edemez."
+     },
+     {
+      "id": "question",
+      "label": "Toplantıda ona kişisel bir soru sorarım",
+      "correct": false,
+      "feedback": "Yanıt sosyal medyada bulunabilir ya da soruyu geçiştirebilir. Ayrı bir kanal daha güvenilirdir."
+     },
+     {
+      "id": "quality",
+      "label": "Görüntü kalitesini dikkatle incelerim",
+      "correct": false,
+      "feedback": "Günümüzün sahte videoları çok inandırıcıdır. Görüntüye güvenmeyin."
+     },
+     {
+      "id": "reply-invite",
+      "label": "Davet e-postasını yanıtlarım",
+      "correct": false,
+      "feedback": "Yanıtınız yine dolandırıcıya gider. Kanalı kendiniz seçin."
+     }
+    ]
+   },
+   "explain": "İkinci kanal, sizin seçtiğiniz ve zaten bildiğiniz bir kanaldır: dahili numara, rehberinizdeki numara ya da yüz yüze görüşme."
+  },
+  {
+   "type": "order",
+   "id": "dm-order",
+   "prompt": "Bir toplantıda acilen para isteniyor. Adımları doğru sıraya koyun.",
+   "items": [
+    {
+     "id": "hold",
+     "label": "Ödemeyi yapmayın"
+    },
+    {
+     "id": "leave",
+     "label": "Toplantıdan ayrılın"
+    },
+    {
+     "id": "call",
+     "label": "Bildiğiniz bir numarayı kendiniz arayın"
+    },
+    {
+     "id": "report",
+     "label": "Güvenlik ekibine bildirin ve kanıtları saklayın"
+    }
+   ],
+   "explain": "Önce parayı durdurun, sonra kontrol edin ve bildirin. Aciliyet hiçbir zaman kontrolden önce gelmez."
+  },
+  {
+   "type": "recap",
+   "id": "dm-recap",
+   "points": [
+    "Tanıdık bir yüz ve ses kanıt değildir",
+    "Acil para talebi ve gizlilik bir aradaysa durun",
+    "Bildiğiniz bir numaradan kendiniz geri arayın"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

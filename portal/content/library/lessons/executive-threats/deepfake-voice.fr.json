@@ -1,0 +1,366 @@
+{
+ "id": "deepfake-voice",
+ "title": "La fausse voix du dirigeant",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "L’intelligence artificielle peut copier la voix d’un dirigeant à partir d’un court enregistrement. Des discours et des interviews suffisent.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Le nom et le numéro affichés à l’écran peuvent eux aussi être falsifiés. Un appel qui a l’air familier n’est pas une preuve.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Saadat Mammadli"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 50 000 47 12",
+         "spot": "number"
+        }
+       ],
+       "label": "Mobile"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "b3",
+     "say": "Convenez à l’avance d’une phrase de vérification. Si votre interlocuteur ne la connaît pas, raccrochez.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Le plus sûr : raccrocher et rappeler vous-même la personne, au numéro que vous connaissez.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "cloned-call",
+   "environment": "call",
+   "title": "La voix de la vice-ministre",
+   "intro": "Il est huit heures du soir. Votre téléphone sonne, et le nom de la vice-ministre s’affiche à l’écran.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Saadat Mammadli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "older-woman"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Répondre",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Répondre n’a rien de dangereux. Ce qui compte, c’est ce que vous faites ensuite."
+      },
+      {
+       "id": "decline",
+       "label": "Refuser",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "C’est aussi une bonne option. En cas de doute, appelez vous-même la vice-ministre au numéro que vous connaissez.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "request",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Saadat Mammadli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "older-woman"
+     },
+     "say": "Allô, c’est moi, Saadat. Je suis malade et j’ai la voix enrouée. Virez soixante-quinze mille manats à un partenaire ce soir, c’est urgent.",
+     "spoken": "Allô, c’est moi, Saadat. <throat-clearing> Je suis malade et j’ai la voix enrouée. Virez soixante-quinze mille manats à un partenaire, euh, ce soir, c’est urgent.",
+     "actions": [
+      {
+       "id": "phrase",
+       "label": "Dites-moi notre phrase de vérification, s’il vous plaît",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Une phrase convenue à l’avance est une vérification plus solide qu’une voix."
+      },
+      {
+       "id": "pay",
+       "label": "D’accord, je fais le virement tout de suite",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Une voix familière n’est plus une preuve. Celle-ci a été créée par l’intelligence artificielle, et l’argent est perdu."
+      },
+      {
+       "id": "hang",
+       "label": "Je raccroche, je vous rappelle moi-même",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. Appelez maintenant la vice-ministre au numéro que vous connaissez.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Saadat Mammadli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "older-woman"
+     },
+     "say": "Quelle phrase ? Je n’ai pas le temps, le ministre attend ! J’enverrai les papiers demain, faites le virement maintenant.",
+     "spoken": "Quelle phrase ? <breath> Je n’ai pas le temps, le ministre attend ! J’enverrai les papiers demain, faites le virement maintenant.",
+     "actions": [
+      {
+       "id": "hang",
+       "label": "Raccrocher",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Une personne qui ne connaît pas la phrase et vous met la pression est un imposteur."
+      },
+      {
+       "id": "pay",
+       "label": "D’accord, je fais le virement",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "La pression sert à éviter la vérification. L’argent pourrait ne jamais revenir."
+      },
+      {
+       "id": "details",
+       "label": "Envoyez-moi le numéro de compte",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Prolonger la conversation donne plus de chances à l’attaquant. Raccrochez."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "L’appel est terminé. Et maintenant ?",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Saadat Mammadli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "older-woman"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "Appeler la vice-ministre au numéro de l’annuaire",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Un numéro que vous composez vous-même démasque tout de suite le faux appel."
+      },
+      {
+       "id": "report",
+       "label": "Signaler à l’équipe sécurité",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Votre signalement met en garde les Finances et vos collègues contre ce même appel."
+      },
+      {
+       "id": "ignore",
+       "label": "Ne rien faire",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "L’attaquant va peut-être appeler un autre collègue. Vérifiez et signalez."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "check-phrase",
+   "question": {
+    "prompt": "Qu’est-ce qui fait une bonne phrase de vérification ?",
+    "options": [
+     {
+      "id": "secret",
+      "label": "Un mot qui n’est écrit nulle part, connu de nous deux seulement",
+      "correct": true,
+      "feedback": "Bonne réponse. Un mot absent d’internet ne peut pas être copié."
+     },
+     {
+      "id": "birthday",
+      "label": "La date de naissance de la vice-ministre",
+      "correct": false,
+      "feedback": "Une date de naissance se trouve facilement en ligne."
+     },
+     {
+      "id": "office",
+      "label": "Le nom de l’organisation et le numéro du bureau",
+      "correct": false,
+      "feedback": "Beaucoup de gens les connaissent, ce n’est donc pas une vérification."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "key"
+    }
+   },
+   "explain": "Convenez de la phrase en personne, et ne l’envoyez jamais par e-mail ni par message."
+  },
+  {
+   "type": "match",
+   "id": "voice-signs",
+   "prompt": "Associez chaque constat à sa signification.",
+   "pairs": [
+    {
+     "id": "voice",
+     "left": "La voix est familière",
+     "right": "Pas une preuve, elle peut être copiée"
+    },
+    {
+     "id": "caller-id",
+     "left": "Un nom familier à l’écran",
+     "right": "Le numéro aussi peut être falsifié"
+    },
+    {
+     "id": "urgent",
+     "left": "Urgent et secret",
+     "right": "Une tentative pour sauter la vérification"
+    },
+    {
+     "id": "phrase",
+     "left": "La phrase de vérification est correcte",
+     "right": "La vérification la plus fiable au téléphone"
+    }
+   ],
+   "explain": "Fiez-vous à la règle convenue, pas à la voix ni au nom affiché."
+  },
+  {
+   "type": "scenario",
+   "id": "video-call",
+   "title": "Un appel vidéo",
+   "start": "screen",
+   "nodes": [
+    {
+     "id": "screen",
+     "text": "Versez l’acompte au partenaire ce soir.",
+     "speaker": "Le ministre (appel vidéo, le son est haché)",
+     "voice": "older-man",
+     "channel": "video",
+     "spoken": "Versez l’acompte au partenaire <short pause> ce soir.",
+     "character": "minister",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     },
+     "choices": [
+      {
+       "label": "Je mets fin à l’appel et j’appelle l’assistant au numéro que je connais",
+       "next": "assistant",
+       "feedback": "Bonne réponse. La vidéo aussi peut être falsifiée : un second canal reste la règle."
+      },
+      {
+       "label": "Je vois son visage, c’est donc bien lui",
+       "outcome": "compromised",
+       "feedback": "L’intelligence artificielle peut aussi falsifier une vidéo. Une image seule n’est pas une preuve."
+      }
+     ]
+    },
+    {
+     "id": "assistant",
+     "text": "Le ministre est en déplacement et n’a appelé personne.",
+     "speaker": "L’assistant du ministre",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Le ministre est en déplacement <breath> et n’a appelé personne.",
+     "character": "assistant",
+     "choices": [
+      {
+       "label": "Je signale l’appel à l’équipe sécurité, en notant l’heure et le nom du compte",
+       "outcome": "safe",
+       "feedback": "Excellent. Ces notes aident les spécialistes à remonter la piste de l’attaque."
+      },
+      {
+       "label": "Aucun argent n’est parti, alors je n’en parle à personne",
+       "outcome": "risky",
+       "feedback": "La prochaine cible pourrait être la vice-ministre ou les Finances. Signaler protège tout le monde."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Une voix, un visage ou un nom familiers ne sont pas une preuve.",
+    "Demandez la phrase de vérification, raccrochez et rappelez vous-même.",
+    "Signalez immédiatement un faux appel à l’équipe sécurité."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,364 @@
+{
+ "id": "work-anywhere",
+ "title": "Oriunde ați lucra",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "protection-stays",
+     "say": "Când lucrați de acasă sau dintr-o cafenea, protecția biroului nu vine cu dumneavoastră. Trebuie să v-o asigurați chiar dumneavoastră.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "vpn",
+     "say": "Conectați-vă la sistemele de serviciu doar prin VPN-ul organizației. Aplicațiile VPN gratuite pot transmite datele dumneavoastră altora.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "vpn"
+     }
+    },
+    {
+     "id": "open-wifi",
+     "say": "Oricine poate imita numele rețelei deschise a unei cafenele. Dacă puteți, folosiți în schimb hotspotul telefonului.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    {
+     "id": "shoulder",
+     "say": "Cei din spatele dumneavoastră vă pot vedea ecranul și parola pe care o tastați. Stați cu spatele la perete și folosiți un filtru de confidențialitate.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "family",
+     "say": "Laptopul de serviciu nu este pentru familie. Un joc descărcat de cineva din casă poate aduce cu el și malware.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "cafe-networks",
+   "prompt": "Care dintre rețelele din această cafenea sunt suspecte?",
+   "artifact": {
+    "kind": "wifi",
+    "networks": [
+     {
+      "ssid": [
+       {
+        "text": "Cinar_Pulsuz_WiFi",
+        "spot": "twin"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Cinar-Cayxana"
+       }
+      ],
+      "secured": true,
+      "signal": 3
+     },
+     {
+      "ssid": [
+       {
+        "text": "Free_Internet_BAKU",
+        "spot": "free"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "RXAgentlik-Staff",
+        "spot": "staff"
+       }
+      ],
+      "secured": false,
+      "signal": 2
+     },
+     {
+      "ssid": [
+       {
+        "text": "Telefonul lui Aynur"
+       }
+      ],
+      "secured": true,
+      "signal": 4
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "twin",
+     "label": "Nume aproape identic",
+     "explain": "O rețea deschisă care imită numele cafenelei. Nu are parolă și poate fi falsă. Întrebați personalul care este rețeaua reală."
+    },
+    {
+     "id": "free",
+     "label": "Proprietar necunoscut",
+     "explain": "O rețea deschisă, fără un proprietar cunoscut, vă poate trimite pe o pagină de conectare falsă."
+    },
+    {
+     "id": "staff",
+     "label": "Numele organizației dumneavoastră",
+     "explain": "Rețeaua organizației dumneavoastră nu are cum să fie într-o cafenea. Aceasta a fost creată ca să vă păcălească."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "swipe",
+   "id": "home-setup",
+   "prompt": "Este sigur pentru lucrul de acasă?",
+   "cards": [
+    {
+     "id": "default-router",
+     "artifact": {
+      "kind": "login",
+      "brand": "HomeRouter",
+      "url": [
+       {
+        "text": "http://192.168.1.1"
+       }
+      ],
+      "fields": [
+       "Nume de utilizator: admin",
+       "Parolă: admin"
+      ],
+      "button": "Conectați-vă"
+     },
+     "verdict": "threat",
+     "explain": "Parolele din fabrică sunt cunoscute de toată lumea. Schimbați acum parola routerului."
+    },
+    {
+     "id": "share-password",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Tural, coleg"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Nu pot intra în sistem de acasă. Spune-mi parola ta, doar pentru un minut."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Parola nu se dă nimănui, nici măcar unui coleg. Sugerați-i să contacteze suportul IT."
+    },
+    {
+     "id": "vpn-update",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Suport IT"
+        }
+       ],
+       "address": [
+        {
+         "text": "it@rxagentlik.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Versiune nouă a aplicației VPN"
+       }
+      ],
+      "time": "08:30",
+      "body": [
+       [
+        {
+         "text": "Actualizarea se va instala automat pe computerul dumneavoastră de serviciu. Nu descărcați nimic."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Domeniul este corect și nu vi se cere să descărcați nimic."
+    },
+    {
+     "id": "free-vpn",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://super-free-vpn.top/download"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un VPN gratuit necunoscut vă poate citi traficul. Pentru serviciu, folosiți doar VPN-ul organizației."
+    },
+    {
+     "id": "home-wifi",
+     "artifact": {
+      "kind": "wifi",
+      "networks": [
+       {
+        "ssid": [
+         {
+          "text": "Ev_5G"
+         }
+        ],
+        "secured": true,
+        "signal": 4
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "O rețea de acasă protejată cu parolă. Dacă ați schimbat și parola routerului, este un început bun."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "home-and-cafe",
+   "title": "Acasă și la cafenea",
+   "start": "evening",
+   "nodes": [
+    {
+     "id": "evening",
+     "text": "Pot să instalez un joc pe laptopul tău de serviciu? Al meu e prea lent.",
+     "speaker": "Membru al familiei",
+     "voice": "young-man",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Pot să instalez un joc pe laptopul tău de serviciu? <short pause> Al meu e prea lent.",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     },
+     "choices": [
+      {
+       "label": "Bine, doar pentru o oră",
+       "outcome": "compromised",
+       "feedback": "Odată cu jocul a venit și un malware, iar conturile dumneavoastră de serviciu sunt acum în pericol."
+      },
+      {
+       "label": "Nu, laptopul de serviciu e doar pentru serviciu",
+       "next": "cafe",
+       "feedback": "Corect. Explicați-i calm de ce."
+      }
+     ]
+    },
+    {
+     "id": "cafe",
+     "text": "A doua zi lucrați într-o cafenea. Trebuie să mergeți la tejghea ca să comandați, iar laptopul este deschis.",
+     "choices": [
+      {
+       "label": "Îl las deschis, sunt doar două minute",
+       "outcome": "risky",
+       "feedback": "Două minute sunt suficiente ca cineva să se uite, să conecteze un stick USB sau să ia laptopul."
+      },
+      {
+       "label": "Blochez ecranul și iau laptopul cu mine",
+       "next": "call",
+       "feedback": "Un obicei excelent."
+      }
+     ]
+    },
+    {
+     "id": "call",
+     "text": "Când vă întoarceți la masă, vă sună managerul și vă cere cifre dintr-un proiect confidențial. În apropiere stau și alte persoane.",
+     "choices": [
+      {
+       "label": "Spun cifrele cu voce tare",
+       "outcome": "risky",
+       "feedback": "Cei din jur pot auzi. Discuțiile confidențiale nu se poartă în public."
+      },
+      {
+       "label": "Spun că sun înapoi dintr-un loc liniștit",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Purtați convorbirile confidențiale doar acolo unde nu vă poate auzi nimeni."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "home-router",
+   "question": {
+    "prompt": "Ce pași contează pentru routerul de acasă?",
+    "options": [
+     {
+      "id": "admin-password",
+      "label": "Schimbați parola de administrator din fabrică",
+      "correct": true,
+      "feedback": "Oricine poate afla o parolă din fabrică."
+     },
+     {
+      "id": "firmware",
+      "label": "Actualizați firmware-ul routerului",
+      "correct": true,
+      "feedback": "Actualizările închid vulnerabilitățile cunoscute."
+     },
+     {
+      "id": "encryption",
+      "label": "Alegeți criptarea WPA3 sau WPA2",
+      "correct": true,
+      "feedback": "Vă protejează rețeaua de interceptări."
+     },
+     {
+      "id": "no-password",
+      "label": "Lăsați Wi-Fi-ul fără parolă, pentru viteză",
+      "correct": false,
+      "feedback": "Oricine s-ar putea conecta, iar rețeaua nu devine mai rapidă."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "wifi"
+    }
+   },
+   "explain": "Routerul este ușa casei dumneavoastră spre internet. O parolă din fabrică și un firmware vechi o lasă deschisă."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Conectați-vă la sistemele de serviciu doar prin VPN-ul organizației.",
+    "Folosiți hotspotul telefonului în locul unei rețele Wi-Fi deschise.",
+    "Nu lăsați familia să folosească laptopul de serviciu și blocați ecranul."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

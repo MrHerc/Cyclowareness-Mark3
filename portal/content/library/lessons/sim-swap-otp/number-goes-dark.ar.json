@@ -1,0 +1,466 @@
+{
+ "id": "number-goes-dark",
+ "title": "رقم خرج عن الخدمة",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ss1-tutor",
+   "beats": [
+    {
+     "id": "ss1-b1",
+     "say": "مرحبًا! نتحدث اليوم عن مجرمين يستولون على رقم جوالك، ويسرقون رموز التحقق التي تصلك في الرسائل النصية.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "ss1-b2",
+     "say": "عندما يخدع المجرم شركة الاتصالات لتنقل رقمك إلى شريحته، يفقد جوالك الإشارة فجأة.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2b-sahiltel",
+       "app": "SahilTel",
+       "title": [
+        {
+         "text": "لا توجد خدمة",
+         "spot": "no-service"
+        }
+       ],
+       "body": [
+        {
+         "text": "مكالمات الطوارئ فقط. لم يتم التعرف على شريحة SIM."
+        }
+       ],
+       "time": "00:14"
+      }
+     },
+     "highlight": "no-service"
+    },
+    {
+     "id": "ss1-b3",
+     "say": "يسرق المحتالون كل عام ملايين المانات من البطاقات، ومعظمها عبر رموز وبيانات شاركها أصحابها.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "ملايين المانات",
+      "label": "مسروقة من البطاقات كل عام"
+     }
+    },
+    {
+     "id": "ss1-b4",
+     "say": "إذا انقطعت الخدمة عن رقمك ليلًا، فلا تنتظر الصباح. اتصل بشركة الاتصالات من جوال آخر.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ss1-sim",
+   "environment": "phone",
+   "title": "الواحدة بعد منتصف الليل",
+   "intro": "الوقت ليل، وجوالك بجانبك. انظر إلى كل إشعار واختر الخطوة الصحيحة.",
+   "steps": [
+    {
+     "id": "no-service",
+     "label": "00:14 لا توجد خدمة",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2b-sahiltel",
+      "app": "SahilTel",
+      "title": [
+       {
+        "text": "لا توجد خدمة"
+       }
+      ],
+      "body": [
+       {
+        "text": "مكالمات الطوارئ فقط. لم يتم التعرف على شريحة SIM."
+       }
+      ],
+      "time": "00:14"
+     },
+     "actions": [
+      {
+       "id": "call-operator",
+       "label": "اتصل بشركة الاتصالات من جوال آخر",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "صحيح. إذا انتقل رقمك إلى شريحة أخرى، فيمكن لشركة الاتصالات أن توقفها وتعيد إليك رقمك."
+      },
+      {
+       "id": "sleep",
+       "label": "أطفئ الجوال ونم",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "هذا بالضبط ما يأمله المجرم. فطوال الليل ستذهب إليه رموز التحقق التي تصلك في الرسائل النصية."
+      }
+     ]
+    },
+    {
+     "id": "bank-login",
+     "label": "00:27 UlduzBank Mobil",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ulduzbank-app",
+      "app": "UlduzBank Mobil",
+      "title": [
+       {
+        "text": "تسجيل دخول من جهاز جديد"
+       }
+      ],
+      "body": [
+       {
+        "text": "Android، كنجة، 00:27. إذا لم تكن أنت، فجمد بطاقتك."
+       }
+      ],
+      "time": "00:27"
+     },
+     "say": "الشريحة معطلة، لكن تطبيق البنك ما زال يصلك عبر إنترنت المنزل.",
+     "actions": [
+      {
+       "id": "freeze",
+       "label": "افتح التطبيق وجمد البطاقة",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "صحيح. لا يخرج أي مال من بطاقة مجمدة، ويمكنك إلغاء التجميد لاحقًا مع البنك."
+      },
+      {
+       "id": "call-bank",
+       "label": "اتصل من جوال آخر بالرقم المكتوب خلف البطاقة",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "صحيح. الرقم المكتوب على البطاقة هو رقم البنك الحقيقي، فاطلب منهم إيقاف البطاقة."
+      },
+      {
+       "id": "dismiss",
+       "label": "تجاهل",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "المجرم يتلقى رموز رسائلك النصية بالفعل، ويمكنه تحويل المال من الحساب خلال دقائق."
+      }
+     ]
+    },
+    {
+     "id": "push-request",
+     "label": "00:33 Təsdiqləyici",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "tesdiqleyici",
+      "app": "Təsdiqləyici",
+      "title": [
+       {
+        "text": "طلب تسجيل دخول: İşPoçt"
+       }
+      ],
+      "body": [
+       {
+        "text": "كنجة، 00:33. هل تحاول تسجيل الدخول الآن؟"
+       }
+      ],
+      "time": "00:33"
+     },
+     "actions": [
+      {
+       "id": "deny",
+       "label": "رفض",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "أحسنت. المجرم يملك رقمك، لكن هذه الموافقة موجودة على جوالك فقط."
+      },
+      {
+       "id": "approve",
+       "label": "موافقة",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "لقد فتحت الباب بنفسك. لا توافق أبدًا على طلب لم تكن تتوقعه، خاصة في الليل."
+      }
+     ]
+    },
+    {
+     "id": "messenger-moved",
+     "label": "00:41 Söhbət",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "تم فتح حسابك على جوال آخر"
+       }
+      ],
+      "body": [
+       {
+        "text": "تم تسجيل هذا الرقم على جهاز جديد."
+       }
+      ],
+      "time": "00:41"
+     },
+     "say": "حسابك في تطبيق المراسلة مرتبط برقمك أيضًا.",
+     "actions": [
+      {
+       "id": "warn-family",
+       "label": "حذر عائلتك وأصدقاءك بطريقة أخرى",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "صحيح. قد يطلب المجرم المال من عائلتك باسمك، فاسبقه وحذرهم."
+      },
+      {
+       "id": "ignore",
+       "label": "تجاهل الإشعار",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "قد يصل إلى أصدقائك الليلة طلب عاجل للمال باسمك. حذرهم الآن."
+      }
+     ]
+    },
+    {
+     "id": "recovery-sms",
+     "label": "08:05 UlduzBank",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank-fake",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "08:05",
+      "messages": [
+       [
+        {
+         "text": "تم حظر بطاقتك بعد رصد نشاط مشبوه. لاستعادتها، أدخل بيانات بطاقتك: "
+        },
+        {
+         "text": "ulduzbank-berpa.example",
+         "link": {
+          "label": "ulduzbank-berpa.example",
+          "href": "https://ulduzbank-berpa.example/kart"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "في الصباح عاد رقمك إلى العمل. انظر إلى هذه الرسالة.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "الإبلاغ عنها كرسالة غير مرغوب فيها",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "صحيح. يستغل المجرمون حادثة حقيقية ليضربوا مرة ثانية."
+      },
+      {
+       "id": "delete",
+       "label": "حذف",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "صحيح. تعامل مع أمور البطاقة فقط عبر تطبيق البنك أو الرقم المكتوب على البطاقة."
+      },
+      {
+       "id": "open-link",
+       "label": "فتح الرابط",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "هذا ليس موقع البنك. إذا أدخلت بيانات بطاقتك، فستخسر المال مرة ثانية."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "ss1-order",
+   "prompt": "انقطعت الخدمة عن رقمك فجأة. رتب الخطوات.",
+   "items": [
+    {
+     "id": "operator",
+     "label": "اتصل بشركة الاتصالات من جوال آخر واستعد رقمك"
+    },
+    {
+     "id": "bank",
+     "label": "اتصل بالبنك على الرقم المكتوب على بطاقتك وجمد البطاقة"
+    },
+    {
+     "id": "passwords",
+     "label": "غير كلمات المرور في الحسابات المهمة، وانتقل من الرسائل النصية إلى تطبيق المصادقة"
+    },
+    {
+     "id": "it",
+     "label": "أبلغ الدعم الفني بشأن حسابات العمل"
+    },
+    {
+     "id": "police",
+     "label": "إذا خسرت مالًا، فأبلغ الشرطة على الرقم 102"
+    }
+   ],
+   "explain": "استعد رقمك أولًا حتى تتوقف الرموز الجديدة عن الوصول إلى المجرم. وبعد ذلك مباشرة اطلب من البنك تجميد بطاقتك."
+  },
+  {
+   "type": "swipe",
+   "id": "ss1-swipe",
+   "prompt": "أي رسالة عادية وأيها تهديد؟ اسحب البطاقة.",
+   "cards": [
+    {
+     "id": "own-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "14:02",
+      "messages": [
+       [
+        {
+         "text": "رمز تسجيل الدخول: 482193. لا تخبر أحدًا بهذا الرمز."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "إذا طلبت هذا الرمز بنفسك، فهي رسالة عادية. اكتب الرمز بنفسك، ولا تضعه في أي مكان آخر."
+    },
+    {
+     "id": "sim-changed",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2b-sahiltel",
+      "sender": [
+       {
+        "text": "SahilTel"
+       }
+      ],
+      "time": "23:52",
+      "messages": [
+       [
+        {
+         "text": "تم استلام طلب لاستبدال شريحة SIM الخاصة برقمك."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "إذا لم تطلب شريحة جديدة، فهذه أول علامة على هجوم. اتصل بشركة الاتصالات فورًا."
+    },
+    {
+     "id": "tell-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank-fake",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "10:18",
+      "messages": [
+       [
+        {
+         "text": "بطاقتك محظورة. لإلغاء الحظر، أخبر موظفنا الذي سيتصل بك بالرمز الذي سيصلك."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "البنك لا يطلب منك أبدًا أن تخبر موظفيه بأي رمز. هدف هذه الرسالة سرقة الرمز."
+    },
+    {
+     "id": "night-login",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ulduzbank-app",
+      "app": "UlduzBank Mobil",
+      "title": [
+       {
+        "text": "تسجيل دخول من جهاز جديد"
+       }
+      ],
+      "body": [
+       {
+        "text": "Android، كنجة، 02:14"
+       }
+      ],
+      "time": "02:14"
+     },
+     "verdict": "threat",
+     "explain": "سجل أحدهم الدخول من جهاز آخر أثناء نومك. جمد البطاقة واتصل بالبنك."
+    },
+    {
+     "id": "own-push",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "tesdiqleyici",
+      "app": "Təsdiqləyici",
+      "title": [
+       {
+        "text": "طلب تسجيل دخول: İşPoçt"
+       }
+      ],
+      "body": [
+       {
+        "text": "باكو، 09:01. هل تحاول تسجيل الدخول الآن؟"
+       }
+      ],
+      "time": "09:01"
+     },
+     "verdict": "safe",
+     "explain": "إذا كنت تسجل الدخول الآن، فالطلب عادي. ارفض أي طلب لم تكن تتوقعه."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ss1-choice",
+   "question": {
+    "prompt": "أي وسيلة حماية تظل فعالة إذا انتقل رقمك إلى شخص آخر؟",
+    "options": [
+     {
+      "id": "sms",
+      "label": "رمز يصل في رسالة نصية",
+      "correct": false,
+      "feedback": "عندما ينتقل الرقم إلى المجرم، تنتقل معه رموز الرسائل النصية. هذه حماية ضعيفة للحسابات المهمة."
+     },
+     {
+      "id": "app",
+      "label": "تطبيق المصادقة أو مفتاح المرور",
+      "correct": true,
+      "feedback": "صحيح. فهما مرتبطان بجهازك، لا بشريحة SIM."
+     },
+     {
+      "id": "long-password",
+      "label": "كلمة مرور أطول",
+      "correct": false,
+      "feedback": "كلمة المرور الطويلة جيدة، لكن إذا أمكن إعادة تعيينها برمز يصل في رسالة نصية، فسيدخل المجرم رغم ذلك."
+     }
+    ]
+   },
+   "explain": "في الحسابات المهمة، مثل البنك والبريد الإلكتروني والخدمات الحكومية، اختر تطبيق المصادقة أو مفتاح المرور بدلًا من الرسائل النصية متى أمكنك ذلك."
+  },
+  {
+   "type": "recap",
+   "id": "ss1-recap",
+   "points": [
+    "إذا انقطعت الخدمة عن رقمك فجأة، فاتصل فورًا بشركة الاتصالات من جوال آخر",
+    "ثم اتصل بالبنك وجمد بطاقتك",
+    "استخدم في الحسابات المهمة تطبيق المصادقة أو مفتاح المرور بدلًا من الرسائل النصية"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

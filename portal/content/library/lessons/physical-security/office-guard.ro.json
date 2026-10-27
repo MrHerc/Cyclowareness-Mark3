@@ -1,0 +1,394 @@
+{
+ "id": "office-guard",
+ "title": "Paza biroului",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "no-computer",
+     "say": "Un atacator nu are mereu nevoie de un computer. Uneori îi este suficient un document lăsat pe birou sau un ecran neblocat.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "lock-screen",
+     "say": "Blocați ecranul de fiecare dată când vă ridicați de la birou. Pe un computer cu Windows, apăsați simultan tasta Windows și litera L.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "tailgating",
+     "say": "Dacă un necunoscut încearcă să intre după dumneavoastră pe o ușă cu acces controlat, rugați-l politicos să-și folosească propriul ecuson.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "visitors",
+     "say": "Vizitatorii se înregistrează la recepție, poartă un ecuson de vizitator și sunt însoțiți permanent în clădire.",
+     "mood": "happy",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "tailgate",
+   "title": "Cineva în spatele dumneavoastră",
+   "start": "door",
+   "nodes": [
+    {
+     "id": "door",
+     "text": "Puteți să-mi țineți ușa, vă rog? Am mâinile pline. Ecusonul e în geantă, am venit să repar imprimanta.",
+     "speaker": "Bărbat necunoscut",
+     "voice": "young-man-2",
+     "channel": "in-person",
+     "spoken": "Puteți să-mi țineți ușa, vă rog? Am mâinile pline. <breath> Ecusonul e în geantă, am venit să repar imprimanta.",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     },
+     "choices": [
+      {
+       "label": "Țineți-i ușa, are mâinile pline",
+       "outcome": "compromised",
+       "feedback": "A intrat o persoană neverificată. Atacatorii se bazează exact pe această politețe."
+      },
+      {
+       "label": "Oferiți-vă să-i țineți cutiile, ca să-și găsească ecusonul",
+       "next": "no-badge",
+       "feedback": "Politicos și corect."
+      },
+      {
+       "label": "Lăsați ușa să se închidă și plecați fără un cuvânt",
+       "outcome": "risky",
+       "feedback": "El nu a intrat, dar altcineva îi poate deschide ușa. Mai bine anunțați paza."
+      }
+     ]
+    },
+    {
+     "id": "no-badge",
+     "text": "Se pare că l-am uitat acasă. Mă grăbesc, șeful dumneavoastră mă așteaptă.",
+     "speaker": "Bărbat necunoscut",
+     "voice": "young-man-2",
+     "channel": "in-person",
+     "spoken": "Se pare că, ăă, l-am uitat acasă. Mă grăbesc, șeful dumneavoastră mă așteaptă.",
+     "choices": [
+      {
+       "label": "Bine, intrați",
+       "outcome": "compromised",
+       "feedback": "Numele șefului și graba sunt cel mai vechi truc. Fără ecuson, nu intră nimeni."
+      },
+      {
+       "label": "Însoțiți-l la punctul de pază",
+       "next": "guard",
+       "feedback": "Corect. Acolo i se poate elibera un ecuson de vizitator sau i se poate refuza intrarea."
+      }
+     ]
+    },
+    {
+     "id": "guard",
+     "text": "Pentru azi nu este programată nicio reparație la imprimantă. Bine că l-ați adus aici.",
+     "speaker": "Agent de pază",
+     "voice": "older-man",
+     "channel": "in-person",
+     "manner": "firm",
+     "spoken": "Pentru azi nu este programată nicio reparație la imprimantă. <breath> Bine că l-ați adus aici.",
+     "character": "guard",
+     "choices": [
+      {
+       "label": "Trimiteți și un scurt mesaj echipei de securitate",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Vor verifica înregistrările camerelor și celelalte intrări."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "reception-call",
+   "environment": "call",
+   "title": "Apel de la recepție",
+   "intro": "Vă sună recepția. Decideți ce faceți cu un vizitator pe care nu îl așteptați.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Recepție"
+       }
+      ],
+      "number": [
+       {
+        "text": "Interior 115"
+       }
+      ],
+      "label": "Telefon de serviciu",
+      "voice": "woman-2"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Răspundeți",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Răspundeți. Dumneavoastră decideți ce se întâmplă cu vizitatorul."
+      },
+      {
+       "id": "decline",
+       "label": "Respingeți",
+       "kind": "decline",
+       "outcome": "risky",
+       "feedback": "Recepția nu primește niciun răspuns și poate lăsa vizitatorul să treacă neverificat. Răspundeți la astfel de apeluri.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "visitor",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Recepție"
+       }
+      ],
+      "number": [
+       {
+        "text": "Interior 115"
+       }
+      ],
+      "label": "Telefon de serviciu",
+      "voice": "woman-2"
+     },
+     "say": "Bună ziua, aici e un tehnician pentru aer condiționat. Spune că dumneavoastră, mă scuzați, l-ați chemat. Să-l trimit sus?",
+     "spoken": "Bună ziua, <breath> aici e un, ăă, tehnician pentru aer condiționat. Spune că dumneavoastră <cough> mă scuzați, l-ați chemat. Să-l trimit sus?",
+     "actions": [
+      {
+       "id": "send-up",
+       "label": "Da, trimiteți-l sus",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "O persoană neverificată va umbla singură prin clădire. Verificați mai întâi comanda de intervenție."
+      },
+      {
+       "id": "hold",
+       "label": "Nu am chemat pe nimeni, țineți-l la recepție",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Un vizitator neașteptat nu intră fără verificare."
+      },
+      {
+       "id": "come-down",
+       "label": "Cobor eu să văd",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bine. Întâmpinați vizitatorul la recepție și nu-l lăsați singur."
+      }
+     ]
+    },
+    {
+     "id": "name-drop",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Recepție"
+       }
+      ],
+      "number": [
+       {
+        "text": "Interior 115"
+       }
+      ],
+      "label": "Telefon de serviciu",
+      "voice": "woman-2"
+     },
+     "say": "Spune că domnul Kamran a aprobat. Are nevoie doar de cinci minute în camera serverelor.",
+     "spoken": "Spune că <breath> domnul Kamran a aprobat. Are nevoie doar de cinci minute în camera serverelor.",
+     "actions": [
+      {
+       "id": "let-in",
+       "label": "Atunci lăsați-l să intre",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Accesul neverificat în camera serverelor este o amenințare serioasă. Numele unui manager nu ține loc de aprobare."
+      },
+      {
+       "id": "check-order",
+       "label": "Verific comanda la serviciul administrativ",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Verificați comanda pe canalele oficiale, nu pe baza spuselor vizitatorului."
+      },
+      {
+       "id": "call-boss",
+       "label": "Îl sun eu pe domnul Kamran",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bine. Sunați-l pe manager la numărul pe care îl aveți deja și întrebați-l direct.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Apelul s-a încheiat. Serviciul administrativ spune că azi nu era programat niciun tehnician.",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Recepție"
+       }
+      ],
+      "number": [
+       {
+        "text": "Interior 115"
+       }
+      ],
+      "label": "Telefon de serviciu",
+      "voice": "woman-2"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Anunțați paza și echipa de securitate",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Agenții de pază vor opri persoana, iar înregistrările camerelor vor fi verificate."
+      },
+      {
+       "id": "ignore",
+       "label": "Nu faceți nimic",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Falsul tehnician poate încerca să intre pe altă intrare. Raportarea protejează clădirea."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "clean-desk",
+   "question": {
+    "prompt": "Plecați la prânz. Ce nu trebuie să rămână pe birou?",
+    "options": [
+     {
+      "id": "sticky-note",
+      "label": "Un post-it cu o parolă",
+      "correct": true,
+      "feedback": "O parolă nu trebuie să stea niciodată pe hârtie, la vedere."
+     },
+     {
+      "id": "citizen-file",
+      "label": "Un dosar cu cererea unui cetățean",
+      "correct": true,
+      "feedback": "Puneți dosarele confidențiale într-un dulap încuiat."
+     },
+     {
+      "id": "phone",
+      "label": "Un telefon de serviciu deblocat",
+      "correct": true,
+      "feedback": "Un telefon deblocat deschide drumul spre conturile dumneavoastră."
+     },
+     {
+      "id": "cup",
+      "label": "O ceașcă de cafea goală",
+      "correct": false,
+      "feedback": "Nu este un risc. Doar strângeți-o."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "desk"
+    }
+   },
+   "explain": "Regula biroului curat: când plecați, documentele, suporturile de stocare și dispozitivele sunt puse sub cheie."
+  },
+  {
+   "type": "match",
+   "id": "situations",
+   "prompt": "Asociați fiecare situație cu reacția potrivită.",
+   "pairs": [
+    {
+     "id": "stranger",
+     "left": "Un necunoscut fără ecuson pe coridor",
+     "right": "Întrebați-l politicos și însoțiți-l la pază"
+    },
+    {
+     "id": "printer",
+     "left": "Documentul confidențial imprimat de altcineva",
+     "right": "Dați-l înapoi proprietarului, fără să-l citiți"
+    },
+    {
+     "id": "lost-badge",
+     "left": "V-ați pierdut ecusonul de acces",
+     "right": "Raportați imediat, ca să fie blocat"
+    },
+    {
+     "id": "open-screen",
+     "left": "Un coleg și-a lăsat ecranul deblocat",
+     "right": "Blocați-l și amintiți-i de regulă"
+    }
+   ],
+   "explain": "Securitatea fizică este treaba tuturor. Un pas mic previne o scurgere mare de date."
+  },
+  {
+   "type": "order",
+   "id": "visitor-flow",
+   "prompt": "Puneți în ordine pașii de la sosirea unui vizitator.",
+   "items": [
+    {
+     "id": "sign-in",
+     "label": "Vizitatorul se înregistrează la recepție"
+    },
+    {
+     "id": "badge",
+     "label": "Primește un ecuson de vizitator și îl poartă la vedere"
+    },
+    {
+     "id": "escort",
+     "label": "Persoana care l-a invitat îl întâmpină și îl însoțește"
+    },
+    {
+     "id": "return",
+     "label": "La plecare, ecusonul este returnat"
+    }
+   ],
+   "explain": "Un vizitator nu este lăsat niciodată singur în clădire și predă ecusonul la plecare."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Blocați ecranul când vă ridicați de la birou și țineți documentele sub cheie.",
+    "Nu lăsați necunoscuții să intre după dumneavoastră; trimiteți-i la pază.",
+    "Luați imediat paginile de la imprimantă și distrugeți corect documentele confidențiale pe hârtie."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

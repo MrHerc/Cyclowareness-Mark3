@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import path from "node:path";
 import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
@@ -7,6 +8,10 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import * as t from "../src/server/db/schema";
 import type { DB } from "../src/server/db/client";
 import { departmentKey } from "../src/lib/departments";
+import { toCsv } from "../src/lib/csv";
+import { LOCALES } from "../src/i18n/config";
+import { ASSIGNABLE_ROLES } from "../src/server/auth/permissions";
+import type { Role } from "../src/server/db/schema";
 
 // Only the import's own database writes are under test here.
 vi.mock("next/cache", () => ({ refresh: vi.fn() }));
@@ -107,6 +112,31 @@ describe("CSV import department conflicts", () => {
     expect(await importPeopleAction(csv, false)).toEqual({ ok: false, rows: 2, problems: [{ line: 2, problem: "departmentAmbiguous" }], newDepartments: [] });
     expect(await importPeopleAction(csv, true)).toMatchObject({ ok: false, problems: [{ line: 2, problem: "departmentAmbiguous" }] });
     expect(await usersByEmail(["elvin@acme.test", "gunel@acme.test"])).toEqual([]);
+  });
+});
+
+describe("CSV import roles", () => {
+  it("refuses role words that only exist on every object, and accepts the listed ones", async () => {
+    const csv = ["name,email,role", "Orxan Mammadov,orxan@acme.test,constructor", "Samir Aliyev,samir@acme.test,__proto__", "Lala Guliyeva,lala@acme.test,admin"].join("\n");
+    expect(await importPeopleAction(csv, false)).toMatchObject({
+      ok: false,
+      problems: [
+        { line: 2, problem: "role" },
+        { line: 3, problem: "role" },
+      ],
+    });
+  });
+
+  it("imports the role names the people export writes in every interface language", async () => {
+    const people = LOCALES.flatMap((l) => {
+      const names = (JSON.parse(fs.readFileSync(path.join(__dirname, "..", "messages", l, "common.json"), "utf8")) as { roles: Record<Role, string> }).roles;
+      return ASSIGNABLE_ROLES.map((role) => ({ email: `${l}.${role}@acme.test`, role, written: names[role] }));
+    });
+    const csv = toCsv(["name", "email", "role"], people.map((p) => [`Person ${p.email}`, p.email, p.written]));
+    expect(await importPeopleAction(csv, true)).toMatchObject({ ok: true, problems: [], imported: people.length });
+    const users = await db.select({ email: t.users.email, role: t.users.role }).from(t.users).where(eq(t.users.tenantId, tenantId));
+    const roleOf = new Map(users.map((u) => [u.email, u.role]));
+    for (const p of people) expect(roleOf.get(p.email), `${p.email} (${p.written})`).toBe(p.role);
   });
 });
 

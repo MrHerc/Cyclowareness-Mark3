@@ -1,0 +1,401 @@
+{
+  "id": "camera-panel",
+  "title": "Kamera paneli",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "sc1-tutor",
+      "beats": [
+        {
+          "id": "sc1-b1",
+          "say": "Merhaba! Kameralar evde de işte de çok işe yarar. Ama parolası hiç değiştirilmediyse bir yabancı da izleyebilir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "sc1-b2",
+          "say": "Yeni kameraların çoğu varsayılan bir parolayla gelir. Bu parolaların listeleri internette herkese açıktır.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2f-baxiskam",
+              "tone": "system",
+              "title": [
+                {
+                  "text": "BaxışKam: ilk giriş"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Kullanıcı adı: admin"
+                  }
+                ],
+                [
+                  {
+                    "text": "Parola: admin",
+                    "spot": "default-pass"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Giriş yap"
+              ]
+            }
+          },
+          "highlight": "default-pass"
+        },
+        {
+          "id": "sc1-b3",
+          "say": "2025 yılında Azerbaycan'da ev ve ofis kameralarına yetkisiz erişim tespit edildi. Görüntüler yabancı sitelere yüklenmişti.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "stat",
+            "value": "2025",
+            "label": "Ev ve ofis kameralarına yetkisiz erişim tespit edildi"
+          }
+        },
+        {
+          "id": "sc1-b4",
+          "say": "Üç adım yeterli: parolayı değiştirin, cihaz yazılımını güncelleyin ve internete açık erişimi kapatın.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "password",
+      "id": "sc1-password",
+      "prompt": "Kamera paneli için yeni bir parola oluşturun.",
+      "targetScore": 4,
+      "tips": [
+        "Buraya gerçek parolanızı yazmayın, bu bir alıştırma.",
+        "Rastgele dört kelimeden oluşan bir parola cümlesi seçin.",
+        "Wi-Fi veya e-posta parolanızı tekrar kullanmayın.",
+        "Parolayı bir parola yöneticisinde saklayın."
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "sc1-sim",
+      "environment": "browser",
+      "title": "Kamera kurulumu",
+      "intro": "Yeni bir kamera kuruyorsunuz. Paneldeki her pencereye bakın ve doğru düğmeyi seçin.",
+      "steps": [
+        {
+          "id": "first-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2f-baxiskam",
+            "brand": "BaxışKam",
+            "url": [
+              {
+                "text": "http://192.168.1.64/login"
+              }
+            ],
+            "fields": [
+              "Kullanıcı adı",
+              "Parola"
+            ],
+            "button": "Giriş yap"
+          },
+          "say": "Kamera paneline ilk kez giriş yapıyorsunuz.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Giriş yap",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Doğru, bu kameranın ev ağınızdaki kendi adresi. İlk girişten hemen sonra parolayı değiştirin."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "risky",
+              "feedback": "Giriş yapmadan varsayılan parolayı değiştiremezsiniz. Kamera herkese açık kalır."
+            }
+          ]
+        },
+        {
+          "id": "change-default",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2f-baxiskam",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Varsayılan parola kullanılıyor"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Güvenliğiniz için parolayı şimdi değiştirin."
+                }
+              ]
+            ],
+            "buttons": [
+              "Parolayı değiştir",
+              "Daha sonra hatırlat"
+            ]
+          },
+          "actions": [
+            {
+              "id": "change",
+              "label": "Parolayı değiştir",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Çok iyi. Varsayılan parolayı değiştirmek, bir kamera için atılacak en önemli adımdır."
+            },
+            {
+              "id": "later",
+              "label": "Daha sonra hatırlat",
+              "kind": "later",
+              "outcome": "compromised",
+              "feedback": "Varsayılan parolayla içeri girmek hiçbir beceri gerektirmez. Otomatik araçlar bu tür kameraları sürekli arar."
+            }
+          ]
+        },
+        {
+          "id": "firmware",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2f-baxiskam",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Yeni cihaz yazılımı: 5.2.8"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Güvenlik açıkları giderildi. Güncelleme yaklaşık üç dakika sürer."
+                }
+              ]
+            ],
+            "buttons": [
+              "Güncelle",
+              "Sonra"
+            ]
+          },
+          "actions": [
+            {
+              "id": "update",
+              "label": "Güncelle",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Doğru. Saldırganlar eski cihaz yazılımlarındaki güvenlik açıklarını çok iyi bilir."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Güncelleme yapılmazsa bilinen güvenlik açıkları kapanmaz. Bugün güncelleyin."
+            }
+          ]
+        },
+        {
+          "id": "remote-access",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2f-baxiskam",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Uzaktan erişim"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Kamerayı doğrudan internetten izlemek için UPnP ve port yönlendirme açılsın mı?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Açık kalsın",
+              "Kapat"
+            ]
+          },
+          "say": "Şimdi kamera, internetten doğrudan erişim öneriyor.",
+          "actions": [
+            {
+              "id": "open-port",
+              "label": "Açık kalsın",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "Açık bir port, kamerayı bütün internete görünür kılar. Saldırganlar bu tür açık cihazları özel arama araçlarıyla kolayca bulur."
+            },
+            {
+              "id": "off",
+              "label": "Kapat",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Doğru. Uzaktan izlemeniz gerekiyorsa port açmak yerine üreticinin resmî uygulamasını kullanın."
+            }
+          ]
+        },
+        {
+          "id": "public-link",
+          "label": "Canlı yayın için herkese açık bir bağlantı oluşturulsun mu? Bağlantıya sahip olan herkes izleyebilecek.",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2f-baxiskam",
+            "url": [
+              {
+                "text": "http://192.168.1.64/paylas"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "share",
+              "label": "Bağlantı oluştur",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Bağlantı yayıldıktan sonra kimlerin izlediğini asla bilemezsiniz. Aile üyelerinizi uygulamaya kendi hesaplarıyla ekleyin."
+            },
+            {
+              "id": "private",
+              "label": "Herkese açık bağlantı oluşturma",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Doğru. Görüntüyü yalnızca kendi hesaplarıyla giriş yapmış yakınlarınız görmeli."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "sc1-hotspot",
+      "prompt": "Video kaydedicinin durum penceresindeki riskli ayarları bulun.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2f-baxiskam",
+        "tone": "system",
+        "title": [
+          {
+            "text": "Bölge ofisi girişi: video kaydedici"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Model: BX-DVR 8"
+            }
+          ],
+          [
+            {
+              "text": "Kullanıcı: admin, parola: varsayılan",
+              "spot": "default"
+            }
+          ],
+          [
+            {
+              "text": "Cihaz yazılımı: 2019, güncelleme yok",
+              "spot": "old-firmware"
+            }
+          ],
+          [
+            {
+              "text": "Port yönlendirme: açık, 8000",
+              "spot": "open-port"
+            }
+          ],
+          [
+            {
+              "text": "Kamera 3: İK odası, bilgisayar ekranlarına dönük",
+              "spot": "screens"
+            }
+          ],
+          [
+            {
+              "text": "Tarih ve saat: doğru"
+            }
+          ]
+        ],
+        "buttons": [
+          "Kapat"
+        ]
+      },
+      "spots": [
+        {
+          "id": "default",
+          "label": "Varsayılan parola",
+          "explain": "Saldırganlar varsayılan parolaları hazır listelerden alır. İlk iş bu parolayı değiştirmektir."
+        },
+        {
+          "id": "old-firmware",
+          "label": "Eski cihaz yazılımı",
+          "explain": "Yedi yıldır güncellenmeyen bir cihazda bilinen güvenlik açıkları vardır. Güncelleme çıkmıyorsa cihaz değiştirilmelidir."
+        },
+        {
+          "id": "open-port",
+          "label": "Açık port",
+          "explain": "Açık port, kaydediciyi bütün internete gösterir. Gerekli değilse kapatın."
+        },
+        {
+          "id": "screens",
+          "label": "Ekranlara dönük kamera",
+          "explain": "Bu kamera iş ekranlarını ve belgeleri çekiyor. Görüntüler çalınırsa gizli veriler de onlarla birlikte gider."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "sc1-choice",
+      "question": {
+        "prompt": "Bir iş arkadaşınız evden getirdiği Wi-Fi kamerayı iş yerindeki ağa bağlamak istiyor. Ne dersiniz?",
+        "options": [
+          {
+            "id": "it-approved",
+            "label": "Cihazı BT destek ekibi onaylamalı ve bağlamalı",
+            "correct": true,
+            "feedback": "Doğru. İş ağına yalnızca onaylı cihazlar bağlanır."
+          },
+          {
+            "id": "password-enough",
+            "label": "Parolasını değiştirirse sorun yok",
+            "correct": false,
+            "feedback": "Parola önemli, ama kontrol edilmemiş bir cihaz iş ağına bir kapı açabilir. Kararı BT destek ekibi verir."
+          },
+          {
+            "id": "guest-quiet",
+            "label": "Misafir Wi-Fi ağına bağlasın, kimse fark etmez",
+            "correct": false,
+            "feedback": "Kimseye haber vermeden bağlanan bir cihaz ofis için risktir. Her kamera BT destek ekibinin onayından geçer."
+          }
+        ]
+      },
+      "explain": "İş yerinde kameraları ve akıllı cihazları yalnızca BT destek ekibi bağlar. Unutulan bir cihaz yıllarca güncellenmeden kalır."
+    },
+    {
+      "type": "recap",
+      "id": "sc1-recap",
+      "points": [
+        "Varsayılan parolayı ilk gün değiştirin.",
+        "Cihaz yazılımını güncelleyin, açık portları kapatın.",
+        "İş yerinde yalnızca onaylı cihazlar kullanın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { db } from "@/server/db";
-import { allowed, requirePermission } from "@/server/auth/viewer";
+import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
 import { buildReport, parseReportFilters } from "@/server/reports/build";
 import { audit } from "@/server/services/audit";
 import { REPORT_KINDS, type ReportKind } from "@/server/db/schema";
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps<"/print/report/[kin
 export default async function PrintReport({ params, searchParams }: PageProps<"/print/report/[kind]">) {
   const [{ kind }, sp] = await Promise.all([params, searchParams]);
   const v = await requirePermission("reports.read");
-  if (!(REPORT_KINDS as readonly string[]).includes(kind) || (kind === "secops" && !allowed(v, "secops.read"))) notFound();
+  if (!hasFeature(v, "reports") || !(REPORT_KINDS as readonly string[]).includes(kind) || (kind === "secops" && !allowed(v, "secops.read"))) notFound();
   const locale = await getLocale();
   const [tr, format] = await Promise.all([getTranslations("admin.reports"), getFormatter()]);
   const str = (k: string) => (typeof sp[k] === "string" ? (sp[k] as string) : undefined);

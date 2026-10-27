@@ -1,0 +1,419 @@
+{
+  "id": "autofill-right-site",
+  "title": "Otomatik doldurma çalışmadığında",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Parola yöneticisi sahte bir siteyi sizden daha iyi fark eder, çünkü adresi harf harf kontrol eder.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Adres birazcık bile farklıysa parola yöneticisi hiçbir parola önermez. İşte bu, sizin için bir uyarı işaretidir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "idare-fake",
+              "url": [
+                {
+                  "text": "https://portal."
+                },
+                {
+                  "text": "idare-giris.example.net",
+                  "spot": "lookalike"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "lookalike"
+        },
+        {
+          "id": "b3",
+          "say": "Parolayı kasadan kopyalayıp kendiniz yapıştırmayın. Önce adresi kontrol edin.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Beklemediğiniz her onay isteğini reddedin. Böyle bir istek, birinin parolanızı bildiği anlamına gelir.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "autofill-check",
+      "environment": "browser",
+      "title": "Otomatik doldurmayı sınayın",
+      "intro": "ParolSeyf tarayıcınızda çalışıyor. Her sayfada ne önerdiğine dikkat edin ve adresi kontrol edin.",
+      "steps": [
+        {
+          "id": "real-portal",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "idare",
+            "brand": "Ofis portalı",
+            "url": [
+              {
+                "text": "https://portal.idare.example/giris",
+                "reveal": "idare.example"
+              }
+            ],
+            "fields": [
+              "Kullanıcı adı",
+              "Parola"
+            ],
+            "button": "Giriş yap"
+          },
+          "say": "ParolSeyf giriş bilgilerinizi öneriyor. Adresi kontrol edin.",
+          "actions": [
+            {
+              "id": "fill",
+              "label": "ParolSeyf ile doldur",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Doğru. Adres kayıtlı giriş bilgileriyle eşleşiyor; parola yöneticisi de bu yüzden önerdi."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Dikkatli olmak iyidir, ama bu gerçek ofis portalı ve parola yöneticisi onu tanıdı."
+            }
+          ]
+        },
+        {
+          "id": "lookalike",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "idare-fake",
+            "brand": "Ofis portalı",
+            "url": [
+              {
+                "text": "https://portal.idare-giris.example.net/giris",
+                "reveal": "idare-giris.example.net"
+              }
+            ],
+            "fields": [
+              "Kullanıcı adı",
+              "Parola"
+            ],
+            "button": "Giriş yap"
+          },
+          "say": "Bu sayfaya bir e-postadaki bağlantıyla geldiniz. ParolSeyf hiçbir şey önermiyor.",
+          "actions": [
+            {
+              "id": "type",
+              "label": "Parolayı elle yaz",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Parola yöneticisi sessiz kaldı, çünkü bu sahte bir site. Parolanızı hemen gerçek portalda değiştirin ve durumu bildirin.",
+              "next": "fake-vault"
+            },
+            {
+              "id": "search",
+              "label": "ParolSeyf'te bul ve doldur",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "Parola yöneticisi bu siteyi tanımıyor ve bunun bir sebebi var. Devam etmeden önce adresi okuyun."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Alan adı idare-giris.example.net idi, ofis portalınınki değil.",
+              "next": "fake-vault"
+            },
+            {
+              "id": "report",
+              "label": "Siteyi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Harika. Bildiriminiz iş arkadaşlarınızı aynı bağlantıdan korur.",
+              "next": "fake-vault"
+            }
+          ]
+        },
+        {
+          "id": "mismatch",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "system",
+            "title": [
+              {
+                "text": "ParolSeyf: site eşleşmiyor"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Kayıtlı adres: portal.idare.example"
+                }
+              ],
+              [
+                {
+                  "text": "Bu sayfa: portal.idare-giris.example.net"
+                }
+              ]
+            ],
+            "buttons": [
+              "İptal",
+              "Yine de doldur"
+            ]
+          },
+          "actions": [
+            {
+              "id": "cancel",
+              "label": "İptal",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru, farkı sizin yerinize parola yöneticisi yakaladı. Sayfayı kapatın ve bildirin."
+            },
+            {
+              "id": "fill",
+              "label": "Yine de doldur",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Uyarıyı yok sayarak parolanızı sahte bir siteye teslim ettiniz. Parolayı hemen değiştirin ve durumu bildirin."
+            }
+          ]
+        },
+        {
+          "id": "fake-vault",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "parolseyf-fake",
+            "brand": "ParolSeyf",
+            "url": [
+              {
+                "text": "https://parolseyf-giris.example.net/seyf",
+                "reveal": "parolseyf-giris.example.net"
+              }
+            ],
+            "fields": [
+              "E-posta",
+              "Ana parola"
+            ],
+            "button": "Kasayı aç"
+          },
+          "say": "Bir e-postadaki bağlantı sizi bir kasa giriş sayfasına götürüyor.",
+          "actions": [
+            {
+              "id": "type",
+              "label": "Kasayı aç",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Ana parolayı yalnızca ParolSeyf uygulamasının kendisine yazın. Bu site kasanızın tamamını ele geçirmek istiyordu."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Kasayı asla bir bağlantı üzerinden açmayın; uygulamayı kendiniz başlatın."
+            },
+            {
+              "id": "report",
+              "label": "Siteyi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Harika. Bu site birkaç kişiye birden gönderilmiş olabilir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "vault-lure",
+      "prompt": "Bu e-postanın sahte olduğunu gösteren işaretlere dokunun.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "parolseyf-fake",
+        "from": {
+          "name": [
+            {
+              "text": "ParolSeyf"
+            }
+          ],
+          "address": [
+            {
+              "text": "security@parolseyf-alert.example.net",
+              "spot": "sender"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Kasanız 24 saat içinde silinecektir",
+            "spot": "deadline"
+          }
+        ],
+        "time": "07:58",
+        "body": [
+          [
+            {
+              "text": "Güvenlik güncellemesi kapsamında lütfen "
+            },
+            {
+              "text": "ana parolanızı doğrulayınız",
+              "spot": "ask-master"
+            },
+            {
+              "text": "."
+            }
+          ],
+          [
+            {
+              "text": "Doğrulamak için: "
+            },
+            {
+              "text": "parolseyf-alert.example.net/tesdiq",
+              "spot": "link",
+              "link": {
+                "label": "parolseyf-alert.example.net/tesdiq",
+                "href": "https://parolseyf-alert.example.net/tesdiq"
+              }
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender",
+          "label": "Gönderen",
+          "explain": "Bu adres ParolSeyf'in alan adı değil, ona benzetilmiş bir taklit."
+        },
+        {
+          "id": "deadline",
+          "label": "Son tarih",
+          "explain": "24 saatlik tehdit, düşünmenizi engellemek için orada."
+        },
+        {
+          "id": "ask-master",
+          "label": "Ana parola isteği",
+          "explain": "Hiçbir hizmet sizden ana parolanızı e-postayla doğrulamanızı istemez."
+        },
+        {
+          "id": "link",
+          "label": "Bağlantı",
+          "explain": "Bağlantı sahte bir alan adına gidiyor. Kasayı uygulamadan kendiniz açın."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "unexpected-push",
+      "question": {
+        "prompt": "Gece ParolSeyf sizden bir girişi onaylamanızı istiyor, ama siz giriş yapmıyorsunuz. Ne yaparsınız?",
+        "options": [
+          {
+            "id": "deny",
+            "label": "Reddeder ve güvenlik ekibine bildiririm",
+            "correct": true,
+            "feedback": "Doğru. Birisi ana parolanızı biliyor: ana parolanızı hemen değiştirin ve güvenlik ekibinin oturumları kontrol etmesini sağlayın."
+          },
+          {
+            "id": "approve",
+            "label": "İstekler kesilsin diye onaylarım",
+            "correct": false,
+            "feedback": "Bu, onay isteği bombardımanıdır (push bombing). Tek bir onay, saldırganı kasanıza sokar."
+          },
+          {
+            "id": "ignore",
+            "label": "Görmezden gelir, sabah bakarım",
+            "correct": false,
+            "feedback": "İstek açık kalır ve birisinin elinde zaten ana parolanız var. Hemen reddedin ve bildirin."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "parolseyf",
+            "app": "ParolSeyf",
+            "title": [
+              {
+                "text": "Giriş onaylansın mı?"
+              }
+            ],
+            "body": [
+              {
+                "text": "Yeni cihaz: Windows, 23:47"
+              }
+            ],
+            "time": "23:47"
+          }
+        }
+      },
+      "explain": "Beklenmedik bir onay isteği, parolanızın sızdığını gösterir. Reddedin, bildirin, değiştirin."
+    },
+    {
+      "type": "match",
+      "id": "autofill-rules",
+      "prompt": "Her durumu doğru adımla eşleştirin.",
+      "pairs": [
+        {
+          "id": "silent",
+          "left": "Parola yöneticisi hiçbir parola önermiyor",
+          "right": "Adresi kontrol edin, parolayı kopyalamayın"
+        },
+        {
+          "id": "link",
+          "left": "E-postadaki bir bağlantı kasayı açmanızı istiyor",
+          "right": "Uygulamayı kendiniz açın"
+        },
+        {
+          "id": "shared-pc",
+          "left": "Başkasının bilgisayarındasınız",
+          "right": "Kasanızı orada açmayın"
+        },
+        {
+          "id": "push",
+          "left": "Beklemediğiniz bir onay isteği",
+          "right": "Reddedin ve bildirin"
+        }
+      ],
+      "explain": "Adresi parola yöneticisi kontrol eder; o sessiz kaldığı anda siz durursunuz."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Parola yöneticisi hiçbir parola önermiyorsa durun ve adresi kontrol edin.",
+        "Ana parolayı yalnızca parola yöneticisinin kendi uygulamasına yazın, bağlantı üzerinden asla yazmayın.",
+        "Beklemediğiniz onay isteklerini reddedin ve bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

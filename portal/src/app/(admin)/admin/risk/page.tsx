@@ -97,7 +97,7 @@ export default async function RiskProfilesPage({ searchParams }: PageProps<"/adm
       <Notice tone="info">{tr("explain")}</Notice>
       <div className="flex flex-wrap items-center gap-3">
         <TabsNav items={BANDS.map((b) => ({ href: `?band=${b}${dept ? `&d=${dept}` : ""}`, label: tr(`bands.${b}`), active: band === b, count: b === "all" ? rows.length : counts[b] }))} />
-        <form className="ml-auto">
+        <form className="ms-auto">
           <input type="hidden" name="band" value={band} />
           <select name="d" defaultValue={dept} aria-label={tc("department")} className="h-10 rounded-pill border border-line-control bg-surface px-4 text-caption font-semibold">
             <option value="">{tc("allDepartments")}</option>
@@ -107,7 +107,7 @@ export default async function RiskProfilesPage({ searchParams }: PageProps<"/adm
               </option>
             ))}
           </select>
-          <button type="submit" className="ml-2 h-10 rounded-pill bg-ink px-4 text-caption font-semibold text-white">
+          <button type="submit" className="ms-2 h-10 rounded-pill bg-ink px-4 text-caption font-semibold text-white">
             {tc("apply")}
           </button>
         </form>
@@ -115,13 +115,13 @@ export default async function RiskProfilesPage({ searchParams }: PageProps<"/adm
       {list.length ? (
         <Card>
           <ScrollRegion label={tn("risk")}>
-            <table className="w-full min-w-[48rem] text-left text-caption">
+            <table className="w-full min-w-[48rem] text-start text-caption">
               <thead className="text-tab text-ink-subtle">
                 <tr className="border-b border-line">
                   <th className="px-5 py-3 font-semibold">{tr("person")}</th>
                   <th className="px-3 py-3 font-semibold">{tr("score")}</th>
                   <th className="px-3 py-3 font-semibold">{tr("why")}</th>
-                  <th className="px-5 py-3 text-right font-semibold">{tr("openRisks")}</th>
+                  <th className="px-5 py-3 text-end font-semibold">{tr("openRisks")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-line">
@@ -153,7 +153,7 @@ export default async function RiskProfilesPage({ searchParams }: PageProps<"/adm
                             .join(" · ")}
                         </p>
                       </td>
-                      <td className="px-5 py-3 text-right font-semibold tabular-nums">{openBy.get(r.id) ?? 0}</td>
+                      <td className="px-5 py-3 text-end font-semibold tabular-nums">{openBy.get(r.id) ?? 0}</td>
                     </tr>
                   );
                 })}

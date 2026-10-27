@@ -324,7 +324,8 @@ catalog and the tutor API). Publishing audits `module.published`. Deleting is re
 
 - `aiEnabled()` = `!!env.ANTHROPIC_API_KEY`; model `env.ANTHROPIC_MODEL` (default
   `"claude-opus-5-5"`, `src/server/env.ts`; OPEN-QUESTIONS item 1 mentions
-  `claude-haiku-5-5` as the cheaper option).
+  `claude-haiku-5-5` as the cheaper option). The tutor does not use it: it has its own
+  `ANTHROPIC_TUTOR_MODEL` (default `"claude-haiku-5-5"`, lesson-engine.md, Model).
 - `draftLesson(topic, locale)` calls `client.messages.create` with the tool `save_lesson_draft`
   (`tool_choice: { type: "auto" }`: a forced tool is rejected while thinking is on, so the system
   prompt asks for the tool and no `tool_use` block means no draft), `max_tokens: 4000`, a system prompt

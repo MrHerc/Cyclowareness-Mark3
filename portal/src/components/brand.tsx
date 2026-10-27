@@ -42,7 +42,7 @@ export function TenantMark({ name, logoUrl, className }: { name: string; logoUrl
     <span className={cn("flex min-w-0 items-center gap-2.5", className)}>
       {logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={logoUrl} alt="" className="h-8 w-auto min-w-8 max-w-32 shrink object-contain object-left sm:h-10 sm:max-w-64" />
+        <img src={logoUrl} alt="" className="h-8 w-auto min-w-8 max-w-32 shrink object-contain object-left rtl:object-right sm:h-10 sm:max-w-64" />
       ) : (
         <span aria-hidden className="grid size-8 shrink-0 place-items-center rounded-sm bg-brand-600 text-tab font-bold text-brand-on">
           {name.slice(0, 1)}

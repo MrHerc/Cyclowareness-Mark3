@@ -39,7 +39,7 @@ Hər qərar qısa: kontekst → qərar → nəticə. Dəyişdirmək lazım olsa,
 
 ## ADR-008 · Sİ: Claude API, PII göndərilmir, insan təsdiqi
 **Kontekst.** Dərs içində müəllim və studiyada dərs qaralaması lazımdır; şəxsi məlumat modelə getməməlidir.
-**Qərar.** `@anthropic-ai/sdk`, model `ANTHROPIC_MODEL` (default `claude-opus-5-5`). Müəllimə yalnız dərs konteksti gedir, cavablar keşlənir, açar yoxdursa dərs mətnindən cavab. Studiya qaralaması `tool_use` ilə strukturlu gəlir, zod ilə yoxlanır və həmişə qaralama kimi saxlanır; Sİ materialı təsdiq mərhələsindən keçmədən əməkdaşa çatmır.
+**Qərar.** `@anthropic-ai/sdk`. Studiya qaralaması üçün model `ANTHROPIC_MODEL` (default `claude-opus-5-5`), müəllim üçün ayrıca `ANTHROPIC_TUTOR_MODEL` (default `claude-haiku-5-5`, düşünmə söndürülüb, `max_tokens` 1024, sistem promptu və dərs konteksti prompt keşindədir). Müəllimə yalnız dərs konteksti gedir, cavablar keşlənir (yalnız model cavabı normal bitirəndə, `end_turn`), açar yoxdursa dərs mətnindən cavab. Studiya qaralaması `tool_use` ilə strukturlu gəlir, zod ilə yoxlanır və həmişə qaralama kimi saxlanır; Sİ materialı təsdiq mərhələsindən keçmədən əməkdaşa çatmır.
 **Nəticə.** Açar yoxdursa hər şey işləyir; model dəyişmək bir env dəyişənidir.
 
 ## ADR-009 · Sandbox statik analizdir
@@ -125,3 +125,16 @@ Hər qərar qısa: kontekst → qərar → nəticə. Dəyişdirmək lazım olsa,
 11. Chromium-da Azərbaycan rəqəmlərinin qruplaşdırması üçün FormatJS polyfill-i (`@formatjs/intl-numberformat`) işlənir (`src/i18n/az-numbers.ts`, `AzNumbersGate`). O, yalnız az səhifəsində və yalnız brauzer az formatını səhv göstərəndə yüklənir. Server və en/ru səhifələri ona toxunmur. Bu qərar ADR-017-nin davamıdır.
 12. Standart istinadlarında «Art.» az dilində «maddə», ru dilində «ст.» kimi göstərilir (`src/lib/standards.ts`). Verilənlər bir dəfə saxlanılır.
 **Nəticə.** Demo verilənlərində əl ilə yazılmış adlar (insident, şöbə və kampaniya adları) yalnız azərbaycancadır, çünki real təşkilatlar bunları özləri yazır. Hüquqi mətnlər (Şərtlər, Məxfilik) hələ yalnız AZ dilindədir (OPEN-QUESTIONS 8).
+
+## ADR-025 · Portal 10 dildə, ərəb dili sağdan sola
+**Kontekst.** Portal Səudiyyə Ərəbistanında da satılacaq, tətbiq isə yalnız AZ/EN/RU dillərində idi (OPEN-QUESTIONS 7). Öyrənən və ya admin istənilən dili seçəndə hər şey ona uyğunlaşmalıdır: istiqamət, şrift, rəqəm, tarix, e-poçt, sertifikat, Sİ müəllimi və səsləndirmə.
+**Qərar.**
+1. `LOCALES` = az en ru tr ro ka uk de fr ar (`src/i18n/config.ts`), `SITE_LOCALES` eyni siyahıdır. İtalyan dili (`it`) hər yerdən, ictimai saytdan da çıxarılıb. `tr` və `uk` artıq öz dilləridir, `be/kk/ky/uz` ru dilinə keçir (ADR-024 bənd 1-i əvəz edir). Yeni təşkilatlarda və demo seed-də 10 dil açıqdır.
+2. Formatlama `ar` kodu ilədir: Qərb rəqəmləri 0-9 və Qriqorian təqvimi. `ar-SA` yalnız nitq teqidir (səsləndirmə və nitq tanıma).
+3. İstiqamət: `dirOf` yalnız `ar` üçün `rtl` qaytarır. Məzmun dili səhifənin dilindən fərqli ola bilən elementlər `langAttrs` (`lang` və `dir`) alır. Tailwind sinifləri məntiqidir (`ms/pe/start/end/text-start`), fiziki sinifləri `tests/rtl-logical.test.ts` tutur.
+4. Qrafiklər (AreaChart, Sparkline) RTL-də güzgü kimi çevrilir, trend oxları da onlarla birgə.
+5. Laboratoriyanın VM masaüstü soldan sağa işləyən simulyasiya ƏS-i kimi qalır (`dir="ltr"`). Poçtun və veb səhifəsinin mətni öz dilinin istiqamətini alır. Kod, terminal, URL, e-poçt ünvanı, telefon, IBAN, hash, IP və OTP həmişə soldan sağadır (`dir="ltr"` və ya `<bdi>`).
+6. Maskotun daxili hissələri fizikidir və CSS ilə güzgülənmir. RTL-də yalnız baxış istiqaməti və `point-left/right` jestləri dəyişir (`cat-mascot.tsx`, `mirrorForRtl`).
+7. Gürcü və ərəb şriftləri (Noto Sans) əvvəlcədən yüklənmir. Ərəb mətnində ərəb şrifti birinci gəlir. `/og/ar` ingiliscə kartı göstərir, çünki Satori ərəb hərflərini birləşdirmir.
+8. E-poçtlar ərəb dilində `dir="rtl"` ilə və sağa düzlənmiş mətnlə gedir. Sİ müəllimi və studiya hər dilin öz üslub qaydası ilə yazır (`src/server/tutor.ts`).
+**Nəticə.** Heç nə yerləşdirilmədiyi üçün mövcud təşkilatlara miqrasiya yoxdur, lokal baza yenidən seed olunacaq. Yeni UI açarı 10 dilin hamısına əlavə olunmalıdır.

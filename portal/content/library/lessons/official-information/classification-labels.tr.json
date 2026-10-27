@@ -1,0 +1,529 @@
+{
+  "id": "classification-labels",
+  "title": "Gizlilik dereceleri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l1-tutor",
+      "beats": [
+        {
+          "id": "l1-b1",
+          "say": "Resmî bir belgedeki gizlilik derecesi, o belgeyi kimlerin görebileceğini söyler. Gelin, bu işaretleri okumayı öğrenelim.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        },
+        {
+          "id": "l1-b2",
+          "say": "Gizlilik derecesi konu satırında, belgenin en üstünde ya da dosya adında yazar. Paylaşmadan önce bir durun.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "idare",
+              "from": {
+                "name": [
+                  {
+                    "text": "Finans Departmanı"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "maliyye@idare.example"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "HİZMETE ÖZEL",
+                  "spot": "label"
+                },
+                {
+                  "text": ": 2027 bütçe taslağı"
+                }
+              ],
+              "time": "09:20",
+              "body": [
+                [
+                  {
+                    "text": "Bu taslak yalnızca departman müdürleri içindir. Lütfen başka hiç kimseye göndermeyin."
+                  }
+                ]
+              ],
+              "attachments": [
+                {
+                  "name": [
+                    {
+                      "text": "Bütçe_taslağı_2027.xlsx"
+                    }
+                  ],
+                  "size": "84 KB"
+                }
+              ]
+            }
+          },
+          "highlight": "label"
+        },
+        {
+          "id": "l1-b3",
+          "say": "Temel kural, bilmesi gereken ilkesidir: belgeyi yalnızca işi gereği ona gerçekten ihtiyaç duyanlar görür.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "l1-b4",
+          "say": "Unvan, arkadaşlık ya da merak bir gerekçe değildir. Gizlilik derecesi olmasa bile vatandaşların verileri korunur.",
+          "mood": "talk",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "l1-match",
+      "prompt": "Her gizlilik derecesini anlamıyla eşleştirin.",
+      "pairs": [
+        {
+          "id": "open",
+          "left": "Herkese açık",
+          "right": "Herkes görebilir; örneğin web sitesinde yayımlanan bir duyuru"
+        },
+        {
+          "id": "official-use",
+          "left": "Hizmete özel",
+          "right": "Kurum içinde, yalnızca işi için ihtiyacı olanlar görür"
+        },
+        {
+          "id": "secret",
+          "left": "Gizli",
+          "right": "Yalnızca yetkili kişiler, özel kurallara göre görür"
+        },
+        {
+          "id": "no-label",
+          "left": "Gizlilik derecesi yok, ama kişisel veri içeriyor",
+          "right": "Yine de korunur: vatandaşların verileri herkese açık değildir"
+        }
+      ],
+      "explain": "Gizlilik derecelerinin adları ve kuralları kurumdan kuruma değişebilir. Her zaman kendi kurumunuzun talimatlarına uyun."
+    },
+    {
+      "type": "swipe",
+      "id": "l1-swipe",
+      "prompt": "Bu talebi yerine getirebilir misiniz?",
+      "cards": [
+        {
+          "id": "curious-colleague",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "sohbet",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Tural (İK)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Selam! Bütçe taslağını bana da atar mısın? Sadece merak ediyorum, kimin maaşı artıyor."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Merak, ihtiyaç değildir. İK bu belgeyle çalışmıyorsa göndermeyin."
+        },
+        {
+          "id": "manager-report",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Nermin Hüseynova"
+                }
+              ],
+              "address": [
+                {
+                  "text": "n.huseynova@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Üç aylık rapor"
+              }
+            ],
+            "time": "10:05",
+            "body": [
+              [
+                {
+                  "text": "Ekibin raporunu lütfen SənədAxını üzerinden bana gönderin, yarın bakanlığa sunuyoruz."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Yöneticiniz bu belgeyle çalışıyor ve resmî sistemi kullanmanızı istiyor. Bu, olağan bir iş talebi."
+        },
+        {
+          "id": "friend-order",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Samir (arkadaş)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Yeni bir emir hazırlıyormuşsun, duydum. Taslağın fotoğrafını çekiver, kimsenin haberi olmaz."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Yayımlanmamış bir emir kurumun dışına çıkmaz. Arkadaş olmak, belgeyi görmek için bir gerekçe değildir."
+        },
+        {
+          "id": "press-public",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Basın bürosu"
+                }
+              ],
+              "address": [
+                {
+                  "text": "press@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Duyuru metni"
+              }
+            ],
+            "time": "11:30",
+            "body": [
+              [
+                {
+                  "text": "Dün web sitesinde yayımlanan duyurunun metnini bize gönderebilir misiniz?"
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Duyuru zaten yayımlandı. Herkese açık bilgiler paylaşılabilir."
+        },
+        {
+          "id": "new-employee",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "+994 50 000 41 27"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Merhaba, burada yeniyim. Departmandaki herkesin listesini telefon numaralarıyla birlikte bana gönderir misiniz?"
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Yeni bir çalışan böyle bir listeyi yöneticisi aracılığıyla alır. Bilinmeyen bir numaraya hiçbir şey göndermeyin."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l1-sim",
+      "environment": "inbox",
+      "title": "Sabah gelen talepler",
+      "intro": "Dört e-postanız var. Her birinde kimin ne istediğine bakın, sonra karar verin.",
+      "steps": [
+        {
+          "id": "m1",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Tural Gasımov"
+                }
+              ],
+              "address": [
+                {
+                  "text": "t.qasimov@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Bütçe taslağı"
+              }
+            ],
+            "time": "09:05",
+            "body": [
+              [
+                {
+                  "text": "Merhaba! Finans biriminin hazırladığı bütçe taslağını bana iletebilir misiniz? Sadece bir göz atmak istiyorum."
+                }
+              ]
+            ]
+          },
+          "say": "Tural bu belgeyle çalışıyor mu?",
+          "actions": [
+            {
+              "id": "forward",
+              "label": "İlet",
+              "kind": "forward",
+              "outcome": "risky",
+              "feedback": "Tural bu belgeyle çalışmıyor. Gizlilik derecesi taşıyan bir belge yalnızca ona ihtiyacı olanlara gider."
+            },
+            {
+              "id": "reply",
+              "label": "Yanıtla: yönetici onayı gerekiyor",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Doğru. Gerçek bir ihtiyaç varsa bunu bir yönetici resmî yoldan onaylar."
+            }
+          ]
+        },
+        {
+          "id": "m2",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "senedaxini",
+            "from": {
+              "name": [
+                {
+                  "text": "SənədAxını"
+                }
+              ],
+              "address": [
+                {
+                  "text": "bildiris@senedaxini.idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Yeni görev: Üç aylık rapor"
+              }
+            ],
+            "time": "09:12",
+            "body": [
+              [
+                {
+                  "text": "Nermin Hüseynova size bir görev gönderdi. Görmek için SənədAxını sistemini açın."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "safe",
+              "label": "Güvenli olarak işaretle",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Doğru. İç sistemden gelen, beklediğiniz bir görev; tıklanacak bir bağlantı da yok."
+            },
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Her e-posta tehdit değildir. Gönderen, adres ve içerik tam da beklediğiniz gibi."
+            }
+          ]
+        },
+        {
+          "id": "m3",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "regional-nazirlik-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "Bölgesel İlişkiler Bakanlığı"
+                }
+              ],
+              "address": [
+                {
+                  "text": "rel.nazirlik@poct-mail.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Acil: personel listesi"
+              }
+            ],
+            "time": "09:40",
+            "body": [
+              [
+                {
+                  "text": "Ortak bir proje kapsamında, departmanınızdaki personelin ad, unvan ve cep telefonu bilgilerini bugün bu adrese gönderiniz."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. Bir bakanlık ücretsiz bir e-posta hizmeti kullanmaz; resmî talepler resmî yazıyla gelir."
+            },
+            {
+              "id": "reply",
+              "label": "Listeyi gönder",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "İş arkadaşlarınızın verileri bir dolandırıcının eline geçti. Artık her birine hedefli bir e-posta gönderilebilir."
+            }
+          ]
+        },
+        {
+          "id": "m4",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Kamran Aliyev"
+                }
+              ],
+              "address": [
+                {
+                  "text": "k.aliyev@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "GİZLİ: Denetim sonuçları"
+              }
+            ],
+            "time": "10:02",
+            "body": [
+              [
+                {
+                  "text": "Reşad, sonuçlar ekte."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Denetim_sonuçları.pdf"
+                  }
+                ],
+                "size": "1,1 MB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Eki aç",
+              "kind": "open-attachment",
+              "outcome": "risky",
+              "feedback": "Bu e-posta size gönderilmemişti. Meraktan açmak da bir sızıntıdır."
+            },
+            {
+              "id": "forward",
+              "label": "Reşad'a ilet",
+              "kind": "forward",
+              "outcome": "risky",
+              "feedback": "Niyetiniz iyi, ama hatayı daha da yaydınız. Hatayı gönderen düzeltmeli."
+            },
+            {
+              "id": "reply",
+              "label": "Gönderene e-postanın yanlış kişiye gittiğini bildir",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Doğru. Gönderene haber verin, eki açmayın ve e-postayı kurumunuzun kurallarına göre silin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l1-choice",
+      "question": {
+        "prompt": "Başka bir bakanlıkta çalışan bir arkadaşınız, “Hizmete özel” derecesi taşıyan bir raporu istiyor.",
+        "options": [
+          {
+            "id": "send",
+            "label": "Gönderirim, o da devlet memuru",
+            "correct": false,
+            "feedback": "Devlet memuru olmak, belgeyi bilmesi gereken kişi olmak demek değildir. Başka bir kurumun talebi resmî yazıyla gelir."
+          },
+          {
+            "id": "official",
+            "label": "Resmî bir talep isterim ve yöneticime haber veririm",
+            "correct": true,
+            "feedback": "Doğru. Resmî talebi yönetim değerlendirir, yanıtı da kurum verir."
+          },
+          {
+            "id": "verbal",
+            "label": "Göndermem, ama önemli rakamları söylerim",
+            "correct": false,
+            "feedback": "Rakamlar da belgenin bir parçası. Onları söylemek de paylaşmaktır."
+          }
+        ]
+      },
+      "explain": "Kararı kanal değil, bilmesi gereken ilkesi ve izin belirler. Yönetim de bu kararı resmî yoldan verir."
+    },
+    {
+      "type": "recap",
+      "id": "l1-recap",
+      "points": [
+        "Gizlilik derecesi, belgeyi kimin görebileceğini gösterir: paylaşmadan önce kontrol edin.",
+        "Belgeyi yalnızca işi için ihtiyacı olanlara gösterin; merak ya da arkadaşlık bir gerekçe değildir.",
+        "Size yanlışlıkla gönderilen bir belgeyi açmayın, gönderene haber verin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

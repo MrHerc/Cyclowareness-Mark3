@@ -1,0 +1,719 @@
+{
+ "id": "vendor-bank-change",
+ "title": "Neue Bankverbindung",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "vb-tutor",
+   "beats": [
+    {
+     "id": "vb-b1",
+     "say": "Hallo! Heute lernen Sie, gefälschte Zahlungsaufforderungen zu erkennen, die im Namen eines bekannten Lieferanten verschickt werden.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "vb-b2",
+     "say": "Das ist der gefährlichste Satz: „Unsere Bankverbindung hat sich geändert, bitte überweisen Sie die nächste Rechnung auf das neue Konto.“",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "ofistechizat-fake",
+       "from": {
+        "name": [
+         {
+          "text": "OfisTəchizat MMC Buchhaltung"
+         }
+        ],
+        "address": [
+         {
+          "text": "muhasibat@ofistechizat-az.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Unsere Bankverbindung hat sich geändert"
+        }
+       ],
+       "time": "10:42",
+       "body": [
+        [
+         {
+          "text": "Sehr geehrte Damen und Herren,"
+         }
+        ],
+        [
+         {
+          "text": "aufgrund einer Prüfung haben wir mit unserem Konto zur UlduzBank gewechselt."
+         }
+        ],
+        [
+         {
+          "text": "Bitte überweisen Sie die Rechnung für September (14.860 Manat) auf das neue Konto: ",
+          "spot": "new-iban"
+         },
+         {
+          "text": "AZ00ULDZ00000000400520007731",
+          "spot": "new-iban"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "new-iban"
+    },
+    {
+     "id": "vb-b3",
+     "say": "Eine solche E-Mail kann sogar von der echten Adresse des Lieferanten kommen, denn auch sein Postfach kann gekapert werden.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "vb-b4",
+     "say": "Die Regel ist einfach: Rufen Sie eine Nummer an, die Sie bereits kennen, und niemals die aus der E-Mail.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vb-hotspot",
+   "prompt": "Finden Sie die Warnsignale in dieser E-Mail.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "ofistechizat-fake",
+    "from": {
+     "name": [
+      {
+       "text": "OfisTəchizat MMC Buchhaltung"
+      }
+     ],
+     "address": [
+      {
+       "text": "muhasibat@ofistechizat-az.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Unsere Bankverbindung hat sich geändert"
+     }
+    ],
+    "time": "10:42",
+    "body": [
+     [
+      {
+       "text": "Sehr geehrte Damen und Herren,"
+      }
+     ],
+     [
+      {
+       "text": "aufgrund einer Prüfung haben wir mit unserem Konto zur UlduzBank gewechselt."
+      }
+     ],
+     [
+      {
+       "text": "Bitte überweisen Sie die Rechnung für September (14.860 Manat) auf das neue Konto: ",
+       "spot": "new-iban"
+      },
+      {
+       "text": "AZ00ULDZ00000000400520007731",
+       "spot": "new-iban"
+      }
+     ],
+     [
+      {
+       "text": "Die Zahlung ist heute bis 16:00 Uhr fällig. Das alte Konto wird geschlossen.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "Bei Fragen rufen Sie bitte nur diese Nummer an: +994 50 000 72 19",
+       "spot": "phone"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Andere Domain",
+     "explain": "Die bisherige Domain des Lieferanten war ofistechizat.example. Das zusätzliche „-az“ und die andere Endung ergeben eine täuschend ähnliche Domain."
+    },
+    {
+     "id": "new-iban",
+     "label": "Neue Kontonummer",
+     "explain": "Die geänderte Bankverbindung ist das eigentliche Ziel dieser Betrugsmasche. Geld, das dorthin fließt, lässt sich nur schwer zurückholen."
+    },
+    {
+     "id": "urgency",
+     "label": "Zeitdruck",
+     "explain": "Eine Frist soll Sie dazu bringen, ohne Prüfung zu zahlen. Ein echter Geschäftspartner lässt Ihnen Zeit, das zu überprüfen."
+    },
+    {
+     "id": "phone",
+     "label": "Nummer in der E-Mail",
+     "explain": "Wenn Sie diese Nummer anrufen, meldet sich der Betrüger. Nehmen Sie stattdessen die Nummer aus dem Vertrag."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "vb-sim-inbox",
+   "environment": "inbox",
+   "title": "Postfach der Buchhaltung",
+   "intro": "Sie sind für Zahlungen zuständig. Öffnen Sie vier E-Mails und wählen Sie für jede den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "invoice-normal",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat",
+      "from": {
+       "name": [
+        {
+         "text": "OfisTəchizat MMC"
+        }
+       ],
+       "address": [
+        {
+         "text": "satis@ofistechizat.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Rechnung für September"
+       }
+      ],
+      "time": "09:15",
+      "body": [
+       [
+        {
+         "text": "Guten Tag, anbei erhalten Sie die Rechnung für September."
+        }
+       ],
+       [
+        {
+         "text": "Die Zahlung bitte wie gewohnt auf das Konto aus unserem Vertrag. Mit freundlichen Grüßen, Səbinə Kərimova"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Invoice_2026_09.pdf"
+         }
+        ],
+        "size": "180 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Anhang öffnen",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "Bekannte Adresse, eine erwartete Rechnung als PDF, und das Konto bleibt gleich. Das ist eine ganz normale E-Mail."
+      },
+      {
+       "id": "safe",
+       "label": "Als sicher markieren",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Richtig. Hier gibt es weder ein neues Konto noch Zeitdruck."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Vorsicht ist gut, aber hier gibt es keine Warnsignale. Eine erwartete Rechnung können Sie auf das Konto aus dem Vertrag bezahlen."
+      }
+     ]
+    },
+    {
+     "id": "bank-change-fake",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat-fake",
+      "from": {
+       "name": [
+        {
+         "text": "OfisTəchizat MMC Buchhaltung"
+        }
+       ],
+       "address": [
+        {
+         "text": "muhasibat@ofistechizat-az.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Unsere Bankverbindung hat sich geändert"
+       }
+      ],
+      "time": "10:42",
+      "body": [
+       [
+        {
+         "text": "Sehr geehrte Damen und Herren,"
+        }
+       ],
+       [
+        {
+         "text": "aufgrund einer Prüfung haben wir mit unserem Konto zur UlduzBank gewechselt."
+        }
+       ],
+       [
+        {
+         "text": "Bitte überweisen Sie die Rechnung für September (14.860 Manat) auf das neue Konto: ",
+         "spot": "new-iban"
+        },
+        {
+         "text": "AZ00ULDZ00000000400520007731",
+         "spot": "new-iban"
+        }
+       ],
+       [
+        {
+         "text": "Die Zahlung ist heute bis 16:00 Uhr fällig. Das alte Konto wird geschlossen.",
+         "spot": "urgency"
+        }
+       ],
+       [
+        {
+         "text": "Bei Fragen rufen Sie bitte nur diese Nummer an: +994 50 000 72 19",
+         "spot": "phone"
+        }
+       ]
+      ]
+     },
+     "say": "Sehen Sie sich die Domain des Absenders an.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig: täuschend ähnliche Domain, neues Konto und eine Frist. Fehlt die Schaltfläche „Phishing melden“? Dann leiten Sie die E-Mail an das Sicherheitsteam weiter."
+      },
+      {
+       "id": "confirm",
+       "label": "Antworten: Wir akzeptieren das neue Konto",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Die Zahlung ginge an den Betrüger. Akzeptieren Sie eine neue Bankverbindung nie allein auf eine E-Mail hin."
+      },
+      {
+       "id": "ask",
+       "label": "Antworten: Stimmt das?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Der Betrüger antwortet und bestätigt alles. Prüfen lässt sich das nur über eine Nummer, die Sie bereits kennen."
+      }
+     ]
+    },
+    {
+     "id": "bank-change-real-box",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat",
+      "from": {
+       "name": [
+        {
+         "text": "Səbinə Kərimova"
+        }
+       ],
+       "address": [
+        {
+         "text": "satis@ofistechizat.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "AW: Rechnung für September"
+       }
+      ],
+      "time": "11:20",
+      "body": [
+       [
+        {
+         "text": "Entschuldigung, das hatten wir vergessen zu erwähnen."
+        }
+       ],
+       [
+        {
+         "text": "Bitte überweisen Sie den Rechnungsbetrag auf unser neues Konto: AZ00ULDZ00000000400520007731"
+        }
+       ],
+       [
+        {
+         "text": "Zur Bestätigung rufen Sie mich bitte unter dieser Nummer an: +994 55 000 31 84"
+        }
+       ]
+      ]
+     },
+     "say": "Die Adresse ist echt. Seien Sie trotzdem vorsichtig.",
+     "actions": [
+      {
+       "id": "verify",
+       "label": "Nummer aus dem Vertrag anrufen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein Postfach kann gekapert werden, aber unter der Nummer aus Ihrem Vertrag erreichen Sie den echten Lieferanten."
+      },
+      {
+       "id": "call-mail",
+       "label": "Nummer aus der E-Mail anrufen",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Diese Nummer gehört dem Betrüger, und der bestätigt Ihnen alles. Nutzen Sie Ihre eigenen Unterlagen."
+      },
+      {
+       "id": "safe",
+       "label": "Als sicher markieren",
+       "kind": "mark-safe",
+       "outcome": "compromised",
+       "feedback": "Die Adresse ist echt, aber das Postfach wurde gekapert. Prüfen Sie eine neue Bankverbindung immer auf einem separaten Weg."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Guter Schritt. Das Sicherheitsteam kann außerdem den Lieferanten warnen."
+      }
+     ]
+    },
+    {
+     "id": "boss-urgent",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Anar Hüseynov"
+        }
+       ],
+       "address": [
+        {
+         "text": "anar.huseynov@idare-mail.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Dringend: Anzahlung an Kür Tikinti"
+       }
+      ],
+      "time": "12:05",
+      "body": [
+       [
+        {
+         "text": "Bitte überweisen Sie die Anzahlung an Kür Tikinti heute auf deren neues Konto. Die Kontodaten schicken sie morgen."
+        }
+       ],
+       [
+        {
+         "text": "Ich bin im Meeting. Rufen Sie mich nicht an. Anar"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Der Name ist der des Chefs, aber die Domain ist nicht idare.example, und „rufen Sie mich nicht an“ ist ein Warnsignal."
+      },
+      {
+       "id": "verify",
+       "label": "Chef unter einer bekannten Nummer anrufen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Auch wenn der Chef im Meeting sitzt: Eine einminütige Prüfung verhindert einen großen Schaden."
+      },
+      {
+       "id": "pay",
+       "label": "Antworten: Wir zahlen heute",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Das Geld ginge an den Betrüger. Druck und Geheimhaltung sind Gründe, die Zahlung zu stoppen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "vb-sim-call",
+   "environment": "call",
+   "title": "Anruf vom Lieferanten",
+   "intro": "Kurz darauf kommt ein Anruf im Namen des Lieferanten. Lesen Sie, was der Anrufer sagt, und wählen Sie Ihre Antwort.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-2"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Annehmen",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Den Anruf anzunehmen ist nicht gefährlich. Entscheidend ist, was Sie danach sagen."
+      },
+      {
+       "id": "decline",
+       "label": "Ablehnen",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Auch das ist in Ordnung. Rufen Sie den Lieferanten später selbst unter der Nummer aus dem Vertrag an.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pitch",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-2"
+     },
+     "say": "Guten Tag, hier ist Zaur Quliyev von OfisTəchizat. Haben Sie unsere neue Bankverbindung erhalten? Wenn Sie heute nicht zahlen, stoppen wir Ihre Bestellung.",
+     "spoken": "Guten Tag, <breath> hier ist Zaur Quliyev von OfisTəchizat. Haben Sie unsere neue Bankverbindung erhalten? Wenn Sie heute nicht zahlen, äh, stoppen wir Ihre Bestellung.",
+     "actions": [
+      {
+       "id": "agree",
+       "label": "Gut, wir zahlen heute auf das neue Konto",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Der Anruf gehört zur Falle und soll die E-Mail glaubwürdig machen. Die Nummer des Anrufers beweist gar nichts."
+      },
+      {
+       "id": "own-check",
+       "label": "Wir prüfen die Änderung auf unserem eigenen Weg",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein echter Lieferant hat Verständnis für eine Prüfung."
+      },
+      {
+       "id": "hang",
+       "label": "Auflegen",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Gute Wahl. Rufen Sie jetzt selbst die Nummer aus dem Vertrag an.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-2"
+     },
+     "say": "Ihr Vorgesetzter hat zugestimmt, ich habe mit ihm gesprochen. Schicken Sie mir ein Foto des Zahlungsauftrags, damit ich ihn prüfen kann.",
+     "spoken": "Ihr Vorgesetzter hat zugestimmt, ich habe mit ihm gesprochen. <breath> Schicken Sie mir ein Foto des Zahlungsauftrags, damit ich ihn prüfen kann.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Ich schicke das Foto",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Ein Zahlungsauftrag enthält Konto- und Unterschriftsdaten. Kriminelle nutzen sie, um neue Dokumente zu fälschen."
+      },
+      {
+       "id": "verify",
+       "label": "Ich rufe meinen Vorgesetzten selbst an",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Ob der Vorgesetzte wirklich zugestimmt hat, kann nur er selbst bestätigen."
+      },
+      {
+       "id": "hang",
+       "label": "Auflegen",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn der Druck steigt, ist Auflegen die beste Antwort."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Das Gespräch ist beendet. Was jetzt?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-2"
+     },
+     "actions": [
+      {
+       "id": "contract",
+       "label": "Nummer aus dem Vertrag anrufen",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Richtig. Der echte Lieferant wird Ihnen sagen, dass sich nichts geändert hat, und Sie melden den Betrug."
+      },
+      {
+       "id": "redial",
+       "label": "Die Nummer zurückrufen, von der der Anruf kam",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Diese Nummer führt zum Betrüger. Prüfen Sie nur über eine Nummer aus Ihren eigenen Unterlagen."
+      },
+      {
+       "id": "ignore",
+       "label": "Nichts tun",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Der Betrüger versucht es dann bei jemand anderem im Team. Informieren Sie das Sicherheitsteam."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "vb-order",
+   "prompt": "Eine neue Bankverbindung trifft ein. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "pause",
+     "label": "Zahlung zurückhalten"
+    },
+    {
+     "id": "known-number",
+     "label": "Nummer aus dem Vertrag oder früheren Unterlagen heraussuchen"
+    },
+    {
+     "id": "call",
+     "label": "Anrufen und nach der Änderung fragen"
+    },
+    {
+     "id": "second",
+     "label": "Von einer zweiten Person freigeben lassen"
+    },
+    {
+     "id": "update",
+     "label": "Erst dann die Bankverbindung ändern"
+    }
+   ],
+   "explain": "Eine Bankverbindung wird erst geändert, wenn sie über eine bekannte Nummer geprüft und von einer zweiten Person freigegeben wurde."
+  },
+  {
+   "type": "choice",
+   "id": "vb-choice",
+   "question": {
+    "prompt": "Sie haben das Geld bereits auf das neue Konto überwiesen. Was tun Sie zuerst?",
+    "options": [
+     {
+      "id": "call-bank",
+      "label": "Sofort meine Bank anrufen, um die Überweisung zu stoppen, und das Sicherheitsteam informieren",
+      "correct": true,
+      "feedback": "Richtig. Je früher die Bank Bescheid weiß, desto größer ist die Chance, das Geld noch aufzuhalten."
+     },
+     {
+      "id": "wait",
+      "label": "Auf eine Antwort des Lieferanten warten",
+      "correct": false,
+      "feedback": "Mit jeder Stunde ist das Geld weiter weg. Warten kostet wertvolle Zeit."
+     },
+     {
+      "id": "email-again",
+      "label": "An dieselbe Adresse schreiben und das Geld zurückfordern",
+      "correct": false,
+      "feedback": "Dieses Postfach liest der Betrüger mit. Nur die Bank kann das Geld aufhalten."
+     }
+    ]
+   },
+   "explain": "Bei einer falschen Überweisung entscheidet die Zeit: zuerst die Bank, dann das Sicherheitsteam. Bewahren Sie die E-Mails als Beweis auf."
+  },
+  {
+   "type": "recap",
+   "id": "vb-recap",
+   "points": [
+    "Ändert sich die Bankverbindung, halten Sie die Zahlung zurück",
+    "Rufen Sie eine bekannte Nummer an, nicht die aus der E-Mail",
+    "Schon bezahlt? Rufen Sie sofort die Bank an und informieren Sie das Sicherheitsteam"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

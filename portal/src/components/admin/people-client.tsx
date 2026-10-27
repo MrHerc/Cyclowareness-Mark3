@@ -63,8 +63,8 @@ export function PeopleFilters({ departments }: { departments: { id: string; name
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.4fr)_repeat(4,minmax(0,1fr))]">
       <label className="relative">
         <span className="sr-only">{t("search")}</span>
-        <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-ink-subtle" />
-        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="pl-10" />
+        <Search className="pointer-events-none absolute top-1/2 start-3.5 size-4 -translate-y-1/2 text-ink-subtle" />
+        <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="ps-10" />
       </label>
       <Select aria-label={tc("department")} value={sp.get("dept") ?? ""} onChange={(e) => push("dept", e.target.value)}>
         <option value="">{tc("allDepartments")}</option>
@@ -192,7 +192,7 @@ export function PeopleTable({
           <>
             <span className="text-ink-muted">{t("bulkHint")}</span>
             {canRemind ? (
-              <Button size="sm" variant="secondary" icon={<Bell />} className="ml-auto" disabled={pending} onClick={() => start(async () => toast(to("reminded", { count: (await remindAwaitingAction(null)).count })))}>
+              <Button size="sm" variant="secondary" icon={<Bell />} className="ms-auto" disabled={pending} onClick={() => start(async () => toast(to("reminded", { count: (await remindAwaitingAction(null)).count })))}>
                 {t("remindWaiting")}
               </Button>
             ) : null}
@@ -200,10 +200,10 @@ export function PeopleTable({
         )}
       </div>
       <ScrollRegion label={t("title")}>
-        <table className="w-full min-w-[60rem] text-left text-body-sm">
+        <table className="w-full min-w-[60rem] text-start text-body-sm">
           <thead className="text-tab text-ink-subtle">
             <tr className="border-b border-line">
-              <th className="w-10 py-3 pl-4">
+              <th className="w-10 py-3 ps-4">
                 <label className={CHECK_HIT}>
                   <input type="checkbox" aria-label={tc("all")} className="size-4 accent-(--brand)" checked={all} onChange={() => setSelected(all ? new Set() : new Set(selectable.map((r) => r.id)))} />
                 </label>
@@ -216,7 +216,7 @@ export function PeopleTable({
               <th className="px-3 py-3 font-semibold">{t("col.risk")}</th>
               <th className="px-3 py-3 font-semibold">{t("col.xp")}</th>
               <th className="px-3 py-3 font-semibold">{t("col.lastActive")}</th>
-              {canWrite ? <th className="py-3 pr-4 pl-3 font-semibold">{t("col.actions")}</th> : null}
+              {canWrite ? <th className="py-3 pe-4 ps-3 font-semibold">{t("col.actions")}</th> : null}
             </tr>
           </thead>
           <tbody>
@@ -225,7 +225,7 @@ export function PeopleTable({
               const deleted = r.status === "deleted";
               return (
                 <tr key={r.id} className={cn("border-b border-line last:border-0 hover:bg-sunken/40", selected.has(r.id) && "bg-brand-50/50")}>
-                  <td className="py-3 pl-4">
+                  <td className="py-3 ps-4">
                     {deleted ? null : (
                       <label className={CHECK_HIT}>
                         <input type="checkbox" aria-label={r.name} className="size-4 accent-(--brand)" checked={selected.has(r.id)} onChange={() => toggle(r.id)} />
@@ -238,7 +238,7 @@ export function PeopleTable({
                         <Avatar name={r.name} src={r.avatarUrl} size="sm" />
                         <span className="min-w-0">
                           <span className="block truncate font-semibold">{r.name}</span>
-                          <span className="block truncate text-tab text-ink-subtle">{r.email}</span>
+                          <bdi className="block truncate text-tab text-ink-subtle">{r.email}</bdi>
                         </span>
                       </span>
                     ) : (
@@ -246,7 +246,7 @@ export function PeopleTable({
                         <Avatar name={r.name} src={r.avatarUrl} size="sm" />
                         <span className="min-w-0">
                           <span className="block truncate font-semibold hover:underline">{r.name}</span>
-                          <span className="block truncate text-tab text-ink-subtle">{r.email}</span>
+                          <bdi className="block truncate text-tab text-ink-subtle">{r.email}</bdi>
                         </span>
                       </Link>
                     )}
@@ -266,7 +266,7 @@ export function PeopleTable({
                   <td className="px-3 py-3 tabular-nums">{r.xp}</td>
                   <td className="px-3 py-3 text-ink-muted">{r.lastActiveAt ? <RelativeTime date={r.lastActiveAt} /> : tc("time.never")}</td>
                   {canWrite ? (
-                    <td className="py-3 pr-4 pl-3">
+                    <td className="py-3 pe-4 ps-3">
                       {r.status === "invited" ? (
                         <TextButton disabled={pending} onClick={() => copyLink(r.id, "invite")}>
                           <Link2 className="size-3.5" />

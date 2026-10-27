@@ -1,0 +1,475 @@
+{
+ "id": "device-and-votes",
+ "title": "Dispozitive și voturi",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "mh2-tutor",
+   "beats": [
+    {
+     "id": "mh2-b1",
+     "say": "Există și o metodă discretă de a fura un cont: un link de vot și un dispozitiv asociat pe ascuns.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "mh2-b2",
+     "say": "Dacă vedeți o astfel de notificare, contul dumneavoastră este deschis și pe un alt dispozitiv.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "sohbet",
+       "app": "Söhbət",
+       "title": [
+        {
+         "text": "Dispozitiv nou asociat",
+         "spot": "device"
+        }
+       ],
+       "body": [
+        {
+         "text": "Computer, Ganja. Dacă nu ați fost dumneavoastră, verificați dispozitivele asociate."
+        }
+       ],
+       "time": "21:14"
+      }
+     },
+     "highlight": "device"
+    },
+    {
+     "id": "mh2-b3",
+     "say": "Nu aveți încredere într-o pagină care vă cere să vă conectați cu contul de mesagerie ca să puteți vota.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "mh2-b4",
+     "say": "Activați verificarea în doi pași și aruncați din când în când o privire la dispozitivele asociate.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "mh2-swipe",
+   "prompt": "Care notificare este sigură și care este o amenințare?",
+   "cards": [
+    {
+     "id": "unasked-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sohbet",
+      "sender": [
+       {
+        "text": "Söhbət"
+       }
+      ],
+      "time": "23:40",
+      "messages": [
+       [
+        {
+         "text": "Codul dumneavoastră Söhbət: 418 205. Nu comunicați acest cod nimănui."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Dacă nu l-ați cerut, cineva încearcă să se conecteze cu numărul dumneavoastră. Nu dați codul nimănui."
+    },
+    {
+     "id": "linked",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "Dispozitiv nou asociat"
+       }
+      ],
+      "body": [
+       {
+        "text": "Computer, Ganja, 21:14"
+       }
+      ],
+      "time": "21:14"
+     },
+     "verdict": "threat",
+     "explain": "Dacă nu l-ați asociat chiar dumneavoastră, cineva vă citește conversațiile. Eliminați-l imediat din dispozitivele asociate."
+    },
+    {
+     "id": "vote-link",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Sevinj Aliyeva"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Fiica mea participă la un concurs de desen, te rog să votezi: "
+         },
+         {
+          "text": "balaca-ressam.example.org/ses",
+          "link": {
+           "label": "balaca-ressam.example.org/ses",
+           "href": "https://balaca-ressam.example.org/ses"
+          }
+         }
+        ],
+        "time": "19:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Linkurile de vot sunt una dintre metodele preferate de furt al conturilor. Chiar dacă vi-l trimite cineva cunoscut, nu vă conectați pe pagina respectivă."
+    },
+    {
+     "id": "pin-on",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "Verificarea în doi pași a fost activată"
+       }
+      ],
+      "body": [
+       {
+        "text": "Ați configurat o protecție suplimentară pentru cont."
+       }
+      ],
+      "time": "12:30"
+     },
+     "verdict": "safe",
+     "explain": "Notificarea confirmă un pas pe care l-ați făcut chiar dumneavoastră. Verificarea în doi pași protejează contul de furtul codului."
+    },
+    {
+     "id": "meeting",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Grupul departamentului"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Kamran Ahmadov: Ședința de mâine este la ora zece, în sala 214."
+         }
+        ],
+        "time": "17:48"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Este un mesaj de serviciu obișnuit. Nu vă cere nici cod, nici bani, nici vreun link."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "mh2-sim",
+   "environment": "browser",
+   "title": "Concursul de desen",
+   "intro": "O persoană cunoscută vă cere voturi într-un concurs de desen pentru copii. Alegeți pasul corect pe fiecare pagină.",
+   "steps": [
+    {
+     "id": "vote-page",
+     "label": "Votați desenul Leylei",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2a-balaca-ressam",
+      "url": [
+       {
+        "text": "https://balaca-ressam.example.org/ses"
+       }
+      ]
+     },
+     "say": "Pagina arată frumos și are un buton „Votați”.",
+     "actions": [
+      {
+       "id": "vote",
+       "label": "Votați",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Butonul de vot vă duce la o pagină de conectare. Încă nu ați pierdut nimic, dar aveți grijă."
+      },
+      {
+       "id": "close",
+       "label": "Închideți pagina",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Când o pagină necunoscută vă cere un cont pentru un vot, cel mai sigur este să o închideți.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2a-sohbet-fake",
+      "brand": "Söhbət",
+      "url": [
+       {
+        "text": "https://sohbet-giris.example.org"
+       }
+      ],
+      "fields": [
+       "Număr de telefon"
+      ],
+      "button": "Obțineți codul"
+     },
+     "say": "Pagina vă cere să vă conectați cu Söhbət ca să votați.",
+     "actions": [
+      {
+       "id": "enter",
+       "label": "Introduceți numărul",
+       "kind": "enter-credentials",
+       "outcome": "risky",
+       "feedback": "Cu numărul dumneavoastră, hoțul cere un cod în numele dumneavoastră. La pasul următor vă va cere chiar acel cod."
+      },
+      {
+       "id": "close",
+       "label": "Închideți pagina",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Adresa nu aparține aplicației Söhbət, deci pagina de conectare este falsă.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sohbet-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Introduceți codul"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Tastați codul Söhbət de șase cifre trimis pe telefonul dumneavoastră."
+        }
+       ]
+      ],
+      "buttons": [
+       "Confirmați",
+       "Anulați"
+      ]
+     },
+     "say": "Acum pagina vă cere să tastați aici codul primit pe telefon.",
+     "actions": [
+      {
+       "id": "enter",
+       "label": "Tastați codul",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "În clipa în care l-ați tastat, contul dumneavoastră s-a deschis pe telefonul hoțului. Un cod Söhbət nu se introduce niciodată pe un site."
+      },
+      {
+       "id": "cancel",
+       "label": "Anulați",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Codul este necesar doar în aplicația Söhbət, niciodată pe o pagină web.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "pairing",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sohbet-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Confirmați votul"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Deschideți „Dispozitive asociate” în aplicația Söhbət și introduceți acest cod:"
+        }
+       ],
+       [
+        {
+         "text": "[codul afișat de pagină]"
+        }
+       ]
+      ],
+      "buttons": [
+       "Gata",
+       "Anulați"
+      ]
+     },
+     "say": "Pagina vă cere ceva nou: să asociați un dispozitiv în aplicație.",
+     "actions": [
+      {
+       "id": "pair",
+       "label": "Asociați dispozitivul",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Ați asociat computerul hoțului la contul dumneavoastră. Acum vă vede toate conversațiile."
+      },
+      {
+       "id": "cancel",
+       "label": "Anulați",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Pentru un vot nu este niciodată nevoie să asociați un dispozitiv."
+      }
+     ]
+    },
+    {
+     "id": "devices",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sohbet",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Dispozitive asociate"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Computer, Ganja. Ultima activitate: acum două minute."
+        }
+       ],
+       [
+        {
+         "text": "Ați asociat dumneavoastră acest dispozitiv?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Deconectați dispozitivul",
+       "Păstrați dispozitivul"
+      ]
+     },
+     "say": "Ca măsură de precauție, verificați dispozitivele asociate chiar din setările aplicației Söhbət.",
+     "actions": [
+      {
+       "id": "logout",
+       "label": "Deconectați dispozitivul",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Corect. Odată deconectat, un dispozitiv pe care nu îl cunoașteți nu vă mai vede mesajele."
+      },
+      {
+       "id": "keep",
+       "label": "Păstrați dispozitivul",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Nu dumneavoastră ați asociat acest dispozitiv. Dacă îl păstrați, cineva vă va citi în continuare conversațiile."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "mh2-choice",
+   "question": {
+    "prompt": "Ce vă protejează cel mai bine contul Söhbət de furtul codului?",
+    "options": [
+     {
+      "id": "two-step",
+      "label": "Activarea verificării în doi pași",
+      "correct": true,
+      "feedback": "Corect. Chiar dacă vă este furat codul, nimeni nu intră fără cifrele secrete pe care le-ați setat."
+     },
+     {
+      "id": "photo",
+      "label": "Ascunderea fotografiei de profil",
+      "correct": false,
+      "feedback": "Confidențialitatea fotografiei este utilă, dar nu protejează contul. Verificarea în doi pași îl protejează."
+     },
+     {
+      "id": "delete-chats",
+      "label": "Ștergerea frecventă a conversațiilor",
+      "correct": false,
+      "feedback": "Asta nu îl împiedică pe hoț să intre. Activați verificarea în doi pași."
+     }
+    ]
+   },
+   "explain": "Verificarea în doi pași pune un al doilea lacăt pe contul dumneavoastră, iar combinația o știți doar dumneavoastră."
+  },
+  {
+   "type": "match",
+   "id": "mh2-match",
+   "prompt": "Asociați fiecare situație cu pasul corect.",
+   "pairs": [
+    {
+     "id": "code",
+     "left": "Un cod pe care nu l-ați cerut",
+     "right": "Nu îl dați nimănui"
+    },
+    {
+     "id": "device",
+     "left": "O notificare despre un dispozitiv nou",
+     "right": "Eliminați-l din dispozitivele asociate"
+    },
+    {
+     "id": "vote",
+     "left": "O conectare cerută pentru vot",
+     "right": "Închideți pagina"
+    },
+    {
+     "id": "money",
+     "left": "Un prieten vă cere bani",
+     "right": "Verificați printr-un apel obișnuit"
+    }
+   ],
+   "explain": "Codul, dispozitivele și linkurile sunt ușile contului dumneavoastră. Controlați-le pe fiecare chiar dumneavoastră și nu le deschideți nimănui."
+  },
+  {
+   "type": "recap",
+   "id": "mh2-recap",
+   "points": [
+    "Nu vă conectați cu Söhbət ca să votați",
+    "La o notificare despre un dispozitiv nou, verificați dispozitivele asociate",
+    "Activați verificarea în doi pași"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

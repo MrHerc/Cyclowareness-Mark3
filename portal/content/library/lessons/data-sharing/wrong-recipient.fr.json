@@ -1,0 +1,549 @@
+{
+ "id": "wrong-recipient",
+ "title": "Mauvais destinataire",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Un e-mail envoyé à la mauvaise personne est l’une des fuites les plus fréquentes. En cause, le plus souvent : la précipitation et la saisie semi-automatique des adresses.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Le même nom apparaît deux fois : une fois avec l’adresse professionnelle, une fois avec une adresse personnelle ou externe. Vérifiez le domaine.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "app",
+       "title": [
+        {
+         "text": "À : Leyla"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Leyla Hasanova, leyla.hasanova@rxagentlik.az"
+         }
+        ],
+        [
+         {
+          "text": "Leyla Hasanova, "
+         },
+         {
+          "text": "leyla.hasanova85@poct.example",
+          "spot": "external"
+         }
+        ]
+       ],
+       "buttons": [
+        "Sélectionner"
+       ]
+      }
+     },
+     "highlight": "external"
+    },
+    {
+     "id": "b3",
+     "say": "Ne comptez pas sur le rappel du message après l’envoi : il échoue généralement pour les adresses externes.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Avant d’envoyer, vérifiez trois choses : le destinataire, la pièce jointe et les personnes en copie.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "before-send",
+   "environment": "inbox",
+   "title": "Avant d’envoyer",
+   "intro": "Trois brouillons attendent d’être envoyés, et une réponse est arrivée de l’extérieur. Vérifiez chacun d’eux.",
+   "steps": [
+    {
+     "id": "autocomplete",
+     "label": "Brouillon",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Vous"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "Leyla Hasanova <leyla.hasanova85@poct.example>",
+      "subject": [
+       {
+        "text": "Liste des demandes"
+       }
+      ],
+      "time": "11:38",
+      "body": [
+       [
+        {
+         "text": "Leyla, vous trouverez ci-joint la liste que vous m’avez demandée."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Muracietler_2026.xlsx"
+         }
+        ],
+        "size": "310 Ko"
+       }
+      ]
+     },
+     "say": "Lisez le domaine du destinataire jusqu’au bout.",
+     "actions": [
+      {
+       "id": "fix",
+       "label": "Vérifier et corriger le destinataire",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact : le nom correspondait, mais pas le domaine. L’adresse professionnelle se termine par rxagentlik.az."
+      },
+      {
+       "id": "send",
+       "label": "Envoyer",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Le destinataire était une adresse e-mail personnelle. Une liste confidentielle est sortie de l’organisation."
+      }
+     ]
+    },
+    {
+     "id": "reply-all",
+     "label": "Brouillon",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Vous"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "layihe-qrupu@rxagentlik.az, e.rzayev@merkez-konsalting.example",
+      "subject": [
+       {
+        "text": "RE : Offre tarifaire du partenaire"
+       }
+      ],
+      "time": "12:05",
+      "body": [
+       [
+        {
+         "text": "Chers collègues, l’offre de Merkez Konsalting semble chère, consultons aussi une autre entreprise."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "remove",
+       "label": "Retirer l’adresse externe",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. « Répondre à tous » conserve tous les destinataires précédents, y compris les personnes extérieures."
+      },
+      {
+       "id": "send",
+       "label": "Envoyer",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Le partenaire figure parmi les destinataires. La discussion interne lui serait parvenue à lui aussi."
+      }
+     ]
+    },
+    {
+     "id": "correct-draft",
+     "label": "Brouillon",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Vous"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "kadrlar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Demande de congé"
+       }
+      ],
+      "time": "12:20",
+      "body": [
+       [
+        {
+         "text": "Bonjour, vous trouverez ci-joint ma demande de congé."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Erize.pdf"
+         }
+        ],
+        "size": "52 Ko"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "send",
+       "label": "Envoyer",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Tout est en ordre : une adresse interne, le bon fichier, aucun destinataire en trop."
+      },
+      {
+       "id": "check",
+       "label": "Vérifier à nouveau",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Vérifier ne fait jamais de mal. Cet e-mail était correct et peut partir."
+      }
+     ]
+    },
+    {
+     "id": "partner-notice",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "merkez-konsalting",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Rzayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "e.rzayev@merkez-konsalting.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Reçu par erreur ?"
+       }
+      ],
+      "time": "13:10",
+      "body": [
+       [
+        {
+         "text": "Bonjour, hier, votre service m’a envoyé la grille des salaires du personnel. C’est sans doute une erreur. Que dois-je faire ?"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Transférer à l’équipe sécurité",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Exact. Un e-mail mal adressé est un incident : le spécialiste vous dira quoi faire."
+      },
+      {
+       "id": "reply",
+       "label": "Répondre : merci de le supprimer",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Demander la suppression est une bonne idée, mais prévenez d’abord l’équipe sécurité."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "La fuite ne disparaît pas pour autant. Signalez-la pour que les spécialistes puissent intervenir."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "recall",
+   "question": {
+    "prompt": "Un e-mail est parti à la mauvaise adresse et vous l’avez rappelé. Est-ce suffisant ?",
+    "options": [
+     {
+      "id": "enough",
+      "label": "Oui, l’e-mail sera supprimé",
+      "correct": false,
+      "feedback": "Le rappel échoue généralement pour les adresses externes, et l’e-mail a peut-être déjà été lu."
+     },
+     {
+      "id": "report",
+      "label": "Non, je préviens quand même tout de suite l’équipe sécurité",
+      "correct": true,
+      "feedback": "Exact. Le rappel peut échouer, le signalement est indispensable."
+     },
+     {
+      "id": "wait",
+      "label": "J’attends, la personne ne l’ouvrira peut-être pas",
+      "correct": false,
+      "feedback": "Attendre ne réduit pas les dégâts. Un signalement rapide laisse plus de solutions."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "inbox"
+    }
+   },
+   "explain": "En cas d’erreur d’envoi, ne la cachez pas : prévenez tout de suite votre responsable et l’équipe sécurité."
+  },
+  {
+   "type": "swipe",
+   "id": "recipient-check",
+   "prompt": "Cette liste de destinataires est-elle correcte ?",
+   "cards": [
+    {
+     "id": "hr",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Vous"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "kadrlar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Demande d’attestation"
+       }
+      ],
+      "time": "14:00",
+      "body": [
+       [
+        {
+         "text": "Bonjour, j’aurais besoin d’une attestation d’emploi."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Une adresse interne, le bon service, aucun destinataire en trop."
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Vous"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "Rashad Aliyev <reshad.aliyev@rxagentlik-az.com>",
+      "subject": [
+       {
+        "text": "Tableau budgétaire"
+       }
+      ],
+      "time": "14:12",
+      "body": [
+       [
+        {
+         "text": "Rashad, vous trouverez le tableau en pièce jointe."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Budce_2027.xlsx"
+         }
+        ],
+        "size": "180 Ko"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Le domaine rxagentlik-az.com n’est pas le vôtre. La saisie semi-automatique a proposé une adresse ancienne ou frauduleuse."
+    },
+    {
+     "id": "all-staff",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Vous"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "butun-emekdaslar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Certificat médical d’un collègue"
+       }
+      ],
+      "time": "14:30",
+      "body": [
+       [
+        {
+         "text": "Le certificat est en pièce jointe."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Arayis.pdf"
+         }
+        ],
+        "size": "96 Ko"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un document personnel ne doit pas être envoyé à tout le personnel. Envoyez-le uniquement à la personne qui en a besoin."
+    },
+    {
+     "id": "no-bcc",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Vous"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "40 partenaires, tous dans le champ À",
+      "subject": [
+       {
+        "text": "Vœux de fin d’année"
+       }
+      ],
+      "time": "15:00",
+      "body": [
+       [
+        {
+         "text": "Chers partenaires, joyeuses fêtes !"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Dans un envoi groupé, placez les adresses en Cci pour que les destinataires ne voient pas les adresses des autres."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "address-fields",
+   "prompt": "Placez chaque destinataire dans le bon champ.",
+   "pairs": [
+    {
+     "id": "to",
+     "left": "Destinataire principal, une réponse est attendue",
+     "right": "À"
+    },
+    {
+     "id": "cc",
+     "left": "Un collègue tenu informé",
+     "right": "Cc"
+    },
+    {
+     "id": "bcc",
+     "left": "De nombreux destinataires qui ne se connaissent pas",
+     "right": "Cci"
+    }
+   ],
+   "explain": "Le bon champ évite que des personnes extérieures voient des adresses dont elles n’ont pas besoin."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Avant d’envoyer, lisez le domaine du destinataire jusqu’au bout.",
+    "Vérifiez les destinataires d’un « Répondre à tous » et les adresses externes en copie.",
+    "En cas d’erreur, ne comptez pas sur le rappel du message : signalez-la tout de suite."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

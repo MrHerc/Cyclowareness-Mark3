@@ -1,0 +1,423 @@
+{
+ "id": "update-turns",
+ "title": "Die veränderte Erweiterung",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ut-tutor",
+   "beats": [
+    {
+     "id": "ut-b1",
+     "say": "Eine Erweiterung kann jahrelang einwandfrei arbeiten. Dann wechselt der Besitzer, und ein einziges Update macht sie zum Spion.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "ut-b2",
+     "say": "Solche Updates gelangten automatisch in Millionen von Browsern. Die Nutzenden haben nichts bemerkt.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "4,3 Millionen",
+      "label": "Geräte, auf denen lange als vertrauenswürdig geltende Erweiterungen 2025 zu Spyware wurden"
+     }
+    },
+    {
+     "id": "ut-b3",
+     "say": "Werden Sie hellhörig, wenn eine Erweiterung plötzlich neue Berechtigungen verlangt, Ihre Suchmaschine sich geändert hat oder immer mehr Werbung erscheint.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2c-pdf-ustasi",
+       "tone": "app",
+       "title": [
+        {
+         "text": "PDF Ustası wurde deaktiviert"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Die neue Version verlangt weitere Berechtigungen:"
+         }
+        ],
+        [
+         {
+          "text": "Alle Ihre Daten auf allen Websites lesen und ändern",
+          "spot": "new-perm"
+         }
+        ]
+       ],
+       "buttons": [
+        "Berechtigungen akzeptieren",
+        "Erweiterung entfernen"
+       ]
+      }
+     },
+     "highlight": "new-perm"
+    },
+    {
+     "id": "ut-b4",
+     "say": "Entfernen Sie dann die Erweiterung, informieren Sie den IT-Support und ändern Sie die Passwörter, die er Ihnen nennt.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ut-scenario",
+   "title": "PDF Ustası hat sich verändert",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Sie öffnen morgens den Browser. Ein Hinweis in der Ecke lautet: PDF Ustası wurde deaktiviert, weil die Erweiterung neue Berechtigungen verlangt.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2c-pdf-ustasi",
+       "tone": "app",
+       "title": [
+        {
+         "text": "PDF Ustası wurde deaktiviert"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Die neue Version verlangt weitere Berechtigungen."
+         }
+        ]
+       ],
+       "buttons": [
+        "Berechtigungen ansehen",
+        "Erweiterung entfernen"
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "Ich akzeptiere die Berechtigungen – ich nutze die Erweiterung schon seit einem Jahr",
+       "next": "n2-bad",
+       "outcome": "compromised",
+       "feedback": "Altes Vertrauen macht eine neue Berechtigung nicht sicher. Dieses Update könnte die Erweiterung zum Spion gemacht haben."
+      },
+      {
+       "label": "Ich sehe mir zuerst an, welche Berechtigungen sie verlangt",
+       "next": "n2",
+       "outcome": "safe",
+       "feedback": "Richtig. Neue Berechtigungen zeigen, was die Erweiterung jetzt vorhat."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Neue Berechtigungen: Daten auf allen Websites lesen und ändern sowie lesen, was Sie kopieren. Zum Öffnen einer PDF-Datei ist nichts davon nötig.",
+     "choices": [
+      {
+       "label": "Ich entferne die Erweiterung und schreibe dem IT-Support",
+       "next": "n3",
+       "outcome": "safe",
+       "feedback": "Richtig. Der IT-Support prüft, ob diese Erweiterung auch auf anderen Computern installiert ist."
+      },
+      {
+       "label": "Ich lasse sie deaktiviert und schaue später nach",
+       "next": "n3",
+       "outcome": "risky",
+       "feedback": "Eine deaktivierte Erweiterung bleibt im Browser und ist mit einem Klick wieder aktiv. Sie zu entfernen, ist sicherer."
+      }
+     ]
+    },
+    {
+     "id": "n2-bad",
+     "text": "Eine Woche später hat sich Ihre Suchmaschine von selbst geändert, und auf Websites erscheint unbekannte Werbung.",
+     "choices": [
+      {
+       "label": "Ich entferne die Erweiterung und rufe den IT-Support an",
+       "next": "n3",
+       "outcome": "safe",
+       "feedback": "Spät, aber richtig. Der IT-Support prüft, welche Daten abgeflossen sind."
+      },
+      {
+       "label": "Ich gewöhne mich an die Werbung",
+       "outcome": "compromised",
+       "feedback": "Die Erweiterung sieht weiterhin jede Seite, die Sie öffnen. Die Werbung ist ein Zeichen dafür, dass sie aktiv ist."
+      }
+     ]
+    },
+    {
+     "id": "n3",
+     "text": "Danke. Diese Erweiterung hat auf allen Websites Daten gesammelt. Ändern Sie bitte Ihre Passwörter für das dienstliche Postfach und das Portal, dann beenden wir die offenen Anmeldesitzungen.",
+     "speaker": "Aytən, IT-Support",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Danke. <breath> Diese Erweiterung hat auf allen Websites Daten gesammelt. Ändern Sie bitte Ihre Passwörter für das dienstliche Postfach und das Portal, dann beenden wir die offenen Anmeldesitzungen.",
+     "choices": [
+      {
+       "label": "Ich ändere die Passwörter sofort",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Was die Erweiterung gesammelt hat, ist damit nicht mehr aktuell."
+      },
+      {
+       "label": "Ich habe die Erweiterung entfernt – das reicht",
+       "outcome": "risky",
+       "feedback": "Die Erweiterung ist weg, aber die gesammelten Daten liegen bei den Kriminellen. Die Passwörter müssen geändert werden."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ut-sim",
+   "environment": "desktop",
+   "title": "Dienstlicher Computer",
+   "intro": "Auf Ihrem dienstlichen Computer passieren seltsame Dinge. Reagieren Sie auf jede Warnung richtig.",
+   "steps": [
+    {
+     "id": "ad-tab",
+     "label": "Herzlichen Glückwunsch! Sie haben ein Smartphone gewonnen",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://endirim-kupon.example.info/hediyye",
+        "reveal": "endirim-kupon.example.info"
+       }
+      ]
+     },
+     "say": "Der Browser hat von selbst einen neuen Tab geöffnet.",
+     "actions": [
+      {
+       "id": "claim",
+       "label": "Gewinn abholen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Ein Tab, der sich von selbst öffnet und einen Gewinn verspricht, ist eine Falle. Die Seite hätte Ihre Kartendaten verlangt."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Tabs, die sich von selbst öffnen, sind oft das Werk einer schädlichen Erweiterung. Suchen wir also die Ursache."
+      }
+     ]
+    },
+    {
+     "id": "search-changed",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "db-xezri-brauzer",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Ihre Suchmaschine wurde geändert"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ihre Suchanfragen gehen jetzt an axtar-tez.example.info."
+        }
+       ],
+       [
+        {
+         "text": "Geändert durch: Erweiterung Kupon Tapan"
+        }
+       ]
+      ],
+      "buttons": [
+       "Änderung beibehalten",
+       "Rückgängig machen"
+      ]
+     },
+     "say": "Der Browser meldet, dass Ihre Sucheinstellung geändert wurde.",
+     "actions": [
+      {
+       "id": "keep",
+       "label": "Änderung beibehalten",
+       "kind": "mark-safe",
+       "outcome": "risky",
+       "feedback": "Ihre Suchanfragen gehen jetzt an eine fremde Website, die alles sieht, was Sie eintippen. Machen Sie die Änderung rückgängig."
+      },
+      {
+       "id": "restore",
+       "label": "Rückgängig machen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Sehen wir uns jetzt die Erweiterung an, die das getan hat."
+      }
+     ]
+    },
+    {
+     "id": "ext-list",
+     "label": "Erweiterungen: Kupon Tapan, Ekran Şəkli, Qısa Qeyd",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-xezri-brauzer",
+      "url": [
+       {
+        "text": "https://magaza.xezri.example/elavelerim",
+        "reveal": "xezri.example"
+       }
+      ]
+     },
+     "say": "In der Liste steht eine Erweiterung, die Sie nie installiert haben.",
+     "actions": [
+      {
+       "id": "remove",
+       "label": "Kupon Tapan entfernen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine Erweiterung, die Sie nicht kennen, gehört nicht in Ihren Browser."
+      },
+      {
+       "id": "keep",
+       "label": "Alle behalten",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Kupon Tapan hat Ihre Suche geändert und öffnet Tabs. Wenn Sie die Erweiterung behalten, liegen Ihre Daten für sie weiter offen."
+      }
+     ]
+    },
+    {
+     "id": "bundle-file",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "w2c-kupon-tapan",
+      "name": [
+       {
+        "text": "Pulsuz_PDF_Cevirici_setup.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "6,2 MB",
+      "source": [
+       {
+        "text": "pulsuz-pdf-cevir.example.info"
+       }
+      ]
+     },
+     "say": "Ihr Ordner „Downloads“ zeigt, woher die Erweiterung stammt.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Öffnen",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Dieser kostenlose Konverter hat die Erweiterung heimlich installiert. Öffnen Sie ihn noch einmal, kommt die Erweiterung zurück."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Richtig. Diese Datei kam mit einem kostenlosen Programm und hat die Erweiterung ohne Nachfrage installiert."
+      }
+     ]
+    },
+    {
+     "id": "av-alert",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "qoruyucu",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Qoruyucu: Bedrohung gefunden"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Die Erweiterung Kupon Tapan hat Browser-Daten an einen unbekannten Server gesendet."
+        }
+       ],
+       [
+        {
+         "text": "Die Erweiterung wurde entfernt."
+        }
+       ]
+      ],
+      "buttons": [
+       "IT-Support informieren",
+       "Schließen"
+      ]
+     },
+     "say": "Auch das Antivirenprogramm hat etwas gefunden.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "IT-Support informieren",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Der IT-Support prüft, welche Daten abgeflossen sind, und hilft Ihnen, Ihre Passwörter zu ändern."
+      },
+      {
+       "id": "close",
+       "label": "Schließen",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Die Erweiterung ist weg, aber die gesammelten Daten sind bereits abgeflossen. Melden Sie den Vorfall unbedingt."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ut-match",
+   "prompt": "Ordnen Sie jeder Berechtigung zu, was sie ermöglicht.",
+   "pairs": [
+    {
+     "id": "all-sites",
+     "left": "Daten auf allen Websites lesen und ändern",
+     "right": "Ihre E-Mails lesen, eine Zahlungsseite verändern"
+    },
+    {
+     "id": "clipboard",
+     "left": "Lesen, was Sie kopieren",
+     "right": "Ein kopiertes Passwort oder eine kopierte Kartennummer sehen"
+    },
+    {
+     "id": "history",
+     "left": "Browser-Verlauf lesen",
+     "right": "Wissen, welche Websites Sie besuchen"
+    },
+    {
+     "id": "downloads",
+     "left": "Downloads verwalten",
+     "right": "Dateien in Ihrem Namen herunterladen"
+    }
+   ],
+   "explain": "Jede Berechtigung ist eine Befugnis. Geben Sie einer Erweiterung keine Befugnis, die sie für ihre Aufgabe nicht braucht."
+  },
+  {
+   "type": "recap",
+   "id": "ut-recap",
+   "points": [
+    "Entfernen Sie eine Erweiterung, die nach einem Update neue Berechtigungen verlangt",
+    "Eine Suchmaschine, die sich von selbst geändert hat, neue Werbung und neue Tabs sind Warnsignale",
+    "Erweiterung entfernen, IT-Support informieren, Passwörter ändern"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

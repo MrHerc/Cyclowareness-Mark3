@@ -6,6 +6,8 @@ import { appUrl, env } from "@/server/env";
 import { allowed, getSession } from "@/server/auth/viewer";
 import { SSO_STATE_COOKIE, codeChallenge, discover, randomValue, sealState } from "@/server/auth/oidc";
 import { TENANT_SLUG_RE } from "@/server/services/tenants";
+import { rateLimit } from "@/server/rate-limit";
+import { clientIp, ipRateKey } from "@/server/request";
 import { featuresFor, withDefaults } from "@/lib/tenant-defaults";
 import { DEFAULT_LOCALE, LOCALES, LOCALE_COOKIE, isLocale, negotiate } from "@/i18n/config";
 
@@ -19,6 +21,12 @@ export async function GET(request: Request) {
   const slug = url.searchParams.get("tenant") ?? "";
   const test = url.searchParams.get("test") === "1";
   const failed = test ? "/admin/settings?tab=identity&ssoTest=failed" : "/sign-in?error=sso";
+
+  // Anonymous, and each start reads the database and can mean a request to the provider: limited per client and per organisation.
+  const ip = await clientIp();
+  if ((ip && !(await rateLimit(`sso-start:${ipRateKey(ip)}`, 60, 60_000)).ok) || (TENANT_SLUG_RE.test(slug) && !(await rateLimit(`sso-start:t:${slug}`, 600, 60_000)).ok)) {
+    return new Response("Too many requests", { status: 429, headers: { "retry-after": "60" } });
+  }
 
   // Anything that is not a slug (empty, too long, a NUL byte the database rejects) is no organisation.
   const [row] = TENANT_SLUG_RE.test(slug)

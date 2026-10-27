@@ -1,0 +1,323 @@
+{
+  "id": "first-15-minutes",
+  "title": "İlk 15 dakika",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Bir bağlantıya mı tıkladınız, yoksa parolanızı mı yazdınız? Bu herkesin başına gelebilir.",
+          "mood": "talk",
+          "gesture": "nod",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "En önemlisi ilk on beş dakikadır, çünkü çalınan parolalar çoğu zaman hemen kullanılır.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "stat",
+            "value": "15",
+            "label": "en kritik dakika"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Parolayı gerçek sitede değiştirin, güvenlik ekibine haber verin ve e-postayı silmeyin.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Olanı gizlemeyin. Susmak saldırgana zaman kazandırır; dürüst bir bildirim ise herkesi korur.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "after-the-click",
+      "environment": "desktop",
+      "title": "Parolanızı yazdınız",
+      "intro": "Sahte bir sayfaya e-posta parolanızı yazdınız ve bunu az önce fark ettiniz. Sonraki adımlar sizin elinizde.",
+      "steps": [
+        {
+          "id": "retry-trap",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Giriş başarısız"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Parola yanlış. Tekrar deneyin veya başka bir parola kullanın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Kapat",
+              "Tekrar dene"
+            ]
+          },
+          "say": "Sayfada bir hata görünüyor.",
+          "actions": [
+            {
+              "id": "retry",
+              "label": "Tekrar dene",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Sahte siteler parolayı bir kez daha yazmanız için hata gösterir; bazen başka bir parolanızı da yazdırmaya çalışır."
+            },
+            {
+              "id": "close",
+              "label": "Kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru, başka hiçbir şey yazmayın. Sayfayı kapatın ve sonraki adıma geçin."
+            }
+          ]
+        },
+        {
+          "id": "the-email",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "ispoct-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "İşPoçt Sistem Yöneticisi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "admin@ispoct-mail.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Posta kutunuz %98 dolu"
+              }
+            ],
+            "time": "09:41",
+            "body": [
+              [
+                {
+                  "text": "E-postalarınızın silinmemesi için depolama alanınızı artırınız: "
+                },
+                {
+                  "text": "ispoct-mail.example.net/yer",
+                  "link": {
+                    "label": "ispoct-mail.example.net/yer",
+                    "href": "https://ispoct-mail.example.net/yer"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "E-posta hâlâ gelen kutunuzda.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. Bildiriminiz sayesinde güvenlik ekibi bu e-postayı diğer gelen kutularından da kaldırabilir."
+            },
+            {
+              "id": "forward",
+              "label": "Güvenlik ekibine ilet",
+              "kind": "forward",
+              "outcome": "safe",
+              "feedback": "İyi. Bildir düğmesi yoksa böyle yapın, ardından ekibi telefonla da arayın."
+            },
+            {
+              "id": "delete",
+              "label": "Kimse görmesin diye sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "E-posta bir kanıttır. Silinirse güvenlik ekibi saldırının izini süremez."
+            }
+          ]
+        },
+        {
+          "id": "change-password",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "ispoct",
+            "brand": "İşPoçt",
+            "url": [
+              {
+                "text": "https://poct.idare.example/parol"
+              }
+            ],
+            "fields": [
+              "Mevcut parola",
+              "Yeni parola"
+            ],
+            "button": "Parolayı değiştir"
+          },
+          "say": "Adresi kendiniz yazdınız. Şimdi parolayı değiştirin.",
+          "actions": [
+            {
+              "id": "change",
+              "label": "Parolayı değiştir",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Doğru, site gerçek. Yeni parola eskisine benzememeli."
+            },
+            {
+              "id": "later",
+              "label": "Yarın değiştiririm",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Çalınan parolalar hızla kullanılır. Beklemek saldırgana zaman kazandırır."
+            }
+          ]
+        },
+        {
+          "id": "reused",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Bu parola başka yerlerde de kullanılıyor"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Eski e-posta parolanız ofis portalında ve Kontakto sayfasında da kullanılıyor."
+                }
+              ]
+            ],
+            "buttons": [
+              "Daha sonra",
+              "Tümünü değiştir"
+            ]
+          },
+          "actions": [
+            {
+              "id": "update",
+              "label": "Tümünü değiştir",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Doğru. Saldırganlar çalınan bir parolayı başka sitelerde de dener."
+            },
+            {
+              "id": "later",
+              "label": "Daha sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Aynı parolayı kullanan her hesap artık risk altında. Hepsini bugün değiştirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "mistake-first-step",
+      "prompt": "Her hatayı atılacak ilk adımla eşleştirin.",
+      "pairs": [
+        {
+          "id": "clicked",
+          "left": "Tıkladım ama hiçbir şey yazmadım",
+          "right": "Sayfayı kapatın ve e-postayı bildirin"
+        },
+        {
+          "id": "password",
+          "left": "Sahte bir sayfaya parolamı yazdım",
+          "right": "Parolayı gerçek sitede değiştirin ve bildirin"
+        },
+        {
+          "id": "code",
+          "left": "Arayan birine doğrulama kodumu verdim",
+          "right": "Hemen güvenlik ekibini arayın"
+        },
+        {
+          "id": "card",
+          "left": "Kart bilgilerimi yazdım",
+          "right": "Kartınızın üzerindeki numaradan bankayı arayın"
+        }
+      ],
+      "explain": "Her seferinde bildirin: uzmanlar sizin göremediğiniz izleri kontrol eder."
+    },
+    {
+      "type": "choice",
+      "id": "approved-push",
+      "question": {
+        "prompt": "Telefonunuza bir giriş isteği geldi ve yanlışlıkla “Onayla” düğmesine dokundunuz. Şimdi ne yaparsınız?",
+        "options": [
+          {
+            "id": "report",
+            "label": "Hemen güvenlik ekibini arar ve parolamı değiştiririm",
+            "correct": true,
+            "feedback": "Doğru. Saldırgan onayınızla içeri girdi; güvenlik ekibi oturumları sonlandırarak onu dışarı çıkaracak."
+          },
+          {
+            "id": "nothing",
+            "label": "Hiçbir şey, sadece bir kereydi",
+            "correct": false,
+            "feedback": "Tek bir onay yeterli: saldırgan zaten hesabınızda."
+          },
+          {
+            "id": "phone-off",
+            "label": "Telefonu kapatırım",
+            "correct": false,
+            "feedback": "Telefonu kapatmak saldırganı dışarı çıkarmaz. O zaten içeride."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "mfa-phone"
+        }
+      },
+      "explain": "Yanlışlıkla verilen bir onay da, başkasına verilen bir kod da aynı acil adımı gerektirir: hemen bildirin."
+    },
+    {
+      "type": "password",
+      "id": "new-password",
+      "prompt": "Çalınan parolanın yerine yeni bir parola oluşturun: eskisine hiç benzemesin.",
+      "targetScore": 4,
+      "tips": [
+        "Eskisini biraz değiştirmek yetmez: Aysel2026 yerine Aysel2027 olmaz",
+        "Dört rastgele kelimeyi boşluklarla birleştirin",
+        "Yeni parolayı parola yöneticisine kaydedin"
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Başka hiçbir şey yazmayın: sayfayı kapatın ve e-postayı silmeyin.",
+        "Parolayı gerçek sitede ve onu kullandığınız diğer her yerde değiştirin.",
+        "Birine kod mu verdiniz, yoksa bir girişi yanlışlıkla mı onayladınız? Hemen güvenlik ekibini arayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

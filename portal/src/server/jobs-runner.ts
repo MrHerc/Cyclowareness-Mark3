@@ -2,6 +2,7 @@ import "server-only";
 import { env } from "./env";
 import { db, dbHandle } from "./db";
 import { runJobs } from "./jobs";
+import { logFailure } from "./db/errors";
 
 /**
  * Job runner, started once per Node.js server process from src/instrumentation.ts, or by the
@@ -61,7 +62,7 @@ export function startJobLoop(): () => Promise<void> {
       try {
         await runLockedTick();
       } catch (error) {
-        console.error("[jobs] tick failed", error);
+        logFailure("[jobs] tick failed", error);
       } finally {
         current = null;
       }

@@ -1,0 +1,466 @@
+{
+ "id": "number-goes-dark",
+ "title": "Plötzlich kein Netz",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ss1-tutor",
+   "beats": [
+    {
+     "id": "ss1-b1",
+     "say": "Hallo! Heute geht es darum, wie Kriminelle Ihre Telefonnummer übernehmen und Ihre SMS-Codes stehlen.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "ss1-b2",
+     "say": "Wenn Kriminelle Ihren Mobilfunkanbieter dazu bringen, Ihre Nummer auf ihre eigene SIM-Karte zu übertragen, hat Ihr Smartphone plötzlich kein Netz mehr.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2b-sahiltel",
+       "app": "SahilTel",
+       "title": [
+        {
+         "text": "Kein Netz",
+         "spot": "no-service"
+        }
+       ],
+       "body": [
+        {
+         "text": "Nur Notrufe. SIM-Karte nicht erkannt."
+        }
+       ],
+       "time": "00:14"
+      }
+     },
+     "highlight": "no-service"
+    },
+    {
+     "id": "ss1-b3",
+     "say": "Jedes Jahr werden Millionen Manat von Karten gestohlen, meist weil Menschen Codes und Daten weitergegeben haben.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "Millionen Manat",
+      "label": "werden jedes Jahr von Karten gestohlen"
+     }
+    },
+    {
+     "id": "ss1-b4",
+     "say": "Wenn Ihre Nummer nachts ausfällt, warten Sie nicht bis zum Morgen. Rufen Sie Ihren Mobilfunkanbieter von einem anderen Telefon aus an.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ss1-sim",
+   "environment": "phone",
+   "title": "Ein Uhr nachts",
+   "intro": "Es ist Nacht, und Ihr Smartphone liegt neben Ihnen. Sehen Sie sich jede Benachrichtigung an und wählen Sie den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "no-service",
+     "label": "00:14 Kein Netz",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2b-sahiltel",
+      "app": "SahilTel",
+      "title": [
+       {
+        "text": "Kein Netz"
+       }
+      ],
+      "body": [
+       {
+        "text": "Nur Notrufe. SIM-Karte nicht erkannt."
+       }
+      ],
+      "time": "00:14"
+     },
+     "actions": [
+      {
+       "id": "call-operator",
+       "label": "Anbieter von einem anderen Telefon aus anrufen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Wurde Ihre Nummer auf eine andere Karte übertragen, kann der Anbieter sie sperren und Ihnen zurückgeben."
+      },
+      {
+       "id": "sleep",
+       "label": "Smartphone ausschalten und schlafen",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Genau darauf hoffen die Kriminellen. Die ganze Nacht über gehen Ihre SMS-Codes an sie."
+      }
+     ]
+    },
+    {
+     "id": "bank-login",
+     "label": "00:27 UlduzBank Mobil",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ulduzbank-app",
+      "app": "UlduzBank Mobil",
+      "title": [
+       {
+        "text": "Anmeldung von einem neuen Gerät"
+       }
+      ],
+      "body": [
+       {
+        "text": "Android, Gəncə, 00:27. Falls Sie das nicht waren, sperren Sie Ihre Karte."
+       }
+      ],
+      "time": "00:27"
+     },
+     "say": "Die SIM-Karte funktioniert nicht mehr, aber die Banking-App erreicht Sie weiterhin über Ihr WLAN zu Hause.",
+     "actions": [
+      {
+       "id": "freeze",
+       "label": "App öffnen und Karte sperren",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Von einer gesperrten Karte geht kein Geld ab, und die Sperre lässt sich später bei der Bank wieder aufheben."
+      },
+      {
+       "id": "call-bank",
+       "label": "Von einem anderen Telefon aus die Nummer auf der Kartenrückseite anrufen",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Richtig. Unter der Nummer auf der Karte erreichen Sie die echte Bank. Bitten Sie dort darum, die Karte zu sperren."
+      },
+      {
+       "id": "dismiss",
+       "label": "Schließen",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Die Kriminellen erhalten Ihre SMS-Codes bereits. Innerhalb von Minuten können sie Geld von Ihrem Konto abziehen."
+      }
+     ]
+    },
+    {
+     "id": "push-request",
+     "label": "00:33 Təsdiqləyici",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "tesdiqleyici",
+      "app": "Təsdiqləyici",
+      "title": [
+       {
+        "text": "Anmeldeanfrage: İşPoçt"
+       }
+      ],
+      "body": [
+       {
+        "text": "Gəncə, 00:33. Melden Sie sich gerade an?"
+       }
+      ],
+      "time": "00:33"
+     },
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Ablehnen",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Die Kriminellen haben zwar Ihre Nummer, aber diese Bestätigung gibt es nur auf Ihrem Smartphone."
+      },
+      {
+       "id": "approve",
+       "label": "Genehmigen",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Damit haben Sie selbst die Tür geöffnet. Genehmigen Sie nie eine Anfrage, die Sie nicht erwartet haben, schon gar nicht nachts."
+      }
+     ]
+    },
+    {
+     "id": "messenger-moved",
+     "label": "00:41 Söhbət",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "Ihr Account wurde auf einem anderen Smartphone geöffnet"
+       }
+      ],
+      "body": [
+       {
+        "text": "Diese Nummer wurde auf einem neuen Gerät registriert."
+       }
+      ],
+      "time": "00:41"
+     },
+     "say": "Auch Ihr Messenger-Account hängt an Ihrer Nummer.",
+     "actions": [
+      {
+       "id": "warn-family",
+       "label": "Familie und Freunde auf anderem Weg warnen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Kriminellen könnten Ihre Familie in Ihrem Namen um Geld bitten. Warnen Sie Ihre Angehörigen deshalb, bevor das passiert."
+      },
+      {
+       "id": "ignore",
+       "label": "Ignorieren",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Noch heute Nacht könnten Ihre Freunde eine dringende Bitte um Geld von Ihnen bekommen. Warnen Sie diese Kontakte jetzt."
+      }
+     ]
+    },
+    {
+     "id": "recovery-sms",
+     "label": "08:05 UlduzBank",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank-fake",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "08:05",
+      "messages": [
+       [
+        {
+         "text": "Ihre Karte wurde wegen verdächtiger Aktivitäten gesperrt. Um sie wieder freizuschalten, geben Sie Ihre Kartendaten ein: "
+        },
+        {
+         "text": "ulduzbank-berpa.example",
+         "link": {
+          "label": "ulduzbank-berpa.example",
+          "href": "https://ulduzbank-berpa.example/kart"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Am Morgen ist Ihre Nummer wieder da. Sehen Sie sich diese Nachricht an.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Als Spam melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Kriminelle nutzen einen echten Vorfall, um ein zweites Mal zuzuschlagen."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Richtig. Klären Sie Fragen zu Ihrer Karte nur in der Banking-App oder über die Nummer auf der Karte."
+      },
+      {
+       "id": "open-link",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Das ist nicht die Website der Bank. Wenn Sie dort Ihre Kartendaten eingeben, verlieren Sie ein zweites Mal Geld."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "ss1-order",
+   "prompt": "Ihre Nummer funktioniert plötzlich nicht mehr. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "operator",
+     "label": "Den Anbieter von einem anderen Telefon aus anrufen und die Nummer zurückholen"
+    },
+    {
+     "id": "bank",
+     "label": "Die Bank unter der Nummer auf Ihrer Karte anrufen und die Karte sperren lassen"
+    },
+    {
+     "id": "passwords",
+     "label": "Die Passwörter wichtiger Konten ändern und von SMS auf eine Authenticator-App umstellen"
+    },
+    {
+     "id": "it",
+     "label": "Den IT-Support über Ihre dienstlichen Konten informieren"
+    },
+    {
+     "id": "police",
+     "label": "Wenn Geld fehlt, unter 102 Anzeige bei der Polizei erstatten"
+    }
+   ],
+   "explain": "Holen Sie zuerst die Nummer zurück, damit neue Codes nicht mehr an die Kriminellen gehen. Lassen Sie direkt danach Ihre Karte von der Bank sperren."
+  },
+  {
+   "type": "swipe",
+   "id": "ss1-swipe",
+   "prompt": "Welche Nachricht ist normal, welche eine Falle? Wischen Sie.",
+   "cards": [
+    {
+     "id": "own-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "14:02",
+      "messages": [
+       [
+        {
+         "text": "Ihr Anmeldecode: 482193. Geben Sie diesen Code an niemanden weiter."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Wenn Sie diesen Code selbst angefordert haben, ist das eine normale Nachricht. Geben Sie den Code selbst ein und nirgendwo sonst."
+    },
+    {
+     "id": "sim-changed",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2b-sahiltel",
+      "sender": [
+       {
+        "text": "SahilTel"
+       }
+      ],
+      "time": "23:52",
+      "messages": [
+       [
+        {
+         "text": "Für Ihre Nummer ist ein Antrag auf Austausch der SIM-Karte eingegangen."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Wenn Sie keine neue SIM-Karte beantragt haben, ist dies das erste Anzeichen eines Angriffs. Rufen Sie sofort Ihren Anbieter an."
+    },
+    {
+     "id": "tell-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank-fake",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "10:18",
+      "messages": [
+       [
+        {
+         "text": "Ihre Karte ist gesperrt. Um sie zu entsperren, nennen Sie unserem Mitarbeiter, der Sie anruft, den Code, den Sie per SMS erhalten."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Eine Bank bittet Sie nie, ihren Mitarbeitenden einen Code zu nennen. Diese Nachricht soll den Code stehlen."
+    },
+    {
+     "id": "night-login",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ulduzbank-app",
+      "app": "UlduzBank Mobil",
+      "title": [
+       {
+        "text": "Anmeldung von einem neuen Gerät"
+       }
+      ],
+      "body": [
+       {
+        "text": "Android, Gəncə, 02:14"
+       }
+      ],
+      "time": "02:14"
+     },
+     "verdict": "threat",
+     "explain": "Jemand hat sich von einem anderen Gerät aus angemeldet, während Sie geschlafen haben. Sperren Sie die Karte und rufen Sie die Bank an."
+    },
+    {
+     "id": "own-push",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "tesdiqleyici",
+      "app": "Təsdiqləyici",
+      "title": [
+       {
+        "text": "Anmeldeanfrage: İşPoçt"
+       }
+      ],
+      "body": [
+       {
+        "text": "Baku, 09:01. Melden Sie sich gerade an?"
+       }
+      ],
+      "time": "09:01"
+     },
+     "verdict": "safe",
+     "explain": "Wenn Sie sich gerade selbst anmelden, ist die Anfrage normal. Lehnen Sie jede Anfrage ab, die Sie nicht erwartet haben."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ss1-choice",
+   "question": {
+    "prompt": "Welcher Schutz funktioniert noch, wenn Ihre Nummer an jemand anderen übergeht?",
+    "options": [
+     {
+      "id": "sms",
+      "label": "Ein Code per SMS",
+      "correct": false,
+      "feedback": "Geht die Nummer an Kriminelle über, wandern die SMS-Codes mit. Für wichtige Konten ist das ein schwacher Schutz."
+     },
+     {
+      "id": "app",
+      "label": "Eine Authenticator-App oder ein Passkey",
+      "correct": true,
+      "feedback": "Richtig. Beide sind an Ihr Gerät gebunden, nicht an Ihre SIM-Karte."
+     },
+     {
+      "id": "long-password",
+      "label": "Ein längeres Passwort",
+      "correct": false,
+      "feedback": "Ein langes Passwort ist gut. Lässt es sich aber per SMS-Code zurücksetzen, kommen die Kriminellen trotzdem hinein."
+     }
+    ]
+   },
+   "explain": "Wählen Sie für wichtige Konten wie Bank, E-Mail und Behördendienste nach Möglichkeit eine Authenticator-App oder einen Passkey statt SMS."
+  },
+  {
+   "type": "recap",
+   "id": "ss1-recap",
+   "points": [
+    "Fällt Ihre Nummer plötzlich aus, rufen Sie sofort von einem anderen Telefon aus Ihren Anbieter an",
+    "Rufen Sie danach die Bank an und lassen Sie Ihre Karte sperren",
+    "Nutzen Sie für wichtige Konten eine Authenticator-App oder einen Passkey statt SMS"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

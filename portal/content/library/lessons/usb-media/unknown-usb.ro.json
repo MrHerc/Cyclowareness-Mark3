@@ -1,0 +1,281 @@
+{
+ "id": "unknown-usb",
+ "title": "Stickul necunoscut",
+ "minutes": 2,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "curiosity",
+     "say": "Un stick USB găsit stârnește curiozitatea. Exact pe asta contează atacatorii.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "plug-is-enough",
+     "say": "Uneori este suficient doar să-l conectați. Unele dispozitive se dau drept tastatură și tastează singure comenzi.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "hand-over",
+     "say": "Așadar, nu conectați niciodată un stick găsit. Predați-l echipei de securitate.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "approved",
+     "say": "La serviciu, folosiți doar stickuri primite sau aprobate de echipa de suport IT.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "charging",
+     "say": "În locurile publice, încărcați telefonul cu propriul adaptor, de la o priză de perete. Dacă telefonul vă întreabă dacă aveți încredere într-un dispozitiv, refuzați.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "courier-sms",
+   "prompt": "Găsiți semnalele de alarmă din acest mesaj.",
+   "artifact": {
+    "kind": "sms",
+    "sender": [
+     {
+      "text": "+994 51 000 77 63",
+      "spot": "number"
+     }
+    ],
+    "time": "09:48",
+    "messages": [
+     [
+      {
+       "text": "Bună ziua, sunt Nigar, noua asistentă a directorului."
+      }
+     ],
+     [
+      {
+       "text": "V-am lăsat un stick pe birou, "
+      },
+      {
+       "text": "este prezentarea directorului.",
+       "spot": "authority"
+      }
+     ],
+     [
+      {
+       "text": "Vă rog să-l conectați și să deschideți fișierul acum, ",
+       "spot": "action"
+      },
+      {
+       "text": "ședința începe în 10 minute.",
+       "spot": "urgent"
+      }
+     ],
+     [
+      {
+       "text": "Nu spuneți nimănui, este o surpriză.",
+       "spot": "secret"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "number",
+     "label": "Număr necunoscut",
+     "explain": "O sarcină de serviciu vine de pe un număr personal pe care nu îl cunoașteți."
+    },
+    {
+     "id": "authority",
+     "label": "Numele directorului",
+     "explain": "Directorul este menționat ca să vă grăbiți și să săriți peste verificări."
+    },
+    {
+     "id": "action",
+     "label": "Cererea de a-l conecta",
+     "explain": "Principalul pericol este cererea de a conecta un stick necunoscut și de a-l deschide."
+    },
+    {
+     "id": "urgent",
+     "label": "Presiune de timp",
+     "explain": "Zece minute nu vă lasă timp de gândire."
+    },
+    {
+     "id": "secret",
+     "label": "Secretul",
+     "explain": "Cererea de a păstra secretul vă împiedică să verificați."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "scenario",
+   "id": "car-park-drive",
+   "title": "Stickul din parcare",
+   "start": "found",
+   "nodes": [
+    {
+     "id": "found",
+     "text": "Dimineața găsiți în parcare un stick USB cu eticheta „Salarii 2026, confidențial”.",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     },
+     "choices": [
+      {
+       "label": "Îl conectez la computerul de serviciu ca să văd ce conține",
+       "outcome": "compromised",
+       "feedback": "Stickul a lansat malware. Eticheta „confidențial” era acolo ca să vă tenteze."
+      },
+      {
+       "label": "Îl verific pe computerul de acasă",
+       "outcome": "risky",
+       "feedback": "Și dispozitivul de acasă poate fi infectat, iar pe el pot exista conturile dumneavoastră de serviciu."
+      },
+      {
+       "label": "Îl duc echipei de securitate",
+       "next": "colleague",
+       "feedback": "Alegerea corectă."
+      }
+     ]
+    },
+    {
+     "id": "colleague",
+     "text": "Dă-mi-l mie, mă uit eu. Am antivirus pe computer.",
+     "speaker": "Tural, un coleg",
+     "voice": "man-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Dă-mi-l mie, mă uit eu. <breath> Am antivirus pe computer.",
+     "choices": [
+      {
+       "label": "I-l dau, antivirusul îl va proteja",
+       "outcome": "risky",
+       "feedback": "Antivirusul nu prinde orice atac, mai ales dispozitivele care se dau drept tastatură."
+      },
+      {
+       "label": "Refuz politicos și predau stickul",
+       "next": "security",
+       "feedback": "Foarte bine. Regula este aceeași pentru toată lumea."
+      }
+     ]
+    },
+    {
+     "id": "security",
+     "text": "Vă mulțumim. Verificăm separat astfel de dispozitive, pe un computer izolat de rețea.",
+     "speaker": "Echipa de securitate",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Vă mulțumim. <breath> Verificăm separat astfel de dispozitive, pe un computer izolat de rețea.",
+     "choices": [
+      {
+       "label": "Le spun unde și când l-am găsit",
+       "outcome": "safe",
+       "feedback": "Excelent. Așa pot căuta și alte stickuri."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "airport-charging",
+   "question": {
+    "prompt": "Telefonul vi se descarcă pe aeroport. Ce variante sunt sigure?",
+    "options": [
+     {
+      "id": "own-adapter",
+      "label": "Îmi conectez propriul adaptor la o priză de perete",
+      "correct": true,
+      "feedback": "Cea mai simplă și mai sigură cale."
+     },
+     {
+      "id": "power-bank",
+      "label": "Încarc telefonul de la propria baterie externă",
+      "correct": true,
+      "feedback": "Excelent, nu este implicat niciun dispozitiv necunoscut."
+     },
+     {
+      "id": "strangers-cable",
+      "label": "Folosesc un cablu împrumutat de la un necunoscut",
+      "correct": false,
+      "feedback": "Cablul unui necunoscut poate ascunde un dispozitiv în interior."
+     },
+     {
+      "id": "trust-yes",
+      "label": "Ating „Da” când telefonul mă întreabă dacă am încredere în dispozitiv",
+      "correct": false,
+      "feedback": "Așa îi dați dispozitivului acces la datele dumneavoastră. Pentru încărcare nu este nevoie de încredere."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "phone-lock"
+    }
+   },
+   "explain": "Atacurile prin porturile USB publice sunt rare, dar protecția este simplă: propriul adaptor și nicio încredere acordată dispozitivelor necunoscute."
+  },
+  {
+   "type": "match",
+   "id": "media-rules",
+   "prompt": "Asociați fiecare situație cu pasul corect.",
+   "pairs": [
+    {
+     "id": "gift-drive",
+     "left": "Un stick primit gratuit la o conferință",
+     "right": "Dați-l mai întâi suportului IT la verificat"
+    },
+    {
+     "id": "carry-files",
+     "left": "Trebuie să luați acasă fișiere de serviciu",
+     "right": "Folosiți suporturi de stocare aprobate sau cloudul aprobat"
+    },
+    {
+     "id": "courier",
+     "left": "Un curier aduce un stick pentru director",
+     "right": "Predați-l echipei de securitate"
+    },
+    {
+     "id": "lost",
+     "left": "V-ați pierdut stickul de serviciu",
+     "right": "Raportați imediat"
+    }
+   ],
+   "explain": "Suporturile de stocare necunoscute nu se conectează niciodată, iar datele de serviciu circulă doar pe căi aprobate."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Nu conectați niciodată un stick găsit sau necunoscut, predați-l.",
+    "La serviciu, folosiți doar suporturi de stocare aprobate.",
+    "Încărcați telefonul cu propriul adaptor și nu acordați niciodată încredere dispozitivelor necunoscute."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

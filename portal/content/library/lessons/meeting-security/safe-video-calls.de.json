@@ -1,0 +1,474 @@
+{
+ "id": "safe-video-calls",
+ "title": "Sichere Videokonferenzen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "vc-tutor",
+   "beats": [
+    {
+     "id": "vc-b1",
+     "say": "Hallo! Bei einer Videokonferenz kommt es auf zwei Fragen an: Wer hört mit, und was ist auf Ihrem Bildschirm zu sehen?",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "vc-b2",
+     "say": "Sehen Sie einen Namen oder eine Nummer, die Sie nicht kennen, fragen Sie den Organisator. Vertrauliches muss so lange warten.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "gorus",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Teilnehmende (6)"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Rəşad Məmmədov (Organisator)"
+         }
+        ],
+        [
+         {
+          "text": "Leyla Rzayeva"
+         }
+        ],
+        [
+         {
+          "text": "Kamal Nəbiyev"
+         }
+        ],
+        [
+         {
+          "text": "iPhone (Gast)",
+          "spot": "unknown"
+         }
+        ],
+        [
+         {
+          "text": "Eingewählt: +994 70 000 55 12",
+          "spot": "dial-in"
+         }
+        ],
+        [
+         {
+          "text": "Gast 4821: zeichnet das Meeting auf",
+          "spot": "recording"
+         }
+        ]
+       ],
+       "buttons": [
+        "Schließen"
+       ]
+      }
+     },
+     "highlight": "unknown"
+    },
+    {
+     "id": "vc-b3",
+     "say": "Wenn Sie Ihren gesamten Bildschirm teilen, sehen alle Ihre offenen Tabs und eingehende Benachrichtigungen.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "vc-b4",
+     "say": "Aktivieren Sie den Warteraum, teilen Sie nur das Fenster, das Sie brauchen, und schalten Sie Benachrichtigungen stumm.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "vc-sim",
+   "environment": "desktop",
+   "title": "Das Meeting beginnt",
+   "intro": "Sie leiten dieses Meeting. Lassen Sie die Teilnehmenden ein und teilen Sie Ihre Präsentation.",
+   "steps": [
+    {
+     "id": "lobby-unknown",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Warteraum"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Möchte teilnehmen: iPhone"
+        }
+       ],
+       [
+        {
+         "text": "Nicht auf der Einladungsliste"
+        }
+       ]
+      ],
+      "buttons": [
+       "Zulassen",
+       "Ablehnen"
+      ]
+     },
+     "say": "Jemand wartet im Warteraum.",
+     "actions": [
+      {
+       "id": "admit",
+       "label": "Zulassen",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Sie haben jemanden hereingelassen, ohne zu wissen, wer es ist. Eine fremde Person könnte ein vertrauliches Gespräch mithören."
+      },
+      {
+       "id": "deny",
+       "label": "Ablehnen",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Richtig. Genau dafür gibt es den Warteraum."
+      },
+      {
+       "id": "ask",
+       "label": "Nach dem Namen fragen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Guter Schritt. Nennt die Person einen Namen, der auf der Einladungsliste steht, lassen Sie sie zu."
+      }
+     ]
+    },
+    {
+     "id": "lobby-known",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Warteraum"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Möchte teilnehmen: Leyla Rzayeva"
+        }
+       ],
+       [
+        {
+         "text": "Auf der Einladungsliste"
+        }
+       ]
+      ],
+      "buttons": [
+       "Zulassen",
+       "Ablehnen"
+      ]
+     },
+     "actions": [
+      {
+       "id": "admit",
+       "label": "Zulassen",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Richtig. Leyla ist eingeladen, und ihr Name steht auf der Liste."
+      },
+      {
+       "id": "deny",
+       "label": "Ablehnen",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "Leyla ist eingeladen. Unnötige Vorsicht hält auch die Arbeit auf."
+      }
+     ]
+    },
+    {
+     "id": "share-pick",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Was möchten Sie teilen?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Gesamter Bildschirm"
+        }
+       ],
+       [
+        {
+         "text": "Fenster: Teqdimat_oktyabr.pptx"
+        }
+       ],
+       [
+        {
+         "text": "Geöffneter Browser-Tab: Gehaltstabelle 2026",
+         "spot": "tab"
+        }
+       ]
+      ],
+      "buttons": [
+       "Teilen"
+      ]
+     },
+     "say": "Wählen Sie aus, was Sie teilen möchten.",
+     "actions": [
+      {
+       "id": "whole",
+       "label": "Gesamten Bildschirm teilen",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Jetzt sehen alle Ihre offenen Tabs, E-Mails und Benachrichtigungen. Auch die Gehaltstabelle ist auf dem Bildschirm zu sehen."
+      },
+      {
+       "id": "window",
+       "label": "Nur das Fenster mit der Präsentation teilen",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Teilnehmenden sehen nur, was sie brauchen."
+      }
+     ]
+    },
+    {
+     "id": "popup",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "İşPoçt",
+      "title": [
+       {
+        "text": "Personalabteilung"
+       }
+      ],
+      "body": [
+       {
+        "text": "Liste zum Stellenabbau (vertraulich) im Anhang"
+       }
+      ],
+      "time": "10:14"
+     },
+     "say": "Während Sie teilen, ist eine neue E-Mail eingegangen.",
+     "actions": [
+      {
+       "id": "pause",
+       "label": "Teilen pausieren und Benachrichtigungen stummschalten",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig: Wenn der gesamte Bildschirm geteilt wird, sehen alle ein solches Pop-up. Der Modus „Nicht stören“ verhindert das."
+      },
+      {
+       "id": "go-on",
+       "label": "Weitermachen",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Wenn der gesamte Bildschirm geteilt wird, sehen alle den vertraulichen Betreff. Schalten Sie Benachrichtigungen vor dem Teilen stumm."
+      }
+     ]
+    },
+    {
+     "id": "recording",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Meeting beendet"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Die Aufzeichnung des Meetings ist fertig."
+        }
+       ],
+       [
+        {
+         "text": "Freigabe: Jeder mit dem Link kann die Aufzeichnung ansehen",
+         "spot": "link"
+        }
+       ]
+      ],
+      "buttons": [
+       "Link kopieren",
+       "Zugriff ändern"
+      ]
+     },
+     "actions": [
+      {
+       "id": "public",
+       "label": "Link an den allgemeinen Gruppenchat senden",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Die Aufzeichnung enthält eine vertrauliche Besprechung. Sobald der Link weitergegeben wird, verlieren Sie die Kontrolle."
+      },
+      {
+       "id": "limit",
+       "label": "Zugriff auf die Teilnehmenden beschränken",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. Nur wer die Aufzeichnung braucht, sollte sie sehen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vc-hotspot",
+   "prompt": "Was wirkt in der Liste der Teilnehmenden verdächtig?",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "gorus",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Teilnehmende (6)"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Rəşad Məmmədov (Organisator)"
+      }
+     ],
+     [
+      {
+       "text": "Leyla Rzayeva"
+      }
+     ],
+     [
+      {
+       "text": "Kamal Nəbiyev"
+      }
+     ],
+     [
+      {
+       "text": "iPhone (Gast)",
+       "spot": "unknown"
+      }
+     ],
+     [
+      {
+       "text": "Eingewählt: +994 70 000 55 12",
+       "spot": "dial-in"
+      }
+     ],
+     [
+      {
+       "text": "Gast 4821: zeichnet das Meeting auf",
+       "spot": "recording"
+      }
+     ]
+    ],
+    "buttons": [
+     "Schließen"
+    ]
+   },
+   "spots": [
+    {
+     "id": "unknown",
+     "label": "Gerät ohne Namen",
+     "explain": "„iPhone“ ist kein Name. Wenn Sie nicht wissen, wer das ist, fragen Sie den Organisator."
+    },
+    {
+     "id": "dial-in",
+     "label": "Unbekannte Nummer",
+     "explain": "Wenn Ihnen eine eingewählte Nummer nicht bekannt ist, klären Sie, wer dahintersteckt."
+    },
+    {
+     "id": "recording",
+     "label": "Nicht genehmigte Aufzeichnung",
+     "explain": "Ein Gast zeichnet auf. Der Organisator sollte die Aufzeichnung stoppen und nach dem Grund fragen."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "order",
+   "id": "vc-order",
+   "prompt": "Sie bereiten ein vertrauliches Meeting vor. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "lobby",
+     "label": "Warteraum und Zugangscode für das Meeting aktivieren"
+    },
+    {
+     "id": "tabs",
+     "label": "Nicht benötigte Tabs und Dateien schließen"
+    },
+    {
+     "id": "dnd",
+     "label": "Benachrichtigungen stummschalten"
+    },
+    {
+     "id": "window",
+     "label": "Nur das Fenster mit der Präsentation teilen"
+    }
+   ],
+   "explain": "Legen Sie zuerst fest, wer teilnehmen kann, und dann, was die Teilnehmenden sehen."
+  },
+  {
+   "type": "choice",
+   "id": "vc-choice",
+   "question": {
+    "prompt": "Jemand, den Sie nicht kennen, ist im Meeting, und auch der Organisator kennt die Person nicht. Was tun Sie?",
+    "options": [
+     {
+      "id": "remove",
+      "label": "Den Organisator bitten, die Person zu entfernen, und dann weitermachen",
+      "correct": true,
+      "feedback": "Richtig. Sobald die fremde Person draußen ist, kann die Besprechung weitergehen."
+     },
+     {
+      "id": "ignore",
+      "label": "Ich ignoriere es, wahrscheinlich hat sich jemand per Telefon eingewählt",
+      "correct": false,
+      "feedback": "„Wahrscheinlich“ reicht nicht. Eine fremde Person könnte ein vertrauliches Gespräch mithören."
+     },
+     {
+      "id": "leave",
+      "label": "Ich verlasse das Meeting unauffällig",
+      "correct": false,
+      "feedback": "Auch wenn Sie gehen, bleiben die anderen. Sagen Sie dem Organisator Bescheid, damit alle geschützt sind."
+     }
+    ]
+   },
+   "explain": "Wenn Sie nicht wissen, wer mithört, besprechen Sie keine vertraulichen Themen."
+  },
+  {
+   "type": "recap",
+   "id": "vc-recap",
+   "points": [
+    "Lassen Sie nur Teilnehmende zu, die Sie kennen",
+    "Teilen Sie ein Fenster, nicht den gesamten Bildschirm",
+    "Schalten Sie Benachrichtigungen vor dem Teilen stumm"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

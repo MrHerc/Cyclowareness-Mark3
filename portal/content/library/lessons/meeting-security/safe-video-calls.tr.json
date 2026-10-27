@@ -1,0 +1,474 @@
+{
+ "id": "safe-video-calls",
+ "title": "Güvenli görüntülü görüşmeler",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "vc-tutor",
+   "beats": [
+    {
+     "id": "vc-b1",
+     "say": "Merhaba! Görüntülü görüşmede iki soru önemlidir: kim dinliyor ve ekranınızda ne var?",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "vc-b2",
+     "say": "Tanımadığınız bir ad ya da numara görürseniz toplantı sahibine sorun. Gizli konuşmalar, durum netleşene kadar bekletilmeli.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "gorus",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Katılımcılar (6)"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Reşad Memmedov (toplantı sahibi)"
+         }
+        ],
+        [
+         {
+          "text": "Leyla Rzayeva"
+         }
+        ],
+        [
+         {
+          "text": "Kamal Nebiyev"
+         }
+        ],
+        [
+         {
+          "text": "iPhone (misafir)",
+          "spot": "unknown"
+         }
+        ],
+        [
+         {
+          "text": "Telefonla katılan: +994 70 000 55 12",
+          "spot": "dial-in"
+         }
+        ],
+        [
+         {
+          "text": "Misafir 4821: toplantıyı kaydediyor",
+          "spot": "recording"
+         }
+        ]
+       ],
+       "buttons": [
+        "Kapat"
+       ]
+      }
+     },
+     "highlight": "unknown"
+    },
+    {
+     "id": "vc-b3",
+     "say": "Ekranınızın tamamını paylaştığınızda açık sekmeler ve gelen bildirimler herkese görünür.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "vc-b4",
+     "say": "Bekleme odasını açın, yalnızca gereken pencereyi paylaşın ve bildirimleri sessize alın.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "vc-sim",
+   "environment": "desktop",
+   "title": "Toplantı başlıyor",
+   "intro": "Bu toplantının sahibi sizsiniz. Katılımcıları içeri alın ve sunumunuzu paylaşın.",
+   "steps": [
+    {
+     "id": "lobby-unknown",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Bekleme odası"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Katılmak istiyor: iPhone"
+        }
+       ],
+       [
+        {
+         "text": "Davet listesinde yok"
+        }
+       ]
+      ],
+      "buttons": [
+       "Kabul et",
+       "Reddet"
+      ]
+     },
+     "say": "Bekleme odasında biri var.",
+     "actions": [
+      {
+       "id": "admit",
+       "label": "Kabul et",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Kim olduğunu bilmeden birini içeri aldınız. Gizli bir konuşmayı bir yabancı duyabilir."
+      },
+      {
+       "id": "deny",
+       "label": "Reddet",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Doğru. Bekleme odası tam da bunun için var."
+      },
+      {
+       "id": "ask",
+       "label": "Adını söylemesini iste",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "İyi bir hamle. Söylediği ad davet listesindeyse içeri alın."
+      }
+     ]
+    },
+    {
+     "id": "lobby-known",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Bekleme odası"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Katılmak istiyor: Leyla Rzayeva"
+        }
+       ],
+       [
+        {
+         "text": "Davet listesinde var"
+        }
+       ]
+      ],
+      "buttons": [
+       "Kabul et",
+       "Reddet"
+      ]
+     },
+     "actions": [
+      {
+       "id": "admit",
+       "label": "Kabul et",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Doğru. Leyla Hanım davetli ve adı listede var."
+      },
+      {
+       "id": "deny",
+       "label": "Reddet",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "Leyla Hanım davetli. Gereksiz temkin de işi durdurur."
+      }
+     ]
+    },
+    {
+     "id": "share-pick",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Neyi paylaşmak istiyorsunuz?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ekranın tamamı"
+        }
+       ],
+       [
+        {
+         "text": "Pencere: Teqdimat_oktyabr.pptx"
+        }
+       ],
+       [
+        {
+         "text": "Açık tarayıcı sekmesi: Maaş tablosu 2026",
+         "spot": "tab"
+        }
+       ]
+      ],
+      "buttons": [
+       "Paylaş"
+      ]
+     },
+     "say": "Neyi paylaşacağınızı seçin.",
+     "actions": [
+      {
+       "id": "whole",
+       "label": "Ekranın tamamını paylaş",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Artık herkes açık sekmelerinizi, e-postalarınızı ve bildirimlerinizi görüyor. Maaş tablosu da ekranda."
+      },
+      {
+       "id": "window",
+       "label": "Yalnızca sunum penceresini paylaş",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Doğru. Katılımcılar yalnızca görmeleri gerekeni görür."
+      }
+     ]
+    },
+    {
+     "id": "popup",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "İşPoçt",
+      "title": [
+       {
+        "text": "İnsan Kaynakları"
+       }
+      ],
+      "body": [
+       {
+        "text": "Kadro azaltma listesi (gizli) ektedir"
+       }
+      ],
+      "time": "10:14"
+     },
+     "say": "Siz paylaşım yaparken yeni bir e-posta geldi.",
+     "actions": [
+      {
+       "id": "pause",
+       "label": "Paylaşımı duraklat ve bildirimleri sessize al",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru: ekranın tamamı paylaşılırken böyle bir açılır pencereyi herkes görür. Rahatsız Etmeyin modu bunu önler."
+      },
+      {
+       "id": "go-on",
+       "label": "Devam et",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Ekranın tamamı paylaşılıyorsa gizli e-postanın konusunu herkes görür. Paylaşımdan önce bildirimleri sessize alın."
+      }
+     ]
+    },
+    {
+     "id": "recording",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Toplantı sona erdi"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Toplantı kaydı hazır."
+        }
+       ],
+       [
+        {
+         "text": "Paylaşım: bağlantıya sahip olan herkes görüntüleyebilir",
+         "spot": "link"
+        }
+       ]
+      ],
+      "buttons": [
+       "Bağlantıyı kopyala",
+       "Erişimi değiştir"
+      ]
+     },
+     "actions": [
+      {
+       "id": "public",
+       "label": "Bağlantıyı genel gruba gönder",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Kayıtta gizli bir görüşme var. Bağlantı yayıldıkça kontrolü kaybedersiniz."
+      },
+      {
+       "id": "limit",
+       "label": "Erişimi katılımcılarla sınırla",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Kaydı yalnızca ihtiyacı olanlar görmeli."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vc-hotspot",
+   "prompt": "Katılımcı listesinde şüpheli görünen ne var?",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "gorus",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Katılımcılar (6)"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Reşad Memmedov (toplantı sahibi)"
+      }
+     ],
+     [
+      {
+       "text": "Leyla Rzayeva"
+      }
+     ],
+     [
+      {
+       "text": "Kamal Nebiyev"
+      }
+     ],
+     [
+      {
+       "text": "iPhone (misafir)",
+       "spot": "unknown"
+      }
+     ],
+     [
+      {
+       "text": "Telefonla katılan: +994 70 000 55 12",
+       "spot": "dial-in"
+      }
+     ],
+     [
+      {
+       "text": "Misafir 4821: toplantıyı kaydediyor",
+       "spot": "recording"
+      }
+     ]
+    ],
+    "buttons": [
+     "Kapat"
+    ]
+   },
+   "spots": [
+    {
+     "id": "unknown",
+     "label": "Adı olmayan cihaz",
+     "explain": "“iPhone” bir ad değil. Kim olduğunu bilmiyorsanız toplantı sahibine sorun."
+    },
+    {
+     "id": "dial-in",
+     "label": "Bilinmeyen numara",
+     "explain": "Telefonla katılan numara tanıdık değilse kime ait olduğunu kontrol edin."
+    },
+    {
+     "id": "recording",
+     "label": "İzinsiz kayıt",
+     "explain": "Bir misafir kayıt yapıyor. Toplantı sahibi kaydı durdurmalı ve nedenini sormalı."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "order",
+   "id": "vc-order",
+   "prompt": "Gizli bir toplantıya hazırlanın. Adımları doğru sıraya koyun.",
+   "items": [
+    {
+     "id": "lobby",
+     "label": "Bekleme odasını ve toplantı parolasını etkinleştirin"
+    },
+    {
+     "id": "tabs",
+     "label": "Gerekmeyen sekme ve dosyaları kapatın"
+    },
+    {
+     "id": "dnd",
+     "label": "Bildirimleri sessize alın"
+    },
+    {
+     "id": "window",
+     "label": "Yalnızca sunum penceresini paylaşın"
+    }
+   ],
+   "explain": "Önce kimin katılabileceğini, sonra neyi görebileceğini kontrol altına alın."
+  },
+  {
+   "type": "choice",
+   "id": "vc-choice",
+   "question": {
+    "prompt": "Toplantıda tanımadığınız biri var ve toplantı sahibi de onu tanımıyor. Ne yaparsınız?",
+    "options": [
+     {
+      "id": "remove",
+      "label": "Toplantı sahibinden onu çıkarmasını ister, sonra devam ederim",
+      "correct": true,
+      "feedback": "Doğru. Yabancı kişi çıkarıldıktan sonra görüşme devam edebilir."
+     },
+     {
+      "id": "ignore",
+      "label": "Önemsemem, muhtemelen biri telefonla katılmıştır",
+      "correct": false,
+      "feedback": "“Muhtemelen” yeterli değildir. Gizli bir konuşmayı yabancı biri duyabilir."
+     },
+     {
+      "id": "leave",
+      "label": "Sessizce toplantıdan çıkarım",
+      "correct": false,
+      "feedback": "Siz çıksanız da diğerleri kalır. Herkesin korunması için toplantı sahibine haber verin."
+     }
+    ]
+   },
+   "explain": "Kimin dinlediğini bilmiyorsanız gizli konuları konuşmayın."
+  },
+  {
+   "type": "recap",
+   "id": "vc-recap",
+   "points": [
+    "Yalnızca tanıdığınız katılımcıları içeri alın",
+    "Ekranın tamamını değil, tek bir pencereyi paylaşın",
+    "Paylaşımdan önce bildirimleri sessize alın"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

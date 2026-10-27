@@ -1,8 +1,8 @@
 /**
  * Checks translated lesson files against their English originals.
- *   npx tsx scripts/check-lesson-locales.ts                      every .az.json and .ru.json
+ *   npx tsx scripts/check-lesson-locales.ts                      every translation (<lesson>.<locale>.json)
  *   npx tsx scripts/check-lesson-locales.ts <file.az.json> ...    only these files
- *   npx tsx scripts/check-lesson-locales.ts --coverage           also: every English lesson has both translations
+ *   npx tsx scripts/check-lesson-locales.ts --coverage           also: every English lesson has a translation in every interface locale
  * Each file must pass the lesson schema, the integrity rules and the locale parity rules
  * (src/lib/content/locale-parity.ts). Exit code 1 when anything fails (or, with --coverage, is missing).
  */
@@ -10,6 +10,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { lessonFileSchema, lessonIntegrityErrors } from "../src/lib/content/validate";
 import { localeParityErrors } from "../src/lib/content/locale-parity";
+import { LOCALES } from "../src/i18n/config";
+
+const TRANSLATION = /\.(?!en\.)[a-z]{2}\.json$/;
 
 const ROOT = path.join(process.cwd(), "content", "library", "lessons");
 
@@ -18,7 +21,7 @@ function allTranslations(): string[] {
   for (const mod of fs.readdirSync(ROOT)) {
     const dir = path.join(ROOT, mod);
     if (!fs.statSync(dir).isDirectory()) continue;
-    for (const f of fs.readdirSync(dir)) if (/\.(az|ru)\.json$/.test(f)) out.push(path.join(dir, f));
+    for (const f of fs.readdirSync(dir)) if (TRANSLATION.test(f)) out.push(path.join(dir, f));
   }
   return out;
 }
@@ -28,7 +31,7 @@ const named = process.argv.slice(2).filter((a) => a !== "--coverage");
 const files = named.length ? named.map((f) => path.resolve(f)) : allTranslations();
 let failed = 0;
 for (const file of files) {
-  const enFile = file.replace(/\.(az|ru)\.json$/, ".en.json");
+  const enFile = file.replace(/\.[a-z]{2}\.json$/, ".en.json");
   const rel = path.relative(process.cwd(), file);
   const errors: string[] = [];
   let doc: unknown;
@@ -54,12 +57,13 @@ console.log(`\n${files.length - failed} of ${files.length} files pass`);
 let missing = 0;
 if (coverage) {
   let english = 0;
+  const locales = LOCALES.filter((l) => l !== "en");
   for (const mod of fs.readdirSync(ROOT)) {
     const dir = path.join(ROOT, mod);
     if (!fs.statSync(dir).isDirectory()) continue;
     for (const f of fs.readdirSync(dir).filter((x) => x.endsWith(".en.json"))) {
       english++;
-      for (const locale of ["az", "ru"]) {
+      for (const locale of locales) {
         const translated = path.join(dir, f.replace(/\.en\.json$/, `.${locale}.json`));
         if (fs.existsSync(translated)) continue;
         missing++;
@@ -67,6 +71,6 @@ if (coverage) {
       }
     }
   }
-  console.log(`${english * 2 - missing} of ${english * 2} translations present (${english} English lessons × az, ru)`);
+  console.log(`${english * locales.length - missing} of ${english * locales.length} translations present (${english} English lessons × ${locales.join(", ")})`);
 }
 process.exit(failed || missing ? 1 : 0);

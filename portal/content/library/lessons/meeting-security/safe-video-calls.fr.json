@@ -1,0 +1,474 @@
+{
+ "id": "safe-video-calls",
+ "title": "Visioconférences sécurisées",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "vc-tutor",
+   "beats": [
+    {
+     "id": "vc-b1",
+     "say": "Bonjour ! Pendant un appel vidéo, deux questions comptent : qui écoute, et que montre votre écran ?",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "vc-b2",
+     "say": "Si vous voyez un nom ou un numéro que vous ne connaissez pas, interrogez l’organisateur. Les sujets confidentiels doivent attendre.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "gorus",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Participants (6)"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Rashad Mammadov (organisateur)"
+         }
+        ],
+        [
+         {
+          "text": "Leyla Rzayeva"
+         }
+        ],
+        [
+         {
+          "text": "Kamal Nabiyev"
+         }
+        ],
+        [
+         {
+          "text": "iPhone (invité)",
+          "spot": "unknown"
+         }
+        ],
+        [
+         {
+          "text": "Connecté par téléphone : +994 70 000 55 12",
+          "spot": "dial-in"
+         }
+        ],
+        [
+         {
+          "text": "Invité 4821 : enregistre la réunion",
+          "spot": "recording"
+         }
+        ]
+       ],
+       "buttons": [
+        "Fermer"
+       ]
+      }
+     },
+     "highlight": "unknown"
+    },
+    {
+     "id": "vc-b3",
+     "say": "Quand vous partagez tout votre écran, vos onglets ouverts et les notifications qui arrivent sont visibles par tous.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "vc-b4",
+     "say": "Activez la salle d’attente, ne partagez que la fenêtre nécessaire et coupez les notifications.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "vc-sim",
+   "environment": "desktop",
+   "title": "La réunion commence",
+   "intro": "Vous organisez cette réunion. Faites entrer les participants et partagez votre présentation.",
+   "steps": [
+    {
+     "id": "lobby-unknown",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Salle d’attente"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Souhaite participer : iPhone"
+        }
+       ],
+       [
+        {
+         "text": "Absent de la liste des invités"
+        }
+       ]
+      ],
+      "buttons": [
+       "Admettre",
+       "Refuser"
+      ]
+     },
+     "say": "Quelqu’un patiente dans la salle d’attente.",
+     "actions": [
+      {
+       "id": "admit",
+       "label": "Admettre",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Vous avez admis quelqu’un sans savoir qui c’était. Une personne inconnue pourrait entendre une discussion confidentielle."
+      },
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. C’est précisément à cela que sert la salle d’attente."
+      },
+      {
+       "id": "ask",
+       "label": "Lui demander de donner son nom",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Bonne idée. Si le nom donné figure sur la liste des invités, admettez la personne."
+      }
+     ]
+    },
+    {
+     "id": "lobby-known",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Salle d’attente"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Souhaite participer : Leyla Rzayeva"
+        }
+       ],
+       [
+        {
+         "text": "Figure sur la liste des invités"
+        }
+       ]
+      ],
+      "buttons": [
+       "Admettre",
+       "Refuser"
+      ]
+     },
+     "actions": [
+      {
+       "id": "admit",
+       "label": "Admettre",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Exact. Leyla est invitée et son nom figure sur la liste."
+      },
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "Leyla est invitée. Trop de prudence finit aussi par bloquer le travail."
+      }
+     ]
+    },
+    {
+     "id": "share-pick",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Que voulez-vous partager ?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Écran entier"
+        }
+       ],
+       [
+        {
+         "text": "Fenêtre : Teqdimat_oktyabr.pptx"
+        }
+       ],
+       [
+        {
+         "text": "Onglet de navigateur ouvert : Tableau des salaires 2026",
+         "spot": "tab"
+        }
+       ]
+      ],
+      "buttons": [
+       "Partager"
+      ]
+     },
+     "say": "Choisissez ce que vous partagez.",
+     "actions": [
+      {
+       "id": "whole",
+       "label": "Partager l’écran entier",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Tout le monde voit maintenant vos onglets ouverts, votre messagerie et vos notifications. Le tableau des salaires s’affiche aussi."
+      },
+      {
+       "id": "window",
+       "label": "Partager uniquement la fenêtre de la présentation",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Exact. Les participants ne voient que ce dont ils ont besoin."
+      }
+     ]
+    },
+    {
+     "id": "popup",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "IshPocht",
+      "title": [
+       {
+        "text": "Service RH"
+       }
+      ],
+      "body": [
+       {
+        "text": "Liste des suppressions de postes (confidentiel) en pièce jointe"
+       }
+      ],
+      "time": "10:14"
+     },
+     "say": "Un nouvel e-mail est arrivé pendant le partage.",
+     "actions": [
+      {
+       "id": "pause",
+       "label": "Suspendre le partage et couper les notifications",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact : quand tout l’écran est partagé, tout le monde voit ce genre de fenêtre pop-up. Le mode Ne pas déranger l’évite."
+      },
+      {
+       "id": "go-on",
+       "label": "Continuer",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Si tout l’écran est partagé, tout le monde voit l’objet confidentiel. Coupez les notifications avant de partager."
+      }
+     ]
+    },
+    {
+     "id": "recording",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Réunion terminée"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "L’enregistrement de la réunion est prêt."
+        }
+       ],
+       [
+        {
+         "text": "Partage : toute personne disposant du lien peut le consulter",
+         "spot": "link"
+        }
+       ]
+      ],
+      "buttons": [
+       "Copier le lien",
+       "Modifier l’accès"
+      ]
+     },
+     "actions": [
+      {
+       "id": "public",
+       "label": "Envoyer le lien au groupe général",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "L’enregistrement contient une discussion confidentielle. À mesure que le lien circule, vous en perdez le contrôle."
+      },
+      {
+       "id": "limit",
+       "label": "Limiter l’accès aux participants",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Seules les personnes qui en ont besoin doivent voir l’enregistrement."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vc-hotspot",
+   "prompt": "Qu’est-ce qui semble suspect dans la liste des participants ?",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "gorus",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Participants (6)"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Rashad Mammadov (organisateur)"
+      }
+     ],
+     [
+      {
+       "text": "Leyla Rzayeva"
+      }
+     ],
+     [
+      {
+       "text": "Kamal Nabiyev"
+      }
+     ],
+     [
+      {
+       "text": "iPhone (invité)",
+       "spot": "unknown"
+      }
+     ],
+     [
+      {
+       "text": "Connecté par téléphone : +994 70 000 55 12",
+       "spot": "dial-in"
+      }
+     ],
+     [
+      {
+       "text": "Invité 4821 : enregistre la réunion",
+       "spot": "recording"
+      }
+     ]
+    ],
+    "buttons": [
+     "Fermer"
+    ]
+   },
+   "spots": [
+    {
+     "id": "unknown",
+     "label": "Appareil sans nom",
+     "explain": "« iPhone » n’est pas un nom. Si vous ne savez pas de qui il s’agit, interrogez l’organisateur."
+    },
+    {
+     "id": "dial-in",
+     "label": "Numéro inconnu",
+     "explain": "Si un numéro connecté par téléphone ne vous dit rien, vérifiez de qui il s’agit."
+    },
+    {
+     "id": "recording",
+     "label": "Enregistrement non autorisé",
+     "explain": "Un invité enregistre la réunion. L’organisateur doit arrêter l’enregistrement et demander pourquoi."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "order",
+   "id": "vc-order",
+   "prompt": "Vous préparez une réunion confidentielle. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "lobby",
+     "label": "Activer la salle d’attente et le code secret de la réunion"
+    },
+    {
+     "id": "tabs",
+     "label": "Fermer les onglets et les fichiers inutiles"
+    },
+    {
+     "id": "dnd",
+     "label": "Couper les notifications"
+    },
+    {
+     "id": "window",
+     "label": "Partager uniquement la fenêtre de la présentation"
+    }
+   ],
+   "explain": "Contrôlez d’abord qui peut participer, puis ce que les participants peuvent voir."
+  },
+  {
+   "type": "choice",
+   "id": "vc-choice",
+   "question": {
+    "prompt": "Une personne que vous ne connaissez pas participe à la réunion, et l’organisateur ne la connaît pas non plus. Que faites-vous ?",
+    "options": [
+     {
+      "id": "remove",
+      "label": "Demander à l’organisateur de l’exclure, puis continuer",
+      "correct": true,
+      "feedback": "Exact. Une fois la personne extérieure exclue, la discussion peut reprendre."
+     },
+     {
+      "id": "ignore",
+      "label": "Je laisse faire, quelqu’un s’est sans doute connecté par téléphone",
+      "correct": false,
+      "feedback": "« Sans doute » ne suffit pas. Une personne extérieure pourrait entendre une discussion confidentielle."
+     },
+     {
+      "id": "leave",
+      "label": "Je quitte discrètement la réunion",
+      "correct": false,
+      "feedback": "Même si vous partez, les autres restent. Prévenez l’organisateur pour que tout le monde soit protégé."
+     }
+    ]
+   },
+   "explain": "Si vous ne savez pas qui écoute, n’abordez pas de sujets confidentiels."
+  },
+  {
+   "type": "recap",
+   "id": "vc-recap",
+   "points": [
+    "N’admettez que des participants que vous connaissez",
+    "Partagez une fenêtre, pas tout votre écran",
+    "Coupez les notifications avant de partager"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

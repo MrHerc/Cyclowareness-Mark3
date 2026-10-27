@@ -732,3 +732,62 @@ describe("registrableDomain", () => {
     expect(registrableDomain("WWW.Example.COM.")).toBe("example.com");
   });
 });
+
+/* ───────────── hostile input (ReDoS) ───────────── */
+
+describe("analyzeFile on hostile input", () => {
+  const ms = (fn: () => unknown) => {
+    const start = performance.now();
+    fn();
+    return performance.now() - start;
+  };
+  const MB = 1_000_000;
+  /** Generous, since the full suite runs files in parallel: the linear scans take tens of ms, the quadratic ones took seconds to hours. */
+  const LINEAR_MS = 2000;
+
+  /** A zip whose central directory declares every entry as 1 byte, so the 2 MB size check passes and each entry inflates to 4 MB. */
+  function bomb(entries: { name: string; data: string }[]): Buffer {
+    const zip = buildZip(entries.map((e) => ({ ...e, deflate: true })));
+    for (let p = zip.indexOf(Buffer.from([0x50, 0x4b, 0x01, 0x02])); p >= 0; p = zip.indexOf(Buffer.from([0x50, 0x4b, 0x01, 0x02]), p + 4)) zip.writeUInt32LE(1, p + 24);
+    return zip;
+  }
+
+  // Before the fix: 100k "a" as .txt took 17.6 s and 4 MB of HTML extrapolated to hours (quadratic e-mail regex).
+  it("scans long runs without an e-mail address in linear time", () => {
+    expect(ms(() => analyzeFile("a.txt", Buffer.from("a".repeat(MB))))).toBeLessThan(LINEAR_MS);
+    expect(ms(() => analyzeFile("a.html", Buffer.from(`<html>${"a".repeat(4 * MB)}`)))).toBeLessThan(LINEAR_MS);
+    expect(ms(() => analyzeFile("a.svg", Buffer.from("a.".repeat(2 * MB))))).toBeLessThan(LINEAR_MS);
+    expect(ms(() => analyzeFile("a.txt", Buffer.from("a@".repeat(2 * MB))))).toBeLessThan(LINEAR_MS);
+  }, 30_000);
+
+  it("scans unclosed <input, <form and /URI( runs in linear time", () => {
+    expect(ms(() => analyzeFile("a.html", Buffer.from(`<html>${"<input ".repeat(MB / 2)}`)))).toBeLessThan(LINEAR_MS);
+    expect(ms(() => analyzeFile("a.html", Buffer.from(`<html>${"<form ".repeat(MB / 2)}`)))).toBeLessThan(LINEAR_MS);
+    expect(ms(() => analyzeFile("a.pdf", Buffer.from(`%PDF-1.7 ${"/URI(".repeat(MB / 2)}`)))).toBeLessThan(LINEAR_MS);
+  }, 30_000);
+
+  it("caps the UTF-16 view of a 10 MB shortcut", () => {
+    const big = Buffer.concat([LNK_HEADER, Buffer.from("a".repeat((MAX_FILE_BYTES - LNK_HEADER.length) / 2), "utf16le")]);
+    expect(ms(() => analyzeFile("a.lnk", big))).toBeLessThan(5000);
+  }, 30_000);
+
+  it("does not stall on a small zip whose entries inflate to megabytes", () => {
+    const entries = Array.from({ length: 12 }, (_, i) => ({ name: `word/part${i}.xml`, data: "a".repeat(4 * MB - 100) }));
+    entries.push({ name: "word/_rels/settings.xml.rels", data: "attachedTemplate ".repeat(200_000) });
+    const zip = bomb(entries);
+    expect(zip.length).toBeLessThan(200_000);
+    expect(ms(() => analyzeFile("a.docx", zip))).toBeLessThan(10_000);
+  }, 30_000);
+
+  it("still finds addresses, credential forms and remote templates the old patterns found", () => {
+    const long = `${"x".repeat(70)}@evil-mail.top`;
+    const a = analyzeFile("a.txt", Buffer.from(`contact bob.smith@evil.com or ${long}, then b.cc@second.top`));
+    expect(a.iocs.filter((i) => i.type === "email").map((i) => i.value)).toEqual(["bob.smith@evil.com", long, "b.cc@second.top"]);
+    // A "<" inside an attribute value does not end the tag, as for the browser.
+    const h = analyzeFile("a.html", Buffer.from(`<html><form data-x="<" action="https://grab.top/p"><input title="<" type="password"></form></html>`));
+    expect(ids(h)).toEqual(expect.arrayContaining(["file.html_credential_form", "file.html_external_post"]));
+    expect(byId(h, "file.html_external_post")?.params).toEqual({ host: "grab.top" });
+    const p = analyzeFile("a.pdf", Buffer.from("%PDF-1.7 << /URI (https://pdf-lure.top/a) >> << /URI (abc) >> << /URI (https://second.top/b"));
+    expect(p.iocs.filter((i) => i.type === "url").map((i) => i.value)).toEqual(["https://pdf-lure.top/a"]);
+  });
+});

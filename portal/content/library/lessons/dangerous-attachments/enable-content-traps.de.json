@@ -1,0 +1,468 @@
+{
+ "id": "enable-content-traps",
+ "title": "Makro- und Bearbeitungsfallen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ec-tutor",
+   "beats": [
+    {
+     "id": "ec-b1",
+     "say": "Ein Dokument aus dem Internet öffnet sich zuerst in der geschützten Ansicht, also schreibgeschützt. Das ist Ihr Schutzschild.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "ec-b2",
+     "say": "Zeigt eine leere Seite einen Text wie diesen, halten Sie sofort inne. Ein echtes Dokument verlangt nicht, dass Sie Schaltflächen anklicken.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "senedyaz",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Geschützte Ansicht: Diese Datei stammt aus dem Internet"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Das Dokument ist leer, nur ein Bild ist zu sehen:"
+         }
+        ],
+        [
+         {
+          "text": "„Um den Text zu sehen, klicken Sie auf ‚Bearbeitung aktivieren‘ und dann auf ‚Inhalt aktivieren‘.“",
+          "spot": "lure"
+         }
+        ]
+       ],
+       "buttons": [
+        "Bearbeitung aktivieren",
+        "Schließen"
+       ]
+      }
+     },
+     "highlight": "lure"
+    },
+    {
+     "id": "ec-b3",
+     "say": "Ein Makro ist ein versteckter Befehl in einem Dokument. Es kann Schadsoftware auf dem Computer installieren.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "ec-b4",
+     "say": "Laden Sie außerdem niemals einen speziellen Viewer von einer Website herunter, nur um ein Dokument zu öffnen.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ec-sim-doc",
+   "environment": "desktop",
+   "title": "Ein Dokument öffnen",
+   "intro": "Sie haben einen Anhang mit dem Namen „Ausschreibungsbedingungen“ geöffnet. Lesen Sie jedes Fenster und entscheiden Sie bei jedem Schritt.",
+   "steps": [
+    {
+     "id": "protected-view",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedyaz",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Geschützte Ansicht: Diese Datei stammt aus dem Internet"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Das Dokument ist leer, nur ein Bild ist zu sehen:"
+        }
+       ],
+       [
+        {
+         "text": "„Um den Text zu sehen, klicken Sie auf ‚Bearbeitung aktivieren‘ und dann auf ‚Inhalt aktivieren‘.“",
+         "spot": "lure"
+        }
+       ]
+      ],
+      "buttons": [
+       "Bearbeitung aktivieren",
+       "Schließen"
+      ]
+     },
+     "say": "Das Dokument ist leer und verlangt einen Klick.",
+     "actions": [
+      {
+       "id": "enable",
+       "label": "Bearbeitung aktivieren",
+       "kind": "enable-content",
+       "outcome": "risky",
+       "feedback": "Sie haben die geschützte Ansicht verlassen. Genau vor solchen Dateien soll dieser Modus schützen."
+      },
+      {
+       "id": "close",
+       "label": "Dokument schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine leere Seite, die einen Klick verlangt, ist eine Falle.",
+       "next": "it-alert"
+      },
+      {
+       "id": "report",
+       "label": "An das Sicherheitsteam melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Sie haben die Datei gemeldet, ohne die Bearbeitung zu aktivieren.",
+       "next": "it-alert"
+      }
+     ]
+    },
+    {
+     "id": "macro-blocked",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedyaz",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Sicherheitsrisiko: Makros blockiert"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Die Makros in diesem Dokument wurden blockiert, weil die Datei aus dem Internet stammt."
+        }
+       ],
+       [
+        {
+         "text": "Im Dokument steht: „Heben Sie die Blockierung der Datei in den Eigenschaften auf und lassen Sie Makros zu.“",
+         "spot": "unblock"
+        }
+       ]
+      ],
+      "buttons": [
+       "Weitere Informationen",
+       "Schließen"
+      ]
+     },
+     "say": "Die App hat die Makros blockiert. Das Dokument fordert Sie auf, die Blockierung aufzuheben.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Blockierung aufheben und Makros zulassen",
+       "kind": "enable-content",
+       "outcome": "compromised",
+       "feedback": "Das versteckte Makro wurde ausgeführt und hat Schadsoftware installiert. Trennen Sie das Gerät vom Netzwerk und rufen Sie sofort das Sicherheitsteam an."
+      },
+      {
+       "id": "close",
+       "label": "Dokument schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Sie haben rechtzeitig aufgehört. Die App hat Sie geschützt, und Sie haben den Schutz nicht umgangen."
+      }
+     ]
+    },
+    {
+     "id": "it-alert",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "it-destek",
+      "app": "IT-Support",
+      "title": [
+       {
+        "text": "Warnung: gefälschte Ausschreibungsunterlagen"
+       }
+      ],
+      "body": [
+       {
+        "text": "Schädliche Dokumente mit dem Titel „Ausschreibungsbedingungen“ sind im Umlauf. Wenn Sie eines erhalten haben, melden Sie es."
+       }
+      ],
+      "time": "11:02"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "E-Mail melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Mit Ihrer Meldung kann die IT die E-Mail aus allen Postfächern entfernen."
+      },
+      {
+       "id": "ignore",
+       "label": "Ignorieren",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Sie haben die Datei geschlossen, aber die E-Mail ist noch da. Melden Sie sie, damit Kolleginnen und Kollegen sie nicht öffnen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ec-sim-viewer",
+   "environment": "browser",
+   "title": "Gefälschter PDF-Viewer",
+   "intro": "Ein Link in einer E-Mail bietet ein Programm zum Öffnen des Dokuments an. Was tun Sie?",
+   "steps": [
+    {
+     "id": "viewer-page",
+     "label": "Aktualisieren Sie Sənəd Oxu, um dieses Dokument anzuzeigen",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "senedoxu-fake",
+      "url": [
+       {
+        "text": "https://senedoxu-yenile.example.net/bax"
+       }
+      ]
+     },
+     "say": "Sehen Sie sich die Adressleiste an.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Herunterladen und installieren",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Der gefälschte Viewer ist Schadsoftware. Ihr Browser kann PDF-Dateien selbst öffnen."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Programme installiert nur die IT oder das Softwarecenter Ihrer Organisation."
+      },
+      {
+       "id": "report",
+       "label": "Website melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Wenn Sie die Website melden, schützen Sie auch Ihre Kolleginnen und Kollegen."
+      }
+     ]
+    },
+    {
+     "id": "viewer-download",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "senedoxu-fake",
+      "name": [
+       {
+        "text": "SenedOxu_Yenileme.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "5,7 MB",
+      "source": [
+       {
+        "text": "senedoxu-yenile.example.net"
+       }
+      ]
+     },
+     "say": "Ein Download hat von selbst begonnen. Prüfen Sie den Dateityp.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Öffnen",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Das ist ein Programm von einer gefälschten Website. Wenn Sie es öffnen, wird der Computer infiziert."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Richtig. Löschen Sie einen Download, den Sie nicht angefordert haben, ohne ihn zu öffnen."
+      },
+      {
+       "id": "report",
+       "label": "An die IT melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Die IT kann diese Website für alle sperren."
+      }
+     ]
+    },
+    {
+     "id": "portal-pdf",
+     "label": "Telimat_2026.pdf",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "idare",
+      "url": [
+       {
+        "text": "https://portal.idare.example/senedler/telimat-2026.pdf"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Dokument öffnen",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Das interne Portal öffnet die Datei im Browser, und nichts muss installiert werden."
+      },
+      {
+       "id": "report",
+       "label": "Website melden",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Das ist das eigene Portal Ihrer Organisation, und es verlangt keine Installation. Melden Sie nur wirklich verdächtige Fälle."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ec-hotspot",
+   "prompt": "Finden Sie die Anzeichen einer Falle in dieser E-Mail.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "docusfera-fake",
+    "from": {
+     "name": [
+      {
+       "text": "DocuSfera"
+      }
+     ],
+     "address": [
+      {
+       "text": "imza@docusfera-sened.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Vertrag wartet auf Ihre Unterschrift"
+     }
+    ],
+    "time": "15:47",
+    "body": [
+     [
+      {
+       "text": "Das Dokument wurde in einem älteren Format erstellt."
+      }
+     ],
+     [
+      {
+       "text": "Um es anzuzeigen, aktivieren Sie zuerst die Bearbeitung und dann den Inhalt.",
+       "spot": "enable"
+      }
+     ],
+     [
+      {
+       "text": "Falls es sich nicht öffnet, aktualisieren Sie Ihren Viewer hier: ",
+       "spot": "viewer"
+      },
+      {
+       "text": "Sənəd Oxu herunterladen",
+       "spot": "viewer",
+       "link": {
+        "label": "Sənəd Oxu",
+        "href": "https://senedoxu-yenile.example.net/yukle"
+       }
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Muqavile_imza.xlsm",
+        "spot": "macro"
+       }
+      ],
+      "size": "210 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Andere Domain",
+     "explain": "Die Adresse nutzt den Namen des Signaturdienstes, aber die Domain ist eine andere. Melden Sie die E-Mail."
+    },
+    {
+     "id": "enable",
+     "label": "Aufforderung zum Aktivieren",
+     "explain": "Ein echtes Dokument lässt sich lesen, ohne dass Sie Bearbeitung oder Makros aktivieren."
+    },
+    {
+     "id": "macro",
+     "label": "Datei mit Makros",
+     "explain": "Eine Office-Datei mit einem „m“ am Ende der Endung (xlsm, docm) kann Makros enthalten."
+    },
+    {
+     "id": "viewer",
+     "label": "Link zum Programm-Download",
+     "explain": "Braucht ein Dokument angeblich ein spezielles Programm, ist das ein Zeichen für einen gefälschten Viewer."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "ec-order",
+   "prompt": "Ein Dokument verlangt Makros. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Auf keine Schaltfläche klicken"
+    },
+    {
+     "id": "close",
+     "label": "Das Dokument schließen"
+    },
+    {
+     "id": "report",
+     "label": "Die E-Mail an das Sicherheitsteam melden"
+    },
+    {
+     "id": "verify",
+     "label": "Wenn Sie die Datei erwartet haben: beim Absender unter einer bekannten Nummer nachfragen"
+    }
+   ],
+   "explain": "Zuerst innehalten und das Dokument schließen, dann melden. Fragen Sie beim Absender nur unter einer Nummer nach, die Sie bereits kennen."
+  },
+  {
+   "type": "recap",
+   "id": "ec-recap",
+   "points": [
+    "Ein leeres Dokument, das einen Klick verlangt, ist eine Falle",
+    "Aktivieren Sie weder Bearbeitung noch Makros: schließen und melden",
+    "Laden Sie nie ein Programm von einer Website herunter, um ein Dokument zu öffnen"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

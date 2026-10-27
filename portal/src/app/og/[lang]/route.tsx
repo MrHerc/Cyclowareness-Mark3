@@ -31,9 +31,11 @@ function titleSize(title: string): number {
 export async function GET(_req: Request, { params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   if (!isSiteLocale(lang)) notFound();
-  const { copy } = await loadLanding(lang);
+  // shortcut: Satori neither joins Arabic letters nor reorders right-to-left text, so /og/ar is the English card; render ar once Satori shapes Arabic, or ship a pre-drawn PNG.
+  const card = lang === "ar" ? "en" : lang;
+  const { copy } = await loadLanding(card);
   const icon = `data:image/png;base64,${(await readFile(path.join(process.cwd(), "public", "icons", "icon-512.png"))).toString("base64")}`;
-  const scriptFont = SCRIPT_FONTS[lang];
+  const scriptFont = SCRIPT_FONTS[card];
   const fonts = scriptFont
     ? [{ name: scriptFont.name, data: await readFile(path.join(process.cwd(), "public", "fonts", scriptFont.file)), weight: 400 as const, style: "normal" as const }]
     : undefined;

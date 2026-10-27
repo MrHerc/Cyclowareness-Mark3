@@ -1,0 +1,364 @@
+{
+  "id": "work-anywhere",
+  "title": "أينما عملت",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "protection-stays",
+          "say": "عندما تعمل من المنزل أو من مقهى، لا تنتقل معك حماية المكتب. عليك أن توفرها بنفسك.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        },
+        {
+          "id": "vpn",
+          "say": "لا تتصل بأنظمة العمل إلا عبر الشبكة الافتراضية الخاصة VPN التي توفرها جهتك. فتطبيقات VPN المجانية قد تسلم بياناتك لغيرك.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "vpn"
+          }
+        },
+        {
+          "id": "open-wifi",
+          "say": "يستطيع أي شخص أن ينتحل اسم شبكة مفتوحة في المقهى. استخدم نقطة الاتصال في جوالك بدلًا منها إن استطعت.",
+          "mood": "think",
+          "visual": {
+            "kind": "illustration",
+            "id": "wifi"
+          }
+        },
+        {
+          "id": "shoulder",
+          "say": "من يجلس خلفك يستطيع أن يرى شاشتك وكلمة المرور التي تكتبها. اجلس وظهرك إلى الجدار، واستخدم فلتر خصوصية للشاشة.",
+          "mood": "alert",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "family",
+          "say": "حاسوب العمل المحمول ليس للعائلة. فلعبة ينزلها أحد أفراد الأسرة قد تجلب معها برمجيات ضارة.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "cafe-networks",
+      "prompt": "أي الشبكات في هذا المقهى مشبوهة؟",
+      "artifact": {
+        "kind": "wifi",
+        "networks": [
+          {
+            "ssid": [
+              {
+                "text": "Cinar_Pulsuz_WiFi",
+                "spot": "twin"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "Cinar-Cayxana"
+              }
+            ],
+            "secured": true,
+            "signal": 3
+          },
+          {
+            "ssid": [
+              {
+                "text": "Free_Internet_BAKU",
+                "spot": "free"
+              }
+            ],
+            "secured": false,
+            "signal": 4
+          },
+          {
+            "ssid": [
+              {
+                "text": "RXAgentlik-Staff",
+                "spot": "staff"
+              }
+            ],
+            "secured": false,
+            "signal": 2
+          },
+          {
+            "ssid": [
+              {
+                "text": "جوال آينور"
+              }
+            ],
+            "secured": true,
+            "signal": 4
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "twin",
+          "label": "اسم مشابه",
+          "explain": "شبكة مفتوحة تقلد اسم المقهى، بلا كلمة مرور، وقد تكون مزيفة. اسأل العاملين في المقهى عن الشبكة الحقيقية."
+        },
+        {
+          "id": "free",
+          "label": "مالك غير معروف",
+          "explain": "الشبكة المفتوحة مجهولة المالك قد توجهك إلى صفحة تسجيل دخول مزيفة."
+        },
+        {
+          "id": "staff",
+          "label": "اسم جهتك",
+          "explain": "لا يمكن أن تكون شبكة جهتك في مقهى. هذه الشبكة أنشأها أحدهم لخداعك."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "swipe",
+      "id": "home-setup",
+      "prompt": "هل هذا آمن عند العمل من المنزل؟",
+      "cards": [
+        {
+          "id": "default-router",
+          "artifact": {
+            "kind": "login",
+            "brand": "HomeRouter",
+            "url": [
+              {
+                "text": "http://192.168.1.1"
+              }
+            ],
+            "fields": [
+              "اسم المستخدم: admin",
+              "كلمة المرور: admin"
+            ],
+            "button": "تسجيل الدخول"
+          },
+          "verdict": "threat",
+          "explain": "كلمات مرور المصنع معروفة للجميع. بادر بتغيير كلمة مرور جهاز الراوتر الآن."
+        },
+        {
+          "id": "share-password",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "تورال، زميل"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "لا أستطيع الدخول إلى النظام من المنزل. أعطني كلمة مرورك، لدقيقة واحدة فقط."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "لا تشارك كلمة المرور مع أحد أبدًا، ولا حتى مع زميل. اقترح عليه أن يتواصل مع الدعم الفني."
+        },
+        {
+          "id": "vpn-update",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "الدعم الفني"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it@rxagentlik.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "إصدار جديد من تطبيق VPN"
+              }
+            ],
+            "time": "08:30",
+            "body": [
+              [
+                {
+                  "text": "سيجري تثبيت التحديث على حاسوب العمل تلقائيًا. لا تنزل أي شيء."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "النطاق صحيح، والرسالة لا تطلب منك تنزيل أي شيء."
+        },
+        {
+          "id": "free-vpn",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://super-free-vpn.top/download"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "تطبيق VPN مجاني ومجهول المصدر يستطيع الاطلاع على كل بياناتك المتنقلة عبر الشبكة. في العمل، استخدم شبكة VPN التابعة لجهتك فقط."
+        },
+        {
+          "id": "home-wifi",
+          "artifact": {
+            "kind": "wifi",
+            "networks": [
+              {
+                "ssid": [
+                  {
+                    "text": "Ev_5G"
+                  }
+                ],
+                "secured": true,
+                "signal": 4
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "شبكة منزلية محمية بكلمة مرور. وإذا غيرت كلمة مرور جهاز الراوتر أيضًا، فهذه بداية جيدة."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "home-and-cafe",
+      "title": "في المنزل وفي المقهى",
+      "start": "evening",
+      "nodes": [
+        {
+          "id": "evening",
+          "text": "هل يمكنني تثبيت لعبة على حاسوب عملك المحمول؟ حاسوبي بطيء جدًا.",
+          "speaker": "أحد أفراد العائلة",
+          "voice": "young-man",
+          "channel": "in-person",
+          "manner": "natural",
+          "spoken": "هل يمكنني تثبيت لعبة على حاسوب عملك المحمول؟ <short pause> حاسوبي بطيء جدًا.",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          },
+          "choices": [
+            {
+              "label": "حسنًا، لساعة واحدة فقط",
+              "outcome": "compromised",
+              "feedback": "جاءت البرمجيات الضارة مع اللعبة، وأصبحت حسابات عملك الآن في خطر."
+            },
+            {
+              "label": "لا، حاسوب العمل للعمل فقط",
+              "next": "cafe",
+              "feedback": "صحيح. اشرح السبب بهدوء."
+            }
+          ]
+        },
+        {
+          "id": "cafe",
+          "text": "في اليوم التالي تعمل في مقهى. عليك أن تذهب إلى منضدة الطلبات، وحاسوبك مفتوح.",
+          "choices": [
+            {
+              "label": "أتركه مفتوحًا، إنها دقيقتان فقط",
+              "outcome": "risky",
+              "feedback": "دقيقتان تكفيان لإلقاء نظرة، أو توصيل ذاكرة USB، أو أخذ الحاسوب."
+            },
+            {
+              "label": "أقفل الشاشة وآخذ الحاسوب معي",
+              "next": "call",
+              "feedback": "عادة رائعة."
+            }
+          ]
+        },
+        {
+          "id": "call",
+          "text": "بعد عودتك إلى طاولتك، يتصل بك مديرك ويطلب أرقامًا من مشروع سري. وبالقرب منك أشخاص جالسون.",
+          "choices": [
+            {
+              "label": "أذكر الأرقام بصوت مسموع",
+              "outcome": "risky",
+              "feedback": "من حولك يستطيعون السماع. لا مكان للأحاديث السرية في الأماكن العامة."
+            },
+            {
+              "label": "أقول إنني سأعاود الاتصال من مكان هادئ",
+              "outcome": "safe",
+              "feedback": "أحسنت. لا تجر المكالمات السرية إلا حيث لا يسمعك أحد."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "home-router",
+      "question": {
+        "prompt": "ما الخطوات المهمة لحماية جهاز الراوتر في منزلك؟",
+        "options": [
+          {
+            "id": "admin-password",
+            "label": "تغيير كلمة مرور مسؤول النظام التي ضبطها المصنع",
+            "correct": true,
+            "feedback": "يستطيع أي شخص أن يعثر على كلمة مرور المصنع."
+          },
+          {
+            "id": "firmware",
+            "label": "تحديث البرنامج الثابت لجهاز الراوتر",
+            "correct": true,
+            "feedback": "التحديثات تسد الثغرات المعروفة."
+          },
+          {
+            "id": "encryption",
+            "label": "اختيار تشفير WPA3 أو WPA2",
+            "correct": true,
+            "feedback": "التشفير يحمي شبكتك من التنصت."
+          },
+          {
+            "id": "no-password",
+            "label": "ترك شبكة Wi-Fi بلا كلمة مرور لتكون أسرع",
+            "correct": false,
+            "feedback": "سيتمكن أي شخص من الاتصال بها، ولن تصبح أسرع."
+          }
+        ],
+        "multi": true,
+        "visual": {
+          "kind": "illustration",
+          "id": "wifi"
+        }
+      },
+      "explain": "جهاز الراوتر هو باب منزلك إلى الإنترنت. وكلمة مرور المصنع والبرنامج الثابت القديم يتركانه مفتوحًا."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "لا تتصل بأنظمة العمل إلا عبر شبكة VPN التابعة لجهتك.",
+        "استخدم نقطة الاتصال في جوالك بدلًا من شبكات Wi-Fi المفتوحة.",
+        "لا تشارك حاسوب العمل مع عائلتك، واقفل الشاشة."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

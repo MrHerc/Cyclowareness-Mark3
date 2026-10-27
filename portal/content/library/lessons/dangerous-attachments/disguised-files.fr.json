@@ -1,0 +1,512 @@
+{
+ "id": "disguised-files",
+ "title": "Fichiers déguisés",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "df-tutor",
+   "beats": [
+    {
+     "id": "df-b1",
+     "say": "Bonjour ! Un nom de fichier peut mentir. Aujourd’hui, nous apprenons à voir ce qu’est vraiment une pièce jointe.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "df-b2",
+     "say": "Ce fichier ressemble à un PDF. Mais tout à la fin du nom, il y a point exe : c’est donc un programme.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "file",
+       "name": [
+        {
+         "text": "Qerar_2026.pdf"
+        },
+        {
+         "text": ".exe",
+         "spot": "ext"
+        }
+       ],
+       "type": "exe",
+       "size": "1,8 Mo",
+       "source": [
+        {
+         "text": "Pièce jointe d’un e-mail"
+        }
+       ]
+      }
+     },
+     "highlight": "ext"
+    },
+    {
+     "id": "df-b3",
+     "say": "Les archives, les images disque et les raccourcis peuvent eux aussi cacher un programme.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    },
+    {
+     "id": "df-b4",
+     "say": "La règle est simple : avant d’ouvrir un fichier inattendu, vérifiez son type et, en cas de doute, signalez-le.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "df-sim-files",
+   "environment": "desktop",
+   "title": "Dossier Téléchargements",
+   "intro": "Examinez les fichiers que vous avez téléchargés depuis vos e-mails. Affichez les extensions et choisissez quoi faire de chacun.",
+   "steps": [
+    {
+     "id": "decree-exe",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Qerar_2026.pdf.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "1,8 Mo",
+      "source": [
+       {
+        "text": "Téléchargements : qerar@nazirlik-sened.example.net"
+       }
+      ]
+     },
+     "say": "Affichez les extensions. Par quoi se termine le nom ?",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Ce n’est pas un document, c’est un programme. Il peut installer un logiciel malveillant dès son ouverture."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Exact. Une vraie décision ministérielle n’est jamais un programme."
+      },
+      {
+       "id": "report",
+       "label": "Signaler à la Sécurité informatique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Très bien. L’équipe sécurité peut aussi retirer ce même e-mail des boîtes de réception de tous vos collègues."
+      }
+     ]
+    },
+    {
+     "id": "report-iso",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Hesabat_sentyabr.iso"
+       }
+      ],
+      "type": "iso",
+      "size": "4,2 Mo",
+      "source": [
+       {
+        "text": "Téléchargements : hesabat@audit-xidmet.example.net"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Un fichier ISO s’ouvre comme un disque et peut contenir un programme. Les rapports ne s’envoient pas sous forme d’image disque."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Exact. N’ouvrez pas une image disque que vous n’attendiez pas."
+      },
+      {
+       "id": "report",
+       "label": "Signaler à la Sécurité informatique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Très bien. Un fichier ISO déguisé en rapport, c’est une attaque classique."
+      }
+     ]
+    },
+    {
+     "id": "photos-lnk",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Tedbir_fotolari"
+       }
+      ],
+      "type": "lnk",
+      "size": "3 Ko",
+      "source": [
+       {
+        "text": "Téléchargements : extrait d’une archive"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "C’était un raccourci, et il a lancé une commande cachée. Des photos ne pèsent jamais 3 Ko."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Exact. Un raccourci (.lnk) déguisé en photos est un piège."
+      },
+      {
+       "id": "report",
+       "label": "Signaler à la Sécurité informatique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Très bien. Signaler sans ouvrir, c’est la méthode la plus sûre."
+      }
+     ]
+    },
+    {
+     "id": "leave-pdf",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [
+       {
+        "text": "Mezuniyyet_qrafiki.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "220 Ko",
+      "source": [
+       {
+        "text": "Téléchargements : kadrlar@idare.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Exact. Un PDF attendu, venant d’une adresse interne, peut être ouvert sans crainte."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Ce fichier est sans danger : c’est un vrai PDF d’un expéditeur connu. Inutile de supprimer tous les fichiers."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "df-hotspot",
+   "prompt": "Trouvez les signaux d’alerte dans cet e-mail.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "e-xidmet-fake",
+    "from": {
+     "name": [
+      {
+       "text": "e-Xidmət Portal"
+      }
+     ],
+     "address": [
+      {
+       "text": "bildiris@e-xidmet-gov.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Avis d’amende"
+     }
+    ],
+    "time": "09:31",
+    "body": [
+     [
+      {
+       "text": "Une amende administrative a été établie à votre nom. Les détails figurent en pièce jointe."
+      }
+     ],
+     [
+      {
+       "text": "Mot de passe de l’archive : 2026",
+       "spot": "zip"
+      }
+     ],
+     [
+      {
+       "text": "Sans paiement sous 3 jours, le montant sera doublé.",
+       "spot": "urgency"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Cerime_bildirisi.zip",
+        "spot": "zip"
+       }
+      ],
+      "size": "860 Ko"
+     },
+     {
+      "name": [
+       {
+        "text": "Odenis_qebzi.html",
+        "spot": "html"
+       }
+      ],
+      "size": "14 Ko"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Faux domaine",
+     "explain": "L’adresse ajoute « -gov » et une terminaison différente. Vérifiez vous-même le domaine du portail officiel."
+    },
+    {
+     "id": "zip",
+     "label": "Archive protégée par un mot de passe",
+     "explain": "Le mot de passe empêche l’antivirus d’analyser son contenu. Les avis officiels ne sont pas envoyés de cette façon."
+    },
+    {
+     "id": "html",
+     "label": "Pièce jointe HTML",
+     "explain": "Une pièce jointe HTML ouvre dans le navigateur une fausse page de paiement ou de connexion."
+    },
+    {
+     "id": "urgency",
+     "label": "Menace et urgence",
+     "explain": "La peur doit vous pousser à ouvrir sans vérifier. Ne vérifiez vos amendes que sur le portail officiel."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "df-swipe",
+   "prompt": "Sans danger ou menace ?",
+   "cards": [
+    {
+     "id": "manual-pdf",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [
+       {
+        "text": "Telimat_2026.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "310 Ko",
+      "source": [
+       {
+        "text": "it@idare.example, guide attendu"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Adresse interne, document attendu, PDF ordinaire. Vous pouvez l’ouvrir."
+    },
+    {
+     "id": "salary-lnk",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Maas_cedveli.xlsx.lnk"
+       }
+      ],
+      "type": "lnk",
+      "size": "2 Ko",
+      "source": [
+       {
+        "text": "Expéditeur inconnu"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un raccourci déguisé en tableur. L’ouvrir peut lancer une commande cachée."
+    },
+    {
+     "id": "order-img",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "cevikkargo-fake",
+      "name": [
+       {
+        "text": "Sifaris_1873.img"
+       }
+      ],
+      "type": "img",
+      "size": "3,6 Mo",
+      "source": [
+       {
+        "text": "sifaris@cevik-kargo.example.net"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "IMG est une image disque. Les détails d’une commande ne sont jamais envoyés de cette façon."
+    },
+    {
+     "id": "slides-ppt",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "ofistechizat",
+      "name": [
+       {
+        "text": "Teqdimat_oktyabr.pptx"
+       }
+      ],
+      "type": "ppt",
+      "size": "2,1 Mo",
+      "source": [
+       {
+        "text": "Sabina Karimova, convenu pour la réunion"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Une présentation convenue, dans un format normal. Aucun signal d’alerte."
+    },
+    {
+     "id": "invoice-html",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "ofistechizat-fake",
+      "name": [
+       {
+        "text": "Faktura_oktyabr.html"
+       }
+      ],
+      "type": "html",
+      "size": "9 Ko",
+      "source": [
+       {
+        "text": "faktura@ofistechizat-az.example.net"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une facture n’est pas un fichier HTML. Celle-ci, venue d’un domaine trompeur, ouvre une page de connexion."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "df-match",
+   "prompt": "Associez chaque type de fichier à son risque.",
+   "pairs": [
+    {
+     "id": "exe",
+     "left": ".exe",
+     "right": "Un programme qui s’exécute à l’ouverture"
+    },
+    {
+     "id": "lnk",
+     "left": ".lnk",
+     "right": "Un raccourci qui peut lancer une commande cachée"
+    },
+    {
+     "id": "iso",
+     "left": ".iso",
+     "right": "Une image disque qui peut cacher un programme"
+    },
+    {
+     "id": "html",
+     "left": ".html",
+     "right": "Peut ouvrir une fausse page de connexion dans le navigateur"
+    },
+    {
+     "id": "zip",
+     "left": ".zip (avec mot de passe)",
+     "right": "L’antivirus ne peut pas analyser son contenu"
+    }
+   ],
+   "explain": "Ces types de fichiers sont rares dans les e-mails professionnels. Si vous en recevez un sans l’attendre, ne l’ouvrez pas et signalez-le."
+  },
+  {
+   "type": "choice",
+   "id": "df-choice",
+   "question": {
+    "prompt": "Un collègue vous dit : « J’ai ouvert le fichier et il ne s’est rien passé. » Que lui conseillez-vous ?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Se déconnecter du réseau et appeler immédiatement la Sécurité informatique",
+      "correct": true,
+      "feedback": "Exact. Un logiciel malveillant agit souvent en silence, et un signalement rapide limite les dégâts."
+     },
+     {
+      "id": "wait",
+      "label": "Attendre et signaler si quelque chose se passe",
+      "correct": false,
+      "feedback": "« Il ne s’est rien passé » est souvent une fausse impression. Attendre laisse du temps à l’attaquant."
+     },
+     {
+      "id": "shutdown",
+      "label": "Éteindre immédiatement l’ordinateur",
+      "correct": false,
+      "feedback": "L’extinction peut effacer des preuves en mémoire. Sauf consigne contraire de votre procédure, laissez-le allumé, déconnectez-le du réseau et signalez l’incident."
+     }
+    ]
+   },
+   "explain": "Un fichier suspect ouvert, c’est un incident : déconnectez l’appareil du réseau, laissez l’ordinateur allumé et signalez-le immédiatement."
+  },
+  {
+   "type": "recap",
+   "id": "df-recap",
+   "points": [
+    "Regardez tout à la fin du nom : c’est là que se trouve le vrai type",
+    "N’ouvrez pas d’archives, d’ISO, de raccourcis ou de fichiers HTML inattendus",
+    "Vous l’avez ouvert ? Déconnectez l’appareil du réseau et signalez-le immédiatement"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

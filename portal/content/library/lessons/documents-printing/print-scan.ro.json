@@ -1,0 +1,321 @@
+{
+ "id": "print-scan",
+ "title": "Imprimante și scanere",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "O pagină uitată la imprimantă este cea mai simplă scurgere de date. Oricine trece pe hol o poate lua.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": { "kind": "illustration", "id": "desk" }
+    },
+    {
+     "id": "b2",
+     "say": "Înainte să trimiteți documentul, verificați ce imprimantă este selectată și dacă imprimarea securizată este activată.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "nc-capmerkezi",
+       "tone": "system",
+       "title": [{ "text": "Imprimare" }],
+       "body": [
+        [
+         { "text": "Imprimantă: " },
+         { "text": "Coridor-2 (partajată)", "spot": "printer" }
+        ],
+        [
+         { "text": "Imprimare securizată: " },
+         { "text": "dezactivată", "spot": "secure" }
+        ]
+       ],
+       "buttons": ["Anulați", "Imprimați"]
+      }
+     },
+     "highlight": "secure"
+    },
+    {
+     "id": "b3",
+     "say": "Cu imprimarea securizată, paginile ies doar după ce apropiați cardul de imprimantă sau introduceți un PIN.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": { "kind": "illustration", "id": "lock" }
+    },
+    {
+     "id": "b4",
+     "say": "Și e-mailurile de la scaner cer atenție. Atacatorii deghizează des phishingul în documente scanate.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": { "kind": "illustration", "id": "inbox" }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "print-day",
+   "environment": "desktop",
+   "title": "O zi la imprimantă",
+   "intro": "Astăzi imprimați mai multe documente. Analizați ferestrele care se deschid și decideți.",
+   "steps": [
+    {
+     "id": "salary-print",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-capmerkezi",
+      "tone": "system",
+      "title": [{ "text": "Imprimare: Tabel_salarii_octombrie.xlsx" }],
+      "body": [
+       [{ "text": "Imprimantă: Coridor-2 (partajată)" }],
+       [{ "text": "Imprimare securizată: dezactivată" }],
+       [{ "text": "Copii: 1" }]
+      ],
+      "buttons": ["Imprimați direct", "Trimiteți cu imprimare securizată"]
+     },
+     "say": "Acest document conține salariile angajaților.",
+     "actions": [
+      {
+       "id": "secure",
+       "label": "Trimiteți cu imprimare securizată",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Documentul așteaptă în coadă și iese doar când sunteți lângă imprimantă."
+      },
+      {
+       "id": "direct",
+       "label": "Imprimați direct",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Pagina vă va aștepta pe holul comun. Dacă întârziați, o poate vedea altcineva."
+      }
+     ]
+    },
+    {
+     "id": "paper-out",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-capmerkezi",
+      "app": "Çap Mərkəzi",
+      "title": [{ "text": "Coridor-2: nu mai este hârtie" }],
+      "body": [{ "text": "Lista_deplasari.pdf este în coadă. Se va imprima imediat ce se pune hârtie." }],
+      "time": "11:20"
+     },
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Anulați imprimarea",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. După ce se pune hârtie, pagina ar ieși fără să fiți acolo, așa că retrimiteți-o cu imprimare securizată."
+      },
+      {
+       "id": "ignore",
+       "label": "Ignorați",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Cine pune hârtia va lua și lista. Anulați lucrarea care încă așteaptă în coadă."
+      }
+     ]
+    },
+    {
+     "id": "driver-popup",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-drayver",
+      "tone": "warning",
+      "title": [{ "text": "Driverul imprimantei este învechit" }],
+      "body": [
+       [{ "text": "Descărcați Drayver Yeniləyici ca să puteți imprima în continuare." }],
+       [{ "text": "printer-drayver.example.info" }]
+      ],
+      "buttons": ["Închideți", "Descărcați acum"]
+     },
+     "say": "Un site vă oferă un program pentru imprimantă.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Descărcați acum",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Un site nu poate verifica driverul de pe computerul dumneavoastră. Astfel de descărcări sunt de obicei malware."
+      },
+      {
+       "id": "cancel",
+       "label": "Închideți",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Doar suportul IT instalează driverele de imprimantă."
+      },
+      {
+       "id": "report",
+       "label": "Raportați suportului IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Suportul IT va verifica de unde a apărut această fereastră."
+      }
+     ]
+    },
+    {
+     "id": "scan-folder",
+     "label": "Folder partajat: Scanări",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-capmerkezi",
+      "name": [{ "text": "Scanare_pasapoarte_0410.pdf" }],
+      "type": "pdf",
+      "size": "3,2 MB",
+      "source": [{ "text": "Folder partajat: Scaner, etajul 3" }]
+     },
+     "say": "Copiile pașapoartelor pe care le-ați scanat au ajuns într-un folder partajat.",
+     "actions": [
+      {
+       "id": "move",
+       "label": "Mutați în folderul personal",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Mutați fișierul în folderul propriu, ca să nu rămână în cel partajat."
+      },
+      {
+       "id": "leave",
+       "label": "Lăsați-l acolo",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Folderul poate fi deschis de oricine de pe etaj. Copiile pașapoartelor sunt date cu caracter personal."
+      },
+      {
+       "id": "share",
+       "label": "Trimiteți linkul departamentului",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Datele personale ajung doar la persoana care are nevoie de ele. Nu le trimiteți întregului departament."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "scan-mail",
+   "prompt": "Găsiți elementele suspecte din acest e-mail care pretinde că vine de la scaner.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "nc-capmerkezi-fake",
+    "from": {
+     "name": [{ "text": "Scaner, etajul 3" }],
+     "address": [{ "text": "scan@idare-skan.example.net", "spot": "sender" }]
+    },
+    "subject": [{ "text": "Document scanat: 4 pagini" }],
+    "time": "14:03",
+    "body": [
+     [{ "text": "Stimate utilizator," }],
+     [
+      { "text": "Un document a fost scanat pentru dumneavoastră. " },
+      { "text": "Dacă nu îl vizualizați în 24 de ore, va fi șters.", "spot": "urgent" }
+     ],
+     [
+      {
+       "text": "Vizualizați documentul",
+       "spot": "link",
+       "link": { "label": "Vizualizați documentul", "href": "https://idare-skan.example.net/view" }
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       { "text": "Scanare_0410.pdf" },
+       { "text": ".html", "spot": "ext" }
+      ],
+      "size": "12 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Domeniul expeditorului",
+     "explain": "Scanerul dumneavoastră trimite de pe idare.example. Acest domeniu seamănă cu el, dar este altul."
+    },
+    {
+     "id": "urgent",
+     "label": "Presiune de timp",
+     "explain": "Un scaner nu vă grăbește. Presiunea timpului este un semn clasic de phishing."
+    },
+    {
+     "id": "link",
+     "label": "Link extern",
+     "explain": "Linkul duce la un site din afara organizației, unde vi se va cere parola."
+    },
+    {
+     "id": "ext",
+     "label": "Extensia fișierului",
+     "explain": "Un fișier .html este o pagină web, nu un document. Dacă îl deschideți, poate afișa un formular de conectare fals."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "found-print",
+   "question": {
+    "prompt": "Găsiți la imprimantă tabelul de salarii al altcuiva. Ce faceți?",
+    "options": [
+     {
+      "id": "owner",
+      "label": "Îl dau, fără să îl citesc, celui care l-a imprimat sau unui manager",
+      "correct": true,
+      "feedback": "Corect. Documentul ajunge înapoi în mâinile potrivite, iar colegul va fi mai atent data viitoare."
+     },
+     {
+      "id": "leave",
+      "label": "Îl las acolo, va veni cel care l-a imprimat",
+      "correct": false,
+      "feedback": "Oricine vine după dumneavoastră îl poate vedea. Nu lăsați pagini în imprimantă."
+     },
+     {
+      "id": "bin",
+      "label": "Îl arunc în cel mai apropiat coș de gunoi",
+      "correct": false,
+      "feedback": "O pagină dintr-un coș obișnuit poate fi scoasă ușor de acolo. Documentele confidențiale merg la distrugătorul de documente."
+     },
+     {
+      "id": "photo",
+      "label": "Postez o fotografie în chatul echipei: „Al cui este?”",
+      "correct": false,
+      "feedback": "Așa ajung datele salariale la și mai mulți oameni. Dați-i discret pagina celui care a imprimat-o."
+     }
+    ],
+    "visual": { "kind": "illustration", "id": "desk" }
+   },
+   "explain": "O pagină lăsată la imprimantă este o scurgere de date. Returnați-o celui care a imprimat-o sau unui manager, dacă nu știți al cui este."
+  },
+  {
+   "type": "match",
+   "id": "right-move",
+   "prompt": "Asociați fiecare situație cu reacția corectă.",
+   "pairs": [
+    { "id": "paper", "left": "Nu mai este hârtie, iar documentul așteaptă în coadă", "right": "Anulați lucrarea de imprimare" },
+    { "id": "driver", "left": "Un site vă oferă un program pentru imprimantă", "right": "Contactați suportul IT" },
+    { "id": "scan", "left": "Documentul scanat a ajuns într-un folder partajat", "right": "Mutați-l în folderul propriu" },
+    { "id": "secret", "left": "Trebuie să imprimați un fișier confidențial", "right": "Folosiți imprimarea securizată" }
+   ],
+   "explain": "Câteva obiceiuri mărunte previn scurgerile de date la imprimare."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Trimiteți fișierele confidențiale cu imprimare securizată și ridicați-le imediat.",
+    "Doar suportul IT instalează programe pentru imprimantă.",
+    "La e-mailurile de la scaner, verificați expeditorul și extensia fișierului."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

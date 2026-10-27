@@ -1,0 +1,530 @@
+{
+ "id": "pin-and-codes",
+ "title": "Code PIN et codes SMS",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l1-tutor",
+   "beats": [
+    {
+     "id": "l1-b1",
+     "say": "Mobile ID et la signature électronique, c’est votre signature numérique. Un document signé avec votre code PIN est considéré comme signé par vous.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "l1-b2",
+     "say": "Les escrocs appellent en disant « votre certificat expire », puis demandent votre code PIN ou votre code SMS.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "mohurid-fake",
+       "caller": [
+        {
+         "text": "Support MöhürID",
+         "spot": "caller-name"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 77 40"
+        }
+       ],
+       "label": "Support"
+      }
+     },
+     "highlight": "caller-name"
+    },
+    {
+     "id": "l1-b3",
+     "say": "Votre code PIN et vos codes SMS ne se communiquent à personne : ni au support, ni à vos collègues, ni à votre responsable.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "l1-b4",
+     "say": "Si votre certificat doit être renouvelé, faites-le vous-même sur le site officiel ou dans un centre de services.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "certificate"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "l1-sim",
+   "environment": "call",
+   "title": "Un appel au sujet du certificat",
+   "intro": "Quelqu’un appelle en se présentant comme le support du service de signature. Lisez ce qu’il dit et choisissez votre réponse.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "mohurid-fake",
+      "caller": [
+       {
+        "text": "Support MöhürID"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 77 40"
+       }
+      ],
+      "label": "Support",
+      "voice": "young-man"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Répondre",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Répondre n’a rien de dangereux. Ce qui compte, c’est ce que vous dites."
+      },
+      {
+       "id": "decline",
+       "label": "Refuser",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Cela convient aussi. En cas de doute, appelez vous-même le numéro officiel du service.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "expire",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "mohurid-fake",
+      "caller": [
+       {
+        "text": "Support MöhürID"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 77 40"
+       }
+      ],
+      "label": "Support",
+      "voice": "young-man"
+     },
+     "say": "Bonjour, ici le support MöhürID. Votre certificat de signature mobile, excusez-moi, expire aujourd’hui et sera bloqué si vous ne le renouvelez pas.",
+     "spoken": "Bonjour, <breath> ici le support MöhürID. Votre certificat de signature mobile <cough> excusez-moi, expire aujourd’hui et sera bloqué si vous ne le renouvelez pas.",
+     "actions": [
+      {
+       "id": "comply",
+       "label": "Comment puis-je le renouveler ?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "L’appelant commence à piloter la démarche. Vérifiez vous-même la date du certificat sur le site officiel."
+      },
+      {
+       "id": "verify",
+       "label": "Je vais appeler moi-même le numéro officiel",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Cherchez vous-même le numéro du service sur son site officiel.",
+       "next": "after"
+      },
+      {
+       "id": "hang",
+       "label": "Raccrocher",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bonne décision. Vous avez le droit de mettre fin à un appel qui vous presse.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "sms-code",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "mohurid-fake",
+      "caller": [
+       {
+        "text": "Support MöhürID"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 77 40"
+       }
+      ],
+      "label": "Support",
+      "voice": "young-man"
+     },
+     "say": "Vous allez recevoir un SMS pour le renouvellement. Lisez-moi le code, et je le saisirai dans le système à votre place.",
+     "spoken": "Vous allez recevoir un SMS pour le renouvellement. <breath> Lisez-moi le code, et je le saisirai dans le système à votre place.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Je lis le code à voix haute",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Avec ce code, ils se connectent à votre place. Un code est fait pour votre écran, et pour personne d’autre."
+      },
+      {
+       "id": "keep",
+       "label": "Je ne communique de code à personne",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Un vrai support ne demande jamais de code."
+      },
+      {
+       "id": "hang",
+       "label": "Raccrocher",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Exact. Raccrochez dès qu’on vous demande un code.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pin-sign",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "mohurid-fake",
+      "caller": [
+       {
+        "text": "Support MöhürID"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 77 40"
+       }
+      ],
+      "label": "Support",
+      "voice": "young-man"
+     },
+     "say": "Le code n’a pas fonctionné. Une demande va s’afficher sur votre téléphone : saisissez votre code PIN et confirmez-la.",
+     "spoken": "Le code n’a pas fonctionné. <sigh> Une demande va s’afficher sur votre téléphone : saisissez votre code PIN et confirmez-la.",
+     "actions": [
+      {
+       "id": "confirm",
+       "label": "Je saisis mon code PIN et je confirme",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Ce n’était pas un renouvellement : vous avez signé un document préparé par les escrocs. Appelez immédiatement le numéro officiel du service de signature."
+      },
+      {
+       "id": "deny",
+       "label": "Je refuse la demande",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. Ne confirmez jamais une demande que vous n’avez pas lancée vous-même."
+      },
+      {
+       "id": "hang",
+       "label": "Raccrocher",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Exact. Raccrochez et refusez la demande."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "L’appel est terminé. Et maintenant ?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "mohurid-fake",
+      "caller": [
+       {
+        "text": "Support MöhürID"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 77 40"
+       }
+      ],
+      "label": "Support",
+      "voice": "young-man"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "Appeler le numéro officiel du service",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Exact. Le support officiel peut vous indiquer l’état réel de votre certificat."
+      },
+      {
+       "id": "report",
+       "label": "Prévenir l’équipe sécurité",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bravo. Ce genre d’appel vise souvent plusieurs collègues."
+      },
+      {
+       "id": "ignore",
+       "label": "Ne rien faire",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "L’appelant va réessayer. Le signalement protège vos collègues."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l1-hotspot",
+   "prompt": "Trouvez les pièges dans ce message.",
+   "artifact": {
+    "kind": "sms",
+    "brandRef": "mohurid-fake",
+    "sender": [
+     {
+      "text": "MohurID"
+     }
+    ],
+    "time": "08:55",
+    "messages": [
+     [
+      {
+       "text": "Votre certificat de signature mobile "
+      },
+      {
+       "text": "expire aujourd’hui à 18:00",
+       "spot": "deadline"
+      },
+      {
+       "text": ". Pour le renouveler, "
+      },
+      {
+       "text": "saisissez votre code PIN",
+       "spot": "pin"
+      },
+      {
+       "text": " sur "
+      },
+      {
+       "text": "mohurid-yenile.test",
+       "spot": "link"
+      },
+      {
+       "text": ". "
+      },
+      {
+       "text": "Sans cela, votre signature sera révoquée.",
+       "spot": "threat"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "deadline",
+     "label": "Expire aujourd’hui",
+     "explain": "L’urgence ne laisse pas le temps de vérifier. Vous pouvez consulter vous-même la date du certificat sur le site officiel."
+    },
+    {
+     "id": "link",
+     "label": "Adresse inconnue",
+     "explain": "Ce n’est pas le site officiel du service. Saisissez vous-même l’adresse officielle."
+    },
+    {
+     "id": "pin",
+     "label": "Demande de code PIN",
+     "explain": "Un code PIN ne se saisit jamais sur un site pour « renouveler » quoi que ce soit. Il sert uniquement à confirmer une connexion ou une signature que vous avez lancée."
+    },
+    {
+     "id": "threat",
+     "label": "Menace de révocation",
+     "explain": "Faire peur est une méthode d’arnaque courante. En cas de doute, appelez le numéro officiel."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "l1-swipe",
+   "prompt": "Ce message est-il sûr ou dangereux ?",
+   "cards": [
+    {
+     "id": "own-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "mohurid",
+      "sender": [
+       {
+        "text": "MohurID"
+       }
+      ],
+      "time": "09:10",
+      "messages": [
+       [
+        {
+         "text": "Code de confirmation : 482913. Ne communiquez ce code à personne. Si vous n’êtes pas à l’origine de cette demande, refusez-la."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "C’est un message normal quand vous vous connectez vous-même. Il ne contient aucun lien et vous rappelle de garder le code secret."
+    },
+    {
+     "id": "renew-link",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "mohurid-fake",
+      "sender": [
+       {
+        "text": "MohurID"
+       }
+      ],
+      "time": "09:42",
+      "messages": [
+       [
+        {
+         "text": "Votre certificat est bloqué. Rétablissez-le ici : mohurid-yenile.test"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Le lien ne mène pas au site officiel du service. Pour vérifier, ouvrez vous-même le site officiel."
+    },
+    {
+     "id": "colleague-pin",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Elvin (Finances)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Je suis en congé. Mon code PIN, c’est 4471, signe ces documents à ma place."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Signer avec le code PIN de quelqu’un d’autre, c’est signer en son nom. Une délégation de pouvoir se fait par la voie officielle."
+    },
+    {
+     "id": "hr-reminder",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Service RH"
+        }
+       ],
+       "address": [
+        {
+         "text": "kadr@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Votre certificat expire dans 30 jours"
+       }
+      ],
+      "time": "10:15",
+      "body": [
+       [
+        {
+         "text": "Pour le renouveler, connectez-vous vous-même au site officiel du service de signature ou rendez-vous dans un centre de services."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Il n’y a aucun lien, et on ne vous demande ni code PIN ni code SMS. Vous renouvelez vous-même le certificat par la voie officielle."
+    },
+    {
+     "id": "unexpected-request",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "mohurid",
+      "app": "MöhürID",
+      "title": [
+       {
+        "text": "Demande de signature"
+       }
+      ],
+      "body": [
+       {
+        "text": "Etibarname_tam_selahiyyet.pdf attend votre signature"
+       }
+      ],
+      "time": "10:31"
+     },
+     "verdict": "threat",
+     "explain": "Vous n’êtes pas à l’origine de cette demande. Refusez-la et prévenez l’équipe sécurité."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "l1-choice",
+   "question": {
+    "prompt": "Un collègue en arrêt maladie vous demande de signer un document urgent avec son code PIN.",
+    "options": [
+     {
+      "id": "do",
+      "label": "Je signe, il m’a donné son accord",
+      "correct": false,
+      "feedback": "Une signature électronique n’appartient qu’à son titulaire. Signer avec son code PIN enfreint les règles."
+     },
+     {
+      "id": "refuse",
+      "label": "Je refuse et je demande à mon responsable d’organiser une délégation de pouvoir officielle",
+      "correct": true,
+      "feedback": "Exact. C’est l’institution qui délègue le pouvoir de signature à un remplaçant, par la voie officielle."
+     },
+     {
+      "id": "keep",
+      "label": "Je note le code PIN au cas où j’en aurais besoin",
+      "correct": false,
+      "feedback": "Conserver le code PIN de quelqu’un d’autre est risqué aussi. Un code PIN reste à son titulaire."
+     }
+    ]
+   },
+   "explain": "Le code PIN, c’est la signature elle-même. Vous ne donnez jamais le vôtre, et vous ne prenez jamais celui de quelqu’un d’autre."
+  },
+  {
+   "type": "recap",
+   "id": "l1-recap",
+   "points": [
+    "Ne communiquez jamais votre code PIN ni vos codes SMS, pas même au support.",
+    "Renouvelez votre certificat uniquement sur le site officiel ou dans un centre de services.",
+    "Refusez et signalez toute demande de signature que vous n’avez pas lancée."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

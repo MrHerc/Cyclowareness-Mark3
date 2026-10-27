@@ -1,0 +1,631 @@
+{
+  "id": "new-card-email",
+  "title": "Yeni kart numarası",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "pd1-tutor",
+      "beats": [
+        {
+          "id": "pd1-b1",
+          "say": "Merhaba! Bugün insan kaynaklarında çalışıyorsunuz ve yarın maaş günü.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        },
+        {
+          "id": "pd1-b2",
+          "say": "Bir çalışanın adından bir e-posta geliyor: “Kartım değişti, maaşımı yeni hesaba yatırın.”",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "from": {
+                "name": [
+                  {
+                    "text": "Leyla Memmedova"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "leyla.mammadova.88@poct-mail.example.net"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "Acil: maaş kartım değişti"
+                }
+              ],
+              "time": "16:40",
+              "body": [
+                [
+                  {
+                    "text": "Merhaba, eski kartımı kaybettim ve banka onu kapattı."
+                  }
+                ],
+                [
+                  {
+                    "text": "Lütfen yarınki maaşımı şu hesaba yatırın: "
+                  },
+                  {
+                    "text": "AZ00SAHL00000000000000004417",
+                    "spot": "new-account"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "new-account"
+        },
+        {
+          "id": "pd1-b3",
+          "say": "İsim tanıdık, ama adres kişisel bir e-posta adresi. Dolandırıcı maaşın kendi hesabına yatmasını istiyor.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "pd1-b4",
+          "say": "Kural basit: bir e-posta yüzünden banka bilgilerini asla değiştirmeyin. Çalışanı zaten bildiğiniz bir numaradan arayın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "pd1-hotspot",
+      "prompt": "Bu e-postadaki uyarı işaretlerini bulun.",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": [
+            {
+              "text": "Leyla Memmedova"
+            }
+          ],
+          "address": [
+            {
+              "text": "leyla.mammadova.88@poct-mail.example.net",
+              "spot": "personal-address"
+            }
+          ]
+        },
+        "to": "kadr@seherxidmetleri.example",
+        "subject": [
+          {
+            "text": "Acil: maaş kartım değişti"
+          }
+        ],
+        "time": "16:40",
+        "body": [
+          [
+            {
+              "text": "Sayın İnsan Kaynakları ekibi,"
+            }
+          ],
+          [
+            {
+              "text": "Eski kartımı kaybettim ve banka onu kapattı."
+            }
+          ],
+          [
+            {
+              "text": "Lütfen yarınki maaşımı yeni hesabıma yatırın: ",
+              "spot": "new-account"
+            },
+            {
+              "text": "AZ00SAHL00000000000000004417",
+              "spot": "new-account"
+            }
+          ],
+          [
+            {
+              "text": "Bugün işte değilim ve telefonum bozuk. Lütfen yalnızca buradan yanıt verin.",
+              "spot": "no-call"
+            }
+          ],
+          [
+            {
+              "text": "Lütfen yarın sabaha kadar halledin, kiramı ödemem gerekiyor.",
+              "spot": "urgency"
+            }
+          ],
+          [
+            {
+              "text": "Leyla Memmedova, Kamu Hizmetleri Departmanı"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "personal-address",
+          "label": "Kişisel e-posta adresi",
+          "explain": "Çalışanlar genellikle iş adreslerinden yazar. Herkes istediği adla kişisel bir e-posta hesabı açabilir."
+        },
+        {
+          "id": "new-account",
+          "label": "Yeni hesap",
+          "explain": "E-postanın asıl amacı bu. Maaş o hesaba yattıktan sonra geri almak zordur."
+        },
+        {
+          "id": "no-call",
+          "label": "Telefonla ulaşılamıyor",
+          "explain": "Bu satır, kontrol etmenizi engellemek için yazılmış. Tam da bu yüzden çalışanı bildiğiniz bir numaradan arayın."
+        },
+        {
+          "id": "urgency",
+          "label": "Baskı",
+          "explain": "Maaş gününden hemen önce baskı yapmak bu dolandırıcılığın olağan bir parçasıdır. Bir telefon görüşmesi yalnızca birkaç dakika sürer."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "pd1-sim",
+      "environment": "inbox",
+      "title": "İnsan kaynakları gelen kutusu",
+      "intro": "Yarın maaş günü. Beş e-postayı açın ve her biri için doğru adımı seçin.",
+      "steps": [
+        {
+          "id": "fake-colleague",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "w2f-seher-xidmetleri",
+            "from": {
+              "name": [
+                {
+                  "text": "Kamran Aliyev"
+                }
+              ],
+              "address": [
+                {
+                  "text": "k.aliyev@seherxidmetleri-mail.example.net"
+                }
+              ]
+            },
+            "to": "kadr@seherxidmetleri.example",
+            "subject": [
+              {
+                "text": "Maaş hesabımın güncellenmesi"
+              }
+            ],
+            "time": "09:12",
+            "body": [
+              [
+                {
+                  "text": "Merhaba, bankamı değiştirdim."
+                }
+              ],
+              [
+                {
+                  "text": "Lütfen eylül maaşımı şu hesaba yatırın: AZ00ULDZ00000000000000007731"
+                }
+              ],
+              [
+                {
+                  "text": "Formu sonra getiririm. Kamran Aliyev, Ulaştırma Birimi"
+                }
+              ]
+            ]
+          },
+          "say": "Gönderenin alan adına bakın.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. Bu, kurumunuzun alan adı değil: araya fazladan bir kelime eklenmiş."
+            },
+            {
+              "id": "verify",
+              "label": "Kamran Bey'i bildiğim numaradan ara",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Çok iyi. Kamran Bey böyle bir e-posta yazmadığını söyleyecek, siz de e-postayı bildireceksiniz."
+            },
+            {
+              "id": "change",
+              "label": "Yanıtla: hesap güncellendi",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Maaş dolandırıcıya giderdi. Banka bilgisi değişikliğini asla e-postayla kabul etmeyin."
+            }
+          ]
+        },
+        {
+          "id": "system-request",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "w2f-kadr-kabineti",
+            "from": {
+              "name": [
+                {
+                  "text": "Kadr Kabineti"
+                }
+              ],
+              "address": [
+                {
+                  "text": "noreply@kabinet.seherxidmetleri.example"
+                }
+              ]
+            },
+            "to": "kadr@seherxidmetleri.example",
+            "subject": [
+              {
+                "text": "Yeni talep: banka bilgisi değişikliği, Ayten Hüseynova"
+              }
+            ],
+            "time": "10:05",
+            "body": [
+              [
+                {
+                  "text": "Çalışan bu talebi, iki adımlı doğrulamayla giriş yaparak Kadr Kabineti sisteminden gönderdi."
+                }
+              ],
+              [
+                {
+                  "text": "Talebi sistemde inceleyin: "
+                },
+                {
+                  "text": "Talebi görüntüle",
+                  "link": {
+                    "label": "Talebi görüntüle",
+                    "href": "https://kabinet.seherxidmetleri.example/sorgular/2187"
+                  }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Talebi görüntüle",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "Doğru. Adres kurumunuzun kendi alan adında ve talep sistemin içinden geldi."
+            },
+            {
+              "id": "safe",
+              "label": "Güvenli olarak işaretle",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Doğru. Resmî sistemden gelen talep, doğru kanaldır."
+            },
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Dikkatli olmanız iyi, ama bu kurumunuzun kendi sistemi. Banka bilgisi değişiklikleri tam da bu yolla gelmelidir."
+            }
+          ]
+        },
+        {
+          "id": "portal-phish",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "w2f-kadr-kabineti-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "Kadr Kabineti"
+                }
+              ],
+              "address": [
+                {
+                  "text": "kabinet@kadr-kabineti.example.net"
+                }
+              ]
+            },
+            "to": "kadr@seherxidmetleri.example",
+            "subject": [
+              {
+                "text": "Parolanızın süresi bugün doluyor"
+              }
+            ],
+            "time": "11:30",
+            "body": [
+              [
+                {
+                  "text": "Maaş tablosuna erişiminiz bugün kapatılacaktır."
+                }
+              ],
+              [
+                {
+                  "text": "Erişiminizi korumak için: "
+                },
+                {
+                  "text": "Parolayı yenile",
+                  "link": {
+                    "label": "Parolayı yenile",
+                    "href": "https://kadr-kabineti-giris.example.net/yenile"
+                  }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Bağlantı kurumunuzun alan adına gitmiyor. “Bildir” düğmesi yoksa e-postayı güvenlik ekibine iletin."
+            },
+            {
+              "id": "click",
+              "label": "Parolayı yenile",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Bu sahte bir portal. Bir insan kaynakları hesabıyla dolandırıcı herkesin banka bilgilerini değiştirebilir."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Fena değil. Ama bildirirseniz iş arkadaşlarınız da korunur."
+            }
+          ]
+        },
+        {
+          "id": "payroll-sheet",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "w2f-seher-xidmetleri",
+            "from": {
+              "name": [
+                {
+                  "text": "Sebine Gasımova"
+                }
+              ],
+              "address": [
+                {
+                  "text": "s.qasimova@seherxidmetleri.example"
+                }
+              ]
+            },
+            "to": "kadr@seherxidmetleri.example",
+            "subject": [
+              {
+                "text": "Eylül maaş tablosu: son kontrol"
+              }
+            ],
+            "time": "12:15",
+            "body": [
+              [
+                {
+                  "text": "Merhaba, tablo ekte. Lütfen saat 15:00'e kadar inceleyin. Sebine, Finans"
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Maaş_tablosu_2026_09.xlsx"
+                  }
+                ],
+                "size": "96 KB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Eki aç",
+              "kind": "open-attachment",
+              "outcome": "safe",
+              "feedback": "Doğru. Tanıdık bir iş arkadaşı, kurumunuzun alan adı ve beklenen bir tablo."
+            },
+            {
+              "id": "forward",
+              "label": "Kişisel e-postama gönder",
+              "kind": "forward",
+              "outcome": "risky",
+              "feedback": "Tabloda herkesin kişisel verileri var. İş dosyalarını kişisel e-posta adresinize göndermeyin."
+            },
+            {
+              "id": "safe",
+              "label": "Güvenli olarak işaretle",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Doğru. Burada ne yeni bir hesap var ne de baskı."
+            }
+          ]
+        },
+        {
+          "id": "real-address-odd",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "w2f-seher-xidmetleri",
+            "from": {
+              "name": [
+                {
+                  "text": "Nermin Seferova"
+                }
+              ],
+              "address": [
+                {
+                  "text": "n.seferova@seherxidmetleri.example"
+                }
+              ]
+            },
+            "to": "kadr@seherxidmetleri.example",
+            "subject": [
+              {
+                "text": "Yeni hesap"
+              }
+            ],
+            "time": "14:48",
+            "body": [
+              [
+                {
+                  "text": "Maaşımı şu hesaba yatırın: AZ00SAHL00000000000000009260"
+                }
+              ],
+              [
+                {
+                  "text": "Aramayın, bütün gün toplantıdayım."
+                }
+              ]
+            ]
+          },
+          "say": "Adres gerçek. Yine de dikkatli olun.",
+          "actions": [
+            {
+              "id": "verify",
+              "label": "Dahili numarasından ara",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğru. Bir e-posta hesabı ele geçirilebilir, ama bildiğiniz numarada gerçek Nermin Hanım yanıt verir."
+            },
+            {
+              "id": "ask",
+              "label": "Yanıtla: bu doğru mu?",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "E-posta hesabı ele geçirildiyse yanıtı dolandırıcı yazar. Gerçek doğrulama yalnızca telefonla yapılır."
+            },
+            {
+              "id": "safe",
+              "label": "Güvenli olarak işaretle",
+              "kind": "mark-safe",
+              "outcome": "compromised",
+              "feedback": "Adres gerçek, ama hesap ele geçirilmiş olabilir. Banka bilgisi değişikliklerini her zaman telefonla doğrulayın."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "pd1-match",
+      "prompt": "Her talebi doğru kontrol yöntemiyle eşleştirin.",
+      "pairs": [
+        {
+          "id": "mail-account",
+          "left": "E-postada yeni banka hesabı",
+          "right": "Çalışanı bildiğiniz bir numaradan arayın"
+        },
+        {
+          "id": "system-request",
+          "left": "Kadr Kabineti sistemindeki talep",
+          "right": "Sistemde inceleyin, şüpheniz varsa arayın"
+        },
+        {
+          "id": "password-link",
+          "left": "Parola yenileme bağlantısı",
+          "right": "Portal adresini kendiniz yazın"
+        },
+        {
+          "id": "phone-request",
+          "left": "Çalışan, hesabını değiştirmek için arıyor",
+          "right": "Talebi Kadr Kabineti üzerinden göndermesini isteyin"
+        }
+      ],
+      "explain": "Her değişiklik sistemin içinde ya da sizin seçtiğiniz bir kanaldan doğrulanır. E-postadaki numara veya bağlantı bir doğrulama yöntemi değildir."
+    },
+    {
+      "type": "scenario",
+      "id": "pd1-scenario",
+      "title": "Maaş yatmadı",
+      "start": "n1",
+      "nodes": [
+        {
+          "id": "n1",
+          "text": "Merhaba, bugün maaşım kartıma yatmadı. Ben hesabımı değiştirmek için hiçbir talepte bulunmadım!",
+          "speaker": "Leyla Memmedova",
+          "voice": "young-woman",
+          "channel": "phone",
+          "manner": "worried",
+          "spoken": "Merhaba, bugün maaşım kartıma yatmadı. <breath> Ben hesabımı değiştirmek için hiçbir talepte bulunmadım!",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "w2f-seher-xidmetleri",
+              "caller": [
+                {
+                  "text": "Leyla Memmedova"
+                }
+              ],
+              "number": [
+                {
+                  "text": "Dahili 4107"
+                }
+              ],
+              "label": "Dahili arama"
+            }
+          },
+          "choices": [
+            {
+              "label": "Muhasebe bankayı arıyor, ben de durumu güvenlik ekibine bildiriyorum",
+              "next": "n2",
+              "feedback": "Doğru. Ne kadar erken bildirirseniz paranın geri alınma şansı o kadar artar."
+            },
+            {
+              "label": "Hesap bilgisini kimseye söylemeden eskisine çeviriyorum",
+              "outcome": "risky",
+              "feedback": "Hata düzeltilmeli, ama gizlenmemeli. Banka transferi durdurmayı deneyebilir, güvenlik ekibi de ne olduğunu araştırır."
+            },
+            {
+              "label": "Ona e-postayı kendisinin yazdığını söylüyorum",
+              "outcome": "risky",
+              "feedback": "O e-postayı Leyla Hanım yazmadı. Önemli olan suçlu aramak değil, zararı durdurmak."
+            }
+          ]
+        },
+        {
+          "id": "n2",
+          "text": "E-postayı silmeyin, bana iletin. Bu hafta başka banka bilgisi değişikliği oldu mu?",
+          "speaker": "Fidan Rzayeva, güvenlik ekibi",
+          "voice": "woman",
+          "channel": "phone",
+          "manner": "firm",
+          "spoken": "E-postayı silmeyin, bana iletin. <breath> Bu hafta başka banka bilgisi değişikliği oldu mu?",
+          "choices": [
+            {
+              "label": "E-postayı iletiyor ve bu hafta yapılan bütün değişiklikleri kontrol ediyorum",
+              "outcome": "safe",
+              "feedback": "Çok iyi. Dolandırıcılar genellikle birkaç çalışanın adına birden yazar."
+            },
+            {
+              "label": "Zaten sildim, gerek yok",
+              "outcome": "risky",
+              "feedback": "E-posta bir kanıttır. Sildiyseniz silinmiş öğelerden geri yükleyip iletin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "pd1-recap",
+      "points": [
+        "Banka bilgileri asla e-postayla değiştirilmez.",
+        "Çalışanı bildiğiniz bir numaradan arayın.",
+        "Şüpheniz varsa ödemeyi bekletin ve durumu bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

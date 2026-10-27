@@ -842,7 +842,9 @@ language's voice (section 3.4).
   whitespace collapsed, trailing `?!.` removed). Answers grounded in a translation are cached apart from
   answers grounded in the English text, whose ids stayed as they were before translations existed. A hit
   returns the stored answer with `x-tutor-mode: cache`. Answers are stored after streaming
-  (`onConflictDoNothing`), with `model`; nothing hashes the lesson text, so after a lesson is re-translated
+  (`onConflictDoNothing`), with `model` = `ANTHROPIC_TUTOR_MODEL`, and only when the stream's
+  `message_delta` stop_reason is `end_turn` (a refused or cut-off answer is shown to that learner but
+  never stored, since cache ids do not include the tenant); nothing hashes the lesson text, so after a lesson is re-translated
   the old answers stay until their rows are deleted. To clear them: rows exist only when
   `ANTHROPIC_API_KEY` is set (offline answers, and the fallback after a failed stream, are never
   cached); `tutor_cache` (`src/server/db/schema.ts`) has `tenant_id` and `lesson_id` (= `lessons.id`), so
@@ -853,16 +855,23 @@ language's voice (section 3.4).
   live database. An audit event name `tutor.cache_removed` is declared
   in `src/server/services/audit.ts`, but no code path emits it yet (verify before documenting a
   cache-clearing UI).
-- **Model**: `@anthropic-ai/sdk` `client.messages.stream({ model: env.ANTHROPIC_MODEL, max_tokens: 2000,
-  system: tutorSystemPrompt(locale), messages: [{ role: "user", content: "Lesson context:\n{context}\n\nThe learner asks: {question}" }] })`,
-  streamed as `text/plain` with `x-tutor-mode: ai` once the first text has arrived (Offline fallback
-  below). Env (`src/server/env.ts`): `ANTHROPIC_API_KEY`
-  (optional) and `ANTHROPIC_MODEL` (default `claude-opus-5-5`; OPEN-QUESTIONS #1 suggests
-  `claude-haiku-5-5` for cost). No TTS variables exist; `VOICE_PROVIDER` is for voice-call campaigns, not
-  narration. ADR-008: only lesson context and the question go to the model, never learner data.
-- **Context** `lessonContext(moduleTitle, lessonTitle, scenes, sceneId)`, called with the module and
+- **Model**: `@anthropic-ai/sdk` `client.messages.stream(tutorRequest(env.ANTHROPIC_TUTOR_MODEL, locale,
+  context, scene, question))`. `tutorRequest()` (`src/server/tutor.ts`) builds `max_tokens: 1024`,
+  `thinking: { type: "disabled" }`, `output_config: { effort: "medium" }`, `system: tutorSystemPrompt(locale)`
+  and one user message of two text blocks: `"Lesson context:\n{context}"` with
+  `cache_control: { type: "ephemeral" }` (this one breakpoint caches system + lesson context), then the
+  current scene's lines and `"The learner asks: {question}"` after it. No temperature/top_p/top_k, prefill
+  or fallbacks (Haiku 5.5 rejects them). Streamed as `text/plain` with `x-tutor-mode: ai` once the first
+  text has arrived (Offline fallback below). Env (`src/server/env.ts`): `ANTHROPIC_API_KEY` (optional) and
+  `ANTHROPIC_TUTOR_MODEL` (default `claude-haiku-5-5`; tutor only). `ANTHROPIC_MODEL` (default
+  `claude-opus-5-5`) is the Studio drafting model in `src/server/ai.ts`; it rejects disabled thinking, so
+  pointing the tutor at it makes every answer fall back to the lesson text. No TTS variables exist;
+  `VOICE_PROVIDER` is for voice-call campaigns, not narration. ADR-008: only lesson context and the
+  question go to the model, never learner data.
+- **Context** `lessonContext(moduleTitle, lessonTitle, scenes)`, called with the module and
   lesson titles in the scenes' language (`pick(mod.title, row.locale)`, `pick(row.title, row.locale)`):
-  the current scene first, then the rest; beats as `- say`, questions with `[correct]/[wrong]` options
+  the whole lesson in order, byte-identical for every scene and question on it so the cached prefix is
+  reused (the current scene goes after the breakpoint instead); beats as `- say`, questions with `[correct]/[wrong]` options
   and feedback, hotspot spots, swipe verdicts, simulation actions `label → outcome: feedback`, scenario choices, match pairs, the correct
   order, recap points, intro; capped at 9 000 characters. `tutorSystemPrompt(locale)`: friendly security
   tutor, answer in `TUTOR_LANGUAGE[locale]` (Azerbaijani/English/Russian) in at most four plain sentences,
@@ -1329,11 +1338,13 @@ Azerbaijani voice. Everything in the UI goes through `useNarrator().speak()`, so
 ### 6.8 Add a tutor capability
 
 - New context (e.g. the learner's wrong answers of this lesson): extend the request schema in
-  `src/server/tutor.ts`, pass the data from `TutorPanel` (`tutor-panel.tsx` builds the body), fold it into
-  `lessonContext()` without PII (ADR-008), and include it in the cache id only if it changes the answer.
+  `src/server/tutor.ts`, pass the data from `TutorPanel` (`tutor-panel.tsx` builds the body), add it to
+  the second text block of `tutorRequest()` without PII (ADR-008; `lessonContext()` is the cached prefix
+  and must stay the same for every question on a lesson), and include it in the cache id only if it
+  changes the answer.
 - New behaviour (e.g. a "Why is it fake?" quick action): add the string to `player.tutor.suggestions`
   in three locales; the chips call `ask(s)` directly.
-- Tool use or longer answers: change `max_tokens`/`system` in the route; keep the plain-text streaming
+- Tool use or longer answers: change `max_tokens`/`system` in `tutorRequest()` (`src/server/tutor.ts`); keep the plain-text streaming
   contract and `x-tutor-mode` header the panel relies on, or update the panel's reader.
 - Voice output quality: `TutorPanel` speaks through the same narrator (`speak(text, answerLang)`), so the TTS
   provider from 6.6 applies automatically once `speak()` handles texts without a manifest entry (the

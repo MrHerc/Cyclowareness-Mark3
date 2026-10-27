@@ -1,0 +1,354 @@
+{
+ "id": "wrong-recipient",
+ "title": "არასწორი ადრესატი",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "არასწორ ადამიანს გაგზავნილი წერილი მონაცემთა გაჟონვის ერთ-ერთი ყველაზე გავრცელებული მიზეზია. ჩვეულებრივ, ამას აჩქარება და ავტომატური შევსება იწვევს.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": { "kind": "illustration", "id": "inbox" }
+    },
+    {
+     "id": "b2",
+     "say": "ერთი და იგივე სახელი ორჯერ ჩანს: ერთი სამსახურის მისამართია, მეორე კი პირადი ან გარე. შეამოწმეთ დომენი.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "app",
+       "title": [ { "text": "ვის: ლეილა" } ],
+       "body": [
+        [ { "text": "ლეილა ჰასანოვა, leyla.hasanova@rxagentlik.az" } ],
+        [
+         { "text": "ლეილა ჰასანოვა, " },
+         { "text": "leyla.hasanova85@poct.example", "spot": "external" }
+        ]
+       ],
+       "buttons": [ "არჩევა" ]
+      }
+     },
+     "highlight": "external"
+    },
+    {
+     "id": "b3",
+     "say": "გაგზავნის შემდეგ წერილის გამოხმობის იმედი არ გქონდეთ: გარე მისამართებზე ეს ჩვეულებრივ არ მუშაობს.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": { "kind": "illustration", "id": "lock" }
+    },
+    {
+     "id": "b4",
+     "say": "გაგზავნამდე სამი რამ შეამოწმეთ: ადრესატი, დანართი და ასლში მითითებული სახელები.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": { "kind": "illustration", "id": "folder" }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "before-send",
+   "environment": "inbox",
+   "title": "გაგზავნამდე",
+   "intro": "სამი მონახაზი გაგზავნას ელოდება, ერთი პასუხი კი გარედან მოვიდა. შეამოწმეთ თითოეული.",
+   "steps": [
+    {
+     "id": "autocomplete",
+     "label": "მონახაზი",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [ { "text": "თქვენ" } ],
+       "address": [ { "text": "aynur.mammadova@rxagentlik.az" } ]
+      },
+      "to": "ლეილა ჰასანოვა <leyla.hasanova85@poct.example>",
+      "subject": [ { "text": "განცხადებების სია" } ],
+      "time": "11:38",
+      "body": [
+       [ { "text": "ლეილა, სია, რომელიც მთხოვეთ, დანართშია." } ]
+      ],
+      "attachments": [
+       { "name": [ { "text": "Muracietler_2026.xlsx" } ], "size": "310 კბ" }
+      ]
+     },
+     "say": "ადრესატის დომენი ბოლომდე წაიკითხეთ.",
+     "actions": [
+      {
+       "id": "fix",
+       "label": "ადრესატის შემოწმება და გასწორება",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "სწორია, სახელი ემთხვეოდა, დომენი კი არა. სამსახურის მისამართის ბოლოში rxagentlik.az უნდა ეწეროს."
+      },
+      {
+       "id": "send",
+       "label": "გაგზავნა",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "ადრესატი პირადი საფოსტო ყუთი იყო. კონფიდენციალური სია ორგანიზაციის გარეთ აღმოჩნდა."
+      }
+     ]
+    },
+    {
+     "id": "reply-all",
+     "label": "მონახაზი",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [ { "text": "თქვენ" } ],
+       "address": [ { "text": "aynur.mammadova@rxagentlik.az" } ]
+      },
+      "to": "layihe-qrupu@rxagentlik.az, e.rzayev@merkez-konsalting.example",
+      "subject": [ { "text": "Re: პარტნიორის ფასების შეთავაზება" } ],
+      "time": "12:05",
+      "body": [
+       [ { "text": "კოლეგებო, Merkez Konsalting-ის შეთავაზება ძვირი ჩანს, მოდით, სხვა კომპანიასაც დაველაპარაკოთ." } ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "remove",
+       "label": "გარე მისამართის წაშლა",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "სწორია. „ყველასთვის პასუხი“ ყველა წინა ადრესატს ინარჩუნებს, გარეშე პირების ჩათვლით."
+      },
+      {
+       "id": "send",
+       "label": "გაგზავნა",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "პარტნიორი სიაშია. შიდა განხილვა მასაც მიუვიდოდა."
+      }
+     ]
+    },
+    {
+     "id": "correct-draft",
+     "label": "მონახაზი",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [ { "text": "თქვენ" } ],
+       "address": [ { "text": "aynur.mammadova@rxagentlik.az" } ]
+      },
+      "to": "kadrlar@rxagentlik.az",
+      "subject": [ { "text": "შვებულების განცხადება" } ],
+      "time": "12:20",
+      "body": [
+       [ { "text": "გამარჯობა, შვებულების განცხადებას დანართად გიგზავნით." } ]
+      ],
+      "attachments": [
+       { "name": [ { "text": "Erize.pdf" } ], "size": "52 კბ" }
+      ]
+     },
+     "actions": [
+      {
+       "id": "send",
+       "label": "გაგზავნა",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "ყველაფერი რიგზეა: შიდა მისამართი, სწორი ფაილი და არც ერთი ზედმეტი ადრესატი."
+      },
+      {
+       "id": "check",
+       "label": "ხელახლა შემოწმება",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "შემოწმება არასოდეს აწყენს. ეს წერილი სწორი იყო და შეგიძლიათ გაგზავნოთ."
+      }
+     ]
+    },
+    {
+     "id": "partner-notice",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "merkez-konsalting",
+      "from": {
+       "name": [ { "text": "ელჩინ რზაევი" } ],
+       "address": [ { "text": "e.rzayev@merkez-konsalting.example" } ]
+      },
+      "subject": [ { "text": "ეს შეცდომით ხომ არ მომივიდა?" } ],
+      "time": "13:10",
+      "body": [
+       [ { "text": "გამარჯობა, გუშინ თქვენმა დეპარტამენტმა თანამშრომლების ხელფასების ცხრილი გამომიგზავნა. ალბათ შეცდომით. რა ვქნა?" } ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "უსაფრთხოების სამსახურისთვის გადაგზავნა",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "სწორია. არასწორ მისამართზე გაგზავნილი წერილი ინციდენტია, სპეციალისტი გეტყვით, რა უნდა გააკეთოთ."
+      },
+      {
+       "id": "reply",
+       "label": "პასუხი: გთხოვთ, წაშალოთ",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "წაშლის თხოვნა სწორია, მაგრამ ჯერ უსაფრთხოების სამსახურს აცნობეთ."
+      },
+      {
+       "id": "delete",
+       "label": "წაშლა",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "გაჟონვა ამით არ ქრება. შეატყობინეთ, რომ სპეციალისტებმა საქმე ბოლომდე მიიყვანონ."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "recall",
+   "question": {
+    "prompt": "წერილი არასწორ მისამართზე წავიდა და თქვენ ის გამოიხმეთ. ეს საკმარისია?",
+    "options": [
+     {
+      "id": "enough",
+      "label": "დიახ, წერილი წაიშლება",
+      "correct": false,
+      "feedback": "გარე მისამართებზე გამოხმობა ჩვეულებრივ არ მუშაობს, წერილი კი შეიძლება უკვე წაკითხულიც იყოს."
+     },
+     {
+      "id": "report",
+      "label": "არა, მაინც დაუყოვნებლივ შევატყობინებ უსაფრთხოების სამსახურს",
+      "correct": true,
+      "feedback": "სწორია. გამოხმობამ შეიძლება არ იმუშაოს, ამიტომ აუცილებლად უნდა შეატყობინოთ."
+     },
+     {
+      "id": "wait",
+      "label": "დაველოდები, იქნებ არ გახსნან",
+      "correct": false,
+      "feedback": "ლოდინი ზიანს არ ამცირებს. რაც უფრო სწრაფად შეატყობინებთ, მით მეტი შესაძლებლობა გექნებათ."
+     }
+    ],
+    "visual": { "kind": "illustration", "id": "inbox" }
+   },
+   "explain": "თუ შეცდომით გაგზავნეთ, არ დამალოთ: დაუყოვნებლივ აცნობეთ ხელმძღვანელს და უსაფრთხოების სამსახურს."
+  },
+  {
+   "type": "swipe",
+   "id": "recipient-check",
+   "prompt": "ადრესატების ეს სია სწორია?",
+   "cards": [
+    {
+     "id": "hr",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [ { "text": "თქვენ" } ],
+       "address": [ { "text": "aynur.mammadova@rxagentlik.az" } ]
+      },
+      "to": "kadrlar@rxagentlik.az",
+      "subject": [ { "text": "ცნობის მოთხოვნა" } ],
+      "time": "14:00",
+      "body": [
+       [ { "text": "გამარჯობა, სამსახურიდან ცნობა მჭირდება." } ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "შიდა მისამართი, სწორი დეპარტამენტი და არც ერთი ზედმეტი ადრესატი."
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [ { "text": "თქვენ" } ],
+       "address": [ { "text": "aynur.mammadova@rxagentlik.az" } ]
+      },
+      "to": "რაშად ალიევი <reshad.aliyev@rxagentlik-az.com>",
+      "subject": [ { "text": "ბიუჯეტის ცხრილი" } ],
+      "time": "14:12",
+      "body": [
+       [ { "text": "რაშად, ცხრილი დანართშია." } ]
+      ],
+      "attachments": [
+       { "name": [ { "text": "Budce_2027.xlsx" } ], "size": "180 კბ" }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "rxagentlik-az.com თქვენი დომენი არ არის. ავტომატურმა შევსებამ ძველი ან ყალბი მისამართი შემოგთავაზათ."
+    },
+    {
+     "id": "all-staff",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [ { "text": "თქვენ" } ],
+       "address": [ { "text": "aynur.mammadova@rxagentlik.az" } ]
+      },
+      "to": "butun-emekdaslar@rxagentlik.az",
+      "subject": [ { "text": "კოლეგის სამედიცინო ცნობა" } ],
+      "time": "14:30",
+      "body": [
+       [ { "text": "ცნობა დანართშია." } ]
+      ],
+      "attachments": [
+       { "name": [ { "text": "Arayis.pdf" } ], "size": "96 კბ" }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "პირადი ხასიათის დოკუმენტი ყველა თანამშრომელს არ უნდა გაეგზავნოს. გაუგზავნეთ მხოლოდ იმ ადამიანს, ვისაც ის სჭირდება."
+    },
+    {
+     "id": "no-bcc",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [ { "text": "თქვენ" } ],
+       "address": [ { "text": "aynur.mammadova@rxagentlik.az" } ]
+      },
+      "to": "40 პარტნიორი, ყველა ველში „ვის“",
+      "subject": [ { "text": "სადღესასწაულო მილოცვა" } ],
+      "time": "15:00",
+      "body": [
+       [ { "text": "ძვირფასო პარტნიორებო, გილოცავთ დღესასწაულს!" } ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "მასობრივ წერილში მისამართები ფარულ ასლში (Bcc) ჩაწერეთ, რომ ადრესატებმა ერთმანეთის მისამართები ვერ დაინახონ."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "address-fields",
+   "prompt": "თითოეული ადრესატი სწორ ველში მოათავსეთ.",
+   "pairs": [
+    { "id": "to", "left": "მთავარი ადრესატი, რომლისგანაც პასუხს ელით", "right": "ვის (To)" },
+    { "id": "cc", "left": "კოლეგა, რომელიც საქმის კურსში უნდა იყოს", "right": "ასლი (Cc)" },
+    { "id": "bcc", "left": "ბევრი ადრესატი, რომლებიც ერთმანეთს არ იცნობენ", "right": "ფარული ასლი (Bcc)" }
+   ],
+   "explain": "სწორი ველის წყალობით გარეშე პირები ვერ ხედავენ მისამართებს, რომლებიც მათ არ სჭირდებათ."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "გაგზავნამდე ადრესატის დომენი ბოლომდე წაიკითხეთ.",
+    "შეამოწმეთ „ყველასთვის პასუხი“ და ასლში მითითებული გარე მისამართები.",
+    "თუ წერილი შეცდომით გაიგზავნა, გამოხმობის იმედი არ გქონდეთ, დაუყოვნებლივ შეატყობინეთ."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

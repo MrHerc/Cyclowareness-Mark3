@@ -1,0 +1,359 @@
+{
+ "id": "disguised-files",
+ "title": "შენიღბული ფაილები",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "df-tutor",
+   "beats": [
+    {
+     "id": "df-b1",
+     "say": "გამარჯობა! ფაილის სახელი შეიძლება ტყუოდეს. დღეს ვისწავლით, როგორ გავიგოთ, რა არის დანართი სინამდვილეში.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": { "kind": "illustration", "id": "folder" }
+    },
+    {
+     "id": "df-b2",
+     "say": "ეს ფაილი PDF-ს ჰგავს. მაგრამ სახელის ბოლოში exe წერია, ანუ ეს პროგრამაა.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "file",
+       "name": [
+        { "text": "Qerar_2026.pdf" },
+        { "text": ".exe", "spot": "ext" }
+       ],
+       "type": "exe",
+       "size": "1,8 მბ",
+       "source": [ { "text": "ელფოსტის დანართი" } ]
+      }
+     },
+     "highlight": "ext"
+    },
+    {
+     "id": "df-b3",
+     "say": "არქივებში, დისკის ასლებსა და მალსახმობებშიც შეიძლება პროგრამა იმალებოდეს.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": { "kind": "illustration", "id": "download" }
+    },
+    {
+     "id": "df-b4",
+     "say": "წესი მარტივია: მოულოდნელი ფაილის გახსნამდე შეამოწმეთ მისი ტიპი, ეჭვის შემთხვევაში კი შეატყობინეთ.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": { "kind": "illustration", "id": "shield" }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "df-sim-files",
+   "environment": "desktop",
+   "title": "ჩამოტვირთვების საქაღალდე",
+   "intro": "შეხედეთ ელფოსტიდან ჩამოტვირთულ ფაილებს. ჩართეთ ფაილის გაფართოებების ჩვენება და აირჩიეთ, რა უნდა ქნათ თითოეულთან.",
+   "steps": [
+    {
+     "id": "decree-exe",
+     "artifact": {
+      "kind": "file",
+      "name": [ { "text": "Qerar_2026.pdf.exe" } ],
+      "type": "exe",
+      "size": "1,8 მბ",
+      "source": [ { "text": "ჩამოტვირთვები: qerar@nazirlik-sened.example.net" } ]
+     },
+     "say": "ჩართეთ ფაილის გაფართოებების ჩვენება. რა წერია სახელის ბოლოში?",
+     "actions": [
+      {
+       "id": "open",
+       "label": "გახსნა",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "ეს დოკუმენტი კი არა, პროგრამაა. გახსნისთანავე მას შეუძლია მავნე პროგრამა დააყენოს."
+      },
+      {
+       "id": "delete",
+       "label": "წაშლა",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "სწორია. ოფიციალური დადგენილება პროგრამა არასოდეს არის."
+      },
+      {
+       "id": "report",
+       "label": "IT უსაფრთხოების სამსახურისთვის შეტყობინება",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "შესანიშნავია. უსაფრთხოების სამსახურს შეუძლია იგივე წერილი ყველა სხვა თანამშრომლის ელფოსტიდანაც წაშალოს."
+      }
+     ]
+    },
+    {
+     "id": "report-iso",
+     "artifact": {
+      "kind": "file",
+      "name": [ { "text": "Hesabat_sentyabr.iso" } ],
+      "type": "iso",
+      "size": "4,2 მბ",
+      "source": [ { "text": "ჩამოტვირთვები: hesabat@audit-xidmet.example.net" } ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "გახსნა",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "ISO-ფაილი დისკივით იხსნება და შიგნით შეიძლება პროგრამა იყოს. ანგარიშებს დისკის ასლის სახით არ აგზავნიან."
+      },
+      {
+       "id": "delete",
+       "label": "წაშლა",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "სწორია. არ გახსნათ დისკის ასლი, რომელსაც არ ელოდით."
+      },
+      {
+       "id": "report",
+       "label": "IT უსაფრთხოების სამსახურისთვის შეტყობინება",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "შესანიშნავია. ანგარიშად შენიღბული ISO-ფაილი ტიპური შეტევაა."
+      }
+     ]
+    },
+    {
+     "id": "photos-lnk",
+     "artifact": {
+      "kind": "file",
+      "name": [ { "text": "Tedbir_fotolari" } ],
+      "type": "lnk",
+      "size": "3 კბ",
+      "source": [ { "text": "ჩამოტვირთვები: არქივიდან ამოღებული" } ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "გახსნა",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "ეს მალსახმობი იყო და მან ფარული ბრძანება გაუშვა. ფოტოები არასოდეს იწონის 3 კბ-ს."
+      },
+      {
+       "id": "delete",
+       "label": "წაშლა",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "სწორია. ფოტოებად შენიღბული მალსახმობი (.lnk) ხაფანგია."
+      },
+      {
+       "id": "report",
+       "label": "IT უსაფრთხოების სამსახურისთვის შეტყობინება",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "შესანიშნავია. ყველაზე უსაფრთხოა, რომ ფაილი არ გახსნათ და ისე შეატყობინოთ."
+      }
+     ]
+    },
+    {
+     "id": "leave-pdf",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [ { "text": "Mezuniyyet_qrafiki.pdf" } ],
+      "type": "pdf",
+      "size": "220 კბ",
+      "source": [ { "text": "ჩამოტვირთვები: kadrlar@idare.example" } ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "გახსნა",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "სწორია. შიდა მისამართიდან მოსული მოსალოდნელი PDF შეგიძლიათ გახსნათ."
+      },
+      {
+       "id": "delete",
+       "label": "წაშლა",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "ეს ფაილი უსაფრთხოა: ნამდვილი PDF ნაცნობი გამგზავნისგან. ყველა ფაილის წაშლა საჭირო არ არის."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "df-hotspot",
+   "prompt": "იპოვეთ ამ წერილის საგანგაშო ნიშნები.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "e-xidmet-fake",
+    "from": {
+     "name": [ { "text": "e-Xidmət პორტალი" } ],
+     "address": [ { "text": "bildiris@e-xidmet-gov.example.net", "spot": "domain" } ]
+    },
+    "subject": [ { "text": "ცნობა ჯარიმის შესახებ" } ],
+    "time": "09:31",
+    "body": [
+     [ { "text": "თქვენს სახელზე ადმინისტრაციული ჯარიმა დაირიცხა. დეტალები თან ერთვის." } ],
+     [ { "text": "არქივის პაროლი: 2026", "spot": "zip" } ],
+     [ { "text": "თუ 3 დღეში არ გადაიხდით, თანხა გაორმაგდება.", "spot": "urgency" } ]
+    ],
+    "attachments": [
+     { "name": [ { "text": "Cerime_bildirisi.zip", "spot": "zip" } ], "size": "860 კბ" },
+     { "name": [ { "text": "Odenis_qebzi.html", "spot": "html" } ], "size": "14 კბ" }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "ყალბი დომენი",
+     "explain": "მისამართს დამატებული აქვს „-gov“ და განსხვავებული დაბოლოება. ოფიციალური პორტალის დომენი თავად შეამოწმეთ."
+    },
+    {
+     "id": "zip",
+     "label": "პაროლით დაცული არქივი",
+     "explain": "პაროლი ანტივირუსს შიგნით ჩახედვის საშუალებას არ აძლევს. ოფიციალურ ცნობებს ასე არ აგზავნიან."
+    },
+    {
+     "id": "html",
+     "label": "HTML-დანართი",
+     "explain": "HTML-დანართი ბრაუზერში გადახდის ან შესვლის ყალბ გვერდს ხსნის."
+    },
+    {
+     "id": "urgency",
+     "label": "მუქარა და აჩქარება",
+     "explain": "შიში იმისთვისაა, რომ ფაილი შემოწმების გარეშე გახსნათ. ჯარიმები მხოლოდ ოფიციალურ პორტალზე შეამოწმეთ."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "df-swipe",
+   "prompt": "უსაფრთხოა თუ საფრთხეა?",
+   "cards": [
+    {
+     "id": "manual-pdf",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [ { "text": "Telimat_2026.pdf" } ],
+      "type": "pdf",
+      "size": "310 კბ",
+      "source": [ { "text": "it@idare.example, მოსალოდნელი სახელმძღვანელო" } ]
+     },
+     "verdict": "safe",
+     "explain": "შიდა მისამართი, მოსალოდნელი დოკუმენტი, ჩვეულებრივი PDF. შეგიძლიათ გახსნათ."
+    },
+    {
+     "id": "salary-lnk",
+     "artifact": {
+      "kind": "file",
+      "name": [ { "text": "Maas_cedveli.xlsx.lnk" } ],
+      "type": "lnk",
+      "size": "2 კბ",
+      "source": [ { "text": "უცნობი გამგზავნი" } ]
+     },
+     "verdict": "threat",
+     "explain": "ეს ცხრილის სახელით შენიღბული მალსახმობია. მისმა გახსნამ შეიძლება ფარული ბრძანება გაუშვას."
+    },
+    {
+     "id": "order-img",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "cevikkargo-fake",
+      "name": [ { "text": "Sifaris_1873.img" } ],
+      "type": "img",
+      "size": "3,6 მბ",
+      "source": [ { "text": "sifaris@cevik-kargo.example.net" } ]
+     },
+     "verdict": "threat",
+     "explain": "IMG დისკის ასლია. შეკვეთის დეტალებს ასე არასოდეს აგზავნიან."
+    },
+    {
+     "id": "slides-ppt",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "ofistechizat",
+      "name": [ { "text": "Teqdimat_oktyabr.pptx" } ],
+      "type": "ppt",
+      "size": "2,1 მბ",
+      "source": [ { "text": "საბინა ქერიმოვა, შეხვედრისთვის შეთანხმებული" } ]
+     },
+     "verdict": "safe",
+     "explain": "შეთანხმებული პრეზენტაცია ჩვეულებრივ ფორმატში. საგანგაშო ნიშნები არ არის."
+    },
+    {
+     "id": "invoice-html",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "ofistechizat-fake",
+      "name": [ { "text": "Faktura_oktyabr.html" } ],
+      "type": "html",
+      "size": "9 კბ",
+      "source": [ { "text": "faktura@ofistechizat-az.example.net" } ]
+     },
+     "verdict": "threat",
+     "explain": "ინვოისები HTML-ფაილები არ არის. მსგავსი დომენიდან მოსული ეს ფაილი შესვლის გვერდს ხსნის."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "df-match",
+   "prompt": "დააკავშირეთ თითოეული ფაილის ტიპი მის რისკთან.",
+   "pairs": [
+    { "id": "exe", "left": ".exe", "right": "პროგრამა, რომელიც გახსნისას ეშვება" },
+    { "id": "lnk", "left": ".lnk", "right": "მალსახმობი, რომელსაც ფარული ბრძანების გაშვება შეუძლია" },
+    { "id": "iso", "left": ".iso", "right": "დისკის ასლი, რომელშიც შეიძლება პროგრამა იმალებოდეს" },
+    { "id": "html", "left": ".html", "right": "ბრაუზერში შესვლის ყალბი გვერდის გახსნა შეუძლია" },
+    { "id": "zip", "left": ".zip (პაროლით)", "right": "ანტივირუსი შიგნით ვერ იხედება" }
+   ],
+   "explain": "სამსახურებრივ ელფოსტაში ეს ტიპები იშვიათია. თუ ასეთ ფაილს არ ელოდით, არ გახსნათ და შეატყობინეთ."
+  },
+  {
+   "type": "choice",
+   "id": "df-choice",
+   "question": {
+    "prompt": "კოლეგა გეუბნებათ: „ფაილი გავხსენი და არაფერი მომხდარა“. რას ურჩევთ?",
+    "options": [
+     {
+      "id": "report",
+      "label": "ქსელიდან გაითიშოს და მაშინვე დაურეკოს IT უსაფრთხოების სამსახურს",
+      "correct": true,
+      "feedback": "სწორია. მავნე პროგრამა ხშირად ჩუმად მუშაობს. თუ მაშინვე შეატყობინებთ, ზიანი ნაკლები იქნება."
+     },
+     {
+      "id": "wait",
+      "label": "დაელოდოს და შეატყობინოს, თუ რამე მოხდება",
+      "correct": false,
+      "feedback": "„არაფერი მომხდარა“ ხშირად მცდარი შთაბეჭდილებაა. ლოდინი თავდამსხმელს დროს აძლევს."
+     },
+     {
+      "id": "shutdown",
+      "label": "კომპიუტერი მაშინვე გამორთოს",
+      "correct": false,
+      "feedback": "გამორთვამ მეხსიერებაში არსებული მტკიცებულებები შეიძლება წაშალოს. თუ თქვენი პროცედურა სხვა რამეს არ ითვალისწინებს, კომპიუტერი ჩართული დატოვეთ, ქსელიდან გათიშეთ და შეატყობინეთ."
+     }
+    ]
+   },
+   "explain": "გახსნილი საეჭვო ფაილი ინციდენტია: გაითიშეთ ქსელიდან, კომპიუტერი ჩართული დატოვეთ და მაშინვე შეატყობინეთ."
+  },
+  {
+   "type": "recap",
+   "id": "df-recap",
+   "points": [
+    "შეხედეთ სახელის ბოლო ნაწილს: ის ფაილის ნამდვილ ტიპს გიჩვენებთ",
+    "არ გახსნათ მოულოდნელი არქივები, ISO-ფაილები, მალსახმობები და HTML-ფაილები",
+    "გახსენით? გაითიშეთ ქსელიდან და მაშინვე შეატყობინეთ"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

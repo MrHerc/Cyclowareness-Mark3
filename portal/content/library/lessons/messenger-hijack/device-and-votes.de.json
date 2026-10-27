@@ -1,0 +1,475 @@
+{
+ "id": "device-and-votes",
+ "title": "Geräte und Abstimmungen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "mh2-tutor",
+   "beats": [
+    {
+     "id": "mh2-b1",
+     "say": "Es gibt auch einen unauffälligen Weg, einen Account zu stehlen: einen Abstimmungslink und ein heimlich verknüpftes Gerät.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "mh2-b2",
+     "say": "Wenn Sie eine solche Benachrichtigung sehen, ist Ihr Account auch auf einem anderen Gerät geöffnet.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "sohbet",
+       "app": "Söhbət",
+       "title": [
+        {
+         "text": "Neues Gerät verknüpft",
+         "spot": "device"
+        }
+       ],
+       "body": [
+        {
+         "text": "Computer, Gəncə. Falls Sie das nicht waren, prüfen Sie Ihre verknüpften Geräte."
+        }
+       ],
+       "time": "21:14"
+      }
+     },
+     "highlight": "device"
+    },
+    {
+     "id": "mh2-b3",
+     "say": "Trauen Sie keiner Seite, auf der Sie sich erst mit Ihrem Messenger anmelden sollen, bevor Sie abstimmen dürfen.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "mh2-b4",
+     "say": "Aktivieren Sie die Zwei-Faktor-Authentisierung und prüfen Sie ab und zu Ihre verknüpften Geräte.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "mh2-swipe",
+   "prompt": "Sicher oder eine Falle? Entscheiden Sie bei jeder Nachricht.",
+   "cards": [
+    {
+     "id": "unasked-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sohbet",
+      "sender": [
+       {
+        "text": "Söhbət"
+       }
+      ],
+      "time": "23:40",
+      "messages": [
+       [
+        {
+         "text": "Ihr Söhbət-Code: 418 205. Geben Sie diesen Code an niemanden weiter."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Wenn Sie den Code nicht angefordert haben, versucht jemand, sich mit Ihrer Nummer anzumelden. Geben Sie ihn niemandem."
+    },
+    {
+     "id": "linked",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "Neues Gerät verknüpft"
+       }
+      ],
+      "body": [
+       {
+        "text": "Computer, Gəncə, 21:14"
+       }
+      ],
+      "time": "21:14"
+     },
+     "verdict": "threat",
+     "explain": "Wenn Sie das Gerät nicht selbst verknüpft haben, liest jemand Ihre Chats mit. Entfernen Sie es sofort aus den verknüpften Geräten."
+    },
+    {
+     "id": "vote-link",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Sevinc Əliyeva"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Meine Tochter macht bei einem Malwettbewerb mit, bitte stimm für sie ab: "
+         },
+         {
+          "text": "balaca-ressam.example.org/ses",
+          "link": {
+           "label": "balaca-ressam.example.org/ses",
+           "href": "https://balaca-ressam.example.org/ses"
+          }
+         }
+        ],
+        "time": "19:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Abstimmungslinks sind ein beliebter Weg, Accounts zu stehlen. Selbst wenn jemand, den Sie kennen, so einen Link schickt: Melden Sie sich auf dieser Seite nicht an."
+    },
+    {
+     "id": "pin-on",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "Zwei-Faktor-Authentisierung aktiviert"
+       }
+      ],
+      "body": [
+       {
+        "text": "Sie haben einen zusätzlichen Schutz für Ihren Account eingerichtet."
+       }
+      ],
+      "time": "12:30"
+     },
+     "verdict": "safe",
+     "explain": "Das bestätigt einen Schritt, den Sie selbst unternommen haben. Die Zwei-Faktor-Authentisierung schützt den Account vor Code-Diebstahl."
+    },
+    {
+     "id": "meeting",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Abteilungsgruppe"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Kamran Əhmədov: Das Meeting morgen ist um zehn Uhr in Raum 214."
+         }
+        ],
+        "time": "17:48"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Das ist eine gewöhnliche dienstliche Nachricht. Niemand verlangt darin einen Code, Geld oder einen Klick auf einen Link."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "mh2-sim",
+   "environment": "browser",
+   "title": "Der Malwettbewerb",
+   "intro": "Jemand aus Ihrem Bekanntenkreis bittet um Stimmen für einen Malwettbewerb für Kinder. Wählen Sie auf jeder Seite den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "vote-page",
+     "label": "Für Leylas Bild abstimmen",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2a-balaca-ressam",
+      "url": [
+       {
+        "text": "https://balaca-ressam.example.org/ses"
+       }
+      ]
+     },
+     "say": "Die Seite sieht hübsch aus und hat eine Schaltfläche zum Abstimmen.",
+     "actions": [
+      {
+       "id": "vote",
+       "label": "Abstimmen",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Die Schaltfläche führt Sie zu einer Anmeldeseite. Noch haben Sie nichts verloren, aber seien Sie vorsichtig."
+      },
+      {
+       "id": "close",
+       "label": "Seite schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine unbekannte Seite, die für eine Abstimmung Ihren Account verlangt, schließen Sie am besten sofort.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2a-sohbet-fake",
+      "brand": "Söhbət",
+      "url": [
+       {
+        "text": "https://sohbet-giris.example.org"
+       }
+      ],
+      "fields": [
+       "Telefonnummer"
+      ],
+      "button": "Code anfordern"
+     },
+     "say": "Zum Abstimmen sollen Sie sich mit Söhbət anmelden.",
+     "actions": [
+      {
+       "id": "enter",
+       "label": "Nummer eingeben",
+       "kind": "enter-credentials",
+       "outcome": "risky",
+       "feedback": "Mit Ihrer Nummer fordern die Kriminellen in Ihrem Namen einen Code an. Im nächsten Schritt fragen sie nach genau diesem Code."
+      },
+      {
+       "id": "close",
+       "label": "Seite schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Adresse gehört nicht zu Söhbət, also ist das eine gefälschte Anmeldeseite.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sohbet-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Code eingeben"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Geben Sie den sechsstelligen Söhbət-Code ein, der an Ihr Smartphone gesendet wurde."
+        }
+       ]
+      ],
+      "buttons": [
+       "Bestätigen",
+       "Abbrechen"
+      ]
+     },
+     "say": "Jetzt sollen Sie den Code von Ihrem Smartphone auf dieser Seite eingeben.",
+     "actions": [
+      {
+       "id": "enter",
+       "label": "Code eingeben",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Im selben Moment hat sich Ihr Account auf dem Smartphone der Kriminellen geöffnet. Einen Söhbət-Code geben Sie nie auf einer Website ein."
+      },
+      {
+       "id": "cancel",
+       "label": "Abbrechen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Den Code brauchen Sie nur in der Söhbət-App selbst, nie auf einer Webseite.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "pairing",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sohbet-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Ihre Stimme bestätigen"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Öffnen Sie in der Söhbət-App „Verknüpfte Geräte“ und geben Sie diesen Code ein:"
+        }
+       ],
+       [
+        {
+         "text": "[Code von dieser Seite]"
+        }
+       ]
+      ],
+      "buttons": [
+       "Fertig",
+       "Abbrechen"
+      ]
+     },
+     "say": "Die Seite verlangt etwas Neues: Sie sollen in der App ein Gerät verknüpfen.",
+     "actions": [
+      {
+       "id": "pair",
+       "label": "Gerät verknüpfen",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Sie haben den Computer der Kriminellen mit Ihrem Account verknüpft. Jetzt sehen sie alle Ihre Chats."
+      },
+      {
+       "id": "cancel",
+       "label": "Abbrechen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Für eine Abstimmung muss man nie ein Gerät verknüpfen."
+      }
+     ]
+    },
+    {
+     "id": "devices",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sohbet",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Verknüpfte Geräte"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Computer, Gəncə. Zuletzt aktiv: vor zwei Minuten."
+        }
+       ],
+       [
+        {
+         "text": "Haben Sie dieses Gerät verknüpft?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Abmelden",
+       "Behalten"
+      ]
+     },
+     "say": "Zur Sicherheit prüfen Sie die verknüpften Geräte direkt in den Einstellungen von Söhbət.",
+     "actions": [
+      {
+       "id": "logout",
+       "label": "Abmelden",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Richtig. Sobald Sie ein unbekanntes Gerät abmelden, sieht es Ihre Nachrichten nicht mehr."
+      },
+      {
+       "id": "keep",
+       "label": "Behalten",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Sie haben dieses Gerät nicht verknüpft. Wenn Sie es behalten, liest weiter jemand Ihre Chats mit."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "mh2-choice",
+   "question": {
+    "prompt": "Was schützt Ihren Söhbət-Account am besten vor Code-Diebstahl?",
+    "options": [
+     {
+      "id": "two-step",
+      "label": "Die Zwei-Faktor-Authentisierung aktivieren",
+      "correct": true,
+      "feedback": "Richtig. Selbst wenn der Code gestohlen wird, kommt ohne die geheime PIN, die Sie festgelegt haben, niemand hinein."
+     },
+     {
+      "id": "photo",
+      "label": "Das Profilbild verbergen",
+      "correct": false,
+      "feedback": "Ein verborgenes Profilbild schützt Ihre Privatsphäre, aber nicht den Account. Das schafft die Zwei-Faktor-Authentisierung."
+     },
+     {
+      "id": "delete-chats",
+      "label": "Chats häufig löschen",
+      "correct": false,
+      "feedback": "Das hält Kriminelle nicht davon ab, in Ihren Account zu gelangen. Aktivieren Sie die Zwei-Faktor-Authentisierung."
+     }
+    ]
+   },
+   "explain": "Die Zwei-Faktor-Authentisierung ist ein zweites Schloss für Ihren Account. Den Schlüssel dazu kennen nur Sie."
+  },
+  {
+   "type": "match",
+   "id": "mh2-match",
+   "prompt": "Ordnen Sie jeder Situation den richtigen Schritt zu.",
+   "pairs": [
+    {
+     "id": "code",
+     "left": "Ein Code, den Sie nicht angefordert haben",
+     "right": "Niemandem weitergeben"
+    },
+    {
+     "id": "device",
+     "left": "Eine Benachrichtigung über ein neues Gerät",
+     "right": "Aus den verknüpften Geräten entfernen"
+    },
+    {
+     "id": "vote",
+     "left": "Eine Anmeldung zum Abstimmen",
+     "right": "Seite schließen"
+    },
+    {
+     "id": "money",
+     "left": "Jemand aus dem Freundeskreis bittet um Geld",
+     "right": "Mit einem normalen Anruf prüfen"
+    }
+   ],
+   "explain": "Code, Geräte und Links sind die Türen zu Ihrem Account. Behalten Sie jede davon selbst im Blick und öffnen Sie keine für andere."
+  },
+  {
+   "type": "recap",
+   "id": "mh2-recap",
+   "points": [
+    "Melden Sie sich zum Abstimmen nicht mit Söhbət an",
+    "Prüfen Sie bei einer Benachrichtigung über ein neues Gerät Ihre verknüpften Geräte",
+    "Aktivieren Sie die Zwei-Faktor-Authentisierung"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

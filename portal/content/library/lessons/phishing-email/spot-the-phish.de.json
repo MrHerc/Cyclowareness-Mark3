@@ -1,0 +1,887 @@
+{
+  "id": "spot-the-phish",
+  "title": "Phishing entlarven",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "meet-the-phish",
+      "beats": [
+        {
+          "id": "hello",
+          "say": "Hallo! Ich helfe Ihnen in Sachen Sicherheit. Heute lernen Sie, eine gefälschte E-Mail in wenigen Sekunden zu erkennen.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "sender",
+          "say": "Prüfen Sie zuerst die Absenderadresse. Hier ist ein Buchstabe vertauscht, und das fällt kaum auf.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "xidmet-agentliyi-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Buchhaltung"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@"
+                  },
+                  {
+                    "text": "xidmetagentIiyi.az",
+                    "spot": "sender-domain"
+                  }
+                ]
+              },
+              "to": "e.mammadov@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "Gehaltsabrechnung für September"
+                }
+              ],
+              "time": "09:12",
+              "body": [
+                [
+                  {
+                    "text": "Sehr geehrte Benutzerin, sehr geehrter Benutzer,",
+                    "spot": "greeting"
+                  }
+                ],
+                [
+                  {
+                    "text": "Ihre Gehaltsabrechnung für September liegt bereit. "
+                  },
+                  {
+                    "text": "Wenn Sie nicht innerhalb von 24 Stunden bestätigen, wird Ihre Auszahlung gestoppt.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "Gehaltsabrechnung ansehen",
+                    "spot": "link",
+                    "link": {
+                      "label": "Gehaltsabrechnung ansehen",
+                      "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+                    }
+                  }
+                ],
+                [
+                  {
+                    "text": "Abteilung Buchhaltung"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "sender-domain",
+          "checkpoint": {
+            "prompt": "Was prüfen Sie bei einer verdächtigen E-Mail zuerst?",
+            "options": [
+              {
+                "id": "address",
+                "label": "Die Adresse des Absenders",
+                "correct": true,
+                "feedback": "Richtig. An der Adresse erkennt man eine Fälschung oft am schnellsten."
+              },
+              {
+                "id": "logo",
+                "label": "Das Logo und die Gestaltung",
+                "correct": false,
+                "feedback": "Logos und Gestaltung lassen sich leicht kopieren. Prüfen Sie die Adresse."
+              },
+              {
+                "id": "time",
+                "label": "Die Uhrzeit des Versands",
+                "correct": false,
+                "feedback": "Die Uhrzeit sagt nichts aus. Kriminelle schreiben zu jeder Tageszeit."
+              }
+            ]
+          }
+        },
+        {
+          "id": "urgency",
+          "say": "Eine Frist und eine Drohung. Wenn eine E-Mail Sie unter Druck setzt, ist das Ihr Signal, innezuhalten.",
+          "mood": "alert",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "xidmet-agentliyi-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Buchhaltung"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@"
+                  },
+                  {
+                    "text": "xidmetagentIiyi.az",
+                    "spot": "sender-domain"
+                  }
+                ]
+              },
+              "to": "e.mammadov@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "Gehaltsabrechnung für September"
+                }
+              ],
+              "time": "09:12",
+              "body": [
+                [
+                  {
+                    "text": "Sehr geehrte Benutzerin, sehr geehrter Benutzer,",
+                    "spot": "greeting"
+                  }
+                ],
+                [
+                  {
+                    "text": "Ihre Gehaltsabrechnung für September liegt bereit. "
+                  },
+                  {
+                    "text": "Wenn Sie nicht innerhalb von 24 Stunden bestätigen, wird Ihre Auszahlung gestoppt.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "Gehaltsabrechnung ansehen",
+                    "spot": "link",
+                    "link": {
+                      "label": "Gehaltsabrechnung ansehen",
+                      "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+                    }
+                  }
+                ],
+                [
+                  {
+                    "text": "Abteilung Buchhaltung"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "urgency"
+        },
+        {
+          "id": "link",
+          "say": "Tippen Sie nicht darauf. Am Computer fahren Sie mit der Maus über den Link und lesen die Adresse. Am Smartphone öffnen Sie die Website selbst.",
+          "mood": "talk",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "xidmet-agentliyi-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Buchhaltung"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@"
+                  },
+                  {
+                    "text": "xidmetagentIiyi.az",
+                    "spot": "sender-domain"
+                  }
+                ]
+              },
+              "to": "e.mammadov@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "Gehaltsabrechnung für September"
+                }
+              ],
+              "time": "09:12",
+              "body": [
+                [
+                  {
+                    "text": "Sehr geehrte Benutzerin, sehr geehrter Benutzer,",
+                    "spot": "greeting"
+                  }
+                ],
+                [
+                  {
+                    "text": "Ihre Gehaltsabrechnung für September liegt bereit. "
+                  },
+                  {
+                    "text": "Wenn Sie nicht innerhalb von 24 Stunden bestätigen, wird Ihre Auszahlung gestoppt.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "Gehaltsabrechnung ansehen",
+                    "spot": "link",
+                    "link": {
+                      "label": "Gehaltsabrechnung ansehen",
+                      "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+                    }
+                  }
+                ],
+                [
+                  {
+                    "text": "Abteilung Buchhaltung"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "link"
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "morning-inbox",
+      "environment": "inbox",
+      "title": "Posteingang am Morgen",
+      "intro": "Es ist neun Uhr morgens, und fünf neue E-Mails warten auf Sie. Öffnen Sie jede einzelne und wählen Sie den richtigen Schritt.",
+      "steps": [
+        {
+          "id": "payslip",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "Buchhaltung"
+                }
+              ],
+              "address": [
+                {
+                  "text": "muhasibat@xidmetagentIiyi.az",
+                  "reveal": "Nach „agent“ folgt ein großes lateinisches „I“, kein kleines „l“"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Gehaltsabrechnung für September"
+              }
+            ],
+            "time": "09:02",
+            "body": [
+              [
+                {
+                  "text": "Sehr geehrte Benutzerin, sehr geehrter Benutzer,"
+                }
+              ],
+              [
+                {
+                  "text": "Ihre Gehaltsabrechnung liegt bereit. Wenn Sie nicht innerhalb von 24 Stunden bestätigen, wird die Auszahlung gestoppt."
+                }
+              ],
+              [
+                {
+                  "text": "Gehaltsabrechnung ansehen",
+                  "link": {
+                    "label": "Gehaltsabrechnung ansehen",
+                    "href": "https://maas-portal.info/giris"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Lesen Sie die Absenderadresse Buchstabe für Buchstabe.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Phishing melden",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Richtig. In der Adresse steht ein großes I statt eines kleinen l: eine täuschend ähnliche Domain."
+            },
+            {
+              "id": "click",
+              "label": "Link öffnen",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Der Link führt zu maas-portal.info, nicht zur Agentur. Ein dort eingegebenes Passwort landet direkt bei Kriminellen."
+            },
+            {
+              "id": "delete",
+              "label": "Löschen",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Sie selbst sind geschützt, aber auch Ihre Kolleginnen und Kollegen haben die E-Mail erhalten. Melden Sie die E-Mail, damit das Team sie für alle entfernen kann."
+            }
+          ]
+        },
+        {
+          "id": "report-draft",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "Elvin Məmmədov"
+                }
+              ],
+              "address": [
+                {
+                  "text": "e.mammadov@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Endgültige Fassung des Berichts"
+              }
+            ],
+            "time": "08:47",
+            "body": [
+              [
+                {
+                  "text": "Hallo Aynur,"
+                }
+              ],
+              [
+                {
+                  "text": "ich habe die endgültige Fassung des besprochenen Berichts ins interne Portal hochgeladen. Gib mir bitte Bescheid, sobald du ihn dir angesehen hast."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "reply",
+              "label": "Antworten",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Richtig. Ein bekannter Kollege, die Domain der Agentur, kein Link und kein Zeitdruck."
+            },
+            {
+              "id": "report",
+              "label": "Phishing melden",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Diese E-Mail ist echt: die richtige Domain und überhaupt keine Aufforderung."
+            }
+          ]
+        },
+        {
+          "id": "sign-request",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "docusfera-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "DocuSfera"
+                }
+              ],
+              "address": [
+                {
+                  "text": "noreply@docusfera-imza.test"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Ein Dokument wartet auf Ihre Unterschrift"
+              }
+            ],
+            "time": "08:31",
+            "body": [
+              [
+                {
+                  "text": "Die Geschäftsleitung hat Ihnen „Muqavile_2025.pdf“ zur Unterschrift zugesendet."
+                }
+              ],
+              [
+                {
+                  "text": "Melden Sie sich mit Ihrer dienstlichen E-Mail-Adresse an, um das Dokument anzusehen."
+                }
+              ],
+              [
+                {
+                  "text": "Dokument ansehen",
+                  "link": {
+                    "label": "Dokument ansehen",
+                    "href": "https://docusfera-imza.test/doc"
+                  }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "click",
+              "label": "Link öffnen",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Die Domain war docusfera-imza.test, nicht die des Dienstes selbst. Die Seite, die sich öffnet, soll Ihr dienstliches Passwort stehlen."
+            },
+            {
+              "id": "report",
+              "label": "Phishing melden",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Richtig: eine unerwartete Bitte um Unterschrift von einer fremden Domain. Im Zweifel rufen Sie den Absender unter einer bekannten Nummer an."
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "IT-Support"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Geplante Wartungsarbeiten"
+              }
+            ],
+            "time": "08:15",
+            "body": [
+              [
+                {
+                  "text": "Der E-Mail-Dienst ist am Samstag von 20:00 bis 22:00 Uhr nicht verfügbar. Sie müssen nichts unternehmen."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "ok",
+              "label": "Als sicher markieren",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Richtig. Eine offizielle Adresse, kein Link, und von Ihnen wird nichts verlangt."
+            },
+            {
+              "id": "report",
+              "label": "Phishing melden",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Diese E-Mail ist echt – eine reine Information ohne jede Aufforderung."
+            }
+          ]
+        },
+        {
+          "id": "bonus-list",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "Personalabteilung"
+                }
+              ],
+              "address": [
+                {
+                  "text": "kadrlar@xidmetagentliyi-az.com"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Liste der Feiertagsprämien"
+              }
+            ],
+            "time": "07:58",
+            "body": [
+              [
+                {
+                  "text": "Sehr geehrte Mitarbeiterin, sehr geehrter Mitarbeiter,"
+                }
+              ],
+              [
+                {
+                  "text": "die Liste der Prämienempfänger finden Sie im Anhang. Prüfen Sie noch heute, ob Ihr Name dabei ist."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Mukafat_siyahisi.html"
+                  }
+                ],
+                "size": "12 KB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Anhang öffnen",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "Die Liste ist eine .html-Datei, die eine gefälschte Anmeldeseite anzeigt. Außerdem endete die Domain auf -az.com."
+            },
+            {
+              "id": "report",
+              "label": "Phishing melden",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Richtig: eine fremde Domain, ein verlockendes Thema und ein .html-Anhang. Fragen Sie bei der Personalabteilung selbst nach den Prämien."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "find-the-signs",
+      "prompt": "Tippen Sie auf die Anzeichen einer Fälschung.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "e-xidmet-fake",
+        "from": {
+          "name": [
+            {
+              "text": "E-Xidmet Portal",
+              "reveal": "bildiris@e-xidmet-portal.info"
+            }
+          ],
+          "address": [
+            {
+              "text": "bildiris@"
+            },
+            {
+              "text": "e-xidmet-portal.info",
+              "spot": "sender-domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Offenes Bußgeld: letzte Mahnung"
+          }
+        ],
+        "time": "11:47",
+        "body": [
+          [
+            {
+              "text": "Sehr geehrte Bürgerin, sehr geehrter Bürger,",
+              "spot": "greeting"
+            }
+          ],
+          [
+            {
+              "text": "Gegen Sie wurde wegen eines Verkehrsverstoßes ein Bußgeld von 40 AZN verhängt."
+            }
+          ],
+          [
+            {
+              "text": "Wird es nicht innerhalb von 48 Stunden bezahlt, verdoppelt sich der Betrag und der Fall geht vor Gericht.",
+              "spot": "threat"
+            }
+          ],
+          [
+            {
+              "text": "Bußgeld bezahlen",
+              "spot": "link",
+              "link": {
+                "label": "Bußgeld bezahlen",
+                "href": "https://e-xidmet-portal.info/cerime?id=58213"
+              }
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender-domain",
+          "label": "Unbekannte Domain",
+          "explain": "Ein offizieller Dienst schreibt nicht von einer solchen Adresse. Der Name ist erfunden, damit er offiziell wirkt."
+        },
+        {
+          "id": "greeting",
+          "label": "Allgemeine Anrede",
+          "explain": "Ein echter Bescheid nennt in der Regel Ihren Namen und ein Aktenzeichen."
+        },
+        {
+          "id": "threat",
+          "label": "Drohung und Frist",
+          "explain": "Angst und eine knappe Frist sollen Sie dazu bringen, ohne Prüfung zu zahlen."
+        },
+        {
+          "id": "link",
+          "label": "Gefälschter Link",
+          "explain": "Der Link greift Ihre Kartendaten ab. Prüfen Sie Bußgelder, indem Sie das offizielle Portal selbst aufrufen."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "first-move",
+      "question": {
+        "prompt": "Was tun Sie mit einer verdächtigen E-Mail?",
+        "options": [
+          {
+            "id": "report",
+            "label": "Ich klicke auf die Schaltfläche „Phishing melden“",
+            "correct": true,
+            "feedback": "Richtig. Fehlt die Schaltfläche? Dann leiten Sie die E-Mail an Ihre Ansprechperson für IT-Sicherheit weiter. So kann das Team sie für alle sperren."
+          },
+          {
+            "id": "click",
+            "label": "Ich öffne den Link, um ihn zu prüfen",
+            "correct": false,
+            "feedback": "Ein einziger Klick kann eine schädliche Seite öffnen. Prüfen Sie stattdessen die Adresse."
+          },
+          {
+            "id": "reply",
+            "label": "Ich antworte und frage beim Absender nach",
+            "correct": false,
+            "feedback": "Ihre Antwort geht direkt an die Kriminellen. Die werden Ihnen natürlich sagen, dass alles in Ordnung ist."
+          },
+          {
+            "id": "forward",
+            "label": "Ich leite sie zur Prüfung an Kolleginnen und Kollegen weiter",
+            "correct": false,
+            "feedback": "So verbreiten Sie die Gefahr weiter. Melden Sie die E-Mail, dann sieht sich das Team sie an."
+          }
+        ]
+      },
+      "explain": "Eine Meldung schützt Sie und Ihre Kolleginnen und Kollegen. Hat Ihr E-Mail-Programm keine Schaltfläche „Phishing melden“, leiten Sie die E-Mail an die IT-Sicherheit weiter."
+    },
+    {
+      "type": "swipe",
+      "id": "safe-or-phish",
+      "prompt": "Sicher oder Falle?",
+      "cards": [
+        {
+          "id": "card-blocked",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ulduzbank-fake",
+            "sender": [
+              {
+                "text": "UlduzBank"
+              }
+            ],
+            "time": "08:03",
+            "messages": [
+              [
+                {
+                  "text": "UlduzBank: Ihre Karte wurde gesperrt. Zum Entsperren melden Sie sich hier an: "
+                },
+                {
+                  "text": "https://ulduzbank-az.info/kart"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Der Absendername lässt sich fälschen, und der Link führt nicht zur Website der Bank. Im Zweifel rufen Sie die Nummer auf der Rückseite Ihrer Karte an."
+        },
+        {
+          "id": "meeting",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "Elvin Məmmədov"
+                }
+              ],
+              "address": [
+                {
+                  "text": "e.mammadov@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Meeting morgen"
+              }
+            ],
+            "time": "10:21",
+            "body": [
+              [
+                {
+                  "text": "Hallo Aynur,"
+                }
+              ],
+              [
+                {
+                  "text": "wir sehen uns morgen um 10:00 Uhr in Raum 3. Die Tagesordnung steht in der E-Mail von gestern."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ein bekannter Kollege, die richtige Adresse, kein Link und keine Aufforderung. Eine ganz normale dienstliche E-Mail."
+        },
+        {
+          "id": "courier",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "cevikkargo-fake",
+            "sender": [
+              {
+                "text": "+994 70 000 88 31"
+              }
+            ],
+            "time": "13:40",
+            "messages": [
+              [
+                {
+                  "text": "ÇevikKargo: Ihr Paket liegt im Lager fest. Zahlen Sie eine Gebühr von 1,20 AZN: "
+                },
+                {
+                  "text": "https://cevik-kargo.info/odenis"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Der winzige Betrag soll Sie unvorsichtig machen. In Wahrheit geht es darum, Ihre Kartendaten zu stehlen."
+        },
+        {
+          "id": "holidays",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "Personalabteilung"
+                }
+              ],
+              "address": [
+                {
+                  "text": "kadrlar@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Feiertage"
+              }
+            ],
+            "time": "16:05",
+            "body": [
+              [
+                {
+                  "text": "Liebe Kolleginnen und Kollegen,"
+                }
+              ],
+              [
+                {
+                  "text": "den Arbeitsplan für die Feiertage im November finden Sie im internen Portal."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Eine allgemeine Anrede ist nicht immer eine Bedrohung. Die Adresse stimmt, und es gibt weder einen Link noch Zeitdruck."
+        },
+        {
+          "id": "mailbox-full",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "IT-Support"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it-destek@xidmetagentliyi-az.com"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Ihr Postfach ist voll"
+              }
+            ],
+            "time": "07:58",
+            "body": [
+              [
+                {
+                  "text": "Ihr Postfach ist zu 98 % voll. Bestätigen Sie noch heute Ihre Anmeldung, damit keine E-Mails verloren gehen."
+                }
+              ],
+              [
+                {
+                  "text": "Anmeldung bestätigen",
+                  "link": {
+                    "label": "Anmeldung bestätigen",
+                    "href": "https://xidmetagentliyi-az.com/poct"
+                  }
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Die Adresse hat am Ende ein zusätzliches „-az.com“, und das ist nicht die Domain der Agentur. Anmeldungen bestätigt man nicht über einen Link."
+        },
+        {
+          "id": "card-payment",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ulduzbank",
+            "sender": [
+              {
+                "text": "UlduzBank"
+              }
+            ],
+            "time": "19:12",
+            "messages": [
+              [
+                {
+                  "text": "UlduzBank: Mit Ihrer Karte wurde eine Zahlung über 23,40 AZN getätigt. Wenn Sie das nicht waren, rufen Sie die Nummer auf der Rückseite Ihrer Karte an."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Es gibt keinen Link, und die Nachricht verweist auf eine Nummer, die Sie bereits haben. Eine normale Benachrichtigung."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Prüfen Sie die Adresse: Schon ein einziger abweichender Buchstabe verrät die Fälschung.",
+        "Zeitdruck und Drohungen sind Ihr Signal, innezuhalten.",
+        "Prüfen Sie Links, bevor Sie tippen, und melden Sie im Zweifel alles Verdächtige."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

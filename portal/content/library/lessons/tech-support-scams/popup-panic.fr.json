@@ -1,0 +1,398 @@
+{
+ "id": "popup-panic",
+ "title": "Panique à l’écran",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ts1-tutor",
+   "beats": [
+    {
+     "id": "ts1-b1",
+     "say": "Bonjour ! Aujourd’hui, nous allons apprendre à repérer les avertissements effrayants qui surgissent à l’écran.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "ts1-b2",
+     "say": "Une fenêtre comme celle-ci veut vous faire peur pour que vous appeliez un numéro.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-sistem-muhafize",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Votre ordinateur est bloqué"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Le système a détecté quatre virus.",
+          "spot": "virus"
+         }
+        ],
+        [
+         {
+          "text": "Ligne d’assistance : +994 12 000 70 05",
+          "spot": "phone"
+         }
+        ]
+       ],
+       "buttons": [
+        "Appeler maintenant"
+       ]
+      }
+     },
+     "highlight": "phone"
+    },
+    {
+     "id": "ts1-b3",
+     "say": "Un vrai avertissement ne vous donne jamais de numéro de téléphone et ne vous presse jamais.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "ts1-b4",
+     "say": "La règle est simple : n’appelez pas, fermez la fenêtre, et forcez la fermeture du navigateur si nécessaire.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ts1-hotspot",
+   "prompt": "Trouvez les signes qui montrent que cette fenêtre est un piège.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2a-sistem-muhafize",
+    "tone": "warning",
+    "title": [
+     {
+      "text": "Attention : votre ordinateur est bloqué"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Le système a détecté quatre virus et vos données personnelles sont en danger."
+      }
+     ],
+     [
+      {
+       "text": "Ne fermez pas cette fenêtre, sinon tous vos fichiers seront supprimés.",
+       "spot": "dont-close"
+      }
+     ],
+     [
+      {
+       "text": "Appelez immédiatement la ligne d’assistance : +994 12 000 70 05",
+       "spot": "phone"
+      }
+     ],
+     [
+      {
+       "text": "Temps restant : 04:58",
+       "spot": "timer"
+      }
+     ]
+    ],
+    "buttons": [
+     "Appeler maintenant"
+    ]
+   },
+   "spots": [
+    {
+     "id": "dont-close",
+     "label": "Interdiction de fermer",
+     "explain": "Un vrai système ne vous interdit jamais de fermer une fenêtre. On veut vous faire peur pour vous retenir sur la page."
+    },
+    {
+     "id": "phone",
+     "label": "Numéro de téléphone",
+     "explain": "Un système d’exploitation n’affiche jamais de numéro d’assistance à l’écran. Ce numéro appartient à l’escroc."
+    },
+    {
+     "id": "timer",
+     "label": "Compte à rebours",
+     "explain": "Le minuteur est là pour vous presser. Un avertissement qui ne vous laisse pas le temps de réfléchir est faux."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "simulation",
+   "id": "ts1-sim",
+   "environment": "browser",
+   "title": "En lisant les actualités",
+   "intro": "Vous lisez un site d’actualités quand des fenêtres surgissent soudain. Choisissez la bonne réaction pour chacune.",
+   "steps": [
+    {
+     "id": "popup-appears",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sistem-muhafize",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Menace détectée"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Un logiciel malveillant est présent sur votre ordinateur. Appelez immédiatement l’assistance : +994 12 000 70 05"
+        }
+       ]
+      ],
+      "buttons": [
+       "Appeler maintenant",
+       "Analyser"
+      ]
+     },
+     "say": "Un avertissement rouge vient de s’ouvrir.",
+     "actions": [
+      {
+       "id": "close",
+       "label": "Fermer la fenêtre",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Face à une fenêtre comme celle-ci, il suffit de la fermer."
+      },
+      {
+       "id": "call",
+       "label": "Appeler le numéro affiché",
+       "kind": "call-back",
+       "outcome": "compromised",
+       "feedback": "Le faux conseiller va vous faire encore plus peur. N’appelez jamais ce numéro."
+      },
+      {
+       "id": "scan",
+       "label": "Cliquer sur le bouton « Analyser »",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Ce bouton ouvre une autre fausse page. Ne touchez à rien dans la fenêtre."
+      }
+     ]
+    },
+    {
+     "id": "fullscreen-lock",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sistem-muhafize",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Écran verrouillé"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "N’éteignez pas l’ordinateur. Si vous fermez cette fenêtre sans l’aide du support, vos données seront perdues."
+        }
+       ]
+      ],
+      "buttons": [
+       "Appeler le support"
+      ]
+     },
+     "say": "Maintenant, la fenêtre occupe tout l’écran et émet un son.",
+     "actions": [
+      {
+       "id": "force-quit",
+       "label": "Forcer la fermeture du navigateur",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Quand vous forcez la fermeture du navigateur, ce faux écran disparaît aussi."
+      },
+      {
+       "id": "call",
+       "label": "Appeler le support",
+       "kind": "call-back",
+       "outcome": "compromised",
+       "feedback": "Le son et le plein écran ne sont là que pour vous effrayer. Si vous appelez, ils essaieront de prendre le contrôle de votre appareil."
+      }
+     ]
+    },
+    {
+     "id": "real-update",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Le navigateur est prêt pour la mise à jour"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Redémarrez le navigateur pour appliquer les modifications."
+        }
+       ]
+      ],
+      "buttons": [
+       "Plus tard",
+       "Mettre à jour"
+      ]
+     },
+     "say": "Voici la notification discrète du navigateur lui-même.",
+     "actions": [
+      {
+       "id": "update",
+       "label": "Mettre à jour",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Une vraie mise à jour est calme : elle ne donne pas de numéro et ne vous presse pas."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "safe",
+       "feedback": "C’est bien aussi. Vous pouvez faire la mise à jour quand vous voulez, il n’y a aucun danger."
+      },
+      {
+       "id": "call",
+       "label": "Appeler le support, par précaution",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "C’est inutile. Une simple notification de mise à jour n’oblige à appeler personne."
+      }
+     ]
+    },
+    {
+     "id": "popup-returns",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sistem-muhafize",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "La menace persiste"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Le problème n’est pas résolu. Appelez maintenant pour obtenir de l’aide."
+        }
+       ]
+      ],
+      "buttons": [
+       "Appeler maintenant"
+      ]
+     },
+     "say": "Vous l’avez fermée, mais la fenêtre est revenue.",
+     "actions": [
+      {
+       "id": "close-all",
+       "label": "Fermer complètement le navigateur",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Quand vous fermez complètement le navigateur, ces pages disparaissent aussi."
+      },
+      {
+       "id": "report",
+       "label": "Prévenir le support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. Vous pouvez appeler votre propre support technique et lui poser la question."
+      },
+      {
+       "id": "call",
+       "label": "Appeler le numéro",
+       "kind": "call-back",
+       "outcome": "compromised",
+       "feedback": "La fenêtre qui revient fait partie de la ruse. N’appelez pas ce numéro."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ts1-match",
+   "prompt": "Associez chaque signe à la bonne réaction.",
+   "pairs": [
+    {
+     "id": "fullscreen",
+     "left": "Une fenêtre qui occupe tout l’écran",
+     "right": "Forcer la fermeture du navigateur"
+    },
+    {
+     "id": "phone",
+     "left": "Un numéro d’assistance à l’écran",
+     "right": "Un vrai avertissement ne donne pas de numéro"
+    },
+    {
+     "id": "timer",
+     "left": "Un compte à rebours",
+     "right": "L’urgence est un mensonge"
+    },
+    {
+     "id": "sound",
+     "left": "Une alarme et des bips",
+     "right": "C’est fait pour vous effrayer"
+    }
+   ],
+   "explain": "Tous ces signes servent à vous faire peur. Gardez votre calme et fermez la fenêtre."
+  },
+  {
+   "type": "choice",
+   "id": "ts1-choice",
+   "question": {
+    "prompt": "Une fenêtre surgit et vous dit d’appeler un numéro. Quelle est la première chose à faire ?",
+    "options": [
+     {
+      "id": "close",
+      "label": "Je ferme la fenêtre, et je force la fermeture du navigateur si nécessaire",
+      "correct": true,
+      "feedback": "Bonne réponse. Ce genre d’avertissement est inoffensif et disparaît quand on le ferme."
+     },
+     {
+      "id": "call",
+      "label": "Par précaution, j’appelle le numéro affiché",
+      "correct": false,
+      "feedback": "Ce numéro appartient à l’escroc. Si vous appelez, il essaiera de prendre le contrôle de votre appareil."
+     },
+     {
+      "id": "restart",
+      "label": "J’éteins l’ordinateur immédiatement",
+      "correct": false,
+      "feedback": "C’est inutile. Fermer la fenêtre ou le navigateur suffit."
+     }
+    ]
+   },
+   "explain": "La fenêtre effrayante veut vous entraîner dans un appel. N’appelez pas, fermez-la, tout simplement."
+  },
+  {
+   "type": "recap",
+   "id": "ts1-recap",
+   "points": [
+    "Ne faites pas confiance à une fenêtre effrayante qui surgit de nulle part",
+    "N’appelez jamais le numéro qu’elle affiche",
+    "Fermez la fenêtre, et forcez la fermeture du navigateur si nécessaire"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

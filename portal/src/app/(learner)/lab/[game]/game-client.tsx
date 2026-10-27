@@ -62,7 +62,7 @@ export function GameClient({ game, items, forge }: { game: string; items: Item[]
                 {r.correct ? <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-safe-600" /> : <XCircle className="mt-0.5 size-5 shrink-0 text-risk-600" />}
                 <div className="text-body-sm">
                   <p className="font-semibold">
-                    {k + 1}. {items[k]?.subject ?? items[k]?.url ?? items[k]?.situation} → {label(r.answer)}
+                    {k + 1}. <bdi>{items[k]?.subject ?? items[k]?.url ?? items[k]?.situation}</bdi> <span className="inline-block rtl:-scale-x-100">→</span> {label(r.answer)}
                   </p>
                   <p className="mt-0.5 text-ink-muted">{r.why}</p>
                 </div>
@@ -111,7 +111,7 @@ export function GameClient({ game, items, forge }: { game: string; items: Item[]
         ) : game === "link-detective" ? (
           <div>
             <p className="text-caption text-ink-muted">{item.context}</p>
-            <p className="mt-3 flex items-start gap-2 rounded-lg bg-sunken px-4 py-3 font-mono text-body-sm break-all">
+            <p dir="ltr" className="mt-3 flex items-start gap-2 rounded-lg bg-sunken px-4 py-3 font-mono text-body-sm break-all">
               <Link2 className="mt-0.5 size-4 shrink-0 text-ink-subtle" />
               {item.url}
             </p>
@@ -167,7 +167,7 @@ function PasswordForge({ forge, value, setValue, show, setShow, pending, onSubmi
       <label htmlFor="forge" className="text-caption font-semibold">
         {t("pwLabel")}
       </label>
-      <div className="relative mt-1.5">
+      <div dir="ltr" className="relative mt-1.5">
         <input
           id="forge"
           type={show ? "text" : "password"}
@@ -176,9 +176,9 @@ function PasswordForge({ forge, value, setValue, show, setShow, pending, onSubmi
           placeholder={t("pwPlaceholder")}
           autoComplete="off"
           maxLength={200}
-          className="h-13 w-full rounded-md border border-line-strong bg-surface pr-12 pl-4 font-mono text-body focus:border-brand-600 focus:ring-4 focus:ring-brand-100 focus:outline-none"
+          className="h-13 w-full rounded-md border border-line-strong bg-surface pe-12 ps-4 font-mono text-body focus:border-brand-600 focus:ring-4 focus:ring-brand-100 focus:outline-none"
         />
-        <button type="button" onClick={() => setShow(!show)} aria-label={show ? t("pwHide") : t("pwShow")} className="absolute top-1/2 right-2 grid size-9 -translate-y-1/2 place-items-center rounded-full hover:bg-sunken">
+        <button type="button" onClick={() => setShow(!show)} aria-label={show ? t("pwHide") : t("pwShow")} className="absolute top-1/2 end-2 grid size-9 -translate-y-1/2 place-items-center rounded-full hover:bg-sunken">
           {show ? <EyeOff className="size-4.5" /> : <Eye className="size-4.5" />}
         </button>
       </div>

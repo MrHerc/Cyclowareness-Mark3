@@ -1,0 +1,549 @@
+{
+ "id": "wrong-recipient",
+ "title": "Yanlış alıcı",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Yanlış kişiye gönderilen e-posta, en sık görülen veri sızıntılarından biridir. Çoğu zaman acele ve otomatik tamamlama yüzünden olur.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Aynı ad iki kez çıkıyor: biri iş adresi, diğeri kişisel ya da kurum dışı bir adres. Alan adını kontrol edin.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Kime: Leyla"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Leyla Hasanova, leyla.hasanova@rxagentlik.az"
+         }
+        ],
+        [
+         {
+          "text": "Leyla Hasanova, "
+         },
+         {
+          "text": "leyla.hasanova85@poct.example",
+          "spot": "external"
+         }
+        ]
+       ],
+       "buttons": [
+        "Seç"
+       ]
+      }
+     },
+     "highlight": "external"
+    },
+    {
+     "id": "b3",
+     "say": "Gönderdikten sonra geri çekme özelliğine güvenmeyin: kurum dışı adreslerde genellikle işe yaramaz.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Göndermeden önce üç şeyi kontrol edin: alıcıyı, eki ve bilgi alanındaki adları.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "before-send",
+   "environment": "inbox",
+   "title": "Göndermeden önce",
+   "intro": "Gönderilmeyi bekleyen üç taslak var, bir de kurum dışından bir yanıt geldi. Her birini kontrol edin.",
+   "steps": [
+    {
+     "id": "autocomplete",
+     "label": "Taslak",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Siz"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "Leyla Hasanova <leyla.hasanova85@poct.example>",
+      "subject": [
+       {
+        "text": "Başvuru listesi"
+       }
+      ],
+      "time": "11:38",
+      "body": [
+       [
+        {
+         "text": "Leyla Hanım, istediğiniz liste ektedir."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Muracietler_2026.xlsx"
+         }
+        ],
+        "size": "310 KB"
+       }
+      ]
+     },
+     "say": "Alıcının alan adını sonuna kadar okuyun.",
+     "actions": [
+      {
+       "id": "fix",
+       "label": "Alıcıyı kontrol et ve düzelt",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru, ad aynıydı ama alan adı farklıydı. İş adresi rxagentlik.az ile biter."
+      },
+      {
+       "id": "send",
+       "label": "Gönder",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Alıcı kişisel bir e-posta adresiydi. Gizli bir liste kurumun dışına çıktı."
+      }
+     ]
+    },
+    {
+     "id": "reply-all",
+     "label": "Taslak",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Siz"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "layihe-qrupu@rxagentlik.az, e.rzayev@merkez-konsalting.example",
+      "subject": [
+       {
+        "text": "YNT: İş ortağının fiyat teklifi"
+       }
+      ],
+      "time": "12:05",
+      "body": [
+       [
+        {
+         "text": "Arkadaşlar, Merkez Konsalting firmasının teklifi pahalı görünüyor, başka bir firmayla da görüşelim."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "remove",
+       "label": "Kurum dışı adresi çıkar",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru. “Tümünü yanıtla”, dışarıdakiler de dahil önceki tüm alıcıları listede tutar."
+      },
+      {
+       "id": "send",
+       "label": "Gönder",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "İş ortağı alıcılar arasında. Kurum içi tartışma ona da ulaşacaktı."
+      }
+     ]
+    },
+    {
+     "id": "correct-draft",
+     "label": "Taslak",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Siz"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "kadrlar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "İzin dilekçesi"
+       }
+      ],
+      "time": "12:20",
+      "body": [
+       [
+        {
+         "text": "Merhaba, izin dilekçem ektedir."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Erize.pdf"
+         }
+        ],
+        "size": "52 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "send",
+       "label": "Gönder",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Her şey yolunda: kurum içi adres, doğru dosya, fazladan alıcı yok."
+      },
+      {
+       "id": "check",
+       "label": "Tekrar kontrol et",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Kontrol etmenin zararı olmaz. Bu e-posta doğruydu ve gönderilebilir."
+      }
+     ]
+    },
+    {
+     "id": "partner-notice",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "merkez-konsalting",
+      "from": {
+       "name": [
+        {
+         "text": "Elçin Rzayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "e.rzayev@merkez-konsalting.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Bu bana yanlışlıkla mı geldi?"
+       }
+      ],
+      "time": "13:10",
+      "body": [
+       [
+        {
+         "text": "Merhaba, dün departmanınız bana çalışanların maaş tablosunu gönderdi. Muhtemelen bir hata. Ne yapmalıyım?"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Güvenlik ekibine ilet",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Doğru. Yanlış adrese giden bir e-posta bir güvenlik olayıdır, ne yapmanız gerektiğini uzman söyleyecek."
+      },
+      {
+       "id": "reply",
+       "label": "Yanıtla: lütfen silin",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Silmesini istemek doğru, ama önce güvenlik ekibine haber verin."
+      },
+      {
+       "id": "delete",
+       "label": "Sil",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Sızıntı ortadan kalkmaz. Uzmanların takip edebilmesi için bildirin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "recall",
+   "question": {
+    "prompt": "Bir e-posta yanlış adrese gitti ve onu geri çektiniz. Bu yeterli mi?",
+    "options": [
+     {
+      "id": "enough",
+      "label": "Evet, e-posta silinecek",
+      "correct": false,
+      "feedback": "Geri çekme, kurum dışı adreslerde genellikle işe yaramaz ve e-posta çoktan okunmuş olabilir."
+     },
+     {
+      "id": "report",
+      "label": "Hayır, yine de hemen güvenlik ekibine bildiririm",
+      "correct": true,
+      "feedback": "Doğru. Geri çekme başarısız olabilir, bildirmek ise şarttır."
+     },
+     {
+      "id": "wait",
+      "label": "Beklerim, belki açmazlar",
+      "correct": false,
+      "feedback": "Beklemek zararı azaltmaz. Hızlı bildirmek daha fazla seçenek sunar."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "inbox"
+    }
+   },
+   "explain": "Yanlış kişiye gönderdiyseniz saklamayın: hemen yöneticinize ve güvenlik ekibine haber verin."
+  },
+  {
+   "type": "swipe",
+   "id": "recipient-check",
+   "prompt": "Bu alıcı listesi doğru mu?",
+   "cards": [
+    {
+     "id": "hr",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Siz"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "kadrlar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Belge talebi"
+       }
+      ],
+      "time": "14:00",
+      "body": [
+       [
+        {
+         "text": "Merhaba, bir çalışma belgesine ihtiyacım var."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Kurum içi adres, doğru departman, fazladan alıcı yok."
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Siz"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "Reşad Aliyev <reshad.aliyev@rxagentlik-az.com>",
+      "subject": [
+       {
+        "text": "Bütçe tablosu"
+       }
+      ],
+      "time": "14:12",
+      "body": [
+       [
+        {
+         "text": "Reşad Bey, tablo ektedir."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Budce_2027.xlsx"
+         }
+        ],
+        "size": "180 KB"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "rxagentlik-az.com sizin alan adınız değil. Otomatik tamamlama eski ya da sahte bir adres önerdi."
+    },
+    {
+     "id": "all-staff",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Siz"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "butun-emekdaslar@rxagentlik.az",
+      "subject": [
+       {
+        "text": "Bir iş arkadaşının sağlık raporu"
+       }
+      ],
+      "time": "14:30",
+      "body": [
+       [
+        {
+         "text": "Rapor ektedir."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Arayis.pdf"
+         }
+        ],
+        "size": "96 KB"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Kişisel bir belge tüm çalışanlara gönderilmez. Yalnızca ihtiyacı olan kişiye gönderin."
+    },
+    {
+     "id": "no-bcc",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "rxagentlik",
+      "from": {
+       "name": [
+        {
+         "text": "Siz"
+        }
+       ],
+       "address": [
+        {
+         "text": "aynur.mammadova@rxagentlik.az"
+        }
+       ]
+      },
+      "to": "40 iş ortağı, hepsi “Kime” alanında",
+      "subject": [
+       {
+        "text": "Bayram tebriki"
+       }
+      ],
+      "time": "15:00",
+      "body": [
+       [
+        {
+         "text": "Değerli iş ortaklarımız, bayramınız kutlu olsun!"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Toplu e-postalarda adresleri “Gizli (Bcc)” alanına yazın ki alıcılar birbirini görmesin."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "address-fields",
+   "prompt": "Her alıcıyı doğru alana yerleştirin.",
+   "pairs": [
+    {
+     "id": "to",
+     "left": "Asıl alıcı, yanıt bekleniyor",
+     "right": "Kime"
+    },
+    {
+     "id": "cc",
+     "left": "Bilgilendirilen bir iş arkadaşı",
+     "right": "Bilgi (Cc)"
+    },
+    {
+     "id": "bcc",
+     "left": "Birbirini tanımayan çok sayıda alıcı",
+     "right": "Gizli (Bcc)"
+    }
+   ],
+   "explain": "Doğru alan, dışarıdakilerin ihtiyaç duymadıkları adresleri görmesini önler."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Göndermeden önce alıcının alan adını sonuna kadar okuyun.",
+    "“Tümünü yanıtla” seçeneğini ve bilgi alanındaki kurum dışı adresleri kontrol edin.",
+    "Yanlış giderse geri çekmeye güvenmeyin, hemen bildirin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

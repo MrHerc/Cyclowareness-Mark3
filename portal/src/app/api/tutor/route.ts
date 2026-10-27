@@ -6,7 +6,7 @@ import { rateLimit } from "@/server/rate-limit";
 import { sha256Hex } from "@/server/crypto";
 import { sameOrigin } from "@/server/request";
 import { readBodyCapped } from "@/server/request-body";
-import { TUTOR_BODY_LIMIT, lessonContext, offlineAnswer, tutorRequestSchema, tutorSystemPrompt } from "@/server/tutor";
+import { TUTOR_BODY_LIMIT, lessonContext, offlineAnswer, tutorRequest, tutorRequestSchema } from "@/server/tutor";
 import { env } from "@/server/env";
 import { pick } from "@/i18n/config";
 import type { Scene } from "@/lib/content/types";
@@ -74,13 +74,8 @@ export async function POST(request: Request) {
   }
 
   client ??= new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
-  const context = lessonContext(pick(mod.title, row.locale), pick(row.title, row.locale), scenes, sceneId);
-  const stream = client.messages.stream({
-    model: env.ANTHROPIC_MODEL,
-    max_tokens: 2000,
-    system: tutorSystemPrompt(locale),
-    messages: [{ role: "user", content: `Lesson context:\n${context}\n\nThe learner asks: ${question}` }],
-  });
+  const context = lessonContext(pick(mod.title, row.locale), pick(row.title, row.locale), scenes);
+  const stream = client.messages.stream(tutorRequest(env.ANTHROPIC_TUTOR_MODEL, locale, context, scenes.find((s) => s.id === sceneId), question));
 
   // Wait for the first words before answering: a model that fails before saying anything gets the
   // offline answer marked as such, so the client reads it with a voice of the lesson's language and shows the offline note.
@@ -110,16 +105,18 @@ export async function POST(request: Request) {
     async start(controller) {
       try {
         controller.enqueue(encoder.encode(first));
+        let stop: string | null = null;
         for await (const event of { [Symbol.asyncIterator]: () => events }) {
           if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
             answer += event.delta.text;
             controller.enqueue(encoder.encode(event.delta.text));
-          }
+          } else if (event.type === "message_delta") stop = event.delta.stop_reason;
         }
-        if (answer.trim()) {
+        // A refused or cut-off answer reaches this learner only; it is never cached for the next one.
+        if (answer.trim() && stop === "end_turn") {
           await db()
             .insert(t.tutorCache)
-            .values({ id: cacheId, tenantId: v.tenant.id, lessonId: row.id, question: question.slice(0, 500), answer, model: env.ANTHROPIC_MODEL })
+            .values({ id: cacheId, tenantId: v.tenant.id, lessonId: row.id, question: question.slice(0, 500), answer, model: env.ANTHROPIC_TUTOR_MODEL })
             .onConflictDoNothing();
         }
       } catch {

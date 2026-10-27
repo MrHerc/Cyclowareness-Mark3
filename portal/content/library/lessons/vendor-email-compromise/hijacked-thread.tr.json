@@ -1,0 +1,709 @@
+{
+ "id": "hijacked-thread",
+ "title": "Ele geçirilen yazışma",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ht-tutor",
+   "beats": [
+    {
+     "id": "ht-b1",
+     "say": "Bir dolandırıcı iş ortaklarınızdan birinin posta kutusuna girdiğinde, eski yazışmanıza yanıt yazar. Konu da imza da tanıdık görünür.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "ht-b2",
+     "say": "Parola korumalı bir arşiv uyarı işaretidir. Parola, dosyayı antivirüs taramasından gizler.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "kur-tikinti",
+       "from": {
+        "name": [
+         {
+          "text": "Elçin Babayev"
+         }
+        ],
+        "address": [
+         {
+          "text": "layihe@kur-tikinti.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "RE: 47/2026 sayılı sözleşme"
+        }
+       ],
+       "time": "14:10",
+       "body": [
+        [
+         {
+          "text": "Değerli iş ortağımız,"
+         }
+        ],
+        [
+         {
+          "text": "Nihai sözleşme arşivdedir. "
+         },
+         {
+          "text": "Arşiv şifresi: 4417",
+          "spot": "zip-pass"
+         }
+        ],
+        [
+         {
+          "text": "Bugün imzalamazsanız fiyat değişecek."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Sözleşme_nihai.zip"
+          }
+         ],
+         "size": "1,2 MB"
+        }
+       ]
+      }
+     },
+     "highlight": "zip-pass"
+    },
+    {
+     "id": "ht-b3",
+     "say": "Tanıdık bir yazışmada bile beklenmedik bir eki açmak ya da acil bir talebi yerine getirmek için acele etmeyin.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "ht-b4",
+     "say": "Şüpheniz varsa iş ortağınızı bildiğiniz bir numaradan arayın ve dosyayı gönderip göndermediğini sorun.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ht-hotspot",
+   "prompt": "Bu yanıtta nelerin değiştiğini bulun.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "kur-tikinti",
+    "from": {
+     "name": [
+      {
+       "text": "Elçin Babayev"
+      }
+     ],
+     "address": [
+      {
+       "text": "layihe@kur-tikinti.example"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "RE: RE: 47/2026 sayılı sözleşme"
+     }
+    ],
+    "time": "15:02",
+    "body": [
+     [
+      {
+       "text": "Değerli iş ortağımız,",
+       "spot": "greeting"
+      }
+     ],
+     [
+      {
+       "text": "Nihai sözleşme ve ödeme takvimi ektedir. "
+      },
+      {
+       "text": "Açmak için iş e-postanızla giriş yapınız.",
+       "spot": "login"
+      }
+     ],
+     [
+      {
+       "text": "Lütfen bugün saat 15:00'e kadar imzalayınız.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "> Merhaba. Revize taslağı pazartesi gönderirim, acelesi yok. Elçin"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Sözleşme_47_imza.html",
+        "spot": "html"
+       }
+      ],
+      "size": "12 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "greeting",
+     "label": "Değişen üslup",
+     "explain": "Eskiden “Merhaba” diye yazardı, şimdi “Değerli iş ortağımız” diyor. Üsluptaki ani bir değişiklik, yazanın başka biri olabileceğini gösterir."
+    },
+    {
+     "id": "html",
+     "label": "HTML eki",
+     "explain": "Sözleşmeler PDF ya da Word dosyası olarak gelir. HTML eki genellikle sahte bir giriş sayfası açar."
+    },
+    {
+     "id": "login",
+     "label": "Giriş talebi",
+     "explain": "Bir eki açmak için parolanız asla gerekmez. Parolanızı isteyen bir dosyanın amacı onu çalmaktır."
+    },
+    {
+     "id": "urgency",
+     "label": "Ani acele",
+     "explain": "Önceki e-postada “acelesi yok” yazıyordu. Birdenbire ortaya çıkan bir son tarih, dolandırıcıların sık başvurduğu bir yöntemdir."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "ht-sim-inbox",
+   "environment": "inbox",
+   "title": "Proje yazışması",
+   "intro": "Kur Tikinti ile uzun bir yazışmanız var. Yeni yanıtları kontrol edin: hangileri gerçek, hangileri ele geçirilmiş bir posta kutusundan geliyor?",
+   "steps": [
+    {
+     "id": "thread-genuine",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elçin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: 47/2026 sayılı sözleşme"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Merhaba. Yorumlarınızı dikkate aldık, revize taslak ektedir."
+        }
+       ],
+       [
+        {
+         "text": "Sorunuz olursa beni arayın. Elçin"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Sözleşme_47_revize.pdf"
+         }
+        ],
+        "size": "340 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Eki aç",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "Beklenen bir PDF, her zamanki üslup, baskı yok. Bu normal bir iş e-postası."
+      },
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Burada uyarı işareti yok. Dosya bekleniyordu ve yazışmanın akışına uyuyor."
+      }
+     ]
+    },
+    {
+     "id": "thread-zip",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elçin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: 47/2026 sayılı sözleşme: acil"
+       }
+      ],
+      "time": "14:10",
+      "body": [
+       [
+        {
+         "text": "Değerli iş ortağımız,"
+        }
+       ],
+       [
+        {
+         "text": "Nihai sözleşme arşivdedir. "
+        },
+        {
+         "text": "Arşiv şifresi: 4417",
+         "spot": "zip-pass"
+        }
+       ],
+       [
+        {
+         "text": "Bugün imzalamazsanız fiyat değişecek."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Sözleşme_nihai.zip"
+         }
+        ],
+        "size": "1,2 MB"
+       }
+      ]
+     },
+     "say": "Arşive ve parolaya bakın.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Eki aç",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Parola korumalı bir arşivde zararlı yazılım saklanabilir, çünkü antivirüs içine bakamaz."
+      },
+      {
+       "id": "verify",
+       "label": "Elçin Bey'i bilinen bir numaradan ara",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Harika. Elçin Bey bu e-postayı göndermediyse posta kutusu ele geçirilmiştir ve bunu bilmesi gerekir."
+      },
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru: ani acele, parola korumalı arşiv ve yeni bir üslup. Bildirmek ekibinizi de korur."
+      },
+      {
+       "id": "reply",
+       "label": "Yanıtla: bunu siz mi gönderdiniz?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Yanıtınız ele geçirilmiş posta kutusuna gider ve dolandırıcı “evet” der. Bunun yerine arayın."
+      }
+     ]
+    },
+    {
+     "id": "thread-html",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elçin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: Ödeme takvimi"
+       }
+      ],
+      "time": "14:35",
+      "body": [
+       [
+        {
+         "text": "Takvim korumalı bir dosyada. Dosyayı açıp iş e-postanızla giriş yapın."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Ödeme_takvimi.html"
+         }
+        ],
+        "size": "9 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Eki aç",
+       "kind": "open-attachment",
+       "outcome": "risky",
+       "feedback": "HTML dosyası tarayıcıda sahte bir giriş sayfası açar. Henüz bir şey yazmadınız, sayfayı kapatın."
+      },
+      {
+       "id": "login",
+       "label": "Giriş yap",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Parolanız artık dolandırıcının elinde. Hemen değiştirin ve güvenlik ekibine haber verin."
+      },
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru. Ödeme takvimini görmek için parola gerekmez, HTML eki de tipik bir tuzaktır."
+      }
+     ]
+    },
+    {
+     "id": "thread-account",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elçin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: Avans ödemesi"
+       }
+      ],
+      "time": "15:20",
+      "body": [
+       [
+        {
+         "text": "Bu sefer avansı iş ortağımız olan şirketin hesabına ödeyin, bilgiler ektedir."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Banka_bilgileri.pdf"
+         }
+        ],
+        "size": "64 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "verify",
+       "label": "Bilinen bir numarayı arayıp kontrol et",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru. Başka bir şirkete ödeme yapma talebi yalnızca telefonla doğrulanır."
+      },
+      {
+       "id": "accept",
+       "label": "Yanıtla: bilgileri kabul ediyoruz",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Avans dolandırıcıya giderdi. Tanıdık bir yazışma, yeni hesabın gerçek olduğunu kanıtlamaz."
+      },
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "İyi bir adım. Aynı yazışmada iki şüpheli e-posta ciddi bir uyarı işaretidir."
+      }
+     ]
+    },
+    {
+     "id": "legal-genuine",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Hukuk departmanı"
+        }
+       ],
+       "address": [
+        {
+         "text": "huquq@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "47 sayılı sözleşmeye ilişkin notlarımız"
+       }
+      ],
+      "time": "16:00",
+      "body": [
+       [
+        {
+         "text": "Merhaba, 5. maddede bir değişiklik öneriyoruz. Yarınki toplantıda konuşalım."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "reply",
+       "label": "Yanıtla",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Kurum içi bir adres, ek ya da bağlantı yok, sizden bir şey istenmiyor. Bu normal bir e-posta."
+      },
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Bu e-postada uyarı işareti yok. Bildirme düğmesini şüpheli e-postalar için kullanın."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "ht-swipe",
+   "prompt": "Güvenli mi, tehdit mi?",
+   "cards": [
+    {
+     "id": "pdf-expected",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Sözleşme_47_revize.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "340 KB",
+      "source": [
+       {
+        "text": "Elçin Babayev, beklenen yanıt"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Beklenen bir belge, olağan bir dosya türü ve tanıdık bir gönderen. Açabilirsiniz."
+    },
+    {
+     "id": "zip-pass",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Ödeme_talimatı.zip"
+       }
+      ],
+      "type": "zip",
+      "size": "1,1 MB",
+      "source": [
+       {
+        "text": "layihe@kur-tikinti.example, parola: 4417"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Parola korumalı arşiv antivirüs taramasından kaçar. Göndereni arayıp sorun."
+    },
+    {
+     "id": "html-sign",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Sözleşme_imza.html"
+       }
+      ],
+      "type": "html",
+      "size": "11 KB",
+      "source": [
+       {
+        "text": "RE: 47/2026 sayılı sözleşme"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Sözleşme asla HTML dosyası olarak gelmez. Böyle bir dosya sahte bir giriş sayfası açar."
+    },
+    {
+     "id": "act-internal",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [
+       {
+        "text": "Teslim_tutanağı_eylül.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "210 KB",
+      "source": [
+       {
+        "text": "huquq@idare.example, dün kararlaştırıldı"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Kurum içi bir departmandan geliyor ve önceden kararlaştırılmıştı. Uyarı işareti yok."
+    },
+    {
+     "id": "double-ext",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Fatura_47.pdf.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "2,3 MB",
+      "source": [
+       {
+        "text": "RE: 47/2026 sayılı sözleşme"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Dosyanın gerçek türü .exe, yani bir program. Fatura asla program olmaz."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ht-scenario",
+   "title": "Arşivi açtınız",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Parola korumalı arşivi açtınız. İçinde sözleşme yoktu, yalnızca garip bir dosya vardı ve ekran bir anlığına karardı.",
+     "choices": [
+      {
+       "label": "Ağ bağlantısını keser ve güvenlik ekibini ararım",
+       "next": "n2",
+       "feedback": "Doğru. Bağlantıyı kesmek yayılmayı durdurur, arama da ekibi devreye sokar."
+      },
+      {
+       "label": "Bilgisayarı hemen kapatırım",
+       "next": "n2",
+       "feedback": "Bilgisayarı kapatmak bellekteki kanıtları silebilir. Prosedürünüz aksini söylemiyorsa bilgisayarı açık bırakın ve ağ bağlantısını kesin."
+      },
+      {
+       "label": "Kimseye söylemem, muhtemelen bir şey olmadı",
+       "outcome": "compromised",
+       "feedback": "Zararlı yazılım sessizce çalışır ve ağ üzerinden yayılabilir. Bir hatayı hızla bildirmek utanılacak bir şey değildir, durumu kurtarır."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Teşekkürler. E-posta hâlâ posta kutunuzda mı? Kur Tikinti şirketine de haber verdiniz mi?",
+     "speaker": "Güvenlik ekibi",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Teşekkürler. <breath> E-posta hâlâ posta kutunuzda mı? Kur Tikinti şirketine de haber verdiniz mi?",
+     "choices": [
+      {
+       "label": "E-postayı sakladım, Elçin Bey'i de bildiğim bir numaradan arıyorum",
+       "outcome": "safe",
+       "feedback": "Harika. E-posta bir kanıttır. İş ortağınızın da posta kutusunun ele geçirildiğini öğrenmesi gerekir."
+      },
+      {
+       "label": "İz kalmasın diye e-postayı sildim",
+       "outcome": "risky",
+       "feedback": "E-posta inceleme için gerekli. Bir dahaki sefere silmeyin ve güvenlik ekibinin talimatlarına uyun."
+      },
+      {
+       "label": "Elçin Bey'e aynı yazışmada yanıt yazarım",
+       "outcome": "risky",
+       "feedback": "O posta kutusunu dolandırıcı okuyor. İş ortağınıza telefonla haber verin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "ht-recap",
+   "points": [
+    "Tanıdık bir yazışma da ele geçirilebilir",
+    "Parola korumalı bir arşivi ya da HTML dosyasını açmadan önce arayıp kontrol edin",
+    "Açtıysanız ağ bağlantısını kesin ve hemen bildirin"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

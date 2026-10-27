@@ -1,0 +1,424 @@
+{
+ "id": "calm-response",
+ "title": "Un răspuns calm",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "cr-tutor",
+   "beats": [
+    {
+     "id": "cr-b1",
+     "say": "A sosit un e-mail de șantaj. Acum să exersăm, pe rând, pașii corecți.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "cr-b2",
+     "say": "Primele două reguli: nu plătiți și nu răspundeți. Un răspuns vă transformă într-o nouă țintă.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "cr-b3",
+     "say": "Dacă încă folosiți parola din e-mail, schimbați-o și activați verificarea în doi pași.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Schimbați parola"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Parola veche"
+         }
+        ],
+        [
+         {
+          "text": "Parola nouă: cel puțin 15 caractere",
+          "spot": "new"
+         }
+        ]
+       ],
+       "buttons": [
+        "Anulați",
+        "Schimbați"
+       ]
+      }
+     },
+     "highlight": "new"
+    },
+    {
+     "id": "cr-b4",
+     "say": "Dacă mesajul a venit pe adresa de serviciu, raportați-l echipei de securitate. Nu este vina dumneavoastră.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "cr-order",
+   "prompt": "Ați primit un e-mail de șantaj. Puneți pașii în ordine.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Nu plătiți și nu răspundeți"
+    },
+    {
+     "id": "report",
+     "label": "Raportați e-mailul echipei de securitate"
+    },
+    {
+     "id": "change",
+     "label": "Schimbați peste tot parola din e-mail"
+    },
+    {
+     "id": "mfa",
+     "label": "Activați verificarea în doi pași"
+    }
+   ],
+   "explain": "Mai întâi vă opriți, apoi raportați și schimbați parola. Verificarea în doi pași protejează contul chiar dacă o parolă veche este divulgată."
+  },
+  {
+   "type": "simulation",
+   "id": "cr-sim",
+   "environment": "desktop",
+   "title": "Dimineața, la computerul de serviciu",
+   "intro": "Pe computerul de serviciu apare o notificare despre un e-mail de șantaj. Alegeți reacția corectă la fiecare pas.",
+   "steps": [
+    {
+     "id": "toast",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "IshPocht",
+      "title": [
+       {
+        "text": "Parola dumneavoastră: Gunes2019. Aveți 48 de ore"
+       }
+      ],
+      "body": [
+       {
+        "text": "Am videoclipuri filmate cu camera dumneavoastră. Trimiteți bitcoini, altfel le va vedea toată lumea."
+       }
+      ],
+      "time": "09:12"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Cel mai bun prim pas este să raportați mesajul, fără să plătiți și fără să răspundeți.",
+       "next": "password"
+      },
+      {
+       "id": "reply",
+       "label": "Răspundeți: arătați-mi dovada",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Ați răspuns, iar escrocul v-a trimis imediat un fișier numit „dovada”."
+      },
+      {
+       "id": "pay",
+       "label": "Copiați adresa de bitcoin și plătiți",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Banii s-au dus și nu se mai întorc. Cei care plătesc primesc de obicei o nouă cerere.",
+       "next": "password"
+      }
+     ]
+    },
+    {
+     "id": "proof",
+     "label": "Descărcări",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Dovada_video.zip"
+       }
+      ],
+      "type": "zip",
+      "size": "1,2 MB",
+      "source": [
+       {
+        "text": "Anonim: e-mail de răspuns"
+       }
+      ]
+     },
+     "say": "A venit un răspuns: chipurile, o dovadă.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Aceasta nu este o dovadă, ci malware. Nu deschideți niciodată fișiere dintr-un e-mail de șantaj."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. Nu deschideți fișierul și raportați e-mailul echipei de securitate."
+      },
+      {
+       "id": "scan",
+       "label": "Scanați cu antivirusul",
+       "kind": "scan",
+       "outcome": "safe",
+       "feedback": "Un obicei bun, dar nu are rost să păstrați acest fișier. Ștergeți-l și raportați e-mailul."
+      }
+     ]
+    },
+    {
+     "id": "password",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Schimbați parola"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Parola din e-mail a fost găsită într-o scurgere de date mai veche."
+        }
+       ],
+       [
+        {
+         "text": "Parola nouă: cel puțin 15 caractere, nefolosită pe alte site-uri."
+        }
+       ]
+      ],
+      "buttons": [
+       "Mai târziu",
+       "Schimbați parola"
+      ]
+     },
+     "say": "Această parolă este încă folosită la unele dintre conturile dumneavoastră.",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Schimbați parola",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Parola scursă nu mai deschide acest cont, așa că schimbați-o și la celelalte conturi."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Parolele scurse sunt încercate iar și iar pentru a deschide conturi. Nu amânați schimbarea."
+      }
+     ]
+    },
+    {
+     "id": "two-step",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Verificare în doi pași"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Doriți ca la conectare să vi se ceară, pe lângă parolă, și confirmarea în aplicația de pe telefon?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Nu acum",
+       "Activați"
+      ]
+     },
+     "actions": [
+      {
+       "id": "enable",
+       "label": "Activați",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Corect. Chiar dacă parola este divulgată, al doilea pas protejează contul."
+      },
+      {
+       "id": "skip",
+       "label": "Nu acum",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Fără verificarea în doi pași, o singură parolă deschide totul. Activați-o astăzi."
+      }
+     ]
+    },
+    {
+     "id": "second-threat",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "IshPocht",
+      "title": [
+       {
+        "text": "Ultimele 24 de ore!"
+       }
+      ],
+      "body": [
+       {
+        "text": "Plata nu a sosit. Mâine public videoclipurile."
+       }
+      ],
+      "time": "08:30"
+     },
+     "say": "O zi mai târziu a sosit o nouă amenințare.",
+     "actions": [
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. Și o amenințare repetată este o cacealma, așa că nu plătiți și nu răspundeți."
+      },
+      {
+       "id": "report",
+       "label": "Raportați",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Echipa de securitate poate bloca și noile e-mailuri."
+      },
+      {
+       "id": "bargain",
+       "label": "Răspundeți: mai dați-mi puțin timp",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Negocierea îi dă speranțe escrocului. Nu răspundeți, ci raportați mesajul."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "cr-scenario",
+   "title": "O colegă îngrijorată",
+   "start": "panic",
+   "nodes": [
+    {
+     "id": "panic",
+     "text": "Uite, mi-a venit un e-mail de șantaj pe adresa personală și în el apare parola mea veche!",
+     "speaker": "Narmin (colega dumneavoastră) vă arată telefonul",
+     "voice": "woman",
+     "channel": "in-person",
+     "manner": "worried",
+     "spoken": "Uite, <breath> mi-a venit un e-mail de șantaj pe adresa personală și în el apare parola mea veche!",
+     "character": "narmin",
+     "choices": [
+      {
+       "label": "Liniștește-te, e o cacealma trimisă în masă. Nu plăti și nu răspunde",
+       "next": "reuse",
+       "feedback": "Corect. Un sfat calm și clar potolește imediat panica."
+      },
+      {
+       "label": "Poate plătești jumătate, ca să te lase în pace",
+       "outcome": "compromised",
+       "feedback": "Cei care plătesc primesc noi cereri. Banii nu opresc amenințarea."
+      },
+      {
+       "label": "Răspunde-le și cere-le dovezi",
+       "outcome": "risky",
+       "feedback": "Un răspuns arată că adresa este activă și aduce și mai multe e-mailuri."
+      }
+     ]
+    },
+    {
+     "id": "reuse",
+     "text": "Încă folosesc parola asta pe mai multe site-uri. Ce să fac?",
+     "speaker": "Narmin (colega dumneavoastră)",
+     "voice": "woman",
+     "channel": "in-person",
+     "manner": "worried",
+     "spoken": "Încă folosesc parola asta pe mai multe site-uri, ăă, ce să fac?",
+     "character": "narmin",
+     "choices": [
+      {
+       "label": "Schimbă-o peste tot, folosește câte o parolă diferită pentru fiecare site și activează verificarea în doi pași",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Cu parole diferite, o singură scurgere de date nu se mai extinde la toate conturile."
+      },
+      {
+       "label": "Schimbă doar parola acestei căsuțe de e-mail, restul nu contează",
+       "outcome": "risky",
+       "feedback": "Aceeași parolă va fi încercată și pe alte site-uri. Schimbați-le pe toate."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "cr-choice",
+   "question": {
+    "prompt": "Un adolescent din familie vă spune că cineva amenință că îi va publica videoclipurile intime și îi cere bani. Ce trebuie făcut?",
+    "options": [
+     {
+      "id": "police",
+      "label": "Nu plătiți niciodată, mergeți la poliție",
+      "correct": true,
+      "feedback": "Corect. Nu plătiți niciodată, mergeți la poliție."
+     },
+     {
+      "id": "pay",
+      "label": "Plătiți o dată, ca să se termine",
+      "correct": false,
+      "feedback": "Plata nu oprește amenințarea. Nu plătiți niciodată, mergeți la poliție."
+     },
+     {
+      "id": "hide",
+      "label": "Păstrați secretul și nu spuneți nimănui",
+      "correct": false,
+      "feedback": "Tăcerea îl ajută pe cel care amenință. Nu plătiți niciodată, mergeți la poliție."
+     }
+    ]
+   },
+   "explain": "Dacă un copil sau un adolescent este amenințat, nu plătiți niciodată. Mergeți imediat la poliție."
+  },
+  {
+   "type": "recap",
+   "id": "cr-recap",
+   "points": [
+    "Nu plătiți, nu răspundeți și nu deschideți fișierele din e-mail.",
+    "Schimbați peste tot parola scursă și activați verificarea în doi pași.",
+    "Dacă un copil este amenințat, nu plătiți niciodată și mergeți la poliție."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

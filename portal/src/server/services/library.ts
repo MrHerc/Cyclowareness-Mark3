@@ -1,8 +1,8 @@
 /**
  * Training library: imports the shipped content (content/library) into the database.
  * Idempotent: run on every deploy (`npm run content:sync`) and by the seed.
- * Each lesson is `<id>.en.json` plus optional `<id>.az.json` / `<id>.ru.json` translations, stored as
- * one lesson_contents row per locale; tenant (studio) lessons are never touched.
+ * Each lesson is `<id>.en.json` plus an optional `<id>.<locale>.json` translation per other interface
+ * language, stored as one lesson_contents row per locale; tenant (studio) lessons are never touched.
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -14,6 +14,8 @@ import { lessonFileSchema, lessonIntegrityErrors } from "../../lib/content/valid
 import { localeParityErrors } from "../../lib/content/locale-parity";
 import type { ModuleFile } from "../../lib/content/types";
 import { CATEGORY_FROM_LABEL } from "../../lib/domain/catalog";
+import { LOCALES, type Locale } from "../../i18n/config";
+import { isLabId } from "../../lib/domain/labs";
 
 const LIB = path.join(process.cwd(), "content", "library");
 
@@ -31,16 +33,34 @@ function readJson<T>(file: string): T {
   return JSON.parse(fs.readFileSync(file, "utf8")) as T;
 }
 
-export function readLibrary() {
-  const modules = readJson<ModuleFile[]>(path.join(LIB, "modules.json"));
-  const az = readJson<I18n>(path.join(LIB, "i18n.az.json"));
-  const ru = readJson<I18n>(path.join(LIB, "i18n.ru.json"));
-  return { modules, az, ru };
+/** Languages a library lesson may be translated into: `<id>.<locale>.json` next to `<id>.en.json`. */
+export const LESSON_TRANSLATIONS = LOCALES.filter((l): l is TranslationLocale => l !== "en");
+type TranslationLocale = Exclude<Locale, "en">;
+
+/**
+ * Module and lesson titles in one translation (content/library/i18n.<locale>.json). While a file is
+ * missing the titles stay English, with a warning naming it (tests/content.test.ts requires every file).
+ */
+function readTitles(locale: TranslationLocale): I18n {
+  const file = path.join(LIB, `i18n.${locale}.json`);
+  const name = path.relative(process.cwd(), file);
+  if (!fs.existsSync(file)) {
+    console.warn(`[library] ${name} is missing: ${locale} module and lesson titles fall back to English.`);
+    return { modules: {}, lessons: {} };
+  }
+  try {
+    return readJson<I18n>(file);
+  } catch (e) {
+    throw new Error(`${name}: ${(e as Error).message}`);
+  }
 }
 
-/** Languages a library lesson may be translated into: `<id>.az.json` / `<id>.ru.json` next to `<id>.en.json`. */
-export const LESSON_TRANSLATIONS = ["az", "ru"] as const;
-type TranslationLocale = (typeof LESSON_TRANSLATIONS)[number];
+export function readLibrary() {
+  const modules = readJson<ModuleFile[]>(path.join(LIB, "modules.json"));
+  const titles = Object.fromEntries(LESSON_TRANSLATIONS.map((l) => [l, readTitles(l)])) as Record<TranslationLocale, I18n>;
+  return { modules, titles };
+}
+
 type CheckedLesson = z.infer<typeof lessonFileSchema>;
 
 /** Schema and integrity rules for every file; a translation must also keep its English original's structure. */
@@ -80,15 +100,17 @@ export function readLibraryLesson(slug: string, id: string): { en: CheckedLesson
   return { en, translations };
 }
 
-export async function syncLibrary(db: DB): Promise<{ modules: number; lessons: number; locales: Record<"en" | TranslationLocale, number> }> {
-  const { modules, az, ru } = readLibrary();
+export async function syncLibrary(db: DB): Promise<{ modules: number; lessons: number; locales: Record<Locale, number> }> {
+  const { modules, titles } = readLibrary();
   let lessonCount = 0;
-  const locales = { en: 0, az: 0, ru: 0 };
+  const locales = Object.fromEntries(LOCALES.map((l) => [l, 0])) as Record<Locale, number>;
+  /** `{ en, <translation>: text }`, English where a translation has none. */
+  const localized = (en: string, text: (x: I18n) => string | undefined) => ({ en, ...Object.fromEntries(LESSON_TRANSLATIONS.map((l) => [l, text(titles[l]) ?? en])) });
   for (const [order, m] of modules.entries()) {
     const category = CATEGORY_FROM_LABEL[m.category];
     if (!category) throw new Error(`Unknown category ${m.category} in ${m.slug}`);
-    const title = { en: m.title, az: az.modules[m.slug]?.[0] ?? m.title, ru: ru.modules[m.slug]?.[0] ?? m.title };
-    const subtitle = { en: m.subtitle, az: az.modules[m.slug]?.[1] ?? m.subtitle, ru: ru.modules[m.slug]?.[1] ?? m.subtitle };
+    const title = localized(m.title, (x) => x.modules[m.slug]?.[0]);
+    const subtitle = localized(m.subtitle, (x) => x.modules[m.slug]?.[1]);
     const values = {
       slug: m.slug,
       category,
@@ -114,7 +136,7 @@ export async function syncLibrary(db: DB): Promise<{ modules: number; lessons: n
     for (const [position, les] of m.lessons.entries()) {
       const { en, translations } = readLibraryLesson(m.slug, les.id);
       const key = `${m.slug}/${les.id}`;
-      const lessonTitle = { en: les.title, az: az.lessons[key] ?? les.title, ru: ru.lessons[key] ?? les.title };
+      const lessonTitle = localized(les.title, (x) => x.lessons[key]);
       const [row] = await db
         .select({ id: t.lessons.id })
         .from(t.lessons)
@@ -129,8 +151,8 @@ export async function syncLibrary(db: DB): Promise<{ modules: number; lessons: n
           .values({ moduleId, key: les.id, title: lessonTitle, minutes: les.minutes, position })
           .returning({ id: t.lessons.id });
       }
-      const texts: Partial<Record<"en" | TranslationLocale, CheckedLesson>> = { en, ...translations };
-      for (const locale of ["en", ...LESSON_TRANSLATIONS] as const) {
+      const texts: Partial<Record<Locale, CheckedLesson>> = { en, ...translations };
+      for (const locale of LOCALES) {
         const lesson = texts[locale];
         if (!lesson) {
           // The files are the source: a translation that was removed stops being served.
@@ -158,6 +180,8 @@ type PathFile = {
   recurrence: Record<string, string>;
   standards: string[];
   modules: string[];
+  /** Practice labs, shown after the modules. */
+  labs?: string[];
 };
 
 /** Global learning paths (content/library/paths.json). */
@@ -167,6 +191,8 @@ export async function syncPaths(db: DB): Promise<number> {
   for (const p of paths) {
     const missing = p.modules.filter((s) => !slugs.has(s));
     if (missing.length) throw new Error(`Path ${p.key} references unknown modules: ${missing.join(", ")}`);
+    const badLabs = (p.labs ?? []).filter((id) => !isLabId(id));
+    if (badLabs.length) throw new Error(`Path ${p.key} references unknown labs: ${badLabs.join(", ")}`);
     const values = {
       key: p.key,
       title: p.title,
@@ -176,6 +202,7 @@ export async function syncPaths(db: DB): Promise<number> {
       recurrence: p.recurrence,
       standards: p.standards,
       moduleSlugs: p.modules,
+      labIds: p.labs ?? [],
     };
     const [existing] = await db
       .select({ id: t.learningPaths.id })

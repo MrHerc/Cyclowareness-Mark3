@@ -1,0 +1,731 @@
+{
+  "id": "ceo-fraud",
+  "title": "Der falsche Chef",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "money-trap",
+      "beats": [
+        {
+          "id": "intro",
+          "say": "Manchmal kommt die Falle ganz ohne Link und ohne Datei. Nur mit einer dringenden Zahlungsaufforderung im Namen Ihrer Führungskraft.",
+          "mood": "talk",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "ceo"
+          }
+        },
+        {
+          "id": "address",
+          "say": "Der Name ist bekannt, aber die Adresse gehört nicht zur Agentur. Als Absendernamen kann jeder eintragen, was er will.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "poctam",
+              "from": {
+                "name": [
+                  {
+                    "text": "Rauf Kərimov"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "rauf.kerimov.ofis@"
+                  },
+                  {
+                    "text": "poctam.az",
+                    "spot": "free-mail"
+                  }
+                ]
+              },
+              "to": "s.huseynova@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "Dringend und vertraulich"
+                }
+              ],
+              "time": "15:05",
+              "body": [
+                [
+                  {
+                    "text": "Hallo Səbinə,"
+                  }
+                ],
+                [
+                  {
+                    "text": "wir müssen heute noch vor 16:00 Uhr 18.400 AZN an einen Partner überweisen.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "Sagen Sie bitte noch niemandem etwas, die Verhandlungen sind vertraulich.",
+                    "spot": "secrecy"
+                  }
+                ],
+                [
+                  {
+                    "text": "Ich bin in einem Meeting, bitte nicht anrufen, nur schreiben.",
+                    "spot": "no-call"
+                  }
+                ],
+                [
+                  {
+                    "text": "Die Bankverbindung finden Sie im Anhang."
+                  }
+                ]
+              ],
+              "attachments": [
+                {
+                  "name": [
+                    {
+                      "text": "Rekvizitler.pdf"
+                    }
+                  ],
+                  "size": "64 KB"
+                }
+              ]
+            }
+          },
+          "highlight": "free-mail"
+        },
+        {
+          "id": "secrecy",
+          "say": "Die Bitte um Geheimhaltung und das Anrufverbot sollen verhindern, dass Sie nachprüfen.",
+          "mood": "alert",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "poctam",
+              "from": {
+                "name": [
+                  {
+                    "text": "Rauf Kərimov"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "rauf.kerimov.ofis@"
+                  },
+                  {
+                    "text": "poctam.az",
+                    "spot": "free-mail"
+                  }
+                ]
+              },
+              "to": "s.huseynova@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "Dringend und vertraulich"
+                }
+              ],
+              "time": "15:05",
+              "body": [
+                [
+                  {
+                    "text": "Hallo Səbinə,"
+                  }
+                ],
+                [
+                  {
+                    "text": "wir müssen heute noch vor 16:00 Uhr 18.400 AZN an einen Partner überweisen.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "Sagen Sie bitte noch niemandem etwas, die Verhandlungen sind vertraulich.",
+                    "spot": "secrecy"
+                  }
+                ],
+                [
+                  {
+                    "text": "Ich bin in einem Meeting, bitte nicht anrufen, nur schreiben.",
+                    "spot": "no-call"
+                  }
+                ],
+                [
+                  {
+                    "text": "Die Bankverbindung finden Sie im Anhang."
+                  }
+                ]
+              ],
+              "attachments": [
+                {
+                  "name": [
+                    {
+                      "text": "Rekvizitler.pdf"
+                    }
+                  ],
+                  "size": "64 KB"
+                }
+              ]
+            }
+          },
+          "highlight": "secrecy"
+        },
+        {
+          "id": "second-channel",
+          "say": "Prüfen Sie Anfragen zu Geld oder Bankverbindungen immer auf einem anderen Weg. Rufen Sie selbst eine Nummer an, die Sie bereits kennen.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          },
+          "checkpoint": {
+            "prompt": "Und wenn die E-Mail von der echten Adresse des Direktors kommt?",
+            "options": [
+              {
+                "id": "skip",
+                "label": "Dann muss ich nichts nachprüfen",
+                "correct": false,
+                "feedback": "Das Postfach könnte gehackt sein. Prüfen Sie Zahlungsaufforderungen immer telefonisch nach."
+              },
+              {
+                "id": "check",
+                "label": "Ich prüfe trotzdem telefonisch nach",
+                "correct": true,
+                "feedback": "Richtig. Auch eine echte Adresse kann in falsche Hände geraten."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "new-bank-details",
+      "prompt": "Finden Sie die Warnsignale: Der echte Lieferant schreibt von ofistechizat.az.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "ofistechizat-fake",
+        "from": {
+          "name": [
+            {
+              "text": "Günel Əliyeva, OfisTəchizat MMC",
+              "reveal": "kamran@ofis-techizat.az"
+            }
+          ],
+          "address": [
+            {
+              "text": "kamran@"
+            },
+            {
+              "text": "ofis-techizat.az",
+              "spot": "look-alike"
+            }
+          ]
+        },
+        "to": "muhasibat@xidmetagentliyi.az",
+        "subject": [
+          {
+            "text": "Unsere Bankverbindung hat sich geändert"
+          }
+        ],
+        "time": "11:18",
+        "body": [
+          [
+            {
+              "text": "Liebe Kolleginnen und Kollegen,"
+            }
+          ],
+          [
+            {
+              "text": "da wir die Bank gewechselt haben, "
+            },
+            {
+              "text": "überweisen Sie Zahlungen ab diesem Monat bitte auf das neue Konto.",
+              "spot": "new-account"
+            }
+          ],
+          [
+            {
+              "text": "IBAN: AZ21ULDZ00000000137010001944"
+            }
+          ],
+          [
+            {
+              "text": "Zahlen Sie nicht mehr auf das alte Konto, sonst kommt das Geld zurück.",
+              "spot": "old-account"
+            }
+          ],
+          [
+            {
+              "text": "Begleichen Sie die Rechnung für September noch diese Woche, um eine Vertragsstrafe zu vermeiden.",
+              "spot": "pressure"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "look-alike",
+          "label": "Täuschend ähnliche Adresse",
+          "explain": "Die echte Adresse lautet ofistechizat.az. Hier wurde ein Bindestrich eingefügt."
+        },
+        {
+          "id": "new-account",
+          "label": "Neues Konto",
+          "explain": "Eine geänderte Bankverbindung ist die klassische Form dieses Betrugs. Prüfen Sie immer über die Nummer aus dem Vertrag nach."
+        },
+        {
+          "id": "old-account",
+          "label": "Warnung vor dem alten Konto",
+          "explain": "Das Verbot, auf das alte Konto zu zahlen, drängt Sie ungeprüft zum neuen."
+        },
+        {
+          "id": "pressure",
+          "label": "Druck durch Vertragsstrafe",
+          "explain": "Die Angst vor einer Strafe soll Sie zur Eile treiben. Genau dieser Druck ist der Grund, nachzuprüfen."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "intro",
+      "id": "your-turn",
+      "title": "Jetzt sind Sie dran",
+      "body": "Freitag, 15:05 Uhr. Sie sind allein in der Buchhaltung, und die Zahlungen müssen bis 16:00 Uhr raus.",
+      "mood": "think",
+      "visual": {
+        "kind": "illustration",
+        "id": "ceo"
+      }
+    },
+    {
+      "type": "simulation",
+      "id": "vendor-callback",
+      "environment": "call",
+      "title": "Ein Lieferant ruft an",
+      "intro": "Direkt nach der E-Mail mit der neuen Bankverbindung klingelt Ihr Telefon. Hören Sie zu und entscheiden Sie.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat-fake",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 61 27"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "woman"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Annehmen",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Den Anruf anzunehmen ist nicht gefährlich. Entscheidend ist, worauf Sie sich einlassen."
+            },
+            {
+              "id": "decline",
+              "label": "Ablehnen",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Das geht auch. Bevor Sie zahlen, rufen Sie den Lieferanten selbst unter der Nummer aus dem Vertrag an.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pitch",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat-fake",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 61 27"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "woman"
+          },
+          "say": "Guten Tag, hier ist Günel Əliyeva von OfisTəchizat. Haben Sie unsere E-Mail erhalten? Bitte zahlen Sie die Rechnung für September heute noch auf das neue Konto.",
+          "spoken": "Guten Tag, <breath> hier ist Günel Əliyeva von OfisTəchizat. Haben Sie unsere E-Mail erhalten? Bitte zahlen Sie die Rechnung für September, äh, heute noch auf das neue Konto.",
+          "actions": [
+            {
+              "id": "agree",
+              "label": "Gut, ich zahle heute",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Der Anruf wiederholt nur die Geschichte aus der E-Mail und beweist nichts. Bestätigen Sie eine geänderte Bankverbindung über die Nummer aus dem Vertrag."
+            },
+            {
+              "id": "verify",
+              "label": "Ich prüfe das über die Nummer aus dem Vertrag",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Richtig: E-Mail und Anruf können von denselben Kriminellen stammen. Prüfen Sie über einen anderen Kanal nach."
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat-fake",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 61 27"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "woman"
+          },
+          "say": "Wir haben keine Zeit, unser Direktor ist schon verärgert. Wenn Sie es prüfen wollen, rufen Sie mich einfach unter dieser Nummer zurück.",
+          "spoken": "Wir haben keine Zeit, <breath> unser Direktor ist schon verärgert. Wenn Sie es prüfen wollen, rufen Sie mich einfach unter dieser Nummer zurück.",
+          "actions": [
+            {
+              "id": "hang",
+              "label": "Auflegen",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Richtig. Wenn der Druck steigt, beenden Sie das Gespräch höflich und prüfen Sie selbst nach."
+            },
+            {
+              "id": "his-number",
+              "label": "Ich rufe zur Bestätigung diese Nummer an",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Eine Nummer, die Ihnen die Anruferin nennt, führt zu ihrem eigenen Telefon. Vertrauen Sie nur der Nummer aus dem Vertrag."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Das Gespräch ist beendet. Was tun Sie jetzt?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat-fake",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 61 27"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "woman"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "Nummer aus dem Vertrag anrufen",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Richtig. Wählen Sie die offizielle Nummer selbst, am besten von einem anderen Telefon aus."
+            },
+            {
+              "id": "ignore",
+              "label": "Nichts tun, nur nicht zahlen",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Das Geld ist sicher, aber der Lieferant und Ihre Kolleginnen und Kollegen wissen von nichts. Die Kriminellen versuchen es dann bei jemand anderem."
+            }
+          ]
+        },
+        {
+          "id": "real-supplier",
+          "label": "Anruf unter der Nummer aus dem Vertrag",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 31 00"
+              }
+            ],
+            "label": "Nummer aus dem Vertrag",
+            "voice": "woman-2"
+          },
+          "say": "OfisTəchizat, Günel Əliyeva am Apparat. Nein, wir haben weder unsere Bankverbindung geändert noch Sie angerufen.",
+          "spoken": "OfisTəchizat, <breath> Günel Əliyeva am Apparat. Nein, wir haben, äh, weder unsere Bankverbindung geändert noch Sie angerufen.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Buchhaltung und Sicherheitsteam informieren",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Sehr gut. Melden Sie die E-Mail, ohne sie zu löschen: Das Team sperrt die gefälschte Domain und warnt die Kolleginnen und Kollegen."
+            },
+            {
+              "id": "keep-quiet",
+              "label": "Ich habe nicht gezahlt, das reicht",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Das Geld ist sicher, aber dieselbe E-Mail kann auch bei Ihren Kolleginnen und Kollegen landen. Eine Meldung schützt sie."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "money-requests",
+      "prompt": "Ist diese Anfrage sicher oder eine Falle?",
+      "cards": [
+        {
+          "id": "gift-cards",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Rauf Kərimov (neue Nummer)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hallo, das ist meine neue Nummer."
+                  }
+                ],
+                "time": "12:02"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Kaufen Sie bitte dringend fünf Geschenkkarten zu je 200 Manat und schicken Sie mir die Codes. Ich gebe Ihnen das Geld zurück."
+                  }
+                ],
+                "time": "12:03"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Eine neue Nummer und Geschenkkarten – das ist eine klassische Betrugsmasche. Rufen Sie zur Prüfung die alte Nummer Ihrer Führungskraft an."
+        },
+        {
+          "id": "report-request",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "Rauf Kərimov"
+                }
+              ],
+              "address": [
+                {
+                  "text": "r.kerimov@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Meeting morgen"
+              }
+            ],
+            "time": "09:40",
+            "body": [
+              [
+                {
+                  "text": "Səbinə, bitte bringen Sie den Quartalsbericht morgen ins Meeting mit. Danke."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Die richtige Adresse und eine normale dienstliche Bitte. Kein Geld und keine Geheimhaltung."
+        },
+        {
+          "id": "broken-phone",
+          "artifact": {
+            "kind": "sms",
+            "sender": [
+              {
+                "text": "+994 55 000 71 48"
+              }
+            ],
+            "time": "14:15",
+            "messages": [
+              [
+                {
+                  "text": "Hallo, hier ist Rauf Kərimov, mein Handy ist kaputt. Überweisen Sie dringend 3.000 AZN an einen Partner, die Daten habe ich Ihnen per E-Mail geschickt."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Eine unbekannte Nummer, die Ausrede mit dem kaputten Handy und dringend Geld. Rufen Sie den Direktor unter der Nummer an, die Sie kennen."
+        },
+        {
+          "id": "usual-invoice",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "ofistechizat",
+            "from": {
+              "name": [
+                {
+                  "text": "OfisTəchizat MMC"
+                }
+              ],
+              "address": [
+                {
+                  "text": "muhasibat@ofistechizat.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Rechnung für September"
+              }
+            ],
+            "time": "10:30",
+            "body": [
+              [
+                {
+                  "text": "Guten Tag, anbei die Rechnung für September. Die Zahlung geht wie gewohnt auf das Konto aus dem Vertrag."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Faktura_sentyabr.pdf"
+                  }
+                ],
+                "size": "120 KB"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Eine bekannte Adresse, eine erwartete Rechnung und keine geänderte Bankverbindung. Eine ganz normale E-Mail."
+        },
+        {
+          "id": "hacked-mailbox",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "Rauf Kərimov"
+                }
+              ],
+              "address": [
+                {
+                  "text": "r.kerimov@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Dringende Zahlung"
+              }
+            ],
+            "time": "16:48",
+            "body": [
+              [
+                {
+                  "text": "Überweisen Sie heute 9.750 AZN an einen neuen Partner, die Daten stehen unten."
+                }
+              ],
+              [
+                {
+                  "text": "Nicht anrufen, ich bin in einem Meeting."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Die Adresse ist echt, aber das Postfach könnte gehackt sein. Dringend Geld und dazu ein Anrufverbot – das ist Grund genug, nachzuprüfen."
+        },
+        {
+          "id": "approval-flow",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Elvin Məmmədov"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Səbinə, ich habe die Zahlungsunterlagen für morgen im System zur Freigabe eingereicht. Schau sie dir an, wenn du Zeit hast."
+                  }
+                ],
+                "time": "11:05"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ein normaler Ablauf: Zahlungen werden nach den Regeln im offiziellen System freigegeben. Nichts wird überstürzt."
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "money-steps",
+      "prompt": "Bringen Sie die Schritte bei einer verdächtigen Zahlungsaufforderung in die richtige Reihenfolge.",
+      "items": [
+        {
+          "id": "pause",
+          "label": "Nicht zahlen, innehalten"
+        },
+        {
+          "id": "verify",
+          "label": "Über eine bekannte Nummer nachprüfen"
+        },
+        {
+          "id": "report",
+          "label": "Bei einer Fälschung auf „Phishing melden“ klicken"
+        }
+      ],
+      "explain": "Innehalten, prüfen, dann melden. Keine Schaltfläche „Phishing melden“? Leiten Sie die E-Mail an die IT-Sicherheit weiter. Wenn Sie bereits gezahlt haben, rufen Sie sofort Ihre Bank und die IT-Sicherheit an."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Prüfen Sie Anfragen zu Geld und Bankverbindungen auf einem anderen Weg.",
+        "Zeitdruck und Geheimhaltung sind das Markenzeichen von Betrug.",
+        "Nicht löschen, sondern auf „Phishing melden“ klicken."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

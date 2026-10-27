@@ -121,7 +121,7 @@ export function ModuleArt({ slug, category, className, tone = "onBrand" }: { slu
     <div aria-hidden className={cn("relative grid aspect-square place-items-center", className)}>
       <div className={cn("absolute inset-0 rounded-full", light ? "bg-brand-100" : "bg-white/14")} />
       {light ? null : <div className="absolute inset-[14%] rounded-full bg-white/16" />}
-      <div className="absolute top-[12%] right-[14%] size-[16%] rounded-full bg-reward-500 shadow-raised" />
+      <div className="absolute top-[12%] end-[14%] size-[16%] rounded-full bg-reward-500 shadow-raised" />
       <Icon className={cn("relative size-[42%]", light ? "text-brand-600" : "text-white drop-shadow-sm")} strokeWidth={1.6} />
     </div>
   );

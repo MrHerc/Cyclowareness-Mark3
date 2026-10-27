@@ -1,0 +1,335 @@
+{
+ "id": "the-copied-command",
+ "title": "Comanda copiată",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fc2-tutor",
+   "beats": [
+    {
+     "id": "fc2-b1",
+     "say": "De data aceasta, o pagină falsă vă cere să copiați un text și să îl lipiți în caseta „Executare”.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    },
+    {
+     "id": "fc2-b2",
+     "say": "Textul acela este de fapt o comandă ascunsă, iar când rulează, instalează software rău intenționat.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "ransomware"
+     }
+    },
+    {
+     "id": "fc2-b3",
+     "say": "Nu lipiți niciodată în caseta „Executare” un text pe care un site vă cere să îl copiați.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "fc2-b4",
+     "say": "Dacă ați făcut-o deja, deconectați dispozitivul de la rețea și anunțați imediat suportul IT.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "fc2-sim",
+   "environment": "desktop",
+   "title": "Caseta „Executare”",
+   "intro": "O pagină v-a spus că un document nu se deschide și v-a adus aici. Alegeți de fiecare dată pasul corect.",
+   "steps": [
+    {
+     "id": "run-box",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Executare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Textul copiat de site a fost lipit în casetă:"
+        }
+       ],
+       [
+        {
+         "text": "[text necunoscut, copiat de site]"
+        }
+       ]
+      ],
+      "buttons": [
+       "Anulați",
+       "OK"
+      ]
+     },
+     "say": "Caseta „Executare” este deschisă și conține un text necunoscut, copiat de site.",
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Anulați și închideți",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Prin anulare, textul nu mai rulează; apoi spuneți-i suportului IT ce s-a întâmplat."
+      },
+      {
+       "id": "run",
+       "label": "Rulați-l cu OK",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Comanda a rulat și a instalat în fundal software rău intenționat. Nu rulați niciodată nimic într-o astfel de casetă."
+      },
+      {
+       "id": "report",
+       "label": "Raportați suportului IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Alegere bună. Suportul IT poate afla ce s-a întâmplat."
+      }
+     ]
+    },
+    {
+     "id": "script-window",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Script necunoscut"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Un script necunoscut încearcă să ruleze. Continuați?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Opriți",
+       "Continuați"
+      ]
+     },
+     "say": "Acum se deschide o fereastră necunoscută, care vă cere permisiunea să continue.",
+     "actions": [
+      {
+       "id": "stop",
+       "label": "Opriți",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă opriți un script la care nu vă așteptați, preveniți paguba."
+      },
+      {
+       "id": "continue",
+       "label": "Continuați",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Scriptul a continuat și a instalat software rău intenționat. Nu permiteți rularea unui script necunoscut."
+      }
+     ]
+    },
+    {
+     "id": "real-update",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sistem-yenileme",
+      "tone": "system",
+      "title": [
+       {
+        "text": "O actualizare de sistem este pregătită"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Doriți să aplicați actualizarea acum?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Mai târziu",
+       "Actualizați"
+      ]
+     },
+     "say": "Aceasta este fereastra de actualizare a sistemului de operare.",
+     "actions": [
+      {
+       "id": "update",
+       "label": "Actualizați",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Corect. Actualizarea sistemului de operare este sigură și nu vă cere niciodată o comandă."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "safe",
+       "feedback": "Este în regulă și așa. Puteți aplica actualizarea când vă convine."
+      },
+      {
+       "id": "report",
+       "label": "Raportați ca suspect",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Nu este nevoie. Aceasta este notificarea obișnuită de actualizare a sistemului."
+      }
+     ]
+    },
+    {
+     "id": "beacon",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "it-tehlukesizlik",
+      "app": "Securitate IT",
+      "title": [
+       {
+        "text": "Activitate de rețea neobișnuită"
+       }
+      ],
+      "body": [
+       {
+        "text": "Computerul dumneavoastră trimite date către un server necunoscut."
+       }
+      ],
+      "time": "14:20"
+     },
+     "say": "O notificare spune că computerul se conectează la o adresă necunoscută.",
+     "actions": [
+      {
+       "id": "disconnect",
+       "label": "Opriți conexiunea la internet",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Corect. Odată întreruptă conexiunea, datele nu mai pot ieși."
+      },
+      {
+       "id": "report",
+       "label": "Raportați suportului IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Acum suportul IT poate verifica și curăța computerul."
+      },
+      {
+       "id": "ignore",
+       "label": "Închideți și lucrați mai departe",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Software-ul continuă să trimită date. Nu ignorați niciodată o astfel de notificare."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "fc2-order",
+   "prompt": "Ați rulat comanda primită de la un site. Puneți pașii în ordine.",
+   "items": [
+    {
+     "id": "disconnect",
+     "label": "Scoateți cablul sau opriți Wi-Fi-ul"
+    },
+    {
+     "id": "report",
+     "label": "Sunați imediat la suportul IT"
+    },
+    {
+     "id": "tell",
+     "label": "Spuneți ce ați lipit și unde"
+    },
+    {
+     "id": "password",
+     "label": "Schimbați parolele de pe alt dispozitiv, curat"
+    }
+   ],
+   "explain": "Mai întâi întrerupeți conexiunea, apoi sunați imediat. Dacă procedura nu prevede altceva, nu opriți computerul."
+  },
+  {
+   "type": "choice",
+   "id": "fc2-choice",
+   "question": {
+    "prompt": "Un site vă cere să copiați un text și să îl lipiți în caseta „Executare”. Ce faceți?",
+    "options": [
+     {
+      "id": "refuse",
+      "label": "Nu fac asta și închid pagina",
+      "correct": true,
+      "feedback": "Corect. Niciun site legitim nu vă cere să rulați o comandă, deci aceasta este o capcană."
+     },
+     {
+      "id": "paste",
+      "label": "Îl lipesc, ca să pot continua",
+      "correct": false,
+      "feedback": "Textul acela este o comandă ascunsă care instalează software rău intenționat. Nu-l lipiți niciodată."
+     },
+     {
+      "id": "official",
+      "label": "Îl lipesc dacă site-ul pare oficial",
+      "correct": false,
+      "feedback": "Aspectul oficial se falsifică ușor. Regula e simplă: nu rulați niciodată un astfel de text."
+     }
+    ]
+   },
+   "explain": "Textul pe care un site vă cere să îl copiați este o comandă ascunsă. Nu-l lipiți, închideți pagina."
+  },
+  {
+   "type": "match",
+   "id": "fc2-match",
+   "prompt": "Asociați fiecare situație cu reacția potrivită.",
+   "pairs": [
+    {
+     "id": "robot",
+     "left": "O verificare vă cere să apăsați taste",
+     "right": "Este falsă, închideți pagina"
+    },
+    {
+     "id": "pdf",
+     "left": "Un document nu se deschide: rulați o comandă",
+     "right": "Aceeași capcană, nu o faceți"
+    },
+    {
+     "id": "real",
+     "left": "O verificare reală",
+     "right": "Alegeți imagini sau bifați o casetă"
+    },
+    {
+     "id": "done",
+     "left": "Ați rulat deja comanda",
+     "right": "Deconectați dispozitivul de la rețea și raportați"
+    }
+   ],
+   "explain": "Orice pagină care cere o comandă este falsă. Dacă ați rulat-o deja, deconectați dispozitivul de la rețea și anunțați suportul IT."
+  },
+  {
+   "type": "recap",
+   "id": "fc2-recap",
+   "points": [
+    "Nu lipiți niciodată în caseta „Executare” un text de pe un site",
+    "Orice pagină care cere o comandă este falsă",
+    "Dacă ați făcut-o, deconectați dispozitivul de la rețea și anunțați suportul IT"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,343 @@
+{
+ "id": "deepfake-meeting",
+ "title": "Participantul fals",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "dm-tutor",
+   "beats": [
+    {
+     "id": "dm-b1",
+     "say": "Astăzi, cu ajutorul inteligenței artificiale, o față și o voce cunoscute pot fi imitate într-un apel video.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "dm-b2",
+     "say": "O plată urgentă, cererea de a păstra secretul și o solicitare în afara regulilor obișnuite: împreună, acestea sunt un semnal de alarmă.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "gorus",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Rashad Mammadov (director)"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Camera este pornită, vocea rămâne puțin în urma mișcării buzelor."
+         }
+        ],
+        [
+         {
+          "text": "„Transferați astăzi, până la ora 15:00, 46.000 de manați într-un cont nou. Este confidențial, nu spuneți nimănui.”",
+          "spot": "urgent"
+         }
+        ]
+       ],
+       "buttons": [
+        "Activați microfonul",
+        "Părăsiți"
+       ]
+      }
+     },
+     "highlight": "urgent"
+    },
+    {
+     "id": "dm-b3",
+     "say": "Imaginea poate părea impecabilă. De aceea, judecați cererea, nu chipul.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "dm-b4",
+     "say": "Părăsiți întâlnirea și sunați chiar dumneavoastră persoana respectivă, la un număr pe care îl cunoașteți deja.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "dm-sim",
+   "environment": "desktop",
+   "title": "Întâlnire urgentă",
+   "intro": "Ați primit de la director o invitație la o întâlnire urgentă și v-ați alăturat. Uitați-vă la ce vi se cere și decideți.",
+   "steps": [
+    {
+     "id": "the-ask",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Rashad Mammadov (director)"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Camera este pornită, vocea rămâne puțin în urma mișcării buzelor."
+        }
+       ],
+       [
+        {
+         "text": "„Transferați astăzi, până la ora 15:00, 46.000 de manați într-un cont nou. Este confidențial, nu spuneți nimănui.”",
+         "spot": "urgent"
+        }
+       ]
+      ],
+      "buttons": [
+       "Activați microfonul",
+       "Părăsiți"
+      ]
+     },
+     "say": "Directorul apare pe cameră, iar vocea sună cunoscut.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Bine, fac transferul acum",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Imaginea video era un deepfake, iar banii au ajuns la un escroc. O față cunoscută nu confirmă o cerere de plată."
+      },
+      {
+       "id": "verify",
+       "label": "Vă confirm sunându-vă la numărul pe care îl știu",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Un al doilea canal demască rapid falsul."
+      },
+      {
+       "id": "wave-test",
+       "label": "Vă rog să faceți cu mâna spre cameră",
+       "kind": "verify",
+       "outcome": "risky",
+       "feedback": "Astfel de teste nu mai sunt sigure: și un deepfake poate face cu mâna. Verificați pe un canal separat."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Chatul întâlnirii"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Rashad Mammadov: Nu mă sunați, nu am telefonul la mine.",
+         "spot": "no-call"
+        }
+       ],
+       [
+        {
+         "text": "Sevda Karimli (contabil-șef): Sunt și eu aici, totul este în regulă."
+        }
+       ]
+      ],
+      "buttons": [
+       "Trimiteți"
+      ]
+     },
+     "say": "Acum confirmă și o altă persoană cunoscută.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Dacă toată lumea este de acord, fac transferul",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Orice participant la întâlnire poate fi fals. În astfel de atacuri, uneori este falsificată întreaga întâlnire."
+      },
+      {
+       "id": "leave",
+       "label": "Părăsiți întâlnirea și suspendați plata",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Corect. „Nu mă sunați” este cel mai bun motiv să sunați."
+      }
+     ]
+    },
+    {
+     "id": "new-number",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "+994 50 000 64 27"
+       }
+      ],
+      "body": [
+       {
+        "text": "Rashad Mammadov: Acesta este numărul meu nou. S-a făcut transferul?"
+       }
+      ],
+      "time": "14:22"
+     },
+     "say": "După întâlnire sosește un mesaj.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați echipei de securitate",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect, escrocul face presiuni pe alt canal. Păstrați mesajul, este o dovadă."
+      },
+      {
+       "id": "reply",
+       "label": "Răspundeți: încă nu, îl fac acum",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Un număr nou se verifică doar prin numărul vechi pe care îl cunoașteți. Acesta este numărul escrocului."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "dm-scenario",
+   "title": "Apelul de verificare",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Domnul Rashad este astăzi la Ganja și are ședințe toată ziua. Nu a organizat nicio întâlnire.",
+     "speaker": "Asistenta Aygun Rahimova (număr intern)",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Domnul Rashad este astăzi la Ganja <breath> și are ședințe toată ziua. Nu a organizat nicio întâlnire.",
+     "choices": [
+      {
+       "label": "Anunț imediat echipa de securitate și departamentul financiar",
+       "next": "n2",
+       "feedback": "Corect. Atacatorul îi poate viza și pe alți angajați."
+      },
+      {
+       "label": "Probabil a uitat, fac transferul",
+       "outcome": "compromised",
+       "feedback": "Asistenta a confirmat că nu a existat nicio întâlnire. Banii ar fi ajuns la un escroc."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Vă mulțumesc. Ați păstrat invitația, chatul întâlnirii și mesajul?",
+     "speaker": "Echipa de securitate",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Vă mulțumesc. <breath> Ați păstrat invitația, chatul întâlnirii și mesajul?",
+     "choices": [
+      {
+       "label": "Am păstrat totul și vi le trimit",
+       "outcome": "safe",
+       "feedback": "Excelent. Aceste dovezi ajută investigația și îi avertizează pe ceilalți."
+      },
+      {
+       "label": "Am șters totul, pentru că mi-a fost jenă",
+       "outcome": "risky",
+       "feedback": "Fără dovezi, investigația este mai grea. Data viitoare nu ștergeți nimic: nu aveți de ce să vă fie rușine."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "dm-choice",
+   "question": {
+    "prompt": "Care este cea mai sigură metodă de a-l verifica pe „directorul” din întâlnire?",
+    "options": [
+     {
+      "id": "known",
+      "label": "Părăsesc întâlnirea și îl sun la numărul lui pe care îl știu deja",
+      "correct": true,
+      "feedback": "Corect. Escrocul nu controlează acel canal."
+     },
+     {
+      "id": "question",
+      "label": "Îi pun o întrebare personală în timpul întâlnirii",
+      "correct": false,
+      "feedback": "Răspunsul se poate găsi pe rețelele sociale, iar impostorul poate ocoli întrebarea. Un canal separat este mai sigur."
+     },
+     {
+      "id": "quality",
+      "label": "Mă uit atent la calitatea imaginii",
+      "correct": false,
+      "feedback": "Deepfake-urile moderne sunt foarte convingătoare. Nu vă bazați pe imagine."
+     },
+     {
+      "id": "reply-invite",
+      "label": "Răspund la e-mailul cu invitația",
+      "correct": false,
+      "feedback": "Răspunsul ar ajunge tot la escroc. Alegeți chiar dumneavoastră canalul."
+     }
+    ]
+   },
+   "explain": "Un al doilea canal este unul pe care îl alegeți dumneavoastră și pe care îl cunoașteți deja: numărul intern, numărul din agenda telefonului sau o discuție față în față."
+  },
+  {
+   "type": "order",
+   "id": "dm-order",
+   "prompt": "Într-o întâlnire vi se cer urgent bani. Ordonați pașii.",
+   "items": [
+    {
+     "id": "hold",
+     "label": "Nu efectuați plata"
+    },
+    {
+     "id": "leave",
+     "label": "Părăsiți întâlnirea"
+    },
+    {
+     "id": "call",
+     "label": "Sunați chiar dumneavoastră la un număr cunoscut"
+    },
+    {
+     "id": "report",
+     "label": "Raportați echipei de securitate și păstrați dovezile"
+    }
+   ],
+   "explain": "Mai întâi opriți plata, apoi verificați și raportați. Urgența nu este niciodată mai importantă decât verificarea."
+  },
+  {
+   "type": "recap",
+   "id": "dm-recap",
+   "points": [
+    "O față și o voce cunoscute nu sunt o dovadă",
+    "Plată urgentă și cerere de secret? Opriți-vă",
+    "Sunați chiar dumneavoastră înapoi, la un număr cunoscut"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

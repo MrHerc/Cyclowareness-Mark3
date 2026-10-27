@@ -1,0 +1,514 @@
+{
+ "id": "robot-check-trap",
+ "title": "Le piège « Je ne suis pas un robot »",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fc1-tutor",
+   "beats": [
+    {
+     "id": "fc1-b1",
+     "say": "Bonjour ! Aujourd’hui, nous allons repérer les fausses pages qui se font passer pour une vérification anti-robot.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "fc1-b2",
+     "say": "Une page comme celle-ci vous donne trois consignes : appuyer sur des touches, coller un texte, valider.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-xezer-forum-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Confirmez que vous êtes un être humain"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "1. Appuyez en même temps sur les touches indiquées."
+         }
+        ],
+        [
+         {
+          "text": "2. Collez le texte copié.",
+          "spot": "paste"
+         }
+        ],
+        [
+         {
+          "text": "3. Appuyez sur Entrée."
+         }
+        ]
+       ],
+       "buttons": [
+        "Je ne suis pas un robot"
+       ]
+      }
+     },
+     "highlight": "paste"
+    },
+    {
+     "id": "fc1-b3",
+     "say": "Une vraie vérification ne vous demande jamais de taper une commande au clavier.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "fc1-b4",
+     "say": "La règle : quoi qu’un site vous dise de taper, ne le faites pas, et fermez la page.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fc1-hotspot",
+   "prompt": "Trouvez les signaux d’alerte sur cette page de vérification.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2a-xezer-forum-fake",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Confirmez que vous êtes un être humain"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Pour continuer, suivez les étapes ci-dessous :"
+      }
+     ],
+     [
+      {
+       "text": "1. Appuyez sur les touches du clavier qui ouvrent une fenêtre.",
+       "spot": "keys"
+      }
+     ],
+     [
+      {
+       "text": "2. Collez le texte copié dans la zone.",
+       "spot": "paste"
+      }
+     ],
+     [
+      {
+       "text": "3. Validez avec la touche Entrée.",
+       "spot": "enter"
+      }
+     ],
+     [
+      {
+       "text": "Cette vérification est nécessaire pour détecter les robots.",
+       "spot": "excuse"
+      }
+     ]
+    ],
+    "buttons": [
+     "Je ne suis pas un robot"
+    ]
+   },
+   "spots": [
+    {
+     "id": "keys",
+     "label": "Appuyer sur des touches",
+     "explain": "Une vraie vérification ne vous demande jamais d’appuyer sur des touches du clavier. C’est ainsi qu’une commande cachée est lancée."
+    },
+    {
+     "id": "paste",
+     "label": "Coller un texte",
+     "explain": "Le texte que vous collez est en réalité une commande cachée. Ne collez jamais ce qu’un site vous dit de coller."
+    },
+    {
+     "id": "enter",
+     "label": "La touche de validation",
+     "explain": "Quand vous validez, la commande s’exécute et installe un logiciel malveillant. Ne franchissez pas cette étape."
+    },
+    {
+     "id": "excuse",
+     "label": "Un faux prétexte",
+     "explain": "La détection des robots n’est qu’un prétexte. Une vraie vérification vous demande de choisir des images ou de cocher une case."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "simulation",
+   "id": "fc1-sim",
+   "environment": "browser",
+   "title": "Sur le site du forum",
+   "intro": "Sur le site d’une conférence, vous tombez sur plusieurs vérifications. Choisissez la bonne réaction pour chacune.",
+   "steps": [
+    {
+     "id": "clickfix",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Confirmez que vous êtes un être humain"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Pour continuer, appuyez sur les touches indiquées et collez le texte."
+        }
+       ]
+      ],
+      "buttons": [
+       "Commencer",
+       "Fermer"
+      ]
+     },
+     "say": "La page vous dit d’appuyer sur des touches et de coller un texte.",
+     "actions": [
+      {
+       "id": "close",
+       "label": "Fermer la page",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Une vérification qui vous demande de taper une commande est fausse : fermer la page est la bonne réaction."
+      },
+      {
+       "id": "do",
+       "label": "Suivre les étapes",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "La commande cachée que vous avez collée a installé un logiciel malveillant. Ne suivez jamais ce genre d’étapes."
+      },
+      {
+       "id": "report",
+       "label": "Signaler au support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. En montrant cette page au support technique, vous protégez aussi vos collègues."
+      }
+     ]
+    },
+    {
+     "id": "real-captcha",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Sélectionnez les images"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Pour prouver que vous n’êtes pas un robot, sélectionnez les images qui contiennent des feux de circulation."
+        }
+       ]
+      ],
+      "buttons": [
+       "Confirmer",
+       "Actualiser"
+      ]
+     },
+     "say": "Voici une vérification par images tout à fait ordinaire.",
+     "actions": [
+      {
+       "id": "complete",
+       "label": "Sélectionner les images et valider",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Voilà à quoi ressemble une vraie vérification : choisir des images ou cocher une case."
+      },
+      {
+       "id": "close",
+       "label": "Fermer la page",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "C’est bien aussi. Si vous ne voulez pas continuer, vous pouvez simplement la fermer."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme une attaque",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Cette vérification est sans danger : inutile de la signaler. Seules les vérifications qui demandent des commandes sont fausses."
+      }
+     ]
+    },
+    {
+     "id": "fix-pdf",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedoxu-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Le document ne s’ouvre pas"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Impossible d’afficher le PDF. Pour corriger le problème, copiez et exécutez la commande ci-dessous."
+        }
+       ],
+       [
+        {
+         "text": "[texte inconnu copié par le site]"
+        }
+       ]
+      ],
+      "buttons": [
+       "Corriger",
+       "Fermer"
+      ]
+     },
+     "say": "Cette page vous donne une commande pour ouvrir un document.",
+     "actions": [
+      {
+       "id": "close",
+       "label": "Fermer la page",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Une page qui prétend qu’un document ne s’ouvre pas, c’est le même piège : fermez-la."
+      },
+      {
+       "id": "fix",
+       "label": "Exécuter la commande",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Cette commande a installé un logiciel malveillant sur l’ordinateur. Méfiez-vous d’une page qui prétend qu’un document ne s’ouvre pas."
+      },
+      {
+       "id": "report",
+       "label": "Signaler au support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bon choix. Le support technique peut vérifier la page et prévenir les autres."
+      }
+     ]
+    },
+    {
+     "id": "fix-meeting",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-gorus-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Erreur de réunion"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Pour rejoindre la réunion, exécutez cette commande, puis actualisez la page."
+        }
+       ]
+      ],
+      "buttons": [
+       "Exécuter la commande",
+       "Fermer"
+      ]
+     },
+     "say": "Cette fois, la page annonce une erreur dans l’application de réunion.",
+     "actions": [
+      {
+       "id": "close",
+       "label": "Fermer la page",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Une application de réunion ne vous demande jamais d’exécuter une commande : c’est aussi un piège."
+      },
+      {
+       "id": "fix",
+       "label": "Exécuter la commande",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "La commande a lancé un logiciel malveillant. Toute commande censée corriger une erreur relève de la même ruse."
+      },
+      {
+       "id": "report",
+       "label": "Signaler au support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Signaler ce genre de fausses pages d’erreur au support technique aide tout le monde."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "fc1-swipe",
+   "prompt": "Vraie vérification ou piège ?",
+   "cards": [
+    {
+     "id": "image-captcha",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Cochez la case"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Cochez la case « Je ne suis pas un robot » et continuez."
+        }
+       ]
+      ],
+      "buttons": [
+       "Continuer"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "C’est une vérification ordinaire. Cocher une case ou choisir des images est sans danger."
+    },
+    {
+     "id": "keystroke-captcha",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Terminez la vérification"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Appuyez sur les touches qui ouvrent une fenêtre et collez le texte."
+        }
+       ]
+      ],
+      "buttons": [
+       "Commencer"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une vérification qui vous demande de taper une commande est fausse. Fermez la page."
+    },
+    {
+     "id": "letters-captcha",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Tapez les lettres"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Tapez les lettres de l’image dans la zone ci-dessous."
+        }
+       ]
+      ],
+      "buttons": [
+       "Confirmer"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "C’est une vérification ordinaire. Taper les lettres d’une image ne lance rien sur votre ordinateur."
+    },
+    {
+     "id": "paste-run",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedoxu-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Pour continuer"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Copiez ce texte et collez-le dans la fenêtre « Exécuter »."
+        }
+       ]
+      ],
+      "buttons": [
+       "Copier"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "N’exécutez jamais un texte qu’un site vous dit de copier. C’est une commande cachée."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "fc1-choice",
+   "question": {
+    "prompt": "Que peut vous demander une vraie vérification anti-robot ? Sélectionnez toutes les bonnes réponses.",
+    "options": [
+     {
+      "id": "tick",
+      "label": "Cocher une case",
+      "correct": true,
+      "feedback": "Bonne réponse. Cocher une case est une vérification ordinaire, sans danger."
+     },
+     {
+      "id": "images",
+      "label": "Choisir des images",
+      "correct": true,
+      "feedback": "Bonne réponse. Choisir des images est une autre forme de vraie vérification."
+     },
+     {
+      "id": "letters",
+      "label": "Taper les lettres d’une image",
+      "correct": true,
+      "feedback": "Bonne réponse. Taper des lettres ne lance rien sur votre ordinateur."
+     },
+     {
+      "id": "keys",
+      "label": "Appuyer sur des touches et coller un texte",
+      "correct": false,
+      "feedback": "C’est le piège. Une vraie vérification ne vous envoie jamais vers les fenêtres de votre propre ordinateur."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Une vraie vérification reste dans la page. Une vérification qui vous fait appuyer sur des touches et coller un texte est fausse."
+  },
+  {
+   "type": "recap",
+   "id": "fc1-recap",
+   "points": [
+    "Une vraie vérification ne vous demande jamais de taper une commande",
+    "Ne collez jamais un texte qu’un site vous dit de coller",
+    "Fermez ce genre de page et signalez-la au support technique"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

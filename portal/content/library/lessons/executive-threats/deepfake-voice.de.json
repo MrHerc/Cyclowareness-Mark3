@@ -1,0 +1,366 @@
+{
+ "id": "deepfake-voice",
+ "title": "Die gefälschte Stimme der Führungskraft",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Künstliche Intelligenz kann die Stimme einer Führungskraft anhand einer kurzen Aufnahme nachahmen. Reden und Interviews genügen.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Auch Name und Nummer auf dem Display lassen sich fälschen. Ein Anruf, der vertraut aussieht, ist kein Beweis.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Səadət Məmmədli"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 50 000 47 12",
+         "spot": "number"
+        }
+       ],
+       "label": "Mobil"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "b3",
+     "say": "Vereinbaren Sie vorab ein Codewort. Kennt der Anrufer es nicht, beenden Sie das Gespräch.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Am sichersten ist es, aufzulegen und die Person selbst unter der Nummer anzurufen, die Sie kennen.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "cloned-call",
+   "environment": "call",
+   "title": "Die Stimme der Stellvertreterin",
+   "intro": "Es ist acht Uhr abends. Ihr Telefon klingelt, und auf dem Display steht der Name der stellvertretenden Ministerin.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Səadət Məmmədli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "older-woman"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Annehmen",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Den Anruf anzunehmen ist nicht gefährlich. Entscheidend ist, was Sie danach tun."
+      },
+      {
+       "id": "decline",
+       "label": "Ablehnen",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Das geht auch. Wenn Sie beunruhigt sind, rufen Sie die Stellvertreterin selbst unter der Nummer an, die Sie kennen.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "request",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Səadət Məmmədli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "older-woman"
+     },
+     "say": "Hallo, ich bin’s, Səadət. Ich bin krank und heiser. Überweisen Sie heute Abend dringend fünfundsiebzigtausend Manat an einen Partner.",
+     "spoken": "Hallo, ich bin’s, Səadət. <throat-clearing> Ich bin krank und heiser. Überweisen Sie, äh, heute Abend dringend fünfundsiebzigtausend Manat an einen Partner.",
+     "actions": [
+      {
+       "id": "phrase",
+       "label": "Bitte nennen Sie unser Codewort",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein vereinbartes Codewort ist eine stärkere Kontrolle als eine Stimme."
+      },
+      {
+       "id": "pay",
+       "label": "In Ordnung, ich überweise sofort",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Eine vertraute Stimme ist kein Beweis mehr. Diese hier wurde mit künstlicher Intelligenz erzeugt, und das Geld ist weg."
+      },
+      {
+       "id": "hang",
+       "label": "Auflegen, ich rufe selbst zurück",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Gute Entscheidung. Rufen Sie die Stellvertreterin jetzt unter der Nummer an, die Sie kennen.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Səadət Məmmədli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "older-woman"
+     },
+     "say": "Was für ein Codewort? Ich habe keine Zeit, der Minister wartet! Die Unterlagen schicke ich morgen, überweisen Sie jetzt.",
+     "spoken": "Was für ein Codewort? <breath> Ich habe keine Zeit, der Minister wartet! Die Unterlagen schicke ich morgen, überweisen Sie jetzt.",
+     "actions": [
+      {
+       "id": "hang",
+       "label": "Auflegen",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein Anrufer, der das Codewort nicht kennt und Druck macht, ist nicht echt."
+      },
+      {
+       "id": "pay",
+       "label": "In Ordnung, ich überweise",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Druck ist ein Zeichen dafür, dass die Kontrolle umgangen werden soll. Das Geld kommt womöglich nie zurück."
+      },
+      {
+       "id": "details",
+       "label": "Schicken Sie mir die Kontonummer",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Wenn Sie das Gespräch fortsetzen, geben Sie dem Angreifer weitere Chancen. Legen Sie auf."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Das Gespräch ist beendet. Was jetzt?",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Səadət Məmmədli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "older-woman"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "Die Nummer der Stellvertreterin aus dem Telefonverzeichnis anrufen",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine Nummer, die Sie selbst wählen, entlarvt den gefälschten Anruf sofort."
+      },
+      {
+       "id": "report",
+       "label": "Dem Sicherheitsteam melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Ihre Meldung warnt die Finanzabteilung und Ihre Kolleginnen und Kollegen vor demselben Anruf."
+      },
+      {
+       "id": "ignore",
+       "label": "Nichts tun",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Der Angreifer ruft jetzt womöglich jemand anderen an. Prüfen und melden Sie den Anruf."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "check-phrase",
+   "question": {
+    "prompt": "Was ist ein gutes Codewort?",
+    "options": [
+     {
+      "id": "secret",
+      "label": "Ein Wort, das nirgends aufgeschrieben ist und nur wir beide kennen",
+      "correct": true,
+      "feedback": "Richtig. Ein Wort, das nicht im Internet steht, kann niemand kopieren."
+     },
+     {
+      "id": "birthday",
+      "label": "Das Geburtsdatum der Stellvertreterin",
+      "correct": false,
+      "feedback": "Ein Geburtsdatum lässt sich im Internet finden."
+     },
+     {
+      "id": "office",
+      "label": "Der Name der Organisation und die Zimmernummer",
+      "correct": false,
+      "feedback": "Das wissen viele Menschen, also ist es keine Kontrolle."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "key"
+    }
+   },
+   "explain": "Vereinbaren Sie das Codewort persönlich und schicken Sie es nie per E-Mail oder Nachricht."
+  },
+  {
+   "type": "match",
+   "id": "voice-signs",
+   "prompt": "Ordnen Sie jeder Beobachtung ihre Bedeutung zu.",
+   "pairs": [
+    {
+     "id": "voice",
+     "left": "Die Stimme klingt vertraut",
+     "right": "Kein Beweis, sie lässt sich kopieren"
+    },
+    {
+     "id": "caller-id",
+     "left": "Ein bekannter Name auf dem Display",
+     "right": "Auch die Nummer lässt sich fälschen"
+    },
+    {
+     "id": "urgent",
+     "left": "Dringend und geheim",
+     "right": "Ein Versuch, die Kontrolle zu umgehen"
+    },
+    {
+     "id": "phrase",
+     "left": "Das Codewort stimmt",
+     "right": "Die verlässlichste Kontrolle am Telefon"
+    }
+   ],
+   "explain": "Vertrauen Sie der vereinbarten Regel, nicht der Stimme oder dem Namen auf dem Display."
+  },
+  {
+   "type": "scenario",
+   "id": "video-call",
+   "title": "Ein Videoanruf",
+   "start": "screen",
+   "nodes": [
+    {
+     "id": "screen",
+     "text": "Schicken Sie dem Partner noch heute Abend die Vorauszahlung.",
+     "speaker": "Der Minister (Videoanruf, der Ton setzt immer wieder aus)",
+     "voice": "older-man",
+     "channel": "video",
+     "spoken": "Schicken Sie dem Partner <short pause> noch heute Abend die Vorauszahlung.",
+     "character": "minister",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     },
+     "choices": [
+      {
+       "label": "Ich beende den Anruf und rufe den Assistenten unter der mir bekannten Nummer an",
+       "next": "assistant",
+       "feedback": "Richtig. Auch Videos lassen sich fälschen, ein zweiter Kanal bleibt die Regel."
+      },
+      {
+       "label": "Ich sehe sein Gesicht, also ist es echt",
+       "outcome": "compromised",
+       "feedback": "Künstliche Intelligenz kann auch Videos fälschen. Ein Bild allein ist kein Beweis."
+      }
+     ]
+    },
+    {
+     "id": "assistant",
+     "text": "Der Minister ist auf Reisen und hat niemanden angerufen.",
+     "speaker": "Der Assistent des Ministers",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Der Minister ist auf Reisen <breath> und hat niemanden angerufen.",
+     "character": "assistant",
+     "choices": [
+      {
+       "label": "Ich melde es dem Sicherheitsteam und notiere die Uhrzeit und den Namen des Accounts",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Diese Notizen helfen den Fachleuten, den Angriff zurückzuverfolgen."
+      },
+      {
+       "label": "Es ist kein Geld abgeflossen, also sage ich niemandem etwas",
+       "outcome": "risky",
+       "feedback": "Das nächste Ziel könnte die Stellvertreterin oder die Finanzabteilung sein. Eine Meldung schützt alle."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Eine vertraute Stimme, ein bekanntes Gesicht oder ein bekannter Name ist kein Beweis.",
+    "Fragen Sie nach dem Codewort, legen Sie auf und rufen Sie selbst zurück.",
+    "Melden Sie einen gefälschten Anruf sofort dem Sicherheitsteam."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

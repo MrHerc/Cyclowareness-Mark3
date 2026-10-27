@@ -1,0 +1,398 @@
+{
+ "id": "popup-panic",
+ "title": "Panică pe ecran",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ts1-tutor",
+   "beats": [
+    {
+     "id": "ts1-b1",
+     "say": "Bună ziua! Astăzi învățăm să recunoaștem avertismentele înfricoșătoare care apar pe ecran.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "ts1-b2",
+     "say": "O fereastră ca aceasta vrea să vă sperie, ca să sunați la un număr.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-sistem-muhafize",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Computerul dumneavoastră este blocat"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Sistemul a găsit patru viruși.",
+          "spot": "virus"
+         }
+        ],
+        [
+         {
+          "text": "Linie de suport: +994 12 000 70 05",
+          "spot": "phone"
+         }
+        ]
+       ],
+       "buttons": [
+        "Sunați acum"
+       ]
+      }
+     },
+     "highlight": "phone"
+    },
+    {
+     "id": "ts1-b3",
+     "say": "Un avertisment real nu vă dă niciodată un număr de telefon și nu vă grăbește niciodată.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "ts1-b4",
+     "say": "Regula e simplă: nu sunați, închideți fereastra și, la nevoie, forțați închiderea browserului.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ts1-hotspot",
+   "prompt": "Găsiți semnele care arată că fereastra este un truc.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2a-sistem-muhafize",
+    "tone": "warning",
+    "title": [
+     {
+      "text": "Atenție: computerul dumneavoastră este blocat"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Sistemul a găsit patru viruși, iar datele dumneavoastră personale sunt în pericol."
+      }
+     ],
+     [
+      {
+       "text": "Nu închideți această fereastră, altfel toate fișierele vor fi șterse.",
+       "spot": "dont-close"
+      }
+     ],
+     [
+      {
+       "text": "Sunați acum la linia de suport: +994 12 000 70 05",
+       "spot": "phone"
+      }
+     ],
+     [
+      {
+       "text": "Timp rămas: 04:58",
+       "spot": "timer"
+      }
+     ]
+    ],
+    "buttons": [
+     "Sunați acum"
+    ]
+   },
+   "spots": [
+    {
+     "id": "dont-close",
+     "label": "Închiderea este interzisă",
+     "explain": "Un sistem real nu vă interzice niciodată să închideți o fereastră. Este o tactică de intimidare, ca să rămâneți pe pagină."
+    },
+    {
+     "id": "phone",
+     "label": "Număr de telefon",
+     "explain": "Un sistem de operare nu afișează niciodată un număr de suport pe ecran. Numărul acesta este al escrocului."
+    },
+    {
+     "id": "timer",
+     "label": "Numărătoare inversă",
+     "explain": "Cronometrul este acolo ca să vă grăbească. Un avertisment care nu vă lasă timp de gândire este fals."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "simulation",
+   "id": "ts1-sim",
+   "environment": "browser",
+   "title": "În timp ce citiți știrile",
+   "intro": "Citiți un site de știri și deodată apar ferestre. Alegeți pasul corect pentru fiecare.",
+   "steps": [
+    {
+     "id": "popup-appears",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sistem-muhafize",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Amenințare detectată"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Pe computerul dumneavoastră există malware. Sunați acum la suport: +994 12 000 70 05"
+        }
+       ]
+      ],
+      "buttons": [
+       "Sunați acum",
+       "Scanați"
+      ]
+     },
+     "say": "Tocmai s-a deschis un avertisment roșu.",
+     "actions": [
+      {
+       "id": "close",
+       "label": "Închideți fereastra",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Pur și simplu închideți o astfel de fereastră: acesta este răspunsul potrivit."
+      },
+      {
+       "id": "call",
+       "label": "Sunați la numărul afișat",
+       "kind": "call-back",
+       "outcome": "compromised",
+       "feedback": "Falsul operator vă va speria și mai tare. Nu sunați niciodată la acest număr."
+      },
+      {
+       "id": "scan",
+       "label": "Apăsați butonul „Scanați”",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Butonul acela deschide o altă pagină falsă. Nu atingeți nimic în fereastră."
+      }
+     ]
+    },
+    {
+     "id": "fullscreen-lock",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sistem-muhafize",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Ecran blocat"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Nu opriți computerul. Dacă închideți fereastra fără ajutorul suportului, datele dumneavoastră se vor pierde."
+        }
+       ]
+      ],
+      "buttons": [
+       "Sunați la suport"
+      ]
+     },
+     "say": "Acum fereastra ocupă tot ecranul și scoate un sunet.",
+     "actions": [
+      {
+       "id": "force-quit",
+       "label": "Forțați închiderea browserului",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Când forțați închiderea browserului, dispare și acest ecran fals."
+      },
+      {
+       "id": "call",
+       "label": "Sunați la suport",
+       "kind": "call-back",
+       "outcome": "compromised",
+       "feedback": "Sunetul și ecranul complet sunt acolo doar ca să vă sperie. Dacă sunați, vor încerca să preia controlul asupra dispozitivului."
+      }
+     ]
+    },
+    {
+     "id": "real-update",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Browserul este pregătit pentru actualizare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Reporniți browserul pentru a aplica modificările."
+        }
+       ]
+      ],
+      "buttons": [
+       "Mai târziu",
+       "Actualizați"
+      ]
+     },
+     "say": "Aceasta este notificarea discretă a browserului însuși.",
+     "actions": [
+      {
+       "id": "update",
+       "label": "Actualizați",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Corect. O actualizare reală este calmă, nu vă dă niciun număr și nu vă grăbește."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "safe",
+       "feedback": "Este în regulă și așa. Puteți actualiza oricând doriți, nu există niciun pericol."
+      },
+      {
+       "id": "call",
+       "label": "Sunați la suport, pentru orice eventualitate",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Nu este nevoie. O simplă notificare de actualizare nu vă cere să sunați pe nimeni."
+      }
+     ]
+    },
+    {
+     "id": "popup-returns",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sistem-muhafize",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Amenințarea persistă"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Problema nu este rezolvată. Sunați acum pentru ajutor."
+        }
+       ]
+      ],
+      "buttons": [
+       "Sunați acum"
+      ]
+     },
+     "say": "Ați închis-o, dar fereastra a revenit.",
+     "actions": [
+      {
+       "id": "close-all",
+       "label": "Închideți tot browserul",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Când închideți complet browserul, dispar și aceste pagini."
+      },
+      {
+       "id": "report",
+       "label": "Anunțați suportul IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Un pas bun. Sunați la suportul IT al organizației și întrebați despre această fereastră."
+      },
+      {
+       "id": "call",
+       "label": "Sunați la număr",
+       "kind": "call-back",
+       "outcome": "compromised",
+       "feedback": "Revenirea ferestrei face parte din truc. Nu sunați la acel număr."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ts1-match",
+   "prompt": "Asociați fiecare semn cu reacția potrivită.",
+   "pairs": [
+    {
+     "id": "fullscreen",
+     "left": "O fereastră care ocupă tot ecranul",
+     "right": "Forțați închiderea browserului"
+    },
+    {
+     "id": "phone",
+     "left": "Un număr de suport pe ecran",
+     "right": "Un avertisment real nu dă niciun număr"
+    },
+    {
+     "id": "timer",
+     "left": "Un ceas cu numărătoare inversă",
+     "right": "Graba este o minciună"
+    },
+    {
+     "id": "sound",
+     "left": "O alarmă și un bip",
+     "right": "Sunt acolo doar ca să vă sperie"
+    }
+   ],
+   "explain": "Toate aceste semne există ca să vă sperie. Păstrați-vă calmul și închideți fereastra."
+  },
+  {
+   "type": "choice",
+   "id": "ts1-choice",
+   "question": {
+    "prompt": "Apare o fereastră care vă spune să sunați la un număr. Care este primul pas?",
+    "options": [
+     {
+      "id": "close",
+      "label": "Închid fereastra și, la nevoie, forțez închiderea browserului",
+      "correct": true,
+      "feedback": "Corect. Un astfel de avertisment este inofensiv și dispare când îl închideți."
+     },
+     {
+      "id": "call",
+      "label": "Ca să nu risc, sun la numărul afișat",
+      "correct": false,
+      "feedback": "Numărul acela este al escrocului. Dacă sunați, va încerca să preia controlul asupra dispozitivului."
+     },
+     {
+      "id": "restart",
+      "label": "Opresc imediat computerul",
+      "correct": false,
+      "feedback": "Nu este nevoie. Este suficient să închideți fereastra sau browserul."
+     }
+    ]
+   },
+   "explain": "Fereastra înfricoșătoare vrea să vă atragă într-un apel. Nu sunați, doar închideți-o."
+  },
+  {
+   "type": "recap",
+   "id": "ts1-recap",
+   "points": [
+    "Nu aveți încredere într-o fereastră alarmantă care apare din senin",
+    "Nu sunați niciodată la numărul afișat",
+    "Închideți fereastra și, la nevoie, forțați închiderea browserului"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

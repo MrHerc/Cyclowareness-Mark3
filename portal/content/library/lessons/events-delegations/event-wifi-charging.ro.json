@@ -1,0 +1,315 @@
+{
+ "id": "event-wifi-charging",
+ "title": "Wi-Fi și încărcare la evenimente",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "La evenimente, sute de oameni se conectează la aceeași rețea. Un atacator poate crea o alta, cu același nume.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": { "kind": "illustration", "id": "wifi" }
+    },
+    {
+     "id": "b2",
+     "say": "O rețea deschisă, cu semnal puternic și un nume asemănător, poate fi o capcană. Întrebați la punctul de înregistrare care este numele corect.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "wifi",
+       "networks": [
+        { "ssid": [{ "text": "ReqemYol-Forum" }], "secured": true, "signal": 3 },
+        { "ssid": [{ "text": "ReqemYol-Forum-FREE", "spot": "twin" }], "secured": false, "signal": 4 }
+       ]
+      }
+     },
+     "highlight": "twin"
+    },
+    {
+     "id": "b3",
+     "say": "Când lucrați, folosiți datele mobile sau VPN-ul organizației. Nu introduceți niciodată parola de serviciu pe o pagină de conectare la Wi-Fi.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": { "kind": "illustration", "id": "vpn" }
+    },
+    {
+     "id": "b4",
+     "say": "În locul unei stații publice de încărcare, conectați propriul încărcător la priză sau folosiți propria baterie externă.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": { "kind": "illustration", "id": "usb" }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "forum-wifi",
+   "environment": "browser",
+   "title": "Wi-Fi-ul de la forum",
+   "intro": "La forum v-ați conectat la o rețea deschisă și s-a deschis browserul. Alegeți pasul corect pe fiecare pagină.",
+   "steps": [
+    {
+     "id": "portal-login",
+     "label": "ReqemYol-Forum-FREE",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "nc-reqemyol-fake",
+      "brand": "Wi-Fi RəqəmYol Forum",
+      "url": [{ "text": "http://wifi-reqemyol-forum.example.net/login" }],
+      "fields": ["E-mail de serviciu", "Parola e-mailului de serviciu"],
+      "button": "Conectați-vă la internet"
+     },
+     "say": "Ce vă cere această pagină de Wi-Fi?",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Conectați-vă la internet",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "O pagină de Wi-Fi nu are niciodată nevoie de parola de serviciu. Cine administrează această rețea deschisă o vede acum."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Ieșiți din rețea și întrebați la punctul de înregistrare care este numele corect."
+      },
+      {
+       "id": "disconnect",
+       "label": "Ieșiți din rețea",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Excelent. Ieșirea dintr-o rețea deschisă necunoscută este cea mai rapidă protecție."
+      }
+     ]
+    },
+    {
+     "id": "cert-warning",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [{ "text": "Conexiunea nu este sigură" }],
+      "body": [
+       [{ "text": "Certificatul pentru poct.idare.example nu este valid." }],
+       [{ "text": "Cineva ar putea încerca să vă citească datele." }]
+      ],
+      "buttons": ["Reveniți", "Continuați oricum"]
+     },
+     "say": "Deschideți e-mailul de serviciu, iar browserul afișează un avertisment.",
+     "actions": [
+      {
+       "id": "back",
+       "label": "Reveniți",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Acest avertisment poate însemna că cineva s-a interpus în conexiunea dumneavoastră, așa că treceți pe datele mobile."
+      },
+      {
+       "id": "proceed",
+       "label": "Continuați oricum",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Dacă ignorați avertismentul, parola poate ajunge la cel care s-a interpus. Reveniți și schimbați rețeaua."
+      }
+     ]
+    },
+    {
+     "id": "setup-download",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-reqemyol-fake",
+      "name": [{ "text": "ReqemYol_WiFi_Setup.exe" }],
+      "type": "exe",
+      "size": "4,1 MB",
+      "source": [{ "text": "wifi-reqemyol-forum.example.net" }]
+     },
+     "say": "Pagina vă oferă un program pentru Wi-Fi.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți fișierul",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Pentru conectarea la Wi-Fi nu este nevoie de niciun program. Acest fișier instalează malware pe computer."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. Rețeaua unui eveniment nu vă cere niciodată să instalați programe."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "network-list",
+   "prompt": "Care dintre rețelele de la eveniment par suspecte? Găsiți-le.",
+   "artifact": {
+    "kind": "wifi",
+    "networks": [
+     { "ssid": [{ "text": "ReqemYol-Forum" }], "secured": true, "signal": 3 },
+     { "ssid": [{ "text": "ReqemYol-Forum-FREE", "spot": "free" }], "secured": false, "signal": 4 },
+     { "ssid": [{ "text": "ReqemYol_Forum", "spot": "twin" }], "secured": false, "signal": 4 },
+     { "ssid": [{ "text": "Pulsuz_Sarj_WiFi", "spot": "charge" }], "secured": false, "signal": 2 },
+     { "ssid": [{ "text": "Lumera-Guest" }], "secured": true, "signal": 1 }
+    ]
+   },
+   "spots": [
+    {
+     "id": "free",
+     "label": "Cuvântul FREE adăugat",
+     "explain": "Rețeaua este deschisă, iar la nume s-a adăugat FREE. Numele oficial îl aflați la punctul de înregistrare."
+    },
+    {
+     "id": "twin",
+     "label": "Nume aproape identic",
+     "explain": "Numele este aproape cel oficial, diferă un singur caracter. Poate fi o rețea-capcană de tip „evil twin”."
+    },
+    {
+     "id": "charge",
+     "label": "Nume ademenitor",
+     "explain": "O rețea deschisă care promite ceva gratuit este un semn clasic de capcană."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "choice",
+   "id": "charging",
+   "question": {
+    "prompt": "Telefonul mai are 5% baterie, iar în sală este o stație publică de încărcare prin USB. Ce faceți?",
+    "options": [
+     {
+      "id": "own-adapter",
+      "label": "Îmi conectez propriul încărcător la priză",
+      "correct": true,
+      "feedback": "Corect. Priza furnizează doar curent, nu și date."
+     },
+     {
+      "id": "powerbank",
+      "label": "Încarc telefonul de la propria baterie externă",
+      "correct": true,
+      "feedback": "Corect. Propria baterie externă rămâne sub controlul dumneavoastră."
+     },
+     {
+      "id": "trust",
+      "label": "Mă conectez la stație și ating „Acordați încredere”",
+      "correct": false,
+      "feedback": "Dacă acordați încredere, dispozitivul primește acces la datele telefonului. Pentru încărcare nu este nevoie de asta."
+     },
+     {
+      "id": "stranger-cable",
+      "label": "Împrumut cablul persoanei de lângă mine",
+      "correct": false,
+      "feedback": "Un cablu necunoscut poate ascunde un cip. Purtați la dumneavoastră propriul cablu și încărcător."
+     }
+    ],
+    "multi": true,
+    "visual": { "kind": "illustration", "id": "usb" }
+   },
+   "explain": "Cel mai sigur este propriul încărcător conectat la priză sau propria baterie externă. Dacă telefonul întreabă, nu acordați încredere."
+  },
+  {
+   "type": "swipe",
+   "id": "event-messages",
+   "prompt": "Mesaje și notificări din timpul evenimentului. Sigur sau amenințare?",
+   "cards": [
+    {
+     "id": "badge-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "nc-reqemyol",
+      "sender": [{ "text": "ReqemYol" }],
+      "time": "08:30",
+      "messages": [
+       [{ "text": "Ecusonul dumneavoastră este gata. Veniți cu actul de identitate la punctul de înregistrare." }]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Fără link, fără plată și fără nimic de introdus. Este un memento obișnuit."
+    },
+    {
+     "id": "cert-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "nc-reqemyol-fake",
+      "from": {
+       "name": [{ "text": "RəqəmYol Forum" }],
+       "address": [{ "text": "sertifikat@reqemyol-forum.example.info" }]
+      },
+      "subject": [{ "text": "Certificatul dumneavoastră de participare" }],
+      "time": "17:05",
+      "body": [
+       [
+        { "text": "Conectați-vă cu e-mailul de serviciu ca să descărcați certificatul: " },
+        {
+         "text": "reqemyol-forum.example.info/certificate",
+         "link": { "label": "reqemyol-forum.example.info/certificate", "href": "https://reqemyol-forum.example.info/certificate" }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Site-ul oficial este reqemyol-forum.example, iar acesta este alt domeniu. Pentru un certificat nu este nevoie niciodată de parola de serviciu."
+    },
+    {
+     "id": "qr-table",
+     "artifact": {
+      "kind": "qr",
+      "caption": [{ "text": "Autocolant pe masă: scanați pentru Wi-Fi gratuit" }],
+      "destination": [{ "text": "http://wifi-giris.example.info/connect" }]
+     },
+     "verdict": "threat",
+     "explain": "Oricine poate lipi un autocolant, iar adresa nu este a forumului. Întrebați la punctul de înregistrare care este numele rețelei."
+    },
+    {
+     "id": "session-note",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-reqemyol",
+      "app": "RəqəmYol Forum",
+      "title": [{ "text": "Sesiunea începe în 15 minute" }],
+      "body": [{ "text": "Panel despre securitatea cibernetică, Sala B." }],
+      "time": "13:45"
+     },
+     "verdict": "safe",
+     "explain": "Notificarea vine din aplicația pe care ați instalat-o din magazinul oficial. Nu are link și nu cere nimic."
+    },
+    {
+     "id": "trust-prompt",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [{ "text": "Acordați încredere acestui dispozitiv?" }],
+      "body": [
+       [{ "text": "Dispozitivul conectat vrea acces la fișierele telefonului." }]
+      ],
+      "buttons": ["Nu acordați încredere", "Acordați încredere"]
+     },
+     "verdict": "threat",
+     "explain": "O stație de încărcare nu are de ce să ceară acces la fișiere. Alegeți „Nu acordați încredere”, iar încărcarea continuă."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Întrebați la punctul de înregistrare care este numele rețelei, iar când lucrați, folosiți datele mobile sau VPN-ul.",
+    "Nu introduceți niciodată parola de serviciu pe o pagină de Wi-Fi și nu ignorați avertismentele despre certificate.",
+    "Încărcați telefonul cu propriul încărcător, la priză, sau de la propria baterie externă."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

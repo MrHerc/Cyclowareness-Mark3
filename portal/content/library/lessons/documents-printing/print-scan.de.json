@@ -1,0 +1,446 @@
+{
+ "id": "print-scan",
+ "title": "Drucker und Scanner",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Eine im Drucker vergessene Seite ist das einfachste Datenleck. Jeder, der über den Flur geht, kann sie mitnehmen.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Prüfen Sie vor dem Senden, welcher Drucker ausgewählt ist und ob der sichere Druck eingeschaltet ist.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "nc-capmerkezi",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Drucken"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Drucker: "
+         },
+         {
+          "text": "Flur-2 (gemeinsam genutzt)",
+          "spot": "printer"
+         }
+        ],
+        [
+         {
+          "text": "Sicherer Druck: "
+         },
+         {
+          "text": "aus",
+          "spot": "secure"
+         }
+        ]
+       ],
+       "buttons": [
+        "Abbrechen",
+        "Drucken"
+       ]
+      }
+     },
+     "highlight": "secure"
+    },
+    {
+     "id": "b3",
+     "say": "Beim sicheren Druck kommen die Seiten erst heraus, wenn Sie am Drucker Ihre Karte vorhalten oder eine PIN eingeben.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Auch bei E-Mails vom Scanner ist Vorsicht geboten. Kriminelle tarnen Phishing oft als eingescanntes Dokument.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "print-day",
+   "environment": "desktop",
+   "title": "Heute wird gedruckt",
+   "intro": "Heute drucken Sie mehrere Dokumente. Sehen Sie sich die Fenster an, die sich öffnen, und entscheiden Sie.",
+   "steps": [
+    {
+     "id": "salary-print",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-capmerkezi",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Drucken: Salary_table_October.xlsx"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Drucker: Flur-2 (gemeinsam genutzt)"
+        }
+       ],
+       [
+        {
+         "text": "Sicherer Druck: aus"
+        }
+       ],
+       [
+        {
+         "text": "Kopien: 1"
+        }
+       ]
+      ],
+      "buttons": [
+       "Direkt drucken",
+       "Mit sicherem Druck senden"
+      ]
+     },
+     "say": "Dieses Dokument enthält die Gehälter der Beschäftigten.",
+     "actions": [
+      {
+       "id": "secure",
+       "label": "Mit sicherem Druck senden",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. Das Dokument wartet in der Warteschlange und wird erst gedruckt, wenn Sie am Drucker stehen."
+      },
+      {
+       "id": "direct",
+       "label": "Direkt drucken",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Die Seite liegt dann am gemeinsam genutzten Drucker im Flur und wartet auf Sie. Wenn Sie aufgehalten werden, sieht vielleicht jemand anderes die Seite."
+      }
+     ]
+    },
+    {
+     "id": "paper-out",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-capmerkezi",
+      "app": "Çap Mərkəzi",
+      "title": [
+       {
+        "text": "Flur-2: kein Papier"
+       }
+      ],
+      "body": [
+       {
+        "text": "Business_trip_list.pdf wartet in der Warteschlange und wird gedruckt, sobald Papier eingelegt ist."
+       }
+      ],
+      "time": "11:20"
+     },
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Druck abbrechen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Sobald Papier eingelegt ist, würde die Seite ohne Sie ausgegeben. Senden Sie das Dokument deshalb erneut mit sicherem Druck."
+      },
+      {
+       "id": "ignore",
+       "label": "Ausblenden",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Wer das Papier einlegt, nimmt auch die Liste mit. Brechen Sie den Auftrag ab, solange er noch in der Warteschlange ist."
+      }
+     ]
+    },
+    {
+     "id": "driver-popup",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-drayver",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Druckertreiber veraltet"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Laden Sie Drayver Yeniləyici herunter, um weiter drucken zu können."
+        }
+       ],
+       [
+        {
+         "text": "printer-drayver.example.info"
+        }
+       ]
+      ],
+      "buttons": [
+       "Schließen",
+       "Jetzt herunterladen"
+      ]
+     },
+     "say": "Eine Website bietet Ihnen Druckersoftware an.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Jetzt herunterladen",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Eine Website kann den Treiber auf Ihrem Computer nicht prüfen. Solche Downloads sind meist Schadsoftware."
+      },
+      {
+       "id": "cancel",
+       "label": "Schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Druckertreiber installiert nur der IT-Support."
+      },
+      {
+       "id": "report",
+       "label": "An den IT-Support melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Der IT-Support prüft, woher dieses Fenster kam."
+      }
+     ]
+    },
+    {
+     "id": "scan-folder",
+     "label": "Freigegebener Ordner: Scans",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-capmerkezi",
+      "name": [
+       {
+        "text": "Scan_passports_0410.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "3,2 MB",
+      "source": [
+       {
+        "text": "Freigegebener Ordner: Scanner, 3. Stock"
+       }
+      ]
+     },
+     "say": "Die Passkopien, die Sie eingescannt haben, sind in einem freigegebenen Ordner gelandet.",
+     "actions": [
+      {
+       "id": "move",
+       "label": "In meinen Ordner verschieben",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. Verschieben Sie die Datei in Ihren eigenen Ordner, damit sie nicht im freigegebenen Ordner bleibt."
+      },
+      {
+       "id": "leave",
+       "label": "Dort lassen",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Diesen Ordner kann das ganze Stockwerk öffnen. Passkopien sind personenbezogene Daten."
+      },
+      {
+       "id": "share",
+       "label": "Link an die Abteilung senden",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Personenbezogene Daten bekommt nur, wer sie braucht. Schicken Sie sie nicht an die ganze Abteilung."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "scan-mail",
+   "prompt": "Finden Sie die verdächtigen Stellen in dieser E-Mail, die angeblich vom Scanner kommt.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "nc-capmerkezi-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Scanner, 3. Stock"
+      }
+     ],
+     "address": [
+      {
+       "text": "scan@idare-skan.example.net",
+       "spot": "sender"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Eingescanntes Dokument: 4 Seiten"
+     }
+    ],
+    "time": "14:03",
+    "body": [
+     [
+      {
+       "text": "Sehr geehrte Benutzerin, sehr geehrter Benutzer,"
+      }
+     ],
+     [
+      {
+       "text": "für Sie wurde ein Dokument eingescannt. "
+      },
+      {
+       "text": "Wenn Sie es nicht innerhalb von 24 Stunden ansehen, wird es gelöscht.",
+       "spot": "urgent"
+      }
+     ],
+     [
+      {
+       "text": "Dokument ansehen",
+       "spot": "link",
+       "link": {
+        "label": "Dokument ansehen",
+        "href": "https://idare-skan.example.net/view"
+       }
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Scan_0410.pdf"
+       },
+       {
+        "text": ".html",
+        "spot": "ext"
+       }
+      ],
+      "size": "12 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Absenderdomain",
+     "explain": "Ihr Scanner versendet E-Mails über idare.example. Diese Domain sieht täuschend ähnlich aus, ist aber eine andere."
+    },
+    {
+     "id": "urgent",
+     "label": "Zeitdruck",
+     "explain": "Ein Scanner setzt Sie nicht unter Druck. Zeitdruck ist ein klassisches Warnsignal für Phishing."
+    },
+    {
+     "id": "link",
+     "label": "Externer Link",
+     "explain": "Der Link führt zu einer Website außerhalb Ihrer Organisation, auf der nach einem Passwort gefragt wird."
+    },
+    {
+     "id": "ext",
+     "label": "Dateiendung",
+     "explain": "Eine .html-Datei ist eine Webseite, kein Dokument. Beim Öffnen kann ein gefälschtes Anmeldeformular erscheinen."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "found-print",
+   "question": {
+    "prompt": "Sie finden im Drucker die Gehaltstabelle einer anderen Person. Was tun Sie?",
+    "options": [
+     {
+      "id": "owner",
+      "label": "Ungelesen der Person zurückgeben, der die Tabelle gehört, oder einer Führungskraft",
+      "correct": true,
+      "feedback": "Richtig. Das Dokument kommt in die richtigen Hände zurück, und beim nächsten Mal passt die Person besser auf."
+     },
+     {
+      "id": "leave",
+      "label": "Liegen lassen, die Person holt sie bestimmt ab",
+      "correct": false,
+      "feedback": "Alle, die nach Ihnen kommen, können sie sehen. Lassen Sie keine Seiten im Drucker liegen."
+     },
+     {
+      "id": "bin",
+      "label": "In den nächsten Papierkorb werfen",
+      "correct": false,
+      "feedback": "Aus einem gewöhnlichen Papierkorb lässt sich eine Seite leicht herausfischen. Vertrauliches Papier gehört in den Aktenvernichter."
+     },
+     {
+      "id": "photo",
+      "label": "Ein Foto im Team-Chat posten: Wem gehört das?",
+      "correct": false,
+      "feedback": "So landen die Gehaltsdaten bei noch mehr Menschen. Geben Sie die Seite unauffällig der Person zurück, der sie gehört."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "desk"
+    }
+   },
+   "explain": "Eine im Drucker liegen gelassene Seite ist ein Datenleck. Geben Sie sie der Person zurück, der sie gehört, oder – falls Sie diese nicht kennen – einer Führungskraft."
+  },
+  {
+   "type": "match",
+   "id": "right-move",
+   "prompt": "Ordnen Sie jeder Situation den richtigen Schritt zu.",
+   "pairs": [
+    {
+     "id": "paper",
+     "left": "Kein Papier, Dokument in der Warteschlange",
+     "right": "Druckauftrag abbrechen"
+    },
+    {
+     "id": "driver",
+     "left": "Eine Website bietet Druckersoftware an",
+     "right": "IT-Support kontaktieren"
+    },
+    {
+     "id": "scan",
+     "left": "Scan in einem freigegebenen Ordner gelandet",
+     "right": "In den eigenen Ordner verschieben"
+    },
+    {
+     "id": "secret",
+     "left": "Sie müssen eine vertrauliche Datei drucken",
+     "right": "Sicheren Druck verwenden"
+    }
+   ],
+   "explain": "Kleine Gewohnheiten verhindern Datenlecks beim Drucken."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Senden Sie vertrauliche Dateien mit sicherem Druck und holen Sie sie sofort ab.",
+    "Druckersoftware installiert nur der IT-Support.",
+    "Prüfen Sie bei E-Mails vom Scanner den Absender und die Dateiendung."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

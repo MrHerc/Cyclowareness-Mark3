@@ -1,0 +1,469 @@
+{
+ "id": "event-wifi-charging",
+ "title": "Wi-Fi et recharge lors des événements",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Lors des événements, des centaines de personnes se connectent au même réseau. Un attaquant peut en créer un autre qui porte le même nom.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Un réseau ouvert, au signal fort et au nom similaire, peut être un piège. Demandez le bon nom à l’accueil.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "wifi",
+       "networks": [
+        {
+         "ssid": [
+          {
+           "text": "ReqemYol-Forum"
+          }
+         ],
+         "secured": true,
+         "signal": 3
+        },
+        {
+         "ssid": [
+          {
+           "text": "ReqemYol-Forum-FREE",
+           "spot": "twin"
+          }
+         ],
+         "secured": false,
+         "signal": 4
+        }
+       ]
+      }
+     },
+     "highlight": "twin"
+    },
+    {
+     "id": "b3",
+     "say": "Pour travailler, utilisez vos données mobiles ou le VPN de votre organisation. Ne saisissez jamais votre mot de passe professionnel sur une page de connexion Wi-Fi.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "vpn"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Plutôt qu’une borne de recharge publique, branchez votre propre chargeur sur une prise, ou utilisez votre propre batterie externe.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "forum-wifi",
+   "environment": "browser",
+   "title": "Le Wi-Fi du forum",
+   "intro": "Au forum, votre ordinateur s’est connecté à un réseau ouvert, et le navigateur s’est ouvert. Choisissez la bonne action sur chaque page.",
+   "steps": [
+    {
+     "id": "portal-login",
+     "label": "ReqemYol-Forum-FREE",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "nc-reqemyol-fake",
+      "brand": "RəqəmYol Forum Wi-Fi",
+      "url": [
+       {
+        "text": "http://wifi-reqemyol-forum.example.net/login"
+       }
+      ],
+      "fields": [
+       "Adresse e-mail professionnelle",
+       "Mot de passe de la messagerie professionnelle"
+      ],
+      "button": "Se connecter à internet"
+     },
+     "say": "Que demande cette page Wi-Fi ?",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Se connecter à internet",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Une page Wi-Fi n’a jamais besoin de votre mot de passe professionnel. La personne qui gère ce réseau ouvert le voit désormais."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Quittez le réseau et demandez le bon nom à l’accueil."
+      },
+      {
+       "id": "disconnect",
+       "label": "Quitter le réseau",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Excellent. Quitter un réseau ouvert inconnu est la protection la plus rapide."
+      }
+     ]
+    },
+    {
+     "id": "cert-warning",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Votre connexion n’est pas sécurisée"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Le certificat de poct.idare.example n’est pas valide."
+        }
+       ],
+       [
+        {
+         "text": "Quelqu’un essaie peut-être de lire vos données."
+        }
+       ]
+      ],
+      "buttons": [
+       "Revenir en arrière",
+       "Continuer quand même"
+      ]
+     },
+     "say": "Vous ouvrez votre messagerie professionnelle, et le navigateur affiche un avertissement.",
+     "actions": [
+      {
+       "id": "back",
+       "label": "Revenir en arrière",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Cet avertissement peut signifier que quelqu’un s’est placé au milieu de votre connexion. Passez aux données mobiles."
+      },
+      {
+       "id": "proceed",
+       "label": "Continuer quand même",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Ignorer l’avertissement peut livrer votre mot de passe à la personne placée au milieu. Revenez en arrière et changez de réseau."
+      }
+     ]
+    },
+    {
+     "id": "setup-download",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-reqemyol-fake",
+      "name": [
+       {
+        "text": "ReqemYol_WiFi_Setup.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "4,1 Mo",
+      "source": [
+       {
+        "text": "wifi-reqemyol-forum.example.net"
+       }
+      ]
+     },
+     "say": "La page vous propose un logiciel pour le Wi-Fi.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir le fichier",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Se connecter au Wi-Fi ne demande aucun logiciel. Ce fichier installe un logiciel malveillant sur l’ordinateur."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Exact. Le réseau d’un événement ne vous demande jamais d’installer un logiciel."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "network-list",
+   "prompt": "Quels réseaux de l’événement semblent suspects ? Trouvez-les.",
+   "artifact": {
+    "kind": "wifi",
+    "networks": [
+     {
+      "ssid": [
+       {
+        "text": "ReqemYol-Forum"
+       }
+      ],
+      "secured": true,
+      "signal": 3
+     },
+     {
+      "ssid": [
+       {
+        "text": "ReqemYol-Forum-FREE",
+        "spot": "free"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "ReqemYol_Forum",
+        "spot": "twin"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Pulsuz_Sarj_WiFi",
+        "spot": "charge"
+       }
+      ],
+      "secured": false,
+      "signal": 2
+     },
+     {
+      "ssid": [
+       {
+        "text": "Lumera-Guest"
+       }
+      ],
+      "secured": true,
+      "signal": 1
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "free",
+     "label": "Mention FREE ajoutée",
+     "explain": "Le réseau est ouvert, et le mot « FREE » a été ajouté à son nom. Le nom officiel est communiqué à l’accueil."
+    },
+    {
+     "id": "twin",
+     "label": "Nom trompeur",
+     "explain": "Le nom est presque identique au nom officiel : un seul caractère diffère. C’est peut-être un jumeau maléfique, un faux point d’accès."
+    },
+    {
+     "id": "charge",
+     "label": "Nom alléchant",
+     "explain": "« Pulsuz Sarj » signifie « recharge gratuite ». Un réseau ouvert qui promet un service gratuit est un piège classique."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "choice",
+   "id": "charging",
+   "question": {
+    "prompt": "Votre téléphone est à 5 % et la salle dispose d’une borne de recharge USB publique. Que faites-vous ?",
+    "options": [
+     {
+      "id": "own-adapter",
+      "label": "Brancher mon propre chargeur sur une prise murale",
+      "correct": true,
+      "feedback": "Exact. Une prise fournit seulement du courant, pas de données."
+     },
+     {
+      "id": "powerbank",
+      "label": "Recharger avec ma propre batterie externe",
+      "correct": true,
+      "feedback": "Bien vu. Votre propre batterie externe reste sous votre contrôle."
+     },
+     {
+      "id": "trust",
+      "label": "Brancher le téléphone sur la borne et appuyer sur « Faire confiance »",
+      "correct": false,
+      "feedback": "Faire confiance donne à l’appareil accès aux données de votre téléphone. La recharge n’en a pas besoin."
+     },
+     {
+      "id": "stranger-cable",
+      "label": "Emprunter le câble de la personne assise à côté de moi",
+      "correct": false,
+      "feedback": "Un câble inconnu peut cacher une puce. Ayez toujours sur vous votre propre câble et votre propre chargeur."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "usb"
+    }
+   },
+   "explain": "Votre propre chargeur sur une prise ou votre propre batterie externe, c’est le plus sûr. Si le téléphone vous le demande, ne faites pas confiance à l’appareil."
+  },
+  {
+   "type": "swipe",
+   "id": "event-messages",
+   "prompt": "Ce que vous recevez pendant l’événement. Sans danger ou menace ?",
+   "cards": [
+    {
+     "id": "badge-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "nc-reqemyol",
+      "sender": [
+       {
+        "text": "ReqemYol"
+       }
+      ],
+      "time": "08:30",
+      "messages": [
+       [
+        {
+         "text": "Votre badge est prêt. Présentez votre carte d’identité à l’accueil."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Pas de lien, rien à payer, rien à saisir. C’est un rappel normal."
+    },
+    {
+     "id": "cert-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "nc-reqemyol-fake",
+      "from": {
+       "name": [
+        {
+         "text": "RəqəmYol Forum"
+        }
+       ],
+       "address": [
+        {
+         "text": "sertifikat@reqemyol-forum.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Votre certificat de participation"
+       }
+      ],
+      "time": "17:05",
+      "body": [
+       [
+        {
+         "text": "Connectez-vous avec votre e-mail professionnel pour télécharger le certificat : "
+        },
+        {
+         "text": "reqemyol-forum.example.info/certificate",
+         "link": {
+          "label": "reqemyol-forum.example.info/certificate",
+          "href": "https://reqemyol-forum.example.info/certificate"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Le site officiel est reqemyol-forum.example, et ce domaine est différent. Un certificat n’exige jamais votre mot de passe professionnel."
+    },
+    {
+     "id": "qr-table",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Autocollant sur la table : scannez pour le Wi-Fi gratuit"
+       }
+      ],
+      "destination": [
+       {
+        "text": "http://wifi-giris.example.info/connect"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "N’importe qui peut coller un autocollant, et l’adresse n’est pas celle du forum. Demandez le nom du réseau à l’accueil."
+    },
+    {
+     "id": "session-note",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-reqemyol",
+      "app": "RəqəmYol Forum",
+      "title": [
+       {
+        "text": "La session commence dans 15 minutes"
+       }
+      ],
+      "body": [
+       {
+        "text": "Table ronde sur la cybersécurité, salle B."
+       }
+      ],
+      "time": "13:45"
+     },
+     "verdict": "safe",
+     "explain": "Cela vient de l’application que vous avez installée depuis la boutique officielle. Pas de lien, aucune demande."
+    },
+    {
+     "id": "trust-prompt",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Faire confiance à cet appareil ?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "L’appareil branché veut accéder aux fichiers de votre téléphone."
+        }
+       ]
+      ],
+      "buttons": [
+       "Ne pas faire confiance",
+       "Faire confiance"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une borne de recharge n’a pas à demander vos fichiers. Choisissez « Ne pas faire confiance » : la recharge continue."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Demandez le nom du réseau à l’accueil, et utilisez vos données mobiles ou le VPN pour travailler.",
+    "Ne saisissez jamais votre mot de passe professionnel sur une page Wi-Fi, et n’ignorez jamais un avertissement de certificat.",
+    "Rechargez avec votre propre chargeur sur une prise, ou avec votre propre batterie externe."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

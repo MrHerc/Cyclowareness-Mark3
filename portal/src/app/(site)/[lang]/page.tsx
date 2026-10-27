@@ -6,7 +6,7 @@ import { BrandMark } from "@/components/brand";
 import { textLinkClass } from "@/components/ui/button";
 import { ForgetButton, LandingTour } from "@/components/site/landing-tour";
 import { countryOptions, loadLanding, loadSiteData } from "@/server/landing";
-import { LOCALE_NAMES, SITE_LOCALES, isSiteLocale, type SiteLocale } from "@/i18n/config";
+import { LOCALE_NAMES, SITE_LOCALES, isSiteLocale, langAttrs, type SiteLocale } from "@/i18n/config";
 
 export const dynamicParams = false;
 
@@ -46,7 +46,7 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
 
   return (
     <div className="relative min-h-dvh bg-canvas pb-40">
-      <a href="#hero" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-pill focus:bg-surface focus:px-4 focus:py-2 focus:shadow-raised">
+      <a href="#hero" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:start-3 focus:z-50 focus:rounded-pill focus:bg-surface focus:px-4 focus:py-2 focus:shadow-raised">
         {copy.tour.chapters.hero}
       </a>
       {/* data-site-header: the travelling guide cat keeps below it. */}
@@ -62,10 +62,10 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
                 {lang.toUpperCase()}
                 <ChevronDown className="hidden size-3.5 text-ink-subtle sm:block" />
               </summary>
-              <ul className="absolute right-0 mt-2 grid w-48 gap-0.5 rounded-xl bg-surface p-1.5 shadow-overlay ring-1 ring-line">
+              <ul className="absolute end-0 mt-2 grid w-48 gap-0.5 rounded-xl bg-surface p-1.5 shadow-overlay ring-1 ring-line">
                 {SITE_LOCALES.map((l) => (
                   <li key={l}>
-                    <a href={`/${l}`} hrefLang={l} lang={l} aria-current={l === lang ? "page" : undefined} className="flex items-center justify-between rounded-md px-3 py-2 text-caption hover:bg-sunken aria-[current=page]:font-bold pointer-coarse:min-h-11">
+                    <a href={`/${l}`} hrefLang={l} {...langAttrs(l)} aria-current={l === lang ? "page" : undefined} className="flex items-center justify-between rounded-md px-3 py-2 text-caption hover:bg-sunken aria-[current=page]:font-bold pointer-coarse:min-h-11">
                       {LOCALE_NAMES[l]}
                       <span className="text-tab text-ink-subtle">{l.toUpperCase()}</span>
                     </a>
@@ -82,7 +82,7 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
 
       {fallback ? <p className="mx-auto max-w-6xl px-4 pt-3 text-caption text-ink-muted sm:px-8">{copy.ui.fallbackNote}</p> : null}
 
-      <main id="main" lang={lang}>
+      <main id="main" {...langAttrs(lang)}>
         <LandingTour copy={copy} guide={guide} lang={lang} countries={countryOptions(lang)} privacyLabel={copy.ui.privacy} />
 
         <section aria-labelledby="faq-title" className="px-4 py-20 sm:px-8">
@@ -157,11 +157,11 @@ export default async function LandingPage({ params }: PageProps<"/[lang]">) {
                     <dd className="flex flex-wrap gap-x-3 text-ink-muted">
                       {site.contact.email ? (
                         <a href={`mailto:${site.contact.email}`} className={textLinkClass("hover:text-ink")}>
-                          {site.contact.email}
+                          <bdi>{site.contact.email}</bdi>
                         </a>
                       ) : null}
                       {site.contact.phone ? (
-                        <a href={`tel:${site.contact.phone.replace(/[^\d+]/g, "")}`} className={textLinkClass("hover:text-ink")}>
+                        <a href={`tel:${site.contact.phone.replace(/[^\d+]/g, "")}`} className={textLinkClass("hover:text-ink")} dir="ltr">
                           {site.contact.phone}
                         </a>
                       ) : null}

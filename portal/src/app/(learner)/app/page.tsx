@@ -54,14 +54,14 @@ export default async function HomePage() {
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:gap-8">
       <div className="grid min-w-0 content-start gap-6">
-        <section className="flex items-center justify-between gap-4">
+        <section className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="min-w-0">
             <h1 className="text-headline font-bold text-balance">{t("greeting", { name: firstName })}</h1>
             <p className="mt-2 text-lead text-ink-muted">{t("sub")}</p>
           </div>
           <HomeMascot
             label={tutor ? t("talk") : t("mascot")}
-            still={v.user.motion === "still"}
+            motion={v.user.motion}
             soundOn={v.user.soundOn}
             tutor={tutor}
             tutorVoice={v.tenant.features.has("tutor_voice")}
@@ -82,7 +82,7 @@ export default async function HomePage() {
             <ul className="mt-4 grid gap-2">
               {toSign.map((p) => (
                 <li key={p.versionId}>
-                  <Link href={`/policies/${p.policyId}?from=%2F`} className="flex items-center gap-3 rounded-lg bg-surface px-4 py-3 shadow-xs hover:shadow-raised">
+                  <Link href={`/policies/${p.policyId}?from=%2Fapp`} className="flex items-center gap-3 rounded-lg bg-surface px-4 py-3 shadow-xs hover:shadow-raised">
                     <FileText className="size-5 shrink-0 text-ink-subtle" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-body-sm font-semibold">{p.title}</span>
@@ -114,7 +114,7 @@ export default async function HomePage() {
 
         {current ? (
           <section data-tour="continue" className="relative scroll-mt-[calc(var(--topbar-height)+1rem)] overflow-hidden rounded-2xl bg-brand-600 p-6 text-brand-on shadow-raised sm:p-8">
-            <div aria-hidden className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-white/8" />
+            <div aria-hidden className="pointer-events-none absolute -top-24 -end-24 size-72 rounded-full bg-white/8" />
             <div className="relative flex items-center gap-6">
               <div className="min-w-0 flex-1">
                 <Pill className="bg-white/18 text-white">
@@ -246,7 +246,7 @@ export default async function HomePage() {
           </div>
         </Card>
         <Card className="grid grid-cols-2 divide-x divide-line p-5">
-          <div className="min-w-0 pr-4">
+          <div className="min-w-0 pe-4">
             <p className="flex items-center gap-1.5 text-title font-bold tabular-nums">
               <Zap className="size-5 fill-brand-600 text-brand-600" />
               {format.number(v.user.xp)}
@@ -256,7 +256,7 @@ export default async function HomePage() {
               {tc("level", { level: lvl.level })}
             </Pill>
           </div>
-          <Link href="/security" className="min-w-0 pl-4">
+          <Link href="/security" className="min-w-0 ps-4">
             <p className="flex items-center gap-1.5 text-title font-bold tabular-nums">
               <ShieldCheck className={cn("size-5", band === "low" ? "text-safe-600" : band === "medium" ? "text-warn-500" : "text-risk-600")} />
               {v.user.riskScore}

@@ -1,0 +1,419 @@
+{
+ "id": "autofill-right-site",
+ "title": "عندما يصمت الملء التلقائي",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "مدير كلمات المرور يكشف الموقع المزيف أفضل منك، لأنه يتحقق من العنوان حرفًا حرفًا.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "إذا اختلف العنوان ولو قليلًا، فلن يقترح مدير كلمات المرور أي كلمة مرور. وهذه علامة التحذير التي تنبهك.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "idare-fake",
+       "url": [
+        {
+         "text": "https://portal."
+        },
+        {
+         "text": "idare-giris.example.net",
+         "spot": "lookalike"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "lookalike"
+    },
+    {
+     "id": "b3",
+     "say": "لا تنسخ كلمة المرور من الخزنة لتلصقها بنفسك. تحقق من العنوان أولًا.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "ارفض أي طلب موافقة لم تكن تتوقعه، فهو يعني أن شخصًا ما يعرف كلمة مرورك.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "autofill-check",
+   "environment": "browser",
+   "title": "اختبر الملء التلقائي",
+   "intro": "يعمل ParolSeyf في متصفحك. في كل صفحة، انتبه لما يقترحه وتحقق من العنوان.",
+   "steps": [
+    {
+     "id": "real-portal",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "idare",
+      "brand": "بوابة الجهة",
+      "url": [
+       {
+        "text": "https://portal.idare.example/giris",
+        "reveal": "idare.example"
+       }
+      ],
+      "fields": [
+       "اسم المستخدم",
+       "كلمة المرور"
+      ],
+      "button": "تسجيل الدخول"
+     },
+     "say": "يقترح ParolSeyf بيانات دخولك. تحقق من العنوان.",
+     "actions": [
+      {
+       "id": "fill",
+       "label": "الملء باستخدام ParolSeyf",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "صحيح. العنوان يطابق بيانات الدخول المحفوظة، ولهذا اقترحها مدير كلمات المرور."
+      },
+      {
+       "id": "close",
+       "label": "إغلاق علامة التبويب",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "الحذر أمر جيد، لكن هذه بوابة الجهة الحقيقية، وقد تعرف عليها مدير كلمات المرور."
+      }
+     ]
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "idare-fake",
+      "brand": "بوابة الجهة",
+      "url": [
+       {
+        "text": "https://portal.idare-giris.example.net/giris",
+        "reveal": "idare-giris.example.net"
+       }
+      ],
+      "fields": [
+       "اسم المستخدم",
+       "كلمة المرور"
+      ],
+      "button": "تسجيل الدخول"
+     },
+     "say": "فتحت هذه الصفحة من رابط في رسالة بريد إلكتروني. ParolSeyf صامت.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "كتابة كلمة المرور يدويًا",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "صمت مدير كلمات المرور لأن هذا موقع مزيف. غير كلمة المرور على البوابة الحقيقية الآن، وأبلغ عن الموقع.",
+       "next": "fake-vault"
+      },
+      {
+       "id": "search",
+       "label": "البحث عنها في ParolSeyf والملء",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "مدير كلمات المرور لا يتعرف على هذا الموقع، ولذلك سبب. اقرأ العنوان قبل أن تتابع."
+      },
+      {
+       "id": "close",
+       "label": "إغلاق علامة التبويب",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "صحيح. النطاق كان idare-giris.example.net، وليس بوابة الجهة.",
+       "next": "fake-vault"
+      },
+      {
+       "id": "report",
+       "label": "الإبلاغ عن الموقع",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "رائع. بلاغك يحمي زملاءك من الرابط نفسه.",
+       "next": "fake-vault"
+      }
+     ]
+    },
+    {
+     "id": "mismatch",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf: الموقع غير مطابق"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "العنوان المحفوظ: portal.idare.example"
+        }
+       ],
+       [
+        {
+         "text": "هذه الصفحة: portal.idare-giris.example.net"
+        }
+       ]
+      ],
+      "buttons": [
+       "إلغاء",
+       "الملء على أي حال"
+      ]
+     },
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "إلغاء",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "صحيح، فقد اكتشف مدير كلمات المرور الفرق نيابة عنك. أغلق الصفحة وأبلغ عنها."
+      },
+      {
+       "id": "fill",
+       "label": "الملء على أي حال",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "بتجاهل التحذير سلمت كلمة مرورك لموقع مزيف. غيرها الآن وأبلغ عن الموقع."
+      }
+     ]
+    },
+    {
+     "id": "fake-vault",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "parolseyf-fake",
+      "brand": "ParolSeyf",
+      "url": [
+       {
+        "text": "https://parolseyf-giris.example.net/seyf",
+        "reveal": "parolseyf-giris.example.net"
+       }
+      ],
+      "fields": [
+       "البريد الإلكتروني",
+       "كلمة المرور الرئيسية"
+      ],
+      "button": "فتح الخزنة"
+     },
+     "say": "رابط في رسالة بريد إلكتروني ينقلك إلى صفحة تسجيل الدخول إلى الخزنة.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "فتح الخزنة",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "اكتب كلمة المرور الرئيسية في تطبيق ParolSeyf نفسه فقط. هذا الموقع كان يريد خزنتك كلها."
+      },
+      {
+       "id": "close",
+       "label": "إغلاق علامة التبويب",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "صحيح. افتح الخزنة بتشغيل التطبيق بنفسك، ولا تفتحها عبر رابط أبدًا."
+      },
+      {
+       "id": "report",
+       "label": "الإبلاغ عن الموقع",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "رائع. ربما وصل رابط هذا الموقع إلى عدة أشخاص."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vault-lure",
+   "prompt": "اضغط على العلامات التي تدل على أن هذه الرسالة مزيفة.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "parolseyf-fake",
+    "from": {
+     "name": [
+      {
+       "text": "ParolSeyf"
+      }
+     ],
+     "address": [
+      {
+       "text": "security@parolseyf-alert.example.net",
+       "spot": "sender"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "سيتم حذف خزنتك خلال 24 ساعة",
+      "spot": "deadline"
+     }
+    ],
+    "time": "07:58",
+    "body": [
+     [
+      {
+       "text": "لإتمام التحديث الأمني، "
+      },
+      {
+       "text": "أكد كلمة مرورك الرئيسية",
+       "spot": "ask-master"
+      },
+      {
+       "text": "."
+      }
+     ],
+     [
+      {
+       "text": "للتأكيد: "
+      },
+      {
+       "text": "parolseyf-alert.example.net/tesdiq",
+       "spot": "link",
+       "link": {
+        "label": "parolseyf-alert.example.net/tesdiq",
+        "href": "https://parolseyf-alert.example.net/tesdiq"
+       }
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "المرسل",
+     "explain": "العنوان مشابه فقط، وليس على نطاق ParolSeyf."
+    },
+    {
+     "id": "deadline",
+     "label": "المهلة",
+     "explain": "التهديد بمهلة 24 ساعة هدفه أن يمنعك من التفكير."
+    },
+    {
+     "id": "ask-master",
+     "label": "طلب كلمة المرور الرئيسية",
+     "explain": "لا توجد خدمة تطلب منك تأكيد كلمة المرور الرئيسية عبر البريد الإلكتروني."
+    },
+    {
+     "id": "link",
+     "label": "الرابط",
+     "explain": "الرابط يقود إلى نطاق مزيف. افتح الخزنة من التطبيق بنفسك."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "unexpected-push",
+   "question": {
+    "prompt": "في الليل يطلب منك ParolSeyf الموافقة على تسجيل دخول، مع أنك لا تسجل الدخول. ماذا تفعل؟",
+    "options": [
+     {
+      "id": "deny",
+      "label": "أرفضه وأبلغ فريق الأمن السيبراني",
+      "correct": true,
+      "feedback": "صحيح. شخص ما يعرف كلمة مرورك الرئيسية: غيرها الآن، ودع فريق الأمن السيبراني يتحقق من الجلسات."
+     },
+     {
+      "id": "approve",
+      "label": "أوافق عليه لكي تتوقف الطلبات",
+      "correct": false,
+      "feedback": "هذا هجوم إغراق الإشعارات. موافقة واحدة تكفي ليدخل المهاجم إلى الخزنة."
+     },
+     {
+      "id": "ignore",
+      "label": "أتجاهله وأنظر فيه صباحًا",
+      "correct": false,
+      "feedback": "يبقى الطلب مفتوحًا، وكلمة مرورك الرئيسية أصبحت بيد شخص آخر. ارفضه وأبلغ عنه الآن."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "parolseyf",
+      "app": "ParolSeyf",
+      "title": [
+       {
+        "text": "هل توافق على تسجيل الدخول؟"
+       }
+      ],
+      "body": [
+       {
+        "text": "جهاز جديد: Windows، 23:47"
+       }
+      ],
+      "time": "23:47"
+     }
+    }
+   },
+   "explain": "طلب الموافقة غير المتوقع يعني أن كلمة مرورك تسربت. ارفض، ثم أبلغ، ثم غير كلمة المرور."
+  },
+  {
+   "type": "match",
+   "id": "autofill-rules",
+   "prompt": "طابق كل موقف مع الخطوة الصحيحة.",
+   "pairs": [
+    {
+     "id": "silent",
+     "left": "مدير كلمات المرور لا يقترح أي كلمة مرور",
+     "right": "تحقق من العنوان، ولا تنسخ كلمة المرور"
+    },
+    {
+     "id": "link",
+     "left": "رابط في رسالة يطلب منك فتح الخزنة",
+     "right": "افتح التطبيق بنفسك"
+    },
+    {
+     "id": "shared-pc",
+     "left": "تستخدم حاسوب شخص آخر",
+     "right": "لا تفتح خزنتك عليه"
+    },
+    {
+     "id": "push",
+     "left": "طلب موافقة لم تكن تتوقعه",
+     "right": "ارفضه وأبلغ عنه"
+    }
+   ],
+   "explain": "مدير كلمات المرور يتحقق من العنوان، وأنت تتوقف عندما يصمت."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "إذا لم يقترح مدير كلمات المرور أي كلمة مرور، فتوقف وتحقق من العنوان.",
+    "اكتب كلمة المرور الرئيسية في تطبيق مدير كلمات المرور نفسه فقط، ولا تكتبها عبر رابط أبدًا.",
+    "ارفض طلبات الموافقة التي لم تكن تتوقعها، وأبلغ عنها."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

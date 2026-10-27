@@ -31,10 +31,12 @@ export function useClientFormat(): ClientFormat {
   const timeZone = useTimeZone();
   const format = useFormatter();
   if (locale !== "az") {
+    // Arabic keeps Western digits like the server (Node's CLDR), also in a browser whose older CLDR defaults "ar" to Arabic-Indic ones.
+    const nu = locale === "ar" ? ({ numberingSystem: "latn" } as const) : {};
     return {
-      dateTime: (date, options = { dateStyle: "medium" }) => format.dateTime(new Date(date), intlOptions(options)),
-      relativeTime: (date, now) => format.relativeTime(new Date(date), now),
-      number: (n, options) => format.number(n, options),
+      dateTime: (date, options = { dateStyle: "medium" }) => format.dateTime(new Date(date), { ...intlOptions(options), ...nu }),
+      relativeTime: (date, now) => format.relativeTime(new Date(date), { now, ...nu }),
+      number: (n, options) => format.number(n, { ...options, ...nu }),
     };
   }
   return {

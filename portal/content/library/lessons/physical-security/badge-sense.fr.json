@@ -1,0 +1,379 @@
+{
+ "id": "badge-sense",
+ "title": "Votre badge d’accès",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "key",
+     "say": "Votre badge est une clé du bâtiment. Ne le prêtez jamais, même à vos collègues.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "photos",
+     "say": "Ne publiez pas de photos où l’on voit votre badge. Une photo aide à en fabriquer un faux.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "uniform",
+     "say": "Un attaquant peut se présenter déguisé en technicien, en livreur ou en inspecteur. Un uniforme n’est pas une pièce d’identité.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "lost",
+     "say": "Vous avez perdu votre badge ? Signalez-le tout de suite pour qu’il soit bloqué. Et cachez-le quand vous quittez le bâtiment.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "badge-phone",
+   "environment": "phone",
+   "title": "Messages au sujet du badge",
+   "intro": "Au fil de la journée, vous recevez sur votre téléphone des messages qui concernent votre badge. Répondez correctement à chacun.",
+   "steps": [
+    {
+     "id": "borrow",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Elnur Huseynov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Salut, j’ai oublié mon badge chez moi. Laisse le tien au poste de sécurité, je te le rends ce soir."
+         }
+        ],
+        "time": "08:52"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "lend",
+       "label": "OK, je le laisse au poste",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Chaque passage fait avec votre badge est enregistré à votre nom. Ne le prêtez jamais."
+      },
+      {
+       "id": "decline",
+       "label": "Non, demande un badge temporaire au poste",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Le poste de sécurité vérifie l’identité et remet un badge temporaire."
+      }
+     ]
+    },
+    {
+     "id": "tagged",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Gulnar a publié une photo de vous"
+       }
+      ],
+      "body": [
+       {
+        "text": "« Premier jour avec l’équipe ! » 24 J’aime"
+       }
+      ],
+      "time": "13:15"
+     },
+     "say": "Votre badge se voit clairement sur la photo.",
+     "actions": [
+      {
+       "id": "ask-remove",
+       "label": "Demander à Gulnar de modifier la photo",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Exact. Une photo du badge peut aider quelqu’un à le copier ou à entrer dans le bâtiment."
+      },
+      {
+       "id": "like",
+       "label": "Aimer la photo et passer à autre chose",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "La photo est publique et montre le modèle du badge et votre nom. Ne partagez pas de photos de badge."
+      }
+     ]
+    },
+    {
+     "id": "recon-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "db-alov-servis-fake",
+      "sender": [
+       {
+        "text": "AlovServis"
+       }
+      ],
+      "time": "15:30",
+      "messages": [
+       [
+        {
+         "text": "Nous passons demain pour vérifier les extincteurs. À quel étage se trouve la salle des serveurs, et à quelle heure a lieu la relève des agents de sécurité ?"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Répondre : 3e étage, 20 h",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "C’est du repérage avant une attaque. Ne donnez aucun détail sur le bâtiment."
+      },
+      {
+       "id": "report",
+       "label": "Signaler à l’équipe sécurité",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Un vrai prestataire ne vous pose pas ce genre de question par SMS."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Vous n’avez rien révélé, c’est bien. Mais un signalement protège aussi vos collègues."
+      }
+     ]
+    },
+    {
+     "id": "badge-phish",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "idare-fake",
+      "sender": [
+       {
+        "text": "Idare"
+       }
+      ],
+      "time": "17:05",
+      "messages": [
+       [
+        {
+         "text": "Votre badge d’accès arrive à expiration. Mettez à jour vos informations pour éviter son blocage : "
+        },
+        {
+         "text": "kart-yenile.example.net",
+         "link": {
+          "label": "kart-yenile.example.net",
+          "href": "https://kart-yenile.example.net"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Le lien mène à une fausse page qui veut votre mot de passe professionnel. Seul le poste de sécurité renouvelle les badges."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Réglez les questions de badge en personne, au poste de sécurité."
+      },
+      {
+       "id": "block",
+       "label": "Bloquer",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bien. Encore mieux : prévenez aussi l’équipe sécurité."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "uniform",
+   "title": "Le visiteur en uniforme",
+   "start": "door",
+   "nodes": [
+    {
+     "id": "door",
+     "text": "Bonjour, on vient de la part d’Alov Servis pour le contrôle des extincteurs. Ouvrez-moi la salle des serveurs, il y en a un là-dedans aussi.",
+     "speaker": "Homme en uniforme",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Bonjour, on vient de la part d’Alov Servis pour le contrôle des extincteurs. <breath> Ouvrez-moi la salle des serveurs, il y en a un là-dedans aussi.",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     },
+     "choices": [
+      {
+       "label": "J’ouvre la salle des serveurs",
+       "outcome": "compromised",
+       "feedback": "Un uniforme et une caisse à outils ne sont pas une pièce d’identité. Personne n’entre dans la salle des serveurs sans vérification."
+      },
+      {
+       "label": "Je lui demande son badge visiteur et son bon d’intervention",
+       "next": "paper",
+       "feedback": "Bien. Voyons ce qu’il vous montre."
+      },
+      {
+       "label": "J’appelle les agents de sécurité",
+       "next": "guard",
+       "feedback": "Exact. Laissez les agents de sécurité décider."
+      }
+     ]
+    },
+    {
+     "id": "paper",
+     "text": "Les papiers sont dans la camionnette. On vient tous les mois, vous ne me reconnaissez pas ?",
+     "speaker": "Homme en uniforme",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Les papiers sont dans la camionnette. <short pause> On vient tous les mois, vous ne me reconnaissez pas ?",
+     "choices": [
+      {
+       "label": "Ah oui, allez-y",
+       "outcome": "compromised",
+       "feedback": "Cette impression de déjà-vu fait partie de la ruse. Pas de badge visiteur, pas d’entrée."
+      },
+      {
+       "label": "J’appelle les agents de sécurité",
+       "next": "guard",
+       "feedback": "Exact. Laissez les agents de sécurité décider."
+      }
+     ]
+    },
+    {
+     "id": "guard",
+     "text": "Aucun contrôle d’Alov Servis n’est prévu ce mois-ci. L’homme est reparti vers la sortie.",
+     "speaker": "Agent de sécurité",
+     "voice": "older-man",
+     "channel": "in-person",
+     "manner": "firm",
+     "spoken": "Aucun contrôle d’Alov Servis n’est prévu ce mois-ci. <breath> L’homme est reparti vers la sortie.",
+     "character": "guard",
+     "choices": [
+      {
+       "label": "J’écris à l’équipe sécurité en décrivant l’homme",
+       "outcome": "safe",
+       "feedback": "Parfait. L’équipe va vérifier les caméras et prévenir les autres entrées."
+      },
+      {
+       "label": "Il est parti, donc il n’y a pas de problème",
+       "outcome": "risky",
+       "feedback": "Il peut revenir un autre jour ou par une autre porte. Le signalement compte."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "badge-rules",
+   "prompt": "Associez chaque situation à la bonne action.",
+   "pairs": [
+    {
+     "id": "lend",
+     "left": "Quelqu’un de l’équipe vous demande votre badge",
+     "right": "L’orienter vers le poste de sécurité"
+    },
+    {
+     "id": "photo",
+     "left": "On prend une photo d’équipe",
+     "right": "Cacher d’abord le badge"
+    },
+    {
+     "id": "outside",
+     "left": "Vous faites des courses après le travail",
+     "right": "Ranger le badge dans votre sac"
+    },
+    {
+     "id": "no-badge",
+     "left": "Un technicien en uniforme n’a pas de badge visiteur",
+     "right": "Appeler les agents de sécurité"
+    }
+   ],
+   "explain": "Votre badge, c’est votre identité. Utilisez-le seulement dans le bâtiment, et ne le confiez à personne."
+  },
+  {
+   "type": "choice",
+   "id": "why-hide",
+   "question": {
+    "prompt": "Pourquoi cacher votre badge en dehors du bâtiment ?",
+    "options": [
+     {
+      "id": "dirt",
+      "label": "Pour qu’il ne se salisse pas",
+      "correct": false,
+      "feedback": "La raison tient à la sécurité, pas à la propreté."
+     },
+     {
+      "id": "target",
+      "label": "Il montre votre nom et votre lieu de travail, et il peut être volé",
+      "correct": true,
+      "feedback": "Exact : un badge visible indique à un attaquant qui aborder. Certains badges peuvent même être copiés à courte distance."
+     },
+     {
+      "id": "rule",
+      "label": "C’est simplement la règle",
+      "correct": false,
+      "feedback": "Il y a une raison : le badge vous protège, vous et le bâtiment."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "badge-id"
+    }
+   },
+   "explain": "Portez le badge de façon visible à l’intérieur, et cachez-le quand vous sortez."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Ne prêtez jamais votre badge et n’en publiez pas de photos.",
+    "Un uniforme n’est pas une pièce d’identité : pas de badge visiteur, pas d’entrée.",
+    "Vous avez perdu votre badge ? Signalez-le tout de suite."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

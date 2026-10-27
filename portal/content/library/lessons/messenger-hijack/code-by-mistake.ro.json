@@ -1,0 +1,542 @@
+{
+ "id": "code-by-mistake",
+ "title": "Un cod trimis din greșeală",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "mh1-tutor",
+   "beats": [
+    {
+     "id": "mh1-b1",
+     "say": "Bună ziua! Astăzi învățăm să recunoaștem persoanele care încearcă să vă preia contul de mesagerie.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "mh1-b2",
+     "say": "Tot ce le trebuie este codul de șase cifre pe care îl primiți pe telefon.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "sohbet",
+       "sender": [
+        {
+         "text": "Söhbət"
+        }
+       ],
+       "time": "10:03",
+       "messages": [
+        [
+         {
+          "text": "Codul dumneavoastră Söhbət: "
+         },
+         {
+          "text": "731 064",
+          "spot": "code"
+         },
+         {
+          "text": ". Nu comunicați acest cod nimănui."
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "code"
+    },
+    {
+     "id": "mh1-b3",
+     "say": "Nu dați niciodată acest cod nimănui: nici unui prieten, nici unui coleg, nici măcar echipei de suport.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "mh1-b4",
+     "say": "Dacă cineva vă cere bani într-un mesaj, sunați persoana la telefon și întrebați-o chiar dumneavoastră.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "mh1-scenario",
+   "title": "Mesajul unei colege",
+   "start": "start",
+   "nodes": [
+    {
+     "id": "start",
+     "text": "Primiți un mesaj de la colega dumneavoastră Rena, iar un minut mai târziu vă sosește pe telefon un cod Söhbət. Ce faceți?",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "sohbet",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Rena Guliyeva"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Bună, scuze, ți-am trimis din greșeală un cod pe număr."
+          }
+         ],
+         "time": "10:02"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Poți să-mi trimiți, te rog, codul de șase cifre pe care l-ai primit?"
+          }
+         ],
+         "time": "10:02"
+        }
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "Nu trimit codul, o sun pe Rena la telefon",
+       "next": "call",
+       "feedback": "Corect. Codul este cheia propriului dumneavoastră cont, iar un apel obișnuit arată dacă v-a scris cu adevărat Rena."
+      },
+      {
+       "label": "Îi trimit codul, doar e colega mea",
+       "next": "taken",
+       "feedback": "Era codul pentru contul dumneavoastră, nu pentru al ei. În clipa în care îl trimiteți, contul trece în mâinile altcuiva."
+      },
+      {
+       "label": "Nu răspund și șterg mesajul",
+       "outcome": "risky",
+       "feedback": "Este corect că nu dați codul. Dar contul Renei a fost furat, așa că sunați-o și anunțați-o."
+      }
+     ]
+    },
+    {
+     "id": "call",
+     "text": "N-am trimis nimic! Nu reușesc să intru în cont de aseară.",
+     "speaker": "Rena (la telefon)",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "N-am trimis nimic! <breath> Nu reușesc să intru în cont de aseară.",
+     "choices": [
+      {
+       "label": "Îi spun să se conecteze din nou cu numărul ei și avertizăm grupul de lucru",
+       "outcome": "safe",
+       "feedback": "Excelent. Prin reconectare își recuperează contul, iar grupul nu se va mai lăsa păcălit de mesajele false."
+      },
+      {
+       "label": "Eu nu am pățit nimic, așa că nu mă mai implic",
+       "outcome": "risky",
+       "feedback": "Din contul Renei, escrocii le vor scrie și altora. Dacă o ajutați pe Rena și avertizați grupul, îi protejați pe toți."
+      }
+     ]
+    },
+    {
+     "id": "taken",
+     "text": "Ați trimis codul. În scurt timp, Söhbət vă deconectează, iar în grup ajunge, în numele dumneavoastră, un mesaj prin care se cer bani.",
+     "choices": [
+      {
+       "label": "Mă conectez din nou cu numărul meu și activez verificarea în doi pași",
+       "outcome": "risky",
+       "feedback": "Așa vă recuperați corect contul. Totuși, cel mai bine este să nu dați niciodată codul."
+      },
+      {
+       "label": "Aștept, poate se rezolvă de la sine",
+       "outcome": "compromised",
+       "feedback": "Cât timp așteptați, hoții continuă să le ceară bani prietenilor dumneavoastră. Conectați-vă imediat din nou cu numărul dumneavoastră."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "mh1-sim",
+   "environment": "phone",
+   "title": "Mesajele de dimineață",
+   "intro": "Pe telefon v-au sosit mai multe mesaje. Deschideți-le pe rând și alegeți pasul corect.",
+   "steps": [
+    {
+     "id": "group-money",
+     "label": "09:12 Grupul departamentului",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Grupul departamentului"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Elnara Huseynova: Bună ziua tuturor. Am nevoie urgent de 300 de manați, îi dau înapoi diseară."
+         }
+        ],
+        "time": "09:12"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Elnara Huseynova: Trimit numărul cardului în privat. Nu mă sunați, sunt în ședință."
+         }
+        ],
+        "time": "09:12"
+       }
+      ]
+     },
+     "say": "În grup sosește un mesaj din contul șefei dumneavoastră de departament.",
+     "actions": [
+      {
+       "id": "call",
+       "label": "Sunați-o pe Elnara la telefon",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Un apel la numărul pe care îl cunoașteți arată imediat cine a scris mesajul."
+      },
+      {
+       "id": "send",
+       "label": "Trimit eu banii, scrieți-mi numărul cardului",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Banii vor ajunge pe cardul hoțului. O cerere urgentă de bani însoțită de „nu mă sunați” este un truc clasic."
+      },
+      {
+       "id": "report",
+       "label": "Raportați în grup că mesajul este fals",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Un pas bun. Apoi sunați-o pe Elnara și ajutați-o să-și recupereze contul."
+      }
+     ]
+    },
+    {
+     "id": "code-sms",
+     "label": "09:20 Söhbət",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sohbet",
+      "sender": [
+       {
+        "text": "Söhbət"
+       }
+      ],
+      "time": "09:20",
+      "messages": [
+       [
+        {
+         "text": "Codul dumneavoastră Söhbət: 731 064. Nu comunicați acest cod nimănui."
+        }
+       ]
+      ]
+     },
+     "say": "Ați primit un cod Söhbət, deși nu ați cerut niciunul.",
+     "actions": [
+      {
+       "id": "keep",
+       "label": "Nu dau codul nimănui",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă primiți un cod pe care nu l-ați cerut, cineva încearcă să intre în contul dumneavoastră."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți SMS-ul",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Și așa este bine. Important este să nu ajungă codul la nimeni."
+      }
+     ]
+    },
+    {
+     "id": "friend-asks",
+     "label": "09:21 Aysel Mammadova",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Aysel Mammadova"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună, draga mea, ai primit un cod? L-am trimis pe al meu din greșeală pe numărul tău."
+         }
+        ],
+        "time": "09:21"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Te rog, trimite-mi-l repede, mi se blochează telefonul."
+         }
+        ],
+        "time": "09:21"
+       }
+      ]
+     },
+     "say": "Un minut mai târziu primiți un mesaj de la prietena dumneavoastră Aysel.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Trimiteți-i codul",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Era codul pentru contul dumneavoastră. Acum contul este pe mâna celui care l-a furat pe al lui Aysel."
+      },
+      {
+       "id": "call",
+       "label": "Sunați-o pe Aysel la telefon",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Un cod primit de dumneavoastră aparține contului dumneavoastră, iar apelul o avertizează pe adevărata Aysel."
+      },
+      {
+       "id": "block",
+       "label": "Blocați",
+       "kind": "block",
+       "outcome": "risky",
+       "feedback": "Este corect că nu dați codul. Dar contul lui Aysel a fost furat, așa că anunțați-o pe altă cale."
+      }
+     ]
+    },
+    {
+     "id": "new-device",
+     "label": "09:30 Söhbət",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "Dispozitiv nou asociat"
+       }
+      ],
+      "body": [
+       {
+        "text": "Computer, Ganja. Dacă nu ați fost dumneavoastră, verificați dispozitivele asociate."
+       }
+      ],
+      "time": "09:30"
+     },
+     "say": "Acum Söhbət v-a trimis o notificare despre un dispozitiv nou.",
+     "actions": [
+      {
+       "id": "check",
+       "label": "Deschideți și eliminați dispozitivul",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. Odată eliminat, un dispozitiv pe care nu îl cunoașteți nu vă mai poate citi mesajele."
+      },
+      {
+       "id": "ignore",
+       "label": "Închideți notificarea",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Dispozitivul acela vede toate conversațiile dumneavoastră. Când vedeți o astfel de notificare, verificați imediat."
+      }
+     ]
+    },
+    {
+     "id": "fake-support",
+     "label": "09:41 Suport Söhbət",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2a-sohbet-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Suport Söhbət"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Am detectat o conectare suspectă în contul dumneavoastră, iar contul va fi blocat peste o oră."
+         }
+        ],
+        "time": "09:41"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Pentru confirmare, scrieți aici codul primit pe telefon."
+         }
+        ],
+        "time": "09:41"
+       }
+      ]
+     },
+     "say": "Ultimul mesaj pretinde că vine de la echipa de suport Söhbət.",
+     "actions": [
+      {
+       "id": "block",
+       "label": "Blocați și raportați",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Corect. Echipa de suport adevărată nu vă cere niciodată codul."
+      },
+      {
+       "id": "share",
+       "label": "Scrieți codul",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Cine vă scrie în numele echipei de suport este un escroc. În clipa în care trimiteți codul, contul devine al lui."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "mh1-hotspot",
+   "prompt": "Găsiți semnele de înșelătorie din acest mesaj.",
+   "artifact": {
+    "kind": "chat",
+    "brandRef": "sohbet",
+    "app": "generic",
+    "contact": [
+     {
+      "text": "Grupul departamentului"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Elnara Huseynova: "
+       },
+       {
+        "text": "Am nevoie urgent de 300 de manați",
+        "spot": "urgent"
+       },
+       {
+        "text": ", "
+       },
+       {
+        "text": "îi dau înapoi diseară.",
+        "spot": "return"
+       }
+      ],
+      "time": "09:12"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Trimit numărul cardului în privat.",
+        "spot": "card"
+       },
+       {
+        "text": " "
+       },
+       {
+        "text": "Nu mă sunați, sunt în ședință.",
+        "spot": "no-call"
+       }
+      ],
+      "time": "09:12"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "urgent",
+     "label": "Bani, urgent",
+     "explain": "Graba nu vă lasă timp de gândire. O cerere urgentă de bani trebuie verificată întotdeauna."
+    },
+    {
+     "id": "no-call",
+     "label": "„Nu mă sunați”",
+     "explain": "Evitarea unui apel este cel mai puternic semnal. Hoțul nu vă poate lăsa să-i auziți vocea, de aceea scrie."
+    },
+    {
+     "id": "card",
+     "label": "Un card trimis în privat",
+     "explain": "Banii ajung pe un card pe care nu îl cunoașteți. Nimic nu arată că acest card este al Elnarei."
+    },
+    {
+     "id": "return",
+     "label": "Promisiunea de a da banii înapoi",
+     "explain": "Promisiunea unei rambursări rapide este acolo ca să vă liniștească. Mai întâi sunați și verificați."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "choice",
+   "id": "mh1-choice",
+   "question": {
+    "prompt": "Contul dumneavoastră a fost deja furat. Care este primul pas?",
+    "options": [
+     {
+      "id": "relogin",
+      "label": "Mă conectez din nou la Söhbət cu numărul meu",
+      "correct": true,
+      "feedback": "Corect. Noul cod ajunge doar pe telefonul dumneavoastră, iar contul revine la dumneavoastră."
+     },
+     {
+      "id": "new-account",
+      "label": "Îmi fac un cont nou și îl uit pe cel vechi",
+      "correct": false,
+      "feedback": "Contul vechi rămâne la hoț. Acesta va continua să le ceară bani prietenilor dumneavoastră."
+     },
+     {
+      "id": "write",
+      "label": "Îi scriu hoțului și îi cer contul înapoi",
+      "correct": false,
+      "feedback": "Hoțul nu vi-l va da înapoi și s-ar putea chiar să vă ceară bani. Conectați-vă din nou cu numărul dumneavoastră."
+     }
+    ]
+   },
+   "explain": "Conectați-vă din nou cu numărul dumneavoastră, activați verificarea în doi pași și avertizați-vă prietenii pe altă cale."
+  },
+  {
+   "type": "recap",
+   "id": "mh1-recap",
+   "points": [
+    "Nu dați codul nimănui, nici măcar unui prieten",
+    "Verificați orice cerere de bani printr-un apel telefonic obișnuit",
+    "Dacă ați pierdut contul, conectați-vă din nou cu numărul dumneavoastră"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

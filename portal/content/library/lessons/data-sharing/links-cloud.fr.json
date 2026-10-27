@@ -1,0 +1,441 @@
+{
+ "id": "links-cloud",
+ "title": "Liens et dossiers cloud",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Les dossiers cloud sont pratiques, mais un seul mauvais réglage peut ouvrir un fichier à tout internet.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Avec l’option « Toute personne disposant du lien », si le lien circule, des inconnus peuvent eux aussi ouvrir le fichier.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "rxagentlik-disk",
+       "url": [
+        {
+         "text": "https://disk.rxagentlik.az/qovluq/budce-2027?paylasim="
+        },
+        {
+         "text": "hamiya-acik",
+         "spot": "public"
+        }
+       ]
+      }
+     },
+     "highlight": "public"
+    },
+    {
+     "id": "b3",
+     "say": "La bonne méthode : des personnes désignées uniquement, un accès en lecture seule et une date d’expiration.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Ne déposez pas de fichiers de travail sur un compte cloud personnel. L’organisation ne peut ni les y protéger ni les récupérer.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "share-folder",
+   "environment": "browser",
+   "title": "Partager le fichier",
+   "intro": "Vous devez envoyer le projet de budget à un partenaire externe. Configurez vous-même le partage sur le disque cloud.",
+   "steps": [
+    {
+     "id": "file-page",
+     "label": "Projet de budget 2027.xlsx",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "rxagentlik-disk",
+      "url": [
+       {
+        "text": "https://disk.rxagentlik.az/fayllar/Budce_layihesi_2027.xlsx",
+        "reveal": "rxagentlik.az"
+       }
+      ]
+     },
+     "say": "Comment partagez-vous le fichier ?",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Partager",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Bien, le fichier reste sur le disque professionnel. Regardez maintenant les paramètres de partage."
+      },
+      {
+       "id": "personal",
+       "label": "Déplacer vers mon cloud personnel",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Un compte personnel échappe au contrôle de l’organisation. Les fichiers de travail restent sur le disque professionnel."
+      }
+     ]
+    },
+    {
+     "id": "who-can-open",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Partager : Projet de budget 2027.xlsx"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Qui peut l’ouvrir ?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Toute personne disposant du lien",
+       "Personnes désignées uniquement"
+      ]
+     },
+     "actions": [
+      {
+       "id": "named",
+       "label": "Personnes désignées uniquement",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Seules les personnes que vous choisissez peuvent ouvrir le fichier."
+      },
+      {
+       "id": "anyone",
+       "label": "Toute personne disposant du lien",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Le lien peut être transféré ou atterrir au mauvais endroit. N’importe qui peut alors ouvrir le fichier."
+      }
+     ]
+    },
+    {
+     "id": "rights",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "À qui et comment ?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Destinataire : e.rzayev@merkez-konsalting.example"
+        }
+       ],
+       [
+        {
+         "text": "Accès : lecture seule ou modification"
+        }
+       ],
+       [
+        {
+         "text": "Expiration : dans 7 jours ou jamais"
+        }
+       ]
+      ],
+      "buttons": [
+       "Modification, sans date de fin",
+       "Lecture seule, 7 jours"
+      ]
+     },
+     "actions": [
+      {
+       "id": "view",
+       "label": "Lecture seule, 7 jours",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Excellent. Le partenaire peut consulter le fichier sans le modifier, et l’accès prend fin dans une semaine."
+      },
+      {
+       "id": "edit",
+       "label": "Modification, sans date de fin",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Le partenaire n’a pas besoin de modifier le fichier, et un accès sans date de fin reste ouvert pendant des années."
+      }
+     ]
+    },
+    {
+     "id": "fake-share",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "rxagentlik-disk-fake",
+      "brand": "RXAgentlik Disk",
+      "url": [
+       {
+        "text": "https://rxagentlik-disk.example.net/giris",
+        "reveal": "rxagentlik-disk.example.net"
+       }
+      ],
+      "fields": [
+       "Adresse e-mail",
+       "Mot de passe"
+      ],
+      "button": "Se connecter"
+     },
+     "say": "Une heure plus tard, une page de fichier partagé s’ouvre. Vérifiez l’adresse.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Se connecter",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Ce domaine n’est pas celui de votre disque professionnel. Le fichier partagé n’est qu’un prétexte pour voler votre mot de passe."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. N’ouvrez les fichiers partagés que sur disk.rxagentlik.az."
+      },
+      {
+       "id": "report",
+       "label": "Signaler le site",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Signaler la fausse page protège aussi vos collègues."
+      }
+     ]
+    },
+    {
+     "id": "old-links",
+     "label": "Mes partages : 4 fichiers sont ouverts à tous",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "rxagentlik-disk",
+      "url": [
+       {
+        "text": "https://disk.rxagentlik.az/paylasimlar",
+        "reveal": "rxagentlik.az"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "close-links",
+       "label": "Désactiver les liens ouverts",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Désactiver les partages dont vous n’avez plus besoin, c’est la protection la plus simple."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Chaque lien laissé ouvert représente un risque de plus, chaque jour."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "link-settings",
+   "prompt": "Ce paramètre de partage est-il sûr ?",
+   "cards": [
+    {
+     "id": "anyone-forever",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Paramètre de partage"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Grille des salaires : toute personne disposant du lien, modification, sans date de fin"
+        }
+       ]
+      ],
+      "buttons": [
+       "Terminé"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un fichier confidentiel ouvert à tous, sans date de fin. Une fois que le lien a circulé, impossible de revenir en arrière."
+    },
+    {
+     "id": "named-week",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Paramètre de partage"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Rapport de projet : 2 personnes, lecture seule, 7 jours"
+        }
+       ]
+      ],
+      "buttons": [
+       "Terminé"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Un accès restreint, en lecture seule, avec une date de fin. C’est le bon réglage."
+    },
+    {
+     "id": "whole-org",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Paramètre de partage"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Liste RH : tous les membres de l’organisation"
+        }
+       ]
+      ],
+      "buttons": [
+       "Terminé"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un document confidentiel n’est pas destiné à toute l’organisation, mais seulement à des personnes désignées."
+    },
+    {
+     "id": "public-ad",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Paramètre de partage"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Offre d’emploi : toute personne disposant du lien"
+        }
+       ]
+      ],
+      "buttons": [
+       "Terminé"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Elle est publique et figure déjà sur le site. Ici, un lien ouvert ne pose pas de problème."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "who-needs-what",
+   "prompt": "Trouvez le bon réglage pour chaque besoin.",
+   "pairs": [
+    {
+     "id": "partner",
+     "left": "Un partenaire doit lire un document",
+     "right": "Lecture seule, personne désignée, 7 jours"
+    },
+    {
+     "id": "coauthor",
+     "left": "Un collègue corédige le document",
+     "right": "Modification, pour cette personne uniquement"
+    },
+    {
+     "id": "public",
+     "left": "Une annonce publiée sur le site web",
+     "right": "Lien ouvert à tous"
+    }
+   ],
+   "explain": "Partagez de la façon la plus restreinte possible : avec qui, avec quels droits, pour combien de temps."
+  },
+  {
+   "type": "choice",
+   "id": "personal-cloud",
+   "question": {
+    "prompt": "Pouvez-vous déposer un fichier confidentiel sur votre cloud personnel pour travailler de chez vous ?",
+    "options": [
+     {
+      "id": "strong",
+      "label": "Oui, mon mot de passe est robuste",
+      "correct": false,
+      "feedback": "Un mot de passe robuste ne remet pas le fichier sous le contrôle de l’organisation."
+     },
+     {
+      "id": "work",
+      "label": "Non, j’utilise le disque professionnel ou un moyen autorisé par l’organisation",
+      "correct": true,
+      "feedback": "Exact. Sur le disque professionnel, le fichier est protégé et peut être récupéré."
+     },
+     {
+      "id": "delete-later",
+      "label": "Oui, je le supprimerai plus tard",
+      "correct": false,
+      "feedback": "Un fichier supprimé reste souvent dans la corbeille et sur d’autres appareils."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "cloud"
+    }
+   },
+   "explain": "Les fichiers de travail restent dans les systèmes professionnels. En cas de doute, demandez au support technique."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "N’utilisez jamais l’option « Toute personne disposant du lien » pour des fichiers confidentiels.",
+    "Partagez avec des personnes désignées, en lecture seule et avec une date de fin.",
+    "Désactivez régulièrement les anciens partages."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

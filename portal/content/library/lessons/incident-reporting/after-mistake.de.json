@@ -1,0 +1,387 @@
+{
+ "id": "after-mistake",
+ "title": "Nach einem Fehler",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Jedem passiert mal ein Fehler: Man tippt auf einen Link oder liest einen Code vor. Entscheidend sind die nächsten fünf Minuten.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Verheimlichen Sie es nicht und versuchen Sie nicht, es allein zu beheben. Ein verschwiegener Fehler verschafft dem Angreifer Zeit.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Seien Sie ehrlich: worauf Sie getippt, was Sie eingegeben und was Sie gesagt haben. Die Fachleute müssen das wissen.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Danach sperren die Fachleute das Konto und überprüfen das Gerät. Es geht darum, den Schaden zu stoppen, nicht darum, Schuldige zu suchen.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "gave-code",
+   "title": "Sie haben den Code vorgelesen",
+   "start": "call-ended",
+   "nodes": [
+    {
+     "id": "call-ended",
+     "text": "Der Anrufer gab sich als IT-Support aus, und Sie haben ihm den Code vorgelesen, der an Ihr Smartphone geschickt wurde. Nach dem Gespräch kommen Ihnen Zweifel.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "IT-Support"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 50 000 38 17"
+        }
+       ],
+       "label": "Mobil"
+      }
+     },
+     "choices": [
+      {
+       "label": "Ich rufe sofort die mir bekannte Nummer des IT-Supports an",
+       "next": "honest",
+       "feedback": "Richtig. Jede Minute zählt – der Angreifer meldet sich womöglich gerade an."
+      },
+      {
+       "label": "Es ist mir peinlich, ich sage niemandem etwas",
+       "outcome": "compromised",
+       "feedback": "Der Angreifer ist jetzt in Ihrem Konto, und niemand weiß davon. Schweigen macht alles schlimmer."
+      },
+      {
+       "label": "Ich ändere selbst das Passwort, das reicht",
+       "outcome": "risky",
+       "feedback": "Ein guter Schritt, aber er reicht nicht. Der Angreifer kann in einer offenen Anmeldesitzung bleiben, die das Sicherheitsteam beenden muss."
+      }
+     ]
+    },
+    {
+     "id": "honest",
+     "text": "Wann haben Sie den Code weitergegeben, und was wollte der Anrufer sonst noch?",
+     "speaker": "Sicherheitsteam",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "firm",
+     "spoken": "Wann haben Sie den Code weitergegeben, <breath> und was wollte der Anrufer sonst noch?",
+     "choices": [
+      {
+       "label": "Ich erzähle alles so, wie es war, auch das mit dem Code",
+       "next": "manager",
+       "feedback": "Richtig. Mit ehrlichen Angaben weiß das Sicherheitsteam genau, was gesperrt werden muss."
+      },
+      {
+       "label": "Ich sage, es gab nur einen Anruf und ich habe keinen Code genannt",
+       "outcome": "risky",
+       "feedback": "Mit der halben Geschichte weiß das Sicherheitsteam nicht, dass das Konto übernommen wurde. Ehrlichkeit spart Zeit."
+      }
+     ]
+    },
+    {
+     "id": "manager",
+     "text": "Das Sicherheitsteam hat alle Anmeldesitzungen beendet und Sie gebeten, ein neues Passwort festzulegen. Ihre Führungskraft fragt: Was ist passiert?",
+     "choices": [
+      {
+       "label": "Ich erkläre es offen, damit auch das Team gewarnt ist",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Ihre Geschichte schützt Ihre Kolleginnen und Kollegen vor demselben Anruf."
+      },
+      {
+       "label": "Ich sage, es sei nichts passiert",
+       "outcome": "risky",
+       "feedback": "Derselbe Anruf kann auch Ihre Kolleginnen und Kollegen erreichen. Wenn Sie offen darüber sprechen, schützen Sie sie."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "next-day-inbox",
+   "environment": "inbox",
+   "title": "Am nächsten Tag",
+   "intro": "Gestern haben Sie einen gefälschten Link geöffnet und das gemeldet. Heute warten drei E-Mails in Ihrem Posteingang.",
+   "steps": [
+    {
+     "id": "ticket",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik",
+      "from": {
+       "name": [
+        {
+         "text": "IT-Sicherheit"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Ihre Meldung: INC-2026-0412"
+       }
+      ],
+      "time": "08:20",
+      "body": [
+       [
+        {
+         "text": "Vielen Dank für Ihre Meldung. Alle offenen Sitzungen Ihres Kontos wurden beendet."
+        }
+       ],
+       [
+        {
+         "text": "Bitte ändern Sie heute Ihr Passwort im Portal der Organisation. Wir schicken Ihnen keinen Link: Öffnen Sie das Portal bitte selbst."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Als sicher markieren",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Adresse gehört zu Ihrer Organisation, es gibt keinen Link, und niemand verlangt etwas von Ihnen."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Vorsicht ist gut, aber diese E-Mail ist echt: Die Absenderadresse gehört zu Ihrer Organisation, und es gibt keinen Link."
+      }
+     ]
+    },
+    {
+     "id": "second-trap",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik-fake",
+      "from": {
+       "name": [
+        {
+         "text": "IT-Sicherheit"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare-secure.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Dringend: Ihr Konto wurde gehackt"
+       }
+      ],
+      "time": "09:02",
+      "body": [
+       [
+        {
+         "text": "Bestätigen Sie nach dem gestrigen Vorfall Ihr Konto innerhalb einer Stunde erneut."
+        }
+       ],
+       [
+        {
+         "text": "Jetzt bestätigen: "
+        },
+        {
+         "text": "idare-secure.example.net/yoxla",
+         "link": {
+          "label": "idare-secure.example.net/yoxla",
+          "href": "https://idare-secure.example.net/yoxla"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Angreifer melden sich manchmal ein zweites Mal.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig, die Adresse gehört nicht zur Domain Ihrer Organisation. Angreifer nehmen oft dieselbe Person erneut ins Visier."
+      },
+      {
+       "id": "click",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Das war eine zweite Falle. Das echte Team hatte Sie gebeten, das Passwort selbst im Portal zu ändern."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Sie sind sicher, aber diese E-Mail zeigt, dass der Angriff noch läuft. Melden Sie die E-Mail."
+      }
+     ]
+    },
+    {
+     "id": "colleague",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Nigar Quliyeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "n.quliyeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Von Ihnen kam eine seltsame E-Mail"
+       }
+      ],
+      "time": "09:40",
+      "body": [
+       [
+        {
+         "text": "Hallo, gestern Abend kam von Ihrer Adresse eine E-Mail mit dem Betreff „Rechnung“ und einem Link darin. Haben Sie die geschickt?"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "An das Sicherheitsteam weiterleiten",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn der Angreifer von Ihrem Konto aus anderen geschrieben hat, müssen die Fachleute das wissen."
+      },
+      {
+       "id": "reply",
+       "label": "Antworten: Das war ich nicht, bitte nicht öffnen",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Gut, Sie haben Ihre Kollegin gewarnt. Leiten Sie die E-Mail zusätzlich an das Sicherheitsteam weiter."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Ihre Kollegin öffnet womöglich den Link, und die Fachleute erfahren nicht, dass sich der Angriff ausgebreitet hat."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "what-happens-next",
+   "prompt": "Was passiert normalerweise nach Ihrer Meldung? Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "report",
+     "label": "Sie melden den Vorfall"
+    },
+    {
+     "id": "lock",
+     "label": "Die Fachleute sperren das Konto und beenden die Sitzungen"
+    },
+    {
+     "id": "check",
+     "label": "Computer und Postfach werden überprüft"
+    },
+    {
+     "id": "back",
+     "label": "Sie legen ein neues Passwort fest und arbeiten weiter"
+    }
+   ],
+   "explain": "Das ist der übliche Ablauf. Je früher Sie melden, desto schneller ist er vorbei."
+  },
+  {
+   "type": "choice",
+   "id": "fear-of-blame",
+   "question": {
+    "prompt": "Ein Kollege sagt: „Wenn ich das melde, bekomme ich Ärger.“ Was antworten Sie?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Schnelles Melden begrenzt den Schaden, Verheimlichen vergrößert ihn",
+      "correct": true,
+      "feedback": "Richtig. Schnelle, ehrliche Informationen sind die wertvollste Hilfe für die Fachleute."
+     },
+     {
+      "id": "hide",
+      "label": "Stimmt, das muss niemand erfahren",
+      "correct": false,
+      "feedback": "Ein verheimlichter Fehler wächst und kann der ganzen Organisation schaden."
+     },
+     {
+      "id": "fix",
+      "label": "Erst einmal selbst versuchen, es zu beheben",
+      "correct": false,
+      "feedback": "Wer allein versucht, den Fehler zu beheben, kann Spuren zerstören und verliert Zeit."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "handshake"
+    }
+   },
+   "explain": "Nicht der Fehler lässt die Gefahr wachsen, sondern das Schweigen."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Wenn Ihnen ein Fehler passiert ist, melden Sie ihn sofort und ehrlich.",
+    "Achten Sie auf die nächsten E-Mails: Der Angreifer meldet sich womöglich erneut.",
+    "Es geht darum, den Schaden zu stoppen, nicht darum, Schuldige zu suchen."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

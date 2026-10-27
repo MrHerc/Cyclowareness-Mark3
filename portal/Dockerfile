@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Production image, built from the portal folder:  docker build -t portal .
 # Stages: deps (npm ci) -> builder (next build) -> runner (standalone server, non-root).
-FROM node:22-bookworm-slim AS base
+FROM node:24-trixie-slim AS base
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 

@@ -6,7 +6,7 @@ import { unstable_rethrow } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { db, t } from "../db";
-import { isUniqueViolation } from "../db/errors";
+import { isUniqueViolation, logFailure } from "../db/errors";
 import { actionViewer, type Viewer } from "../auth/viewer";
 import { isUuid } from "../../lib/ids";
 import { ASSIGNABLE_ROLES } from "../auth/permissions";
@@ -28,11 +28,21 @@ import { pick } from "../../i18n/config";
 import azCommon from "../../../messages/az/common.json";
 import enCommon from "../../../messages/en/common.json";
 import ruCommon from "../../../messages/ru/common.json";
+import trCommon from "../../../messages/tr/common.json";
+import roCommon from "../../../messages/ro/common.json";
+import kaCommon from "../../../messages/ka/common.json";
+import ukCommon from "../../../messages/uk/common.json";
+import deCommon from "../../../messages/de/common.json";
+import frCommon from "../../../messages/fr/common.json";
+import arCommon from "../../../messages/ar/common.json";
+
+/** The platform operator is out of reach of tenant administrators (even in the platform organisation): only another super_admin acts on one. */
+const reachable = (v: Viewer) => (v.user.role === "super_admin" ? undefined : ne(t.users.role, "super_admin"));
 
 async function target(v: Viewer, userId: string) {
   // The id reaches a uuid column: anything else is no person (instead of a database error).
   if (!isUuid(userId)) return null;
-  const [u] = await db().select().from(t.users).where(and(eq(t.users.id, userId), eq(t.users.tenantId, v.tenant.id), ne(t.users.status, "deleted")));
+  const [u] = await db().select().from(t.users).where(and(eq(t.users.id, userId), eq(t.users.tenantId, v.tenant.id), ne(t.users.status, "deleted"), reachable(v)));
   return u ?? null;
 }
 
@@ -138,7 +148,7 @@ export async function addPersonAction(_: PersonState, form: FormData): Promise<P
     if (isUniqueViolation(error, "users_phone_active_idx")) return { error: "phoneTaken" };
     // Any other failure keeps the dialog open with a notice instead of replacing it with the error page.
     unstable_rethrow(error);
-    console.error("[people] adding a person failed", error);
+    logFailure("[people] adding a person failed", error);
     return { error: "generic" };
   }
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.added", targetType: "user", targetId: row.id, ip: await clientIp(), meta: { email: p.data.email, role: p.data.role } });
@@ -256,18 +266,20 @@ export async function moveDepartmentAction(userIds: string[], departmentId: stri
       .select({ id: t.assignments.id, scope: t.assignments.scope, departmentId: t.assignments.departmentId })
       .from(t.assignments)
       .where(and(eq(t.assignments.tenantId, v.tenant.id), eq(t.assignments.scope, "department"))),
-    db().select({ id: t.users.id, departmentId: t.users.departmentId }).from(t.users).where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, ids))),
+    db().select({ id: t.users.id, departmentId: t.users.departmentId }).from(t.users).where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, ids), reachable(v))),
   ]);
+  const moved = people.map((p) => p.id);
+  if (!moved.length) return { ok: false };
   const closure = departmentClosure(departments);
   const after = coveringAssignments(assignments, closure, departmentId);
   const gained = people.filter((p) => p.departmentId !== departmentId && gainsCoverage(coveringAssignments(assignments, closure, p.departmentId), after)).map((p) => p.id);
   await db().transaction(async (tx) => {
     const changing = and(eq(t.users.tenantId, v.tenant.id), sql`${t.users.departmentId} is distinct from ${departmentId}`);
     if (gained.length) await tx.update(t.users).set({ departmentId, departmentChangedAt: new Date() }).where(and(changing, inArray(t.users.id, gained)));
-    await tx.update(t.users).set({ departmentId }).where(and(changing, inArray(t.users.id, ids)));
+    await tx.update(t.users).set({ departmentId }).where(and(changing, inArray(t.users.id, moved)));
   });
-  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.moved", meta: { count: ids.length, departmentId } });
-  await recomputeRisk(db(), v.tenant.id, ids);
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.moved", meta: { count: moved.length, departmentId } });
+  await recomputeRisk(db(), v.tenant.id, moved);
   refresh();
   return { ok: true };
 }
@@ -277,7 +289,7 @@ export async function setStatusAction(userIds: string[], status: "active" | "sus
   if (status !== "active" && status !== "suspended") return { ok: false };
   const ids = userIds.filter((id) => id !== v.user.id && isUuid(id)).slice(0, 5000);
   if (!ids.length) return { ok: false };
-  await db()
+  const changed = await db()
     .update(t.users)
     // An account that was never activated (still invited, or suspended before it accepted its invite: no
     // activation date and no password) starts its reminder clock now, as accepting the invite does.
@@ -289,15 +301,17 @@ export async function setStatusAction(userIds: string[], status: "active" | "sus
           }
         : { status },
     )
-    .where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, ids), ne(t.users.status, "deleted")));
-  if (status === "suspended") for (const id of ids) await invalidateUserSessions(id);
-  for (const id of ids) await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: status === "suspended" ? "person.suspended" : "person.reactivated", targetType: "user", targetId: id });
+    .where(and(eq(t.users.tenantId, v.tenant.id), inArray(t.users.id, ids), ne(t.users.status, "deleted"), reachable(v)))
+    .returning({ id: t.users.id });
+  if (status === "suspended") for (const { id } of changed) await invalidateUserSessions(id);
+  for (const { id } of changed) await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: status === "suspended" ? "person.suspended" : "person.reactivated", targetType: "user", targetId: id });
   refresh();
-  return { ok: true };
+  return { ok: changed.length > 0 };
 }
 
 /** Deletion anonymises the person: learning history stays for reports, identity is removed. */
-async function anonymise(v: Viewer, userId: string, action: "person.deleted" | "person.deletion_approved") {
+async function anonymise(v: Viewer, u: { id: string; email: string }, action: "person.deleted" | "person.deletion_approved") {
+  const userId = u.id;
   // All or nothing: a deleted person must not stay a department head or manager, or keep sign-in links.
   await db().transaction(async (tx) => {
     await tx
@@ -310,6 +324,14 @@ async function anonymise(v: Viewer, userId: string, action: "person.deleted" | "
     // Signed out everywhere (as invalidateUserSessions does), in the same transaction.
     await tx.delete(t.sessions).where(eq(t.sessions.userId, userId));
     await tx.delete(t.authTokens).where(eq(t.authTokens.userId, userId));
+    // The address is removed wherever else it was kept (privacy policy): mail to it, queued ones included (so they
+    // are never delivered), the IP of policy sign-offs, and the address in audit entries about the person.
+    await tx.delete(t.outbox).where(and(eq(t.outbox.tenantId, v.tenant.id), sql`lower(${t.outbox.to}) = ${u.email.toLowerCase()}`));
+    await tx.update(t.policySignoffs).set({ ip: null }).where(eq(t.policySignoffs.userId, userId));
+    await tx
+      .update(t.auditLog)
+      .set({ meta: sql`${t.auditLog.meta} - 'email'` })
+      .where(and(eq(t.auditLog.tenantId, v.tenant.id), eq(t.auditLog.targetType, "user"), eq(t.auditLog.targetId, userId)));
   });
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action, targetType: "user", targetId: userId, ip: await clientIp() });
 }
@@ -318,7 +340,7 @@ export async function deletePersonAction(userId: string): Promise<{ ok: boolean 
   const v = await actionViewer("people.write");
   const u = await target(v, userId);
   if (!u || u.id === v.user.id) return { ok: false };
-  await anonymise(v, u.id, "person.deleted");
+  await anonymise(v, u, "person.deleted");
   refresh();
   return { ok: true };
 }
@@ -327,7 +349,7 @@ export async function decideDeletionAction(userId: string, approve: boolean): Pr
   const v = await actionViewer("people.write");
   const u = await target(v, userId);
   if (!u || !u.deletionRequestedAt) return { ok: false };
-  if (approve) await anonymise(v, u.id, "person.deletion_approved");
+  if (approve) await anonymise(v, u, "person.deletion_approved");
   else {
     await db().update(t.users).set({ deletionRequestedAt: null }).where(eq(t.users.id, u.id));
     await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.deletion_declined", targetType: "user", targetId: u.id });
@@ -376,6 +398,18 @@ const fold = (s: string) => s.trim().toLowerCase().replace(/̇/g, "").replace(/\
  * Role spellings the import accepts: the codes, a few English words, and the role names of every
  * interface language, which is what the people export writes (so an exported file imports again).
  */
+const ROLE_NAMES: Record<Locale, Record<string, string>> = {
+  az: azCommon.roles,
+  en: enCommon.roles,
+  ru: ruCommon.roles,
+  tr: trCommon.roles,
+  ro: roCommon.roles,
+  ka: kaCommon.roles,
+  uk: ukCommon.roles,
+  de: deCommon.roles,
+  fr: frCommon.roles,
+  ar: arCommon.roles,
+};
 const ROLE_ALIASES: Record<string, Role> = {
   learner: "learner",
   employee: "learner",
@@ -389,9 +423,7 @@ const ROLE_ALIASES: Record<string, Role> = {
   administrator: "tenant_admin",
   tenant_admin: "tenant_admin",
   ...Object.fromEntries(
-    [azCommon.roles, enCommon.roles, ruCommon.roles].flatMap((names) =>
-      ASSIGNABLE_ROLES.map((role) => [fold(names[role as keyof typeof names]), role] as const),
-    ),
+    Object.values(ROLE_NAMES).flatMap((names) => ASSIGNABLE_ROLES.map((role) => [fold(names[role]), role] as const)),
   ),
 };
 
@@ -495,7 +527,8 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
     else if (existing.has(email)) problems.push({ line, problem: "exists" });
     else if (foreign.has(emailDomain(email) ?? "")) problems.push({ line, problem: "foreignDomain" });
     seen.add(email);
-    const role = roleRaw ? ROLE_ALIASES[roleRaw] : "learner";
+    // Own keys only: "constructor" or "__proto__" in the file must not match what every object inherits.
+    const role = roleRaw ? (Object.hasOwn(ROLE_ALIASES, roleRaw) ? ROLE_ALIASES[roleRaw] : undefined) : "learner";
     if (!role) problems.push({ line, problem: "role" });
     // Optional, but a number that is given must be usable for phone sign-in and SMS: +994501234567.
     const phone = cleanPhone(get("phone"));

@@ -1,0 +1,303 @@
+{
+  "id": "first-minutes",
+  "title": "Primele minute",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Primele minute contează cel mai mult. Atacatorul se grăbește, așa că trebuie să acționați mai repede decât el.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": { "kind": "illustration", "id": "alarm" }
+        },
+        {
+          "id": "b2",
+          "say": "Opriți-vă când ceva pare în neregulă: o conectare pe care nu o recunoașteți, o fereastră care se deschide singură, fișiere care lipsesc.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "notification",
+              "brandRef": "ispoct",
+              "app": "IshPocht",
+              "title": [{ "text": "Conectare de pe un dispozitiv nou" }],
+              "body": [
+                { "text": "Cineva s-a conectat la contul dumneavoastră " },
+                { "text": "din Ganja, de pe un dispozitiv necunoscut", "spot": "place" },
+                { "text": ", la ora 03:12." }
+              ],
+              "time": "08:31"
+            }
+          },
+          "highlight": "place"
+        },
+        {
+          "id": "b3",
+          "say": "În caz de urgență, sunați la suportul IT sau la echipa de securitate. E-mailul mai poate aștepta.",
+          "mood": "talk",
+          "gesture": "shield-up",
+          "visual": { "kind": "illustration", "id": "shield" }
+        },
+        {
+          "id": "b4",
+          "say": "Dacă bănuiți că a fost compromis computerul, nu raportați de pe el. Atacatorul ar putea citi mesajele, așa că mai bine sunați.",
+          "mood": "think",
+          "gesture": "recite",
+          "visual": { "kind": "illustration", "id": "eye" }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "strange-morning",
+      "environment": "desktop",
+      "title": "O dimineață ciudată",
+      "intro": "Dimineața porniți computerul și observați câteva lucruri ciudate. Cum reacționați la fiecare?",
+      "steps": [
+        {
+          "id": "new-login",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "ispoct",
+            "app": "IshPocht",
+            "title": [{ "text": "Conectare de pe un dispozitiv nou" }],
+            "body": [{ "text": "Cineva s-a conectat la contul dumneavoastră din Ganja, de pe un dispozitiv necunoscut, la ora 03:12." }],
+            "time": "08:31"
+          },
+          "say": "Dacă nu dumneavoastră v-ați conectat, ce faceți?",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Nu am fost eu: raportez",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Corect, o conectare necunoscută înseamnă că cineva are parola dumneavoastră. O raportare rapidă salvează contul."
+            },
+            {
+              "id": "ignore",
+              "label": "Ignorați",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Atacatorul este încă în contul dumneavoastră și câștigă timp. O astfel de notificare se raportează imediat."
+            }
+          ]
+        },
+        {
+          "id": "remote-request",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "texkomek-24",
+            "tone": "app",
+            "title": [{ "text": "TexKomek 24 dorește să se conecteze" }],
+            "body": [
+              [{ "text": "Un operator vrea să vă vadă ecranul și să vă controleze computerul." }]
+            ],
+            "buttons": ["Refuzați", "Permiteți"]
+          },
+          "actions": [
+            {
+              "id": "deny",
+              "label": "Refuzați",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Corect, nu ați cerut asistență. Raportați și o astfel de solicitare neașteptată."
+            },
+            {
+              "id": "allow",
+              "label": "Permiteți",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Persoana de la distanță vă controlează acum computerul. Nu acordați niciodată acces la distanță unui serviciu de asistență pe care nu l-ați apelat chiar dumneavoastră."
+            },
+            {
+              "id": "report",
+              "label": "Refuzați și raportați",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Excelent. O cerere neașteptată de acces de la distanță trebuie raportată imediat."
+            }
+          ]
+        },
+        {
+          "id": "encrypted",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "warning",
+            "title": [{ "text": "Fișierele dumneavoastră sunt criptate" }],
+            "body": [
+              [{ "text": "Plătiți în 72 de ore ca să vă recuperați fișierele. Dacă opriți computerul, fișierele vor fi șterse." }]
+            ],
+            "buttons": ["Mergeți la pagina de plată"]
+          },
+          "say": "Pe ecran apare o cerere de răscumpărare. Care este primul pas?",
+          "actions": [
+            {
+              "id": "disconnect",
+              "label": "Scoateți cablul de rețea, dezactivați Wi-Fi-ul",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Corect, deconectarea de la rețea oprește răspândirea. Lăsați computerul pornit și sunați imediat."
+            },
+            {
+              "id": "shutdown",
+              "label": "Opriți computerul",
+              "kind": "cancel",
+              "outcome": "risky",
+              "feedback": "Oprirea poate șterge urmele din memorie. Dacă procedura nu prevede altceva, deconectați computerul de la rețea și lăsați-l pornit."
+            },
+            {
+              "id": "pay",
+              "label": "Deschideți pagina de plată",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Plata nu garantează că vă recuperați fișierele. Nu plătiți niciodată și lăsați decizia în seama specialiștilor."
+            }
+          ]
+        },
+        {
+          "id": "call-line",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "it-tehlukesizlik",
+            "tone": "system",
+            "title": [{ "text": "Linia de securitate" }],
+            "body": [
+              [{ "text": "Incident urgent: +994 12 000 15 15" }],
+              [{ "text": "Dacă nu este urgent: butonul „Raportați” sau security@idare.example" }]
+            ],
+            "buttons": ["Mai târziu", "Sunați"]
+          },
+          "actions": [
+            {
+              "id": "call",
+              "label": "Sunați acum",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Corect. Un incident urgent se raportează telefonic: specialistul vă spune imediat ce să faceți."
+            },
+            {
+              "id": "later",
+              "label": "Trimiteți un e-mail mâine",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Criptarea se extinde și fiecare minut contează. În plus, este posibil ca nici căsuța de e-mail să nu mai fie sigură."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "who-to-tell",
+      "question": {
+        "prompt": "Un necunoscut s-a conectat la contul dumneavoastră. Pe cine anunțați?",
+        "options": [
+          {
+            "id": "security",
+            "label": "Suportul IT sau echipa de securitate",
+            "correct": true,
+            "feedback": "Corect. Doar ei pot bloca și verifica contul."
+          },
+          {
+            "id": "manager",
+            "label": "Și pe managerul meu",
+            "correct": true,
+            "feedback": "Corect. Managerul vă ajută să organizați munca, dar nu îl înlocuiește pe specialist."
+          },
+          {
+            "id": "colleagues",
+            "label": "Doar colegii din departament",
+            "correct": false,
+            "feedback": "Colegii nu pot bloca contul, așa că se pierde timp."
+          },
+          {
+            "id": "social",
+            "label": "Postez pe rețelele sociale, ca să afle toată lumea",
+            "correct": false,
+            "feedback": "Postările despre un incident îl ajută pe atacator și pe alți escroci."
+          }
+        ],
+        "multi": true,
+        "visual": { "kind": "illustration", "id": "badge-id" }
+      },
+      "explain": "Specialistul remediază problema, managerul este informat, iar nimeni altcineva nu trebuie implicat."
+    },
+    {
+      "type": "match",
+      "id": "how-to-report",
+      "prompt": "Alegeți modul de raportare pentru fiecare situație.",
+      "pairs": [
+        { "id": "phish", "left": "A sosit un e-mail suspect", "right": "Trimiteți-l cu butonul „Raportați”" },
+        { "id": "ransom", "left": "Pe ecran apare o cerere de răscumpărare", "right": "Deconectați dispozitivul de la rețea și sunați" },
+        { "id": "phone", "left": "Telefonul de serviciu s-a pierdut", "right": "Sunați imediat, ca să poată fi blocat de la distanță" },
+        { "id": "misdirect", "left": "Un fișier a ajuns la persoana greșită", "right": "Anunțați managerul și echipa de securitate" }
+      ],
+      "explain": "În cazurile urgente sau care se extind, sunați. Celelalte cazuri le raportați cu butonul „Raportați” sau prin e-mail."
+    },
+    {
+      "type": "scenario",
+      "id": "colleague-says-wait",
+      "title": "Să mai așteptăm?",
+      "start": "window",
+      "nodes": [
+        {
+          "id": "window",
+          "text": "Nu-ți face griji, probabil e o actualizare. Nu face din țânțar armăsar.",
+          "speaker": "Tural (coleg), uitându-se la fereastra ciudată",
+          "voice": "man-2",
+          "channel": "in-person",
+          "manner": "natural",
+          "spoken": "Nu-ți face griji, ăă, probabil e o actualizare. Nu face din țânțar armăsar.",
+          "choices": [
+            {
+              "label": "Sun totuși la suportul IT",
+              "next": "specialist",
+              "feedback": "Corect. O alarmă falsă nu e o problemă, o raportare întârziată este."
+            },
+            {
+              "label": "Aștept, poate dispare",
+              "outcome": "risky",
+              "feedback": "Așteptarea îi dă timp atacatorului. Dacă aveți dubii, sunați."
+            }
+          ]
+        },
+        {
+          "id": "specialist",
+          "text": "Ce ați văzut și ce ați făcut?",
+          "speaker": "Suport IT",
+          "voice": "woman-2",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Ce ați văzut <short pause> și ce ați făcut?",
+          "choices": [
+            {
+              "label": "Spun pe scurt: ce, când, pe ce computer și ce am făcut",
+              "outcome": "safe",
+              "feedback": "Excelent. Cu detalii exacte, specialistul poate începe imediat."
+            },
+            {
+              "label": "Am închis fereastra, nu mai țin minte",
+              "outcome": "risky",
+              "feedback": "Fiecare detaliu contează. Data viitoare, fotografiați ecranul cu telefonul."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Când ceva pare în neregulă, opriți-vă și raportați imediat.",
+        "În caz de urgență, sunați. Nu raportați de pe un computer suspect.",
+        "O alarmă falsă nu e o problemă, dar întârzierea este periculoasă."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

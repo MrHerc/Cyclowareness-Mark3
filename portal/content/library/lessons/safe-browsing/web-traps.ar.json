@@ -1,0 +1,320 @@
+{
+  "id": "web-traps",
+  "title": "فخاخ الإنترنت",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "padlock",
+          "say": "رمز القفل في شريط العنوان يعني أمرًا واحدًا فقط: أن الاتصال مشفر. لكنه لا يخبرك بمن يدير الموقع.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "read-domain",
+          "say": "ومعظم مواقع الاحتيال تحمل رمز القفل أيضًا. لذلك اقرأ النطاق نفسه.",
+          "mood": "think",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "sahilbank-giris.info",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/login"
+                }
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "search-ads",
+          "say": "قد تكون النتيجة الأولى في محرك البحث إعلانًا، فالمحتالون يشترون إعلانات بأسماء مواقع معروفة.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "fake-update",
+          "say": "إذا قال لك موقع إن متصفحك قديم، وعرض عليك تنزيل تحديث، فهذا فخ. المتصفحات تحدث نفسها بنفسها.",
+          "mood": "alert",
+          "visual": {
+            "kind": "illustration",
+            "id": "update"
+          }
+        },
+        {
+          "id": "warnings",
+          "say": "إذا عرض متصفحك تحذيرًا أحمر، فارجع. إنه يوقفك ليحميك.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "fake-portal",
+      "prompt": "ابحث عن الأجزاء المشبوهة في صفحة تسجيل الدخول هذه.",
+      "artifact": {
+        "kind": "login",
+        "brand": "DövlətPortal",
+        "url": [
+          {
+            "text": "https://",
+            "spot": "padlock"
+          },
+          {
+            "text": "dovletportal-az",
+            "spot": "lookalike"
+          },
+          {
+            "text": ".online",
+            "spot": "tld"
+          },
+          {
+            "text": "/giris"
+          }
+        ],
+        "fields": [
+          "رمز الهوية الشخصية",
+          "كلمة المرور"
+        ],
+        "button": "تسجيل الدخول"
+      },
+      "spots": [
+        {
+          "id": "padlock",
+          "label": "رمز القفل",
+          "explain": "يوجد رمز قفل، لكنه يعني التشفير فقط، ولا يثبت أن الموقع حقيقي."
+        },
+        {
+          "id": "lookalike",
+          "label": "اسم مشابه",
+          "explain": "أضيفت إلى الاسم الرسمي شرطة والحرفان az. إنه نطاق مزيف مشابه."
+        },
+        {
+          "id": "tld",
+          "label": "نهاية خاطئة",
+          "explain": "ينتهي النطاق بالمقطع .online، أما البوابة الرسمية فعنوانها dovletportal.az."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "swipe",
+      "id": "click-or-not",
+      "prompt": "أي هذه الروابط يمكن فتحها بأمان؟",
+      "cards": [
+        {
+          "id": "free-download",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://free-download-pdf.top/Sened_pulsuz.exe"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "ملف البرنامج القادم من موقع تنزيل مجاني غالبًا ما يكون ضارًا. احصل على البرامج عن طريق الدعم الفني."
+        },
+        {
+          "id": "official",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://dovletportal.az/xidmetler/arayis"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "النطاق هو البوابة الرسمية نفسها: dovletportal.az. لا كلمات إضافية ولا شرطات."
+        },
+        {
+          "id": "subdomain-trick",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://sahilbank.az.hesab-yoxla.info/login"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "النطاق الحقيقي هو الجزء الأخير: hesab-yoxla.info. أما sahilbank.az في البداية فمجرد خدعة."
+        },
+        {
+          "id": "update-exe",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://brauzer-yenile.top/update.exe"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "تحديثات المتصفح لا يتم تنزيلها من المواقع، فالمتصفح يحدث نفسه بنفسه."
+        },
+        {
+          "id": "bank-path",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://www.sahilbank.az/az/kartlar"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "النطاق هو sahilbank.az، والباقي مجرد مسار الصفحة."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "padlock-meaning",
+      "question": {
+        "prompt": "يوجد رمز قفل في شريط العنوان. ماذا يعني ذلك؟",
+        "options": [
+          {
+            "id": "safe-site",
+            "label": "الموقع مفحوص وآمن",
+            "correct": false,
+            "feedback": "لا. المواقع المزيفة تحصل على رمز القفل بسهولة أيضًا."
+          },
+          {
+            "id": "encrypted",
+            "label": "الاتصال بينك وبين الموقع مشفر",
+            "correct": true,
+            "feedback": "صحيح. لكن الموقع قد يكون مزيفًا مع ذلك."
+          },
+          {
+            "id": "state-approved",
+            "label": "الموقع معتمد من الدولة",
+            "correct": false,
+            "feedback": "رمز القفل ليس اعتمادًا حكوميًا من أي نوع."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://"
+              },
+              {
+                "text": "sahilbank-giris.info",
+                "spot": "domain"
+              },
+              {
+                "text": "/login"
+              }
+            ]
+          }
+        }
+      },
+      "explain": "رمز القفل ضروري لكنه غير كاف. اقرأ النطاق نفسه دائمًا."
+    },
+    {
+      "type": "scenario",
+      "id": "sudden-popup",
+      "title": "نافذة منبثقة مفاجئة",
+      "start": "popup",
+      "nodes": [
+        {
+          "id": "popup",
+          "text": "أنت تقرأ موقعًا إخباريًا. فجأة تملأ الشاشة نافذة حمراء: حاسوبك مصاب، اتصل بالرقم +994 12 000 04 19. ويعلو صوت إنذار.",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          },
+          "choices": [
+            {
+              "label": "أتصل بالرقم",
+              "next": "operator",
+              "feedback": "هذا احتيال الدعم الفني المزيف. لنر ما سيحدث."
+            },
+            {
+              "label": "أضغط زر «تنظيف»",
+              "outcome": "compromised",
+              "feedback": "تم تنزيل برمجيات ضارة على جهازك بمجرد ضغطك على الزر. لا تضغط على أي شيء في مثل هذه النافذة."
+            },
+            {
+              "label": "أغلق علامة التبويب، أو المتصفح كله إذا لزم الأمر",
+              "next": "restore",
+              "feedback": "صحيح. هذه النافذة مجرد صفحة ويب، وحاسوبك غير مصاب."
+            }
+          ]
+        },
+        {
+          "id": "operator",
+          "text": "نحتاج إلى الاتصال بحاسوبك عن بعد. ثبت هذا البرنامج، واقرأ لي الرمز الظاهر على الشاشة.",
+          "speaker": "موظف الدعم",
+          "voice": "man",
+          "channel": "phone",
+          "spoken": "نحتاج إلى الاتصال بحاسوبك عن بعد. <breath> ثبت هذا البرنامج، واقرأ لي الرمز الظاهر على الشاشة.",
+          "choices": [
+            {
+              "label": "أثبت البرنامج",
+              "outcome": "compromised",
+              "feedback": "أصبح لدى المحتال الآن وصول كامل إلى حاسوبك. افصله عن الشبكة وأبلغ فورًا."
+            },
+            {
+              "label": "أنهي المكالمة وأخبر الدعم الفني",
+              "outcome": "risky",
+              "feedback": "توقفت في الوقت المناسب. لكن لا تتصل أبدًا برقم يظهر في نافذة كهذه."
+            }
+          ]
+        },
+        {
+          "id": "restore",
+          "text": "تعيد فتح المتصفح، فيعرض عليك استعادة علامات التبويب السابقة.",
+          "choices": [
+            {
+              "label": "لا أستعيدها، وأرسل إلى الدعم الفني رسالة قصيرة",
+              "outcome": "safe",
+              "feedback": "أحسنت. النافذة لم تثبت أي شيء، والدعم الفني على علم بما حدث."
+            },
+            {
+              "label": "أستعيد علامات التبويب",
+              "outcome": "risky",
+              "feedback": "قد تفتح النافذة المزيفة نفسها مرة أخرى. تجنب استعادة علامات التبويب."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "رمز القفل يعني التشفير فقط: اقرأ النطاق.",
+        "ثق بالإشارات المرجعية أو بالعناوين التي تكتبها بنفسك، لا بالإعلانات.",
+        "النوافذ المنبثقة التي تطالبك بالتحديث فورًا أو تزعم أن جهازك مصاب فخاخ."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

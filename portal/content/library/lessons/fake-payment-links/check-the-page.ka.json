@@ -1,0 +1,383 @@
+{
+ "id": "check-the-page",
+ "title": "შეამოწმეთ გვერდი",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "cp-tutor",
+   "beats": [
+    {
+     "id": "cp-b1",
+     "say": "გადახდის ყალბი გვერდი შეიძლება ნამდვილის ზუსტი ასლი იყოს.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "cp-b2",
+     "say": "ლოგო, ფერები და ღილაკები იგივეა. განსხვავება მისამართის ზოლშია და იმაში, რასაც გვერდი ითხოვს.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "e-xidmet-fake",
+       "brand": "e-Xidmət პორტალი",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "e-xidmet-cerime.example.net",
+         "spot": "domain"
+        },
+        {
+         "text": "/odenis"
+        }
+       ],
+       "fields": [
+        "ბარათის ნომერი",
+        "მოქმედების ვადა",
+        "CVV",
+        "SMS-კოდი"
+       ],
+       "button": "გადახდა: 40 AZN"
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "cp-b3",
+     "say": "ბოქლომიც არაფერს ამტკიცებს: ყალბი საიტების უმეტესობას ის აქვს.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "cp-b4",
+     "say": "ყველაზე უსაფრთხო გზა: პორტალი სანიშნიდან გახსენით ან მისამართი თავად აკრიფეთ.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "cp-swipe",
+   "prompt": "ეს გვერდი ნამდვილია თუ ყალბი?",
+   "cards": [
+    {
+     "id": "real-fines",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet",
+      "brand": "e-Xidmət პორტალი",
+      "url": [
+       {
+        "text": "https://e-xidmet.example/cerimeler"
+       }
+      ],
+      "fields": [
+       "პირადი ნომერი",
+       "პაროლი"
+      ],
+      "button": "შესვლა"
+     },
+     "verdict": "safe",
+     "explain": "ეს პორტალის საკუთარი დომენია და ის თავად გახსენით. ჯარიმები სწორედ აქ უნდა შეამოწმოთ."
+    },
+    {
+     "id": "fake-discount",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet-fake",
+      "brand": "e-Xidmət პორტალი",
+      "url": [
+       {
+        "text": "https://e-xidmet-endirim.example.net/cerime"
+       }
+      ],
+      "fields": [
+       "ბარათის ნომერი",
+       "მოქმედების ვადა",
+       "CVV",
+       "SMS-კოდი"
+      ],
+      "button": "გადახდა 50%-იანი ფასდაკლებით"
+     },
+     "verdict": "threat",
+     "explain": "დომენი სხვაა, გვერდი კი ყველაფერს ერთად ითხოვს: ბარათს, CVV-კოდს და SMS-კოდს. ეს მონაცემების მოსაპარი ფორმაა."
+    },
+    {
+     "id": "app-notice",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "e-xidmet",
+      "app": "e-Xidmət",
+      "title": [
+       {
+        "text": "ახალი შეტყობინება"
+       }
+      ],
+      "body": [
+       {
+        "text": "თქვენს სახელზე რეგისტრირებულია 1 ჯარიმა. დეტალები: აპლიკაციის განყოფილება „ჯარიმები“."
+       }
+      ],
+      "time": "09:15"
+     },
+     "verdict": "safe",
+     "explain": "შეტყობინება ოფიციალურ აპლიკაციაშია და ბმულს არ შეიცავს. ჯარიმა იქვე, აპლიკაციაში შეამოწმეთ და გადაიხადეთ."
+    },
+    {
+     "id": "fake-benefit",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet-fake",
+      "brand": "ოჯახის მხარდაჭერა",
+      "url": [
+       {
+        "text": "https://ailedestek-qeydiyyat.example.net"
+       }
+      ],
+      "fields": [
+       "სახელი და გვარი",
+       "პირადი ნომერი",
+       "ბარათის ნომერი",
+       "CVV"
+      ],
+      "button": "შემწეობის მიღება"
+     },
+     "verdict": "threat",
+     "explain": "ფულის მისაღებად ბარათის უკანა მხარეს მითითებული კოდი არასოდეს არის საჭირო. სახელმწიფო შემწეობა ბმულით რეგისტრაციას არ მოითხოვს."
+    },
+    {
+     "id": "fake-gateway",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2d-manatpay-fake",
+      "brand": "ManatPay",
+      "url": [
+       {
+        "text": "https://manatpay-secure.example.net/3ds"
+       }
+      ],
+      "fields": [
+       "ბარათის ნომერი",
+       "CVV",
+       "SMS-კოდი",
+       "ბარათის PIN-კოდი"
+      ],
+      "button": "დადასტურება"
+     },
+     "verdict": "threat",
+     "explain": "გადახდის არცერთი გვერდი ბარათის PIN-კოდს არასოდეს ითხოვს. PIN-კოდი მხოლოდ ბანკომატებსა და ბარათის ტერმინალებში გჭირდებათ."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "cp-sim",
+   "environment": "browser",
+   "title": "ბმული ჯარიმაზე",
+   "intro": "მეგობარმა ჯარიმის ბმული გამოგიგზავნათ და თქვენ უკვე გახსენით. ბრაუზერში ყოველ ნაბიჯზე სწორი გადაწყვეტილება მიიღეთ.",
+   "steps": [
+    {
+     "id": "fake-fine-page",
+     "label": "გადაუხდელი ჯარიმა: 80 AZN. დღეს – 50%-იანი ფასდაკლება",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "e-xidmet-fake",
+      "url": [
+       {
+        "text": "https://",
+        "reveal": "e-xidmet-cerime.example.net"
+       },
+       {
+        "text": "e-xidmet-cerime.example.net"
+       },
+       {
+        "text": "/odenis"
+       }
+      ]
+     },
+     "say": "მისამართის ზოლს დააკვირდით.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "ფასდაკლებით გადახდა",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "ფასდაკლება იმისთვისაა, რომ აგაჩქაროთ. ახლა ნახეთ, რას ითხოვს გვერდი."
+      },
+      {
+       "id": "close",
+       "label": "ჩანართის დახურვა",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "სწორია, ეს პორტალის საკუთარი დომენი არ არის. ახლა პორტალი თავად გახსენით.",
+       "next": "real-portal"
+      }
+     ]
+    },
+    {
+     "id": "card-form",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet-fake",
+      "brand": "e-Xidmət პორტალი",
+      "url": [
+       {
+        "text": "https://e-xidmet-cerime.example.net",
+        "reveal": "e-xidmet-cerime.example.net"
+       }
+      ],
+      "fields": [
+       "ბარათის ნომერი",
+       "მოქმედების ვადა",
+       "CVV",
+       "SMS-კოდი"
+      ],
+      "button": "გადახდა: 40 AZN"
+     },
+     "say": "გვერდი ბარათის მონაცემებსა და SMS-კოდს ერთად ითხოვს.",
+     "actions": [
+      {
+       "id": "submit",
+       "label": "გადახდა: 40 AZN",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "თქვენი ბარათის მონაცემები თაღლითებს გაეგზავნა. ახლავე დარეკეთ ბანკში ბარათზე მითითებულ ნომერზე."
+      },
+      {
+       "id": "close",
+       "label": "ჩანართის დახურვა",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "სწორი გადაწყვეტილებაა. არაფერი აგიკრეფიათ, ახლა ჯარიმა ოფიციალურ პორტალზე შეამოწმეთ."
+      }
+     ]
+    },
+    {
+     "id": "real-portal",
+     "label": "ჯარიმები: აქტიური ჯარიმები არ არის",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "e-xidmet",
+      "url": [
+       {
+        "text": "https://e-xidmet.example/cerimeler",
+        "reveal": "e-xidmet.example"
+       }
+      ]
+     },
+     "say": "პორტალი სანიშნიდან გახსენით.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "ჯარიმების ნახვა",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "სწორია. ოფიციალური პორტალი ჯარიმას არ აჩვენებს, ესე იგი ბმული ყალბი იყო."
+      },
+      {
+       "id": "tell-friend",
+       "label": "მეგობრის გაფრთხილება",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "შესანიშნავია. უთხარით მეგობარს, რომელმაც ბმული გამოგიგზავნათ, რომ იქ არაფერი აკრიფოს."
+      }
+     ]
+    },
+    {
+     "id": "benefit-page",
+     "label": "ოჯახის მხარდაჭერა: რეგისტრაცია დღეს მთავრდება",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "e-xidmet-fake",
+      "url": [
+       {
+        "text": "https://ailedestek-qeydiyyat.example.net",
+        "reveal": "ailedestek-qeydiyyat.example.net"
+       }
+      ]
+     },
+     "say": "ამჯერად მეზობელმა შემწეობის ბმული გამოგიგზავნათ.",
+     "actions": [
+      {
+       "id": "register",
+       "label": "რეგისტრაცია",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "ეს ფორმა ბარათის მონაცემებს აგროვებს. სახელმწიფო შემწეობისთვის ბმულით რეგისტრაცია არასოდეს არის საჭირო."
+      },
+      {
+       "id": "close",
+       "label": "ჩანართის დახურვა",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "სწორია. ნებისმიერი შემწეობა მხოლოდ ოფიციალურ პორტალზე შეამოწმეთ."
+      },
+      {
+       "id": "report",
+       "label": "ყალბი საიტის შესახებ შეტყობინება",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "შესანიშნავია. თქვენი შეტყობინება ყალბი საიტის დაბლოკვას შეუწყობს ხელს და სხვებსაც დაიცავს."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "cp-match",
+   "prompt": "დაუკავშირეთ ის, რასაც გვერდი ითხოვს, იმას, თუ რას ნიშნავს ეს.",
+   "pairs": [
+    {
+     "id": "pin",
+     "left": "ბარათის PIN-კოდი",
+     "right": "გადახდის არცერთი გვერდი მას არასოდეს ითხოვს"
+    },
+    {
+     "id": "sms-code",
+     "left": "ბანკის SMS-კოდი",
+     "right": "გადახდას ადასტურებს: ჯერ თანხა წაიკითხეთ"
+    },
+    {
+     "id": "benefit-cvv",
+     "left": "ბარათის უკანა მხარის კოდი შემწეობის მისაღებად",
+     "right": "ფულის მისაღებად საჭირო არ არის"
+    },
+    {
+     "id": "discount",
+     "left": "ფასდაკლება, თუ დღესვე გადაიხდით",
+     "right": "გაჩქარებენ, რომ შეუმოწმებლად გადაიხადოთ"
+    }
+   ],
+   "explain": "თუ დარწმუნებული არ ხართ, არ გადაიხადოთ. თავად შეამოწმეთ ოფიციალურ პორტალზე ან დარეკეთ პოლიციაში 102-ზე."
+  },
+  {
+   "type": "recap",
+   "id": "cp-recap",
+   "points": [
+    "წაიკითხეთ მისამართის ზოლი: ლოგო და ბოქლომი არაფერს ამტკიცებს.",
+    "გვერდი, რომელიც PIN-კოდს ან შემწეობისთვის ბარათის კოდს ითხოვს, ყალბია.",
+    "ეჭვის შემთხვევაში: ETX 1654 ან პოლიცია 102."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

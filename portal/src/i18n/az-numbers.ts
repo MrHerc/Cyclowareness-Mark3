@@ -4,7 +4,7 @@
  * az message ({count, number}, the # of a plural) prints 1234.5 as "1,234.5" instead of "1.234,5",
  * unlike the server's HTML, which also breaks hydration. Such a browser loads FormatJS's polyfill
  * (az-numbers-polyfill.ts) before anything formats an az message, see `<AzNumbersGate>`. Browsers
- * with the data, en and ru pages and the server (Node has full ICU) never load it; Next compiles
+ * with the data, pages in the other languages and the server (Node has full ICU) never load it; Next compiles
  * `typeof window` to a constant, so the chunk is not even part of the server bundle.
  */
 

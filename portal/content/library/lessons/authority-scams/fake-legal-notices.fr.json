@@ -1,0 +1,521 @@
+{
+ "id": "fake-legal-notices",
+ "title": "Fausses convocations",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l1-tutor",
+   "beats": [
+    {
+     "id": "l1-b1",
+     "say": "Affaire pénale, convocation au tribunal, dette fiscale. Ces mots font peur, et les escrocs comptent bien là-dessus.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "l1-b2",
+     "say": "Ce genre d’e-mails arrive aussi sur les adresses des institutions publiques. La pièce jointe cache souvent un logiciel malveillant.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "istintaq-buro-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Bureau central d’enquêtes"
+         }
+        ],
+        "address": [
+         {
+          "text": "bildiris@istintaq-buro-gov.test"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Avis concernant une affaire pénale"
+        }
+       ],
+       "time": "08:47",
+       "body": [
+        [
+         {
+          "text": "Votre nom figure dans une affaire pénale. Le dossier est en pièce jointe."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Is_materiallari.zip",
+           "spot": "archive"
+          }
+         ],
+         "size": "312 Ko"
+        }
+       ]
+      }
+     },
+     "highlight": "archive"
+    },
+    {
+     "id": "l1-b3",
+     "say": "D’autres exigent le paiement immédiat d’une dette ou d’une amende, par un lien.",
+     "mood": "think",
+     "gesture": "point-right",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "vergi-nezaret-fake",
+       "sender": [
+        {
+         "text": "VergiNezaret"
+        }
+       ],
+       "time": "09:15",
+       "messages": [
+        [
+         {
+          "text": "Votre dette fiscale s’élève à 186,40 AZN. Payez aujourd’hui : "
+         },
+         {
+          "text": "vergi-borc-odenis.test",
+          "spot": "pay-link"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "pay-link"
+    },
+    {
+     "id": "l1-b4",
+     "say": "Vérifiez l’avis vous-même : appelez le numéro indiqué sur le site officiel de l’organisme, ou passez par son portail officiel.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l1-hotspot",
+   "prompt": "Trouvez les signes de fraude dans cet avis.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "istintaq-buro-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Bureau central d’enquêtes"
+      }
+     ],
+     "address": [
+      {
+       "text": "bildiris@"
+      },
+      {
+       "text": "istintaq-buro-gov.test",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Avis concernant l’affaire pénale n° 2026/4471"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Cher citoyen,",
+       "spot": "generic"
+      }
+     ],
+     [
+      {
+       "text": "Votre nom figure parmi les suspects d’une affaire pénale. "
+      },
+      {
+       "text": "Sans réponse de votre part sous 24 heures, un mandat d’arrêt sera délivré.",
+       "spot": "threat"
+      }
+     ],
+     [
+      {
+       "text": "Ouvrez la pièce jointe pour consulter le dossier."
+      }
+     ],
+     [
+      {
+       "text": "Ne parlez de cet e-mail à personne.",
+       "spot": "secrecy"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Is_materiallari.zip",
+        "spot": "archive"
+       }
+      ],
+      "size": "312 Ko"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Faux domaine",
+     "explain": "Le domaine a l’air officiel, mais il ne l’est pas. Ouvrez vous-même le site de l’organisme et comparez."
+    },
+    {
+     "id": "generic",
+     "label": "Salutation impersonnelle",
+     "explain": "Un véritable avis qui vous est adressé porte votre nom, pas un « Cher citoyen » impersonnel."
+    },
+    {
+     "id": "threat",
+     "label": "Menace d’arrestation et délai de 24 heures",
+     "explain": "La peur et un délai très court vous poussent à agir sans réfléchir."
+    },
+    {
+     "id": "secrecy",
+     "label": "Interdiction d’en parler",
+     "explain": "On veut vous empêcher de demander de l’aide. Au contraire, prévenez immédiatement l’équipe sécurité."
+    },
+    {
+     "id": "archive",
+     "label": "Fichier d’archive",
+     "explain": "Une archive peut contenir un logiciel malveillant. N’ouvrez jamais une archive que vous n’attendiez pas."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "l1-sim",
+   "environment": "inbox",
+   "title": "Des e-mails qui font peur",
+   "intro": "Votre boîte de réception contient quatre e-mails envoyés au nom d’organismes officiels. Examinez-les un par un, puis décidez.",
+   "steps": [
+    {
+     "id": "m1",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "istintaq-buro-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Bureau central d’enquêtes"
+        }
+       ],
+       "address": [
+        {
+         "text": "bildiris@istintaq-buro-gov.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Avis concernant une affaire pénale"
+       }
+      ],
+      "time": "08:47",
+      "body": [
+       [
+        {
+         "text": "Votre nom figure dans une affaire pénale. Consultez le dossier joint sous 24 heures."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Is_materiallari.zip"
+         }
+        ],
+        "size": "312 Ko"
+       }
+      ]
+     },
+     "say": "Regardez le domaine de l’expéditeur.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Faux domaine, menace et archive : en le signalant, vous protégez aussi vos collègues."
+      },
+      {
+       "id": "open",
+       "label": "Ouvrir la pièce jointe",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Le fichier contenu dans l’archive a lancé un logiciel malveillant. Déconnectez l’ordinateur du réseau et signalez-le immédiatement."
+      },
+      {
+       "id": "reply",
+       "label": "Répondre",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Votre réponse confirme à l’escroc que votre adresse est active. D’autres menaces vont suivre."
+      }
+     ]
+    },
+    {
+     "id": "m2",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "adalet-mehkemesi-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Tribunal de la capitale"
+        }
+       ],
+       "address": [
+        {
+         "text": "cagiris@mehkeme-cagiris.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Convocation au tribunal"
+       }
+      ],
+      "time": "09:30",
+      "body": [
+       [
+        {
+         "text": "Vous devez vous présenter au tribunal demain à 10:00. "
+        },
+        {
+         "text": "Téléchargez votre convocation ici",
+         "link": {
+          "label": "Téléchargez votre convocation ici",
+          "href": "https://mehkeme-cagiris.test/vereqe"
+         }
+        },
+        {
+         "text": "."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "click",
+       "label": "Télécharger la convocation",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Le lien a téléchargé un fichier malveillant. Il fallait vérifier la convocation en appelant le numéro officiel du tribunal."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Signalez une convocation venue d’un domaine qui n’est pas celui du tribunal et, au besoin, appelez vous-même le tribunal."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Sans danger. Mais si vous le signalez, vos collègues sont protégés eux aussi."
+      }
+     ]
+    },
+    {
+     "id": "m3",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "vergi-nezaret-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Centre de contrôle fiscal"
+        }
+       ],
+       "address": [
+        {
+         "text": "info@vergi-borc-odenis.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Dernier avertissement : dette fiscale de 186,40 AZN"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Si vous ne payez pas aujourd’hui, vos comptes bancaires seront gelés. "
+        },
+        {
+         "text": "Payer en ligne",
+         "link": {
+          "label": "Payer en ligne",
+          "href": "https://vergi-borc-odenis.test/pay"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "click",
+       "label": "Payer en ligne",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "La fausse page de paiement a récupéré les données de votre carte. Appelez tout de suite votre banque et faites bloquer la carte."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Ne vérifiez une dette qu’en vous connectant vous-même au portail officiel."
+      }
+     ]
+    },
+    {
+     "id": "m4",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Service juridique"
+        }
+       ],
+       "address": [
+        {
+         "text": "huquq@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Attention : fausses convocations judiciaires"
+       }
+      ],
+      "time": "10:40",
+      "body": [
+       [
+        {
+         "text": "Cette semaine, des agents reçoivent de faux e-mails au sujet d’une « affaire pénale ». N’ouvrez pas les pièces jointes et signalez ces e-mails comme hameçonnage."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Marquer comme fiable",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Exact. C’est un avertissement de votre propre service juridique, sans lien ni pièce jointe."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Tous les e-mails ne sont pas des menaces. Celui-ci est un avertissement utile de votre propre institution."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "l1-choice",
+   "question": {
+    "prompt": "L’e-mail affirme que l’affaire sera classée si vous payez aujourd’hui la moitié de l’amende.",
+    "options": [
+     {
+      "id": "pay",
+      "label": "Je paie pour que la situation ne s’aggrave pas",
+      "correct": false,
+      "feedback": "Les organismes officiels ne « classent » pas une affaire contre un paiement par lien. L’argent part directement chez l’escroc."
+     },
+     {
+      "id": "call-letter",
+      "label": "J’appelle le numéro indiqué dans l’e-mail pour me renseigner",
+      "correct": false,
+      "feedback": "Ce numéro appartient à l’escroc. Il ne fera que vous effrayer davantage."
+     },
+     {
+      "id": "verify",
+      "label": "Je cherche le numéro de l’organisme sur son site officiel et j’appelle",
+      "correct": true,
+      "feedback": "Exact. Quand vous trouvez le contact vous-même, un faux avis est immédiatement démasqué."
+     }
+    ]
+   },
+   "explain": "Menaces, urgence et demande de paiement réunies : c’est une fraude. Signalez aussi l’e-mail à l’équipe sécurité."
+  },
+  {
+   "type": "match",
+   "id": "l1-match",
+   "prompt": "Associez chaque technique à son objectif.",
+   "pairs": [
+    {
+     "id": "arrest",
+     "left": "Menace d’arrestation ou de poursuites pénales",
+     "right": "Faire peur pour ne pas vous laisser le temps de réfléchir"
+    },
+    {
+     "id": "secret",
+     "left": "« N’en parlez à personne »",
+     "right": "Vous empêcher de demander conseil"
+    },
+    {
+     "id": "fee",
+     "left": "« Payez aujourd’hui pour classer l’affaire »",
+     "right": "Prendre directement votre argent"
+    },
+    {
+     "id": "archive",
+     "left": "Une archive jointe ou un lien",
+     "right": "Installer un logiciel malveillant sur votre ordinateur"
+    }
+   ],
+   "explain": "Aussi grave que paraisse la menace, la marche à suivre ne change pas : s’arrêter, vérifier par un canal officiel, signaler."
+  },
+  {
+   "type": "recap",
+   "id": "l1-recap",
+   "points": [
+    "Menaces, urgence et demandes de paiement : ce sont les signes d’un faux avis.",
+    "N’ouvrez pas de pièces jointes ni de liens inattendus, et signalez l’e-mail comme hameçonnage.",
+    "Vérifiez un avis vous-même, avec le numéro indiqué sur le site officiel de l’organisme."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

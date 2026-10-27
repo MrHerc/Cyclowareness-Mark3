@@ -1,0 +1,348 @@
+{
+ "id": "stop-fake-news",
+ "title": "Opriți știrile false",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Știrile false arată adesea ca o decizie oficială și se răspândesc repede în grupurile de chat.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": { "kind": "illustration", "id": "social" }
+    },
+    {
+     "id": "b2",
+     "say": "Nu are sursă, nu are dată, vă grăbește și vă cere să o trimiteți tuturor.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [{ "text": "Grupul departamentului" }],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          { "text": "Redirecționat. ", "spot": "fwd" },
+          { "text": "Toate cardurile de salariu se schimbă de mâine! " },
+          { "text": "Trimiteți tuturor!", "spot": "share-all" }
+         ],
+         "time": "08:40"
+        }
+       ]
+      }
+     },
+     "highlight": "fwd"
+    },
+    {
+     "id": "b3",
+     "say": "Înainte să distribuiți, verificați știrea pe site-ul organizației și în surse de știri de încredere.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": { "kind": "illustration", "id": "eye" }
+    },
+    {
+     "id": "b4",
+     "say": "Dacă este falsă, raportați-o platformei și postați în grup o scurtă rectificare.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": { "kind": "illustration", "id": "flag" }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "group-news",
+   "environment": "phone",
+   "title": "Știri în conversațiile dumneavoastră",
+   "intro": "În conversațiile de la serviciu și din familie sosesc știri. Ce faceți cu fiecare?",
+   "steps": [
+    {
+     "id": "salary-card",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [{ "text": "Grupul departamentului" }],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         { "text": "Redirecționat. Urgent! De mâine, cardurile de salariu ale funcționarilor publici se înlocuiesc. Actualizați-vă datele ca să nu vi se blocheze cardul vechi: " },
+         {
+          "text": "maas-kart-yeni.example.net",
+          "link": { "label": "maas-kart-yeni.example.net", "href": "https://maas-kart-yeni.example.net" }
+         }
+        ],
+        "time": "08:45"
+       }
+      ]
+     },
+     "say": "A postat-o un coleg, dar nu este indicată nicio sursă.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Deschideți linkul",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Această pagină colectează datele cardurilor. Contabilitatea anunță schimbarea cardurilor de salariu prin canale oficiale."
+      },
+      {
+       "id": "verify",
+       "label": "Întrebați la contabilitate",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. O decizie internă o verificați la o sursă internă, la un număr pe care îl cunoașteți."
+      },
+      {
+       "id": "warn",
+       "label": "Răspundeți: neverificat, nu deschideți linkul",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bine, v-ați protejat colegii. Arătați mesajul și echipei de securitate."
+      },
+      {
+       "id": "share",
+       "label": "Trimiteți în grupul familiei",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Dacă răspândiți știri neverificate, îi atrageți și pe alții în capcană."
+      }
+     ]
+    },
+    {
+     "id": "news-site",
+     "label": "Oficial: toate datoriile la utilități sunt anulate, înscrierea se încheie astăzi",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-gundem24-fake",
+      "url": [{ "text": "https://gundem24-az.example.net/xeber/borclar-silinir" }]
+     },
+     "say": "Pare un site de știri cunoscut. Verificați adresa.",
+     "actions": [
+      {
+       "id": "register",
+       "label": "Înscrieți-vă",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Adresa site-ului Gündəm24 este gundem24.example, iar acesta este o clonă. Formularul colectează date personale."
+      },
+      {
+       "id": "share",
+       "label": "Distribuiți",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Ați răspândi un site clonat. Verificați adresa și sursa înainte să distribuiți."
+      },
+      {
+       "id": "verify",
+       "label": "Verificați site-ul oficial",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. O astfel de decizie ar apărea pe site-ul propriu al organizației."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bine. Adresa nu era domeniul real al Gündəm24."
+      }
+     ]
+    },
+    {
+     "id": "relatives-ask",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [{ "text": "Grupul familiei" }],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         { "text": "Lucrează cineva de aici la o instituție de stat? Se zice că de mâine internetul din Baku va fi oprit trei zile. E adevărat?" }
+        ],
+        "time": "19:20"
+       }
+      ]
+     },
+     "say": "Rudele au încredere în dumneavoastră.",
+     "actions": [
+      {
+       "id": "confirm",
+       "label": "Probabil e adevărat, pregătiți-vă",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Cuvântul unui angajat de la stat dă greutate unei știri. Nu confirmați ce nu știți."
+      },
+      {
+       "id": "check",
+       "label": "Nu știu, verific la o sursă oficială și revin",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Corect. Un „nu știu” sincer oprește o poveste falsă."
+      },
+      {
+       "id": "forward",
+       "label": "Redirecționați în alte grupuri",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Ați duce povestea falsă la și mai mulți oameni."
+      }
+     ]
+    },
+    {
+     "id": "fake-office-page",
+     "label": "Ministerul Serviciilor Sociale: 50 de posturi vacante. Taxă de înscriere: 10 AZN",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn-fake",
+      "url": [{ "text": "https://kontakto.example/sxn.nazirlik.vakansiya" }]
+     },
+     "say": "Această pagină a fost deschisă în numele chiar al ministerului în care lucrați.",
+     "actions": [
+      {
+       "id": "apply",
+       "label": "Depuneți candidatura",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Ministerul nu percepe nicio taxă de înscriere. Pagina falsă strânge banii și datele oamenilor."
+      },
+      {
+       "id": "report",
+       "label": "Raportați platformei",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Anunțați și biroul de presă, ca să publice un avertisment oficial."
+      },
+      {
+       "id": "press",
+       "label": "Anunțați biroul de presă",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Excelent. Raportați pagina și platformei, ca să fie ștearsă mai repede."
+      },
+      {
+       "id": "skip",
+       "label": "Ignorați, nu e treaba mea",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Pagina falsă înșală oameni în numele instituției dumneavoastră. Raportarea durează un minut."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "check-tools",
+   "prompt": "Asociați fiecare îndoială cu verificarea potrivită.",
+   "pairs": [
+    { "id": "no-source", "left": "Știrea nu indică nicio sursă", "right": "Căutați pe site-ul oficial al organizației" },
+    { "id": "old-photo", "left": "Fotografia pare cunoscută și veche", "right": "Faceți o căutare inversă după imagine" },
+    { "id": "site-address", "left": "Site-ul seamănă cu un site de știri cunoscut", "right": "Comparați adresa cu domeniul real" },
+    { "id": "fear", "left": "Știrea vă sperie și vă grăbește", "right": "Opriți-vă și verificați înainte să distribuiți" }
+   ],
+   "explain": "Câteva secunde de verificare pot împiedica o poveste falsă să ajungă la mii de oameni."
+  },
+  {
+   "type": "scenario",
+   "id": "shared-by-mistake",
+   "title": "Ați distribuit-o din greșeală",
+   "start": "shared",
+   "nodes": [
+    {
+     "id": "shared",
+     "text": "Azi-dimineață ați postat în grupul familiei știrea „cardurile de salariu se schimbă”. La prânz ați aflat că este falsă.",
+     "choices": [
+      {
+       "label": "O șterg și postez o rectificare",
+       "next": "relative",
+       "feedback": "Corect. O rectificare îi oprește pe cei care au văzut-o deja."
+      },
+      {
+       "label": "O șterg discret",
+       "outcome": "risky",
+       "feedback": "Cei care au văzut-o poate o transmit deja mai departe. O scurtă rectificare rupe lanțul."
+      },
+      {
+       "label": "Nu fac nimic, e prea târziu",
+       "outcome": "risky",
+       "feedback": "Nu este prea târziu: o rectificare tot oprește răspândirea."
+      }
+     ]
+    },
+    {
+     "id": "relative",
+     "text": "Am deschis linkul acela și mi-am introdus datele cardului. Ce fac acum?",
+     "speaker": "Ruda dumneavoastră",
+     "voice": "young-man",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Am deschis linkul acela și mi-am introdus datele cardului. <breath> Ce fac acum?",
+     "choices": [
+      {
+       "label": "Sună acum la bancă, la numărul de pe card, și blochează cardul",
+       "outcome": "safe",
+       "feedback": "Corect. Cu cât cardul este blocat mai repede, cu atât riscul de a pierde bani este mai mic."
+      },
+      {
+       "label": "Nu-ți face griji, poate nu se întâmplă nimic",
+       "outcome": "compromised",
+       "feedback": "Escrocii folosesc adesea datele cardului imediat."
+      },
+      {
+       "label": "Șterge ce ai introdus pe site",
+       "outcome": "risky",
+       "feedback": "Datele sunt deja la escroc. Doar banca poate bloca cardul."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "speak-for-office",
+   "question": {
+    "prompt": "Un jurnalist vă scrie: „Puteți comenta decizia ministerului în care lucrați?” Ce faceți?",
+    "options": [
+     {
+      "id": "press",
+      "label": "Îl îndrum spre biroul de presă",
+      "correct": true,
+      "feedback": "Corect. Doar biroul de presă vorbește în numele organizației."
+     },
+     {
+      "id": "guess",
+      "label": "Spun ce știu",
+      "correct": false,
+      "feedback": "Un comentariu făcut fără informații complete poate deveni o nouă știre falsă, iar „jurnalistul” poate fi și el fals."
+     },
+     {
+      "id": "doc",
+      "label": "Trimit o fotografie a documentului intern",
+      "correct": false,
+      "feedback": "Documentele interne nu se distribuie, iar o fotografie se poate răspândi scoasă din context."
+     }
+    ],
+    "visual": { "kind": "illustration", "id": "social" }
+   },
+   "explain": "Comentariile oficiale vin de la biroul de presă. Așa vă protejați atât pe dumneavoastră, cât și organizația."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Înainte să distribuiți, verificați sursa pe site-ul propriu al organizației.",
+    "Nu confirmați știri despre care aveți îndoieli; biroul de presă vorbește în numele organizației.",
+    "Raportați paginile și știrile false; dacă ați distribuit ceva din greșeală, postați o rectificare."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

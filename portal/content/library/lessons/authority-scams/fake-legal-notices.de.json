@@ -1,0 +1,521 @@
+{
+ "id": "fake-legal-notices",
+ "title": "Gefälschte Behördenschreiben",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l1-tutor",
+   "beats": [
+    {
+     "id": "l1-b1",
+     "say": "Strafverfahren, gerichtliche Vorladung, Steuerschulden: Solche Worte machen Angst, und genau darauf setzen Kriminelle.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "l1-b2",
+     "say": "Solche E-Mails landen auch in den Postfächern staatlicher Stellen. Im Anhang steckt oft Schadsoftware.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "istintaq-buro-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Zentrales Ermittlungsbüro"
+         }
+        ],
+        "address": [
+         {
+          "text": "bildiris@istintaq-buro-gov.test"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Benachrichtigung über ein Strafverfahren"
+        }
+       ],
+       "time": "08:47",
+       "body": [
+        [
+         {
+          "text": "Ihr Name taucht in einem Strafverfahren auf. Die Unterlagen finden Sie im Anhang."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Is_materiallari.zip",
+           "spot": "archive"
+          }
+         ],
+         "size": "312 KB"
+        }
+       ]
+      }
+     },
+     "highlight": "archive"
+    },
+    {
+     "id": "l1-b3",
+     "say": "Andere verlangen per Link die sofortige Zahlung von Schulden oder eines Bußgelds.",
+     "mood": "think",
+     "gesture": "point-right",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "vergi-nezaret-fake",
+       "sender": [
+        {
+         "text": "VergiNezaret"
+        }
+       ],
+       "time": "09:15",
+       "messages": [
+        [
+         {
+          "text": "Ihre Steuerschuld beträgt 186,40 AZN. Zahlen Sie noch heute: "
+         },
+         {
+          "text": "vergi-borc-odenis.test",
+          "spot": "pay-link"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "pay-link"
+    },
+    {
+     "id": "l1-b4",
+     "say": "Prüfen Sie das Schreiben selbst: über die Nummer auf der offiziellen Website der Behörde oder über ihr offizielles Portal.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l1-hotspot",
+   "prompt": "Finden Sie die Anzeichen für Betrug in diesem Schreiben.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "istintaq-buro-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Zentrales Ermittlungsbüro"
+      }
+     ],
+     "address": [
+      {
+       "text": "bildiris@"
+      },
+      {
+       "text": "istintaq-buro-gov.test",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Benachrichtigung über das Strafverfahren Nr. 2026/4471"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Sehr geehrte Bürgerin, sehr geehrter Bürger,",
+       "spot": "generic"
+      }
+     ],
+     [
+      {
+       "text": "gegen Sie wird in einem Strafverfahren ermittelt. "
+      },
+      {
+       "text": "Wenn Sie nicht innerhalb von 24 Stunden antworten, wird ein Haftbefehl erlassen.",
+       "spot": "threat"
+      }
+     ],
+     [
+      {
+       "text": "Öffnen Sie den Anhang, um die Verfahrensunterlagen zu lesen."
+      }
+     ],
+     [
+      {
+       "text": "Erzählen Sie niemandem von dieser E-Mail.",
+       "spot": "secrecy"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Is_materiallari.zip",
+        "spot": "archive"
+       }
+      ],
+      "size": "312 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Gefälschte Domain",
+     "explain": "Die Domain wirkt offiziell, ist es aber nicht. Öffnen Sie die Website der Behörde selbst und vergleichen Sie."
+    },
+    {
+     "id": "generic",
+     "label": "Allgemeine Anrede",
+     "explain": "Ein echtes Schreiben an Sie nennt Ihren Namen, nicht nur „Sehr geehrte Bürgerin, sehr geehrter Bürger“."
+    },
+    {
+     "id": "threat",
+     "label": "Drohung mit Haft und 24 Stunden",
+     "explain": "Angst und eine kurze Frist sollen Sie dazu bringen, ohne nachzudenken zu handeln."
+    },
+    {
+     "id": "secrecy",
+     "label": "Erzählen Sie niemandem davon",
+     "explain": "Man will Sie von jeder Hilfe abschneiden. Informieren Sie stattdessen sofort das Sicherheitsteam."
+    },
+    {
+     "id": "archive",
+     "label": "Archivdatei",
+     "explain": "Ein Archiv kann Schadsoftware enthalten. Öffnen Sie kein Archiv, das Sie nicht erwartet haben."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "l1-sim",
+   "environment": "inbox",
+   "title": "Post, die Angst macht",
+   "intro": "In Ihrem Postfach liegen vier E-Mails im Namen offizieller Stellen. Prüfen Sie jede einzelne und entscheiden Sie.",
+   "steps": [
+    {
+     "id": "m1",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "istintaq-buro-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Zentrales Ermittlungsbüro"
+        }
+       ],
+       "address": [
+        {
+         "text": "bildiris@istintaq-buro-gov.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Benachrichtigung über ein Strafverfahren"
+       }
+      ],
+      "time": "08:47",
+      "body": [
+       [
+        {
+         "text": "Ihr Name taucht in einem Strafverfahren auf. Lesen Sie die beigefügten Unterlagen innerhalb von 24 Stunden."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Is_materiallari.zip"
+         }
+        ],
+        "size": "312 KB"
+       }
+      ]
+     },
+     "say": "Sehen Sie sich die Domain des Absenders an.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Gefälschte Domain, Drohung und Archiv: Ihre Meldung schützt auch Ihre Kolleginnen und Kollegen."
+      },
+      {
+       "id": "open",
+       "label": "Anhang öffnen",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Die Datei im Archiv hat Schadsoftware gestartet. Trennen Sie den Computer vom Netzwerk und melden Sie den Vorfall sofort."
+      },
+      {
+       "id": "reply",
+       "label": "Antworten",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Eine Antwort verrät den Kriminellen, dass Ihre Adresse aktiv ist. Weitere Drohungen werden folgen."
+      }
+     ]
+    },
+    {
+     "id": "m2",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "adalet-mehkemesi-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Hauptstädtisches Gericht"
+        }
+       ],
+       "address": [
+        {
+         "text": "cagiris@mehkeme-cagiris.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Gerichtliche Vorladung"
+       }
+      ],
+      "time": "09:30",
+      "body": [
+       [
+        {
+         "text": "Sie müssen morgen um 10:00 Uhr vor Gericht erscheinen. "
+        },
+        {
+         "text": "Laden Sie die Vorladung hier herunter",
+         "link": {
+          "label": "Laden Sie die Vorladung hier herunter",
+          "href": "https://mehkeme-cagiris.test/vereqe"
+         }
+        },
+        {
+         "text": "."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "click",
+       "label": "Vorladung herunterladen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Über den Link wurde eine schädliche Datei heruntergeladen. Die Vorladung hätten Sie über die offizielle Nummer des Gerichts prüfen sollen."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Melden Sie eine Vorladung von einer fremden Domain und rufen Sie bei Bedarf selbst beim Gericht an."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Sicher. Wenn Sie die E-Mail aber melden, schützen Sie auch Ihre Kolleginnen und Kollegen."
+      }
+     ]
+    },
+    {
+     "id": "m3",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "vergi-nezaret-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Steueraufsichtszentrum"
+        }
+       ],
+       "address": [
+        {
+         "text": "info@vergi-borc-odenis.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Letzte Mahnung: Steuerschuld 186,40 AZN"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Wenn Sie nicht heute zahlen, werden Ihre Bankkonten eingefroren. "
+        },
+        {
+         "text": "Online bezahlen",
+         "link": {
+          "label": "Online bezahlen",
+          "href": "https://vergi-borc-odenis.test/pay"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "click",
+       "label": "Online bezahlen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Die gefälschte Zahlungsseite hat Ihre Kartendaten abgegriffen. Rufen Sie sofort Ihre Bank an und lassen Sie die Karte sperren."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Prüfen Sie angebliche Schulden nur, indem Sie sich selbst im offiziellen Portal anmelden."
+      }
+     ]
+    },
+    {
+     "id": "m4",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Rechtsabteilung"
+        }
+       ],
+       "address": [
+        {
+         "text": "huquq@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Warnung: gefälschte Gerichtsschreiben"
+       }
+      ],
+      "time": "10:40",
+      "body": [
+       [
+        {
+         "text": "Diese Woche erhalten Mitarbeitende gefälschte E-Mails zu angeblichen „Strafverfahren“. Öffnen Sie keine Anhänge und melden Sie solche E-Mails als Phishing."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Als sicher markieren",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine Warnung Ihrer eigenen Rechtsabteilung, ohne Link und ohne Anhang."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Nicht jede E-Mail ist eine Bedrohung. Das ist eine nützliche Warnung Ihrer eigenen Behörde."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "l1-choice",
+   "question": {
+    "prompt": "In der E-Mail steht, das Verfahren werde eingestellt, wenn Sie heute die Hälfte des Bußgelds zahlen.",
+    "options": [
+     {
+      "id": "pay",
+      "label": "Ich zahle, damit es nicht schlimmer wird",
+      "correct": false,
+      "feedback": "Keine Behörde stellt ein Verfahren ein, weil Sie über einen Link bezahlen. Das Geld landet direkt bei den Kriminellen."
+     },
+     {
+      "id": "call-letter",
+      "label": "Ich rufe die Nummer aus der E-Mail an und frage nach",
+      "correct": false,
+      "feedback": "Diese Nummer gehört den Kriminellen. Dort wird man Ihnen nur noch mehr Angst machen."
+     },
+     {
+      "id": "verify",
+      "label": "Ich suche die Nummer der Behörde auf ihrer offiziellen Website und rufe dort an",
+      "correct": true,
+      "feedback": "Richtig. Wenn Sie den Kontakt selbst heraussuchen, fliegt ein gefälschtes Schreiben sofort auf."
+     }
+    ]
+   },
+   "explain": "Drohungen, Zeitdruck und eine Zahlungsforderung zusammen bedeuten Betrug. Melden Sie die E-Mail außerdem dem Sicherheitsteam."
+  },
+  {
+   "type": "match",
+   "id": "l1-match",
+   "prompt": "Ordnen Sie jedem Trick sein Ziel zu.",
+   "pairs": [
+    {
+     "id": "arrest",
+     "left": "Drohung mit Festnahme oder Strafverfahren",
+     "right": "Mit Angst keine Zeit zum Nachdenken lassen"
+    },
+    {
+     "id": "secret",
+     "left": "„Erzählen Sie niemandem davon“",
+     "right": "Sie davon abhalten, sich Rat zu holen"
+    },
+    {
+     "id": "fee",
+     "left": "„Zahlen Sie heute, dann wird das Verfahren eingestellt“",
+     "right": "Direkt an Ihr Geld kommen"
+    },
+    {
+     "id": "archive",
+     "left": "Ein angehängtes Archiv oder ein Link",
+     "right": "Schadsoftware auf Ihrem Computer installieren"
+    }
+   ],
+   "explain": "Wie ernst die Drohung auch klingt, die Schritte sind immer dieselben: innehalten, über einen offiziellen Kanal prüfen, melden."
+  },
+  {
+   "type": "recap",
+   "id": "l1-recap",
+   "points": [
+    "Drohungen, Zeitdruck und Zahlungsforderungen sind Zeichen eines gefälschten Schreibens.",
+    "Öffnen Sie keine unerwarteten Anhänge oder Links, und melden Sie die E-Mail als Phishing.",
+    "Prüfen Sie ein Schreiben selbst über die Nummer auf der offiziellen Website der Behörde."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -38,7 +38,7 @@ export default async function LearnerSandboxPage() {
               {recent.map((a) => (
                 <li key={a.id} className="flex flex-wrap items-center gap-3 py-3">
                   <span className="font-mono text-tab text-ink-subtle">SB-{a.number}</span>
-                  <span className="min-w-0 flex-1 truncate font-mono text-caption">{a.kind === "url" ? defang(a.objectName) : a.objectName}</span>
+                  <span dir="ltr" className="min-w-0 flex-1 truncate font-mono text-caption">{a.kind === "url" ? defang(a.objectName) : a.objectName}</span>
                   <VerdictBadge verdict={a.verdict} />
                   <span className="text-tab tabular-nums">{a.score}/100</span>
                   <span className="text-tab text-ink-subtle">{format.relativeTime(a.createdAt)}</span>

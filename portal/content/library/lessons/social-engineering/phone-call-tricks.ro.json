@@ -1,0 +1,553 @@
+{
+ "id": "phone-call-tricks",
+ "title": "Trucuri la telefon",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l1-tutor",
+   "beats": [
+    {
+     "id": "l1-b1",
+     "say": "Bună ziua! Sunt asistentul dumneavoastră pentru securitate. Astăzi veți învăța să recunoașteți înșelătoriile care vin prin telefon.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "l1-b2",
+     "say": "Pe ecran apare numele băncii, dar numele și numărul unui apelant se falsifică foarte ușor.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "sahilbank",
+       "caller": [
+        {
+         "text": "SahilBank",
+         "spot": "caller-name"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 00 00",
+         "spot": "caller-number"
+        }
+       ],
+       "label": "Apel primit"
+      }
+     },
+     "highlight": "caller-name"
+    },
+    {
+     "id": "l1-b3",
+     "say": "Escrocii vă grăbesc: cardul dumneavoastră este blocat, banii pleacă din cont. Frica și graba sunt armele lor principale.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     },
+     "checkpoint": {
+      "prompt": "Apelantul vă cere codul primit prin SMS. Ce faceți?",
+      "options": [
+       {
+        "id": "say-code",
+        "label": "Îi citesc codul",
+        "correct": false,
+        "feedback": "Acest cod vă poate deschide contul sau poate aproba o plată. O bancă nu vi-l cere niciodată."
+       },
+       {
+        "id": "call-back",
+        "label": "Închid și sun eu la bancă",
+        "correct": true,
+        "feedback": "Corect. Această verificare îi strică escrocului tot planul."
+       }
+      ]
+     }
+    },
+    {
+     "id": "l1-b5",
+     "say": "Regula de aur: închideți și sunați chiar dumneavoastră la numărul oficial, de pe card sau de pe site-ul oficial.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "bank-vishing",
+   "environment": "call",
+   "title": "Un apel de la bancă",
+   "intro": "Pe ecran apare numele băncii dumneavoastră. Ascultați apelantul și alegeți răspunsul la fiecare pas.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank",
+      "caller": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 00 00"
+       }
+      ],
+      "label": "Bancă",
+      "voice": "man"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Răspundeți",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Nu este periculos să răspundeți. Contează ce spuneți."
+      },
+      {
+       "id": "decline",
+       "label": "Respingeți",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Este și aceasta o variantă bună. Dacă vă îngrijorează ceva, sunați chiar dumneavoastră la numărul de pe spatele cardului.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "alarm",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank",
+      "caller": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 00 00"
+       }
+      ],
+      "label": "Bancă",
+      "voice": "man"
+     },
+     "say": "Bună ziua, sunt Fuad Mammadov, de la departamentul de securitate al SahilBank. Chiar acum, cineva încearcă să vă retragă 1.200 de manați de pe card.",
+     "spoken": "Bună ziua, <breath> sunt Fuad Mammadov, de la departamentul de securitate al SahilBank. Chiar acum, cineva încearcă, ăă, să vă retragă 1.200 de manați de pe card.",
+     "actions": [
+      {
+       "id": "card",
+       "label": "Îi spun ultimele cifre ale cardului",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Banca vă cunoaște deja și nu are nevoie de ele. Fiecare detaliu îl face pe escroc mai convingător."
+      },
+      {
+       "id": "keep",
+       "label": "Nu dau la telefon niciun detaliu al cardului",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Nu dați niciodată datele cardului într-un apel primit; numele și numărul pot fi falsificate."
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank",
+      "caller": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 00 00"
+       }
+      ],
+      "label": "Bancă",
+      "voice": "man"
+     },
+     "say": "Aveți cinci minute ca să opriți tranzacția. Citiți-mi codul care tocmai v-a venit pe telefon și nu spuneți nimănui.",
+     "spoken": "Aveți cinci minute ca să opriți tranzacția. <breath> Citiți-mi codul care tocmai v-a venit pe telefon și nu spuneți nimănui.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Îi citesc codul",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Codul din SMS aprobă o plată. Dacă îl citiți, trimiteți chiar dumneavoastră banii."
+      },
+      {
+       "id": "hang",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Corect. Nicio bancă nu cere prin telefon un cod primit prin SMS.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "safe-account",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank",
+      "caller": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 00 00"
+       }
+      ],
+      "label": "Bancă",
+      "voice": "man"
+     },
+     "say": "Atunci mutați-vă banii într-un cont sigur, ca să-i protejați. Vă trimit acum datele prin SMS.",
+     "spoken": "Atunci, ăă, mutați-vă banii într-un cont sigur, ca să-i protejați. <breath> Vă trimit acum datele prin SMS.",
+     "actions": [
+      {
+       "id": "transfer",
+       "label": "Mut banii în contul sigur",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Nu există niciun cont sigur: contul este al escrocului. O bancă nu vă cere niciodată să mutați banii."
+      },
+      {
+       "id": "hang",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "O decizie excelentă. Cererea de a muta banii este ultimul pas al înșelătoriei."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Apelul s-a încheiat. Ce faceți acum?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank",
+      "caller": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 00 00"
+       }
+      ],
+      "label": "Bancă",
+      "voice": "man"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "Sunați la numărul de pe card",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Corect. Formați chiar dumneavoastră numărul oficial, de preferat de pe alt telefon, ca linia să nu poată rămâne deschisă."
+      },
+      {
+       "id": "redial",
+       "label": "Sunați înapoi la numărul care v-a apelat",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Numărul poate fi falsificat. Luați numărul de pe card sau de pe site-ul oficial al băncii."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "l1-choice-spoof",
+   "question": {
+    "prompt": "Pe ecran apare numărul oficial al băncii. Apelul este real?",
+    "options": [
+     {
+      "id": "yes-number",
+      "label": "Da, dacă numărul este corect, apelul este real",
+      "correct": false,
+      "feedback": "Un număr poate fi falsificat. Numărul de pe ecran nu este o dovadă."
+     },
+     {
+      "id": "call-back",
+      "label": "Nu am cum să știu, așa că sun eu înapoi",
+      "correct": true,
+      "feedback": "Corect. Formați chiar dumneavoastră numărul oficial, de preferat de pe alt telefon, ca escrocul să nu poată ține linia deschisă."
+     },
+     {
+      "id": "ask-name",
+      "label": "Îl întreb cum se numește, e suficient",
+      "correct": false,
+      "feedback": "Un escroc poate da orice nume. Numele nu este o verificare."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 00 00"
+       }
+      ],
+      "label": "Apel primit"
+     }
+    }
+   },
+   "explain": "Numele și numărul unui apelant pot fi false. Cel mai sigur este să închideți și să sunați chiar dumneavoastră la numărul oficial."
+  },
+  {
+   "type": "swipe",
+   "id": "l1-swipe",
+   "prompt": "Sigur sau înșelătorie?",
+   "cards": [
+    {
+     "id": "police-safe-account",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Apel: +994 12 000 11 22"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Aici poliția. Pe numele dumneavoastră a fost deschis un credit. Mutați-vă imediat banii într-un cont sigur."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Poliția nu vă cere niciodată să mutați banii într-un cont sigur. Este o înșelătorie bine cunoscută."
+    },
+    {
+     "id": "bank-call-back",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sahilbank",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Apel: SahilBank"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Am observat o plată suspectă cu cardul dumneavoastră. Nu ne spuneți nimic acum, sunați la numărul de pe spatele cardului."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Nu vă cere nimic și vă trimite la numărul oficial. Ca să verificați, sunați la numărul de pe card."
+    },
+    {
+     "id": "support-password",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Apel: Suport IT"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Căsuța dumneavoastră de e-mail are un virus. Spuneți-mi parola și îl curăț de la distanță."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Suportul IT nu are nevoie de parola dumneavoastră. Nu o spuneți nimănui, niciodată."
+    },
+    {
+     "id": "support-planned",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Apel: Suport IT"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Vă sun în legătură cu solicitarea pe care ați deschis-o ieri. Mâine vă actualizăm computerul, nu trebuie să faceți nimic."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Dumneavoastră ați deschis solicitarea și nu vi se cere nimic. Este un apel de serviciu obișnuit."
+    },
+    {
+     "id": "remote-app",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sahilbank",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Apel: SahilBank"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Pentru a vă proteja contul, instalați această aplicație, ca să vă pot vedea ecranul."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O aplicație de control de la distanță le predă tot telefonul dumneavoastră. O bancă nu cere niciodată așa ceva."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "l1-scenario",
+   "title": "Apelul de la suportul IT",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Bună ziua, sunt Elvin de la suportul IT. Contul dumneavoastră este în curs de blocare, trebuie să vă confirmăm parola chiar acum.",
+     "speaker": "Apelant",
+     "voice": "man-3",
+     "channel": "phone",
+     "spoken": "Bună ziua, sunt Elvin de la suportul IT. <breath> Contul dumneavoastră este în curs de blocare, trebuie să vă confirmăm parola chiar acum.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "it-destek-fake",
+       "caller": [
+        {
+         "text": "Suport IT"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 33 44"
+        }
+       ],
+       "label": "Apel primit"
+      }
+     },
+     "choices": [
+      {
+       "label": "Îi spun parola",
+       "outcome": "compromised",
+       "feedback": "Acum altcineva are parola dumneavoastră. Schimbați-o imediat și raportați incidentul suportului, la numărul oficial."
+      },
+      {
+       "label": "Îl întreb cine este",
+       "next": "n2",
+       "feedback": "Un început bun, dar nu vă bazați complet pe răspuns."
+      },
+      {
+       "label": "Închid și sun eu la suport",
+       "outcome": "safe",
+       "feedback": "Excelent. Suportul IT real nu vă cere niciodată parola."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Sunt Elvin Hasanov, de la etajul trei. Grăbiți-vă, contul va fi șters în cinci minute. Măcar instalați programul acesta.",
+     "speaker": "Apelant",
+     "voice": "man-3",
+     "channel": "phone",
+     "spoken": "Sunt Elvin Hasanov, de la etajul trei. Grăbiți-vă, ăă, contul va fi șters în cinci minute. Măcar instalați programul acesta.",
+     "choices": [
+      {
+       "label": "Instalez programul",
+       "next": "n3",
+       "feedback": "Cu un program de control de la distanță, el vă poate vedea și controla computerul."
+      },
+      {
+       "label": "Îi spun că sun eu înapoi",
+       "outcome": "safe",
+       "feedback": "Decizia corectă. Graba este un semnal de alarmă, iar apelul pe care îl faceți dumneavoastră este cea mai bună verificare."
+      }
+     ]
+    },
+    {
+     "id": "n3",
+     "text": "Se deschide un program necunoscut, iar cursorul se mișcă singur.",
+     "choices": [
+      {
+       "label": "Deconectez computerul de la rețea și sun la suport",
+       "outcome": "risky",
+       "feedback": "Reacția corectă. O raportare rapidă limitează pagubele."
+      },
+      {
+       "label": "Mi-e rușine și nu spun nimănui",
+       "outcome": "compromised",
+       "feedback": "Tăcerea îi dă timp atacatorului. Nu aveți de ce să vă fie rușine să raportați: raportarea îi protejează pe toți."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "l1-recap",
+   "points": [
+    "Numele și numărul unui apelant pot fi false",
+    "Nu spuneți nimănui niciun cod, PIN sau parolă",
+    "Închideți și sunați chiar dumneavoastră la numărul oficial"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

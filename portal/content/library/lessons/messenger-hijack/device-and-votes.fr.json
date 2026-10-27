@@ -1,0 +1,475 @@
+{
+ "id": "device-and-votes",
+ "title": "Appareils connectés et faux votes",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "mh2-tutor",
+   "beats": [
+    {
+     "id": "mh2-b1",
+     "say": "Il existe aussi une façon discrète de voler un compte : un lien pour voter et un appareil connecté caché.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "mh2-b2",
+     "say": "Si vous voyez une notification comme celle-ci, votre compte est aussi ouvert sur un autre appareil.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "sohbet",
+       "app": "Söhbət",
+       "title": [
+        {
+         "text": "Nouvel appareil connecté",
+         "spot": "device"
+        }
+       ],
+       "body": [
+        {
+         "text": "Ordinateur, Gandja. Si ce n’était pas vous, vérifiez vos appareils connectés."
+        }
+       ],
+       "time": "21:14"
+      }
+     },
+     "highlight": "device"
+    },
+    {
+     "id": "mh2-b3",
+     "say": "Méfiez-vous d’une page qui vous demande de vous connecter à votre messagerie instantanée avant de pouvoir voter.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "mh2-b4",
+     "say": "Activez la double authentification et vérifiez de temps en temps vos appareils connectés.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "mh2-swipe",
+   "prompt": "Pour chaque notification : sans danger ou menace ?",
+   "cards": [
+    {
+     "id": "unasked-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sohbet",
+      "sender": [
+       {
+        "text": "Söhbət"
+       }
+      ],
+      "time": "23:40",
+      "messages": [
+       [
+        {
+         "text": "Votre code Söhbət : 418 205. Ne partagez ce code avec personne."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Si vous ne l’avez pas demandé, quelqu’un essaie de se connecter avec votre numéro. Ne donnez ce code à personne."
+    },
+    {
+     "id": "linked",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "Nouvel appareil connecté"
+       }
+      ],
+      "body": [
+       {
+        "text": "Ordinateur, Gandja, 21:14"
+       }
+      ],
+      "time": "21:14"
+     },
+     "verdict": "threat",
+     "explain": "Si vous ne l’avez pas connecté vous-même, quelqu’un lit vos conversations. Retirez-le tout de suite de vos appareils connectés."
+    },
+    {
+     "id": "vote-link",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Sevinj Aliyeva"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ma fille participe à un concours de dessin, merci de voter pour elle : "
+         },
+         {
+          "text": "balaca-ressam.example.org/ses",
+          "link": {
+           "label": "balaca-ressam.example.org/ses",
+           "href": "https://balaca-ressam.example.org/ses"
+          }
+         }
+        ],
+        "time": "19:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Les liens de vote sont l’un des moyens préférés pour voler des comptes. Même si c’est une personne que vous connaissez qui l’envoie, ne vous connectez pas sur cette page."
+    },
+    {
+     "id": "pin-on",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "Double authentification activée"
+       }
+      ],
+      "body": [
+       {
+        "text": "Vous avez ajouté une protection supplémentaire à votre compte."
+       }
+      ],
+      "time": "12:30"
+     },
+     "verdict": "safe",
+     "explain": "Cette notification confirme une action que vous avez faite vous-même. La double authentification protège le compte contre le vol de code."
+    },
+    {
+     "id": "meeting",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Groupe du service"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Kamran Ahmadov : La réunion de demain aura lieu à dix heures, salle deux cent quatorze."
+         }
+        ],
+        "time": "17:48"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "C’est un message de travail ordinaire. Il ne demande ni code, ni argent, ni clic sur un lien."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "mh2-sim",
+   "environment": "browser",
+   "title": "Le concours de dessin",
+   "intro": "Une personne que vous connaissez vous demande de voter dans un concours de dessin pour enfants. Choisissez la bonne action sur chaque page.",
+   "steps": [
+    {
+     "id": "vote-page",
+     "label": "Votez pour le dessin de Leyla",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2a-balaca-ressam",
+      "url": [
+       {
+        "text": "https://balaca-ressam.example.org/ses"
+       }
+      ]
+     },
+     "say": "La page est très jolie et propose un bouton Voter.",
+     "actions": [
+      {
+       "id": "vote",
+       "label": "Voter",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Le bouton de vote vous mène à une page de connexion. Vous n’avez encore rien perdu, mais restez sur vos gardes."
+      },
+      {
+       "id": "close",
+       "label": "Fermer la page",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Fermer une page inconnue qui exige un compte pour voter, c’est la solution la plus sûre.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2a-sohbet-fake",
+      "brand": "Söhbət",
+      "url": [
+       {
+        "text": "https://sohbet-giris.example.org"
+       }
+      ],
+      "fields": [
+       "Numéro de téléphone"
+      ],
+      "button": "Recevoir le code"
+     },
+     "say": "Elle vous demande de vous connecter avec Söhbət pour voter.",
+     "actions": [
+      {
+       "id": "enter",
+       "label": "Saisir le numéro",
+       "kind": "enter-credentials",
+       "outcome": "risky",
+       "feedback": "Avec votre numéro, l’escroc demande un code en votre nom. À l’étape suivante, il vous demandera ce code."
+      },
+      {
+       "id": "close",
+       "label": "Fermer la page",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Cette adresse n’est pas celle de Söhbət : c’est une fausse page de connexion.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sohbet-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Saisissez le code"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Saisissez le code Söhbət à six chiffres envoyé sur votre téléphone."
+        }
+       ]
+      ],
+      "buttons": [
+       "Confirmer",
+       "Annuler"
+      ]
+     },
+     "say": "Elle vous demande maintenant de saisir sur cette page le code reçu sur votre téléphone.",
+     "actions": [
+      {
+       "id": "enter",
+       "label": "Saisir le code",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Dès que vous l’avez saisi, votre compte s’est ouvert sur le téléphone de l’escroc. Un code Söhbət ne se saisit jamais sur un site web."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Ce code ne sert que dans l’application Söhbət elle-même, jamais sur une page web.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "pairing",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sohbet-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Confirmez votre vote"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ouvrez Appareils connectés dans l’application Söhbət et saisissez ce code :"
+        }
+       ],
+       [
+        {
+         "text": "[code fourni par la page]"
+        }
+       ]
+      ],
+      "buttons": [
+       "Terminé",
+       "Annuler"
+      ]
+     },
+     "say": "La page demande maintenant autre chose : connecter un appareil dans l’application.",
+     "actions": [
+      {
+       "id": "pair",
+       "label": "Connecter l’appareil",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Vous avez connecté l’ordinateur de l’escroc à votre compte. Il voit maintenant toutes vos conversations."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Pour voter, on n’a jamais besoin de connecter un appareil."
+      }
+     ]
+    },
+    {
+     "id": "devices",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sohbet",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Appareils connectés"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ordinateur, Gandja. Dernière activité : il y a deux minutes."
+        }
+       ],
+       [
+        {
+         "text": "Avez-vous connecté cet appareil ?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Déconnecter",
+       "Conserver"
+      ]
+     },
+     "say": "Par précaution, vous vérifiez les appareils connectés dans les paramètres de Söhbət.",
+     "actions": [
+      {
+       "id": "logout",
+       "label": "Déconnecter",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Exact. Une fois déconnecté, un appareil que vous ne connaissez pas ne voit plus vos messages."
+      },
+      {
+       "id": "keep",
+       "label": "Conserver",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Vous n’avez pas connecté cet appareil. Si vous le conservez, quelqu’un continuera de lire vos conversations."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "mh2-choice",
+   "question": {
+    "prompt": "Qu’est-ce qui protège le mieux votre compte Söhbət contre le vol de code ?",
+    "options": [
+     {
+      "id": "two-step",
+      "label": "Activer la double authentification",
+      "correct": true,
+      "feedback": "Exact. Même si le code est volé, personne ne peut entrer sans le code PIN secret que vous avez défini."
+     },
+     {
+      "id": "photo",
+      "label": "Masquer votre photo de profil",
+      "correct": false,
+      "feedback": "Protéger sa photo, c’est bien, mais cela ne protège pas le compte. La double authentification, si."
+     },
+     {
+      "id": "delete-chats",
+      "label": "Supprimer souvent vos conversations",
+      "correct": false,
+      "feedback": "Cela n’empêche pas un escroc d’entrer. Activez la double authentification."
+     }
+    ]
+   },
+   "explain": "La double authentification ajoute un deuxième verrou à votre compte. Personne d’autre que vous n’en connaît le code."
+  },
+  {
+   "type": "match",
+   "id": "mh2-match",
+   "prompt": "Associez chaque situation à la bonne action.",
+   "pairs": [
+    {
+     "id": "code",
+     "left": "Un code que vous n’avez pas demandé",
+     "right": "Ne le donner à personne"
+    },
+    {
+     "id": "device",
+     "left": "Une notification de nouvel appareil",
+     "right": "Le retirer des appareils connectés"
+    },
+    {
+     "id": "vote",
+     "left": "Une connexion exigée pour voter",
+     "right": "Fermer la page"
+    },
+    {
+     "id": "money",
+     "left": "Un ami demande de l’argent",
+     "right": "Vérifier par un simple appel"
+    }
+   ],
+   "explain": "Le code, les appareils et les liens sont les portes de votre compte. Gardez-en vous-même le contrôle et n’en ouvrez aucune aux autres."
+  },
+  {
+   "type": "recap",
+   "id": "mh2-recap",
+   "points": [
+    "Ne vous connectez pas avec Söhbət pour voter",
+    "En cas de notification de nouvel appareil, vérifiez vos appareils connectés",
+    "Activez la double authentification"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

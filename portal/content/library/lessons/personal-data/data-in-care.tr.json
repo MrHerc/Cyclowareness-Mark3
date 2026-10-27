@@ -1,0 +1,420 @@
+{
+ "id": "data-in-care",
+ "title": "Size emanet edilen veriler",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "what-is",
+     "say": "Vatandaşların ve iş arkadaşlarınızın adları, kimlik belgeleri, adresleri ve telefon numaraları kişisel verilerdir. Bu veriler size iş için emanet edilmiştir.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "law",
+     "say": "Azerbaycan'da kişisel veriler yasayla korunur. Onları yalnızca hukuka uygun bir amaç için ve yalnızca gerektiği kadar kullanın.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "need-to-know",
+     "say": "Kural basit: işiniz gerektirmiyorsa bakmayın, sormayın, paylaşmayın.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "id-photos",
+     "say": "Kimlik kartlarının fotoğraflarını mesajlaşma uygulamalarıyla göndermeyin. Bu fotoğraflar yıllarca telefonlarda kalır ve sızar.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "request-check",
+   "prompt": "Hangi talepler uygun?",
+   "cards": [
+    {
+     "id": "fake-police",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "+994 50 000 22 90"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Merhaba, emniyetten yazıyorum. Reşad Aliyev'in kayıtlı adresini ve telefonunu bana gönderin, acil."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Resmî kurumlar verileri resmî kanallardan ister, kişisel bir numaradan mesajla değil."
+    },
+    {
+     "id": "hr-system",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "İnsan Kaynakları"
+        }
+       ],
+       "address": [
+        {
+         "text": "kadrlar@rxagentlik.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "İzin talebi"
+       }
+      ],
+      "time": "11:02",
+      "body": [
+       [
+        {
+         "text": "Lütfen talebinizi iç belge sisteminde imzalayın. Ek belge gerekmiyor."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Alan adı doğru, sizi iç sisteme yönlendiriyor ve ek veri istemiyor."
+    },
+    {
+     "id": "curious-colleague",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Elvin, iş arkadaşı"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Komşum bize başvurmuş. Dosyasında ne var? Bir fotoğrafını atar mısın, merak ettim."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Merak bir iş ihtiyacı değildir. İş gerektirmiyorsa dosya paylaşılmaz."
+    },
+    {
+     "id": "personal-email",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Leyla Hasanova"
+        }
+       ],
+       "address": [
+        {
+         "text": "leyla.hasanova@rxagentlik.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Liste"
+       }
+      ],
+      "time": "11:02",
+      "body": [
+       [
+        {
+         "text": "Departmanın tüm kimlik kodlarını ve telefon numaralarını kişisel e-posta adresime gönderin, evden çalışacağım: leyla.h.1990@mail.example"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Tanıdık bir iş arkadaşı bile olsa kişisel veriler kişisel bir e-posta adresine gönderilmez. İş sistemlerinde kalır."
+    },
+    {
+     "id": "portal-sms",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "DovletPortal"
+       }
+      ],
+      "time": "15:30",
+      "messages": [
+       [
+        {
+         "text": "Başvurunuz alınmıştır. Sonucu portaldaki hesabınızdan görebilirsiniz."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Bağlantı yok ve hiçbir şey istenmiyor. Yalnızca bilgi veriyor."
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "id-photo-chat",
+   "prompt": "Bu yazışmadaki riskleri bulun.",
+   "artifact": {
+    "kind": "chat",
+    "app": "whatsapp",
+    "contact": [
+     {
+      "text": "Sebine, İK "
+     },
+     {
+      "text": "+994 77 000 19 55",
+      "spot": "number"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Merhaba! Kayıtlarınız güncelleniyor. "
+       },
+       {
+        "text": "Kimliğinizin ön ve arka yüzünün fotoğrafını buraya gönderin.",
+        "spot": "id-photo"
+       }
+      ],
+      "time": "16:10"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Saat 17:00'ye kadar, yoksa maaşınız gecikecek.",
+        "spot": "threat"
+       }
+      ],
+      "time": "16:10"
+     },
+     {
+      "from": "me",
+      "body": [
+       {
+        "text": "İK neden WhatsApp'tan yazıyor?"
+       }
+      ],
+      "time": "16:12"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Sistem çöktü, böylesi daha hızlı.",
+        "spot": "excuse"
+       }
+      ],
+      "time": "16:12"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "number",
+     "label": "Kişisel numara",
+     "explain": "Biri, bilinmeyen kişisel bir numaradan İK adına yazıyor."
+    },
+    {
+     "id": "id-photo",
+     "label": "Kimlik fotoğrafı",
+     "explain": "Kimliğinizin fotoğrafıyla bir dolandırıcı adınıza kredi çekebilir ya da hesap açabilir."
+    },
+    {
+     "id": "threat",
+     "label": "Maaş tehdidi",
+     "explain": "Maaşınızla ilgili tehdit, sizi acele ettirip kontrolleri atlatmak içindir."
+    },
+    {
+     "id": "excuse",
+     "label": "Bahane",
+     "explain": "“Sistem çöktü” sözü, resmî yolu atlamak için bir bahane. İK'yı kendiniz arayın."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "scenario",
+   "id": "citizen-call",
+   "title": "Bir vatandaş arıyor",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "Merhaba, kardeşimin başvurusu sizde. Kendisi hasta, ona yardım edebilmem için lütfen bana telefonunu ve adresini verin.",
+     "speaker": "Arayan",
+     "voice": "older-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Merhaba, kardeşimin başvurusu sizde. <breath> Kendisi hasta, ona yardım edebilmem için lütfen bana telefonunu ve adresini verin.",
+     "character": "citizen",
+     "choices": [
+      {
+       "label": "Ona acıyıp bilgileri veririm",
+       "outcome": "compromised",
+       "feedback": "Arayanın kim olduğunu bilmiyorsunuz. Veriler artık bir yabancının elinde."
+      },
+      {
+       "label": "Arayanı doğrulamak için kardeşinin kimlik kodunu sorarım",
+       "outcome": "risky",
+       "feedback": "Kimlik kodu bir sır değildir. Onu bilmek hiçbir şey kanıtlamaz."
+      },
+      {
+       "label": "Bu bilgileri telefonda paylaşamayacağımı açıklarım",
+       "next": "pressure",
+       "feedback": "Doğru. Kibar ama kararlı olun."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Siz nasıl bir insansınız? Hasta diyorum size!",
+     "speaker": "Arayan",
+     "voice": "older-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Siz nasıl bir insansınız? <short pause> Hasta diyorum size!",
+     "character": "citizen",
+     "choices": [
+      {
+       "label": "Baskıya dayanamayıp bir istisna yaparım",
+       "outcome": "compromised",
+       "feedback": "Duygusal baskı en sık kullanılan hiledir."
+      },
+      {
+       "label": "Resmî yolu anlatırım: kardeşi kendisi ya da vekâletnamesi olan bir temsilcisi başvurabilir",
+       "next": "after",
+       "feedback": "Harika. Yolu gösterdiniz ve verileri korudunuz."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "text": "Görüşme bitti. Şimdi ne yapmalı?",
+     "choices": [
+      {
+       "label": "Aramayı yöneticime ve güvenlik ekibine bildiririm",
+       "outcome": "safe",
+       "feedback": "Çok iyi. Aynı kişi iş arkadaşlarınızı da arayabilir."
+      },
+      {
+       "label": "Hiçbir şey, sonuçta hiçbir bilgi vermedim",
+       "outcome": "risky",
+       "feedback": "Kararlı durdunuz, ama bildirirseniz iş arkadaşlarınız da hazırlıklı olur."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "principles",
+   "prompt": "Her ilkeyi anlamıyla eşleştirin.",
+   "pairs": [
+    {
+     "id": "purpose",
+     "left": "Amaçla sınırlılık",
+     "right": "Yalnızca açık ve hukuka uygun bir görev için kullanın"
+    },
+    {
+     "id": "minimum",
+     "left": "Ölçülülük",
+     "right": "Gerekenden fazlasını toplamayın"
+    },
+    {
+     "id": "need-to-know",
+     "left": "Bilmesi gereken kadar",
+     "right": "Yalnızca işi gerektiren kişiler bakabilir"
+    },
+    {
+     "id": "confidential",
+     "left": "Gizlilik",
+     "right": "Yasal dayanak olmadan asla üçüncü kişilere vermeyin"
+    }
+   ],
+   "explain": "Bu ilkeler, günlük işte vatandaşların verilerini korumanıza yardımcı olur."
+  },
+  {
+   "type": "choice",
+   "id": "send-way",
+   "question": {
+    "prompt": "Bir vatandaşın belgesini bir iş arkadaşınıza nasıl gönderebilirsiniz?",
+    "options": [
+     {
+      "id": "whatsapp",
+      "label": "Fotoğrafını çekip kişisel WhatsApp hesabımdan gönderirim",
+      "correct": false,
+      "feedback": "Fotoğraf telefonlarda kalır ve kontrolden çıkar."
+     },
+     {
+      "id": "internal",
+      "label": "İç belge sistemi üzerinden, yalnızca ihtiyacı olan kişiye",
+      "correct": true,
+      "feedback": "Doğru. Erişim sınırlı ve kontrol altında."
+     },
+     {
+      "id": "private-mail",
+      "label": "Hızlı olsun diye kişisel e-postayla",
+      "correct": false,
+      "feedback": "Kişisel e-posta, kurumun korumasının dışındadır."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "folder"
+    }
+   },
+   "explain": "Kişisel veriler, kurumun onaylı sistemlerinin dışına asla çıkmamalıdır."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Kişisel verileri yalnızca işiniz gerektirdiğinde ve yalnızca gerektiği kadar kullanın.",
+    "Kimlik fotoğraflarını ya da listeleri asla mesajlaşma uygulamalarıyla göndermeyin.",
+    "Telefonla arayanları resmî başvuru yoluna yönlendirin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

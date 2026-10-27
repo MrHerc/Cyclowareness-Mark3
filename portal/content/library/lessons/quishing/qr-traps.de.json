@@ -1,0 +1,417 @@
+{
+  "id": "qr-traps",
+  "title": "QR-Code-Fallen",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "hidden-link",
+          "say": "Hallo! Ein QR-Code ist nichts anderes als ein versteckter Link. Wohin er führt, sehen Sie ihm nicht an.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "qr"
+          }
+        },
+        {
+          "id": "stickers",
+          "say": "Kriminelle kleben eigene QR-Aufkleber auf Parkautomaten, Speisekarten und Plakate.",
+          "mood": "think",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "qr",
+              "caption": [
+                {
+                  "text": "ShaharPark. Zum Bezahlen scannen"
+                }
+              ],
+              "destination": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "seherpark-odenis.info",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/pay"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "check-domain",
+          "say": "Wenn Ihr Smartphone den Code liest, zeigt es die Adresse an. Prüfen Sie vor dem Öffnen die Domain: Gehört sie wirklich zu dieser Organisation?",
+          "mood": "talk",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "qr",
+              "caption": [
+                {
+                  "text": "ShaharPark. Zum Bezahlen scannen"
+                }
+              ],
+              "destination": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "seherpark-odenis.info",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/pay"
+                }
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "email-qr",
+          "say": "Auch ein QR-Code in einer E-Mail kann eine Falle sein. Wenn die Seite nach Ihrem Passwort oder Ihrer Karte fragt, brechen Sie sofort ab.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "scan-or-not",
+      "prompt": "Welche QR-Codes können Sie gefahrlos öffnen?",
+      "cards": [
+        {
+          "id": "parking-fine",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Parkautomat. Sie haben ein Bußgeld – scannen und bezahlen"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://seherpark-cerime.info/pay"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bußgelder werden nicht über Aufkleber eingezogen. Prüfen Sie Bußgelder nur im offiziellen Portal oder in der offiziellen App."
+        },
+        {
+          "id": "cafe-menu",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Teehaus „Çinar“. Speisekarte"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://cinar-cayxana.az/menyu"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Die Domain passt zum Namen des Teehauses, und die Seite zeigt nur eine Speisekarte. Es wird nichts verlangt."
+        },
+        {
+          "id": "mfa-email",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Die Verifizierung Ihres Kontos läuft ab. Zum Erneuern scannen"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://rxagentlik-login.info/verify"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Eine E-Mail mit QR-Code, über den Sie Ihr Konto bestätigen sollen, ist eine klassische Falle. Öffnen Sie das Portal selbst über ein Lesezeichen."
+        },
+        {
+          "id": "certificate-check",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Bescheinigung von DövlətPortal. Echtheit prüfen"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://dovletportal.az/yoxla/7F3K2"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Der Code führt zur eigenen Adresse des ausstellenden Portals und verlangt keine Daten."
+        },
+        {
+          "id": "free-wifi",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Kostenloses WLAN. Zum Verbinden scannen"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://free-wifi-baku.top/login?card=1"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Für kostenloses Internet braucht niemand Ihre Karte. Eine unbekannte Domain und dazu die Frage nach der Karte – das ist eine Falle."
+        },
+        {
+          "id": "donation",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Helfen Sie Kindern. Zum Spenden scannen"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://qisalt.info/x7Qa"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Ein gekürzter Link verbirgt die tatsächliche Adresse. Spenden Sie nur über die offizielle Website der Hilfsorganisation."
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "email-qr",
+      "prompt": "Finden Sie die verdächtigen Stellen in dieser E-Mail.",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": [
+            {
+              "text": "IT-Support"
+            }
+          ],
+          "address": [
+            {
+              "text": "it-destek@rxagentlik-support.info",
+              "spot": "sender"
+            }
+          ]
+        },
+        "to": "aynur.mammadova@rxagentlik.az",
+        "subject": [
+          {
+            "text": "DRINGEND: ",
+            "spot": "urgent"
+          },
+          {
+            "text": "Erneuern Sie Ihre Zwei-Faktor-Authentisierung"
+          }
+        ],
+        "time": "09:12",
+        "body": [
+          [
+            {
+              "text": "Liebe Kollegin, lieber Kollege,"
+            }
+          ],
+          [
+            {
+              "text": "unser Sicherheitssystem wird aktualisiert. "
+            },
+            {
+              "text": "Wenn Sie nicht innerhalb von 24 Stunden bestätigen, wird Ihr Konto gesperrt.",
+              "spot": "threat"
+            }
+          ],
+          [
+            {
+              "text": "Scannen Sie den QR-Code unten mit Ihrem Smartphone.",
+              "spot": "qr"
+            }
+          ],
+          [
+            {
+              "text": "Viele Grüße, Ihr IT-Support"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender",
+          "label": "Fremde Domain",
+          "explain": "Die Domain des Absenders ist nicht unsere. Unsere lautet rxagentlik.az."
+        },
+        {
+          "id": "urgent",
+          "label": "Dringlichkeit",
+          "explain": "Das Wort „dringend“ soll Sie zum Handeln drängen, bevor Sie nachdenken."
+        },
+        {
+          "id": "threat",
+          "label": "Drohung",
+          "explain": "Die Drohung mit der Sperrung soll Sie unter Druck setzen. Der echte Support schreibt selten so."
+        },
+        {
+          "id": "qr",
+          "label": "QR-Code",
+          "explain": "Der QR-Code versteckt den Link vor dem Mailfilter und lockt Sie auf das weniger geschützte Smartphone."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "fine-notice",
+      "question": {
+        "prompt": "Hinter Ihrem Scheibenwischer steckt ein Bußgeldhinweis mit QR-Code. Was tun Sie?",
+        "options": [
+          {
+            "id": "scan-pay",
+            "label": "Scannen und sofort bezahlen",
+            "correct": false,
+            "feedback": "Eine gefälschte Seite kann Ihre Kartendaten stehlen."
+          },
+          {
+            "id": "official",
+            "label": "Das Bußgeld selbst im offiziellen Portal prüfen",
+            "correct": true,
+            "feedback": "Richtig. Wenn das Bußgeld echt ist, finden Sie es dort."
+          },
+          {
+            "id": "call-number",
+            "label": "Die Nummer auf dem Hinweis anrufen",
+            "correct": false,
+            "feedback": "Auch die Nummer kann zu den Kriminellen gehören."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "qr",
+            "caption": [
+              {
+                "text": "Bußgeldhinweis. Zahlung innerhalb von 3 Tagen"
+              }
+            ],
+            "destination": [
+              {
+                "text": "https://seherpark-cerime.info/odenis"
+              }
+            ]
+          }
+        }
+      },
+      "explain": "Vertrauen Sie keiner Kontaktangabe auf dem Hinweis. Nutzen Sie selbst den offiziellen Weg."
+    },
+    {
+      "type": "scenario",
+      "id": "payment-sticker",
+      "title": "Der Bezahl-Aufkleber",
+      "start": "counter",
+      "nodes": [
+        {
+          "id": "counter",
+          "text": "An der Theke des Cafés klebt ein QR-Aufkleber zum schnellen Bezahlen. Er sitzt leicht schief.",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "qr",
+              "caption": [
+                {
+                  "text": "Schnell bezahlen"
+                }
+              ],
+              "destination": [
+                {
+                  "text": "https://sahilpay-odenis.top/p/1942"
+                }
+              ]
+            }
+          },
+          "choices": [
+            {
+              "label": "Scannen und zuerst die Adresse prüfen",
+              "next": "address",
+              "feedback": "Ein guter Anfang. Die Adresse zu prüfen, ist wichtig."
+            },
+            {
+              "label": "Scannen und sofort bezahlen",
+              "outcome": "compromised",
+              "feedback": "Die Adresse war gefälscht. Ihre Kartendaten sind bei Kriminellen gelandet."
+            },
+            {
+              "label": "Die Kassiererin fragen, ob der Aufkleber vom Café ist",
+              "next": "cashier",
+              "feedback": "Sehr gute Idee. Nachfragen ist die einfachste Prüfung."
+            }
+          ]
+        },
+        {
+          "id": "address",
+          "text": "Ihr Smartphone zeigt die Adresse: sahilpay-odenis.top. Der Name des Cafés taucht nirgends auf.",
+          "choices": [
+            {
+              "label": "Trotzdem bezahlen, ich habe es eilig",
+              "outcome": "compromised",
+              "feedback": "Die eilige Zahlung ging an Kriminelle. Die seltsame Adresse war Warnung genug."
+            },
+            {
+              "label": "Nicht öffnen und der Kassiererin Bescheid sagen",
+              "next": "cashier",
+              "feedback": "Die richtige Entscheidung."
+            }
+          ]
+        },
+        {
+          "id": "cashier",
+          "text": "Das ist nicht unser Aufkleber! Bitte zahlen Sie mit Karte am Terminal.",
+          "speaker": "Kassiererin",
+          "voice": "young-woman",
+          "channel": "in-person",
+          "manner": "firm",
+          "spoken": "Das ist nicht unser Aufkleber! <short pause> Bitte zahlen Sie mit Karte am Terminal.",
+          "choices": [
+            {
+              "label": "Am Terminal bezahlen",
+              "outcome": "safe",
+              "feedback": "Gut gemacht. Sie haben sich selbst und die nächsten Gäste geschützt."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Ein QR-Code ist ein versteckter Link: Prüfen Sie die Adresse vor dem Öffnen.",
+        "Bezahlen Sie Bußgelder und Rechnungen nur über offizielle Kanäle.",
+        "Geben Sie auf einer Seite, die ein QR-Code geöffnet hat, nie Passwort oder Kartendaten ein."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -1,3 +1,13 @@
+CREATE TABLE "ai_cache" (
+	"id" text PRIMARY KEY NOT NULL,
+	"kind" text NOT NULL,
+	"lesson_id" uuid NOT NULL,
+	"locale" text NOT NULL,
+	"payload" jsonb NOT NULL,
+	"model" text NOT NULL,
+	"created_at" timestamp with time zone DEFAULT now() NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "answers" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"tenant_id" uuid NOT NULL,
@@ -229,6 +239,7 @@ CREATE TABLE "learning_paths" (
 	"recurrence" jsonb NOT NULL,
 	"standards" jsonb NOT NULL,
 	"module_slugs" jsonb NOT NULL,
+	"lab_ids" jsonb DEFAULT '[]'::jsonb NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
 	CONSTRAINT "learning_paths_key_tenant_idx" UNIQUE NULLS NOT DISTINCT("key","tenant_id")
 );
@@ -634,6 +645,7 @@ CREATE TABLE "xp_events" (
 	"at" timestamp with time zone DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
+ALTER TABLE "ai_cache" ADD CONSTRAINT "ai_cache_lesson_id_lessons_id_fk" FOREIGN KEY ("lesson_id") REFERENCES "public"."lessons"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "answers" ADD CONSTRAINT "answers_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "answers" ADD CONSTRAINT "answers_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE "assets" ADD CONSTRAINT "assets_tenant_id_tenants_id_fk" FOREIGN KEY ("tenant_id") REFERENCES "public"."tenants"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint

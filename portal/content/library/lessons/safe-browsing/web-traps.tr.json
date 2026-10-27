@@ -1,0 +1,320 @@
+{
+ "id": "web-traps",
+ "title": "Web tuzakları",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "padlock",
+     "say": "Adres çubuğundaki asma kilit tek bir şey söyler: bağlantı şifrelidir. Siteyi kimin işlettiğini söylemez.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "read-domain",
+     "say": "Dolandırıcılık sitelerinin çoğunda da asma kilit vardır. Bu yüzden alan adının kendisini okuyun.",
+     "mood": "think",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "sahilbank-giris.info",
+         "spot": "domain"
+        },
+        {
+         "text": "/login"
+        }
+       ]
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "search-ads",
+     "say": "Aramada en üstte çıkan sonuç bir reklam olabilir. Dolandırıcılar, tanınmış sitelerin adlarını kullanarak reklam satın alır.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "fake-update",
+     "say": "Bir web sitesi tarayıcınızın güncel olmadığını söyleyip güncelleme dosyası indirmenizi öneriyorsa, bu bir tuzaktır. Tarayıcılar kendilerini otomatik olarak günceller.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "warnings",
+     "say": "Tarayıcınız kırmızı bir uyarı gösterirse geri dönün. Sizi korumak için durduruyor.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-portal",
+   "prompt": "Bu giriş sayfasındaki şüpheli kısımları bulun.",
+   "artifact": {
+    "kind": "login",
+    "brand": "DövlətPortal",
+    "url": [
+     {
+      "text": "https://",
+      "spot": "padlock"
+     },
+     {
+      "text": "dovletportal-az",
+      "spot": "lookalike"
+     },
+     {
+      "text": ".online",
+      "spot": "tld"
+     },
+     {
+      "text": "/giris"
+     }
+    ],
+    "fields": [
+     "Kişisel kimlik kodu",
+     "Parola"
+    ],
+    "button": "Giriş yap"
+   },
+   "spots": [
+    {
+     "id": "padlock",
+     "label": "Asma kilit",
+     "explain": "Asma kilit var, ama bu yalnızca şifreleme demektir. Sitenin gerçek olduğunu kanıtlamaz."
+    },
+    {
+     "id": "lookalike",
+     "label": "Benzer ad",
+     "explain": "Resmî ada bir tire ve “az” eklenmiş. Bu, gerçeğine benzetilmiş sahte bir alan adı."
+    },
+    {
+     "id": "tld",
+     "label": "Yanlış alan adı uzantısı",
+     "explain": "Alan adı .online ile bitiyor. Resmî portalın adresi ise dovletportal.az."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "swipe",
+   "id": "click-or-not",
+   "prompt": "Hangi bağlantıları açmak güvenli?",
+   "cards": [
+    {
+     "id": "free-download",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://free-download-pdf.top/Sened_pulsuz.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ücretsiz indirme sitesindeki bir program dosyası çoğu zaman zararlıdır. Yazılımı BT destek ekibi aracılığıyla edinin."
+    },
+    {
+     "id": "official",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://dovletportal.az/xidmetler/arayis"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Alan adı resmî portalın kendisi: dovletportal.az. Fazladan kelime ya da tire yok."
+    },
+    {
+     "id": "subdomain-trick",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://sahilbank.az.hesab-yoxla.info/login"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Gerçek alan adı son kısımdır: hesab-yoxla.info. Öndeki sahilbank.az yalnızca bir yem."
+    },
+    {
+     "id": "update-exe",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://brauzer-yenile.top/update.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Tarayıcı güncellemeleri web sitelerinden indirilmez. Tarayıcı kendi kendini günceller."
+    },
+    {
+     "id": "bank-path",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://www.sahilbank.az/az/kartlar"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Alan adı sahilbank.az. Gerisi yalnızca sayfanın yolu."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "padlock-meaning",
+   "question": {
+    "prompt": "Adres çubuğunda bir asma kilit var. Bu ne anlama gelir?",
+    "options": [
+     {
+      "id": "safe-site",
+      "label": "Site kontrol edilmiş ve güvenli",
+      "correct": false,
+      "feedback": "Hayır. Sahte siteler de kolayca asma kilit edinir."
+     },
+     {
+      "id": "encrypted",
+      "label": "Sizinle site arasındaki bağlantı şifreli",
+      "correct": true,
+      "feedback": "Doğru. Ama site yine de sahte olabilir."
+     },
+     {
+      "id": "state-approved",
+      "label": "Site devlet tarafından onaylanmış",
+      "correct": false,
+      "feedback": "Asma kilit hiçbir şekilde devlet onayı anlamına gelmez."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://"
+       },
+       {
+        "text": "sahilbank-giris.info",
+        "spot": "domain"
+       },
+       {
+        "text": "/login"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "Asma kilit gereklidir ama yeterli değildir. Her zaman alan adının kendisini okuyun."
+  },
+  {
+   "type": "scenario",
+   "id": "sudden-popup",
+   "title": "Birden açılan pencere",
+   "start": "popup",
+   "nodes": [
+    {
+     "id": "popup",
+     "text": "Bir haber sitesi okuyorsunuz. Birden ekranı kırmızı bir pencere kaplıyor: bilgisayarınıza virüs bulaştı, +994 12 000 04 19 numarasını arayın. Bir alarm sesi çalıyor.",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     },
+     "choices": [
+      {
+       "label": "Numarayı ara",
+       "next": "operator",
+       "feedback": "Bu, sahte teknik destek dolandırıcılığı. Bakalım ne olacak."
+      },
+      {
+       "label": "“Temizle” düğmesine tıkla",
+       "outcome": "compromised",
+       "feedback": "Düğme zararlı yazılım indirdi. Böyle bir pencerede hiçbir şeye tıklamayın."
+      },
+      {
+       "label": "Sekmeyi, gerekirse bütün tarayıcıyı kapat",
+       "next": "restore",
+       "feedback": "Doğru. O pencere yalnızca bir web sayfası, bilgisayarınıza virüs bulaşmadı."
+      }
+     ]
+    },
+    {
+     "id": "operator",
+     "text": "Bilgisayarınıza uzaktan bağlanmamız gerekiyor. Bu programı kurun ve ekrandaki kodu bana okuyun.",
+     "speaker": "Operatör",
+     "voice": "man",
+     "channel": "phone",
+     "spoken": "Bilgisayarınıza uzaktan bağlanmamız gerekiyor. <breath> Bu programı kurun ve ekrandaki kodu bana okuyun.",
+     "choices": [
+      {
+       "label": "Programı kur",
+       "outcome": "compromised",
+       "feedback": "Dolandırıcı artık bilgisayarınıza tam erişime sahip. Ağ bağlantısını kesin ve hemen bildirin."
+      },
+      {
+       "label": "Telefonu kapat ve BT destek ekibine haber ver",
+       "outcome": "risky",
+       "feedback": "Zamanında durdunuz. Ama böyle bir pencerede yazan numarayı asla aramayın."
+      }
+     ]
+    },
+    {
+     "id": "restore",
+     "text": "Tarayıcıyı yeniden açıyorsunuz. Önceki sekmelerinizi geri yüklemeyi öneriyor.",
+     "choices": [
+      {
+       "label": "Sekmeleri geri yükleme, BT destek ekibine kısa bir not gönder",
+       "outcome": "safe",
+       "feedback": "Çok iyi. Pencere hiçbir şey kurmadı ve BT destek ekibinin olaydan haberi var."
+      },
+      {
+       "label": "Sekmeleri geri yükle",
+       "outcome": "risky",
+       "feedback": "Aynı sahte pencere yeniden açılabilir. Geri yüklemeyi atlayın."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Asma kilit yalnızca şifreleme demektir: alan adını okuyun.",
+    "Reklamlara değil, yer imlerine ya da kendi yazdığınız adreslere güvenin.",
+    "“Hemen güncelleyin” ya da “Virüs bulaştı” diyen açılır pencereler birer tuzaktır."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

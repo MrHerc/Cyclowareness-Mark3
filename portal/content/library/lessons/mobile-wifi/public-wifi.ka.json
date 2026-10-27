@@ -1,0 +1,510 @@
+{
+ "id": "public-wifi",
+ "title": "საჯარო Wi-Fi",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "b-tutor",
+   "beats": [
+    {
+     "id": "b-b1",
+     "say": "კაფეებში, აეროპორტებსა და სასტუმროებში უფასო Wi-Fi მოსახერხებელია, მაგრამ ვინ შექმნა ეს ქსელი?",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    {
+     "id": "b-b2",
+     "say": "თავდამსხმელს შეუძლია კაფის ქსელის სახელი ზუსტად ან თითქმის ზუსტად გაიმეოროს. ამ ხრიკს „ბოროტ ტყუპს“ უწოდებენ.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "wifi",
+       "networks": [
+        {
+         "ssid": [
+          {
+           "text": "Cafe_Nargiz"
+          }
+         ],
+         "secured": true,
+         "signal": 3
+        },
+        {
+         "ssid": [
+          {
+           "text": "Cafe_Nargiz_Free",
+           "spot": "twin"
+          }
+         ],
+         "secured": false,
+         "signal": 4
+        },
+        {
+         "ssid": [
+          {
+           "text": "Home-5G"
+          }
+         ],
+         "secured": true,
+         "signal": 1
+        }
+       ]
+      }
+     },
+     "highlight": "twin"
+    },
+    {
+     "id": "b-b3",
+     "say": "ყალბმა ქსელმა შეიძლება გახსნას შესვლის გვერდი, რომელიც სამსახურის პაროლს ითხოვს. Wi-Fi-სთვის ამ პაროლს არასოდეს შეიყვანოთ.",
+     "mood": "alert",
+     "gesture": "point-down",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "login",
+       "brand": "უფასო Wi-Fi",
+       "url": [
+        {
+         "text": "wifi-giris.test",
+         "spot": "portal-url"
+        }
+       ],
+       "fields": [
+        "სამსახურის ელფოსტა",
+        "ელფოსტის პაროლი"
+       ],
+       "button": "დაკავშირება"
+      }
+     },
+     "highlight": "portal-url"
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "cafe-twin",
+   "environment": "phone",
+   "title": "კაფის Wi-Fi",
+   "intro": "კაფიდან სამსახურის წერილი უნდა გაგზავნოთ. რომელ ქსელს დაუკავშირდებით?",
+   "steps": [
+    {
+     "id": "networks",
+     "artifact": {
+      "kind": "wifi",
+      "networks": [
+       {
+        "ssid": [
+         {
+          "text": "Kafe_Nargiz"
+         }
+        ],
+        "secured": true,
+        "signal": 2
+       },
+       {
+        "ssid": [
+         {
+          "text": "Kafe_Nargiz_Free"
+         }
+        ],
+        "secured": false,
+        "signal": 4
+       },
+       {
+        "ssid": [
+         {
+          "text": "DIRECT-Printer"
+         }
+        ],
+        "secured": true,
+        "signal": 1
+       }
+      ]
+     },
+     "say": "ორი მსგავსი სახელია. ერთი ქსელი ღიაა და ძლიერი სიგნალი აქვს.",
+     "actions": [
+      {
+       "id": "free",
+       "label": "ვუკავშირდები Kafe_Nargiz_Free-ს",
+       "kind": "connect",
+       "outcome": "risky",
+       "feedback": "ღია ქსელი ძლიერი სიგნალითა და მსგავსი სახელით შეიძლება „ბოროტი ტყუპი“ იყოს. ჯერ ზუსტი სახელი პერსონალს ჰკითხეთ.",
+       "next": "portal"
+      },
+      {
+       "id": "ask",
+       "label": "პერსონალს ზუსტ სახელს ვკითხავ",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "სწორია. კაფის პერსონალმა ქსელის ზუსტი სახელიც იცის და პაროლიც."
+      },
+      {
+       "id": "mobile",
+       "label": "ამის ნაცვლად მობილურ ინტერნეტს ვიყენებ",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "შესანიშნავი არჩევანია. მნიშვნელოვანი საქმისთვის მობილური ინტერნეტი საჯარო Wi-Fi-ზე უფრო უსაფრთხოა.",
+       "next": "vpn"
+      }
+     ]
+    },
+    {
+     "id": "staff-said",
+     "label": "პერსონალი: ქსელის სახელია Kafe_Nargiz, პაროლი სალაროსთანაა",
+     "artifact": {
+      "kind": "wifi",
+      "networks": [
+       {
+        "ssid": [
+         {
+          "text": "Kafe_Nargiz"
+         }
+        ],
+        "secured": true,
+        "signal": 2
+       },
+       {
+        "ssid": [
+         {
+          "text": "Kafe_Nargiz_Free"
+         }
+        ],
+        "secured": false,
+        "signal": 4
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "real",
+       "label": "ვუკავშირდები Kafe_Nargiz-ს",
+       "kind": "connect",
+       "outcome": "safe",
+       "feedback": "სწორია. მაგრამ სახელის გაყალბებაც შეიძლება, ამიტომ სამუშაოდ VPN ჩართეთ.",
+       "next": "vpn"
+      },
+      {
+       "id": "free",
+       "label": "ვუკავშირდები Kafe_Nargiz_Free-ს",
+       "kind": "connect",
+       "outcome": "risky",
+       "feedback": "პერსონალს ეს ქსელი არ უხსენებია. ძლიერი სიგნალი „ბოროტი ტყუპის“ ტიპური ხრიკია."
+      }
+     ]
+    },
+    {
+     "id": "portal",
+     "label": "გაიხსნა შესვლის გვერდი",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "kafe-nargiz-fake",
+      "brand": "Kafe Nargiz Wi-Fi",
+      "url": [
+       {
+        "text": "http://"
+       },
+       {
+        "text": "kafe-nargiz-wifi.test",
+        "spot": "portal"
+       },
+       {
+        "text": "/giris"
+       }
+      ],
+      "fields": [
+       "სამსახურის ელფოსტა",
+       "პაროლი"
+      ],
+      "button": "ინტერნეტთან დაკავშირება"
+     },
+     "say": "Wi-Fi-ს გვერდი სამსახურის პაროლს ითხოვს.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "ინტერნეტთან დაკავშირება",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Wi-Fi-ს სამსახურის პაროლი არასოდეს სჭირდება. ახლავე შეცვალეთ ის სხვა მოწყობილობიდან და შეატყობინეთ უსაფრთხოების სამსახურს."
+      },
+      {
+       "id": "leave",
+       "label": "დახურვა და ქსელიდან გათიშვა",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "სწორია: Wi-Fi-ს გვერდი, რომელიც სამსახურის პაროლს ითხოვს, ყალბია. ეს ქსელი ტელეფონის მეხსიერებიდან წაშალეთ."
+      }
+     ]
+    },
+    {
+     "id": "vpn",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "agentlik-vpn",
+      "tone": "app",
+      "title": [
+       {
+        "text": "VPN არ არის დაკავშირებული"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "სამსახურის ელფოსტის გასახსნელად თქვენი ორგანიზაცია VPN-ს მოითხოვს."
+        }
+       ]
+      ],
+      "buttons": [
+       "VPN-ის ჩართვა",
+       "VPN-ის გარეშე გაგრძელება"
+      ]
+     },
+     "actions": [
+      {
+       "id": "vpn",
+       "label": "VPN-ის ჩართვა",
+       "kind": "connect",
+       "outcome": "safe",
+       "feedback": "სწორია. VPN მონაცემებს დაშიფრული გვირაბით გადასცემს, ყალბ ქსელშიც კი."
+      },
+      {
+       "id": "skip",
+       "label": "VPN-ის გარეშე გაგრძელება",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "სწრაფი საქმეც სარისკოა. თუ ორგანიზაცია VPN-ს მოითხოვს, ყოველთვის ჯერ ის ჩართეთ."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "b-hotspot",
+   "prompt": "აეროპორტში ხართ. იპოვეთ საეჭვო ქსელები.",
+   "artifact": {
+    "kind": "wifi",
+    "networks": [
+     {
+      "ssid": [
+       {
+        "text": "Terminal-WiFi"
+       }
+      ],
+      "secured": false,
+      "signal": 3
+     },
+     {
+      "ssid": [
+       {
+        "text": "Terminal_WiFi",
+        "spot": "lookalike"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Free_Fast_Internet",
+        "spot": "bait-name"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Terminal-WiFi-VIP",
+        "spot": "vip"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Cafe-Guest"
+       }
+      ],
+      "secured": true,
+      "signal": 2
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "lookalike",
+     "label": "თითქმის ოფიციალური სახელი",
+     "explain": "ერთი სიმბოლოს სხვაობა „ბოროტი ტყუპის“ ნიშანია. ყალბ ქსელს ზუსტად იგივე სახელიც შეიძლება ერქვას, ამიტომ მნიშვნელოვანი საქმისთვის VPN გამოიყენეთ."
+    },
+    {
+     "id": "bait-name",
+     "label": "მაცდური სახელი",
+     "explain": "ძალიან მაცდური სახელი სატყუარაა. არავინ იცის, ვინ შექმნა ეს ქსელი."
+    },
+    {
+     "id": "vip",
+     "label": "მოგონილი VIP-ქსელი",
+     "explain": "დამატებითი ქსელი, რომელიც ოფიციალურ საინფორმაციო დაფაზე არ არის მითითებული, შეიძლება ყალბი იყოს."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "swipe",
+   "id": "b-swipe",
+   "prompt": "დაკავშირება შეიძლება თუ სარისკოა?",
+   "cards": [
+    {
+     "id": "open-unknown",
+     "artifact": {
+      "kind": "wifi",
+      "networks": [
+       {
+        "ssid": [
+         {
+          "text": "Free_WiFi_Fast"
+         }
+        ],
+        "secured": false,
+        "signal": 4
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "ღია ქსელი, რომელიც ვინ იცის ვინ შექმნა. მნიშვნელოვანი საქმისთვის მობილური ინტერნეტი გამოიყენეთ."
+    },
+    {
+     "id": "own-hotspot",
+     "artifact": {
+      "kind": "wifi",
+      "networks": [
+       {
+        "ssid": [
+         {
+          "text": "ჩემი ტელეფონი"
+         }
+        ],
+        "secured": true,
+        "signal": 4
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "თქვენივე ტელეფონის პაროლით დაცული წვდომის წერტილი. ის საჯარო ქსელზე უფრო უსაფრთხოა."
+    },
+    {
+     "id": "portal-password",
+     "artifact": {
+      "kind": "login",
+      "brand": "უფასო Wi-Fi",
+      "url": [
+       {
+        "text": "free-wifi-giris.test"
+       }
+      ],
+      "fields": [
+       "სამსახურის ელფოსტა",
+       "პაროლი"
+      ],
+      "button": "დაკავშირება"
+     },
+     "verdict": "threat",
+     "explain": "Wi-Fi-ს სამსახურის პაროლი არასოდეს სჭირდება. ეს ყალბი გვერდია, რომელიც პაროლს იპარავს."
+    },
+    {
+     "id": "hotel-room",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "qala-otel",
+      "brand": "Qala Hotel – სტუმრების Wi-Fi",
+      "url": [
+       {
+        "text": "wifi.otel-qala.test"
+       }
+      ],
+      "fields": [
+       "ოთახის ნომერი",
+       "გვარი"
+      ],
+      "button": "დაკავშირება"
+     },
+     "verdict": "safe",
+     "explain": "ბევრი სასტუმრო მხოლოდ ოთახის ნომერსა და გვარს ითხოვს, მისამართში კი სასტუმროს სახელი ჩანს. არც პაროლს ითხოვენ და არც ბარათს. ქსელი რეცეფციაზე დააზუსტეთ, სამუშაოდ კი VPN გამოიყენეთ."
+    },
+    {
+     "id": "wifi-card",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "WiFi-Xidmet"
+       }
+      ],
+      "time": "17:40",
+      "messages": [
+       [
+        {
+         "text": "თქვენი უფასო ინტერნეტ-პაკეტი სრულდება. გასაგრძელებლად შეიყვანეთ ბარათის მონაცემები: "
+        },
+        {
+         "text": "wifi-paket.test"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "უფასო ინტერნეტს თქვენი ბარათის მონაცემები არ სჭირდება. ეს მათი მოპარვის მცდელობაა."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "b-choice-vpn",
+   "question": {
+    "prompt": "კაფეში სამსახურის ელფოსტა გჭირდებათ, თქვენი ორგანიზაცია კი VPN-ს მოითხოვს. რას იზამთ?",
+    "options": [
+     {
+      "id": "vpn-first",
+      "label": "ჯერ VPN-ს ვრთავ, მერე ელფოსტას ვხსნი",
+      "correct": true,
+      "feedback": "სწორია. VPN სამსახურის მონაცემებს დაშიფრული არხით გადასცემს."
+     },
+     {
+      "id": "quick-no-vpn",
+      "label": "სწრაფად მოვრჩები, ამიტომ VPN-ის გარეშე შევდივარ",
+      "correct": false,
+      "feedback": "წესი სწრაფ საქმეებზეც ვრცელდება. ყალბი ქსელი სწორედ ასეთ მომენტებს ელოდება."
+     },
+     {
+      "id": "personal-mail",
+      "label": "ფაილებს პირად ელფოსტაზე ვიგზავნი",
+      "correct": false,
+      "feedback": "სამსახურის მონაცემების პირად ელფოსტაზე გაგზავნა შეიძლება წესებს არღვევდეს და მონაცემებს დაუცველს ტოვებდეს."
+     }
+    ]
+   },
+   "explain": "VPN-ის წესი ტყუილად არ არსებობს. ის სამსახურის მონაცემებს ღია ქსელშიც კი იცავს."
+  },
+  {
+   "type": "recap",
+   "id": "b-recap",
+   "points": [
+    "ქსელის ზუსტი სახელი პერსონალს ჰკითხეთ",
+    "Wi-Fi-სთვის სამსახურის პაროლი არასოდეს შეიყვანოთ",
+    "მნიშვნელოვანი საქმისთვის – მობილური ინტერნეტი ან VPN"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

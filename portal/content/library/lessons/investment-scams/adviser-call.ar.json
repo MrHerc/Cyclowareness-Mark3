@@ -1,0 +1,416 @@
+{
+ "id": "adviser-call",
+ "title": "مكالمة المستشار",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac-tutor",
+   "beats": [
+    {
+     "id": "ac-b1",
+     "say": "مرحبًا! نتعرف اليوم على أخطر لحظة في الاحتيال الاستثماري: مكالمة المستشار الشخصي.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "ac-b2",
+     "say": "تبدأ القصة بإعلان أو بمجموعة على تطبيق مراسلة. انتبه لعبارة «أرباح مضمونة».",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2d-bakutrade",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "BakuTrade Pro | المستثمرون"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "+18% أخرى اليوم!"
+          }
+         ],
+         "time": "19:02"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "أرباح مضمونة، بلا أي مخاطرة.",
+           "spot": "guarantee"
+          }
+         ],
+         "time": "19:03"
+        }
+       ]
+      }
+     },
+     "highlight": "guarantee"
+    },
+    {
+     "id": "ac-b3",
+     "say": "لا يوجد استثمار مشروع يعد بأرباح كبيرة ومضمونة.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "ac-b4",
+     "say": "تحقق من الترخيص بنفسك في القائمة الرسمية للبنك المركزي. فالترخيص الأجنبي لا يكفي هنا.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "certificate"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac-sim",
+   "environment": "call",
+   "title": "مكالمة من BakuTrade Pro",
+   "intro": "تركت رقمك في نموذج من أحد الإعلانات. والآن يتصل بك مستشار. اختر ردودك.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "المملكة المتحدة",
+      "voice": "young-man-2"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "رد",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "الرد على المكالمة ليس خطيرًا. المهم هو ما توافق عليه."
+      },
+      {
+       "id": "decline",
+       "label": "رفض",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "هذا خيار جيد أيضًا. لا يلزمك الرد على رقم أجنبي غير معروف.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pitch",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "المملكة المتحدة",
+      "voice": "young-man-2"
+     },
+     "say": "مرحبًا، أنا جاويد علي زاده، مستشارك الشخصي في BakuTrade Pro. نضمن لك ثلاثين بالمئة شهريًا، دون أي مخاطرة.",
+     "spoken": "مرحبًا، <breath> أنا جاويد علي زاده، مستشارك الشخصي في BakuTrade Pro. نضمن لك، أمم، ثلاثين بالمئة شهريًا، دون أي مخاطرة.",
+     "actions": [
+      {
+       "id": "interested",
+       "label": "يبدو هذا جيدًا، ماذا علي أن أفعل؟",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "الأرباح المرتفعة المضمونة هي العلامة الأوضح على الاحتيال. وإذا واصلت، فسيطلبون منك المال."
+      },
+      {
+       "id": "licence",
+       "label": "سأتحقق من ترخيصكم في قائمة البنك المركزي",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "صحيح. تحقق من الترخيص بنفسك في القائمة الرسمية، لا على أساس كلامهم.",
+       "next": "licence-push"
+      },
+      {
+       "id": "hang",
+       "label": "إنهاء المكالمة",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "قرار صائب. الوعد بأرباح مضمونة سبب يكفي لإنهاء المكالمة.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "deposit",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "المملكة المتحدة",
+      "voice": "young-man-2"
+     },
+     "say": "رائع! تحتاج فقط إلى 250 مانات للبدء. أعطني رقم بطاقتك والرمز المكتوب على ظهرها، وسأفتح لك الحساب.",
+     "spoken": "رائع! <breath> تحتاج فقط إلى 250 مانات للبدء. أعطني رقم بطاقتك والرمز المكتوب على ظهرها، وسأفتح لك الحساب.",
+     "actions": [
+      {
+       "id": "give-card",
+       "label": "سأقرأ له بيانات بطاقتي",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "بيانات بطاقتك وصلت إلى المحتال. اتصل ببنكك فور انتهاء المكالمة واطلب إيقاف البطاقة.",
+       "next": "remote"
+      },
+      {
+       "id": "refuse",
+       "label": "لا أعطي بيانات بطاقتي عبر الهاتف",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "صحيح. لا تخبر أحدًا أبدًا عبر الهاتف برقم بطاقتك أو بالرمز المكتوب على ظهرها.",
+       "next": "licence-push"
+      },
+      {
+       "id": "hang",
+       "label": "إنهاء المكالمة",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "قرار صائب. إنهاء المكالمة التي تطلب بيانات البطاقة هو التصرف الصحيح.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "licence-push",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "المملكة المتحدة",
+      "voice": "young-man-2"
+     },
+     "say": "لدينا ترخيص أوروبي، وقد أرسلت لك الشهادة للتو. لا داعي للتحقق لدى البنك المركزي.",
+     "spoken": "لدينا ترخيص أوروبي، أمم، وقد أرسلت لك الشهادة للتو. <breath> لا داعي للتحقق لدى البنك المركزي.",
+     "actions": [
+      {
+       "id": "accept",
+       "label": "ما دامت هناك شهادة، فلا بأس",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "صورة الشهادة سهلة التزوير. وقد حذر البنك المركزي من أن الترخيص الأجنبي لا يمنح حق العمل هنا."
+      },
+      {
+       "id": "check",
+       "label": "سأتحقق من القائمة الرسمية على أي حال",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "رائع. المستشار الذي يحاول منعك من التحقق يكشف نفسه بنفسه."
+      },
+      {
+       "id": "hang",
+       "label": "إنهاء المكالمة",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "صحيح. عندما يشتد الضغط، فإنهاء المكالمة هو أفضل رد.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "remote",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "المملكة المتحدة",
+      "voice": "young-man-2"
+     },
+     "say": "دعني أساعدك في التداول. ثبت تطبيق EkranPaylash حتى أتمكن من رؤية شاشتك.",
+     "spoken": "دعني، أمم، أساعدك في التداول. <breath> ثبت تطبيق EkranPaylash حتى أتمكن من رؤية شاشتك.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "سأثبت التطبيق",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "بهذا التطبيق يستطيع التحكم في شاشتك وفي تطبيق البنك. لا تثبت تطبيقًا كهذا أبدًا لمجرد أن متصلًا طلب منك ذلك."
+      },
+      {
+       "id": "refuse",
+       "label": "لن أثبت أي تطبيق",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "صحيح. المستشار الحقيقي لا يطلب أبدًا التحكم في شاشتك."
+      },
+      {
+       "id": "hang",
+       "label": "إنهاء المكالمة",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "قرار صائب. أي مكالمة تطلب الوصول إلى جهازك عن بعد يجب إنهاؤها فورًا."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "انتهت المكالمة. ما الخطوة التالية؟",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "المملكة المتحدة",
+      "voice": "young-man-2"
+     },
+     "actions": [
+      {
+       "id": "check-list",
+       "label": "التحقق من قائمة البنك المركزي",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "صحيح. إذا لم تكن الشركة في القائمة، فأبلغ الشرطة على الرقم 102."
+      },
+      {
+       "id": "call-back",
+       "label": "معاودة الاتصال بالمستشار",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "معاودة الاتصال تعيد زمام الحديث إلى المحتال. تحقق عبر مصدر رسمي."
+      },
+      {
+       "id": "block",
+       "label": "حظر الرقم",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "جيد. وإذا أعطيت بيانات بطاقتك، فاتصل ببنكك فورًا أيضًا."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ac-choice",
+   "question": {
+    "prompt": "تقول لك زميلتك: «أنا ربحت 200 مانات في الشهر الأول وسحبتها. إذن المنصة حقيقية».",
+    "options": [
+     {
+      "id": "bait",
+      "label": "السحب الأول طعم، ولن يعيدوا مبلغًا كبيرًا",
+      "correct": true,
+      "feedback": "صحيح. يتركونك تسحب مبلغًا صغيرًا ليحصلوا منك على إيداع أكبر بكثير."
+     },
+     {
+      "id": "join",
+      "label": "إذن هي حقيقية، سأنضم أنا أيضًا",
+      "correct": false,
+      "feedback": "سحب ناجح واحد لا يثبت أن المنصة قانونية. تحقق من الترخيص في القائمة الرسمية."
+     },
+     {
+      "id": "more",
+      "label": "عليها أن تستثمر أكثر لتزيد أرباحها",
+      "correct": false,
+      "feedback": "هذا بالضبط ما ينتظره المحتالون. فبعد الإيداع الكبير يتوقف السحب فجأة."
+     }
+    ]
+   },
+   "explain": "ثق بقائمة التراخيص لدى البنك المركزي، لا بكلام المنصة."
+  },
+  {
+   "type": "order",
+   "id": "ac-order",
+   "prompt": "رتب الخطوات الواجبة بعد إرسال المال إلى منصة احتيالية.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "التوقف عن الدفع وقطع التواصل"
+    },
+    {
+     "id": "bank",
+     "label": "الاتصال بالبنك وإيقاف البطاقة"
+    },
+    {
+     "id": "evidence",
+     "label": "الاحتفاظ بالمحادثات والأرقام وسجلات التحويل"
+    },
+    {
+     "id": "police",
+     "label": "إبلاغ الشرطة على الرقم 102"
+    }
+   ],
+   "explain": "بعد ذلك ستظهر خدمات تعدك باسترداد أموالك. هذه عملية احتيال ثانية، فلا تدفع لها شيئًا."
+  },
+  {
+   "type": "recap",
+   "id": "ac-recap",
+   "points": [
+    "الأرباح المرتفعة المضمونة علامة على الاحتيال.",
+    "تحقق من الترخيص بنفسك في القائمة الرسمية للبنك المركزي.",
+    "لا تثبت أي تطبيق ولا تشارك بيانات بطاقتك بطلب من أي متصل."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

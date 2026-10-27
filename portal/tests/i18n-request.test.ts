@@ -44,18 +44,45 @@ describe("request config", () => {
     session.value = null;
   });
 
-  it("gives a signed-out visitor outside Azerbaijan English for a language the app does not have", async () => {
+  it("gives a signed-out visitor the browser's language, and outside Azerbaijan English for one the app does not have", async () => {
     cookie.value = undefined;
-    header.accept = "de-DE,de;q=0.9";
+    header.accept = "it-IT,it;q=0.9";
     expect((await (await config())({})).locale).toBe("en");
     header.country = "AZ";
     expect((await (await config())({})).locale).toBe("az");
     header.country = null;
-    header.accept = "tr-TR,tr;q=0.9";
-    expect((await (await config())({})).locale).toBe("az");
-    header.accept = "uk-UA";
-    expect((await (await config())({})).locale).toBe("ru");
+    for (const [accept, locale] of [
+      ["tr-TR,tr;q=0.9", "tr"],
+      ["uk-UA", "uk"],
+      ["de-DE,de;q=0.9", "de"],
+      ["ar-SA,ar;q=0.9", "ar"],
+      ["kk-KZ", "ru"],
+    ]) {
+      header.accept = accept;
+      expect((await (await config())({})).locale, accept).toBe(locale);
+    }
     header.accept = null;
     expect((await (await config())({})).locale).toBe("az");
+    // The first load of each language transforms its nine message files.
+  }, 30_000);
+
+  it("maps alias cookies but never reads Object.prototype for a crafted one", async () => {
+    session.value = null;
+    cookie.value = "kk";
+    expect((await (await config())({})).locale).toBe("ru");
+    cookie.value = "uk";
+    expect((await (await config())({})).locale).toBe("uk");
+    header.accept = "en-US";
+    // A cookie left from the removed Italian site falls back like any unknown language.
+    cookie.value = "it";
+    expect((await (await config())({})).locale).toBe("en");
+    for (const name of ["constructor", "__proto__", "toString", "hasOwnProperty", "valueOf"]) {
+      cookie.value = name;
+      const r = await (await config())({});
+      expect(r.locale, name).toBe("en");
+      expect(r.messages.common.cancel, name).toBe("Cancel");
+    }
+    header.accept = null;
+    cookie.value = undefined;
   });
 });

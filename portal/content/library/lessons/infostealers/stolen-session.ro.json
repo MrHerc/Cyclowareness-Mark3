@@ -1,0 +1,353 @@
+{
+ "id": "stolen-session",
+ "title": "Sesiunea furată",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "is2-tutor",
+   "beats": [
+    {
+     "id": "is2-b1",
+     "say": "Bună ziua! Dimineața descoperiți că, peste noapte, din e-mailul dumneavoastră de serviciu au plecat patruzeci de mesaje în străinătate.",
+     "mood": "alert",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "is2-b2",
+     "say": "Nimeni nu v-a aflat parola. Un program v-a furat din browser sesiunea de conectare, adică cookie-ul.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "ispoct",
+       "app": "IshPocht",
+       "title": [
+        {
+         "text": "Conectare nouă"
+        }
+       ],
+       "body": [
+        {
+         "text": "Amsterdam, 03:05, browser necunoscut",
+         "spot": "location"
+        }
+       ],
+       "time": "03:05"
+      }
+     },
+     "highlight": "location"
+    },
+    {
+     "id": "is2-b3",
+     "say": "Cookie-ul îi arată site-ului că v-ați conectat deja, așa că acesta nu mai cere nici parolă, nici cod.",
+     "mood": "talk",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "is2-b4",
+     "say": "Vă ajută trei lucruri: un dispozitiv curat, deconectarea din toate sesiunile și suportul IT.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "is2-match",
+   "prompt": "Ce îi permite unui infractor fiecare element furat? Potriviți-le.",
+   "pairs": [
+    {
+     "id": "cookie",
+     "left": "Sesiunea de conectare din browser",
+     "right": "Să intre în cont fără parolă și fără cod"
+    },
+    {
+     "id": "saved",
+     "left": "Parolele salvate în browser",
+     "right": "Să intre în conturile dumneavoastră de pe alte site-uri"
+    },
+    {
+     "id": "card",
+     "left": "Datele cardului salvate pentru completarea automată",
+     "right": "Să plătească online în numele dumneavoastră"
+    },
+    {
+     "id": "messenger",
+     "left": "Sesiunea aplicației de mesagerie",
+     "right": "Să vă citească conversațiile și să scrie în numele dumneavoastră"
+    }
+   ],
+   "explain": "Un infostealer le fură pe toate odată. De aceea schimbați toate parolele, nu doar una, și deconectați-vă din toate sesiunile."
+  },
+  {
+   "type": "simulation",
+   "id": "is2-sim",
+   "environment": "browser",
+   "title": "Pe un computer de serviciu curat",
+   "intro": "Lucrați pe computerul de serviciu, iar acesta este curat. Deschideți e-mailul și alegeți pasul corect pe fiecare ecran.",
+   "steps": [
+    {
+     "id": "sent-folder",
+     "label": "Trimise: azi-noapte la 03:12, 40 de e-mailuri către adrese necunoscute",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://poct.idare.example/gonderilenler"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "call-it",
+       "label": "Sunați la suportul IT",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Un specialist poate proteja imediat contul și poate vedea ce s-a trimis."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți e-mailurile",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Ștergerea nu aduce înapoi e-mailurile trimise, dar distruge dovezile. Anunțați mai întâi suportul IT."
+      },
+      {
+       "id": "later",
+       "label": "Închideți și verificați mai târziu",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Atacatorul este încă în cont și continuă să trimită mesaje. Fiecare minut contează."
+      }
+     ]
+    },
+    {
+     "id": "new-login",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Conectare de pe un dispozitiv nou"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Windows, browser necunoscut"
+        }
+       ],
+       [
+        {
+         "text": "Amsterdam, azi, la 03:05"
+        }
+       ],
+       [
+        {
+         "text": "Dumneavoastră ați fost?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Nu am fost eu",
+       "Am fost eu"
+      ]
+     },
+     "actions": [
+      {
+       "id": "not-me",
+       "label": "Nu am fost eu",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Sistemul marchează conectarea ca suspectă, iar suportul IT o va vedea."
+      },
+      {
+       "id": "me",
+       "label": "Am fost eu",
+       "kind": "mark-safe",
+       "outcome": "compromised",
+       "feedback": "Tocmai ați confirmat conectarea atacatorului. Acum sistemul îl tratează ca și cum ar fi dumneavoastră."
+      }
+     ]
+    },
+    {
+     "id": "change-password",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "IshPocht",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/parol"
+       }
+      ],
+      "fields": [
+       "Parola actuală",
+       "Parola nouă",
+       "Repetați parola nouă"
+      ],
+      "button": "Schimbați parola"
+     },
+     "say": "Adresa este cea reală, iar computerul este curat.",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Schimbați parola",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Corect. Introduceți o parolă nouă doar pe un dispozitiv curat; altfel, programul o fură și pe aceasta."
+      },
+      {
+       "id": "skip",
+       "label": "Mai târziu",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Parola veche poate fi deja furată. Schimbați-o acum, de pe acest computer curat."
+      }
+     ]
+    },
+    {
+     "id": "sessions",
+     "label": "Sesiuni active: 3 dispozitive. Vă deconectați de pe toate?",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/sessiyalar"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "sign-out-all",
+       "label": "Deconectați-vă de pe toate dispozitivele",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Cookie-ul furat nu mai funcționează, iar atacatorul ar trebui să se conecteze din nou."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Schimbarea parolei nu închide întotdeauna o sesiune deschisă. Atacatorul poate fi încă în cont."
+      }
+     ]
+    },
+    {
+     "id": "forward-rule",
+     "label": "Regulă nouă, 03:07: tot e-mailul se redirecționează către arxiv@poct-yedek.example",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://poct.idare.example/qaydalar"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "show-it",
+       "label": "Arătați regula suportului IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Chiar și după ce atacatorul a ieșit din cont, această regulă a continuat să-i trimită e-mailurile dumneavoastră."
+      },
+      {
+       "id": "leave",
+       "label": "Lăsați-o așa",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Este o redirecționare ascunsă. Fiecare e-mail nou pe care îl primiți va ajunge la atacator."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "is2-choice",
+   "question": {
+    "prompt": "Cum a intrat atacatorul în căsuța de e-mail fără parola și fără codul dumneavoastră?",
+    "options": [
+     {
+      "id": "cookie",
+      "label": "Cu o sesiune furată din browser",
+      "correct": true,
+      "feedback": "Corect. Sesiunea arată că v-ați conectat deja, așa că nu se mai cere niciun cod."
+     },
+     {
+      "id": "guess",
+      "label": "Ghicind parola",
+      "correct": false,
+      "feedback": "Atunci sistemul ar fi cerut un cod. Aici nu a fost nevoie nici de parolă, nici de cod."
+     },
+     {
+      "id": "server",
+      "label": "Serverul de e-mail a fost spart",
+      "correct": false,
+      "feedback": "Serverul este în regulă. A fost furată sesiunea din browserul dumneavoastră."
+     }
+    ]
+   },
+   "explain": "Când un cookie este furat, nici verificarea în doi pași nu mai ajută. De aceea, nu lăsați niciun infostealer să ajungă pe computerul dumneavoastră."
+  },
+  {
+   "type": "order",
+   "id": "is2-order",
+   "prompt": "Dacă un computer este infectat, puneți pașii în ordine.",
+   "items": [
+    {
+     "id": "isolate",
+     "label": "Deconectați computerul infectat de la rețea"
+    },
+    {
+     "id": "report",
+     "label": "Anunțați imediat suportul IT"
+    },
+    {
+     "id": "passwords",
+     "label": "Schimbați parolele de pe un dispozitiv curat"
+    },
+    {
+     "id": "sessions",
+     "label": "Deconectați-vă din toate sesiunile"
+    },
+    {
+     "id": "rebuild",
+     "label": "Lăsați suportul IT să reinstaleze complet computerul"
+    }
+   ],
+   "explain": "Dacă schimbați o parolă pe computerul infectat, programul o fură și pe cea nouă. Computerul este considerat curat abia după o reinstalare completă."
+  },
+  {
+   "type": "recap",
+   "id": "is2-recap",
+   "points": [
+    "O sesiune furată oferă acces fără parolă și fără cod",
+    "Schimbați parolele de pe un dispozitiv curat, apoi deconectați-vă din toate sesiunile",
+    "Lăsați suportul IT să reinstaleze complet computerul infectat"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,509 @@
+{
+ "id": "hospital-call",
+ "title": "Apel de la spital",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "hc-tutor",
+   "beats": [
+    {
+     "id": "hc-b1",
+     "say": "De data aceasta, escrocul vă sună și pretinde că este medic la un spital din străinătate.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "hc-b2",
+     "say": "Vă spune că prietenul dumneavoastră de pe internet a avut un accident și are nevoie urgent de bani pentru o operație.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2e-nordhaven-klinika",
+       "caller": [
+        {
+         "text": "Nordhaven Clinic"
+        }
+       ],
+       "number": [
+        {
+         "text": "+44 7700 900 418",
+         "spot": "number"
+        }
+       ],
+       "label": "Internațional"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "hc-b3",
+     "say": "Urgență, frică și secret: când toate trei apar împreună, aveți de-a face cu o înșelătorie.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "hc-b4",
+     "say": "Închideți, căutați chiar dumneavoastră numărul și vorbiți cu familia înainte să trimiteți vreun ban.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "hc-choice",
+   "question": {
+    "prompt": "Persoana care vă sună spune că prietenul dumneavoastră este în spital și că banii trebuie trimiși astăzi. Care este primul pas?",
+    "options": [
+     {
+      "id": "hang-up",
+      "label": "Închid și caut eu numărul spitalului",
+      "correct": true,
+      "feedback": "Corect. Un apel la un număr găsit chiar de dumneavoastră îl demască imediat pe falsul medic."
+     },
+     {
+      "id": "pay",
+      "label": "Trimit repede banii și întreb mai târziu",
+      "correct": false,
+      "feedback": "Banii trimiși nu se mai întorc. Urgența este creată exact pentru asta."
+     },
+     {
+      "id": "card",
+      "label": "Le dau datele cardului, ca să ia ei banii",
+      "correct": false,
+      "feedback": "Cu datele cardului dumneavoastră pot lua cât vor. Nu dați niciodată datele cardului la telefon."
+     },
+     {
+      "id": "secret",
+      "label": "Promit că nu spun nimănui",
+      "correct": false,
+      "feedback": "Secretul îl ajută pe escroc. Familia dumneavoastră vede situația cu mintea limpede."
+     }
+    ]
+   },
+   "explain": "O cerere urgentă de bani la telefon, mai ales în criptomonede, este un semn de înșelătorie. Închideți și verificați chiar dumneavoastră."
+  },
+  {
+   "type": "simulation",
+   "id": "hc-sim",
+   "environment": "call",
+   "title": "Un apel în miez de noapte",
+   "intro": "La unu noaptea primiți un apel din străinătate. Citiți ce spune persoana care sună și alegeți răspunsul.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Internațional",
+      "voice": "woman"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Răspundeți",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Nu este periculos să răspundeți. Contează ce spuneți."
+      },
+      {
+       "id": "decline",
+       "label": "Respingeți",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Și așa este bine. Dacă vă îngrijorează apelul, verificați mai târziu numărul chiar dumneavoastră.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "doctor",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Internațional",
+      "voice": "woman"
+     },
+     "say": "Sunt doctor Helena Mart, de la clinica Nordhaven. Kamran Aliyev a avut un accident și v-a indicat drept cea mai apropiată rudă.",
+     "spoken": "Sunt doctor Helena Mart, <breath> de la clinica Nordhaven. Kamran Aliyev a avut un accident, și v-a indicat drept cea mai apropiată rudă.",
+     "actions": [
+      {
+       "id": "video",
+       "label": "Vreau un apel video cu Kamran",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "O verificare bună. Un escroc găsește mereu un motiv pentru care apelul video este imposibil."
+      },
+      {
+       "id": "panic",
+       "label": "De ce aveți nevoie? Vă ajut",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Șocul este de înțeles, dar această întrebare deschide ușa unei cereri de bani. Verificați mai întâi."
+      },
+      {
+       "id": "hang-up",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "O decizie bună. Puteți găsi chiar dumneavoastră numărul clinicii și puteți suna acolo.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "demand",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Internațional",
+      "voice": "woman"
+     },
+     "say": "Este inconștient. Pentru operație este nevoie astăzi de un avans de patru mii opt sute de manați, iar asigurarea lui nu acoperă suma.",
+     "spoken": "Este inconștient. <breath> Pentru operație este nevoie astăzi de un avans de patru mii opt sute de manați, iar asigurarea lui, ăă, nu acoperă suma.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Trimit banii, dați-mi datele",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Banii au ajuns la escroc. Verificați întotdeauna chiar dumneavoastră o cerere urgentă de bani primită la telefon."
+      },
+      {
+       "id": "card",
+       "label": "Vă dau datele cardului",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Cu datele cardului dumneavoastră pot lua cât vor. Nu le spuneți niciodată la telefon."
+      },
+      {
+       "id": "check",
+       "label": "Caut numărul clinicii și sun eu acolo",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Un număr găsit chiar de dumneavoastră nu vă duce înapoi la escroc."
+      }
+     ]
+    },
+    {
+     "id": "push",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Internațional",
+      "voice": "woman"
+     },
+     "say": "Nu este timp! Merg și criptomonede, vă trimit adresa prin SMS. Nu spuneți nimănui despre asta.",
+     "spoken": "Nu este timp! <breath> Merg și criptomonede, vă trimit adresa prin SMS. Nu spuneți nimănui despre asta.",
+     "actions": [
+      {
+       "id": "crypto",
+       "label": "Plătesc în criptomonede",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Nimeni nu poate anula un transfer în criptomonede. O cerere urgentă de criptomonede la telefon este un semn de înșelătorie."
+      },
+      {
+       "id": "sister",
+       "label": "Trebuie să vorbesc mai întâi cu sora mea",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Escrocul se teme de familia dumneavoastră, pentru că ea vede trucul."
+      },
+      {
+       "id": "hang-up",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Corect. Criptomonedele, presiunea și secretul, toate la un loc, înseamnă înșelătorie."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Internațional",
+      "voice": "woman"
+     },
+     "actions": [
+      {
+       "id": "call-back",
+       "label": "Sunați înapoi la acest număr",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Numărul este al escrocului, care vă va spune aceeași poveste. Căutați chiar dumneavoastră numărul."
+      },
+      {
+       "id": "family",
+       "label": "Le spun celor din familie",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. O discuție cu familia înlătură imediat presiunea."
+      },
+      {
+       "id": "block",
+       "label": "Blocați numărul",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bine. Blocați numărul și raportați și profilul de pe platforma de întâlniri."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "hc-swipe",
+   "prompt": "Care mesaj este normal și care este un semnal de alarmă?",
+   "cards": [
+    {
+     "id": "video-date",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Elchin"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Facem un apel video diseară la 8? Apoi ne putem vedea sâmbătă la o cafenea."
+         }
+        ],
+        "time": "18:20"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Propunerea unui apel video și a unei întâlniri într-un loc public este normală. Exact asta evită un escroc."
+    },
+    {
+     "id": "visa",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Mark Leon"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ca să vin să te văd, am nevoie de bani pentru viză, 600 AZN. Ți-i dau înapoi imediat ce ajung, îți promit."
+         }
+        ],
+        "time": "23:10"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Când cineva pe care nu l-ați întâlnit niciodată vă cere bani pentru bilet, viză sau vamă, este o înșelătorie clasică."
+    },
+    {
+     "id": "withdraw-fee",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2e-kriptonova",
+      "app": "KriptoNova",
+      "title": [
+       {
+        "text": "Profitul dumneavoastră: 2.340 AZN"
+       }
+      ],
+      "body": [
+       {
+        "text": "Ca să vă retrageți banii, plătiți mai întâi un impozit de 15%."
+       }
+      ],
+      "time": "09:05"
+     },
+     "verdict": "threat",
+     "explain": "O platformă care vrea o plată înainte să vă puteți retrage banii este falsă. Cifra profitului este inventată."
+    },
+    {
+     "id": "report-done",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2e-gorusek",
+      "app": "Görüşək",
+      "title": [
+       {
+        "text": "Raportarea dumneavoastră a fost analizată"
+       }
+      ],
+      "body": [
+       {
+        "text": "Profilul pe care l-ați raportat era fals și a fost închis. Vă mulțumim."
+       }
+      ],
+      "time": "14:30"
+     },
+     "verdict": "safe",
+     "explain": "Aceasta este o notificare obișnuită a platformei și nu vă cere nimic. Raportarea unui profil fals îi protejează pe ceilalți."
+    },
+    {
+     "id": "secret",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Kamran Aliyev"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Nu le spune alor tăi, nu ne vor înțelege. E doar secretul nostru."
+         }
+        ],
+        "time": "22:45"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Cine vrea să vă îndepărteze de familie ascunde ceva. Cererea de a păstra un secret este un semnal de alarmă."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "hc-scenario",
+   "title": "Sora dumneavoastră întreabă",
+   "start": "sister",
+   "nodes": [
+    {
+     "id": "sister",
+     "text": "Se vede că te frământă ceva. Ce s-a întâmplat, te deranjează cineva?",
+     "speaker": "Nigar (sora dumneavoastră)",
+     "voice": "woman-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Se vede că te frământă ceva. <breath> Ce s-a întâmplat, te deranjează cineva?",
+     "character": "nigar",
+     "choices": [
+      {
+       "label": "Îi povestesc totul și îi arăt conversația",
+       "next": "search",
+       "feedback": "Corect. Când vorbiți despre asta, escrocul își pierde puterea."
+      },
+      {
+       "label": "Nimic, Kamran m-a rugat să nu spun nimănui",
+       "outcome": "risky",
+       "feedback": "Secretul îl ajută pe escroc. O discuție cu cineva apropiat este cea mai puternică protecție."
+      }
+     ]
+    },
+    {
+     "id": "search",
+     "text": "Hai să căutăm împreună poza lui Kamran, cu o căutare inversă de imagini. Uite, fotografia apare sub alt nume, pe pagina unui model din străinătate!",
+     "speaker": "Nigar (sora dumneavoastră)",
+     "voice": "woman-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Hai să căutăm împreună poza lui Kamran, cu o căutare inversă de imagini. <breath> Uite, fotografia apare sub alt nume, pe pagina unui model din străinătate!",
+     "character": "nigar",
+     "choices": [
+      {
+       "label": "Raportez și blochez profilul și nu mai trimit niciodată bani",
+       "outcome": "safe",
+       "feedback": "Foarte bine. V-ați protejat pe dumneavoastră și pe alții."
+      },
+      {
+       "label": "Poate cineva i-a furat poza, eu mai vorbesc cu el",
+       "outcome": "risky",
+       "feedback": "Profilurile false se construiesc pe fotografii furate. Aveți încredere în ce a arătat verificarea."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "hc-recap",
+   "points": [
+    "Dacă primiți la telefon o cerere urgentă de bani, închideți și căutați chiar dumneavoastră numărul.",
+    "Criptomonedele, presiunea și secretul, toate la un loc, înseamnă înșelătorie.",
+    "Vorbiți cu familia înainte să trimiteți bani și raportați profilul fals."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

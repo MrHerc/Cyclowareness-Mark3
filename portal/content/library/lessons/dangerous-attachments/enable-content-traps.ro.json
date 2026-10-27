@@ -1,0 +1,468 @@
+{
+ "id": "enable-content-traps",
+ "title": "Capcane cu macrocomenzi",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ec-tutor",
+   "beats": [
+    {
+     "id": "ec-b1",
+     "say": "Un document descărcat de pe internet se deschide mai întâi în Vizualizare protejată, doar pentru citire. Acesta este scutul dumneavoastră.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "ec-b2",
+     "say": "Dacă pe o pagină goală apare un text ca acesta, opriți-vă. Un document real nu vă cere să apăsați butoane.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "senedyaz",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Vizualizare protejată: acest fișier provine de pe internet"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Documentul este gol, se vede doar o imagine:"
+         }
+        ],
+        [
+         {
+          "text": "„Pentru a vedea textul, dați clic pe «Activați editarea», apoi pe «Activați conținutul».”",
+          "spot": "lure"
+         }
+        ]
+       ],
+       "buttons": [
+        "Activați editarea",
+        "Închideți"
+       ]
+      }
+     },
+     "highlight": "lure"
+    },
+    {
+     "id": "ec-b3",
+     "say": "O macrocomandă este o comandă ascunsă într-un document. Ea poate instala malware pe computer.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "ec-b4",
+     "say": "Și încă ceva: nu acceptați niciodată să descărcați de pe un site un program special, doar ca să puteți deschide un document.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ec-sim-doc",
+   "environment": "desktop",
+   "title": "Deschiderea unui document",
+   "intro": "Ați deschis un atașament numit „condițiile licitației”. Citiți fiecare fereastră și decideți la fiecare pas.",
+   "steps": [
+    {
+     "id": "protected-view",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedyaz",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Vizualizare protejată: acest fișier provine de pe internet"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Documentul este gol, se vede doar o imagine:"
+        }
+       ],
+       [
+        {
+         "text": "„Pentru a vedea textul, dați clic pe «Activați editarea», apoi pe «Activați conținutul».”",
+         "spot": "lure"
+        }
+       ]
+      ],
+      "buttons": [
+       "Activați editarea",
+       "Închideți"
+      ]
+     },
+     "say": "Documentul este gol și vă cere un clic.",
+     "actions": [
+      {
+       "id": "enable",
+       "label": "Activați editarea",
+       "kind": "enable-content",
+       "outcome": "risky",
+       "feedback": "Ați ieșit din Vizualizare protejată. Acest mod există tocmai ca să vă apere de astfel de fișiere."
+      },
+      {
+       "id": "close",
+       "label": "Închideți documentul",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. O pagină goală care vă cere un clic este o capcană.",
+       "next": "it-alert"
+      },
+      {
+       "id": "report",
+       "label": "Raportați echipei de securitate IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Ați raportat documentul fără să activați editarea.",
+       "next": "it-alert"
+      }
+     ]
+    },
+    {
+     "id": "macro-blocked",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedyaz",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Risc de securitate: macrocomenzi blocate"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Macrocomenzile din acest document sunt blocate, deoarece fișierul provine de pe internet."
+        }
+       ],
+       [
+        {
+         "text": "Documentul spune: „Deblocați fișierul din proprietățile lui și permiteți macrocomenzile.”",
+         "spot": "unblock"
+        }
+       ]
+      ],
+      "buttons": [
+       "Aflați mai multe",
+       "Închideți"
+      ]
+     },
+     "say": "Aplicația a blocat macrocomenzile. Documentul vă cere să le deblocați.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Deblocați și permiteți macrocomenzile",
+       "kind": "enable-content",
+       "outcome": "compromised",
+       "feedback": "Macrocomanda ascunsă a rulat și a instalat malware. Deconectați imediat dispozitivul de la rețea și sunați la echipa de securitate IT."
+      },
+      {
+       "id": "close",
+       "label": "Închideți documentul",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "V-ați oprit la timp. Aplicația v-a protejat, iar dumneavoastră nu i-ați ocolit protecția."
+      }
+     ]
+    },
+    {
+     "id": "it-alert",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "it-destek",
+      "app": "Suport IT",
+      "title": [
+       {
+        "text": "Alertă: documente de licitație false"
+       }
+      ],
+      "body": [
+       {
+        "text": "Circulă documente periculoase numite „condițiile licitației”. Dacă ați primit unul, raportați-l."
+       }
+      ],
+      "time": "11:02"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați e-mailul",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Raportarea dumneavoastră ajută echipa IT să șteargă e-mailul din toate căsuțele."
+      },
+      {
+       "id": "ignore",
+       "label": "Ignorați",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Ați închis fișierul, dar e-mailul este tot acolo. Raportați-l, ca să nu-l deschidă colegii."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ec-sim-viewer",
+   "environment": "browser",
+   "title": "Cititor PDF fals",
+   "intro": "Un link dintr-un e-mail vă oferă un program cu care să deschideți documentul. Ce faceți?",
+   "steps": [
+    {
+     "id": "viewer-page",
+     "label": "Actualizați Sənəd Oxu pentru a vedea acest document",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "senedoxu-fake",
+      "url": [
+       {
+        "text": "https://senedoxu-yenile.example.net/bax"
+       }
+      ]
+     },
+     "say": "Uitați-vă la bara de adrese.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Descărcați și instalați",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Cititorul fals este malware. Browserul dumneavoastră poate deschide singur fișierele PDF."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Programele se instalează doar de către echipa IT sau din centrul de software al organizației."
+      },
+      {
+       "id": "report",
+       "label": "Raportați site-ul",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Raportarea site-ului îi protejează și pe colegi."
+      }
+     ]
+    },
+    {
+     "id": "viewer-download",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "senedoxu-fake",
+      "name": [
+       {
+        "text": "SenedOxu_Actualizare.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "5,7 MB",
+      "source": [
+       {
+        "text": "senedoxu-yenile.example.net"
+       }
+      ]
+     },
+     "say": "O descărcare a pornit de la sine. Verificați tipul fișierului.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Este un program de pe un site fals. Dacă îl deschideți, computerul se infectează."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. O descărcare pe care nu ați cerut-o se șterge fără să fie deschisă."
+      },
+      {
+       "id": "report",
+       "label": "Raportați echipei IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Echipa IT poate bloca acest site pentru toată lumea."
+      }
+     ]
+    },
+    {
+     "id": "portal-pdf",
+     "label": "Instructiuni_2026.pdf",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "idare",
+      "url": [
+       {
+        "text": "https://portal.idare.example/senedler/telimat-2026.pdf"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți documentul",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. Este portalul intern, fișierul se deschide în browser și nu trebuie instalat nimic."
+      },
+      {
+       "id": "report",
+       "label": "Raportați site-ul",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Acesta este portalul organizației dumneavoastră și nu vă cere nicio instalare. Păstrați raportările pentru cazurile suspecte."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ec-hotspot",
+   "prompt": "Găsiți semnele unei capcane în acest e-mail.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "docusfera-fake",
+    "from": {
+     "name": [
+      {
+       "text": "DocuSfera"
+      }
+     ],
+     "address": [
+      {
+       "text": "imza@docusfera-sened.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Contract în așteptarea semnăturii"
+     }
+    ],
+    "time": "15:47",
+    "body": [
+     [
+      {
+       "text": "Documentul a fost creat într-un format mai vechi."
+      }
+     ],
+     [
+      {
+       "text": "Pentru a-l vedea, activați mai întâi editarea, apoi conținutul.",
+       "spot": "enable"
+      }
+     ],
+     [
+      {
+       "text": "Dacă nu se deschide, actualizați aici programul de vizualizare: ",
+       "spot": "viewer"
+      },
+      {
+       "text": "Descărcați Sənəd Oxu",
+       "spot": "viewer",
+       "link": {
+        "label": "Sənəd Oxu",
+        "href": "https://senedoxu-yenile.example.net/yukle"
+       }
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Contract_semnare.xlsm",
+        "spot": "macro"
+       }
+      ],
+      "size": "210 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Alt domeniu",
+     "explain": "Folosește numele serviciului de semnare, dar domeniul este diferit. Raportați e-mailul."
+    },
+    {
+     "id": "enable",
+     "label": "Cerere de activare",
+     "explain": "Un document real poate fi citit fără să activați editarea sau macrocomenzile."
+    },
+    {
+     "id": "macro",
+     "label": "Fișier cu macrocomenzi",
+     "explain": "Un fișier Office cu extensia terminată în „m” (xlsm, docm) poate conține macrocomenzi."
+    },
+    {
+     "id": "viewer",
+     "label": "Link de descărcare a unui program",
+     "explain": "Dacă pentru un document aveți nevoie de un program special, este semnul unui cititor fals."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "ec-order",
+   "prompt": "Un document vă cere să activați macrocomenzile. Ordonați pașii.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Nu apăsați niciun buton"
+    },
+    {
+     "id": "close",
+     "label": "Închideți documentul"
+    },
+    {
+     "id": "report",
+     "label": "Raportați e-mailul echipei de securitate IT"
+    },
+    {
+     "id": "verify",
+     "label": "Dacă documentul era așteptat, întrebați expeditorul la un număr cunoscut"
+    }
+   ],
+   "explain": "Mai întâi vă opriți și închideți documentul, apoi raportați. Verificați cu expeditorul doar la un număr pe care îl cunoașteți deja."
+  },
+  {
+   "type": "recap",
+   "id": "ec-recap",
+   "points": [
+    "Un document gol care vă cere un clic este o capcană",
+    "Nu activați editarea sau macrocomenzile: închideți și raportați",
+    "Nu descărcați niciodată un program de pe un site ca să deschideți un document"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

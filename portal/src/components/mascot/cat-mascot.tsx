@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useLocale } from "next-intl";
 import { cn } from "@/lib/cn";
 // Imported statically: the engine has no side effects at module load (it may be evaluated during SSR), and
 // a separate chunk loaded after hydration left the box empty for a moment.
-import { createCat, type CatBehaviour, type CatInstance } from "./cat/engine";
-import { ACT_TO_CAT, BOUNCE_MS, FIRE_TO_CAT, GESTURE_TO_CAT, HOPS, HOP_MS, bounceKeyframes, catMood, fireDue, heldGesture, hopKeyframes, lookDirection, motionOff, talkLevel } from "./cat/props";
+import { createCat, mascotAutoWeights, type CatBehaviour, type CatInstance } from "./cat/engine";
+import { ACT_TO_CAT, BOUNCE_MS, FIRE_TO_CAT, GESTURE_TO_CAT, HOPS, HOP_MS, bounceKeyframes, catMood, fireDue, heldGesture, hopKeyframes, lookDirection, mirrorForRtl, motionOff, talkLevel } from "./cat/props";
 import type { MascotAct, MascotGesture, MascotMood, MascotTopic } from "./mapping";
 import type { MascotAim, MascotFire, MascotGuide } from "./rive-mascot";
 
@@ -37,6 +38,12 @@ function readMotionOff(): boolean {
   return motionOff(false, document.documentElement.dataset.motion, window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 }
 
+// The acts the engine's own idle scheduler can pick (setAuto), which a narration interrupts.
+const AUTO_ACTS = new Set(Object.keys(mascotAutoWeights({ stage: true, idle: Infinity })).filter((k) => k !== "present"));
+
+// Read in effects only (the server renders an empty box), so it cannot cause a hydration mismatch.
+const isRtl = (el: Element) => getComputedStyle(el).direction === "rtl";
+
 /** Moves the whole cat (a hop in place or toward a side) with the Web Animations API on its host element. */
 function jump(el: HTMLElement | null, frames: Keyframe[], ms: number) {
   if (el && typeof el.animate === "function") el.animate(frames, { duration: ms, easing: "cubic-bezier(0.3, 0.7, 0.4, 1)" });
@@ -63,6 +70,7 @@ export function Mascot({
   fire,
   facing,
   onCat,
+  auto = false,
 }: {
   mood?: MascotMood;
   talking?: boolean;
@@ -83,10 +91,16 @@ export function Mascot({
   act?: MascotAct;
   guide?: MascotGuide;
   fire?: MascotFire;
-  /** Which way the cat sits (default right); the drawing is mirrored for "left". The Rive robot ignores it. */
+  /** Which way the cat sits (default right; the other way in a right-to-left page); the drawing is mirrored for "left". The Rive robot ignores it. */
   facing?: "left" | "right";
   /** Receives the engine instance once it runs (and null when it is destroyed), for hosts that drive it directly, e.g. jump(). */
   onCat?: (cat: CatInstance | null) => void;
+  /**
+   * Decorative placements only (Home, landing, sign-in panel, security overview): the cat lives on its own, sleeping
+   * after a long idle, stretching, grooming, kneading, yawning, playing (calm keeps to the quiet acts; still stays
+   * frozen). Narration placements (player, tours, tutor) leave it off. Turning it off brings the cat back to sitting.
+   */
+  auto?: boolean;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const [cat, setCat] = useState<CatInstance | null>(null);
@@ -97,13 +111,15 @@ export function Mascot({
     offRef.current = off;
   });
 
+  // A language switch refreshes the page without remounting, so the cat is rebuilt to face the new direction.
+  const locale = useLocale();
   // The engine draws on a canvas, so it starts after mount and is destroyed on unmount.
   useEffect(() => {
     if (!host.current) return;
-    const made = createCat(host.current, { mode: "mascot", aria: false, facing });
+    const made = createCat(host.current, { mode: "mascot", aria: false, facing: mirrorForRtl(facing ?? "right", isRtl(host.current)) });
     setCat(made);
     return () => made.destroy();
-  }, [facing]);
+  }, [facing, locale]);
 
   // Kept in a ref so a new callback each render does not re-run the effect.
   const onCatRef = useRef(onCat);
@@ -120,6 +136,14 @@ export function Mascot({
   useEffect(() => {
     cat?.setStill(off);
   }, [cat, off]);
+
+  const wasAuto = useRef(false);
+  useEffect(() => {
+    if (!cat) return;
+    cat.setAuto(auto);
+    if (wasAuto.current && !auto && !offRef.current && AUTO_ACTS.has(cat.state.behaviour ?? "")) cat.do("present");
+    wasAuto.current = auto;
+  }, [cat, auto]);
 
   const { listen, whisper, peer, travel } = guide ?? {};
   const moodName = catMood(mood, { listen });
@@ -144,7 +168,7 @@ export function Mascot({
   useEffect(() => {
     if (!cat || !gesture) return;
     const g = GESTURE_TO_CAT[gesture];
-    if (g) cat.play(g);
+    if (g) cat.play(mirrorForRtl(g, !!host.current && isRtl(host.current)));
     if (HOPS.has(gesture) && !offRef.current) jump(host.current, bounceKeyframes(), BOUNCE_MS);
   }, [cat, gesture, gestureKey]);
 

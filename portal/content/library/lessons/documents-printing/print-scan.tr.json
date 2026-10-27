@@ -1,0 +1,446 @@
+{
+ "id": "print-scan",
+ "title": "Yazdırma ve tarama",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Yazıcıda unutulan bir sayfa, en basit veri sızıntısıdır. Koridordan geçen herkes onu alabilir.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Göndermeden önce hangi yazıcının seçili olduğunu ve güvenli yazdırmanın açık olup olmadığını kontrol edin.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "nc-capmerkezi",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Yazdır"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Yazıcı: "
+         },
+         {
+          "text": "Koridor-2 (ortak)",
+          "spot": "printer"
+         }
+        ],
+        [
+         {
+          "text": "Güvenli yazdırma: "
+         },
+         {
+          "text": "kapalı",
+          "spot": "secure"
+         }
+        ]
+       ],
+       "buttons": [
+        "İptal",
+        "Yazdır"
+       ]
+      }
+     },
+     "highlight": "secure"
+    },
+    {
+     "id": "b3",
+     "say": "Güvenli yazdırmada sayfalar, ancak yazıcının başında kartınızı okuttuğunuzda ya da PIN kodunuzu girdiğinizde çıkar.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Tarama cihazından gelen e-postalara da dikkat edin. Saldırganlar oltalama e-postalarını sık sık taranmış belge kılığında gönderir.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "print-day",
+   "environment": "desktop",
+   "title": "Yazdırma günü",
+   "intro": "Bugün birkaç belge yazdıracaksınız. Açılan pencerelere bakın ve karar verin.",
+   "steps": [
+    {
+     "id": "salary-print",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-capmerkezi",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Yazdır: Maaş_tablosu_Ekim.xlsx"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Yazıcı: Koridor-2 (ortak)"
+        }
+       ],
+       [
+        {
+         "text": "Güvenli yazdırma: kapalı"
+        }
+       ],
+       [
+        {
+         "text": "Kopya sayısı: 1"
+        }
+       ]
+      ],
+      "buttons": [
+       "Doğrudan yazdır",
+       "Güvenli yazdırmayla gönder"
+      ]
+     },
+     "say": "Bu belgede çalışanların maaşları var.",
+     "actions": [
+      {
+       "id": "secure",
+       "label": "Güvenli yazdırmayla gönder",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Belge kuyrukta bekler ve ancak siz yazıcının başındayken çıkar."
+      },
+      {
+       "id": "direct",
+       "label": "Doğrudan yazdır",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Sayfa, ortak koridordaki yazıcıda sizi bekleyecek. Gecikirseniz onu başka biri görebilir."
+      }
+     ]
+    },
+    {
+     "id": "paper-out",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-capmerkezi",
+      "app": "Çap Mərkəzi",
+      "title": [
+       {
+        "text": "Koridor-2: kâğıt bitti"
+       }
+      ],
+      "body": [
+       {
+        "text": "İş_seyahati_listesi.pdf kuyrukta bekliyor. Kâğıt yüklenir yüklenmez yazdırılacak."
+       }
+      ],
+      "time": "11:20"
+     },
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Yazdırmayı iptal et",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. Kâğıt yüklendiğinde sayfa siz orada olmadan çıkar. Bu yüzden belgeyi güvenli yazdırmayla yeniden gönderin."
+      },
+      {
+       "id": "ignore",
+       "label": "Yok say",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Kâğıdı kim yüklerse listeyi de o alır. Kuyrukta bekleyen işi iptal edin."
+      }
+     ]
+    },
+    {
+     "id": "driver-popup",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-drayver",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Yazıcı sürücüsü güncel değil"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Yazdırmaya devam etmek için Drayver Yeniləyici uygulamasını indirin."
+        }
+       ],
+       [
+        {
+         "text": "printer-drayver.example.info"
+        }
+       ]
+      ],
+      "buttons": [
+       "Kapat",
+       "Şimdi indir"
+      ]
+     },
+     "say": "Bir web sitesi size yazıcı yazılımı öneriyor.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Şimdi indir",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Bir web sitesi, bilgisayarınızdaki sürücüyü kontrol edemez. Bu tür indirmeler genellikle zararlı yazılımdır."
+      },
+      {
+       "id": "cancel",
+       "label": "Kapat",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. Yazıcı sürücülerini yalnızca BT destek ekibi yükler."
+      },
+      {
+       "id": "report",
+       "label": "BT destek ekibine bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Mükemmel. BT destek ekibi bu pencerenin nereden geldiğini inceleyecek."
+      }
+     ]
+    },
+    {
+     "id": "scan-folder",
+     "label": "Ortak klasör: Taramalar",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-capmerkezi",
+      "name": [
+       {
+        "text": "Pasaport_taramaları_0410.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "3,2 MB",
+      "source": [
+       {
+        "text": "Ortak klasör: Tarama cihazı, 3. kat"
+       }
+      ]
+     },
+     "say": "Taradığınız pasaport kopyaları ortak bir klasöre düştü.",
+     "actions": [
+      {
+       "id": "move",
+       "label": "Klasörüme taşı",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Dosya ortak klasörde kalmasın diye onu kendi klasörünüze taşıyın."
+      },
+      {
+       "id": "leave",
+       "label": "Orada bırak",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Bu klasörü bütün kat açabilir. Pasaport kopyaları kişisel veridir."
+      },
+      {
+       "id": "share",
+       "label": "Bağlantıyı departmana gönder",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Kişisel veriler yalnızca onlara ihtiyacı olan kişiye gönderilir. Bunları bütün departmana göndermeyin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "scan-mail",
+   "prompt": "Tarama cihazından geldiğini iddia eden bu e-postadaki şüpheli noktaları bulun.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "nc-capmerkezi-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Tarama cihazı, 3. kat"
+      }
+     ],
+     "address": [
+      {
+       "text": "scan@idare-skan.example.net",
+       "spot": "sender"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Taranmış belge: 4 sayfa"
+     }
+    ],
+    "time": "14:03",
+    "body": [
+     [
+      {
+       "text": "Sayın kullanıcı,"
+      }
+     ],
+     [
+      {
+       "text": "Sizin için bir belge tarandı. "
+      },
+      {
+       "text": "24 saat içinde görüntülemezseniz belge silinecektir.",
+       "spot": "urgent"
+      }
+     ],
+     [
+      {
+       "text": "Belgeyi görüntüle",
+       "spot": "link",
+       "link": {
+        "label": "Belgeyi görüntüle",
+        "href": "https://idare-skan.example.net/view"
+       }
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Tarama_0410.pdf"
+       },
+       {
+        "text": ".html",
+        "spot": "ext"
+       }
+      ],
+      "size": "12 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Gönderenin alan adı",
+     "explain": "Tarama cihazınız e-postaları idare.example alan adından gönderir. Bu alan adı ona benziyor ama farklı."
+    },
+    {
+     "id": "urgent",
+     "label": "Zaman baskısı",
+     "explain": "Bir tarama cihazı sizi acele ettirmez. Zaman baskısı, oltalamanın (phishing) klasik bir işaretidir."
+    },
+    {
+     "id": "link",
+     "label": "Dış bağlantı",
+     "explain": "Bağlantı, kurumunuzun dışındaki bir siteye gider ve orada sizden parola istenir."
+    },
+    {
+     "id": "ext",
+     "label": "Dosya uzantısı",
+     "explain": "Bir .html dosyası belge değil, web sayfasıdır. Açıldığında sahte bir giriş formu gösterebilir."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "found-print",
+   "question": {
+    "prompt": "Yazıcıda başka birinin maaş tablosunu buluyorsunuz. Ne yaparsınız?",
+    "options": [
+     {
+      "id": "owner",
+      "label": "Okumadan sahibine ya da bir yöneticiye veririm",
+      "correct": true,
+      "feedback": "Doğru. Belge doğru ellere döner, sahibi de bir dahaki sefere daha dikkatli olur."
+     },
+     {
+      "id": "leave",
+      "label": "Olduğu yerde bırakırım, sahibi gelip alır",
+      "correct": false,
+      "feedback": "Sizden sonra gelen herkes onu görebilir. Yazıcıda sayfa bırakmayın."
+     },
+     {
+      "id": "bin",
+      "label": "En yakın çöp kutusuna atarım",
+      "correct": false,
+      "feedback": "Sıradan bir çöp kutusundaki sayfayı almak kolaydır. Gizli belgeler kâğıt öğütücüye gider."
+     },
+     {
+      "id": "photo",
+      "label": "Fotoğrafını ekip sohbetinde paylaşıp “Bu kimin?” diye sorarım",
+      "correct": false,
+      "feedback": "Bu, maaş bilgilerini daha da çok kişiye yayar. Sayfayı sessizce sahibine teslim edin."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "desk"
+    }
+   },
+   "explain": "Yazıcıda bırakılan bir sayfa, bir veri sızıntısıdır. Onu sahibine, sahibi belli değilse bir yöneticiye geri verin."
+  },
+  {
+   "type": "match",
+   "id": "right-move",
+   "prompt": "Her durumu doğru hamleyle eşleştirin.",
+   "pairs": [
+    {
+     "id": "paper",
+     "left": "Kâğıt bitti, belge kuyrukta",
+     "right": "Yazdırma işini iptal edin"
+    },
+    {
+     "id": "driver",
+     "left": "Bir site yazıcı yazılımı öneriyor",
+     "right": "BT destek ekibine başvurun"
+    },
+    {
+     "id": "scan",
+     "left": "Tarama ortak klasöre düştü",
+     "right": "Onu kendi klasörünüze taşıyın"
+    },
+    {
+     "id": "secret",
+     "left": "Gizli bir dosya yazdırmanız gerekiyor",
+     "right": "Güvenli yazdırmayı kullanın"
+    }
+   ],
+   "explain": "Küçük alışkanlıklar, yazdırırken oluşabilecek sızıntıları önler."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Gizli dosyaları güvenli yazdırmayla gönderin ve çıktıyı hemen alın.",
+    "Yazıcı yazılımlarını yalnızca BT destek ekibi yükler.",
+    "Tarama cihazından gelen e-postalarda göndereni ve dosya uzantısını kontrol edin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,431 @@
+{
+  "id": "selling-safely",
+  "title": "Wenn Sie verkaufen",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ss-tutor",
+      "beats": [
+        {
+          "id": "ss-b1",
+          "say": "Diesmal sind Sie auf der Verkäuferseite. Sie bieten einen alten Kinderwagen auf einem Kleinanzeigenportal für 260 Manat an.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        },
+        {
+          "id": "ss-b2",
+          "say": "Die Käuferin schreibt, sie habe schon bezahlt, und bittet Sie, diesen Link zu öffnen, um das Geld zu erhalten.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "app": "whatsapp",
+              "contact": [
+                {
+                  "text": "Rəna (Käuferin)"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Hallo, ich nehme den Kinderwagen! Ich habe über „AlSat Sicherer Kauf“ bezahlt."
+                    }
+                  ],
+                  "time": "19:40"
+                },
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Um das Geld zu erhalten, bestätigen Sie hier Ihre Karte: "
+                    },
+                    {
+                      "text": "alsat-odenis.example.net/qebul",
+                      "spot": "link",
+                      "link": {
+                        "label": "alsat-odenis.example.net/qebul",
+                        "href": "https://alsat-odenis.example.net/qebul"
+                      }
+                    }
+                  ],
+                  "time": "19:41"
+                }
+              ]
+            }
+          },
+          "highlight": "link"
+        },
+        {
+          "id": "ss-b3",
+          "say": "Um Geld zu empfangen, braucht man nur die Kartennummer. Die drei Ziffern auf der Rückseite und der Code aus der SMS werden dafür nie gebraucht.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "ss-b4",
+          "say": "Wenn so ein Link kommt, geben Sie nichts ein. Schreiben Sie mit Kaufinteressierten nur über die Nachrichtenfunktion des Portals.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "ss-hotspot",
+      "prompt": "Finden Sie die Warnsignale auf dieser Seite.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2e-alsat-fake",
+        "tone": "app",
+        "title": [
+          {
+            "text": "AlSat Sicherer Kauf"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Seite: "
+            },
+            {
+              "text": "alsat-odenis.example.net/qebul",
+              "spot": "domain"
+            }
+          ],
+          [
+            {
+              "text": "Der Käufer hat 260,00 AZN bezahlt. Bestätigen Sie Ihre Karte, um das Geld zu erhalten."
+            }
+          ],
+          [
+            {
+              "text": "Kartennummer, Ablaufdatum und CVV eingeben",
+              "spot": "cvv"
+            }
+          ],
+          [
+            {
+              "text": "SMS-Code Ihrer Bank eingeben",
+              "spot": "otp"
+            }
+          ],
+          [
+            {
+              "text": "Der Kauf wird in 15 Minuten storniert",
+              "spot": "timer"
+            }
+          ]
+        ],
+        "buttons": [
+          "Abbrechen",
+          "Geld empfangen"
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Seltsame Adresse",
+          "explain": "Das ist nicht die Adresse des Kleinanzeigenportals. Ein bekannter Name wurde in eine fremde Domain eingebaut."
+        },
+        {
+          "id": "cvv",
+          "label": "Code auf der Kartenrückseite",
+          "explain": "Mit diesem Code wird Geld von Ihrer Karte abgebucht. Zum Empfangen von Geld wird er nie gebraucht."
+        },
+        {
+          "id": "otp",
+          "label": "SMS-Code",
+          "explain": "Der Code aus der SMS bestätigt eine Zahlung. Wenn Sie ihn eingeben, geht Geld von Ihrer Karte ab."
+        },
+        {
+          "id": "timer",
+          "label": "Zeitdruck",
+          "explain": "Der Countdown soll Sie vom Nachdenken abhalten. Eine echte Website setzt Verkaufende nicht unter Zeitdruck."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "ss-sim",
+      "environment": "browser",
+      "title": "Der Link der Käuferin",
+      "intro": "Sie haben den Link geöffnet, den die Käuferin geschickt hat. Wählen Sie im Browser bei jedem Schritt die richtige Reaktion.",
+      "steps": [
+        {
+          "id": "landing",
+          "label": "Geld wartet auf Sie: 260,00 AZN",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2e-alsat-fake",
+            "url": [
+              {
+                "text": "https://alsat-odenis.example.net/qebul",
+                "reveal": "alsat-odenis.example.net"
+              }
+            ]
+          },
+          "say": "Sehen Sie sich die Adressleiste an.",
+          "actions": [
+            {
+              "id": "receive",
+              "label": "Geld empfangen",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Diese Schaltfläche zahlt Ihnen nichts aus, sondern öffnet ein Formular, das Kartendaten abfragt. Die Adresse gehört nicht zum Kleinanzeigenportal."
+            },
+            {
+              "id": "close",
+              "label": "Tab schließen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig. Die Adresse war seltsam, also geben Sie auf dieser Seite nichts ein.",
+              "next": "real-site"
+            },
+            {
+              "id": "own",
+              "label": "Das Portal selbst aufrufen",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Gut gemacht. Wenn Sie die Website selbst aufrufen, landen Sie nicht auf einer gefälschten Seite.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "card-form",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2e-alsat-fake",
+            "brand": "AlSat Bezahlung",
+            "url": [
+              {
+                "text": "https://alsat-odenis.example.net/kart",
+                "reveal": "alsat-odenis.example.net"
+              }
+            ],
+            "fields": [
+              "Kartennummer",
+              "Ablaufdatum",
+              "CVV"
+            ],
+            "button": "Bestätigen"
+          },
+          "say": "Das Formular will auch den Code auf der Kartenrückseite.",
+          "actions": [
+            {
+              "id": "enter",
+              "label": "Bestätigen",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Mit diesen Daten können die Kriminellen mit Ihrer Karte bezahlen. Zum Empfangen von Geld ist dieser Code nicht nötig."
+            },
+            {
+              "id": "cancel",
+              "label": "Abbrechen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig. Eine Seite, die den Code auf der Kartenrückseite verlangt, gibt kein Geld, sie nimmt es.",
+              "next": "real-site"
+            }
+          ]
+        },
+        {
+          "id": "sms-code",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2e-alsat-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "SMS-Code eingeben"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Ihre Bank hat Ihnen einen 6-stelligen Code gesendet."
+                }
+              ],
+              [
+                {
+                  "text": "Keine Sorge, wenn in der SMS „Zahlung“ steht: Es handelt sich um einen Zahlungseingang."
+                }
+              ]
+            ],
+            "buttons": [
+              "Abbrechen",
+              "Code bestätigen"
+            ]
+          },
+          "say": "Die Bank schreibt „Zahlung“, die Seite behauptet aber, es sei ein Zahlungseingang.",
+          "actions": [
+            {
+              "id": "confirm",
+              "label": "Code bestätigen",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Der Code hat eine Zahlung freigegeben, und Geld ist von Ihrer Karte abgegangen. Rufen Sie sofort Ihre Bank an."
+            },
+            {
+              "id": "stop",
+              "label": "Abbrechen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig. Der SMS-Code ist für Zahlungen da – geben Sie ihn nie auf einer Seite ein und nennen Sie ihn niemandem."
+            }
+          ]
+        },
+        {
+          "id": "real-site",
+          "label": "AlSat: Nachrichten mit der Käuferin",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2e-alsat",
+            "url": [
+              {
+                "text": "https://alsat.example/mesajlar",
+                "reveal": "alsat.example"
+              }
+            ]
+          },
+          "say": "Das ist das Kleinanzeigenportal selbst.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Käuferin melden",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Gut gemacht. Das Portal sperrt das betrügerische Konto und schützt andere Verkaufende."
+            },
+            {
+              "id": "cash",
+              "label": "Der Käuferin schreiben: Bargeld bei Übergabe",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Gut. Sich persönlich treffen und bar kassieren ist der einfachste und sicherste Weg."
+            },
+            {
+              "id": "photo",
+              "label": "Foto von Vorder- und Rückseite der Karte schicken",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Auf dem Foto ist auch der Code auf der Rückseite zu sehen. Damit geben Sie den Kriminellen praktisch Ihre Karte."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "ss-choice",
+      "question": {
+        "prompt": "Die Käuferin will Ihnen Geld auf Ihre Karte überweisen. Welche Angabe genügt dafür?",
+        "options": [
+          {
+            "id": "number",
+            "label": "Nur die Kartennummer oder die Kontonummer",
+            "correct": true,
+            "feedback": "Richtig. Mehr braucht es nicht, um Geld zu empfangen."
+          },
+          {
+            "id": "cvv",
+            "label": "Kartennummer, Ablaufdatum und der Code auf der Rückseite",
+            "correct": false,
+            "feedback": "Mit diesen Daten kann jemand mit Ihrer Karte bezahlen. Geben Sie den Code auf der Rückseite nie heraus."
+          },
+          {
+            "id": "otp",
+            "label": "Der SMS-Code der Bank",
+            "correct": false,
+            "feedback": "Mit dem SMS-Code wird Geld abgebucht. Wer beim Kauf danach fragt, will Sie betrügen."
+          },
+          {
+            "id": "photo",
+            "label": "Ein Foto von Vorder- und Rückseite der Karte",
+            "correct": false,
+            "feedback": "Auf dem Foto steht alles, auch der Code auf der Rückseite. Das ist so, als würden Sie die Karte aus der Hand geben."
+          }
+        ]
+      },
+      "explain": "Zum Empfangen von Geld braucht man nie den Code auf der Kartenrückseite oder einen SMS-Code. Wer danach fragt, will Sie betrügen."
+    },
+    {
+      "type": "scenario",
+      "id": "ss-scenario",
+      "title": "Sie haben den Code eingegeben",
+      "start": "charged",
+      "nodes": [
+        {
+          "id": "charged",
+          "text": "In der Eile haben Sie Ihre Kartendaten und den SMS-Code eingegeben. Eine Minute später schreibt Ihnen die Bank: 389 Manat wurden von Ihrer Karte abgebucht.",
+          "choices": [
+            {
+              "label": "Sofort die Bank unter der Nummer auf der Karte anrufen und die Karte sperren lassen",
+              "next": "bank",
+              "feedback": "Richtig. Eine schnell gesperrte Karte verhindert weitere Zahlungen."
+            },
+            {
+              "label": "Der Käuferin schreiben und das Geld zurückverlangen",
+              "outcome": "risky",
+              "feedback": "Die Kriminellen zahlen nichts zurück, und die Zeit läuft. Rufen Sie zuerst die Bank an."
+            },
+            {
+              "label": "Ich schäme mich und sage niemandem etwas",
+              "outcome": "compromised",
+              "feedback": "Schweigen verschafft den Kriminellen Zeit. Banken und Polizei haben jeden Tag mit solchen Fällen zu tun."
+            }
+          ]
+        },
+        {
+          "id": "bank",
+          "text": "Ihre Karte ist gesperrt. Was möchten Sie noch tun?",
+          "speaker": "Gülnar (Bankmitarbeiterin)",
+          "voice": "woman",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Ihre Karte ist gesperrt. <breath> Was möchten Sie noch tun?",
+          "choices": [
+            {
+              "label": "Screenshots sichern und den Fall der Polizei und dem Kleinanzeigenportal melden",
+              "outcome": "safe",
+              "feedback": "Gut gemacht. Beweise helfen der Polizei, und das Portal sperrt das betrügerische Konto."
+            },
+            {
+              "label": "Den Chat löschen, um alles zu vergessen",
+              "outcome": "risky",
+              "feedback": "Der Chat ist ein Beweis. Löschen Sie ihn nicht, sondern zeigen Sie ihn der Polizei."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "ss-recap",
+      "points": [
+        "Zum Empfangen von Geld braucht man nie den Code auf der Kartenrückseite oder einen SMS-Code.",
+        "Geben Sie nichts in einen Zahlungslink ein, den Ihnen Kaufinteressierte schicken.",
+        "Wenn Sie einen Code eingegeben haben, rufen Sie sofort Ihre Bank unter der Nummer auf der Karte an."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

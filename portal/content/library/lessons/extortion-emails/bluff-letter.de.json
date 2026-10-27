@@ -1,0 +1,510 @@
+{
+ "id": "bluff-letter",
+ "title": "Eine leere Drohung",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "bl-tutor",
+   "beats": [
+    {
+     "id": "bl-b1",
+     "say": "Hallo! Manchmal kommt eine beängstigende E-Mail: „Ich habe Ihre Kamera gehackt. Zahlen Sie, sonst veröffentliche ich Ihre privaten Videos.“",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "bl-b2",
+     "say": "Die E-Mail nennt sogar eines Ihrer alten Passwörter. Es stammt meist aus einem Datenleck, das schon Jahre zurückliegt.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Anonym"
+         }
+        ],
+        "address": [
+         {
+          "text": "anonim.7781@mail-relay.example.net"
+         }
+        ]
+       },
+       "to": "you@idare.example",
+       "subject": [
+        {
+         "text": "Ihr Passwort: "
+        },
+        {
+         "text": "Gunes2019",
+         "spot": "password"
+        },
+        {
+         "text": ". Sie haben 48 Stunden Zeit"
+        }
+       ],
+       "time": "08:47",
+       "body": [
+        [
+         {
+          "text": "Ich bin in Ihr Gerät eingedrungen und habe mit Ihrer Kamera private Videos aufgenommen."
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "password"
+    },
+    {
+     "id": "bl-b3",
+     "say": "Solche E-Mails gehen gleichzeitig an Tausende Menschen. Ein Video von Ihrer Kamera gibt es nicht.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "bl-b4",
+     "say": "Die Regel lautet: nicht zahlen, nicht antworten, das Passwort ändern und dienstliche E-Mails dem Sicherheitsteam melden.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "bl-hotspot",
+   "prompt": "Finden Sie die Tricks der Kriminellen in dieser E-Mail.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Anonym"
+      }
+     ],
+     "address": [
+      {
+       "text": "anonim.7781@mail-relay.example.net"
+      }
+     ]
+    },
+    "to": "you@idare.example",
+    "subject": [
+     {
+      "text": "Ihr Passwort: "
+     },
+     {
+      "text": "Gunes2019",
+      "spot": "password"
+     },
+     {
+      "text": ". Sie haben 48 Stunden Zeit"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Ich bin in Ihr Gerät eingedrungen und habe mit Ihrer Kamera private Videos aufgenommen.",
+       "spot": "camera"
+      }
+     ],
+     [
+      {
+       "text": "Als Beweis nenne ich Ihnen Ihr Passwort. Wenn Sie nicht wollen, dass die Videos veröffentlicht werden, senden Sie Bitcoin im Wert von 1.500 AZN an:"
+      }
+     ],
+     [
+      {
+       "text": "bc1q000000000000000000000000000000demo",
+       "spot": "btc"
+      }
+     ],
+     [
+      {
+       "text": "Sie haben 48 Stunden Zeit, um zu zahlen. Zeigen Sie diese E-Mail niemandem.",
+       "spot": "timer"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "password",
+     "label": "Altes Passwort",
+     "explain": "Dieses Passwort stammt aus einem alten Datenleck. Es beweist keinen Hack, aber ändern Sie es überall, wo Sie es noch verwenden."
+    },
+    {
+     "id": "camera",
+     "label": "Angeblicher Kamera-Hack",
+     "explain": "Das ist ein Bluff. Derselbe Text geht an Tausende Adressen, und ein Video gibt es nicht."
+    },
+    {
+     "id": "btc",
+     "label": "Bitcoin-Adresse",
+     "explain": "Eine Krypto-Zahlung lässt sich nicht rückgängig machen. Wenn Sie zahlen, folgt die nächste Forderung."
+    },
+    {
+     "id": "timer",
+     "label": "48 Stunden",
+     "explain": "Die Frist soll Ihnen Angst machen und Sie vom Nachdenken abhalten. Zahlen Sie nicht und antworten Sie nicht."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "match",
+   "id": "bl-match",
+   "prompt": "Ordnen Sie jeder Behauptung aus der E-Mail die Wahrheit zu.",
+   "pairs": [
+    {
+     "id": "camera",
+     "left": "Ich habe Ihre Kamera gehackt",
+     "right": "Kein Beweis – der Text wird massenhaft verschickt"
+    },
+    {
+     "id": "password",
+     "left": "Hier ist Ihr Passwort",
+     "right": "Stammt aus einem alten Datenleck"
+    },
+    {
+     "id": "house",
+     "left": "Im Anhang ist ein Foto Ihres Hauses",
+     "right": "Adresse aus einem Datenleck, Foto aus einem öffentlichen Kartendienst"
+    },
+    {
+     "id": "timer",
+     "left": "Sie haben 48 Stunden Zeit",
+     "right": "Eine erfundene Frist, die Ihnen Angst machen soll"
+    }
+   ],
+   "explain": "Alles, was die Kriminellen wissen, ist öffentlich oder stammt aus Datenlecks. Es wurde nur zusammengetragen, um Ihnen Angst zu machen."
+  },
+  {
+   "type": "simulation",
+   "id": "bl-sim",
+   "environment": "inbox",
+   "title": "Ihr dienstliches Postfach",
+   "intro": "Sie öffnen Ihr dienstliches Postfach im Ministerium. Wählen Sie für jede der vier E-Mails die richtige Reaktion.",
+   "steps": [
+    {
+     "id": "sextortion",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Anonym"
+        }
+       ],
+       "address": [
+        {
+         "text": "anonim.7781@mail-relay.example.net"
+        }
+       ]
+      },
+      "to": "you@idare.example",
+      "subject": [
+       {
+        "text": "Ihr Passwort: Gunes2019. Sie haben 48 Stunden Zeit"
+       }
+      ],
+      "time": "08:47",
+      "body": [
+       [
+        {
+         "text": "Ich bin in Ihr Gerät eingedrungen und habe mit Ihrer Kamera private Videos aufgenommen."
+        }
+       ],
+       [
+        {
+         "text": "Wenn Sie nicht wollen, dass die Videos veröffentlicht werden, senden Sie Bitcoin im Wert von 1.500 AZN an: bc1q000000000000000000000000000000demo"
+        }
+       ],
+       [
+        {
+         "text": "Sie haben 48 Stunden Zeit, um zu zahlen."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Das Sicherheitsteam kann dieselbe E-Mail auch aus den Postfächern anderer Kolleginnen und Kollegen entfernen."
+      },
+      {
+       "id": "reply",
+       "label": "Antworten: „Beweisen Sie es!“",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Eine Antwort zeigt, dass Ihre Adresse aktiv ist, und zieht noch mehr solcher E-Mails nach sich. Antworten Sie nicht."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Löschen ist in Ordnung. Im dienstlichen Postfach ist es aber besser, die E-Mail zuerst zu melden."
+      }
+     ]
+    },
+    {
+     "id": "house-photo",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Der Beobachter"
+        }
+       ],
+       "address": [
+        {
+         "text": "watcher.0042@anon-post.example.net"
+        }
+       ]
+      },
+      "to": "you@idare.example",
+      "subject": [
+       {
+        "text": "Sehen Sie das Foto Ihres Hauses?"
+       }
+      ],
+      "time": "09:05",
+      "body": [
+       [
+        {
+         "text": "Das ist Ihr Haus. Ich kenne Ihre Adresse und Ihr Passwort."
+        }
+       ],
+       [
+        {
+         "text": "Senden Sie 1.500 AZN in Bitcoin, sonst werden die Videos veröffentlicht."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "ev_unvan.jpg"
+         }
+        ],
+        "size": "212 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Das Foto Ihres Hauses stammt aus einem öffentlichen Kartendienst. Auch diese E-Mail ist ein Bluff, der massenhaft verschickt wird."
+      },
+      {
+       "id": "open",
+       "label": "Foto öffnen",
+       "kind": "open-attachment",
+       "outcome": "risky",
+       "feedback": "Das Foto soll Ihnen noch mehr Angst machen. Öffnen Sie keinen verdächtigen Anhang, sondern melden Sie die E-Mail."
+      },
+      {
+       "id": "promise",
+       "label": "Antworten: „Ich zahle“",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Wer zahlt oder eine Zahlung verspricht, bekommt neue Forderungen. Zahlen Sie nicht und antworten Sie nicht."
+      }
+     ]
+    },
+    {
+     "id": "security-notice",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik",
+      "from": {
+       "name": [
+        {
+         "text": "IT-Sicherheit"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare.example"
+        }
+       ]
+      },
+      "to": "you@idare.example",
+      "subject": [
+       {
+        "text": "Warnung: Erpresser-Mails"
+       }
+      ],
+      "time": "09:20",
+      "body": [
+       [
+        {
+         "text": "Heute haben einige Kolleginnen und Kollegen Erpresser-Mails erhalten, in denen ein altes Passwort steht."
+        }
+       ],
+       [
+        {
+         "text": "Zahlen Sie nicht und antworten Sie nicht. Melden Sie die E-Mail mit der Schaltfläche „Phishing melden“."
+        }
+       ],
+       [
+        {
+         "text": "Wenn Sie dieses Passwort noch verwenden, ändern Sie es."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Als sicher markieren",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Richtig. Diese E-Mail verlangt nichts, sie wiederholt nur die richtigen Regeln."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Vorsicht ist gut, aber diese E-Mail kommt von einer Adresse Ihrer eigenen Organisation und verlangt nichts."
+      }
+     ]
+    },
+    {
+     "id": "fake-reset",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik-fake",
+      "from": {
+       "name": [
+        {
+         "text": "IT-Sicherheit"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare-support.example.net"
+        }
+       ]
+      },
+      "to": "you@idare.example",
+      "subject": [
+       {
+        "text": "Ihr Konto wurde gehackt: Ändern Sie sofort Ihr Passwort"
+       }
+      ],
+      "time": "09:34",
+      "body": [
+       [
+        {
+         "text": "Eine Erpresser-Mail erhalten? Ihr Konto ist in Gefahr."
+        }
+       ],
+       [
+        {
+         "text": "Passwort hier ändern",
+         "link": {
+          "label": "Passwort hier ändern",
+          "href": "https://idare-support.example.net/parol"
+         }
+        }
+       ],
+       [
+        {
+         "text": "Wenn Sie es nicht innerhalb von 30 Minuten ändern, wird Ihr Konto gesperrt."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Das ist eine zweite Falle, die Ihre Angst ausnutzt, und die Domain gehört nicht zu Ihrer Organisation."
+      },
+      {
+       "id": "click",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Die gefälschte Seite hätte Ihr Passwort gestohlen. Ändern Sie es nur im offiziellen System, das Sie selbst aufrufen."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Löschen ist in Ordnung. Wenn Sie die E-Mail melden, sind aber auch Ihre Kolleginnen und Kollegen geschützt."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "bl-choice",
+   "question": {
+    "prompt": "Eine Erpresser-Mail zeigt ein Foto Ihres Hauses aus einem Kartendienst und nennt Ihre Adresse. Was bedeutet das?",
+    "options": [
+     {
+      "id": "public",
+      "label": "Die Adresse stammt aus einem Datenleck, das Foto aus einem öffentlichen Kartendienst",
+      "correct": true,
+      "feedback": "Richtig. Dass jemand Ihre Adresse kennt, heißt nicht, dass Ihre Kamera gehackt wurde."
+     },
+     {
+      "id": "real",
+      "label": "Ich werde wirklich beobachtet, also muss ich zahlen",
+      "correct": false,
+      "feedback": "Eine Zahlung beendet nichts, sondern bringt nur die nächste Forderung. Melden Sie die E-Mail."
+     },
+     {
+      "id": "ask",
+      "label": "Ich sollte antworten und fragen, wer dahintersteckt",
+      "correct": false,
+      "feedback": "Eine Antwort zeigt, dass Ihre Adresse aktiv ist. Dann schicken die Kriminellen noch mehr E-Mails."
+     }
+    ]
+   },
+   "explain": "Die Kriminellen kombinieren öffentlich zugängliche Daten mit Daten aus Datenlecks, um Angst zu erzeugen. Zahlen Sie nicht und antworten Sie nicht. Wenn Sie sich bedroht fühlen, wenden Sie sich an die Polizei."
+  },
+  {
+   "type": "recap",
+   "id": "bl-recap",
+   "points": [
+    "Eine Massen-E-Mail mit „Ich habe Ihre Kamera gehackt“ ist ein Bluff: nicht zahlen, nicht antworten.",
+    "Wenn Sie das alte Passwort aus der E-Mail noch verwenden, ändern Sie es überall.",
+    "Im dienstlichen Postfach melden Sie eine solche E-Mail dem Sicherheitsteam."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

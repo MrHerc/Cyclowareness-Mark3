@@ -23,7 +23,7 @@ export function TicketThread({ ticketId, messages, closed }: { ticketId: string;
         {messages.map((m) => (
           <li key={m.id} className={cn("flex gap-3", m.mine && "flex-row-reverse")}>
             <Avatar name={m.authorName} size="sm" />
-            <div className={cn("min-w-0 max-w-[80%] rounded-2xl px-4 py-3 [overflow-wrap:anywhere]", m.mine ? "rounded-tr-sm bg-brand-600 text-brand-on" : "rounded-tl-sm bg-surface shadow-xs ring-1 ring-line")}>
+            <div className={cn("min-w-0 max-w-[80%] rounded-2xl px-4 py-3 [overflow-wrap:anywhere]", m.mine ? "rounded-se-sm bg-brand-600 text-brand-on" : "rounded-ss-sm bg-surface shadow-xs ring-1 ring-line")}>
               <p className={cn("text-tab font-semibold", m.mine ? "opacity-80" : "text-brand-700")}>
                 {m.mine ? t("you") : m.staff ? `${m.authorName} · ${t("team")}` : m.authorName}
               </p>

@@ -1,0 +1,123 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>cat harness</title>
+<style>
+  html, body { margin: 0; background: #fff; }
+  #work { position: absolute; left: 0; top: 0; width: 2000px; height: 2000px; overflow: hidden; }
+  #work > div { position: absolute; left: 0; top: 0; }
+</style>
+<div id="work"></div>
+<script type="module">
+  import { createCat, BEHAVIOUR_NAMES, MOOD_NAMES, GESTURE_NAMES } from "./engine.js";
+  import * as E from "./engine.js";
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const work = document.getElementById("work");
+  const cats = {};
+  function host(key, w, h, mode, opts = {}) {
+    const k = `${key}:${w}x${h}:${mode}`;
+    if (cats[k]) return cats[k];
+    const d = document.createElement("div");
+    d.style.width = w + "px"; d.style.height = h + "px"; if (opts.bg) d.style.background = opts.bg; // the engine reads the surface (dark: lighter line, violet floor)
+    work.appendChild(d);
+    const c = createCat(d, Object.assign({ mode }, opts));
+    if (opts.userSize) c.setSize(opts.userSize);
+    return (cats[k] = { d, c, inst: d.catInstance });
+  }
+  // A sheet: rows of cells, each cell = one frozen frame copied from a cat canvas. Labels are review-only text.
+  function sheet({ title, cols, cellW, cellH, bg = "#f7f6fb", fg = "#16123a", cells }) {
+    const rows = Math.ceil(cells.length / cols), pad = 10, lab = 16, head = 30;
+    const W = cols * (cellW + pad) + pad, H = head + rows * (cellH + lab + pad) + pad;
+    const cv = document.createElement("canvas"); cv.width = W * dpr; cv.height = H * dpr;
+    const g = cv.getContext("2d"); g.scale(dpr, dpr);
+    g.fillStyle = bg; g.fillRect(0, 0, W, H);
+    g.fillStyle = fg; g.font = "600 15px system-ui"; g.fillText(title, pad, 21);
+    cells.forEach((cell, i) => {
+      const x = pad + (i % cols) * (cellW + pad), y = head + Math.floor(i / cols) * (cellH + lab + pad);
+      if (cell.cellBg) { g.fillStyle = cell.cellBg; g.fillRect(x, y, cellW, cellH); }
+      const src = cell.render();
+      g.save(); g.beginPath(); g.rect(x, y, cellW, cellH); g.clip();
+      g.drawImage(src.cv, src.sx * dpr, src.sy * dpr, src.sw * dpr, src.sh * dpr, x + (cellW - src.sw) / 2, y + (cellH - src.sh) / 2, src.sw, src.sh);
+      if (cell.box) { g.strokeStyle = "rgba(79,70,229,.35)"; g.setLineDash([4, 4]); g.strokeRect(x + (cellW - src.sw) / 2 + 0.5, y + (cellH - src.sh) / 2 + 0.5, src.sw - 1, src.sh - 1); g.setLineDash([]); }
+      g.restore();
+      g.fillStyle = fg; g.font = "12px system-ui"; g.fillText(cell.label, x + 2, y + cellH + 12);
+    });
+    return cv.toDataURL("image/png");
+  }
+  const mascotCell = (size, name, t, o, label, cellBg) => boxCell(size, size, name, t, o, label, cellBg);
+  // a mascot box of w x h (wider than tall: the stage version of the roomy acts); box: outline the box in the cell
+  const boxCell = (w, h, name, t, o, label, cellBg, box) => ({ label, cellBg, box, render: () => {
+    const hh = host("m" + (cellBg || ""), w, h, "mascot", { bg: cellBg }); hh.c.renderAt(name, t, o || {});
+    return { cv: hh.inst.cv, sx: 0, sy: 0, sw: w, sh: h };
+  } });
+  const roamCell = (name, t, o, label, cw, ch) => ({ label, render: () => {
+    const h = host("r", 900, 380, "roam", { userSize: 210 }); h.c.renderAt(name, t, o || {});
+    const hit = h.inst.hit, cx = (hit.bx0 + hit.bx1) / 2, fl = h.inst.floor;
+    return { cv: h.inst.cv, sx: Math.max(0, Math.min(900 - cw, cx - cw / 2)), sy: fl - ch + 34, sw: cw, sh: ch };
+  } });
+  const frames = (n) => Array.from({ length: n }, (_, i) => +((i + 0.5) / n).toFixed(3));
+  window.H = {
+    names: { BEHAVIOUR_NAMES, MOOD_NAMES, GESTURE_NAMES },
+    behaviour(name, mode, n = 8, o) {
+      const cells = frames(n).map((t) => (mode === "roam" ? roamCell(name, t, o, `${name} t=${t}`, 300, 250) : mascotCell(200, name, t, o, `${name} t=${t}`)));
+      return sheet({ title: `${name} (${mode})`, cols: n > 4 ? 4 : n, cellW: mode === "roam" ? 300 : 200, cellH: mode === "roam" ? 250 : 200, cells });
+    },
+    moods() {
+      const cells = MOOD_NAMES.map((m) => mascotCell(200, "present", 0.02, { mood: m }, m));
+      cells.push(mascotCell(200, "present", 0.02, { mood: "talk", talking: true }, "talking"));
+      return sheet({ title: "moods (present, 200 px)", cols: 5, cellW: 200, cellH: 200, cells });
+    },
+    gestures() {
+      const cells = GESTURE_NAMES.map((gname) => mascotCell(200, "present", 0.02, { gesture: gname, gt: 0.5 }, gname));
+      return sheet({ title: "gestures (present, gt 0.5, 200 px)", cols: 6, cellW: 200, cellH: 200, cells });
+    },
+    // close-ups: [[behaviour, t, opts, label, size, mode], ...]
+    close(list, title = "close-ups") {
+      const cells = list.map(([b, t, o, lab, size = 420, mode = "mascot"]) => (mode === "roam" ? roamCell(b, t, o, lab, 420, 330) : mascotCell(size, b, t, o, lab)));
+      const cw = Math.max(420, ...list.map((l) => l[4] || 0)); return sheet({ title, cols: Math.min(3, cells.length), cellW: cw, cellH: cw, cells });
+    },
+    // the new rig parameters on fixed poses (needs the __t test hook the shooter appends)
+    rig() {
+      const t = E.__t; if (!t) return sheet({ title: "rig: no test hook", cols: 1, cellW: 200, cellH: 40, cells: [] });
+      t.BEH.__pose = (cat, o) => ({ segs: [{ d: 1, b: 0, f: () => t.at(Object.assign({}, t[o.base || "PRESENT"], o.pose), 0, o.th != null ? o.th : 0.8) }] });
+      const LIE = { hipY: 13, shY: 14, bodyL: 46, arch: 3, sag: 0, neckA: 0, neckL: 15, faceCam: 0.75, headRoll: -10, elbow: 1, legZ: 6,
+        nfx: 16, nfy: 14, nfa: 1.7, ffx: 21, ffy: 16, ffa: 1.5, nhx: -17, nhy: 12, nha: 2.7, fhx: -12, fhy: 14, fha: 2.5, tailA: -175, tailCurl: 1, tailTip: 30, tailRoot: 0.1 };
+      const cells = [];
+      for (const r of [0, 0.3, 0.5, 0.75, 1]) cells.push(mascotCell(200, "__pose", 0.5, { base: "STAND", th: 0.25, pose: Object.assign({}, LIE, { bodyRoll: r }) }, `bodyRoll ${r}`));
+      cells.push(mascotCell(200, "__pose", 0.5, { base: "STAND", th: 0.25, pose: Object.assign({}, LIE, { bodyRoll: 0.8, rollTwist: 0.5 }) }, "roll .8 twist .5"));
+      for (const [c, pv] of [[25, 0], [-20, 0], [0, 25], [-15, -15], [20, 20]]) cells.push(mascotCell(200, "__pose", 0.5, { base: "STAND", th: 0.1, pose: { chestBend: c, pelvisBend: pv } }, `chest ${c} pelvis ${pv}`));
+      cells.push(mascotCell(200, "__pose", 0.5, { pose: { nfx: 34, nfy: 22, nfa: -0.35, pawFront: 1, splay: 1, claws: 1, shift: 2 } }, "swat, claws"));
+      cells.push(mascotCell(200, "__pose", 0.5, { pose: { earL: -0.9 } }, "ear twitch L"));
+      cells.push(mascotCell(200, "__pose", 0.5, { pose: { earRot: -0.9 } }, "ears flat + fold"));
+      cells.push(mascotCell(200, "__pose", 0.5, { pose: { mouth: 0.8, jawTall: 0.6 } }, "jaw (meow)"));
+      cells.push(mascotCell(200, "__pose", 0.5, { base: "STAND", th: 0, pose: {} }, "stand side"));
+      return sheet({ title: "rig parameters", cols: 6, cellW: 200, cellH: 200, cells });
+    },
+    // a mascot act in a stage box (340 x 200: side-on, room to move) and in a square box (the compact version)
+    act(name, o = {}, n = 8, title) {
+      const cells = [];
+      for (const t of frames(n)) cells.push(boxCell(340, 200, name, t, o, `stage t=${t}`, null, true));
+      for (const t of frames(n)) cells.push(boxCell(200, 200, name, t, o, `compact t=${t}`, null, true));
+      return sheet({ title: title || `${name} ${JSON.stringify(o)} (dashed: the mascot box)`, cols: 4, cellW: 340, cellH: 200, cells });
+    },
+    // chosen moments of an act (t in seconds from its start) in a w x h box
+    strip(name, secs, w = 340, h = 200, o = {}, cols = 4) {
+      const hh = host("m", w, h, "mascot"); // the act's length comes from a first render
+      hh.c.renderAt(name, 0, o); const total = hh.inst.frozen.B.total;
+      const cells = secs.map((sec) => boxCell(w, h, name, Math.min(1, sec / total), o, `${name} ${sec.toFixed(2)} s`, null, true));
+      return sheet({ title: `${name} ${JSON.stringify(o)} (${total.toFixed(2)} s)`, cols, cellW: w, cellH: h, cells });
+    },
+    // one act in square boxes of 64 / 96 / 160 / 240 px, light and dark
+    actSizes(name, t, o = {}) {
+      const cells = [];
+      for (const dark of [false, true]) for (const s of [64, 96, 160, 240]) cells.push(boxCell(s, s, name, t, o, `${s}px`, dark ? "#16141f" : "#f7f6fb", true));
+      return sheet({ title: `${name} t=${t} at 64 / 96 / 160 / 240 px, light and dark`, cols: 4, cellW: 240, cellH: 240, cells });
+    },
+    sizes(dark) {
+      const bg = dark ? "#16141f" : "#f7f6fb", fg = dark ? "#ece9ff" : "#16123a", cells = [];
+      const rows = [["present", 0.02, {}, "idle"], ["present", 0.02, { mood: "happy" }, "happy"], ["present", 0.02, { mood: "think" }, "think"], ["sleep", 0.85, {}, "sleep"]];
+      for (const [b, t, o, lab] of rows) for (const s of [64, 96, 160, 240]) cells.push(mascotCell(s, b, t, o, `${lab} ${s}px`, dark ? bg : null));
+      return sheet({ title: `sizes on ${dark ? "dark" : "light"} (DPR ${dpr})`, cols: 4, cellW: 240, cellH: 240, bg, fg, cells });
+    },
+  };
+  window.ready = true;
+</script>

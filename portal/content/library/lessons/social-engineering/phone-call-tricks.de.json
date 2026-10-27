@@ -1,0 +1,553 @@
+{
+  "id": "phone-call-tricks",
+  "title": "Tricks am Telefon",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l1-tutor",
+      "beats": [
+        {
+          "id": "l1-b1",
+          "say": "Hallo! Ich helfe Ihnen in Sachen Sicherheit. Heute lernen Sie, Betrugsversuche am Telefon zu erkennen.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "l1-b2",
+          "say": "Auf dem Bildschirm steht der Name der Bank. Aber Name und Nummer eines Anrufers lassen sich leicht fälschen.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "sahilbank",
+              "caller": [
+                {
+                  "text": "SahilBank",
+                  "spot": "caller-name"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 12 000 00 00",
+                  "spot": "caller-number"
+                }
+              ],
+              "label": "Eingehender Anruf"
+            }
+          },
+          "highlight": "caller-name"
+        },
+        {
+          "id": "l1-b3",
+          "say": "Kriminelle setzen Sie unter Druck: Ihre Karte sei gesperrt, gerade werde Geld abgebucht. Angst und Eile sind ihre wichtigsten Waffen.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          },
+          "checkpoint": {
+            "prompt": "Der Anrufer verlangt den Code aus Ihrer SMS. Was tun Sie?",
+            "options": [
+              {
+                "id": "say-code",
+                "label": "Ich lese den Code vor",
+                "correct": false,
+                "feedback": "Mit diesem Code lässt sich Ihr Konto öffnen oder eine Zahlung freigeben. Eine Bank fragt nie danach."
+              },
+              {
+                "id": "call-back",
+                "label": "Ich lege auf und rufe selbst bei der Bank an",
+                "correct": true,
+                "feedback": "Richtig. Mit diesem Rückruf durchkreuzen Sie den Plan der Kriminellen vollständig."
+              }
+            ]
+          }
+        },
+        {
+          "id": "l1-b5",
+          "say": "Die goldene Regel: Legen Sie auf und rufen Sie selbst die offizielle Nummer an. Die Nummer steht auf Ihrer Karte oder auf der offiziellen Website.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "bank-vishing",
+      "environment": "call",
+      "title": "Ein Anruf von der Bank",
+      "intro": "Auf dem Bildschirm steht der Name Ihrer Bank. Hören Sie dem Anrufer zu und wählen Sie bei jedem Schritt Ihre Antwort.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Bank",
+            "voice": "man"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Annehmen",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Den Anruf anzunehmen ist nicht gefährlich. Entscheidend ist, was Sie sagen."
+            },
+            {
+              "id": "decline",
+              "label": "Ablehnen",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Das geht auch. Wenn Sie beunruhigt sind, rufen Sie selbst die Nummer auf der Rückseite Ihrer Karte an.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "alarm",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Bank",
+            "voice": "man"
+          },
+          "say": "Guten Tag, hier ist Fuad Məmmədov vom Sicherheitsdienst der SahilBank. Gerade versucht jemand, 1.200 Manat von Ihrer Karte abzubuchen.",
+          "spoken": "Guten Tag, <breath> hier ist Fuad Məmmədov vom Sicherheitsdienst der SahilBank. Gerade versucht jemand, äh, 1.200 Manat von Ihrer Karte abzubuchen.",
+          "actions": [
+            {
+              "id": "card",
+              "label": "Ich nenne die letzten Ziffern der Karte",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Ihre Bank kennt Sie bereits und braucht diese Angabe nicht. Jedes Detail macht den Betrüger glaubwürdiger."
+            },
+            {
+              "id": "keep",
+              "label": "Ich gebe am Telefon keine Kartendaten heraus",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Richtig. Geben Sie bei einem eingehenden Anruf nie Kartendaten heraus – Name und Nummer können gefälscht sein."
+            }
+          ]
+        },
+        {
+          "id": "code",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Bank",
+            "voice": "man"
+          },
+          "say": "Sie haben fünf Minuten, um das zu stoppen. Lesen Sie mir den Code vor, der gerade auf Ihr Smartphone gekommen ist, und sagen Sie niemandem etwas davon.",
+          "spoken": "Sie haben fünf Minuten, um das zu stoppen. <breath> Lesen Sie mir den Code vor, der gerade auf Ihr Smartphone gekommen ist, und sagen Sie niemandem etwas davon.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Ich lese den Code vor",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Der SMS-Code gibt eine Zahlung frei. Wenn Sie ihn vorlesen, überweisen Sie das Geld selbst."
+            },
+            {
+              "id": "hang",
+              "label": "Auflegen",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Richtig. Keine Bank fragt am Telefon nach einem SMS-Code.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "safe-account",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Bank",
+            "voice": "man"
+          },
+          "say": "Dann überweisen Sie Ihr Geld zum Schutz auf ein sicheres Konto. Ich schicke Ihnen die Daten jetzt per SMS.",
+          "spoken": "Dann, äh, überweisen Sie Ihr Geld zum Schutz auf ein sicheres Konto. <breath> Ich schicke Ihnen die Daten jetzt per SMS.",
+          "actions": [
+            {
+              "id": "transfer",
+              "label": "Ich überweise das Geld auf das sichere Konto",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Ein sicheres Konto gibt es nicht: Es gehört den Kriminellen. Eine Bank verlangt nie, dass Sie Geld umbuchen."
+            },
+            {
+              "id": "hang",
+              "label": "Auflegen",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Sehr gute Entscheidung. Die Aufforderung, Geld zu überweisen, ist der letzte Schritt der Masche."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Das Gespräch ist beendet. Was tun Sie jetzt?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Bank",
+            "voice": "man"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "Nummer auf der Karte anrufen",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Richtig. Wählen Sie die offizielle Nummer selbst, am besten von einem anderen Telefon aus, damit die Leitung nicht offen bleiben kann."
+            },
+            {
+              "id": "redial",
+              "label": "Die eingehende Nummer zurückrufen",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "Die Nummer kann gefälscht sein. Nehmen Sie die Nummer von Ihrer Karte oder von der offiziellen Website der Bank."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l1-choice-spoof",
+      "question": {
+        "prompt": "Auf dem Bildschirm steht die offizielle Nummer der Bank. Ist der Anruf echt?",
+        "options": [
+          {
+            "id": "yes-number",
+            "label": "Ja, wenn die Nummer stimmt, ist der Anruf echt",
+            "correct": false,
+            "feedback": "Eine Nummer lässt sich fälschen. Die Nummer auf dem Bildschirm ist kein Beweis."
+          },
+          {
+            "id": "call-back",
+            "label": "Das kann ich nicht erkennen, also rufe ich selbst zurück",
+            "correct": true,
+            "feedback": "Richtig. Wählen Sie die offizielle Nummer selbst, am besten von einem anderen Telefon aus, damit die Kriminellen die Leitung nicht offen halten können."
+          },
+          {
+            "id": "ask-name",
+            "label": "Ich frage nach dem Namen, das reicht",
+            "correct": false,
+            "feedback": "Kriminelle können jeden beliebigen Namen nennen. Ein Name ist keine Prüfung."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Eingehender Anruf"
+          }
+        }
+      },
+      "explain": "Name und Nummer eines Anrufers können gefälscht sein. Am sichersten ist es, aufzulegen und selbst die offizielle Nummer anzurufen."
+    },
+    {
+      "type": "swipe",
+      "id": "l1-swipe",
+      "prompt": "Sicher oder Falle?",
+      "cards": [
+        {
+          "id": "police-safe-account",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Anruf: +994 12 000 11 22"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hier spricht die Polizei. Auf Ihren Namen wurde ein Kredit aufgenommen. Überweisen Sie Ihr Geld sofort auf ein sicheres Konto."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Die Polizei verlangt nie, dass Sie Geld auf ein sicheres Konto überweisen. Das ist eine bekannte Betrugsmasche."
+        },
+        {
+          "id": "bank-call-back",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "sahilbank",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Anruf: SahilBank"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Wir haben eine verdächtige Zahlung mit Ihrer Karte bemerkt. Nennen Sie uns keine Daten, sondern rufen Sie die Nummer auf der Rückseite Ihrer Karte an."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Der Anruf verlangt nichts und verweist Sie an die offizielle Nummer. Rufen Sie zur Prüfung die Nummer auf Ihrer Karte an."
+        },
+        {
+          "id": "support-password",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek-fake",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Anruf: IT-Support"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "In Ihrem Postfach ist ein Virus. Nennen Sie mir Ihr Passwort, dann entferne ich ihn per Fernzugriff."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Der IT-Support braucht Ihr Passwort nicht. Verraten Sie es niemandem."
+        },
+        {
+          "id": "support-planned",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Anruf: IT-Support"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Ich rufe wegen der Anfrage an, die Sie gestern gestellt haben. Wir aktualisieren Ihren Computer morgen, Sie müssen nichts tun."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Sie haben die Anfrage selbst gestellt, und von Ihnen wird nichts verlangt. Ein ganz normaler dienstlicher Anruf."
+        },
+        {
+          "id": "remote-app",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "sahilbank",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Anruf: SahilBank"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Installieren Sie zum Schutz Ihres Kontos diese App, damit ich Ihren Bildschirm sehen kann."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Mit einer Fernwartungs-App überlassen Sie den Kriminellen Ihr ganzes Smartphone. Eine Bank verlangt so etwas nie."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "l1-scenario",
+      "title": "Ein Anruf vom Support",
+      "start": "n1",
+      "nodes": [
+        {
+          "id": "n1",
+          "text": "Guten Tag, hier ist Elvin vom IT-Support. Ihr Konto wird gerade gesperrt, wir müssen sofort Ihr Passwort bestätigen.",
+          "speaker": "Anrufer",
+          "voice": "man-3",
+          "channel": "phone",
+          "spoken": "Guten Tag, hier ist Elvin vom IT-Support. <breath> Ihr Konto wird gerade gesperrt, wir müssen sofort Ihr Passwort bestätigen.",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "it-destek-fake",
+              "caller": [
+                {
+                  "text": "IT-Support"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 12 000 33 44"
+                }
+              ],
+              "label": "Eingehender Anruf"
+            }
+          },
+          "choices": [
+            {
+              "label": "Ich nenne mein Passwort",
+              "outcome": "compromised",
+              "feedback": "Jetzt kennt jemand anderes Ihr Passwort. Ändern Sie es sofort und melden Sie den Vorfall dem Support unter der offiziellen Nummer."
+            },
+            {
+              "label": "Ich frage, wer da spricht",
+              "next": "n2",
+              "feedback": "Ein guter Anfang, aber verlassen Sie sich nicht ganz auf die Antwort."
+            },
+            {
+              "label": "Ich lege auf und rufe selbst beim Support an",
+              "outcome": "safe",
+              "feedback": "Ausgezeichnet. Der echte IT-Support fragt nie nach Ihrem Passwort."
+            }
+          ]
+        },
+        {
+          "id": "n2",
+          "text": "Ich bin Elvin Həsənov aus dem dritten Stock. Beeilen Sie sich, das Konto wird in fünf Minuten gelöscht. Installieren Sie wenigstens dieses Programm.",
+          "speaker": "Anrufer",
+          "voice": "man-3",
+          "channel": "phone",
+          "spoken": "Ich bin Elvin Həsənov aus dem dritten Stock. Beeilen Sie sich, äh, das Konto wird in fünf Minuten gelöscht. Installieren Sie wenigstens dieses Programm.",
+          "choices": [
+            {
+              "label": "Ich installiere das Programm",
+              "next": "n3",
+              "feedback": "Mit einem Fernwartungsprogramm kann er Ihren Computer sehen und steuern."
+            },
+            {
+              "label": "Ich sage, dass ich selbst zurückrufe",
+              "outcome": "safe",
+              "feedback": "Die richtige Entscheidung. Zeitdruck ist ein Warnsignal, und ein Rückruf ist die beste Prüfung."
+            }
+          ]
+        },
+        {
+          "id": "n3",
+          "text": "Ein unbekanntes Programm öffnet sich, und der Mauszeiger bewegt sich von selbst.",
+          "choices": [
+            {
+              "label": "Ich trenne die Verbindung und rufe den Support an",
+              "outcome": "risky",
+              "feedback": "Die richtige Reaktion. Eine schnelle Meldung begrenzt den Schaden."
+            },
+            {
+              "label": "Es ist mir peinlich, ich sage niemandem etwas",
+              "outcome": "compromised",
+              "feedback": "Schweigen verschafft dem Angreifer Zeit. Eine Meldung ist nichts, wofür man sich schämen muss – sie schützt alle."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "l1-recap",
+      "points": [
+        "Name und Nummer eines Anrufers können gefälscht sein",
+        "Nennen Sie niemandem einen Code, eine PIN oder ein Passwort",
+        "Legen Sie auf und rufen Sie selbst die offizielle Nummer an"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

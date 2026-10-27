@@ -1,0 +1,417 @@
+{
+ "id": "spot-the-impostor",
+ "title": "Recunoașteți impostorul",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Escrocii deschid pagini și canale false în numele ministerelor și al oficialilor.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": { "kind": "illustration", "id": "social" }
+    },
+    {
+     "id": "b2",
+     "say": "Uitați-vă la adresă, nu la nume: o literă, un cuvânt sau o cifră în plus dau de gol un cont fals.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "nd-sxn-fake",
+       "url": [
+        { "text": "https://kontakto.example/" },
+        { "text": "sxn.rasmi.az2", "spot": "handle" }
+       ]
+      }
+     },
+     "highlight": "handle"
+    },
+    {
+     "id": "b3",
+     "say": "Un cont fals vă grăbește și vă cere bani, datele cardului sau un clic.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": { "kind": "illustration", "id": "mask" }
+    },
+    {
+     "id": "b4",
+     "say": "Dacă aveți dubii, deschideți chiar dumneavoastră site-ul organizației și verificați lista conturilor oficiale.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": { "kind": "illustration", "id": "shield" }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "official-messages",
+   "environment": "phone",
+   "title": "Mesaje în numele unei instituții",
+   "intro": "Pe telefon vă sosesc mesaje în numele unui minister. Alegeți pasul corect pentru fiecare.",
+   "steps": [
+    {
+     "id": "aid-channel",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "nd-sxn-fake",
+      "app": "telegram",
+      "contact": [{ "text": "Ministerul Serviciilor Sociale | Oficial" }],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         { "text": "Stimați cetățeni! Fiecare familie primește de la stat o plată unică de 300 AZN." }
+        ],
+        "time": "10:02"
+       },
+       {
+        "from": "them",
+        "body": [
+         { "text": "Pentru a o primi, introduceți astăzi datele cardului: " },
+         {
+          "text": "sxn-yardim.example.net/qeydiyyat",
+          "link": { "label": "sxn-yardim.example.net/qeydiyyat", "href": "https://sxn-yardim.example.net/qeydiyyat" }
+         }
+        ],
+        "time": "10:02"
+       }
+      ]
+     },
+     "say": "Numele canalului pare oficial. Dar unde duce linkul?",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Deschideți linkul",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Această pagină fură datele cardului. Un minister nu vă cere prin mesaj toate datele cardului ca să plătească un ajutor."
+      },
+      {
+       "id": "report",
+       "label": "Raportați canalul",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Adresa nu este site-ul ministerului, iar o raportare grăbește închiderea canalului."
+      },
+      {
+       "id": "block",
+       "label": "Blocați",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bine, canalul nu vă mai poate contacta. Raportați-l totodată, ca să-i protejați și pe ceilalți."
+      },
+      {
+       "id": "share",
+       "label": "Trimiteți în grupul familiei",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Dacă distribuiți un mesaj neverificat, vă trimiteți și familia în capcană. Verificați mai întâi site-ul oficial."
+      }
+     ]
+    },
+    {
+     "id": "real-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "nd-sxn",
+      "sender": [{ "text": "SXN" }],
+      "time": "11:30",
+      "messages": [
+       [
+        { "text": "Cererea dumneavoastră 2026-118 a fost primită. Stadiul ei poate fi urmărit în contul personal de pe sxn.example." }
+       ]
+      ]
+     },
+     "say": "Săptămâna trecută ați trimis o cerere la minister.",
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Marcați ca sigur",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Corect. Se potrivește cu cererea pe care ați depus-o, nu are link și nu cere nimic."
+      },
+      {
+       "id": "report",
+       "label": "Raportați",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Prudența este bună, dar acest mesaj este autentic: nu cere nimic și vă lasă să deschideți chiar dumneavoastră site-ul."
+      }
+     ]
+    },
+    {
+     "id": "boss-new-number",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [{ "text": "Șeful biroului (număr nou)" }],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         { "text": "Bună ziua. Acesta este noul meu număr. Sunt în ședință și nu pot suna." }
+        ],
+        "time": "12:15"
+       },
+       {
+        "from": "them",
+        "body": [
+         { "text": "Trimiteți-mi urgent aici o copie a scrisorii oficiale de azi-dimineață." }
+        ],
+        "time": "12:16"
+       }
+      ]
+     },
+     "say": "Funcția vă este cunoscută, dar numărul nu.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Trimiteți scrisoarea",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Un document oficial a ajuns la un număr necunoscut. Escrocii scriu des așa, în numele unui manager."
+      },
+      {
+       "id": "verify",
+       "label": "Sunați la numărul cunoscut al managerului",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Verificați întotdeauna un număr nou printr-un canal pe care îl cunoașteți deja."
+      },
+      {
+       "id": "report",
+       "label": "Raportați și blocați",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Anunțați și echipa de securitate: colegii pot primi același mesaj."
+      },
+      {
+       "id": "ask",
+       "label": "Cine sunteți?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Dacă răspundeți, conversația continuă, iar escrocul are pregătit un răspuns convingător. Verificați prin telefon."
+      }
+     ]
+    },
+    {
+     "id": "giveaway-page",
+     "label": "Ministerul Serviciilor Sociale: 1.000 de laptopuri gratuite! Taxă de înscriere: 5 AZN",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn-fake",
+      "url": [{ "text": "https://kontakto.example/sxn.resmi.official" }]
+     },
+     "say": "Un prieten a distribuit această pagină.",
+     "actions": [
+      {
+       "id": "join",
+       "label": "Participați",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "O instituție de stat nu cere niciodată o taxă pentru un premiu. Această pagină falsă colectează datele cardurilor."
+      },
+      {
+       "id": "report",
+       "label": "Raportați pagina",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Cuvântul în plus din adresă o dă de gol, iar o raportare duce la ștergerea ei."
+      },
+      {
+       "id": "verify",
+       "label": "Verificați pe site-ul ministerului",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Un obicei excelent. Dacă pe site nu există un astfel de concurs, raportați pagina."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-channel-signs",
+   "prompt": "Atingeți semnele unui canal fals.",
+   "artifact": {
+    "kind": "chat",
+    "brandRef": "nd-sxn-fake",
+    "app": "telegram",
+    "contact": [
+     { "text": "Ministerul Serviciilor Sociale" },
+     { "text": " @sxn_rasmi", "spot": "handle" }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       { "text": "Astăzi este ultima zi! ", "spot": "urgent" },
+       { "text": "Pentru plata compensației, " },
+       { "text": "achitați o taxă de înregistrare de 5 AZN", "spot": "fee" },
+       { "text": ": " },
+       {
+        "text": "sxn-kompensasiya.example.net",
+        "spot": "link",
+        "link": { "label": "sxn-kompensasiya.example.net", "href": "https://sxn-kompensasiya.example.net" }
+       }
+      ],
+      "time": "16:40"
+     },
+     {
+      "from": "them",
+      "body": [
+       { "text": "Comentariile sunt închise, vă rugăm fără întrebări.", "spot": "no-questions" }
+      ],
+      "time": "16:41"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "handle",
+     "label": "Numele de utilizator",
+     "explain": "Numele de utilizator oficial este @sxn_resmi. Aici a fost schimbată o literă."
+    },
+    {
+     "id": "urgent",
+     "label": "Grabă",
+     "explain": "Escrocii vă grăbesc ca să nu aveți timp să vă gândiți."
+    },
+    {
+     "id": "fee",
+     "label": "Cererea unei taxe",
+     "explain": "Nu trebuie să plătiți niciodată ca să primiți o plată de la stat."
+    },
+    {
+     "id": "link",
+     "label": "Linkul",
+     "explain": "Domeniul nu este sxn.example, cel al ministerului."
+    },
+    {
+     "id": "no-questions",
+     "label": "Comentarii închise",
+     "explain": "Închiderea comentariilor îi reduce la tăcere pe cei care i-ar putea avertiza pe ceilalți."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "real-or-fake",
+   "prompt": "Oficial sau fals?",
+   "cards": [
+    {
+     "id": "official-list",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn",
+      "url": [{ "text": "https://sxn.example/elaqe/sosial-sebekeler" }]
+     },
+     "verdict": "safe",
+     "explain": "Acesta este chiar site-ul ministerului. Lista conturilor oficiale o luați de pe o astfel de pagină."
+    },
+    {
+     "id": "extra-word",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn-fake",
+      "url": [{ "text": "https://kontakto.example/sxn.resmi.official" }]
+     },
+     "verdict": "threat",
+     "explain": "Cuvântul în plus de la final este un semn tipic de fals. Adresa oficială este sxn.resmi."
+    },
+    {
+     "id": "job-fee",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "nd-sxn-fake",
+      "app": "telegram",
+      "contact": [{ "text": "Ministerul Serviciilor Sociale | Resurse umane" }],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         { "text": "Programarea la interviul de angajare costă 20 AZN. Locul vă este rezervat după plată." }
+        ],
+        "time": "13:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O instituție de stat nu cere bani prin mesaj pentru un interviu sau pentru o cerere."
+    },
+    {
+     "id": "post-to-site",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [{ "text": "Ministerul Serviciilor Sociale" }],
+      "body": [{ "text": "Programul cu publicul s-a schimbat. Detalii pe sxn.example." }],
+      "time": "09:10"
+     },
+     "verdict": "safe",
+     "explain": "Nu cere nimic și vă trimite la site-ul oficial. Totuși, confirmați detaliile chiar pe site."
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "verify-account",
+   "prompt": "Cum verificați dacă un cont este oficial? Puneți pașii în ordine.",
+   "items": [
+    { "id": "open-site", "label": "Tastați chiar dumneavoastră în browser adresa site-ului organizației" },
+    { "id": "find-list", "label": "Găsiți pe site linkurile către conturile oficiale" },
+    { "id": "compare", "label": "Comparați adresa contului literă cu literă" },
+    { "id": "report", "label": "Dacă nu se potrivește, raportați contul pe platformă" }
+   ],
+   "explain": "Începeți întotdeauna verificarea de pe site-ul organizației, niciodată de la un link din mesaj."
+  },
+  {
+   "type": "choice",
+   "id": "badge",
+   "question": {
+    "prompt": "Contul are o bifă de verificare lângă nume. Asta dovedește că este oficial?",
+    "options": [
+     {
+      "id": "yes",
+      "label": "Da, bifa este o garanție",
+      "correct": false,
+      "feedback": "Pe unele platforme, bifa se poate cumpăra, iar conturile false pun și ele simbolul unei bife în nume."
+     },
+     {
+      "id": "followers",
+      "label": "Da, dacă are mulți urmăritori",
+      "correct": false,
+      "feedback": "Urmăritorii se pot cumpăra, iar unei pagini vechi i se poate schimba pur și simplu numele."
+     },
+     {
+      "id": "site",
+      "label": "Nu, îl compar cu linkul de pe site-ul organizației",
+      "correct": true,
+      "feedback": "Corect. Linkul de pe site-ul propriu al organizației este verificarea cea mai sigură."
+     }
+    ],
+    "visual": { "kind": "illustration", "id": "badge-id" }
+   },
+   "explain": "Bifele, urmăritorii și o siglă îngrijită se pot falsifica. Site-ul propriu al organizației, nu."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Verificați adresa contului, nu numele: poate diferi o singură literă.",
+    "Instituțiile oficiale nu cer prin mesaj datele cardului, taxe sau plăți urgente.",
+    "Dacă aveți dubii, deschideți chiar dumneavoastră site-ul și raportați contul fals."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

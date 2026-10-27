@@ -1,0 +1,389 @@
+{
+  "id": "classify-and-share",
+  "title": "Klassifizieren und teilen",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "levels",
+          "say": "Jedes Dokument hat eine Vertraulichkeitsstufe: öffentlich, intern oder vertraulich. Daran erkennen Sie, wer es sehen darf.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        },
+        {
+          "id": "public-internal",
+          "say": "Öffentlich heißt: für alle, etwa eine Mitteilung auf der Website. Intern heißt: nur für Mitarbeitende.",
+          "mood": "talk",
+          "gesture": "nod",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "confidential",
+          "say": "Vertraulich heißt: nur für namentlich bestimmte Personen. Gelangt ein solches Dokument nach außen, entsteht für Menschen und für die Organisation ernsthafter Schaden.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "public-link",
+          "say": "Ein Link, den jeder öffnen kann, macht die Datei für das ganze Internet zugänglich. Teilen Sie nur mit namentlich bestimmten Personen und legen Sie ein Ablaufdatum fest.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "rxagentlik-disk",
+              "url": [
+                {
+                  "text": "https://disk.rxagentlik.az/s/8Kq2Lm?access="
+                },
+                {
+                  "text": "anyone",
+                  "spot": "public"
+                }
+              ]
+            }
+          },
+          "highlight": "public"
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "share-requests",
+      "environment": "phone",
+      "title": "Anfragen zum Teilen",
+      "intro": "Auf Ihrem Smartphone sind drei Anfragen eingegangen. Entscheiden Sie anhand der Vertraulichkeitsstufe des Dokuments: Teilen Sie es oder nicht?",
+      "steps": [
+        {
+          "id": "phone-book",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Nigar (ehemalige Kollegin)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hallo! Ich bräuchte es für meinen neuen Job: Kannst du mir das interne Telefonverzeichnis schicken?"
+                  }
+                ],
+                "time": "10:14"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "keep",
+              "label": "Das ist intern, ich darf es nicht schicken",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Richtig. Interne Dokumente sind nur für Mitarbeitende, und eine ehemalige Kollegin gehört nicht mehr dazu."
+            },
+            {
+              "id": "share",
+              "label": "Ich schicke die Datei",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Das Telefonverzeichnis ist intern. Außerhalb der Organisation ist es eine fertige Liste mit Zielen für Phishing."
+            }
+          ]
+        },
+        {
+          "id": "job-ad",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "merkez-konsalting",
+            "from": {
+              "name": [
+                {
+                  "text": "Elçin Rzayev"
+                }
+              ],
+              "address": [
+                {
+                  "text": "e.rzayev@merkez-konsalting.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Stellenanzeige"
+              }
+            ],
+            "time": "11:02",
+            "body": [
+              [
+                {
+                  "text": "Guten Tag, könnten Sie uns die Stellenanzeige von Ihrer Website schicken? Wir würden sie gern an unsere Studierenden weitergeben."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "share",
+              "label": "Ich schicke die Anzeige",
+              "kind": "share",
+              "outcome": "safe",
+              "feedback": "Richtig. Eine Stellenanzeige ist öffentlich und steht ohnehin auf der Website."
+            },
+            {
+              "id": "keep",
+              "label": "Ich schicke nichts",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Sicher, aber ein öffentliches Dokument müssen Sie nicht zurückhalten. Der Link zur Website genügt."
+            }
+          ]
+        },
+        {
+          "id": "applications",
+          "artifact": {
+            "kind": "sms",
+            "sender": [
+              {
+                "text": "+994 55 000 63 21"
+              }
+            ],
+            "time": "12:30",
+            "messages": [
+              [
+                {
+                  "text": "Guten Tag, ich bin Journalist. Wenn Sie mir die Liste der Bürgeranträge schicken, werden wir Ihren Namen nie nennen."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "keep",
+              "label": "Ich lehne ab und verweise an die Pressestelle",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Richtig. Anträge sind vertraulich, und mit den Medien spricht nur die Pressestelle."
+            },
+            {
+              "id": "share",
+              "label": "Ich schicke die Liste",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Eine vertrauliche Liste hat die Organisation verlassen. Das ist ein Datenleck mit personenbezogenen Daten von Bürgerinnen und Bürgern."
+            },
+            {
+              "id": "report",
+              "label": "Melden",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Gut. Melden Sie eine solche Anfrage auch dem Sicherheitsteam und Ihrer Führungskraft."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "classify",
+      "prompt": "Ordnen Sie jedem Dokument seine Vertraulichkeitsstufe zu.",
+      "pairs": [
+        {
+          "id": "job-ad",
+          "left": "Eine auf der Website veröffentlichte Stellenanzeige",
+          "right": "Öffentlich"
+        },
+        {
+          "id": "phone-book",
+          "left": "Das interne Telefonverzeichnis",
+          "right": "Intern"
+        },
+        {
+          "id": "applications",
+          "left": "Die Liste der Bürgeranträge",
+          "right": "Vertraulich"
+        }
+      ],
+      "explain": "Wählen Sie im Zweifel die höhere Stufe und fragen Sie die Person, die für das Dokument verantwortlich ist."
+    },
+    {
+      "type": "hotspot",
+      "id": "misdelivered",
+      "prompt": "Diese E-Mail haben Sie versehentlich erhalten. Finden Sie die Fehler beim Teilen.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "rxagentlik",
+        "from": {
+          "name": [
+            {
+              "text": "Rəşad Əliyev"
+            }
+          ],
+          "address": [
+            {
+              "text": "reshad.aliyev@rxagentlik.az"
+            }
+          ]
+        },
+        "to": "aynur.mammadova@rxagentlik.az",
+        "subject": [
+          {
+            "text": "Liste der Anträge"
+          }
+        ],
+        "time": "11:40",
+        "body": [
+          [
+            {
+              "text": "Hallo Leyla,",
+              "spot": "greeting"
+            }
+          ],
+          [
+            {
+              "text": "anbei die "
+            },
+            {
+              "text": "vollständige Liste der Bürgeranträge mit ID-Nummern",
+              "spot": "full-list"
+            },
+            {
+              "text": "."
+            }
+          ],
+          [
+            {
+              "text": "Ich habe sie außerdem in die Cloud hochgeladen, "
+            },
+            {
+              "text": "jeder mit dem Link kann sie öffnen.",
+              "spot": "anyone"
+            }
+          ],
+          [
+            {
+              "text": "Passwort für das Archiv: Muraciet2026",
+              "spot": "password"
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Muracietler_tam.zip"
+              }
+            ],
+            "size": "2,4 MB"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "greeting",
+          "label": "Falscher Empfänger",
+          "explain": "Die E-Mail ist an Leyla gerichtet, aber bei Ihnen angekommen. Ein typischer Fehler durch die Autovervollständigung."
+        },
+        {
+          "id": "full-list",
+          "label": "Zu viele Daten",
+          "explain": "Für die Aufgabe war die vollständige Liste mit ID-Nummern nicht nötig. Schicken Sie nur, was gebraucht wird."
+        },
+        {
+          "id": "anyone",
+          "label": "Offener Link",
+          "explain": "Eine vertrauliche Datei darf nie über einen offenen Link erreichbar sein. Wer den Link bekommt, kann sie öffnen."
+        },
+        {
+          "id": "password",
+          "label": "Passwort in derselben E-Mail",
+          "explain": "Ein Passwort in derselben E-Mail wie die Datei schützt nichts. Schicken Sie es über einen anderen Kanal."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "order",
+      "id": "sent-wrong",
+      "prompt": "Sie haben eine vertrauliche Datei an die falsche Person geschickt. Bringen Sie die Schritte in die richtige Reihenfolge.",
+      "items": [
+        {
+          "id": "close-link",
+          "label": "Die Freigabe über den Link sofort beenden"
+        },
+        {
+          "id": "report",
+          "label": "Führungskraft und Sicherheitsteam informieren"
+        },
+        {
+          "id": "ask-delete",
+          "label": "Nach deren Anweisung den Empfänger bitten, die Datei zu löschen"
+        },
+        {
+          "id": "record",
+          "label": "Notieren, was wann an wen gegangen ist"
+        }
+      ],
+      "explain": "Dieser Fehler kann jedem passieren. Eine schnelle Meldung verringert den Schaden, Verschweigen macht ihn größer."
+    },
+    {
+      "type": "choice",
+      "id": "link-setting",
+      "question": {
+        "prompt": "Sie schicken eine Projektdatei an einen externen Partner. Welche Einstellung ist richtig?",
+        "options": [
+          {
+            "id": "anyone",
+            "label": "Jeder mit dem Link, ohne Ablaufdatum",
+            "correct": false,
+            "feedback": "Der Link kann weitergeleitet werden, und dann könnte jeder die Datei öffnen."
+          },
+          {
+            "id": "named",
+            "label": "Nur die namentlich genannte Person, für 7 Tage",
+            "correct": true,
+            "feedback": "Richtig. Der Zugriff ist eng begrenzt und zeitlich befristet."
+          },
+          {
+            "id": "personal-cloud",
+            "label": "In meine private Cloud hochladen und einen Link schicken",
+            "correct": false,
+            "feedback": "Ein privates Konto liegt außerhalb der Kontrolle der Organisation."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "cloud"
+        }
+      },
+      "explain": "Halten Sie Freigaben so eng wie möglich: wer, wie lange und mit welchen Rechten."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Prüfen Sie vor dem Senden die Vertraulichkeitsstufe des Dokuments und den Empfänger.",
+        "Beschränken Sie Links auf bestimmte Personen und Zeiträume, schicken Sie Passwörter getrennt.",
+        "Falsch verschickt? Nicht verschweigen, sofort melden."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -1,0 +1,518 @@
+{
+ "id": "spot-the-impostor",
+ "title": "كشف المنتحل",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "ينشئ المحتالون صفحات وقنوات مزيفة باسم الوزارات والمسؤولين.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "انظر إلى العنوان لا إلى الاسم: فحرف أو كلمة أو رقم زائد يكشف الحساب المزيف.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "nd-sxn-fake",
+       "url": [
+        {
+         "text": "https://kontakto.example/"
+        },
+        {
+         "text": "sxn.rasmi.az2",
+         "spot": "handle"
+        }
+       ]
+      }
+     },
+     "highlight": "handle"
+    },
+    {
+     "id": "b3",
+     "say": "الحساب المزيف يستعجلك، ويطلب منك المال أو بيانات بطاقتك أو الضغط على رابط.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "عند الشك، افتح موقع الجهة بنفسك، وراجع قائمة حساباتها الرسمية.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "official-messages",
+   "environment": "phone",
+   "title": "رسائل باسم جهة رسمية",
+   "intro": "تصل إلى جوالك رسائل باسم إحدى الوزارات. اختر الخطوة الصحيحة لكل رسالة.",
+   "steps": [
+    {
+     "id": "aid-channel",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "nd-sxn-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "وزارة الخدمات الاجتماعية | الحساب الرسمي"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "عزيزي المواطن! تقرر صرف دفعة حكومية لمرة واحدة بقيمة 300 AZN لكل أسرة."
+         }
+        ],
+        "time": "10:02"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "لاستلامها، أدخل بيانات بطاقتك اليوم: "
+         },
+         {
+          "text": "sxn-yardim.example.net/qeydiyyat",
+          "link": {
+           "label": "sxn-yardim.example.net/qeydiyyat",
+           "href": "https://sxn-yardim.example.net/qeydiyyat"
+          }
+         }
+        ],
+        "time": "10:02"
+       }
+      ]
+     },
+     "say": "اسم القناة يبدو رسميًا. لكن إلى أين يقود الرابط؟",
+     "actions": [
+      {
+       "id": "click",
+       "label": "فتح الرابط",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "هذه الصفحة تسرق بيانات البطاقات. والوزارة لا تطلب بيانات بطاقتك كاملة عبر الرسائل لتصرف لك المساعدة."
+      },
+      {
+       "id": "report",
+       "label": "الإبلاغ عن القناة",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "صحيح. العنوان ليس موقع الوزارة، والبلاغ يسرع إغلاق القناة."
+      },
+      {
+       "id": "block",
+       "label": "الحظر",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "جيد، لن تتمكن القناة من الوصول إليك مجددًا. وأبلغ عنها أيضًا لحماية الآخرين."
+      },
+      {
+       "id": "share",
+       "label": "الإرسال إلى مجموعة العائلة",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "مشاركة رسالة لم تتحقق منها توقع عائلتك في الفخ أيضًا. تحقق من الموقع الرسمي أولًا."
+      }
+     ]
+    },
+    {
+     "id": "real-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "nd-sxn",
+      "sender": [
+       {
+        "text": "SXN"
+       }
+      ],
+      "time": "11:30",
+      "messages": [
+       [
+        {
+         "text": "تم استلام طلبك رقم 2026-118. يمكنك متابعة حالته في حسابك الشخصي على sxn.example."
+        }
+       ]
+      ]
+     },
+     "say": "أرسلت الأسبوع الماضي طلبًا إلى الوزارة.",
+     "actions": [
+      {
+       "id": "safe",
+       "label": "تمييزها كرسالة آمنة",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "صحيح. الرسالة تتوافق مع الطلب الذي قدمته، ولا رابط فيها، ولا تطلب أي شيء."
+      },
+      {
+       "id": "report",
+       "label": "الإبلاغ",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "الحذر أمر جيد، لكن هذه الرسالة حقيقية: فهي لا تطلب شيئًا، وتترك لك أن تفتح الموقع بنفسك."
+      }
+     ]
+    },
+    {
+     "id": "boss-new-number",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "مدير المكتب (رقم جديد)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "مرحبًا. هذا رقمي الجديد. أنا في اجتماع ولا أستطيع الاتصال."
+         }
+        ],
+        "time": "12:15"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "أرسل لي هنا نسخة من الخطاب الرسمي الذي وصل صباح اليوم، الأمر عاجل."
+         }
+        ],
+        "time": "12:16"
+       }
+      ]
+     },
+     "say": "المنصب مألوف، لكن الرقم لا تعرفه.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "إرسال الخطاب",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "ذهبت وثيقة رسمية إلى رقم غير معروف. وكثيرًا ما يكتب المحتالون باسم المدير بهذه الطريقة."
+      },
+      {
+       "id": "verify",
+       "label": "الاتصال بالرقم المعروف للمدير",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "أحسنت. تحقق دائمًا من أي رقم جديد عبر قناة تعرفها مسبقًا."
+      },
+      {
+       "id": "report",
+       "label": "الإبلاغ والحظر",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "صحيح. وأبلغ فريق الأمن السيبراني أيضًا، فقد تصل الرسالة نفسها إلى زملائك."
+      },
+      {
+       "id": "ask",
+       "label": "من معي؟",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "الرد يبقي المحادثة مستمرة، والمحتال لديه جواب مقنع جاهز. تحقق بمكالمة هاتفية."
+      }
+     ]
+    },
+    {
+     "id": "giveaway-page",
+     "label": "وزارة الخدمات الاجتماعية: 1000 حاسوب محمول مجانًا! رسوم التسجيل 5 AZN",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn-fake",
+      "url": [
+       {
+        "text": "https://kontakto.example/sxn.resmi.official"
+       }
+      ]
+     },
+     "say": "شارك صديق معك هذه الصفحة.",
+     "actions": [
+      {
+       "id": "join",
+       "label": "المشاركة",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "الجهات الحكومية لا تطلب أبدًا رسومًا مقابل جائزة. وهذه الصفحة المزيفة تجمع بيانات البطاقات."
+      },
+      {
+       "id": "report",
+       "label": "الإبلاغ عن الصفحة",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "صحيح. الكلمة الزائدة في العنوان تكشفها، والبلاغ يؤدي إلى حذفها."
+      },
+      {
+       "id": "verify",
+       "label": "التحقق من موقع الوزارة",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "عادة رائعة. وإذا لم تجد في الموقع مسابقة كهذه، فأبلغ عن الصفحة."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-channel-signs",
+   "prompt": "اضغط على علامات القناة المزيفة.",
+   "artifact": {
+    "kind": "chat",
+    "brandRef": "nd-sxn-fake",
+    "app": "telegram",
+    "contact": [
+     {
+      "text": "وزارة الخدمات الاجتماعية"
+     },
+     {
+      "text": " @sxn_rasmi",
+      "spot": "handle"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "اليوم هو آخر يوم! ",
+        "spot": "urgent"
+       },
+       {
+        "text": "للحصول على مبلغ التعويض، "
+       },
+       {
+        "text": "ادفع رسوم تسجيل قدرها 5 AZN",
+        "spot": "fee"
+       },
+       {
+        "text": ": "
+       },
+       {
+        "text": "sxn-kompensasiya.example.net",
+        "spot": "link",
+        "link": {
+         "label": "sxn-kompensasiya.example.net",
+         "href": "https://sxn-kompensasiya.example.net"
+        }
+       }
+      ],
+      "time": "16:40"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "التعليقات مغلقة، يرجى عدم طرح الأسئلة.",
+        "spot": "no-questions"
+       }
+      ],
+      "time": "16:41"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "handle",
+     "label": "اسم المستخدم",
+     "explain": "اسم المستخدم الرسمي هو @sxn_resmi. وهنا تم تغيير حرف واحد."
+    },
+    {
+     "id": "urgent",
+     "label": "الاستعجال",
+     "explain": "المحتالون يستعجلونك حتى لا يبقى لديك وقت للتفكير."
+    },
+    {
+     "id": "fee",
+     "label": "طلب رسوم",
+     "explain": "لا يتعين عليك أبدًا أن تدفع شيئًا لتحصل على دفعة حكومية."
+    },
+    {
+     "id": "link",
+     "label": "الرابط",
+     "explain": "هذا النطاق ليس نطاق الوزارة sxn.example."
+    },
+    {
+     "id": "no-questions",
+     "label": "التعليقات المغلقة",
+     "explain": "إغلاق التعليقات يمنع الناس من تحذير غيرهم."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "real-or-fake",
+   "prompt": "رسمي أم مزيف؟",
+   "cards": [
+    {
+     "id": "official-list",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn",
+      "url": [
+       {
+        "text": "https://sxn.example/elaqe/sosial-sebekeler"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "هذا موقع الوزارة نفسها. خذ قائمة الحسابات الرسمية من صفحة كهذه."
+    },
+    {
+     "id": "extra-word",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn-fake",
+      "url": [
+       {
+        "text": "https://kontakto.example/sxn.resmi.official"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "الكلمة الزائدة في النهاية علامة معتادة على التزييف. والعنوان الرسمي هو sxn.resmi."
+    },
+    {
+     "id": "job-fee",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "nd-sxn-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "وزارة الخدمات الاجتماعية | الموارد البشرية"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "حجز موعد للمقابلة الوظيفية يكلف 20 AZN. ويتم تثبيت موعدك بعد الدفع."
+         }
+        ],
+        "time": "13:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "الجهات الحكومية لا تطلب المال عبر الرسائل مقابل مقابلة أو طلب توظيف."
+    },
+    {
+     "id": "post-to-site",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "وزارة الخدمات الاجتماعية"
+       }
+      ],
+      "body": [
+       {
+        "text": "تغيرت أوقات استقبال المراجعين. التفاصيل على sxn.example."
+       }
+      ],
+      "time": "09:10"
+     },
+     "verdict": "safe",
+     "explain": "لا يطلب منك شيئًا، ويحيلك إلى الموقع الرسمي. ومع ذلك تأكد من التفاصيل على الموقع نفسه."
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "verify-account",
+   "prompt": "كيف تتحقق من أن الحساب رسمي؟ رتب الخطوات بالترتيب الصحيح.",
+   "items": [
+    {
+     "id": "open-site",
+     "label": "كتابة عنوان موقع الجهة في المتصفح بنفسك"
+    },
+    {
+     "id": "find-list",
+     "label": "البحث في الموقع عن روابط حساباتها الرسمية"
+    },
+    {
+     "id": "compare",
+     "label": "مقارنة عنوان الحساب حرفًا حرفًا"
+    },
+    {
+     "id": "report",
+     "label": "الإبلاغ عن الحساب لدى المنصة إذا لم يتطابق"
+    }
+   ],
+   "explain": "ابدأ التحقق دائمًا من موقع الجهة نفسها، ولا تبدأه أبدًا من رابط في الرسالة."
+  },
+  {
+   "type": "choice",
+   "id": "badge",
+   "question": {
+    "prompt": "تظهر بجانب اسم الحساب شارة توثيق. هل يثبت ذلك أنه حساب رسمي؟",
+    "options": [
+     {
+      "id": "yes",
+      "label": "نعم، الشارة ضمان كاف",
+      "correct": false,
+      "feedback": "في بعض المنصات يمكن شراء الشارة، والحسابات المزيفة تضع رمز الشارة داخل الاسم أيضًا."
+     },
+     {
+      "id": "followers",
+      "label": "نعم، إذا كان لديه متابعون كثيرون",
+      "correct": false,
+      "feedback": "يمكن شراء المتابعين، ويمكن ببساطة تغيير اسم صفحة قديمة."
+     },
+     {
+      "id": "site",
+      "label": "لا، أتحقق منه بالرابط المنشور على موقع الجهة",
+      "correct": true,
+      "feedback": "صحيح. الرابط المنشور على موقع الجهة نفسها هو أوثق وسيلة للتحقق."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "badge-id"
+    }
+   },
+   "explain": "الشارات والمتابعون والشعار الأنيق يمكن تزييفها. أما موقع الجهة نفسها فلا."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "تحقق من عنوان الحساب لا من اسمه، فقد يختلف حرف واحد.",
+    "الجهات الرسمية لا تطلب عبر الرسائل بيانات البطاقة ولا رسومًا ولا دفعات عاجلة.",
+    "عند الشك، افتح الموقع بنفسك وأبلغ عن الحساب المزيف."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

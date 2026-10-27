@@ -1,0 +1,416 @@
+{
+ "id": "adviser-call",
+ "title": "Danışmanın araması",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac-tutor",
+   "beats": [
+    {
+     "id": "ac-b1",
+     "say": "Merhaba! Bugün yatırım dolandırıcılığının en tehlikeli anına bakacağız: kişisel danışmanın araması.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "ac-b2",
+     "say": "Her şey bir reklamla ya da bir mesajlaşma grubuyla başlar. “Garantili kazanç” sözlerine dikkat edin.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2d-bakutrade",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "BakuTrade Pro | Yatırımcılar"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Bugün yine +%18!"
+          }
+         ],
+         "time": "19:02"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Garantili kazanç, sıfır risk.",
+           "spot": "guarantee"
+          }
+         ],
+         "time": "19:03"
+        }
+       ]
+      }
+     },
+     "highlight": "guarantee"
+    },
+    {
+     "id": "ac-b3",
+     "say": "Hiçbir gerçek yatırım, yüksek ve garantili kazanç vaat etmez.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "ac-b4",
+     "say": "Lisansı Merkez Bankasının resmî listesinden kendiniz kontrol edin. Yabancı bir lisans burada yeterli değildir.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "certificate"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac-sim",
+   "environment": "call",
+   "title": "BakuTrade Pro arıyor",
+   "intro": "Bir reklamdaki forma telefon numaranızı bıraktınız. Şimdi bir danışman arıyor. Yanıtlarınızı seçin.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Birleşik Krallık",
+      "voice": "young-man-2"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Yanıtla",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Aramayı yanıtlamak tehlikeli değil. Önemli olan neyi kabul ettiğiniz."
+      },
+      {
+       "id": "decline",
+       "label": "Reddet",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Bu da olur. Tanımadığınız yabancı bir numarayı yanıtlamak zorunda değilsiniz.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pitch",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Birleşik Krallık",
+      "voice": "young-man-2"
+     },
+     "say": "Merhaba, ben Cavid Alizade, BakuTrade Pro şirketinden kişisel danışmanınız. Size ayda yüzde otuz kazanç garanti ediyoruz, hem de sıfır riskle.",
+     "spoken": "Merhaba, <breath> ben Cavid Alizade, BakuTrade Pro şirketinden kişisel danışmanınız. Size, ee, ayda yüzde otuz kazanç garanti ediyoruz, hem de sıfır riskle.",
+     "actions": [
+      {
+       "id": "interested",
+       "label": "Kulağa hoş geliyor, ne yapmam gerekiyor?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Yüksek ve garantili kazanç vaadi, dolandırıcılığın en önemli işaretidir. Devam ederseniz sizden para isteyecekler."
+      },
+      {
+       "id": "licence",
+       "label": "Lisansınızı Merkez Bankasının listesinden kontrol edeceğim",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru. Lisansı onların sözüne güvenerek değil, resmî listeden kendiniz kontrol edin.",
+       "next": "licence-push"
+      },
+      {
+       "id": "hang",
+       "label": "Aramayı sonlandır",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "İyi karar. Garantili kazanç vaadi, telefonu kapatmak için yeterli bir sebeptir.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "deposit",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Birleşik Krallık",
+      "voice": "young-man-2"
+     },
+     "say": "Harika! Başlamak için yalnızca 250 manat yeterli. Bana kart numaranızı ve kartın arkasındaki güvenlik kodunu söyleyin, hesabınızı hemen açayım.",
+     "spoken": "Harika! <breath> Başlamak için yalnızca 250 manat yeterli. Bana kart numaranızı ve kartın arkasındaki güvenlik kodunu söyleyin, hesabınızı hemen açayım.",
+     "actions": [
+      {
+       "id": "give-card",
+       "label": "Kart bilgilerimi okuyorum",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Kart bilgileriniz dolandırıcının eline geçti. Görüşme biter bitmez bankanızı arayın ve kartı bloke ettirin.",
+       "next": "remote"
+      },
+      {
+       "id": "refuse",
+       "label": "Telefonda kart bilgisi vermem",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Kart numaranızı ya da kartın arkasındaki güvenlik kodunu telefonda asla kimseye söylemeyin.",
+       "next": "licence-push"
+      },
+      {
+       "id": "hang",
+       "label": "Aramayı sonlandır",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "İyi karar. Kart bilgisi isteyen bir aramayı kapatmak doğru yanıttır.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "licence-push",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Birleşik Krallık",
+      "voice": "young-man-2"
+     },
+     "say": "Avrupa lisansımız var, sertifikayı az önce size gönderdim. Merkez Bankasından kontrol etmenize hiç gerek yok.",
+     "spoken": "Avrupa lisansımız var, ee, sertifikayı az önce size gönderdim. <breath> Merkez Bankasından kontrol etmenize hiç gerek yok.",
+     "actions": [
+      {
+       "id": "accept",
+       "label": "Sertifika varsa sorun yok",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Bir sertifika görselini taklit etmek kolaydır. Merkez Bankası, yabancı lisansın burada faaliyet gösterme hakkı vermediği konusunda uyarmıştır."
+      },
+      {
+       "id": "check",
+       "label": "Yine de resmî listeye bakacağım",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Harika. Kontrol etmenizi engellemeye çalışan danışman kendini ele verir."
+      },
+      {
+       "id": "hang",
+       "label": "Aramayı sonlandır",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Doğru. Baskı arttığında en iyi yanıt aramayı sonlandırmaktır.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "remote",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Birleşik Krallık",
+      "voice": "young-man-2"
+     },
+     "say": "Alım satım yapmanıza yardımcı olayım. Ekranınızı görebilmem için EkranPaylaş uygulamasını yükleyin.",
+     "spoken": "Alım satım yapmanıza, ee, yardımcı olayım. <breath> Ekranınızı görebilmem için EkranPaylaş uygulamasını yükleyin.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Uygulamayı yüklüyorum",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Bu uygulamayla arayan kişi ekranınızı ve mobil bankacılık uygulamanızı uzaktan kontrol edebilir. Arayan biri istedi diye asla böyle bir uygulama yüklemeyin."
+      },
+      {
+       "id": "refuse",
+       "label": "Hiçbir uygulama yüklemeyeceğim",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Gerçek bir danışman ekranınızın kontrolünü istemez."
+      },
+      {
+       "id": "hang",
+       "label": "Aramayı sonlandır",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "İyi karar. Uzaktan erişim isteyen her aramayı hemen sonlandırın."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Arama sona erdi. Şimdi ne yapmalı?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Birleşik Krallık",
+      "voice": "young-man-2"
+     },
+     "actions": [
+      {
+       "id": "check-list",
+       "label": "Merkez Bankasının listesine bak",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru. Şirket listede yoksa 102'yi arayarak polise bildirin."
+      },
+      {
+       "id": "call-back",
+       "label": "Danışmanı geri ara",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Geri aramak, konuşmanın kontrolünü yeniden dolandırıcıya verir. Resmî bir kaynaktan kontrol edin."
+      },
+      {
+       "id": "block",
+       "label": "Numarayı engelle",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Güzel. Kart bilgilerinizi verdiyseniz hemen bankanızı da arayın."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ac-choice",
+   "question": {
+    "prompt": "Bir iş arkadaşınız diyor ki: “İlk ayda 200 manat kazandım ve parayı çektim. Demek ki platform gerçek.”",
+    "options": [
+     {
+      "id": "bait",
+      "label": "İlk para çekme bir yem, büyük bir tutarı geri vermezler",
+      "correct": true,
+      "feedback": "Doğru. Biraz para çekmenize izin vererek çok daha büyük bir yatırım yapmanızı sağlarlar."
+     },
+     {
+      "id": "join",
+      "label": "Demek ki gerçek, ben de katılacağım",
+      "correct": false,
+      "feedback": "Bir kez para çekebilmiş olmak, platformun yasal olduğunu kanıtlamaz. Lisansı resmî listeden kontrol edin."
+     },
+     {
+      "id": "more",
+      "label": "Kazancını büyütmek için daha fazla yatırım yapmalı",
+      "correct": false,
+      "feedback": "Dolandırıcıların beklediği de tam olarak budur. Büyük bir yatırımdan sonra para çekme işlemleri birden durur."
+     }
+    ]
+   },
+   "explain": "Platformun sözüne değil, Merkez Bankasının lisans listesine güvenin."
+  },
+  {
+   "type": "order",
+   "id": "ac-order",
+   "prompt": "Dolandırıcı bir platforma para gönderdikten sonra atılacak adımları sıraya koyun.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Ödemeyi durdurun ve iletişimi kesin"
+    },
+    {
+     "id": "bank",
+     "label": "Bankanızı arayın ve kartı bloke ettirin"
+    },
+    {
+     "id": "evidence",
+     "label": "Yazışmaları, numaraları ve transfer kayıtlarını saklayın"
+    },
+    {
+     "id": "police",
+     "label": "102'yi arayarak polise bildirin"
+    }
+   ],
+   "explain": "Ardından paranızı geri almayı vaat eden hizmetler ortaya çıkacak. Bu ikinci bir dolandırıcılıktır, onlara para ödemeyin."
+  },
+  {
+   "type": "recap",
+   "id": "ac-recap",
+   "points": [
+    "Yüksek ve garantili kazanç vaadi bir dolandırıcılık işaretidir.",
+    "Lisansı Merkez Bankasının resmî listesinden kendiniz kontrol edin.",
+    "Arayan biri istedi diye asla uygulama yüklemeyin ve kart bilgilerinizi vermeyin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

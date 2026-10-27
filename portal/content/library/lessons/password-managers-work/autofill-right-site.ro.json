@@ -1,0 +1,419 @@
+{
+ "id": "autofill-right-site",
+ "title": "Când completarea automată tace",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Un manager de parole recunoaște un site fals mai bine decât dumneavoastră: verifică adresa literă cu literă.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Dacă adresa diferă chiar și puțin, managerul nu vă oferă nicio parolă. Acesta este semnalul dumneavoastră de alarmă.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "idare-fake",
+       "url": [
+        {
+         "text": "https://portal."
+        },
+        {
+         "text": "idare-giris.example.net",
+         "spot": "lookalike"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "lookalike"
+    },
+    {
+     "id": "b3",
+     "say": "Nu copiați parola din seif ca să o lipiți manual. Verificați mai întâi adresa.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Respingeți orice cerere de aprobare la care nu vă așteptați: înseamnă că cineva vă cunoaște parola.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "autofill-check",
+   "environment": "browser",
+   "title": "Testați completarea automată",
+   "intro": "ParolSeyf funcționează în browserul dumneavoastră. Pe fiecare pagină, urmăriți ce vă oferă și verificați adresa.",
+   "steps": [
+    {
+     "id": "real-portal",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "idare",
+      "brand": "Portalul biroului",
+      "url": [
+       {
+        "text": "https://portal.idare.example/giris",
+        "reveal": "idare.example"
+       }
+      ],
+      "fields": [
+       "Nume de utilizator",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "say": "ParolSeyf vă oferă datele de conectare. Verificați adresa.",
+     "actions": [
+      {
+       "id": "fill",
+       "label": "Completați cu ParolSeyf",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Corect. Adresa se potrivește cu datele de conectare salvate, de aceea managerul vi le-a oferit."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Prudența e bună, dar acesta este portalul real al biroului, iar managerul l-a recunoscut."
+      }
+     ]
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "idare-fake",
+      "brand": "Portalul biroului",
+      "url": [
+       {
+        "text": "https://portal.idare-giris.example.net/giris",
+        "reveal": "idare-giris.example.net"
+       }
+      ],
+      "fields": [
+       "Nume de utilizator",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "say": "Această pagină s-a deschis dintr-un link primit pe e-mail. ParolSeyf tace.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "Scrieți parola manual",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Managerul a tăcut pentru că acesta este un site fals. Schimbați acum parola pe portalul real și raportați site-ul.",
+       "next": "fake-vault"
+      },
+      {
+       "id": "search",
+       "label": "Căutați-o în ParolSeyf și completați",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Managerul nu recunoaște acest site și are un motiv. Citiți adresa înainte de a continua."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Domeniul era idare-giris.example.net, nu cel al portalului biroului.",
+       "next": "fake-vault"
+      },
+      {
+       "id": "report",
+       "label": "Raportați site-ul",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Raportul dumneavoastră îi protejează pe colegi de același link.",
+       "next": "fake-vault"
+      }
+     ]
+    },
+    {
+     "id": "mismatch",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf: site-ul nu se potrivește"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Adresa salvată: portal.idare.example"
+        }
+       ],
+       [
+        {
+         "text": "Această pagină: portal.idare-giris.example.net"
+        }
+       ]
+      ],
+      "buttons": [
+       "Anulați",
+       "Completați oricum"
+      ]
+     },
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Anulați",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect, managerul a observat diferența în locul dumneavoastră. Închideți pagina și raportați-o."
+      },
+      {
+       "id": "fill",
+       "label": "Completați oricum",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Ignorând avertismentul, ați dat parola unui site fals. Schimbați-o acum și raportați site-ul."
+      }
+     ]
+    },
+    {
+     "id": "fake-vault",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "parolseyf-fake",
+      "brand": "ParolSeyf",
+      "url": [
+       {
+        "text": "https://parolseyf-giris.example.net/seyf",
+        "reveal": "parolseyf-giris.example.net"
+       }
+      ],
+      "fields": [
+       "E-mail",
+       "Parolă principală"
+      ],
+      "button": "Deschideți seiful"
+     },
+     "say": "Un link dintr-un e-mail vă duce la o pagină de conectare la seif.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "Deschideți seiful",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Scrieți parola principală doar în aplicația ParolSeyf. Site-ul acesta voia acces la tot seiful dumneavoastră."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Deschideți seiful pornind chiar dumneavoastră aplicația, niciodată printr-un link."
+      },
+      {
+       "id": "report",
+       "label": "Raportați site-ul",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Este posibil ca acest site să fi fost trimis mai multor persoane."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vault-lure",
+   "prompt": "Atingeți semnele care arată că acest e-mail este fals.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "parolseyf-fake",
+    "from": {
+     "name": [
+      {
+       "text": "ParolSeyf"
+      }
+     ],
+     "address": [
+      {
+       "text": "security@parolseyf-alert.example.net",
+       "spot": "sender"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Seiful dumneavoastră va fi șters în 24 de ore",
+      "spot": "deadline"
+     }
+    ],
+    "time": "07:58",
+    "body": [
+     [
+      {
+       "text": "Pentru o actualizare de securitate, "
+      },
+      {
+       "text": "confirmați parola principală",
+       "spot": "ask-master"
+      },
+      {
+       "text": "."
+      }
+     ],
+     [
+      {
+       "text": "Confirmați aici: "
+      },
+      {
+       "text": "parolseyf-alert.example.net/tesdiq",
+       "spot": "link",
+       "link": {
+        "label": "parolseyf-alert.example.net/tesdiq",
+        "href": "https://parolseyf-alert.example.net/tesdiq"
+       }
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Expeditor",
+     "explain": "Adresa este aproape identică, dar nu este domeniul ParolSeyf."
+    },
+    {
+     "id": "deadline",
+     "label": "Termen-limită",
+     "explain": "Amenințarea cu cele 24 de ore are rolul de a vă împiedica să gândiți."
+    },
+    {
+     "id": "ask-master",
+     "label": "Cererea parolei principale",
+     "explain": "Niciun serviciu nu vă cere să vă confirmați parola principală prin e-mail."
+    },
+    {
+     "id": "link",
+     "label": "Link",
+     "explain": "Linkul duce la un domeniu fals. Deschideți seiful chiar dumneavoastră, din aplicație."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "unexpected-push",
+   "question": {
+    "prompt": "Noaptea, ParolSeyf vă cere să aprobați o conectare, dar dumneavoastră nu încercați să vă conectați. Ce faceți?",
+    "options": [
+     {
+      "id": "deny",
+      "label": "O resping și o raportez echipei de securitate",
+      "correct": true,
+      "feedback": "Corect. Cineva vă cunoaște parola principală: schimbați-o acum și lăsați echipa de securitate să verifice sesiunile."
+     },
+     {
+      "id": "approve",
+      "label": "O aprob, ca să nu mai vină cereri",
+      "correct": false,
+      "feedback": "Acesta este un atac de tip push bombing: bombardarea cu cereri de aprobare. O singură aprobare îi deschide atacatorului seiful."
+     },
+     {
+      "id": "ignore",
+      "label": "O ignor și mă uit dimineață",
+      "correct": false,
+      "feedback": "Cererea rămâne deschisă, iar cineva are deja parola dumneavoastră principală. Respingeți-o și raportați-o acum."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "parolseyf",
+      "app": "ParolSeyf",
+      "title": [
+       {
+        "text": "Aprobați conectarea?"
+       }
+      ],
+      "body": [
+       {
+        "text": "Dispozitiv nou: Windows, 23:47"
+       }
+      ],
+      "time": "23:47"
+     }
+    }
+   },
+   "explain": "O cerere de aprobare neașteptată înseamnă că parola dumneavoastră s-a scurs. Respingeți, raportați, schimbați parola."
+  },
+  {
+   "type": "match",
+   "id": "autofill-rules",
+   "prompt": "Asociați fiecare situație cu pasul potrivit.",
+   "pairs": [
+    {
+     "id": "silent",
+     "left": "Managerul nu oferă nicio parolă",
+     "right": "Verificați adresa, nu copiați parola"
+    },
+    {
+     "id": "link",
+     "left": "Un link dintr-un e-mail vă cere să deschideți seiful",
+     "right": "Deschideți chiar dumneavoastră aplicația"
+    },
+    {
+     "id": "shared-pc",
+     "left": "Lucrați pe computerul altcuiva",
+     "right": "Nu vă deschideți seiful acolo"
+    },
+    {
+     "id": "push",
+     "left": "O cerere de aprobare la care nu vă așteptați",
+     "right": "Respingeți-o și raportați-o"
+    }
+   ],
+   "explain": "Managerul verifică adresa; dumneavoastră vă opriți în clipa în care el tace."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Dacă managerul nu oferă nicio parolă, opriți-vă și verificați adresa.",
+    "Scrieți parola principală doar în aplicația managerului, niciodată printr-un link.",
+    "Respingeți cererile de aprobare neașteptate și raportați-le."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

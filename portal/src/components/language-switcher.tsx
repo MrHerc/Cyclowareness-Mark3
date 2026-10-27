@@ -4,7 +4,7 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Globe } from "lucide-react";
-import { LOCALES, LOCALE_NAMES, type Locale } from "@/i18n/config";
+import { LOCALES, LOCALE_NAMES, langAttrs, type Locale } from "@/i18n/config";
 import { setLocaleAction } from "@/server/actions/auth";
 import { cn } from "@/lib/cn";
 
@@ -23,7 +23,7 @@ export function LanguageSwitcher({ className, locales = LOCALES }: { className?:
   return (
     <label
       className={cn(
-        "relative inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-pill border border-line bg-surface px-3 text-caption font-semibold whitespace-nowrap text-ink hover:bg-sunken has-[select:focus-visible]:outline-2 has-[select:focus-visible]:outline-offset-2 has-[select:focus-visible]:outline-brand-600 has-[select:disabled]:opacity-60 sm:pr-4 pointer-coarse:h-11",
+        "relative inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-pill border border-line bg-surface px-3 text-caption font-semibold whitespace-nowrap text-ink hover:bg-sunken has-[select:focus-visible]:outline-2 has-[select:focus-visible]:outline-offset-2 has-[select:focus-visible]:outline-brand-600 has-[select:disabled]:opacity-60 sm:pe-4 pointer-coarse:h-11",
         className,
       )}
     >
@@ -47,7 +47,7 @@ export function LanguageSwitcher({ className, locales = LOCALES }: { className?:
         className="absolute -inset-px cursor-pointer appearance-none rounded-pill opacity-0"
       >
         {LOCALES.filter((l) => l === locale || locales.includes(l)).map((l) => (
-          <option key={l} value={l} lang={l}>
+          <option key={l} value={l} {...langAttrs(l)}>
             {LOCALE_NAMES[l]} · {l.toUpperCase()}
           </option>
         ))}

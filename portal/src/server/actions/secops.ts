@@ -16,6 +16,7 @@ import { aiEnabled, draftLesson, lessonDraftSchema, type LessonDraft } from "../
 import { rateLimit } from "../rate-limit";
 import { isLocale, LOCALES, pick } from "../../i18n/config";
 import { AUDIENCES, CATEGORIES } from "../../lib/domain/catalog";
+import { LAB_IDS } from "../../lib/domain/labs";
 import { parseDay } from "../../lib/day";
 import { isForeignKeyViolation } from "../db/errors";
 
@@ -341,7 +342,7 @@ const incidentUpdateSchema = z.object({ status: z.enum(t.INCIDENT_STATUS).option
 export async function updateIncidentAction(id: string, input: z.infer<typeof incidentUpdateSchema>): Promise<Result> {
   const v = await actionViewer("secops.write");
   const p = incidentUpdateSchema.safeParse(input);
-  if (!uuid.safeParse(id).success || !p.success) return { ok: false };
+  if (!uuid.safeParse(id).success || !p.success || !v.tenant.features.has("incidents")) return { ok: false };
   const [inc] = await db().select().from(t.incidents).where(and(eq(t.incidents.id, id), eq(t.incidents.tenantId, v.tenant.id)));
   if (!inc) return { ok: false };
   const set: Partial<typeof t.incidents.$inferInsert> = { ...p.data };
@@ -365,7 +366,7 @@ const trainingSchema = z.object({
 export async function setIncidentTrainingAction(id: string, input: z.infer<typeof trainingSchema>): Promise<Result> {
   const v = await actionViewer("secops.write");
   const p = trainingSchema.safeParse(input);
-  if (!uuid.safeParse(id).success || !p.success) return { ok: false };
+  if (!uuid.safeParse(id).success || !p.success || !v.tenant.features.has("incidents")) return { ok: false };
   const [inc] = await db().select().from(t.incidents).where(and(eq(t.incidents.id, id), eq(t.incidents.tenantId, v.tenant.id)));
   if (!inc) return { ok: false };
   const d = p.data;
@@ -387,7 +388,7 @@ export async function setIncidentTrainingAction(id: string, input: z.infer<typeo
 
 export async function assignIncidentTrainingAction(id: string): Promise<Result & { count?: number }> {
   const v = await actionViewer("secops.write");
-  if (!uuid.safeParse(id).success) return { ok: false };
+  if (!uuid.safeParse(id).success || !v.tenant.features.has("incidents")) return { ok: false };
   const count = await assignIncidentTraining(db(), { tenantId: v.tenant.id, incidentId: id, actorId: v.user.id });
   refresh();
   return { ok: true, count };
@@ -568,10 +569,13 @@ const pathSchema = z.object({
   standards: z.string().trim().max(200),
   mandatory: z.boolean(),
   moduleSlugs: z.array(z.string().max(120)).min(1).max(40),
+  /** Practice labs, shown after the modules. */
+  labIds: z.array(z.enum(LAB_IDS)).max(LAB_IDS.length).default([]),
 });
 
-export async function savePathAction(input: z.infer<typeof pathSchema>): Promise<Result & { id?: string }> {
+export async function savePathAction(input: z.input<typeof pathSchema>): Promise<Result & { id?: string }> {
   const v = await actionViewer("paths.write");
+  if (!v.tenant.features.has("paths")) return { ok: false };
   const p = pathSchema.safeParse(input);
   if (!p.success) return { ok: false, error: "invalid" };
   const d = p.data;
@@ -600,6 +604,7 @@ export async function savePathAction(input: z.infer<typeof pathSchema>): Promise
     standards: d.standards.split(",").map((s) => s.trim()).filter(Boolean).slice(0, 12),
     mandatory: d.mandatory,
     moduleSlugs: slugs,
+    labIds: [...new Set(d.labIds)],
   };
   if (d.id) {
     if (!base) return { ok: false };
@@ -620,7 +625,7 @@ export async function savePathAction(input: z.infer<typeof pathSchema>): Promise
 /** A path with issued path certificates is kept (they are compliance evidence with public links). */
 export async function deletePathAction(id: string): Promise<Result> {
   const v = await actionViewer("paths.write");
-  if (!uuid.safeParse(id).success) return { ok: false };
+  if (!uuid.safeParse(id).success || !v.tenant.features.has("paths")) return { ok: false };
   const [own] = await db().select({ id: t.learningPaths.id }).from(t.learningPaths).where(and(eq(t.learningPaths.id, id), eq(t.learningPaths.tenantId, v.tenant.id)));
   if (!own) return { ok: false };
   const [cert] = await db().select({ id: t.certificates.id }).from(t.certificates).where(eq(t.certificates.pathId, own.id)).limit(1);
@@ -709,7 +714,7 @@ export async function setAttendanceAction(sessionId: string, userId: string, att
 export async function setTicketStatusAction(id: string, status: string): Promise<Result> {
   const v = await actionViewer("support.manage");
   const s = z.enum(["open", "in_progress", "answered", "closed"]).safeParse(status);
-  if (!uuid.safeParse(id).success || !s.success) return { ok: false };
+  if (!uuid.safeParse(id).success || !s.success || !v.tenant.features.has("support")) return { ok: false };
   const [tk] = await db().select().from(t.supportTickets).where(and(eq(t.supportTickets.id, id), eq(t.supportTickets.tenantId, v.tenant.id)));
   if (!tk) return { ok: false };
   await db().update(t.supportTickets).set({ status: s.data, updatedAt: new Date() }).where(eq(t.supportTickets.id, tk.id));
@@ -729,7 +734,7 @@ export async function setTicketStatusAction(id: string, status: string): Promise
 
 export async function reviewFeedbackAction(id: string): Promise<Result> {
   const v = await actionViewer("feedback.read");
-  if (!uuid.safeParse(id).success) return { ok: false };
+  if (!uuid.safeParse(id).success || !v.tenant.features.has("feedback")) return { ok: false };
   const changed = await db()
     .update(t.feedback)
     .set({ status: "reviewed" })

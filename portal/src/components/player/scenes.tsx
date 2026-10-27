@@ -40,7 +40,7 @@ import { Mascot, angleBetween } from "@/components/mascot/mascot";
 import type { MascotGesture, MascotMood } from "@/components/mascot/mapping";
 import { ArtifactView, CallView, EmailListItem, SpeakingBars } from "./artifacts";
 import { BrandAvatar } from "./brand-avatar";
-import { ArtifactModeProvider, hasLink, lensTargets, cleanSpeech, useContentLang } from "./rich";
+import { ArtifactModeProvider, hasLink, lensTargets, cleanSpeech, langProps, useContentLang } from "./rich";
 import { Illustration, Stat } from "./illustrations";
 import { wordsOf, type Voice } from "./narrator";
 import { tutorAnswerId } from "./resume";
@@ -88,7 +88,7 @@ function Karaoke({ text, word, soundOn, className, variant = "title", ui = false
   const words = useMemo(() => wordsOf(text), [text]);
   const body = variant === "body";
   return (
-    <p lang={ui ? undefined : contentLang} className={cn(body ? "text-body" : "text-[clamp(1.35rem,1.05rem+1.1vw,2rem)] leading-snug font-bold tracking-tight text-balance", className)} aria-live="polite">
+    <p {...langProps(ui ? undefined : contentLang)} className={cn(body ? "text-body" : "text-[clamp(1.35rem,1.05rem+1.1vw,2rem)] leading-snug font-bold tracking-tight text-balance", className)} aria-live="polite">
       {words.map((w, i) => (
         <span key={i}>
           <span
@@ -201,7 +201,7 @@ export function FeedbackCard({ tone, title, text, uiText = false, extra, onConti
           {auto ? (
             <span
               aria-hidden
-              className="absolute bottom-1 left-6 h-0.5 rounded-pill bg-brand-600 transition-[width] duration-(--duration-base)"
+              className="absolute bottom-1 start-6 h-0.5 rounded-pill bg-brand-600 transition-[width] duration-(--duration-base)"
               style={{ width: `calc((100% - 3rem) * ${Math.round((100 * Math.min(word, n)) / n) / 100})` }}
             />
           ) : null}
@@ -296,7 +296,9 @@ function ChoiceOptions({
 
   const onArrow = (e: KeyboardEvent<HTMLDivElement>) => {
     if (checked) return;
-    const d = e.key === "ArrowDown" || e.key === "ArrowRight" ? 1 : e.key === "ArrowUp" || e.key === "ArrowLeft" ? -1 : 0;
+    // Left is "next" in a right-to-left list.
+    const rtl = getComputedStyle(e.currentTarget).direction === "rtl";
+    const d = e.key === "ArrowDown" || e.key === (rtl ? "ArrowLeft" : "ArrowRight") ? 1 : e.key === "ArrowUp" || e.key === (rtl ? "ArrowRight" : "ArrowLeft") ? -1 : 0;
     if (!d) return;
     e.preventDefault();
     const from = optRefs.current.indexOf(e.target as HTMLButtonElement);
@@ -306,7 +308,7 @@ function ChoiceOptions({
   };
 
   return (
-    <div role={multi ? "group" : "radiogroup"} aria-labelledby={labelledBy} onKeyDown={onArrow} lang={contentLang} className={cn("grid gap-3", className)}>
+    <div role={multi ? "group" : "radiogroup"} aria-labelledby={labelledBy} onKeyDown={onArrow} {...langProps(contentLang)} className={cn("grid gap-3", className)}>
       {options.map((o, k) => {
         const on = picked.has(o.id);
         // After the check a right answer that was left out (multi) is outlined, not filled.
@@ -324,7 +326,7 @@ function ChoiceOptions({
             disabled={checked}
             onClick={() => onPick(o.id)}
             className={cn(
-              "flex items-center gap-4 rounded-pill border-2 bg-surface px-4 py-3.5 text-left text-body-sm font-semibold transition-all",
+              "flex items-center gap-4 rounded-pill border-2 bg-surface px-4 py-3.5 text-start text-body-sm font-semibold transition-all",
               state === "idle" && "border-line hover:border-brand-300",
               state === "picked" && "border-brand-600 bg-brand-50",
               state === "correct" && "border-safe-500 bg-safe-50",
@@ -484,7 +486,7 @@ export function TutorScene({ scene, env, onBack }: { scene: Extract<Scene, { typ
           </div>
           {asking && checkpoint ? (
             <div key={`${i}-question`} className="mt-5 animate-rise">
-              <h2 id={questionId} lang={contentLang} className="text-title font-bold text-balance">
+              <h2 id={questionId} {...langProps(contentLang)} className="text-title font-bold text-balance">
                 {checkpoint.prompt}
               </h2>
               <ChoiceOptions className="mt-5" options={checkpoint.options} picked={pickedSet} checked={checked} onPick={setPicked} labelledBy={questionId} />
@@ -557,7 +559,7 @@ export function IntroScene({ scene, env }: { scene: Extract<Scene, { type: "intr
     <div className="mx-auto grid max-w-3xl items-center gap-8 py-6 md:grid-cols-[1fr_1.2fr]">
       <VisualView visual={scene.visual} />
       <div>
-        <div lang={contentLang}>
+        <div {...langProps(contentLang)}>
           <h2 className="text-headline font-bold">{scene.title}</h2>
           <p className="mt-3 text-lead text-ink-muted">{scene.body}</p>
         </div>
@@ -698,13 +700,13 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
   // The step label is the context line: announced here as it changes, shown by each environment in its own place.
   const header = (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <p lang={contentLang} className="flex items-center gap-3 text-title font-medium">
+      <p {...langProps(contentLang)} className="flex items-center gap-3 text-title font-medium">
         <span className="grid size-10 place-items-center rounded-xl bg-brand-600 text-brand-on">
           <Icon className="size-5" />
         </span>
         {scene.title}
       </p>
-      <p lang={contentLang} className="sr-only" aria-live="polite">
+      <p {...langProps(contentLang)} className="sr-only" aria-live="polite">
         {started ? step?.label : null}
       </p>
       <div className="flex items-center gap-3">
@@ -724,12 +726,12 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
   const contextLine =
     step?.label && scene.environment !== "call" ? (
       tab ? (
-        <div aria-hidden lang={contentLang} className="flex w-fit max-w-full items-center gap-2 rounded-t-lg bg-surface px-4 py-2 text-caption font-semibold text-ink-muted shadow-xs">
+        <div aria-hidden {...langProps(contentLang)} className="flex w-fit max-w-full items-center gap-2 rounded-t-lg bg-surface px-4 py-2 text-caption font-semibold text-ink-muted shadow-xs">
           <Icon className="size-4 shrink-0" />
           <span className="truncate">{step.label}</span>
         </div>
       ) : (
-        <p aria-hidden lang={contentLang} className="text-center text-caption font-semibold text-ink-muted">
+        <p aria-hidden {...langProps(contentLang)} className="text-center text-caption font-semibold text-ink-muted">
           {step.label}
         </p>
       )
@@ -740,7 +742,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
         <ArtifactView artifact={step.artifact} onBack={inbox && !result ? backToList : undefined} inbox={inbox} />
       </ArtifactModeProvider>
       {targets.length ? (
-        <div className="absolute right-4 bottom-4 z-20 flex items-end gap-2">
+        <div className="absolute end-4 bottom-4 z-20 flex items-end gap-2">
           {/* The mascot peers through its glass while the lens is out (below 80 px it is a head crop, framed as a tile). */}
           {lens ? <Mascot mood="curious" guide={{ peer: true }} className="size-14 animate-reveal overflow-hidden rounded-md bg-surface shadow-xs ring-1 ring-line sm:size-16" still={env.still} /> : null}
           <LensButton active={lensIdx !== null} last={lensIdx === targets.length - 1} onClick={() => setLensIdx((x) => (x === null ? 0 : x + 1 >= targets.length ? null : x + 1))} />
@@ -770,10 +772,10 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
           <Search className="size-4" />
           {t("simulation.searchMail")}
         </span>
-        <span className="ml-auto grid size-8 place-items-center rounded-full bg-brand-600 text-tab font-bold text-brand-on">{t("scenario.you").charAt(0)}</span>
+        <span className="ms-auto grid size-8 place-items-center rounded-full bg-brand-600 text-tab font-bold text-brand-on">{t("scenario.you").charAt(0)}</span>
       </div>
       <div className="grid md:grid-cols-[9rem_16rem_minmax(0,1fr)]">
-        <nav className="hidden border-r border-line p-2 text-caption md:block">
+        <nav className="hidden border-e border-line p-2 text-caption md:block">
           {(["inbox", "sent", "drafts", "spam", "archive", "trash"] as const).map((f, k) => (
             <div key={f} className={cn("flex items-center justify-between rounded-md px-2.5 py-1.5", k === 0 ? "bg-brand-50 font-semibold text-brand-700" : "text-ink-muted")}>
               <span className="flex items-center gap-2">
@@ -784,7 +786,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
             </div>
           ))}
         </nav>
-        <div className={cn("max-h-[28rem] overflow-y-auto border-r border-line", step && "hidden md:block")}>
+        <div className={cn("max-h-[28rem] overflow-y-auto border-e border-line", step && "hidden md:block")}>
           {scene.steps.map((s) =>
             s.artifact.kind === "email" ? (
               <EmailListItem key={s.id} a={s.artifact as EmailArtifact} active={s.id === stepId} done={done.has(s.id)} onClick={!result && !done.has(s.id) ? () => goTo(s.id) : undefined} />
@@ -808,7 +810,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
               {actions.map((a) => {
                 const AIcon = ACTION_ICON[a.kind];
                 return (
-                  <button key={a.id} type="button" disabled={!!result} onClick={() => choose(a)} lang={contentLang} className="flex flex-col items-center gap-1 py-3 text-caption font-semibold text-ink hover:bg-sunken">
+                  <button key={a.id} type="button" disabled={!!result} onClick={() => choose(a)} {...langProps(contentLang)} className="flex flex-col items-center gap-1 py-3 text-caption font-semibold text-ink hover:bg-sunken">
                     {AIcon ? <AIcon className="size-5" /> : null}
                     {a.label}
                   </button>
@@ -843,7 +845,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
                   <Icon className="size-6" />
                 </span>
                 <p className="mt-3 text-tab-sm font-bold text-brand-700">{t("simulation.mailbox")}</p>
-                <h2 lang={contentLang} className="text-headline font-bold">
+                <h2 {...langProps(contentLang)} className="text-headline font-bold">
                   {scene.title}
                 </h2>
                 <Karaoke text={scene.intro} word={introWord} soundOn={env.soundOn} variant="body" className="mt-2" />
@@ -858,7 +860,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
             <span className="grid size-16 place-items-center rounded-full bg-brand-50 text-brand-600">
               <Icon className="size-8" />
             </span>
-            <h2 lang={contentLang} className="mt-5 text-headline font-bold">
+            <h2 {...langProps(contentLang)} className="mt-5 text-headline font-bold">
               {scene.title}
             </h2>
             <Karaoke text={scene.intro} word={introWord} soundOn={env.soundOn} variant="body" className="mt-3 text-lead" />
@@ -903,7 +905,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
           {contextLine}
           {artifactNode}
           {step?.label && scene.environment === "call" ? (
-            <p aria-hidden lang={contentLang} className="text-center text-caption font-semibold text-ink-muted">
+            <p aria-hidden {...langProps(contentLang)} className="text-center text-caption font-semibold text-ink-muted">
               {step.label}
             </p>
           ) : null}
@@ -914,7 +916,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
         <div className="flex flex-wrap items-center gap-3">
           <p className="flex items-start gap-2 rounded-xl bg-surface px-4 py-3 text-body-sm shadow-xs ring-1 ring-line">
             <MessageCircle className="mt-0.5 size-4 shrink-0 text-brand-600" />
-            <span lang={contentLang} className="italic">
+            <span {...langProps(contentLang)} className="italic">
               {t("quote", { text: cleanSpeech(step.say) })}
             </span>
           </p>
@@ -926,7 +928,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
           {actions.map((a) => {
             const AIcon = ACTION_ICON[a.kind];
             return (
-              <Button key={a.id} variant={a.kind === "report" ? "danger-soft" : "secondary"} size="lg" onClick={() => choose(a)} disabled={!!result} icon={AIcon ? <AIcon /> : undefined} lang={contentLang}>
+              <Button key={a.id} variant={a.kind === "report" ? "danger-soft" : "secondary"} size="lg" onClick={() => choose(a)} disabled={!!result} icon={AIcon ? <AIcon /> : undefined} {...langProps(contentLang)}>
                 {a.label}
               </Button>
             );
@@ -1005,7 +1007,7 @@ export function ChoiceScene({ scene, env }: { scene: Extract<Scene, { type: "cho
         {checked ? <span /> : <Mascot mood={env.narrator.speaking ? "talk" : "idle"} talking={env.narrator.speaking} topic={env.topic as never} className="size-24 shrink-0 sm:size-28" still={env.still} />}
         <TimerPill left={left} total={env.timer} />
       </div>
-      <h2 id={promptId} lang={contentLang} className="mt-5 text-title font-bold text-balance">
+      <h2 id={promptId} {...langProps(contentLang)} className="mt-5 text-title font-bold text-balance">
         {scene.question.prompt}
       </h2>
       {multi ? <p className="mt-1.5 text-caption font-semibold text-ink-muted">{t("multiHint")}</p> : null}
@@ -1103,7 +1105,7 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
         </ArtifactModeProvider>
       </div>
       <div>
-        <h2 lang={contentLang} className="text-title font-bold text-balance">
+        <h2 {...langProps(contentLang)} className="text-title font-bold text-balance">
           {scene.prompt}
         </h2>
         <p className="mt-2 text-caption text-ink-muted">{t("hotspot.tap")}</p>
@@ -1116,7 +1118,7 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
           <span className="text-caption font-semibold">{t("hotspot.found", { found: Math.min(found.size, need), need })}</span>
         </div>
         {last && !finished ? (
-          <div lang={contentLang} className="mt-4 animate-rise rounded-lg border border-risk-100 bg-risk-50 p-3.5">
+          <div {...langProps(contentLang)} className="mt-4 animate-rise rounded-lg border border-risk-100 bg-risk-50 p-3.5">
             <p className="text-body-sm font-semibold text-risk-700">{last.label}</p>
             <p className="mt-0.5 text-caption text-ink">{last.explain}</p>
           </div>
@@ -1129,7 +1131,7 @@ export function HotspotScene({ scene, env }: { scene: Extract<Scene, { type: "ho
           text={t("hotspot.done")}
           uiText
           extra={
-            <ul lang={contentLang} className="mt-2 grid gap-1.5">
+            <ul {...langProps(contentLang)} className="mt-2 grid gap-1.5">
               {scene.spots.map((s) => (
                 <li key={s.id} className="text-body-sm">
                   <b>{s.label}.</b> {s.explain}
@@ -1156,6 +1158,9 @@ export function SwipeScene({ scene, env }: { scene: Extract<Scene, { type: "swip
   const [answer, setAnswer] = useState<"threat" | "safe" | null>(null);
   const [drag, setDrag] = useState(0);
   const [startX, setStartX] = useState<number | null>(null);
+  // The card follows the finger (physical), but "threat" is toward the inline start, like its button: -1 in a right-to-left page.
+  const [sign, setSign] = useState(1);
+  const along = drag * sign;
   const card = scene.cards[i];
 
   useEffect(() => {
@@ -1181,7 +1186,7 @@ export function SwipeScene({ scene, env }: { scene: Extract<Scene, { type: "swip
   return (
     <div className="mx-auto grid w-full max-w-xl gap-5 py-2">
       <div className="flex items-center justify-between gap-3">
-        <h2 lang={contentLang} className="text-title font-bold">
+        <h2 {...langProps(contentLang)} className="text-title font-bold">
           {scene.prompt}
         </h2>
         <span className="shrink-0 text-caption text-ink-muted">{t("swipe.left", { count: scene.cards.length - i })}</span>
@@ -1195,21 +1200,21 @@ export function SwipeScene({ scene, env }: { scene: Extract<Scene, { type: "swip
           onPointerDown={(e) => {
             if (answer) return;
             setStartX(e.clientX);
+            setSign(getComputedStyle(e.currentTarget).direction === "rtl" ? -1 : 1);
             (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
           }}
           onPointerMove={(e) => startX !== null && setDrag(e.clientX - startX)}
           onPointerUp={() => {
-            const d = drag;
             setStartX(null);
-            if (d < -90) decide("threat");
-            else if (d > 90) decide("safe");
+            if (along < -90) decide("threat");
+            else if (along > 90) decide("safe");
             else setDrag(0);
           }}
         >
           <ArtifactView artifact={card.artifact as Artifact} />
           {drag !== 0 ? (
-            <span className={cn("absolute top-4 rounded-pill px-3 py-1 text-caption font-bold text-white", drag < 0 ? "left-4 bg-risk-600" : "right-4 bg-safe-600")}>
-              {drag < 0 ? t("swipe.threat") : t("swipe.safe")}
+            <span className={cn("absolute top-4 rounded-pill px-3 py-1 text-caption font-bold text-white", along < 0 ? "start-4 bg-risk-600" : "end-4 bg-safe-600")}>
+              {along < 0 ? t("swipe.threat") : t("swipe.safe")}
             </span>
           ) : null}
         </div>
@@ -1287,13 +1292,13 @@ export function MatchScene({ scene, env }: { scene: Extract<Scene, { type: "matc
 
   return (
     <div className="mx-auto w-full max-w-4xl py-2">
-      <h2 lang={contentLang} className="text-title font-bold text-balance">
+      <h2 {...langProps(contentLang)} className="text-title font-bold text-balance">
         {scene.prompt}
       </h2>
       <p className="mt-1.5 text-caption text-ink-muted">
         {t("match.pick")} · {t("match.matched", { count: matched.size, total: scene.pairs.length })}
       </p>
-      <div lang={contentLang} className="mt-6 grid grid-cols-2 gap-3 sm:gap-6">
+      <div {...langProps(contentLang)} className="mt-6 grid grid-cols-2 gap-3 sm:gap-6">
         <div className="grid content-start gap-2.5">
           {scene.pairs.map((p) => (
             <button
@@ -1303,7 +1308,7 @@ export function MatchScene({ scene, env }: { scene: Extract<Scene, { type: "matc
               onClick={() => setLeft(p.id)}
               aria-pressed={left === p.id}
               className={cn(
-                "rounded-lg border-2 bg-surface px-3.5 py-3 text-left text-caption font-semibold transition-colors sm:text-body-sm",
+                "rounded-lg border-2 bg-surface px-3.5 py-3 text-start text-caption font-semibold transition-colors sm:text-body-sm",
                 matched.has(p.id) ? "border-safe-500 bg-safe-50 text-safe-700" : left === p.id ? "border-brand-600 bg-brand-50" : "border-line hover:border-brand-300",
               )}
             >
@@ -1319,7 +1324,7 @@ export function MatchScene({ scene, env }: { scene: Extract<Scene, { type: "matc
               disabled={matched.has(p.id) || !left}
               onClick={() => pickRight(p.id)}
               className={cn(
-                "rounded-lg border-2 bg-surface px-3.5 py-3 text-left text-caption transition-colors sm:text-body-sm",
+                "rounded-lg border-2 bg-surface px-3.5 py-3 text-start text-caption transition-colors sm:text-body-sm",
                 matched.has(p.id) ? "border-safe-500 bg-safe-50 text-safe-700" : wrong === p.id ? "animate-pulse border-risk-500 bg-risk-50" : "border-line enabled:hover:border-brand-300 disabled:opacity-80",
               )}
             >
@@ -1374,7 +1379,7 @@ export function OrderScene({ scene, env }: { scene: Extract<Scene, { type: "orde
 
   return (
     <div className="mx-auto w-full max-w-2xl py-2">
-      <h2 lang={contentLang} className="text-title font-bold text-balance">
+      <h2 {...langProps(contentLang)} className="text-title font-bold text-balance">
         {scene.prompt}
       </h2>
       <p className="mt-1.5 text-caption text-ink-muted">{t("order.hint")}</p>
@@ -1384,7 +1389,7 @@ export function OrderScene({ scene, env }: { scene: Extract<Scene, { type: "orde
           return (
             <li key={x.id} className={cn("flex items-center gap-3 rounded-lg border-2 bg-surface px-3 py-2.5 transition-colors", wrongHere ? "border-warn-500 bg-warn-50" : result === "ok" ? "border-safe-500 bg-safe-50" : "border-line")}>
               <span className="grid size-8 shrink-0 place-items-center rounded-full bg-sunken text-caption font-bold text-ink-muted">{i + 1}</span>
-              <span lang={contentLang} className="min-w-0 flex-1 text-body-sm font-semibold">
+              <span {...langProps(contentLang)} className="min-w-0 flex-1 text-body-sm font-semibold">
                 {x.label}
               </span>
               <span className="flex shrink-0 gap-1">
@@ -1474,7 +1479,7 @@ export function ScenarioScene({ scene, env }: { scene: Extract<Scene, { type: "s
 
   return (
     <div className={cn("mx-auto grid w-full gap-4 py-2", stage ? "max-w-5xl lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:gap-8" : "max-w-2xl")}>
-      <h2 lang={contentLang} className="flex items-center gap-2 text-title font-bold lg:col-span-full">
+      <h2 {...langProps(contentLang)} className="flex items-center gap-2 text-title font-bold lg:col-span-full">
         <ChannelIcon className="size-6 text-brand-600" />
         {scene.title}
       </h2>
@@ -1495,14 +1500,14 @@ export function ScenarioScene({ scene, env }: { scene: Extract<Scene, { type: "s
           <div className="grid gap-3">
             {history.map((h, k) => (
               <div key={k} className="grid gap-2">
-                <div lang={contentLang} className="max-w-[90%] animate-rise rounded-2xl rounded-tl-sm bg-surface px-4 py-3 shadow-xs ring-1 ring-line">
+                <div {...langProps(contentLang)} className="max-w-[90%] animate-rise rounded-2xl rounded-ss-sm bg-surface px-4 py-3 shadow-xs ring-1 ring-line">
                   {h.node.speaker ? <p className="text-tab font-semibold text-brand-700">{h.node.speaker}</p> : null}
                   <p className="mt-0.5 text-body-sm">{h.node.text}</p>
                 </div>
                 {h.choice ? (
-                  <div className="ml-auto max-w-[85%] animate-rise rounded-2xl rounded-tr-sm bg-brand-600 px-4 py-3 text-body-sm text-brand-on">
+                  <div className="ms-auto max-w-[85%] animate-rise rounded-2xl rounded-se-sm bg-brand-600 px-4 py-3 text-body-sm text-brand-on">
                     <p className="text-tab font-semibold opacity-80">{t("scenario.you")}</p>
-                    <p lang={contentLang}>{h.choice}</p>
+                    <p {...langProps(contentLang)}>{h.choice}</p>
                   </div>
                 ) : null}
               </div>
@@ -1511,9 +1516,9 @@ export function ScenarioScene({ scene, env }: { scene: Extract<Scene, { type: "s
           </div>
         )}
         {!pending && !ending && current.choices?.length ? (
-          <div lang={contentLang} className="grid gap-2">
+          <div {...langProps(contentLang)} className="grid gap-2">
             {current.choices.map((c, k) => (
-              <button key={k} type="button" onClick={() => choose(c)} className="rounded-xl border-2 border-line bg-surface px-4 py-3 text-left text-body-sm font-semibold transition-colors hover:border-brand-400">
+              <button key={k} type="button" onClick={() => choose(c)} className="rounded-xl border-2 border-line bg-surface px-4 py-3 text-start text-body-sm font-semibold transition-colors hover:border-brand-400">
                 {c.label}
               </button>
             ))}
@@ -1550,13 +1555,13 @@ function SpeakerCard({ name, nameLang, video, talking }: { name?: string; nameLa
       <span className="relative shrink-0">
         <BrandAvatar name={name} size="lg" className={cn("size-16 text-title transition-shadow duration-(--duration-base)", talking && "ring-4 ring-safe-500/60")} />
         {video ? (
-          <span className="absolute -right-1 -bottom-1 grid size-6 place-items-center rounded-full bg-risk-500 text-white">
+          <span className="absolute -end-1 -bottom-1 grid size-6 place-items-center rounded-full bg-risk-500 text-white">
             <Video className="size-3.5" />
           </span>
         ) : null}
       </span>
       <div className="min-w-0 flex-1">
-        <p lang={nameLang} className="truncate text-body font-bold">
+        <p {...langProps(nameLang)} className="truncate text-body font-bold">
           {name}
         </p>
         <p className={cn("text-caption", video ? "text-white/70" : "text-ink-muted")}>{video ? t("scenario.videoCall") : t("scenario.inPerson")}</p>
@@ -1594,7 +1599,7 @@ export function PasswordScene({ scene, env }: { scene: Extract<Scene, { type: "p
 
   return (
     <div className="mx-auto w-full max-w-xl py-2">
-      <h2 lang={contentLang} className="text-title font-bold text-balance">
+      <h2 {...langProps(contentLang)} className="text-title font-bold text-balance">
         {scene.prompt}
       </h2>
       <label className="mt-6 block text-caption font-semibold" htmlFor="pw-scene">
@@ -1622,7 +1627,7 @@ export function PasswordScene({ scene, env }: { scene: Extract<Scene, { type: "p
           ))}
         </div>
       </div>
-      <ul lang={contentLang} className="mt-5 grid gap-1.5">
+      <ul {...langProps(contentLang)} className="mt-5 grid gap-1.5">
         {scene.tips.map((tip, k) => (
           <li key={k} className="flex items-start gap-2 text-body-sm text-ink-muted">
             <Check className="mt-0.5 size-4 shrink-0 text-brand-600" />
@@ -1651,7 +1656,7 @@ export function RecapScene({ scene, env, saving, onFinish }: { scene: Extract<Sc
       <Mascot mood="celebrate" gesture="cheer" fire={{ name: "bounce", key: 0 }} talking={env.narrator.speaking} className="mx-auto size-48 md:size-56" topic={env.topic as never} still={env.still} />
       <div>
         <h2 className="text-headline font-bold">{t("title")}</h2>
-        <ul lang={contentLang} className="mt-5 grid gap-3">
+        <ul {...langProps(contentLang)} className="mt-5 grid gap-3">
           {scene.points.map((p, k) => (
             <li key={k} className="flex animate-rise items-start gap-3 rounded-xl bg-surface p-4 shadow-xs ring-1 ring-line" style={{ animationDelay: `${k * 90}ms` }}>
               <span className="grid size-7 shrink-0 place-items-center rounded-full bg-safe-500 text-white">

@@ -12,8 +12,8 @@ import * as t from "./db/schema";
  * is enforced separately (login_attempts).
  */
 
-/** The longest window a caller may use; the daily clean-up keeps windows this recent. */
-export const RATE_LIMIT_MAX_WINDOW_MS = 60 * 60_000;
+/** The longest window a caller may use (a day: the AI subtitles' daily cap); the daily clean-up keeps windows this recent. */
+export const RATE_LIMIT_MAX_WINDOW_MS = 24 * 60 * 60_000;
 
 export type RateLimitResult = { ok: boolean; retryAfterMs: number };
 

@@ -1,0 +1,610 @@
+{
+ "id": "lead-securely",
+ "title": "Güvenli liderlik",
+ "minutes": 4,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Saldırganlar üst yöneticileri bilerek seçer. Sizin tek bir imzanız ya da tek bir telefon aramanız, büyük tutarlı ödemelere ve önemli kararlara yol açabilir.",
+     "mood": "think",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "ceo"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Buna balina avı (whaling) denir. Bu tür e-postalar sizin görevinize ve konuşmalarınıza göre hazırlanır, bu yüzden çok inandırıcı görünür.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Uluslararası İş Birliği Fonu"
+         }
+        ],
+        "address": [
+         {
+          "text": "director@"
+         },
+         {
+          "text": "intl-cooperation-fund.example.net",
+          "spot": "domain"
+         }
+        ]
+       },
+       "to": "Anar Hasanov",
+       "subject": [
+        {
+         "text": "Size özel: ana konuşmacı daveti"
+        }
+       ],
+       "time": "08:05",
+       "body": [
+        [
+         {
+          "text": "Sayın Hasanov,"
+         }
+        ],
+        [
+         {
+          "text": "Geçen hafta televizyondaki röportajınızı izledik ve sizi ana konuşmacımız olarak ağırlamak istiyoruz.",
+          "spot": "public-info"
+         }
+        ],
+        [
+         {
+          "text": "Programı görmek için iş hesabınızla giriş yapınız: "
+         },
+         {
+          "text": "forum-portal.example.net/login",
+          "spot": "login-link"
+         }
+        ],
+        [
+         {
+          "text": "Davet gizlidir, lütfen asistanınızla paylaşmayınız.",
+          "spot": "bypass"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "public-info"
+    },
+    {
+     "id": "b3",
+     "say": "Yapay zekâ, kısa bir kayıttan sesinizi kopyalayabilir. Sizden yardımcınıza gelen bir arama sahte olabilir.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Asistanınız da bir hedeftir. Para ya da veri taleplerinin, sizden gelse bile, ikinci bir kanaldan doğrulanması konusunda anlaşın.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "whaling-email",
+   "prompt": "Balina avı e-postasının işaretlerini bulun.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Uluslararası İş Birliği Fonu"
+      }
+     ],
+     "address": [
+      {
+       "text": "director@"
+      },
+      {
+       "text": "intl-cooperation-fund.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "to": "Anar Hasanov",
+    "subject": [
+     {
+      "text": "Size özel: ana konuşmacı daveti"
+     }
+    ],
+    "time": "08:05",
+    "body": [
+     [
+      {
+       "text": "Sayın Hasanov,"
+      }
+     ],
+     [
+      {
+       "text": "Geçen hafta televizyondaki röportajınızı izledik ve sizi ana konuşmacımız olarak ağırlamak istiyoruz.",
+       "spot": "public-info"
+      }
+     ],
+     [
+      {
+       "text": "Programı görmek için iş hesabınızla giriş yapınız: "
+      },
+      {
+       "text": "forum-portal.example.net/login",
+       "spot": "login-link"
+      }
+     ],
+     [
+      {
+       "text": "Davet gizlidir, lütfen asistanınızla paylaşmayınız.",
+       "spot": "bypass"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Bilinmeyen alan adı",
+     "explain": "Resmî görünen bir adı herkes kaydedebilir. Kuruluşu kendiniz araştırın ve kontrol edin."
+    },
+    {
+     "id": "public-info",
+     "label": "Kamuya açık bilgiyle kazanılan güven",
+     "explain": "Röportajınız herkese açık. Ondan bahsetmeleri sizi tanıdıklarını kanıtlamaz."
+    },
+    {
+     "id": "login-link",
+     "label": "İş hesabıyla giriş",
+     "explain": "Bir daveti okumak için iş parolanıza ihtiyacınız yoktur. Amaç, bir üst yöneticinin hesabını çalmaktır."
+    },
+    {
+     "id": "bypass",
+     "label": "Asistanı devre dışı bırakma",
+     "explain": "Asistanınız sizin kontrol hattınızdır. Onu dışarıda bırakmak isteyen her e-postaya karşı dikkatli olun."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "scenario",
+   "id": "voice-call",
+   "title": "Tanıdık bir ses",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "Ortağımıza yapılacak ödemeyi bu akşam onaylayın, belgeleri sonra gönderirim.",
+     "speaker": "Bakanın sesi (20:00)",
+     "voice": "older-man",
+     "channel": "phone",
+     "spoken": "Ortağımıza yapılacak ödemeyi bu akşam onaylayın, <breath> belgeleri sonra gönderirim.",
+     "character": "minister",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Bilinmeyen numara"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 70 000 22 65"
+        }
+       ],
+       "label": "Mobil"
+      }
+     },
+     "choices": [
+      {
+       "label": "Telefonu kapatıp bakanın bilinen numarasını kendim ararım",
+       "next": "check",
+       "feedback": "Doğru. Ses taklit edilebilir, bilinen bir numara ise güvenilir bir kontroldür."
+      },
+      {
+       "label": "Ses tanıdık, ödemeyi onaylarım",
+       "outcome": "compromised",
+       "feedback": "Tanıdık bir ses artık kanıt değildir. Para bir dolandırıcının hesabına gitti."
+      }
+     ]
+    },
+    {
+     "id": "check",
+     "text": "Bakan şu anda uçakta ve kimseyi aramadı.",
+     "speaker": "Bakanın asistanı",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Bakan şu anda uçakta <breath> ve kimseyi aramadı.",
+     "character": "assistant",
+     "choices": [
+      {
+       "label": "Durumu hemen güvenlik ekibine bildirip finans birimini uyarırım",
+       "next": "morning",
+       "feedback": "Doğru. Saldırgan şimdi başka bir iş arkadaşınızı deneyebilir."
+      },
+      {
+       "label": "Hiçbir şey yapmam, zaten ödeme yapmadım",
+       "outcome": "risky",
+       "feedback": "Siz güvendeydiniz, ama sıradaki hedef yardımcınız olabilir. Bildirmek herkesi korur."
+      }
+     ]
+    },
+    {
+     "id": "morning",
+     "text": "Sabah ekibiniz soruyor: “Bu konuyu nasıl ele alalım?”",
+     "choices": [
+      {
+       "label": "Açıkça konuşup doğrulama kuralının herkes için geçerli olduğunu yeniden vurgularım",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Lider açıkça konuştuğunda ekip kuralı ciddiye alır."
+      },
+      {
+       "label": "Konuyu gizli tutarız, yoksa itibarımız zarar görür",
+       "outcome": "risky",
+       "feedback": "Sessizlik başkalarını korumasız bırakır. Açıklık güven oluşturur."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "assistant-requests",
+   "prompt": "Asistanınıza gelen bu talep güvenli mi?",
+   "cards": [
+    {
+     "id": "gift-cards",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Anar Hasanov (müdür)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Toplantıdayım, arayamam. Bugün 10 hediye kartı alın ve kodların fotoğraflarını buraya gönderin."
+         }
+        ],
+        "time": "13:12"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Hediye kartı kodları nakit para gibidir ve geri alınamaz. Aramadan kaçınmak da ayrı bir uyarı işaretidir."
+    },
+    {
+     "id": "agenda",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Anar Hasanov"
+        }
+       ],
+       "address": [
+        {
+         "text": "a.hasanov@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Yarınki toplantının gündemi"
+       }
+      ],
+      "time": "17:30",
+      "body": [
+       [
+        {
+         "text": "Gündem ektedir. Toplantı üçüncü katta yapılacaktır."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Gundelik.pdf"
+         }
+        ],
+        "size": "96 KB"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Doğru alan adı, beklenen bir konu, para ya da veri talebi yok."
+    },
+    {
+     "id": "calendar",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "+994 55 000 19 04"
+       }
+      ],
+      "time": "21:48",
+      "messages": [
+       [
+        {
+         "text": "Ben müdürünüz, bu yeni numaram. Takvimimi ve yarınki toplantıların nerede olacağını bana gönderin."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Bir üst yöneticinin takvimi, onun nerede olacağını ele verir. Yeni bir numarayı bilinen bir kanal üzerinden doğrulayın."
+    },
+    {
+     "id": "second-signature",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "idare-maliyye",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Finans · iç sistem"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ödeme talebi iç sistemde oluşturuldu ve kurallar gereği ikinci imzayı bekliyor."
+         }
+        ],
+        "time": "10:05"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Talep resmî sistem üzerinden ilerliyor ve ikinci bir imza gerektiriyor. Doğru süreç budur."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "evening-payment",
+   "environment": "desktop",
+   "title": "Akşam gelen bir ödeme",
+   "intro": "Saat 19:52. Finans sisteminde acil bir ödeme onayınızı bekliyor.",
+   "steps": [
+    {
+     "id": "approve",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "idare-maliyye",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Ödeme onayı: 48.000 AZN"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Alıcı: Qafqaz Tərəfdaş MMC, yeni banka hesabı"
+        }
+       ],
+       [
+        {
+         "text": "Not: Bakan telefonla talep etti, bu akşam ödeyin, belgeler sonra gelecek."
+        }
+       ]
+      ],
+      "buttons": [
+       "Beklet",
+       "Onayla"
+      ]
+     },
+     "say": "Alıcıya ve nota bakın.",
+     "actions": [
+      {
+       "id": "hold",
+       "label": "Beklet ve doğrula",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru. Yeni bir hesaba yapılacak acil bir ödeme her zaman bildiğiniz bir kanaldan doğrulanır."
+      },
+      {
+       "id": "approve",
+       "label": "Onayla",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Yeni hesap, aciliyet ve sonradan gelecek belgeler dolandırıcılık işaretidir. Para sahte bir hesaba gitti."
+      }
+     ]
+    },
+    {
+     "id": "which-number",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "idare-maliyye",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Talimatı nasıl doğrularsınız?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Notta bir iletişim numarası var: +994 50 000 71 30"
+        }
+       ]
+      ],
+      "buttons": [
+       "Nottaki numara",
+       "Bildiğim numara"
+      ]
+     },
+     "actions": [
+      {
+       "id": "known",
+       "label": "Bakanın asistanını bildiğim numaradan ara",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Doğru. Zaten bildiğiniz bir numara, sahte bir talimatı hemen ortaya çıkarır."
+      },
+      {
+       "id": "note",
+       "label": "Nottaki numarayı ara",
+       "kind": "call-back",
+       "outcome": "compromised",
+       "feedback": "Nottaki numara saldırgana aittir ve talimatı o “onaylayacaktır”."
+      }
+     ]
+    },
+    {
+     "id": "confirmed-fake",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "it-tehlukesizlik",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Talimat sahteydi"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Asistan, bakanın böyle bir talimat vermediğini söylüyor."
+        }
+       ]
+      ],
+      "buttons": [
+       "İptal",
+       "Bildir"
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Güvenlik ekibine bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Saldırgan bir sonraki adımda imza yetkisi olan başka birini deneyecek, bildiriminiz herkesi uyarır."
+      },
+      {
+       "id": "cancel",
+       "label": "Ödemeyi iptal et ve konuyu kapat",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Ödemeyi durdurmanız iyi, ama saldırgan başka birini deneyecek. Durumu bildirin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "first-hour",
+   "question": {
+    "prompt": "Bir güvenlik olayının ilk saatinde üst yönetici ne yapmalıdır?",
+    "options": [
+     {
+      "id": "call-team",
+      "label": "Güvenlik ekibini hemen devreye sokmak",
+      "correct": true,
+      "feedback": "Doğru. Uzmanlar ne kadar erken başlarsa zarar o kadar az olur."
+     },
+     {
+      "id": "separate-channel",
+      "label": "İş e-postası dışında bir iletişim yolu seçmek",
+      "correct": true,
+      "feedback": "Doğru. Saldırgan e-postaları okuyor olabilir, bu yüzden telefonu ya da ayrı bir kanalı kullanın."
+     },
+     {
+      "id": "approve-isolation",
+      "label": "Uzmanlar önerir önermez sistemlerin izole edilmesini onaylamak",
+      "correct": true,
+      "feedback": "Doğru. Üst kademeden gelen hızlı bir karar yayılmayı durdurur."
+     },
+     {
+      "id": "hide",
+      "label": "İtibarı korumak için olayı gizlemek",
+      "correct": false,
+      "feedback": "Olayı gizlemek sonradan daha büyük zarara yol açar ve bildirim yükümlülüklerinin ihlaline neden olabilir."
+     },
+     {
+      "id": "pay-fast",
+      "label": "Fidye talebine hızla yanıt vermek",
+      "correct": false,
+      "feedback": "Saldırganlarla her türlü temas, uzmanlar ve hukukçularla birlikte kararlaştırılır."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "alarm"
+    }
+   },
+   "explain": "İlk saatte üst yönetici kararları hızlandırır ve ekibine destek olur."
+  },
+  {
+   "type": "order",
+   "id": "payment-check",
+   "prompt": "Acil bir ödeme talebini doğru sırayla kontrol edin.",
+   "items": [
+    {
+     "id": "pause",
+     "label": "Talebi bekletin"
+    },
+    {
+     "id": "call-back",
+     "label": "Bildiğiniz bir numaradan geri arayın"
+    },
+    {
+     "id": "second",
+     "label": "İkinci bir kişinin onayını alın"
+    },
+    {
+     "id": "execute",
+     "label": "Ancak bundan sonra ödemeyi gerçekleştirin"
+    }
+   ],
+   "explain": "Aciliyet saldırganın ana silahıdır. Birkaç dakikalık kontrol büyük bir kaybı önler."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Talep ne kadar üst kademeden gelirse gelsin, ikinci bir kanaldan doğrulayın.",
+    "Doğrulama kuralını asistanınızla önceden kararlaştırın.",
+    "Bir güvenlik olayında sakin, açık ve hızlı karar verin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,601 @@
+{
+  "id": "app-permissions",
+  "title": "App-Berechtigungen",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "a-tutor",
+      "beats": [
+        {
+          "id": "a-b1",
+          "say": "Auf Ihrem Smartphone liegen dienstliche E-Mails, Nachrichten und Ihr Online-Banking. Prüfen Sie bei jeder neuen App, was Sie ihr erlauben.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "a-b3",
+          "say": "Warum sollte eine Taschenlampen-App Ihre Nachrichten lesen? Mit dieser Berechtigung kann sie auch die Codes Ihrer Bank mitlesen.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "permission",
+              "brandRef": "fener-pro",
+              "app": "Torch Pro",
+              "permissions": [
+                {
+                  "label": [
+                    {
+                      "text": "Taschenlampe"
+                    }
+                  ],
+                  "needed": true
+                },
+                {
+                  "label": [
+                    {
+                      "text": "Kontakte",
+                      "spot": "contacts"
+                    }
+                  ],
+                  "needed": false
+                },
+                {
+                  "label": [
+                    {
+                      "text": "SMS",
+                      "spot": "sms"
+                    }
+                  ],
+                  "needed": false
+                },
+                {
+                  "label": [
+                    {
+                      "text": "Genauer Standort",
+                      "spot": "location"
+                    }
+                  ],
+                  "needed": false
+                }
+              ]
+            }
+          },
+          "highlight": "sms",
+          "checkpoint": {
+            "prompt": "Ein Taschenrechner möchte auf Ihre Kontakte zugreifen. Was tun Sie?",
+            "options": [
+              {
+                "id": "allow",
+                "label": "Ich erlaube es",
+                "correct": false,
+                "feedback": "Ein Taschenrechner braucht keine Kontakte. Vielleicht will jemand auf diesem Weg Ihre Daten sammeln."
+              },
+              {
+                "id": "deny",
+                "label": "Ich lehne ab und lösche die App",
+                "correct": true,
+                "feedback": "Richtig. Eine App, die Zugriff auf etwas verlangt, das sie nicht braucht, löschen Sie am besten."
+              }
+            ]
+          }
+        },
+        {
+          "id": "a-b4",
+          "say": "Die Bedienungshilfen sind die weitreichendste Berechtigung: Damit liest eine App Ihren Bildschirm mit und tippt an Ihrer Stelle. Erlauben Sie das nur sehr wenigen Apps.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "a-b5",
+          "say": "Eine einfache Regel: Jede Berechtigung muss zur Aufgabe der App passen. Eine Karten-App braucht Ihren Standort, ein Taschenrechner nicht.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "app-install",
+      "environment": "phone",
+      "title": "Eine kostenlose Foto-App",
+      "intro": "Sie suchen eine App zur Bildbearbeitung. Sehen Sie sich an, was Ihr Smartphone anzeigt, und entscheiden Sie bei jedem Schritt.",
+      "steps": [
+        {
+          "id": "offer",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Schnäppchen-Gruppe"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "FotoRedaktor Plus Pro kostet im Store Geld – hier gibt es die App gratis: "
+                  },
+                  {
+                    "text": "fotoredaktor-pro.test/app.apk",
+                    "link": {
+                      "label": "fotoredaktor-pro.test/app.apk",
+                      "href": "https://fotoredaktor-pro.test/app.apk"
+                    }
+                  }
+                ],
+                "time": "13:05"
+              }
+            ]
+          },
+          "say": "Jemand hat in einer Gruppe eine kostenlose App-Datei geteilt.",
+          "actions": [
+            {
+              "id": "download",
+              "label": "Datei herunterladen",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Eine kostenpflichtige App, die plötzlich gratis ist, ist ein bekannter Köder. In solchen Dateien steckt oft Schadsoftware."
+            },
+            {
+              "id": "block",
+              "label": "Blockieren und melden",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Richtig. Installieren Sie Apps nur aus dem offiziellen Store Ihres Smartphones.",
+              "next": "store-app"
+            }
+          ]
+        },
+        {
+          "id": "unknown-source",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Unbekannte Quelle"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Aus Sicherheitsgründen ist auf Ihrem Smartphone die Installation unbekannter Apps aus dieser Quelle nicht zulässig."
+                }
+              ]
+            ],
+            "buttons": [
+              "Einstellungen",
+              "Abbrechen"
+            ]
+          },
+          "actions": [
+            {
+              "id": "settings",
+              "label": "In den Einstellungen zulassen",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "Dieser Schutz ist genau für solche Dateien da. Wer ihn abschaltet, öffnet das Smartphone für schädliche Apps."
+            },
+            {
+              "id": "cancel",
+              "label": "Abbrechen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig. Die Installation aus unbekannten Quellen sollte ausgeschaltet bleiben."
+            }
+          ]
+        },
+        {
+          "id": "fake-apk",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "fotoredaktor-plus-fake",
+            "name": [
+              {
+                "text": "FotoRedaktor_Plus_Pro.apk"
+              }
+            ],
+            "type": "apk",
+            "size": "18 MB",
+            "source": [
+              {
+                "text": "Telegram: Schnäppchen-Gruppe"
+              }
+            ]
+          },
+          "say": "Das Symbol kommt Ihnen bekannt vor. Lesen Sie den Namen genau.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "Installieren",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Das ist eine Kopie der App aus dem Store: Der Name unterscheidet sich nur durch ein Leerzeichen. Diese Kopie kann Ihre SMS-Codes mitlesen."
+            },
+            {
+              "id": "cancel",
+              "label": "Abbrechen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig. Installieren Sie keine .apk-Datei aus einer Nachricht, sondern suchen Sie die App im offiziellen Store."
+            }
+          ]
+        },
+        {
+          "id": "store-app",
+          "label": "Aus dem offiziellen Store installiert",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "fotoredaktor-plus",
+            "app": "Foto Redaktor Plus",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Fotos und Videos"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Kontakte"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "SMS"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "Auch die App aus dem Store verlangt zu viel.",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "Zulassen",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "Eine Bildbearbeitung braucht weder Kontakte noch SMS. Mit SMS-Zugriff kann eine App die Codes Ihrer Bank lesen."
+            },
+            {
+              "id": "deny",
+              "label": "Nicht zulassen",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Richtig. Erlauben Sie nur, was die Funktion wirklich braucht – hier also nur Fotos."
+            }
+          ]
+        },
+        {
+          "id": "fake-antivirus",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "qoruyucu-fake",
+            "app": "Qoruyucu Antivirus",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Bedienungshilfen: Bildschirm steuern"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "Ein Antivirenprogramm will Ihren Bildschirm steuern.",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "Zulassen",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Damit liest eine App Ihren Bildschirm mit und tippt an Ihrer Stelle. Genau das verlangen Banking-Trojaner."
+            },
+            {
+              "id": "deny",
+              "label": "Nicht zulassen",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Richtig. Eine App, die sich als Virenschutz ausgibt und Ihren Bildschirm steuern will, sollten Sie löschen und melden."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "a-hotspot",
+      "prompt": "Finden Sie die Berechtigungen, die diese App nicht braucht.",
+      "artifact": {
+        "kind": "permission",
+        "brandRef": "fotoredaktor-plus",
+        "app": "Foto Redaktor Plus",
+        "permissions": [
+          {
+            "label": [
+              {
+                "text": "Fotos und Videos",
+                "reveal": "Liest die Fotos und Videos, die auf diesem Smartphone gespeichert sind"
+              }
+            ],
+            "needed": true
+          },
+          {
+            "label": [
+              {
+                "text": "Kamera",
+                "reveal": "Nimmt Fotos und Videos auf"
+              }
+            ],
+            "needed": true
+          },
+          {
+            "label": [
+              {
+                "text": "Kontakte",
+                "spot": "contacts",
+                "reveal": "Liest Ihre Kontaktliste: Namen, Nummern, E-Mail-Adressen"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "SMS senden und lesen",
+                "spot": "sms",
+                "reveal": "Liest jede SMS auf dem Smartphone und verschickt neue"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "Bedienungshilfen: Bildschirm steuern",
+                "spot": "accessibility",
+                "reveal": "Sieht alles auf dem Bildschirm und tippt in anderen Apps an Ihrer Stelle"
+              }
+            ],
+            "needed": false
+          },
+          {
+            "label": [
+              {
+                "text": "Anrufliste",
+                "spot": "call-log",
+                "reveal": "Liest die Liste Ihrer Anrufe: wer, wann und wie lange"
+              }
+            ],
+            "needed": false
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "contacts",
+          "label": "Kontakte",
+          "explain": "Zum Bearbeiten von Fotos braucht die App Ihre Kontakte nicht."
+        },
+        {
+          "id": "sms",
+          "label": "SMS-Zugriff",
+          "explain": "Mit SMS-Zugriff kann eine App Ihre Bank- und Anmeldecodes lesen."
+        },
+        {
+          "id": "accessibility",
+          "label": "Bildschirmsteuerung",
+          "explain": "Damit kann eine App den Bildschirm lesen und an Ihrer Stelle tippen. Genau das verlangen schädliche Apps."
+        },
+        {
+          "id": "call-log",
+          "label": "Anrufliste",
+          "explain": "Eine Bildbearbeitungs-App muss nicht wissen, wen Sie anrufen."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "a-swipe",
+      "prompt": "Sicher oder Falle?",
+      "cards": [
+        {
+          "id": "bank-apk",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank-fake",
+            "sender": [
+              {
+                "text": "+994 55 000 11 22"
+              }
+            ],
+            "time": "13:02",
+            "messages": [
+              [
+                {
+                  "text": "SahilBank hat eine neue App. Hier herunterladen: "
+                },
+                {
+                  "text": "sahilbank-app.test/SahilBank.apk"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Eine Banking-App finden Sie im offiziellen Store. Eine Installationsdatei, die per Link kommt, kann schädlich sein."
+        },
+        {
+          "id": "map-location",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "xerite-app",
+            "app": "Karten",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Standort (nur während der Nutzung der App)"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Eine Karten-App braucht Ihren Standort, um Sie ans Ziel zu führen. Den Zugriff nur während der Nutzung zu erlauben, ist eine kluge Wahl."
+        },
+        {
+          "id": "torch-mic",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "fener-pro",
+            "app": "Taschenlampe",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Kontakte"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Mikrofon"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Eine Taschenlampe braucht weder Ihre Kontakte noch das Mikrofon."
+        },
+        {
+          "id": "video-call",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "videozeng-app",
+            "app": "Videoanruf",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Kamera"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Mikrofon"
+                  }
+                ],
+                "needed": true
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Für einen Videoanruf braucht die App tatsächlich Kamera und Mikrofon."
+        },
+        {
+          "id": "discount-apk",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Rabatt-Kanal"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Installieren Sie die Rabatt-App aus dieser Datei. Erlauben Sie dafür in den Einstellungen unbekannte Quellen."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Wenn Sie unbekannte Quellen erlauben, schwächen Sie den Schutz Ihres Smartphones. Trauen Sie keiner Nachricht, die das von Ihnen verlangt."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "a-choice-store",
+      "question": {
+        "prompt": "Woher können Sie Apps sicher installieren?",
+        "options": [
+          {
+            "id": "official-store",
+            "label": "Aus dem offiziellen App-Store Ihres Smartphones",
+            "correct": true,
+            "feedback": "Richtig. Der offizielle Store prüft Apps und senkt das Risiko deutlich."
+          },
+          {
+            "id": "sms-link",
+            "label": "Über einen Link in einer Nachricht",
+            "correct": false,
+            "feedback": "Ein Link in einer Nachricht kann zu einer gefälschten App führen."
+          },
+          {
+            "id": "cracked",
+            "label": "Als kostenlose gecrackte Version aus einem Forum",
+            "correct": false,
+            "feedback": "In gecrackten Versionen steckt oft Schadsoftware."
+          },
+          {
+            "id": "work-portal",
+            "label": "Aus dem freigegebenen App-Katalog Ihrer Organisation",
+            "correct": true,
+            "feedback": "Richtig. Ein Katalog, den Ihre Organisation verwaltet, ist ebenfalls eine offizielle Quelle."
+          }
+        ],
+        "multi": true
+      },
+      "explain": "Auch ein offizieller Store ist keine vollständige Garantie, aber er senkt das Risiko stark. Achten Sie zusätzlich auf Bewertungen und Berechtigungen."
+    },
+    {
+      "type": "recap",
+      "id": "a-recap",
+      "points": [
+        "Installieren Sie Apps nur aus dem offiziellen Store",
+        "Jede Berechtigung muss zur Aufgabe der App passen",
+        "Seien Sie bei SMS-Zugriff und Bedienungshilfen besonders vorsichtig"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

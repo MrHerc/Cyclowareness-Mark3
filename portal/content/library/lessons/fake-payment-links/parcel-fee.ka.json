@@ -1,0 +1,459 @@
+{
+ "id": "parcel-fee",
+ "title": "ამანათის საფასური",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pf-tutor",
+   "beats": [
+    {
+     "id": "pf-b1",
+     "say": "გამარჯობა! დღეს ვნახავთ, როგორ იქცევა გადახდის პაწია ბმული დიდ ზარალად.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "pf-b2",
+     "say": "საფასური სულ რაღაც ერთი მანათი და ოცი გეპიკია. თაღლითს საფასური კი არა, თქვენი ბარათის მონაცემები აინტერესებს.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "w2d-tezkuryer-fake",
+       "sender": [
+        {
+         "text": "+994 51 000 83 17"
+        }
+       ],
+       "time": "10:47",
+       "messages": [
+        [
+         {
+          "text": "TezKuryer: თქვენი ამანათი საბაჟოზე შეჩერებულია. "
+         },
+         {
+          "text": "გადაიხადეთ 1,20 AZN-ის საფასური: ",
+          "spot": "fee"
+         },
+         {
+          "text": "tezkuryer-gomruk.example.net/odenis",
+          "link": {
+           "label": "tezkuryer-gomruk.example.net/odenis",
+           "href": "https://tezkuryer-gomruk.example.net/odenis"
+          }
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "fee"
+    },
+    {
+     "id": "pf-b3",
+     "say": "ამანათი, ჯარიმა თუ შემწეობა – რაც არ უნდა იყოს, SMS-ით მიღებული ბმულით არასოდეს გადაიხადოთ.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "pf-b4",
+     "say": "ამის ნაცვლად ოფიციალური აპლიკაცია ან პორტალი თავად გახსენით და იქ შეამოწმეთ.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "pf-hotspot",
+   "prompt": "იპოვეთ თაღლითობის ნიშნები ამ SMS-შეტყობინებაში.",
+   "artifact": {
+    "kind": "sms",
+    "brandRef": "w2d-tezkuryer-fake",
+    "sender": [
+     {
+      "text": "+994 51 000 83 17",
+      "spot": "sender"
+     }
+    ],
+    "time": "10:47",
+    "messages": [
+     [
+      {
+       "text": "TezKuryer: თქვენი ამანათი TZ48120577AZ საბაჟოზე შეჩერებულია. "
+      },
+      {
+       "text": "1,20 AZN-ის საბაჟო მოსაკრებელი",
+       "spot": "small-fee"
+      },
+      {
+       "text": " უნდა გადაიხადოთ."
+      }
+     ],
+     [
+      {
+       "text": "გადაიხადეთ აქ: "
+      },
+      {
+       "text": "tezkuryer-gomruk.example.net/odenis",
+       "spot": "link",
+       "link": {
+        "label": "tezkuryer-gomruk.example.net/odenis",
+        "href": "https://tezkuryer-gomruk.example.net/odenis"
+       }
+      }
+     ],
+     [
+      {
+       "text": "თუ 24 საათში არ გადაიხდით, ამანათი გამგზავნს დაუბრუნდება.",
+       "spot": "deadline"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "ჩვეულებრივი მობილურის ნომერი",
+     "explain": "კომპანიების SMS-ები, როგორც წესი, სახელით მოდის. სახელის გაყალბებაც შეიძლება, ამიტომ მხოლოდ ამ ნიშანს არასოდეს დაეყრდნოთ."
+    },
+    {
+     "id": "small-fee",
+     "label": "პაწაწინა თანხა",
+     "explain": "პაწაწინა თანხა სიფხიზლეს გიდუნებთ. ნამდვილი სამიზნე თქვენი ბარათის ნომერი, უკანა მხარეს მითითებული კოდი და SMS-კოდია."
+    },
+    {
+     "id": "link",
+     "label": "ყალბი მისამართი",
+     "explain": "ეს საკურიერო კომპანიის ოფიციალური საიტი არ არის: სახელს ზედმეტი სიტყვები აქვს დამატებული. ბმულს არ დააჭიროთ, ოფიციალური აპლიკაცია თავად გახსენით."
+    },
+    {
+     "id": "deadline",
+     "label": "აჩქარება",
+     "explain": "ვადა იმისთვისაა, რომ დაფიქრება ვერ მოასწროთ. ნამდვილი კურიერი შესამოწმებლად დროს გაძლევთ."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "pf-sim",
+   "environment": "phone",
+   "title": "შეტყობინებები დღის განმავლობაში",
+   "intro": "დღის განმავლობაში ტელეფონზე რამდენიმე შეტყობინება მოგდით. თითოეულზე სწორი რეაქცია აირჩიეთ.",
+   "steps": [
+    {
+     "id": "redeliver-sms",
+     "label": "10:47 ახალი SMS",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2d-tezkuryer-fake",
+      "sender": [
+       {
+        "text": "+994 51 000 83 17"
+       }
+      ],
+      "time": "10:47",
+      "messages": [
+       [
+        {
+         "text": "TezKuryer: ჩვენმა კურიერმა ვერ მოგძებნათ. ხელახალი მიტანისთვის გადაიხადეთ 0,90 AZN: "
+        },
+        {
+         "text": "tezkuryer-catdirilma.example.net/odenis",
+         "link": {
+          "label": "tezkuryer-catdirilma.example.net/odenis",
+          "href": "https://tezkuryer-catdirilma.example.net/odenis"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "ნაცნობი საკურიერო კომპანიის სახელი და მცირე თანხა.",
+     "actions": [
+      {
+       "id": "open-link",
+       "label": "ბმულის გახსნა",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "გვერდი საკურიერო კომპანიის საიტს ჰგავს, მაგრამ მისამართი ყალბია. ახლა ნახეთ, რას ითხოვს.",
+       "next": "bank-code"
+      },
+      {
+       "id": "report",
+       "label": "სპამის შესახებ შეტყობინება",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "სწორია. ჯერ ამ SMS-ის შესახებ შეატყობინეთ, შემდეგ კი ამანათი ოფიციალურ აპლიკაციაში შეამოწმეთ.",
+       "next": "real-app"
+      },
+      {
+       "id": "delete",
+       "label": "წაშლა",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "კარგია. თუ ამანათს ელოდებით, ოფიციალურ აპლიკაციაში შეამოწმეთ.",
+       "next": "real-app"
+      }
+     ]
+    },
+    {
+     "id": "bank-code",
+     "label": "გვერდმა ბარათის მონაცემები და SMS-კოდი მოითხოვა",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "10:49",
+      "messages": [
+       [
+        {
+         "text": "კოდი: 518204. გადახდა 412,00 AZN, TZK GLOBAL PAY. არასოდეს გადასცეთ ეს კოდი სხვას."
+        }
+       ]
+      ]
+     },
+     "say": "ბანკმა კოდი გამოგიგზავნათ. თანხას დააკვირდით.",
+     "actions": [
+      {
+       "id": "type-code",
+       "label": "კოდის აკრეფა საიტზე",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "ამ კოდით ერთ მანათს კი არა, ოთხას თორმეტ მანათს ადასტურებთ. ახლავე დარეკეთ ბანკში ბარათის უკანა მხარეს მითითებულ ნომერზე."
+      },
+      {
+       "id": "call-bank",
+       "label": "ბანკში დარეკვა ბარათზე მითითებულ ნომერზე",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "სწორია. კოდის გვერდით მითითებული თანხა გაცილებით მეტია, ვიდრე გვერდზე ეწერა, ამიტომ ბარათი ახლავე დაბლოკეთ."
+      },
+      {
+       "id": "ignore",
+       "label": "კოდს არსად ავკრეფ",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "კარგია, გადახდა არ შესრულდა. მაგრამ თქვენი ბარათის მონაცემები უკვე იმ საიტზეა, ამიტომ დარეკეთ ბანკში და ბარათი დაბლოკეთ."
+      }
+     ]
+    },
+    {
+     "id": "real-app",
+     "label": "TezKuryer-ის ოფიციალური აპლიკაცია",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2d-tezkuryer",
+      "app": "TezKuryer",
+      "title": [
+       {
+        "text": "TZ77015342AZ: გზაშია"
+       }
+      ],
+      "body": [
+       {
+        "text": "მიტანა 4 ოქტომბერს. დამატებითი გადახდა საჭირო არ არის."
+       }
+      ],
+      "time": "11:05"
+     },
+     "say": "ეს შეტყობინება ოფიციალური აპლიკაციიდან მოდის.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "აპლიკაციაში გახსნა",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "სწორია. ოფიციალური აპლიკაცია დამატებით საფასურს არ აჩვენებს, ესე იგი SMS ყალბი იყო."
+      },
+      {
+       "id": "later",
+       "label": "მოგვიანებით ნახვა",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "არა უშავს. საფასური რომ გქონოდათ გადასახდელი, ოფიციალურ აპლიკაციაშიც დაინახავდით."
+      }
+     ]
+    },
+    {
+     "id": "fine-sms",
+     "label": "13:20 ახალი SMS",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2d-yol-nezaret-fake",
+      "sender": [
+       {
+        "text": "YolNezaret"
+       }
+      ],
+      "time": "13:20",
+      "messages": [
+       [
+        {
+         "text": "სიჩქარის გადაჭარბებისთვის დაგეკისრათ ჯარიმა 80 AZN. გადაიხადეთ დღესვე და მიიღეთ 50%-იანი ფასდაკლება: "
+        },
+        {
+         "text": "yolnezaret-cerime.example.net/endirim",
+         "link": {
+          "label": "yolnezaret-cerime.example.net/endirim",
+          "href": "https://yolnezaret-cerime.example.net/endirim"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "ახლა ჯარიმაა. ფასდაკლებას დააკვირდით.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "ფასდაკლებით გადახდა",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "ფასდაკლება იმისთვისაა, რომ აგაჩქაროთ. ბმულის მიღმა გვერდი ბარათის მონაცემებს აგროვებს."
+      },
+      {
+       "id": "verify",
+       "label": "ჯარიმებს პორტალზე თავად შევამოწმებ",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "სწორია. თუ ჯარიმა ნამდვილია, ის ოფიციალურ პორტალზე იქნება."
+      },
+      {
+       "id": "report",
+       "label": "სპამის შესახებ შეტყობინება",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "კარგია. თუ დარწმუნებული არ ხართ, დარეკეთ პოლიციაში 102-ზე და იკითხეთ."
+      }
+     ]
+    },
+    {
+     "id": "aunt-chat",
+     "label": "16:02 დეიდა საბინა",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "დეიდა საბინა"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "მეზობელმა ეს ბმული გამომიგზავნა, ოჯახის მხარდაჭერის თანხას არიგებენ, დღეს ბოლო დღეა."
+         }
+        ],
+        "time": "16:01"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "ailedestek-qeydiyyat.example.net",
+          "link": {
+           "label": "ailedestek-qeydiyyat.example.net",
+           "href": "https://ailedestek-qeydiyyat.example.net"
+          }
+         }
+        ],
+        "time": "16:01"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "ბარათის მონაცემები შევიყვანო?"
+         }
+        ],
+        "time": "16:02"
+       }
+      ]
+     },
+     "say": "ნათესავი რჩევას გეკითხებათ.",
+     "actions": [
+      {
+       "id": "advise-stop",
+       "label": "არ შეიყვანოთ, მოდით, ერთად შევამოწმოთ ოფიციალურ პორტალზე",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "შესანიშნავია. სახელმწიფო შემწეობისთვის ბმულით რეგისტრაცია არასოდეს არის საჭირო, მისი შემოწმება კი ოფიციალურ პორტალზე შეიძლება."
+      },
+      {
+       "id": "advise-go",
+       "label": "იჩქარეთ, ბოლო დღეა",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "ბოლო დღის ხრიკმა გაჭრა. გვერდი მისი ბარათის მონაცემებს მოიპარავს, ამიტომ მან ახლავე უნდა დარეკოს თავის ბანკში."
+      },
+      {
+       "id": "open-it",
+       "label": "ჯერ მე გავხსნი ბმულს",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "შესამოწმებლად გახსნაც სარისკოა. თანაც ეს მისამართი ოფიციალურ პორტალს არ ეკუთვნის."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "pf-choice",
+   "question": {
+    "prompt": "ბარათის მონაცემები ყალბ გვერდზე უკვე აკრიფეთ. რა უნდა გააკეთოთ პირველ რიგში?",
+    "options": [
+     {
+      "id": "call-bank",
+      "label": "ბანკში დარეკვა ბარათის უკანა მხარეს მითითებულ ნომერზე და ბარათის დაბლოკვა",
+      "correct": true,
+      "feedback": "სწორია. რაც უფრო მალე დაიბლოკება ბარათი, მით ნაკლებს დაკარგავთ."
+     },
+     {
+      "id": "wait",
+      "label": "ლოდინი, ჩამოიჭრება თუ არა ფული საბანკო ანგარიშიდან",
+      "correct": false,
+      "feedback": "ლოდინი თაღლითს დროს აძლევს. როცა ფული უკვე წასულია, შეიძლება გვიან იყოს."
+     },
+     {
+      "id": "reply-sms",
+      "label": "SMS-ზე პასუხი და ფულის დაბრუნების თხოვნა",
+      "correct": false,
+      "feedback": "თაღლითი ფულს არ დაგიბრუნებთ, სამაგიეროდ ახალ კოდს მოგთხოვთ. კავშირი გაწყვიტეთ."
+     }
+    ]
+   },
+   "explain": "შემდეგ მომხდარის შესახებ შეატყობინეთ პოლიციას 102-ზე და SMS მტკიცებულებად შეინახეთ."
+  },
+  {
+   "type": "recap",
+   "id": "pf-recap",
+   "points": [
+    "ამანათი, ჯარიმა თუ შემწეობა: SMS-ით მიღებული ბმულით არასოდეს გადაიხადოთ.",
+    "შესამოწმებლად ოფიციალური აპლიკაცია ან პორტალი თავად გახსენით.",
+    "ბარათის მონაცემები აკრიფეთ? ახლავე დარეკეთ ბანკში, შემდეგ კი პოლიციაში 102-ზე."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

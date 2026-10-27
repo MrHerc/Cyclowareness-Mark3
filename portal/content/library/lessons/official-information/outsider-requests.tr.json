@@ -1,0 +1,540 @@
+{
+  "id": "outsider-requests",
+  "title": "Dışarıdan gelen talepler",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l3-tutor",
+      "beats": [
+        {
+          "id": "l3-b1",
+          "say": "Gazeteciler, denetçiler, başka bakanlıklar: hepsi bilgi isteyebilir. Dolandırıcılar da onların adına yazar.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        },
+        {
+          "id": "l3-b2",
+          "say": "Bir denetçiden gelen e-postada adresi kontrol edin. Gerçek bir denetimi yönetim önceden duyurur.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "etalon-audit-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Etalon Audit"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "yoxlama@"
+                  },
+                  {
+                    "text": "etalon-audit-az.test",
+                    "spot": "domain"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "Planlı denetim: belgeler"
+                }
+              ],
+              "time": "11:40",
+              "body": [
+                [
+                  {
+                    "text": "Yönetiminizle mutabık kalındı. İnsan kaynakları ve finans belgelerini bugün gönderiniz."
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "l3-b3",
+          "say": "Aciliyet, kişisel bir e-posta adresi ve “yöneticinize söylemeyin” sözleri ciddi uyarı işaretleridir.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "l3-b4",
+          "say": "Talebi, zaten bildiğiniz bir numarayı arayarak doğrulayın. Yanıtı yönetim ya da basın bürosu verir.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l3-sim",
+      "environment": "call",
+      "title": "Bakanlıktan arama",
+      "intro": "Arayan kişi başka bir bakanlıkta çalıştığını söylüyor. Söylediklerini okuyun ve yanıtınızı seçin.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "regional-nazirlik-fake",
+            "caller": [
+              {
+                "text": "Bölgesel İlişkiler Bakanlığı"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 36 18"
+              }
+            ],
+            "label": "Bakanlık",
+            "voice": "man-2"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Yanıtla",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Aramayı yanıtlamak tehlikeli değildir. Önemli olan, neyi verdiğinizdir."
+            },
+            {
+              "id": "decline",
+              "label": "Reddet",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olur. Gerekirse bakanlığın resmî numarasını kendiniz arayın.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "ask",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "regional-nazirlik-fake",
+            "caller": [
+              {
+                "text": "Bölgesel İlişkiler Bakanlığı"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 36 18"
+              }
+            ],
+            "label": "Bakanlık",
+            "voice": "man-2"
+          },
+          "say": "Merhaba, ben Bölgesel İlişkiler Bakanlığından Samir Guliyev. Ortak bir proje için departmanınızdaki personelin listesine, cep telefonu numaralarıyla birlikte ihtiyacımız var.",
+          "spoken": "Merhaba, <breath> ben Bölgesel İlişkiler Bakanlığından Samir Guliyev. Ortak bir proje için, ee, departmanınızdaki personelin listesine, cep telefonu numaralarıyla birlikte ihtiyacımız var.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Listeyi göndereceğim",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Kimliğini doğrulamadığınız birine personel bilgisi verilmez."
+            },
+            {
+              "id": "verify",
+              "label": "Lütfen resmî bir yazı gönderin",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğru. Kurumlar arasındaki talepler resmî yazıyla gelir ve yanıtı yönetim verir."
+            },
+            {
+              "id": "hang",
+              "label": "Telefonu kapat",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "İyi karar. Şimdi talebi resmî bir kanaldan kontrol edin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "push",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "regional-nazirlik-fake",
+            "caller": [
+              {
+                "text": "Bölgesel İlişkiler Bakanlığı"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 36 18"
+              }
+            ],
+            "label": "Bakanlık",
+            "voice": "man-2"
+          },
+          "say": "Resmî yazıya vakit yok, bakan yardımcısı listeyi bugün istiyor. Kişisel e-postama gönderin, adresi size vereyim.",
+          "spoken": "Resmî yazıya vakit yok, bakan yardımcısı listeyi bugün istiyor. <breath> Kişisel e-postama gönderin, adresi size vereyim.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Tamam, hemen gönderiyorum",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Liste bilinmeyen bir adrese gitti. Artık her iş arkadaşınız hedefli bir oltalama (phishing) saldırısına uğrayabilir."
+            },
+            {
+              "id": "keep",
+              "label": "Yöneticimin onayı olmadan hiçbir şey paylaşmam",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Doğru. Baskı ve kişisel bir e-posta adresi, dolandırıcılığın başlıca işaretleridir."
+            },
+            {
+              "id": "hang",
+              "label": "Telefonu kapat",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Doğru. Baskı arttığında telefonu kapatmak en basit korunma yoludur.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Arama sona erdi. Şimdi ne yapmalı?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "regional-nazirlik-fake",
+            "caller": [
+              {
+                "text": "Bölgesel İlişkiler Bakanlığı"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 36 18"
+              }
+            ],
+            "label": "Bakanlık",
+            "voice": "man-2"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "Bakanlığın resmî web sitesindeki numarayı ara",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Doğru. Numarayı kendiniz bulduğunuzda sahte arama hemen ortaya çıkar."
+            },
+            {
+              "id": "report",
+              "label": "Yöneticiye ve güvenlik ekibine bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Çok iyi. Bu tür aramalar genellikle birkaç iş arkadaşınıza birden gelir; bildiriminiz hepsini korur."
+            },
+            {
+              "id": "ignore",
+              "label": "Hiçbir şey yapma",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Arayan kişi şansını başka bir iş arkadaşınızla deneyecek. Bildirmek onları da korur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l3-hotspot",
+      "prompt": "Bu sahte denetçi e-postasındaki uyarı işaretlerini bulun.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "etalon-audit-fake",
+        "from": {
+          "name": [
+            {
+              "text": "Etalon Audit"
+            }
+          ],
+          "address": [
+            {
+              "text": "audit.etalon@"
+            },
+            {
+              "text": "poct-mail.example",
+              "spot": "free-mail"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Planlı denetim: "
+          },
+          {
+            "text": "bugün saat 17:00'ye kadar yanıt veriniz",
+            "spot": "deadline"
+          }
+        ],
+        "time": "10:12",
+        "body": [
+          [
+            {
+              "text": "Değerli çalışma arkadaşımız, bakanlık adına kurumunuzda denetim yapıyoruz."
+            }
+          ],
+          [
+            {
+              "text": "Sistemi uzaktan inceleyebilmemiz için yanıtınızda "
+            },
+            {
+              "text": "kullanıcı adınızı ve şifrenizi",
+              "spot": "credentials"
+            },
+            {
+              "text": " yazınız."
+            }
+          ],
+          [
+            {
+              "text": "Denetim gizlidir, yöneticinize bilgi vermeyiniz.",
+              "spot": "secrecy"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "free-mail",
+          "label": "Ücretsiz e-posta adresi",
+          "explain": "Bir denetim firması kendi alan adından yazar. Resmî denetimler kişisel bir e-posta adresinden gelmez."
+        },
+        {
+          "id": "deadline",
+          "label": "Kesin son tarih",
+          "explain": "Aciliyet, sizi kontrol etmeden yanıt vermeye yöneltmek için kullanılır."
+        },
+        {
+          "id": "credentials",
+          "label": "Parola talebi",
+          "explain": "Hiçbir denetçi parolanızı istemez. Erişim gerekiyorsa bunu BT destek ekibi resmî yoldan sağlar."
+        },
+        {
+          "id": "secrecy",
+          "label": "Yöneticinizden saklamak",
+          "explain": "Gerçek bir denetim yönetimle kararlaştırılır. Gizlilik talebi bir dolandırıcılık işaretidir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "l3-swipe",
+      "prompt": "Bu talep güvenli mi, tehlikeli mi?",
+      "cards": [
+        {
+          "id": "journalist-docs",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "paytaxt-xeber",
+            "from": {
+              "name": [
+                {
+                  "text": "Leyla Abbasova, Paytaxt Xəbər"
+                }
+              ],
+              "address": [
+                {
+                  "text": "l.abbasova@paytaxtxeber.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Anonim yorum"
+              }
+            ],
+            "time": "12:15",
+            "body": [
+              [
+                {
+                  "text": "Adınızı yazmayacağız. Denetim raporunun bir kopyasını bana gönderebilir misiniz?"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Kurum adına gazetecilerle basın bürosu konuşur. İç belgeleri kendiniz vermeyin."
+        },
+        {
+          "id": "press-stats",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Basın bürosu"
+                }
+              ],
+              "address": [
+                {
+                  "text": "press@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Yıllık istatistikler"
+              }
+            ],
+            "time": "12:40",
+            "body": [
+              [
+                {
+                  "text": "Lütfen web sitesinde yayımlanan yıllık istatistiklerin son sürümünü gönderin, bir gazeteciye yanıt veriyoruz."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Kendi basın büronuz herkese açık bir bilgiyi istiyor. Bu, olağan bir iş akışı."
+        },
+        {
+          "id": "registered-letter",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "senedaxini",
+            "from": {
+              "name": [
+                {
+                  "text": "SənədAxını"
+                }
+              ],
+              "address": [
+                {
+                  "text": "bildiris@senedaxini.idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Gelen evrak no. 1847"
+              }
+            ],
+            "time": "13:05",
+            "body": [
+              [
+                {
+                  "text": "Bölgesel İlişkiler Bakanlığından gelen resmî talep, evrak kayıt birimi tarafından kaydedildi ve size havale edildi."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Talep resmî olarak kaydedildi ve iç sistem üzerinden geldi. Yanıt da aynı yoldan gider."
+        },
+        {
+          "id": "telegram-ministry",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Kamran | Bakanlık"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Selam, karar taslağını bugün buraya atıverin, resmî yazı yarın gelir."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Resmî belgeler mesajlaşma uygulamasından istenmez. “Resmî yazı sonradan gelecek” demek bir baskı hilesidir."
+        },
+        {
+          "id": "auditor-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "etalon-audit-fake",
+            "sender": [
+              {
+                "text": "EtalonAudit"
+              }
+            ],
+            "time": "14:20",
+            "messages": [
+              [
+                {
+                  "text": "Denetim için sisteme erişim gerekiyor. Şifrenizi bu SMS'e yanıt olarak gönderiniz."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Hiçbir denetçi parola istemez. Böyle bir mesajı güvenlik ekibine bildirin."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l3-choice",
+      "question": {
+        "prompt": "Bir gazeteci arıyor ve kurumunuzdaki bir denetim hakkında yorum yapmanızı istiyor.",
+        "options": [
+          {
+            "id": "comment",
+            "label": "Adımı yazmazlarsa bildiklerimi anlatırım",
+            "correct": false,
+            "feedback": "Anonim bir yorum da kurumun bilgisidir. Kurum adına yalnızca yetkili kişi konuşur."
+          },
+          {
+            "id": "press",
+            "label": "Kibarca basın bürosuna yönlendiririm",
+            "correct": true,
+            "feedback": "Doğru. Basın bürosu talebi kayda alır ve resmî bir yanıt verir."
+          },
+          {
+            "id": "hang",
+            "label": "Tek kelime etmeden telefonu kapatırım",
+            "correct": false,
+            "feedback": "Bilgi sızmaz, ama gazeteci de yanıt alamaz. Basın bürosunun iletişim bilgilerini vermek daha iyidir."
+          }
+        ]
+      },
+      "explain": "Dışarıdan gelen taleplere siz şahsen değil, kurum yanıt verir. Önce kimliği resmî bir kanaldan doğrulayın."
+    },
+    {
+      "type": "recap",
+      "id": "l3-recap",
+      "points": [
+        "Dışarıdan gelen talepleri, kendiniz bulduğunuz resmî bir numaradan kontrol edin.",
+        "Aciliyet, kişisel bir e-posta adresi ve “yöneticinize söylemeyin” sözleri dolandırıcılık işaretidir.",
+        "Kurum adına yanıtı yönetim ya da basın bürosu verir."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

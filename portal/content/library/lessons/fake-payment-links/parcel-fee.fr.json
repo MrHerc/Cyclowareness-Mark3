@@ -1,0 +1,459 @@
+{
+ "id": "parcel-fee",
+ "title": "Les frais de colis",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pf-tutor",
+   "beats": [
+    {
+     "id": "pf-b1",
+     "say": "Bonjour ! Aujourd’hui, nous allons voir comment un tout petit lien de paiement se transforme en grosse perte.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "pf-b2",
+     "say": "Les frais ne sont que d’un manat vingt. Ce que veut l’escroc, ce sont les données de votre carte, pas ces frais.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "w2d-tezkuryer-fake",
+       "sender": [
+        {
+         "text": "+994 51 000 83 17"
+        }
+       ],
+       "time": "10:47",
+       "messages": [
+        [
+         {
+          "text": "TezKuryer : votre colis est retenu en douane. "
+         },
+         {
+          "text": "Réglez des frais de 1,20 AZN : ",
+          "spot": "fee"
+         },
+         {
+          "text": "tezkuryer-gomruk.example.net/odenis",
+          "link": {
+           "label": "tezkuryer-gomruk.example.net/odenis",
+           "href": "https://tezkuryer-gomruk.example.net/odenis"
+          }
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "fee"
+    },
+    {
+     "id": "pf-b3",
+     "say": "Colis, amende ou allocation : quel que soit le motif, ne payez jamais via un lien reçu par SMS.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "pf-b4",
+     "say": "Ouvrez plutôt vous-même l’application ou le portail officiel, et vérifiez là-bas.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "pf-hotspot",
+   "prompt": "Trouvez les signes de fraude dans ce SMS.",
+   "artifact": {
+    "kind": "sms",
+    "brandRef": "w2d-tezkuryer-fake",
+    "sender": [
+     {
+      "text": "+994 51 000 83 17",
+      "spot": "sender"
+     }
+    ],
+    "time": "10:47",
+    "messages": [
+     [
+      {
+       "text": "TezKuryer : votre colis TZ48120577AZ est retenu en douane. "
+      },
+      {
+       "text": "Des frais de douane de 1,20 AZN",
+       "spot": "small-fee"
+      },
+      {
+       "text": " doivent être réglés."
+      }
+     ],
+     [
+      {
+       "text": "Payez ici : "
+      },
+      {
+       "text": "tezkuryer-gomruk.example.net/odenis",
+       "spot": "link",
+       "link": {
+        "label": "tezkuryer-gomruk.example.net/odenis",
+        "href": "https://tezkuryer-gomruk.example.net/odenis"
+       }
+      }
+     ],
+     [
+      {
+       "text": "Sans paiement sous 24 heures, le colis sera renvoyé à l’expéditeur.",
+       "spot": "deadline"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Un numéro de mobile ordinaire",
+     "explain": "Les SMS des entreprises arrivent généralement sous un nom. Mais un nom peut aussi être falsifié : ne vous fiez jamais à ce seul signe."
+    },
+    {
+     "id": "small-fee",
+     "label": "Un montant minime",
+     "explain": "Un montant minime fait baisser votre vigilance. La vraie cible, c’est votre numéro de carte, le code au dos et le code SMS."
+    },
+    {
+     "id": "link",
+     "label": "Fausse adresse",
+     "explain": "Ce n’est pas le site officiel du transporteur : des mots ont été ajoutés au nom. N’appuyez pas dessus, ouvrez vous-même l’application officielle."
+    },
+    {
+     "id": "deadline",
+     "label": "On vous presse",
+     "explain": "Le délai est là pour vous empêcher de réfléchir. Un vrai transporteur vous laisse le temps de vérifier."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "pf-sim",
+   "environment": "phone",
+   "title": "Messages au fil de la journée",
+   "intro": "Plusieurs messages arrivent sur votre téléphone au cours de la journée. Choisissez la bonne réaction à chacun.",
+   "steps": [
+    {
+     "id": "redeliver-sms",
+     "label": "10:47 Nouveau SMS",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2d-tezkuryer-fake",
+      "sender": [
+       {
+        "text": "+994 51 000 83 17"
+       }
+      ],
+      "time": "10:47",
+      "messages": [
+       [
+        {
+         "text": "TezKuryer : notre livreur n’a pas pu vous remettre votre colis. Payez 0,90 AZN pour une nouvelle livraison : "
+        },
+        {
+         "text": "tezkuryer-catdirilma.example.net/odenis",
+         "link": {
+          "label": "tezkuryer-catdirilma.example.net/odenis",
+          "href": "https://tezkuryer-catdirilma.example.net/odenis"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Un nom de transporteur connu et un petit montant.",
+     "actions": [
+      {
+       "id": "open-link",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "La page ressemble au site du transporteur, mais l’adresse est fausse. Voyons maintenant ce qu’elle demande.",
+       "next": "bank-code"
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme spam",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Signalez le SMS, puis vérifiez le colis dans l’application officielle.",
+       "next": "real-app"
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Bien. Si vous attendez un colis, vérifiez-le dans l’application officielle.",
+       "next": "real-app"
+      }
+     ]
+    },
+    {
+     "id": "bank-code",
+     "label": "La page a demandé les données de la carte et le code SMS",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "10:49",
+      "messages": [
+       [
+        {
+         "text": "Code : 518204. Paiement de 412,00 AZN, TZK GLOBAL PAY. Ne communiquez jamais ce code."
+        }
+       ]
+      ]
+     },
+     "say": "Votre banque a envoyé un code. Regardez le montant.",
+     "actions": [
+      {
+       "id": "type-code",
+       "label": "Saisir le code sur le site",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Avec ce code, vous validez un paiement de quatre cent douze manats, et non d’un seul. Appelez tout de suite la banque au numéro inscrit au dos de votre carte."
+      },
+      {
+       "id": "call-bank",
+       "label": "Appeler la banque au numéro de la carte",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Exact. Le montant indiqué avec le code est bien plus élevé que celui annoncé par la page : faites bloquer la carte tout de suite."
+      },
+      {
+       "id": "ignore",
+       "label": "Ne saisir le code nulle part",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Bien, le paiement n’est pas passé. Mais les données de votre carte sont déjà sur ce site : appelez la banque et faites bloquer la carte."
+      }
+     ]
+    },
+    {
+     "id": "real-app",
+     "label": "Application officielle TezKuryer",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2d-tezkuryer",
+      "app": "TezKuryer",
+      "title": [
+       {
+        "text": "TZ77015342AZ : en cours d’acheminement"
+       }
+      ],
+      "body": [
+       {
+        "text": "Livraison le 4 octobre. Aucun paiement supplémentaire n’est nécessaire."
+       }
+      ],
+      "time": "11:05"
+     },
+     "say": "Cette notification vient de l’application officielle.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir dans l’application",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Exact. L’application officielle n’indique rien à payer en plus : le SMS était donc faux."
+      },
+      {
+       "id": "later",
+       "label": "Regarder plus tard",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Pas de problème. Si des frais étaient dus, vous les verriez aussi dans l’application officielle."
+      }
+     ]
+    },
+    {
+     "id": "fine-sms",
+     "label": "13:20 Nouveau SMS",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2d-yol-nezaret-fake",
+      "sender": [
+       {
+        "text": "YolNezaret"
+       }
+      ],
+      "time": "13:20",
+      "messages": [
+       [
+        {
+         "text": "Vous avez reçu une amende de 80 AZN pour excès de vitesse. Payez aujourd’hui et bénéficiez de 50 % de réduction : "
+        },
+        {
+         "text": "yolnezaret-cerime.example.net/endirim",
+         "link": {
+          "label": "yolnezaret-cerime.example.net/endirim",
+          "href": "https://yolnezaret-cerime.example.net/endirim"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Maintenant, une amende. Attention à la réduction.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Payer avec la réduction",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "La réduction est là pour vous presser. La page derrière le lien collecte les données de carte bancaire."
+      },
+      {
+       "id": "verify",
+       "label": "Je vérifierai moi-même mes amendes sur le portail",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Si l’amende est réelle, elle apparaîtra sur le portail officiel."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme spam",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bien. En cas de doute, appelez la police au 102 et posez la question."
+      }
+     ]
+    },
+    {
+     "id": "aunt-chat",
+     "label": "16:02 Tante Sabina",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Tante Sabina"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "La voisine m’a envoyé ce lien, ils versent une aide aux familles, et c’est le dernier jour aujourd’hui."
+         }
+        ],
+        "time": "16:01"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "ailedestek-qeydiyyat.example.net",
+          "link": {
+           "label": "ailedestek-qeydiyyat.example.net",
+           "href": "https://ailedestek-qeydiyyat.example.net"
+          }
+         }
+        ],
+        "time": "16:01"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Je dois mettre les infos de ma carte ?"
+         }
+        ],
+        "time": "16:02"
+       }
+      ]
+     },
+     "say": "Une proche vous demande conseil.",
+     "actions": [
+      {
+       "id": "advise-stop",
+       "label": "Surtout pas, vérifions ensemble sur le portail officiel",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Très bien. Les allocations de l’État ne demandent jamais d’inscription par un lien, et vous pouvez les vérifier sur le portail officiel."
+      },
+      {
+       "id": "advise-go",
+       "label": "Dépêche-toi, c’est le dernier jour",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Le piège du dernier jour a fonctionné. La page va voler les données de sa carte : elle doit appeler sa banque tout de suite."
+      },
+      {
+       "id": "open-it",
+       "label": "Attends, j’ouvre le lien",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "L’ouvrir pour vérifier est risqué aussi. De toute façon, l’adresse n’est pas celle du portail officiel."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "pf-choice",
+   "question": {
+    "prompt": "Vous avez déjà saisi les données de votre carte sur une fausse page. Que faire en premier ?",
+    "options": [
+     {
+      "id": "call-bank",
+      "label": "Appeler la banque au numéro inscrit au dos de la carte et la faire bloquer",
+      "correct": true,
+      "feedback": "Exact. Plus la carte est bloquée tôt, moins vous perdez."
+     },
+     {
+      "id": "wait",
+      "label": "Attendre de voir si de l’argent quitte le compte",
+      "correct": false,
+      "feedback": "Attendre laisse du temps à l’escroc. Une fois l’argent parti, il sera peut-être trop tard."
+     },
+     {
+      "id": "reply-sms",
+      "label": "Répondre au SMS et demander le remboursement",
+      "correct": false,
+      "feedback": "L’escroc ne vous rendra rien et vous demandera plutôt un nouveau code. Coupez tout contact."
+     }
+    ]
+   },
+   "explain": "Ensuite, signalez les faits à la police au 102 et conservez le message comme preuve."
+  },
+  {
+   "type": "recap",
+   "id": "pf-recap",
+   "points": [
+    "Colis, amende ou allocation : ne payez jamais via un lien reçu par SMS.",
+    "Pour vérifier, ouvrez vous-même l’application ou le portail officiel.",
+    "Données de carte saisies ? Appelez tout de suite la banque, puis la police au 102."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

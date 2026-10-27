@@ -1,0 +1,498 @@
+{
+  "id": "fake-video-call",
+  "title": "Sahte görüntülü görüşme",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "live-fake",
+          "say": "Sahte bir yüz artık görüntülü görüşmede canlı olarak karşınıza çıkabilir. Konuşur, gülümser ve gerçek gibi görünür.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          }
+        },
+        {
+          "id": "traces",
+          "say": "Bazen bulanık kenarlar ve sese uymayan dudak hareketleri fark edilir, ama iyi bir sahte görüntü bu izleri gizler.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "the-ask",
+          "say": "Gözlerinize değil, kurala güvenin: sizden para, kod ya da belge isteniyorsa başka bir yoldan doğrulayın.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "rule",
+          "say": "Görüşmeyi sonlandırın ve o kişiyi bildiğiniz numaradan kendiniz arayın.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "colleague-video",
+      "environment": "phone",
+      "title": "İş arkadaşınızdan görüntülü görüşme",
+      "intro": "İş arkadaşınız size mesaj yazıyor, ardından görüntülü görüşme başlatıyor. Her adımda karar verin.",
+      "steps": [
+        {
+          "id": "new-account",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Aynur Guliyeva (yeni hesap)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Merhaba! Eski hesabım kapandı, bu yeni hesabım.",
+                    "spot": "new"
+                  }
+                ],
+                "time": "16:40"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Sizi şimdi görüntülü arıyorum, acilen bir belgeye ihtiyacım var.",
+                    "spot": "urgent"
+                  }
+                ],
+                "time": "16:40"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "wait",
+              "label": "Tamam, bekliyorum",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Yeni hesap başlı başına bir uyarı işaretidir. Önce eski numaradan doğrulamak daha iyidir."
+            },
+            {
+              "id": "verify",
+              "label": "Önce eski numaranızı arayacağım",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğru. “Yeni hesap” hikâyesi, doğrulama yapmanızı engellemek için anlatılır.",
+              "next": "real-aynur"
+            }
+          ]
+        },
+        {
+          "id": "video-ring",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Aynur Guliyeva (yeni hesap)"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 55 000 62 19"
+              }
+            ],
+            "label": "Görüntülü arama",
+            "voice": "young-woman"
+          },
+          "say": "Ekranda Aynur'un yüzü beliriyor.",
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Yanıtla",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Yanıtlamak henüz bir zarar vermez. Önemli olan ne istediğidir."
+            },
+            {
+              "id": "decline",
+              "label": "Reddet",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olur. Aynur'u bildiğiniz numaradan kendiniz arayın.",
+              "next": "real-aynur"
+            }
+          ]
+        },
+        {
+          "id": "the-ask",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Aynur Guliyeva (yeni hesap)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Beni gördünüz, gerçekten benim. Vatandaş başvurularının listesini buraya gönderin, müdür bekliyor."
+                  }
+                ],
+                "time": "16:44"
+              }
+            ]
+          },
+          "say": "Görüşmeden sonra talep geliyor.",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Dosyayı gönder",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Görüntü sahteydi ve liste bir dolandırıcıya gitti. Yüz kanıt değildir; başka bir yoldan doğrulayın."
+            },
+            {
+              "id": "verify",
+              "label": "Önce her zamanki numaranızı arayacağım",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğru. Gerçek bir iş arkadaşı bu kontrolü anlayışla karşılar."
+            },
+            {
+              "id": "report",
+              "label": "Bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "İyi hamle. Hesabı bildirin ve güvenlik ekibine de haber verin."
+            }
+          ]
+        },
+        {
+          "id": "real-aynur",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Aynur Guliyeva"
+              }
+            ],
+            "messages": [
+              {
+                "from": "me",
+                "body": [
+                  {
+                    "text": "Aynur Hanım, az önce beni görüntülü aradınız mı?"
+                  }
+                ],
+                "time": "16:47"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hayır! Toplantıdayım. Biri benim adıma mı yazıyor?"
+                  }
+                ],
+                "time": "16:48"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Güvenlik ekibine haber ver",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Harika. Güvenlik ekibi diğer iş arkadaşlarınızı da uyaracak."
+            },
+            {
+              "id": "delete",
+              "label": "Sohbeti sil ve unut",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Dolandırıcı başka bir iş arkadaşınızı deneyecek. Bildirmek herkesi korur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "reliable-checks",
+      "question": {
+        "prompt": "Görüntülü görüşmede karşınızdakinin kim olduğunu hangi kontroller güvenilir biçimde doğrular?",
+        "options": [
+          {
+            "id": "callback",
+            "label": "Bildiğiniz numarayı kendiniz aramak",
+            "correct": true,
+            "feedback": "Bu aramayı siz başlatırsınız, bu yüzden dolandırıcı onu kontrol edemez."
+          },
+          {
+            "id": "code-word",
+            "label": "Önceden belirlediğiniz doğrulama kelimesi",
+            "correct": true,
+            "feedback": "Sahte görüntü bu kelimeyi bilemez."
+          },
+          {
+            "id": "face",
+            "label": "Yüz ve ses tanıdık geliyor",
+            "correct": false,
+            "feedback": "Yüzler ve sesler taklit edilebilir."
+          },
+          {
+            "id": "quality",
+            "label": "Görüntü net",
+            "correct": false,
+            "feedback": "Net bir görüntü hiçbir şeyi kanıtlamaz. Sahte görüntüler de net olabilir."
+          },
+          {
+            "id": "account",
+            "label": "Arama, tanıdık bir ada sahip hesaptan geliyor",
+            "correct": false,
+            "feedback": "Hesaplar ele geçirilebilir ya da sahte olarak açılabilir."
+          }
+        ],
+        "multi": true,
+        "visual": {
+          "kind": "illustration",
+          "id": "deepfake"
+        }
+      },
+      "explain": "Güvenilir kanıt görüntüde değil, kendi başlattığınız ikinci iletişimdedir."
+    },
+    {
+      "type": "swipe",
+      "id": "follow-or-check",
+      "prompt": "Bu talep normal mi, tehlikeli mi?",
+      "cards": [
+        {
+          "id": "card-code",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Tural (akraba)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Beni videoda gördün, benim işte. Kartına az önce gelen kodu söyle, bilet için lazım."
+                  }
+                ],
+                "time": "20:15"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Akraba bile olsa kimse kart kodunuzu istememelidir. Görüntü kanıt değildir."
+        },
+        {
+          "id": "meeting",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "Sebine Aliyeva"
+                }
+              ],
+              "address": [
+                {
+                  "text": "s.aliyeva@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Yarın 10:00'da ekip toplantısı"
+              }
+            ],
+            "time": "11:05",
+            "body": [
+              [
+                {
+                  "text": "Toplantı bağlantısı kurum içi takvimde. Gündem eki yok, sadece saati not edin."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Sıradan bir toplantı daveti: alan adı kuruma ait ve hiçbir şey istenmiyor."
+        },
+        {
+          "id": "hr-video",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "İnsan Kaynakları"
+                }
+              ],
+              "address": [
+                {
+                  "text": "hr@idare-hr.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Maaş kartı yenileme"
+              }
+            ],
+            "time": "09:30",
+            "body": [
+              [
+                {
+                  "text": "15 dakikalık görüntülü toplantıya katılınız ve kartınızı kameraya gösteriniz."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Hiçbir departman kartınızı kameraya göstermenizi istemez. Üstelik alan adı da kuruma ait değil."
+        },
+        {
+          "id": "operator",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "kehkesan-mobil",
+            "sender": [
+              {
+                "text": "Kehkesan"
+              }
+            ],
+            "time": "13:10",
+            "messages": [
+              [
+                {
+                  "text": "Bakiyeniz 5 manatın altına düştü. Bakiye yüklemek için mobil uygulamamızı kullanabilirsiniz."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ne bağlantı ne de kod isteniyor. Operatörden gelen sıradan bir bildirim."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "abroad-relative",
+      "title": "Yurt dışından görüntülü görüşme",
+      "start": "call",
+      "nodes": [
+        {
+          "id": "call",
+          "text": "Selam! Gümrükte beni durdurdular, telefonumu aldılar. Bir arkadaşımın hesabından arıyorum. 1.200 manat gönder, sonra sana geri öderim.",
+          "speaker": "Videodaki Tural",
+          "voice": "man-3",
+          "channel": "video",
+          "manner": "worried",
+          "spoken": "Selam! <breath> Gümrükte beni durdurdular, telefonumu aldılar. Bir arkadaşımın hesabından arıyorum. 1.200 manat gönder, ee, sonra sana geri öderim.",
+          "character": "tural",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          },
+          "choices": [
+            {
+              "label": "Parayı hemen gönderirim",
+              "outcome": "compromised",
+              "feedback": "Para bir dolandırıcıya gitti. Başkasının hesabı ve acil para talebi bir aradaysa bu bir uyarı işaretidir."
+            },
+            {
+              "label": "Doğrulama kelimemizi sorarım",
+              "next": "dodge",
+              "feedback": "İyi hamle. Bakalım ne diyecek."
+            },
+            {
+              "label": "Önce aileyle kontrol edeceğimi söylerim",
+              "next": "check",
+              "feedback": "Doğru. Bildiğiniz numaralardan doğrulayın."
+            }
+          ]
+        },
+        {
+          "id": "dodge",
+          "text": "Hat çok kötü, seni duyamıyorum… Vakit yok, çabuk gönder!",
+          "speaker": "Videodaki Tural (görüntü donuyor)",
+          "voice": "man-3",
+          "channel": "video",
+          "manner": "worried",
+          "spoken": "Hat çok kötü, seni duyamıyorum… <short pause> Vakit yok, çabuk gönder!",
+          "character": "tural",
+          "choices": [
+            {
+              "label": "Tamam, gönderiyorum",
+              "outcome": "compromised",
+              "feedback": "“Hat kötü” bahanesi sorunuzdan kaçmak içindir. Doğrulama kelimesi yoksa para da yok."
+            },
+            {
+              "label": "Görüşmeyi bitirir, aileyi ararım",
+              "next": "check",
+              "feedback": "Doğru karar."
+            }
+          ]
+        },
+        {
+          "id": "check",
+          "text": "Tural'ın eşi, onun bugün işte olduğunu ve telefonunun yanında olduğunu söylüyor.",
+          "choices": [
+            {
+              "label": "Polise bildirir, aileyi uyarırım",
+              "outcome": "safe",
+              "feedback": "Harika. Dolandırıcı diğer aile üyelerini de deneyebilir."
+            },
+            {
+              "label": "Hiçbir şey yapmam, para kaybı olmadı",
+              "outcome": "risky",
+              "feedback": "Dolandırıcı yeniden deneyecek. Aileyi uyarmak herkesi korur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Videodaki yüz ve ses kanıt değildir.",
+        "Para, kod ya da belge mi isteniyor? Kendiniz geri arayın.",
+        "Sahte aramayı güvenlik ekibine ya da polise bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

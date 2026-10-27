@@ -18,7 +18,9 @@ export function slugify(text: string): string {
 
 function inline(text: string, key: string): ReactNode[] {
   const out: ReactNode[] = [];
-  const re = /(\*\*([^*]+)\*\*|\*([^*]+)\*|\[([^\]]+)\]\((https?:\/\/[^\s)]+|\/[^\s)]*)\))/g;
+  // A link's text and address stop at the next "[", where the next link could start: otherwise every
+  // unclosed "[" re-scans to the end of the paragraph (quadratic on a policy full of "[").
+  const re = /(\*\*([^*]+)\*\*|\*([^*]+)\*|\[([^[\]]+)\]\((https?:\/\/[^\s)[]+|\/[^\s)[]*)\))/g;
   let last = 0;
   let m: RegExpExecArray | null;
   let i = 0;
@@ -44,7 +46,7 @@ function inline(text: string, key: string): ReactNode[] {
 /** Text of an inline Markdown fragment without its markup, for accessible names. */
 export function plainText(text: string): string {
   return text
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    .replace(/\[([^[\]]+)\]\([^)[]*\)/g, "$1")
     .replace(/\*\*([^*]+)\*\*|\*([^*]+)\*/g, "$1$2")
     .replace(/\s+/g, " ")
     .trim();
@@ -73,7 +75,7 @@ export function Markdown({ source, skipTitle = false }: { source: string; skipTi
   const flushList = () => {
     if (!list) return;
     const items = list.items.map((it, i) => <li key={i}>{inline(it, `l${k}-${i}`)}</li>);
-    blocks.push(list.ordered ? <ol key={`o${k++}`} className="list-decimal pl-6">{items}</ol> : <ul key={`u${k++}`} className="list-disc pl-6">{items}</ul>);
+    blocks.push(list.ordered ? <ol key={`o${k++}`} className="list-decimal ps-6">{items}</ol> : <ul key={`u${k++}`} className="list-disc ps-6">{items}</ul>);
     list = null;
   };
   const flushTable = () => {
@@ -85,7 +87,7 @@ export function Markdown({ source, skipTitle = false }: { source: string; skipTi
     const label = heading ?? head.map(plainText).filter(Boolean).join(", ");
     blocks.push(
       <div key={`t${key}`} tabIndex={0} role="region" aria-label={label || undefined} className="overflow-x-auto rounded-lg ring-1 ring-line">
-        <table className="w-full min-w-[36rem] text-left text-body-sm">
+        <table className="w-full min-w-[36rem] text-start text-body-sm">
           <thead className="bg-sunken">
             <tr>
               {head.map((c, i) => (

@@ -1,0 +1,442 @@
+{
+ "id": "lost-phone",
+ "title": "Téléphone perdu",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "c-tutor",
+   "beats": [
+    {
+     "id": "c-b1",
+     "say": "Un téléphone peut être perdu ou volé. Protégeons-le à l’avance, et voyons ce qu’il faut faire.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "c-b2",
+     "say": "D’abord, le verrouillage de l’écran : un code PIN de six chiffres ou plus, complété par l’empreinte digitale ou la reconnaissance faciale.",
+     "mood": "think",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     },
+     "checkpoint": {
+      "prompt": "L’année de naissance est-elle un bon code PIN ?",
+      "options": [
+       {
+        "id": "yes",
+        "label": "Oui, c’est facile à retenir",
+        "correct": false,
+        "feedback": "Une année de naissance se trouve facilement, souvent directement sur les réseaux sociaux."
+       },
+       {
+        "id": "no",
+        "label": "Non, je choisis un code PIN aléatoire",
+        "correct": true,
+        "feedback": "Bon réflexe. Choisissez un code PIN aléatoire d’au moins six chiffres."
+       }
+      ]
+     }
+    },
+    {
+     "id": "c-b4",
+     "say": "Ensuite, les sauvegardes. Si vos photos et vos contacts sont dans le cloud, perdre le téléphone, c’est seulement perdre l’appareil.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    {
+     "id": "c-b5",
+     "say": "Téléphone perdu ? Agissez vite : verrouillez-le à distance, prévenez tout de suite votre organisation, et effacez-le si nécessaire.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "lost-phone-flow",
+   "environment": "phone",
+   "title": "Téléphone perdu",
+   "intro": "Dans la soirée, vous avez oublié votre téléphone professionnel dans un taxi. Agissez étape par étape depuis le téléphone d’un collègue.",
+   "steps": [
+    {
+     "id": "locate",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "cihaz-tapici",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Téléphone pro"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Dernière position : quartier de Narimanov, il y a 5 minutes."
+        }
+       ],
+       [
+        {
+         "text": "Le téléphone se déplace."
+        }
+       ]
+      ],
+      "buttons": [
+       "Verrouiller",
+       "Effacer les données",
+       "Attendre"
+      ]
+     },
+     "say": "Le service de localisation de l’appareil affiche le téléphone sur la carte.",
+     "actions": [
+      {
+       "id": "lock",
+       "label": "Verrouiller et afficher un message",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. Le verrouillage prend une minute et empêche les inconnus d’accéder au téléphone."
+      },
+      {
+       "id": "wipe",
+       "label": "Effacer maintenant",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "L’effacement est la dernière étape : ensuite, le téléphone n’apparaît plus sur la carte. Verrouillez-le d’abord."
+      },
+      {
+       "id": "wait",
+       "label": "Attendre le lendemain matin",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Chaque heure donne plus de temps au voleur. Verrouillez le téléphone maintenant."
+      }
+     ]
+    },
+    {
+     "id": "tell-it",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Support informatique"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour ! Ici le support informatique, que pouvons-nous faire pour vous ?"
+         }
+        ],
+        "time": "21:08"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "J’ai perdu mon téléphone pro, bloquez mon compte",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. Une fois votre compte professionnel bloqué par le support, personne ne peut ouvrir la messagerie sur le téléphone."
+      },
+      {
+       "id": "tomorrow",
+       "label": "Je les préviendrai demain au travail",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "La messagerie professionnelle est ouverte sur ce téléphone. Prévenir votre organisation tout de suite évite l’essentiel des dégâts."
+      }
+     ]
+    },
+    {
+     "id": "sim-block",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "kehkesan-mobil",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Bloquer la carte SIM"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "+994 55 000 18 40"
+        }
+       ],
+       [
+        {
+         "text": "Un numéro bloqué ne reçoit plus de codes SMS."
+        }
+       ]
+      ],
+      "buttons": [
+       "Bloquer",
+       "Annuler"
+      ]
+     },
+     "say": "Vous êtes maintenant dans l’application de votre opérateur.",
+     "actions": [
+      {
+       "id": "block",
+       "label": "Bloquer",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. Une fois la SIM bloquée, un voleur ne peut plus recevoir de codes SMS pour récupérer vos comptes."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Si la SIM reste active, les codes SMS continuent d’arriver sur le téléphone volé."
+      }
+     ]
+    },
+    {
+     "id": "found-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "cihaz-tapici-fake",
+      "sender": [
+       {
+        "text": "+994 70 000 45 67"
+       }
+      ],
+      "time": "21:30",
+      "messages": [
+       [
+        {
+         "text": "Votre téléphone perdu a été retrouvé. Connectez-vous pour voir où il se trouve : "
+        },
+        {
+         "text": "cihaz-tapildi.test",
+         "link": {
+          "label": "cihaz-tapildi.test",
+          "href": "https://cihaz-tapildi.test/giris"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Une demi-heure plus tard, vous recevez ce SMS.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Après un vol, ce genre de SMS cherche à voler le mot de passe du compte, qui permet de déverrouiller le téléphone."
+      },
+      {
+       "id": "block",
+       "label": "Bloquer et signaler",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. Vérifiez la position du téléphone uniquement dans le service de localisation, en l’ouvrant vous-même."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "c-order",
+   "prompt": "Votre téléphone a disparu. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "lock-remote",
+     "label": "Verrouiller le téléphone avec le service de localisation de l’appareil"
+    },
+    {
+     "id": "tell-support",
+     "label": "Prévenir immédiatement le support technique de votre organisation"
+    },
+    {
+     "id": "block-sim",
+     "label": "Appeler votre opérateur pour bloquer la carte SIM"
+    },
+    {
+     "id": "change-passwords",
+     "label": "Modifier les mots de passe importants depuis un autre appareil"
+    },
+    {
+     "id": "wipe",
+     "label": "S’il reste introuvable, l’effacer à distance"
+    }
+   ],
+   "explain": "D’abord verrouiller et signaler, puis protéger la SIM et les mots de passe. L’effacement vient en dernier, car un téléphone effacé est plus difficile à retrouver. Si la procédure de votre organisation prévoit un autre ordre, suivez-la."
+  },
+  {
+   "type": "swipe",
+   "id": "c-swipe",
+   "prompt": "Sans danger ou piège ?",
+   "cards": [
+    {
+     "id": "support-locked",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Support technique"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Nous avons enregistré la perte de votre téléphone et suspendu votre compte professionnel. Passez au bureau pour obtenir un nouveau mot de passe."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Aucun lien ni code n’est demandé, et on vous invite à venir en personne au bureau. C’est la bonne procédure."
+    },
+    {
+     "id": "finder-passcode",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "+44 7700 900654"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "J’ai trouvé votre téléphone. Envoyez-moi le code de verrouillage de l’écran, que je vérifie que vous êtes bien le propriétaire."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Pour rendre un téléphone, nul besoin de son code de verrouillage. Ne le donnez pas, et organisez la remise par l’intermédiaire de la police."
+    },
+    {
+     "id": "update-reminder",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Support technique"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Rappel : une nouvelle mise à jour du système est disponible pour les téléphones. Installez-la depuis les Paramètres."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Il n’y a aucun lien : on vous renvoie vers les Paramètres de votre téléphone. C’est justement là que s’installent les mises à jour."
+    },
+    {
+     "id": "cloud-full",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "buludxidmet-fake",
+      "sender": [
+       {
+        "text": "BuludXidmet"
+       }
+      ],
+      "time": "19:12",
+      "messages": [
+       [
+        {
+         "text": "Votre stockage cloud est plein et vos photos seront supprimées aujourd’hui. Payez ici : "
+        },
+        {
+         "text": "bulud-yaddas.test"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un vrai avertissement s’affiche dans l’application elle-même. Ne payez pas via un lien, ouvrez vous-même l’application."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "c-choice-lock",
+   "question": {
+    "prompt": "Quels verrouillages d’écran sont robustes ?",
+    "options": [
+     {
+      "id": "none",
+      "label": "Aucun verrouillage",
+      "correct": false,
+      "feedback": "Quiconque trouve un téléphone non verrouillé voit tout."
+     },
+     {
+      "id": "birth-year",
+      "label": "Votre année de naissance",
+      "correct": false,
+      "feedback": "Une année de naissance se trouve facilement, souvent sur les réseaux sociaux."
+     },
+     {
+      "id": "random-pin",
+      "label": "Un code PIN aléatoire d’au moins six chiffres",
+      "correct": true,
+      "feedback": "Exact. Un long code PIN aléatoire est difficile à deviner."
+     },
+     {
+      "id": "bio-pin",
+      "label": "L’empreinte digitale ou le visage, avec un code PIN robuste",
+      "correct": true,
+      "feedback": "Exact. C’est pratique, et le code PIN de secours est robuste lui aussi."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Le verrouillage est la première protection quand on perd un téléphone. L’empreinte digitale est pratique, mais le code PIN principal doit rester robuste."
+  },
+  {
+   "type": "recap",
+   "id": "c-recap",
+   "points": [
+    "Un verrouillage d’écran robuste et les mises à jour automatiques",
+    "Activez à l’avance la sauvegarde et la localisation de l’appareil",
+    "Téléphone disparu : verrouiller, signaler, effacer si nécessaire"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

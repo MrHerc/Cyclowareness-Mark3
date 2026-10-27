@@ -1,0 +1,482 @@
+{
+ "id": "lost-phone",
+ "title": "Kaybolan iş telefonu",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "İş telefonunuz mu kayboldu ya da çalındı? Utanmayın ve beklemeyin. Her dakika önemli.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Hemen başka bir telefondan BT destek ekibini arayın. Telefonu uzaktan kilitleyebilir ve yerini kontrol edebilirler.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Ardından buna benzer bir mesaj gelebilir. Bu, parolanızı çalıp telefonun kilidini açma girişimidir.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "Cihaz Servisi"
+        }
+       ],
+       "time": "20:14",
+       "messages": [
+        [
+         {
+          "text": "Telefonunuz bulundu. Nerede olduğunu görmek için giriş yapın: "
+         },
+         {
+          "text": "cihaz-tapildi.example.net",
+          "spot": "link"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "link"
+    },
+    {
+     "id": "b4",
+     "say": "Arayan kişi BT destek ekibinden olduğunu söylese bile, PIN'inizi ya da SMS kodunuzu asla kimseye söylemeyin.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "first-steps",
+   "prompt": "İş telefonunuz kayboldu. Adımları sıraya koyun.",
+   "items": [
+    {
+     "id": "report",
+     "label": "Başka bir telefondan BT destek ekibini arayın"
+    },
+    {
+     "id": "lock",
+     "label": "Telefonu uzaktan kilitletin"
+    },
+    {
+     "id": "sim",
+     "label": "Operatörünüzü arayın ve SIM kartı kapattırın"
+    },
+    {
+     "id": "passwords",
+     "label": "Başka bir cihazdan iş parolalarınızı değiştirin"
+    },
+    {
+     "id": "wipe",
+     "label": "Telefon bulunamazsa içeriğini uzaktan sildirin"
+    }
+   ],
+   "explain": "Bildirmek ve kilitletmek birkaç dakika sürer ve zararın çoğunu önler. Telefon hâlâ bulunabilsin diye silme işlemi en sona bırakılır. Kurumunuzun prosedürü başka bir sıra öngörüyorsa ona uyun."
+  },
+  {
+   "type": "simulation",
+   "id": "fake-support-call",
+   "environment": "call",
+   "title": "BT destekten gelen arama",
+   "intro": "İş telefonunuz dün gece kayboldu. Bu sabah kişisel numaranıza BT destek ekibinden bir arama geliyor.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [
+       {
+        "text": "BT Destek"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 45 17"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "young-man"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Yanıtla",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Aramayı yanıtlamak tehlikeli değildir. Önemli olan ne söylediğinizdir."
+      },
+      {
+       "id": "decline",
+       "label": "Reddet",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Bu da olur. BT destek ekibini resmî numarasından kendiniz arayın.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [
+       {
+        "text": "BT Destek"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 45 17"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "young-man"
+     },
+     "say": "Merhaba, BT destek ekibinden arıyorum. Telefonunuzu kilitlemek için size bir SMS kodu gönderdik. Lütfen kodu bana okur musunuz?",
+     "spoken": "Merhaba, <breath> BT destek ekibinden arıyorum. Telefonunuzu kilitlemek için size bir SMS kodu gönderdik. Lütfen, ee, kodu bana okur musunuz?",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Kodu oku",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "O kod, hesabınıza giriş yapmak içindir. BT destek ekibinin bir telefonu kilitlemek için sizin kodunuza ihtiyacı yoktur."
+      },
+      {
+       "id": "verify",
+       "label": "Resmî numarayı kendim arayacağım",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Resmî numaradan kontrol etmek, sahte bir aramayı hemen ortaya çıkarır.",
+       "next": "after"
+      },
+      {
+       "id": "hang",
+       "label": "Kapat",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Doğru. Gerçek BT destek ekibi asla kod ya da parola istemez.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pin",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [
+       {
+        "text": "BT Destek"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 45 17"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "young-man"
+     },
+     "say": "Peki, o zaman ekran kilidi PIN'inizi söyleyin. Telefonun kilidini uzaktan açıp verilerinizi kurtaracağız.",
+     "spoken": "Peki, <sigh> o zaman ekran kilidi PIN'inizi söyleyin. Telefonun kilidini uzaktan açıp verilerinizi kurtaracağız.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "PIN'i söyle",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Telefon kimin elindeyse bu PIN ile onu açar. Yönetim sisteminin telefonu kilitlemek için PIN'inize asla ihtiyacı yoktur."
+      },
+      {
+       "id": "keep",
+       "label": "PIN'imi söylemeyeceğim",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. PIN'iniz yalnızca size aittir ve asla paylaşılmaz."
+      },
+      {
+       "id": "hang",
+       "label": "Kapat",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "İyi karar. Baskı arttığında aramayı sonlandırmak doğru harekettir.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Arama sona erdi. Şimdi ne yapmalı?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [
+       {
+        "text": "BT Destek"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 45 17"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "young-man"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "BT destek ekibinin resmî numarasını ara",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Doğru. Bu aramayı bildirin, çünkü saldırgan adınızı ve numaranızı biliyor."
+      },
+      {
+       "id": "ignore",
+       "label": "Hiçbir şey yapma",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Saldırgan sırada başka bir iş arkadaşınızı arayacak. Bildirirseniz BT destek ekibi herkesi uyarabilir."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "after-loss",
+   "prompt": "Telefon kaybolduktan sonra gelen mesajlar. Güvenli mi, yoksa tehdit mi?",
+   "cards": [
+    {
+     "id": "found-sms",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "Cihaz Servisi"
+       }
+      ],
+      "time": "20:14",
+      "messages": [
+       [
+        {
+         "text": "Telefonunuz bulundu. Haritada görmek için giriş yapın: "
+        },
+        {
+         "text": "cihaz-tapildi.example.net/map",
+         "link": {
+          "label": "cihaz-tapildi.example.net/map",
+          "href": "https://cihaz-tapildi.example.net/map"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Sahte bir “telefonunuz bulundu” mesajı parolanızın peşindedir. Telefonun nerede olduğunu yalnızca BT destek ekibi kontrol eder."
+    },
+    {
+     "id": "sim-blocked",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "kehkesan-mobil",
+      "sender": [
+       {
+        "text": "Kehkesan"
+       }
+      ],
+      "time": "20:31",
+      "messages": [
+       [
+        {
+         "text": "SIM kartınız talebiniz üzerine kapatılmıştır. Yeni SIM kart için kimlik kartınızla satış ofislerimize başvurabilirsiniz."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Bağlantı yok, hiçbir şey istenmiyor ve mesaj sizin kendi talebinizi doğruluyor. Bu olağan bir bilgilendirme."
+    },
+    {
+     "id": "ticket-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "BT Destek"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Talep 4471: telefon kilitlendi"
+       }
+      ],
+      "time": "20:40",
+      "body": [
+       [
+        {
+         "text": "İş telefonunuz uzaktan kilitlendi. Yeni cihazınızı almak için yarın saat 10:00'da 2. kata gelin."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Adres kurumunuza ait, bağlantı yok ve parola istenmiyor. Bu, yaptığınız bildirime verilen yanıttır."
+    },
+    {
+     "id": "ransom-chat",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "+994 55 000 63 21"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Telefonunuz bende. 100 AZN gönderin, geri vereyim. Polise haber verirseniz içindekileri internete sızdırırım."
+         }
+        ],
+        "time": "21:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Para göndermeyin ve yazışmayı silmeyin. Onu BT destek ekibine ve polise gösterin."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "taxi",
+   "title": "Takside unutulan telefon",
+   "start": "night",
+   "nodes": [
+    {
+     "id": "night",
+     "text": "Akşam evdeyken iş telefonunuzu takside unuttuğunuzu fark ediyorsunuz. Saat 22:00.",
+     "choices": [
+      {
+       "label": "BT destek ekibini hemen şimdi ararım",
+       "next": "morning",
+       "feedback": "Doğru. Kaybı gece de bildirebilirsiniz ve telefon hemen kilitlenir."
+      },
+      {
+       "label": "Sabaha kadar beklerim, belki şoför arar",
+       "outcome": "risky",
+       "feedback": "Bir telefonla tek gecede çok şey yapılabilir. Hemen bildirin, şoför de ararsa daha iyi."
+      }
+     ]
+    },
+    {
+     "id": "morning",
+     "text": "Merhaba, dün gece telefonunuzu taksimde unutmuşsunuz. Getirdim, kilitliydi, hiçbir şeye dokunmadım.",
+     "speaker": "Taksi şoförü (sabah, ofiste)",
+     "voice": "older-man",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Merhaba, dün gece telefonunuzu taksimde unutmuşsunuz. <breath> Getirdim, kilitliydi, hiçbir şeye dokunmadım.",
+     "choices": [
+      {
+       "label": "Kontrol etmesi için BT destek ekibine teslim ederim",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Elinizden çıkmış bir telefonun kontrol edilmesi gerekir, kararı da uzman verir."
+      },
+      {
+       "label": "Kilidini açar ve hemen işe dönerim",
+       "outcome": "risky",
+       "feedback": "Telefon bir geceyi başkasının elinde geçirdi. Önce BT destek ekibi kontrol etsin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "best-lock",
+   "question": {
+    "prompt": "Telefon kaybolduğunda verilerinizi en iyi ne korur?",
+    "options": [
+     {
+      "id": "pin-bio",
+      "label": "En az 6 haneli bir PIN ve parmak izi",
+      "correct": true,
+      "feedback": "Doğru. Uzun bir PIN'i tahmin etmek zordur, parmak izi de günlük kullanımı kolaylaştırır."
+     },
+     {
+      "id": "birth-year",
+      "label": "Doğum yılınızdan oluşan 4 haneli bir PIN",
+      "correct": false,
+      "feedback": "Doğum yılı sosyal medyada kolayca bulunur. En az 6 rastgele rakam seçin."
+     },
+     {
+      "id": "pattern",
+      "label": "Basit bir kilit açma deseni",
+      "correct": false,
+      "feedback": "Basit bir desen, ekrandaki parmak lekelerinden ya da omzunuzun üzerinden bakılarak çözülebilir."
+     },
+     {
+      "id": "none",
+      "label": "Kilit yok, telefon hep yanımda",
+      "correct": false,
+      "feedback": "Telefon bir anda kaybolabilir. Kilit olmazsa iş e-postaları herkese açık kalır."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "lock"
+    }
+   },
+   "explain": "Kaybolan bir telefondaki verileri koruyan ilk engel, güçlü bir ekran kilididir."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Telefon kaybolursa hemen başka bir telefondan BT destek ekibini arayın.",
+    "Arayan kim olursa olsun, kodu, PIN'i ya da parolayı asla kimseye söylemeyin.",
+    "Geri gelen bir telefonu kullanmadan önce BT destek ekibine kontrol ettirin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

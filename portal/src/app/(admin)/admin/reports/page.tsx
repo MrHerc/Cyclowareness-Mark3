@@ -1,8 +1,9 @@
+import { notFound } from "next/navigation";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { and, avg, count, desc, eq, isNotNull } from "drizzle-orm";
 import { FileDown, FileSpreadsheet, FileText, ShieldCheck, Star, AlertTriangle } from "lucide-react";
 import { db, t } from "@/server/db";
-import { allowed, requirePermission } from "@/server/auth/viewer";
+import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
 import { getDepartments, scopeDepartmentIds } from "@/server/queries/admin";
 import { REPORT_KINDS } from "@/server/db/schema";
 import { Card, CardBody, CardHeader } from "@/components/ui/card";
@@ -23,6 +24,7 @@ export async function generateMetadata() {
 
 export default async function ReportsPage({ searchParams }: PageProps<"/admin/reports">) {
   const v = await requirePermission("reports.read");
+  if (!hasFeature(v, "reports")) notFound();
   const sp = await searchParams;
   const locale = await getLocale();
   const [tr, format] = await Promise.all([getTranslations("admin.reports"), getFormatter()]);

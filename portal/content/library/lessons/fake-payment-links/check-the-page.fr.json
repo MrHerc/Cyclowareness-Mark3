@@ -1,0 +1,383 @@
+{
+ "id": "check-the-page",
+ "title": "Vérifiez la page",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "cp-tutor",
+   "beats": [
+    {
+     "id": "cp-b1",
+     "say": "Une fausse page de paiement peut être la copie exacte de la vraie.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "cp-b2",
+     "say": "Le logo, les couleurs et les boutons sont identiques. La différence se trouve dans la barre d’adresse et dans ce que la page demande.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "e-xidmet-fake",
+       "brand": "e-Xidmət Portalı",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "e-xidmet-cerime.example.net",
+         "spot": "domain"
+        },
+        {
+         "text": "/odenis"
+        }
+       ],
+       "fields": [
+        "Numéro de carte",
+        "Date d’expiration",
+        "CVV",
+        "Code SMS"
+       ],
+       "button": "Payer : 40 AZN"
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "cp-b3",
+     "say": "Le cadenas ne prouve rien non plus : la plupart des faux sites en ont un.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "cp-b4",
+     "say": "Le plus sûr : ouvrez le portail depuis vos favoris ou saisissez vous-même l’adresse.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "cp-swipe",
+   "prompt": "Cette page est-elle authentique ou fausse ?",
+   "cards": [
+    {
+     "id": "real-fines",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet",
+      "brand": "e-Xidmət Portalı",
+      "url": [
+       {
+        "text": "https://e-xidmet.example/cerimeler"
+       }
+      ],
+      "fields": [
+       "Code d’identification personnel",
+       "Mot de passe"
+      ],
+      "button": "Se connecter"
+     },
+     "verdict": "safe",
+     "explain": "C’est le domaine du portail lui-même, et vous l’avez ouvert vous-même. C’est ici qu’il faut vérifier vos amendes."
+    },
+    {
+     "id": "fake-discount",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet-fake",
+      "brand": "e-Xidmət Portalı",
+      "url": [
+       {
+        "text": "https://e-xidmet-endirim.example.net/cerime"
+       }
+      ],
+      "fields": [
+       "Numéro de carte",
+       "Date d’expiration",
+       "CVV",
+       "Code SMS"
+      ],
+      "button": "Payer avec 50 % de réduction"
+     },
+     "verdict": "threat",
+     "explain": "Le domaine est différent, et la page veut tout à la fois : la carte, son code et le code SMS. C’est un formulaire conçu pour voler vos données."
+    },
+    {
+     "id": "app-notice",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "e-xidmet",
+      "app": "e-Xidmət",
+      "title": [
+       {
+        "text": "Nouvel avis"
+       }
+      ],
+      "body": [
+       {
+        "text": "Une amende est enregistrée à votre nom. Détails : rubrique Amendes de l’application."
+       }
+      ],
+      "time": "09:15"
+     },
+     "verdict": "safe",
+     "explain": "L’avis se trouve dans l’application officielle et ne contient aucun lien. Vérifiez et payez l’amende directement dans l’application."
+    },
+    {
+     "id": "fake-benefit",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet-fake",
+      "brand": "Aide aux familles",
+      "url": [
+       {
+        "text": "https://ailedestek-qeydiyyat.example.net"
+       }
+      ],
+      "fields": [
+       "Nom et prénom",
+       "Code d’identification personnel",
+       "Numéro de carte",
+       "CVV"
+      ],
+      "button": "Recevoir l’allocation"
+     },
+     "verdict": "threat",
+     "explain": "Pour recevoir de l’argent, le code au dos de votre carte n’est jamais nécessaire. Les allocations de l’État ne demandent pas d’inscription par un lien."
+    },
+    {
+     "id": "fake-gateway",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2d-manatpay-fake",
+      "brand": "ManatPay",
+      "url": [
+       {
+        "text": "https://manatpay-secure.example.net/3ds"
+       }
+      ],
+      "fields": [
+       "Numéro de carte",
+       "CVV",
+       "Code SMS",
+       "Code PIN de la carte"
+      ],
+      "button": "Confirmer"
+     },
+     "verdict": "threat",
+     "explain": "Aucune page de paiement ne demande jamais le code PIN de votre carte. Il sert uniquement aux distributeurs de billets et aux terminaux de paiement."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "cp-sim",
+   "environment": "browser",
+   "title": "Le lien de l’amende",
+   "intro": "Un ami vous a envoyé le lien d’une amende, et vous l’avez ouvert. À chaque étape dans le navigateur, faites le bon choix.",
+   "steps": [
+    {
+     "id": "fake-fine-page",
+     "label": "Amende impayée : 80 AZN. 50 % de réduction aujourd’hui",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "e-xidmet-fake",
+      "url": [
+       {
+        "text": "https://",
+        "reveal": "e-xidmet-cerime.example.net"
+       },
+       {
+        "text": "e-xidmet-cerime.example.net"
+       },
+       {
+        "text": "/odenis"
+       }
+      ]
+     },
+     "say": "Regardez la barre d’adresse.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Payer avec la réduction",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "La réduction est là pour vous presser. Voyons maintenant ce que la page demande."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact, ce n’est pas le domaine du portail. Maintenant, ouvrez vous-même le portail.",
+       "next": "real-portal"
+      }
+     ]
+    },
+    {
+     "id": "card-form",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet-fake",
+      "brand": "e-Xidmət Portalı",
+      "url": [
+       {
+        "text": "https://e-xidmet-cerime.example.net",
+        "reveal": "e-xidmet-cerime.example.net"
+       }
+      ],
+      "fields": [
+       "Numéro de carte",
+       "Date d’expiration",
+       "CVV",
+       "Code SMS"
+      ],
+      "button": "Payer : 40 AZN"
+     },
+     "say": "La page veut la carte et le code SMS en même temps.",
+     "actions": [
+      {
+       "id": "submit",
+       "label": "Payer : 40 AZN",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Les données de votre carte sont parties chez les escrocs. Appelez tout de suite la banque au numéro inscrit sur votre carte."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bien vu. Vous n’avez rien saisi : vérifiez maintenant l’amende sur le portail officiel."
+      }
+     ]
+    },
+    {
+     "id": "real-portal",
+     "label": "Amendes : aucune amende en cours",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "e-xidmet",
+      "url": [
+       {
+        "text": "https://e-xidmet.example/cerimeler",
+        "reveal": "e-xidmet.example"
+       }
+      ]
+     },
+     "say": "Vous avez ouvert le portail depuis vos favoris.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Voir les amendes",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Exact. Le portail officiel n’affiche aucune amende : le lien était donc faux."
+      },
+      {
+       "id": "tell-friend",
+       "label": "Prévenir votre ami",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Très bien. Dites à l’ami qui vous l’a envoyé de ne rien saisir sur cette page."
+      }
+     ]
+    },
+    {
+     "id": "benefit-page",
+     "label": "Aide aux familles : fin des inscriptions aujourd’hui",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "e-xidmet-fake",
+      "url": [
+       {
+        "text": "https://ailedestek-qeydiyyat.example.net",
+        "reveal": "ailedestek-qeydiyyat.example.net"
+       }
+      ]
+     },
+     "say": "Cette fois, une voisine vous a envoyé le lien d’une allocation.",
+     "actions": [
+      {
+       "id": "register",
+       "label": "S’inscrire",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Ce formulaire collecte les données de carte bancaire. Les allocations de l’État ne demandent jamais d’inscription par un lien."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Vérifiez toute allocation uniquement sur le portail officiel."
+      },
+      {
+       "id": "report",
+       "label": "Signaler le faux site",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Très bien. Votre signalement aide à faire bloquer le faux site pour les autres aussi."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "cp-match",
+   "prompt": "Associez ce que la page demande à ce que cela signifie.",
+   "pairs": [
+    {
+     "id": "pin",
+     "left": "Code PIN de la carte",
+     "right": "Aucune page de paiement ne le demande jamais"
+    },
+    {
+     "id": "sms-code",
+     "left": "Code SMS de votre banque",
+     "right": "Valide un paiement : lisez d’abord le montant"
+    },
+    {
+     "id": "benefit-cvv",
+     "left": "Code au dos de la carte pour recevoir une allocation",
+     "right": "Inutile pour recevoir de l’argent"
+    },
+    {
+     "id": "discount",
+     "left": "Une réduction si vous payez aujourd’hui",
+     "right": "Vous pousser à payer sans vérifier"
+    }
+   ],
+   "explain": "En cas de doute, ne payez pas. Vérifiez vous-même sur le portail officiel ou appelez la police au 102."
+  },
+  {
+   "type": "recap",
+   "id": "cp-recap",
+   "points": [
+    "Lisez la barre d’adresse : le logo et le cadenas ne prouvent rien.",
+    "Une page qui demande votre code PIN, ou le code de la carte pour une allocation, est fausse.",
+    "En cas de doute : ETX au 1654 ou police au 102."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

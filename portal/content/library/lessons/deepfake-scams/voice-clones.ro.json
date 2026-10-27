@@ -1,0 +1,445 @@
+{
+ "id": "voice-clones",
+ "title": "Voci clonate",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "few-seconds",
+     "say": "Inteligența artificială poate copia vocea unei persoane dintr-o înregistrare scurtă, uneori de doar câteva secunde.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "the-ask",
+     "say": "Un escroc vă sună cu vocea șefului sau a unei rude și vă cere urgent bani, un cod sau un document.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [ { "text": "Kamran Babayev" } ],
+       "number": [ { "text": "+994 70 000 18 42", "spot": "number" } ],
+       "label": "Mobil"
+      }
+     }
+    },
+    {
+     "id": "spoofed-number",
+     "say": "Și numărul poate fi falsificat. Numele și numărul de pe ecran nu sunt o dovadă.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [ { "text": "Kamran Babayev" } ],
+       "number": [ { "text": "+994 70 000 18 42", "spot": "number" } ],
+       "label": "Mobil"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "code-word",
+     "say": "Stabiliți un cuvânt secret de verificare cu familia și cu echipa. O voce falsă nu îl va ști.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "boss-call",
+   "title": "Un apel de la șef",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "Bună, sunt într-o ședință și nu pot vorbi mult. Trebuie să transferăm urgent 18.000 de manați unui contractor. Nu spune nimănui, îți explic mai târziu.",
+     "speaker": "Vocea lui Kamran Babayev",
+     "voice": "older-man",
+     "channel": "phone",
+     "spoken": "Bună, <breath> sunt într-o ședință și nu pot vorbi mult. Trebuie să transferăm urgent 18.000 de manați unui contractor. Nu spune nimănui, ăă, îți explic mai târziu.",
+     "character": "kamran",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [ { "text": "Kamran Babayev" } ],
+       "number": [ { "text": "+994 70 000 18 42", "spot": "number" } ],
+       "label": "Mobil"
+      }
+     },
+     "choices": [
+      {
+       "label": "Fac transferul imediat",
+       "outcome": "compromised",
+       "feedback": "Banii au ajuns la un escroc. Urgența și secretul la un loc sunt cel mai puternic semnal de alarmă."
+      },
+      {
+       "label": "Îi cer cuvântul de verificare",
+       "next": "pressure",
+       "feedback": "Bună idee. Să vedem ce răspunde."
+      },
+      {
+       "label": "Îi spun că îl sun eu înapoi",
+       "next": "callback",
+       "feedback": "Corect. Sunați la un număr pe care îl cunoașteți deja."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Ce cuvânt? N-am timp! Nu mă recunoști?",
+     "speaker": "Vocea lui Kamran Babayev",
+     "voice": "older-man",
+     "channel": "phone",
+     "spoken": "Ce cuvânt? N-am timp! <short pause> Nu mă recunoști?",
+     "character": "kamran",
+     "choices": [
+      {
+       "label": "Îmi cer scuze și fac transferul",
+       "outcome": "compromised",
+       "feedback": "Presiunea este principala armă a escrocului. Un șef adevărat înțelege nevoia unei verificări."
+      },
+      {
+       "label": "Închid și îl sun eu înapoi",
+       "next": "callback",
+       "feedback": "Corect. Fără cuvântul convenit, nu se face niciun transfer."
+      }
+     ]
+    },
+    {
+     "id": "callback",
+     "text": "Nu, nu te-am sunat deloc.",
+     "speaker": "Kamran Babayev (numărul din contactele dumneavoastră)",
+     "voice": "older-man",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Nu, <breath> nu te-am sunat deloc.",
+     "character": "kamran",
+     "choices": [
+      {
+       "label": "Raportez incidentul echipei de securitate",
+       "outcome": "safe",
+       "feedback": "Bravo. Echipa îi va avertiza și pe colegii dumneavoastră."
+      },
+      {
+       "label": "Nu spun nimănui, oricum nu s-au pierdut bani",
+       "outcome": "risky",
+       "feedback": "Escrocul va încerca la altcineva. Raportarea îi protejează pe toți."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "voice-message",
+   "prompt": "Găsiți semnalele de alarmă din această conversație.",
+   "artifact": {
+    "kind": "chat",
+    "app": "whatsapp",
+    "contact": [ { "text": "+994 55 000 40 17" } ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       { "text": "Salut, sunt eu, Elvin. " },
+       { "text": "Mi s-a stricat telefonul, acesta e numărul meu nou.", "spot": "new-number" }
+      ],
+      "time": "21:04"
+     },
+     {
+      "from": "them",
+      "body": [
+       { "text": "Sunt eu, Elvin. Mă auzi? Am dat de necaz, am nevoie urgent de ajutorul tău.", "spot": "voice" }
+      ],
+      "time": "21:04",
+      "voice": "young-man",
+      "manner": "natural",
+      "spoken": "Sunt eu, Elvin. <breath> Mă auzi? Am dat de necaz, am nevoie urgent de ajutorul tău."
+     },
+     {
+      "from": "them",
+      "body": [
+       { "text": "Am nevoie urgent de 600 de manați, chiar azi.", "spot": "urgent" },
+       { "text": " " },
+       { "text": "Te rog, nu le spune celor de acasă.", "spot": "secret" }
+      ],
+      "time": "21:05"
+     },
+     {
+      "from": "them",
+      "body": [
+       { "text": "Trimite banii pe cardul acesta, e al unui prieten.", "spot": "card" }
+      ],
+      "time": "21:05"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "new-number",
+     "label": "Număr nou",
+     "explain": "Povestea cu numărul nou vă împiedică să sunați la numărul vechi ca să verificați."
+    },
+    {
+     "id": "voice",
+     "label": "Mesaj vocal",
+     "explain": "Vocea poate părea cunoscută și totuși să fie falsă. O înregistrare scurtă este suficientă pentru a o copia."
+    },
+    {
+     "id": "urgent",
+     "label": "Bani ceruți urgent",
+     "explain": "O cerere urgentă de bani este semnul principal al unei înșelătorii."
+    },
+    {
+     "id": "secret",
+     "label": "Secretul",
+     "explain": "Rugămintea de a nu spune nimănui are rolul de a vă împiedica să verificați."
+    },
+    {
+     "id": "card",
+     "label": "Cardul altcuiva",
+     "explain": "Banii ajung pe cardul altcuiva. Așa se pierd urmele."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "relative-call",
+   "environment": "call",
+   "title": "Un apel de seară",
+   "intro": "Seara vă sună un număr necunoscut. Vocea vi se pare foarte cunoscută. Ce faceți?",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "caller": [ { "text": "Număr necunoscut" } ],
+      "number": [ { "text": "+994 50 000 73 26" } ],
+      "label": "Mobil",
+      "voice": "child"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Răspundeți",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Nu este periculos să răspundeți. Contează ce faceți mai departe."
+      },
+      {
+       "id": "decline",
+       "label": "Respingeți",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Și asta este în regulă. Dacă vă faceți griji, sunați chiar dumneavoastră ruda la numărul pe care îl cunoașteți.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "plea",
+     "artifact": {
+      "kind": "call",
+      "caller": [ { "text": "Număr necunoscut" } ],
+      "number": [ { "text": "+994 50 000 73 26" } ],
+      "label": "Mobil",
+      "voice": "child"
+     },
+     "say": "Alo, sunt eu, Narmin! Am avut un accident și m-a reținut poliția. Am nevoie acum de 900 de manați, nu le spune celor din familie!",
+     "spoken": "Alo, <breath> sunt eu, Narmin! Am avut un accident și poliția, ăă, m-a reținut. Am nevoie acum de 900 de manați, <breath> nu le spune celor din familie!",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Unde să trimit banii?",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Acordul imediat este exact ce îi trebuie escrocului. Verificați mai întâi."
+      },
+      {
+       "id": "code-word",
+       "label": "Care este cuvântul nostru secret?",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. O voce clonată nu va ști cuvântul convenit."
+      },
+      {
+       "id": "hang-up",
+       "label": "Închid și sun eu înapoi",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Corect. Sunați-o pe Narmin la numărul vechi, pe care îl cunoașteți.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "caller": [ { "text": "Număr necunoscut" } ],
+      "number": [ { "text": "+994 50 000 73 26" } ],
+      "label": "Mobil",
+      "voice": "child"
+     },
+     "say": "Ce cuvânt? Eu plâng și tu mă întrebi de un cuvânt! Poliția așteaptă, grăbește-te!",
+     "spoken": "Ce cuvânt? <breath> Eu plâng și tu mă întrebi de un cuvânt! Poliția așteaptă, <breath> grăbește-te!",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Bine, îți trimit banii",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Banii au ajuns la un escroc. Lacrimile și graba au rolul de a vă face să săriți peste verificare."
+      },
+      {
+       "id": "hang-up",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Corect. Fără cuvântul secret, nu există conversație."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Apelul s-a încheiat. Ce faceți acum?",
+     "artifact": {
+      "kind": "call",
+      "caller": [ { "text": "Număr necunoscut" } ],
+      "number": [ { "text": "+994 50 000 73 26" } ],
+      "label": "Mobil",
+      "voice": "child"
+     },
+     "actions": [
+      {
+       "id": "call-back",
+       "label": "Sunați la numărul vechi al lui Narmin",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Corect: Narmin este acasă și nu s-a întâmplat nimic. Avertizați și familia."
+      },
+      {
+       "id": "ignore",
+       "label": "Nu faceți nimic",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Escrocul poate suna din nou sau poate încerca la altă rudă. Anunțați familia."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "verify-steps",
+   "prompt": "Puneți în ordine pașii de după un apel suspect.",
+   "items": [
+    {
+     "id": "hang-up",
+     "label": "Închideți fără să promiteți nimic"
+    },
+    {
+     "id": "call-known",
+     "label": "Sunați chiar dumneavoastră la numărul din contacte"
+    },
+    {
+     "id": "confirm",
+     "label": "Întrebați dacă cererea este reală"
+    },
+    {
+     "id": "report",
+     "label": "Raportați incidentul echipei de securitate"
+    }
+   ],
+   "explain": "Dovada nu este pe ecran. Ea vine din al doilea apel, pe care îl inițiați chiar dumneavoastră."
+  },
+  {
+   "type": "match",
+   "id": "tricks",
+   "prompt": "Asociați fiecare truc cu reacția corectă.",
+   "pairs": [
+    {
+     "id": "boss-voice",
+     "left": "Transfer urgent cerut cu vocea șefului",
+     "right": "Sunați înapoi la un număr cunoscut"
+    },
+    {
+     "id": "new-number",
+     "left": "Numărul nou al unei rude",
+     "right": "Sunați la numărul vechi ca să verificați"
+    },
+    {
+     "id": "video-face",
+     "left": "O față cunoscută într-un apel video",
+     "right": "Cereți cuvântul de verificare"
+    },
+    {
+     "id": "keep-secret",
+     "left": "Rugămintea de a păstra secretul",
+     "right": "Anunțați întotdeauna încă o persoană"
+    }
+   ],
+   "explain": "Fiecare truc are o verificare simplă. Transformați-o în obișnuință."
+  },
+  {
+   "type": "choice",
+   "id": "exec-video",
+   "question": {
+    "prompt": "Într-un apel video, directorul vă cere să trimiteți un raport confidențial pe o adresă de e-mail personală. Ce faceți?",
+    "options": [
+     {
+      "id": "send",
+      "label": "Îl trimit, îl văd pe ecran",
+      "correct": false,
+      "feedback": "Imaginea poate fi falsă. O față nu este o dovadă."
+     },
+     {
+      "id": "verify",
+      "label": "Cer o confirmare separată printr-un canal oficial",
+      "correct": true,
+      "feedback": "Corect. Fișierele confidențiale se trimit doar prin canale oficiale, după confirmare."
+     },
+     {
+      "id": "wave",
+      "label": "Îi cer să-și fluture mâna prin fața camerei",
+      "correct": false,
+      "feedback": "Poate da de gol unele falsuri, dar nu este o verificare de încredere."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "ceo"
+    }
+   },
+   "explain": "Oricât de real ar părea apelul, verificați o cerere neobișnuită printr-un alt canal."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "O voce, o față sau un număr cunoscut nu sunt o dovadă.",
+    "Închideți și sunați înapoi la un număr pe care îl cunoașteți.",
+    "Stabiliți un cuvânt de verificare cu familia și cu echipa."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

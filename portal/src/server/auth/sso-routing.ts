@@ -20,7 +20,7 @@ export type SsoTenant = {
   autoCreate: boolean;
 };
 
-export type SsoPerson = { tenantId: string; role: Role; status: string };
+export type SsoPerson = { tenantId: string; role: Role };
 
 export type SignInStep = { step: "password" } | { step: "sso"; url: string };
 
@@ -37,9 +37,9 @@ export function ssoStartUrl(slug: string): string {
 
 /**
  * Single sign-on only for a proven domain with SSO switched on. Administrators and the other
- * privileged roles always use their password and two-step code. Unknown people on such a domain
- * go to the provider too (the callback refuses them unless it may create them), so the answer
- * does not tell whether an account exists.
+ * privileged roles always use their password and two-step code. Unknown and suspended people on
+ * such a domain go to the provider too (the callback refuses them unless it may create them), so
+ * the answer does not tell whether an account exists or is still active.
  */
 export function decideSignInStep(email: string, tenant: SsoTenant | null, person: SsoPerson | null): SignInStep {
   const password: SignInStep = { step: "password" };
@@ -47,9 +47,6 @@ export function decideSignInStep(email: string, tenant: SsoTenant | null, person
   if (!domain || !tenant) return password;
   if (!tenant.domain || tenant.domain.toLowerCase() !== domain || !tenant.domainVerifiedAt) return password;
   if (!tenant.ssoEnabled || !tenant.ssoFeature || !tenant.ssoReady) return password;
-  if (person) {
-    if (person.tenantId !== tenant.id || isPrivileged(person.role)) return password;
-    if (person.status !== "active" && person.status !== "invited") return password;
-  }
+  if (person && (person.tenantId !== tenant.id || isPrivileged(person.role))) return password;
   return { step: "sso", url: ssoStartUrl(tenant.slug) };
 }

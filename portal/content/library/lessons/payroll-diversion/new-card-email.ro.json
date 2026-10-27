@@ -1,0 +1,631 @@
+{
+ "id": "new-card-email",
+ "title": "Un număr de card nou",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pd1-tutor",
+   "beats": [
+    {
+     "id": "pd1-b1",
+     "say": "Bună ziua! Astăzi lucrați la resurse umane, iar mâine se plătesc salariile.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "pd1-b2",
+     "say": "Sosește un e-mail în numele unei angajate: „Mi s-a schimbat cardul, virați-mi salariul într-un cont nou”.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Leyla Mammadova"
+         }
+        ],
+        "address": [
+         {
+          "text": "leyla.mammadova.88@poct-mail.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Urgent: mi s-a schimbat cardul de salariu"
+        }
+       ],
+       "time": "16:40",
+       "body": [
+        [
+         {
+          "text": "Bună ziua, mi-am pierdut cardul vechi, iar banca l-a închis."
+         }
+        ],
+        [
+         {
+          "text": "Vă rog să virați salariul de mâine în acest cont: "
+         },
+         {
+          "text": "AZ00SAHL00000000000000004417",
+          "spot": "new-account"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "new-account"
+    },
+    {
+     "id": "pd1-b3",
+     "say": "Numele este cunoscut, dar adresa este o căsuță de e-mail personală. Un escroc vrea să primească salariul în propriul cont.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "pd1-b4",
+     "say": "Regula este simplă: nu schimbați niciodată datele bancare pe baza unui e-mail. Sunați angajatul la un număr pe care îl cunoașteți deja.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "pd1-hotspot",
+   "prompt": "Găsiți semnalele de alarmă din acest e-mail.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Leyla Mammadova"
+      }
+     ],
+     "address": [
+      {
+       "text": "leyla.mammadova.88@poct-mail.example.net",
+       "spot": "personal-address"
+      }
+     ]
+    },
+    "to": "kadr@seherxidmetleri.example",
+    "subject": [
+     {
+      "text": "Urgent: mi s-a schimbat cardul de salariu"
+     }
+    ],
+    "time": "16:40",
+    "body": [
+     [
+      {
+       "text": "Stimată echipă de resurse umane,"
+      }
+     ],
+     [
+      {
+       "text": "Mi-am pierdut cardul vechi, iar banca l-a închis."
+      }
+     ],
+     [
+      {
+       "text": "Vă rog să virați salariul de mâine în noul meu cont: ",
+       "spot": "new-account"
+      },
+      {
+       "text": "AZ00SAHL00000000000000004417",
+       "spot": "new-account"
+      }
+     ],
+     [
+      {
+       "text": "Astăzi nu sunt la birou, iar telefonul mi s-a stricat. Vă rog să îmi răspundeți doar aici.",
+       "spot": "no-call"
+      }
+     ],
+     [
+      {
+       "text": "Vă rog să rezolvați până mâine dimineață, trebuie să plătesc chiria.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "Leyla Mammadova, Departamentul Utilități"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "personal-address",
+     "label": "Adresă de e-mail personală",
+     "explain": "De obicei, angajații scriu de pe adresa de serviciu. Oricine își poate face o căsuță de e-mail personală pe orice nume."
+    },
+    {
+     "id": "new-account",
+     "label": "Cont nou",
+     "explain": "Acesta este adevăratul scop al e-mailului. Odată ce salariul ajunge acolo, este greu de recuperat."
+    },
+    {
+     "id": "no-call",
+     "label": "Nicio posibilitate de a suna",
+     "explain": "Acest rând este acolo ca să nu verificați. Tocmai de aceea sunați angajata la un număr pe care îl cunoașteți."
+    },
+    {
+     "id": "urgency",
+     "label": "Presiune",
+     "explain": "Presiunea chiar înainte de ziua de salariu este tipică pentru această înșelătorie. Un apel durează doar câteva minute."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "pd1-sim",
+   "environment": "inbox",
+   "title": "Căsuța de e-mail a resurselor umane",
+   "intro": "Este ziua dinaintea plății salariilor. Deschideți cele cinci e-mailuri și alegeți pasul corect pentru fiecare.",
+   "steps": [
+    {
+     "id": "fake-colleague",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-seher-xidmetleri",
+      "from": {
+       "name": [
+        {
+         "text": "Kamran Aliyev"
+        }
+       ],
+       "address": [
+        {
+         "text": "k.aliyev@seherxidmetleri-mail.example.net"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Actualizarea contului de salariu"
+       }
+      ],
+      "time": "09:12",
+      "body": [
+       [
+        {
+         "text": "Bună ziua, am schimbat banca."
+        }
+       ],
+       [
+        {
+         "text": "Vă rog să virați salariul pe septembrie în acest cont: AZ00ULDZ00000000000000007731"
+        }
+       ],
+       [
+        {
+         "text": "Formularul îl aduc mai târziu. Kamran Aliyev, Serviciul Transport"
+        }
+       ]
+      ]
+     },
+     "say": "Uitați-vă la domeniul expeditorului.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Domeniul nu este cel al organizației dumneavoastră: are un cuvânt în plus."
+      },
+      {
+       "id": "verify",
+       "label": "Sunați-l pe Kamran la un număr cunoscut",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Kamran vă va spune că nu a scris niciodată acest e-mail, iar dumneavoastră îl veți raporta."
+      },
+      {
+       "id": "change",
+       "label": "Răspundeți: contul a fost actualizat",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Salariul ar ajunge la escroc. Nu acceptați niciodată o schimbare a datelor bancare prin e-mail."
+      }
+     ]
+    },
+    {
+     "id": "system-request",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-kadr-kabineti",
+      "from": {
+       "name": [
+        {
+         "text": "Kadr Kabineti"
+        }
+       ],
+       "address": [
+        {
+         "text": "noreply@kabinet.seherxidmetleri.example"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Cerere nouă: modificarea datelor bancare, Ayten Huseynova"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Angajata a trimis această cerere din Kadr Kabineti, după ce s-a conectat folosind verificarea în doi pași."
+        }
+       ],
+       [
+        {
+         "text": "Verificați cererea în sistem: "
+        },
+        {
+         "text": "Vedeți cererea",
+         "link": {
+          "label": "Vedeți cererea",
+          "href": "https://kabinet.seherxidmetleri.example/sorgular/2187"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Vedeți cererea",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Corect. Adresa folosește domeniul organizației dumneavoastră, iar cererea a venit din interiorul sistemului."
+      },
+      {
+       "id": "safe",
+       "label": "Marcați ca sigur",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Corect. O cerere venită din sistemul oficial este canalul potrivit."
+      },
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Prudența este bună, dar acesta este chiar sistemul organizației dumneavoastră. Modificările datelor bancare trebuie să sosească exact pe această cale."
+      }
+     ]
+    },
+    {
+     "id": "portal-phish",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Kadr Kabineti"
+        }
+       ],
+       "address": [
+        {
+         "text": "kabinet@kadr-kabineti.example.net"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Parola dumneavoastră expiră astăzi"
+       }
+      ],
+      "time": "11:30",
+      "body": [
+       [
+        {
+         "text": "Accesul dumneavoastră la statul de plată va fi închis astăzi."
+        }
+       ],
+       [
+        {
+         "text": "Pentru a păstra accesul: "
+        },
+        {
+         "text": "Reînnoiți parola",
+         "link": {
+          "label": "Reînnoiți parola",
+          "href": "https://kadr-kabineti-giris.example.net/yenile"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Linkul nu duce la domeniul organizației dumneavoastră. Dacă nu aveți un buton de raportare, redirecționați e-mailul echipei de securitate."
+      },
+      {
+       "id": "click",
+       "label": "Reînnoiți parola",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Acesta este un portal fals. Cu un cont de resurse umane, un escroc poate schimba datele bancare ale tuturor angajaților."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Nu este rău. Dar dacă îl raportați, îi protejați și pe colegi."
+      }
+     ]
+    },
+    {
+     "id": "payroll-sheet",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-seher-xidmetleri",
+      "from": {
+       "name": [
+        {
+         "text": "Sabina Gasimova"
+        }
+       ],
+       "address": [
+        {
+         "text": "s.qasimova@seherxidmetleri.example"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Statul de plată pe septembrie: verificarea finală"
+       }
+      ],
+      "time": "12:15",
+      "body": [
+       [
+        {
+         "text": "Bună ziua, vă trimit atașat statul de plată. Vă rog să îl verificați până la 15:00. Sabina, Departamentul Financiar"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Stat_de_plata_2026_09.xlsx"
+         }
+        ],
+        "size": "96 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți atașamentul",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "Corect. O colegă cunoscută, domeniul organizației dumneavoastră și un fișier pe care îl așteptați."
+      },
+      {
+       "id": "forward",
+       "label": "Trimiteți-l pe e-mailul personal",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Statul de plată conține datele cu caracter personal ale tuturor angajaților. Nu trimiteți fișiere de serviciu într-o căsuță de e-mail personală."
+      },
+      {
+       "id": "safe",
+       "label": "Marcați ca sigur",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Corect. Aici nu există niciun cont nou și nicio presiune."
+      }
+     ]
+    },
+    {
+     "id": "real-address-odd",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "w2f-seher-xidmetleri",
+      "from": {
+       "name": [
+        {
+         "text": "Narmin Safarova"
+        }
+       ],
+       "address": [
+        {
+         "text": "n.seferova@seherxidmetleri.example"
+        }
+       ]
+      },
+      "to": "kadr@seherxidmetleri.example",
+      "subject": [
+       {
+        "text": "Cont nou"
+       }
+      ],
+      "time": "14:48",
+      "body": [
+       [
+        {
+         "text": "Virați-mi salariul în acest cont: AZ00SAHL00000000000000009260"
+        }
+       ],
+       [
+        {
+         "text": "Nu mă sunați, sunt în ședințe toată ziua."
+        }
+       ]
+      ]
+     },
+     "say": "Adresa este reală. Totuși, nu lăsați garda jos.",
+     "actions": [
+      {
+       "id": "verify",
+       "label": "Sunați-o la numărul ei interior",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. O căsuță de e-mail poate fi preluată de altcineva, dar adevărata Narmin răspunde la numărul pe care îl cunoașteți."
+      },
+      {
+       "id": "ask",
+       "label": "Răspundeți: chiar dumneavoastră ați scris?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Dacă cineva a preluat căsuța, tot escrocul scrie și răspunsul. Doar un apel este o verificare reală."
+      },
+      {
+       "id": "safe",
+       "label": "Marcați ca sigur",
+       "kind": "mark-safe",
+       "outcome": "compromised",
+       "feedback": "Adresa este reală, dar contul poate fi preluat de altcineva. Confirmați întotdeauna telefonic schimbarea datelor bancare."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "pd1-match",
+   "prompt": "Asociați fiecare cerere cu modul corect de verificare.",
+   "pairs": [
+    {
+     "id": "mail-account",
+     "left": "Cont bancar nou într-un e-mail",
+     "right": "Sunați angajatul la un număr cunoscut"
+    },
+    {
+     "id": "system-request",
+     "left": "Cerere în Kadr Kabineti",
+     "right": "Verificați-o în sistem, iar dacă aveți dubii, sunați"
+    },
+    {
+     "id": "password-link",
+     "left": "Link pentru reînnoirea parolei",
+     "right": "Tastați chiar dumneavoastră adresa portalului"
+    },
+    {
+     "id": "phone-request",
+     "left": "Un angajat sună ca să-și schimbe contul",
+     "right": "Rugați-l să trimită cererea prin Kadr Kabineti"
+    }
+   ],
+   "explain": "Orice modificare se confirmă în sistem sau printr-un canal ales de dumneavoastră. Un număr sau un link din e-mail nu înseamnă verificare."
+  },
+  {
+   "type": "scenario",
+   "id": "pd1-scenario",
+   "title": "Salariul nu a sosit",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Bună ziua, astăzi salariul nu mi-a intrat pe card. Eu nu am cerut niciodată să-mi schimb contul!",
+     "speaker": "Leyla Mammadova",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Bună ziua, astăzi salariul nu mi-a intrat pe card. <breath> Eu nu am cerut niciodată să-mi schimb contul!",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2f-seher-xidmetleri",
+       "caller": [
+        {
+         "text": "Leyla Mammadova"
+        }
+       ],
+       "number": [
+        {
+         "text": "Interior 4107"
+        }
+       ],
+       "label": "Apel intern"
+      }
+     },
+     "choices": [
+      {
+       "label": "Contabilitatea sună la bancă, iar eu raportez cazul echipei de securitate",
+       "next": "n2",
+       "feedback": "Corect. Cu cât raportați mai repede, cu atât sunt mai mari șansele de a recupera banii."
+      },
+      {
+       "label": "Schimb contul înapoi, fără să spun nimănui",
+       "outcome": "risky",
+       "feedback": "Greșeala trebuie corectată, nu ascunsă. Banca poate încerca să oprească transferul, iar echipa de securitate investighează ce s-a întâmplat."
+      },
+      {
+       "label": "Îi spun că a scris chiar ea e-mailul",
+       "outcome": "risky",
+       "feedback": "Leyla nu a scris acel e-mail. Important este să opriți paguba, nu să găsiți un vinovat."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Nu ștergeți e-mailul, redirecționați-mi-l. Au mai fost și alte modificări ale datelor bancare săptămâna aceasta?",
+     "speaker": "Fidan Rzayeva, echipa de securitate",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "firm",
+     "spoken": "Nu ștergeți e-mailul, redirecționați-mi-l. <breath> Au mai fost și alte modificări ale datelor bancare săptămâna aceasta?",
+     "choices": [
+      {
+       "label": "Redirecționez e-mailul și verific toate modificările din această săptămână",
+       "outcome": "safe",
+       "feedback": "Foarte bine. De obicei, escrocii scriu în numele mai multor angajați."
+      },
+      {
+       "label": "L-am șters deja, nu mai e nevoie de el",
+       "outcome": "risky",
+       "feedback": "E-mailul este o dovadă. Dacă l-ați șters, recuperați-l din „Elemente șterse” și redirecționați-l."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "pd1-recap",
+   "points": [
+    "Datele bancare nu se schimbă niciodată prin e-mail.",
+    "Sunați angajatul la un număr pe care îl cunoașteți.",
+    "Dacă aveți dubii, suspendați plata și raportați cazul."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

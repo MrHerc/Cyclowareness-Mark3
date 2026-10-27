@@ -25,7 +25,7 @@ const CHANNELS: { key: Channel; icon: typeof Mail }[] = [
 /** A draft or scheduled campaign reopened for editing; the wizard starts on the review step. */
 export type WizardInitial = { id: string; name: string; templateKey: string; channel: Channel; audience: "all" | "department"; departmentId: string | null; scheduledAt: string | null };
 
-export function CampaignWizard({ departments, smsVoice, initial }: { departments: { id: string; name: string; people: number }[]; smsVoice: boolean; initial?: WizardInitial }) {
+export function CampaignWizard({ departments, smsVoice, qrTrap, initial }: { departments: { id: string; name: string; people: number }[]; smsVoice: boolean; qrTrap: boolean; initial?: WizardInitial }) {
   const t = useTranslations("admin.campaigns");
   const tw = useTranslations("admin.campaigns.wizard");
   const tc = useTranslations("common");
@@ -46,7 +46,9 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
   const [now, setNow] = useState(0);
   const [name, setName] = useState(initial?.name ?? "");
   const [pending, start] = useTransition();
-  const templates = useMemo(() => TEMPLATES.filter((x) => x.channel === channel), [channel]);
+  // QR traps only on a plan with the qr_trap feature (the server refuses them otherwise).
+  const offered = useMemo(() => TEMPLATES.filter((x) => qrTrap || !x.qr), [qrTrap]);
+  const templates = useMemo(() => offered.filter((x) => x.channel === channel), [offered, channel]);
   const tpl = TEMPLATES.find((x) => x.key === templateKey) ?? null;
   const dept = departments.find((d) => d.id === departmentId);
   const scheduledAt = when === "date" && date ? fromBakuParts(date, time || "10:00") : null;
@@ -62,7 +64,7 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
   ].filter(Boolean) as { step: number; label: string; value: string }[];
 
   const card = (active: boolean, disabled = false) =>
-    cn("flex w-full items-start gap-4 rounded-xl border-2 bg-surface p-4 text-left transition-colors", active ? "border-brand-600 bg-brand-50/60" : "border-line hover:border-brand-300", disabled && "pointer-events-none opacity-50");
+    cn("flex w-full items-start gap-4 rounded-xl border-2 bg-surface p-4 text-start transition-colors", active ? "border-brand-600 bg-brand-50/60" : "border-line hover:border-brand-300", disabled && "pointer-events-none opacity-50");
 
   return (
     <div className="grid gap-5">
@@ -89,7 +91,7 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
                   <span className="min-w-0 flex-1">
                     <span className="block text-body-sm font-semibold">{t(`channel.${key}`)}</span>
                     <span className="block text-caption text-ink-muted">{t(`channelBody.${key}`)}</span>
-                    <span className="mt-1 block text-tab text-ink-subtle">{t("templates", { count: TEMPLATES.filter((x) => x.channel === key).length })}</span>
+                    <span className="mt-1 block text-tab text-ink-subtle">{t("templates", { count: offered.filter((x) => x.channel === key).length })}</span>
                   </span>
                   {channel === key ? <Check className="size-5 text-brand-600" /> : null}
                 </button>
@@ -197,7 +199,7 @@ export function CampaignWizard({ departments, smsVoice, initial }: { departments
             ].map(([k, val, s]) => (
               <div key={String(s)} className="flex items-center justify-between gap-3 border-b border-line py-2 last:border-0">
                 <dt className="text-ink-muted">{k}</dt>
-                <dd className="flex min-w-0 items-center gap-3 text-right font-semibold">
+                <dd className="flex min-w-0 items-center gap-3 text-end font-semibold">
                   <span className="min-w-0 break-words">{val}</span>
                   <button type="button" className="-mx-2 inline-flex min-h-10 shrink-0 items-center px-2 text-tab text-brand-600 hover:underline" onClick={() => setStep(Number(s))}>
                     {tw("change")}

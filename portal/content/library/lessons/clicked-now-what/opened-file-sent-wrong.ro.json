@@ -1,0 +1,518 @@
+{
+ "id": "opened-file-sent-wrong",
+ "title": "Fișiere și destinatari greșiți",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Ați deschis un fișier suspect sau ați trimis date cui nu trebuia? Păstrați-vă calmul, pașii sunt puțini și simpli.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Ați deschis fișierul? Opriți Wi-Fi-ul și scoateți cablul de rețea. Lăsați computerul pornit, dacă procedura dumneavoastră nu prevede altceva.",
+     "mood": "alert",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Nu ștergeți fișierul sau e-mailul: din ele, specialiștii află ce a făcut atacul.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "file",
+       "name": [
+        {
+         "text": "Act_de_semnat"
+        },
+        {
+         "text": ".docm",
+         "spot": "ext"
+        }
+       ],
+       "type": "doc",
+       "size": "84 KB",
+       "source": [
+        {
+         "text": "n.ismayilov@tender-akt.example.net"
+        }
+       ]
+      }
+     },
+     "highlight": "ext"
+    },
+    {
+     "id": "b4",
+     "say": "Raportați la telefon, nu de pe computerul infectat. Și nu ascundeți niciodată datele trimise cui nu trebuia.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "file-opened",
+   "environment": "desktop",
+   "title": "Ați deschis fișierul",
+   "intro": "Ați deschis atașamentul „Act_de_semnat” și ați permis macrocomenzile. Acum se întâmplă lucruri ciudate.",
+   "steps": [
+    {
+     "id": "av-alert",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "qoruyucu",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Amenințare detectată"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "În Act_de_semnat.docm a fost găsită o macrocomandă rău intenționată. Curățarea nu s-a finalizat."
+        }
+       ]
+      ],
+      "buttons": [
+       "Închideți",
+       "Detalii"
+      ]
+     },
+     "say": "Antivirusul afișează o alertă.",
+     "actions": [
+      {
+       "id": "disconnect",
+       "label": "Opriți Wi-Fi-ul, scoateți cablul",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Corect. Deconectat de la rețea, computerul nu mai poate extinde paguba și nici nu mai poate trimite date în exterior."
+      },
+      {
+       "id": "keep-working",
+       "label": "Închideți și lucrați mai departe",
+       "kind": "cancel",
+       "outcome": "compromised",
+       "feedback": "Curățarea nu s-a finalizat, deci programul poate rula în continuare. Fiecare minut îl ajută să se răspândească."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți fișierul",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Ștergerea distruge dovezile și nu oprește ce a rulat deja. Mai întâi deconectați dispozitivul de la rețea."
+      }
+     ]
+    },
+    {
+     "id": "fake-helper",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "texkomek-24",
+      "app": "TexKömək 24",
+      "title": [
+       {
+        "text": "Computerul dumneavoastră este infectat"
+       }
+      ],
+      "body": [
+       {
+        "text": "Acordați acces la distanță aplicației TexKömək 24 pentru curățare imediată."
+       }
+      ],
+      "time": "10:07"
+     },
+     "say": "O notificare vă oferă ajutor.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Permiteți accesul la distanță",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Accesul la distanță pentru o aplicație necunoscută îi dă atacatorului tot computerul. Ajutorul vine doar de la suportul IT al organizației dumneavoastră."
+      },
+      {
+       "id": "deny",
+       "label": "Refuzați",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Nu încercați să îl curățați pe cont propriu; așteptați echipa de securitate."
+      }
+     ]
+    },
+    {
+     "id": "keep-evidence",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Act_de_semnat.docm"
+       }
+      ],
+      "type": "doc",
+      "size": "84 KB",
+      "source": [
+       {
+        "text": "Descărcări"
+       }
+      ]
+     },
+     "say": "Fișierul este încă în folderul Descărcări.",
+     "actions": [
+      {
+       "id": "reopen",
+       "label": "Deschideți din nou",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "La fiecare deschidere, macrocomanda poate rula din nou. Nu atingeți fișierul."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Echipa de securitate are nevoie de fișier ca să afle ce a făcut. Nu-l ștergeți."
+      },
+      {
+       "id": "leave",
+       "label": "Lăsați-l așa cum este",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Corect. Fișierul este o dovadă; echipa de securitate îl va examina în condiții sigure."
+      }
+     ]
+    },
+    {
+     "id": "reconnect",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Nicio conexiune la rețea"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Wi-Fi-ul este oprit. Doriți să vă reconectați la rețea?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Rămâneți offline",
+       "Reconectați"
+      ]
+     },
+     "say": "Doriți să vă verificați e-mailul, dar nu aveți conexiune la rețea.",
+     "actions": [
+      {
+       "id": "connect",
+       "label": "Reconectați",
+       "kind": "connect",
+       "outcome": "risky",
+       "feedback": "Rămâneți offline până vă spune echipa de securitate: programul v-ar putea cripta fișierele sau s-ar putea răspândi."
+      },
+      {
+       "id": "stay",
+       "label": "Rămâneți offline",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Corect. Acum sunați echipa de securitate de pe telefon și spuneți ce ați deschis."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "power-off",
+   "question": {
+    "prompt": "Computerul este infectat și deconectat de la rețea. Ar trebui să îl opriți?",
+    "options": [
+     {
+      "id": "leave-on",
+      "label": "Nu, îl las pornit, dacă procedura noastră nu prevede altceva",
+      "correct": true,
+      "feedback": "Corect. Urmele din memorie sunt importante pentru specialiști."
+     },
+     {
+      "id": "shut",
+      "label": "Da, îl opresc imediat",
+      "correct": false,
+      "feedback": "Oprirea șterge urmele din memorie. Deconectarea de la rețea oprește deja răspândirea."
+     },
+     {
+      "id": "keep-working",
+      "label": "Nu, lucrez mai departe pe el",
+      "correct": false,
+      "feedback": "Dacă lucrați pe un computer infectat, vă puneți în pericol parolele și fișierele."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "alarm"
+    }
+   },
+   "explain": "Deconectați dispozitivul de la rețea, lăsați-l pornit, raportați la telefon. Dacă procedura organizației dumneavoastră este alta, respectați-o."
+  },
+  {
+   "type": "order",
+   "id": "after-file",
+   "prompt": "Ați deschis un fișier suspect. Puneți pașii în ordine.",
+   "items": [
+    {
+     "id": "isolate",
+     "label": "Deconectați computerul de la rețea"
+    },
+    {
+     "id": "call",
+     "label": "Sunați echipa de securitate de pe telefon"
+    },
+    {
+     "id": "tell",
+     "label": "Spuneți exact ce ați deschis și când"
+    },
+    {
+     "id": "passwords",
+     "label": "Schimbați-vă parolele de pe alt dispozitiv, curat"
+    }
+   ],
+   "explain": "Nu schimbați niciodată parolele pe computerul infectat: programul le-ar putea citi și pe cele noi."
+  },
+  {
+   "type": "scenario",
+   "id": "wrong-recipient",
+   "title": "Destinatar greșit",
+   "start": "sent",
+   "nodes": [
+    {
+     "id": "sent",
+     "text": "Ați trimis lista la o adresă externă cu același nume, în loc de colegul dumneavoastră Kamran. Lista conține numele și numerele de telefon ale unor cetățeni.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "idare",
+       "from": {
+        "name": [
+         {
+          "text": "Eu"
+         }
+        ],
+        "address": [
+         {
+          "text": "r.mammadli@idare.example"
+         }
+        ]
+       },
+       "to": "kamran.h@poct-mail.example",
+       "subject": [
+        {
+         "text": "Solicitările cetățenilor: lista"
+        }
+       ],
+       "time": "15:20",
+       "body": [
+        [
+         {
+          "text": "Kamran, găsești lista în atașament."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Cereri_septembrie.xlsx"
+          }
+         ],
+         "size": "240 KB"
+        }
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "Îi anunț imediat pe managerul meu și pe echipa de securitate",
+       "next": "advice",
+       "feedback": "Corect. Dacă s-au scurs date cu caracter personal, organizația trebuie să afle la timp."
+      },
+      {
+       "label": "Nu spun nimănui, poate nu-l deschide",
+       "outcome": "compromised",
+       "feedback": "Dacă scurgerea de date rămâne ascunsă, organizația nu poate face nimic ca să îi protejeze pe cetățeni."
+      },
+      {
+       "label": "Doar îi cer destinatarului să-l șteargă, atât",
+       "outcome": "risky",
+       "feedback": "Rugămintea ajută, dar organizația tot trebuie să afle de scurgerea de date."
+      }
+     ]
+    },
+    {
+     "id": "advice",
+     "text": "Scrieți-i politicos destinatarului, rugați-l să șteargă fișierul și să vă confirme.",
+     "speaker": "Echipa de securitate",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Scrieți-i politicos destinatarului, <breath> rugați-l să șteargă fișierul și să vă confirme.",
+     "choices": [
+      {
+       "label": "Îi scriu și îi trimit specialistului răspunsul primit",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Confirmarea scrisă dovedește că scurgerea de date a fost ținută sub control."
+      },
+      {
+       "label": "Retrimit fișierul lui Kamran și uit de asta",
+       "outcome": "risky",
+       "feedback": "E bine că îl trimiteți persoanei potrivite, dar copia de la adresa greșită rămâne acolo."
+      },
+      {
+       "label": "Șterg e-mailul trimis, ca să nu rămână nicio urmă",
+       "outcome": "risky",
+       "feedback": "E-mailul trimis arată ce a plecat, unde și când. Păstrați-l."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "colleague-reactions",
+   "prompt": "Este corectă această reacție?",
+   "cards": [
+    {
+     "id": "farid",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Farid"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Am deschis un fișier ciudat. Am oprit Wi-Fi-ul și sun acum la securitate."
+         }
+        ],
+        "time": "10:15"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Corect: întâi deconectarea de la rețea, apoi raportarea la telefon."
+    },
+    {
+     "id": "leyla",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Leyla"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Am deschis fișierul, apoi l-am șters. Nu o să afle nimeni."
+         }
+        ],
+        "time": "11:02"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ștergerea distruge urmele, iar ascunderea îi dă timp atacului."
+    },
+    {
+     "id": "elvin",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Elvin"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Mi-a apărut un virus, așa că am descărcat de pe internet un program gratuit de curățare."
+         }
+        ],
+        "time": "12:30"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Programele instalate pe cont propriu pot șterge urmele și pot aduce malware nou."
+    },
+    {
+     "id": "narmin",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Narmin"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Am trimis din greșeală un document la o adresă externă. I-am anunțat imediat pe managerul meu și pe cei de la securitate."
+         }
+        ],
+        "time": "15:45"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Corect. Un raport rapid limitează pagubele."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Ați deschis un fișier periculos? Deconectați dispozitivul de la rețea, lăsați-l pornit dacă procedura nu prevede altceva și raportați la telefon.",
+    "Nu ștergeți fișierul sau e-mailul și nu încercați să curățați computerul pe cont propriu.",
+    "Ați trimis ceva cui nu trebuia? Nu ascundeți ce s-a întâmplat: anunțați imediat managerul și echipa de securitate."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

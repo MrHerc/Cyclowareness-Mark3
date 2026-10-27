@@ -1,0 +1,419 @@
+{
+  "id": "autofill-right-site",
+  "title": "როცა ავტომატური შევსება დუმს",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "პაროლების მენეჯერი ყალბ საიტს თქვენზე უკეთ ამოიცნობს: ის მისამართს ასო-ასო ამოწმებს.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "თუ მისამართი ოდნავ მაინც განსხვავდება, მენეჯერი პაროლს არ შემოგთავაზებთ. სწორედ ეს არის თქვენთვის საგანგაშო ნიშანი.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "idare-fake",
+              "url": [
+                {
+                  "text": "https://portal."
+                },
+                {
+                  "text": "idare-giris.example.net",
+                  "spot": "lookalike"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "lookalike"
+        },
+        {
+          "id": "b3",
+          "say": "არ დააკოპიროთ პაროლი საცავიდან და თავად არ ჩასვათ ის. ჯერ მისამართი შეამოწმეთ.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "უარყავით დადასტურების ნებისმიერი მოთხოვნა, რომელსაც არ ელოდით: ეს ნიშნავს, რომ თქვენი პაროლი ვიღაცისთვის უკვე ცნობილია.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "autofill-check",
+      "environment": "browser",
+      "title": "გამოცადეთ ავტომატური შევსება",
+      "intro": "ParolSeyf თქვენს ბრაუზერში მუშაობს. ყველა გვერდზე დააკვირდით, რას გთავაზობთ ParolSeyf, და მისამართი შეამოწმეთ.",
+      "steps": [
+        {
+          "id": "real-portal",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "idare",
+            "brand": "ოფისის პორტალი",
+            "url": [
+              {
+                "text": "https://portal.idare.example/giris",
+                "reveal": "idare.example"
+              }
+            ],
+            "fields": [
+              "მომხმარებლის სახელი",
+              "პაროლი"
+            ],
+            "button": "შესვლა"
+          },
+          "say": "ParolSeyf თქვენს შესვლის მონაცემებს გთავაზობთ. შეამოწმეთ მისამართი.",
+          "actions": [
+            {
+              "id": "fill",
+              "label": "ParolSeyf-ით შევსება",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "სწორია. მისამართი შენახულ მონაცემებს ემთხვევა, ამიტომაც შემოგთავაზათ ისინი მენეჯერმა."
+            },
+            {
+              "id": "close",
+              "label": "ჩანართის დახურვა",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "სიფრთხილე კარგია, მაგრამ ეს ნამდვილი ოფისის პორტალია და მენეჯერმა ის ამოიცნო."
+            }
+          ]
+        },
+        {
+          "id": "lookalike",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "idare-fake",
+            "brand": "ოფისის პორტალი",
+            "url": [
+              {
+                "text": "https://portal.idare-giris.example.net/giris",
+                "reveal": "idare-giris.example.net"
+              }
+            ],
+            "fields": [
+              "მომხმარებლის სახელი",
+              "პაროლი"
+            ],
+            "button": "შესვლა"
+          },
+          "say": "ეს გვერდი წერილში მოცემული ბმულით გაიხსნა. ParolSeyf დუმს.",
+          "actions": [
+            {
+              "id": "type",
+              "label": "პაროლის ხელით აკრეფა",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "მენეჯერი იმიტომ დუმდა, რომ ეს ყალბი საიტია. ახლავე შეცვალეთ პაროლი ნამდვილ პორტალზე და შეატყობინეთ უსაფრთხოების სამსახურს.",
+              "next": "fake-vault"
+            },
+            {
+              "id": "search",
+              "label": "ParolSeyf-ში მოძებნა და შევსება",
+              "kind": "allow",
+              "outcome": "risky",
+              "feedback": "მენეჯერი ამ საიტს ვერ ცნობს და ამას თავისი მიზეზი აქვს. სანამ გააგრძელებთ, მისამართი წაიკითხეთ."
+            },
+            {
+              "id": "close",
+              "label": "ჩანართის დახურვა",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "სწორია. დომენი idare-giris.example.net იყო და არა ოფისის პორტალის.",
+              "next": "fake-vault"
+            },
+            {
+              "id": "report",
+              "label": "საიტის შესახებ შეტყობინება",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "შესანიშნავია. ამით კოლეგებს იმავე ბმულისგან დაიცავთ.",
+              "next": "fake-vault"
+            }
+          ]
+        },
+        {
+          "id": "mismatch",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "system",
+            "title": [
+              {
+                "text": "ParolSeyf: საიტი არ ემთხვევა"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "შენახული მისამართი: portal.idare.example"
+                }
+              ],
+              [
+                {
+                  "text": "ეს გვერდი: portal.idare-giris.example.net"
+                }
+              ]
+            ],
+            "buttons": [
+              "გაუქმება",
+              "მაინც შევსება"
+            ]
+          },
+          "actions": [
+            {
+              "id": "cancel",
+              "label": "გაუქმება",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "სწორია, მენეჯერმა განსხვავება თქვენს ნაცვლად შეამჩნია. დახურეთ გვერდი და უსაფრთხოების სამსახურს შეატყობინეთ."
+            },
+            {
+              "id": "fill",
+              "label": "მაინც შევსება",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "გაფრთხილების უგულებელყოფით თქვენი პაროლი ყალბი საიტის ხელში აღმოჩნდა. ახლავე შეცვალეთ ის და შეატყობინეთ უსაფრთხოების სამსახურს."
+            }
+          ]
+        },
+        {
+          "id": "fake-vault",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "parolseyf-fake",
+            "brand": "ParolSeyf",
+            "url": [
+              {
+                "text": "https://parolseyf-giris.example.net/seyf",
+                "reveal": "parolseyf-giris.example.net"
+              }
+            ],
+            "fields": [
+              "ელფოსტა",
+              "მთავარი პაროლი"
+            ],
+            "button": "საცავის გახსნა"
+          },
+          "say": "წერილში მოცემულმა ბმულმა საცავში შესვლის გვერდზე გადაგიყვანათ.",
+          "actions": [
+            {
+              "id": "type",
+              "label": "საცავის გახსნა",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "მთავარი პაროლი მხოლოდ თავად ParolSeyf-ის აპლიკაციაში აკრიფეთ. ამ საიტს თქვენი მთელი საცავი სურდა."
+            },
+            {
+              "id": "close",
+              "label": "ჩანართის დახურვა",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "სწორია. საცავის გასახსნელად აპლიკაცია თავად გაუშვით და არასოდეს გახსნათ ის ბმულით."
+            },
+            {
+              "id": "report",
+              "label": "საიტის შესახებ შეტყობინება",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "შესანიშნავია. ამ საიტის ბმული შეიძლება რამდენიმე ადამიანს გაუგზავნეს."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "vault-lure",
+      "prompt": "დააჭირეთ ნიშნებს, რომლებიც ამ წერილის სიყალბეზე მიუთითებს.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "parolseyf-fake",
+        "from": {
+          "name": [
+            {
+              "text": "ParolSeyf"
+            }
+          ],
+          "address": [
+            {
+              "text": "security@parolseyf-alert.example.net",
+              "spot": "sender"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "თქვენი საცავი 24 საათში წაიშლება",
+            "spot": "deadline"
+          }
+        ],
+        "time": "07:58",
+        "body": [
+          [
+            {
+              "text": "უსაფრთხოების განახლებისთვის "
+            },
+            {
+              "text": "დაადასტურეთ თქვენი მთავარი პაროლი",
+              "spot": "ask-master"
+            },
+            {
+              "text": "."
+            }
+          ],
+          [
+            {
+              "text": "დადასტურება: "
+            },
+            {
+              "text": "parolseyf-alert.example.net/tesdiq",
+              "spot": "link",
+              "link": {
+                "label": "parolseyf-alert.example.net/tesdiq",
+                "href": "https://parolseyf-alert.example.net/tesdiq"
+              }
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender",
+          "label": "გამგზავნი",
+          "explain": "მისამართი ParolSeyf-ის მისამართს მხოლოდ ჰგავს. ეს მისი დომენი არ არის."
+        },
+        {
+          "id": "deadline",
+          "label": "ვადა",
+          "explain": "24-საათიანი მუქარა იმისთვისაა, რომ დაფიქრება ვერ მოასწროთ."
+        },
+        {
+          "id": "ask-master",
+          "label": "მთავარი პაროლის მოთხოვნა",
+          "explain": "ელფოსტით მთავარი პაროლის დადასტურებას არცერთი სერვისი არ მოითხოვს."
+        },
+        {
+          "id": "link",
+          "label": "ბმული",
+          "explain": "ბმული ყალბ დომენზე მიდის. საცავი თავად გახსენით აპლიკაციიდან."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "unexpected-push",
+      "question": {
+        "prompt": "ღამით ParolSeyf-ისგან შესვლის დადასტურების მოთხოვნა მოგივიდათ, თქვენ კი არსად შედიხართ. რას გააკეთებთ?",
+        "options": [
+          {
+            "id": "deny",
+            "label": "უარვყოფ და უსაფრთხოების სამსახურს ვატყობინებ",
+            "correct": true,
+            "feedback": "სწორია. თქვენი მთავარი პაროლი ვიღაცისთვის უკვე ცნობილია: ახლავე შეცვალეთ ის და სთხოვეთ უსაფრთხოების სამსახურს სესიების შემოწმება."
+          },
+          {
+            "id": "approve",
+            "label": "ვადასტურებ, რომ მოთხოვნები შეწყდეს",
+            "correct": false,
+            "feedback": "ამას push-შეტყობინებებით დაბომბვა ჰქვია. ერთი დადასტურებაც საკმარისია, რომ თავდამსხმელი საცავში შევიდეს."
+          },
+          {
+            "id": "ignore",
+            "label": "ყურადღებას არ ვაქცევ და დილით ვნახავ",
+            "correct": false,
+            "feedback": "მოთხოვნა ღია რჩება, თქვენი მთავარი პაროლი კი უკვე ვიღაცას აქვს. ახლავე უარყავით და უსაფრთხოების სამსახურს შეატყობინეთ."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "parolseyf",
+            "app": "ParolSeyf",
+            "title": [
+              {
+                "text": "დაადასტურებთ შესვლას?"
+              }
+            ],
+            "body": [
+              {
+                "text": "ახალი მოწყობილობა: Windows, 23:47"
+              }
+            ],
+            "time": "23:47"
+          }
+        }
+      },
+      "explain": "დადასტურების მოულოდნელი მოთხოვნა ნიშნავს, რომ თქვენი პაროლი გაჟონილია. უარყავით, შეატყობინეთ, შეცვალეთ."
+    },
+    {
+      "type": "match",
+      "id": "autofill-rules",
+      "prompt": "დააკავშირეთ თითოეული სიტუაცია სწორ ნაბიჯთან.",
+      "pairs": [
+        {
+          "id": "silent",
+          "left": "მენეჯერი პაროლს არ გთავაზობთ",
+          "right": "შეამოწმეთ მისამართი, პაროლი არ დააკოპიროთ"
+        },
+        {
+          "id": "link",
+          "left": "წერილში გთხოვენ, ბმულით გახსნათ საცავი",
+          "right": "აპლიკაცია თავად გახსენით"
+        },
+        {
+          "id": "shared-pc",
+          "left": "სხვის კომპიუტერთან ხართ",
+          "right": "იქ თქვენი საცავი არ გახსნათ"
+        },
+        {
+          "id": "push",
+          "left": "დადასტურების მოთხოვნა, რომელსაც არ ელოდით",
+          "right": "უარყავით და შეატყობინეთ"
+        }
+      ],
+      "explain": "მისამართს მენეჯერი ამოწმებს, თქვენ კი ჩერდებით, როგორც კი ის დადუმდება."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "თუ მენეჯერი პაროლს არ გთავაზობთ, შეჩერდით და მისამართი შეამოწმეთ.",
+        "მთავარი პაროლი მხოლოდ მენეჯერის საკუთარ აპლიკაციაში აკრიფეთ და არასოდეს შეიყვანოთ ბმულით გახსნილ გვერდზე.",
+        "უარყავით დადასტურების მოთხოვნები, რომლებსაც არ ელოდით, და შეატყობინეთ მათ შესახებ."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

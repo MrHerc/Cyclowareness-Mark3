@@ -1,0 +1,423 @@
+{
+ "id": "update-turns",
+ "title": "L’extension qui a changé",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ut-tutor",
+   "beats": [
+    {
+     "id": "ut-b1",
+     "say": "Une extension peut fonctionner honnêtement pendant des années. Puis son propriétaire change, et une seule mise à jour en fait un espion.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "ut-b2",
+     "say": "Des mises à jour de ce genre ont atteint automatiquement des millions de navigateurs. Les utilisateurs n’ont rien remarqué.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "4,3 millions",
+      "label": "d’appareils sur lesquels des extensions utilisées en confiance depuis longtemps sont devenues des logiciels espions en 2025"
+     }
+    },
+    {
+     "id": "ut-b3",
+     "say": "Méfiez-vous si une extension demande soudain de nouvelles autorisations, si votre moteur de recherche a changé ou si les publicités se sont multipliées.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2c-pdf-ustasi",
+       "tone": "app",
+       "title": [
+        {
+         "text": "L’extension PDF Ustası a été désactivée"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "La nouvelle version demande davantage d’autorisations :"
+         }
+        ],
+        [
+         {
+          "text": "Lire et modifier toutes vos données sur tous les sites web",
+          "spot": "new-perm"
+         }
+        ]
+       ],
+       "buttons": [
+        "Accepter les autorisations",
+        "Supprimer l’extension"
+       ]
+      }
+     },
+     "highlight": "new-perm"
+    },
+    {
+     "id": "ut-b4",
+     "say": "Dans ce cas, supprimez l’extension, prévenez le support technique et modifiez les mots de passe qu’il vous indique.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ut-scenario",
+   "title": "L’extension PDF Ustası a changé",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Le matin, vous ouvrez le navigateur. Une notification dans le coin indique : l’extension PDF Ustası a été désactivée, car elle demande de nouvelles autorisations.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2c-pdf-ustasi",
+       "tone": "app",
+       "title": [
+        {
+         "text": "L’extension PDF Ustası a été désactivée"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "La nouvelle version demande davantage d’autorisations."
+         }
+        ]
+       ],
+       "buttons": [
+        "Voir les autorisations",
+        "Supprimer l’extension"
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "J’accepte les autorisations, je l’utilise depuis un an",
+       "next": "n2-bad",
+       "outcome": "compromised",
+       "feedback": "Une confiance ancienne ne rend pas une nouvelle autorisation plus sûre. Cette mise à jour a peut-être fait de l’extension un espion."
+      },
+      {
+       "label": "D’abord, je regarde quelles autorisations elle demande",
+       "next": "n2",
+       "outcome": "safe",
+       "feedback": "Exact. Les nouvelles autorisations montrent ce que l’extension veut faire désormais."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Nouvelles autorisations : lire et modifier les données sur tous les sites web, lire ce que vous copiez. Pour ouvrir un PDF, rien de tout cela n’est nécessaire.",
+     "choices": [
+      {
+       "label": "Je supprime l’extension et j’écris au support technique",
+       "next": "n3",
+       "outcome": "safe",
+       "feedback": "Exact. Le support technique vérifiera si cette extension se trouve aussi sur d’autres ordinateurs."
+      },
+      {
+       "label": "Je la laisse désactivée et je regarderai plus tard",
+       "next": "n3",
+       "outcome": "risky",
+       "feedback": "Une extension désactivée reste dans le navigateur et se réactive d’un clic. La supprimer est plus sûr."
+      }
+     ]
+    },
+    {
+     "id": "n2-bad",
+     "text": "Une semaine plus tard, votre moteur de recherche a changé tout seul, et des publicités inconnues apparaissent sur les sites web.",
+     "choices": [
+      {
+       "label": "Je supprime l’extension et j’appelle le support technique",
+       "next": "n3",
+       "outcome": "safe",
+       "feedback": "C’est tard, mais c’est la bonne décision. Le support technique vérifiera ce qui a fuité."
+      },
+      {
+       "label": "Je m’habitue aux publicités",
+       "outcome": "compromised",
+       "feedback": "L’extension voit toujours chaque page que vous ouvrez. Les publicités sont le signe qu’elle est active."
+      }
+     ]
+    },
+    {
+     "id": "n3",
+     "text": "Merci. Cette extension collectait des données sur tous les sites web. Modifiez les mots de passe de votre messagerie professionnelle et du portail de l’entreprise, et nous fermerons les sessions ouvertes.",
+     "speaker": "Ayten, support technique",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Merci. <breath> Cette extension collectait des données sur tous les sites web. Modifiez les mots de passe de votre messagerie professionnelle et du portail de l’entreprise, et nous fermerons les sessions ouvertes.",
+     "choices": [
+      {
+       "label": "Je modifie les mots de passe tout de suite",
+       "outcome": "safe",
+       "feedback": "Excellent. Tout ce que l’extension a collecté ne sert plus à rien."
+      },
+      {
+       "label": "J’ai supprimé l’extension, ça suffit",
+       "outcome": "risky",
+       "feedback": "L’extension a disparu, mais les données qu’elle a collectées sont chez l’escroc. Il faut modifier les mots de passe."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ut-sim",
+   "environment": "desktop",
+   "title": "Ordinateur professionnel",
+   "intro": "Des choses étranges se passent sur votre ordinateur professionnel. Répondez correctement à chaque alerte.",
+   "steps": [
+    {
+     "id": "ad-tab",
+     "label": "Félicitations ! Vous avez gagné un téléphone",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://endirim-kupon.example.info/hediyye",
+        "reveal": "endirim-kupon.example.info"
+       }
+      ]
+     },
+     "say": "Le navigateur a ouvert un nouvel onglet tout seul.",
+     "actions": [
+      {
+       "id": "claim",
+       "label": "Récupérer le cadeau",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Un onglet qui s’ouvre tout seul pour annoncer un cadeau est un piège. La page vous aurait demandé les données de votre carte bancaire."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Les onglets qui s’ouvrent tout seuls sont souvent l’œuvre d’une extension malveillante. Cherchons la cause."
+      }
+     ]
+    },
+    {
+     "id": "search-changed",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "db-xezri-brauzer",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Votre moteur de recherche a été modifié"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Vos recherches passent désormais par axtar-tez.example.info."
+        }
+       ],
+       [
+        {
+         "text": "Modifié par : l’extension Kupon Tapan"
+        }
+       ]
+      ],
+      "buttons": [
+       "Conserver la modification",
+       "Rétablir"
+      ]
+     },
+     "say": "Le navigateur indique que votre paramètre de recherche a été modifié.",
+     "actions": [
+      {
+       "id": "keep",
+       "label": "Conserver la modification",
+       "kind": "mark-safe",
+       "outcome": "risky",
+       "feedback": "Vos recherches passent désormais par le site d’un inconnu, qui voit tout ce que vous tapez. Rétablissez le paramètre."
+      },
+      {
+       "id": "restore",
+       "label": "Rétablir",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Maintenant, regardons l’extension responsable."
+      }
+     ]
+    },
+    {
+     "id": "ext-list",
+     "label": "Extensions : Kupon Tapan, Ekran Şəkli, Qısa Qeyd",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-xezri-brauzer",
+      "url": [
+       {
+        "text": "https://magaza.xezri.example/elavelerim",
+        "reveal": "xezri.example"
+       }
+      ]
+     },
+     "say": "La liste contient une extension que vous n’avez jamais installée.",
+     "actions": [
+      {
+       "id": "remove",
+       "label": "Supprimer Kupon Tapan",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Exact. Une extension que vous ne reconnaissez pas n’a rien à faire dans votre navigateur."
+      },
+      {
+       "id": "keep",
+       "label": "Tout garder",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Kupon Tapan a modifié votre recherche et ouvre des onglets. En la gardant, vous lui laissez l’accès à vos données."
+      }
+     ]
+    },
+    {
+     "id": "bundle-file",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "w2c-kupon-tapan",
+      "name": [
+       {
+        "text": "Pulsuz_PDF_Cevirici_setup.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "6,2 Mo",
+      "source": [
+       {
+        "text": "pulsuz-pdf-cevir.example.info"
+       }
+      ]
+     },
+     "say": "Votre dossier Téléchargements montre d’où vient l’extension.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Ce convertisseur gratuit a installé l’extension en cachette. Ouvrez-le de nouveau, et l’extension reviendra."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Exact. Ce fichier est arrivé avec un programme gratuit et a installé l’extension sans rien demander."
+      }
+     ]
+    },
+    {
+     "id": "av-alert",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "qoruyucu",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Qoruyucu : menace détectée"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "L’extension Kupon Tapan envoyait des données du navigateur à un serveur inconnu."
+        }
+       ],
+       [
+        {
+         "text": "L’extension a été supprimée."
+        }
+       ]
+      ],
+      "buttons": [
+       "Prévenir le support technique",
+       "Fermer"
+      ]
+     },
+     "say": "L’antivirus a lui aussi trouvé quelque chose.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Prévenir le support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Le support technique vérifiera ce qui a fuité et vous aidera à modifier vos mots de passe."
+      },
+      {
+       "id": "close",
+       "label": "Fermer",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "L’extension a disparu, mais les données qu’elle a collectées sont déjà parties. Signalez-le sans faute."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ut-match",
+   "prompt": "Associez chaque autorisation à ce qu’elle rend possible.",
+   "pairs": [
+    {
+     "id": "all-sites",
+     "left": "Lire et modifier les données sur tous les sites web",
+     "right": "Lire vos e-mails, modifier une page de paiement"
+    },
+    {
+     "id": "clipboard",
+     "left": "Lire ce que vous copiez",
+     "right": "Voir un mot de passe ou un numéro de carte que vous avez copié"
+    },
+    {
+     "id": "history",
+     "left": "Lire l’historique de navigation",
+     "right": "Savoir quels sites vous visitez"
+    },
+    {
+     "id": "downloads",
+     "left": "Gérer les téléchargements",
+     "right": "Télécharger des fichiers en votre nom"
+    }
+   ],
+   "explain": "Chaque autorisation est un pouvoir. Ne donnez pas à une extension un pouvoir dont sa tâche n’a pas besoin."
+  },
+  {
+   "type": "recap",
+   "id": "ut-recap",
+   "points": [
+    "Supprimez une extension qui demande de nouvelles autorisations après une mise à jour",
+    "Un moteur de recherche qui change tout seul, de nouvelles publicités ou de nouveaux onglets sont des signaux d’alerte",
+    "Supprimez l’extension, prévenez le support technique, modifiez vos mots de passe"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -40,7 +40,7 @@ export function PathTimeline({ items, today }: { items: PathItem[]; today: strin
   return (
     <div>
       <ol className="relative grid gap-3">
-        <span aria-hidden className="absolute top-6 bottom-6 left-[1.4rem] border-l-2 border-dashed border-line-strong" />
+        <span aria-hidden className="absolute top-6 bottom-6 start-[1.4rem] border-s-2 border-dashed border-line-strong" />
         {shown.map((m) => {
           const Icon = moduleIcon(m.slug, m.category);
           const done = m.status === "completed";

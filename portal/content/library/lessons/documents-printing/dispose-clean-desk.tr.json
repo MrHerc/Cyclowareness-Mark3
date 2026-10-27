@@ -1,0 +1,346 @@
+{
+ "id": "dispose-clean-desk",
+ "title": "İmha ve temiz masa",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Çöp kutusundaki bir sayfa ve masada bırakılan bir belge, saldırgan için hazır bilgidir.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Sayfayı elle yırtmak yetmez. Parçaları yeniden birleştirmek kolaydır.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Gizli belgeler kâğıt öğütücüye, eski USB bellekler ve dizüstü bilgisayarlar da BT destek ekibine gider.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Masanızdan kalkarken ekranı kilitleyin ve belgeleri kilitli bir dolaba koyun.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "before-you-leave",
+   "environment": "desktop",
+   "title": "Masanızdan kalkmadan önce",
+   "intro": "Gün içinde masanızdan birkaç kez kalkarsınız. Açılan pencerelere bakın ve karar verin.",
+   "steps": [
+    {
+     "id": "lock-screen",
+     "label": "15 dakikalık bir toplantıya gidiyorsunuz",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Ekran kilidi"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Bilgisayarınızın başında 15 dakika kimse olmayacak. Şimdi kilitlensin mi?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Sonra",
+       "Kilitle"
+      ]
+     },
+     "actions": [
+      {
+       "id": "lock",
+       "label": "Kilitle",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Kilitlenmemiş bir ekranda herkes sizin adınıza e-posta gönderebilir ya da dosyalarınızı alabilir."
+      },
+      {
+       "id": "later",
+       "label": "Sonra",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Birkaç dakika yeter. Her kalktığınızda ekranı kilitleyin."
+      }
+     ]
+    },
+    {
+     "id": "old-usb",
+     "label": "Eski bir USB belleği atmak istiyorsunuz",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "USB bellek (E:) biçimlendirilsin mi?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Hızlı biçimlendirme: dosyaların kapladığı alan boş olarak işaretlenecek."
+        }
+       ]
+      ],
+      "buttons": [
+       "İptal",
+       "Biçimlendir"
+      ]
+     },
+     "say": "Bellekte eski personel listeleri var.",
+     "actions": [
+      {
+       "id": "hand-over",
+       "label": "Çıkar ve BT destek ekibine ver",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Doğru. BT destek ekibi belleği tamamen siler ya da imha eder."
+      },
+      {
+       "id": "quick-format",
+       "label": "Hızlı biçimlendir ve çöpe at",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Hızlı biçimlendirme dosyaları silmez, yalnızca gizler. Sıradan programlarla geri getirilebilirler."
+      }
+     ]
+    },
+    {
+     "id": "laptop-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Sebine Hüseynova"
+        }
+       ],
+       "address": [
+        {
+         "text": "s.huseynova@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Eski dizüstü bilgisayar"
+       }
+      ],
+      "time": "16:12",
+      "body": [
+       [
+        {
+         "text": "Merhaba, eski iş bilgisayarımı bir akrabama verebilir miyim? Dosyaları sildim ve geri dönüşüm kutusunu boşalttım."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "no",
+       "label": "Yanıtla: Hayır, BT destek ekibine teslim edin",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Doğru. İş cihazı kuruma aittir, diski de BT destek ekibi temizler."
+      },
+      {
+       "id": "yes",
+       "label": "Yanıtla: Olur, dosyalar silinmiş",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Geri dönüşüm kutusunu boşaltmak diski temizlemez. Silinen dosyalar özel yazılımlarla kurtarılabilir."
+      }
+     ]
+    },
+    {
+     "id": "queued-print",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-capmerkezi",
+      "app": "Çap Mərkəzi",
+      "title": [
+       {
+        "text": "Güvenli yazdırma: 3 belge"
+       }
+      ],
+      "body": [
+       {
+        "text": "Adınıza kuyrukta 3 belge bekliyor. Alınmazlarsa saat 18:00'de silinecekler."
+       }
+      ],
+      "time": "17:30"
+     },
+     "actions": [
+      {
+       "id": "collect",
+       "label": "Yazıcıya git ve al",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Doğru. İhtiyacınız olanları alın, gerekmeyenleri kuyruk kendisi silsin."
+      },
+      {
+       "id": "print-all",
+       "label": "Hepsini doğrudan yazdır",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Doğrudan yazdırmada sayfalar sizi beklemeden çıkış tepsisine düşer. Güvenli yazdırma tam da bunun için var."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "how-to-dispose",
+   "prompt": "Her öğeyi doğru imha yöntemiyle eşleştirin.",
+   "pairs": [
+    {
+     "id": "id-copy",
+     "left": "Kimlik kartı fotokopisi",
+     "right": "Kâğıt öğütücü"
+    },
+    {
+     "id": "draft",
+     "left": "Gizli bir projenin taslağı",
+     "right": "Kilitli gizli atık kutusu"
+    },
+    {
+     "id": "laptop",
+     "left": "Eski iş dizüstü bilgisayarı",
+     "right": "BT destek ekibine teslim"
+    },
+    {
+     "id": "flyer",
+     "left": "Etkinlik reklam broşürü",
+     "right": "Sıradan kâğıt geri dönüşümü"
+    }
+   ],
+   "explain": "Gizli belgeler asla sıradan çöp kutusuna atılmaz. Cihazları yalnızca BT destek ekibi siler ve imha eder."
+  },
+  {
+   "type": "scenario",
+   "id": "clean-desk",
+   "title": "On dakikalık mola",
+   "start": "leave",
+   "nodes": [
+    {
+     "id": "leave",
+     "text": "Çay almaya çıkıyorsunuz. Masada bir sözleşme klasörü, monitörde de üzerinde parola yazılı bir yapışkan not var.",
+     "choices": [
+      {
+       "label": "Klasörü dolaba kilitler, notu da yanıma alırım",
+       "next": "visitor",
+       "feedback": "Doğru. On dakika, fotoğraf çekmek için fazlasıyla yeterli."
+      },
+      {
+       "label": "Çabuk dönerim, öyle kalsın",
+       "outcome": "risky",
+       "feedback": "İçeri bir ziyaretçi, kurye ya da tamirci girebilir. Belgeyi kaldırın ve parolanızı asla yapışkan notta tutmayın."
+      }
+     ]
+    },
+    {
+     "id": "visitor",
+     "text": "Yöneticinizle toplantım var. Bu klasördeki belgeye bakabilir miyim?",
+     "speaker": "Ziyaretçi (masanızın yanında)",
+     "voice": "man-2",
+     "channel": "in-person",
+     "spoken": "Yöneticinizle toplantım var. <breath> Bu klasördeki belgeye bakabilir miyim?",
+     "choices": [
+      {
+       "label": "Kibarca reddeder ve yöneticimi ararım",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Belgeyi yalnızca yetkili kişi görür."
+      },
+      {
+       "label": "Gösteririm, sonuçta yöneticimin misafiri",
+       "outcome": "risky",
+       "feedback": "Kimliği ve yetkisi kontrol edilmedi. Önce yöneticinizle teyit edin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "shredder",
+   "question": {
+    "prompt": "Gizli belgeleri en güvenilir şekilde hangi yöntem imha eder?",
+    "options": [
+     {
+      "id": "cross-cut",
+      "label": "Kâğıdı küçük parçacıklara ayıran bir kâğıt öğütücü",
+      "correct": true,
+      "feedback": "Doğru. Minik parçacıkları yeniden birleştirmek pratikte imkânsızdır."
+     },
+     {
+      "id": "strip-cut",
+      "label": "Kâğıdı uzun şeritlere ayıran bir kâğıt öğütücü",
+      "correct": false,
+      "feedback": "Şeritler yan yana dizilerek sayfa yeniden oluşturulabilir. Küçük parçalara ayıran bir kâğıt öğütücü seçin."
+     },
+     {
+      "id": "tear",
+      "label": "Elle dörde yırtmak",
+      "correct": false,
+      "feedback": "Dört parçayı bantla birleştirmek bir dakika sürer. Gizli belgeler kâğıt öğütücüye gider."
+     },
+     {
+      "id": "bin",
+      "label": "Yüzü aşağı gelecek şekilde sıradan çöp kutusuna atmak",
+      "correct": false,
+      "feedback": "Çöp binadan çıkar ve dışarıda onu herkes açabilir."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "folder"
+    }
+   },
+   "explain": "Gizli belgeler için küçük parçalara ayıran bir kâğıt öğütücü ya da gizli atık kutusu kullanın."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Gizli belgeler kâğıt öğütücüye, cihazlar BT destek ekibine gider.",
+    "Silmek ve hızlı biçimlendirmek verileri yok etmez.",
+    "Masanızdan kalkarken ekranı kilitleyin ve belgeleri kaldırın."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

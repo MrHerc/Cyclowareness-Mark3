@@ -1,0 +1,433 @@
+{
+ "id": "admin-hygiene",
+ "title": "L’hygiène informatique de l’administrateur",
+ "minutes": 4,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Un compte administrateur est la clé que les attaquants convoitent le plus. Avec un seul compte administrateur, ils peuvent atteindre tout le réseau.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Utilisez un compte normal pour le travail quotidien et un compte distinct pour l’administration. Ne lisez jamais vos e-mails et ne naviguez jamais sur internet avec le compte administrateur.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Ne mettez jamais de mots de passe ni de clés dans le code, les conversations ou les tickets. Ils y restent pendant des années. Utilisez plutôt un coffre-fort de secrets.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "telegram",
+       "contact": [
+        {
+         "text": "Équipe infrastructure · 46 membres"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Pour les tests, connectez-vous à la base de données comme ceci : "
+          },
+          {
+           "text": "DB_PASSWORD=Pr0d!Baza2026",
+           "spot": "secret"
+          }
+         ],
+         "time": "23:14"
+        }
+       ]
+      }
+     },
+     "highlight": "secret"
+    },
+    {
+     "id": "b4",
+     "say": "Les faux techniciens du support vous demandent souvent d’installer un logiciel de prise en main à distance. C’est alors vous-même qui leur ouvrez le système.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Support du fournisseur"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 01 23"
+        }
+       ],
+       "label": "Inconnu"
+      }
+     }
+    },
+    {
+     "id": "b5",
+     "say": "Pour les panneaux d’administration, l’accès à distance et les consoles cloud, activez une authentification multifacteur résistante à l’hameçonnage, par exemple une clé de sécurité physique.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "admin-phish",
+   "prompt": "Trouvez les signes d’un hameçonnage qui vise les administrateurs informatiques.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Notification Console Cloud"
+      }
+     ],
+     "address": [
+      {
+       "text": "alerts@"
+      },
+      {
+       "text": "cloudconsole-admin.example.info",
+       "spot": "domain"
+      }
+     ]
+    },
+    "to": "admin@idare.example",
+    "subject": [
+     {
+      "text": "Critique : votre compte administrateur sera suspendu dans 2 heures",
+      "spot": "urgency"
+     }
+    ],
+    "time": "06:12",
+    "body": [
+     [
+      {
+       "text": "À l’attention de l’administrateur,"
+      }
+     ],
+     [
+      {
+       "text": "Veuillez réenregistrer l’authentification multifacteur de votre locataire."
+      }
+     ],
+     [
+      {
+       "text": "Connectez-vous à la console : "
+      },
+      {
+       "text": "console-login.example.info/admin",
+       "spot": "link"
+      }
+     ],
+     [
+      {
+       "text": "Dictez ensuite le code de confirmation à l’agent du support qui vous appellera.",
+       "spot": "code-share"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Mauvais domaine",
+     "explain": "Les avis d’un fournisseur viennent du domaine officiel de ce fournisseur. Ouvrez toujours la console depuis votre propre favori."
+    },
+    {
+     "id": "urgency",
+     "label": "Menace de suspension",
+     "explain": "Un délai de deux heures est là pour ne vous laisser aucun temps de vérification."
+    },
+    {
+     "id": "link",
+     "label": "Fausse page de connexion",
+     "explain": "Cette page peut relayer votre mot de passe et votre code en temps réel. Les codes ordinaires ne l’empêchent pas."
+    },
+    {
+     "id": "code-share",
+     "label": "Dicter un code à quelqu’un",
+     "explain": "Un vrai support ne demande jamais votre code de confirmation. Le communiquer, c’est livrer le compte."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "remote-support",
+   "question": {
+    "prompt": "Le support d’un fournisseur vous appelle et veut un accès à distance à un serveur. Que faites-vous ?",
+    "options": [
+     {
+      "id": "call-back",
+      "label": "Je raccroche et j’appelle le numéro indiqué dans le contrat",
+      "correct": true,
+      "feedback": "Bonne réponse. Vérifiez par un canal que vous connaissez, puis n’accordez l’accès que via l’outil approuvé."
+     },
+     {
+      "id": "install",
+      "label": "J’installe l’outil indiqué et je dicte le code",
+      "correct": false,
+      "feedback": "Vous donnez ainsi à l’appelant un accès complet au système. C’est exactement de cette façon que les logiciels de prise en main à distance sont détournés lors des attaques."
+     },
+     {
+      "id": "watch",
+      "label": "J’autorise l’accès, mais je surveille l’écran",
+      "correct": false,
+      "feedback": "Surveiller ne suffit pas. Installer une porte dérobée prend quelques secondes."
+     }
+    ]
+   },
+   "explain": "Une demande inattendue d’accès à distance se vérifie toujours par un canal connu, et l’accès ne s’accorde que via l’outil approuvé."
+  },
+  {
+   "type": "swipe",
+   "id": "secrets",
+   "prompt": "Est-ce une bonne pratique ?",
+   "cards": [
+    {
+     "id": "ticket-password",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Ticket 4821"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "J’ai mis le mot de passe du serveur dans les commentaires pour que l’équipe de relève puisse le voir."
+         }
+        ],
+        "time": "02:30"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Beaucoup de personnes voient les tickets, et ils restent dans les archives. Renouvelez le mot de passe et placez-le dans le coffre-fort de secrets."
+    },
+    {
+     "id": "vault-share",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Groupe DevOps"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "J’ai ajouté la clé au coffre-fort de secrets et je vous ai donné un accès en lecture."
+         }
+        ],
+        "time": "11:20"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "La clé elle-même n’est pas dans la conversation, seul l’accès au coffre-fort a été partagé. C’est la bonne méthode."
+    },
+    {
+     "id": "env-in-repo",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://git.idare.example/infra/deploy/-/blob/main/.env"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Le fichier .env a été ajouté au dépôt. Les clés restent dans l’historique, donc supprimer le fichier ne suffit pas. Renouvelez-les immédiatement."
+    },
+    {
+     "id": "keys-issued",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Équipe sécurité"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Clés de sécurité pour les comptes administrateurs"
+       }
+      ],
+      "time": "15:00",
+      "body": [
+       [
+        {
+         "text": "À partir de lundi, la connexion aux panneaux d’administration nécessitera une clé de sécurité physique. Venez retirer la vôtre en personne au bureau 305."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Aucun lien, rien à télécharger ni à saisir, et la clé est remise en personne. Ce changement renforce votre sécurité."
+    },
+    {
+     "id": "shared-admin",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Kamran (réseau)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Je pars en vacances, voici mon mot de passe administrateur, utilise-le si besoin."
+         }
+        ],
+        "time": "18:55"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Avec un compte administrateur partagé, impossible de savoir qui a fait quoi. La personne qui assure le remplacement doit recevoir des droits temporaires sur son propre compte."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "right-account",
+   "prompt": "Associez chaque tâche au bon compte.",
+   "pairs": [
+    {
+     "id": "mail",
+     "left": "Lire ses e-mails",
+     "right": "Compte normal du quotidien"
+    },
+    {
+     "id": "config",
+     "left": "Configurer un serveur",
+     "right": "Compte administrateur distinct"
+    },
+    {
+     "id": "script",
+     "left": "Script automatisé",
+     "right": "Compte de service aux privilèges minimaux"
+    },
+    {
+     "id": "emergency",
+     "left": "Accès d’urgence",
+     "right": "Compte gardé dans le coffre-fort et surveillé"
+    }
+   ],
+   "explain": "Ne donnez à chaque tâche que les droits nécessaires. Moins un compte administrateur sert, plus la cible est petite."
+  },
+  {
+   "type": "scenario",
+   "id": "night-prompt",
+   "title": "Alerte nocturne",
+   "start": "prompt",
+   "nodes": [
+    {
+     "id": "prompt",
+     "text": "Il est 2 h du matin. Votre téléphone affiche une demande d’approbation de connexion pour votre compte administrateur, alors que vous dormiez.",
+     "choices": [
+      {
+       "label": "Je la refuse et j’alerte l’équipe sécurité",
+       "next": "reuse",
+       "feedback": "Bien vu. Une demande inattendue signifie que quelqu’un connaît votre mot de passe."
+      },
+      {
+       "label": "Je l’approuve pour que les demandes s’arrêtent",
+       "outcome": "compromised",
+       "feedback": "L’attaquant est dans le panneau d’administration. C’est ce qu’on appelle une attaque par bombardement de notifications."
+      }
+     ]
+    },
+    {
+     "id": "reuse",
+     "text": "Avez-vous utilisé ce mot de passe ailleurs ?",
+     "speaker": "Équipe sécurité",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Avez-vous utilisé ce mot de passe <short pause> ailleurs ?",
+     "choices": [
+      {
+       "label": "Oui, aussi sur un compte personnel. Je vais changer les deux",
+       "next": "harden",
+       "feedback": "Une réponse honnête. Les mots de passe qui ont fuité d’autres sites sont souvent essayés exactement de cette façon."
+      },
+      {
+       "label": "J’ai honte et je ne dis rien",
+       "outcome": "risky",
+       "feedback": "L’équipe ne peut pas trouver l’origine de la fuite. L’honnêteté accélère l’enquête."
+      }
+     ]
+    },
+    {
+     "id": "harden",
+     "text": "Le mot de passe est changé. Et ensuite ?",
+     "choices": [
+      {
+       "label": "Je ferme les sessions actives et je passe le compte sur une clé de sécurité",
+       "outcome": "safe",
+       "feedback": "Excellent. Fermer les sessions coupe tout accès encore ouvert, et une clé de sécurité résiste à l’hameçonnage."
+      },
+      {
+       "label": "Tout va bien, je reprends le travail",
+       "outcome": "risky",
+       "feedback": "Des sessions ouvertes et des jetons peuvent encore être actifs. Fermez-les aussi."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Les tâches d’administration sur un compte administrateur, le travail quotidien sur un compte normal.",
+    "Gardez les secrets hors du code et des conversations, et renouvelez immédiatement tout secret exposé.",
+    "Vérifiez les demandes inattendues d’accès à distance par un canal connu."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

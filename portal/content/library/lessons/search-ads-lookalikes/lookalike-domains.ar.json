@@ -1,0 +1,333 @@
+{
+  "id": "lookalike-domains",
+  "title": "عناوين مشابهة",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ld-tutor",
+      "beats": [
+        {
+          "id": "ld-b1",
+          "say": "على الجوال يكون شريط العنوان قصيرًا، ويختفي معظم العنوان. والمحتالون يعتمدون على ذلك.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "ld-b2",
+          "say": "انظر إلى هذا العنوان: الاسم الرسمي يأتي في البداية، لكن المالك الحقيقي للموقع هو الجزء الأخير منه.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "url": [
+                {
+                  "text": "https://vetendasportal.gov."
+                },
+                {
+                  "text": "az-arayis.example",
+                  "spot": "real-owner"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "real-owner"
+        },
+        {
+          "id": "ld-b3",
+          "say": "وهناك حيل أخرى أيضًا: حروف تتبادل أماكنها، أو كلمة تضاف، أو رقم مشابه يحل محل حرف.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "ld-b4",
+          "say": "إذا كان العنوان مشبوهًا، فلا تكتب شيئًا، وأغلق الصفحة، وأبلغ الدعم الفني.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "ld-match",
+      "prompt": "طابق كل عنوان مزيف مع العنوان الرسمي الذي يقلده.",
+      "pairs": [
+        {
+          "id": "gov",
+          "left": "vetendasportal.gov.az-arayis.example",
+          "right": "vetendasportal.gov.az"
+        },
+        {
+          "id": "sahil",
+          "left": "sahi1bank.example.info",
+          "right": "sahilbank.az"
+        },
+        {
+          "id": "ulduz",
+          "left": "ulduzbnak.example",
+          "right": "ulduzbank.az"
+        },
+        {
+          "id": "mail",
+          "left": "idare-poct-giris.example.info",
+          "right": "poct.idare.example"
+        }
+      ],
+      "explain": "الفرق صغير: اسم رسمي في المقدمة، أو رقم، أو حرفان تبادلا مكانيهما، أو كلمة زائدة. اقرأ العنوان دائمًا من نهايته."
+    },
+    {
+      "type": "simulation",
+      "id": "ld-sim",
+      "environment": "phone",
+      "title": "استخراج شهادة عبر الجوال",
+      "intro": "تريد استخراج شهادة عبر جوالك. في كل خطوة، اقرأ العنوان حتى نهايته.",
+      "steps": [
+        {
+          "id": "search-ad",
+          "label": "برعاية: Vatandash Portal، الموقع الرسمي",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tapan",
+            "url": [
+              {
+                "text": "https://tapan.example/axtar?q=vetendas+portali+arayis",
+                "reveal": "tapan.example"
+              }
+            ]
+          },
+          "say": "أول نتيجة في البحث إعلان.",
+          "actions": [
+            {
+              "id": "ad",
+              "label": "فتح الإعلان",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "نقلك الإعلان إلى موقع آخر. والآن اقرأ العنوان بعناية.",
+              "next": "fake-login"
+            },
+            {
+              "id": "official",
+              "label": "فتح النتيجة vetendasportal.gov.az",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "صحيح. تجاوزت الإعلان واخترت النتيجة التي ينتهي عنوانها بالمقطع gov.az.",
+              "next": "real-login"
+            }
+          ]
+        },
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2c-vetendas-portal-fake",
+            "brand": "Vatandash Portal",
+            "url": [
+              {
+                "text": "https://vetendasportal.gov.az-arayis.example/giris",
+                "reveal": "az-arayis.example"
+              }
+            ],
+            "fields": [
+              "رمز FIN",
+              "كلمة المرور"
+            ],
+            "button": "تسجيل الدخول"
+          },
+          "say": "على الجوال تظهر بداية العنوان فقط. اقرأه حتى النهاية.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "تسجيل الدخول",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "ظهر gov.az في بداية العنوان، لكنه لم يكن في نهايته. ووصل رمز FIN وكلمة المرور إلى المحتال."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق الصفحة",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. المالك الحقيقي للموقع في نهاية العنوان، وهذا العنوان لا ينتهي بالمقطع gov.az.",
+              "next": "real-login"
+            }
+          ]
+        },
+        {
+          "id": "new-login",
+          "label": "10:16 Vatandash Portal",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2c-vetendas-portal",
+            "app": "Vatandash Portal",
+            "title": [
+              {
+                "text": "تسجيل دخول جديد"
+              }
+            ],
+            "body": [
+              {
+                "text": "سجل شخص ما الدخول إلى حسابك من جهاز غير معروف."
+              }
+            ],
+            "time": "10:16"
+          },
+          "say": "بعد دقيقة واحدة، وصل هذا الإشعار.",
+          "actions": [
+            {
+              "id": "fix",
+              "label": "أفتح البوابة بنفسي وأغير كلمة المرور",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "صحيح. افتح البوابة من الإشارة المرجعية، وغير كلمة المرور، وسجل الخروج من جميع الأجهزة."
+            },
+            {
+              "id": "later",
+              "label": "سأنظر في الأمر لاحقًا",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "المحتال موجود الآن داخل حسابك، وكل دقيقة مهمة."
+            }
+          ]
+        },
+        {
+          "id": "real-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2c-vetendas-portal",
+            "brand": "Vatandash Portal",
+            "url": [
+              {
+                "text": "https://vetendasportal.gov.az/giris",
+                "reveal": "vetendasportal.gov.az"
+              }
+            ],
+            "fields": [
+              "رمز FIN",
+              "كلمة المرور"
+            ],
+            "button": "تسجيل الدخول"
+          },
+          "say": "هذا العنوان ينتهي بالمقطع gov.az.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "تسجيل الدخول",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "صحيح، هذه هي البوابة الرسمية نفسها. والآن احفظها في الإشارات المرجعية."
+            },
+            {
+              "id": "check",
+              "label": "التحقق من العنوان",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "عادة ممتازة. النطاق ينتهي بالمقطع gov.az، دون أي كلمة زائدة قبله."
+            }
+          ]
+        },
+        {
+          "id": "bank-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank-fake",
+            "sender": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "time": "19:42",
+            "messages": [
+              [
+                {
+                  "text": "تم إيقاف بطاقتك مؤقتًا. لإعادة تفعيلها: "
+                },
+                {
+                  "text": "sahilbank.az-kart.example/ac",
+                  "link": {
+                    "label": "sahilbank.az-kart.example/ac",
+                    "href": "https://sahilbank.az-kart.example/ac"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "في المساء تصلك رسالة نصية باسم البنك.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح الرابط",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "يبدأ العنوان باسم البنك، لكن المالك هو الجزء الأخير منه. افتح تطبيق البنك بنفسك."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن رسالة غير مرغوب فيها",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "صحيح. تحقق من بطاقتك في تطبيق البنك أو عبر الرقم المكتوب على ظهر البطاقة."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "هذا يفي بالغرض. وعند الشك، اتصل بالبنك بنفسك على الرقم المكتوب على ظهر بطاقتك."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "ld-order",
+      "prompt": "رتب خطوات التحقق من العنوان على الجوال.",
+      "items": [
+        {
+          "id": "tap",
+          "label": "الضغط على شريط العنوان لرؤية العنوان كاملًا"
+        },
+        {
+          "id": "end",
+          "label": "تحديد الجزء الأخير من النطاق"
+        },
+        {
+          "id": "compare",
+          "label": "مقارنته حرفًا بحرف مع العنوان الرسمي"
+        },
+        {
+          "id": "leave",
+          "label": "الإغلاق دون كتابة أي شيء إذا وجدت أي اختلاف"
+        }
+      ],
+      "explain": "على الجوال تختفي نهاية العنوان غالبًا، لذا افتحه كاملًا أولًا. وإذا لم يكن الاسم الرسمي في النهاية، فالموقع مزيف."
+    },
+    {
+      "type": "recap",
+      "id": "ld-recap",
+      "points": [
+        "على الجوال، افتح العنوان كاملًا واقرأه من نهايته",
+        "حتى لو جاء الاسم الرسمي أولًا، فالمالك الحقيقي هو الجزء الأخير",
+        "إذا كتبت كلمة المرور، فغيرها في الموقع الرسمي وأبلغ عن الحادثة"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

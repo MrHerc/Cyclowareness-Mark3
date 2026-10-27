@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { DEFAULT_LOCALE, LOCALE_COOKIE, SITE_LOCALES, isSiteLocale, negotiate, type SiteLocale } from "./i18n/config";
+import { isAppPath } from "./lib/app-paths";
 
 /**
  * Runs before every request. Pages get a strict CSP with a per-request nonce, the public-site
@@ -10,20 +11,12 @@ const SESSION_COOKIE = process.env.NODE_ENV === "production" ? "__Host-cy_sessio
 /** Mirrors SESSION_DAYS in server/auth/session.ts (the database renews the row; the cookie must slide too). */
 const SESSION_DAYS = 30;
 const SESSION_SEEN_COOKIE = process.env.NODE_ENV === "production" ? "__Host-cy_session_seen" : "cy_session_seen";
-/**
- * The signed-in app (route groups (learner), (focus), (admin), (print)). Only these send an anonymous
- * visitor to sign-in; every other unknown path reaches the app and gets a real 404.
- */
-const APP_PREFIXES = ["/app", "/admin", "/super", "/learn", "/paths", "/league", "/progress", "/profile", "/lab", "/security", "/sessions", "/help", "/policies", "/print"];
 /** Language of `/` by visitor country (Cloudflare's CF-IPCountry) when the browser languages do not match. */
-const COUNTRY_LOCALE: Record<string, SiteLocale> = { AZ: "az", TR: "tr", GE: "ka", UA: "uk", RO: "ro", MD: "ro", DE: "de", AT: "de", FR: "fr", IT: "it", RU: "ru", BY: "ru", KZ: "ru", UZ: "ru" };
+const COUNTRY_LOCALE: Record<string, SiteLocale> = { AZ: "az", TR: "tr", GE: "ka", UA: "uk", RO: "ro", MD: "ro", DE: "de", AT: "de", FR: "fr", SA: "ar", RU: "ru", BY: "ru", KZ: "ru", UZ: "ru" };
 
 /** API routes, build assets and public files: no CSP, session redirect or cookies, only HSTS. */
-const PASSTHROUGH = /^\/(api\/|_next\/static\/|_next\/image|favicon\.ico$|icons\/|rive\/|brand\/|manifest\.webmanifest$|robots\.txt$|sitemap\.xml$|sw\.js$)/;
-
-function needsSession(pathname: string): boolean {
-  return APP_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
-}
+// Narration clips (generated/tts/) are cached as immutable: a response must never carry a session cookie.
+const PASSTHROUGH = /^\/(api\/|_next\/static\/|_next\/image|favicon\.ico$|icons\/|rive\/|brand\/|generated\/tts\/|manifest\.webmanifest$|robots\.txt$|sitemap\.xml$|sw\.js$)/;
 
 /**
  * Strict-Transport-Security, read at run time (the image is built once and configured per customer).
@@ -74,7 +67,10 @@ export function proxy(request: NextRequest) {
   // Every HTTPS response carries the same HSTS value (scanners flag any response without it, and a
   // different value on assets would undo an opted-in includeSubDomains); nothing else changes here.
   if (PASSTHROUGH.test(pathname) || request.headers.has("next-router-prefetch") || request.headers.get("purpose") === "prefetch") {
-    const res = NextResponse.next();
+    // i18n/request.ts trusts x-site-locale, so only the page branch below may set it (API routes call getLocale() too).
+    const headers = new Headers(request.headers);
+    headers.delete("x-site-locale");
+    const res = NextResponse.next({ request: { headers } });
     if (transport) res.headers.set("Strict-Transport-Security", transport);
     return res;
   }
@@ -90,7 +86,7 @@ export function proxy(request: NextRequest) {
 
   const hasSession = !!request.cookies.get(SESSION_COOKIE)?.value;
 
-  if (!hasSession && needsSession(pathname)) {
+  if (!hasSession && isAppPath(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/sign-in";
     url.search = "";
@@ -134,8 +130,8 @@ export function proxy(request: NextRequest) {
     response.cookies.set(LOCALE_COOKIE, siteLocale, { path: "/", maxAge: 365 * 86_400, sameSite: "lax" });
   }
 
-  // Sliding expiry: the session row is renewed on use; the cookie is re-issued once a day so it
-  // does not run out 30 days after sign-in regardless of use.
+  // Sliding expiry: the session row is renewed on use, up to SESSION_MAX_DAYS after sign-in (the row decides); the cookie
+  // is re-issued once a day so it does not run out 30 days after sign-in regardless of use.
   const token = request.cookies.get(SESSION_COOKIE)?.value;
   if (token && !request.cookies.get(SESSION_SEEN_COOKIE)) {
     const secure = process.env.NODE_ENV === "production";

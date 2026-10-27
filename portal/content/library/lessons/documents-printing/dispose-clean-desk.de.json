@@ -1,0 +1,346 @@
+{
+ "id": "dispose-clean-desk",
+ "title": "Entsorgung und Clean Desk",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Eine Seite im Papierkorb oder ein Dokument, das offen auf dem Schreibtisch liegt, liefert Angreifern Informationen frei Haus.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Eine Seite von Hand zu zerreißen reicht nicht. Die Schnipsel lassen sich leicht wieder zusammensetzen.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Vertrauliches Papier gehört in den Aktenvernichter, alte USB-Sticks und Laptops geben Sie beim IT-Support ab.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Wenn Sie Ihren Platz verlassen, sperren Sie den Bildschirm und schließen Sie Dokumente in einen Schrank ein.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "before-you-leave",
+   "environment": "desktop",
+   "title": "Bevor Sie Ihren Platz verlassen",
+   "intro": "Sie verlassen Ihren Platz mehrmals am Tag. Sehen Sie sich die Fenster an, die sich öffnen, und entscheiden Sie.",
+   "steps": [
+    {
+     "id": "lock-screen",
+     "label": "Sie gehen in ein 15-minütiges Meeting",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Bildschirmsperre"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ihr Computer bleibt 15 Minuten unbeaufsichtigt. Jetzt sperren?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Später",
+       "Sperren"
+      ]
+     },
+     "actions": [
+      {
+       "id": "lock",
+       "label": "Sperren",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. An einem nicht gesperrten Computer kann jeder in Ihrem Namen E-Mails verschicken oder Dateien mitnehmen."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Ein paar Minuten reichen schon. Sperren Sie den Bildschirm jedes Mal, wenn Sie aufstehen."
+      }
+     ]
+    },
+    {
+     "id": "old-usb",
+     "label": "Sie wollen einen alten USB-Stick wegwerfen",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "USB-Stick (E:) formatieren?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Schnellformatierung: Der Speicherplatz der Dateien wird als frei markiert."
+        }
+       ]
+      ],
+      "buttons": [
+       "Abbrechen",
+       "Formatieren"
+      ]
+     },
+     "say": "Auf dem Stick liegen alte Personallisten.",
+     "actions": [
+      {
+       "id": "hand-over",
+       "label": "Auswerfen und dem IT-Support geben",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Richtig. Der IT-Support löscht den Stick vollständig oder vernichtet ihn."
+      },
+      {
+       "id": "quick-format",
+       "label": "Schnell formatieren und wegwerfen",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Eine Schnellformatierung löscht keine Dateien, sondern versteckt sie nur. Mit gängiger Software lassen sie sich wiederherstellen."
+      }
+     ]
+    },
+    {
+     "id": "laptop-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Səbinə Hüseynova"
+        }
+       ],
+       "address": [
+        {
+         "text": "s.huseynova@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Alter Laptop"
+       }
+      ],
+      "time": "16:12",
+      "body": [
+       [
+        {
+         "text": "Hallo, darf ich meinen alten Dienstlaptop jemandem aus meiner Familie geben? Ich habe die Dateien gelöscht und den Papierkorb geleert."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "no",
+       "label": "Antworten: Nein, bitte dem IT-Support übergeben",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein Dienstgerät gehört der Organisation, und der IT-Support bereinigt die Festplatte."
+      },
+      {
+       "id": "yes",
+       "label": "Antworten: In Ordnung, die Dateien sind ja gelöscht",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Das Leeren des Papierkorbs bereinigt die Festplatte nicht. Gelöschte Dateien lassen sich mit spezieller Software wiederherstellen."
+      }
+     ]
+    },
+    {
+     "id": "queued-print",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-capmerkezi",
+      "app": "Çap Mərkəzi",
+      "title": [
+       {
+        "text": "Sicherer Druck: 3 Dokumente"
+       }
+      ],
+      "body": [
+       {
+        "text": "3 Dokumente warten unter Ihrem Namen in der Warteschlange. Was nicht abgeholt wird, wird um 18:00 Uhr gelöscht."
+       }
+      ],
+      "time": "17:30"
+     },
+     "actions": [
+      {
+       "id": "collect",
+       "label": "Zum Drucker gehen und abholen",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Holen Sie ab, was Sie brauchen, und lassen Sie den Rest automatisch aus der Warteschlange löschen."
+      },
+      {
+       "id": "print-all",
+       "label": "Alle direkt drucken",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Beim direkten Druck landen die Seiten im Ausgabefach, ohne auf Sie zu warten. Genau dafür gibt es den sicheren Druck."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "how-to-dispose",
+   "prompt": "Ordnen Sie jedem Gegenstand die richtige Entsorgung zu.",
+   "pairs": [
+    {
+     "id": "id-copy",
+     "left": "Kopie eines Ausweises",
+     "right": "Aktenvernichter"
+    },
+    {
+     "id": "draft",
+     "left": "Entwurf eines vertraulichen Projekts",
+     "right": "Verschlossene Datenschutztonne"
+    },
+    {
+     "id": "laptop",
+     "left": "Alter Dienstlaptop",
+     "right": "An den IT-Support übergeben"
+    },
+    {
+     "id": "flyer",
+     "left": "Werbeflyer für eine Veranstaltung",
+     "right": "Normales Altpapier"
+    }
+   ],
+   "explain": "Vertrauliches Papier kommt nie in den normalen Papierkorb. Geräte werden nur vom IT-Support gelöscht und vernichtet."
+  },
+  {
+   "type": "scenario",
+   "id": "clean-desk",
+   "title": "Zehn Minuten Pause",
+   "start": "leave",
+   "nodes": [
+    {
+     "id": "leave",
+     "text": "Sie holen sich kurz einen Tee. Auf dem Schreibtisch liegt eine Vertragsmappe, und am Monitor klebt ein Zettel mit einem Passwort.",
+     "choices": [
+      {
+       "label": "Ich schließe die Mappe im Schrank ein und nehme den Zettel mit",
+       "next": "visitor",
+       "feedback": "Richtig. Zehn Minuten sind mehr als genug Zeit für ein Foto."
+      },
+      {
+       "label": "Ich bin gleich zurück, das bleibt liegen",
+       "outcome": "risky",
+       "feedback": "Es könnten Besucher, Kuriere oder Handwerker hereinkommen. Räumen Sie das Dokument weg und bewahren Sie ein Passwort nie auf einem Klebezettel auf."
+      }
+     ]
+    },
+    {
+     "id": "visitor",
+     "text": "Ich habe einen Termin mit Ihrer Führungskraft. Darf ich mir das Dokument in dieser Mappe ansehen?",
+     "speaker": "Besucher (an Ihrem Schreibtisch)",
+     "voice": "man-2",
+     "channel": "in-person",
+     "spoken": "Ich habe einen Termin mit Ihrer Führungskraft. <breath> Darf ich mir das Dokument in dieser Mappe ansehen?",
+     "choices": [
+      {
+       "label": "Ich lehne höflich ab und rufe meine Führungskraft an",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Das Dokument sieht nur, wer dazu berechtigt ist."
+      },
+      {
+       "label": "Ich zeige es ihm, er ist ja Gast meiner Führungskraft",
+       "outcome": "risky",
+       "feedback": "Seine Identität und seine Berechtigungen wurden nicht geprüft. Klären Sie das zuerst mit Ihrer Führungskraft."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "shredder",
+   "question": {
+    "prompt": "Mit welcher Methode wird vertrauliches Papier am zuverlässigsten vernichtet?",
+    "options": [
+     {
+      "id": "cross-cut",
+      "label": "Ein Aktenvernichter, der in kleine Partikel schneidet",
+      "correct": true,
+      "feedback": "Richtig. Winzige Partikel wieder zusammenzusetzen ist praktisch unmöglich."
+     },
+     {
+      "id": "strip-cut",
+      "label": "Ein Aktenvernichter, der lange Streifen schneidet",
+      "correct": false,
+      "feedback": "Streifen lassen sich nebeneinanderlegen, bis die Seite wieder lesbar ist. Wählen Sie einen Aktenvernichter, der in kleine Stücke schneidet."
+     },
+     {
+      "id": "tear",
+      "label": "Von Hand in vier Teile zerreißen",
+      "correct": false,
+      "feedback": "Vier Teile sind in einer Minute wieder zusammengeklebt. Vertrauliches Papier gehört in den Aktenvernichter."
+     },
+     {
+      "id": "bin",
+      "label": "In den normalen Papierkorb, mit der Schrift nach unten",
+      "correct": false,
+      "feedback": "Der Müll verlässt das Gebäude, und draußen kann ihn jeder öffnen."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "folder"
+    }
+   },
+   "explain": "Für vertrauliches Papier verwenden Sie einen Aktenvernichter, der in kleine Partikel schneidet, oder eine Datenschutztonne."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Vertrauliches Papier gehört in den Aktenvernichter, Geräte geben Sie beim IT-Support ab.",
+    "Löschen und Schnellformatieren entfernen keine Daten.",
+    "Wenn Sie Ihren Platz verlassen, sperren Sie den Bildschirm und räumen Sie Dokumente weg."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

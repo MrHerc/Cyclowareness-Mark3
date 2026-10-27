@@ -16,6 +16,7 @@ vi.mock("../src/server/services/audit", () => ({ audit: async () => undefined })
 vi.mock("../src/server/services/progress", () => ({ randomToken: () => "x".repeat(16) }));
 vi.mock("../src/server/auth/links", () => ({ issueAccountLink: async () => "" }));
 vi.mock("next/headers", () => ({ cookies: async () => ({ set: () => undefined }), headers: async () => new Headers() }));
+vi.mock("next/server", () => ({ after: () => undefined }));
 
 const { checkEmailAction, setPasswordAction, signInAction, verifyPhoneCodeAction, verifySecondFactorAction } = await import("../src/server/actions/auth");
 

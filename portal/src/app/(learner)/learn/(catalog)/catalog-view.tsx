@@ -44,7 +44,8 @@ export function CatalogView({ modules }: { modules: CatalogCard[] }) {
   const list = useMemo(() => {
     const needle = fold(q.trim());
     return modules
-      .filter((m) => m.audiences.includes(audience))
+      // "My path" always keeps what is assigned to the person, whatever audience the module is written for.
+      .filter((m) => (view === "path" && m.forYou) || m.audiences.includes(audience))
       .filter((m) => category === "all" || m.category === category)
       .filter((m) => !needle || fold(`${m.title} ${m.subtitle}`).includes(needle))
       .sort((a, b) => (view === "path" ? a.pathRank - b.pathRank : a.catalogRank - b.catalogRank));
@@ -59,13 +60,13 @@ export function CatalogView({ modules }: { modules: CatalogCard[] }) {
         </div>
         <label className="relative w-full sm:w-96">
           <span className="sr-only">{t("searchLabel")}</span>
-          <Search aria-hidden className="pointer-events-none absolute top-1/2 left-4 size-4.5 -translate-y-1/2 text-ink-subtle" />
+          <Search aria-hidden className="pointer-events-none absolute top-1/2 start-4 size-4.5 -translate-y-1/2 text-ink-subtle" />
           <input
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t("search")}
-            className="h-12 w-full rounded-pill border border-line bg-surface pr-4 pl-11 text-body-sm shadow-xs placeholder:text-ink-disabled focus:border-brand-600 focus:ring-4 focus:ring-brand-100 focus:outline-none"
+            className="h-12 w-full rounded-pill border border-line bg-surface pe-4 ps-11 text-body-sm shadow-xs placeholder:text-ink-disabled focus:border-brand-600 focus:ring-4 focus:ring-brand-100 focus:outline-none"
           />
         </label>
       </header>
@@ -154,7 +155,7 @@ export function CatalogView({ modules }: { modules: CatalogCard[] }) {
                     </span>
                   </div>
                 </div>
-                <ChevronRight className="size-5 shrink-0 text-ink-subtle transition-transform group-hover:translate-x-0.5" />
+                <ChevronRight className="size-5 shrink-0 text-ink-subtle transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" />
               </Link>
             </li>
           ))}

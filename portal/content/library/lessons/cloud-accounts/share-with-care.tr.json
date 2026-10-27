@@ -1,0 +1,376 @@
+{
+ "id": "share-with-care",
+ "title": "Dikkatle paylaşın",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Bulut çok kullanışlıdır: dosyalar her yerden açılır. Ama yanlış paylaşılan bir bağlantı da her yerden açılır.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Bağlantı oluştururken üç şeyi kontrol edin: kimler açabilir, düzenleme yapabilirler mi ve bağlantı ne zamana kadar açık kalacak.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Bazen hiç parola istenmez, yalnızca uygulamaya izin vermeniz istenir. Tek bir dokunuş, saldırgana hesabınızın anahtarını verebilir.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "DocuSfera"
+         }
+        ],
+        "address": [
+         {
+          "text": "no-reply@docusfera-share.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Leyla Guliyeva sizinle bir belge paylaştı"
+        }
+       ],
+       "time": "10:41",
+       "body": [
+        [
+         {
+          "text": "Belge: Üç aylık bütçe, son sürüm"
+         }
+        ],
+        [
+         {
+          "text": "Belgeyi açmak için DocuSfera Viewer uygulamasının hesabınıza erişmesine izin verin.",
+          "spot": "grant"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "grant"
+    },
+    {
+     "id": "b4",
+     "say": "İzin verdiyseniz parolanızı değiştirmek yeterli olmayabilir. BT destek ekibinden uygulamanın erişimini hemen iptal etmesini isteyin.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "consent-prompt",
+   "prompt": "Bu uygulamanın, işi için gerekenden fazla neler istediğini bulun.",
+   "artifact": {
+    "kind": "permission",
+    "app": "PDF Merger Pro",
+    "permissions": [
+     {
+      "label": [
+       {
+        "text": "Adınızı ve e-posta adresinizi görme"
+       }
+      ],
+      "needed": true
+     },
+     {
+      "label": [
+       {
+        "text": "E-postalarınızı okuma, gönderme ve silme",
+        "spot": "mail"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Tüm dosyalarınıza tam erişim",
+        "spot": "files"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Kişilerinizi yönetme",
+        "spot": "contacts"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Siz kullanmadığınızda bile erişimi koruma",
+        "spot": "offline"
+       }
+      ],
+      "needed": false
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "mail",
+     "label": "Posta kutusuna tam erişim",
+     "explain": "PDF birleştirmek için e-postalarınıza gerek yoktur. Bu izinle biri sizin adınıza e-posta gönderebilir."
+    },
+    {
+     "id": "files",
+     "label": "Tüm dosyalar",
+     "explain": "Uygulamanın tüm bulut alanınıza değil, yalnızca seçtiğiniz dosyaya ihtiyacı vardır."
+    },
+    {
+     "id": "contacts",
+     "label": "Kişiler",
+     "explain": "Kişi listeniz, bir sonraki oltalama (phishing) dalgasının hedef listesi olur."
+    },
+    {
+     "id": "offline",
+     "label": "Kalıcı erişim",
+     "explain": "Uygulama, siz ayrıldıktan sonra da hesabınıza erişmeye devam edebilir. Parolanızı değiştirmek bu erişimi her zaman kesmez."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "link-settings",
+   "question": {
+    "prompt": "Bir raporu okumaları için iki iş arkadaşınıza gönderiyorsunuz. Hangi bağlantıyı seçersiniz?",
+    "options": [
+     {
+      "id": "anyone-edit",
+      "label": "Bağlantıya sahip olan herkes, düzenleyebilir",
+      "correct": false,
+      "feedback": "Bağlantı sızarsa herkes dosyayı açıp değiştirebilir."
+     },
+     {
+      "id": "two-view",
+      "label": "Yalnızca o iki iş arkadaşı, salt görüntüleme, bitiş tarihli",
+      "correct": true,
+      "feedback": "Doğru. En az erişim, en az risk."
+     },
+     {
+      "id": "org-edit",
+      "label": "Kurumdaki herkes, düzenleyebilir",
+      "correct": false,
+      "feedback": "İhtiyacı olmayan yüzlerce kişi dosyayı açıp değiştirebilir."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "folder"
+    }
+   },
+   "explain": "En az erişimi verin: adı belli kişiler, yalnızca gereken haklar ve bir bitiş tarihi."
+  },
+  {
+   "type": "swipe",
+   "id": "cloud-cards",
+   "prompt": "Bu paylaşım güvenli mi, riskli mi?",
+   "cards": [
+    {
+     "id": "expected-share",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "DocuSfera"
+        }
+       ],
+       "address": [
+        {
+         "text": "no-reply@docusfera.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Samir Babayev sizinle “Üç aylık rapor” dosyasını paylaştı"
+       }
+      ],
+      "time": "09:15",
+      "body": [
+       [
+        {
+         "text": "Samir: Dün konuştuğumuz rapor burada."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Tanıdık bir iş arkadaşı, beklenen bir dosya, hizmetin kendi alan adı. Yine de dosya açılınca adres çubuğunu kontrol edin."
+    },
+    {
+     "id": "salary-files",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "DocuSfera"
+        }
+       ],
+       "address": [
+        {
+         "text": "share@docusfera-files.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Size 3 dosya gönderildi: Maaş artışı 2027.pdf"
+       }
+      ],
+      "time": "16:58",
+      "body": [
+       [
+        {
+         "text": "Dosyalar 24 saat içinde silinecektir. Görüntülemek için e-posta parolanızı doğrulayınız."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Yanlış alan adı, cazip bir konu, zaman baskısı ve parola talebi. Klasik bir tuzak."
+    },
+    {
+     "id": "open-link",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://docusfera.example/s/Hx82kQ?access=anyone&role=editor"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Bu bağlantı herkesin düzenleme yapmasına izin veriyor. Göndermeden önce erişim düzeyini değiştirin."
+    },
+    {
+     "id": "personal-cloud",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Günay (ekip)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Evden çalışabilmek için belgeleri kişisel bulut hesabıma yükledim."
+         }
+        ],
+        "time": "18:40"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Kişisel bulut, kurumunuzun kontrolü dışındadır. İş dosyalarını yalnızca onaylı hizmette tutun."
+    },
+    {
+     "id": "cleanup-notice",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "BT Destek"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Eski açık bağlantılar kapatılacak"
+       }
+      ],
+      "time": "11:00",
+      "body": [
+       [
+        {
+         "text": "Cuma günü 90 günden eski açık bağlantılar otomatik olarak kapatılacaktır. Sizin herhangi bir işlem yapmanıza gerek yoktur."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Adres doğru, bağlantı yok, istek yok. Bu yararlı bir temizlik."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "access-levels",
+   "prompt": "Her erişim düzeyini anlamıyla eşleştirin.",
+   "pairs": [
+    {
+     "id": "viewer",
+     "left": "Görüntüleyen",
+     "right": "Yalnızca okuyabilir"
+    },
+    {
+     "id": "commenter",
+     "left": "Yorum yapan",
+     "right": "Okur ve not bırakır"
+    },
+    {
+     "id": "editor",
+     "left": "Düzenleyen",
+     "right": "Dosyayı değiştirebilir"
+    },
+    {
+     "id": "anyone",
+     "left": "Bağlantıya sahip olan herkes",
+     "right": "Kurum dışındakiler de açabilir"
+    }
+   ],
+   "explain": "Kimsenin ihtiyaç duymadığı düzenleme hakları, hata ya da zararlı değişiklik riskini artırır."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Bağlantıları adı belli kişilerle ve yalnızca gereken haklarla paylaşın.",
+    "Tanımadığınız bir uygulamanın hesabınıza erişmesine asla izin vermeyin.",
+    "İş dosyalarını kişisel bulut hesaplarında tutmayın."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

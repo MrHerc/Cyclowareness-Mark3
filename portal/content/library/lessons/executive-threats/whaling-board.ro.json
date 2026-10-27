@@ -1,0 +1,396 @@
+{
+  "id": "whaling-board",
+  "title": "Whaling",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Un e-mail fals de la conducere vine adesea în numele unui viceministru sau al secretariatului consiliului de conducere.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": { "kind": "illustration", "id": "ceo" }
+        },
+        {
+          "id": "b2",
+          "say": "Numele vă este cunoscut, dar verificați adresa: domeniul nu este al organizației, iar un cuvânt sau o literă diferă.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "idare-fake",
+              "from": {
+                "name": [{ "text": "Saadat Mammadli" }],
+                "address": [
+                  { "text": "r.mammadli@" },
+                  { "text": "idare-gov.example.net", "spot": "domain" }
+                ]
+              },
+              "subject": [{ "text": "Confidențial: trebuie rezolvat astăzi" }],
+              "time": "09:12",
+              "body": [
+                [
+                  { "text": "Bună ziua. " },
+                  { "text": "Sunt în ședință și nu pot suna.", "spot": "no-call" }
+                ],
+                [{ "text": "Astăzi trebuie virat un avans unui partener, detaliile sunt în atașament." }],
+                [{ "text": "Este confidențial, nu discutați cu nimeni despre asta.", "spot": "secret" }],
+                [{ "text": "Saadat Mammadli, viceministru" }]
+              ],
+              "attachments": [
+                { "name": [{ "text": "Rekvizitler.pdf" }], "size": "88 KB" }
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "b3",
+          "say": "Urgența, secretul și „nu pot suna” sunt acolo ca să vă împiedice să verificați.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "idare-fake",
+              "from": {
+                "name": [{ "text": "Saadat Mammadli" }],
+                "address": [
+                  { "text": "r.mammadli@" },
+                  { "text": "idare-gov.example.net", "spot": "domain" }
+                ]
+              },
+              "subject": [{ "text": "Confidențial: trebuie rezolvat astăzi" }],
+              "time": "09:12",
+              "body": [
+                [
+                  { "text": "Bună ziua. " },
+                  { "text": "Sunt în ședință și nu pot suna.", "spot": "no-call" }
+                ],
+                [{ "text": "Astăzi trebuie virat un avans unui partener, detaliile sunt în atașament." }],
+                [{ "text": "Este confidențial, nu discutați cu nimeni despre asta.", "spot": "secret" }],
+                [{ "text": "Saadat Mammadli, viceministru" }]
+              ],
+              "attachments": [
+                { "name": [{ "text": "Rekvizitler.pdf" }], "size": "88 KB" }
+              ]
+            }
+          },
+          "highlight": "no-call"
+        },
+        {
+          "id": "b4",
+          "say": "Regula este simplă: o cerere venită de la conducere se verifică la un număr cunoscut sau în persoană, niciodată printr-un răspuns la e-mail.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": { "kind": "illustration", "id": "handshake" }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "board-inbox",
+      "environment": "inbox",
+      "title": "E-mailuri de la conducere",
+      "intro": "În căsuța de e-mail aveți patru mesaje de la conducere. Deschideți-le pe rând: care sunt reale și care sunt false?",
+      "steps": [
+        {
+          "id": "fake-deputy",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare-fake",
+            "from": {
+              "name": [{ "text": "Saadat Mammadli" }],
+              "address": [
+                { "text": "r.mammadli@" },
+                { "text": "idare-gov.example.net", "spot": "domain" }
+              ]
+            },
+            "subject": [{ "text": "Confidențial: trebuie rezolvat astăzi" }],
+            "time": "09:12",
+            "body": [
+              [
+                { "text": "Bună ziua. " },
+                { "text": "Sunt în ședință și nu pot suna.", "spot": "no-call" }
+              ],
+              [{ "text": "Astăzi trebuie virat un avans unui partener, detaliile sunt în atașament." }],
+              [{ "text": "Este confidențial, nu discutați cu nimeni despre asta.", "spot": "secret" }],
+              [{ "text": "Saadat Mammadli, viceministru" }]
+            ],
+            "attachments": [
+              { "name": [{ "text": "Rekvizitler.pdf" }], "size": "88 KB" }
+            ]
+          },
+          "say": "Citiți domeniul până la capăt.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Corect. Domeniul nu este al organizației, iar pe deasupra apar urgența, secretul și evitarea unui apel."
+            },
+            {
+              "id": "reply",
+              "label": "Răspundeți: „Mă ocup de asta”",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Răspunsul ajunge direct la atacator. O cerere de bani se verifică întotdeauna la un număr cunoscut."
+            },
+            {
+              "id": "attachment",
+              "label": "Deschideți atașamentul",
+              "kind": "open-attachment",
+              "outcome": "risky",
+              "feedback": "Atașamentul poate conține malware sau date bancare false. Verificați mai întâi expeditorul."
+            }
+          ]
+        },
+        {
+          "id": "real-deputy",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Saadat Mammadli" }],
+              "address": [{ "text": "r.mammadli@idare.example" }]
+            },
+            "subject": [{ "text": "Ședința consiliului de conducere de vineri" }],
+            "time": "10:05",
+            "body": [
+              [{ "text": "Stimați colegi, ședința consiliului de conducere are loc vineri, la 11:00." }],
+              [{ "text": "Agenda se află în sistemul intern de documente. Trimiteți prezentările până joi." }]
+            ]
+          },
+          "actions": [
+            {
+              "id": "safe",
+              "label": "Marcați ca sigur",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Corect: domeniul organizației, un subiect așteptat, nicio cerere de bani sau de parolă."
+            },
+            {
+              "id": "reply",
+              "label": "Răspundeți",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Este un e-mail de serviciu obișnuit, puteți răspunde fără grijă."
+            },
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Prudența e bună, dar acest e-mail este real: vine din domeniul organizației și nu vi se cere nimic."
+            }
+          ]
+        },
+        {
+          "id": "fake-board",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare-fake",
+            "from": {
+              "name": [{ "text": "Secretariatul consiliului de conducere" }],
+              "address": [{ "text": "katiblik@board-idare.example.net" }]
+            },
+            "subject": [{ "text": "Votați astăzi până la 18:00" }],
+            "time": "11:30",
+            "body": [
+              [{ "text": "Stimați membri ai consiliului de conducere, vă rugăm să votați urgent un proiect de decizie." }],
+              [
+                { "text": "Conectați-vă cu contul de serviciu: " },
+                {
+                  "text": "board-idare.example.net/sesverme",
+                  "link": { "label": "board-idare.example.net/sesverme", "href": "https://board-idare.example.net/sesverme" }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Corect. Domeniul nu este al organizației, iar un site extern vă cere parola de serviciu."
+            },
+            {
+              "id": "click",
+              "label": "Deschideți linkul",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Este un portal fals, care fură parolele de serviciu. Voturile reale au loc în sistemul intern."
+            },
+            {
+              "id": "forward",
+              "label": "Redirecționați mesajul asistentului",
+              "kind": "forward",
+              "outcome": "risky",
+              "feedback": "Prin redirecționare, pericolul ajunge la asistent. Raportați e-mailul ca phishing."
+            }
+          ]
+        },
+        {
+          "id": "assistant-schedule",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Sabina Aliyeva" }],
+              "address": [{ "text": "s.aliyeva@idare.example" }]
+            },
+            "subject": [{ "text": "Programul de mâine" }],
+            "time": "12:10",
+            "body": [
+              [{ "text": "Vă trimit atașat programul de mâine. Ședința de la 15:00 s-a mutat la etajul doi." }]
+            ],
+            "attachments": [
+              { "name": [{ "text": "Cedvel.pdf" }], "size": "64 KB" }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Deschideți atașamentul",
+              "kind": "open-attachment",
+              "outcome": "safe",
+              "feedback": "Corect. Un expeditor așteptat, domeniul organizației și un PDF obișnuit."
+            },
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Este e-mailul obișnuit al asistentei dumneavoastră. Dacă vă îndoiți de orice, munca încetinește."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "verify-right-way",
+      "question": {
+        "prompt": "Ați primit de la viceministru o cerere de bani. Cum o verificați?",
+        "options": [
+          {
+            "id": "mail-number",
+            "label": "Sun la numărul din e-mail",
+            "correct": false,
+            "feedback": "Numărul acela este al atacatorului, care vă va spune „da”."
+          },
+          {
+            "id": "reply",
+            "label": "Răspund la e-mail și întreb",
+            "correct": false,
+            "feedback": "Răspunsul ajunge la atacator, care va confirma cererea."
+          },
+          {
+            "id": "known",
+            "label": "Sun la un număr din agenda telefonică a organizației sau întreb asistentul",
+            "correct": true,
+            "feedback": "Corect. Un canal cunoscut nu se află sub controlul atacatorului."
+          }
+        ],
+        "visual": { "kind": "illustration", "id": "ceo" }
+      },
+      "explain": "Verificați întotdeauna în afara e-mailului, pe un canal cunoscut."
+    },
+    {
+      "type": "match",
+      "id": "red-flags",
+      "prompt": "Asociați fiecare semnal de alarmă cu semnificația lui.",
+      "pairs": [
+        { "id": "domain", "left": "Un domeniu extern", "right": "E-mailul nu vine din organizația dumneavoastră" },
+        { "id": "secret", "left": "„Nu spuneți nimănui”", "right": "Vă împiedică să verificați" },
+        { "id": "no-call", "left": "„Nu pot suna”", "right": "Evită o verificare la telefon" },
+        { "id": "deadline", "left": "„Astăzi până la 18:00”", "right": "Nu vă lasă timp de gândire" }
+      ],
+      "explain": "Un singur semnal de alarmă este suficient ca să vă opriți și să verificați."
+    },
+    {
+      "type": "swipe",
+      "id": "board-swipe",
+      "prompt": "Cerere reală sau falsă?",
+      "cards": [
+        {
+          "id": "new-number",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [{ "text": "Saadat Mammadli (număr nou)" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Acesta este noul meu număr. Sunt în ședință, nu îi spuneți asistentului meu, am o sarcină pentru dumneavoastră." }],
+                "time": "14:02"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Un număr nou și o cerere de păstrare a secretului. Sunați la numărul vechi ca să verificați."
+        },
+        {
+          "id": "doc-system",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Sistemul intern de documente" }],
+              "address": [{ "text": "edoc@idare.example" }]
+            },
+            "subject": [{ "text": "Un proces-verbal vă așteaptă semnătura" }],
+            "time": "15:20",
+            "body": [
+              [{ "text": "Procesul-verbal al ședinței consiliului de conducere vă așteaptă semnătura. Conectați-vă pe portalul organizației." }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Niciun link, vă îndrumă spre portalul oficial. Un flux de lucru obișnuit."
+        },
+        {
+          "id": "fake-protocol",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare-fake",
+            "from": {
+              "name": [{ "text": "Secretariatul consiliului de conducere" }],
+              "address": [{ "text": "kollegiya@idare-gov.example.net" }]
+            },
+            "subject": [{ "text": "Semnați urgent procesul-verbal" }],
+            "time": "16:45",
+            "body": [
+              [
+                { "text": "Semnați astăzi procesul-verbal: " },
+                {
+                  "text": "idare-gov.example.net/imza",
+                  "link": { "label": "idare-gov.example.net/imza", "href": "https://idare-gov.example.net/imza" }
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Domeniul nu este al organizației, iar mesajul conține un link urgent. Raportați-l ca phishing."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Numele unui lider nu este o dovadă: verificați domeniul și cererea.",
+        "Confirmați cererile de bani și de parole pe un canal cunoscut.",
+        "Nu răspundeți la un e-mail fals, ci raportați-l."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

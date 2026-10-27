@@ -1,0 +1,394 @@
+{
+ "id": "office-guard",
+ "title": "Veiller sur les locaux",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "no-computer",
+     "say": "Un attaquant n’a pas toujours besoin d’un ordinateur. Un document oublié sur un bureau ou un écran non verrouillé lui suffit.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "lock-screen",
+     "say": "Verrouillez votre écran chaque fois que vous vous levez. Sur un ordinateur Windows, appuyez en même temps sur la touche Windows et sur la lettre L.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "tailgating",
+     "say": "Si un inconnu essaie de franchir une porte sécurisée juste derrière vous, demandez-lui poliment d’utiliser son propre badge.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "visitors",
+     "say": "Les visiteurs s’enregistrent à l’accueil, portent un badge visiteur et sont toujours accompagnés dans le bâtiment.",
+     "mood": "happy",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "tailgate",
+   "title": "Quelqu’un derrière vous",
+   "start": "door",
+   "nodes": [
+    {
+     "id": "door",
+     "text": "Vous pouvez me tenir la porte, s’il vous plaît ? J’ai les mains prises. Mon badge est dans mon sac, je viens réparer l’imprimante.",
+     "speaker": "Un inconnu",
+     "voice": "young-man-2",
+     "channel": "in-person",
+     "spoken": "Vous pouvez me tenir la porte, s’il vous plaît ? J’ai les mains prises. <breath> Mon badge est dans mon sac, je viens réparer l’imprimante.",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     },
+     "choices": [
+      {
+       "label": "Lui tenir la porte, il a les mains prises",
+       "outcome": "compromised",
+       "feedback": "Une personne non vérifiée est entrée. Les attaquants comptent justement sur cette politesse."
+      },
+      {
+       "label": "Proposer de tenir ses cartons pour qu’il trouve son badge",
+       "next": "no-badge",
+       "feedback": "Poli, et c’est la bonne réaction."
+      },
+      {
+       "label": "Laisser la porte se refermer et partir sans rien dire",
+       "outcome": "risky",
+       "feedback": "Il n’est pas entré, mais quelqu’un d’autre risque de lui ouvrir. Mieux vaut prévenir la sécurité."
+      }
+     ]
+    },
+    {
+     "id": "no-badge",
+     "text": "On dirait que je l’ai oublié chez moi. Je suis pressé, votre chef m’attend.",
+     "speaker": "Un inconnu",
+     "voice": "young-man-2",
+     "channel": "in-person",
+     "spoken": "On dirait que, euh, je l’ai oublié chez moi. Je suis pressé, votre chef m’attend.",
+     "choices": [
+      {
+       "label": "D’accord, allez-y",
+       "outcome": "compromised",
+       "feedback": "Citer le chef et vous presser, c’est la ruse la plus ancienne. Pas de badge, pas d’entrée."
+      },
+      {
+       "label": "L’accompagner au poste de sécurité",
+       "next": "guard",
+       "feedback": "Exact. Là-bas, on peut lui remettre un badge visiteur ou lui refuser l’entrée."
+      }
+     ]
+    },
+    {
+     "id": "guard",
+     "text": "Aucune réparation d’imprimante n’est prévue aujourd’hui. Vous avez bien fait de me l’amener.",
+     "speaker": "Agent de sécurité",
+     "voice": "older-man",
+     "channel": "in-person",
+     "manner": "firm",
+     "spoken": "Aucune réparation d’imprimante n’est prévue aujourd’hui. <breath> Vous avez bien fait de me l’amener.",
+     "character": "guard",
+     "choices": [
+      {
+       "label": "Envoyer aussi un petit message à l’équipe sécurité",
+       "outcome": "safe",
+       "feedback": "Bravo. L’équipe va vérifier les caméras et contrôler les autres entrées."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "reception-call",
+   "environment": "call",
+   "title": "Appel de l’accueil",
+   "intro": "L’accueil vous appelle. Décidez quoi faire d’un visiteur que vous n’attendiez pas.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Accueil"
+       }
+      ],
+      "number": [
+       {
+        "text": "Poste 115"
+       }
+      ],
+      "label": "Téléphone pro",
+      "voice": "woman-2"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Répondre",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Répondez. C’est à vous de décider pour ce visiteur."
+      },
+      {
+       "id": "decline",
+       "label": "Refuser",
+       "kind": "decline",
+       "outcome": "risky",
+       "feedback": "L’accueil n’obtient pas de réponse et risque de laisser passer le visiteur sans contrôle. Prenez ce genre d’appel.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "visitor",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Accueil"
+       }
+      ],
+      "number": [
+       {
+        "text": "Poste 115"
+       }
+      ],
+      "label": "Téléphone pro",
+      "voice": "woman-2"
+     },
+     "say": "Bonjour, il y a ici un technicien pour la climatisation. Il dit que vous, pardon, que vous l’avez appelé. Je le fais monter ?",
+     "spoken": "Bonjour, <breath> il y a ici un, euh, technicien pour la climatisation. Il dit que vous <cough> pardon, que vous l’avez appelé. Je le fais monter ?",
+     "actions": [
+      {
+       "id": "send-up",
+       "label": "Oui, faites-le monter",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Une personne non vérifiée va circuler seule dans le bâtiment. Vérifiez d’abord le bon d’intervention."
+      },
+      {
+       "id": "hold",
+       "label": "Je n’ai appelé personne, gardez-le à l’accueil",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Un visiteur inattendu n’entre pas sans vérification."
+      },
+      {
+       "id": "come-down",
+       "label": "Je descends voir",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bien. Retrouvez le visiteur à l’accueil et ne le laissez pas seul."
+      }
+     ]
+    },
+    {
+     "id": "name-drop",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Accueil"
+       }
+      ],
+      "number": [
+       {
+        "text": "Poste 115"
+       }
+      ],
+      "label": "Téléphone pro",
+      "voice": "woman-2"
+     },
+     "say": "Il dit que monsieur Kamran a donné son accord. Il n’a besoin que de cinq minutes dans la salle des serveurs.",
+     "spoken": "Il dit que <breath> monsieur Kamran a donné son accord. Il n’a besoin que de cinq minutes dans la salle des serveurs.",
+     "actions": [
+      {
+       "id": "let-in",
+       "label": "Alors laissez-le entrer",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Un accès non vérifié à la salle des serveurs est une menace sérieuse. Le nom d’un responsable ne vaut pas autorisation."
+      },
+      {
+       "id": "check-order",
+       "label": "Je vérifie l’intervention auprès des services généraux",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Vérifiez l’intervention par les canaux officiels, pas sur la parole du visiteur."
+      },
+      {
+       "id": "call-boss",
+       "label": "J’appelle moi-même M. Kamran",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bien. Appelez votre responsable au numéro que vous connaissez et posez-lui la question.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "L’appel est terminé. Les services généraux confirment qu’aucun technicien n’était prévu aujourd’hui.",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Accueil"
+       }
+      ],
+      "number": [
+       {
+        "text": "Poste 115"
+       }
+      ],
+      "label": "Téléphone pro",
+      "voice": "woman-2"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Prévenir les agents de sécurité et l’équipe sécurité",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Parfait. Les agents vont retenir la personne, et les caméras seront vérifiées."
+      },
+      {
+       "id": "ignore",
+       "label": "Ne rien faire",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Le faux technicien risque de tenter sa chance par une autre entrée. Le signalement protège tout le bâtiment."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "clean-desk",
+   "question": {
+    "prompt": "Vous partez déjeuner. Qu’est-ce qui ne doit pas rester sur votre bureau ?",
+    "options": [
+     {
+      "id": "sticky-note",
+      "label": "Un post-it avec un mot de passe",
+      "correct": true,
+      "feedback": "Un mot de passe ne doit jamais rester sur papier, à la vue de tous."
+     },
+     {
+      "id": "citizen-file",
+      "label": "Un dossier contenant la demande d’un usager",
+      "correct": true,
+      "feedback": "Rangez les dossiers confidentiels dans une armoire fermée à clé."
+     },
+     {
+      "id": "phone",
+      "label": "Un téléphone pro non verrouillé",
+      "correct": true,
+      "feedback": "Un téléphone non verrouillé ouvre la porte à vos comptes."
+     },
+     {
+      "id": "cup",
+      "label": "Une tasse de café vide",
+      "correct": false,
+      "feedback": "Ce n’est pas un risque. Rangez-la, tout simplement."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "desk"
+    }
+   },
+   "explain": "Règle du bureau propre : quand vous partez, papiers, supports et appareils sont rangés sous clé."
+  },
+  {
+   "type": "match",
+   "id": "situations",
+   "prompt": "Associez chaque situation à la bonne réaction.",
+   "pairs": [
+    {
+     "id": "stranger",
+     "left": "Un inconnu sans badge dans le couloir",
+     "right": "L’aborder poliment et l’accompagner à la sécurité"
+    },
+    {
+     "id": "printer",
+     "left": "L’impression confidentielle de quelqu’un d’autre",
+     "right": "La rendre à son propriétaire sans la lire"
+    },
+    {
+     "id": "lost-badge",
+     "left": "Vous avez perdu votre badge d’accès",
+     "right": "Le signaler tout de suite pour qu’il soit bloqué"
+    },
+    {
+     "id": "open-screen",
+     "left": "Une personne de l’équipe est partie sans verrouiller son écran",
+     "right": "Verrouiller l’écran et lui rappeler la règle"
+    }
+   ],
+   "explain": "La sécurité physique est l’affaire de tous. Un petit geste évite une grosse fuite."
+  },
+  {
+   "type": "order",
+   "id": "visitor-flow",
+   "prompt": "Remettez dans l’ordre l’arrivée d’un visiteur.",
+   "items": [
+    {
+     "id": "sign-in",
+     "label": "Le visiteur s’enregistre à l’accueil"
+    },
+    {
+     "id": "badge",
+     "label": "Il reçoit un badge visiteur et le porte de façon visible"
+    },
+    {
+     "id": "escort",
+     "label": "La personne qui le reçoit vient le chercher et l’accompagne"
+    },
+    {
+     "id": "return",
+     "label": "Il rend le badge en sortant"
+    }
+   ],
+   "explain": "Un visiteur n’est jamais laissé seul dans le bâtiment, et il rend son badge en partant."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Verrouillez votre écran quand vous vous levez et rangez vos papiers sous clé.",
+    "Ne laissez pas d’inconnus entrer derrière vous : orientez-les vers la sécurité.",
+    "Récupérez vos impressions tout de suite et détruisez correctement les papiers confidentiels."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

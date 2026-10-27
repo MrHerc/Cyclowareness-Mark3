@@ -1,0 +1,323 @@
+{
+ "id": "first-15-minutes",
+ "title": "Primele 15 minute",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Ați dat clic pe un link sau v-ați introdus parola? I se poate întâmpla oricui.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Primele cincisprezece minute contează cel mai mult: parolele furate sunt adesea folosite imediat.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "15",
+      "label": "minute care contează cel mai mult"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Schimbați parola pe site-ul real, anunțați echipa de securitate și păstrați e-mailul.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Nu ascundeți ce s-a întâmplat. Tăcerea îi dă timp atacatorului; un raport sincer îi protejează pe toți.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "after-the-click",
+   "environment": "desktop",
+   "title": "V-ați introdus parola",
+   "intro": "V-ați introdus parola de la e-mail pe o pagină falsă și tocmai v-ați dat seama. Ce urmează depinde de dumneavoastră.",
+   "steps": [
+    {
+     "id": "retry-trap",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Conectare eșuată"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Parolă greșită. Încercați din nou sau folosiți altă parolă."
+        }
+       ]
+      ],
+      "buttons": [
+       "Închideți",
+       "Încercați din nou"
+      ]
+     },
+     "say": "Pagina afișează o eroare.",
+     "actions": [
+      {
+       "id": "retry",
+       "label": "Încercați din nou",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Site-urile false afișează o eroare ca să introduceți parola încă o dată, uneori chiar și una diferită."
+      },
+      {
+       "id": "close",
+       "label": "Închideți",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect, nu mai introduceți nimic. Închideți pagina și treceți la pasul următor."
+      }
+     ]
+    },
+    {
+     "id": "the-email",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ispoct-fake",
+      "from": {
+       "name": [
+        {
+         "text": "IshPocht Admin"
+        }
+       ],
+       "address": [
+        {
+         "text": "admin@ispoct-mail.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Căsuța dumneavoastră de e-mail este plină în proporție de 98%"
+       }
+      ],
+      "time": "09:41",
+      "body": [
+       [
+        {
+         "text": "Măriți spațiul de stocare ca să nu vi se șteargă e-mailurile: "
+        },
+        {
+         "text": "ispoct-mail.example.net/yer",
+         "link": {
+          "label": "ispoct-mail.example.net/yer",
+          "href": "https://ispoct-mail.example.net/yer"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "E-mailul este încă în căsuța dumneavoastră.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Raportul permite echipei de securitate să șteargă e-mailul și din căsuțele colegilor."
+      },
+      {
+       "id": "forward",
+       "label": "Redirecționați-l echipei de securitate",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Bine. Faceți așa dacă nu aveți un buton de raportare, apoi sunați-i și la telefon."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți-l, ca să nu-l vadă nimeni",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "E-mailul este o dovadă. Odată șters, nu mai poate ajuta echipa de securitate să urmărească atacul."
+      }
+     ]
+    },
+    {
+     "id": "change-password",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "IshPocht",
+      "url": [
+       {
+        "text": "https://poct.idare.example/parol"
+       }
+      ],
+      "fields": [
+       "Parola actuală",
+       "Parola nouă"
+      ],
+      "button": "Schimbați parola"
+     },
+     "say": "Ați tastat chiar dumneavoastră adresa. Schimbați parola.",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Schimbați parola",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Corect, site-ul este cel autentic. Parola nouă nu trebuie să semene cu cea veche."
+      },
+      {
+       "id": "later",
+       "label": "O schimb mâine",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Parolele furate sunt folosite repede. Dacă așteptați, îi dați timp atacatorului."
+      }
+     ]
+    },
+    {
+     "id": "reused",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Această parolă este folosită și în altă parte"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Vechea parolă de la e-mail este folosită și pe portalul biroului, și pe pagina Kontakto."
+        }
+       ]
+      ],
+      "buttons": [
+       "Mai târziu",
+       "Schimbați-le pe toate"
+      ]
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "Schimbați-le pe toate",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Corect. Atacatorii încearcă parola furată și pe alte site-uri."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Fiecare cont cu aceeași parolă este acum expus. Schimbați-le pe toate chiar azi."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "mistake-first-step",
+   "prompt": "Asociați fiecare greșeală cu primul pas.",
+   "pairs": [
+    {
+     "id": "clicked",
+     "left": "Am dat clic, dar n-am introdus nimic",
+     "right": "Închideți pagina și raportați e-mailul"
+    },
+    {
+     "id": "password",
+     "left": "Mi-am introdus parola pe o pagină falsă",
+     "right": "Schimbați-o pe site-ul real și raportați"
+    },
+    {
+     "id": "code",
+     "left": "I-am dat cuiva la telefon codul de verificare",
+     "right": "Sunați imediat echipa de securitate"
+    },
+    {
+     "id": "card",
+     "left": "Mi-am introdus datele cardului",
+     "right": "Sunați la bancă, la numărul de pe card"
+    }
+   ],
+   "explain": "Raportați de fiecare dată: specialiștii caută urme pe care dumneavoastră nu le vedeți."
+  },
+  {
+   "type": "choice",
+   "id": "approved-push",
+   "question": {
+    "prompt": "Pe telefon v-a venit o cerere de conectare și ați atins din greșeală „Aprobați”. Ce faceți acum?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Sun imediat echipa de securitate și îmi schimb parola",
+      "correct": true,
+      "feedback": "Corect. L-ați lăsat pe atacator să intre; echipa de securitate îl va scoate din cont, închizând sesiunile."
+     },
+     {
+      "id": "nothing",
+      "label": "Nimic, a fost doar o dată",
+      "correct": false,
+      "feedback": "O singură aprobare este de ajuns: atacatorul este deja în contul dumneavoastră."
+     },
+     {
+      "id": "phone-off",
+      "label": "Opresc telefonul",
+      "correct": false,
+      "feedback": "Oprirea telefonului nu îl scoate pe atacator. El este deja înăuntru."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "mfa-phone"
+    }
+   },
+   "explain": "O aprobare dată din greșeală și un cod dat altcuiva cer același pas urgent: raportați imediat."
+  },
+  {
+   "type": "password",
+   "id": "new-password",
+   "prompt": "Creați o parolă nouă în locul celei furate, una care să nu semene deloc cu cea veche.",
+   "targetScore": 4,
+   "tips": [
+    "Nu modificați doar puțin parola veche: Aysel2027 în loc de Aysel2026 nu este suficient",
+    "Uniți patru cuvinte la întâmplare, cu spații între ele",
+    "Salvați parola nouă în managerul de parole"
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Nu mai introduceți nimic: închideți pagina și păstrați e-mailul.",
+    "Schimbați parola pe site-ul real și oriunde altundeva ați mai folosit-o.",
+    "Ați dat un cod sau ați atins „Aprobați”? Sunați imediat echipa de securitate."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

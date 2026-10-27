@@ -1,0 +1,353 @@
+{
+ "id": "stolen-session",
+ "title": "La session volée",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "is2-tutor",
+   "beats": [
+    {
+     "id": "is2-b1",
+     "say": "Bonjour ! Ce matin, vous découvrez que votre messagerie professionnelle a envoyé quarante e-mails à l’étranger pendant la nuit.",
+     "mood": "alert",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "is2-b2",
+     "say": "Personne n’avait votre mot de passe. Un programme a volé dans le navigateur votre session de connexion, c’est-à-dire le cookie.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "ispoct",
+       "app": "İşPoçt",
+       "title": [
+        {
+         "text": "Nouvelle connexion"
+        }
+       ],
+       "body": [
+        {
+         "text": "Amsterdam, 03:05, navigateur inconnu",
+         "spot": "location"
+        }
+       ],
+       "time": "03:05"
+      }
+     },
+     "highlight": "location"
+    },
+    {
+     "id": "is2-b3",
+     "say": "Le cookie indique au site que la connexion a déjà eu lieu : il ne demande donc ni mot de passe ni code.",
+     "mood": "talk",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "is2-b4",
+     "say": "Trois choses vous aident : un appareil sain, la déconnexion de toutes les sessions et le support technique.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "is2-match",
+   "prompt": "Que permet chaque élément volé à un criminel ? Associez-les.",
+   "pairs": [
+    {
+     "id": "cookie",
+     "left": "La session de connexion du navigateur",
+     "right": "Entrer dans le compte sans mot de passe ni code"
+    },
+    {
+     "id": "saved",
+     "left": "Les mots de passe enregistrés dans le navigateur",
+     "right": "Entrer dans vos comptes sur d’autres sites"
+    },
+    {
+     "id": "card",
+     "left": "Les données de carte de la saisie automatique",
+     "right": "Payer en ligne en votre nom"
+    },
+    {
+     "id": "messenger",
+     "left": "La session de l’application de messagerie",
+     "right": "Lire vos conversations et écrire à votre place"
+    }
+   ],
+   "explain": "Un logiciel voleur de données (infostealer) prend tout cela d’un coup. Modifiez donc tous vos mots de passe, pas un seul, et fermez les sessions."
+  },
+  {
+   "type": "simulation",
+   "id": "is2-sim",
+   "environment": "browser",
+   "title": "Sur un ordinateur professionnel sain",
+   "intro": "Vous êtes sur votre ordinateur professionnel, et il est sain. Ouvrez votre messagerie et choisissez la bonne action sur chaque écran.",
+   "steps": [
+    {
+     "id": "sent-folder",
+     "label": "Envoyés : cette nuit à 03:12, 40 e-mails vers des adresses inconnues",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://poct.idare.example/gonderilenler"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "call-it",
+       "label": "Appeler le support technique",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Un spécialiste peut protéger le compte immédiatement et voir ce qui a été envoyé."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer les e-mails",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Supprimer ne rattrape pas les e-mails envoyés, mais détruit des preuves. Prévenez d’abord le support technique."
+      },
+      {
+       "id": "later",
+       "label": "Fermer et regarder plus tard",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "L’attaquant est toujours dans le compte et continue d’écrire. Chaque minute compte."
+      }
+     ]
+    },
+    {
+     "id": "new-login",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Connexion depuis un nouvel appareil"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Windows, navigateur inconnu"
+        }
+       ],
+       [
+        {
+         "text": "Amsterdam, aujourd’hui à 03:05"
+        }
+       ],
+       [
+        {
+         "text": "Est-ce bien vous ?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Ce n’était pas moi",
+       "C’était moi"
+      ]
+     },
+     "actions": [
+      {
+       "id": "not-me",
+       "label": "Ce n’était pas moi",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Le système marque la connexion comme suspecte, et le support technique la verra."
+      },
+      {
+       "id": "me",
+       "label": "C’était moi",
+       "kind": "mark-safe",
+       "outcome": "compromised",
+       "feedback": "Vous venez de confirmer la connexion de l’attaquant. Désormais, le système le prend pour vous."
+      }
+     ]
+    },
+    {
+     "id": "change-password",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "İşPoçt",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/parol"
+       }
+      ],
+      "fields": [
+       "Mot de passe actuel",
+       "Nouveau mot de passe",
+       "Confirmer le nouveau mot de passe"
+      ],
+      "button": "Modifier le mot de passe"
+     },
+     "say": "L’adresse est authentique et l’ordinateur est sain.",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Modifier le mot de passe",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Exact. Ne saisissez un nouveau mot de passe que sur un appareil sain, sinon le programme le vole aussi."
+      },
+      {
+       "id": "skip",
+       "label": "Plus tard",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "L’ancien mot de passe a peut-être été volé. Modifiez-le maintenant, depuis cet ordinateur sain."
+      }
+     ]
+    },
+    {
+     "id": "sessions",
+     "label": "Sessions actives : 3 appareils. Se déconnecter de tous ?",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/sessiyalar"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "sign-out-all",
+       "label": "Se déconnecter de tous les appareils",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Bravo. Le cookie volé ne fonctionne plus, et l’attaquant devrait se reconnecter."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Modifier le mot de passe ne ferme pas toujours une session ouverte. L’attaquant est peut-être encore dans le compte."
+      }
+     ]
+    },
+    {
+     "id": "forward-rule",
+     "label": "Nouvelle règle, 03:07 : transférer tous les e-mails à arxiv@poct-yedek.example",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://poct.idare.example/qaydalar"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "show-it",
+       "label": "Montrer la règle au support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Même après le départ de l’attaquant, cette règle continuait de lui envoyer vos e-mails."
+      },
+      {
+       "id": "leave",
+       "label": "La laisser",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "C’est un transfert caché. Chaque nouvel e-mail que vous recevez partira chez l’attaquant."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "is2-choice",
+   "question": {
+    "prompt": "Comment l’attaquant est-il entré dans la messagerie sans votre mot de passe ni code ?",
+    "options": [
+     {
+      "id": "cookie",
+      "label": "Grâce à une session volée dans le navigateur",
+      "correct": true,
+      "feedback": "Exact. La session indique que la connexion a déjà eu lieu, donc aucun code n’est demandé."
+     },
+     {
+      "id": "guess",
+      "label": "En devinant le mot de passe",
+      "correct": false,
+      "feedback": "Dans ce cas, le système aurait demandé un code. Ici, il n’a fallu ni mot de passe ni code."
+     },
+     {
+      "id": "server",
+      "label": "Le serveur de messagerie a été piraté",
+      "correct": false,
+      "feedback": "Le serveur n’a rien. C’est la session de votre navigateur qui a été volée."
+     }
+    ]
+   },
+   "explain": "Quand un cookie est volé, la double authentification ne sert à rien non plus. Ne laissez donc pas un logiciel voleur de données s’installer sur votre ordinateur."
+  },
+  {
+   "type": "order",
+   "id": "is2-order",
+   "prompt": "Si un ordinateur est infecté, remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "isolate",
+     "label": "Déconnecter l’ordinateur infecté du réseau"
+    },
+    {
+     "id": "report",
+     "label": "Prévenir immédiatement le support technique"
+    },
+    {
+     "id": "passwords",
+     "label": "Modifier les mots de passe depuis un appareil sain"
+    },
+    {
+     "id": "sessions",
+     "label": "Se déconnecter de toutes les sessions"
+    },
+    {
+     "id": "rebuild",
+     "label": "Laisser le support technique réinstaller l’ordinateur"
+    }
+   ],
+   "explain": "Si vous modifiez un mot de passe sur l’ordinateur infecté, le programme vole aussi le nouveau. L’ordinateur n’est considéré comme sain qu’après une réinstallation complète."
+  },
+  {
+   "type": "recap",
+   "id": "is2-recap",
+   "points": [
+    "Une session volée donne accès au compte sans mot de passe ni code",
+    "Modifiez vos mots de passe depuis un appareil sain, puis déconnectez-vous de toutes les sessions",
+    "Laissez le support technique réinstaller l’ordinateur infecté"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

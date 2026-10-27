@@ -1,0 +1,459 @@
+{
+ "id": "parcel-fee",
+ "title": "Paketgebühr",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pf-tutor",
+   "beats": [
+    {
+     "id": "pf-b1",
+     "say": "Hallo! Heute sehen wir uns an, wie aus einem winzigen Zahlungslink ein großer Schaden wird.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "pf-b2",
+     "say": "Die Gebühr liegt bei gerade einmal einem Manat zwanzig. Den Kriminellen geht es nicht um die Gebühr, sondern um Ihre Kartendaten.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "w2d-tezkuryer-fake",
+       "sender": [
+        {
+         "text": "+994 51 000 83 17"
+        }
+       ],
+       "time": "10:47",
+       "messages": [
+        [
+         {
+          "text": "TezKuryer: Ihr Paket wird beim Zoll festgehalten. "
+         },
+         {
+          "text": "Zahlen Sie eine Gebühr von 1,20 AZN: ",
+          "spot": "fee"
+         },
+         {
+          "text": "tezkuryer-gomruk.example.net/odenis",
+          "link": {
+           "label": "tezkuryer-gomruk.example.net/odenis",
+           "href": "https://tezkuryer-gomruk.example.net/odenis"
+          }
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "fee"
+    },
+    {
+     "id": "pf-b3",
+     "say": "Paket, Bußgeld oder Zuschuss – ganz gleich, worum es geht: Zahlen Sie nie über einen Link in einer SMS.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "pf-b4",
+     "say": "Öffnen Sie stattdessen selbst die offizielle App oder das Portal und sehen Sie dort nach.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "pf-hotspot",
+   "prompt": "Finden Sie die Warnsignale für Betrug in dieser SMS.",
+   "artifact": {
+    "kind": "sms",
+    "brandRef": "w2d-tezkuryer-fake",
+    "sender": [
+     {
+      "text": "+994 51 000 83 17",
+      "spot": "sender"
+     }
+    ],
+    "time": "10:47",
+    "messages": [
+     [
+      {
+       "text": "TezKuryer: Ihr Paket TZ48120577AZ wird beim Zoll festgehalten. "
+      },
+      {
+       "text": "Eine Zollgebühr von 1,20 AZN",
+       "spot": "small-fee"
+      },
+      {
+       "text": " ist zu zahlen."
+      }
+     ],
+     [
+      {
+       "text": "Hier bezahlen: "
+      },
+      {
+       "text": "tezkuryer-gomruk.example.net/odenis",
+       "spot": "link",
+       "link": {
+        "label": "tezkuryer-gomruk.example.net/odenis",
+        "href": "https://tezkuryer-gomruk.example.net/odenis"
+       }
+      }
+     ],
+     [
+      {
+       "text": "Erfolgt die Zahlung nicht innerhalb von 24 Stunden, geht das Paket an den Absender zurück.",
+       "spot": "deadline"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Gewöhnliche Mobilfunknummer",
+     "explain": "SMS von Unternehmen kommen meist unter einem Namen an. Auch ein Name lässt sich fälschen. Verlassen Sie sich deshalb nie allein auf dieses Merkmal."
+    },
+    {
+     "id": "small-fee",
+     "label": "Winziger Betrag",
+     "explain": "Ein winziger Betrag macht Sie unvorsichtig. Das eigentliche Ziel sind Ihre Kartennummer, der Sicherheitscode auf der Rückseite und der SMS-Code."
+    },
+    {
+     "id": "link",
+     "label": "Gefälschte Adresse",
+     "explain": "Das ist nicht die offizielle Website des Kurierdienstes: Dem Namen wurden zusätzliche Wörter angehängt. Tippen Sie nicht darauf, sondern öffnen Sie selbst die offizielle App."
+    },
+    {
+     "id": "deadline",
+     "label": "Zeitdruck",
+     "explain": "Die Frist soll Sie vom Nachdenken abhalten. Ein echter Kurierdienst lässt Ihnen Zeit, alles zu prüfen."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "pf-sim",
+   "environment": "phone",
+   "title": "Nachrichten im Laufe des Tages",
+   "intro": "Im Laufe des Tages kommen mehrere Nachrichten auf Ihrem Smartphone an. Wählen Sie jeweils die richtige Reaktion.",
+   "steps": [
+    {
+     "id": "redeliver-sms",
+     "label": "10:47 Neue SMS",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2d-tezkuryer-fake",
+      "sender": [
+       {
+        "text": "+994 51 000 83 17"
+       }
+      ],
+      "time": "10:47",
+      "messages": [
+       [
+        {
+         "text": "TezKuryer: Unser Kurier hat Sie nicht angetroffen. Zahlen Sie 0,90 AZN für eine erneute Zustellung: "
+        },
+        {
+         "text": "tezkuryer-catdirilma.example.net/odenis",
+         "link": {
+          "label": "tezkuryer-catdirilma.example.net/odenis",
+          "href": "https://tezkuryer-catdirilma.example.net/odenis"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Der Name eines bekannten Kurierdienstes und ein kleiner Betrag.",
+     "actions": [
+      {
+       "id": "open-link",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Die Seite sieht aus wie die Website des Kurierdienstes, aber die Adresse ist gefälscht. Sehen Sie sich jetzt an, was sie verlangt.",
+       "next": "bank-code"
+      },
+      {
+       "id": "report",
+       "label": "Als Spam melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Melden Sie die SMS und prüfen Sie das Paket dann in der offiziellen App.",
+       "next": "real-app"
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Gut. Wenn Sie ein Paket erwarten, prüfen Sie es in der offiziellen App.",
+       "next": "real-app"
+      }
+     ]
+    },
+    {
+     "id": "bank-code",
+     "label": "Die Seite hat Kartendaten und den SMS-Code verlangt",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "10:49",
+      "messages": [
+       [
+        {
+         "text": "Code: 518204. Zahlung über 412,00 AZN an TZK GLOBAL PAY. Geben Sie diesen Code niemals weiter."
+        }
+       ]
+      ]
+     },
+     "say": "Ihre Bank hat einen Code geschickt. Achten Sie auf den Betrag.",
+     "actions": [
+      {
+       "id": "type-code",
+       "label": "Code auf der Website eingeben",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Mit diesem Code bestätigen Sie nicht einen Manat, sondern 412 Manat. Rufen Sie sofort Ihre Bank unter der Nummer auf der Rückseite Ihrer Karte an."
+      },
+      {
+       "id": "call-bank",
+       "label": "Bank unter der Nummer auf der Karte anrufen",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Richtig. Der Betrag neben dem Code ist weit höher als auf der Seite angegeben. Lassen Sie die Karte jetzt sperren."
+      },
+      {
+       "id": "ignore",
+       "label": "Den Code nirgends eingeben",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Gut, die Zahlung ist nicht durchgegangen. Ihre Kartendaten sind aber bereits auf dieser Website. Rufen Sie also die Bank an und lassen Sie die Karte sperren."
+      }
+     ]
+    },
+    {
+     "id": "real-app",
+     "label": "Offizielle TezKuryer-App",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2d-tezkuryer",
+      "app": "TezKuryer",
+      "title": [
+       {
+        "text": "TZ77015342AZ: unterwegs"
+       }
+      ],
+      "body": [
+       {
+        "text": "Zustellung am 4. Oktober. Eine zusätzliche Zahlung ist nicht erforderlich."
+       }
+      ],
+      "time": "11:05"
+     },
+     "say": "Diese Benachrichtigung kommt aus der offiziellen App.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "In der App öffnen",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Die offizielle App zeigt keine zusätzliche Gebühr an, die SMS war also gefälscht."
+      },
+      {
+       "id": "later",
+       "label": "Später ansehen",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Das ist in Ordnung. Wäre eine Gebühr fällig, sähen Sie sie auch in der offiziellen App."
+      }
+     ]
+    },
+    {
+     "id": "fine-sms",
+     "label": "13:20 Neue SMS",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2d-yol-nezaret-fake",
+      "sender": [
+       {
+        "text": "YolNezaret"
+       }
+      ],
+      "time": "13:20",
+      "messages": [
+       [
+        {
+         "text": "Gegen Sie wurde wegen Geschwindigkeitsüberschreitung ein Bußgeld von 80 AZN verhängt. Zahlen Sie heute und erhalten Sie 50 % Rabatt: "
+        },
+        {
+         "text": "yolnezaret-cerime.example.net/endirim",
+         "link": {
+          "label": "yolnezaret-cerime.example.net/endirim",
+          "href": "https://yolnezaret-cerime.example.net/endirim"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Jetzt ein Bußgeld. Achten Sie auf den Rabatt.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Mit Rabatt bezahlen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Der Rabatt soll Sie unter Zeitdruck setzen. Die Seite hinter dem Link sammelt Kartendaten."
+      },
+      {
+       "id": "verify",
+       "label": "Ich prüfe Bußgelder selbst im Portal",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Ist das Bußgeld echt, steht es auch im offiziellen Portal."
+      },
+      {
+       "id": "report",
+       "label": "Als Spam melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Gut. Wenn Sie unsicher sind, rufen Sie die Polizei unter 102 an und fragen Sie nach."
+      }
+     ]
+    },
+    {
+     "id": "aunt-chat",
+     "label": "16:02 Tante Səbinə",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Tante Səbinə"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Die Nachbarin hat mir diesen Link geschickt, es gibt einen Familienzuschuss, heute ist der letzte Tag."
+         }
+        ],
+        "time": "16:01"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "ailedestek-qeydiyyat.example.net",
+          "link": {
+           "label": "ailedestek-qeydiyyat.example.net",
+           "href": "https://ailedestek-qeydiyyat.example.net"
+          }
+         }
+        ],
+        "time": "16:01"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Soll ich meine Kartendaten eingeben?"
+         }
+        ],
+        "time": "16:02"
+       }
+      ]
+     },
+     "say": "Eine Verwandte bittet Sie um Rat.",
+     "actions": [
+      {
+       "id": "advise-stop",
+       "label": "Lieber nicht, lass uns zusammen im offiziellen Portal nachsehen",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Staatliche Zuschüsse erfordern nie eine Registrierung über einen Link, und im offiziellen Portal können Sie sie prüfen."
+      },
+      {
+       "id": "advise-go",
+       "label": "Beeil dich, heute ist der letzte Tag",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Der Trick mit dem „letzten Tag“ hat funktioniert. Die Seite stiehlt ihre Kartendaten, deshalb muss Tante Səbinə sofort ihre Bank anrufen."
+      },
+      {
+       "id": "open-it",
+       "label": "Warte, ich öffne den Link mal",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Auch das Öffnen zum Prüfen ist riskant. Und die Adresse gehört ohnehin nicht zum offiziellen Portal."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "pf-choice",
+   "question": {
+    "prompt": "Sie haben Ihre Kartendaten bereits auf einer gefälschten Seite eingegeben. Was tun Sie zuerst?",
+    "options": [
+     {
+      "id": "call-bank",
+      "label": "Die Bank unter der Nummer auf der Kartenrückseite anrufen und die Karte sperren lassen",
+      "correct": true,
+      "feedback": "Richtig. Je schneller die Karte gesperrt ist, desto geringer ist der Schaden."
+     },
+     {
+      "id": "wait",
+      "label": "Abwarten, ob Geld vom Konto abgebucht wird",
+      "correct": false,
+      "feedback": "Wer abwartet, verschafft den Kriminellen Zeit. Ist das Geld erst weg, kann es zu spät sein."
+     },
+     {
+      "id": "reply-sms",
+      "label": "Auf die SMS antworten und das Geld zurückfordern",
+      "correct": false,
+      "feedback": "Die Kriminellen geben es nicht zurück, sondern verlangen stattdessen einen neuen Code. Brechen Sie den Kontakt ab."
+     }
+    ]
+   },
+   "explain": "Melden Sie den Fall danach der Polizei unter 102 und bewahren Sie die Nachricht als Beweis auf."
+  },
+  {
+   "type": "recap",
+   "id": "pf-recap",
+   "points": [
+    "Paket, Bußgeld oder Zuschuss: Zahlen Sie nie über einen Link in einer SMS.",
+    "Öffnen Sie zum Prüfen selbst die offizielle App oder das Portal.",
+    "Kartendaten eingegeben? Rufen Sie sofort die Bank an, danach die Polizei unter 102."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

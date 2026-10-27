@@ -256,7 +256,27 @@ function entropy(buf: Buffer): number {
   return e;
 }
 
-function extractIndicators(text: string, iocs: Ioc[]) {
+/** Indicators are a sample (25 URLs, 10 addresses), so only the start of a text is scanned for them. */
+const INDICATOR_SCAN_CHARS = 200_000;
+/**
+ * Matched from the "@", with the local part read backwards by the lookbehind, so every character is
+ * scanned a bounded number of times; a pattern that starts with the local part re-scans a long run
+ * from every position (quadratic: one upload of "aaaa…" froze the server).
+ */
+const EMAIL = /@(?<=([a-z0-9._%+-]+)@)[a-z0-9.-]+\.[a-z]{2,}/gi;
+
+/** Text up to the next ">" after each `open`, each tag being one match, scanned once. */
+function tagText(text: string, open: string, re: RegExp): RegExpMatchArray | null {
+  // `<input[^>]+type=` would re-scan to the end of the text from every unclosed tag (quadratic).
+  for (const m of text.matchAll(new RegExp(`${open}([^>]*)`, "gi"))) {
+    const hit = m[1].match(re);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+function extractIndicators(source: string, iocs: Ioc[]) {
+  const text = source.slice(0, INDICATOR_SCAN_CHARS);
   const urls = text.match(/https?:\/\/[^\s"'<>()\\]{4,200}/gi) ?? [];
   for (const u of urls.slice(0, 25)) {
     iocs.push({ type: "url", value: u });
@@ -266,8 +286,7 @@ function extractIndicators(text: string, iocs: Ioc[]) {
       /* ignore malformed */
     }
   }
-  const emails = text.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi) ?? [];
-  for (const e of emails.slice(0, 10)) iocs.push({ type: "email", value: e.toLowerCase() });
+  for (const m of [...text.matchAll(EMAIL)].slice(0, 10)) iocs.push({ type: "email", value: (m[1] + m[0]).toLowerCase() });
 }
 
 export function analyzeFile(fileName: string, bytes: Buffer): Analysis {
@@ -319,8 +338,8 @@ export function analyzeFile(fileName: string, bytes: Buffer): Analysis {
   if (type === "lnk") {
     findings.push(finding("file.lnk", "high", 30));
     mitre.add("T1204.002");
-    // LNK arguments are stored as UTF-16LE.
-    const wide = bytes.toString("utf16le");
+    // LNK arguments are stored as UTF-16LE; the same 4 MB window as the other views.
+    const wide = bytes.subarray(0, 4_000_000).toString("utf16le");
     if (POWERSHELL_MARKERS.some((r) => r.test(wide) || r.test(latin))) {
       findings.push(finding("file.powershell", "high", 30));
       mitre.add("T1059.001");
@@ -349,8 +368,13 @@ export function analyzeFile(fileName: string, bytes: Buffer): Analysis {
     }
     if (/\/EmbeddedFile/.test(latin)) findings.push(finding("file.pdf_embedded", "medium", 12));
     if (/\/URI\s*\(/.test(latin)) {
-      const links = latin.match(/\/URI\s*\(([^)]{4,300})\)/g) ?? [];
-      for (const l of links.slice(0, 20)) extractIndicators(l, iocs);
+      // Read up to the next ")" and check the rest after: `\(([^)]{4,300})\)` re-scans 300 characters per unclosed "/URI(".
+      let links = 0;
+      for (const m of latin.matchAll(/\/URI\s*\(([^)]{4,})/g)) {
+        if (m[1].length > 300 || latin[m.index + m[0].length] !== ")") continue;
+        extractIndicators(m[1], iocs);
+        if (++links === 20) break;
+      }
     }
   }
 
@@ -364,7 +388,7 @@ export function analyzeFile(fileName: string, bytes: Buffer): Analysis {
     }
     const rels = entries.find((e) => /_rels\/settings\.xml\.rels$/i.test(e.name));
     const relsText = rels ? readZipText(bytes, rels) : null;
-    if (relsText && /attachedTemplate[^>]+TargetMode="External"/i.test(relsText)) {
+    if (relsText && tagText(relsText, "attachedTemplate", /TargetMode="External"/i)) {
       findings.push(finding("file.remote_template", "high", 30));
       mitre.add("T1221");
       // Only the external template address is an indicator, not the OOXML schema namespaces.
@@ -399,8 +423,8 @@ export function analyzeFile(fileName: string, bytes: Buffer): Analysis {
 
   if (type === "html" || ext === "html" || ext === "htm" || ext === "svg") {
     const lower = textual.toLowerCase();
-    const hasPassword = /<input[^>]+type=["']?password/i.test(textual);
-    const formAction = textual.match(/<form[^>]+action=["']?(https?:\/\/[^"'\s>]+)/i);
+    const hasPassword = !!tagText(textual, "<input", /type=["']?password/i);
+    const formAction = tagText(textual, "<form", /action=["']?(https?:\/\/[^"'\s>]+)/i);
     if (hasPassword) {
       findings.push(finding("file.html_credential_form", "high", 32));
       mitre.add("T1056.003");
@@ -430,7 +454,7 @@ export function analyzeFile(fileName: string, bytes: Buffer): Analysis {
       findings.push(finding("file.lolbin", "high", 20));
       mitre.add(ext === "hta" ? "T1218.005" : "T1059.005");
     }
-    if (type === "unknown") extractIndicators(textual.slice(0, 200_000), iocs);
+    if (type === "unknown") extractIndicators(textual, iocs);
   }
 
   const e = entropy(bytes);

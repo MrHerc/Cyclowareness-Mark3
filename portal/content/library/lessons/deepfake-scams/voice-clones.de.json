@@ -1,0 +1,527 @@
+{
+  "id": "voice-clones",
+  "title": "Geklonte Stimmen",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "few-seconds",
+          "say": "Künstliche Intelligenz kann die Stimme eines Menschen aus einer kurzen Aufnahme nachbilden. Manchmal reichen schon wenige Sekunden.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          }
+        },
+        {
+          "id": "the-ask",
+          "say": "Kriminelle rufen mit der Stimme Ihres Chefs oder eines Angehörigen an und verlangen dringend Geld, einen Code oder ein Dokument.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [
+                {
+                  "text": "Kamran Babayev"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 70 000 18 42",
+                  "spot": "number"
+                }
+              ],
+              "label": "Mobil"
+            }
+          }
+        },
+        {
+          "id": "spoofed-number",
+          "say": "Auch die Nummer lässt sich fälschen. Name und Nummer auf Ihrem Bildschirm sind kein Beweis.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [
+                {
+                  "text": "Kamran Babayev"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 70 000 18 42",
+                  "spot": "number"
+                }
+              ],
+              "label": "Mobil"
+            }
+          },
+          "highlight": "number"
+        },
+        {
+          "id": "code-word",
+          "say": "Vereinbaren Sie mit Ihrer Familie und Ihrem Team ein geheimes Codewort. Eine gefälschte Stimme kennt es nicht.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "boss-call",
+      "title": "Anruf vom Chef",
+      "start": "call",
+      "nodes": [
+        {
+          "id": "call",
+          "text": "Hallo, ich sitze gerade in einem Meeting und kann nicht lange reden. Wir müssen dringend 18.000 Manat an einen Dienstleister überweisen. Sagen Sie niemandem etwas, ich erkläre es Ihnen später.",
+          "speaker": "Stimme von Kamran Babayev",
+          "voice": "older-man",
+          "channel": "phone",
+          "spoken": "Hallo, <breath> ich sitze gerade in einem Meeting und kann nicht lange reden. Wir müssen dringend 18.000 Manat an einen Dienstleister überweisen. Sagen Sie niemandem etwas, äh, ich erkläre es Ihnen später.",
+          "character": "kamran",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [
+                {
+                  "text": "Kamran Babayev"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 70 000 18 42",
+                  "spot": "number"
+                }
+              ],
+              "label": "Mobil"
+            }
+          },
+          "choices": [
+            {
+              "label": "Sofort erledigen",
+              "outcome": "compromised",
+              "feedback": "Das Geld ging an einen Betrüger. Dringlichkeit plus Geheimhaltung ist das stärkste Warnsignal."
+            },
+            {
+              "label": "Nach dem Codewort fragen",
+              "next": "pressure",
+              "feedback": "Gute Idee. Mal sehen, was er antwortet."
+            },
+            {
+              "label": "Sagen, dass ich selbst zurückrufe",
+              "next": "callback",
+              "feedback": "Richtig. Rufen Sie eine Nummer an, die Sie bereits kennen."
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "text": "Welches Wort? Ich habe keine Zeit! Erkennen Sie mich etwa nicht?",
+          "speaker": "Stimme von Kamran Babayev",
+          "voice": "older-man",
+          "channel": "phone",
+          "spoken": "Welches Wort? Ich habe keine Zeit! <short pause> Erkennen Sie mich etwa nicht?",
+          "character": "kamran",
+          "choices": [
+            {
+              "label": "Mich entschuldigen und überweisen",
+              "outcome": "compromised",
+              "feedback": "Druck ist das wichtigste Werkzeug von Kriminellen. Ein echter Chef hat Verständnis für eine Prüfung."
+            },
+            {
+              "label": "Auflegen und selbst zurückrufen",
+              "next": "callback",
+              "feedback": "Richtig. Ohne Codewort keine Überweisung."
+            }
+          ]
+        },
+        {
+          "id": "callback",
+          "text": "Nein, ich habe Sie nie angerufen.",
+          "speaker": "Kamran Babayev (Nummer aus Ihren Kontakten)",
+          "voice": "older-man",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Nein, <breath> ich habe Sie nie angerufen.",
+          "character": "kamran",
+          "choices": [
+            {
+              "label": "Dem Sicherheitsteam melden",
+              "outcome": "safe",
+              "feedback": "Gut gemacht. Das Sicherheitsteam warnt auch Ihre Kolleginnen und Kollegen."
+            },
+            {
+              "label": "Niemandem etwas sagen, es ist ja kein Geld verloren",
+              "outcome": "risky",
+              "feedback": "Der Betrüger versucht es dann bei jemand anderem. Eine Meldung schützt alle."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "voice-message",
+      "prompt": "Finden Sie die Warnsignale in diesem Chat.",
+      "artifact": {
+        "kind": "chat",
+        "app": "whatsapp",
+        "contact": [
+          {
+            "text": "+994 55 000 40 17"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Hallo, ich bin’s, Elvin. "
+              },
+              {
+                "text": "Mein Handy ist kaputt, das ist meine neue Nummer.",
+                "spot": "new-number"
+              }
+            ],
+            "time": "21:04"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Ich bin’s, Elvin. Hörst du mich? Ich stecke in Schwierigkeiten und brauche dringend deine Hilfe.",
+                "spot": "voice"
+              }
+            ],
+            "time": "21:04",
+            "voice": "young-man",
+            "manner": "natural",
+            "spoken": "Ich bin’s, Elvin. <breath> Hörst du mich? Ich stecke in Schwierigkeiten und brauche dringend deine Hilfe."
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Ich brauche dringend 600 Manat, heute noch.",
+                "spot": "urgent"
+              },
+              {
+                "text": " "
+              },
+              {
+                "text": "Bitte sag zu Hause niemandem etwas.",
+                "spot": "secret"
+              }
+            ],
+            "time": "21:05"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Überweis es auf diese Karte, die gehört einem Freund.",
+                "spot": "card"
+              }
+            ],
+            "time": "21:05"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "new-number",
+          "label": "Neue Nummer",
+          "explain": "Die Geschichte von der neuen Nummer soll verhindern, dass Sie zur Kontrolle die alte Nummer anrufen."
+        },
+        {
+          "id": "voice",
+          "label": "Sprachnachricht",
+          "explain": "Die Stimme kann vertraut klingen und trotzdem gefälscht sein. Eine kurze Aufnahme reicht, um sie zu kopieren."
+        },
+        {
+          "id": "urgent",
+          "label": "Dringend Geld",
+          "explain": "Eine dringende Bitte um Geld ist das zentrale Merkmal eines Betrugs."
+        },
+        {
+          "id": "secret",
+          "label": "Geheimhaltung",
+          "explain": "Die Bitte, niemandem etwas zu sagen, soll Sie davon abhalten, nachzuprüfen."
+        },
+        {
+          "id": "card",
+          "label": "Fremde Karte",
+          "explain": "Das Geld geht auf die Karte einer anderen Person. So wird die Spur verwischt."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "relative-call",
+      "environment": "call",
+      "title": "Ein Anruf am Abend",
+      "intro": "Am Abend ruft eine unbekannte Nummer an. Die Stimme klingt sehr vertraut. Was tun Sie?",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Unbekannte Nummer"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 73 26"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "child"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Annehmen",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Den Anruf anzunehmen ist nicht gefährlich. Entscheidend ist, was Sie danach tun."
+            },
+            {
+              "id": "decline",
+              "label": "Ablehnen",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Auch das ist in Ordnung. Wenn Sie sich Sorgen machen, rufen Sie Ihre Familie selbst unter einer Nummer an, die Sie kennen.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "plea",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Unbekannte Nummer"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 73 26"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "child"
+          },
+          "say": "Hallo, ich bin’s, Nərmin! Es gab einen Unfall, und die Polizei hält mich fest. Ich brauche sofort 900 Manat, sag der Familie nichts!",
+          "spoken": "Hallo, <breath> ich bin’s, Nərmin! Es gab einen Unfall, und die Polizei hält mich, äh, fest. Ich brauche sofort 900 Manat, <breath> sag der Familie nichts!",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Wohin soll ich es schicken?",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Sofort zuzustimmen ist genau das, was der Betrüger braucht. Prüfen Sie zuerst."
+            },
+            {
+              "id": "code-word",
+              "label": "Wie lautet unser Codewort?",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Richtig. Eine geklonte Stimme kennt das vereinbarte Wort nicht."
+            },
+            {
+              "id": "hang-up",
+              "label": "Auflegen und selbst zurückrufen",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Richtig. Rufen Sie Nərmin unter der alten Nummer an, die Sie kennen.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Unbekannte Nummer"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 73 26"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "child"
+          },
+          "say": "Welches Wort? Ich weine, und du fragst nach einem Wort! Die Polizei wartet, beeil dich!",
+          "spoken": "Welches Wort? <breath> Ich weine, und du fragst nach einem Wort! Die Polizei wartet, <breath> beeil dich!",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Gut, ich schicke das Geld",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Das Geld ging an einen Betrüger. Tränen und Eile sollen Sie dazu bringen, die Prüfung zu überspringen."
+            },
+            {
+              "id": "hang-up",
+              "label": "Auflegen",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Richtig. Ohne Codewort kein Gespräch."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Das Gespräch ist beendet. Was jetzt?",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Unbekannte Nummer"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 73 26"
+              }
+            ],
+            "label": "Mobil",
+            "voice": "child"
+          },
+          "actions": [
+            {
+              "id": "call-back",
+              "label": "Nərmins alte Nummer anrufen",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Richtig: Nərmin ist zu Hause, und es ist nichts passiert. Warnen Sie auch die Familie."
+            },
+            {
+              "id": "ignore",
+              "label": "Nichts tun",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Der Betrüger ruft vielleicht noch einmal an oder versucht es bei einem anderen Familienmitglied. Informieren Sie die Familie."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "verify-steps",
+      "prompt": "Bringen Sie die Schritte nach einem verdächtigen Anruf in die richtige Reihenfolge.",
+      "items": [
+        {
+          "id": "hang-up",
+          "label": "Auflegen, ohne etwas zu versprechen"
+        },
+        {
+          "id": "call-known",
+          "label": "Selbst die Nummer aus Ihren Kontakten anrufen"
+        },
+        {
+          "id": "confirm",
+          "label": "Fragen, ob die Bitte echt ist"
+        },
+        {
+          "id": "report",
+          "label": "Den Vorfall dem Sicherheitsteam melden"
+        }
+      ],
+      "explain": "Der Beweis steht nicht auf dem Bildschirm. Er liegt im zweiten Anruf, den Sie selbst tätigen."
+    },
+    {
+      "type": "match",
+      "id": "tricks",
+      "prompt": "Ordnen Sie jedem Trick die richtige Reaktion zu.",
+      "pairs": [
+        {
+          "id": "boss-voice",
+          "left": "Dringende Überweisung mit der Stimme des Chefs",
+          "right": "Unter einer bekannten Nummer zurückrufen"
+        },
+        {
+          "id": "new-number",
+          "left": "Neue Nummer eines Angehörigen",
+          "right": "Zur Kontrolle die alte Nummer anrufen"
+        },
+        {
+          "id": "video-face",
+          "left": "Ein vertrautes Gesicht im Videoanruf",
+          "right": "Nach dem Codewort fragen"
+        },
+        {
+          "id": "keep-secret",
+          "left": "Die Bitte, es geheim zu halten",
+          "right": "Immer eine zweite Person einweihen"
+        }
+      ],
+      "explain": "Für jeden Trick gibt es eine einfache Prüfung. Machen Sie sie zur Gewohnheit."
+    },
+    {
+      "type": "choice",
+      "id": "exec-video",
+      "question": {
+        "prompt": "In einem Videoanruf bittet Sie der Direktor, einen vertraulichen Bericht an eine private E-Mail-Adresse zu senden. Was tun Sie?",
+        "options": [
+          {
+            "id": "send",
+            "label": "Senden, ich sehe ihn doch auf dem Bildschirm",
+            "correct": false,
+            "feedback": "Das Bild kann gefälscht sein. Ein Gesicht ist kein Beweis."
+          },
+          {
+            "id": "verify",
+            "label": "Mir die Bitte separat über einen offiziellen Kanal bestätigen lassen",
+            "correct": true,
+            "feedback": "Richtig. Vertrauliche Dateien gehen nur über offizielle Kanäle, und erst nach einer Bestätigung."
+          },
+          {
+            "id": "wave",
+            "label": "Ihn bitten, vor der Kamera mit der Hand zu winken",
+            "correct": false,
+            "feedback": "Das bringt manche Fälschungen vielleicht durcheinander, ist aber keine zuverlässige Prüfung."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "ceo"
+        }
+      },
+      "explain": "Egal, wie echt es aussieht: Prüfen Sie eine ungewöhnliche Bitte über einen anderen Kanal."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Eine vertraute Stimme, ein bekanntes Gesicht oder eine bekannte Nummer sind kein Beweis.",
+        "Legen Sie auf und rufen Sie unter einer Nummer zurück, die Sie kennen.",
+        "Vereinbaren Sie mit Familie und Team ein Codewort."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

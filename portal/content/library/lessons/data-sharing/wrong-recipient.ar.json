@@ -1,0 +1,549 @@
+{
+  "id": "wrong-recipient",
+  "title": "المستلم الخطأ",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "الرسالة التي تصل إلى الشخص الخطأ من أكثر أسباب تسرب البيانات شيوعًا. والسبب المعتاد هو الاستعجال والإكمال التلقائي للعناوين.",
+          "mood": "talk",
+          "gesture": "nod",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "يظهر الاسم نفسه مرتين: أحدهما عنوان العمل، والآخر عنوان شخصي أو خارجي. تحقق من النطاق.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "ispoct",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "إلى: ليلى"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "ليلى حسنوفا، leyla.hasanova@rxagentlik.az"
+                  }
+                ],
+                [
+                  {
+                    "text": "ليلى حسنوفا، "
+                  },
+                  {
+                    "text": "leyla.hasanova85@poct.example",
+                    "spot": "external"
+                  }
+                ]
+              ],
+              "buttons": [
+                "اختيار"
+              ]
+            }
+          },
+          "highlight": "external"
+        },
+        {
+          "id": "b3",
+          "say": "لا تعتمد على استدعاء الرسالة بعد إرسالها، فهو يفشل عادة مع العناوين الخارجية.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "قبل الإرسال، تحقق من ثلاثة أشياء: المستلم، والمرفق، والأسماء الموجودة في النسخة.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "before-send",
+      "environment": "inbox",
+      "title": "قبل أن ترسل",
+      "intro": "هناك ثلاث مسودات تنتظر الإرسال، ورد واحد وصل من خارج الجهة. تحقق من كل رسالة.",
+      "steps": [
+        {
+          "id": "autocomplete",
+          "label": "مسودة",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "أنت"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "ليلى حسنوفا <leyla.hasanova85@poct.example>",
+            "subject": [
+              {
+                "text": "قائمة الطلبات"
+              }
+            ],
+            "time": "11:38",
+            "body": [
+              [
+                {
+                  "text": "ليلى، القائمة التي طلبتها في المرفق."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Muracietler_2026.xlsx"
+                  }
+                ],
+                "size": "310 KB"
+              }
+            ]
+          },
+          "say": "اقرأ نطاق المستلم حتى النهاية.",
+          "actions": [
+            {
+              "id": "fix",
+              "label": "التحقق من المستلم وتصحيحه",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "صحيح، فالاسم كان مطابقًا لكن النطاق لم يكن كذلك. عنوان العمل ينتهي بالمقطع rxagentlik.az."
+            },
+            {
+              "id": "send",
+              "label": "إرسال",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "كان المستلم صندوق بريد شخصيًا. وخرجت قائمة سرية من الجهة."
+            }
+          ]
+        },
+        {
+          "id": "reply-all",
+          "label": "مسودة",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "أنت"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "layihe-qrupu@rxagentlik.az, e.rzayev@merkez-konsalting.example",
+            "subject": [
+              {
+                "text": "رد: عرض أسعار الشريك"
+              }
+            ],
+            "time": "12:05",
+            "body": [
+              [
+                {
+                  "text": "زملائي، عرض شركة Merkez Konsalting يبدو مرتفع السعر، فلنتحدث إلى شركة أخرى أيضًا."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "remove",
+              "label": "حذف العنوان الخارجي",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "صحيح. «الرد على الكل» يحتفظ بجميع المستلمين السابقين، بمن فيهم من هم خارج الجهة."
+            },
+            {
+              "id": "send",
+              "label": "إرسال",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "الشريك موجود في قائمة المستلمين، وكان النقاش الداخلي سيصل إليه أيضًا."
+            }
+          ]
+        },
+        {
+          "id": "correct-draft",
+          "label": "مسودة",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "أنت"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "kadrlar@rxagentlik.az",
+            "subject": [
+              {
+                "text": "طلب إجازة"
+              }
+            ],
+            "time": "12:20",
+            "body": [
+              [
+                {
+                  "text": "مرحبًا، مرفق طلب الإجازة الخاص بي."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Erize.pdf"
+                  }
+                ],
+                "size": "52 KB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "send",
+              "label": "إرسال",
+              "kind": "share",
+              "outcome": "safe",
+              "feedback": "كل شيء على ما يرام: عنوان داخلي، والملف الصحيح، ولا مستلمين إضافيين."
+            },
+            {
+              "id": "check",
+              "label": "التحقق مرة أخرى",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "التحقق لا يضر أبدًا. هذه الرسالة صحيحة ويمكن إرسالها."
+            }
+          ]
+        },
+        {
+          "id": "partner-notice",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "merkez-konsalting",
+            "from": {
+              "name": [
+                {
+                  "text": "إلتشين رضاييف"
+                }
+              ],
+              "address": [
+                {
+                  "text": "e.rzayev@merkez-konsalting.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "هل وصلني هذا عن طريق الخطأ؟"
+              }
+            ],
+            "time": "13:10",
+            "body": [
+              [
+                {
+                  "text": "مرحبًا، أرسلت إلي إدارتكم أمس جدول رواتب الموظفين. ربما حدث ذلك عن طريق الخطأ. ماذا علي أن أفعل؟"
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "forward",
+              "label": "إعادة التوجيه إلى فريق الأمن السيبراني",
+              "kind": "forward",
+              "outcome": "safe",
+              "feedback": "صحيح. الرسالة التي تصل إلى الشخص الخطأ حادثة أمنية، وسيخبرك المختص بما يجب فعله."
+            },
+            {
+              "id": "reply",
+              "label": "الرد: يرجى حذفه",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "طلب الحذف تصرف صحيح، لكن أخبر فريق الأمن السيبراني أولًا."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "التسرب لا يختفي بذلك. أبلغ عنه حتى يتمكن المختصون من متابعته."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "recall",
+      "question": {
+        "prompt": "أرسلت رسالة إلى العنوان الخطأ، ثم استدعيتها. هل هذا كاف؟",
+        "options": [
+          {
+            "id": "enough",
+            "label": "نعم، ستتم إزالة الرسالة",
+            "correct": false,
+            "feedback": "استدعاء الرسالة يفشل عادة مع العناوين الخارجية، وربما قرأها المستلم بالفعل."
+          },
+          {
+            "id": "report",
+            "label": "لا، سأبلغ فريق الأمن السيبراني فورًا رغم ذلك",
+            "correct": true,
+            "feedback": "صحيح. قد يفشل الاستدعاء، أما الإبلاغ فواجب."
+          },
+          {
+            "id": "wait",
+            "label": "أنتظر، فربما لا يفتحها",
+            "correct": false,
+            "feedback": "الانتظار لا يقلل الضرر. والإبلاغ السريع يتيح خيارات أكثر."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "inbox"
+        }
+      },
+      "explain": "إذا أرسلت شيئًا إلى الشخص الخطأ، فلا تتكتم عليه: أخبر مديرك وفريق الأمن السيبراني فورًا."
+    },
+    {
+      "type": "swipe",
+      "id": "recipient-check",
+      "prompt": "هل قائمة المستلمين هذه صحيحة؟",
+      "cards": [
+        {
+          "id": "hr",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "أنت"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "kadrlar@rxagentlik.az",
+            "subject": [
+              {
+                "text": "طلب شهادة تعريف"
+              }
+            ],
+            "time": "14:00",
+            "body": [
+              [
+                {
+                  "text": "مرحبًا، أحتاج إلى شهادة تعريف بالعمل."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "عنوان داخلي، والإدارة الصحيحة، ولا مستلمين إضافيين."
+        },
+        {
+          "id": "lookalike",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "أنت"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "رشاد علييف <reshad.aliyev@rxagentlik-az.com>",
+            "subject": [
+              {
+                "text": "جدول الميزانية"
+              }
+            ],
+            "time": "14:12",
+            "body": [
+              [
+                {
+                  "text": "رشاد، الجدول في المرفق."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Budce_2027.xlsx"
+                  }
+                ],
+                "size": "180 KB"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "النطاق rxagentlik-az.com ليس نطاق جهتك. فقد اقترح الإكمال التلقائي عنوانًا قديمًا أو مزيفًا."
+        },
+        {
+          "id": "all-staff",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "أنت"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "butun-emekdaslar@rxagentlik.az",
+            "subject": [
+              {
+                "text": "إفادة طبية لأحد الزملاء"
+              }
+            ],
+            "time": "14:30",
+            "body": [
+              [
+                {
+                  "text": "الإفادة في المرفق."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Arayis.pdf"
+                  }
+                ],
+                "size": "96 KB"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "المستند الشخصي لا يجوز إرساله إلى جميع الموظفين. أرسله فقط إلى الشخص الذي يحتاج إليه."
+        },
+        {
+          "id": "no-bcc",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "rxagentlik",
+            "from": {
+              "name": [
+                {
+                  "text": "أنت"
+                }
+              ],
+              "address": [
+                {
+                  "text": "aynur.mammadova@rxagentlik.az"
+                }
+              ]
+            },
+            "to": "40 شريكًا، جميعهم في حقل «إلى»",
+            "subject": [
+              {
+                "text": "تهنئة بمناسبة الأعياد"
+              }
+            ],
+            "time": "15:00",
+            "body": [
+              [
+                {
+                  "text": "شركاءنا الأعزاء، كل عام وأنتم بخير!"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "في الرسائل الجماعية، ضع العناوين في حقل «نسخة مخفية» (Bcc)، حتى لا يرى المستلمون عناوين بعضهم."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "address-fields",
+      "prompt": "ضع كل مستلم في الحقل الصحيح.",
+      "pairs": [
+        {
+          "id": "to",
+          "left": "المستلم الرئيسي، وينتظر منه رد",
+          "right": "إلى (To)"
+        },
+        {
+          "id": "cc",
+          "left": "زميل تريد إبقاءه على اطلاع",
+          "right": "نسخة (Cc)"
+        },
+        {
+          "id": "bcc",
+          "left": "مستلمون كثيرون لا يعرف بعضهم بعضًا",
+          "right": "نسخة مخفية (Bcc)"
+        }
+      ],
+      "explain": "الحقل الصحيح يمنع الأطراف الخارجية من رؤية عناوين لا تحتاج إليها."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "قبل الإرسال، اقرأ نطاق المستلم حتى النهاية.",
+        "انتبه إلى «الرد على الكل» وإلى أي عناوين خارجية في النسخة.",
+        "إذا أرسلت إلى الشخص الخطأ، فلا تعتمد على استدعاء الرسالة، وأبلغ فورًا."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

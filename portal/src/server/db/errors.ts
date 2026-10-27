@@ -28,3 +28,13 @@ export function isUniqueViolation(error: unknown, constraint?: string): boolean 
   if (!constraint) return true;
   return e.constraint === constraint || String(e.message ?? "").includes(`"${constraint}"`);
 }
+
+/**
+ * Logs a failure without its message: a failed query's message repeats the query and its parameters (a reset link, a password
+ * hash, personal data). The log gets the error's name, its driver or system code, and where it was thrown (stack frames only).
+ */
+export function logFailure(what: string, error: unknown): void {
+  const e = error as { name?: unknown; code?: unknown; cause?: { code?: unknown }; stack?: unknown } | null;
+  const at = typeof e?.stack === "string" ? e.stack.split("\n").filter((line) => /^\s+at /.test(line)).slice(0, 5).join("\n") : "";
+  console.error(what, String(e?.name ?? "error"), String(driverError(error)?.code ?? e?.cause?.code ?? e?.code ?? ""), ...(at ? [at] : []));
+}

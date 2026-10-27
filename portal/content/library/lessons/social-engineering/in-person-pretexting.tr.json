@@ -1,0 +1,510 @@
+{
+  "id": "in-person-pretexting",
+  "title": "Yüz yüze hileler",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l3-tutor",
+      "beats": [
+        {
+          "id": "l3-b1",
+          "say": "Dolandırıcı her zaman bir ekranın arkasında değildir. Bazen elinde bir kutuyla kapıda bekler.",
+          "mood": "talk",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        },
+        {
+          "id": "l3-b2",
+          "say": "Giriş kartı olmayan birine kapıyı açık tutmayın. Onu kibarca resepsiyona yönlendirin.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        },
+        {
+          "id": "l3-b3",
+          "say": "Teknisyen olduğunu söyleyen biri üniforma giyip sizi aceleye getirebilir. Ziyareti BT destek ekibiyle kendiniz doğrulayın.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "desk"
+          },
+          "checkpoint": {
+            "prompt": "Beklenmedik bir teknisyen geldi. Ne yaparsınız?",
+            "options": [
+              {
+                "id": "let-in",
+                "label": "Üniforması var, içeri alırım",
+                "correct": false,
+                "feedback": "Üniformayı herkes giyebilir. Ziyareti BT destek ekibine kendiniz sorun."
+              },
+              {
+                "id": "check",
+                "label": "Doğrulamak için BT destek ekibini kendim ararım",
+                "correct": true,
+                "feedback": "Doğru. Beklenmedik bir ziyareti resmî kanaldan doğrulayın."
+              }
+            ]
+          }
+        },
+        {
+          "id": "l3-b5",
+          "say": "Her durum için tek bir alışkanlık: durun, kontrol edin, bildirin. Resmî yoldan doğrulayın ve şüphelerinizi güvenlik ekibine iletin.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "flag"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "visitor-at-door",
+      "environment": "phone",
+      "title": "Kapıdaki teknisyen",
+      "intro": "Sabah iştesiniz. Binaya girmek isteyen bir ziyaretçiyle ilgili mesajlar geliyor.",
+      "steps": [
+        {
+          "id": "no-badge",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek-fake",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "BT Destek (yeni)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Merhaba, yazıcınızı tamir etmeye geldim, girişteyim. Giriş kartımı evde unuttum, aşağı inip kapıyı açabilir misiniz?"
+                  }
+                ],
+                "time": "09:12"
+              }
+            ]
+          },
+          "say": "Tanımadığınız bir teknisyen ve giriş kartı yok.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Geliyorum, açarım",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Giriş kartı olmayan birini içeri almak, kapıyı herkese açmak demektir. Onu resepsiyona yönlendirin."
+            },
+            {
+              "id": "verify",
+              "label": "Resmî BT destek numarasını ararım",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğru. Beklenmedik bir teknisyen ziyaretini resmî kanaldan kendiniz doğrulayın."
+            }
+          ]
+        },
+        {
+          "id": "reception",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "idare",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Resepsiyon"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Orhan adında bir teknisyen resepsiyonda ve sizin adınızı veriyor. Planlanmış bir ziyaret yok. İçeri alalım mı?"
+                  }
+                ],
+                "time": "09:15"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "let-in",
+              "label": "İçeri alın, onu ben çağırdım",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Onu siz çağırmadınız. Artık bir yabancı, sizin adınızı kullanarak binada serbestçe dolaşıyor."
+            },
+            {
+              "id": "wait",
+              "label": "Ben kontrol edene kadar resepsiyonda beklesin",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Doğru. Ziyaretçi resepsiyonda kayıt yaptırır ve doğrulanana kadar yalnız bırakılmaz."
+            }
+          ]
+        },
+        {
+          "id": "boss-pressure",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Kamran Aliyev (yeni numara)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Teknisyeni ben çağırdım. Onu sunucu odasına kendiniz götürün. Toplantıdayım, aramayın."
+                  }
+                ],
+                "time": "09:17"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "escort",
+              "label": "Tamam, götürürüm",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Yöneticinin adı ve “aramayın” talimatı, kontrol etmenizi engellemek için var. Yabancılar sunucu odasına asla giremez."
+            },
+            {
+              "id": "verify",
+              "label": "Yöneticimi bilinen numarasından ararım",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Harika. Yeni bir numaradan yazan yöneticinizi her zaman eski, bilinen numarasından doğrulayın."
+            },
+            {
+              "id": "block",
+              "label": "Engelle ve bildir",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Doğru. Ardından yöneticinize ve güvenlik ekibine haber verin."
+            }
+          ]
+        },
+        {
+          "id": "real-it",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "BT Destek"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Bugün size hiçbir teknisyen göndermedik. İyi ki yazdınız; güvenlik ekibi resepsiyona doğru yola çıktı."
+                  }
+                ],
+                "time": "09:20"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "thanks",
+              "label": "Teşekkürler, resepsiyona da haber veririm",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Doğru. Durdunuz, kontrol ettiniz ve bildirdiniz: üç adımın üçü de tamam."
+            },
+            {
+              "id": "go-down",
+              "label": "Aşağı inip onunla kendim konuşacağım",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Şüpheli biriyle tek başınıza yüzleşmeyin. Güvenlik ekibi durumu halledecektir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l3-hotspot-email",
+      "prompt": "Bu e-postanın şüpheli kısımlarını bulun.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "idare-fake",
+        "from": {
+          "name": [
+            {
+              "text": "İdari İşler Ekibi",
+              "reveal": "texnik@servis-idare.test"
+            }
+          ],
+          "address": [
+            {
+              "text": "texnik@servis-idare.test",
+              "spot": "outside-address"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "ACİL: ",
+            "spot": "urgent-subject"
+          },
+          {
+            "text": "sunucu odasında onarım"
+          }
+        ],
+        "time": "08:47",
+        "body": [
+          [
+            {
+              "text": "Merhaba,"
+            }
+          ],
+          [
+            {
+              "text": "Bugün saat 15:00'te teknisyen Orhan, sunucu odasındaki klimayı kontrol edecek."
+            }
+          ],
+          [
+            {
+              "text": "Programımız sıkışık olduğu için "
+            },
+            {
+              "text": "onu refakatsiz içeri alın",
+              "spot": "unescorted"
+            },
+            {
+              "text": "."
+            }
+          ],
+          [
+            {
+              "text": "Lütfen "
+            },
+            {
+              "text": "bu e-postayı kimseye iletmeyin",
+              "spot": "no-forward"
+            },
+            {
+              "text": "."
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "outside-address",
+          "label": "Dış adres",
+          "explain": "İç ekipler, kurumun kendi e-posta adresinden yazar. Bu adres başka bir alan adına ait."
+        },
+        {
+          "id": "urgent-subject",
+          "label": "Aciliyet",
+          "explain": "Büyük harflerle yazılmış aciliyet, sizi kontrol etmeden harekete geçmeye iter."
+        },
+        {
+          "id": "unescorted",
+          "label": "Refakatsiz giriş",
+          "explain": "Ziyaretçiye, özellikle sunucu odasında, her zaman refakat edilir."
+        },
+        {
+          "id": "no-forward",
+          "label": "Gizli tutma isteği",
+          "explain": "Kimseye söylememenizi istemek, kimsenin kontrol edememesi içindir."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "l3-choice-tailgate",
+      "question": {
+        "prompt": "Elleri kutularla dolu bir adam, giriş kartı olmadan peşinizden içeri girmek istiyor.",
+        "options": [
+          {
+            "id": "hold-door",
+            "label": "Kapıyı açık tutarım, elleri dolu",
+            "correct": false,
+            "feedback": "Kibar olmak güzel, ama bir yabancı hiçbir kontrolden geçmeden içeri girer."
+          },
+          {
+            "id": "send-reception",
+            "label": "Onu kibarca resepsiyona yönlendiririm",
+            "correct": true,
+            "feedback": "Doğru. Resepsiyon onu kontrol eder ve doğru kişiye götürür."
+          },
+          {
+            "id": "ask-and-let",
+            "label": "Kim olduğunu sorar ve içeri alırım",
+            "correct": false,
+            "feedback": "Verdiği yanıtı doğrulayamazsınız. Kararı resepsiyona ya da güvenlik görevlisine bırakın."
+          }
+        ]
+      },
+      "explain": "Birinin peşinden içeri girmek (tailgating), en basit fiziksel saldırıdır. Herkes kendi giriş kartını kullanır, misafirler resepsiyondan geçer."
+    },
+    {
+      "type": "swipe",
+      "id": "l3-swipe",
+      "prompt": "Güvenli mi, tuzak mı?",
+      "cards": [
+        {
+          "id": "no-badge-door",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek-fake",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Teknik destek (yeni)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Merhaba, yazıcınıza bakmaya geldim. Giriş kartımı evde unuttum, aşağı inip kapıyı açabilir misiniz?"
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Giriş kartı olmayan birini içeri almamalısınız. Onu resepsiyona yönlendirin."
+        },
+        {
+          "id": "planned-maintenance",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "Teknik destek"
+                }
+              ],
+              "address": [
+                {
+                  "text": "support@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Cumartesi günü planlı çalışma"
+              }
+            ],
+            "time": "11:05",
+            "body": [
+              [
+                {
+                  "text": "Cumartesi günü 10:00 ile 12:00 arasında e-posta hizmeti kullanılamayacaktır. Sizin herhangi bir işlem yapmanıza gerek yoktur."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ne bağlantı ne parola ne de erişim istiyor. Yalnızca bir bilgilendirme."
+        },
+        {
+          "id": "found-usb",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Samir (iş arkadaşı)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Koridorda üzerinde “Maaşlar 2026” yazan bir USB bellek buldum. Bilgisayarınızda açalım mı?"
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bulunan bir USB bellek zararlı yazılım taşıyabilir. Açmayın, güvenlik ekibinize teslim edin."
+        },
+        {
+          "id": "guest-at-reception",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "idare",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Resepsiyon"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Misafiriniz Tural Bey resepsiyonda kaydını yaptırdı ve ziyaretçi kartını aldı. Sizi bekliyor."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Misafirin kaydı yapılmış ve sizi bekliyor. Onu kendiniz karşılayın ve ona eşlik edin."
+        },
+        {
+          "id": "menu-qr",
+          "artifact": {
+            "kind": "qr",
+            "brandRef": "idare-fake",
+            "caption": [
+              {
+                "text": "Yemekhane menüsü: QR kodu okutun ve iş parolanızla giriş yapın"
+              }
+            ],
+            "destination": [
+              {
+                "text": "menyu-idare.test/login"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Menüyü görmek için iş parolasına ihtiyacınız yoktur. Böyle bir QR kod, parolanızı çalmak için oradadır."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "l3-recap",
+      "points": [
+        "Giriş kartı olmayan herkesi resepsiyona yönlendirin",
+        "Bulduğunuz bir USB belleği asla bilgisayara takmayın",
+        "Her zaman: durun, kontrol edin, bildirin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

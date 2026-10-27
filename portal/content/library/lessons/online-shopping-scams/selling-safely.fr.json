@@ -1,0 +1,431 @@
+{
+ "id": "selling-safely",
+ "title": "Quand vous vendez",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ss-tutor",
+   "beats": [
+    {
+     "id": "ss-b1",
+     "say": "Cette fois, c’est vous qui vendez : une vieille poussette, sur un site de petites annonces, pour 260 manats.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "ss-b2",
+     "say": "L’acheteuse écrit qu’elle a déjà payé, et vous demande d’ouvrir ce lien pour recevoir l’argent.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Rena (acheteuse)"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Bonjour, je prends la poussette ! J’ai payé via AlSat Paiement sécurisé."
+          }
+         ],
+         "time": "19:40"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Pour recevoir l’argent, confirmez votre carte ici : "
+          },
+          {
+           "text": "alsat-odenis.example.net/qebul",
+           "spot": "link",
+           "link": {
+            "label": "alsat-odenis.example.net/qebul",
+            "href": "https://alsat-odenis.example.net/qebul"
+           }
+          }
+         ],
+         "time": "19:41"
+        }
+       ]
+      }
+     },
+     "highlight": "link"
+    },
+    {
+     "id": "ss-b3",
+     "say": "Pour recevoir de l’argent, le numéro de carte suffit. Les trois chiffres au dos et le code reçu par SMS ne sont jamais nécessaires.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "ss-b4",
+     "say": "Si un lien de ce genre arrive, ne saisissez rien. Parlez à l’acheteur uniquement dans la messagerie du site.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ss-hotspot",
+   "prompt": "Trouvez les signaux d’alerte sur cette page.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2e-alsat-fake",
+    "tone": "app",
+    "title": [
+     {
+      "text": "AlSat Paiement sécurisé"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Page : "
+      },
+      {
+       "text": "alsat-odenis.example.net/qebul",
+       "spot": "domain"
+      }
+     ],
+     [
+      {
+       "text": "L’acheteur a payé 260,00 AZN. Confirmez votre carte pour recevoir l’argent."
+      }
+     ],
+     [
+      {
+       "text": "Saisissez le numéro de carte, la date d’expiration et le CVV",
+       "spot": "cvv"
+      }
+     ],
+     [
+      {
+       "text": "Saisissez le code SMS envoyé par votre banque",
+       "spot": "otp"
+      }
+     ],
+     [
+      {
+       "text": "La transaction sera annulée dans 15 minutes",
+       "spot": "timer"
+      }
+     ]
+    ],
+    "buttons": [
+     "Annuler",
+     "Recevoir l’argent"
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Adresse étrange",
+     "explain": "Ce n’est pas l’adresse du site de petites annonces. Un nom connu a été ajouté à un autre domaine."
+    },
+    {
+     "id": "cvv",
+     "label": "Code au dos de la carte",
+     "explain": "Ce code sert à débiter votre carte. Il n’est jamais nécessaire pour recevoir de l’argent."
+    },
+    {
+     "id": "otp",
+     "label": "Code SMS",
+     "explain": "Le code reçu par SMS confirme un paiement. Si vous le saisissez, l’argent quitte votre carte."
+    },
+    {
+     "id": "timer",
+     "label": "Pression",
+     "explain": "Le compte à rebours est là pour vous empêcher de réfléchir. Un vrai site ne presse pas le vendeur."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "ss-sim",
+   "environment": "browser",
+   "title": "Le lien de l’acheteuse",
+   "intro": "Vous avez ouvert le lien envoyé par l’acheteuse. Dans le navigateur, choisissez la bonne action à chaque étape.",
+   "steps": [
+    {
+     "id": "landing",
+     "label": "Votre argent vous attend : 260,00 AZN",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2e-alsat-fake",
+      "url": [
+       {
+        "text": "https://alsat-odenis.example.net/qebul",
+        "reveal": "alsat-odenis.example.net"
+       }
+      ]
+     },
+     "say": "Regardez la barre d’adresse.",
+     "actions": [
+      {
+       "id": "receive",
+       "label": "Recevoir l’argent",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Ce bouton ne vous paie pas, il ouvre un formulaire qui demande les données de votre carte. L’adresse n’est pas celle du site de petites annonces."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. L’adresse était étrange, alors ne saisissez rien sur cette page.",
+       "next": "real-site"
+      },
+      {
+       "id": "own",
+       "label": "Ouvrir le site moi-même",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Bravo. Quand vous ouvrez le site vous-même, vous ne tombez pas sur une fausse page.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "card-form",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2e-alsat-fake",
+      "brand": "AlSat Paiement",
+      "url": [
+       {
+        "text": "https://alsat-odenis.example.net/kart",
+        "reveal": "alsat-odenis.example.net"
+       }
+      ],
+      "fields": [
+       "Numéro de carte",
+       "Date d’expiration",
+       "CVV"
+      ],
+      "button": "Confirmer"
+     },
+     "say": "Le formulaire demande aussi le code au dos de la carte.",
+     "actions": [
+      {
+       "id": "enter",
+       "label": "Confirmer",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Avec ces données, l’escroc peut payer avec votre carte. Ce code n’est pas nécessaire pour recevoir de l’argent."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Une page qui demande le code au dos de la carte ne donne pas d’argent, elle en prend.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "sms-code",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2e-alsat-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Saisissez le code SMS"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Votre banque vous a envoyé un code à 6 chiffres."
+        }
+       ],
+       [
+        {
+         "text": "Pas d’inquiétude si le SMS indique « paiement » : il s’agit d’une opération de réception."
+        }
+       ]
+      ],
+      "buttons": [
+       "Annuler",
+       "Confirmer le code"
+      ]
+     },
+     "say": "Le SMS de la banque parle de paiement, mais la page parle de réception.",
+     "actions": [
+      {
+       "id": "confirm",
+       "label": "Confirmer le code",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Le code a validé un paiement, et l’argent a quitté votre carte. Appelez votre banque tout de suite."
+      },
+      {
+       "id": "stop",
+       "label": "Annuler",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Le code reçu par SMS sert aux paiements : ne le saisissez jamais sur une page et ne le donnez à personne."
+      }
+     ]
+    },
+    {
+     "id": "real-site",
+     "label": "AlSat : messages avec l’acheteuse",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2e-alsat",
+      "url": [
+       {
+        "text": "https://alsat.example/mesajlar",
+        "reveal": "alsat.example"
+       }
+      ]
+     },
+     "say": "Voici le vrai site de petites annonces.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler l’acheteuse",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bravo. Le site fermera le compte frauduleux et protégera les autres vendeurs."
+      },
+      {
+       "id": "cash",
+       "label": "Répondre à l’acheteuse : paiement en espèces lors du rendez-vous",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bien. Se rencontrer et recevoir des espèces, c’est la solution la plus simple et la plus sûre."
+      },
+      {
+       "id": "photo",
+       "label": "Envoyer une photo recto verso de la carte",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "La photo montre aussi le code au dos. Cela revient à donner votre carte à l’escroc."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ss-choice",
+   "question": {
+    "prompt": "Un acheteur veut virer de l’argent sur votre carte. Que suffit-il de lui donner ?",
+    "options": [
+     {
+      "id": "number",
+      "label": "Uniquement le numéro de carte ou le numéro de compte",
+      "correct": true,
+      "feedback": "Exact. Rien d’autre n’est nécessaire pour recevoir de l’argent."
+     },
+     {
+      "id": "cvv",
+      "label": "Le numéro de carte, la date d’expiration et le code au dos",
+      "correct": false,
+      "feedback": "Avec ces données, quelqu’un peut payer avec votre carte. Ne donnez jamais le code au dos."
+     },
+     {
+      "id": "otp",
+      "label": "Le code SMS envoyé par la banque",
+      "correct": false,
+      "feedback": "Le code reçu par SMS sert à faire sortir de l’argent. Un acheteur qui le demande est un escroc."
+     },
+     {
+      "id": "photo",
+      "label": "Une photo recto verso de la carte",
+      "correct": false,
+      "feedback": "La photo contient tout, y compris le code au dos. C’est comme remettre la carte elle-même."
+     }
+    ]
+   },
+   "explain": "Pour recevoir de l’argent, on n’a jamais besoin du code au dos de la carte ni d’un code SMS. Quiconque les demande est un escroc."
+  },
+  {
+   "type": "scenario",
+   "id": "ss-scenario",
+   "title": "Vous avez saisi le code",
+   "start": "charged",
+   "nodes": [
+    {
+     "id": "charged",
+     "text": "Dans la précipitation, vous avez saisi les données de votre carte et le code SMS. Une minute plus tard, la banque vous envoie un SMS : 389 manats ont été débités de votre carte.",
+     "choices": [
+      {
+       "label": "Appeler immédiatement la banque au numéro inscrit sur la carte et la faire bloquer",
+       "next": "bank",
+       "feedback": "Exact. Faire bloquer la carte rapidement empêche d’autres paiements."
+      },
+      {
+       "label": "Écrire à l’acheteuse et lui demander de rendre l’argent",
+       "outcome": "risky",
+       "feedback": "L’escroc ne vous remboursera pas, et le temps passe. Appelez d’abord la banque."
+      },
+      {
+       "label": "J’ai honte et je n’en parle à personne",
+       "outcome": "compromised",
+       "feedback": "Le silence donne du temps à l’escroc. Les banques et la police traitent ce genre de cas tous les jours."
+      }
+     ]
+    },
+    {
+     "id": "bank",
+     "text": "Votre carte est bloquée. Souhaitez-vous faire autre chose ?",
+     "speaker": "Gulnar (conseillère de la banque)",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Votre carte est bloquée. <breath> Souhaitez-vous faire autre chose ?",
+     "choices": [
+      {
+       "label": "Garder des captures d’écran et signaler les faits à la police et au site d’annonces",
+       "outcome": "safe",
+       "feedback": "Bravo. Les preuves aident la police, et le site ferme le compte frauduleux."
+      },
+      {
+       "label": "Supprimer la discussion pour oublier",
+       "outcome": "risky",
+       "feedback": "La discussion est une preuve. Ne la supprimez pas, montrez-la à la police."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "ss-recap",
+   "points": [
+    "Pour recevoir de l’argent, on n’a jamais besoin du code au dos de la carte ni d’un code SMS.",
+    "Ne saisissez rien dans un lien de paiement envoyé par un acheteur.",
+    "Si vous avez saisi un code, appelez immédiatement votre banque au numéro inscrit sur la carte."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

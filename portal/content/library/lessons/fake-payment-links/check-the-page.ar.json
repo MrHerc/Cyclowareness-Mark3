@@ -1,0 +1,383 @@
+{
+  "id": "check-the-page",
+  "title": "فحص الصفحة",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "cp-tutor",
+      "beats": [
+        {
+          "id": "cp-b1",
+          "say": "قد تكون صفحة الدفع المزيفة نسخة طبق الأصل من الصفحة الحقيقية.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "cp-b2",
+          "say": "الشعار والألوان والأزرار كلها متطابقة. والفرق في شريط العنوان، وفي ما تطلبه الصفحة منك.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "login",
+              "brandRef": "e-xidmet-fake",
+              "brand": "بوابة e-Xidmət",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "e-xidmet-cerime.example.net",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/odenis"
+                }
+              ],
+              "fields": [
+                "رقم البطاقة",
+                "تاريخ الانتهاء",
+                "CVV",
+                "رمز SMS"
+              ],
+              "button": "الدفع: 40 AZN"
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "cp-b3",
+          "say": "ورمز القفل لا يثبت شيئًا أيضًا، فمعظم المواقع المزيفة تحمله.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "cp-b4",
+          "say": "الطريقة الأكثر أمانًا: افتح البوابة من الإشارة المرجعية، أو اكتب العنوان بنفسك.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "cp-swipe",
+      "prompt": "هل هذه الصفحة حقيقية أم مزيفة؟",
+      "cards": [
+        {
+          "id": "real-fines",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet",
+            "brand": "بوابة e-Xidmət",
+            "url": [
+              {
+                "text": "https://e-xidmet.example/cerimeler"
+              }
+            ],
+            "fields": [
+              "رمز الهوية الشخصية",
+              "كلمة المرور"
+            ],
+            "button": "تسجيل الدخول"
+          },
+          "verdict": "safe",
+          "explain": "هذا هو النطاق الخاص بالبوابة، وقد فتحته بنفسك. هنا تتحقق من المخالفات."
+        },
+        {
+          "id": "fake-discount",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet-fake",
+            "brand": "بوابة e-Xidmət",
+            "url": [
+              {
+                "text": "https://e-xidmet-endirim.example.net/cerime"
+              }
+            ],
+            "fields": [
+              "رقم البطاقة",
+              "تاريخ الانتهاء",
+              "CVV",
+              "رمز SMS"
+            ],
+            "button": "الدفع بخصم 50%"
+          },
+          "verdict": "threat",
+          "explain": "النطاق مختلف، والصفحة تريد كل شيء دفعة واحدة: رقم البطاقة، ورمز CVV، ورمز SMS. إنه نموذج لسرقة البيانات."
+        },
+        {
+          "id": "app-notice",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "e-xidmet",
+            "app": "e-Xidmət",
+            "title": [
+              {
+                "text": "إشعار جديد"
+              }
+            ],
+            "body": [
+              {
+                "text": "توجد مخالفة واحدة مسجلة باسمك. التفاصيل في قسم «المخالفات» داخل التطبيق."
+              }
+            ],
+            "time": "09:15"
+          },
+          "verdict": "safe",
+          "explain": "الإشعار داخل التطبيق الرسمي، ولا يحتوي على رابط. تحقق من المخالفة وادفعها في التطبيق نفسه."
+        },
+        {
+          "id": "fake-benefit",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet-fake",
+            "brand": "دعم الأسرة",
+            "url": [
+              {
+                "text": "https://ailedestek-qeydiyyat.example.net"
+              }
+            ],
+            "fields": [
+              "الاسم الكامل",
+              "رمز الهوية الشخصية",
+              "رقم البطاقة",
+              "CVV"
+            ],
+            "button": "الحصول على الدعم"
+          },
+          "verdict": "threat",
+          "explain": "استلام الأموال لا يحتاج أبدًا إلى الرمز المكتوب على ظهر بطاقتك. والدعم الحكومي لا يتطلب التسجيل عبر رابط."
+        },
+        {
+          "id": "fake-gateway",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2d-manatpay-fake",
+            "brand": "ManatPay",
+            "url": [
+              {
+                "text": "https://manatpay-secure.example.net/3ds"
+              }
+            ],
+            "fields": [
+              "رقم البطاقة",
+              "CVV",
+              "رمز SMS",
+              "الرقم السري للبطاقة (PIN)"
+            ],
+            "button": "تأكيد"
+          },
+          "verdict": "threat",
+          "explain": "لا توجد صفحة دفع تطلب الرقم السري لبطاقتك أبدًا. فالرقم السري (PIN) مخصص لأجهزة الصراف الآلي وأجهزة نقاط البيع فقط."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "cp-sim",
+      "environment": "browser",
+      "title": "رابط المخالفة",
+      "intro": "أرسل لك صديق رابطًا لمخالفة، وفتحته. اتخذ القرار الصحيح في كل خطوة داخل المتصفح.",
+      "steps": [
+        {
+          "id": "fake-fine-page",
+          "label": "مخالفة غير مدفوعة: 80 AZN. خصم 50% اليوم",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "e-xidmet-fake",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "e-xidmet-cerime.example.net"
+              },
+              {
+                "text": "e-xidmet-cerime.example.net"
+              },
+              {
+                "text": "/odenis"
+              }
+            ]
+          },
+          "say": "انظر إلى شريط العنوان.",
+          "actions": [
+            {
+              "id": "pay",
+              "label": "الدفع مع الخصم",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "الخصم موجود ليجعلك تستعجل. والآن انظر إلى ما تطلبه الصفحة."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق علامة التبويب",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح، هذا ليس النطاق الخاص بالبوابة. والآن افتح البوابة بنفسك.",
+              "next": "real-portal"
+            }
+          ]
+        },
+        {
+          "id": "card-form",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "e-xidmet-fake",
+            "brand": "بوابة e-Xidmət",
+            "url": [
+              {
+                "text": "https://e-xidmet-cerime.example.net",
+                "reveal": "e-xidmet-cerime.example.net"
+              }
+            ],
+            "fields": [
+              "رقم البطاقة",
+              "تاريخ الانتهاء",
+              "CVV",
+              "رمز SMS"
+            ],
+            "button": "الدفع: 40 AZN"
+          },
+          "say": "الصفحة تطلب بيانات البطاقة ورمز الرسالة النصية معًا.",
+          "actions": [
+            {
+              "id": "submit",
+              "label": "الدفع: 40 AZN",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "وصلت بيانات بطاقتك إلى المحتالين. اتصل بالبنك فورًا على الرقم المكتوب على بطاقتك."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق علامة التبويب",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "قرار صائب. لم تكتب شيئًا، والآن تحقق من المخالفة في البوابة الرسمية."
+            }
+          ]
+        },
+        {
+          "id": "real-portal",
+          "label": "المخالفات: لا توجد مخالفات قائمة",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "e-xidmet",
+            "url": [
+              {
+                "text": "https://e-xidmet.example/cerimeler",
+                "reveal": "e-xidmet.example"
+              }
+            ]
+          },
+          "say": "فتحت البوابة من الإشارة المرجعية.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "عرض المخالفات",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "صحيح. البوابة الرسمية لا تعرض أي مخالفة، إذن فالرابط كان مزيفًا."
+            },
+            {
+              "id": "tell-friend",
+              "label": "إخبار صديقك",
+              "kind": "share",
+              "outcome": "safe",
+              "feedback": "رائع. أخبر الصديق الذي أرسل الرابط ألا يكتب أي شيء هناك."
+            }
+          ]
+        },
+        {
+          "id": "benefit-page",
+          "label": "دعم الأسرة: التسجيل ينتهي اليوم",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "e-xidmet-fake",
+            "url": [
+              {
+                "text": "https://ailedestek-qeydiyyat.example.net",
+                "reveal": "ailedestek-qeydiyyat.example.net"
+              }
+            ]
+          },
+          "say": "هذه المرة أرسل لك أحد الجيران رابطًا لدعم مالي.",
+          "actions": [
+            {
+              "id": "register",
+              "label": "التسجيل",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "هذا النموذج يجمع بيانات البطاقات. والدعم الحكومي لا يتطلب أبدًا التسجيل عبر رابط."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق علامة التبويب",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. تحقق من أي دعم مالي في البوابة الرسمية فقط."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن الموقع المزيف",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "رائع. الإبلاغ يساعد على حظر الموقع المزيف وحماية الآخرين أيضًا."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "cp-match",
+      "prompt": "طابق ما تطلبه الصفحة مع ما يعنيه.",
+      "pairs": [
+        {
+          "id": "pin",
+          "left": "الرقم السري للبطاقة (PIN)",
+          "right": "لا تطلبه أي صفحة دفع أبدًا"
+        },
+        {
+          "id": "sms-code",
+          "left": "رمز SMS من البنك",
+          "right": "يعتمد عملية دفع: اقرأ المبلغ أولًا"
+        },
+        {
+          "id": "benefit-cvv",
+          "left": "الرمز المكتوب على ظهر البطاقة لاستلام دعم مالي",
+          "right": "لا حاجة إليه لاستلام الأموال"
+        },
+        {
+          "id": "discount",
+          "left": "خصم إذا دفعت اليوم",
+          "right": "محاولة لاستعجالك حتى تدفع دون أن تتحقق"
+        }
+      ],
+      "explain": "إذا لم تكن متأكدًا، فلا تدفع. تحقق من البوابة الرسمية بنفسك، أو اتصل بالشرطة على الرقم 102."
+    },
+    {
+      "type": "recap",
+      "id": "cp-recap",
+      "points": [
+        "اقرأ شريط العنوان: الشعار ورمز القفل لا يثبتان شيئًا.",
+        "الصفحة التي تطلب الرقم السري (PIN)، أو رمز البطاقة مقابل دعم مالي، مزيفة.",
+        "عند الشك: اتصل بخدمة ETX على الرقم 1654 أو بالشرطة على الرقم 102."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

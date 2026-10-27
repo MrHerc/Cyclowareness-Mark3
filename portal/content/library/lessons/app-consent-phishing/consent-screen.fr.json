@@ -1,0 +1,526 @@
+{
+ "id": "consent-screen",
+ "title": "L’écran d’autorisation",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac1-tutor",
+   "beats": [
+    {
+     "id": "ac1-b1",
+     "say": "Bonjour ! Aujourd’hui, nous découvrons un piège qui vous demande une autorisation au lieu d’un mot de passe.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "ac1-b2",
+     "say": "L’application vous dit : pour afficher le document, autorisez-moi à lire vos e-mails et à envoyer des e-mails en votre nom.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "w2b-dokubaxis",
+       "app": "DokuBaxış Viewer",
+       "permissions": [
+        {
+         "label": [
+          {
+           "text": "Voir votre profil"
+          }
+         ],
+         "needed": true
+        },
+        {
+         "label": [
+          {
+           "text": "Lire vos e-mails et envoyer des e-mails en votre nom",
+           "spot": "mail"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "Conserver l’accès même en votre absence"
+          }
+         ],
+         "needed": false
+        }
+       ]
+      }
+     },
+     "highlight": "mail"
+    },
+    {
+     "id": "ac1-b3",
+     "say": "Un seul clic, et l’application entre dans votre messagerie. Même si vous modifiez votre mot de passe, l’autorisation reste valable.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "ac1-b4",
+     "say": "La règle : lisez le nom de l’application et les autorisations demandées, et n’autorisez jamais une application que vous ne connaissez pas.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ac1-hotspot",
+   "prompt": "Trouvez les demandes dont cette application n’a pas besoin.",
+   "artifact": {
+    "kind": "permission",
+    "brandRef": "w2b-dokubaxis",
+    "app": "DokuBaxış Viewer",
+    "permissions": [
+     {
+      "label": [
+       {
+        "text": "Voir votre profil"
+       }
+      ],
+      "needed": true
+     },
+     {
+      "label": [
+       {
+        "text": "Lire vos e-mails et envoyer des e-mails en votre nom",
+        "spot": "mail"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Lire et modifier tous vos fichiers",
+        "spot": "files"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Voir vos contacts",
+        "spot": "contacts"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Conserver l’accès même en votre absence",
+        "spot": "offline"
+       }
+      ],
+      "needed": false
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "mail",
+     "label": "Lecture et envoi d’e-mails",
+     "explain": "Pour afficher un document, inutile d’accéder à vos e-mails. Avec cette autorisation, l’application peut envoyer des e-mails d’hameçonnage (phishing) en votre nom."
+    },
+    {
+     "id": "files",
+     "label": "Tous les fichiers",
+     "explain": "Une application qui affiche un seul document n’a pas besoin de tous vos fichiers. Cette demande sert à voler des données."
+    },
+    {
+     "id": "contacts",
+     "label": "Contacts",
+     "explain": "Votre liste de contacts, c’est la liste des cibles de la prochaine attaque. Un document n’en a pas besoin."
+    },
+    {
+     "id": "offline",
+     "label": "Un accès permanent",
+     "explain": "Cela signifie que l’application reste dans votre compte après votre déconnexion, et même après un changement de mot de passe."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "ac1-swipe",
+   "prompt": "Quelle demande d’autorisation est normale, laquelle est un piège ? Faites glisser les cartes.",
+   "cards": [
+    {
+     "id": "meeting-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "gorus",
+      "app": "Görüş",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Voir votre agenda"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Voir votre profil"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Görüş est l’application bien connue de l’entreprise, et elle ne demande que ce dont elle a besoin pour fonctionner."
+    },
+    {
+     "id": "greeting-card",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-bayram-tebriki",
+      "app": "Bayram Təbriki",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Voir vos contacts"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Envoyer des e-mails en votre nom"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une carte de vœux n’a besoin ni de vos contacts ni du droit d’envoyer des e-mails. Cette demande sert à diffuser de l’hameçonnage en votre nom."
+    },
+    {
+     "id": "salary-calc",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-maas-kalkulyatoru",
+      "app": "Maaş Kalkulyatoru",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Lire vos e-mails"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Conserver l’accès même en votre absence"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une calculatrice n’a pas besoin de vos e-mails. Et l’accès permanent garde l’application dans votre compte."
+    },
+    {
+     "id": "editor",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "senedyaz",
+      "app": "SənədYaz",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Ouvrir et enregistrer le fichier que vous choisissez"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Cet éditeur connu ne demande que le fichier que vous choisissez. Cette autorisation correspond à sa fonction."
+    },
+    {
+     "id": "pdf-tool",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "pdf-birlesdirici",
+      "app": "PDF Birləşdirici Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Lire et modifier tous vos fichiers"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Lire et envoyer vos e-mails"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Pour fusionner des fichiers, il ne faut ni vos e-mails ni l’accès à tous vos fichiers. N’autorisez pas ce genre d’application."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac1-sim",
+   "environment": "browser",
+   "title": "Le document budgétaire partagé",
+   "intro": "Un document budgétaire a été partagé avec vous au nom de votre collègue Nigar. Vous avez ouvert le lien : décidez maintenant sur chaque écran.",
+   "steps": [
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "İşPoçt",
+      "url": [
+       {
+        "text": "https://giris.idare.example/icaze"
+       }
+      ],
+      "fields": [
+       "Adresse e-mail",
+       "Mot de passe"
+      ],
+      "button": "Se connecter"
+     },
+     "say": "Regardez l’adresse : c’est la vraie page de connexion de l’entreprise.",
+     "actions": [
+      {
+       "id": "sign-in",
+       "label": "Se connecter",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "L’adresse est authentique, donc le mot de passe ne part pas chez un criminel. Le piège se trouve dans la fenêtre suivante."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "C’est sans danger aussi. Mais imaginons que la connexion soit faite : voyons la fenêtre suivante."
+      }
+     ]
+    },
+    {
+     "id": "consent",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-dokubaxis",
+      "app": "DokuBaxış Viewer",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Voir votre profil"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Lire vos e-mails et envoyer des e-mails en votre nom"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Lire et modifier tous vos fichiers"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Conserver l’accès même en votre absence"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Avant que le document s’ouvre, cette fenêtre est apparue.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. Pour afficher un document, il ne faut ni vos e-mails, ni l’accès à tous les fichiers, ni un accès permanent.",
+       "next": "known-app"
+      },
+      {
+       "id": "allow",
+       "label": "Autoriser",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "L’application lit maintenant vos e-mails et écrit en votre nom. Modifier votre mot de passe ne l’arrête pas."
+      }
+     ]
+    },
+    {
+     "id": "connected-apps",
+     "label": "Applications connectées : DokuBaxış Viewer, accès permanent aux e-mails et aux fichiers",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/tetbiqler"
+       }
+      ]
+     },
+     "say": "Le lendemain, vous examinez votre compte.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler au support technique pour qu’il révoque l’autorisation",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Seule la révocation de l’autorisation supprime l’application, et un spécialiste recherchera aussi d’éventuelles traces."
+      },
+      {
+       "id": "password-only",
+       "label": "Modifier seulement le mot de passe",
+       "kind": "update",
+       "outcome": "risky",
+       "feedback": "Le mot de passe change, mais l’application conserve son autorisation. C’est le support technique qui doit la révoquer."
+      },
+      {
+       "id": "leave",
+       "label": "La laisser",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "L’application continuera de lire vos e-mails chaque jour. Signalez-la dès aujourd’hui."
+      }
+     ]
+    },
+    {
+     "id": "known-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "idare-komekci",
+      "app": "İdarə Köməkçisi",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Voir votre profil"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Voir votre agenda"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "say": "C’est maintenant l’assistant de l’entreprise qui demande une autorisation.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Autoriser",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Bien vu. Une application professionnelle connue ne demande que ce dont elle a besoin pour fonctionner."
+      },
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "La prudence se comprend, mais cette application est connue et demande peu. En cas de doute, demandez au support technique."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ac1-choice",
+   "question": {
+    "prompt": "Quelles autorisations sont les plus dangereuses ? Choisissez toutes les bonnes réponses.",
+    "options": [
+     {
+      "id": "send",
+      "label": "Envoyer des e-mails en votre nom",
+      "correct": true,
+      "feedback": "Exact. Avec cette autorisation, l’application envoie des e-mails d’hameçonnage à vos collègues en votre nom."
+     },
+     {
+      "id": "offline",
+      "label": "Conserver l’accès même en votre absence",
+      "correct": true,
+      "feedback": "Exact. Cela signifie que l’application reste dans votre compte après votre déconnexion."
+     },
+     {
+      "id": "profile",
+      "label": "Voir votre nom et votre photo de profil",
+      "correct": false,
+      "feedback": "C’est une petite autorisation, nécessaire pour une connexion normale."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Les e-mails, les fichiers et l’accès permanent sont les autorisations les plus sensibles. Ne les accordez jamais à une application que vous ne connaissez pas."
+  },
+  {
+   "type": "recap",
+   "id": "ac1-recap",
+   "points": [
+    "Sur un écran d’autorisation, lisez le nom de l’application et les autorisations demandées",
+    "N’accordez pas à une application inconnue l’accès à vos e-mails, à vos fichiers ou un accès permanent",
+    "Si vous avez autorisé une application par erreur, faites révoquer l’autorisation par le support technique"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

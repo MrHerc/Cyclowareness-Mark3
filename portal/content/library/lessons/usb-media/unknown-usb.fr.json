@@ -1,0 +1,281 @@
+{
+ "id": "unknown-usb",
+ "title": "La clé USB inconnue",
+ "minutes": 2,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "curiosity",
+     "say": "Une clé USB trouvée éveille la curiosité. C’est exactement ce sur quoi comptent les attaquants.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "plug-is-enough",
+     "say": "La brancher peut suffire. Certains appareils se font passer pour un clavier et tapent des commandes tout seuls.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "hand-over",
+     "say": "Ne branchez donc jamais une clé trouvée. Remettez-la à l’équipe sécurité.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "approved",
+     "say": "Au travail, n’utilisez que les clés fournies ou approuvées par votre support technique.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "charging",
+     "say": "Dans les lieux publics, rechargez votre téléphone avec votre propre chargeur, branché sur une prise murale. Si votre téléphone vous demande de faire confiance à un appareil, refusez.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "courier-sms",
+   "prompt": "Trouvez les signaux d’alerte dans ce message.",
+   "artifact": {
+    "kind": "sms",
+    "sender": [
+     {
+      "text": "+994 51 000 77 63",
+      "spot": "number"
+     }
+    ],
+    "time": "09:48",
+    "messages": [
+     [
+      {
+       "text": "Bonjour, je suis Nigar, la nouvelle assistante du directeur."
+      }
+     ],
+     [
+      {
+       "text": "Nous avons déposé une clé USB sur votre bureau, "
+      },
+      {
+       "text": "c’est la présentation du directeur.",
+       "spot": "authority"
+      }
+     ],
+     [
+      {
+       "text": "Merci de la brancher et d’ouvrir le fichier tout de suite, ",
+       "spot": "action"
+      },
+      {
+       "text": "la réunion commence dans 10 minutes.",
+       "spot": "urgent"
+      }
+     ],
+     [
+      {
+       "text": "N’en parlez à personne, c’est une surprise.",
+       "spot": "secret"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "number",
+     "label": "Numéro inconnu",
+     "explain": "Une demande professionnelle arrive depuis un numéro personnel que vous ne connaissez pas."
+    },
+    {
+     "id": "authority",
+     "label": "Le nom du directeur",
+     "explain": "Le directeur est cité pour que vous vous précipitiez sans rien vérifier."
+    },
+    {
+     "id": "action",
+     "label": "Brancher et ouvrir",
+     "explain": "On vous demande de brancher une clé inconnue : c’est le principal danger."
+    },
+    {
+     "id": "urgent",
+     "label": "Pression du temps",
+     "explain": "Dix minutes, cela ne vous laisse pas le temps de réfléchir."
+    },
+    {
+     "id": "secret",
+     "label": "Le secret",
+     "explain": "Exiger le secret vous empêche de vérifier."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "scenario",
+   "id": "car-park-drive",
+   "title": "Une clé USB sur le parking",
+   "start": "found",
+   "nodes": [
+    {
+     "id": "found",
+     "text": "Le matin, vous trouvez sur le parking une clé USB étiquetée « Salaires 2026, confidentiel ».",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     },
+     "choices": [
+      {
+       "label": "La brancher sur mon ordinateur de travail pour voir ce que c’est",
+       "outcome": "compromised",
+       "feedback": "La clé a lancé un logiciel malveillant. L’étiquette « confidentiel » était là pour vous appâter."
+      },
+      {
+       "label": "La vérifier sur mon ordinateur personnel",
+       "outcome": "risky",
+       "feedback": "Votre appareil personnel peut lui aussi être infecté, et vos comptes professionnels s’y trouvent peut-être."
+      },
+      {
+       "label": "L’apporter à l’équipe sécurité",
+       "next": "colleague",
+       "feedback": "C’est le bon choix."
+      }
+     ]
+    },
+    {
+     "id": "colleague",
+     "text": "Donne-la-moi, je vais regarder. J’ai un antivirus sur mon ordinateur.",
+     "speaker": "Tural, un collègue",
+     "voice": "man-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Donne-la-moi, je vais regarder. <breath> J’ai un antivirus sur mon ordinateur.",
+     "choices": [
+      {
+       "label": "La lui donner, l’antivirus le protégera",
+       "outcome": "risky",
+       "feedback": "Un antivirus n’arrête pas toutes les attaques, surtout pas les appareils qui se font passer pour un clavier."
+      },
+      {
+       "label": "Refuser poliment et la remettre à l’équipe sécurité",
+       "next": "security",
+       "feedback": "Bravo. La règle est la même pour tout le monde."
+      }
+     ]
+    },
+    {
+     "id": "security",
+     "text": "Merci. Nous analysons ce genre d’appareil à part, sur un ordinateur isolé du réseau.",
+     "speaker": "Équipe sécurité",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Merci. <breath> Nous analysons ce genre d’appareil à part, sur un ordinateur isolé du réseau.",
+     "choices": [
+      {
+       "label": "Leur dire où et quand je l’ai trouvée",
+       "outcome": "safe",
+       "feedback": "Très bien. Cela les aide à chercher d’autres clés."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "airport-charging",
+   "question": {
+    "prompt": "À l’aéroport, votre téléphone n’a presque plus de batterie. Quelles options sont sûres ?",
+    "options": [
+     {
+      "id": "own-adapter",
+      "label": "Brancher mon propre chargeur sur une prise murale",
+      "correct": true,
+      "feedback": "C’est la solution la plus simple et la plus sûre."
+     },
+     {
+      "id": "power-bank",
+      "label": "Recharger avec ma propre batterie externe",
+      "correct": true,
+      "feedback": "Très bien, aucun appareil inconnu n’entre en jeu."
+     },
+     {
+      "id": "strangers-cable",
+      "label": "Utiliser un câble prêté par un inconnu",
+      "correct": false,
+      "feedback": "Le câble d’un inconnu peut cacher un appareil à l’intérieur."
+     },
+     {
+      "id": "trust-yes",
+      "label": "Appuyer sur « Oui » quand le téléphone demande de faire confiance à l’appareil",
+      "correct": false,
+      "feedback": "Cela donne à l’appareil accès à vos données. Pour recharger, inutile de lui faire confiance."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "phone-lock"
+    }
+   },
+   "explain": "Les attaques par les ports USB publics sont rares, mais il est simple de s’en protéger : votre propre chargeur, et aucune confiance accordée à un appareil inconnu."
+  },
+  {
+   "type": "match",
+   "id": "media-rules",
+   "prompt": "Associez chaque situation à la bonne action.",
+   "pairs": [
+    {
+     "id": "gift-drive",
+     "left": "Une clé USB offerte lors d’une conférence",
+     "right": "La faire d’abord vérifier par le support technique"
+    },
+    {
+     "id": "carry-files",
+     "left": "Vous devez emporter des fichiers de travail chez vous",
+     "right": "Utiliser un support approuvé ou le cloud approuvé"
+    },
+    {
+     "id": "courier",
+     "left": "Un coursier apporte une clé USB pour le directeur",
+     "right": "La remettre à l’équipe sécurité"
+    },
+    {
+     "id": "lost",
+     "left": "Vous avez perdu votre clé USB professionnelle",
+     "right": "Le signaler tout de suite"
+    }
+   ],
+   "explain": "On ne branche jamais un support inconnu, et les données de travail ne circulent que par des moyens approuvés."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Ne branchez jamais une clé trouvée ou inconnue : remettez-la à l’équipe sécurité.",
+    "Au travail, n’utilisez que des supports approuvés.",
+    "Rechargez avec votre propre chargeur et ne faites jamais confiance à un appareil inconnu."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,731 @@
+{
+ "id": "ceo-fraud",
+ "title": "Directorul fals",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "money-trap",
+   "beats": [
+    {
+     "id": "intro",
+     "say": "Uneori, capcana nu are nici link, nici fișier. Doar o cerere urgentă de bani, în numele managerului dumneavoastră.",
+     "mood": "talk",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "ceo"
+     }
+    },
+    {
+     "id": "address",
+     "say": "Numele este cunoscut, dar adresa nu este a agenției. Oricine poate scrie orice nume de expeditor.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "poctam",
+       "from": {
+        "name": [
+         {
+          "text": "Rauf Karimov"
+         }
+        ],
+        "address": [
+         {
+          "text": "rauf.kerimov.ofis@"
+         },
+         {
+          "text": "poctam.az",
+          "spot": "free-mail"
+         }
+        ]
+       },
+       "to": "s.huseynova@xidmetagentliyi.az",
+       "subject": [
+        {
+         "text": "Urgent și confidențial"
+        }
+       ],
+       "time": "15:05",
+       "body": [
+        [
+         {
+          "text": "Bună, Sabina,"
+         }
+        ],
+        [
+         {
+          "text": "Trebuie să transferăm astăzi, până la 16:00, 18.400 AZN unui partener.",
+          "spot": "urgency"
+         }
+        ],
+        [
+         {
+          "text": "Deocamdată nu spune nimănui, negocierile sunt confidențiale.",
+          "spot": "secrecy"
+         }
+        ],
+        [
+         {
+          "text": "Sunt în ședință, nu mă suna, doar scrie-mi.",
+          "spot": "no-call"
+         }
+        ],
+        [
+         {
+          "text": "Datele bancare sunt în atașament."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Rekvizitler.pdf"
+          }
+         ],
+         "size": "64 KB"
+        }
+       ]
+      }
+     },
+     "highlight": "free-mail"
+    },
+    {
+     "id": "secrecy",
+     "say": "Cererea de a păstra secretul și interdicția de a suna au un singur scop: să nu verificați.",
+     "mood": "alert",
+     "gesture": "point-down",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "poctam",
+       "from": {
+        "name": [
+         {
+          "text": "Rauf Karimov"
+         }
+        ],
+        "address": [
+         {
+          "text": "rauf.kerimov.ofis@"
+         },
+         {
+          "text": "poctam.az",
+          "spot": "free-mail"
+         }
+        ]
+       },
+       "to": "s.huseynova@xidmetagentliyi.az",
+       "subject": [
+        {
+         "text": "Urgent și confidențial"
+        }
+       ],
+       "time": "15:05",
+       "body": [
+        [
+         {
+          "text": "Bună, Sabina,"
+         }
+        ],
+        [
+         {
+          "text": "Trebuie să transferăm astăzi, până la 16:00, 18.400 AZN unui partener.",
+          "spot": "urgency"
+         }
+        ],
+        [
+         {
+          "text": "Deocamdată nu spune nimănui, negocierile sunt confidențiale.",
+          "spot": "secrecy"
+         }
+        ],
+        [
+         {
+          "text": "Sunt în ședință, nu mă suna, doar scrie-mi.",
+          "spot": "no-call"
+         }
+        ],
+        [
+         {
+          "text": "Datele bancare sunt în atașament."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Rekvizitler.pdf"
+          }
+         ],
+         "size": "64 KB"
+        }
+       ]
+      }
+     },
+     "highlight": "secrecy"
+    },
+    {
+     "id": "second-channel",
+     "say": "Verificați întotdeauna pe alt canal orice cerere de bani sau de schimbare a datelor bancare. Sunați chiar dumneavoastră la un număr pe care îl cunoașteți deja.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     },
+     "checkpoint": {
+      "prompt": "Și dacă mesajul vine de pe adresa reală a directorului?",
+      "options": [
+       {
+        "id": "skip",
+        "label": "Atunci nu mai este nevoie de verificare",
+        "correct": false,
+        "feedback": "Căsuța de e-mail poate fi compromisă. Verificați întotdeauna cererile de bani prin telefon."
+       },
+       {
+        "id": "check",
+        "label": "Verific oricum prin telefon",
+        "correct": true,
+        "feedback": "Corect. Și o adresă reală poate fi furată."
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "new-bank-details",
+   "prompt": "Găsiți semnalele de alarmă: furnizorul real scrie de pe ofistechizat.az.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "ofistechizat-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Gunel Aliyeva, OfisTəchizat LLC",
+       "reveal": "kamran@ofis-techizat.az"
+      }
+     ],
+     "address": [
+      {
+       "text": "kamran@"
+      },
+      {
+       "text": "ofis-techizat.az",
+       "spot": "look-alike"
+      }
+     ]
+    },
+    "to": "muhasibat@xidmetagentliyi.az",
+    "subject": [
+     {
+      "text": "Datele noastre bancare s-au schimbat"
+     }
+    ],
+    "time": "11:18",
+    "body": [
+     [
+      {
+       "text": "Stimați colegi,"
+      }
+     ],
+     [
+      {
+       "text": "Deoarece am schimbat banca, "
+      },
+      {
+       "text": "vă rugăm ca, începând cu această lună, să efectuați plățile în noul cont.",
+       "spot": "new-account"
+      }
+     ],
+     [
+      {
+       "text": "IBAN: AZ21ULDZ00000000137010001944"
+      }
+     ],
+     [
+      {
+       "text": "Nu mai plătiți în contul vechi, banii vor fi returnați.",
+       "spot": "old-account"
+      }
+     ],
+     [
+      {
+       "text": "Achitați factura pentru septembrie în această săptămână, ca să evitați penalitățile.",
+       "spot": "pressure"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "look-alike",
+     "label": "Adresă aproape identică",
+     "explain": "Adresa reală este ofistechizat.az. Aici a fost adăugată o cratimă."
+    },
+    {
+     "id": "new-account",
+     "label": "Cont nou",
+     "explain": "Schimbarea datelor bancare este forma clasică a acestei fraude. Verificați întotdeauna la numărul din contract."
+    },
+    {
+     "id": "old-account",
+     "label": "Fără plăți în contul vechi",
+     "explain": "Interdicția de a plăti în contul vechi vă împinge spre cel nou, fără verificare."
+    },
+    {
+     "id": "pressure",
+     "label": "Amenințarea cu penalități",
+     "explain": "Frica de penalități vă face să vă grăbiți. Tocmai presiunea este motivul să verificați."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "intro",
+   "id": "your-turn",
+   "title": "Acum e rândul dumneavoastră",
+   "body": "Vineri, ora 15:05. În contabilitate nu mai este nimeni în afară de dumneavoastră, iar plățile trebuie trimise până la 16:00.",
+   "mood": "think",
+   "visual": {
+    "kind": "illustration",
+    "id": "ceo"
+   }
+  },
+  {
+   "type": "simulation",
+   "id": "vendor-callback",
+   "environment": "call",
+   "title": "Sună un furnizor",
+   "intro": "Imediat după e-mailul cu datele bancare, vă sună telefonul. Ascultați ce vi se spune și decideți.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 61 27"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "woman"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Răspundeți",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Nu este periculos să răspundeți. Contează la ce vă dați acordul."
+      },
+      {
+       "id": "decline",
+       "label": "Respingeți",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Este și aceasta o variantă bună. Înainte de a plăti, sunați-l chiar dumneavoastră pe furnizor, la numărul din contract.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pitch",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 61 27"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "woman"
+     },
+     "say": "Bună ziua, sunt Gunel Aliyeva de la OfisTəchizat. Ați primit e-mailul nostru? Vă rog să achitați astăzi factura pentru septembrie în noul cont.",
+     "spoken": "Bună ziua, <breath> sunt Gunel Aliyeva de la OfisTəchizat. Ați primit e-mailul nostru? Vă rog să achitați astăzi factura pentru septembrie, ăă, în noul cont.",
+     "actions": [
+      {
+       "id": "agree",
+       "label": "Bine, plătesc astăzi",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Apelul repetă povestea din e-mail; nu dovedește nimic. Confirmați schimbarea datelor bancare la numărul din contract."
+      },
+      {
+       "id": "verify",
+       "label": "Verific la numărul din contract",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect: e-mailul și apelul pot veni de la același escroc. Verificați pe alt canal."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 61 27"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "woman"
+     },
+     "say": "Nu mai avem timp, directorul nostru este supărat. Dacă doriți să verificați, sunați-mă înapoi la numărul acesta.",
+     "spoken": "Nu mai avem timp, <breath> directorul nostru este supărat. Dacă doriți să verificați, sunați-mă înapoi la numărul acesta.",
+     "actions": [
+      {
+       "id": "hang",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Corect. Când presiunea crește, încheiați politicos apelul și verificați pe cont propriu."
+      },
+      {
+       "id": "his-number",
+       "label": "Sun la acest număr ca să confirm",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Numărul dat de apelantă este chiar telefonul ei. Aveți încredere doar în numărul din contract."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Apelul s-a încheiat. Ce faceți acum?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 61 27"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "woman"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "Sunați la numărul din contract",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Corect. Formați chiar dumneavoastră numărul oficial, de preferat de pe alt telefon."
+      },
+      {
+       "id": "ignore",
+       "label": "Nu faceți nimic, doar nu plătiți",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Banii sunt în siguranță, dar furnizorul și colegii nu află nimic. Escrocul va încerca să-l înșele pe altcineva."
+      }
+     ]
+    },
+    {
+     "id": "real-supplier",
+     "label": "Apel la numărul din contract",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 31 00"
+       }
+      ],
+      "label": "Număr din contract",
+      "voice": "woman-2"
+     },
+     "say": "OfisTəchizat, la telefon Gunel Aliyeva. Nu, nu ne-am schimbat datele bancare și nici nu v-am sunat.",
+     "spoken": "OfisTəchizat, <breath> la telefon Gunel Aliyeva. Nu, nu ne-am, ăă, schimbat datele bancare și nici nu v-am sunat.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Anunțați contabilitatea și echipa de securitate",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Raportați e-mailul fără să-l ștergeți: echipa blochează domeniul fals și îi avertizează pe colegi."
+      },
+      {
+       "id": "keep-quiet",
+       "label": "N-am plătit, e suficient",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Banii sunt în siguranță, dar același e-mail poate ajunge la colegi. Raportarea îi protejează."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "money-requests",
+   "prompt": "Această cerere este sigură sau o capcană?",
+   "cards": [
+    {
+     "id": "gift-cards",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Rauf Karimov (număr nou)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună, acesta e numărul meu nou."
+         }
+        ],
+        "time": "12:02"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Cumpără urgent cinci carduri cadou de câte 200 de manați și trimite-mi codurile. Îți dau banii înapoi."
+         }
+        ],
+        "time": "12:03"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un număr nou plus carduri cadou: o înșelătorie clasică. Ca să verificați, sunați la vechiul număr al managerului."
+    },
+    {
+     "id": "report-request",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi",
+      "from": {
+       "name": [
+        {
+         "text": "Rauf Karimov"
+        }
+       ],
+       "address": [
+        {
+         "text": "r.kerimov@xidmetagentliyi.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Ședința de mâine"
+       }
+      ],
+      "time": "09:40",
+      "body": [
+       [
+        {
+         "text": "Sabina, te rog să aduci raportul trimestrial la ședința de mâine. Mulțumesc."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Adresa corectă și o cerere de serviciu obișnuită. Fără bani și fără secrete."
+    },
+    {
+     "id": "broken-phone",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "+994 55 000 71 48"
+       }
+      ],
+      "time": "14:15",
+      "messages": [
+       [
+        {
+         "text": "Bună, sunt Rauf Karimov, mi s-a stricat telefonul. Transferă urgent 3.000 AZN unui partener, ți-am trimis datele pe e-mail."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un număr necunoscut, scuza telefonului stricat și bani ceruți urgent. Sunați la numărul directorului pe care îl cunoașteți."
+    },
+    {
+     "id": "usual-invoice",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat",
+      "from": {
+       "name": [
+        {
+         "text": "OfisTəchizat MMC"
+        }
+       ],
+       "address": [
+        {
+         "text": "muhasibat@ofistechizat.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Factura pentru septembrie"
+       }
+      ],
+      "time": "10:30",
+      "body": [
+       [
+        {
+         "text": "Bună ziua. Vă trimitem atașată factura pentru septembrie. Plata se face, ca de obicei, în contul din contract."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Factura_septembrie.pdf"
+         }
+        ],
+        "size": "120 KB"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "O adresă cunoscută, o factură așteptată și nicio schimbare a datelor bancare. Un e-mail obișnuit."
+    },
+    {
+     "id": "hacked-mailbox",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi",
+      "from": {
+       "name": [
+        {
+         "text": "Rauf Karimov"
+        }
+       ],
+       "address": [
+        {
+         "text": "r.kerimov@xidmetagentliyi.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Plată urgentă"
+       }
+      ],
+      "time": "16:48",
+      "body": [
+       [
+        {
+         "text": "Transferă astăzi 9.750 AZN unui partener nou, datele sunt mai jos."
+        }
+       ],
+       [
+        {
+         "text": "Nu mă suna, sunt în ședință."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Adresa este reală, dar căsuța de e-mail poate fi compromisă. Banii ceruți urgent și interdicția de a suna sunt un motiv suficient pentru verificare."
+    },
+    {
+     "id": "approval-flow",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Elvin Mammadov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Sabina, am trimis spre aprobare în sistem documentele pentru plata de mâine. Aruncă o privire când ai timp."
+         }
+        ],
+        "time": "11:05"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Un proces obișnuit: plățile se aprobă în sistemul oficial, conform regulilor. Nimic nu se face în grabă."
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "money-steps",
+   "prompt": "Puneți în ordine pașii de urmat în cazul unei cereri suspecte de bani.",
+   "items": [
+    {
+     "id": "pause",
+     "label": "Nu plătiți, luați o pauză"
+    },
+    {
+     "id": "verify",
+     "label": "Verificați la un număr cunoscut"
+    },
+    {
+     "id": "report",
+     "label": "Dacă este un fals, apăsați „Raportați phishing”"
+    }
+   ],
+   "explain": "Pauză, verificare, apoi raportare. Nu aveți butonul „Raportați phishing”? Redirecționați mesajul echipei de securitate IT. Dacă ați plătit deja, sunați imediat la bancă și la echipa de securitate IT."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Verificați pe alt canal cererile de bani și de schimbare a datelor bancare.",
+    "Urgența plus secretul sunt semnătura fraudei.",
+    "Nu ștergeți mesajul, apăsați „Raportați phishing”."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

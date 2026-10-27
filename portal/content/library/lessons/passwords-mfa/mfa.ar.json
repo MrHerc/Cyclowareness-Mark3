@@ -1,0 +1,403 @@
+{
+  "id": "mfa",
+  "title": "التحقق بخطوتين",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "second-step",
+      "beats": [
+        {
+          "id": "why",
+          "say": "حتى لو سرق أحدهم كلمة مرورك، يمكن لخطوة ثانية أن تحمي الحساب. وهذا ما يسمى التحقق بخطوتين.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "mfa-phone"
+          }
+        },
+        {
+          "id": "best",
+          "say": "أقوى الوسائل هي مفاتيح المرور ومفاتيح الأمان، فهي لا تعمل على المواقع المزيفة.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        },
+        {
+          "id": "code",
+          "say": "الرمز لك وحدك. أي شخص يطلبه منك محتال، حتى لو قدم نفسه على أنه البنك.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "brandRef": "ulduzbank",
+              "sender": [
+                {
+                  "text": "UlduzBank"
+                }
+              ],
+              "time": "14:02",
+              "messages": [
+                [
+                  {
+                    "text": "رمز تسجيل الدخول: 482 913. "
+                  },
+                  {
+                    "text": "لا تشارك هذا الرمز مع أي شخص، ولا حتى مع موظفي البنك.",
+                    "spot": "code-warning"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "code-warning"
+        },
+        {
+          "id": "prompts",
+          "say": "إذا ظلت تصلك طلبات موافقة لم تكن تتوقعها، فهناك من يحاول تسجيل الدخول بكلمة مرورك.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          },
+          "checkpoint": {
+            "prompt": "ماذا تفعل بطلب موافقة لم تتوقعه؟",
+            "options": [
+              {
+                "id": "approve",
+                "label": "أوافق عليه حتى تتوقف الطلبات",
+                "correct": false,
+                "feedback": "إذا وافقت، فسيدخل المهاجم إلى حسابك."
+              },
+              {
+                "id": "deny",
+                "label": "أرفضه وأغير كلمة مروري",
+                "correct": true,
+                "feedback": "صحيح. وبعد ذلك أبلغ فريق الأمن السيبراني أيضًا."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "night-push",
+      "environment": "phone",
+      "title": "طلبات في منتصف الليل",
+      "intro": "الساعة الثانية ليلًا، وأنت في نوم عميق. وجوالك يطلب منك مرة بعد مرة الموافقة على تسجيل دخول.",
+      "steps": [
+        {
+          "id": "push-1",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "tesdiqleyici",
+            "app": "Təsdiqləyici",
+            "title": [
+              {
+                "text": "هل توافق على تسجيل الدخول؟"
+              }
+            ],
+            "body": [
+              {
+                "text": "بوابة Xidmət Agentliyi. حاسوب يعمل بنظام Windows."
+              }
+            ],
+            "time": "02:14"
+          },
+          "say": "أنت لا تسجل الدخول إلى أي مكان الآن.",
+          "actions": [
+            {
+              "id": "approve",
+              "label": "موافقة",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "أنت لا تسجل الدخول، إذن هذا شخص آخر. الموافقة تسمح لمن يملك كلمة مرورك بالدخول."
+            },
+            {
+              "id": "deny",
+              "label": "رفض",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "صحيح. ارفض دائمًا أي طلب لم تتوقعه."
+            }
+          ]
+        },
+        {
+          "id": "push-5",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "tesdiqleyici",
+            "app": "Təsdiqləyici",
+            "title": [
+              {
+                "text": "هل توافق على تسجيل الدخول؟"
+              }
+            ],
+            "body": [
+              {
+                "text": "الطلب الخامس. حاسوب يعمل بنظام Windows."
+              }
+            ],
+            "time": "02:16"
+          },
+          "say": "الطلبات لا تتوقف.",
+          "actions": [
+            {
+              "id": "approve",
+              "label": "الموافقة حتى تتوقف الطلبات",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "هجوم إغراق الإشعارات يعتمد على هذا بالضبط: أن تتعب فتوافق. والموافقة تفتح الحساب للمهاجم."
+            },
+            {
+              "id": "deny",
+              "label": "رفض",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "صحيح. الطلبات المتكررة تعني أن أحدًا يعرف كلمة مرورك."
+            },
+            {
+              "id": "report",
+              "label": "لم أكن أنا، الإبلاغ عن الطلب",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "رائع. الإبلاغ يكشف الهجوم لفريق الأمن السيبراني فورًا."
+            }
+          ]
+        },
+        {
+          "id": "fake-it-chat",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek-fake",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "الدعم الفني"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "مرحبًا، يجري الآن فحص ليلي للنظام. وافق على الطلب الأخير حتى لا يتم حظر حسابك."
+                  }
+                ],
+                "time": "02:17"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "agree",
+              "label": "حسنًا، سأوافق",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "الدعم الفني لا يطلب منك أبدًا الموافقة على طلب كهذا. هذا هو النصف الثاني من الهجوم."
+            },
+            {
+              "id": "block",
+              "label": "الحظر والإبلاغ",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "صحيح. رقم غير معروف يراسلك ليلًا ليس الدعم الفني، بل هو المهاجم."
+            }
+          ]
+        },
+        {
+          "id": "change-now",
+          "label": "فتحت البوابة بنفسك",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/profil/parol"
+              }
+            ],
+            "fields": [
+              "كلمة المرور القديمة",
+              "عبارة المرور الجديدة"
+            ],
+            "button": "تغيير"
+          },
+          "say": "كلمة مرورك مسروقة. ماذا تفعل الآن؟",
+          "actions": [
+            {
+              "id": "change",
+              "label": "تغيير كلمة المرور الآن",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "صحيح. ثم أبلغ فريق الأمن السيبراني لينهي كل الجلسات المفتوحة."
+            },
+            {
+              "id": "later",
+              "label": "سألقي نظرة في الصباح",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "المهاجم يعرف كلمة مرورك وسيحاول مجددًا. غيرها الآن."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "strongest-factor",
+      "question": {
+        "prompt": "أي خطوة ثانية هي الأكثر مقاومة للتصيد؟",
+        "options": [
+          {
+            "id": "sms",
+            "label": "رمز يصلك برسالة نصية",
+            "correct": false,
+            "feedback": "الموقع المزيف قد يطلب منك الرمز، ويمكن لشخص آخر نقل رقمك إلى شريحة SIM أخرى."
+          },
+          {
+            "id": "app",
+            "label": "تطبيق المصادقة",
+            "correct": false,
+            "feedback": "أفضل من الرسائل النصية، لكنك قد تكتب الرمز في موقع مزيف رغم ذلك."
+          },
+          {
+            "id": "key",
+            "label": "مفتاح المرور أو مفتاح الأمان",
+            "correct": true,
+            "feedback": "صحيح. المفتاح لا يعمل إلا مع الموقع الحقيقي."
+          },
+          {
+            "id": "email",
+            "label": "رمز يصلك بالبريد الإلكتروني",
+            "correct": false,
+            "feedback": "إذا استولى أحد على بريدك، فقد استولى على الرمز أيضًا."
+          }
+        ]
+      },
+      "explain": "أي خطوة ثانية أفضل من كلمة المرور وحدها. واختر المفتاح عندما يكون ذلك ممكنًا."
+    },
+    {
+      "type": "hotspot",
+      "id": "code-request",
+      "prompt": "ابحث عن الخطر في هذه الرسائل.",
+      "artifact": {
+        "kind": "chat",
+        "app": "whatsapp",
+        "contact": [
+          {
+            "text": "+994 50 000 26 43",
+            "spot": "unknown-number",
+            "reveal": "ليس ضمن جهات اتصالك"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "مرحبًا آينور! أنا نيغار، وهذا رقمي الجديد."
+              }
+            ],
+            "time": "20:31"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "أنا أرسلت رمزًا إلى رقمك بالخطأ.",
+                "spot": "mistake"
+              }
+            ],
+            "time": "20:31"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "أرسلي لي من فضلك الرمز المكون من ستة أرقام الذي وصلك الآن.",
+                "spot": "ask-code"
+              }
+            ],
+            "time": "20:32"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "أسرعي، صلاحيته تنتهي بعد دقيقتين.",
+                "spot": "urgency"
+              }
+            ],
+            "time": "20:32"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "unknown-number",
+          "label": "رقم غير معروف",
+          "explain": "الاسم مألوف، لكن الرقم جديد. اتصل برقم صديقتك القديم لتتحقق."
+        },
+        {
+          "id": "mistake",
+          "label": "«وصل بالخطأ»",
+          "explain": "الرمز لا يصل إلى رقمك بالخطأ. هناك من يحاول الدخول إلى حسابك."
+        },
+        {
+          "id": "ask-code",
+          "label": "طلب الرمز",
+          "explain": "إذا أعطيت هذا الرمز، فسيستولي المحتال على حسابك ويراسل أصدقاءك باسمك."
+        },
+        {
+          "id": "urgency",
+          "label": "الاستعجال",
+          "explain": "ضيق الوقت لا يترك مجالًا للتفكير. لا ترسل أي رمز إلى أي شخص أبدًا."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "order",
+      "id": "setup-authenticator",
+      "prompt": "رتب خطوات إعداد تطبيق المصادقة.",
+      "items": [
+        {
+          "id": "turn-on",
+          "label": "تفعيل التحقق بخطوتين في إعدادات حسابك"
+        },
+        {
+          "id": "scan",
+          "label": "مسح رمز QR الظاهر على الشاشة بالتطبيق"
+        },
+        {
+          "id": "enter-code",
+          "label": "إدخال الرمز الذي يعرضه التطبيق"
+        },
+        {
+          "id": "backup",
+          "label": "حفظ الرموز الاحتياطية في مكان آمن"
+        }
+      ],
+      "explain": "الرموز الاحتياطية تساعدك على استعادة الدخول إلى حسابك إذا فقدت جوالك."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "اختر مفتاح المرور أو تطبيق المصادقة كلما أمكن ذلك.",
+        "لا تخبر أحدًا بأي رمز، ولا ترسله إلى أحد أبدًا.",
+        "ارفض الطلبات غير المتوقعة، وغير كلمة مرورك، وأبلغ عن الأمر."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { localizeStandard } from "@/lib/standards";
-import { BadgeCheck, ChevronRight, Route, Users, Repeat } from "lucide-react";
+import { BadgeCheck, ChevronRight, Gamepad2, Route, Users, Repeat } from "lucide-react";
 import { requireFeature } from "@/server/auth/viewer";
 import { getPaths } from "@/server/queries/paths";
 import { PageHeader } from "@/components/ui/layout";
@@ -45,6 +45,12 @@ export default async function PathsPage() {
                   <Repeat className="size-4" />
                   {p.recurrence}
                 </span>
+                {p.labs.length ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Gamepad2 className="size-4" />
+                    {tr("labsCount", { count: p.labs.length })}
+                  </span>
+                ) : null}
               </div>
               <div className="mt-4 flex items-center gap-3">
                 <ProgressBar decorative value={p.modules.length ? (p.done / p.modules.length) * 100 : 0} tone={p.done === p.modules.length ? "safe" : "brand"} />

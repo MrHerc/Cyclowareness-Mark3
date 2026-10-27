@@ -1,0 +1,509 @@
+{
+ "id": "hospital-call",
+ "title": "مكالمة من المستشفى",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "hc-tutor",
+   "beats": [
+    {
+     "id": "hc-b1",
+     "say": "هذه المرة تتصل بك المحتالة، وتدعي أنها طبيبة في مستشفى بالخارج.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "hc-b2",
+     "say": "تقول إن صديقك الذي تعرفت إليه عبر الإنترنت تعرض لحادث، ويحتاج بشكل عاجل إلى المال لإجراء عملية جراحية.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2e-nordhaven-klinika",
+       "caller": [
+        {
+         "text": "Nordhaven Clinic"
+        }
+       ],
+       "number": [
+        {
+         "text": "+44 7700 900 418",
+         "spot": "number"
+        }
+       ],
+       "label": "رقم دولي"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "hc-b3",
+     "say": "الاستعجال والخوف والكتمان: عندما تجتمع هذه الثلاثة معًا، فأنت أمام عملية احتيال.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "hc-b4",
+     "say": "أغلق الخط، وابحث عن الرقم بنفسك، وتحدث مع عائلتك قبل أن ترسل أي مال.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "hc-choice",
+   "question": {
+    "prompt": "تقول المتصلة إن صديقك في المستشفى وإن المال مطلوب اليوم. ما خطوتك الأولى؟",
+    "options": [
+     {
+      "id": "hang-up",
+      "label": "إنهاء المكالمة والبحث عن رقم المستشفى بنفسي",
+      "correct": true,
+      "feedback": "صحيح. الاتصال برقم وجدته بنفسك يكشف الطبيبة المزيفة فورًا."
+     },
+     {
+      "id": "pay",
+      "label": "إرسال المال بسرعة والسؤال لاحقًا",
+      "correct": false,
+      "feedback": "المال الذي ترسله لا يعود. والاستعجال مصطنع لهذا الغرض تحديدًا."
+     },
+     {
+      "id": "card",
+      "label": "إعطاء بيانات بطاقتي ليأخذوا المبلغ منها",
+      "correct": false,
+      "feedback": "ببيانات بطاقتك يمكنهم أخذ ما يشاؤون. لا تعط بيانات بطاقتك عبر الهاتف أبدًا."
+     },
+     {
+      "id": "secret",
+      "label": "الوعد بعدم إخبار أحد",
+      "correct": false,
+      "feedback": "الكتمان يخدم المحتال. وعائلتك ترى الموقف بعقل هادئ."
+     }
+    ]
+   },
+   "explain": "طلب المال العاجل عبر الهاتف، وخاصة بالعملات المشفرة، علامة على الاحتيال. أغلق الخط وتحقق بنفسك."
+  },
+  {
+   "type": "simulation",
+   "id": "hc-sim",
+   "environment": "call",
+   "title": "مكالمة ليلية",
+   "intro": "في الواحدة بعد منتصف الليل تصلك مكالمة من الخارج. اقرأ ما تقوله المتصلة واختر ردك.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "رقم دولي",
+      "voice": "woman"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "رد",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "الرد على المكالمة ليس خطيرًا. المهم هو ما تقوله."
+      },
+      {
+       "id": "decline",
+       "label": "رفض",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "هذا خيار جيد أيضًا. وإذا ساورك القلق، فتحقق من الرقم بنفسك لاحقًا.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "doctor",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "رقم دولي",
+      "voice": "woman"
+     },
+     "say": "معك الدكتورة هيلينا مارت من Nordhaven Clinic. تعرض كامران علييف لحادث، وذكر اسمك بوصفك أقرب أقاربه.",
+     "spoken": "معك الدكتورة هيلينا مارت، <breath> من Nordhaven Clinic. تعرض كامران علييف لحادث، وذكر اسمك بوصفك أقرب أقاربه.",
+     "actions": [
+      {
+       "id": "video",
+       "label": "أريد مكالمة فيديو مع كامران",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "طريقة تحقق جيدة. المحتال سيجد دائمًا سببًا يجعل مكالمة الفيديو مستحيلة."
+      },
+      {
+       "id": "panic",
+       "label": "ماذا تحتاجين؟ سأساعد",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "الصدمة مفهومة، لكن هذا السؤال يفتح الباب لطلب المال. تحقق أولًا."
+      },
+      {
+       "id": "hang-up",
+       "label": "إنهاء المكالمة",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "قرار جيد. يمكنك البحث عن رقم العيادة بنفسك والاتصال به.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "demand",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "رقم دولي",
+      "voice": "woman"
+     },
+     "say": "إنه فاقد للوعي. العملية تحتاج اليوم إلى دفعة مقدمة قدرها أربعة آلاف وثمانمئة مانات، وتأمينه لا يغطيها.",
+     "spoken": "إنه فاقد للوعي. <breath> العملية تحتاج اليوم إلى دفعة مقدمة قدرها أربعة آلاف وثمانمئة مانات، وتأمينه، أمم، لا يغطيها.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "سأرسل المبلغ، أعطيني البيانات",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "ذهب المال إلى المحتال. تحقق دائمًا بنفسك من أي طلب مال عاجل يصلك عبر الهاتف."
+      },
+      {
+       "id": "card",
+       "label": "دعيني أعطيك بيانات بطاقتي",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "ببيانات بطاقتك يمكنهم أخذ ما يشاؤون. لا تذكرها عبر الهاتف أبدًا."
+      },
+      {
+       "id": "check",
+       "label": "سأبحث عن رقم العيادة وأتصل به",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "صحيح. الرقم الذي وجدته بنفسك لا يوصلك إلى المحتال."
+      }
+     ]
+    },
+    {
+     "id": "push",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "رقم دولي",
+      "voice": "woman"
+     },
+     "say": "لا يوجد وقت! يمكن الدفع بالعملات المشفرة أيضًا، وسأرسل لك العنوان في رسالة نصية. لا تخبر أحدًا بهذا.",
+     "spoken": "لا يوجد وقت! <breath> يمكن الدفع بالعملات المشفرة أيضًا، وسأرسل لك العنوان في رسالة نصية. لا تخبر أحدًا بهذا.",
+     "actions": [
+      {
+       "id": "crypto",
+       "label": "سأدفع بالعملات المشفرة",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "لا أحد يستطيع إلغاء تحويل بالعملات المشفرة. والمطالبة العاجلة بالعملات المشفرة عبر الهاتف علامة على الاحتيال."
+      },
+      {
+       "id": "sister",
+       "label": "يجب أن أتحدث مع أختي أولًا",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "أحسنت. المحتال يخشى عائلتك، لأنها تكشف الحيلة."
+      },
+      {
+       "id": "hang-up",
+       "label": "إنهاء المكالمة",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "صحيح. العملات المشفرة والضغط والكتمان معًا تعني الاحتيال."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "رقم دولي",
+      "voice": "woman"
+     },
+     "actions": [
+      {
+       "id": "call-back",
+       "label": "معاودة الاتصال بهذا الرقم",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "هذا الرقم للمحتال، وسيروي لك القصة نفسها. ابحث عن الرقم بنفسك."
+      },
+      {
+       "id": "family",
+       "label": "إخبار عائلتي",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "صحيح. التحدث مع عائلتك يرفع عنك الضغط فورًا."
+      },
+      {
+       "id": "block",
+       "label": "حظر الرقم",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "جيد. احظر الرقم، وأبلغ أيضًا عن حساب التعارف على المنصة."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "hc-swipe",
+   "prompt": "أي رسالة طبيعية، وأيها علامة تحذير؟",
+   "cards": [
+    {
+     "id": "video-date",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "إلتشين"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "هل نجري مكالمة فيديو الليلة الساعة 8؟ وبعدها يمكننا أن نلتقي في مقهى يوم السبت."
+         }
+        ],
+        "time": "18:20"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "اقتراح مكالمة فيديو ولقاء في مكان عام أمر طبيعي. وهذا بالضبط ما يتجنبه المحتال."
+    },
+    {
+     "id": "visa",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "مارك ليون"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "لكي آتي لرؤيتك أحتاج إلى مال للتأشيرة، 600 AZN. سأعيده لك فور وصولي، أعدك."
+         }
+        ],
+        "time": "23:10"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "أن يطلب منك شخص لم تقابله قط مالًا للتذكرة أو التأشيرة أو الجمارك، فهذا احتيال معروف."
+    },
+    {
+     "id": "withdraw-fee",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2e-kriptonova",
+      "app": "KriptoNova",
+      "title": [
+       {
+        "text": "أرباحك: 2,340 AZN"
+       }
+      ],
+      "body": [
+       {
+        "text": "ادفع ضريبة 15% أولًا لتسحب أموالك."
+       }
+      ],
+      "time": "09:05"
+     },
+     "verdict": "threat",
+     "explain": "المنصة التي تطلب دفعة قبل أن تسمح لك بالسحب مزيفة. ورقم الأرباح مختلق."
+    },
+    {
+     "id": "report-done",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2e-gorusek",
+      "app": "Görüşək",
+      "title": [
+       {
+        "text": "تمت مراجعة بلاغك"
+       }
+      ],
+      "body": [
+       {
+        "text": "الحساب الذي أبلغت عنه كان مزيفًا وتم إغلاقه. شكرًا لك."
+       }
+      ],
+      "time": "14:30"
+     },
+     "verdict": "safe",
+     "explain": "هذا إشعار عادي من المنصة ولا يطلب منك شيئًا. والإبلاغ عن الحساب المزيف يحمي الآخرين."
+    },
+    {
+     "id": "secret",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "كامران علييف"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "لا تخبر عائلتك، فلن يفهمونا. هذا سرنا نحن فقط."
+         }
+        ],
+        "time": "22:45"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "من يريد عزلك عن عائلتك يخفي شيئًا. وطلب الكتمان علامة تحذير."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "hc-scenario",
+   "title": "أختك تسأل",
+   "start": "sister",
+   "nodes": [
+    {
+     "id": "sister",
+     "text": "تبدو قلقًا. ماذا حدث؟ هل يزعجك أحد؟",
+     "speaker": "نيغار (أختك)",
+     "voice": "woman-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "تبدو قلقًا. <breath> ماذا حدث؟ هل يزعجك أحد؟",
+     "character": "nigar",
+     "choices": [
+      {
+       "label": "سأخبرها بكل شيء وأريها المحادثة",
+       "next": "search",
+       "feedback": "صحيح. الحديث عن الأمر يسلب المحتال قوته."
+      },
+      {
+       "label": "لا شيء، طلب مني كامران ألا أخبر أحدًا",
+       "outcome": "risky",
+       "feedback": "الكتمان يخدم المحتال. والحديث مع شخص قريب منك هو أقوى حماية."
+      }
+     ]
+    },
+    {
+     "id": "search",
+     "text": "لنبحث معًا عن صورة كامران بالبحث العكسي. انظر، الصورة تظهر باسم آخر، في صفحة عارض أزياء أجنبي!",
+     "speaker": "نيغار (أختك)",
+     "voice": "woman-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "لنبحث معًا عن صورة كامران بالبحث العكسي. <breath> انظر، الصورة تظهر باسم آخر، في صفحة عارض أزياء أجنبي!",
+     "character": "nigar",
+     "choices": [
+      {
+       "label": "سأبلغ عن الحساب وأحظره، ولن أرسل المال مرة أخرى أبدًا",
+       "outcome": "safe",
+       "feedback": "أحسنت. لقد حميت نفسك والآخرين أيضًا."
+      },
+      {
+       "label": "ربما سرق أحدهم صورته، سأواصل المحادثة",
+       "outcome": "risky",
+       "feedback": "الحسابات المزيفة تبنى على صور مسروقة. ثق بما أظهره التحقق."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "hc-recap",
+   "points": [
+    "إذا وصلك طلب مال عاجل عبر الهاتف، فأغلق الخط وابحث عن الرقم بنفسك.",
+    "العملات المشفرة والضغط والكتمان معًا تعني الاحتيال.",
+    "تحدث مع عائلتك قبل إرسال أي مال، وأبلغ عن الحساب المزيف."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

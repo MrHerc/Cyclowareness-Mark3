@@ -1,0 +1,401 @@
+{
+ "id": "camera-panel",
+ "title": "L’interface de la caméra",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sc1-tutor",
+   "beats": [
+    {
+     "id": "sc1-b1",
+     "say": "Bonjour ! Les caméras sont pratiques à la maison comme au travail. Mais si le mot de passe n’a jamais été changé, un inconnu peut regarder lui aussi.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "sc1-b2",
+     "say": "La plupart des caméras neuves sont livrées avec un mot de passe par défaut. Les listes de ces mots de passe sont accessibles à tout le monde sur internet.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2f-baxiskam",
+       "tone": "system",
+       "title": [
+        {
+         "text": "BaxışKam : première connexion"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Nom d’utilisateur : admin"
+         }
+        ],
+        [
+         {
+          "text": "Mot de passe : admin",
+          "spot": "default-pass"
+         }
+        ]
+       ],
+       "buttons": [
+        "Se connecter"
+       ]
+      }
+     },
+     "highlight": "default-pass"
+    },
+    {
+     "id": "sc1-b3",
+     "say": "En 2025, des accès non autorisés à des caméras de domicile et de bureau ont été découverts en Azerbaïdjan, avec des images mises en ligne sur des sites étrangers.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "2025",
+      "label": "Accès non autorisés à des caméras de domicile et de bureau découverts"
+     }
+    },
+    {
+     "id": "sc1-b4",
+     "say": "Trois gestes suffisent : changer le mot de passe, mettre à jour le micrologiciel et fermer l’accès ouvert depuis internet.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "password",
+   "id": "sc1-password",
+   "prompt": "Créez un nouveau mot de passe pour l’interface de la caméra.",
+   "targetScore": 4,
+   "tips": [
+    "Ne saisissez pas votre vrai mot de passe ici, c’est un exercice.",
+    "Choisissez une phrase de passe de quatre mots pris au hasard.",
+    "Ne réutilisez pas le mot de passe de votre Wi-Fi ni celui de votre messagerie.",
+    "Conservez le mot de passe dans un gestionnaire de mots de passe."
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "sc1-sim",
+   "environment": "browser",
+   "title": "Configurer la caméra",
+   "intro": "Vous installez une nouvelle caméra. Regardez chaque fenêtre de l’interface et choisissez le bon bouton.",
+   "steps": [
+    {
+     "id": "first-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-baxiskam",
+      "brand": "BaxışKam",
+      "url": [
+       {
+        "text": "http://192.168.1.64/login"
+       }
+      ],
+      "fields": [
+       "Nom d’utilisateur",
+       "Mot de passe"
+      ],
+      "button": "Se connecter"
+     },
+     "say": "Vous vous connectez à l’interface de la caméra pour la première fois.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Se connecter",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Exact : c’est l’adresse propre à la caméra sur votre réseau domestique. Changez le mot de passe dès la première connexion."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Sans connexion, vous ne pouvez pas changer le mot de passe par défaut. La caméra reste ouverte à tout le monde."
+      }
+     ]
+    },
+    {
+     "id": "change-default",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-baxiskam",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Mot de passe par défaut utilisé"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Changez le mot de passe maintenant pour votre sécurité."
+        }
+       ]
+      ],
+      "buttons": [
+       "Modifier le mot de passe",
+       "Me le rappeler plus tard"
+      ]
+     },
+     "actions": [
+      {
+       "id": "change",
+       "label": "Modifier le mot de passe",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Très bien. Changer le mot de passe par défaut est l’étape la plus importante pour une caméra."
+      },
+      {
+       "id": "later",
+       "label": "Me le rappeler plus tard",
+       "kind": "later",
+       "outcome": "compromised",
+       "feedback": "Entrer avec un mot de passe par défaut ne demande aucune compétence. Des outils automatiques recherchent ce genre de caméras en permanence."
+      }
+     ]
+    },
+    {
+     "id": "firmware",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-baxiskam",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Nouveau micrologiciel : 5.2.8"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Des failles de sécurité ont été corrigées. La mise à jour prend environ trois minutes."
+        }
+       ]
+      ],
+      "buttons": [
+       "Mettre à jour",
+       "Plus tard"
+      ]
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "Mettre à jour",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Exact. Les attaquants connaissent très bien les failles des anciens micrologiciels."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Sans la mise à jour, des failles connues restent ouvertes. Faites-la dès aujourd’hui."
+      }
+     ]
+    },
+    {
+     "id": "remote-access",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-baxiskam",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Accès à distance"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Activer UPnP et la redirection de ports pour regarder la caméra directement depuis internet ?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Laisser activé",
+       "Désactiver"
+      ]
+     },
+     "say": "La caméra propose maintenant un accès direct depuis internet.",
+     "actions": [
+      {
+       "id": "open-port",
+       "label": "Laisser activé",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Avec un port ouvert, la caméra est visible de n’importe où sur internet. Les attaquants trouvent facilement ces appareils ouverts grâce à des outils de recherche spécialisés."
+      },
+      {
+       "id": "off",
+       "label": "Désactiver",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. Si vous avez besoin de regarder à distance, utilisez l’application officielle du fabricant plutôt que d’ouvrir un port."
+      }
+     ]
+    },
+    {
+     "id": "public-link",
+     "label": "Créer un lien public pour la diffusion en direct ? Toute personne disposant du lien pourra regarder.",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-baxiskam",
+      "url": [
+       {
+        "text": "http://192.168.1.64/paylas"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "share",
+       "label": "Créer le lien",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Dès que le lien circule, vous ne savez plus qui regarde. Ajoutez plutôt les membres de votre famille dans l’application, avec leurs propres comptes."
+      },
+      {
+       "id": "private",
+       "label": "Ne pas créer de lien public",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Seuls vos proches, connectés avec leurs propres comptes, doivent voir l’image."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "sc1-hotspot",
+   "prompt": "Trouvez les réglages risqués dans la fenêtre d’état de l’enregistreur vidéo.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2f-baxiskam",
+    "tone": "system",
+    "title": [
+     {
+      "text": "Entrée du bureau de district : enregistreur vidéo"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Modèle : BX-DVR 8"
+      }
+     ],
+     [
+      {
+       "text": "Utilisateur : admin, mot de passe : par défaut",
+       "spot": "default"
+      }
+     ],
+     [
+      {
+       "text": "Micrologiciel : 2019, aucune mise à jour",
+       "spot": "old-firmware"
+      }
+     ],
+     [
+      {
+       "text": "Redirection de ports : activée, 8000",
+       "spot": "open-port"
+      }
+     ],
+     [
+      {
+       "text": "Caméra 3 : salle des RH, orientée vers les écrans d’ordinateur",
+       "spot": "screens"
+      }
+     ],
+     [
+      {
+       "text": "Date et heure : correctes"
+      }
+     ]
+    ],
+    "buttons": [
+     "Fermer"
+    ]
+   },
+   "spots": [
+    {
+     "id": "default",
+     "label": "Mot de passe par défaut",
+     "explain": "Les attaquants prennent les mots de passe par défaut dans des listes toutes faites. Le changer est la première chose à faire."
+    },
+    {
+     "id": "old-firmware",
+     "label": "Ancien micrologiciel",
+     "explain": "Un appareil resté sans mise à jour pendant sept ans a des failles connues. Si plus aucune mise à jour n’est publiée, il faut remplacer l’appareil."
+    },
+    {
+     "id": "open-port",
+     "label": "Port ouvert",
+     "explain": "Un port ouvert rend l’enregistreur visible de n’importe où sur internet. S’il n’est pas nécessaire, fermez-le."
+    },
+    {
+     "id": "screens",
+     "label": "Caméra orientée vers les écrans",
+     "explain": "Cette caméra filme des écrans et des documents de travail. Si les images sont volées, des données confidentielles partent avec elles."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "sc1-choice",
+   "question": {
+    "prompt": "Un collègue a apporté de chez lui une caméra Wi-Fi et veut la connecter au travail. Que lui répondez-vous ?",
+    "options": [
+     {
+      "id": "it-approved",
+      "label": "Le support technique doit l’approuver et la connecter",
+      "correct": true,
+      "feedback": "Exact. Seuls les appareils approuvés se connectent au réseau de l’entreprise."
+     },
+     {
+      "id": "password-enough",
+      "label": "D’accord, à condition de changer le mot de passe",
+      "correct": false,
+      "feedback": "Le mot de passe compte, mais un appareil non vérifié peut ouvrir une porte vers le réseau de l’entreprise. C’est le support technique qui décide."
+     },
+     {
+      "id": "guest-quiet",
+      "label": "La brancher sur le Wi-Fi invités, personne ne le saura",
+      "correct": false,
+      "feedback": "Un appareil connecté sans prévenir personne est un risque pour l’entreprise. Chaque caméra passe par le support technique."
+     }
+    ]
+   },
+   "explain": "Au travail, seul le support technique connecte les caméras et les objets connectés. Un appareil oublié reste sans mise à jour pendant des années."
+  },
+  {
+   "type": "recap",
+   "id": "sc1-recap",
+   "points": [
+    "Changez le mot de passe par défaut dès le premier jour.",
+    "Mettez à jour le micrologiciel et fermez les ports ouverts.",
+    "Au travail, uniquement des appareils approuvés."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

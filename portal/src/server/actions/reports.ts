@@ -4,7 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { db, t } from "../db";
-import { actionViewer, allowed } from "../auth/viewer";
+import { actionViewer, allowed, hasFeature } from "../auth/viewer";
 import { isUuid } from "../../lib/ids";
 import { audit } from "../services/audit";
 import { scopeDepartmentIds } from "../queries/admin";
@@ -24,6 +24,7 @@ const scheduleSchema = z
 
 export async function saveScheduleAction(input: { kind: string; format: string; frequency: string; day: number; recipients: string; departmentId: string | null }): Promise<{ ok: boolean }> {
   const v = await actionViewer("reports.read");
+  if (!hasFeature(v, "reports")) return { ok: false };
   const p = scheduleSchema.safeParse({
     ...input,
     recipients: input.recipients
@@ -48,7 +49,7 @@ export async function saveScheduleAction(input: { kind: string; format: string; 
 
 export async function removeScheduleAction(id: string): Promise<{ ok: boolean }> {
   const v = await actionViewer("reports.read");
-  if (!isUuid(id)) return { ok: false };
+  if (!isUuid(id) || !hasFeature(v, "reports")) return { ok: false };
   // Scoped roles remove only their own schedules; administrators any of the organisation's.
   const own = allowed(v, "settings.write") ? undefined : eq(t.reportSchedules.createdBy, v.user.id);
   const removed = await db()

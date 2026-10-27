@@ -83,7 +83,7 @@ export default async function AuditPage({ searchParams }: PageProps<"/admin/audi
       </form>
       {rows.length ? (
         <ScrollRegion label={tr("title")} className="rounded-xl border border-line bg-surface shadow-xs">
-          <table className="w-full min-w-[52rem] text-left text-body-sm">
+          <table className="w-full min-w-[52rem] text-start text-body-sm">
             <thead className="text-tab text-ink-subtle">
               <tr className="border-b border-line">
                 <th className="px-4 py-3 font-semibold">{tr("col.time")}</th>
@@ -105,7 +105,9 @@ export default async function AuditPage({ searchParams }: PageProps<"/admin/audi
                   </td>
                   <td className="px-4 py-3">{label(a.action)}</td>
                   <td className="px-4 py-3 font-mono text-tab text-ink-muted">{a.action}</td>
-                  <td className="px-4 py-3 font-mono text-tab text-ink-muted">{a.ip ?? "—"}</td>
+                  <td className="px-4 py-3 font-mono text-tab text-ink-muted">
+                    <span dir="ltr">{a.ip ?? "—"}</span>
+                  </td>
                 </tr>
               ))}
             </tbody>

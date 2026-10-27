@@ -1,0 +1,527 @@
+{
+ "id": "fake-shops",
+ "title": "Magazinul fals",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fs-tutor",
+   "beats": [
+    {
+     "id": "fs-b1",
+     "say": "Bună ziua! În această lecție veți învăța să recunoașteți magazinele false de pe rețelele sociale.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "fs-b2",
+     "say": "Uitați-vă la această reclamă: un aparat de aer condiționat scump, la doar 299 de manați, numai astăzi și cu plata în avans.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "kontakto",
+       "app": "Kontakto",
+       "title": [
+        {
+         "text": "Sponsorizat: Serin Klimat Sale"
+        }
+       ],
+       "body": [
+        {
+         "text": "Aer condiționat la doar 299 AZN în loc de 1.199! "
+        },
+        {
+         "text": "Numai astăzi, plata integrală în avans.",
+         "spot": "prepay"
+        }
+       ],
+       "time": "13:05"
+      }
+     },
+     "highlight": "prepay"
+    },
+    {
+     "id": "fs-b3",
+     "say": "Escrocul ia mai întâi banii, apoi închide pagina și dispare.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "fs-b4",
+     "say": "Regula este simplă: nu plătiți niciodată în avans unei pagini necunoscute și, ori de câte ori puteți, plătiți la livrare.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "fs-swipe",
+   "prompt": "Care ofertă de magazin este sigură și care este o capcană?",
+   "cards": [
+    {
+     "id": "rush",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Serin Klimat Sale"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Oferta expiră azi, au mai rămas doar 3 bucăți. Plata se face numai prin transfer de pe card pe card, integral în avans."
+         }
+        ],
+        "time": "13:12"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Presiunea, plus plata în avans exclusiv prin transfer de pe card pe card, este principalul semn al unui magazin fals. Banii aceștia se recuperează foarte greu."
+    },
+    {
+     "id": "official",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Serin Klimat, din 2014"
+       }
+      ],
+      "body": [
+       {
+        "text": "Aer condiționat: 1.149 AZN. Plata la livrare, numerar sau card. Magazin și centru de service în Narimanov."
+       }
+      ],
+      "time": "10:20"
+     },
+     "verdict": "safe",
+     "explain": "Un preț realist, o pagină veche de ani de zile și plata la livrare. Mai întâi vedeți produsul, apoi plătiți."
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2e-serin-klimat-fake",
+      "url": [
+       {
+        "text": "https://serin-klimat-endirim.example.net/kampaniya"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Acesta nu este site-ul oficial al magazinului. Un cuvânt în plus adăugat la nume și un domeniu ciudat trădează o pagină falsă."
+    },
+    {
+     "id": "cod",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Laman Handmade"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună! Trimit comenzile prin CevikKargo, plătiți curierului când vine coletul."
+         }
+        ],
+        "time": "11:47"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Plata la livrare vă protejează. Nu plătiți nimic înainte să vedeți produsul."
+    },
+    {
+     "id": "new-page",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Phone Outlet Baku"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Pagina noastră e nouă, dar avem 20.000 de urmăritori. Am închis comentariile din cauza spamului. Trimiteți un avans de 50 AZN."
+         }
+        ],
+        "time": "16:30"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O pagină nouă, comentarii închise și o cerere de avans, toate la un loc, sunt un semnal de alarmă serios. Urmăritorii se pot cumpăra."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "fs-sim",
+   "environment": "phone",
+   "title": "Oferta de aer condiționat",
+   "intro": "Ați văzut pe Kontakto o reclamă la un aparat de aer condiționat ieftin. Decideți pas cu pas, pe telefon.",
+   "steps": [
+    {
+     "id": "ad",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Sponsorizat: Serin Klimat Sale"
+       }
+      ],
+      "body": [
+       {
+        "text": "Aer condiționat la doar 299 AZN în loc de 1.199! Numai astăzi, plata integrală în avans."
+       }
+      ],
+      "time": "13:05"
+     },
+     "say": "Reclama este foarte tentantă. Să vă uitați nu strică.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți reclama",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Să vă uitați nu este periculos. Decizia importantă vine înainte de plată."
+      },
+      {
+       "id": "hide",
+       "label": "Ascundeți reclama",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "O alegere bună. Un preț mult prea mic este adesea o momeală.",
+       "next": "real-shop"
+      }
+     ]
+    },
+    {
+     "id": "prepay",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Serin Klimat Sale"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună ziua! Oferta expiră astăzi la 18:00."
+         }
+        ],
+        "time": "13:12"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Trimiteți-ne numele și adresa și transferați 299 AZN pe acest card: **** **** **** 0000. Livrare mâine."
+         }
+        ],
+        "time": "13:12"
+       }
+      ]
+     },
+     "say": "Vânzătorul cere imediat plata în avans.",
+     "actions": [
+      {
+       "id": "ask-cod",
+       "label": "Pot plăti la livrare?",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "O întrebare bună. Un magazin real acceptă de obicei plata la livrare."
+      },
+      {
+       "id": "pay",
+       "label": "Transferați acum 299 AZN",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Banii au ajuns pe cardul unui străin. O plată în avans se recuperează foarte greu.",
+       "next": "gone"
+      },
+      {
+       "id": "report",
+       "label": "Raportați pagina",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Pagina pe care ați raportat-o nu mai poate păcăli alți cumpărători.",
+       "next": "real-shop"
+      }
+     ]
+    },
+    {
+     "id": "deposit",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Serin Klimat Sale"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Pot plăti la livrare?"
+         }
+        ],
+        "time": "13:14"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "La prețul promoțional nu facem plată la livrare. Trimiteți măcar un avans de 50 AZN, iar restul îl plătiți curierului."
+         }
+        ],
+        "time": "13:15"
+       }
+      ]
+     },
+     "say": "Iată și scuza: acum vrea un avans.",
+     "actions": [
+      {
+       "id": "pay-deposit",
+       "label": "Trimiteți un avans de 50 AZN",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Și avansul este o plată anticipată. Magazinul fals îl încasează și dispare."
+      },
+      {
+       "id": "check",
+       "label": "Caut eu pagina oficială a magazinului",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Să verificați pagina oficială și recenziile cumpărătorilor durează doar câteva minute.",
+       "next": "real-shop"
+      },
+      {
+       "id": "block",
+       "label": "Blocați",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bine. Un necunoscut care nu vinde fără plată în avans nu merită timpul dumneavoastră.",
+       "next": "real-shop"
+      }
+     ]
+    },
+    {
+     "id": "gone",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Conversație indisponibilă"
+       }
+      ],
+      "body": [
+       {
+        "text": "Pagina Serin Klimat Sale a fost ștearsă sau v-a blocat."
+       }
+      ],
+      "time": "09:30"
+     },
+     "say": "A doua zi, aparatul de aer condiționat nu a mai venit, iar pagina a dispărut.",
+     "actions": [
+      {
+       "id": "bank",
+       "label": "Sunați la bancă, la numărul de pe card",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă banca află repede, poate încerca să oprească transferul."
+      },
+      {
+       "id": "evidence",
+       "label": "Salvați capturile de ecran și anunțați poliția",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Un pas bun. Conversația și chitanța transferului sunt dovezi pentru poliție."
+      },
+      {
+       "id": "wait",
+       "label": "Mai așteptați câteva zile",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Fiecare oră contează. Dacă așteptați, scad șansele de a vă recupera banii."
+      }
+     ]
+    },
+    {
+     "id": "real-shop",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Serin Klimat"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună ziua! Aceasta este singura noastră pagină oficială. Aer condiționat: 1.149 AZN, plata la livrare, numerar sau cu cardul."
+         }
+        ],
+        "time": "14:02"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Orice pagină care cere plată în avans în numele nostru nu ne aparține."
+         }
+        ],
+        "time": "14:02"
+       }
+      ]
+     },
+     "say": "Aceasta este pagina oficială a magazinului.",
+     "actions": [
+      {
+       "id": "order",
+       "label": "Comandați cu plata la livrare",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "O alegere foarte bună. Plătiți după ce vedeți și verificați produsul."
+      },
+      {
+       "id": "tell",
+       "label": "Arătați-i magazinului pagina falsă",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Bine. Magazinul poate raporta pagina falsă și poate cere ștergerea ei."
+      },
+      {
+       "id": "back",
+       "label": "Întoarceți-vă la pagina ieftină",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Dacă vă întoarceți la pagina falsă, vă puneți banii în pericol. Rămâneți la magazinul oficial."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "fs-match",
+   "prompt": "Asociați fiecare semn cu ceea ce înseamnă.",
+   "pairs": [
+    {
+     "id": "age",
+     "left": "Pagina a fost deschisă acum o săptămână",
+     "right": "Magazinele false apar repede și dispar repede"
+    },
+    {
+     "id": "reviews",
+     "left": "Comentariile sunt dezactivate",
+     "right": "Cumpărătorii nemulțumiți sunt reduși la tăcere"
+    },
+    {
+     "id": "card",
+     "left": "Doar plată în avans, de pe card pe card",
+     "right": "Banii se recuperează foarte greu"
+    },
+    {
+     "id": "price",
+     "left": "Prețul este o treime din cel de pe piață",
+     "right": "O momeală ca să vă grăbiți"
+    }
+   ],
+   "explain": "Un singur semn este suficient ca să vă opriți. Verificați magazinul pe site-ul oficial și în recenziile cumpărătorilor."
+  },
+  {
+   "type": "choice",
+   "id": "fs-choice",
+   "question": {
+    "prompt": "Cumpărați de la un magazin online pe care nu îl cunoașteți. Care este cel mai sigur mod de plată?",
+    "options": [
+     {
+      "id": "cod",
+      "label": "Plata la livrare, când primiți produsul",
+      "correct": true,
+      "feedback": "Corect. Nu plătiți nimic înainte să vedeți produsul, așa că un magazin fals nu primește nimic."
+     },
+     {
+      "id": "card",
+      "label": "Transfer pe cardul personal al vânzătorului",
+      "correct": false,
+      "feedback": "Un transfer pe un card personal nu poate fi anulat. Exact asta vor escrocii."
+     },
+     {
+      "id": "half",
+      "label": "Trimiteți jumătate ca avans",
+      "correct": false,
+      "feedback": "Și avansul este o plată anticipată. Magazinul fals îl încasează și dispare."
+     },
+     {
+      "id": "crypto",
+      "label": "Plata în criptomonede",
+      "correct": false,
+      "feedback": "Nimeni nu poate anula un transfer în criptomonede. Dacă un magazin vă cere așa ceva, renunțați."
+     }
+    ]
+   },
+   "explain": "Dacă plata în avans este obligatorie, plătiți doar unui magazin oficial pe care îl cunoașteți de mult. Când aveți dubii, nu cumpărați."
+  },
+  {
+   "type": "recap",
+   "id": "fs-recap",
+   "points": [
+    "Nu plătiți niciodată în avans unei pagini pe care nu o cunoașteți.",
+    "Plătiți la livrare când puteți: mai întâi vedeți produsul, apoi plătiți.",
+    "Verificați vechimea paginii și recenziile și nu vă încredeți într-un preț mult prea mic."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

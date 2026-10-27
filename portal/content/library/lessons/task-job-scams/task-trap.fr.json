@@ -1,0 +1,499 @@
+{
+ "id": "task-trap",
+ "title": "Le piège des tâches rémunérées",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "tt-tutor",
+   "beats": [
+    {
+     "id": "tt-b1",
+     "say": "Bonjour ! Aujourd’hui, nous parlons des offres d’emploi qui promettent de gagner facilement de l’argent depuis chez soi.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "tt-b2",
+     "say": "La tâche est simple : mettre un j’aime, laisser un avis, envoyer une capture d’écran. Et la rémunération est étrangement élevée.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2d-nergiz-market-fake",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Nargiz Market RH | Aynur"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Bonjour ! Travail à domicile : mettez des j’aime sur des produits et écrivez des avis."
+          }
+         ],
+         "time": "09:12"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Gagnez de 40 à 120 AZN par jour",
+           "spot": "pay"
+          }
+         ],
+         "time": "09:12"
+        }
+       ]
+      }
+     },
+     "highlight": "pay"
+    },
+    {
+     "id": "tt-b3",
+     "say": "Les cinq premiers manats sont vraiment versés. C’est un appât : plus tard, c’est vous qui devrez payer une grosse somme.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "tt-b4",
+     "say": "La règle : si vous devez payer pour commencer ou pour retirer vos gains, c’est une arnaque.",
+     "mood": "happy",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "tt-sim",
+   "environment": "phone",
+   "title": "Travail à domicile",
+   "intro": "Une offre d’emploi arrive d’un numéro inconnu. Choisissez votre réponse à chaque message.",
+   "steps": [
+    {
+     "id": "offer",
+     "label": "09:12 Nouveau message",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Nargiz Market RH | Aynur"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour ! Nous avons trouvé votre numéro sur votre profil, sur un site d’emploi."
+         }
+        ],
+        "time": "09:12"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Travail à domicile : 1 à 2 heures par jour, de 40 à 120 AZN. Ça vous intéresse ?"
+         }
+        ],
+        "time": "09:12"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "interested",
+       "label": "Oui, dites-m’en plus",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Montrer de l’intérêt ne vous fait encore rien perdre, mais cette discussion mène à un paiement. Surveillez chaque étape."
+      },
+      {
+       "id": "block",
+       "label": "Bloquer et signaler",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Exact. Une offre inattendue avec un salaire mirobolant, c’est déjà un signal d’alerte suffisant.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "first-task",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Nargiz Market RH | Aynur"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Première tâche : donnez 5 étoiles à ces 3 produits et envoyez une capture d’écran."
+         }
+        ],
+        "time": "09:20"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "1,70 AZN par tâche."
+         }
+        ],
+        "time": "09:20"
+       }
+      ]
+     },
+     "say": "Voici la première tâche.",
+     "actions": [
+      {
+       "id": "do-it",
+       "label": "Je le fais et j’envoie la capture",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Les faux avis trompent les autres acheteurs. Et c’est aussi le premier échelon de l’arnaque."
+      },
+      {
+       "id": "refuse",
+       "label": "Pas de faux avis, je les bloque",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Exact. Une rémunération pour des j’aime et des avis est un signe bien connu de cette arnaque.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "first-pay",
+     "label": "10:03 SahilBank",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "10:03",
+      "messages": [
+       [
+        {
+         "text": "Crédit sur votre carte : 5,10 AZN. Solde : 63,40 AZN."
+        }
+       ]
+      ]
+     },
+     "say": "L’argent est vraiment arrivé sur votre carte.",
+     "actions": [
+      {
+       "id": "trust",
+       "label": "L’argent est arrivé, donc le travail est réel",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Un petit versement sert à gagner votre confiance. Plus tard, l’escroc vous reprendra bien davantage."
+      },
+      {
+       "id": "bait",
+       "label": "C’est un appât. J’arrête là",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Exact. Le premier versement est un appât, et l’étape suivante, c’est de vous demander de l’argent.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "vip-task",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Groupe VIP Nargiz Market"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Félicitations, vous avez atteint le niveau VIP !"
+         }
+        ],
+        "time": "10:40"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Tâche VIP : déposez 50 AZN, récupérez 130 AZN dans 30 minutes."
+         }
+        ],
+        "time": "10:41"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Tout le monde gagne dans le groupe, regardez : 47 personnes ont été payées aujourd’hui."
+         }
+        ],
+        "time": "10:41"
+       }
+      ]
+     },
+     "say": "Maintenant, ils vous ont fait passer dans un groupe Telegram.",
+     "actions": [
+      {
+       "id": "deposit",
+       "label": "Je dépose 50 AZN",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Cet argent ne reviendra pas. Les gagnants du groupe sont les escrocs eux-mêmes."
+      },
+      {
+       "id": "leave",
+       "label": "Quitter et signaler le groupe",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Exact. Si vous devez verser de l’argent pour travailler, ce n’est pas un emploi, c’est une arnaque.",
+       "next": "end"
+      }
+     ]
+    },
+    {
+     "id": "negative",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2d-nergiz-market-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Groupe VIP Nargiz Market"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Erreur système : votre solde est maintenant de -86 AZN."
+         }
+        ],
+        "time": "11:15"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Payez 86 AZN, sinon vos 214 AZN de gains seront supprimés."
+         }
+        ],
+        "time": "11:15"
+       }
+      ]
+     },
+     "say": "Après votre paiement, le solde est soudain devenu négatif.",
+     "actions": [
+      {
+       "id": "pay-more",
+       "label": "Je paie aussi les 86 AZN",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Après chaque paiement, il y aura un nouveau prétexte. Arrêtez-vous et signalez-le à votre banque et à la police au 102."
+      },
+      {
+       "id": "stop",
+       "label": "Je ne paie pas, je bloque et je signale",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Exact, payer pour débloquer des gains est le dernier échelon de l’arnaque. Gardez la discussion comme preuve."
+      }
+     ]
+    },
+    {
+     "id": "end",
+     "label": "IshBazar : nouvelle offre d’emploi",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2d-isbazar",
+      "app": "IshBazar",
+      "title": [
+       {
+        "text": "Khazar Logistics : poste d’opérateur"
+       }
+      ],
+      "body": [
+       {
+        "text": "Entretien au bureau, salaire de 850 AZN. Postulez sur le site."
+       }
+      ],
+      "time": "12:30"
+     },
+     "say": "Et voici une vraie offre d’emploi.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Voir l’offre",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Exact. Une vraie offre nomme l’entreprise, prévoit un entretien et un vrai salaire, et ne vous demande jamais de payer."
+      },
+      {
+       "id": "later",
+       "label": "Regarder plus tard",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Pas de problème. Une vraie offre d’emploi ne disparaît pas, vous pouvez la vérifier tranquillement."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "tt-scenario",
+   "title": "Leyla a déjà payé",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "J’ai mis 120 manats dans les tâches. Maintenant, ils veulent une taxe de 15 % pour que je puisse retirer l’argent. Je dois payer ?",
+     "speaker": "Leyla, une proche (au téléphone)",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "J’ai mis 120 manats dans les tâches. <breath> Maintenant, ils veulent une taxe de 15 pour cent pour que je puisse retirer l’argent. Je dois payer ?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Ne paie pas, c’est la suite de la même arnaque",
+       "next": "id-photo",
+       "feedback": "Exact. Une taxe ou des frais pour retirer des gains, c’est un signe de fraude."
+      },
+      {
+       "label": "Paie, sinon les 120 manats seront perdus aussi",
+       "outcome": "compromised",
+       "feedback": "Cela ne fait qu’aggraver la perte. Après la taxe, il y aura un nouveau prétexte."
+      }
+     ]
+    },
+    {
+     "id": "id-photo",
+     "text": "Je leur ai aussi envoyé une photo de ma carte d’identité pour m’inscrire. C’est un problème ?",
+     "speaker": "Leyla",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Je leur ai aussi envoyé une photo de ma carte d’identité pour m’inscrire. <breath> C’est un problème ?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Oui, signalons-le aussi à la banque et à la police",
+       "next": "steps",
+       "feedback": "Exact. Une photo de pièce d’identité peut servir à ouvrir des comptes ou des crédits à son nom."
+      },
+      {
+       "label": "Non, une photo ne leur sert à rien",
+       "next": "steps",
+       "outcome": "risky",
+       "feedback": "Au contraire, une photo de pièce d’identité peut servir à ouvrir de faux comptes à son nom. Il faut le signaler aussi."
+      }
+     ]
+    },
+    {
+     "id": "steps",
+     "text": "Alors, qu’est-ce que je fais maintenant ?",
+     "speaker": "Leyla",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "<breath> Alors, euh, qu’est-ce que je fais maintenant ?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Appelle ta banque, signale-le à la police au 102 et garde la discussion",
+       "outcome": "safe",
+       "feedback": "Très bien. La banque peut tenter de bloquer le virement, et la discussion servira de preuve à la police."
+      },
+      {
+       "label": "Supprime tout et oublie",
+       "outcome": "risky",
+       "feedback": "Supprimer la discussion détruit les preuves. Il n’y a aucune honte à avoir, il suffit de le signaler."
+      },
+      {
+       "label": "Écris à la chaîne qui promet de récupérer l’argent",
+       "outcome": "compromised",
+       "feedback": "Ceux qui promettent de récupérer l’argent sont souvent les mêmes escrocs. Ne leur versez rien."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "tt-match",
+   "prompt": "Associez chaque phrase de l’offre à ce qu’elle signifie vraiment.",
+   "pairs": [
+    {
+     "id": "easy",
+     "left": "1 heure par jour, 120 AZN",
+     "right": "Un appât : un vrai travail ne paie pas comme ça"
+    },
+    {
+     "id": "deposit",
+     "left": "Dépôt pour une tâche VIP",
+     "right": "On vous prend votre argent directement"
+    },
+    {
+     "id": "tax",
+     "left": "Taxe pour retirer les gains",
+     "right": "Le prochain piège pour vous faire payer"
+    },
+    {
+     "id": "group",
+     "left": "Tout le monde gagne dans le groupe",
+     "right": "De faux membres et de faux avis"
+    }
+   ],
+   "explain": "Quel que soit le nom donné au paiement, si vous payez pour travailler, ce n’est pas un emploi."
+  },
+  {
+   "type": "recap",
+   "id": "tt-recap",
+   "points": [
+    "Un emploi qui vous paie pour mettre des j’aime et laisser des avis est une arnaque.",
+    "Le premier petit versement est un appât ; les dépôts et les taxes de retrait sont le piège.",
+    "Vous avez déjà payé ? Appelez la banque, la police au 102, et gardez la discussion."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

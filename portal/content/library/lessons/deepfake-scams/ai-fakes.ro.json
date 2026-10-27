@@ -1,0 +1,352 @@
+{
+ "id": "ai-fakes",
+ "title": "Imagini și știri create cu AI",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "seconds",
+     "say": "Inteligența artificială poate crea în câteva secunde imagini, videoclipuri și știri care par reale.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "celebrity",
+     "say": "Reclamele pentru investiții care folosesc un videoclip fals cu o persoană celebră sunt o înșelătorie foarte răspândită.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "db-bulvar-xeber-fake",
+       "from": {
+        "name": [ { "text": "BulvarXəbər" } ],
+        "address": [
+         { "text": "xeber@" },
+         { "text": "bulvar-xeber.example.net", "spot": "domain" }
+        ]
+       },
+       "subject": [
+        { "text": "Senzațional: un prezentator celebru dezvăluie secretul în direct", "spot": "sensation" }
+       ],
+       "time": "08:05",
+       "body": [
+        [ { "text": "Prezentatorul a investit 250 de manați într-o platformă nouă și acum câștigă 3.000 pe lună.", "spot": "promise" } ],
+        [ { "text": "Băncile vă ascund asta!", "spot": "secret" } ],
+        [
+         { "text": "Locuri limitate, înscrierea este deschisă doar astăzi: ", "spot": "rush" },
+         {
+          "text": "neftinvest.example.net",
+          "link": {
+           "label": "neftinvest.example.net",
+           "href": "https://neftinvest.example.net/qeydiyyat"
+          }
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "promise"
+    },
+    {
+     "id": "details",
+     "say": "Uneori, degetele, inscripțiile sau lumina nu arată cum trebuie, dar nu vă puteți da seama întotdeauna.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "rule",
+     "say": "Verificați știrea pe site-ul oficial și nu vă încredeți niciodată în promisiunile de profit mare.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-ad",
+   "prompt": "Găsiți semnalele de alarmă din acest e-mail.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "db-bulvar-xeber-fake",
+    "from": {
+     "name": [ { "text": "BulvarXəbər" } ],
+     "address": [
+      { "text": "xeber@" },
+      { "text": "bulvar-xeber.example.net", "spot": "domain" }
+     ]
+    },
+    "subject": [
+     { "text": "Senzațional: un prezentator celebru dezvăluie secretul în direct", "spot": "sensation" }
+    ],
+    "time": "08:05",
+    "body": [
+     [ { "text": "Prezentatorul a investit 250 de manați într-o platformă nouă și acum câștigă 3.000 pe lună.", "spot": "promise" } ],
+     [ { "text": "Băncile vă ascund asta!", "spot": "secret" } ],
+     [
+      { "text": "Locuri limitate, înscrierea este deschisă doar astăzi: ", "spot": "rush" },
+      {
+       "text": "neftinvest.example.net",
+       "link": {
+        "label": "neftinvest.example.net",
+        "href": "https://neftinvest.example.net/qeydiyyat"
+       }
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Domeniu fals",
+     "explain": "Adresa reală a site-ului de știri este alta. Citiți adresa până la capăt."
+    },
+    {
+     "id": "sensation",
+     "label": "Titlu senzațional",
+     "explain": "Titlul senzațional vă împinge să dați clic sub impulsul emoției."
+    },
+    {
+     "id": "promise",
+     "label": "Promisiune de profit mare",
+     "explain": "Nicio investiție legitimă nu promite câștiguri mari garantate."
+    },
+    {
+     "id": "secret",
+     "label": "Secretul ascuns",
+     "explain": "Povestea cu secretul ascuns vă îndepărtează de sursele oficiale."
+    },
+    {
+     "id": "rush",
+     "label": "Doar astăzi",
+     "explain": "Graba nu vă lasă timp să vă gândiți și să verificați."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "invest-browser",
+   "environment": "browser",
+   "title": "Ce se ascunde în spatele reclamei",
+   "intro": "Să presupunem că ați deschis linkul din reclamă. Luați decizia corectă la fiecare pas pe site.",
+   "steps": [
+    {
+     "id": "fake-article",
+     "label": "Prezentatorul dezvăluie secretul în direct: 3.000 pe lună",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-bulvar-xeber-fake",
+      "url": [
+       { "text": "https://", "reveal": "bulvar-xeber.example.net" },
+       { "text": "bulvar-xeber.example.net", "spot": "domain" },
+       { "text": "/neftinvest" }
+      ]
+     },
+     "say": "Persoana din videoclip vorbește exact ca prezentatorul.",
+     "actions": [
+      {
+       "id": "register",
+       "label": "Urmăriți videoclipul și înscrieți-vă",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Videoclipul a fost creat cu AI; prezentatorul nu a spus niciodată asta. Pagina duce la o platformă frauduloasă."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. O promisiune de profit mare și un domeniu fals sunt suficiente.",
+       "next": "real-news"
+      }
+     ]
+    },
+    {
+     "id": "invest-form",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "db-neftinvest",
+      "brand": "NeftInvest Pro",
+      "url": [
+       { "text": "https://neftinvest.example.net/qeydiyyat", "reveal": "neftinvest.example.net" }
+      ],
+      "fields": [
+       "Nume complet",
+       "Telefon",
+       "Numărul cardului",
+       "CVV"
+      ],
+      "button": "Investiți 250 de manați"
+     },
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Investiți 250 de manați",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Datele cardului au ajuns la escroci, iar banii nu se vor mai întoarce. Sunați imediat la bancă și blocați cardul."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Datele cardului nu se trimit niciodată unei platforme pe care nu o cunoașteți."
+      }
+     ]
+    },
+    {
+     "id": "real-news",
+     "label": "Prezentatorul: reclama care îmi folosește numele este falsă",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-bulvar-xeber",
+      "url": [
+       { "text": "https://bulvar-xeber.example/xeberler/saxta-reklam", "reveal": "bulvar-xeber.example" }
+      ]
+     },
+     "say": "Aceasta este adresa reală a site-ului de știri.",
+     "actions": [
+      {
+       "id": "read",
+       "label": "Citiți articolul",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. Verificarea unei știri îndoielnice la sursa oficială este cea mai sigură cale."
+      },
+      {
+       "id": "share",
+       "label": "Distribuiți-l familiei",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Bună idee. Distribuirea dezmințirii oficiale îi protejează și pe alții."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "believe-or-check",
+   "prompt": "Puteți avea încredere sau este periculos?",
+   "cards": [
+    {
+     "id": "weather",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "db-bulvar-xeber",
+      "app": "BulvarXəbər",
+      "title": [ { "text": "Mâine se așteaptă ploaie la Baku" } ],
+      "body": [ { "text": "Temperaturi între 14 și 18 grade." } ],
+      "time": "07:30"
+     },
+     "verdict": "safe",
+     "explain": "O știre obișnuită, care nu vă cere nimic."
+    },
+    {
+     "id": "aid-link",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [ { "text": "Grupul cartierului" } ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         { "text": "Fiecare familie primește un ajutor de 500 de manați, înscrieți-vă aici: " },
+         {
+          "text": "yardim-az.example.net",
+          "link": {
+           "label": "yardim-az.example.net",
+           "href": "https://yardim-az.example.net"
+          }
+         }
+        ],
+        "time": "19:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ajutoarele de stat se acordă prin portalul oficial, nu printr-un link dintr-un grup de chat."
+    },
+    {
+     "id": "crypto-star",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [ { "text": "Sponsorizat" } ],
+      "body": [ { "text": "Un fotbalist celebru împarte bani: introduceți datele cardului ca să primiți cadoul." } ],
+      "time": "21:00"
+     },
+     "verdict": "threat",
+     "explain": "Banii gratuiți în numele unei celebrități sunt o înșelătorie clasică. Imaginea și videoclipul pot fi create cu AI."
+    },
+    {
+     "id": "portal",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "e-xidmet",
+      "app": "e-Xidmət",
+      "title": [ { "text": "Starea cererii dumneavoastră s-a modificat" } ],
+      "body": [ { "text": "Detaliile se află în contul dumneavoastră personal de pe portal." } ],
+      "time": "10:45"
+     },
+     "verdict": "safe",
+     "explain": "Notificarea nu conține niciun link și nu cere nicio plată; vă trimite la portalul oficial."
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "check-news",
+   "prompt": "Vedeți o știre șocantă. Puneți verificările în ordine.",
+   "items": [
+    {
+     "id": "pause",
+     "label": "Faceți o pauză, nu distribuiți imediat"
+    },
+    {
+     "id": "source",
+     "label": "Uitați-vă la sursă și la adresa site-ului"
+    },
+    {
+     "id": "official",
+     "label": "Căutați știrea pe site-ul oficial sau într-o sursă de încredere"
+    },
+    {
+     "id": "decide",
+     "label": "Distribuiți-o doar dacă este confirmată, raportați-o dacă este falsă"
+    }
+   ],
+   "explain": "Mai întâi stăpâniți-vă emoția, apoi verificați. Distribuirea vine la final."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Imaginile și videoclipurile care par reale pot fi create cu AI.",
+    "Promisiunile de profit mare sau de bani gratuiți sunt înșelătorii.",
+    "Verificați știrile la o sursă oficială înainte să le distribuiți."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,514 @@
+{
+ "id": "robot-check-trap",
+ "title": "Testul „Nu sunt robot”",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fc1-tutor",
+   "beats": [
+    {
+     "id": "fc1-b1",
+     "say": "Bună ziua! Astăzi învățăm să recunoaștem paginile false care se dau drept o verificare anti-robot.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "fc1-b2",
+     "say": "O astfel de pagină vă dă trei pași: apăsați niște taste, lipiți un text, confirmați.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-xezer-forum-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Confirmați că sunteți om"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "1. Apăsați simultan tastele indicate."
+         }
+        ],
+        [
+         {
+          "text": "2. Lipiți textul copiat.",
+          "spot": "paste"
+         }
+        ],
+        [
+         {
+          "text": "3. Apăsați Enter."
+         }
+        ]
+       ],
+       "buttons": [
+        "Nu sunt robot"
+       ]
+      }
+     },
+     "highlight": "paste"
+    },
+    {
+     "id": "fc1-b3",
+     "say": "O verificare reală nu vă cere niciodată să tastați o comandă.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "fc1-b4",
+     "say": "Regula: orice v-ar cere un site să tastați, nu o faceți și închideți pagina.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fc1-hotspot",
+   "prompt": "Găsiți semnalele de alarmă de pe această pagină de verificare.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2a-xezer-forum-fake",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Confirmați că sunteți om"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Pentru a continua, parcurgeți pașii de mai jos:"
+      }
+     ],
+     [
+      {
+       "text": "1. Apăsați tastele care deschid o fereastră.",
+       "spot": "keys"
+      }
+     ],
+     [
+      {
+       "text": "2. Lipiți textul copiat în casetă.",
+       "spot": "paste"
+      }
+     ],
+     [
+      {
+       "text": "3. Confirmați cu tasta Enter.",
+       "spot": "enter"
+      }
+     ],
+     [
+      {
+       "text": "Această verificare este necesară pentru detectarea boților.",
+       "spot": "excuse"
+      }
+     ]
+    ],
+    "buttons": [
+     "Nu sunt robot"
+    ]
+   },
+   "spots": [
+    {
+     "id": "keys",
+     "label": "Apăsarea tastelor",
+     "explain": "O verificare reală nu vă cere niciodată să apăsați taste. Așa este rulată o comandă ascunsă."
+    },
+    {
+     "id": "paste",
+     "label": "Lipirea textului",
+     "explain": "Textul pe care îl lipiți este de fapt o comandă ascunsă. Nu lipiți niciodată un text doar pentru că vi-l cere un site."
+    },
+    {
+     "id": "enter",
+     "label": "Tasta de confirmare",
+     "explain": "Când confirmați, comanda rulează și se instalează software rău intenționat. Nu faceți acest pas."
+    },
+    {
+     "id": "excuse",
+     "label": "O scuză falsă",
+     "explain": "Detectarea boților este doar pretextul. O verificare reală vă cere să alegeți imagini sau să bifați o casetă."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "simulation",
+   "id": "fc1-sim",
+   "environment": "browser",
+   "title": "Pe site-ul forumului",
+   "intro": "Pe site-ul unei conferințe dați peste mai multe verificări. Alegeți pasul corect pentru fiecare.",
+   "steps": [
+    {
+     "id": "clickfix",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Confirmați că sunteți om"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Pentru a continua, apăsați tastele indicate și lipiți textul."
+        }
+       ]
+      ],
+      "buttons": [
+       "Începeți",
+       "Închideți"
+      ]
+     },
+     "say": "Pagina vă cere să apăsați niște taste și să lipiți un text.",
+     "actions": [
+      {
+       "id": "close",
+       "label": "Închideți pagina",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. O verificare care vă cere să tastați o comandă este falsă, așa că închiderea ei este pasul potrivit."
+      },
+      {
+       "id": "do",
+       "label": "Urmați pașii",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Comanda ascunsă pe care ați lipit-o a instalat software rău intenționat. Nu urmați niciodată astfel de pași."
+      },
+      {
+       "id": "report",
+       "label": "Raportați suportului IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Un pas bun. Dacă arătați pagina suportului IT, îi protejați și pe colegi."
+      }
+     ]
+    },
+    {
+     "id": "real-captcha",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Selectați imaginile"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ca să arătați că nu sunteți robot, selectați imaginile cu semafoare."
+        }
+       ]
+      ],
+      "buttons": [
+       "Confirmați",
+       "Reîncărcați"
+      ]
+     },
+     "say": "Aceasta este o verificare obișnuită, cu imagini.",
+     "actions": [
+      {
+       "id": "complete",
+       "label": "Selectați imaginile și confirmați",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Așa arată o verificare reală: alegeți imagini sau bifați o casetă."
+      },
+      {
+       "id": "close",
+       "label": "Închideți pagina",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Este în regulă și așa. Dacă nu vreți să continuați, puteți pur și simplu să o închideți."
+      },
+      {
+       "id": "report",
+       "label": "Raportați ca atac",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Această verificare este sigură, deci nu e nevoie să o raportați. Doar verificările care cer comenzi sunt false."
+      }
+     ]
+    },
+    {
+     "id": "fix-pdf",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedoxu-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Documentul nu se deschide"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "PDF-ul nu a putut fi afișat. Pentru a remedia problema, copiați și rulați comanda de mai jos."
+        }
+       ],
+       [
+        {
+         "text": "[text necunoscut, copiat de site]"
+        }
+       ]
+      ],
+      "buttons": [
+       "Remediați",
+       "Închideți"
+      ]
+     },
+     "say": "Pagina aceasta vă dă o comandă ca să deschideți un document.",
+     "actions": [
+      {
+       "id": "close",
+       "label": "Închideți pagina",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. O pagină care spune că un document nu se deschide este aceeași capcană, așa că închideți-o."
+      },
+      {
+       "id": "fix",
+       "label": "Rulați comanda",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Comanda a instalat software rău intenționat pe computer. Nu aveți încredere într-o pagină care spune că un document nu se deschide."
+      },
+      {
+       "id": "report",
+       "label": "Raportați suportului IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Alegere bună. Suportul IT poate verifica pagina și îi poate avertiza pe alții."
+      }
+     ]
+    },
+    {
+     "id": "fix-meeting",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-gorus-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Eroare la conectarea la ședință"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ca să intrați în ședință, rulați această comandă, apoi reîncărcați pagina."
+        }
+       ]
+      ],
+      "buttons": [
+       "Rulați comanda",
+       "Închideți"
+      ]
+     },
+     "say": "Acum vă spune că aplicația pentru ședințe online are o eroare.",
+     "actions": [
+      {
+       "id": "close",
+       "label": "Închideți pagina",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. O aplicație pentru ședințe nu vă cere niciodată să rulați o comandă, deci și aceasta este o capcană."
+      },
+      {
+       "id": "fix",
+       "label": "Rulați comanda",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Comanda a pornit un software rău intenționat. Orice comandă care pretinde că repară o eroare este același truc."
+      },
+      {
+       "id": "report",
+       "label": "Raportați suportului IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Când raportați suportului IT astfel de pagini de eroare false, îi ajutați pe toți."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "fc1-swipe",
+   "prompt": "Este o verificare reală sau o capcană?",
+   "cards": [
+    {
+     "id": "image-captcha",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Bifați caseta"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Bifați caseta „Nu sunt robot” și continuați."
+        }
+       ]
+      ],
+      "buttons": [
+       "Continuați"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Aceasta este o verificare obișnuită. Bifarea unei casete sau alegerea unor imagini este sigură."
+    },
+    {
+     "id": "keystroke-captcha",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Finalizați verificarea"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Apăsați tastele care deschid o fereastră și lipiți textul."
+        }
+       ]
+      ],
+      "buttons": [
+       "Începeți"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O verificare care vă cere să tastați o comandă este falsă. Închideți pagina."
+    },
+    {
+     "id": "letters-captcha",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-xezer-forum",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Tastați literele"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Tastați în caseta de mai jos literele din imagine."
+        }
+       ]
+      ],
+      "buttons": [
+       "Confirmați"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Aceasta este o verificare obișnuită. Tastarea literelor dintr-o imagine nu pornește nimic pe computerul dumneavoastră."
+    },
+    {
+     "id": "paste-run",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "senedoxu-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Pentru a continua"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Copiați acest text și lipiți-l în caseta „Executare”."
+        }
+       ]
+      ],
+      "buttons": [
+       "Copiați"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Nu rulați niciodată un text pe care un site vă cere să îl copiați. Este o comandă ascunsă."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "fc1-choice",
+   "question": {
+    "prompt": "Ce vă poate cere o verificare anti-robot reală? Selectați toate variantele corecte.",
+    "options": [
+     {
+      "id": "tick",
+      "label": "Să bifați o casetă",
+      "correct": true,
+      "feedback": "Corect. Bifarea unei casete este o verificare obișnuită și sigură."
+     },
+     {
+      "id": "images",
+      "label": "Să alegeți imagini",
+      "correct": true,
+      "feedback": "Corect. Alegerea imaginilor este un alt tip de verificare reală."
+     },
+     {
+      "id": "letters",
+      "label": "Să tastați literele dintr-o imagine",
+      "correct": true,
+      "feedback": "Corect. Tastarea literelor nu pornește nimic pe computer."
+     },
+     {
+      "id": "keys",
+      "label": "Să apăsați niște taste și să lipiți un text",
+      "correct": false,
+      "feedback": "Aceasta este capcana. O verificare reală nu vă trimite niciodată în ferestrele sistemului de operare."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "O verificare reală rămâne în interiorul paginii. O verificare care vă trimite să apăsați taste și să lipiți un text este falsă."
+  },
+  {
+   "type": "recap",
+   "id": "fc1-recap",
+   "points": [
+    "O verificare reală nu vă cere niciodată să tastați o comandă",
+    "Nu lipiți niciodată un text pe care un site vă cere să-l lipiți",
+    "Închideți o astfel de pagină și raportați-o suportului IT"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

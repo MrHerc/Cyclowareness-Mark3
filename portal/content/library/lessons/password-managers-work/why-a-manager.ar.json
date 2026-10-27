@@ -1,0 +1,460 @@
+{
+ "id": "why-a-manager",
+ "title": "لماذا مدير كلمات المرور؟",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "كل حساب يحتاج إلى كلمة مرور طويلة خاصة به. ولا أحد يستطيع أن يتذكرها كلها.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "لا تكرر كلمة المرور نفسها أبدًا: فعندما تتسرب بيانات موقع واحد، يجربها المهاجمون على جميع حساباتك.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "مدير كلمات المرور في الجهة ينشئ كلمة مرور قوية لكل حساب، ويحفظها في خزنة مشفرة.",
+     "mood": "talk",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "parolseyf",
+       "tone": "app",
+       "title": [
+        {
+         "text": "تم إنشاء كلمة المرور"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "28 حرفًا عشوائيًا",
+          "spot": "gen"
+         }
+        ]
+       ],
+       "buttons": [
+        "حفظ"
+       ]
+      }
+     },
+     "highlight": "gen"
+    },
+    {
+     "id": "b4",
+     "say": "وأنت تتذكر كلمة مرور رئيسية واحدة طويلة فقط، وتحمي الخزنة بالتحقق بخطوتين.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "where-passwords-live",
+   "prompt": "هل هذا مكان آمن لحفظ كلمة المرور؟",
+   "cards": [
+    {
+     "id": "excel",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Parollar_hamisi.xlsx"
+       }
+      ],
+      "type": "xls",
+      "size": "18 KB",
+      "source": [
+       {
+        "text": "سطح المكتب"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "الملف غير مشفر: كل من يصل إلى الحاسوب يرى جميع كلمات المرور دفعة واحدة."
+    },
+    {
+     "id": "vault",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "parolseyf",
+      "app": "ParolSeyf",
+      "title": [
+       {
+        "text": "تم حفظ بيانات الدخول في الخزنة"
+       }
+      ],
+      "body": [
+       {
+        "text": "portal.idare.example"
+       }
+      ],
+      "time": "09:05"
+     },
+     "verdict": "safe",
+     "explain": "كلمة المرور محفوظة في الخزنة المشفرة، ولا يمكن فتحها إلا بكلمة مرورك الرئيسية."
+    },
+    {
+     "id": "saved-messages",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "الرسائل المحفوظة"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "كلمة مرور البريد: Aysel1990"
+         }
+        ],
+        "time": "08:31"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "تطبيق المراسلة ليس خزنة. إذا ضاع الجوال أو تم الاستيلاء على الحساب، ضاعت كلمات المرور معه."
+    },
+    {
+     "id": "shared-vault",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "app",
+      "title": [
+       {
+        "text": "خزنة مشتركة: المكتب الإعلامي"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "3 أعضاء. لوحة تحكم الموقع الإلكتروني، وحساب التواصل الاجتماعي."
+        }
+       ]
+      ],
+      "buttons": [
+       "إغلاق"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "يتشارك الفريق كلمات المرور في خزنة مشفرة، ويمكن إلغاء الوصول في أي وقت."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "password-requests",
+   "environment": "phone",
+   "title": "طلبات كلمات المرور",
+   "intro": "اليوم يطلب منك عدة أشخاص كلمات مرور. أجب عن كل طلب على جوالك.",
+   "steps": [
+    {
+     "id": "colleague-asks",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "سابينا حسينوفا"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "مرحبًا! هل يمكنك أن تكتب لي هنا كلمة مرور لوحة تحكم الموقع؟ سأنشر أخبار اليوم."
+         }
+        ],
+        "time": "10:12"
+       }
+      ]
+     },
+     "say": "إنها زميلتك، وتحتاج إلى الوصول فعلًا.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "كتابة كلمة المرور",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "ستبقى كلمة المرور في المحادثة، وقد تتسرب إذا ضاع أحد الجوالين. شاركها عبر الخزنة."
+      },
+      {
+       "id": "vault",
+       "label": "سأشاركها معك عبر الخزنة",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "صحيح. في الخزنة تبقى كلمة المرور مشفرة، ويمكن إلغاء الوصول عند الحاجة."
+      },
+      {
+       "id": "sms",
+       "label": "سأرسلها لك برسالة نصية",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "الرسائل النصية غير مشفرة هي الأخرى، وتبقى على الجوال. شارك كلمات المرور عبر الخزنة فقط."
+      }
+     ]
+    },
+    {
+     "id": "fake-share-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "parolseyf-fake",
+      "from": {
+       "name": [
+        {
+         "text": "ParolSeyf"
+        }
+       ],
+       "address": [
+        {
+         "text": "no-reply@parolseyf-share.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "شارك إلنور كريموف خزنة معك"
+       }
+      ],
+      "time": "11:40",
+      "body": [
+       [
+        {
+         "text": "سجل الدخول لعرض خزنة «المالية»: "
+        },
+        {
+         "text": "parolseyf-share.example.net/seyf",
+         "link": {
+          "label": "parolseyf-share.example.net/seyf",
+          "href": "https://parolseyf-share.example.net/seyf"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "لم تكن تنتظر أي مشاركة.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "فتح الرابط",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "المشاركة الحقيقية تظهر داخل تطبيق ParolSeyf نفسه. أما هذا الرابط فيصطاد كلمة مرورك الرئيسية."
+      },
+      {
+       "id": "report",
+       "label": "الإبلاغ عن تصيد",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "صحيح: العنوان لا يخص ParolSeyf. افتح التطبيق بنفسك وتحقق من المشاركات."
+      },
+      {
+       "id": "delete",
+       "label": "حذف",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "أنت في أمان، لكن الرسالة نفسها قد تصل إلى زملائك. أبلغ عنها."
+      }
+     ]
+    },
+    {
+     "id": "fake-support",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "parolseyf-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "دعم ParolSeyf"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "اكتشفنا خطأ في خزنتك. لاستعادتها، اكتب هنا كلمة المرور الرئيسية ورمز التحقق الذي سيصلك."
+         }
+        ],
+        "time": "14:03"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "send",
+       "label": "كتابة كلمة المرور الرئيسية",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "كلمة المرور الرئيسية تفتح جميع كلمات المرور لديك. ولا يطلبها أي فريق دعم أبدًا."
+      },
+      {
+       "id": "block",
+       "label": "حظر",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "صحيح. لا أحد يطلب كلمة مرورك الرئيسية أو رمز التحقق، ولا حتى الدعم الفني."
+      },
+      {
+       "id": "report",
+       "label": "الإبلاغ",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "رائع. أبلغ فريق الأمن السيبراني أيضًا ليحذر زملاءك."
+      }
+     ]
+    },
+    {
+     "id": "reused-alert",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "app",
+      "title": [
+       {
+        "text": "كلمة المرور هذه مستخدمة في 3 حسابات"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "كلمة المرور نفسها محفوظة لحساب İşPoçt، وبوابة الجهة، وصفحة Kontakto."
+        }
+       ]
+      ],
+      "buttons": [
+       "لاحقًا",
+       "تغيير كلمات المرور"
+      ]
+     },
+     "say": "فحص ParolSeyf كلمات مرورك.",
+     "actions": [
+      {
+       "id": "update",
+       "label": "تغيير كلمات المرور",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "صحيح. ينشئ مولد كلمات المرور كلمة مرور مستقلة لكل حساب، فلا يفتح أي تسرب حسابًا آخر."
+      },
+      {
+       "id": "later",
+       "label": "لاحقًا",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "كلمة المرور المكررة نقطة ضعف يحبها المهاجمون. تسرب واحد يكفي لفتح الحسابات الثلاثة كلها."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "password",
+   "id": "master-password",
+   "prompt": "أنشئ كلمة مرور رئيسية: عبارة طويلة من 15 حرفًا على الأقل.",
+   "targetScore": 4,
+   "tips": [
+    "اجمع أربع أو خمس كلمات عشوائية تفصل بينها مسافات",
+    "لا تستخدم كلمة المرور هذه في أي مكان آخر",
+    "تجنب الأسماء وتواريخ الميلاد والاقتباسات المشهورة"
+   ]
+  },
+  {
+   "type": "match",
+   "id": "manager-terms",
+   "prompt": "طابق كل مصطلح مع معناه.",
+   "pairs": [
+    {
+     "id": "vault",
+     "left": "الخزنة",
+     "right": "مخزن مشفر لكلمات مرورك"
+    },
+    {
+     "id": "master",
+     "left": "كلمة المرور الرئيسية",
+     "right": "كلمة المرور الوحيدة التي تفتح الخزنة"
+    },
+    {
+     "id": "generator",
+     "left": "مولد كلمات المرور",
+     "right": "ينشئ كلمات مرور طويلة وعشوائية"
+    },
+    {
+     "id": "shared",
+     "left": "الخزنة المشتركة",
+     "right": "تتيح للفريق مشاركة كلمات المرور بأمان"
+    }
+   ],
+   "explain": "مدير كلمات المرور يتذكر كلمات المرور، وأنت تحرس كلمة المرور الرئيسية فقط."
+  },
+  {
+   "type": "choice",
+   "id": "shared-account",
+   "question": {
+    "prompt": "ثلاثة أشخاص في إدارتك يديرون حساب التواصل الاجتماعي نفسه. كيف يتشاركون كلمة المرور؟",
+    "options": [
+     {
+      "id": "own",
+      "label": "حساب دخول منفصل لكل شخص إن أمكن، وإلا فخزنة مشتركة",
+      "correct": true,
+      "feedback": "صحيح. عندما يغادر أحدهم الفريق، يمكن إلغاء وصوله بخطوة واحدة."
+     },
+     {
+      "id": "group-chat",
+      "label": "نشر كلمة المرور في محادثة الفريق",
+      "correct": false,
+      "feedback": "كلمة المرور المنشورة في محادثة جماعية تبقى هناك لسنوات، ويراها الأعضاء الجدد أيضًا."
+     },
+     {
+      "id": "note",
+      "label": "كتابتها على ورقة لاصقة على الشاشة",
+      "correct": false,
+      "feedback": "يستطيع أي شخص يدخل المكتب أن يرى كلمة المرور ويلتقط لها صورة."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "key"
+    }
+   },
+   "explain": "حتى في الحساب المشترك، مكان كلمة المرور هو الخزنة، لا المحادثات ولا الأوراق."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "كلمة مرور منفصلة لكل حساب: مدير كلمات المرور ينشئها ويتذكرها.",
+    "شارك كلمات المرور في خزنة مشتركة، ولا تشاركها في محادثة أبدًا.",
+    "لا تخبر أحدًا بكلمة مرورك الرئيسية أبدًا، واحرص على حماية الخزنة بالتحقق بخطوتين."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

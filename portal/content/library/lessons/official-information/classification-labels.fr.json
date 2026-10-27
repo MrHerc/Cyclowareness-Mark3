@@ -1,0 +1,529 @@
+{
+ "id": "classification-labels",
+ "title": "Marquages de confidentialité",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l1-tutor",
+   "beats": [
+    {
+     "id": "l1-b1",
+     "say": "Le marquage de confidentialité d’un document officiel indique qui a le droit de le voir. Apprenons à lire ces marquages.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "l1-b2",
+     "say": "Le marquage figure dans l’objet, en haut du document ou dans le nom du fichier. Avant de partager, arrêtez-vous un instant.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "idare",
+       "from": {
+        "name": [
+         {
+          "text": "Direction financière"
+         }
+        ],
+        "address": [
+         {
+          "text": "maliyye@idare.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "DIFFUSION RESTREINTE",
+         "spot": "label"
+        },
+        {
+         "text": " : projet de budget 2027"
+        }
+       ],
+       "time": "09:20",
+       "body": [
+        [
+         {
+          "text": "Ce projet est réservé aux chefs de service. Ne l’envoyez à personne d’autre."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Budce_layihesi_2027.xlsx"
+          }
+         ],
+         "size": "84 Ko"
+        }
+       ]
+      }
+     },
+     "highlight": "label"
+    },
+    {
+     "id": "l1-b3",
+     "say": "La règle de base, c’est le besoin d’en connaître : seules les personnes qui ont vraiment besoin du document pour leur travail peuvent le voir.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "l1-b4",
+     "say": "Le rang hiérarchique, l’amitié ou la curiosité ne sont pas des raisons valables. Même sans marquage, les données des citoyens restent protégées.",
+     "mood": "talk",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "l1-match",
+   "prompt": "Associez chaque marquage à sa signification.",
+   "pairs": [
+    {
+     "id": "open",
+     "left": "Public",
+     "right": "Tout le monde peut le voir, par exemple un avis publié sur le site web"
+    },
+    {
+     "id": "official-use",
+     "left": "Diffusion restreinte",
+     "right": "Au sein de l’institution, réservé aux personnes qui en ont besoin pour leur travail"
+    },
+    {
+     "id": "secret",
+     "left": "Confidentiel",
+     "right": "Réservé aux personnes habilitées, selon des règles particulières"
+    },
+    {
+     "id": "no-label",
+     "left": "Sans marquage, mais avec des données personnelles",
+     "right": "Toujours protégé : les données des citoyens ne sont pas publiques"
+    }
+   ],
+   "explain": "Les noms des marquages et les règles varient d’une institution à l’autre. Suivez toujours les consignes de votre propre institution."
+  },
+  {
+   "type": "swipe",
+   "id": "l1-swipe",
+   "prompt": "Pouvez-vous donner suite à cette demande ?",
+   "cards": [
+    {
+     "id": "curious-colleague",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Tural (RH)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Salut ! Envoie-moi aussi le projet de budget, je suis juste curieux de savoir qui va être augmenté."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "La curiosité n’est pas un besoin. Si les RH ne travaillent pas sur ce document, ne l’envoyez pas."
+    },
+    {
+     "id": "manager-report",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Narmin Huseynova"
+        }
+       ],
+       "address": [
+        {
+         "text": "n.huseynova@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Rapport trimestriel"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Merci de m’envoyer le rapport de l’équipe via SənədAxını, nous le présentons au ministère demain."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Votre responsable travaille sur ce document et vous demande de passer par le système officiel. C’est une demande de travail normale."
+    },
+    {
+     "id": "friend-order",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Samir (un ami)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Il paraît que tu prépares un nouvel arrêté. Prends le projet en photo, personne n’en saura rien."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un arrêté non publié ne sort pas de l’institution. L’amitié ne crée pas de besoin d’en connaître."
+    },
+    {
+     "id": "press-public",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Service de presse"
+        }
+       ],
+       "address": [
+        {
+         "text": "press@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Texte de l’avis"
+       }
+      ],
+      "time": "11:30",
+      "body": [
+       [
+        {
+         "text": "Pourriez-vous nous envoyer le texte de l’avis publié hier sur le site web ?"
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "L’avis est déjà public. Une information publique peut être partagée."
+    },
+    {
+     "id": "new-employee",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "+994 50 000 41 27"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour, je viens d’arriver ici. Pourriez-vous m’envoyer la liste de toutes les personnes du service, avec leurs numéros de téléphone ?"
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une nouvelle recrue obtient ce genre de liste auprès de son responsable. N’envoyez rien à un numéro inconnu."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "l1-sim",
+   "environment": "inbox",
+   "title": "Demandes du matin",
+   "intro": "Vous avez quatre e-mails. Pour chacun, regardez qui demande quoi, puis décidez.",
+   "steps": [
+    {
+     "id": "m1",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Tural Gasimov"
+        }
+       ],
+       "address": [
+        {
+         "text": "t.qasimov@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Projet de budget"
+       }
+      ],
+      "time": "09:05",
+      "body": [
+       [
+        {
+         "text": "Salut ! Tu pourrais me transférer le projet de budget des Finances ? Je veux juste y jeter un œil."
+        }
+       ]
+      ]
+     },
+     "say": "Tural travaille-t-il sur ce document ?",
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Transférer",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Tural ne travaille pas sur ce document. Un document marqué ne va qu’aux personnes qui en ont besoin."
+      },
+      {
+       "id": "reply",
+       "label": "Répondre : l’accord du responsable est nécessaire",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Exact. S’il y a un vrai besoin, un responsable donne son accord par la voie officielle."
+      }
+     ]
+    },
+    {
+     "id": "m2",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "senedaxini",
+      "from": {
+       "name": [
+        {
+         "text": "SənədAxını"
+        }
+       ],
+       "address": [
+        {
+         "text": "bildiris@senedaxini.idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Nouvelle tâche : rapport trimestriel"
+       }
+      ],
+      "time": "09:12",
+      "body": [
+       [
+        {
+         "text": "Narmin Huseynova vous a envoyé une tâche. Ouvrez SənədAxını pour la consulter."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Marquer comme fiable",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Exact. Une tâche attendue, envoyée par le système interne, sans aucun lien à cliquer."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Tous les e-mails ne sont pas des menaces. L’expéditeur, l’adresse et le contenu sont ceux que vous attendez."
+      }
+     ]
+    },
+    {
+     "id": "m3",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "regional-nazirlik-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Ministère des Relations régionales"
+        }
+       ],
+       "address": [
+        {
+         "text": "rel.nazirlik@poct-mail.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Urgent : liste du personnel"
+       }
+      ],
+      "time": "09:40",
+      "body": [
+       [
+        {
+         "text": "Dans le cadre d’un projet commun, envoyez aujourd’hui à cette adresse les noms, les fonctions et les numéros de portable des agents de votre service."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Un ministère n’écrit pas depuis une messagerie gratuite : les demandes officielles arrivent par courrier officiel."
+      },
+      {
+       "id": "reply",
+       "label": "Envoyer la liste",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Les données de vos collègues sont tombées entre les mains d’un escroc. Chacun d’eux peut maintenant recevoir un e-mail ciblé."
+      }
+     ]
+    },
+    {
+     "id": "m4",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Kamran Aliyev"
+        }
+       ],
+       "address": [
+        {
+         "text": "k.aliyev@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "CONFIDENTIEL : résultats de l’inspection"
+       }
+      ],
+      "time": "10:02",
+      "body": [
+       [
+        {
+         "text": "Rashad, les résultats sont en pièce jointe."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Yoxlama_neticeleri.pdf"
+         }
+        ],
+        "size": "1,1 Mo"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir la pièce jointe",
+       "kind": "open-attachment",
+       "outcome": "risky",
+       "feedback": "Cet e-mail ne vous était pas destiné. L’ouvrir par curiosité, c’est aussi une fuite."
+      },
+      {
+       "id": "forward",
+       "label": "Transférer à Rashad",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "L’intention est bonne, mais vous propagez l’erreur. C’est à l’expéditeur de la corriger."
+      },
+      {
+       "id": "reply",
+       "label": "Prévenir l’expéditeur qu’il s’est trompé de destinataire",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Exact. Prévenez l’expéditeur, n’ouvrez pas la pièce jointe et supprimez l’e-mail comme le prévoit votre institution."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "l1-choice",
+   "question": {
+    "prompt": "Un ami qui travaille dans un autre ministère vous demande un rapport marqué « Diffusion restreinte ».",
+    "options": [
+     {
+      "id": "send",
+      "label": "Je l’envoie, il est fonctionnaire lui aussi",
+      "correct": false,
+      "feedback": "Être fonctionnaire ne donne pas le besoin d’en connaître. La demande d’une autre institution arrive par courrier officiel."
+     },
+     {
+      "id": "official",
+      "label": "Je lui demande d’envoyer une demande officielle et j’en informe mon responsable",
+      "correct": true,
+      "feedback": "Exact. La direction examine la demande officielle, et c’est l’institution qui y répond."
+     },
+     {
+      "id": "verbal",
+      "label": "Je ne l’envoie pas, mais je lui donne les chiffres clés",
+      "correct": false,
+      "feedback": "Les chiffres font partie du document. Les communiquer, c’est aussi partager."
+     }
+    ]
+   },
+   "explain": "Ce n’est pas le canal qui décide, mais le besoin d’en connaître et l’autorisation. La direction tranche par la voie officielle."
+  },
+  {
+   "type": "recap",
+   "id": "l1-recap",
+   "points": [
+    "Le marquage indique qui peut voir un document : vérifiez-le avant de partager.",
+    "Ne le montrez qu’aux personnes qui en ont besoin pour leur travail, jamais par curiosité ni par amitié.",
+    "N’ouvrez pas un document reçu par erreur : prévenez l’expéditeur."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

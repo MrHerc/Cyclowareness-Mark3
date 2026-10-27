@@ -1,0 +1,299 @@
+{
+ "id": "qr-traps",
+ "title": "Capcane cu coduri QR",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "hidden-link",
+     "say": "Bună! Un cod QR nu este altceva decât un link ascuns. Privindu-l, nu vă puteți da seama unde duce.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "qr"
+     }
+    },
+    {
+     "id": "stickers",
+     "say": "Escrocii își lipesc propriile autocolante cu cod QR pe parcometre, meniuri și afișe.",
+     "mood": "think",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "qr",
+       "caption": [ { "text": "ShaharPark. Scanați pentru plată" } ],
+       "destination": [
+        { "text": "https://" },
+        { "text": "seherpark-odenis.info", "spot": "domain" },
+        { "text": "/pay" }
+       ]
+      }
+     }
+    },
+    {
+     "id": "check-domain",
+     "say": "Când telefonul citește codul, vă arată adresa. Înainte să o deschideți, verificați domeniul: aparține cu adevărat acelei organizații?",
+     "mood": "talk",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "qr",
+       "caption": [ { "text": "ShaharPark. Scanați pentru plată" } ],
+       "destination": [
+        { "text": "https://" },
+        { "text": "seherpark-odenis.info", "spot": "domain" },
+        { "text": "/pay" }
+       ]
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "email-qr",
+     "say": "Și un cod QR dintr-un e-mail poate fi o capcană. Dacă pagina vă cere parola sau datele cardului, opriți-vă.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "scan-or-not",
+   "prompt": "Ce coduri QR puteți deschide în siguranță?",
+   "cards": [
+    {
+     "id": "parking-fine",
+     "artifact": {
+      "kind": "qr",
+      "caption": [ { "text": "Parcometru. Aveți o amendă, scanați și plătiți" } ],
+      "destination": [ { "text": "https://seherpark-cerime.info/pay" } ]
+     },
+     "verdict": "threat",
+     "explain": "Amenzile nu se încasează prin autocolante. Verificați-le doar pe portalul oficial sau în aplicația oficială."
+    },
+    {
+     "id": "cafe-menu",
+     "artifact": {
+      "kind": "qr",
+      "caption": [ { "text": "Ceainăria Chinar. Meniu" } ],
+      "destination": [ { "text": "https://cinar-cayxana.az/menyu" } ]
+     },
+     "verdict": "safe",
+     "explain": "Domeniul se potrivește cu numele ceainăriei, iar pagina doar afișează un meniu. Nu vi se cere nimic."
+    },
+    {
+     "id": "mfa-email",
+     "artifact": {
+      "kind": "qr",
+      "caption": [ { "text": "Verificarea contului dumneavoastră expiră. Scanați pentru reînnoire" } ],
+      "destination": [ { "text": "https://rxagentlik-login.info/verify" } ]
+     },
+     "verdict": "threat",
+     "explain": "Un e-mail cu un cod QR pentru verificarea contului este o capcană clasică. Deschideți chiar dumneavoastră portalul, dintr-un marcaj al browserului."
+    },
+    {
+     "id": "certificate-check",
+     "artifact": {
+      "kind": "qr",
+      "caption": [ { "text": "Certificat DovletPortal. Verificați autenticitatea" } ],
+      "destination": [ { "text": "https://dovletportal.az/yoxla/7F3K2" } ]
+     },
+     "verdict": "safe",
+     "explain": "Codul duce la adresa proprie a portalului care a emis certificatul și nu cere niciun fel de date."
+    },
+    {
+     "id": "free-wifi",
+     "artifact": {
+      "kind": "qr",
+      "caption": [ { "text": "Wi-Fi gratuit. Scanați pentru conectare" } ],
+      "destination": [ { "text": "https://free-wifi-baku.top/login?card=1" } ]
+     },
+     "verdict": "threat",
+     "explain": "Internetul gratuit nu are niciodată nevoie de cardul dumneavoastră. Un domeniu necunoscut plus o cerere de card înseamnă capcană."
+    },
+    {
+     "id": "donation",
+     "artifact": {
+      "kind": "qr",
+      "caption": [ { "text": "Ajutați copiii. Scanați pentru a dona" } ],
+      "destination": [ { "text": "https://qisalt.info/x7Qa" } ]
+     },
+     "verdict": "threat",
+     "explain": "Un link scurtat ascunde adresa reală. Donați doar pe site-ul oficial al organizației caritabile."
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "email-qr",
+   "prompt": "Găsiți părțile suspecte ale acestui e-mail.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [ { "text": "Suport IT" } ],
+     "address": [ { "text": "it-destek@rxagentlik-support.info", "spot": "sender" } ]
+    },
+    "to": "aynur.mammadova@rxagentlik.az",
+    "subject": [
+     { "text": "URGENT: ", "spot": "urgent" },
+     { "text": "reînnoiți verificarea în doi pași" }
+    ],
+    "time": "09:12",
+    "body": [
+     [ { "text": "Stimați colegi," } ],
+     [
+      { "text": "Sistemul nostru de securitate este în curs de actualizare. " },
+      { "text": "Dacă nu confirmați în 24 de ore, contul dumneavoastră va fi blocat.", "spot": "threat" }
+     ],
+     [ { "text": "Scanați cu telefonul codul QR de mai jos.", "spot": "qr" } ],
+     [ { "text": "Cu respect, Suport IT" } ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Domeniu străin",
+     "explain": "Domeniul expeditorului nu este al nostru: nu este rxagentlik.az."
+    },
+    {
+     "id": "urgent",
+     "label": "Urgență",
+     "explain": "Cuvântul „urgent” vă împinge să acționați fără să vă gândiți."
+    },
+    {
+     "id": "threat",
+     "label": "Amenințare",
+     "explain": "Amenințarea cu blocarea contului are rolul de a vă pune presiune. Suportul IT real rareori scrie așa."
+    },
+    {
+     "id": "qr",
+     "label": "Cod QR",
+     "explain": "Codul QR ascunde linkul de filtrul de e-mail și vă mută pe telefon, unde protecția este mai slabă."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "fine-notice",
+   "question": {
+    "prompt": "Pe parbrizul mașinii găsiți o notificare de amendă cu un cod QR. Ce faceți?",
+    "options": [
+     {
+      "id": "scan-pay",
+      "label": "Îl scanez și plătesc imediat",
+      "correct": false,
+      "feedback": "O pagină falsă vă poate fura datele cardului."
+     },
+     {
+      "id": "official",
+      "label": "Verific chiar eu amenda pe portalul oficial",
+      "correct": true,
+      "feedback": "Corect. Dacă amenda este reală, o veți găsi acolo."
+     },
+     {
+      "id": "call-number",
+      "label": "Sun numărul de pe notificare",
+      "correct": false,
+      "feedback": "Și numărul poate aparține escrocilor."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "qr",
+      "caption": [ { "text": "Notificare de amendă. Plătiți în termen de 3 zile" } ],
+      "destination": [ { "text": "https://seherpark-cerime.info/odenis" } ]
+     }
+    }
+   },
+   "explain": "Nu aveți încredere în niciun contact de pe notificare. Deschideți chiar dumneavoastră canalul oficial."
+  },
+  {
+   "type": "scenario",
+   "id": "payment-sticker",
+   "title": "Autocolantul de plată",
+   "start": "counter",
+   "nodes": [
+    {
+     "id": "counter",
+     "text": "La casa cafenelei se află un autocolant cu cod QR pentru plată rapidă. Este lipit puțin strâmb.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "qr",
+       "caption": [ { "text": "Plată rapidă" } ],
+       "destination": [ { "text": "https://sahilpay-odenis.top/p/1942" } ]
+      }
+     },
+     "choices": [
+      {
+       "label": "Îl scanez și verific mai întâi adresa",
+       "next": "address",
+       "feedback": "Un început bun. Verificarea adresei contează."
+      },
+      {
+       "label": "Îl scanez și plătesc imediat",
+       "outcome": "compromised",
+       "feedback": "Adresa era falsă. Datele cardului au ajuns la escroci."
+      },
+      {
+       "label": "O întreb pe casieră dacă autocolantul este al lor",
+       "next": "cashier",
+       "feedback": "O idee foarte bună. Cea mai simplă verificare este să întrebați."
+      }
+     ]
+    },
+    {
+     "id": "address",
+     "text": "Telefonul vă arată adresa: sahilpay-odenis.top. Numele cafenelei nu apare nicăieri.",
+     "choices": [
+      {
+       "label": "Plătesc oricum, mă grăbesc",
+       "outcome": "compromised",
+       "feedback": "Plata făcută în grabă a ajuns la un escroc. Adresa ciudată era un avertisment suficient."
+      },
+      {
+       "label": "Nu deschid pagina și o anunț pe casieră",
+       "next": "cashier",
+       "feedback": "Decizia corectă."
+      }
+     ]
+    },
+    {
+     "id": "cashier",
+     "text": "Acesta nu este autocolantul nostru! Vă rog, plătiți cu cardul la terminal.",
+     "speaker": "Casieră",
+     "voice": "young-woman",
+     "channel": "in-person",
+     "manner": "firm",
+     "spoken": "Ăsta nu e autocolantul nostru! <short pause> Vă rog, plătiți cu cardul la terminal.",
+     "choices": [
+      {
+       "label": "Plătesc la terminal",
+       "outcome": "safe",
+       "feedback": "Bravo. V-ați protejat pe dumneavoastră și pe următorii clienți."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Un cod QR este un link ascuns: verificați adresa înainte să o deschideți.",
+    "Plătiți amenzile și facturile doar prin canale oficiale.",
+    "Nu introduceți niciodată parola sau datele cardului pe o pagină deschisă dintr-un cod QR."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

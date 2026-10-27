@@ -1,0 +1,417 @@
+{
+ "id": "qr-traps",
+ "title": "QR codes piégés",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "hidden-link",
+     "say": "Bonjour ! Un QR code n’est qu’un lien caché. Rien qu’en le regardant, impossible de savoir où il mène.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "qr"
+     }
+    },
+    {
+     "id": "stickers",
+     "say": "Les escrocs collent leurs propres QR codes autocollants sur les horodateurs, les menus et les affiches.",
+     "mood": "think",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "qr",
+       "caption": [
+        {
+         "text": "ShaharPark. Scannez pour payer"
+        }
+       ],
+       "destination": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "seherpark-odenis.info",
+         "spot": "domain"
+        },
+        {
+         "text": "/pay"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "check-domain",
+     "say": "Quand votre téléphone lit le code, il affiche l’adresse. Avant de l’ouvrir, vérifiez le domaine : appartient-il vraiment à cet organisme ?",
+     "mood": "talk",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "qr",
+       "caption": [
+        {
+         "text": "ShaharPark. Scannez pour payer"
+        }
+       ],
+       "destination": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "seherpark-odenis.info",
+         "spot": "domain"
+        },
+        {
+         "text": "/pay"
+        }
+       ]
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "email-qr",
+     "say": "Un QR code dans un e-mail peut aussi être un piège. Si la page demande votre mot de passe ou votre carte bancaire, arrêtez-vous.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "scan-or-not",
+   "prompt": "Quels QR codes peut-on ouvrir sans risque ?",
+   "cards": [
+    {
+     "id": "parking-fine",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Horodateur. Vous avez une amende, scannez et payez"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://seherpark-cerime.info/pay"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Les amendes ne se paient pas via des autocollants. Vérifiez vos amendes uniquement sur le portail ou l’application officiels."
+    },
+    {
+     "id": "cafe-menu",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Salon de thé Chinar. Menu"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://cinar-cayxana.az/menyu"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Le domaine correspond au nom de l’établissement, et la page affiche seulement un menu. Rien n’est demandé."
+    },
+    {
+     "id": "mfa-email",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "La vérification de votre compte expire. Scannez pour la renouveler"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://rxagentlik-login.info/verify"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un e-mail avec un QR code pour vérifier votre compte est un piège classique. Ouvrez vous-même le portail depuis vos favoris."
+    },
+    {
+     "id": "certificate-check",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Certificat DovletPortal. Vérifiez son authenticité"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://dovletportal.az/yoxla/7F3K2"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Le code mène à l’adresse du portail qui a délivré le certificat, et ne demande aucune donnée."
+    },
+    {
+     "id": "free-wifi",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Wi-Fi gratuit. Scannez pour vous connecter"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://free-wifi-baku.top/login?card=1"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un internet gratuit n’a jamais besoin de votre carte bancaire. Un domaine inconnu et une demande de carte, c’est un piège."
+    },
+    {
+     "id": "donation",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Aidez les enfants. Scannez pour faire un don"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://qisalt.info/x7Qa"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un lien raccourci cache la vraie adresse. Faites vos dons uniquement sur le site officiel de l’association."
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "email-qr",
+   "prompt": "Trouvez les éléments suspects dans cet e-mail.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Support informatique"
+      }
+     ],
+     "address": [
+      {
+       "text": "it-destek@rxagentlik-support.info",
+       "spot": "sender"
+      }
+     ]
+    },
+    "to": "aynur.mammadova@rxagentlik.az",
+    "subject": [
+     {
+      "text": "URGENT : ",
+      "spot": "urgent"
+     },
+     {
+      "text": "renouvelez votre double authentification"
+     }
+    ],
+    "time": "09:12",
+    "body": [
+     [
+      {
+       "text": "Chers collègues,"
+      }
+     ],
+     [
+      {
+       "text": "Notre système de sécurité est en cours de mise à jour. "
+      },
+      {
+       "text": "Sans confirmation de votre part sous 24 heures, votre compte sera bloqué.",
+       "spot": "threat"
+      }
+     ],
+     [
+      {
+       "text": "Scannez le QR code ci-dessous avec votre téléphone.",
+       "spot": "qr"
+      }
+     ],
+     [
+      {
+       "text": "Cordialement, le support informatique"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Domaine externe",
+     "explain": "Le domaine de l’expéditeur n’est pas le nôtre : ce n’est pas rxagentlik.az."
+    },
+    {
+     "id": "urgent",
+     "label": "Urgence",
+     "explain": "Le mot « urgent » vous pousse à agir sans réfléchir."
+    },
+    {
+     "id": "threat",
+     "label": "Menace",
+     "explain": "La menace de blocage sert à vous mettre la pression. Un vrai support écrit rarement de cette façon."
+    },
+    {
+     "id": "qr",
+     "label": "QR code",
+     "explain": "Le QR code cache le lien aux filtres de la messagerie et vous fait basculer sur votre téléphone, moins bien protégé."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "fine-notice",
+   "question": {
+    "prompt": "Vous trouvez sur votre pare-brise un avis d’amende avec un QR code. Que faites-vous ?",
+    "options": [
+     {
+      "id": "scan-pay",
+      "label": "Le scanner et payer tout de suite",
+      "correct": false,
+      "feedback": "Une fausse page peut voler les données de votre carte bancaire."
+     },
+     {
+      "id": "official",
+      "label": "Vérifier l’amende moi-même sur le portail officiel",
+      "correct": true,
+      "feedback": "Exact. Si l’amende est réelle, elle y figurera."
+     },
+     {
+      "id": "call-number",
+      "label": "Appeler le numéro indiqué sur l’avis",
+      "correct": false,
+      "feedback": "Le numéro peut lui aussi appartenir aux escrocs."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Avis d’amende. Payez sous 3 jours"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://seherpark-cerime.info/odenis"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "Ne vous fiez à aucun contact indiqué sur l’avis. Ouvrez vous-même le canal officiel."
+  },
+  {
+   "type": "scenario",
+   "id": "payment-sticker",
+   "title": "L’autocollant de paiement",
+   "start": "counter",
+   "nodes": [
+    {
+     "id": "counter",
+     "text": "Au comptoir du café, un QR code autocollant permet de payer rapidement. Il est collé un peu de travers.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "qr",
+       "caption": [
+        {
+         "text": "Paiement rapide"
+        }
+       ],
+       "destination": [
+        {
+         "text": "https://sahilpay-odenis.top/p/1942"
+        }
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "Le scanner et vérifier d’abord l’adresse",
+       "next": "address",
+       "feedback": "Bon début. Vérifier l’adresse, c’est essentiel."
+      },
+      {
+       "label": "Le scanner et payer tout de suite",
+       "outcome": "compromised",
+       "feedback": "L’adresse était fausse. Les données de votre carte sont parties chez les escrocs."
+      },
+      {
+       "label": "Demander à la caissière si l’autocollant est bien le leur",
+       "next": "cashier",
+       "feedback": "Excellente idée. Demander, c’est la vérification la plus simple."
+      }
+     ]
+    },
+    {
+     "id": "address",
+     "text": "Votre téléphone affiche l’adresse : sahilpay-odenis.top. Le nom du café n’apparaît nulle part.",
+     "choices": [
+      {
+       "label": "Payer quand même, je n’ai pas le temps",
+       "outcome": "compromised",
+       "feedback": "Ce paiement précipité est parti chez un escroc. L’adresse étrange était un signal suffisant."
+      },
+      {
+       "label": "Ne pas l’ouvrir et prévenir la caissière",
+       "next": "cashier",
+       "feedback": "La bonne décision."
+      }
+     ]
+    },
+    {
+     "id": "cashier",
+     "text": "Ce n’est pas notre autocollant ! Payez plutôt par carte au terminal, s’il vous plaît.",
+     "speaker": "Caissière",
+     "voice": "young-woman",
+     "channel": "in-person",
+     "manner": "firm",
+     "spoken": "Ce n’est pas notre autocollant ! <short pause> Payez plutôt par carte au terminal, s’il vous plaît.",
+     "choices": [
+      {
+       "label": "Payer au terminal",
+       "outcome": "safe",
+       "feedback": "Bravo. Vous avez évité le piège, pour vous comme pour les clients suivants."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Un QR code est un lien caché : vérifiez l’adresse avant de l’ouvrir.",
+    "Payez amendes et factures uniquement par les canaux officiels.",
+    "Ne saisissez jamais de mot de passe ni de carte bancaire sur une page ouverte par un QR code."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

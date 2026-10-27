@@ -1,0 +1,446 @@
+{
+ "id": "print-scan",
+ "title": "Imprimantes et scanners",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Une page oubliée dans l’imprimante, c’est la fuite la plus simple. N’importe qui passant dans le couloir peut la prendre.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Avant de lancer l’impression, vérifiez quelle imprimante est sélectionnée et si l’impression sécurisée est activée.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "nc-capmerkezi",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Imprimer"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Imprimante : "
+         },
+         {
+          "text": "Couloir-2 (partagée)",
+          "spot": "printer"
+         }
+        ],
+        [
+         {
+          "text": "Impression sécurisée : "
+         },
+         {
+          "text": "désactivée",
+          "spot": "secure"
+         }
+        ]
+       ],
+       "buttons": [
+        "Annuler",
+        "Imprimer"
+       ]
+      }
+     },
+     "highlight": "secure"
+    },
+    {
+     "id": "b3",
+     "say": "Avec l’impression sécurisée, les pages ne sortent que lorsque vous passez votre badge ou tapez un code PIN sur l’imprimante.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Les e-mails du scanner demandent aussi de la vigilance. Les attaquants déguisent souvent leurs e-mails d’hameçonnage en documents scannés.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "print-day",
+   "environment": "desktop",
+   "title": "Journée d’impression",
+   "intro": "Aujourd’hui, vous imprimez plusieurs documents. Examinez les fenêtres qui s’ouvrent et décidez.",
+   "steps": [
+    {
+     "id": "salary-print",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-capmerkezi",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Imprimer : Salaires_octobre.xlsx"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Imprimante : Couloir-2 (partagée)"
+        }
+       ],
+       [
+        {
+         "text": "Impression sécurisée : désactivée"
+        }
+       ],
+       [
+        {
+         "text": "Copies : 1"
+        }
+       ]
+      ],
+      "buttons": [
+       "Imprimer directement",
+       "Envoyer en impression sécurisée"
+      ]
+     },
+     "say": "Ce document contient les salaires du personnel.",
+     "actions": [
+      {
+       "id": "secure",
+       "label": "Envoyer en impression sécurisée",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Le document attend dans la file d’attente et ne sort que lorsque vous êtes devant l’imprimante."
+      },
+      {
+       "id": "direct",
+       "label": "Imprimer directement",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "La page va vous attendre sur l’imprimante partagée du couloir. Si vous tardez, quelqu’un d’autre risque de la voir."
+      }
+     ]
+    },
+    {
+     "id": "paper-out",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-capmerkezi",
+      "app": "Çap Mərkəzi",
+      "title": [
+       {
+        "text": "Couloir-2 : plus de papier"
+       }
+      ],
+      "body": [
+       {
+        "text": "Le fichier Liste_déplacements.pdf est en file d’attente. Il sera imprimé dès que du papier sera chargé."
+       }
+      ],
+      "time": "11:20"
+     },
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Annuler l’impression",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Dès que quelqu’un chargerait du papier, la page sortirait en votre absence. Renvoyez-la en impression sécurisée."
+      },
+      {
+       "id": "ignore",
+       "label": "Ignorer",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "La personne qui chargera le papier récupérera aussi la liste. Annulez l’impression encore en file d’attente."
+      }
+     ]
+    },
+    {
+     "id": "driver-popup",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-drayver",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Pilote d’imprimante obsolète"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Téléchargez Drayver Yeniləyici pour continuer à imprimer."
+        }
+       ],
+       [
+        {
+         "text": "printer-drayver.example.info"
+        }
+       ]
+      ],
+      "buttons": [
+       "Fermer",
+       "Télécharger maintenant"
+      ]
+     },
+     "say": "Un site web vous propose un logiciel pour l’imprimante.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Télécharger maintenant",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Un site web ne peut pas vérifier le pilote installé sur votre ordinateur. Ce genre de téléchargement cache généralement un logiciel malveillant."
+      },
+      {
+       "id": "cancel",
+       "label": "Fermer",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Seul le support technique installe les pilotes d’imprimante."
+      },
+      {
+       "id": "report",
+       "label": "Signaler au support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Le support technique vérifiera d’où vient cette fenêtre."
+      }
+     ]
+    },
+    {
+     "id": "scan-folder",
+     "label": "Dossier partagé : Scans",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-capmerkezi",
+      "name": [
+       {
+        "text": "Scan_passeports_0410.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "3,2 Mo",
+      "source": [
+       {
+        "text": "Dossier partagé : Scanner, 3e étage"
+       }
+      ]
+     },
+     "say": "Les copies de passeports que vous avez scannées ont atterri dans un dossier partagé.",
+     "actions": [
+      {
+       "id": "move",
+       "label": "Déplacer vers mon dossier",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Déplacez le fichier dans votre propre dossier pour qu’il ne reste pas dans le dossier partagé."
+      },
+      {
+       "id": "leave",
+       "label": "Le laisser là",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Tout l’étage peut ouvrir ce dossier. Les copies de passeports sont des données personnelles."
+      },
+      {
+       "id": "share",
+       "label": "Envoyer le lien au service",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Les données personnelles ne vont qu’à la personne qui en a besoin. Ne les envoyez pas à tout le service."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "scan-mail",
+   "prompt": "Trouvez les éléments suspects de cet e-mail qui prétend venir du scanner.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "nc-capmerkezi-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Scanner, 3e étage"
+      }
+     ],
+     "address": [
+      {
+       "text": "scan@idare-skan.example.net",
+       "spot": "sender"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Document scanné : 4 pages"
+     }
+    ],
+    "time": "14:03",
+    "body": [
+     [
+      {
+       "text": "Cher utilisateur,"
+      }
+     ],
+     [
+      {
+       "text": "Un document a été scanné pour vous. "
+      },
+      {
+       "text": "Si vous ne le consultez pas sous 24 heures, il sera supprimé.",
+       "spot": "urgent"
+      }
+     ],
+     [
+      {
+       "text": "Consulter le document",
+       "spot": "link",
+       "link": {
+        "label": "Consulter le document",
+        "href": "https://idare-skan.example.net/view"
+       }
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Scan_0410.pdf"
+       },
+       {
+        "text": ".html",
+        "spot": "ext"
+       }
+      ],
+      "size": "12 Ko"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Domaine de l’expéditeur",
+     "explain": "Votre scanner envoie ses e-mails depuis idare.example. Ce domaine lui ressemble, mais il est différent."
+    },
+    {
+     "id": "urgent",
+     "label": "Pression du temps",
+     "explain": "Un scanner ne vous presse pas. La pression du temps est un signal d’alerte classique de l’hameçonnage."
+    },
+    {
+     "id": "link",
+     "label": "Lien externe",
+     "explain": "Le lien mène à un site extérieur à votre organisation, qui vous demandera un mot de passe."
+    },
+    {
+     "id": "ext",
+     "label": "Extension du fichier",
+     "explain": "Un fichier .html est une page web, pas un document. En l’ouvrant, vous risquez de tomber sur un faux formulaire de connexion."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "found-print",
+   "question": {
+    "prompt": "Vous trouvez dans l’imprimante un tableau des salaires imprimé par quelqu’un d’autre. Que faites-vous ?",
+    "options": [
+     {
+      "id": "owner",
+      "label": "Le remettre, sans le lire, à son propriétaire ou à un responsable",
+      "correct": true,
+      "feedback": "Exact. Le document revient entre de bonnes mains, et son propriétaire sera plus attentif la prochaine fois."
+     },
+     {
+      "id": "leave",
+      "label": "Le laisser, son propriétaire viendra le chercher",
+      "correct": false,
+      "feedback": "Tous ceux qui passeront après vous pourront le voir. Ne laissez pas de pages dans l’imprimante."
+     },
+     {
+      "id": "bin",
+      "label": "Le jeter dans la poubelle la plus proche",
+      "correct": false,
+      "feedback": "Une page jetée dans une poubelle ordinaire se récupère facilement. Les papiers confidentiels vont au broyeur."
+     },
+     {
+      "id": "photo",
+      "label": "Poster une photo dans le groupe de l’équipe pour demander à qui il appartient",
+      "correct": false,
+      "feedback": "Les données salariales circuleraient auprès d’encore plus de personnes. Remettez discrètement la page à son propriétaire."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "desk"
+    }
+   },
+   "explain": "Une page oubliée dans l’imprimante, c’est une fuite. Rendez-la à son propriétaire, ou à un responsable si vous ne savez pas à qui elle appartient."
+  },
+  {
+   "type": "match",
+   "id": "right-move",
+   "prompt": "Associez chaque situation au bon réflexe.",
+   "pairs": [
+    {
+     "id": "paper",
+     "left": "Plus de papier, document en file d’attente",
+     "right": "Annuler l’impression"
+    },
+    {
+     "id": "driver",
+     "left": "Un site propose un logiciel pour l’imprimante",
+     "right": "Contacter le support technique"
+    },
+    {
+     "id": "scan",
+     "left": "Un scan a atterri dans un dossier partagé",
+     "right": "Le déplacer dans votre propre dossier"
+    },
+    {
+     "id": "secret",
+     "left": "Vous devez imprimer un fichier confidentiel",
+     "right": "Utiliser l’impression sécurisée"
+    }
+   ],
+   "explain": "De petites habitudes suffisent à éviter les fuites à l’impression."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Envoyez les fichiers confidentiels en impression sécurisée et récupérez-les aussitôt.",
+    "Seul le support technique installe les logiciels d’impression.",
+    "Dans les e-mails du scanner, vérifiez l’expéditeur et l’extension du fichier."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

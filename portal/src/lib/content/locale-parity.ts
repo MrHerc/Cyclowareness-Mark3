@@ -1,5 +1,5 @@
 /**
- * A translated lesson (`<id>.az.json`, `<id>.ru.json`) must be the English lesson with only its human
+ * A translated lesson (`<id>.<locale>.json`, e.g. `<id>.az.json`) must be the English lesson with only its human
  * text changed: the same scenes, ids, spots, brands, links, answers and branches, so answers, resume
  * state, hotspots and highlights keep working in every language.
  *

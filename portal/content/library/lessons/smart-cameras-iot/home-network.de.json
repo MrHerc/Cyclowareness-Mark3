@@ -1,0 +1,525 @@
+{
+ "id": "home-network",
+ "title": "Das Heimnetzwerk",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sc2-tutor",
+   "beats": [
+    {
+     "id": "sc2-b1",
+     "say": "Zu Hause teilen sich Router, Fernseher und Babykamera ein Netzwerk. Ist ein Gerät schwach geschützt, sind alle in Gefahr.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    {
+     "id": "sc2-b2",
+     "say": "Wenn Sie eine solche Benachrichtigung bekommen, schaut jemand ohne Ihr Wissen über Ihre Kamera zu.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2f-korpe-gozu",
+       "app": "Körpə Gözü",
+       "title": [
+        {
+         "text": "Liveansicht von einem neuen Gerät"
+        }
+       ],
+       "body": [
+        {
+         "text": "Unbekanntes Gerät, aus dem Ausland",
+         "spot": "unknown-device"
+        }
+       ],
+       "time": "01:07"
+      }
+     },
+     "highlight": "unknown-device"
+    },
+    {
+     "id": "sc2-b3",
+     "say": "Eine Kamera im Kinderzimmer filmt die privatesten Momente. Geben Sie ihr den stärksten Schutz.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "sc2-b4",
+     "say": "Sehen wir uns die Einstellungen gemeinsam an: Welche sind sicher, und welche bergen ein Risiko?",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "sc2-swipe",
+   "prompt": "Ist diese Einstellung sicher oder eine Bedrohung?",
+   "cards": [
+    {
+     "id": "upnp-on",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-evsebeke",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Router: UPnP"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Aktiviert. Geräte können selbstständig Ports öffnen."
+        }
+       ]
+      ],
+      "buttons": [
+       "Speichern"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Mit dieser Funktion öffnen Geräte von sich aus Türen nach außen. Wenn Sie sie nicht brauchen, schalten Sie sie aus."
+    },
+    {
+     "id": "guest-network",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-evsebeke",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Gastnetzwerk: Home-Devices"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Kamera, Fernseher und Saugroboter sind hier. Smartphones und Laptops bleiben im Hauptnetzwerk."
+        }
+       ]
+      ],
+      "buttons": [
+       "Speichern"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Richtig. Selbst wenn ein schwaches Gerät gehackt wird, erreicht es weder Ihr Smartphone noch Ihren Computer."
+    },
+    {
+     "id": "router-default",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-evsebeke",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Router-Verwaltung"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Benutzername: admin. Passwort: das Standardpasswort vom Aufkleber auf der Unterseite."
+        }
+       ]
+      ],
+      "buttons": [
+       "Speichern"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Der Router ist die Haustür Ihres gesamten Zuhauses. Ersetzen Sie das Standardpasswort durch eine lange Passphrase."
+    },
+    {
+     "id": "auto-update",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-baxiskam",
+      "app": "BaxışKam",
+      "title": [
+       {
+        "text": "Firmware automatisch aktualisiert"
+       }
+      ],
+      "body": [
+       {
+        "text": "Version 5.2.8 installiert."
+       }
+      ],
+      "time": "03:00"
+     },
+     "verdict": "safe",
+     "explain": "Automatische Updates schließen bekannte Lücken von selbst. Lassen Sie diese Einstellung eingeschaltet."
+    },
+    {
+     "id": "port-forward",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-evsebeke",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Portweiterleitung"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Port 554: Kamera, für alle im Internet offen"
+        }
+       ]
+      ],
+      "buttons": [
+       "Speichern"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Diese Regel öffnet die Kamera für das gesamte Internet. Löschen Sie sie und schauen Sie aus der Ferne nur über die offizielle App zu."
+    },
+    {
+     "id": "wifi-security",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-evsebeke",
+      "tone": "system",
+      "title": [
+       {
+        "text": "WLAN-Sicherheit"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "WPA3, lange Passphrase"
+        }
+       ]
+      ],
+      "buttons": [
+       "Speichern"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Moderne Verschlüsselung und eine lange Passphrase halten Fremde aus Ihrem Heimnetzwerk fern."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "sc2-sim",
+   "environment": "phone",
+   "title": "Eine Benachrichtigung in der Nacht",
+   "intro": "Es ist ein Uhr nachts, und die Babykamera schickt eine Benachrichtigung. Entscheiden Sie bei jedem Schritt richtig.",
+   "steps": [
+    {
+     "id": "night-alert",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-korpe-gozu",
+      "app": "Körpə Gözü",
+      "title": [
+       {
+        "text": "Liveansicht von einem neuen Gerät"
+       }
+      ],
+      "body": [
+       {
+        "text": "Unbekanntes Gerät, aus dem Ausland, 01:07"
+       }
+      ],
+      "time": "01:07"
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Benachrichtigung öffnen",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Sehen Sie zuerst in Ihrer eigenen App nach, was los ist."
+      },
+      {
+       "id": "ignore",
+       "label": "Bis morgen früh warten",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Gerade jetzt schaut jemand ins Kinderzimmer. Das kann nicht warten."
+      }
+     ]
+    },
+    {
+     "id": "sessions",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-korpe-gozu",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Aktive Geräte: 2"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ihr Smartphone, Baku"
+        }
+       ],
+       [
+        {
+         "text": "Unbekanntes Gerät, aus dem Ausland, 01:07"
+        }
+       ]
+      ],
+      "buttons": [
+       "Alle abmelden",
+       "Schließen"
+      ]
+     },
+     "say": "Mit der Kamera sind zwei Geräte verbunden.",
+     "actions": [
+      {
+       "id": "sign-out",
+       "label": "Alle abmelden und Passwort ändern",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Das fremde Gerät ist draußen, und das neue Passwort hält es fern."
+      },
+      {
+       "id": "close",
+       "label": "Schließen",
+       "kind": "cancel",
+       "outcome": "compromised",
+       "feedback": "Das fremde Gerät bleibt verbunden und schaut weiter zu. Melden Sie sofort alle Geräte ab."
+      }
+     ]
+    },
+    {
+     "id": "group-tip",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Elterngruppe"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Unsere Kamera wurde auch gehackt. Diese App schützt davor, einfach herunterladen: "
+         },
+         {
+          "text": "korpe-qoruyucu.example.info/qoru.apk",
+          "link": {
+           "label": "korpe-qoruyucu.example.info/qoru.apk",
+           "href": "https://korpe-qoruyucu.example.info/qoru.apk"
+          }
+         }
+        ],
+        "time": "08:20"
+       }
+      ]
+     },
+     "say": "Am Morgen teilt jemand in der Elterngruppe einen Tipp.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Eine App aus einer unbekannten Quelle kann Ihr Smartphone übernehmen, statt Ihre Kamera zu schützen. Installieren Sie Apps nur aus dem offiziellen App-Store.",
+       "next": "apk"
+      },
+      {
+       "id": "ignore",
+       "label": "Nicht auf den Link tippen",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein Link, der wie Hilfe aussieht, kann eine neue Falle sein.",
+       "next": "update-offer"
+      }
+     ]
+    },
+    {
+     "id": "apk",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "KorpeQoruyucu.apk"
+       }
+      ],
+      "type": "apk",
+      "size": "8,4 MB",
+      "source": [
+       {
+        "text": "korpe-qoruyucu.example.info"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "install",
+       "label": "Installieren",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Diese App würde weitreichende Berechtigungen verlangen und könnte Ihre Daten stehlen. Installieren Sie sie nicht."
+      },
+      {
+       "id": "cancel",
+       "label": "Abbrechen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Gute Entscheidung. Eine Kamera schützen ein Passwort, Updates und die Zwei-Faktor-Authentisierung, nicht eine zusätzliche App."
+      }
+     ]
+    },
+    {
+     "id": "update-offer",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-korpe-gozu",
+      "app": "Körpə Gözü",
+      "title": [
+       {
+        "text": "Update und Zwei-Faktor-Authentisierung"
+       }
+      ],
+      "body": [
+       {
+        "text": "Aktualisieren Sie die Kamera und aktivieren Sie die Zwei-Faktor-Authentisierung für das Konto."
+       }
+      ],
+      "time": "08:35"
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "Aktualisieren und aktivieren",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Richtig. Das Update schließt die Lücke, und die Zwei-Faktor-Authentisierung macht ein gestohlenes Passwort nutzlos."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Die Kamera läuft immer noch mit der alten Lücke. Aktualisieren Sie sie noch heute."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "sc2-scenario",
+   "title": "Eine Stimme aus der Kamera",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Am Abend kommt eine fremde Stimme aus dem Lautsprecher der Babykamera. Jemand spricht mit dem Kind.",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     },
+     "choices": [
+      {
+       "label": "Ich ziehe den Stecker der Kamera",
+       "next": "n2",
+       "feedback": "Richtig. Unterbrechen Sie zuerst Bild und Ton, dann sperren Sie den Zugang."
+      },
+      {
+       "label": "Ich antworte und frage, wer da ist",
+       "outcome": "risky",
+       "feedback": "Reden kostet nur Zeit, während die Kamera weiterläuft. Schalten Sie sie zuerst aus."
+      },
+      {
+       "label": "Das habe ich mir bestimmt nur eingebildet",
+       "outcome": "compromised",
+       "feedback": "Die fremde Person kann weiterhin sehen und hören. Schalten Sie die Kamera sofort aus."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Die Kamera ist aus. Was jetzt?",
+     "choices": [
+      {
+       "label": "Ich ändere das Passwort, aktualisiere, aktiviere die Zwei-Faktor-Authentisierung und zeige den Vorfall bei der Polizei an",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Der Zugang ist vollständig geschlossen, und die Polizei ermittelt in solchen Fällen."
+      },
+      {
+       "label": "Ich kaufe eine neue Kamera und vergebe das alte Passwort",
+       "outcome": "risky",
+       "feedback": "Das alte Passwort öffnet auch die neue Kamera. Geben Sie jedem Gerät ein eigenes starkes Passwort."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "sc2-choice",
+   "question": {
+    "prompt": "Sie haben einen neuen Smart-TV gekauft. Welche Schritte sind nötig?",
+    "options": [
+     {
+      "id": "guest",
+      "label": "Mit dem Gastnetzwerk verbinden",
+      "correct": true,
+      "feedback": "Richtig. Selbst wenn der Fernseher gehackt wird, erreicht er weder Ihr Smartphone noch Ihren Computer."
+     },
+     {
+      "id": "auto-update",
+      "label": "Automatische Updates aktivieren",
+      "correct": true,
+      "feedback": "Richtig. Updates schließen bekannte Lücken von selbst."
+     },
+     {
+      "id": "keep-default",
+      "label": "Das Standardpasswort des Kontos beibehalten",
+      "correct": false,
+      "feedback": "Ein Standardpasswort kennt jeder. Ändern Sie es sofort."
+     },
+     {
+      "id": "all-permissions",
+      "label": "Jede Anfrage für Mikrofon und Kontakte zulassen",
+      "correct": false,
+      "feedback": "Jede Berechtigung, die Sie nicht brauchen, ist ein zusätzliches Risiko. Erlauben Sie nur die Funktionen, die Sie nutzen."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Ein smartes Gerät gehört in ein separates Netzwerk, wird aktualisiert und bekommt ein eigenes Passwort. Schalten Sie Berechtigungen ab, die Sie nicht brauchen."
+  },
+  {
+   "type": "recap",
+   "id": "sc2-recap",
+   "points": [
+    "Bringen Sie smarte Geräte in einem separaten Gastnetzwerk unter.",
+    "Schalten Sie UPnP und Portweiterleitung aus.",
+    "Fremder Zugriff? Alle Geräte abmelden und das Passwort ändern."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

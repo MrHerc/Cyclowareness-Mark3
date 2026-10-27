@@ -1,0 +1,408 @@
+{
+ "id": "fake-video-call",
+ "title": "Apel video fals",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "live-fake",
+     "say": "Astăzi, o față falsă poate apărea în direct într-un apel video. Vorbește, zâmbește și pare reală.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "traces",
+     "say": "Uneori se văd contururi neclare sau buze care nu se potrivesc cu sunetul, dar un fals bun ascunde aceste urme.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "the-ask",
+     "say": "Bazați-vă pe regulă, nu pe ochi: dacă vi se cer bani, un cod sau un document, verificați pe altă cale.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "rule",
+     "say": "Încheiați apelul și sunați chiar dumneavoastră persoana respectivă, la numărul pe care îl cunoașteți.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "colleague-video",
+   "environment": "phone",
+   "title": "Apel video de la o colegă",
+   "intro": "O colegă vă scrie un mesaj, apoi vă sună pe video. Decideți la fiecare pas.",
+   "steps": [
+    {
+     "id": "new-account",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [ { "text": "Aynur Guliyeva (cont nou)" } ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [ { "text": "Salut! Contul meu vechi a fost închis, acesta e cel nou.", "spot": "new" } ],
+        "time": "16:40"
+       },
+       {
+        "from": "them",
+        "body": [ { "text": "Te sun acum pe video, am nevoie urgent de un document.", "spot": "urgent" } ],
+        "time": "16:40"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "wait",
+       "label": "Bine, aștept",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Un cont nou este în sine un semnal de alarmă. Este mai bine să verificați mai întâi pe numărul vechi."
+      },
+      {
+       "id": "verify",
+       "label": "Te sun mai întâi pe numărul vechi",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Povestea cu contul nou are rolul de a vă împiedica să verificați.",
+       "next": "real-aynur"
+      }
+     ]
+    },
+    {
+     "id": "video-ring",
+     "artifact": {
+      "kind": "call",
+      "caller": [ { "text": "Aynur Guliyeva (cont nou)" } ],
+      "number": [ { "text": "+994 55 000 62 19" } ],
+      "label": "Apel video",
+      "voice": "young-woman"
+     },
+     "say": "Pe ecran apare fața lui Aynur.",
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Răspundeți",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Deocamdată, răspunsul nu face niciun rău. Contează ce vă cere."
+      },
+      {
+       "id": "decline",
+       "label": "Respingeți",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Și așa este bine. Sunați-o chiar dumneavoastră pe Aynur, la numărul pe care îl cunoașteți.",
+       "next": "real-aynur"
+      }
+     ]
+    },
+    {
+     "id": "the-ask",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [ { "text": "Aynur Guliyeva (cont nou)" } ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [ { "text": "M-ai văzut, chiar sunt eu. Trimite-mi aici lista cu cererile cetățenilor, așteaptă șeful." } ],
+        "time": "16:44"
+       }
+      ]
+     },
+     "say": "După apel, primiți cererea.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Trimiteți fișierul",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Apelul video era fals, iar lista a ajuns la un escroc. O față nu este o dovadă; verificați pe altă cale."
+      },
+      {
+       "id": "verify",
+       "label": "Te sun mai întâi pe numărul obișnuit",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. O colegă adevărată va înțelege verificarea."
+      },
+      {
+       "id": "report",
+       "label": "Raportați",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bine gândit. Raportați contul și anunțați totodată echipa de securitate."
+      }
+     ]
+    },
+    {
+     "id": "real-aynur",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [ { "text": "Aynur Guliyeva" } ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [ { "text": "Aynur, tu m-ai sunat adineauri pe video?" } ],
+        "time": "16:47"
+       },
+       {
+        "from": "them",
+        "body": [ { "text": "Nu! Sunt într-o ședință. Scrie cineva în numele meu?" } ],
+        "time": "16:48"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Anunțați echipa de securitate",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Echipa îi va avertiza și pe ceilalți colegi."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți conversația și uitați de ea",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Escrocul va încerca la alt coleg. Raportarea îi protejează pe toți."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "reliable-checks",
+   "question": {
+    "prompt": "Ce verificări confirmă cu siguranță cine este în apelul video?",
+    "options": [
+     {
+      "id": "callback",
+      "label": "Sunați chiar dumneavoastră la numărul pe care îl cunoașteți",
+      "correct": true,
+      "feedback": "Acest apel îl inițiați dumneavoastră, deci escrocul nu îl controlează."
+     },
+     {
+      "id": "code-word",
+      "label": "Cuvântul secret convenit",
+      "correct": true,
+      "feedback": "O imagine falsă nu cunoaște acest cuvânt."
+     },
+     {
+      "id": "face",
+      "label": "Fața și vocea par cunoscute",
+      "correct": false,
+      "feedback": "Fețele și vocile pot fi falsificate."
+     },
+     {
+      "id": "quality",
+      "label": "Imaginea este clară",
+      "correct": false,
+      "feedback": "O imagine clară nu dovedește nimic. Și falsurile pot fi clare."
+     },
+     {
+      "id": "account",
+      "label": "Apelul vine de la un cont cu un nume cunoscut",
+      "correct": false,
+      "feedback": "Un cont poate fi spart sau creat special pentru a vă păcăli."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "deepfake"
+    }
+   },
+   "explain": "Dovada sigură nu este în imagine, ci în al doilea contact, pe care îl inițiați chiar dumneavoastră."
+  },
+  {
+   "type": "swipe",
+   "id": "follow-or-check",
+   "prompt": "Este o cerere normală sau periculoasă?",
+   "cards": [
+    {
+     "id": "card-code",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [ { "text": "Tural (rudă)" } ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [ { "text": "M-ai văzut pe video, sunt eu. Spune-mi codul pe care tocmai l-ai primit pentru card, e pentru un bilet." } ],
+        "time": "20:15"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Nimeni, nici măcar o rudă, nu ar trebui să vă ceară codul cardului. Un apel video nu este o dovadă."
+    },
+    {
+     "id": "meeting",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [ { "text": "Sabina Aliyeva" } ],
+       "address": [ { "text": "s.aliyeva@idare.example" } ]
+      },
+      "subject": [ { "text": "Ședința echipei, mâine la 10:00" } ],
+      "time": "11:05",
+      "body": [
+       [ { "text": "Linkul pentru ședință este în calendarul intern. Nu este atașată nicio agendă, doar notați-vă ora." } ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "O invitație obișnuită la ședință: domeniul este al agenției și nu vi se cere nimic."
+    },
+    {
+     "id": "hr-video",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare-fake",
+      "from": {
+       "name": [ { "text": "Resurse umane" } ],
+       "address": [ { "text": "hr@idare-hr.example.net" } ]
+      },
+      "subject": [ { "text": "Reînnoirea cardului de salariu" } ],
+      "time": "09:30",
+      "body": [
+       [ { "text": "Intrați într-o întâlnire video de 15 minute și arătați cardul la cameră." } ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Niciun departament nu vă cere să arătați cardul la cameră. Nici domeniul nu este al agenției."
+    },
+    {
+     "id": "operator",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "kehkesan-mobil",
+      "sender": [ { "text": "Kehkesan" } ],
+      "time": "13:10",
+      "messages": [
+       [ { "text": "Soldul dumneavoastră este sub 5 manați. Pentru reîncărcare, folosiți aplicația mobilă." } ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Mesajul nu conține niciun link și nu cere niciun cod. Este o notificare obișnuită de la operator."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "abroad-relative",
+   "title": "Apel video din străinătate",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "Salut! M-au oprit la vamă și mi-au luat telefonul. Te sun de pe contul unui prieten. Trimite-mi 1.200 de manați, ți-i dau înapoi.",
+     "speaker": "Tural, pe video",
+     "voice": "man-3",
+     "channel": "video",
+     "manner": "worried",
+     "spoken": "Salut! <breath> M-au oprit la vamă și mi-au luat telefonul. Te sun de pe contul unui prieten. Trimite-mi 1.200 de manați, ăă, ți-i dau înapoi.",
+     "character": "tural",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     },
+     "choices": [
+      {
+       "label": "Trimit banii imediat",
+       "outcome": "compromised",
+       "feedback": "Banii au ajuns la un escroc. Contul altcuiva plus o cerere urgentă de bani sunt un semnal de alarmă."
+      },
+      {
+       "label": "Îi cer cuvântul nostru secret",
+       "next": "dodge",
+       "feedback": "Bine gândit. Să vedem ce spune."
+      },
+      {
+       "label": "Îi spun că verific mai întâi cu familia",
+       "next": "check",
+       "feedback": "Corect. Verificați prin numerele pe care le cunoașteți."
+      }
+     ]
+    },
+    {
+     "id": "dodge",
+     "text": "Se aude prost, nu te aud… N-am timp, trimite repede!",
+     "speaker": "Tural, pe video (imaginea se blochează)",
+     "voice": "man-3",
+     "channel": "video",
+     "manner": "worried",
+     "spoken": "Se aude prost, nu te aud… <short pause> N-am timp, trimite repede!",
+     "character": "tural",
+     "choices": [
+      {
+       "label": "Bine, trimit banii",
+       "outcome": "compromised",
+       "feedback": "Scuza cu legătura proastă ocolește întrebarea dumneavoastră. Fără cuvântul secret, nu trimiteți bani."
+      },
+      {
+       "label": "Închei apelul și sun pe cineva din familie",
+       "next": "check",
+       "feedback": "Decizia corectă."
+      }
+     ]
+    },
+    {
+     "id": "check",
+     "text": "Soția lui Tural spune că el este azi la serviciu și are telefonul la el.",
+     "choices": [
+      {
+       "label": "Anunț poliția și avertizez familia",
+       "outcome": "safe",
+       "feedback": "Excelent. Escrocul poate încerca și la alți membri ai familiei."
+      },
+      {
+       "label": "Nu fac nimic, oricum nu s-au pierdut bani",
+       "outcome": "risky",
+       "feedback": "Escrocul va încerca din nou. Avertizarea familiei îi protejează pe toți."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "O față și o voce într-un apel video nu sunt o dovadă.",
+    "Vi se cer bani, un cod sau un document? Sunați chiar dumneavoastră înapoi.",
+    "Raportați apelul fals echipei de securitate sau poliției."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

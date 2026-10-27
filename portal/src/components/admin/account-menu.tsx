@@ -41,7 +41,7 @@ export function AccountMenu() {
         <ChevronsUpDown className="size-4" />
       </button>
       {open ? (
-        <div role="menu" aria-label={t("accountMenu")} className="absolute right-0 bottom-full z-50 mb-2 w-56 animate-rise overflow-hidden rounded-xl border border-line bg-surface py-1 shadow-overlay">
+        <div role="menu" aria-label={t("accountMenu")} className="absolute end-0 bottom-full z-50 mb-2 w-56 animate-rise overflow-hidden rounded-xl border border-line bg-surface py-1 shadow-overlay">
           <Link href="/profile" role="menuitem" onClick={() => setOpen(false)} className={item}>
             <User className="size-[1.15rem] shrink-0 text-ink-subtle" />
             {t("profile")}

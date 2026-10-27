@@ -1,0 +1,462 @@
+{
+  "id": "fake-dashboard",
+  "title": "Das gefälschte Gewinn-Dashboard",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "fd-tutor",
+      "beats": [
+        {
+          "id": "fd-b1",
+          "say": "Nach Ihrer Einzahlung zeigt Ihnen die Plattform ein schönes Diagramm und ein wachsendes Guthaben.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "fd-b2",
+          "say": "Auf einer gefälschten Plattform sind diese Zahlen nur Text auf dem Bildschirm, ohne Geld dahinter.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2d-bakutrade",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "BakuTrade Pro | "
+                },
+                {
+                  "text": "Guthaben: 12.480 AZN (+312 %)",
+                  "spot": "balance"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Für die Auszahlung zahlen Sie zuerst 15 % Einkommensteuer: 1.870 AZN",
+                    "spot": "fee"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Steuer bezahlen",
+                "Schließen"
+              ]
+            }
+          },
+          "highlight": "balance"
+        },
+        {
+          "id": "fd-b3",
+          "say": "Wenn Sie sich das Geld auszahlen lassen wollen, verlangen sie eine Steuer, eine Gebühr oder eine Versicherung. Das ist die Schlussphase des Betrugs.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2d-bakutrade",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "BakuTrade Pro | "
+                },
+                {
+                  "text": "Guthaben: 12.480 AZN (+312 %)",
+                  "spot": "balance"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Für die Auszahlung zahlen Sie zuerst 15 % Einkommensteuer: 1.870 AZN",
+                    "spot": "fee"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Steuer bezahlen",
+                "Schließen"
+              ]
+            }
+          },
+          "highlight": "fee"
+        },
+        {
+          "id": "fd-b4",
+          "say": "Wenn Sie vor einer Auszahlung erst zahlen sollen, hören Sie auf und schicken Sie keinen einzigen Manat mehr.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "fd-hotspot",
+      "prompt": "Finden Sie die Anzeichen für Betrug auf diesem Dashboard.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2d-bakutrade",
+        "tone": "app",
+        "title": [
+          {
+            "text": "BakuTrade Pro | "
+          },
+          {
+            "text": "Guthaben: 12.480 AZN (+312 %)",
+            "spot": "balance"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Garantierte Tagesrendite: 3 %",
+              "spot": "guarantee"
+            }
+          ],
+          [
+            {
+              "text": "Für die Auszahlung zahlen Sie zuerst 15 % Einkommensteuer: 1.870 AZN",
+              "spot": "fee"
+            }
+          ],
+          [
+            {
+              "text": "Lizenz: Internationale Finanzkommission, Nr. 00417",
+              "spot": "licence"
+            }
+          ],
+          [
+            {
+              "text": "Angebot endet in 2 Stunden. Kontaktieren Sie Ihre persönliche Kundenbetreuung im Messenger.",
+              "spot": "rush"
+            }
+          ]
+        ],
+        "buttons": [
+          "Steuer bezahlen",
+          "Schließen"
+        ]
+      },
+      "spots": [
+        {
+          "id": "balance",
+          "label": "Wundersames Wachstum",
+          "explain": "Eine Vervierfachung in wenigen Monaten gibt es an einem echten Markt so gut wie nie. Eine Zahl auf dem Bildschirm kann jeder eintippen."
+        },
+        {
+          "id": "guarantee",
+          "label": "Garantierte Rendite",
+          "explain": "Renditen von Geldanlagen lassen sich nicht garantieren. Schon das Wort ist ein Warnsignal."
+        },
+        {
+          "id": "fee",
+          "label": "Zahlen für die Auszahlung",
+          "explain": "Eine echte Plattform verlangt kein neues Geld, um Ihr Geld freizugeben. Zahlen Sie, folgt die nächste Ausrede."
+        },
+        {
+          "id": "licence",
+          "label": "Gefälschte Lizenz",
+          "explain": "Eine solche Kommission gibt es vielleicht gar nicht, und eine ausländische Lizenz berechtigt hier ohnehin zu nichts. Sehen Sie in der Liste der Zentralbank nach."
+        },
+        {
+          "id": "rush",
+          "label": "Zeitdruck",
+          "explain": "Die Frist soll verhindern, dass Sie nachdenken oder jemanden um Rat fragen."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "fd-sim",
+      "environment": "browser",
+      "title": "Die Auszahlung",
+      "intro": "Ihr Guthaben auf der Plattform ist gewachsen, und Sie möchten es sich auszahlen lassen. Entscheiden Sie bei jedem Schritt.",
+      "steps": [
+        {
+          "id": "dashboard",
+          "label": "Ihr Guthaben: 12.480 AZN. Jetzt auf VIP upgraden",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2d-bakutrade",
+            "url": [
+              {
+                "text": "https://bakutrade-pro.example.net/panel"
+              }
+            ]
+          },
+          "say": "Das Guthaben ist gewachsen. Versuchen Sie jetzt, es sich auszahlen zu lassen.",
+          "actions": [
+            {
+              "id": "withdraw",
+              "label": "Auszahlen",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Ein Auszahlungsversuch schadet nicht. Sehen Sie sich an, was auf dem nächsten Bildschirm verlangt wird."
+            },
+            {
+              "id": "vip",
+              "label": "500 AZN einzahlen und VIP werden",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Das Guthaben auf dem Bildschirm ist nicht echt, und auch neues Geld wäre verloren. Hören Sie auf."
+            }
+          ]
+        },
+        {
+          "id": "fee",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2d-bakutrade",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Auszahlung angehalten"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Für die Auszahlung ist eine Einkommensteuer von 15 % fällig: 1.870 AZN."
+                }
+              ],
+              [
+                {
+                  "text": "Zahlen Sie die Steuer nicht, wird Ihr Guthaben in 48 Stunden eingefroren."
+                }
+              ]
+            ],
+            "buttons": [
+              "Steuer bezahlen",
+              "Abbrechen"
+            ]
+          },
+          "say": "Vor der Auszahlung wollen sie eine Steuer.",
+          "actions": [
+            {
+              "id": "pay-tax",
+              "label": "Steuer bezahlen",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Nach der Steuer verlangen sie eine Versicherung, dann eine Provision. Das Guthaben wird nie ausgezahlt."
+            },
+            {
+              "id": "cancel",
+              "label": "Abbrechen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig. Wenn Sie für eine Auszahlung bezahlen sollen, ist die Plattform gefälscht."
+            }
+          ]
+        },
+        {
+          "id": "recovery-page",
+          "label": "Wir holen verlorene Investitionen in 30 Tagen zurück",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2d-fond-berpa",
+            "url": [
+              {
+                "text": "https://fondberpa-huquq.example.net"
+              }
+            ]
+          },
+          "say": "Ein paar Tage später erscheint diese Anzeige.",
+          "actions": [
+            {
+              "id": "apply",
+              "label": "Antrag stellen",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Das Versprechen, Geld zurückzuholen, kann eine zweite Falle sein. Sehen Sie sich an, was als Nächstes verlangt wird."
+            },
+            {
+              "id": "close",
+              "label": "Tab schließen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig. Ein Dienst, der verspricht, Ihr Geld zurückzuholen, ist oft ein zweiter Betrug.",
+              "next": "report-site"
+            }
+          ]
+        },
+        {
+          "id": "recovery-form",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2d-fond-berpa",
+            "brand": "FondBərpa",
+            "url": [
+              {
+                "text": "https://fondberpa-huquq.example.net/muraciet"
+              }
+            ],
+            "fields": [
+              "Vollständiger Name",
+              "Telefon",
+              "Kartennummer",
+              "CVV"
+            ],
+            "button": "300 AZN zahlen und starten"
+          },
+          "say": "Auch für die Rückholung des Geldes wollen sie eine Vorauszahlung.",
+          "actions": [
+            {
+              "id": "pay",
+              "label": "300 AZN zahlen und starten",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Das ist der zweite Betrug, manchmal von derselben Bande. Lassen Sie die Karte sperren und informieren Sie die Polizei."
+            },
+            {
+              "id": "close",
+              "label": "Tab schließen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Gute Entscheidung. Um den Verbleib des Geldes zu klären, wenden Sie sich an Ihre Bank und die Polizei – das kostet nichts."
+            }
+          ]
+        },
+        {
+          "id": "report-site",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Diese Website melden"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "bakutrade-pro.example.net als betrügerische Website melden?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Melden",
+              "Später"
+            ]
+          },
+          "say": "Der Browser bietet an, die Website zu melden.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Melden",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Sehr gut, eine Meldung hilft, die Website auch für andere zu sperren. Wenden Sie sich zusätzlich an die Polizei unter 102."
+            },
+            {
+              "id": "later",
+              "label": "Später",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Ohne Meldung finden die Kriminellen neue Opfer. Nehmen Sie sich eine Minute und melden Sie die Seite."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "fd-scenario",
+      "title": "Die Anlegergruppe",
+      "start": "group",
+      "nodes": [
+        {
+          "id": "group",
+          "text": "Schau mal, ich habe 400 Manat eingezahlt, und heute sind es 1.200. Mach doch mit!",
+          "speaker": "Günay, Ihre Kollegin (Gruppe „Kluge Anleger“)",
+          "voice": "woman",
+          "channel": "message",
+          "manner": "natural",
+          "spoken": "Schau mal, ich habe 400 Manat eingezahlt, und heute sind es 1.200. <breath> Mach doch mit!",
+          "character": "gunay",
+          "choices": [
+            {
+              "label": "Lass uns erst die Lizenz in der Liste der Zentralbank prüfen",
+              "next": "pressure",
+              "feedback": "Richtig. Auch ein Tipp aus dem Bekanntenkreis macht eine Plattform nicht legal."
+            },
+            {
+              "label": "Wenn Günay verdient, bin ich dabei",
+              "outcome": "compromised",
+              "feedback": "Auch der Gewinn auf Günays Bildschirm kann gefälscht sein. Kriminelle ködern Menschen gern über deren Bekanntenkreis."
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "text": "Vergiss die Liste, wir haben eine ausländische Lizenz. Nur noch 3 Plätze frei!",
+          "speaker": "Gruppen-Admin",
+          "voice": "man-2",
+          "channel": "message",
+          "spoken": "Vergiss die Liste, <breath> wir haben eine ausländische Lizenz. Nur noch 3 Plätze frei!",
+          "choices": [
+            {
+              "label": "Eine ausländische Lizenz zählt hier nicht, ich bin raus",
+              "next": "warn",
+              "feedback": "Richtig. Die Zentralbank hat gewarnt, dass eine ausländische Lizenz nicht dazu berechtigt, hier tätig zu sein."
+            },
+            {
+              "label": "Schnell beitreten, bevor die Plätze weg sind",
+              "outcome": "compromised",
+              "feedback": "Begrenzte Plätze sollen Sie zur Eile treiben. Solcher Druck ist schon für sich ein Zeichen für Betrug."
+            }
+          ]
+        },
+        {
+          "id": "warn",
+          "text": "Und was ist mit meinen 400 Manat? Ich will sie mir auszahlen lassen, und jetzt heißt es, ich muss eine Steuer zahlen.",
+          "speaker": "Günay",
+          "voice": "woman",
+          "channel": "message",
+          "manner": "worried",
+          "spoken": "Und was ist mit meinen 400 Manat? Ich will sie mir auszahlen lassen, <short pause> und jetzt heißt es, ich muss eine Steuer zahlen.",
+          "character": "gunay",
+          "choices": [
+            {
+              "label": "Zahl nichts, ruf deine Bank an und melde es unter 102",
+              "outcome": "safe",
+              "feedback": "Sehr gut. Eine rechtzeitige Meldung stoppt den Schaden und schützt andere."
+            },
+            {
+              "label": "Zahl die Steuer, dann kommt das Geld",
+              "outcome": "compromised",
+              "feedback": "Nach der Steuer kommt eine neue Ausrede. Der Schaden wird nur größer."
+            },
+            {
+              "label": "Frag in der Gruppe, die Admins helfen dir",
+              "outcome": "risky",
+              "feedback": "Die Admins sind selbst die Kriminellen. Von ihnen kommt nur die nächste Zahlungsforderung."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "fd-recap",
+      "points": [
+        "Ein Gewinn auf dem Bildschirm ist kein Geld: Sollen Sie für eine Auszahlung zahlen, hören Sie auf.",
+        "Ein Dienst, der verspricht, Ihr Geld zurückzuholen, ist ein zweiter Betrug.",
+        "Prüfen Sie die Lizenz und melden Sie Betrug der Polizei unter 102."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

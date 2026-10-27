@@ -1,0 +1,709 @@
+{
+ "id": "hijacked-thread",
+ "title": "Conversația deturnată",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ht-tutor",
+   "beats": [
+    {
+     "id": "ht-b1",
+     "say": "Când un escroc pătrunde în căsuța de e-mail a unui partener, vă răspunde chiar în vechea conversație. Subiectul și semnătura vi se par familiare.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "ht-b2",
+     "say": "O arhivă protejată cu parolă este un semnal de alarmă. Parola împiedică antivirusul să verifice fișierul.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "kur-tikinti",
+       "from": {
+        "name": [
+         {
+          "text": "Elchin Babayev"
+         }
+        ],
+        "address": [
+         {
+          "text": "layihe@kur-tikinti.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "RE: Contractul 47/2026"
+        }
+       ],
+       "time": "14:10",
+       "body": [
+        [
+         {
+          "text": "Stimate partener,"
+         }
+        ],
+        [
+         {
+          "text": "contractul final se află în arhivă. "
+         },
+         {
+          "text": "Parola arhivei: 4417",
+          "spot": "zip-pass"
+         }
+        ],
+        [
+         {
+          "text": "Dacă nu semnați astăzi, prețul se schimbă."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Contract_final.zip"
+          }
+         ],
+         "size": "1,2 MB"
+        }
+       ]
+      }
+     },
+     "highlight": "zip-pass"
+    },
+    {
+     "id": "ht-b3",
+     "say": "Chiar și într-o conversație cunoscută, nu vă grăbiți să deschideți un atașament neașteptat și nu dați curs imediat unei cereri urgente.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "ht-b4",
+     "say": "Dacă aveți dubii, sunați-l pe partener la un număr cunoscut și întrebați-l dacă el a trimis fișierul.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ht-hotspot",
+   "prompt": "Găsiți ce s-a schimbat în acest răspuns.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "kur-tikinti",
+    "from": {
+     "name": [
+      {
+       "text": "Elchin Babayev"
+      }
+     ],
+     "address": [
+      {
+       "text": "layihe@kur-tikinti.example"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "RE: RE: Contractul 47/2026"
+     }
+    ],
+    "time": "15:02",
+    "body": [
+     [
+      {
+       "text": "Stimate partener,",
+       "spot": "greeting"
+      }
+     ],
+     [
+      {
+       "text": "vă transmit atașat contractul final și graficul de plăți. "
+      },
+      {
+       "text": "Pentru a deschide atașamentul, conectați-vă cu adresa de e-mail de serviciu.",
+       "spot": "login"
+      }
+     ],
+     [
+      {
+       "text": "Semnați-l astăzi, până la ora 15:00.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "> Salut! Trimit varianta revizuită luni, nu e nicio grabă. Elchin"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Contract_47_semnare.html",
+        "spot": "html"
+       }
+      ],
+      "size": "12 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "greeting",
+     "label": "Ton schimbat",
+     "explain": "Înainte scria „Salut”, acum scrie „Stimate partener”. O schimbare bruscă de ton sugerează că scrie altcineva."
+    },
+    {
+     "id": "html",
+     "label": "Atașament HTML",
+     "explain": "Contractele vin ca fișiere PDF sau Word. Un atașament HTML deschide de obicei o pagină de conectare falsă."
+    },
+    {
+     "id": "login",
+     "label": "Cerere de conectare",
+     "explain": "Pentru a deschide un atașament nu aveți niciodată nevoie de parolă. Un fișier care v-o cere vrea să o fure."
+    },
+    {
+     "id": "urgency",
+     "label": "Grabă bruscă",
+     "explain": "În mesajul anterior scria „nu e nicio grabă”. Un termen-limită apărut brusc este o unealtă a escrocilor."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "ht-sim-inbox",
+   "environment": "inbox",
+   "title": "Conversația despre proiect",
+   "intro": "Purtați o conversație lungă prin e-mail cu Kur Tikinti. Verificați răspunsurile noi: care sunt reale și care vin dintr-o căsuță de e-mail deturnată?",
+   "steps": [
+    {
+     "id": "thread-genuine",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: Contractul 47/2026"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Salut! Am ținut cont de observațiile voastre, varianta revizuită este atașată."
+        }
+       ],
+       [
+        {
+         "text": "Dacă aveți întrebări, sunați-mă. Elchin"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Contract_47_revizuit.pdf"
+         }
+        ],
+        "size": "340 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți atașamentul",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "Un PDF așteptat, tonul obișnuit, nicio presiune. Este un e-mail de lucru normal."
+      },
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Aici nu există niciun semnal de alarmă. Fișierul era așteptat și se potrivește cu conversația."
+      }
+     ]
+    },
+    {
+     "id": "thread-zip",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: Contractul 47/2026: urgent"
+       }
+      ],
+      "time": "14:10",
+      "body": [
+       [
+        {
+         "text": "Stimate partener,"
+        }
+       ],
+       [
+        {
+         "text": "contractul final se află în arhivă. "
+        },
+        {
+         "text": "Parola arhivei: 4417",
+         "spot": "zip-pass"
+        }
+       ],
+       [
+        {
+         "text": "Dacă nu semnați astăzi, prețul se schimbă."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Contract_final.zip"
+         }
+        ],
+        "size": "1,2 MB"
+       }
+      ]
+     },
+     "say": "Uitați-vă la arhivă și la parolă.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți atașamentul",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Într-o arhivă protejată cu parolă se poate ascunde malware, pentru că antivirusul nu poate vedea ce este înăuntru."
+      },
+      {
+       "id": "verify",
+       "label": "Sunați-l pe Elchin la un număr cunoscut",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Excelent. Dacă Elchin nu a trimis mesajul, căsuța lui de e-mail a fost deturnată și trebuie să afle."
+      },
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect: grabă bruscă, arhivă protejată și un ton nou. Raportarea protejează și echipa."
+      },
+      {
+       "id": "reply",
+       "label": "Răspundeți: chiar dumneavoastră ați scris?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Răspunsul ajunge în căsuța deturnată, iar escrocul vă spune că da. Mai bine sunați."
+      }
+     ]
+    },
+    {
+     "id": "thread-html",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: Graficul de plăți"
+       }
+      ],
+      "time": "14:35",
+      "body": [
+       [
+        {
+         "text": "Graficul se află într-un fișier protejat. Deschideți-l și conectați-vă cu adresa de e-mail de serviciu."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Grafic_plati.html"
+         }
+        ],
+        "size": "9 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți atașamentul",
+       "kind": "open-attachment",
+       "outcome": "risky",
+       "feedback": "Fișierul HTML deschide în browser o pagină de conectare falsă. Nu ați introdus încă nimic, așa că închideți-o."
+      },
+      {
+       "id": "login",
+       "label": "Conectați-vă",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Escrocul are acum parola dumneavoastră. Schimbați-o imediat și anunțați echipa de securitate."
+      },
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Un grafic de plăți nu are nevoie de parolă, iar un atașament HTML este o capcană tipică."
+      }
+     ]
+    },
+    {
+     "id": "thread-account",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE: Plata în avans"
+       }
+      ],
+      "time": "15:20",
+      "body": [
+       [
+        {
+         "text": "De data aceasta, plătiți avansul în contul companiei noastre partenere, datele sunt atașate."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Date_bancare.pdf"
+         }
+        ],
+        "size": "64 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "verify",
+       "label": "Sunați la un număr cunoscut pentru verificare",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. O cerere de a plăti unei alte companii se confirmă doar telefonic."
+      },
+      {
+       "id": "accept",
+       "label": "Răspundeți: acceptăm datele",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Avansul ar ajunge la escroc. O conversație cunoscută nu dovedește că noul cont este real."
+      },
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Un pas bun. Două e-mailuri suspecte în aceeași conversație sunt un semnal serios."
+      }
+     ]
+    },
+    {
+     "id": "legal-genuine",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Departamentul juridic"
+        }
+       ],
+       "address": [
+        {
+         "text": "huquq@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Observațiile noastre la contractul 47"
+       }
+      ],
+      "time": "16:00",
+      "body": [
+       [
+        {
+         "text": "Salut, propunem o modificare la clauza 5. Haideți să o discutăm la ședința de mâine."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "reply",
+       "label": "Răspundeți",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "O adresă internă, fără atașament sau link și fără nicio cerere. Este un e-mail normal."
+      },
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Acest e-mail nu are semnale de alarmă. Păstrați raportările pentru mesajele suspecte."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "ht-swipe",
+   "prompt": "Sigur sau capcană?",
+   "cards": [
+    {
+     "id": "pdf-expected",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Contract_47_revizuit.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "340 KB",
+      "source": [
+       {
+        "text": "Elchin Babayev, răspuns așteptat"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Un document așteptat, un format obișnuit și un expeditor cunoscut. Îl puteți deschide."
+    },
+    {
+     "id": "zip-pass",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Ordin_plata.zip"
+       }
+      ],
+      "type": "zip",
+      "size": "1,1 MB",
+      "source": [
+       {
+        "text": "layihe@kur-tikinti.example, parola: 4417"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O arhivă protejată cu parolă se ascunde de antivirus. Sunați-l pe expeditor și întrebați."
+    },
+    {
+     "id": "html-sign",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Contract_semnare.html"
+       }
+      ],
+      "type": "html",
+      "size": "11 KB",
+      "source": [
+       {
+        "text": "RE: Contractul 47/2026"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un contract nu este niciodată un fișier HTML. Un astfel de fișier deschide o pagină de conectare falsă."
+    },
+    {
+     "id": "act-internal",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [
+       {
+        "text": "Proces_verbal_septembrie.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "210 KB",
+      "source": [
+       {
+        "text": "huquq@idare.example, convenit ieri"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Vine de la un departament intern și a fost convenit dinainte. Niciun semnal de alarmă."
+    },
+    {
+     "id": "double-ext",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Factura_47.pdf.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "2,3 MB",
+      "source": [
+       {
+        "text": "RE: Contractul 47/2026"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Tipul real este .exe, adică un program. O factură nu este niciodată un program."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ht-scenario",
+   "title": "Ați deschis arhiva",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Ați deschis arhiva protejată. Înăuntru nu era niciun contract, doar un fișier ciudat, iar ecranul s-a întunecat pentru o clipă.",
+     "choices": [
+      {
+       "label": "Deconectez computerul de la rețea și sun la echipa de securitate",
+       "next": "n2",
+       "feedback": "Corect. Deconectarea oprește răspândirea, iar apelul aduce echipa în ajutor."
+      },
+      {
+       "label": "Opresc imediat computerul",
+       "next": "n2",
+       "feedback": "Oprirea poate șterge dovezile din memorie. Dacă procedura internă nu prevede altceva, lăsați computerul pornit și deconectați-l de la rețea."
+      },
+      {
+       "label": "Nu spun nimănui, probabil nu s-a întâmplat nimic",
+       "outcome": "compromised",
+       "feedback": "Malware-ul lucrează pe ascuns și se poate răspândi în rețea. Nu este rușinos să raportați rapid o greșeală: așa salvați situația."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Vă mulțumesc. E-mailul mai este în căsuța dumneavoastră? Și ați anunțat Kur Tikinti?",
+     "speaker": "Echipa de securitate",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Vă mulțumesc. <breath> E-mailul mai este în căsuța dumneavoastră? Și ați anunțat Kur Tikinti?",
+     "choices": [
+      {
+       "label": "Am păstrat e-mailul și îl sun pe Elchin la un număr cunoscut",
+       "outcome": "safe",
+       "feedback": "Excelent. E-mailul este o dovadă, iar partenerul trebuie să afle că i-a fost deturnată căsuța de e-mail."
+      },
+      {
+       "label": "Am șters e-mailul ca să nu rămână nicio urmă",
+       "outcome": "risky",
+       "feedback": "E-mailul este necesar pentru investigație. Data viitoare păstrați-l și urmați instrucțiunile echipei de securitate."
+      },
+      {
+       "label": "Îi răspund lui Elchin în aceeași conversație",
+       "outcome": "risky",
+       "feedback": "Escrocul citește acea căsuță de e-mail. Anunțați-l pe partener la telefon."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "ht-recap",
+   "points": [
+    "Și o conversație cunoscută poate fi deturnată",
+    "Înainte să deschideți o arhivă protejată sau un fișier HTML, sunați și verificați",
+    "Dacă l-ați deschis, deconectați imediat dispozitivul de la rețea și raportați"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

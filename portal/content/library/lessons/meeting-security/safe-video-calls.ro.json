@@ -1,0 +1,474 @@
+{
+ "id": "safe-video-calls",
+ "title": "Apeluri video sigure",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "vc-tutor",
+   "beats": [
+    {
+     "id": "vc-b1",
+     "say": "Bună ziua! Într-un apel video contează două întrebări: cine ascultă și ce se vede pe ecranul dumneavoastră?",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "vc-b2",
+     "say": "Dacă vedeți un nume sau un număr pe care nu îl cunoașteți, întrebați organizatorul. Discuțiile confidențiale trebuie să aștepte.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "gorus",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Participanți (6)"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Rashad Mammadov (organizator)"
+         }
+        ],
+        [
+         {
+          "text": "Leyla Rzayeva"
+         }
+        ],
+        [
+         {
+          "text": "Kamal Nabiyev"
+         }
+        ],
+        [
+         {
+          "text": "iPhone (invitat)",
+          "spot": "unknown"
+         }
+        ],
+        [
+         {
+          "text": "Conectat telefonic: +994 70 000 55 12",
+          "spot": "dial-in"
+         }
+        ],
+        [
+         {
+          "text": "Invitat 4821: înregistrează întâlnirea",
+          "spot": "recording"
+         }
+        ]
+       ],
+       "buttons": [
+        "Închideți"
+       ]
+      }
+     },
+     "highlight": "unknown"
+    },
+    {
+     "id": "vc-b3",
+     "say": "Când partajați tot ecranul, toată lumea vede filele deschise și notificările care sosesc.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "vc-b4",
+     "say": "Activați sala de așteptare, partajați doar fereastra de care aveți nevoie și dezactivați notificările.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "vc-sim",
+   "environment": "desktop",
+   "title": "Începe întâlnirea",
+   "intro": "Dumneavoastră organizați această întâlnire. Admiteți participanții și partajați prezentarea.",
+   "steps": [
+    {
+     "id": "lobby-unknown",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Sala de așteptare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Dorește să se alăture: iPhone"
+        }
+       ],
+       [
+        {
+         "text": "Nu figurează pe lista invitaților"
+        }
+       ]
+      ],
+      "buttons": [
+       "Admiteți",
+       "Refuzați"
+      ]
+     },
+     "say": "O persoană se află în sala de așteptare.",
+     "actions": [
+      {
+       "id": "admit",
+       "label": "Admiteți",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Ați admis o persoană fără să știți cine este. Un străin poate auzi o discuție confidențială."
+      },
+      {
+       "id": "deny",
+       "label": "Refuzați",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Exact pentru asta există sala de așteptare."
+      },
+      {
+       "id": "ask",
+       "label": "Cereți-i să își spună numele",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "O mișcare bună. Dacă numele spus figurează pe lista invitaților, admiteți persoana."
+      }
+     ]
+    },
+    {
+     "id": "lobby-known",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Sala de așteptare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Dorește să se alăture: Leyla Rzayeva"
+        }
+       ],
+       [
+        {
+         "text": "Figurează pe lista invitaților"
+        }
+       ]
+      ],
+      "buttons": [
+       "Admiteți",
+       "Refuzați"
+      ]
+     },
+     "actions": [
+      {
+       "id": "admit",
+       "label": "Admiteți",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Corect. Leyla este invitată, iar numele ei figurează pe listă."
+      },
+      {
+       "id": "deny",
+       "label": "Refuzați",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "Leyla este invitată. Și prudența inutilă oprește lucrul."
+      }
+     ]
+    },
+    {
+     "id": "share-pick",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Ce doriți să partajați?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Tot ecranul"
+        }
+       ],
+       [
+        {
+         "text": "Fereastră: Prezentare_octombrie.pptx"
+        }
+       ],
+       [
+        {
+         "text": "Filă deschisă în browser: Tabel salarii 2026",
+         "spot": "tab"
+        }
+       ]
+      ],
+      "buttons": [
+       "Partajați"
+      ]
+     },
+     "say": "Alegeți ce partajați.",
+     "actions": [
+      {
+       "id": "whole",
+       "label": "Partajați tot ecranul",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Acum toată lumea vede filele deschise, e-mailul și notificările. Pe ecran se vede și tabelul cu salariile."
+      },
+      {
+       "id": "window",
+       "label": "Partajați doar fereastra prezentării",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Corect. Participanții văd doar ce le trebuie."
+      }
+     ]
+    },
+    {
+     "id": "popup",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "IshPocht",
+      "title": [
+       {
+        "text": "Departamentul de resurse umane"
+       }
+      ],
+      "body": [
+       {
+        "text": "Lista reducerilor de personal (confidențial), în atașament"
+       }
+      ],
+      "time": "10:14"
+     },
+     "say": "În timp ce partajați, a sosit un e-mail nou.",
+     "actions": [
+      {
+       "id": "pause",
+       "label": "Întrerupeți partajarea și dezactivați notificările",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect: când partajați tot ecranul, o astfel de fereastră pop-up o vede toată lumea. Modul „Nu deranjați” previne acest lucru."
+      },
+      {
+       "id": "go-on",
+       "label": "Continuați",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Dacă partajați tot ecranul, toată lumea vede subiectul confidențial. Dezactivați notificările înainte de partajare."
+      }
+     ]
+    },
+    {
+     "id": "recording",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Întâlnirea s-a încheiat"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Înregistrarea întâlnirii este gata."
+        }
+       ],
+       [
+        {
+         "text": "Partajare: oricine are linkul o poate vedea",
+         "spot": "link"
+        }
+       ]
+      ],
+      "buttons": [
+       "Copiați linkul",
+       "Modificați accesul"
+      ]
+     },
+     "actions": [
+      {
+       "id": "public",
+       "label": "Trimiteți linkul în grupul general",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Înregistrarea conține o discuție confidențială. Pe măsură ce linkul circulă, pierdeți controlul asupra ei."
+      },
+      {
+       "id": "limit",
+       "label": "Limitați accesul la participanți",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Înregistrarea trebuie să o vadă doar cei care au nevoie de ea."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vc-hotspot",
+   "prompt": "Ce pare suspect în lista participanților?",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "gorus",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Participanți (6)"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Rashad Mammadov (organizator)"
+      }
+     ],
+     [
+      {
+       "text": "Leyla Rzayeva"
+      }
+     ],
+     [
+      {
+       "text": "Kamal Nabiyev"
+      }
+     ],
+     [
+      {
+       "text": "iPhone (invitat)",
+       "spot": "unknown"
+      }
+     ],
+     [
+      {
+       "text": "Conectat telefonic: +994 70 000 55 12",
+       "spot": "dial-in"
+      }
+     ],
+     [
+      {
+       "text": "Invitat 4821: înregistrează întâlnirea",
+       "spot": "recording"
+      }
+     ]
+    ],
+    "buttons": [
+     "Închideți"
+    ]
+   },
+   "spots": [
+    {
+     "id": "unknown",
+     "label": "Dispozitiv fără nume",
+     "explain": "„iPhone” nu este un nume. Dacă nu știți cine este, întrebați organizatorul."
+    },
+    {
+     "id": "dial-in",
+     "label": "Număr necunoscut",
+     "explain": "Dacă nu recunoașteți un număr conectat telefonic, verificați cui aparține."
+    },
+    {
+     "id": "recording",
+     "label": "Înregistrare neaprobată",
+     "explain": "Un invitat înregistrează întâlnirea. Organizatorul ar trebui să oprească înregistrarea și să întrebe de ce."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "order",
+   "id": "vc-order",
+   "prompt": "Pregătiți o întâlnire confidențială. Ordonați pașii.",
+   "items": [
+    {
+     "id": "lobby",
+     "label": "Activați sala de așteptare și parola întâlnirii"
+    },
+    {
+     "id": "tabs",
+     "label": "Închideți filele și fișierele de care nu aveți nevoie"
+    },
+    {
+     "id": "dnd",
+     "label": "Dezactivați notificările"
+    },
+    {
+     "id": "window",
+     "label": "Partajați doar fereastra prezentării"
+    }
+   ],
+   "explain": "Mai întâi controlați cine se poate alătura, apoi ce pot vedea participanții."
+  },
+  {
+   "type": "choice",
+   "id": "vc-choice",
+   "question": {
+    "prompt": "În întâlnire este cineva pe care nu îl cunoașteți, iar organizatorul nu îl cunoaște nici el. Ce faceți?",
+    "options": [
+     {
+      "id": "remove",
+      "label": "Îi cer organizatorului să elimine persoana, apoi continuăm",
+      "correct": true,
+      "feedback": "Corect. După ce persoana din afară a ieșit, discuția poate continua."
+     },
+     {
+      "id": "ignore",
+      "label": "Ignor situația, probabil s-a conectat cineva prin telefon",
+      "correct": false,
+      "feedback": "„Probabil” nu este suficient. O persoană din afară poate auzi o discuție confidențială."
+     },
+     {
+      "id": "leave",
+      "label": "Părăsesc discret întâlnirea",
+      "correct": false,
+      "feedback": "Chiar dacă dumneavoastră plecați, ceilalți rămân. Anunțați organizatorul, ca să fie toți protejați."
+     }
+    ]
+   },
+   "explain": "Dacă nu știți cine ascultă, nu discutați subiecte confidențiale."
+  },
+  {
+   "type": "recap",
+   "id": "vc-recap",
+   "points": [
+    "Admiteți doar participanții pe care îi cunoașteți",
+    "Partajați o fereastră, nu tot ecranul",
+    "Dezactivați notificările înainte de partajare"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

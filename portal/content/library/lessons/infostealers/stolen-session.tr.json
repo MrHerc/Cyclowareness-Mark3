@@ -1,0 +1,353 @@
+{
+ "id": "stolen-session",
+ "title": "Çalınan oturum",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "is2-tutor",
+   "beats": [
+    {
+     "id": "is2-b1",
+     "say": "Merhaba! Sabah bir bakıyorsunuz, iş e-posta hesabınız gece boyunca yurt dışına kırk e-posta göndermiş.",
+     "mood": "alert",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "is2-b2",
+     "say": "Parolanız kimsenin elinde değildi. Bir program, tarayıcınızdaki giriş oturumunuzu, yani çerezi çaldı.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "ispoct",
+       "app": "İşPoçt",
+       "title": [
+        {
+         "text": "Yeni giriş"
+        }
+       ],
+       "body": [
+        {
+         "text": "Amsterdam, 03:05, bilinmeyen tarayıcı",
+         "spot": "location"
+        }
+       ],
+       "time": "03:05"
+      }
+     },
+     "highlight": "location"
+    },
+    {
+     "id": "is2-b3",
+     "say": "Çerez, siteye zaten giriş yaptığınızı söyler. Bu yüzden site ne parola ne de kod ister.",
+     "mood": "talk",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "is2-b4",
+     "say": "Üç şey işe yarar: temiz bir cihaz, tüm oturumlardan çıkış ve BT destek ekibi.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "is2-match",
+   "prompt": "Çalınan her bilgi suçlunun ne yapmasını sağlar? Eşleştirin.",
+   "pairs": [
+    {
+     "id": "cookie",
+     "left": "Tarayıcıdaki giriş oturumu",
+     "right": "Parola ve kod olmadan hesaba girmek"
+    },
+    {
+     "id": "saved",
+     "left": "Tarayıcıya kaydedilmiş parolalar",
+     "right": "Başka sitelerdeki hesaplarınıza girmek"
+    },
+    {
+     "id": "card",
+     "left": "Otomatik doldurulan kart bilgileri",
+     "right": "Sizin adınıza internetten ödeme yapmak"
+    },
+    {
+     "id": "messenger",
+     "left": "Mesajlaşma uygulaması oturumu",
+     "right": "Sohbetlerinizi okumak ve sizin yerinize yazmak"
+    }
+   ],
+   "explain": "Bilgi çalan yazılım bunların hepsini tek seferde alır. Bu yüzden yalnızca bir parolayı değil, tüm parolalarınızı değiştirin ve oturumları kapatın."
+  },
+  {
+   "type": "simulation",
+   "id": "is2-sim",
+   "environment": "browser",
+   "title": "Temiz bir iş bilgisayarında",
+   "intro": "İş bilgisayarınızdasınız ve bu bilgisayar temiz. E-postanızı açın ve her ekranda doğru adımı seçin.",
+   "steps": [
+    {
+     "id": "sent-folder",
+     "label": "Gönderilenler: bu gece 03:12'de bilinmeyen adreslere 40 e-posta",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://poct.idare.example/gonderilenler"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "call-it",
+       "label": "BT destek ekibini ara",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru. Bir uzman hesabı hemen koruma altına alabilir ve neyin gönderildiğini görebilir."
+      },
+      {
+       "id": "delete",
+       "label": "E-postaları sil",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Silmek, gönderilen e-postaları geri almaz, üstelik kanıtları yok eder. Önce BT destek ekibine haber verin."
+      },
+      {
+       "id": "later",
+       "label": "Kapat, sonra bakarım",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Saldırgan hâlâ hesapta ve yazmaya devam ediyor. Her dakika önemli."
+      }
+     ]
+    },
+    {
+     "id": "new-login",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Yeni bir cihazdan giriş"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Windows, bilinmeyen tarayıcı"
+        }
+       ],
+       [
+        {
+         "text": "Amsterdam, bugün 03:05"
+        }
+       ],
+       [
+        {
+         "text": "Bu siz miydiniz?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Ben değildim",
+       "Bendim"
+      ]
+     },
+     "actions": [
+      {
+       "id": "not-me",
+       "label": "Ben değildim",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru. Sistem bu girişi şüpheli olarak işaretler, BT destek ekibi de bunu görür."
+      },
+      {
+       "id": "me",
+       "label": "Bendim",
+       "kind": "mark-safe",
+       "outcome": "compromised",
+       "feedback": "Saldırganın girişini az önce siz onayladınız. Artık sistem onu siz sanıyor."
+      }
+     ]
+    },
+    {
+     "id": "change-password",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "İşPoçt",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/parol"
+       }
+      ],
+      "fields": [
+       "Mevcut parola",
+       "Yeni parola",
+       "Yeni parolayı tekrarlayın"
+      ],
+      "button": "Parolayı değiştir"
+     },
+     "say": "Adres gerçek, bilgisayar da temiz.",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Parolayı değiştir",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Doğru. Yeni parolayı yalnızca temiz bir cihazda yazın, yoksa program onu da alır."
+      },
+      {
+       "id": "skip",
+       "label": "Sonra",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Eski parola çalınmış olabilir. Hemen, bu temiz bilgisayardan değiştirin."
+      }
+     ]
+    },
+    {
+     "id": "sessions",
+     "label": "Etkin oturumlar: 3 cihaz. Hepsinden çıkış yapılsın mı?",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/sessiyalar"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "sign-out-all",
+       "label": "Tüm cihazlardan çıkış yap",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Çok iyi. Çalınan çerez artık işe yaramıyor, saldırganın yeniden giriş yapması gerekir."
+      },
+      {
+       "id": "later",
+       "label": "Sonra",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Parolayı değiştirmek, açık bir oturumu her zaman kapatmaz. Saldırgan hâlâ içeride olabilir."
+      }
+     ]
+    },
+    {
+     "id": "forward-rule",
+     "label": "Yeni kural, 03:07: tüm e-postaları arxiv@poct-yedek.example adresine ilet",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://poct.idare.example/qaydalar"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "show-it",
+       "label": "Kuralı BT destek ekibine göster",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru. Saldırgan çıktıktan sonra bile bu kural e-postalarınızı ona göndermeye devam ediyordu."
+      },
+      {
+       "id": "leave",
+       "label": "Olduğu gibi bırak",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Bu gizli bir yönlendirme. Size gelen her yeni e-posta saldırgana gidecek."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "is2-choice",
+   "question": {
+    "prompt": "Saldırgan, parolanız ya da kodunuz olmadan e-postanıza nasıl girdi?",
+    "options": [
+     {
+      "id": "cookie",
+      "label": "Tarayıcıdan çalınan bir oturumla",
+      "correct": true,
+      "feedback": "Doğru. Oturum, girişin zaten yapıldığını gösterir, bu yüzden kod istenmez."
+     },
+     {
+      "id": "guess",
+      "label": "Parolayı tahmin ederek",
+      "correct": false,
+      "feedback": "O zaman sistem kod isterdi. Burada ne parolaya ne de koda gerek kaldı."
+     },
+     {
+      "id": "server",
+      "label": "E-posta sunucusu ele geçirildi",
+      "correct": false,
+      "feedback": "Sunucuda bir sorun yok. Çalınan şey, tarayıcınızdaki oturumdu."
+     }
+    ]
+   },
+   "explain": "Çerez çalındığında iki adımlı doğrulama da işe yaramaz. Bu yüzden bilgi çalan yazılımın bilgisayarınıza girmesine izin vermeyin."
+  },
+  {
+   "type": "order",
+   "id": "is2-order",
+   "prompt": "Bir bilgisayara zararlı yazılım bulaştıysa adımları doğru sıraya koyun.",
+   "items": [
+    {
+     "id": "isolate",
+     "label": "Enfekte bilgisayarın ağ bağlantısını kesin"
+    },
+    {
+     "id": "report",
+     "label": "Hemen BT destek ekibine haber verin"
+    },
+    {
+     "id": "passwords",
+     "label": "Parolaları temiz bir cihazdan değiştirin"
+    },
+    {
+     "id": "sessions",
+     "label": "Tüm oturumlardan çıkış yapın"
+    },
+    {
+     "id": "rebuild",
+     "label": "Bilgisayarı BT destek ekibine sıfırdan kurdurun"
+    }
+   ],
+   "explain": "Parolayı enfekte bilgisayarda değiştirirseniz program yenisini de alır. Bilgisayar ancak sıfırdan kurulduktan sonra temiz sayılır."
+  },
+  {
+   "type": "recap",
+   "id": "is2-recap",
+   "points": [
+    "Çalınan bir oturum, parola ve kod olmadan erişim sağlar",
+    "Parolaları temiz bir cihazdan değiştirin, sonra tüm oturumlardan çıkış yapın",
+    "Enfekte bilgisayarı BT destek ekibine sıfırdan kurdurun"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

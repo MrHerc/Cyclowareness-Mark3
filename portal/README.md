@@ -22,6 +22,7 @@ Demo hesablar: `admin@safarovindustries.com` (tenant admin), `learner@safarovind
 - [Environment variables](#environment-variables)
 - [Project layout](#project-layout)
 - [Production with Docker](#production-with-docker)
+- [Narration voice](#narration-voice)
 - [Operations notes](#operations-notes)
 - [Tests and checks](#tests-and-checks)
 - [Documentation](#documentation)
@@ -102,8 +103,10 @@ Copy `.env.example` to `.env.local` (development) or provide the values to the c
 | `DATABASE_POOL_MAX` | `10` | node-postgres pool size, 2–100 (only with `DATABASE_URL`; the job runner holds one connection for its lock) |
 | `ALLOW_EMBEDDED_DB` | `0` | `1` lets a production server use the embedded database when `DATABASE_URL` is missing. Single-process demos only; without it the server refuses to start |
 | `BOOTSTRAP_OPERATOR_EMAIL` | empty | First start of a new installation: creates the platform organisation and its operator (status invited) and prints a one-time invitation link to the server log. Ignored once an operator exists |
-| `ANTHROPIC_API_KEY` | empty | AI tutor. Without a key the tutor answers from the lesson content only |
-| `ANTHROPIC_MODEL` | `claude-opus-5-5` | Model used by the tutor |
+| `ANTHROPIC_API_KEY` | empty | AI tutor and AI course generation. Without a key the tutor answers from the lesson content only and course generation is off |
+| `ANTHROPIC_MODEL` | `claude-opus-5-5` | Model for AI course generation in the studio |
+| `ANTHROPIC_TUTOR_MODEL` | `claude-haiku-5-5` | Model for the AI tutor only. The tutor request turns thinking off at medium effort and caches the system prompt and lesson context; a model that rejects disabled thinking (`claude-opus-5-5`, `claude-sonnet-5-5`) or effort (`claude-haiku-4-5`) makes every answer fall back to the lesson text |
+| `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `ELEVENLABS_VOICE_<LOCALE>` | empty | Natural lesson narration, read only by `scripts/generate-narration.ts` (see [Narration voice](#narration-voice)); the server only serves the generated files. Set them in `.env.local` only, never in the compose `.env`, whose `env_file` would hand the key to the container |
 | `SMS_PROVIDER` | empty | Text messages for phone sign-in and SMS simulations. `webhook` posts `{to, text}` to `SMS_WEBHOOK_URL`. Empty: logged to the console in development, reported as unavailable in production |
 | `SMS_WEBHOOK_URL` | empty | Endpoint for the `webhook` provider (required with it; the server refuses to start without) |
 | `SMS_WEBHOOK_TOKEN` | empty | Sent as `Authorization: Bearer ...` to the webhook |
@@ -167,11 +170,11 @@ Fonts come from `next/font/google` (Geologica and Noto Sans Georgian) and are do
 
 ## Production with Docker
 
-The image is a multi-stage build (`deps` -> `builder` -> `runner`) on `node:22-bookworm-slim`. The runner contains the Next.js standalone server, `.next/static`, `public/`, `drizzle/`, `content/` and the migration script, runs as the non-root `node` user, listens on `0.0.0.0:3000` and has a `HEALTHCHECK` against `/api/health` (200 only when the database answers a query, 503 otherwise; usable by load balancers too). On every start:
+The image is a multi-stage build (`deps` -> `builder` -> `runner`) on `node:24-trixie-slim` (build with `--pull` so the base image brings the latest Node security release). The runner contains the Next.js standalone server, `.next/static`, `public/`, `drizzle/`, `content/` and the migration script, runs as the non-root `node` user, listens on `0.0.0.0:3000` and has a `HEALTHCHECK` against `/api/health` (200 only when the database answers a query, 503 otherwise; usable by load balancers too). On every start:
 
 1. the entrypoint checks `DATABASE_URL` and `APP_SECRET` (32+ characters) and applies pending migrations (`scripts/migrate.mjs`, node-postgres); a failure stops the container;
 2. the server (`src/server/bootstrap.ts`, before it takes requests) imports the lesson library and learning paths from `content/` — idempotent, matched by slug/key, progress and assignments are never touched, so a new image brings its content changes with it; several replicas take turns on an advisory lock;
-3. with `BOOTSTRAP_OPERATOR_EMAIL` set and no platform operator yet, it creates the platform organisation and the operator (invited, no password) and prints a one-time invitation link to the log. Until the operator has set a password, each start prints a fresh link.
+3. with `BOOTSTRAP_OPERATOR_EMAIL` set and no platform operator yet, it creates the platform organisation and the operator (invited, no password) and prints a one-time invitation link to the log, once. While that link is unused and valid (14 days), later starts print only its expiry date; after it expires, the next start prints a new one.
 
 An invalid environment or a failed import ends the server with exit code 1 instead of a process that answers 500.
 
@@ -182,7 +185,7 @@ Needs Docker Compose v2.24 or newer (for the optional `env_file`).
 ```bash
 cp .env.example .env
 # edit .env: APP_SECRET (32+ random characters, required), APP_URL=https://your.host (required),
-#            TRUST_PROXY=1 when one reverse proxy sits in front, optionally POSTGRES_PASSWORD,
+#            POSTGRES_PASSWORD (required), TRUST_PROXY=1 when one reverse proxy sits in front,
 #            BOOTSTRAP_OPERATOR_EMAIL=you@your-company.com for the first operator
 docker compose up -d --build
 docker compose logs app | grep bootstrap     # the operator's one-time invitation link
@@ -203,12 +206,16 @@ To run background jobs outside the web containers, set `JOBS_ENABLED=0` for `app
 ### Image only
 
 ```bash
-docker build -t portal .
-docker run --rm -p 3000:3000 \
-  -e DATABASE_URL=postgres://user:pass@host:5432/portal \
+docker build --pull -t portal .
+docker run --rm -p 127.0.0.1:3000:3000 \
+  -e DATABASE_URL='postgres://user:pass@db.example.internal:5432/portal?sslmode=verify-full' \
   -e APP_SECRET=... -e APP_URL=https://your.host -e TRUST_PROXY=1 \
   portal
 ```
+
+The port is published on `127.0.0.1` only, for a TLS proxy on the same host. `TRUST_PROXY=1` is safe only when every request reaches the container through that proxy: a client that can reach port 3000 directly could otherwise send its own `X-Forwarded-For` and pick the address that the sign-in lockout, the rate limits and the audit log see. If the port must be reachable without the proxy, publish it as `3000:3000` and set `TRUST_PROXY=0`.
+
+A database on another host must be reached over TLS: add `sslmode=verify-full` to `DATABASE_URL` (the server certificate is checked against the system CAs; add `sslrootcert=/path/to/ca.pem` for a private CA). Without `sslmode` node-postgres connects unencrypted.
 
 Any PostgreSQL 14+ works (15+ recommended). `JOBS_ENABLED=1` is the default; with several replicas a PostgreSQL advisory lock makes sure only one of them runs a job tick at a time.
 
@@ -242,6 +249,20 @@ npm start                                                # copies public/, .next
 ```
 
 with the same environment as the container (`DATABASE_URL`, `APP_SECRET`, `APP_URL`, ...). The standalone build never contains the local `.data/` database: the database path is kept out of the build's file tracing, `outputFileTracingExcludes` drops it as well, and the `postbuild` script removes `.next/standalone/.data` if anything still got there. `outputFileTracingRoot` pins the layout to `.next/standalone/server.js` even when a folder above the app has its own lockfile. A production server without `DATABASE_URL` refuses to start rather than open an embedded database. Serverless platforms (for example Vercel) would need `JOBS_ENABLED=0` and `npm run jobs -- --once` from an external scheduler every minute. See the [Next.js deployment documentation](https://nextjs.org/docs/app/getting-started/deploying) for platform specifics.
+
+## Narration voice
+
+Lessons are read aloud with word-by-word highlighting. A sentence with a pre-generated clip plays in a natural ElevenLabs voice (`eleven_v3`, the model that reads all ten languages, Azerbaijani and Georgian included) with exact word timings; every other sentence, and every lesson without clips, is read by the browser's own voice (Web Speech), and nothing is read when the browser has no voice for the language.
+
+```bash
+npx tsx --env-file=.env.local scripts/generate-narration.ts --dry-run                 # characters and cost, no key needed
+npx tsx --env-file=.env.local scripts/generate-narration.ts --locales az,ru --only <module>[/<lesson>] --concurrency 4
+```
+
+- **Output.** One clip per spoken sentence and language in `public/generated/tts/<locale>/<sha256>.mp3` (served with `Cache-Control: immutable`; the name hashes language, model, voice, text and `TTS_REVISION` in `src/lib/tts/key.ts`, so changed text is a new file; to remake a clip whose text did not change, such as a bad take, raise `TTS_REVISION` and rerun: every clip then gets a new name and seed, so this costs a full run of the languages generated) and one manifest per lesson in `content/narration/<locale>/<module>__<lesson>.json` with the word timings. Manifests are read by the server and handed to the player of a signed-in learner; they are never public files, because they contain the lesson text. Run the script before building the image so both folders ship with it.
+- **Reruns are cheap.** Clips already on disk are reused; only new or changed sentences are sent. Failed clips are listed and retried on the next run (429 and 5xx answers are retried with backoff; a wrong key or a used-up quota stops the run).
+- **Cost.** The dry run prints the exact figure. The library has about 375,000 spoken characters per language (choose-all questions count every feedback combination), so about 3.8 million characters for ten languages: roughly 300 USD at about 0.08 USD per 1,000 characters; the ElevenLabs plan decides the real price.
+- **Voices.** ElevenLabs is retiring its default voices on 2026-12-31, so no voice is built in: set `ELEVENLABS_VOICE_ID` (every language) and optionally `ELEVENLABS_VOICE_<LOCALE>` (`ELEVENLABS_VOICE_AZ`, `_KA`, `_AR`...). Have a native speaker choose the Azerbaijani, Georgian and Arabic voices from the Voice Library and listen to a sample lesson (`--only`) before generating the rest. Changing a voice regenerates that language's clips.
 
 ## Operations notes
 

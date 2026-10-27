@@ -6,6 +6,7 @@ import { refresh } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
 import { z } from "zod";
 import { db, t } from "../db";
+import { logFailure } from "../db/errors";
 import { actionViewer, allowed } from "../auth/viewer";
 import { insertNumbered, submitThreatReport } from "../services/threats";
 import { analyzeFile, analyzeUrl, MAX_FILE_BYTES, type Analysis } from "../sandbox/analyze";
@@ -63,7 +64,7 @@ export async function analyzeAction(prev: SandboxState, form: FormData): Promise
     return await analyze(prev, form);
   } catch (error) {
     unstable_rethrow(error);
-    console.error("[sandbox] analysis failed", error);
+    logFailure("[sandbox] analysis failed", error);
     return { error: "generic" };
   }
 }
@@ -93,19 +94,28 @@ async function analyze(_: SandboxState, form: FormData): Promise<SandboxState> {
 /** The learner sends a sandbox result to the incident response team (becomes a threat report). */
 export async function escalateAnalysisAction(id: string): Promise<{ ok: boolean }> {
   const v = await actionViewer();
-  if (!isUuid(id)) return { ok: false };
+  if (!isUuid(id) || !v.tenant.features.has("sandbox")) return { ok: false };
+  if (!(await rateLimit(`sandbox-escalate:${v.user.id}`, 10, 60 * 60_000)).ok) return { ok: false };
   const [a] = await db()
     .select()
     .from(t.sandboxAnalyses)
     .where(and(eq(t.sandboxAnalyses.id, id), eq(t.sandboxAnalyses.tenantId, v.tenant.id)));
   if (!a || (a.submittedBy !== v.user.id && !allowed(v, "secops.read"))) return { ok: false };
+  // One report per analysis (SB numbers are unique per organisation): sending it again only reaches the same report.
+  const subject = `SB-${a.number}: ${a.objectName}`.slice(0, 300);
+  const [sent] = await db()
+    .select({ id: t.threatReports.id })
+    .from(t.threatReports)
+    .where(and(eq(t.threatReports.tenantId, v.tenant.id), eq(t.threatReports.subject, subject)))
+    .limit(1);
+  if (sent) return { ok: true };
   // The analysts read the report in the organisation's language, not the learner's.
   const tr = await getTranslations({ locale: v.tenant.settings.defaultLocale, namespace: "security.sandbox" });
   await submitThreatReport(db(), {
     tenantId: v.tenant.id,
     userId: v.user.id,
     channel: a.kind === "url" ? "link" : "file",
-    subject: `SB-${a.number}: ${a.objectName}`.slice(0, 300),
+    subject,
     details: tr("escalatedDetails", { verdict: tr(`verdict.${a.verdict as "clean"}`), score: a.score }),
     url: a.kind === "url" ? a.objectName : null,
     ip: await clientIp(),

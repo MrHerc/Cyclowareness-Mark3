@@ -53,9 +53,9 @@ export function TeachableMoment({
         >
           <p className="text-title-sm font-semibold text-[#1b1b1b]">{brandName}</p>
           <p className="mt-4 text-body text-[#1b1b1b]">{t("fakeLogin")}</p>
-          <input aria-label={t("fakeEmail")} placeholder={t("fakeEmail")} autoComplete="off" className="mt-5 w-full border-b border-[#666] py-2 text-body-sm outline-none focus:border-[#0067b8]" />
-          <input aria-label={t("fakePassword")} placeholder={t("fakePassword")} type="password" autoComplete="new-password" className="mt-4 w-full border-b border-[#666] py-2 text-body-sm outline-none focus:border-[#0067b8]" />
-          <button type="submit" disabled={pending} className="mt-7 ml-auto block bg-[#0067b8] px-8 py-2 text-body-sm text-white">
+          <input aria-label={t("fakeEmail")} placeholder={t("fakeEmail")} autoComplete="off" dir="ltr" className="mt-5 w-full border-b border-[#666] py-2 text-body-sm outline-none focus:border-[#0067b8]" />
+          <input aria-label={t("fakePassword")} placeholder={t("fakePassword")} type="password" autoComplete="new-password" dir="ltr" className="mt-4 w-full border-b border-[#666] py-2 text-body-sm outline-none focus:border-[#0067b8]" />
+          <button type="submit" disabled={pending} className="mt-7 ms-auto block bg-[#0067b8] px-8 py-2 text-body-sm text-white">
             {t("fakeButton")}
           </button>
         </form>

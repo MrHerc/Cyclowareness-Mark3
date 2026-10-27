@@ -51,7 +51,7 @@ export function BandScale({ score, labels }: { score: number; labels: Record<Ris
           <span className="h-full basis-[33%] bg-warn-500/80" />
           <span className="h-full basis-[34%] bg-risk-500/80" />
         </div>
-        <span className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-pill border-[3px] border-surface bg-ink shadow-raised" style={{ left: `${pos}%` }} />
+        <span className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-pill border-[3px] border-surface bg-ink shadow-raised rtl:translate-x-1/2" style={{ insetInlineStart: `${pos}%` }} />
       </div>
       <div className="mt-2 grid grid-cols-3 text-tab-sm text-ink-muted">
         <span>{labels.low}</span>

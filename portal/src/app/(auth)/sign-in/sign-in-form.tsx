@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { unstable_rethrow } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -44,17 +44,13 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
       setSeenPw(pwState);
       setStage("password");
     } else if (res?.step === "sso" && res.email && res.ssoUrl) {
-      // A proven single sign-on domain: the organisation's provider takes over.
+      // A proven single sign-on domain, for every address on it: the organisation's provider, or the password for administrators.
       setEmail(res.email);
       setSsoUrl(res.ssoUrl);
       setStage("sso");
     }
     return res;
   }, undefined);
-
-  useEffect(() => {
-    if (stage === "sso" && ssoUrl) window.location.assign(ssoUrl);
-  }, [stage, ssoUrl]);
 
   const error = stage === "password" ? (pwState !== seenPw ? pwState?.error : undefined) : stage === "email" && emailState?.step !== "password" && emailState?.step !== "sso" ? emailState?.error : undefined;
   const errorText = error ? (error === "blocked" ? t("blocked") : t(`errors.${error}` as "errors.generic")) : null;
@@ -66,7 +62,7 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
           <div>
             <button type="button" onClick={() => setStage("email")} aria-label={t("changeEmail")} className={authBackPill}>
               <ArrowLeft className="size-4 shrink-0" />
-              <span className="min-w-0 truncate">{email}</span>
+              <span dir="ltr" className="min-w-0 truncate">{email}</span>
             </button>
             <h1 className={authTitle}>{t("ssoTitle")}</h1>
             <p className={authLead}>{t("ssoBody")}</p>
@@ -74,6 +70,16 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
           <ButtonAnchor href={ssoUrl} size="lg" icon={<Building2 />}>
             {t("ssoContinue")}
           </ButtonAnchor>
+          <button
+            type="button"
+            onClick={() => {
+              setSeenPw(pwState);
+              setStage("password");
+            }}
+            className="inline-flex items-center justify-center text-caption font-semibold text-brand-600 hover:underline pointer-coarse:-my-3 pointer-coarse:min-h-11"
+          >
+            {t("ssoPassword")}
+          </button>
         </div>
       ) : stage === "email" ? (
         <form action={emailAction} className="grid gap-5" noValidate>
@@ -94,7 +100,7 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
             </p>
           ) : null}
           <Field label={t("emailLabel")} htmlFor="email" error={errorText}>
-            <div className="relative">
+            <div dir="ltr" className="relative">
               <Mail aria-hidden className={authInputIcon} />
               <Input
                 id="email"
@@ -127,7 +133,7 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
           <div>
             <button type="button" onClick={() => setStage("email")} aria-label={t("changeEmail")} className={authBackPill}>
               <ArrowLeft className="size-4 shrink-0" />
-              <span className="min-w-0 truncate">{email}</span>
+              <span dir="ltr" className="min-w-0 truncate">{email}</span>
             </button>
             <h1 className={authTitle}>{t("passwordTitle")}</h1>
           </div>
@@ -135,24 +141,25 @@ export function SignInForm({ next, notice, alertText }: { next: string; notice?:
           <input type="hidden" name="next" value={next} />
           <input type="text" name="username" autoComplete="username" value={email} readOnly hidden />
           <Field label={t("passwordLabel")} htmlFor="password" error={errorText}>
-            <div className="relative">
+            <div dir="ltr" className="relative">
               <LockKeyhole aria-hidden className={authInputIcon} />
               <Input
                 id="password"
                 name="password"
                 type={show ? "text" : "password"}
+                dir="ltr"
                 autoComplete="current-password"
                 autoFocus
                 aria-invalid={!!errorText}
                 aria-describedby={errorText ? "password-error" : undefined}
-                className={`${authInput} pr-12`}
+                className={`${authInput} pe-12`}
                 required
               />
               <button
                 type="button"
                 onClick={() => setShow((s) => !s)}
                 aria-label={show ? t("hidePassword") : t("showPassword")}
-                className="absolute top-1/2 right-1.5 grid size-9 -translate-y-1/2 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:right-0.5 pointer-coarse:size-11"
+                className="absolute top-1/2 end-1.5 grid size-9 -translate-y-1/2 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink pointer-coarse:end-0.5 pointer-coarse:size-11"
               >
                 {show ? <EyeOff className="size-4.5" /> : <Eye className="size-4.5" />}
               </button>

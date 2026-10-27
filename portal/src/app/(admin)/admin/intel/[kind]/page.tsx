@@ -50,7 +50,7 @@ export default async function IntelPage({ params, searchParams }: PageProps<"/ad
                     <Pill tone={SEV_TONE[i.severity]}>{tc(`severity.${i.severity}`)}</Pill>
                     <Pill tone={i.status === "new" ? "brand" : i.status === "converted" ? "safe" : "neutral"}>{tr(`statuses.${i.status}`)}</Pill>
                     {i.jurisdiction ? <Pill tone="cyan">{i.jurisdiction}</Pill> : null}
-                    <span className="ml-auto text-tab text-ink-subtle">{tr("published", { date: format.dateTime(i.publishedAt, { dateStyle: "medium" }) })}</span>
+                    <span className="ms-auto text-tab text-ink-subtle">{tr("published", { date: format.dateTime(i.publishedAt, { dateStyle: "medium" }) })}</span>
                   </div>
                   <h2 className="text-title-sm font-semibold">{i.title}</h2>
                   <p className="text-body-sm text-ink-muted">{i.summary}</p>
@@ -76,12 +76,12 @@ export default async function IntelPage({ params, searchParams }: PageProps<"/ad
                     </span>
                     {i.status === "converted" ? (
                       i.loopId ? (
-                        <Link href={`/admin/loops/${i.loopId}`} className="inline-flex items-center text-caption font-semibold text-brand-600 hover:underline pointer-coarse:min-h-11">
-                          {tr("openLoop")} →
+                        <Link href={`/admin/loops/${i.loopId}`} className="inline-flex items-center gap-1 text-caption font-semibold text-brand-600 hover:underline pointer-coarse:min-h-11">
+                          {tr("openLoop")} <span aria-hidden className="inline-block rtl:-scale-x-100">→</span>
                         </Link>
                       ) : i.policyId ? (
-                        <Link href={`/admin/policies/${i.policyId}`} className="inline-flex items-center text-caption font-semibold text-brand-600 hover:underline pointer-coarse:min-h-11">
-                          {tr("openPolicy")} →
+                        <Link href={`/admin/policies/${i.policyId}`} className="inline-flex items-center gap-1 text-caption font-semibold text-brand-600 hover:underline pointer-coarse:min-h-11">
+                          {tr("openPolicy")} <span aria-hidden className="inline-block rtl:-scale-x-100">→</span>
                         </Link>
                       ) : null
                     ) : (

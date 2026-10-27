@@ -1,0 +1,469 @@
+{
+ "id": "event-wifi-charging",
+ "title": "Wi-Fi და დატენვა ღონისძიებებზე",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "ღონისძიებებზე ასობით ადამიანი ერთ ქსელს უერთდება. თავდამსხმელს შეუძლია, იმავე სახელით სხვა ქსელი შექმნას.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "ღია ქსელი ძლიერი სიგნალით და მსგავსი სახელით შეიძლება ხაფანგი იყოს. სწორი სახელი რეგისტრაციის მაგიდასთან იკითხეთ.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "wifi",
+       "networks": [
+        {
+         "ssid": [
+          {
+           "text": "ReqemYol-Forum"
+          }
+         ],
+         "secured": true,
+         "signal": 3
+        },
+        {
+         "ssid": [
+          {
+           "text": "ReqemYol-Forum-FREE",
+           "spot": "twin"
+          }
+         ],
+         "secured": false,
+         "signal": 4
+        }
+       ]
+      }
+     },
+     "highlight": "twin"
+    },
+    {
+     "id": "b3",
+     "say": "სამუშაოდ მობილური ინტერნეტი ან თქვენი ორგანიზაციის VPN გამოიყენეთ. არასოდეს აკრიფოთ სამსახურებრივი პაროლი Wi-Fi-ის შესვლის გვერდზე.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "vpn"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "დატენვის საჯარო სადგურის ნაცვლად საკუთარი ადაპტერი შეაერთეთ როზეტში ან საკუთარი პორტატული დამტენი გამოიყენეთ.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "forum-wifi",
+   "environment": "browser",
+   "title": "ფორუმის Wi-Fi",
+   "intro": "ფორუმზე ღია ქსელს დაუკავშირდით და ბრაუზერი გაიხსნა. ყოველ გვერდზე სწორი ნაბიჯი აირჩიეთ.",
+   "steps": [
+    {
+     "id": "portal-login",
+     "label": "ReqemYol-Forum-FREE",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "nc-reqemyol-fake",
+      "brand": "RəqəmYol Forum Wi-Fi",
+      "url": [
+       {
+        "text": "http://wifi-reqemyol-forum.example.net/login"
+       }
+      ],
+      "fields": [
+       "სამსახურებრივი ელფოსტა",
+       "სამსახურებრივი ელფოსტის პაროლი"
+      ],
+      "button": "ინტერნეტთან დაკავშირება"
+     },
+     "say": "რას ითხოვს ეს Wi-Fi-ის გვერდი?",
+     "actions": [
+      {
+       "id": "login",
+       "label": "ინტერნეტთან დაკავშირება",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Wi-Fi-ის გვერდს თქვენი სამსახურებრივი პაროლი არასოდეს სჭირდება. ვინც ამ ღია ქსელს მართავს, ახლა მას ხედავს."
+      },
+      {
+       "id": "close",
+       "label": "ჩანართის დახურვა",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "სწორია. ქსელს გამოეთიშეთ და სწორი სახელი რეგისტრაციის მაგიდასთან იკითხეთ."
+      },
+      {
+       "id": "disconnect",
+       "label": "ქსელიდან გათიშვა",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "შესანიშნავია. უცნობი ღია ქსელიდან გათიშვა დაცვის ყველაზე სწრაფი გზაა."
+      }
+     ]
+    },
+    {
+     "id": "cert-warning",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "თქვენი კავშირი დაცული არ არის"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "საიტის poct.idare.example სერტიფიკატი ნამდვილი არ არის."
+        }
+       ],
+       [
+        {
+         "text": "შესაძლოა, ვიღაც თქვენი მონაცემების წაკითხვას ცდილობს."
+        }
+       ]
+      ],
+      "buttons": [
+       "უკან დაბრუნება",
+       "მაინც გაგრძელება"
+      ]
+     },
+     "say": "სამსახურებრივ ელფოსტას ხსნით და ბრაუზერი გაფრთხილებას გაჩვენებთ.",
+     "actions": [
+      {
+       "id": "back",
+       "label": "უკან დაბრუნება",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "სწორია. ეს გაფრთხილება შეიძლება ნიშნავდეს, რომ თქვენსა და საიტს შორის ვიღაც ჩაერია, ამიტომ მობილურ ინტერნეტზე გადადით."
+      },
+      {
+       "id": "proceed",
+       "label": "მაინც გაგრძელება",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "გაფრთხილების გამოტოვებამ შეიძლება თქვენი პაროლი იმ ადამიანს ჩაუგდოს ხელში, ვინც თქვენსა და საიტს შორის ჩაერია. დაბრუნდით და ქსელი შეცვალეთ."
+      }
+     ]
+    },
+    {
+     "id": "setup-download",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-reqemyol-fake",
+      "name": [
+       {
+        "text": "ReqemYol_WiFi_Setup.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "4,1 მბ",
+      "source": [
+       {
+        "text": "wifi-reqemyol-forum.example.net"
+       }
+      ]
+     },
+     "say": "გვერდი Wi-Fi-სთვის პროგრამას გთავაზობთ.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "ფაილის გახსნა",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Wi-Fi-თან დასაკავშირებლად პროგრამა საჭირო არ არის. ეს ფაილი კომპიუტერზე მავნე პროგრამას დააყენებს."
+      },
+      {
+       "id": "delete",
+       "label": "წაშლა",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "სწორია. ღონისძიების ქსელი პროგრამის დაყენებას არასოდეს მოითხოვს."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "network-list",
+   "prompt": "რომელი ქსელები გამოიყურება საეჭვოდ ღონისძიებაზე? იპოვეთ ისინი.",
+   "artifact": {
+    "kind": "wifi",
+    "networks": [
+     {
+      "ssid": [
+       {
+        "text": "ReqemYol-Forum"
+       }
+      ],
+      "secured": true,
+      "signal": 3
+     },
+     {
+      "ssid": [
+       {
+        "text": "ReqemYol-Forum-FREE",
+        "spot": "free"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "ReqemYol_Forum",
+        "spot": "twin"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Pulsuz_Sarj_WiFi",
+        "spot": "charge"
+       }
+      ],
+      "secured": false,
+      "signal": 2
+     },
+     {
+      "ssid": [
+       {
+        "text": "Lumera-Guest"
+       }
+      ],
+      "secured": true,
+      "signal": 1
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "free",
+     "label": "მიწერილი FREE",
+     "explain": "ქსელი ღიაა და სახელს FREE აქვს მიწერილი. ოფიციალურ სახელს რეგისტრაციის მაგიდასთან გეტყვიან."
+    },
+    {
+     "id": "twin",
+     "label": "მსგავსი სახელი",
+     "explain": "სახელი თითქმის ოფიციალურს ემთხვევა, განსხვავება მხოლოდ ერთ სიმბოლოშია. ეს შეიძლება „ბოროტი ტყუპი“ იყოს – ოფიციალური ქსელის ყალბი ასლი."
+    },
+    {
+     "id": "charge",
+     "label": "მაცდური სახელი",
+     "explain": "ღია ქსელი უფასო შეთავაზებით ხაფანგის კლასიკური ნიშანია."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "choice",
+   "id": "charging",
+   "question": {
+    "prompt": "ტელეფონის ბატარეა 5%-ზეა, დარბაზში კი დატენვის საჯარო USB-სადგურია. რას გააკეთებთ?",
+    "options": [
+     {
+      "id": "own-adapter",
+      "label": "საკუთარ ადაპტერს კედლის როზეტში შევაერთებ",
+      "correct": true,
+      "feedback": "სწორია. როზეტი მხოლოდ ელექტროენერგიას აწვდის და არა მონაცემებს."
+     },
+     {
+      "id": "powerbank",
+      "label": "საკუთარი პორტატული დამტენით დავტენი",
+      "correct": true,
+      "feedback": "სწორია. საკუთარი პორტატული დამტენი თქვენი კონტროლის ქვეშ რჩება."
+     },
+     {
+      "id": "trust",
+      "label": "სადგურს შევაერთებ და „ნდობას“ დავაჭერ",
+      "correct": false,
+      "feedback": "ნდობა მოწყობილობას თქვენი ტელეფონის მონაცემებზე წვდომას აძლევს. დატენვას ეს არ სჭირდება."
+     },
+     {
+      "id": "stranger-cable",
+      "label": "გვერდით მჯდომ სტუმარს კაბელს ვთხოვ",
+      "correct": false,
+      "feedback": "უცნობ კაბელში შეიძლება ჩიპი იყოს დამალული. თან იქონიეთ საკუთარი კაბელი და ადაპტერი."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "usb"
+    }
+   },
+   "explain": "ყველაზე უსაფრთხოა საკუთარი ადაპტერი როზეტში ან საკუთარი პორტატული დამტენი. თუ ტელეფონი ნდობას მოგთხოვთ, უარი თქვით."
+  },
+  {
+   "type": "swipe",
+   "id": "event-messages",
+   "prompt": "რასაც ღონისძიების დროს შეხვდებით. უსაფრთხოა თუ საფრთხეა?",
+   "cards": [
+    {
+     "id": "badge-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "nc-reqemyol",
+      "sender": [
+       {
+        "text": "ReqemYol"
+       }
+      ],
+      "time": "08:30",
+      "messages": [
+       [
+        {
+         "text": "თქვენი ბეჯი მზადაა. პირადობის მოწმობით მობრძანდით რეგისტრაციის მაგიდასთან."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "არც ბმულია, არც გადახდა და არც რაიმეს აკრეფაა საჭირო. ეს ჩვეულებრივი შეხსენებაა."
+    },
+    {
+     "id": "cert-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "nc-reqemyol-fake",
+      "from": {
+       "name": [
+        {
+         "text": "RəqəmYol Forum"
+        }
+       ],
+       "address": [
+        {
+         "text": "sertifikat@reqemyol-forum.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "თქვენი მონაწილეობის სერტიფიკატი"
+       }
+      ],
+      "time": "17:05",
+      "body": [
+       [
+        {
+         "text": "სერტიფიკატის ჩამოსატვირთად შედით სამსახურებრივი ელფოსტით: "
+        },
+        {
+         "text": "reqemyol-forum.example.info/certificate",
+         "link": {
+          "label": "reqemyol-forum.example.info/certificate",
+          "href": "https://reqemyol-forum.example.info/certificate"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "ოფიციალური საიტია reqemyol-forum.example, ეს კი სხვა დომენია. სერტიფიკატისთვის სამსახურებრივი პაროლი არასოდეს არის საჭირო."
+    },
+    {
+     "id": "qr-table",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "სტიკერი მაგიდაზე: „დაასკანერეთ უფასო Wi-Fi-სთვის“"
+       }
+      ],
+      "destination": [
+       {
+        "text": "http://wifi-giris.example.info/connect"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "სტიკერის გაკვრა ნებისმიერს შეუძლია, მისამართი კი ფორუმს არ ეკუთვნის. ქსელის სახელი რეგისტრაციის მაგიდასთან იკითხეთ."
+    },
+    {
+     "id": "session-note",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-reqemyol",
+      "app": "RəqəmYol Forum",
+      "title": [
+       {
+        "text": "სესია 15 წუთში იწყება"
+       }
+      ],
+      "body": [
+       {
+        "text": "პანელი კიბერუსაფრთხოებაზე, B დარბაზი."
+       }
+      ],
+      "time": "13:45"
+     },
+     "verdict": "safe",
+     "explain": "ეს შეტყობინება იმ აპლიკაციიდანაა, რომელიც ოფიციალური მაღაზიიდან დააყენეთ. არც ბმულია და არც მოთხოვნა."
+    },
+    {
+     "id": "trust-prompt",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ენდობით ამ მოწყობილობას?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "მიერთებული მოწყობილობა თქვენი ტელეფონის ფაილებზე წვდომას ითხოვს."
+        }
+       ]
+      ],
+      "buttons": [
+       "ნდობაზე უარი",
+       "ნდობა"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "დატენვის სადგურს თქვენი ფაილები არ უნდა სჭირდებოდეს. აირჩიეთ „ნდობაზე უარი“ და დატენვა გაგრძელდება."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "ქსელის სახელი რეგისტრაციის მაგიდასთან იკითხეთ, სამუშაოდ კი მობილური ინტერნეტი ან VPN გამოიყენეთ.",
+    "არასოდეს აკრიფოთ სამსახურებრივი პაროლი Wi-Fi-ის გვერდზე და არ გამოტოვოთ სერტიფიკატის გაფრთხილება.",
+    "დატენეთ საკუთარი ადაპტერით როზეტიდან ან საკუთარი პორტატული დამტენით."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

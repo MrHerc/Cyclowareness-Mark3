@@ -1,0 +1,366 @@
+{
+ "id": "passphrases",
+ "title": "Les phrases de passe",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "long-beats-complex",
+   "beats": [
+    {
+     "id": "short",
+     "say": "Ce mot de passe a l’air complexe, mais un prénom, une année et un point d’exclamation, c’est le tout premier schéma que testent les attaquants.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "stat",
+      "value": "Aynur1985!",
+      "label": "Complexe en apparence, facile à craquer"
+     }
+    },
+    {
+     "id": "phrase",
+     "say": "Mieux vaut une phrase de passe d’au moins quatre mots choisis au hasard. Elle est longue, facile à retenir et très difficile à deviner.",
+     "mood": "happy",
+     "gesture": "nod",
+     "visual": {
+      "kind": "stat",
+      "value": "violette brique océan horloge",
+      "label": "Un simple exemple, créez la vôtre"
+     },
+     "stage": "back"
+    },
+    {
+     "id": "length",
+     "say": "La longueur compte plus que la complexité. Visez au moins quinze caractères ; vous pouvez séparer les mots par des espaces ou des tirets.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "stat",
+      "value": "15+",
+      "label": "caractères, le minimum recommandé"
+     },
+     "checkpoint": {
+      "prompt": "Quel mot de passe est le plus robuste ?",
+      "options": [
+       {
+        "id": "swaps",
+        "label": "Pa$$w0rd2026",
+        "correct": false,
+        "feedback": "Les outils de cassage connaissent bien ces substitutions de lettres."
+       },
+       {
+        "id": "words",
+        "label": "chameau lanterne citron nuage",
+        "correct": true,
+        "feedback": "Exact. Quatre mots pris au hasard, c’est long et imprévisible."
+       }
+      ]
+     }
+    },
+    {
+     "id": "stuffing",
+     "say": "Quand un site subit une fuite, les attaquants essaient le même mot de passe sur d’autres sites. Chaque compte a donc besoin du sien.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    }
+   ]
+  },
+  {
+   "type": "password",
+   "id": "make-passphrase",
+   "prompt": "Créez votre propre phrase de passe.",
+   "targetScore": 4,
+   "tips": [
+    "Ne saisissez pas votre vrai mot de passe ici, c’est un exercice.",
+    "Choisissez au moins quatre mots au hasard.",
+    "Évitez les paroles de chansons, les poèmes et les proverbes.",
+    "Écartez les noms, les dates et votre lieu de travail."
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "leak-alert",
+   "prompt": "Trouvez les signes de fraude dans cette alerte de fuite.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "xidmet-agentliyi-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Centre de sécurité",
+       "reveal": "security@xidmetagentliyi-az.com"
+      }
+     ],
+     "address": [
+      {
+       "text": "security@"
+      },
+      {
+       "text": "xidmetagentliyi-az.com",
+       "spot": "sender-domain"
+      }
+     ]
+    },
+    "to": "a.hasanova@xidmetagentliyi.az",
+    "subject": [
+     {
+      "text": "Votre mot de passe a été trouvé dans une fuite de données"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Cher utilisateur,",
+       "spot": "greeting"
+      }
+     ],
+     [
+      {
+       "text": "Votre mot de passe figure dans une base de données divulguée sur internet."
+      }
+     ],
+     [
+      {
+       "text": "Pour protéger votre compte, "
+      },
+      {
+       "text": "saisissez votre ancien et votre nouveau mot de passe dans ce formulaire.",
+       "spot": "old-password"
+      }
+     ],
+     [
+      {
+       "text": "Ouvrir le formulaire",
+       "spot": "link",
+       "link": {
+        "label": "Ouvrir le formulaire",
+        "href": "https://parol-yenile.info/forma"
+       }
+      }
+     ],
+     [
+      {
+       "text": "Sans action de votre part d’ici une heure, le compte sera supprimé.",
+       "spot": "urgency"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender-domain",
+     "label": "Faux domaine",
+     "explain": "Le domaine de l’agence est xidmetagentliyi.az, sans -az.com à la fin."
+    },
+    {
+     "id": "greeting",
+     "label": "Formule d’appel impersonnelle",
+     "explain": "Votre propre équipe sécurité vous écrirait en vous appelant par votre nom."
+    },
+    {
+     "id": "old-password",
+     "label": "Demande de l’ancien mot de passe",
+     "explain": "Un vrai service ne vous demande pas de saisir votre ancien mot de passe dans un formulaire reçu par e-mail. Changez-le vous-même sur le site que vous connaissez."
+    },
+    {
+     "id": "link",
+     "label": "Lien externe",
+     "explain": "Le lien mène à un autre domaine, pas au site de l’agence."
+    },
+    {
+     "id": "urgency",
+     "label": "Ultimatum d’une heure",
+     "explain": "Un délai très court et une menace vous poussent à agir sans réfléchir."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "reset-page",
+   "environment": "browser",
+   "title": "Réinitialisez votre mot de passe",
+   "intro": "Après une alerte de fuite, une page de réinitialisation du mot de passe s’ouvre dans le navigateur. Lisez l’adresse et décidez.",
+   "steps": [
+    {
+     "id": "leak-page",
+     "label": "Votre mot de passe a été trouvé dans une fuite de données",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "xidmet-agentliyi-fake",
+      "url": [
+       {
+        "text": "https://",
+        "reveal": "hesab-yoxla.info"
+       },
+       {
+        "text": "hesab-yoxla.info",
+        "spot": "real-domain"
+       },
+       {
+        "text": "/sizma"
+       }
+      ]
+     },
+     "say": "La page vous fait peur et vous presse. À qui appartient cette adresse ?",
+     "actions": [
+      {
+       "id": "reset-here",
+       "label": "Réinitialiser le mot de passe ici",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Après une alerte de fuite, ne suivez pas le lien. Changez le mot de passe sur un site que vous ouvrez vous-même."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet, j’ouvrirai le portail moi-même",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact : hesab-yoxla.info n’est pas le site de l’agence. Ouvrez vous-même le portail depuis vos favoris.",
+       "next": "real-reset"
+      }
+     ]
+    },
+    {
+     "id": "fake-reset",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "xidmet-agentliyi-fake",
+      "brand": "Xidmət Agentliyi",
+      "url": [
+       {
+        "text": "https://",
+        "reveal": "parol-yenile.info"
+       },
+       {
+        "text": "parol-yenile.info",
+        "spot": "real-domain"
+       },
+       {
+        "text": "/agentlik"
+       }
+      ],
+      "fields": [
+       "Adresse e-mail",
+       "Ancien mot de passe",
+       "Nouveau mot de passe"
+      ],
+      "button": "Réinitialiser le mot de passe"
+     },
+     "say": "Le formulaire demande aussi votre ancien mot de passe. Vérifiez l’adresse.",
+     "actions": [
+      {
+       "id": "submit",
+       "label": "Réinitialiser le mot de passe",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Un faux formulaire qui demande l’ancien mot de passe sert à le voler. Changez-le tout de suite sur le portail officiel et signalez l’incident."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Le domaine parol-yenile.info n’est pas celui de l’agence, alors ne saisissez rien ici."
+      },
+      {
+       "id": "report",
+       "label": "Signaler le site",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Très bien. Signaler le faux site aide à le faire bloquer pour les autres aussi."
+      }
+     ]
+    },
+    {
+     "id": "real-reset",
+     "label": "Vous avez ouvert le portail vous-même",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "xidmet-agentliyi",
+      "brand": "Xidmət Agentliyi",
+      "url": [
+       {
+        "text": "https://portal.xidmetagentliyi.az/profil/parol",
+        "reveal": "xidmetagentliyi.az"
+       }
+      ],
+      "fields": [
+       "Ancien mot de passe",
+       "Nouvelle phrase de passe"
+      ],
+      "button": "Modifier"
+     },
+     "say": "C’est bien le portail de l’agence. Que faites-vous maintenant ?",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Modifier le mot de passe",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Exact, vous l’avez changé sur le portail officiel. Choisissez comme nouveau mot de passe une longue phrase que vous n’utilisez nulle part ailleurs."
+      },
+      {
+       "id": "later",
+       "label": "Je le changerai plus tard",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Si le mot de passe a fuité, quelqu’un est peut-être déjà en train de l’essayer. Changez-le maintenant sur le portail officiel."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "true-rules",
+   "question": {
+    "prompt": "Quelles règles sont justes ?",
+    "options": [
+     {
+      "id": "length",
+      "label": "La longueur compte plus que la complexité",
+      "correct": true,
+      "feedback": "Exact. Un mot de passe long est bien plus difficile à casser."
+     },
+     {
+      "id": "unique",
+      "label": "Un mot de passe différent pour chaque compte",
+      "correct": true,
+      "feedback": "Exact. Ainsi, une fuite ne met en danger qu’un seul compte."
+     },
+     {
+      "id": "monthly",
+      "label": "Changer de mot de passe tous les mois",
+      "correct": false,
+      "feedback": "Changer sans raison mène souvent à des mots de passe faibles et semblables. Changez-le immédiatement si vous soupçonnez une fuite."
+     },
+     {
+      "id": "birth-year",
+      "label": "Une année de naissance aide à s’en souvenir",
+      "correct": false,
+      "feedback": "Une année de naissance se trouve facilement, et les attaquants l’essaient en premier."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Les recommandations actuelles : des mots de passe longs et uniques, changés immédiatement après une fuite. Si les règles de votre organisation sont différentes, suivez-les."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Une longue phrase de passe vaut mieux qu’un mot de passe court et complexe.",
+    "Un mot de passe différent pour chaque compte.",
+    "Après une fuite, changez immédiatement le mot de passe."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* Tailwind's own rtl:/ltr: also match `[dir="rtl"] *`, which leaks into dir="ltr" islands (the lab VM, code,
+   e-mail and phone inputs). :dir() follows the nearest dir attribute. */
+@custom-variant rtl (&:where(:dir(rtl)));
+@custom-variant ltr (&:where(:dir(ltr)));
+
 /* Design tokens: docs/audit/01-design-tokens.md (Cyclowareness, 1:1). */
 
 :root {
@@ -27,8 +32,8 @@
 }
 
 @theme {
-  --font-sans: var(--font-geologica), var(--font-georgian), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-geologica), var(--font-georgian), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-geologica), var(--font-georgian), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-geologica), var(--font-georgian), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
 
   --color-white: #fff;
   --color-ink: #16123a;
@@ -135,9 +140,10 @@
   --z-80: 80;
   --z-90: 90;
 
+  /* Sweeps in the reading direction (--sweep is -1 under dir="rtl"). */
   @keyframes shimmer {
-    0% { transform: translate(-100%); }
-    100% { transform: translate(100%); }
+    0% { transform: translate(calc(-100% * var(--sweep, 1))); }
+    100% { transform: translate(calc(100% * var(--sweep, 1))); }
   }
   @keyframes float {
     0%, 100% { transform: translateY(0); }
@@ -194,6 +200,62 @@
     ) {
     grid-template-columns: minmax(0, 1fr);
   }
+  /* next/font gives each family a local("Arial") fallback face with no unicode-range, and Arial has Arabic
+     glyphs, so Arabic placed after Geologica would render in Arial: Arabic text lists its own font first. */
+  [lang|="ar"] {
+    --font-sans: var(--font-arabic), var(--font-geologica), var(--font-georgian), ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-sans);
+    font-family: var(--font-sans);
+  }
+  /* Text in another language inside an Arabic page goes back to the Latin-first stack. */
+  [lang]:not([lang|="ar"]) {
+    --font-sans: var(--font-geologica), var(--font-georgian), var(--font-arabic), ui-sans-serif, system-ui, sans-serif;
+    --font-display: var(--font-sans);
+    font-family: var(--font-sans);
+  }
+  [dir="rtl"] {
+    --sweep: -1;
+  }
+  [dir="ltr"] {
+    --sweep: 1;
+  }
+  /* Code, links, hosts, keys and passphrases typed into a monospace field run left to right in every language
+     (a field with its own dir, the policy text editor, keeps it). A wrapper that positions an icon over such a
+     field needs dir="ltr" too, or the field's logical padding and the icon end up on opposite sides. */
+  :is(input, textarea).font-mono:not([dir]) {
+    direction: ltr;
+  }
+}
+
+/* Arabic letters join, so the tokens' negative tracking and tracking-* would break words apart, and the tight
+   display line-heights clip its marks. Unlayered so it wins over the utilities; monospace (codes, the OTP field)
+   keeps its spacing. */
+:lang(ar):not(.font-mono) {
+  letter-spacing: 0;
+  --text-display--line-height: 1.3;
+  --text-headline--line-height: 1.3;
+  --text-title--line-height: 1.4;
+  --text-title-sm--line-height: 1.4;
+  --text-tab--line-height: 1.4;
+  --text-tab-sm--line-height: 1.4;
+}
+
+/* Lucide has no RTL variants: icons that point along the reading direction mirror. On the icon itself, so
+   dir="ltr" islands keep theirs; `transform` composes with Tailwind's separate rotate/translate/scale. */
+:is(
+    .lucide-chevron-right,
+    .lucide-chevron-left,
+    .lucide-arrow-left,
+    .lucide-arrow-right,
+    .lucide-arrow-up-right,
+    .lucide-arrow-down-right,
+    .lucide-send,
+    .lucide-reply,
+    .lucide-log-out,
+    .lucide-move-right,
+    .lucide-corner-down-right
+  ):dir(rtl) {
+  transform: scaleX(-1);
 }
 
 /* Motion preference: "calm" and "still" set on <html data-motion>. */

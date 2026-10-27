@@ -1,0 +1,553 @@
+{
+  "id": "shared-doc-login",
+  "title": "Спільний документ",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "sd-tutor",
+      "beats": [
+        {
+          "id": "sd-b1",
+          "say": "Фальшиве вікно входу часто починається з листа: з вами поділилися документом, увійдіть, щоб його переглянути.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        },
+        {
+          "id": "sd-b2",
+          "say": "Кнопка пропонує увійти через знайомий обліковий запис. А вікно, яке відкривається, намальоване всередині сайту.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "buludxidmet-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "BuludXidmet"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "paylasim@buludxidmet-share.example.net"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "Камран Алієв поділився з вами документом"
+                }
+              ],
+              "time": "09:47",
+              "body": [
+                [
+                  {
+                    "text": "Камран Алієв поділився з вами файлом «Tender_teklifi_2026.pdf»."
+                  }
+                ],
+                [
+                  {
+                    "text": "Щоб переглянути його: "
+                  },
+                  {
+                    "text": "Увійти через IshPocht",
+                    "spot": "signin-btn",
+                    "link": {
+                      "label": "Увійти через IshPocht",
+                      "href": "https://buludxidmet-share.example.net/view?id=88213"
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "signin-btn"
+        },
+        {
+          "id": "sd-b3",
+          "say": "Лист із погрозою закрити сторінку вашої організації в соцмережі — це така сама пастка.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "sd-b4",
+          "say": "Правило просте: не входьте через кнопку в листі. Відкрийте сайт самі.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "sd-choice",
+      "question": {
+        "prompt": "Ви отримали такий лист. Що ви зробите?",
+        "options": [
+          {
+            "id": "signin",
+            "label": "Натисну кнопку й увійду через свій обліковий запис IshPocht",
+            "correct": false,
+            "feedback": "Кнопка веде на незнайомий вам сайт. Вікно входу там може бути фальшивим."
+          },
+          {
+            "id": "ask-colleague",
+            "label": "Зателефоную Камранові на відомий мені номер і перепитаю",
+            "correct": true,
+            "feedback": "Правильно. Якщо документ справжній, Камран поділиться ним ще раз у власній системі вашої організації."
+          },
+          {
+            "id": "forward",
+            "label": "Перешлю колегам, щоб вони теж подивилися",
+            "correct": false,
+            "feedback": "Тоді пастка дістанеться й іншим. Підозрілий лист надсилайте лише техпідтримці."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "buludxidmet-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "BuludXidmet"
+                }
+              ],
+              "address": [
+                {
+                  "text": "paylasim@buludxidmet-share.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Камран Алієв поділився з вами документом"
+              }
+            ],
+            "time": "09:47",
+            "body": [
+              [
+                {
+                  "text": "Камран Алієв поділився з вами файлом «Tender_teklifi_2026.pdf»."
+                }
+              ],
+              [
+                {
+                  "text": "Щоб переглянути його: "
+                },
+                {
+                  "text": "Увійти через IshPocht",
+                  "link": {
+                    "label": "Увійти через IshPocht",
+                    "href": "https://buludxidmet-share.example.net/view?id=88213"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "Посилання дійсне 24 години."
+                }
+              ]
+            ]
+          }
+        }
+      },
+      "explain": "Якщо документ справжній, ви побачите його, коли самі відкриєте сайт. Кнопка входу в листі вам ніколи не потрібна."
+    },
+    {
+      "type": "simulation",
+      "id": "sd-sim",
+      "environment": "inbox",
+      "title": "Ваша робоча пошта",
+      "intro": "У ранковій пошті на вас чекають чотири листи. Відкрийте кожен і виберіть правильну дію.",
+      "steps": [
+        {
+          "id": "real-share",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "buludxidmet",
+            "from": {
+              "name": [
+                {
+                  "text": "BuludXidmet"
+                }
+              ],
+              "address": [
+                {
+                  "text": "bildiris@buludxidmet.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Нармін Гасанова поділилася з вами файлом"
+              }
+            ],
+            "time": "08:55",
+            "body": [
+              [
+                {
+                  "text": "Нармін Гасанова поділилася з вами файлом «Budce_2027.xlsx»."
+                }
+              ],
+              [
+                {
+                  "text": "Примітка: таблиця бюджету, яку ми обговорювали сьогодні вранці."
+                }
+              ],
+              [
+                {
+                  "text": "Відкрити файл",
+                  "link": {
+                    "label": "Відкрити файл",
+                    "href": "https://buludxidmet.example/idare/budce-2027"
+                  }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Відкрити файл",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "Ви чекали на цей файл, а посилання веде на власну адресу сервісу. Його можна відкрити."
+            },
+            {
+              "id": "safe",
+              "label": "Позначити як безпечний",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Правильно. Знайома колега, очікуваний файл і власна адреса сервісу."
+            },
+            {
+              "id": "report",
+              "label": "Повідомити про фішинг",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Обережність — це добре, але тривожних ознак тут немає. Нармін сьогодні вранці казала вам про цей файл."
+            }
+          ]
+        },
+        {
+          "id": "fake-share",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "buludxidmet-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "BuludXidmet"
+                }
+              ],
+              "address": [
+                {
+                  "text": "paylasim@buludxidmet-share.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Камран Алієв поділився з вами документом"
+              }
+            ],
+            "time": "09:47",
+            "body": [
+              [
+                {
+                  "text": "Камран Алієв поділився з вами файлом «Tender_teklifi_2026.pdf»."
+                }
+              ],
+              [
+                {
+                  "text": "Щоб переглянути його: "
+                },
+                {
+                  "text": "Увійти через IshPocht",
+                  "link": {
+                    "label": "Увійти через IshPocht",
+                    "href": "https://buludxidmet-share.example.net/view?id=88213"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "Посилання дійсне 24 години."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Повідомити про фішинг",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Правильно. Чужий домен і кнопка входу, яка вела до фальшивого вікна."
+            },
+            {
+              "id": "click",
+              "label": "Увійти через IshPocht",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Сторінка намалювала б вікно IshPocht і попросила ваш пароль. Не натискайте такі кнопки."
+            },
+            {
+              "id": "delete",
+              "label": "Видалити",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Видалити теж можна. Але якщо ви повідомите про лист, техпідтримка зможе попередити колег."
+            }
+          ]
+        },
+        {
+          "id": "copyright",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "w2c-kontakto-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "Юридичний центр Kontakto"
+                }
+              ],
+              "address": [
+                {
+                  "text": "huquq@kontakto-support.example.info"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Вашу сторінку буде видалено протягом 24 годин"
+              }
+            ],
+            "time": "10:12",
+            "body": [
+              [
+                {
+                  "text": "На офіційній сторінці вашої організації виявлено порушення авторських прав."
+                }
+              ],
+              [
+                {
+                  "text": "Щоб оскаржити рішення, увійдіть як адміністратор сторінки: "
+                },
+                {
+                  "text": "Оскаржити",
+                  "link": {
+                    "label": "Оскаржити",
+                    "href": "https://kontakto-support.example.info/etiraz"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "Якщо ви не відповісте, сторінку буде закрито назавжди."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Повідомити про фішинг",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Правильно. Справжнє попередження з’явилося б і в застосунку самої соцмережі."
+            },
+            {
+              "id": "click",
+              "label": "Оскаржити",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Сторінка оскарження намалювала вікно Kontakto й зібрала пароль і код. Сторінка вашої організації дісталася б шахраєві."
+            },
+            {
+              "id": "reply",
+              "label": "Відповісти: це помилка",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Шахрай прочитає відповідь і надішле нове посилання. Краще повідомте про лист."
+            }
+          ]
+        },
+        {
+          "id": "it-notice",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "ІТ-підтримка"
+                }
+              ],
+              "address": [
+                {
+                  "text": "destek@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Сьогодні ввечері оновлення поштового сервера"
+              }
+            ],
+            "time": "11:30",
+            "body": [
+              [
+                {
+                  "text": "Сьогодні з 19:00 до 20:00 робоча пошта може бути недоступна кілька хвилин."
+                }
+              ],
+              [
+                {
+                  "text": "Від вас не потрібно жодних дій."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "safe",
+              "label": "Позначити як безпечний",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Правильно. Лист надійшов із внутрішньої адреси, без посилань і без прохання ввести пароль."
+            },
+            {
+              "id": "report",
+              "label": "Повідомити про фішинг",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "У цьому листі немає посилань, і він нічого не просить. Такі сповіщення — звичайна робоча справа."
+            },
+            {
+              "id": "delete",
+              "label": "Видалити",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Це нормально, лист лише інформує вас. Небезпеки немає."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "sd-hotspot",
+      "prompt": "Знайдіть ознаки того, що це вікно входу фальшиве.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2c-kontakto-fake",
+        "tone": "app",
+        "title": [
+          {
+            "text": "Kontakto: вхід"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Адресний рядок браузера: "
+            },
+            {
+              "text": "kontakto-support.example.info/etiraz",
+              "spot": "real-address"
+            }
+          ],
+          [
+            {
+              "text": "Адреса у вікні: "
+            },
+            {
+              "text": "https://kontakto.example/login",
+              "spot": "painted-bar"
+            }
+          ],
+          [
+            {
+              "text": "Телефон або адреса пошти, пароль"
+            }
+          ],
+          [
+            {
+              "text": "Також введіть код, який надійшов у SMS",
+              "spot": "code"
+            }
+          ],
+          [
+            {
+              "text": "Вікно не виходить за край сторінки",
+              "spot": "no-drag"
+            }
+          ],
+          [
+            {
+              "text": "На оскарження залишилося 2 години 59 хвилин",
+              "spot": "timer"
+            }
+          ]
+        ],
+        "buttons": [
+          "Увійти"
+        ]
+      },
+      "spots": [
+        {
+          "id": "real-address",
+          "label": "Справжня адреса",
+          "explain": "Власний адресний рядок браузера показує інший сайт. Дивіться саме туди, а не на текст усередині вікна."
+        },
+        {
+          "id": "painted-bar",
+          "label": "Намальована адреса",
+          "explain": "Цей адресний рядок — частина картинки вікна. Шахрай може написати там будь-що."
+        },
+        {
+          "id": "code",
+          "label": "Код підтвердження",
+          "explain": "Код потрібен їм, щоб обійти двоетапну перевірку. Ніколи не вводьте код у таке вікно."
+        },
+        {
+          "id": "no-drag",
+          "label": "Вікно застрягло",
+          "explain": "Справжнє вікно можна перетягнути за межі браузера. А це застрягло всередині сторінки."
+        },
+        {
+          "id": "timer",
+          "label": "Тиск",
+          "explain": "Зворотний відлік потрібен для того, щоб ви увійшли, нічого не перевіривши."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "recap",
+      "id": "sd-recap",
+      "points": [
+        "Щоб знайти спільний документ, самі відкрийте сайт",
+        "Лист із погрозою закрити вашу сторінку — це пастка",
+        "Якщо ви ввели пароль, негайно змініть його й повідомте техпідтримку"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

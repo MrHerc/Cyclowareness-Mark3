@@ -1,0 +1,481 @@
+{
+ "id": "accidental-insider",
+ "title": "Greșeli din neatenție",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ai-tutor",
+   "beats": [
+    {
+     "id": "ai-b1",
+     "say": "Bună ziua! Multe scurgeri de date nu încep cu o intenție rea, ci cu o greșeală obișnuită.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "ai-b2",
+     "say": "Completarea automată poate alege o adresă greșită. Înainte să trimiteți, mai verificați o dată destinatarul.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Destinatar extern"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Acest e-mail pleacă în afara organizației: "
+         },
+         {
+          "text": "rauf.aliyev@kur-tikinti.example",
+          "spot": "wrong"
+         }
+        ],
+        [
+         {
+          "text": "Atașament: Tabel_salarii_2026.xlsx"
+         }
+        ]
+       ],
+       "buttons": [
+        "Trimiteți oricum",
+        "Anulați"
+       ]
+      }
+     },
+     "highlight": "wrong"
+    },
+    {
+     "id": "ai-b3",
+     "say": "Nu încărcați fișiere de serviciu într-un cloud personal sau în aplicații pe care organizația nu le-a aprobat.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    {
+     "id": "ai-b4",
+     "say": "Dacă ați greșit, nu ascundeți greșeala. O raportare rapidă limitează paguba, iar ascunderea o agravează.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ai-sim",
+   "environment": "desktop",
+   "title": "O zi de lucru obișnuită",
+   "intro": "Astăzi ați primit mai multe solicitări. Pentru fiecare, alegeți cum păstrați datele în siguranță.",
+   "steps": [
+    {
+     "id": "personal-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Nigar Aliyeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "nigar.aliyeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Lista pentru raport"
+       }
+      ],
+      "time": "09:20",
+      "body": [
+       [
+        {
+         "text": "Salut, diseară lucrez de acasă."
+        }
+       ],
+       [
+        {
+         "text": "Te rog să-mi trimiți lista angajaților (numerele actelor de identitate, telefoanele) pe e-mailul personal: nigar.84@poctam.example"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Trimiteți lista pe e-mailul ei personal",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Datele cu caracter personal au ieșit de sub controlul organizației. O căsuță de e-mail personală nu este protejată, iar datele se pot scurge de acolo."
+      },
+      {
+       "id": "reply",
+       "label": "Răspundeți: nu pot trimite lista pe e-mailul personal",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Corect. Lucrul de acasă se face prin instrumente aprobate, cum ar fi e-mailul de serviciu prin VPN."
+      }
+     ]
+    },
+    {
+     "id": "shadow-it",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "fayldasi",
+      "tone": "app",
+      "title": [
+       {
+        "text": "FaylDaşı: transfer gratuit de fișiere"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Deviz_proiect.xlsx (2,4 GB) a fost încărcat."
+        }
+       ],
+       [
+        {
+         "text": "Oricine are linkul poate descărca fișierul.",
+         "spot": "public"
+        }
+       ]
+      ],
+      "buttons": [
+       "Copiați linkul",
+       "Anulați"
+      ]
+     },
+     "say": "Fișierul era prea mare pentru e-mail, așa că ați găsit un site gratuit.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Copiați linkul și trimiteți-l partenerului",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Oricine primește linkul poate deschide fișierul. Organizația nu are niciun control asupra acestui serviciu."
+      },
+      {
+       "id": "cancel",
+       "label": "Anulați și cereți echipei IT varianta aprobată",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Suportul IT vă va arăta metoda aprobată prin care puteți trimite în siguranță un fișier mare."
+      }
+     ]
+    },
+    {
+     "id": "wrong-recipient",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Destinatar extern"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Acest e-mail pleacă în afara organizației: "
+        },
+        {
+         "text": "rauf.aliyev@kur-tikinti.example",
+         "spot": "wrong"
+        }
+       ],
+       [
+        {
+         "text": "Atașament: Tabel_salarii_2026.xlsx"
+        }
+       ]
+      ],
+      "buttons": [
+       "Trimiteți oricum",
+       "Anulați"
+      ]
+     },
+     "say": "Îi trimiteți lui Rauf tabelul cu salariile. Verificați adresa.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Trimiteți oricum",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Tabelul cu salariile a ajuns la o companie externă. Aceasta este o scurgere de date cu caracter personal."
+      },
+      {
+       "id": "cancel",
+       "label": "Anulați și verificați destinatarul",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Colegul dumneavoastră este Rauf Alizada, dar completarea automată l-a ales pe Rauf Aliyev, de la o companie parteneră."
+      }
+     ]
+    },
+    {
+     "id": "sent-wrong",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "IshPocht",
+      "title": [
+       {
+        "text": "E-mail trimis"
+       }
+      ],
+      "body": [
+       {
+        "text": "Raport trimestrial: aysel.quliyeva@poctam.example (adresă personală)"
+       }
+      ],
+      "time": "16:41"
+     },
+     "say": "Un alt e-mail a ajuns deja la o adresă greșită.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Anunțați imediat echipa de securitate",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Cu cât raportați mai repede, cu atât sunt mai mari șansele de a retrage mesajul și de a limita paguba."
+      },
+      {
+       "id": "ask",
+       "label": "Scrieți-i destinatarului: vă rog să-l ștergeți",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Este bine să cereți asta, dar nu este suficient. Anunțați mai întâi echipa de securitate, care vă va spune ce să faceți în continuare."
+      },
+      {
+       "id": "hide",
+       "label": "Nu spuneți nimănui",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "O greșeală ascunsă devine tot mai mare. Raportarea este gestul profesionist."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "ai-swipe",
+   "prompt": "Sigur sau riscant?",
+   "cards": [
+    {
+     "id": "badge-photo",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Postarea dumneavoastră a fost publicată"
+       }
+      ],
+      "body": [
+       {
+        "text": "„Prima mea zi!” În fotografie se văd ecusonul dumneavoastră și un sistem intern pe ecran."
+       }
+      ],
+      "time": "12:10"
+     },
+     "verdict": "threat",
+     "explain": "Un ecuson și un ecran de lucru le dau atacatorilor tot ce le trebuie ca să falsifice un card de acces și să-și aleagă țintele."
+    },
+    {
+     "id": "portal-share",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Leyla Rzayeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "leyla.rzayeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Devizul a fost partajat"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Am partajat fișierul pe portalul intern, doar cu departamentul nostru."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Un spațiu intern aprobat și acces limitat. Așa se partajează corect."
+    },
+    {
+     "id": "group-password",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Grupul biroului (34 de persoane)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Parola comună pentru sistem: Arxiv#2026"
+         }
+        ],
+        "time": "09:02"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Într-un grup, o parolă ajunge la mulți oameni, uneori și la persoane din afară. Parolele nu se partajează niciodată."
+    },
+    {
+     "id": "personal-cloud",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "buludxidmet",
+      "name": [
+       {
+        "text": "Proiect_buget_2027.xlsx"
+       }
+      ],
+      "type": "xls",
+      "size": "1,4 MB",
+      "source": [
+       {
+        "text": "Folder personal în cloud: oricine are linkul îl poate vedea"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Într-un cloud personal, un fișier de serviciu iese de sub controlul organizației, iar un link deschis lasă pe oricine să intre."
+    },
+    {
+     "id": "locked-screen",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "idare",
+      "app": "İdarə",
+      "title": [
+       {
+        "text": "Ecran blocat"
+       }
+      ],
+      "body": [
+       {
+        "text": "Ați blocat ecranul când ați plecat de la birou."
+       }
+      ],
+      "time": "13:00"
+     },
+     "verdict": "safe",
+     "explain": "Corect. Un ecran blocat nu lasă pe nimeni să acționeze în numele dumneavoastră."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ai-match",
+   "prompt": "Asociați fiecare risc cu obiceiul potrivit.",
+   "pairs": [
+    {
+     "id": "autocomplete",
+     "left": "Completarea automată",
+     "right": "Verificați destinatarul înainte de trimitere"
+    },
+    {
+     "id": "cloud",
+     "left": "Cloudul personal și site-urile gratuite",
+     "right": "Doar instrumente de partajare aprobate"
+    },
+    {
+     "id": "photo",
+     "left": "Postarea fotografiilor de la birou",
+     "right": "Fără ecrane, ecusoane sau documente în cadru"
+    },
+    {
+     "id": "sent",
+     "left": "Un e-mail trimis persoanei greșite",
+     "right": "Anunțați imediat echipa de securitate"
+    }
+   ],
+   "explain": "Aceste obiceiuri previn majoritatea scurgerilor de date din neatenție."
+  },
+  {
+   "type": "choice",
+   "id": "ai-choice",
+   "question": {
+    "prompt": "Un coleg vă spune: „Aplicația asta gratuită ne ajută să lucrăm mai repede. Instalează-o și nu spune nimic echipei IT.” Ce faceți?",
+    "options": [
+     {
+      "id": "ask-it",
+      "label": "Întreb echipa IT despre această aplicație sau despre o alternativă aprobată",
+      "correct": true,
+      "feedback": "Corect. Echipa IT poate verifica dacă aplicația este sigură sau vă poate oferi o alternativă aprobată."
+     },
+     {
+      "id": "install",
+      "label": "O instalez, toată lumea o folosește",
+      "correct": false,
+      "feedback": "O aplicație neverificată poate trimite date de serviciu în afara organizației. „Toată lumea o folosește” nu înseamnă că este sigură."
+     },
+     {
+      "id": "home-pc",
+      "label": "Copiez fișierele pe laptopul personal și lucrez acolo",
+      "correct": false,
+      "feedback": "Și acesta este shadow IT: datele ajung pe un dispozitiv neprotejat."
+     }
+    ]
+   },
+   "explain": "Aplicațiile și dispozitivele pe care organizația nu le-a aprobat se numesc shadow IT („IT din umbră”). Dacă aveți nevoie de ceva, cereți echipei IT o variantă aprobată."
+  },
+  {
+   "type": "recap",
+   "id": "ai-recap",
+   "points": [
+    "Verificați destinatarul înainte de trimitere",
+    "Păstrați fișierele de serviciu doar în sisteme aprobate",
+    "Ați greșit? Raportați imediat"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

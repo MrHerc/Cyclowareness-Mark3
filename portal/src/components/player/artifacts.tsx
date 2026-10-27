@@ -49,7 +49,7 @@ import type {
 } from "@/lib/content/types";
 import { plain } from "@/lib/content/types";
 import { BrandAvatar } from "./brand-avatar";
-import { RichText, useArtifactMode, useContentLang } from "./rich";
+import { RichText, langProps, useArtifactMode, useContentLang } from "./rich";
 import { cn } from "@/lib/cn";
 
 const BrandsCtx = createContext<Record<string, Brand>>({});
@@ -62,7 +62,7 @@ function useBrand(ref?: string): Brand | null {
 }
 
 function Shell({ children, className }: { children: ReactNode; className?: string }) {
-  return <div className={cn("w-full overflow-hidden rounded-xl border border-line bg-surface text-left shadow-raised", className)}>{children}</div>;
+  return <div className={cn("w-full overflow-hidden rounded-xl border border-line bg-surface text-start shadow-raised", className)}>{children}</div>;
 }
 
 /** `inbox`: shown inside the mailbox simulation (brand back row, "To: me"); otherwise a lesson illustration. */
@@ -74,7 +74,7 @@ function EmailView({ a, onBack, inbox = false }: { a: EmailArtifact; onBack?: ()
   return (
     <Shell>
       {onBack ? (
-        <button type="button" onClick={onBack} className="flex w-full items-center gap-2 border-b border-line px-4 py-2.5 text-left text-caption font-semibold text-brand-700 hover:bg-sunken">
+        <button type="button" onClick={onBack} className="flex w-full items-center gap-2 border-b border-line px-4 py-2.5 text-start text-caption font-semibold text-brand-700 hover:bg-sunken">
           <ChevronLeft className="size-4" />
           {t("simulation.inbox")}
         </button>
@@ -83,7 +83,7 @@ function EmailView({ a, onBack, inbox = false }: { a: EmailArtifact; onBack?: ()
           <ChevronLeft className="size-4" />
           {t("simulation.inbox")}
           {!inbox ? (
-            <span aria-hidden className="ml-auto flex items-center gap-2 text-ink-subtle">
+            <span aria-hidden className="ms-auto flex items-center gap-2 text-ink-subtle">
               <Star className="size-3.5" />
               <Reply className="size-3.5" />
               <MoreVertical className="size-3.5" />
@@ -116,7 +116,7 @@ function EmailView({ a, onBack, inbox = false }: { a: EmailArtifact; onBack?: ()
                 </>
               );
               return onAttachment ? (
-                <button key={i} type="button" onClick={onAttachment} className={cn(attachmentClass, "text-left hover:border-brand-300 hover:bg-brand-50")}>
+                <button key={i} type="button" onClick={onAttachment} className={cn(attachmentClass, "text-start hover:border-brand-300 hover:bg-brand-50")}>
                   {chip}
                 </button>
               ) : (
@@ -165,7 +165,7 @@ function ChatView({ a }: { a: ChatArtifact }) {
       </div>
       <div className={cn("grid gap-2 px-3 py-4", whats ? "bg-[#ece5dd]" : "bg-sunken")}>
         {(a.messages ?? []).map((m, i) => (
-          <div key={i} className={cn("max-w-[85%] rounded-2xl px-3.5 py-2.5 text-caption leading-snug shadow-xs", m.from === "me" ? "ml-auto rounded-br-sm bg-[#dcf8c6] text-ink" : "rounded-bl-sm bg-surface text-ink")}>
+          <div key={i} className={cn("max-w-[85%] rounded-2xl px-3.5 py-2.5 text-caption leading-snug shadow-xs", m.from === "me" ? "ms-auto rounded-ee-sm bg-[#dcf8c6] text-ink" : "rounded-es-sm bg-surface text-ink")}>
             {m.voice ? (
               <span className="flex items-center gap-2 text-ink-muted">
                 <Play className="size-4 fill-current" />
@@ -175,7 +175,7 @@ function ChatView({ a }: { a: ChatArtifact }) {
               </span>
             ) : null}
             <RichText value={m.body} className={cn(m.voice && "mt-1.5 italic")} />
-            {m.time ? <span className="mt-1 block text-right text-[0.65rem] text-ink-subtle">{m.time}</span> : null}
+            {m.time ? <span className="mt-1 block text-end text-[0.65rem] text-ink-subtle">{m.time}</span> : null}
           </div>
         ))}
       </div>
@@ -194,7 +194,7 @@ function SmsView({ a }: { a: SmsArtifact }) {
       <div className="grid gap-2 px-3 py-4">
         {a.time ? <p className="text-center text-[0.65rem] text-ink-subtle">{a.time}</p> : null}
         {(a.messages ?? []).map((m, i) => (
-          <div key={i} className="max-w-[85%] rounded-2xl rounded-bl-sm bg-surface px-3.5 py-2.5 text-caption leading-snug shadow-xs">
+          <div key={i} className="max-w-[85%] rounded-2xl rounded-es-sm bg-surface px-3.5 py-2.5 text-caption leading-snug shadow-xs">
             <RichText value={m} />
           </div>
         ))}
@@ -208,7 +208,7 @@ function DialogView({ a }: { a: DialogArtifact }) {
   const tone = a.tone ?? "app";
   const Icon = tone === "warning" ? AlertTriangle : tone === "system" ? Shield : Info;
   return (
-    <div className="mx-auto w-full max-w-md rounded-xl border border-line bg-surface p-5 text-left shadow-overlay">
+    <div className="mx-auto w-full max-w-md rounded-xl border border-line bg-surface p-5 text-start shadow-overlay">
       <div className="flex items-start gap-3">
         <span className={cn("grid size-10 shrink-0 place-items-center rounded-full", tone === "warning" ? "bg-warn-50 text-warn-700" : tone === "system" ? "bg-brand-50 text-brand-600" : "bg-sunken text-ink-muted")}>
           <Icon className="size-5" />
@@ -219,7 +219,7 @@ function DialogView({ a }: { a: DialogArtifact }) {
         </div>
       </div>
       {a.buttons?.length ? (
-        <div className="mt-5 flex flex-wrap justify-end gap-2" lang={lang}>
+        <div className="mt-5 flex flex-wrap justify-end gap-2" {...langProps(lang)}>
           {a.buttons.map((b, i) => (
             <span key={i} className={cn("rounded-pill px-4 py-2 text-caption font-semibold", i === a.buttons!.length - 1 ? "bg-brand-600 text-brand-on" : "border border-line-strong text-ink")}>
               {b}
@@ -241,7 +241,9 @@ function BrowserBar({ url, secure }: { url: ReactNode; secure: boolean }) {
       </span>
       <div className="flex min-w-0 flex-1 items-center gap-2 rounded-pill bg-surface px-3 py-1.5 text-caption">
         {secure ? <Lock className="size-3.5 shrink-0 text-ink-subtle" /> : <LockOpen className="size-3.5 shrink-0 text-risk-600" />}
-        <div className="min-w-0 truncate">{url}</div>
+        <div dir="ltr" className="min-w-0 truncate">
+          {url}
+        </div>
       </div>
     </div>
   );
@@ -256,7 +258,7 @@ function LoginView({ a }: { a: LoginArtifact }) {
   const fieldLang = a.fields ? lang : undefined;
   return (
     <Shell>
-      <BrowserBar url={<RichText value={a.url} as="span" />} secure={urlText.startsWith("https")} />
+      <BrowserBar url={<RichText value={a.url} as="span" ltr />} secure={urlText.startsWith("https")} />
       <div className="grid place-items-center px-6 py-8">
         <div className="w-full max-w-xs">
           <div className="mb-5 flex flex-col items-center gap-2">
@@ -265,11 +267,11 @@ function LoginView({ a }: { a: LoginArtifact }) {
           </div>
           <div className="grid gap-2.5">
             {(a.fields ?? [t("emailField"), t("passwordField")]).map((f) => (
-              <div key={f} lang={fieldLang} className="rounded-md border border-line-strong px-3 py-2.5 text-caption text-ink-disabled">
+              <div key={f} {...langProps(fieldLang)} className="rounded-md border border-line-strong px-3 py-2.5 text-caption text-ink-disabled">
                 {f}
               </div>
             ))}
-            <span lang={a.button ? lang : undefined} className="mt-1 rounded-pill py-2.5 text-center text-caption font-semibold text-white" style={{ background: brand?.color ?? "var(--brand)" }}>
+            <span {...langProps(a.button ? lang : undefined)} className="mt-1 rounded-pill py-2.5 text-center text-caption font-semibold text-white" style={{ background: brand?.color ?? "var(--brand)" }}>
               {a.button ?? t("signIn")}
             </span>
           </div>
@@ -283,7 +285,7 @@ function UrlView({ a }: { a: UrlArtifact }) {
   const secure = plain(a.url).startsWith("https");
   return (
     <Shell>
-      <BrowserBar url={<RichText value={a.url} as="span" className="font-mono text-tab" />} secure={secure} />
+      <BrowserBar url={<RichText value={a.url} as="span" className="font-mono text-tab" ltr />} secure={secure} />
       <div className="grid h-32 place-items-center bg-canvas">
         <Globe className="size-10 text-ink-disabled" />
       </div>
@@ -300,7 +302,7 @@ function NotificationView({ a }: { a: NotificationArtifact }) {
           <div className="flex items-center gap-2 text-tab-sm text-ink-muted">
             <BrandAvatar brand={brand} name={a.app} size="sm" className="size-5 text-[0.5rem] [&_svg]:size-3" />
             <span className="font-semibold uppercase">{a.app ?? brand?.name}</span>
-            <span className="ml-auto">{a.time}</span>
+            <span className="ms-auto">{a.time}</span>
           </div>
           <RichText value={a.title} className="mt-1.5 text-caption font-semibold" />
           <RichText value={a.body} className="text-caption text-ink-muted" />
@@ -314,7 +316,7 @@ function PermissionView({ a }: { a: PermissionArtifact }) {
   const t = useTranslations("player.artifact");
   const brand = useBrand(a.brandRef);
   return (
-    <div className="mx-auto w-full max-w-sm rounded-xl border border-line bg-surface p-5 text-left shadow-overlay">
+    <div className="mx-auto w-full max-w-sm rounded-xl border border-line bg-surface p-5 text-start shadow-overlay">
       <div className="flex items-center gap-3">
         <BrandAvatar brand={brand} name={a.app} />
         <p className="text-body-sm font-semibold">{t("permissionsTitle", { app: a.app ?? brand?.name ?? "" })}</p>
@@ -365,9 +367,9 @@ export function CallView({ a, status, talking }: { a: CallArtifact; status?: str
         <p className="text-tab text-white/70">{status ?? t("simulation.incoming")}</p>
         <BrandAvatar brand={brand} name={plain(a.caller)} size="lg" className={cn("mt-6 size-20 text-title ring-4 transition-shadow", talking ? "ring-safe-500/70" : "ring-white/10")} />
         <RichText value={a.caller} className="mt-4 text-title-sm font-semibold" />
-        <RichText value={a.number} className="mt-1 text-caption text-white/70" />
+        <RichText value={a.number} className="mt-1 text-caption text-white/70" ltr />
         {a.label ? (
-          <p className="text-tab text-white/50" lang={lang}>
+          <p className="text-tab text-white/50" {...langProps(lang)}>
             {a.label}
           </p>
         ) : null}
@@ -400,14 +402,14 @@ function FileView({ a }: { a: FileArtifact }) {
   const name = plain(a.name);
   const Icon = FILE_ICONS[name.toLowerCase().split(".").pop() ?? ""] ?? FileIcon;
   return (
-    <div className="mx-auto w-full max-w-md rounded-xl border border-line bg-surface p-5 text-left shadow-raised">
+    <div className="mx-auto w-full max-w-md rounded-xl border border-line bg-surface p-5 text-start shadow-raised">
       <div className="flex items-center gap-4">
         <span className="grid size-14 shrink-0 place-items-center rounded-md bg-brand-50 text-brand-600">
           <Icon className="size-7" />
         </span>
         <div className="min-w-0">
           <RichText value={a.name} className="text-body-sm font-semibold break-all" />
-          <p className="text-tab text-ink-subtle" lang={lang}>
+          <p className="text-tab text-ink-subtle" {...langProps(lang)}>
             {[a.type, a.size].filter(Boolean).join(" · ")}
           </p>
           {a.source ? (
@@ -432,7 +434,7 @@ function QrView({ a }: { a: QrArtifact }) {
       {a.destination ? (
         <div className="mt-3 rounded-md bg-sunken px-3 py-2 text-caption">
           <span className="text-tab-sm font-semibold text-ink-subtle uppercase">{t("scanToOpen")}</span>
-          <RichText value={a.destination} className="font-mono text-tab break-all" />
+          <RichText value={a.destination} className="font-mono text-tab break-all" ltr />
         </div>
       ) : null}
     </div>
@@ -503,10 +505,10 @@ export function EmailListItem({ a, active, done, onClick }: { a: EmailArtifact; 
   const lang = useContentLang();
   const brand = useBrand(a.brandRef);
   return (
-    <button type="button" onClick={onClick} disabled={!onClick} className={cn("flex w-full items-start gap-3 border-b border-line px-3 py-3 text-left transition-colors", active ? "bg-brand-50" : "hover:bg-sunken", !onClick && "cursor-default")}>
+    <button type="button" onClick={onClick} disabled={!onClick} className={cn("flex w-full items-start gap-3 border-b border-line px-3 py-3 text-start transition-colors", active ? "bg-brand-50" : "hover:bg-sunken", !onClick && "cursor-default")}>
       <span className={cn("mt-2 size-2 shrink-0 rounded-full", done ? "bg-transparent" : "bg-brand-600")} />
       <BrandAvatar brand={brand} name={plain(a.from?.name)} size="sm" />
-      <span className="min-w-0 flex-1" lang={lang}>
+      <span className="min-w-0 flex-1" {...langProps(lang)}>
         <span className="flex items-baseline justify-between gap-2">
           <span className={cn("truncate text-caption", done ? "text-ink-muted" : "font-semibold text-ink")}>{plain(a.from?.name)}</span>
           <span className="shrink-0 text-tab-sm text-ink-subtle">{a.time}</span>

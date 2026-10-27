@@ -1,0 +1,374 @@
+{
+ "id": "update-safely",
+ "title": "Sicher aktualisieren",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Updates bringen nicht nur neue Schaltflächen. Die meisten schließen Sicherheitslücken, die Angreifer bereits kennen.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Sobald eine Sicherheitslücke bekannt wird, suchen Angreifer gezielt nach Geräten ohne Update. Jeder Tag Verzögerung erhöht das Risiko.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "ransomware"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Ein Pop-up, das behauptet, Ihr Browser sei veraltet und Sie müssten sofort etwas herunterladen, ist eine Falle. Browser aktualisieren sich über ihre eigenen Einstellungen.",
+     "mood": "think",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "brauzer-yenilenme-tecili.example.net",
+         "spot": "fake-domain"
+        },
+        {
+         "text": "/update.exe"
+        }
+       ]
+      }
+     },
+     "highlight": "fake-domain"
+    },
+    {
+     "id": "b4",
+     "say": "Echte Updates kommen über die Geräteeinstellungen oder den offiziellen App-Store. Im Zweifel gehen Sie selbst dorthin und sehen nach.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b5",
+     "say": "Schieben Sie den Neustart nach einem Update nicht auf. Oft greift der Schutz erst, wenn das Gerät neu gestartet ist.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "real-or-fake",
+   "prompt": "Echtes Update oder eine Falle?",
+   "cards": [
+    {
+     "id": "sms-virus",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "Service"
+       }
+      ],
+      "time": "07:55",
+      "messages": [
+       [
+        {
+         "text": "Virus auf Ihrem Smartphone entdeckt! Laden Sie das Sicherheitsupdate herunter: fix-phone.example.info/app.apk"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ihr Smartphone verschickt keine Updates per SMS. Über diesen Link wird eine schädliche App installiert."
+    },
+    {
+     "id": "planned-update",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "IT-Support"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Geplantes Update heute Abend"
+       }
+      ],
+      "time": "14:10",
+      "body": [
+       [
+        {
+         "text": "Heute ab 19:00 Uhr werden die Dienstcomputer automatisch aktualisiert."
+        }
+       ],
+       [
+        {
+         "text": "Lassen Sie Ihren Computer eingeschaltet und speichern Sie einfach Ihre Arbeit. Sie müssen nichts herunterladen."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Kein Link, keine Datei, nichts zum Herunterladen. Die E-Mail informiert Sie nur."
+    },
+    {
+     "id": "player-update",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://video-pleyer-yenile.example.net/pleyer_setup.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Eine Website, die verlangt, dass Sie erst Ihren Player aktualisieren, um ein Video anzusehen, ist eine klassische Falle. Browser spielen Videos von selbst ab."
+    },
+    {
+     "id": "zip-update",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "System Center"
+        }
+       ],
+       "address": [
+        {
+         "text": "noreply@system-update-center.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Ihre Lizenz läuft ab! Update erforderlich"
+       }
+      ],
+      "time": "09:03",
+      "body": [
+       [
+        {
+         "text": "Installieren Sie das angehängte Update noch heute."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Update_KB5039.zip"
+         }
+        ],
+        "size": "1,8 MB"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Updates kommen nicht als E-Mail-Anhang. Im ZIP-Archiv kann sich Schadsoftware verbergen."
+    },
+    {
+     "id": "remote-helper",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "IT-Support (offiziell)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Um Ihren Computer aus der Ferne zu aktualisieren, installieren Sie bitte dieses Programm und schicken Sie mir den Code auf Ihrem Bildschirm."
+         }
+        ],
+        "time": "16:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein Fernwartungsprogramm gibt Angreifern vollen Zugriff auf Ihren Computer. Rufen Sie den Support selbst unter einer Nummer an, die Sie kennen."
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-update-email",
+   "prompt": "Finden Sie die Warnsignale einer gefälschten Update-Mail.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Office Update Service"
+      }
+     ],
+     "address": [
+      {
+       "text": "security-update@"
+      },
+      {
+       "text": "idare-example.info",
+       "spot": "domain"
+      }
+     ]
+    },
+    "to": "mich",
+    "subject": [
+     {
+      "text": "DRINGEND: ",
+      "spot": "urgency"
+     },
+     {
+      "text": "Ihr Computer wird innerhalb von 24 Stunden gesperrt"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Liebe Kollegin, lieber Kollege,"
+      }
+     ],
+     [
+      {
+       "text": "Auf Ihrem Computer fehlt ein kritisches Update. Öffnen und installieren Sie die angehängte Datei."
+      }
+     ],
+     [
+      {
+       "text": "Deaktivieren Sie während der Installation Ihr Antivirenprogramm.",
+       "spot": "disable-av"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Yenilenme_Tecili.exe",
+        "spot": "exe"
+       }
+      ],
+      "size": "2,1 MB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Falsche Domain",
+     "explain": "Ihre Organisation nutzt idare.example. Das hier ist eine andere Domain, mit Bindestrich geschrieben."
+    },
+    {
+     "id": "urgency",
+     "label": "Dringlichkeit und Drohungen",
+     "explain": "Die Drohung mit der Sperre soll Sie dazu bringen, zu handeln, ohne nachzudenken."
+    },
+    {
+     "id": "disable-av",
+     "label": "Antivirenprogramm ausschalten",
+     "explain": "Kein echtes Update verlangt, dass Sie den Schutz abschalten. Damit wird der Weg für Schadsoftware frei."
+    },
+    {
+     "id": "exe",
+     "label": "Ausführbare Datei",
+     "explain": "Eine .exe-Datei startet ein Programm, sobald Sie sie öffnen. Updates kommen nicht auf diesem Weg."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "update-steps",
+   "prompt": "Bringen Sie die Schritte eines Updates in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "save",
+     "label": "Ihre Arbeit speichern"
+    },
+    {
+     "id": "settings",
+     "label": "Das Update über die Einstellungen starten"
+    },
+    {
+     "id": "restart",
+     "label": "Das Gerät neu starten"
+    },
+    {
+     "id": "check",
+     "label": "Prüfen, ob alles funktioniert"
+    }
+   ],
+   "explain": "Das Speichern schützt Ihre Arbeit, und der Neustart schließt das Update ab."
+  },
+  {
+   "type": "choice",
+   "id": "old-device",
+   "question": {
+    "prompt": "Ihr altes Smartphone bekommt keine Updates mehr. Was nun?",
+    "options": [
+     {
+      "id": "antivirus",
+      "label": "Ein Antivirenprogramm installieren und weiter nutzen",
+      "correct": false,
+      "feedback": "Ein Antivirenprogramm schließt keine Lücken im System selbst."
+     },
+     {
+      "id": "move",
+      "label": "Dienstliche Konten entfernen und auf ein unterstütztes Gerät wechseln",
+      "correct": true,
+      "feedback": "Richtig. Ein Gerät ohne Support bekommt keine Sicherheitsupdates für neue Lücken mehr."
+     },
+     {
+      "id": "nothing",
+      "label": "Nichts, es funktioniert doch noch gut",
+      "correct": false,
+      "feedback": "Dass es gut funktioniert, heißt nicht, dass es sicher ist. Neue Lücken bleiben offen."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "update"
+    }
+   },
+   "explain": "Lassen Sie keine dienstlichen Konten oder Daten auf einem Gerät ohne Support. Setzen Sie es vor dem Verkauf vollständig zurück."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Installieren Sie Updates ohne Verzögerung und starten Sie danach neu.",
+    "Aktualisieren Sie nur über die Einstellungen oder den offiziellen Store.",
+    "Speichern Sie keine dienstlichen Daten auf Geräten ohne Support."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

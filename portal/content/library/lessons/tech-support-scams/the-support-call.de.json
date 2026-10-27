@@ -1,0 +1,389 @@
+{
+ "id": "the-support-call",
+ "title": "Der Support-Anruf",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ts2-tutor",
+   "beats": [
+    {
+     "id": "ts2-b1",
+     "say": "Diesmal kommt der Betrug per Telefon: Die angebliche Sicherheitsabteilung Ihrer Bank ruft Sie an.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "ts2-b2",
+     "say": "Die Anrufer behaupten, Ihre Karte sei gestohlen worden und Sie müssten Ihr Geld auf ein sicheres Konto überweisen.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "ts2-b3",
+     "say": "Ein solches sicheres Konto gibt es nicht, und keine Bank verlangt, dass Sie eine App installieren.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "ts2-b4",
+     "say": "Beenden Sie das Gespräch und wählen Sie selbst die Nummer auf der Rückseite Ihrer Karte.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ts2-scenario",
+   "title": "Ein Anruf von der Bank",
+   "start": "claim",
+   "nodes": [
+    {
+     "id": "claim",
+     "text": "Auf Ihrer Karte ist eine verdächtige Zahlung aufgetaucht. Wir müssen das Geld auf ein sicheres Konto überweisen.",
+     "speaker": "SahilBank-Sicherheitsabteilung",
+     "voice": "man-2",
+     "channel": "phone",
+     "spoken": "Auf Ihrer Karte ist eine verdächtige Zahlung aufgetaucht. <breath> Wir müssen das Geld auf ein sicheres Konto überweisen.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "sahilbank-fake",
+       "caller": [
+        {
+         "text": "SahilBank-Sicherheitsabteilung"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 54 30"
+        }
+       ],
+       "label": "Mobil"
+      }
+     },
+     "choices": [
+      {
+       "label": "Ich beende das Gespräch und wähle selbst die Nummer auf der Rückseite meiner Karte",
+       "next": "verify",
+       "feedback": "Richtig. Nur so können Sie es überprüfen: Sie suchen die Nummer selbst heraus und rufen dort an."
+      },
+      {
+       "label": "Ich nenne meine Kartendaten, damit sie es prüfen können",
+       "outcome": "compromised",
+       "feedback": "Eine echte Bank fragt nicht nach Ihrer Kartennummer oder einem Code. Mit diesen Daten räumen die Kriminellen Ihr Konto leer."
+      },
+      {
+       "label": "Ich installiere die App, um die sie mich bitten",
+       "outcome": "compromised",
+       "feedback": "Mit der App geben Sie ihnen Ihr Smartphone in die Hand. Eine Bank verlangt nie, dass Sie eine solche App installieren."
+      }
+     ]
+    },
+    {
+     "id": "verify",
+     "text": "Eine solche Warnung haben wir nicht verschickt.",
+     "speaker": "Bankmitarbeiterin (Nummer auf der Rückseite Ihrer Karte)",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Eine solche Warnung <breath> haben wir nicht verschickt.",
+     "choices": [
+      {
+       "label": "Ich melde den Anruf und die verdächtige Nummer",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Die Bank kann jetzt Ihr Konto im Blick behalten und auch andere warnen."
+      },
+      {
+       "label": "Ich mache mir keine Sorgen, das war bestimmt ein Versehen",
+       "outcome": "risky",
+       "feedback": "Der Betrüger ruft vielleicht noch einmal an. Erzählen Sie der Bank, was passiert ist. Das schützt Sie."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ts2-sim-call",
+   "environment": "call",
+   "title": "Der falsche Support-Anruf",
+   "intro": "Ein Anruf Ihrer Bank geht ein. Lesen Sie, was der Anrufer sagt, und wählen Sie jedes Mal Ihre Antwort.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "SahilBank-Sicherheitsabteilung"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-3"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Annehmen",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Den Anruf anzunehmen, ist an sich nicht gefährlich. Wichtig ist, dass Sie nichts preisgeben."
+      },
+      {
+       "id": "decline",
+       "label": "Ablehnen",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Das geht auch. Rufen Sie danach selbst die Nummer auf der Rückseite Ihrer Karte an.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pitch",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "SahilBank-Sicherheitsabteilung"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-3"
+     },
+     "say": "Guten Tag, hier ist Tural von der Sicherheitsabteilung der SahilBank. Zwölfhundert Manat, Entschuldigung, wurden von Ihrer Karte abgebucht.",
+     "spoken": "Guten Tag, <breath> hier ist Tural von der Sicherheitsabteilung der SahilBank. Zwölfhundert Manat <cough> Entschuldigung, wurden von Ihrer Karte abgebucht.",
+     "actions": [
+      {
+       "id": "listen",
+       "label": "Ich höre zu, sage aber nichts",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Gut. Zuhören dürfen Sie, solange Sie keine Informationen herausgeben."
+      },
+      {
+       "id": "hang",
+       "label": "Gespräch beenden",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Gute Entscheidung. So ruft keine Bank an, deshalb ist Auflegen richtig.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "ask-code",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "SahilBank-Sicherheitsabteilung"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-3"
+     },
+     "say": "Sie haben gerade einen Bestätigungscode auf Ihr Smartphone bekommen. Bitte lesen Sie mir diesen Code vor.",
+     "spoken": "Sie haben gerade einen Bestätigungscode auf Ihr Smartphone bekommen. <breath> Bitte lesen Sie mir diesen Code vor.",
+     "actions": [
+      {
+       "id": "refuse",
+       "label": "Ich lese den Code nicht vor",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. Der Code, den Sie erhalten, ist der Schlüssel zu Ihrem Konto. Verraten Sie ihn niemandem."
+      },
+      {
+       "id": "read",
+       "label": "Ich lese den Code vor",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Sobald Sie ihn vorlesen, sind die Kriminellen in Ihrem Konto. Eine Bank fragt nie nach diesem Code.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "install",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "SahilBank-Sicherheitsabteilung"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-3"
+     },
+     "say": "Damit ich Ihnen helfen kann, installieren Sie bitte die App UzaqMasa und lassen Sie mich eine Verbindung herstellen.",
+     "spoken": "Damit ich Ihnen helfen kann, äh, installieren Sie bitte die App UzaqMasa und <breath> lassen Sie mich eine Verbindung herstellen.",
+     "actions": [
+      {
+       "id": "refuse",
+       "label": "Ich installiere die App nicht",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Richtig. Installieren Sie nie eine Fernzugriffs-App, nur weil ein Anrufer Sie darum bittet."
+      },
+      {
+       "id": "install",
+       "label": "App installieren",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Jetzt sieht der Anrufer Ihren Bildschirm und steuert Ihr Smartphone. Installieren Sie nie eine solche App.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Das Gespräch ist beendet. Was tun Sie jetzt?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "SahilBank-Sicherheitsabteilung"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "man-3"
+     },
+     "actions": [
+      {
+       "id": "call-card",
+       "label": "Die Nummer auf der Rückseite der Karte anrufen",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Bank bestätigt Ihnen, dass der Anruf gefälscht war, und prüft Ihr Konto."
+      },
+      {
+       "id": "redial",
+       "label": "Die Nummer zurückrufen, von der der Anruf kam",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Diese Nummer führt wieder zum Betrüger. Verwenden Sie nur die Nummer auf Ihrer Karte."
+      },
+      {
+       "id": "ignore",
+       "label": "Nichts tun",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Der Betrüger versucht es vielleicht noch einmal. Rufen Sie sicherheitshalber selbst bei der Bank an."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "ts2-order",
+   "prompt": "Ein Anruf wie dieser gibt sich als Ihre Bank aus. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "hang",
+     "label": "Gespräch beenden"
+    },
+    {
+     "id": "find",
+     "label": "Die Nummer auf der Rückseite Ihrer Karte heraussuchen"
+    },
+    {
+     "id": "call",
+     "label": "Diese Nummer selbst anrufen"
+    },
+    {
+     "id": "tell",
+     "label": "Der Bank erzählen, was passiert ist"
+    }
+   ],
+   "explain": "Nur so können Sie es überprüfen: Beenden Sie das Gespräch und wählen Sie die Nummer, die Sie selbst herausgesucht haben."
+  },
+  {
+   "type": "choice",
+   "id": "ts2-choice",
+   "question": {
+    "prompt": "Sie haben die Hilfe-App, um die der Anrufer gebeten hat, bereits installiert. Was tun Sie jetzt?",
+    "options": [
+     {
+      "id": "disconnect",
+      "label": "Ich trenne die Verbindung, informiere den IT-Support und rufe selbst bei der Bank an",
+      "correct": true,
+      "feedback": "Richtig. Durch das Trennen ist der Fernzugriff unterbrochen. Danach holen Sie sich Hilfe."
+     },
+     {
+      "id": "keep",
+      "label": "Ich behalte die App, vielleicht brauche ich sie noch",
+      "correct": false,
+      "feedback": "Solange die App bleibt, steuern die Kriminellen Ihr Smartphone. Trennen Sie die Verbindung und entfernen Sie die App sofort."
+     },
+     {
+      "id": "wait",
+      "label": "Ich warte ab, es ist ja nichts passiert",
+      "correct": false,
+      "feedback": "Abwarten vergrößert den Schaden. Je früher Sie es melden, desto mehr lässt sich retten."
+     }
+    ]
+   },
+   "explain": "Ist die App bereits installiert, trennen Sie sofort die Verbindung, informieren Sie den IT-Support und rufen Sie die Bank unter der Nummer auf Ihrer Karte an."
+  },
+  {
+   "type": "recap",
+   "id": "ts2-recap",
+   "points": [
+    "Ein „sicheres Konto“ gibt es nicht",
+    "Installieren Sie keine App, nur weil ein Anrufer darum bittet",
+    "Beenden Sie das Gespräch und wählen Sie selbst die Nummer auf Ihrer Karte"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

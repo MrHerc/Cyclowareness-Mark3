@@ -1,0 +1,281 @@
+{
+  "id": "unknown-usb",
+  "title": "Unbekannter USB-Stick",
+  "minutes": 2,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "curiosity",
+          "say": "Ein gefundener USB-Stick macht neugierig. Genau darauf setzen Angreifer.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "usb"
+          }
+        },
+        {
+          "id": "plug-is-enough",
+          "say": "Schon das Einstecken kann genügen. Manche Geräte geben sich als Tastatur aus und tippen selbstständig Befehle ein.",
+          "mood": "alert",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "hand-over",
+          "say": "Stecken Sie einen gefundenen USB-Stick deshalb nie ein. Geben Sie ihn beim Sicherheitsteam ab.",
+          "mood": "happy",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        },
+        {
+          "id": "approved",
+          "say": "Verwenden Sie bei der Arbeit nur USB-Sticks, die Ihr IT-Support ausgegeben oder freigegeben hat.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "charging",
+          "say": "Laden Sie an öffentlichen Orten mit Ihrem eigenen Netzteil an der Steckdose. Fragt Ihr Smartphone, ob es einem Gerät vertrauen soll, lehnen Sie ab.",
+          "mood": "think",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "courier-sms",
+      "prompt": "Finden Sie die Warnsignale in dieser Nachricht.",
+      "artifact": {
+        "kind": "sms",
+        "sender": [
+          {
+            "text": "+994 51 000 77 63",
+            "spot": "number"
+          }
+        ],
+        "time": "09:48",
+        "messages": [
+          [
+            {
+              "text": "Hallo, ich bin Nigar, die neue Assistentin des Direktors."
+            }
+          ],
+          [
+            {
+              "text": "Wir haben Ihnen einen USB-Stick auf den Schreibtisch gelegt, "
+            },
+            {
+              "text": "darauf ist die Präsentation des Direktors.",
+              "spot": "authority"
+            }
+          ],
+          [
+            {
+              "text": "Bitte stecken Sie ihn ein und öffnen Sie gleich die Datei, ",
+              "spot": "action"
+            },
+            {
+              "text": "das Meeting beginnt in 10 Minuten.",
+              "spot": "urgent"
+            }
+          ],
+          [
+            {
+              "text": "Sagen Sie niemandem etwas, es soll eine Überraschung sein.",
+              "spot": "secret"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "number",
+          "label": "Unbekannte Nummer",
+          "explain": "Eine dienstliche Aufgabe kommt von einer privaten Nummer, die Sie nicht kennen."
+        },
+        {
+          "id": "authority",
+          "label": "Berufung auf den Direktor",
+          "explain": "Der Direktor wird erwähnt, damit Sie sich beeilen und nichts prüfen."
+        },
+        {
+          "id": "action",
+          "label": "Einstecken und öffnen",
+          "explain": "Die Aufforderung, einen unbekannten USB-Stick einzustecken, ist die größte Gefahr."
+        },
+        {
+          "id": "urgent",
+          "label": "Zeitdruck",
+          "explain": "Zehn Minuten lassen Ihnen keine Zeit zum Nachdenken."
+        },
+        {
+          "id": "secret",
+          "label": "Geheimhaltung",
+          "explain": "Die Bitte um Geheimhaltung soll verhindern, dass Sie nachfragen."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "scenario",
+      "id": "car-park-drive",
+      "title": "USB-Stick auf dem Parkplatz",
+      "start": "found",
+      "nodes": [
+        {
+          "id": "found",
+          "text": "Morgens finden Sie auf dem Parkplatz einen USB-Stick mit der Aufschrift „Gehälter 2026, vertraulich“.",
+          "visual": {
+            "kind": "illustration",
+            "id": "usb"
+          },
+          "choices": [
+            {
+              "label": "Ihn in meinen Dienstcomputer stecken, um nachzusehen, was darauf ist",
+              "outcome": "compromised",
+              "feedback": "Der USB-Stick hat Schadsoftware gestartet. Die Aufschrift „vertraulich“ sollte Sie nur verlocken."
+            },
+            {
+              "label": "Ihn an meinem Computer zu Hause prüfen",
+              "outcome": "risky",
+              "feedback": "Auch Ihr privates Gerät kann infiziert werden, und vielleicht sind dort Ihre dienstlichen Konten eingerichtet."
+            },
+            {
+              "label": "Ihn zum Sicherheitsteam bringen",
+              "next": "colleague",
+              "feedback": "Die richtige Entscheidung."
+            }
+          ]
+        },
+        {
+          "id": "colleague",
+          "text": "Zeig mal her, ich schau nach. Auf meinem Computer läuft ein Virenschutz.",
+          "speaker": "Tural, ein Kollege",
+          "voice": "man-2",
+          "channel": "in-person",
+          "manner": "natural",
+          "spoken": "Zeig mal her, ich schau nach. <breath> Auf meinem Computer läuft ein Virenschutz.",
+          "choices": [
+            {
+              "label": "Ihn übergeben, der Virenschutz wird ihn schon schützen",
+              "outcome": "risky",
+              "feedback": "Ein Virenschutz erkennt nicht jeden Angriff, vor allem keine Geräte, die sich als Tastatur ausgeben."
+            },
+            {
+              "label": "Höflich ablehnen und ihn abgeben",
+              "next": "security",
+              "feedback": "Gut gemacht. Die Regel gilt für alle."
+            }
+          ]
+        },
+        {
+          "id": "security",
+          "text": "Vielen Dank. Solche Geräte prüfen wir gesondert, an einem Computer ohne Verbindung zum Netzwerk.",
+          "speaker": "Sicherheitsteam",
+          "voice": "woman",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Vielen Dank. <breath> Solche Geräte prüfen wir gesondert, an einem Computer ohne Verbindung zum Netzwerk.",
+          "choices": [
+            {
+              "label": "Sagen, wo und wann ich ihn gefunden habe",
+              "outcome": "safe",
+              "feedback": "Sehr gut. So kann das Team nach weiteren USB-Sticks suchen."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "airport-charging",
+      "question": {
+        "prompt": "Am Flughafen ist der Akku Ihres Smartphones fast leer. Welche Möglichkeiten sind sicher?",
+        "options": [
+          {
+            "id": "own-adapter",
+            "label": "Mein eigenes Netzteil in eine Steckdose stecken",
+            "correct": true,
+            "feedback": "Der einfachste und sicherste Weg."
+          },
+          {
+            "id": "power-bank",
+            "label": "Mit meiner eigenen Powerbank laden",
+            "correct": true,
+            "feedback": "Sehr gut, dabei ist kein fremdes Gerät im Spiel."
+          },
+          {
+            "id": "strangers-cable",
+            "label": "Ein Kabel nutzen, das mir ein Fremder leiht",
+            "correct": false,
+            "feedback": "Im Kabel eines Fremden kann ein Gerät versteckt sein."
+          },
+          {
+            "id": "trust-yes",
+            "label": "Auf „Ja“ tippen, wenn gefragt wird, ob ich dem Gerät vertraue",
+            "correct": false,
+            "feedback": "Damit erhält das Gerät Zugriff auf Ihre Daten. Zum Laden ist kein Vertrauen nötig."
+          }
+        ],
+        "multi": true,
+        "visual": {
+          "kind": "illustration",
+          "id": "phone-lock"
+        }
+      },
+      "explain": "Angriffe über öffentliche USB-Anschlüsse sind selten, aber der Schutz ist einfach: das eigene Netzteil und kein Vertrauen für fremde Geräte."
+    },
+    {
+      "type": "match",
+      "id": "media-rules",
+      "prompt": "Ordnen Sie jeder Situation den richtigen Schritt zu.",
+      "pairs": [
+        {
+          "id": "gift-drive",
+          "left": "Ein Gratis-USB-Stick von einer Konferenz",
+          "right": "Zuerst vom IT-Support prüfen lassen"
+        },
+        {
+          "id": "carry-files",
+          "left": "Sie müssen dienstliche Dateien mit nach Hause nehmen",
+          "right": "Freigegebene Datenträger oder die freigegebene Cloud nutzen"
+        },
+        {
+          "id": "courier",
+          "left": "Ein Kurier bringt einen USB-Stick für den Direktor",
+          "right": "Dem Sicherheitsteam übergeben"
+        },
+        {
+          "id": "lost",
+          "left": "Sie haben Ihren dienstlichen USB-Stick verloren",
+          "right": "Sofort melden"
+        }
+      ],
+      "explain": "Unbekannte Datenträger werden nie eingesteckt, und dienstliche Daten werden nur auf freigegebenen Wegen transportiert."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Stecken Sie nie einen gefundenen oder unbekannten USB-Stick ein – geben Sie ihn ab.",
+        "Nutzen Sie bei der Arbeit nur freigegebene Datenträger.",
+        "Laden Sie mit Ihrem eigenen Netzteil und vertrauen Sie nie unbekannten Geräten."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

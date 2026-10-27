@@ -3,7 +3,7 @@
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import { Battery, Camera, CheckCircle2, Cloud, FileDown, Mail, MessageSquare, Phone, PhoneOff, QrCode, RotateCcw, Server, Signal, XCircle } from "lucide-react";
 import { requestDemoAction, type DemoField, type DemoState, type DemoValues } from "@/server/actions/site";
-import { LOCALE_NAMES, type SiteLocale } from "@/i18n/config";
+import { LOCALE_NAMES, langAttrs, type SiteLocale } from "@/i18n/config";
 import { EMPLOYEE_RANGES, type AdminScene, type DeployScene, type DemoScene, type InboxScene, type LanguagesScene, type Line, type PhoneScene, type TutorScene } from "@/lib/landing";
 import { cn } from "@/lib/cn";
 import { Marked } from "./marked";
@@ -164,10 +164,10 @@ export function InboxGame({
   return (
     <div className="grid gap-5">
       <div className="relative mx-auto w-full max-w-[26rem]">
-        <span aria-hidden className="absolute -top-2.5 -left-2.5 size-3 border-t border-l border-ink-subtle/50" />
-        <span aria-hidden className="absolute -top-2.5 -right-2.5 size-3 border-t border-r border-ink-subtle/50" />
-        <span aria-hidden className="absolute -bottom-2.5 -left-2.5 size-3 border-b border-l border-ink-subtle/50" />
-        <span aria-hidden className="absolute -right-2.5 -bottom-2.5 size-3 border-r border-b border-ink-subtle/50" />
+        <span aria-hidden className="absolute -top-2.5 -start-2.5 size-3 border-t border-s border-ink-subtle/50" />
+        <span aria-hidden className="absolute -top-2.5 -end-2.5 size-3 border-t border-e border-ink-subtle/50" />
+        <span aria-hidden className="absolute -bottom-2.5 -start-2.5 size-3 border-b border-s border-ink-subtle/50" />
+        <span aria-hidden className="absolute -end-2.5 -bottom-2.5 size-3 border-e border-b border-ink-subtle/50" />
         <PhoneFrame clock={scene.clock} label={screenLabel} spot="hero-phone">
           {step === "closed" ? (
             <div className="flex flex-1 flex-col justify-center gap-6 px-5 pb-8">
@@ -224,7 +224,11 @@ export function InboxGame({
                 {card.channel === "email" ? (
                   <>
                     <p className="text-body-sm font-bold">{card.sender}</p>
-                    {card.address ? <Marked text={card.address} reveal={answer !== null} className="block font-mono text-tab text-ink-muted" /> : null}
+                    {card.address ? (
+                      <span className="block font-mono text-tab text-ink-muted">
+                        <Marked dir="ltr" text={card.address} reveal={answer !== null} />
+                      </span>
+                    ) : null}
                     {card.subject ? <p className="mt-3 text-body-sm font-semibold">{card.subject}</p> : null}
                     <Marked text={card.body} reveal={answer !== null} className="mt-1.5 block text-caption text-ink-muted" />
                     {card.action ? <span className="mt-3 inline-block rounded-pill bg-brand-600 px-4 py-2 text-tab font-bold text-brand-on">{card.action}</span> : null}
@@ -232,7 +236,7 @@ export function InboxGame({
                 ) : card.channel === "sms" ? (
                   <>
                     <p className="text-center text-tab font-semibold text-ink-subtle">{card.sender}</p>
-                    <p className="mt-2 w-[88%] rounded-2xl rounded-bl-sm bg-sunken px-3.5 py-2.5 text-caption">
+                    <p className="mt-2 w-[88%] rounded-2xl rounded-es-sm bg-sunken px-3.5 py-2.5 text-caption">
                       <Marked text={card.body} reveal={answer !== null} />
                     </p>
                   </>
@@ -243,7 +247,7 @@ export function InboxGame({
                     <Marked text={card.body} reveal={answer !== null} className="text-caption text-ink-muted" />
                     {card.opens ? (
                       <p className="rounded-pill bg-sunken px-3 py-1.5 font-mono text-tab">
-                        {scene.opensLabel}: <Marked text={card.opens} reveal={answer !== null} />
+                        {scene.opensLabel}: <Marked dir="ltr" text={card.opens} reveal={answer !== null} />
                       </p>
                     ) : null}
                   </div>
@@ -332,7 +336,7 @@ export function PhoneCall({ scene, beats, clock, screenLabel, skipLabel }: { sce
       perch="phone"
       // The guide cat can also peek from the phone's edge, as on the hero; not on a phone, where the frame
       // fills the width and the cat would cover the call's caption and buttons (its top edge is the perch there).
-      aside={<span aria-hidden data-perch="phone-side" data-perch-box className="pointer-events-none absolute top-[48%] -right-12 hidden size-28 sm:block" />}
+      aside={<span aria-hidden data-perch="phone-side" data-perch-box className="pointer-events-none absolute top-[48%] -end-12 hidden size-28 sm:block" />}
       className="mx-auto w-full max-w-[22rem]"
     >
       <div className="flex flex-1 flex-col items-center gap-4 px-6 pt-8 pb-8 text-center">
@@ -340,7 +344,9 @@ export function PhoneCall({ scene, beats, clock, screenLabel, skipLabel }: { sce
         <div>
           <p className="text-tab font-semibold text-white/60">{state === "ringing" ? scene.ringing : scene.callerLabel}</p>
           <p className="text-title-sm font-bold">{scene.callerName}</p>
-          <p className="font-mono text-caption text-white/70">{scene.callerNumber}</p>
+          <p dir="ltr" className="font-mono text-caption text-white/70">
+            {scene.callerNumber}
+          </p>
         </div>
         <div className="mt-auto w-full" aria-live="polite">
           {state === "ringing" ? (
@@ -397,11 +403,11 @@ export function TutorDemo({ scene, beats }: { scene: TutorScene; beats: Beats })
   const [asked, setAsked] = useState<string | null>(null);
   return (
     <div data-perch="tutor" className="mx-auto grid w-full max-w-xl gap-4 rounded-3xl bg-surface p-5 shadow-overlay ring-1 ring-line">
-      <div className="w-[88%] rounded-2xl rounded-bl-sm bg-sunken px-4 py-3 text-body-sm">
+      <div className="w-[88%] rounded-2xl rounded-es-sm bg-sunken px-4 py-3 text-body-sm">
         <Marked text={scene.sample} reveal={!!asked} />
       </div>
       {asked ? (
-        <div className="ml-auto w-[88%] rounded-2xl rounded-br-sm bg-brand-600 px-4 py-3 text-body-sm text-brand-on" aria-live="polite">
+        <div className="ms-auto w-[88%] rounded-2xl rounded-ee-sm bg-brand-600 px-4 py-3 text-body-sm text-brand-on" aria-live="polite">
           {scene.chips.find((c) => c.id === asked)?.answer.text}
         </div>
       ) : null}
@@ -438,7 +444,7 @@ export function LanguagesDemo({ scene, beats }: { scene: LanguagesScene; beats: 
           <li key={s.locale}>
             <button
               type="button"
-              lang={s.locale}
+              {...langAttrs(s.locale)}
               onClick={() => {
                 const first = picked === null;
                 setPicked(s.locale);
@@ -452,7 +458,7 @@ export function LanguagesDemo({ scene, beats }: { scene: LanguagesScene; beats: 
         ))}
       </ul>
       {picked ? (
-        <p lang={picked} className="rounded-2xl bg-surface px-5 py-4 text-center text-title-sm font-semibold shadow-raised ring-1 ring-line" aria-live="polite">
+        <p {...langAttrs(picked)} className="rounded-2xl bg-surface px-5 py-4 text-center text-title-sm font-semibold shadow-raised ring-1 ring-line" aria-live="polite">
           {scene.samples.find((s) => s.locale === picked)?.line.text}
         </p>
       ) : null}
@@ -479,7 +485,7 @@ export function AdminDemo({ scene, beats, you }: { scene: AdminScene; beats: Bea
   const tone = { clicked: "bg-risk-500", reported: "bg-safe-500", learned: "bg-brand-500" };
   return (
     <div data-perch="admin" className="mx-auto w-full max-w-2xl overflow-hidden rounded-3xl bg-surface shadow-overlay ring-1 ring-line">
-      <table className="w-full text-left text-caption">
+      <table className="w-full text-start text-caption">
         <thead className="bg-sunken text-tab text-ink-muted">
           <tr>
             <th className="px-4 py-3 font-semibold" />
@@ -502,7 +508,7 @@ export function AdminDemo({ scene, beats, you }: { scene: AdminScene; beats: Bea
                     <span className="h-2 flex-1 overflow-hidden rounded-pill bg-sunken">
                       <span className={cn("block h-full rounded-pill transition-[width] duration-(--duration-slow)", tone[c])} style={{ width: `${r.v[c]}%` }} />
                     </span>
-                    <span className="w-9 text-right tabular-nums">{r.v[c]}%</span>
+                    <span className="w-9 text-end tabular-nums">{r.v[c]}%</span>
                   </span>
                 </td>
               ))}
@@ -544,7 +550,7 @@ export function DeployDemo({ scene, beats }: { scene: DeployScene; beats: Beats 
               setPick(k);
               guide.say(first && beats.lesson ? [scene[k].said, beats.lesson] : scene[k].said, { gesture: k === "cloud" ? "point-up" : "shield-up" });
             }}
-            className={cn("grid gap-3 rounded-3xl p-6 text-left shadow-raised ring-2 transition-all", pick === k ? "bg-brand-600 text-brand-on ring-brand-600" : "bg-surface ring-line hover:ring-brand-200")}
+            className={cn("grid gap-3 rounded-3xl p-6 text-start shadow-raised ring-2 transition-all", pick === k ? "bg-brand-600 text-brand-on ring-brand-600" : "bg-surface ring-line hover:ring-brand-200")}
           >
             <Icon className="size-9" />
             <span className="text-title-sm font-bold">{scene[k].title}</span>
@@ -644,7 +650,7 @@ export function DemoForm({
     >
       <input type="hidden" name="locale" value={lang} />
       <input type="hidden" name="consentVersion" value={scene.consentVersion} />
-      <div aria-hidden className="absolute -left-[9999px] h-0 overflow-hidden">
+      <div aria-hidden className="absolute -start-[9999px] h-0 overflow-hidden">
         <label>
           Website
           <input name="website" tabIndex={-1} autoComplete="off" />
@@ -657,7 +663,7 @@ export function DemoForm({
       </label>
       <label className="grid gap-1.5 text-caption font-semibold">
         {scene.workEmail}
-        <input name="email" type="email" required maxLength={254} autoComplete="email" defaultValue={v?.email} className={field} {...a11y("email")} />
+        <input name="email" type="email" dir="ltr" required maxLength={254} autoComplete="email" defaultValue={v?.email} className={field} {...a11y("email")} />
         {message("email")}
       </label>
       <label className="grid gap-1.5 text-caption font-semibold">

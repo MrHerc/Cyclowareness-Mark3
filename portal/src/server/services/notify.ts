@@ -6,7 +6,7 @@ import type { TemplateKind } from "../db/schema";
 import { queueEmail, renderEmailHtml } from "../mail";
 import { appUrl } from "../env";
 import { DEFAULT_TEMPLATES, DEFAULT_TEMPLATES_NO_DUE, FIXED_MESSAGES, emailButtonLabel, withDefaults } from "../../lib/tenant-defaults";
-import { stripEmailMarkup } from "../../lib/email-markup";
+import { escapeEmailMarkup, stripEmailMarkup } from "../../lib/email-markup";
 import { formatAzDate } from "../../lib/az-format";
 import { messagesFor } from "../../i18n/translator";
 
@@ -86,7 +86,8 @@ export async function notifyUsers(
       link,
     };
     const subject = fill(tpl.subject, values);
-    const body = fill(tpl.body, values);
+    // The template's own markup counts; a name or title filled into it stays text, so "[x](https://…)" in it is no link.
+    const body = fill(tpl.body, { ...Object.fromEntries(Object.entries(values).map(([k, v]) => [k, escapeEmailMarkup(v)])), link });
     await queueEmail(
       db,
       tenantId,

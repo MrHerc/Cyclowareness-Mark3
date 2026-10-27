@@ -1,0 +1,526 @@
+{
+ "id": "consent-screen",
+ "title": "Der Berechtigungsdialog",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac1-tutor",
+   "beats": [
+    {
+     "id": "ac1-b1",
+     "say": "Hallo! Heute lernen wir eine Falle kennen, die nicht nach Ihrem Passwort fragt, sondern nach einer Berechtigung.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "ac1-b2",
+     "say": "Die App sagt: Damit Sie das Dokument sehen können, erlauben Sie mir, Ihre E-Mails zu lesen und in Ihrem Namen zu senden.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "w2b-dokubaxis",
+       "app": "DokuBaxış Viewer",
+       "permissions": [
+        {
+         "label": [
+          {
+           "text": "Ihr Profil sehen"
+          }
+         ],
+         "needed": true
+        },
+        {
+         "label": [
+          {
+           "text": "Ihre E-Mails lesen und in Ihrem Namen senden",
+           "spot": "mail"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "Zugriff behalten, auch wenn Sie nicht da sind"
+          }
+         ],
+         "needed": false
+        }
+       ]
+      }
+     },
+     "highlight": "mail"
+    },
+    {
+     "id": "ac1-b3",
+     "say": "Ein Klick, und die App sitzt in Ihrem Postfach. Selbst wenn Sie Ihr Passwort ändern, bleibt die Berechtigung bestehen.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "ac1-b4",
+     "say": "Die Regel: Lesen Sie den Namen der App und die Berechtigungen, und lassen Sie nie eine App zu, die Sie nicht kennen.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ac1-hotspot",
+   "prompt": "Finden Sie die Berechtigungen, die diese App gar nicht braucht.",
+   "artifact": {
+    "kind": "permission",
+    "brandRef": "w2b-dokubaxis",
+    "app": "DokuBaxış Viewer",
+    "permissions": [
+     {
+      "label": [
+       {
+        "text": "Ihr Profil sehen"
+       }
+      ],
+      "needed": true
+     },
+     {
+      "label": [
+       {
+        "text": "Ihre E-Mails lesen und in Ihrem Namen senden",
+        "spot": "mail"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Alle Ihre Dateien lesen und ändern",
+        "spot": "files"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Ihre Kontakte sehen",
+        "spot": "contacts"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Zugriff behalten, auch wenn Sie nicht da sind",
+        "spot": "offline"
+       }
+      ],
+      "needed": false
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "mail",
+     "label": "E-Mails lesen und senden",
+     "explain": "Um ein Dokument anzuzeigen, braucht eine App keinen Zugriff auf Ihre E-Mails. Mit dieser Berechtigung kann sie in Ihrem Namen Phishing-Mails verschicken."
+    },
+    {
+     "id": "files",
+     "label": "Alle Dateien",
+     "explain": "Eine App, die ein einzelnes Dokument anzeigt, braucht nicht alle Ihre Dateien. Hier geht es um Datendiebstahl."
+    },
+    {
+     "id": "contacts",
+     "label": "Kontakte",
+     "explain": "Ihre Kontaktliste ist die Zielliste für den nächsten Angriff. Für ein Dokument wird sie nicht gebraucht."
+    },
+    {
+     "id": "offline",
+     "label": "Dauerhafter Zugriff",
+     "explain": "Das bedeutet: Die App bleibt in Ihrem Konto, auch wenn Sie sich abmelden und sogar nachdem Sie Ihr Passwort geändert haben."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "ac1-swipe",
+   "prompt": "Welche Berechtigungsanfrage ist normal, welche eine Falle? Wischen Sie.",
+   "cards": [
+    {
+     "id": "meeting-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "gorus",
+      "app": "Görüş",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Ihren Kalender sehen"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Ihr Profil sehen"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Görüş ist die bekannte App Ihrer Organisation und verlangt nur, was sie für ihre Aufgabe braucht."
+    },
+    {
+     "id": "greeting-card",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-bayram-tebriki",
+      "app": "Bayram Təbriki",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Ihre Kontakte sehen"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "E-Mails in Ihrem Namen senden"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Eine Grußkarte braucht weder Ihre Kontakte noch das Recht, E-Mails zu senden. So sollen in Ihrem Namen Phishing-Mails verbreitet werden."
+    },
+    {
+     "id": "salary-calc",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-maas-kalkulyatoru",
+      "app": "Maaş Kalkulyatoru",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Ihre E-Mails lesen"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Zugriff behalten, auch wenn Sie nicht da sind"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein Gehaltsrechner braucht Ihre E-Mails nicht. Durch den dauerhaften Zugriff bleibt die App in Ihrem Konto."
+    },
+    {
+     "id": "editor",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "senedyaz",
+      "app": "SənədYaz",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Die von Ihnen gewählte Datei öffnen und speichern"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Der bekannte Editor verlangt nur Zugriff auf die Datei, die Sie auswählen. Diese Berechtigung passt zu seiner Aufgabe."
+    },
+    {
+     "id": "pdf-tool",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "pdf-birlesdirici",
+      "app": "PDF Birləşdirici Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Alle Ihre Dateien lesen und ändern"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Ihre E-Mails lesen und senden"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Zum Zusammenführen von Dateien braucht eine App weder Ihre E-Mails noch Zugriff auf alle Ihre Dateien. Lassen Sie eine solche App nicht zu."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac1-sim",
+   "environment": "browser",
+   "title": "Das geteilte Budgetdokument",
+   "intro": "Im Namen Ihrer Kollegin Nigar wurde ein Budgetdokument mit Ihnen geteilt. Sie haben den Link geöffnet. Entscheiden Sie jetzt auf jedem Bildschirm.",
+   "steps": [
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "İşPoçt",
+      "url": [
+       {
+        "text": "https://giris.idare.example/icaze"
+       }
+      ],
+      "fields": [
+       "E-Mail",
+       "Passwort"
+      ],
+      "button": "Anmelden"
+     },
+     "say": "Sehen Sie sich die Adresse an: Das ist die echte Anmeldeseite Ihrer Organisation.",
+     "actions": [
+      {
+       "id": "sign-in",
+       "label": "Anmelden",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Die Adresse ist echt, Ihr Passwort landet also nicht bei Kriminellen. Die Falle steckt im nächsten Fenster."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Auch das ist sicher. Aber nehmen wir an, Sie hätten sich angemeldet: Sehen wir uns das nächste Fenster an."
+      }
+     ]
+    },
+    {
+     "id": "consent",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-dokubaxis",
+      "app": "DokuBaxış Viewer",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Ihr Profil sehen"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Ihre E-Mails lesen und in Ihrem Namen senden"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Alle Ihre Dateien lesen und ändern"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Zugriff behalten, auch wenn Sie nicht da sind"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Bevor sich das Dokument öffnete, erschien dieses Fenster.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Ablehnen",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Richtig. Um ein Dokument anzusehen, braucht eine App weder Ihre E-Mails noch alle Dateien noch dauerhaften Zugriff.",
+       "next": "known-app"
+      },
+      {
+       "id": "allow",
+       "label": "Zulassen",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Die App liest jetzt Ihre E-Mails und schreibt in Ihrem Namen. Eine Passwortänderung hält sie nicht auf."
+      }
+     ]
+    },
+    {
+     "id": "connected-apps",
+     "label": "Verbundene Apps: DokuBaxış Viewer, dauerhafter Zugriff auf E-Mails und Dateien",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/tetbiqler"
+       }
+      ]
+     },
+     "say": "Am nächsten Tag sehen Sie sich Ihr Konto an.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Dem IT-Support melden, damit er die Berechtigung widerruft",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Erst wenn die Berechtigung widerrufen ist, verschwindet die App. Eine Fachkraft prüft außerdem, ob Spuren zurückgeblieben sind."
+      },
+      {
+       "id": "password-only",
+       "label": "Nur das Passwort ändern",
+       "kind": "update",
+       "outcome": "risky",
+       "feedback": "Das Passwort ist dann neu, aber die App behält ihre Berechtigung. Der IT-Support muss sie widerrufen."
+      },
+      {
+       "id": "leave",
+       "label": "So lassen",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Die App liest weiterhin jeden Tag Ihre E-Mails. Melden Sie das noch heute."
+      }
+     ]
+    },
+    {
+     "id": "known-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "idare-komekci",
+      "app": "İdarə Köməkçisi",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Ihr Profil sehen"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Ihren Kalender sehen"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "say": "Jetzt bittet die hauseigene Assistenz-App Ihrer Organisation um eine Berechtigung.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Zulassen",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine bekannte dienstliche App verlangt nur, was sie für ihre Aufgabe braucht."
+      },
+      {
+       "id": "deny",
+       "label": "Ablehnen",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "Vorsicht ist verständlich, aber diese App ist bekannt und verlangt wenig. Fragen Sie im Zweifel den IT-Support."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ac1-choice",
+   "question": {
+    "prompt": "Welche Berechtigungen sind am gefährlichsten? Wählen Sie alle zutreffenden aus.",
+    "options": [
+     {
+      "id": "send",
+      "label": "E-Mails in Ihrem Namen senden",
+      "correct": true,
+      "feedback": "Richtig. Mit dieser Berechtigung schickt die App in Ihrem Namen Phishing-Mails an Ihre Kolleginnen und Kollegen."
+     },
+     {
+      "id": "offline",
+      "label": "Zugriff behalten, auch wenn Sie nicht da sind",
+      "correct": true,
+      "feedback": "Richtig. Das bedeutet, dass die App auch nach Ihrer Abmeldung in Ihrem Konto bleibt."
+     },
+     {
+      "id": "profile",
+      "label": "Ihren Namen und Ihr Profilbild sehen",
+      "correct": false,
+      "feedback": "Das ist eine kleine Berechtigung, die für eine normale Anmeldung nötig ist."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "E-Mails, Dateien und dauerhafter Zugriff sind die weitreichendsten Berechtigungen. Erteilen Sie sie nie einer App, die Sie nicht kennen."
+  },
+  {
+   "type": "recap",
+   "id": "ac1-recap",
+   "points": [
+    "Lesen Sie im Berechtigungsdialog den Namen der App und die Berechtigungen",
+    "Geben Sie einer unbekannten App weder Zugriff auf E-Mails noch auf Dateien noch dauerhaften Zugriff",
+    "Haben Sie versehentlich zugestimmt, lassen Sie die Berechtigung vom IT-Support widerrufen"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

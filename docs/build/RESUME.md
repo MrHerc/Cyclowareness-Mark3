@@ -1,4 +1,34 @@
-# ✅ TAMAMLANDI (2026-10-26): bu fayl artıq tarixçədir
+# ⏸ DAVAM ETMƏK ÜÇÜN: 10 dil və təcrübə işi (2026-10-27-də həftəlik limitə görə dayandırılıb)
+
+Həftəlik limit bazar günü, 2026-11-01-də saat 22:00-da (Bakı vaxtı) yenilənir. Bundan sonra soruşmadan qaldığın yerdən davam et. Bitəndə commit et və `origin`-ə push et: https://github.com/MrHerc/Cyclowareness-Mark3. `origin/main`-də yalnız README commit-i var; onu birləşdir, heç vaxt force push etmə.
+
+**Hazırdır (bu commit-də):**
+- 10 interfeys dili: az, en, ru, tr, ro, ka, uk, de, fr, ar. Ərəb dili Səudiyyə üçündür, sağdan sola yazılır və italyan dilinin yerinə gəlib.
+- `dirOf`/`langAttrs`, məntiqi CSS və `tests/rtl-logical.test.ts`.
+- Koddakı mətnlər 10 dildədir: kampaniya şablonları, oyunlar, sertifikat, AI Sel dil üslubu.
+- 7 yeni dildə hər birində 106 dərs var və hamısı yoxlayıcıdan keçir. İnterfeys, hüquqi mətnlər və siyasətlər hazırdır. Ərəbcə landing hazırdır.
+- Lüğətlər: `.claude/skills/cyclowareness-experience/references/glossaries/`.
+- Təlim yolları: dərslərdən sonra laboratoriyalar gəlir. Bura `learning_paths.lab_ids` sütunu və `src/lib/domain/labs.ts` aiddir.
+- Yenilənmiş təlim (modul) səhifəsi.
+- TTS boru xətti. Hər cümlə üçün ElevenLabs `with-timestamps` klipi `scripts/generate-narration.ts` ilə yaradılır. Açar `ELEVENLABS_API_KEY`-dir, açar olmayanda Web Speech işləyir.
+- Süni intellekt subtitrləri: `POST /api/subtitles` və `ai_cache` cədvəli.
+- Yeni pişik: hərəkətlər, ana səhifədəki "Sel ilə oyna" kartı (siçan, yumaq, lazer) və qaçış.
+
+**Qalan işlər (sıra ilə):**
+1. Dayandırılmış workflow-ları eyni `scriptPath`, `resumeFromRunId` və `args` ilə davam etdir. Bu, yalnız həmin Claude sessiyasında işləyir.
+   - Skriptlər sessiyanın scratchpad qovluğundadır: `%TEMP%\claude\C--Users-Safar-Desktop-Cyclowareness--Vol2\66e61158-c161-4119-a251-69c6013bc3e9\scratchpad`.
+   - Vəziyyət `OVERNIGHT-STATE.md` faylındadır.
+   - Davam etdiriləcək dillər (`localize-language.js`): fr `wf_a783af65-3e3`, uk `wf_edb26592-7a5`, ro `wf_75b21604-d0d`, ka `wf_b1c11145-0d6`, de `wf_1bde0a71-fa5`, ar `wf_9f8275a7-ddd`. Bunlarda yalnız yoxlayıcı redaktorlar qalıb.
+   - İşıq effektləri (`light-polish.js`, `wf_466adfa7-ee3`, iş sahəsi `lightws`) hələ bitməyib.
+   - Yeni sessiyada skriptləri yenidən işə sal: tərcüməçilər mövcud faylları saxlayır, redaktorlar yenidən yoxlayır.
+2. Pleyer: yığılan sillabus, səs səviyyəsi, sürət, subtitr seçimi (10 dil və süni intellekt), transkript, qısayollar, TTS kliplərinin qoşulması. Bu, `player-and-mascot.js`-dəki pleyer agentinin işidir.
+3. Yeni açarları 7 dilə tərcümə et (`tests/i18n.test.ts`), sonra `npm run db:reset`, typecheck, lint, vitest və build.
+4. Codex/Claudex Loop baxışı (Codex CLI 0.164 bu kompüterdə 0xC0000005 ilə çökür: yenilə və ya ECC ilə əvəz et), ECC təhlükəsizlik baxışı, ADR-lər (10 dil, RTL, TTS, labs, maskot), PROGRESS, OPEN-QUESTIONS (ElevenLabs açarı və səs seçimi, hüquqi mətnlərdə Vertex AI adı).
+5. Commit, sonra push.
+
+---
+
+# ✅ TAMAMLANDI (2026-10-26): aşağıdakı hissə artıq tarixçədir
 
 Bütün addımlar bitib, bərpa addımlarını yenidən icra etməyin. Hazırki vəziyyət belədir:
 - 212 tərcümənin hamısı var və hamısı yoxlamadan keçir.

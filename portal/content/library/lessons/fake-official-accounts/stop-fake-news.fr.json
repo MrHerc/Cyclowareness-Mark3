@@ -1,0 +1,411 @@
+{
+ "id": "stop-fake-news",
+ "title": "Stop aux fausses infos",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Une fausse information ressemble souvent à une décision officielle et se propage vite dans les groupes de discussion.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Pas de source, pas de date, un ton pressant, et une demande de transférer le message à tout le monde.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Groupe du service"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Transféré. ",
+           "spot": "fwd"
+          },
+          {
+           "text": "Toutes les cartes de salaire changent dès demain ! "
+          },
+          {
+           "text": "Transférez à tout le monde !",
+           "spot": "share-all"
+          }
+         ],
+         "time": "08:40"
+        }
+       ]
+      }
+     },
+     "highlight": "fwd"
+    },
+    {
+     "id": "b3",
+     "say": "Avant de partager, vérifiez l’information sur le site de l’organisation et dans des médias fiables.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Si c’est faux, signalez-le à la plateforme et publiez un court rectificatif dans le groupe.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "flag"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "group-news",
+   "environment": "phone",
+   "title": "Des infos dans vos discussions",
+   "intro": "Des informations arrivent dans vos discussions de travail et de famille. Que faites-vous de chacune ?",
+   "steps": [
+    {
+     "id": "salary-card",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Groupe du service"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Transféré. Urgent ! Dès demain, les cartes de salaire des fonctionnaires sont remplacées. Mettez à jour vos données pour que l’ancienne carte ne soit pas bloquée : "
+         },
+         {
+          "text": "maas-kart-yeni.example.net",
+          "link": {
+           "label": "maas-kart-yeni.example.net",
+           "href": "https://maas-kart-yeni.example.net"
+          }
+         }
+        ],
+        "time": "08:45"
+       }
+      ]
+     },
+     "say": "Un collègue l’a publié, mais aucune source n’est indiquée.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Cette page récolte les données de carte bancaire. La comptabilité annonce les changements de cartes de salaire par les canaux officiels."
+      },
+      {
+       "id": "verify",
+       "label": "Demander à la comptabilité",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Vérifiez une décision interne auprès d’une source interne, à un numéro que vous connaissez."
+      },
+      {
+       "id": "warn",
+       "label": "Répondre : Non vérifié, n’ouvrez pas le lien",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bien, vous avez protégé vos collègues. Montrez aussi le message à l’équipe sécurité."
+      },
+      {
+       "id": "share",
+       "label": "Envoyer au groupe de la famille",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Diffuser une information non vérifiée entraîne les autres dans le piège."
+      }
+     ]
+    },
+    {
+     "id": "news-site",
+     "label": "Officiel : toutes les dettes d’eau, de gaz et d’électricité effacées, inscriptions closes ce soir",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-gundem24-fake",
+      "url": [
+       {
+        "text": "https://gundem24-az.example.net/xeber/borclar-silinir"
+       }
+      ]
+     },
+     "say": "On dirait un site d’information connu. Vérifiez l’adresse.",
+     "actions": [
+      {
+       "id": "register",
+       "label": "S’inscrire",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "L’adresse de Gündəm24 est gundem24.example ; ceci est un clone. Le formulaire collecte des données personnelles."
+      },
+      {
+       "id": "share",
+       "label": "Partager",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Vous diffuseriez un site cloné. Vérifiez l’adresse et la source avant de partager."
+      },
+      {
+       "id": "verify",
+       "label": "Vérifier sur le site officiel",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Une telle décision figurerait sur le site de l’organisation elle-même."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bien. L’adresse n’était pas le vrai domaine de Gündəm24."
+      }
+     ]
+    },
+    {
+     "id": "relatives-ask",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Groupe de la famille"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Quelqu’un ici travaille dans l’administration ? On dit qu’internet sera coupé à Bakou pendant trois jours à partir de demain. C’est vrai ?"
+         }
+        ],
+        "time": "19:20"
+       }
+      ]
+     },
+     "say": "Vos proches vous font confiance.",
+     "actions": [
+      {
+       "id": "confirm",
+       "label": "Sûrement vrai, préparez-vous",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "La parole d’un agent de l’État donne du poids à une information. Ne confirmez pas ce que vous ne savez pas."
+      },
+      {
+       "id": "check",
+       "label": "Je ne sais pas, je vérifie auprès d’une source officielle et je vous redis",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Exact. Un « je ne sais pas » honnête arrête une fausse information."
+      },
+      {
+       "id": "forward",
+       "label": "Transférer à d’autres groupes",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Vous feriez circuler la fausse information auprès d’encore plus de personnes."
+      }
+     ]
+    },
+    {
+     "id": "fake-office-page",
+     "label": "Ministère des Services sociaux : 50 postes à pourvoir. Frais de candidature : 10 AZN",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn-fake",
+      "url": [
+       {
+        "text": "https://kontakto.example/sxn.nazirlik.vakansiya"
+       }
+      ]
+     },
+     "say": "Cette page a été créée au nom de votre propre ministère.",
+     "actions": [
+      {
+       "id": "apply",
+       "label": "Postuler",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Le ministère ne fait jamais payer de frais de candidature. La fausse page récolte l’argent et les données des gens."
+      },
+      {
+       "id": "report",
+       "label": "Signaler à la plateforme",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Prévenez aussi le service de presse pour qu’il publie un avertissement officiel."
+      },
+      {
+       "id": "press",
+       "label": "Prévenir le service de presse",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Parfait. Signalez aussi la page à la plateforme pour qu’elle soit supprimée plus vite."
+      },
+      {
+       "id": "skip",
+       "label": "Passer, ce n’est pas mon travail",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "La fausse page escroque des gens au nom de votre administration. Un signalement prend une minute."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "check-tools",
+   "prompt": "Associez chaque doute à la bonne vérification.",
+   "pairs": [
+    {
+     "id": "no-source",
+     "left": "L’information ne cite aucune source",
+     "right": "Chercher sur le site officiel de l’organisation"
+    },
+    {
+     "id": "old-photo",
+     "left": "La photo semble connue et ancienne",
+     "right": "Faire une recherche d’image inversée"
+    },
+    {
+     "id": "site-address",
+     "left": "Le site ressemble à un site d’information connu",
+     "right": "Comparer l’adresse avec le vrai domaine"
+    },
+    {
+     "id": "fear",
+     "left": "L’information vous fait peur et vous presse",
+     "right": "Faire une pause et vérifier avant de partager"
+    }
+   ],
+   "explain": "Quelques secondes de vérification peuvent empêcher une fausse information d’atteindre des milliers de personnes."
+  },
+  {
+   "type": "scenario",
+   "id": "shared-by-mistake",
+   "title": "Un partage par erreur",
+   "start": "shared",
+   "nodes": [
+    {
+     "id": "shared",
+     "text": "Ce matin, vous avez publié l’information « les cartes de salaire changent » dans le groupe de la famille. À midi, vous apprenez qu’elle est fausse.",
+     "choices": [
+      {
+       "label": "Je la supprime et je publie un rectificatif",
+       "next": "relative",
+       "feedback": "Exact. Un rectificatif arrête ceux qui l’ont déjà vue."
+      },
+      {
+       "label": "Je la supprime discrètement",
+       "outcome": "risky",
+       "feedback": "Les personnes qui l’ont vue la font peut-être déjà circuler. Un court rectificatif brise la chaîne."
+      },
+      {
+       "label": "Je ne fais rien, c’est trop tard",
+       "outcome": "risky",
+       "feedback": "Il n’est pas trop tard : un rectificatif freine encore la propagation."
+      }
+     ]
+    },
+    {
+     "id": "relative",
+     "text": "J’ai ouvert ce lien et j’ai saisi les données de ma carte. Qu’est-ce que je fais maintenant ?",
+     "speaker": "Un proche",
+     "voice": "young-man",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "J’ai ouvert ce lien et j’ai saisi les données de ma carte. <breath> Qu’est-ce que je fais maintenant ?",
+     "choices": [
+      {
+       "label": "Appelle tout de suite ta banque au numéro inscrit sur ta carte et fais-la bloquer",
+       "outcome": "safe",
+       "feedback": "Exact. Plus la carte est bloquée tôt, plus le risque de perdre de l’argent est faible."
+      },
+      {
+       "label": "Ne t’inquiète pas, il ne se passera peut-être rien",
+       "outcome": "compromised",
+       "feedback": "Les escrocs utilisent souvent les données de carte immédiatement."
+      },
+      {
+       "label": "Efface ce que tu as saisi sur le site",
+       "outcome": "risky",
+       "feedback": "Les données sont déjà entre les mains de l’escroc. Seule la banque peut bloquer la carte."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "speak-for-office",
+   "question": {
+    "prompt": "Un journaliste vous écrit : « Pouvez-vous commenter la décision de votre ministère ? » Que faites-vous ?",
+    "options": [
+     {
+      "id": "press",
+      "label": "Je l’oriente vers le service de presse",
+      "correct": true,
+      "feedback": "Exact. Seul le service de presse s’exprime au nom de l’organisation."
+     },
+     {
+      "id": "guess",
+      "label": "Je dis ce que je sais",
+      "correct": false,
+      "feedback": "Un commentaire à moitié informé peut devenir une nouvelle fausse information, et le « journaliste » est peut-être faux lui aussi."
+     },
+     {
+      "id": "doc",
+      "label": "J’envoie une photo du document interne",
+      "correct": false,
+      "feedback": "Les documents internes ne doivent pas être partagés, et une photo peut circuler sans son contexte."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "social"
+    }
+   },
+   "explain": "Les commentaires officiels viennent du service de presse. Cela vous protège, vous et l’organisation."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Avant de partager, vérifiez la source sur le site de l’organisation elle-même.",
+    "Ne confirmez pas une information douteuse ; c’est le service de presse qui parle au nom de l’organisation.",
+    "Signalez les fausses pages et les fausses informations ; en cas de partage par erreur, publiez un rectificatif."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

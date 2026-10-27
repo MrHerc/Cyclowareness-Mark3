@@ -1,0 +1,709 @@
+{
+ "id": "hijacked-thread",
+ "title": "Gekaperter E-Mail-Verlauf",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ht-tutor",
+   "beats": [
+    {
+     "id": "ht-b1",
+     "say": "Wenn Kriminelle in das Postfach eines Geschäftspartners eindringen, antworten sie in Ihrem bestehenden E-Mail-Verlauf. Betreff und Signatur wirken vertraut.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "ht-b2",
+     "say": "Ein passwortgeschütztes Archiv ist ein Warnsignal. Das Passwort versteckt die Datei vor dem Virenschutz.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "kur-tikinti",
+       "from": {
+        "name": [
+         {
+          "text": "Elçin Babayev"
+         }
+        ],
+        "address": [
+         {
+          "text": "layihe@kur-tikinti.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "AW: Vertrag 47/2026"
+        }
+       ],
+       "time": "14:10",
+       "body": [
+        [
+         {
+          "text": "Sehr geehrte Damen und Herren,"
+         }
+        ],
+        [
+         {
+          "text": "der endgültige Vertrag liegt im Archiv. "
+         },
+         {
+          "text": "Passwort für das Archiv: 4417",
+          "spot": "zip-pass"
+         }
+        ],
+        [
+         {
+          "text": "Wenn Sie heute nicht unterschreiben, ändert sich der Preis."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Contract_final.zip"
+          }
+         ],
+         "size": "1,2 MB"
+        }
+       ]
+      }
+     },
+     "highlight": "zip-pass"
+    },
+    {
+     "id": "ht-b3",
+     "say": "Auch in einem vertrauten Verlauf gilt: Öffnen Sie einen unerwarteten Anhang nicht vorschnell, und reagieren Sie nicht überstürzt auf eine dringende Bitte.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "ht-b4",
+     "say": "Rufen Sie im Zweifel den Geschäftspartner unter einer Nummer an, die Sie kennen, und fragen Sie, ob die Datei wirklich von ihm kommt.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ht-hotspot",
+   "prompt": "Finden Sie, was sich in dieser Antwort verändert hat.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "kur-tikinti",
+    "from": {
+     "name": [
+      {
+       "text": "Elçin Babayev"
+      }
+     ],
+     "address": [
+      {
+       "text": "layihe@kur-tikinti.example"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "AW: AW: Vertrag 47/2026"
+     }
+    ],
+    "time": "15:02",
+    "body": [
+     [
+      {
+       "text": "Sehr geehrte Damen und Herren,",
+       "spot": "greeting"
+      }
+     ],
+     [
+      {
+       "text": "anbei der endgültige Vertrag und der Zahlungsplan. "
+      },
+      {
+       "text": "Melden Sie sich zum Öffnen mit Ihrer dienstlichen E-Mail-Adresse an.",
+       "spot": "login"
+      }
+     ],
+     [
+      {
+       "text": "Bitte unterschreiben Sie heute bis 15:00 Uhr.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "> Hallo, den überarbeiteten Entwurf schicke ich Ihnen am Montag, keine Eile. Elçin"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Contract_47_sign.html",
+        "spot": "html"
+       }
+      ],
+      "size": "12 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "greeting",
+     "label": "Anderer Ton",
+     "explain": "Früher schrieb er „Hallo“, jetzt „Sehr geehrte Damen und Herren“. Ein plötzlicher Wechsel im Ton deutet darauf hin, dass jemand anderes schreibt."
+    },
+    {
+     "id": "html",
+     "label": "HTML-Anhang",
+     "explain": "Verträge kommen als PDF- oder Word-Datei. Ein HTML-Anhang öffnet meist eine gefälschte Anmeldeseite."
+    },
+    {
+     "id": "login",
+     "label": "Aufforderung zur Anmeldung",
+     "explain": "Um einen Anhang zu öffnen, brauchen Sie nie Ihr Passwort. Eine Datei, die danach fragt, will es stehlen."
+    },
+    {
+     "id": "urgency",
+     "label": "Plötzliche Eile",
+     "explain": "In der früheren E-Mail stand „keine Eile“. Eine plötzliche Frist ist ein typisches Werkzeug von Kriminellen."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "ht-sim-inbox",
+   "environment": "inbox",
+   "title": "E-Mail-Verlauf zum Projekt",
+   "intro": "Sie haben einen langen E-Mail-Verlauf mit Kür Tikinti. Prüfen Sie die neuen Antworten: Welche sind echt, und welche kommen aus einem gekaperten Postfach?",
+   "steps": [
+    {
+     "id": "thread-genuine",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elçin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "AW: Vertrag 47/2026"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Hallo, wir haben Ihre Anmerkungen berücksichtigt, der überarbeitete Entwurf ist angehängt."
+        }
+       ],
+       [
+        {
+         "text": "Rufen Sie mich an, wenn Sie Fragen haben. Elçin"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Contract_47_revised.pdf"
+         }
+        ],
+        "size": "340 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Anhang öffnen",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "Ein erwartetes PDF, der gewohnte Ton, kein Druck. Das ist eine normale dienstliche E-Mail."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Hier gibt es kein Warnsignal. Die Datei ist erwartet und passt zum Verlauf."
+      }
+     ]
+    },
+    {
+     "id": "thread-zip",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elçin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "AW: Vertrag 47/2026: dringend"
+       }
+      ],
+      "time": "14:10",
+      "body": [
+       [
+        {
+         "text": "Sehr geehrte Damen und Herren,"
+        }
+       ],
+       [
+        {
+         "text": "der endgültige Vertrag liegt im Archiv. "
+        },
+        {
+         "text": "Passwort für das Archiv: 4417",
+         "spot": "zip-pass"
+        }
+       ],
+       [
+        {
+         "text": "Wenn Sie heute nicht unterschreiben, ändert sich der Preis."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Contract_final.zip"
+         }
+        ],
+        "size": "1,2 MB"
+       }
+      ]
+     },
+     "say": "Achten Sie auf das Archiv und das Passwort.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Anhang öffnen",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "In einem passwortgeschützten Archiv kann sich Schadsoftware verstecken, weil der Virenschutz nicht hineinsehen kann."
+      },
+      {
+       "id": "verify",
+       "label": "Elçin unter einer bekannten Nummer anrufen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Wenn Elçin die E-Mail nicht geschickt hat, ist sein Postfach gekapert, und er muss davon erfahren."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig: plötzliche Eile, ein geschütztes Archiv und ein neuer Ton. Ihre Meldung schützt auch das Team."
+      },
+      {
+       "id": "reply",
+       "label": "Antworten: Sind Sie das?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Die Antwort landet im gekaperten Postfach, und der Betrüger bestätigt es. Rufen Sie lieber an."
+      }
+     ]
+    },
+    {
+     "id": "thread-html",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elçin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "AW: Zahlungsplan"
+       }
+      ],
+      "time": "14:35",
+      "body": [
+       [
+        {
+         "text": "Der Zahlungsplan liegt in einer geschützten Datei. Öffnen Sie sie und melden Sie sich mit Ihrer dienstlichen E-Mail-Adresse an."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Payment_schedule.html"
+         }
+        ],
+        "size": "9 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Anhang öffnen",
+       "kind": "open-attachment",
+       "outcome": "risky",
+       "feedback": "Die HTML-Datei öffnet im Browser eine gefälschte Anmeldeseite. Noch haben Sie nichts eingegeben: Schließen Sie die Seite."
+      },
+      {
+       "id": "login",
+       "label": "Anmelden",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Der Betrüger hat jetzt Ihr Passwort. Ändern Sie es sofort und informieren Sie das Sicherheitsteam."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein Zahlungsplan braucht kein Passwort, und ein HTML-Anhang ist eine typische Falle."
+      }
+     ]
+    },
+    {
+     "id": "thread-account",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elçin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "AW: Anzahlung"
+       }
+      ],
+      "time": "15:20",
+      "body": [
+       [
+        {
+         "text": "Bitte überweisen Sie die Anzahlung diesmal auf das Konto unserer Partnerfirma, die Bankverbindung ist angehängt."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Bank_details.pdf"
+         }
+        ],
+        "size": "64 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "verify",
+       "label": "Zur Prüfung eine bekannte Nummer anrufen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Ob Sie wirklich an eine andere Firma zahlen sollen, klären Sie nur telefonisch."
+      },
+      {
+       "id": "accept",
+       "label": "Antworten: Wir übernehmen die Bankverbindung",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Die Anzahlung ginge an den Betrüger. Ein vertrauter Verlauf beweist nicht, dass ein neues Konto echt ist."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Guter Schritt. Zwei verdächtige E-Mails in einem Verlauf sind ein ernstes Signal."
+      }
+     ]
+    },
+    {
+     "id": "legal-genuine",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Rechtsabteilung"
+        }
+       ],
+       "address": [
+        {
+         "text": "huquq@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Unsere Anmerkungen zu Vertrag 47"
+       }
+      ],
+      "time": "16:00",
+      "body": [
+       [
+        {
+         "text": "Hallo, wir schlagen eine Änderung an Klausel 5 vor. Lassen Sie uns das morgen im Meeting besprechen."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "reply",
+       "label": "Antworten",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Eine interne Adresse, kein Anhang, kein Link und keine Forderung. Das ist eine normale E-Mail."
+      },
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Diese E-Mail zeigt keine Warnsignale. Melden Sie nur E-Mails, die wirklich verdächtig sind."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "ht-swipe",
+   "prompt": "Sicher oder Falle?",
+   "cards": [
+    {
+     "id": "pdf-expected",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Contract_47_revised.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "340 KB",
+      "source": [
+       {
+        "text": "Elçin Babayev, erwartete Antwort"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Ein erwartetes Dokument, ein übliches Format und ein bekannter Absender. Sie können es öffnen."
+    },
+    {
+     "id": "zip-pass",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Payment_order.zip"
+       }
+      ],
+      "type": "zip",
+      "size": "1,1 MB",
+      "source": [
+       {
+        "text": "layihe@kur-tikinti.example, Passwort: 4417"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein passwortgeschütztes Archiv versteckt seinen Inhalt vor dem Virenschutz. Rufen Sie den Absender an und fragen Sie nach."
+    },
+    {
+     "id": "html-sign",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Contract_sign.html"
+       }
+      ],
+      "type": "html",
+      "size": "11 KB",
+      "source": [
+       {
+        "text": "AW: Vertrag 47/2026"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein Vertrag ist nie eine HTML-Datei. Eine solche Datei öffnet eine gefälschte Anmeldeseite."
+    },
+    {
+     "id": "act-internal",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [
+       {
+        "text": "Handover_September.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "210 KB",
+      "source": [
+       {
+        "text": "huquq@idare.example, gestern abgestimmt"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Von einer internen Abteilung und vorher abgestimmt. Kein Warnsignal."
+    },
+    {
+     "id": "double-ext",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Invoice_47.pdf.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "2,3 MB",
+      "source": [
+       {
+        "text": "AW: Vertrag 47/2026"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Der echte Dateityp ist .exe, also ein Programm. Eine Rechnung ist niemals ein Programm."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ht-scenario",
+   "title": "Sie haben das Archiv geöffnet",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Sie haben das geschützte Archiv geöffnet. Darin war kein Vertrag, nur eine seltsame Datei, und der Bildschirm wurde kurz schwarz.",
+     "choices": [
+      {
+       "label": "Vom Netzwerk trennen und das Sicherheitsteam anrufen",
+       "next": "n2",
+       "feedback": "Richtig. Die Trennung stoppt die Ausbreitung, und mit dem Anruf holen Sie das Team dazu."
+      },
+      {
+       "label": "Den Computer sofort herunterfahren",
+       "next": "n2",
+       "feedback": "Beim Herunterfahren können Spuren im Arbeitsspeicher verloren gehen. Lassen Sie den Computer eingeschaltet und trennen Sie ihn vom Netzwerk, sofern Ihre Vorgaben nichts anderes sagen."
+      },
+      {
+       "label": "Niemandem etwas sagen, wahrscheinlich ist nichts passiert",
+       "outcome": "compromised",
+       "feedback": "Schadsoftware arbeitet unbemerkt und kann sich im Netzwerk ausbreiten. Einen Fehler schnell zu melden ist keine Schande, sondern rettet die Lage."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Danke. Ist die E-Mail noch in Ihrem Postfach? Und haben Sie Kür Tikinti informiert?",
+     "speaker": "Sicherheitsteam",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Danke. <breath> Ist die E-Mail noch in Ihrem Postfach? Und haben Sie Kür Tikinti informiert?",
+     "choices": [
+      {
+       "label": "Ich habe die E-Mail aufbewahrt und rufe Elçin unter einer bekannten Nummer an",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Die E-Mail ist ein Beweismittel, und der Geschäftspartner muss erfahren, dass sein Postfach gekapert wurde."
+      },
+      {
+       "label": "Ich habe die E-Mail gelöscht, damit keine Spuren bleiben",
+       "outcome": "risky",
+       "feedback": "Die E-Mail wird für die Untersuchung gebraucht. Bewahren Sie sie beim nächsten Mal auf und folgen Sie den Anweisungen des Sicherheitsteams."
+      },
+      {
+       "label": "Ich antworte Elçin im selben Verlauf",
+       "outcome": "risky",
+       "feedback": "Dieses Postfach liest der Betrüger mit. Informieren Sie den Geschäftspartner telefonisch."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "ht-recap",
+   "points": [
+    "Auch ein vertrauter E-Mail-Verlauf kann gekapert sein",
+    "Vor dem Öffnen eines geschützten Archivs oder einer HTML-Datei: anrufen und nachfragen",
+    "Schon geöffnet? Sofort vom Netzwerk trennen und melden"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

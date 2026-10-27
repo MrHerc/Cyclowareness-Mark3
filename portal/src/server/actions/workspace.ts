@@ -4,7 +4,7 @@ import { and, eq, inArray, isNull, ne, or, sql } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { z } from "zod";
 import { db, t } from "../db";
-import { actionViewer } from "../auth/viewer";
+import { actionViewer, hasFeature } from "../auth/viewer";
 import { isUuid } from "../../lib/ids";
 import { parseDay } from "../../lib/day";
 import { departmentKey } from "../../lib/departments";
@@ -186,6 +186,7 @@ export async function createAssignmentAction(input: z.infer<typeof assignSchema>
   const p = assignSchema.safeParse(input);
   if (!p.success) return { ok: false };
   const a = p.data;
+  if (a.target === "path" && !hasFeature(v, "paths")) return { ok: false };
   if (a.scope === "department" && !a.departmentId) return { ok: false };
   if (a.scope === "user" && !a.userId) return { ok: false };
   if (a.dueKind === "fixed" && !a.dueDate) return { ok: false };
@@ -352,7 +353,7 @@ export async function publishVersionAction(input: z.infer<typeof versionSchema>)
       .values(
         everyone.map((u) => {
           const locale = isLocale(u.locale) ? u.locale : base;
-          return { tenantId: v.tenant.id, userId: u.id, kind: "policy", title: translations[locale]?.title ?? p.data.title, body: bodies.get(locale) ?? null, href: `/policies/${policy.id}?from=%2F` };
+          return { tenantId: v.tenant.id, userId: u.id, kind: "policy", title: translations[locale]?.title ?? p.data.title, body: bodies.get(locale) ?? null, href: `/policies/${policy.id}?from=%2Fapp` };
         }),
       );
   }
@@ -390,7 +391,7 @@ export async function remindPolicyAction(versionId: string): Promise<{ count: nu
   const title = (locale: string) => version.translations?.[locale]?.title ?? version.title;
   const bodies = new Map(await Promise.all(LOCALES.map(async (l) => [l, (await getTranslations({ locale: l, namespace: "admin.policies" }))("notifyBody", { version: version.version })] as const)));
   const body = (locale: string) => bodies.get(isLocale(locale) ? locale : "en") ?? "";
-  const href = `/policies/${version.policyId}?from=%2F`;
+  const href = `/policies/${version.policyId}?from=%2Fapp`;
   const count = await notifyUsers(db(), v.tenant.id, targets, "policy_reminder", { module: title, link: href }, { body, href }, { defer: true });
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "policy.reminder", targetType: "policy", targetId: version.policyId, meta: { count } });
   return { count };

@@ -1,0 +1,374 @@
+{
+  "id": "update-safely",
+  "title": "Güvenle güncelleyin",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Güncellemeler sadece yeni düğmeler getirmez. Çoğu, saldırganların zaten bildiği güvenlik açıklarını kapatır.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "update"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Bir açık duyurulur duyurulmaz saldırganlar güncellenmemiş cihazların peşine düşer. Geciktirdiğiniz her gün riski artırır.",
+          "mood": "alert",
+          "visual": {
+            "kind": "illustration",
+            "id": "ransomware"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "“Tarayıcınız eski, hemen indirin” diyen bir açılır pencere tuzaktır. Tarayıcılar kendi ayarlarından güncellenir.",
+          "mood": "think",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "brauzer-yenilenme-tecili.example.net",
+                  "spot": "fake-domain"
+                },
+                {
+                  "text": "/update.exe"
+                }
+              ]
+            }
+          },
+          "highlight": "fake-domain"
+        },
+        {
+          "id": "b4",
+          "say": "Gerçek güncellemeler cihazın ayarlarından ya da resmî uygulama mağazasından gelir. Şüpheye düştüğünüzde oraya kendiniz gidin ve kontrol edin.",
+          "mood": "happy",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "b5",
+          "say": "Güncellemeden sonra yeniden başlatmayı ertelemeyin. Çoğu zaman koruma, ancak cihaz yeniden başladığında devreye girer.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "real-or-fake",
+      "prompt": "Gerçek bir güncelleme mi, yoksa tuzak mı?",
+      "cards": [
+        {
+          "id": "sms-virus",
+          "artifact": {
+            "kind": "sms",
+            "sender": [
+              {
+                "text": "Servis"
+              }
+            ],
+            "time": "07:55",
+            "messages": [
+              [
+                {
+                  "text": "Telefonunuzda virüs tespit edildi! Güvenlik güncellemesini hemen indirin: fix-phone.example.info/app.apk"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Telefonunuz güncellemeleri SMS ile göndermez. Bu bağlantı zararlı bir uygulama yükler."
+        },
+        {
+          "id": "planned-update",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "BT Destek"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it-support@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Bu akşam planlı güncelleme"
+              }
+            ],
+            "time": "14:10",
+            "body": [
+              [
+                {
+                  "text": "Bugün saat 19:00'dan sonra iş bilgisayarları otomatik olarak güncellenecektir."
+                }
+              ],
+              [
+                {
+                  "text": "Bilgisayarınızı açık bırakın, yalnızca çalışmalarınızı kaydedin. Hiçbir şey indirmenize gerek yok."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Bağlantı yok, dosya yok, indirilecek bir şey yok. E-posta yalnızca bilgi veriyor."
+        },
+        {
+          "id": "player-update",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://video-pleyer-yenile.example.net/pleyer_setup.exe"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Video izlemek için “oynatıcınızı güncelleyin” diyen bir site klasik bir tuzaktır. Tarayıcılar videoyu kendi başına oynatır."
+        },
+        {
+          "id": "zip-update",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "Sistem Merkezi"
+                }
+              ],
+              "address": [
+                {
+                  "text": "noreply@system-update-center.example.info"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Lisansınızın süresi doluyor! Güncelleme gerekli"
+              }
+            ],
+            "time": "09:03",
+            "body": [
+              [
+                {
+                  "text": "Ekteki güncellemeyi bugün yükleyiniz."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Update_KB5039.zip"
+                  }
+                ],
+                "size": "1,8 MB"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Güncellemeler e-posta eki olarak gelmez. Bu arşiv dosyası zararlı yazılım gizliyor olabilir."
+        },
+        {
+          "id": "remote-helper",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Teknik Destek (resmî)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Bilgisayarınızı uzaktan güncellemek için bu programı yükleyin ve ekranınızdaki kodu bana gönderin."
+                  }
+                ],
+                "time": "16:20"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Uzaktan kontrol programı, saldırgana bilgisayarınıza tam erişim verir. Destek ekibini bildiğiniz bir numaradan kendiniz arayın."
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "fake-update-email",
+      "prompt": "Sahte güncelleme e-postasının uyarı işaretlerini bulun.",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": [
+            {
+              "text": "Ofis Güncelleme Servisi"
+            }
+          ],
+          "address": [
+            {
+              "text": "security-update@"
+            },
+            {
+              "text": "idare-example.info",
+              "spot": "domain"
+            }
+          ]
+        },
+        "to": "ben",
+        "subject": [
+          {
+            "text": "ACİL: ",
+            "spot": "urgency"
+          },
+          {
+            "text": "Bilgisayarınız 24 saat içinde engellenecek"
+          }
+        ],
+        "time": "08:47",
+        "body": [
+          [
+            {
+              "text": "Değerli çalışma arkadaşımız,"
+            }
+          ],
+          [
+            {
+              "text": "Bilgisayarınızda kritik bir güncelleme eksik. Ekteki dosyayı açıp yükleyiniz."
+            }
+          ],
+          [
+            {
+              "text": "Yükleme sırasında antivirüs programınızı kapatınız.",
+              "spot": "disable-av"
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Acil_Güncelleme.exe",
+                "spot": "exe"
+              }
+            ],
+            "size": "2,1 MB"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Yanlış alan adı",
+          "explain": "Kurumunuz idare.example alan adını kullanır. Bu ise kısa çizgiyle yazılmış farklı bir alan adı."
+        },
+        {
+          "id": "urgency",
+          "label": "Aciliyet ve tehdit",
+          "explain": "Engelleme tehdidi, düşünmeden harekete geçmeniz için yazılmıştır."
+        },
+        {
+          "id": "disable-av",
+          "label": "Antivirüsü kapatma talebi",
+          "explain": "Hiçbir gerçek güncelleme korumayı kapatmanızı istemez. Bu talep, zararlı yazılımın önünü açar."
+        },
+        {
+          "id": "exe",
+          "label": "Çalıştırılabilir dosya",
+          "explain": "Bir .exe dosyası, açtığınız anda bir program çalıştırır. Güncellemeler bu şekilde gelmez."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "order",
+      "id": "update-steps",
+      "prompt": "Güncelleme adımlarını doğru sıraya koyun.",
+      "items": [
+        {
+          "id": "save",
+          "label": "Çalışmanızı kaydedin"
+        },
+        {
+          "id": "settings",
+          "label": "Güncellemeyi “Ayarlar” bölümünden başlatın"
+        },
+        {
+          "id": "restart",
+          "label": "Cihazı yeniden başlatın"
+        },
+        {
+          "id": "check",
+          "label": "Her şeyin çalıştığını kontrol edin"
+        }
+      ],
+      "explain": "Kaydetmek çalışmanızı korur, yeniden başlatmak da güncellemeyi tamamlar."
+    },
+    {
+      "type": "choice",
+      "id": "old-device",
+      "question": {
+        "prompt": "Eski telefonunuz artık güncelleme almıyor. Şimdi ne yapmalı?",
+        "options": [
+          {
+            "id": "antivirus",
+            "label": "Antivirüs yükleyip kullanmaya devam edin",
+            "correct": false,
+            "feedback": "Antivirüs, işletim sisteminin kendisindeki açıkları kapatmaz."
+          },
+          {
+            "id": "move",
+            "label": "İş hesaplarını kaldırın ve desteklenen bir cihaza geçin",
+            "correct": true,
+            "feedback": "Doğru. Desteği sona ermiş bir cihaz, yeni açıklar için düzeltme almaz."
+          },
+          {
+            "id": "nothing",
+            "label": "Hiçbir şey, hâlâ iyi çalışıyor",
+            "correct": false,
+            "feedback": "İyi çalışması, güvenli olduğu anlamına gelmez. Yeni açıklar kapanmadan kalır."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "update"
+        }
+      },
+      "explain": "Desteği sona ermiş bir cihazda iş hesabı ya da iş verisi tutmayın. Satmadan önce cihazı tamamen sıfırlayın."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Güncellemeleri geciktirmeden yükleyin, ardından cihazı yeniden başlatın.",
+        "Yalnızca “Ayarlar” bölümünden ya da resmî mağazadan güncelleyin.",
+        "Desteklenmeyen cihazlarda iş verisi tutmayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

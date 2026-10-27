@@ -1,0 +1,394 @@
+{
+ "id": "office-guard",
+ "title": "Das Büro schützen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "no-computer",
+     "say": "Ein Angreifer braucht nicht immer einen Computer. Ein auf dem Schreibtisch liegen gelassenes Dokument oder ein nicht gesperrter Bildschirm reicht schon.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "lock-screen",
+     "say": "Sperren Sie Ihren Bildschirm, sobald Sie aufstehen. An einem Windows-Computer drücken Sie dafür die Windows-Taste und den Buchstaben L gleichzeitig.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "tailgating",
+     "say": "Wenn eine fremde Person hinter Ihnen durch eine gesicherte Tür gehen will, bitten Sie die Person höflich, ihren eigenen Ausweis zu benutzen.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "visitors",
+     "say": "Besucher melden sich am Empfang an, tragen einen Besucherausweis und werden im Gebäude immer begleitet.",
+     "mood": "happy",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "tailgate",
+   "title": "Jemand direkt hinter Ihnen",
+   "start": "door",
+   "nodes": [
+    {
+     "id": "door",
+     "text": "Könnten Sie mir bitte die Tür aufhalten? Ich habe die Hände voll. Mein Ausweis ist in der Tasche, ich soll den Drucker reparieren.",
+     "speaker": "Unbekannter Mann",
+     "voice": "young-man-2",
+     "channel": "in-person",
+     "spoken": "Könnten Sie mir bitte die Tür aufhalten? Ich habe die Hände voll. <breath> Mein Ausweis ist in der Tasche, ich soll den Drucker reparieren.",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     },
+     "choices": [
+      {
+       "label": "Die Tür aufhalten – er hat ja die Hände voll",
+       "outcome": "compromised",
+       "feedback": "Eine nicht überprüfte Person ist im Gebäude. Angreifer setzen genau auf diese Höflichkeit."
+      },
+      {
+       "label": "Anbieten, die Kartons zu halten, damit er seinen Ausweis suchen kann",
+       "next": "no-badge",
+       "feedback": "Höflich und richtig."
+      },
+      {
+       "label": "Die Tür zufallen lassen und wortlos weitergehen",
+       "outcome": "risky",
+       "feedback": "Er ist nicht hineingekommen, aber vielleicht öffnet ihm jemand anderes die Tür. Besser ist es, den Sicherheitsdienst zu informieren."
+      }
+     ]
+    },
+    {
+     "id": "no-badge",
+     "text": "Sieht so aus, als hätte ich ihn zu Hause vergessen. Ich bin in Eile, Ihr Chef wartet auf mich.",
+     "speaker": "Unbekannter Mann",
+     "voice": "young-man-2",
+     "channel": "in-person",
+     "spoken": "Sieht so aus, äh, als hätte ich ihn zu Hause vergessen. Ich bin in Eile, Ihr Chef wartet auf mich.",
+     "choices": [
+      {
+       "label": "Na gut, gehen Sie rein",
+       "outcome": "compromised",
+       "feedback": "Den Chef ins Spiel bringen und Druck machen ist der älteste Trick überhaupt. Ohne Ausweis kein Zutritt."
+      },
+      {
+       "label": "Ihn zur Pforte begleiten",
+       "next": "guard",
+       "feedback": "Richtig. Dort kann man ihm einen Besucherausweis ausstellen oder ihn abweisen."
+      }
+     ]
+    },
+    {
+     "id": "guard",
+     "text": "Für heute ist keine Druckerreparatur angemeldet. Gut, dass Sie ihn hergebracht haben.",
+     "speaker": "Wachmann",
+     "voice": "older-man",
+     "channel": "in-person",
+     "manner": "firm",
+     "spoken": "Für heute ist keine Druckerreparatur angemeldet. <breath> Gut, dass Sie ihn hergebracht haben.",
+     "character": "guard",
+     "choices": [
+      {
+       "label": "Zusätzlich dem Sicherheitsteam kurz Bescheid geben",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Das Team sieht sich die Kameraaufnahmen an und prüft die anderen Eingänge."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "reception-call",
+   "environment": "call",
+   "title": "Anruf vom Empfang",
+   "intro": "Der Empfang ruft Sie an. Entscheiden Sie, wie Sie mit einem Besucher umgehen, den Sie nicht erwartet haben.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Empfang"
+       }
+      ],
+      "number": [
+       {
+        "text": "Durchwahl 115"
+       }
+      ],
+      "label": "Diensthandy",
+      "voice": "woman-2"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Annehmen",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Nehmen Sie ab. Sie entscheiden über den Besucher."
+      },
+      {
+       "id": "decline",
+       "label": "Ablehnen",
+       "kind": "decline",
+       "outcome": "risky",
+       "feedback": "Der Empfang erreicht niemanden und lässt den Besucher womöglich ungeprüft durch. Nehmen Sie solche Anrufe an.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "visitor",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Empfang"
+       }
+      ],
+      "number": [
+       {
+        "text": "Durchwahl 115"
+       }
+      ],
+      "label": "Diensthandy",
+      "voice": "woman-2"
+     },
+     "say": "Hallo, hier ist ein Techniker für die Klimaanlage. Er sagt, Sie hätten ihn, entschuldigen Sie, bestellt. Soll ich ihn hochschicken?",
+     "spoken": "Hallo, <breath> hier ist ein, äh, Techniker für die Klimaanlage. Er sagt, Sie hätten ihn <cough> entschuldigen Sie, bestellt. Soll ich ihn hochschicken?",
+     "actions": [
+      {
+       "id": "send-up",
+       "label": "Ja, schicken Sie ihn hoch",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Eine nicht überprüfte Person läuft dann allein durchs Gebäude. Prüfen Sie zuerst den Auftrag."
+      },
+      {
+       "id": "hold",
+       "label": "Ich habe niemanden bestellt – lassen Sie ihn bitte am Empfang warten",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein unerwarteter Besucher kommt nicht ohne Prüfung herein."
+      },
+      {
+       "id": "come-down",
+       "label": "Ich komme runter und sehe nach",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Gut. Treffen Sie den Besucher am Empfang und lassen Sie ihn nicht allein."
+      }
+     ]
+    },
+    {
+     "id": "name-drop",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Empfang"
+       }
+      ],
+      "number": [
+       {
+        "text": "Durchwahl 115"
+       }
+      ],
+      "label": "Diensthandy",
+      "voice": "woman-2"
+     },
+     "say": "Er sagt, Herr Kamran hat das genehmigt. Er braucht nur fünf Minuten im Serverraum.",
+     "spoken": "Er sagt, <breath> Herr Kamran hat das genehmigt. Er braucht nur fünf Minuten im Serverraum.",
+     "actions": [
+      {
+       "id": "let-in",
+       "label": "Dann lassen Sie ihn rein",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Ungeprüfter Zugang zum Serverraum ist eine ernste Bedrohung. Der Name einer Führungskraft ist keine Erlaubnis."
+      },
+      {
+       "id": "check-order",
+       "label": "Ich prüfe den Auftrag bei der Haustechnik",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Prüfen Sie den Auftrag über offizielle Kanäle und verlassen Sie sich nicht auf das Wort des Besuchers."
+      },
+      {
+       "id": "call-boss",
+       "label": "Ich rufe Herrn Kamran selbst an",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Gut. Rufen Sie Ihre Führungskraft unter der Nummer an, die Sie kennen, und fragen Sie nach.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Das Gespräch ist beendet. Laut Haustechnik war für heute kein Techniker bestellt.",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Empfang"
+       }
+      ],
+      "number": [
+       {
+        "text": "Durchwahl 115"
+       }
+      ],
+      "label": "Diensthandy",
+      "voice": "woman-2"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Wachdienst und Sicherheitsteam informieren",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Der Wachdienst hält die Person auf, und die Kameraaufnahmen werden geprüft."
+      },
+      {
+       "id": "ignore",
+       "label": "Nichts tun",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Der falsche Techniker versucht es vielleicht an einem anderen Eingang. Eine Meldung schützt das ganze Gebäude."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "clean-desk",
+   "question": {
+    "prompt": "Sie gehen zum Mittagessen. Was darf nicht auf Ihrem Schreibtisch liegen bleiben?",
+    "options": [
+     {
+      "id": "sticky-note",
+      "label": "Ein Haftzettel mit einem Passwort",
+      "correct": true,
+      "feedback": "Ein Passwort darf nie offen sichtbar auf einem Zettel stehen."
+     },
+     {
+      "id": "citizen-file",
+      "label": "Eine Mappe mit einem Bürgerantrag",
+      "correct": true,
+      "feedback": "Vertrauliche Akten gehören in einen abschließbaren Schrank."
+     },
+     {
+      "id": "phone",
+      "label": "Ein entsperrtes Diensthandy",
+      "correct": true,
+      "feedback": "Ein entsperrtes Smartphone öffnet die Tür zu Ihren Konten."
+     },
+     {
+      "id": "cup",
+      "label": "Eine leere Kaffeetasse",
+      "correct": false,
+      "feedback": "Das ist kein Risiko. Räumen Sie sie einfach weg."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "desk"
+    }
+   },
+   "explain": "Clean-Desk-Regel: Wenn Sie Ihren Platz verlassen, kommen Unterlagen, Datenträger und Geräte unter Verschluss."
+  },
+  {
+   "type": "match",
+   "id": "situations",
+   "prompt": "Ordnen Sie jeder Situation die richtige Reaktion zu.",
+   "pairs": [
+    {
+     "id": "stranger",
+     "left": "Eine fremde Person ohne Ausweis auf dem Flur",
+     "right": "Höflich ansprechen und zum Sicherheitsdienst bringen"
+    },
+    {
+     "id": "printer",
+     "left": "Der vertrauliche Ausdruck einer anderen Person",
+     "right": "Ungelesen der Person zurückgeben, der er gehört"
+    },
+    {
+     "id": "lost-badge",
+     "left": "Sie haben Ihren Zugangsausweis verloren",
+     "right": "Sofort melden, damit er gesperrt wird"
+    },
+    {
+     "id": "open-screen",
+     "left": "Jemand aus dem Team hat den Bildschirm nicht gesperrt",
+     "right": "Bildschirm sperren und die Person daran erinnern"
+    }
+   ],
+   "explain": "Physische Sicherheit geht alle an. Ein kleiner Handgriff verhindert ein großes Datenleck."
+  },
+  {
+   "type": "order",
+   "id": "visitor-flow",
+   "prompt": "Bringen Sie die Ankunft eines Besuchers in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "sign-in",
+     "label": "Der Besucher meldet sich am Empfang an"
+    },
+    {
+     "id": "badge",
+     "label": "Er erhält einen Besucherausweis und trägt ihn sichtbar"
+    },
+    {
+     "id": "escort",
+     "label": "Die einladende Person holt ihn ab und begleitet ihn"
+    },
+    {
+     "id": "return",
+     "label": "Beim Verlassen gibt er den Ausweis zurück"
+    }
+   ],
+   "explain": "Ein Besucher ist im Gebäude nie allein unterwegs und gibt beim Gehen seinen Ausweis zurück."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Sperren Sie Ihren Bildschirm, wenn Sie aufstehen, und schließen Sie Unterlagen weg.",
+    "Lassen Sie keine fremden Personen hinter sich durch die Tür, sondern bringen Sie diese zum Sicherheitsdienst.",
+    "Holen Sie Ausdrucke sofort ab und vernichten Sie vertrauliche Unterlagen ordnungsgemäß."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

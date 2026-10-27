@@ -1,0 +1,424 @@
+{
+ "id": "calm-response",
+ "title": "Réagir avec calme",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "cr-tutor",
+   "beats": [
+    {
+     "id": "cr-b1",
+     "say": "Un e-mail de chantage vient d’arriver. Voyons, dans l’ordre, les bons gestes à adopter.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "cr-b2",
+     "say": "Les deux premières règles : ne payez pas et ne répondez pas. Une réponse fait de vous une nouvelle cible.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "cr-b3",
+     "say": "Si vous utilisez encore le mot de passe cité dans l’e-mail, modifiez-le et activez la double authentification.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Modifier le mot de passe"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Ancien mot de passe"
+         }
+        ],
+        [
+         {
+          "text": "Nouveau mot de passe : au moins 15 caractères",
+          "spot": "new"
+         }
+        ]
+       ],
+       "buttons": [
+        "Annuler",
+        "Modifier"
+       ]
+      }
+     },
+     "highlight": "new"
+    },
+    {
+     "id": "cr-b4",
+     "say": "S’il est arrivé sur votre messagerie professionnelle, signalez-le à l’équipe sécurité. Vous n’y êtes pour rien.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "cr-order",
+   "prompt": "Vous avez reçu un e-mail de chantage. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Ne pas payer et ne pas répondre"
+    },
+    {
+     "id": "report",
+     "label": "Signaler l’e-mail à l’équipe sécurité"
+    },
+    {
+     "id": "change",
+     "label": "Modifier partout le mot de passe cité dans l’e-mail"
+    },
+    {
+     "id": "mfa",
+     "label": "Activer la double authentification"
+    }
+   ],
+   "explain": "D’abord, on ne paie pas et on ne répond pas ; ensuite, on signale l’e-mail et on modifie le mot de passe. La double authentification protège le compte même si un ancien mot de passe a fuité."
+  },
+  {
+   "type": "simulation",
+   "id": "cr-sim",
+   "environment": "desktop",
+   "title": "Le matin, sur l’ordinateur professionnel",
+   "intro": "Une notification d’e-mail de chantage s’affiche sur votre ordinateur professionnel. À chaque étape, choisissez la bonne réaction.",
+   "steps": [
+    {
+     "id": "toast",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "IshPocht",
+      "title": [
+       {
+        "text": "Votre mot de passe : Gunes2019. Vous avez 48 heures"
+       }
+      ],
+      "body": [
+       {
+        "text": "J’ai des vidéos enregistrées avec votre caméra. Envoyez des bitcoins, sinon tout le monde les verra."
+       }
+      ],
+      "time": "09:12"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Signaler sans payer ni répondre est la meilleure première étape.",
+       "next": "password"
+      },
+      {
+       "id": "reply",
+       "label": "Répondre : montrez-moi une preuve",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Vous avez répondu, et l’escroc a aussitôt envoyé un fichier censé être la preuve."
+      },
+      {
+       "id": "pay",
+       "label": "Copier l’adresse bitcoin et payer",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "L’argent est perdu et ne reviendra pas. Les personnes qui paient reçoivent le plus souvent une nouvelle demande.",
+       "next": "password"
+      }
+     ]
+    },
+    {
+     "id": "proof",
+     "label": "Téléchargements",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Subut_video.zip"
+       }
+      ],
+      "type": "zip",
+      "size": "1,2 Mo",
+      "source": [
+       {
+        "text": "Anonyme : e-mail de réponse"
+       }
+      ]
+     },
+     "say": "Une réponse est arrivée : soi-disant la preuve.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Ce n’est pas une preuve, c’est un logiciel malveillant. N’ouvrez jamais les fichiers d’un e-mail de chantage."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Exact. N’ouvrez pas le fichier, et signalez l’e-mail à l’équipe sécurité."
+      },
+      {
+       "id": "scan",
+       "label": "Analyser avec l’antivirus",
+       "kind": "scan",
+       "outcome": "safe",
+       "feedback": "Bon réflexe, mais il est inutile de garder ce fichier. Supprimez-le et signalez l’e-mail."
+      }
+     ]
+    },
+    {
+     "id": "password",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Modifier le mot de passe"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Le mot de passe cité dans l’e-mail figurait dans une ancienne fuite de données."
+        }
+       ],
+       [
+        {
+         "text": "Nouveau mot de passe : au moins 15 caractères, jamais utilisé sur d’autres sites."
+        }
+       ]
+      ],
+      "buttons": [
+       "Plus tard",
+       "Modifier le mot de passe"
+      ]
+     },
+     "say": "Ce mot de passe est encore utilisé sur certains de vos comptes.",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Modifier le mot de passe",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Très bien. Le mot de passe qui a fuité n’ouvre plus ce compte. Modifiez-le aussi sur vos autres comptes."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Les mots de passe divulgués sont essayés encore et encore pour ouvrir des comptes. Ne repoussez pas la modification."
+      }
+     ]
+    },
+    {
+     "id": "two-step",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Double authentification"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "À la connexion, demander une validation dans l’application de votre téléphone, en plus du mot de passe ?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Pas maintenant",
+       "Activer"
+      ]
+     },
+     "actions": [
+      {
+       "id": "enable",
+       "label": "Activer",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Exact. Même si le mot de passe est divulgué, la seconde étape protège le compte."
+      },
+      {
+       "id": "skip",
+       "label": "Pas maintenant",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Sans double authentification, un seul mot de passe ouvre tout. Activez-la dès aujourd’hui."
+      }
+     ]
+    },
+    {
+     "id": "second-threat",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "IshPocht",
+      "title": [
+       {
+        "text": "Dernières 24 heures !"
+       }
+      ],
+      "body": [
+       {
+        "text": "Aucun paiement reçu. Les vidéos seront diffusées demain."
+       }
+      ],
+      "time": "08:30"
+     },
+     "say": "Un jour plus tard, une nouvelle menace est arrivée.",
+     "actions": [
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Exact. Une menace répétée est elle aussi du bluff : ne payez pas et ne répondez pas."
+      },
+      {
+       "id": "report",
+       "label": "Signaler",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Très bien. L’équipe sécurité peut aussi bloquer les nouveaux e-mails."
+      },
+      {
+       "id": "bargain",
+       "label": "Répondre : laissez-moi un peu de temps",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Négocier donne de l’espoir à l’escroc. Ne répondez pas et signalez l’e-mail."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "cr-scenario",
+   "title": "Une collègue inquiète",
+   "start": "panic",
+   "nodes": [
+    {
+     "id": "panic",
+     "text": "Regarde, un e-mail de chantage est arrivé sur ma messagerie personnelle, et il affiche mon ancien mot de passe !",
+     "speaker": "Narmin (votre collègue) montre son téléphone",
+     "voice": "woman",
+     "channel": "in-person",
+     "manner": "worried",
+     "spoken": "Regarde, <breath> un e-mail de chantage est arrivé sur ma messagerie personnelle, et il affiche mon ancien mot de passe !",
+     "character": "narmin",
+     "choices": [
+      {
+       "label": "Reste calme, c’est un bluff envoyé en masse. Ne paie pas et ne réponds pas",
+       "next": "reuse",
+       "feedback": "Exact. Un conseil calme et clair fait aussitôt retomber la panique."
+      },
+      {
+       "label": "Paie peut-être la moitié pour qu’ils te laissent tranquille",
+       "outcome": "compromised",
+       "feedback": "Ceux qui paient reçoivent de nouvelles exigences. L’argent n’arrête pas la menace."
+      },
+      {
+       "label": "Réponds et demande une preuve",
+       "outcome": "risky",
+       "feedback": "Une réponse montre que l’adresse est active et attire d’autres e-mails."
+      }
+     ]
+    },
+    {
+     "id": "reuse",
+     "text": "J’utilise encore ce mot de passe sur plusieurs sites, qu’est-ce que je dois faire ?",
+     "speaker": "Narmin (votre collègue)",
+     "voice": "woman",
+     "channel": "in-person",
+     "manner": "worried",
+     "spoken": "J’utilise encore ce mot de passe sur plusieurs sites, euh, qu’est-ce que je dois faire ?",
+     "character": "narmin",
+     "choices": [
+      {
+       "label": "Change-le partout, utilise un mot de passe différent pour chaque site et active la double authentification",
+       "outcome": "safe",
+       "feedback": "Très bien. Des mots de passe distincts empêchent une fuite de se propager à tous les comptes."
+      },
+      {
+       "label": "Change seulement le mot de passe de cette messagerie, le reste n’a pas d’importance",
+       "outcome": "risky",
+       "feedback": "Le même mot de passe sera essayé sur d’autres sites. Il faut tous les changer."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "cr-choice",
+   "question": {
+    "prompt": "Un membre de votre famille, encore adolescent, vous dit que quelqu’un menace de publier ses vidéos privées et lui réclame de l’argent. Que faut-il faire ?",
+    "options": [
+     {
+      "id": "police",
+      "label": "Ne jamais payer, aller à la police",
+      "correct": true,
+      "feedback": "Exact. Ne jamais payer, aller à la police."
+     },
+     {
+      "id": "pay",
+      "label": "Payer une fois pour que ça s’arrête",
+      "correct": false,
+      "feedback": "Payer n’arrête pas la menace. Ne jamais payer, aller à la police."
+     },
+     {
+      "id": "hide",
+      "label": "Garder le secret et n’en parler à personne",
+      "correct": false,
+      "feedback": "Le secret sert la personne qui menace. Ne jamais payer, aller à la police."
+     }
+    ]
+   },
+   "explain": "Si un enfant ou un adolescent est menacé, ne payez jamais. Allez tout de suite à la police."
+  },
+  {
+   "type": "recap",
+   "id": "cr-recap",
+   "points": [
+    "Ne payez pas, ne répondez pas et n’ouvrez aucun fichier de l’e-mail.",
+    "Modifiez partout le mot de passe qui a fuité et activez la double authentification.",
+    "Si un enfant est menacé, ne payez jamais et allez à la police."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

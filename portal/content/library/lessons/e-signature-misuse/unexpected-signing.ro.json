@@ -1,0 +1,337 @@
+{
+  "id": "unexpected-signing",
+  "title": "Semnare neașteptată",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l2-tutor",
+      "beats": [
+        {
+          "id": "l2-b1",
+          "say": "Când primiți o solicitare de semnătură, întrebați-vă mai întâi: am inițiat eu această solicitare?",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": { "kind": "illustration", "id": "certificate" }
+        },
+        {
+          "id": "l2-b2",
+          "say": "Solicitarea arată numele documentului și serviciul care o trimite. Respingeți o solicitare la care nu vă așteptați.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "notification",
+              "brandRef": "mohurid",
+              "app": "MöhürID",
+              "title": [{ "text": "Solicitare de semnătură" }],
+              "body": [
+                { "text": "Document: " },
+                { "text": "Procura_puteri_depline.pdf", "spot": "doc" },
+                { "text": ". Serviciu: imza-xidmet.test" }
+              ],
+              "time": "07:58"
+            }
+          },
+          "highlight": "doc"
+        },
+        {
+          "id": "l2-b3",
+          "say": "Nu semnați fără să citiți. Numele, suma și destinatarul trebuie să corespundă cu ce vă așteptați.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": { "kind": "illustration", "id": "eye" }
+        },
+        {
+          "id": "l2-b4",
+          "say": "Când aveți dubii, nu semnați și anunțați echipa de securitate. O semnătură se retrage greu.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": { "kind": "illustration", "id": "shield" }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l2-sim",
+      "environment": "phone",
+      "title": "Solicitări de semnătură",
+      "intro": "Pe parcursul zilei primiți pe telefon solicitări de semnătură. Verificați-le pe fiecare și decideți.",
+      "steps": [
+        {
+          "id": "unexpected",
+          "label": "Nu intenționați să semnați nimic",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "mohurid",
+            "app": "MöhürID",
+            "title": [{ "text": "Solicitare de semnătură" }],
+            "body": [{ "text": "Document: Procura_autoturism.pdf. Serviciu: Bulud Notariat" }],
+            "time": "07:58"
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Deschideți și semnați",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Ați semnat o procură pregătită de altcineva. Sunați imediat la serviciul de semnătură și anunțați echipa de securitate."
+            },
+            {
+              "id": "deny",
+              "label": "Respingeți",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Corect. O solicitare pe care nu ați inițiat-o înseamnă că cineva încearcă să vă folosească numele."
+            },
+            {
+              "id": "report",
+              "label": "Anunțați echipa de securitate",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Foarte bine. Dacă respingeți și raportați, atacul este oprit la timp."
+            }
+          ]
+        },
+        {
+          "id": "rush-colleague",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [{ "text": "Elvin (Achiziții)" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Ți-am trimis un contract în SənədAxını. Nu e timp să-l citești, semnează-l repede, șeful așteaptă." }],
+                "time": "10:20"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "read",
+              "label": "Mai întâi citesc documentul",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Corect. Graba nu este un motiv să nu citiți: semnătura este responsabilitatea dumneavoastră."
+            },
+            {
+              "id": "rush",
+              "label": "Bine, semnez fără să citesc",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Într-un document necitit, suma sau destinatarul pot fi modificate."
+            }
+          ]
+        },
+        {
+          "id": "fake-portal-mail",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "senedaxini-fake",
+            "from": {
+              "name": [{ "text": "SənədAxını" }],
+              "address": [{ "text": "noreply@senedaxini-imza.test" }]
+            },
+            "subject": [{ "text": "Semnătura dumneavoastră este în așteptare: Proces_verbal_receptie.pdf" }],
+            "time": "12:05",
+            "body": [
+              [
+                { "text": "Pentru a semna documentul, " },
+                {
+                  "text": "conectați-vă",
+                  "link": { "label": "conectați-vă", "href": "https://senedaxini-imza.test/login" }
+                },
+                { "text": "." }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "click",
+              "label": "Conectați-vă",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "O pagină de conectare falsă v-a preluat parola. Schimbați-o acum și anunțați echipa de securitate."
+            },
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Corect. Domeniul nu aparține SənədAxını, așa că deschideți chiar dumneavoastră sistemul."
+            },
+            {
+              "id": "delete",
+              "label": "Ștergeți",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Este sigur. Dar dacă îl raportați, îi protejați și pe ceilalți."
+            }
+          ]
+        },
+        {
+          "id": "own-request",
+          "label": "Tocmai ați început să semnați pe portal cererea de concediu",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "mohurid",
+            "app": "MöhürID",
+            "title": [{ "text": "Solicitare de semnătură" }],
+            "body": [{ "text": "Document: Cerere_concediu.pdf. Serviciu: SənədAxını" }],
+            "time": "14:30"
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Deschideți și semnați",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Corect. Ați inițiat chiar dumneavoastră această solicitare, iar documentul și serviciul sunt cele la care vă așteptați."
+            },
+            {
+              "id": "deny",
+              "label": "Respingeți",
+              "kind": "deny",
+              "outcome": "risky",
+              "feedback": "Nu era nevoie: solicitarea era a dumneavoastră și totul corespunde. A verifica nu înseamnă a respinge totul."
+            }
+          ]
+        },
+        {
+          "id": "mismatch",
+          "label": "Ați comandat pe portal o adeverință de salariat",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "mohurid",
+            "app": "MöhürID",
+            "title": [{ "text": "Solicitare de semnătură" }],
+            "body": [{ "text": "Document: Procura_cont_bancar.pdf. Serviciu: imza-xidmet.test" }],
+            "time": "16:12"
+          },
+          "say": "Comparați numele documentului cu ce vă așteptați.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Deschideți și semnați",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Era o procură bancară, nu adeverința dumneavoastră. Dacă numele nu corespunde, nu semnați."
+            },
+            {
+              "id": "deny",
+              "label": "Respingeți",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Corect. Nici documentul, nici serviciul nu sunt cele la care vă așteptați, așa că respingeți solicitarea și raportați-o."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l2-hotspot",
+      "prompt": "Înainte să semnați, găsiți ce nu este în regulă cu această solicitare.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "mohurid",
+        "tone": "app",
+        "title": [{ "text": "Confirmați semnarea" }],
+        "body": [
+          [
+            { "text": "Document: " },
+            { "text": "Procură: drepturi depline asupra tuturor conturilor bancare", "spot": "doc" }
+          ],
+          [
+            { "text": "Împuternicit: " },
+            { "text": "Huseyn Mammadli", "spot": "person" }
+          ],
+          [
+            { "text": "Valabilitate: " },
+            { "text": "3 ani", "spot": "term" }
+          ],
+          [
+            { "text": "Solicitat de: " },
+            { "text": "imza-xidmet.test", "spot": "source" }
+          ]
+        ],
+        "buttons": ["Respingeți", "Introduceți PIN-ul"]
+      },
+      "spots": [
+        {
+          "id": "doc",
+          "label": "Drepturi depline",
+          "explain": "Acest document îi dă cuiva drepturi largi asupra conturilor dumneavoastră. Un astfel de document nu ar trebui să apară niciodată pe neașteptate."
+        },
+        {
+          "id": "person",
+          "label": "O persoană necunoscută",
+          "explain": "Dacă nu știți cine primește împuternicirea, nu semnați."
+        },
+        {
+          "id": "term",
+          "label": "Durată lungă",
+          "explain": "O procură pe trei ani permite ca paguba să continue mult timp."
+        },
+        {
+          "id": "source",
+          "label": "Serviciu necunoscut",
+          "explain": "Solicitarea vine de pe un site necunoscut, nu dintr-un sistem oficial pe care îl cunoașteți."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "order",
+      "id": "l2-order",
+      "prompt": "Puneți în ordine pașii de dinaintea semnării.",
+      "items": [
+        { "id": "started", "label": "Verificați dacă ați inițiat chiar dumneavoastră solicitarea" },
+        { "id": "read", "label": "Deschideți și citiți documentul" },
+        { "id": "details", "label": "Verificați numele, suma și destinatarul" },
+        { "id": "pin", "label": "Abia apoi introduceți PIN-ul" }
+      ],
+      "explain": "Dacă vreun pas nu corespunde, opriți-vă și respingeți solicitarea. Raportați orice solicitare suspectă echipei de securitate."
+    },
+    {
+      "type": "choice",
+      "id": "l2-choice",
+      "question": {
+        "prompt": "Ați semnat din greșeală un document suspect. Care este primul pas?",
+        "options": [
+          {
+            "id": "hide",
+            "label": "Nu spun nimănui, poate nu se întâmplă nimic",
+            "correct": false,
+            "feedback": "Semnătura este valabilă și poate fi folosită. Dacă o ascundeți, paguba crește."
+          },
+          {
+            "id": "report",
+            "label": "Sun imediat la serviciul de semnătură și anunț echipa de securitate",
+            "correct": true,
+            "feedback": "Corect. Serviciul poate suspenda certificatul, iar echipa de securitate analizează consecințele."
+          },
+          {
+            "id": "pin",
+            "label": "Îmi schimb doar PIN-ul",
+            "correct": false,
+            "feedback": "Este util, dar documentul semnat rămâne valabil. Mai întâi raportați."
+          }
+        ]
+      },
+      "explain": "Când ați semnat ceva greșit, timpul contează. O raportare rapidă vă dă șansa să împiedicați folosirea documentului."
+    },
+    {
+      "type": "recap",
+      "id": "l2-recap",
+      "points": [
+        "Confirmați o solicitare de semnătură doar dacă ați inițiat-o chiar dumneavoastră.",
+        "Citiți documentul: numele, suma și destinatarul trebuie să corespundă cu ce vă așteptați.",
+        "Dacă ați semnat din greșeală, anunțați imediat serviciul de semnătură și echipa de securitate."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

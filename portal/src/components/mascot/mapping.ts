@@ -103,14 +103,41 @@ export const TOPIC_INDEX: Record<MascotTopic, number> = {
  * poke_body, poke_antenna; guide_travel_l, guide_travel_r; aim_R… (right hand), aim_L… (left hand).
  */
 
-/** idleAct values: 0 rest, 1 nap (in/loop; the "wake" trigger ends it), 2 apple, 3 read (inferred). */
-export type MascotAct = "rest" | "nap" | "apple" | "read";
+/**
+ * idleAct values: 0 rest, 1 nap (in/loop; the "wake" trigger ends it), 2 apple, 3 read (inferred). The cat's own acts
+ * (2026-10-27; cat/props.ts ACT_TO_CAT) have no Rive animation: the Rive robot plays its closest act for them.
+ */
+export type MascotAct =
+  | "rest"
+  | "nap"
+  | "apple"
+  | "read"
+  | "sleep"
+  | "stretch"
+  | "groom"
+  | "knead"
+  | "play-mouse"
+  | "play-yarn"
+  | "laser"
+  | "chase-tail"
+  | "roll"
+  | "run";
 
 export const ACT_INDEX: Record<MascotAct, number> = {
   rest: 0,
   nap: 1,
   apple: 2,
   read: 3,
+  sleep: 1,
+  stretch: 0,
+  groom: 2,
+  knead: 0,
+  "play-mouse": 0,
+  "play-yarn": 0,
+  laser: 3,
+  "chase-tail": 0,
+  roll: 0,
+  run: 0,
 };
 
 /** pokeZone values, in the order of the poke_* animations (inferred). */

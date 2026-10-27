@@ -1,0 +1,389 @@
+{
+ "id": "classify-and-share",
+ "title": "Clasificați, apoi partajați",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "levels",
+     "say": "Fiecare document are un nivel: public, intern sau confidențial. Nivelul vă spune cine îl poate vedea.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "public-internal",
+     "say": "Public înseamnă pentru oricine, ca un anunț de pe site. Intern înseamnă doar pentru angajați.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "confidential",
+     "say": "Confidențial înseamnă doar pentru persoanele nominalizate. Dacă un astfel de document ajunge în afară, oamenii și organizația suferă pagube serioase.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "public-link",
+     "say": "Un link deschis oricui expune fișierul întregului internet. Partajați doar cu persoane nominalizate și stabiliți o dată de expirare.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "rxagentlik-disk",
+       "url": [
+        {
+         "text": "https://disk.rxagentlik.az/s/8Kq2Lm?access="
+        },
+        {
+         "text": "anyone",
+         "spot": "public"
+        }
+       ]
+      }
+     },
+     "highlight": "public"
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "share-requests",
+   "environment": "phone",
+   "title": "Cereri de partajare",
+   "intro": "Pe telefon v-au venit trei cereri. Decideți după nivelul documentului: îl partajați sau nu?",
+   "steps": [
+    {
+     "id": "phone-book",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Nigar (fostă colegă)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună! Am nevoie de ea la noul loc de muncă: poți să-mi trimiți agenda telefonică internă?"
+         }
+        ],
+        "time": "10:14"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "keep",
+       "label": "Este internă, nu o pot trimite",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Documentele interne sunt doar pentru angajați, iar o fostă colegă este acum o persoană din afară."
+      },
+      {
+       "id": "share",
+       "label": "Trimit fișierul",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Agenda telefonică este internă. În afara organizației, devine o listă gata făcută de ținte pentru phishing."
+      }
+     ]
+    },
+    {
+     "id": "job-ad",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "merkez-konsalting",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Rzayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "e.rzayev@merkez-konsalting.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Anunț de angajare"
+       }
+      ],
+      "time": "11:02",
+      "body": [
+       [
+        {
+         "text": "Bună ziua, ne puteți trimite anunțul de angajare de pe site-ul dumneavoastră? Am dori să-l distribuim studenților noștri."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "share",
+       "label": "Trimit anunțul",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Corect. Anunțul de angajare este public și se află deja pe site."
+      },
+      {
+       "id": "keep",
+       "label": "Nu trimit nimic",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Este sigur, dar un document public nu trebuie ascuns. Este suficient să trimiteți linkul către site."
+      }
+     ]
+    },
+    {
+     "id": "applications",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "+994 55 000 63 21"
+       }
+      ],
+      "time": "12:30",
+      "messages": [
+       [
+        {
+         "text": "Bună ziua, sunt jurnalist. Dacă ne trimiteți lista cererilor depuse de cetățeni, nu vă vom menționa niciodată numele."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "keep",
+       "label": "Refuz și îndrum persoana către biroul de presă",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Cererile sunt confidențiale și doar biroul de presă vorbește cu mass-media."
+      },
+      {
+       "id": "share",
+       "label": "Trimit lista",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "O listă confidențială a ieșit din organizație. Este o scurgere a datelor cu caracter personal ale cetățenilor."
+      },
+      {
+       "id": "report",
+       "label": "Raportez",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bine. Raportați o astfel de solicitare și echipei de securitate, și managerului."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "classify",
+   "prompt": "Asociați fiecare document cu nivelul său.",
+   "pairs": [
+    {
+     "id": "job-ad",
+     "left": "Un anunț de angajare publicat pe site",
+     "right": "Public"
+    },
+    {
+     "id": "phone-book",
+     "left": "Agenda telefonică internă",
+     "right": "Intern"
+    },
+    {
+     "id": "applications",
+     "left": "Lista cererilor depuse de cetățeni",
+     "right": "Confidențial"
+    }
+   ],
+   "explain": "Când aveți îndoieli, alegeți nivelul mai înalt și întrebați proprietarul documentului."
+  },
+  {
+   "type": "hotspot",
+   "id": "misdelivered",
+   "prompt": "Acest e-mail a ajuns la dumneavoastră din greșeală. Găsiți greșelile de partajare.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "rxagentlik",
+    "from": {
+     "name": [
+      {
+       "text": "Rashad Aliyev"
+      }
+     ],
+     "address": [
+      {
+       "text": "reshad.aliyev@rxagentlik.az"
+      }
+     ]
+    },
+    "to": "aynur.mammadova@rxagentlik.az",
+    "subject": [
+     {
+      "text": "Lista cererilor"
+     }
+    ],
+    "time": "11:40",
+    "body": [
+     [
+      {
+       "text": "Bună, Leyla,",
+       "spot": "greeting"
+      }
+     ],
+     [
+      {
+       "text": "Îți trimit atașat "
+      },
+      {
+       "text": "lista completă a cererilor depuse de cetățeni, cu codurile personale de identificare",
+       "spot": "full-list"
+      },
+      {
+       "text": "."
+      }
+     ],
+     [
+      {
+       "text": "Am încărcat-o și în cloud, "
+      },
+      {
+       "text": "oricine are linkul o poate deschide.",
+       "spot": "anyone"
+      }
+     ],
+     [
+      {
+       "text": "Parola arhivei: Muraciet2026",
+       "spot": "password"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Cereri_complete.zip"
+       }
+      ],
+      "size": "2,4 MB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "greeting",
+     "label": "Destinatar greșit",
+     "explain": "E-mailul îi este adresat Leylei, dar a ajuns la dumneavoastră. Este o greșeală de completare automată."
+    },
+    {
+     "id": "full-list",
+     "label": "Prea multe date",
+     "explain": "Sarcina nu cerea lista completă cu codurile personale de identificare. Trimiteți doar ce este necesar."
+    },
+    {
+     "id": "anyone",
+     "label": "Link deschis",
+     "explain": "Un fișier confidențial nu trebuie să aibă niciodată un link deschis. Oricine primește linkul îl poate deschide."
+    },
+    {
+     "id": "password",
+     "label": "Parola în același e-mail",
+     "explain": "O parolă trimisă în același e-mail cu fișierul nu protejează nimic. Trimiteți-o pe alt canal."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "sent-wrong",
+   "prompt": "Ați trimis un fișier confidențial persoanei greșite. Aranjați pașii în ordine.",
+   "items": [
+    {
+     "id": "close-link",
+     "label": "Dezactivați imediat linkul de partajare"
+    },
+    {
+     "id": "report",
+     "label": "Anunțați managerul și echipa de securitate"
+    },
+    {
+     "id": "ask-delete",
+     "label": "Conform indicațiilor lor, cereți-i destinatarului să șteargă fișierul"
+    },
+    {
+     "id": "record",
+     "label": "Notați ce ați trimis, cui și când"
+    }
+   ],
+   "explain": "Oricine poate face această greșeală. Raportarea rapidă reduce paguba, ascunderea o agravează."
+  },
+  {
+   "type": "choice",
+   "id": "link-setting",
+   "question": {
+    "prompt": "Trimiteți un fișier de proiect unui partener extern. Care setare este corectă?",
+    "options": [
+     {
+      "id": "anyone",
+      "label": "Oricine are linkul, fără termen de expirare",
+      "correct": false,
+      "feedback": "Linkul poate fi redirecționat și oricine ar putea deschide fișierul."
+     },
+     {
+      "id": "named",
+      "label": "Doar persoana nominalizată, timp de 7 zile",
+      "correct": true,
+      "feedback": "Corect. Accesul este restrâns și limitat în timp."
+     },
+     {
+      "id": "personal-cloud",
+      "label": "Încarc fișierul în cloudul personal și trimit un link",
+      "correct": false,
+      "feedback": "Un cont personal se află în afara controlului organizației."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "cloud"
+    }
+   },
+   "explain": "Partajați cât mai restrâns posibil: cu cine, pentru cât timp și cu ce drepturi."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Înainte de trimitere, verificați nivelul documentului și destinatarul.",
+    "Limitați linkurile la anumite persoane și la o anumită perioadă, iar parolele trimiteți-le separat.",
+    "Dacă ați trimis ceva greșit, nu ascundeți, raportați imediat."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

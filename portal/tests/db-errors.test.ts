@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { isForeignKeyViolation, isUniqueViolation } from "../src/server/db/errors";
+import { describe, expect, it, vi } from "vitest";
+import { isForeignKeyViolation, isUniqueViolation, logFailure } from "../src/server/db/errors";
 
 describe("isUniqueViolation", () => {
   const pg = Object.assign(new Error('duplicate key value violates unique constraint "threat_reports_number_idx"'), { code: "23505", constraint: "threat_reports_number_idx" });
@@ -30,5 +30,20 @@ describe("isForeignKeyViolation", () => {
   it("ignores other errors", () => {
     expect(isForeignKeyViolation(Object.assign(new Error("dup"), { code: "23505" }))).toBe(false);
     expect(isForeignKeyViolation(new Error("connection refused"))).toBe(false);
+  });
+});
+
+describe("logFailure", () => {
+  it("logs the name, the driver code and the frames, never the failed query or its parameters", () => {
+    const pg = Object.assign(new Error("duplicate key"), { code: "23505" });
+    const wrapped = Object.assign(new Error("Failed query: insert into outbox values ($1)\nparams: https://x.test/account/reset/SECRET"), { name: "DrizzleQueryError", cause: pg });
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    logFailure("[test] failed", wrapped);
+    const calls = [...log.mock.calls];
+    log.mockRestore();
+    const [what, name, code, at] = calls[0];
+    expect([what, name, code]).toEqual(["[test] failed", "DrizzleQueryError", "23505"]);
+    expect(at).toMatch(/^\s+at /);
+    expect(JSON.stringify(calls)).not.toMatch(/SECRET|params|Failed query/);
   });
 });

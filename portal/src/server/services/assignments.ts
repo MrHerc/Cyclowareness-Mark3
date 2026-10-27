@@ -2,6 +2,7 @@
  * Resolves who has to learn what. Assignments target everyone, a department (with its
  * sub-departments) or one person, and point at a module or a learning path.
  */
+import { cache } from "react";
 import { and, eq, inArray, isNull, ne, or } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
@@ -146,7 +147,10 @@ async function loadAssignments(db: DB, tenantId: string, onlyUserIds?: string[])
 }
 
 export async function resolveAssignments(db: DB, tenantId: string, onlyUserIds?: string[]): Promise<Map<string, Map<string, AssignedModule>>> {
-  const { assignments, users, closure, modulesOf } = await loadAssignments(db, tenantId, onlyUserIds);
+  return resolveLoaded(await loadAssignments(db, tenantId, onlyUserIds));
+}
+
+function resolveLoaded({ assignments, users, closure, modulesOf }: Awaited<ReturnType<typeof loadAssignments>>): Map<string, Map<string, AssignedModule>> {
   const result = new Map<string, Map<string, AssignedModule>>();
   for (const u of users) result.set(u.id, new Map());
 
@@ -172,8 +176,33 @@ export async function resolveAssignments(db: DB, tenantId: string, onlyUserIds?:
   return result;
 }
 
+/** One person's load, cached per request (a no-op outside one): the catalog and the paths pages each need it. */
+const loadForUser = cache((db: DB, tenantId: string, userId: string) => loadAssignments(db, tenantId, [userId]));
+
 export async function assignedForUser(db: DB, tenantId: string, userId: string): Promise<Map<string, AssignedModule>> {
-  return (await resolveAssignments(db, tenantId, [userId])).get(userId) ?? new Map();
+  return resolveLoaded(await loadForUser(db, tenantId, userId)).get(userId) ?? new Map();
+}
+
+type PathAssignment = Target & Pick<typeof t.assignments.$inferSelect, "pathId" | "dueKind" | "dueDate" | "dueDays">;
+
+/**
+ * The learning paths assigned to one person, each with the earliest due day of the assignments that reach them.
+ * Only assignments that target the person count: a path assigned to another department is not theirs, even when
+ * some of its modules are assigned to them on their own.
+ */
+export function pathsAssignedTo(assignments: PathAssignment[], user: UserLite, closure: Map<string, Set<string>>): Map<string, string | null> {
+  const paths = new Map<string, string | null>();
+  for (const a of assignments) {
+    if (!a.pathId || !targetsOf(a, [user], closure).length) continue;
+    const due = dueFor(a, user);
+    paths.set(a.pathId, paths.has(a.pathId) ? earlier(paths.get(a.pathId)!, due) : due);
+  }
+  return paths;
+}
+
+export async function assignedPathsForUser(db: DB, tenantId: string, userId: string): Promise<Map<string, string | null>> {
+  const { assignments, users, closure } = await loadForUser(db, tenantId, userId);
+  return users[0] ? pathsAssignedTo(assignments, users[0], closure) : new Map();
 }
 
 /**

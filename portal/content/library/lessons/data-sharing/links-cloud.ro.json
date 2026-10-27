@@ -1,0 +1,441 @@
+{
+ "id": "links-cloud",
+ "title": "Linkuri și foldere în cloud",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Folderele din cloud sunt practice, dar o singură setare greșită poate deschide un fișier întregului internet.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Cu opțiunea „Oricine are linkul”, dacă linkul ajunge mai departe, și străinii pot deschide fișierul.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "rxagentlik-disk",
+       "url": [
+        {
+         "text": "https://disk.rxagentlik.az/qovluq/budce-2027?paylasim="
+        },
+        {
+         "text": "hamiya-acik",
+         "spot": "public"
+        }
+       ]
+      }
+     },
+     "highlight": "public"
+    },
+    {
+     "id": "b3",
+     "say": "Calea corectă: doar persoane nominalizate, acces numai pentru vizualizare și o dată de expirare.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Nu încărcați fișiere de serviciu într-un cont personal de cloud. Acolo, organizația nu le poate proteja sau recupera.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "share-folder",
+   "environment": "browser",
+   "title": "Partajați fișierul",
+   "intro": "Trebuie să trimiteți proiectul de buget unui partener din afară. Configurați chiar dumneavoastră partajarea pe discul de serviciu din cloud.",
+   "steps": [
+    {
+     "id": "file-page",
+     "label": "Proiect de buget 2027.xlsx",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "rxagentlik-disk",
+      "url": [
+       {
+        "text": "https://disk.rxagentlik.az/fayllar/Budce_layihesi_2027.xlsx",
+        "reveal": "rxagentlik.az"
+       }
+      ]
+     },
+     "say": "Cum partajați fișierul?",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Partajați",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Bine, fișierul rămâne pe discul de serviciu. Acum priviți setările de partajare."
+      },
+      {
+       "id": "personal",
+       "label": "Mutați-l în cloudul personal",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Un cont personal se află în afara controlului organizației. Fișierele de serviciu rămân pe discul de serviciu."
+      }
+     ]
+    },
+    {
+     "id": "who-can-open",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Partajare: Proiect de buget 2027.xlsx"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Cine îl poate deschide?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Oricine are linkul",
+       "Doar persoanele nominalizate"
+      ]
+     },
+     "actions": [
+      {
+       "id": "named",
+       "label": "Doar persoanele nominalizate",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Fișierul se deschide doar pentru persoanele pe care le alegeți."
+      },
+      {
+       "id": "anyone",
+       "label": "Oricine are linkul",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Linkul poate fi redirecționat sau poate ajunge unde nu trebuie. Atunci oricine poate deschide fișierul."
+      }
+     ]
+    },
+    {
+     "id": "rights",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Cui și cum?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Destinatar: e.rzayev@merkez-konsalting.example"
+        }
+       ],
+       [
+        {
+         "text": "Acces: vizualizare sau editare"
+        }
+       ],
+       [
+        {
+         "text": "Expiră: peste 7 zile sau niciodată"
+        }
+       ]
+      ],
+      "buttons": [
+       "Editare, fără termen",
+       "Vizualizare, 7 zile"
+      ]
+     },
+     "actions": [
+      {
+       "id": "view",
+       "label": "Vizualizare, 7 zile",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Excelent. Partenerul poate vedea fișierul, dar nu îl poate modifica, iar accesul se încheie peste o săptămână."
+      },
+      {
+       "id": "edit",
+       "label": "Editare, fără termen",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Partenerul nu are nevoie să editeze, iar un acces fără termen rămâne deschis ani de zile."
+      }
+     ]
+    },
+    {
+     "id": "fake-share",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "rxagentlik-disk-fake",
+      "brand": "RXAgentlik Disk",
+      "url": [
+       {
+        "text": "https://rxagentlik-disk.example.net/giris",
+        "reveal": "rxagentlik-disk.example.net"
+       }
+      ],
+      "fields": [
+       "E-mail",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "say": "O oră mai târziu se deschide o pagină cu un fișier partajat. Verificați adresa.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Conectați-vă",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Domeniul nu este cel al discului de serviciu. Fișierul partajat este doar un pretext pentru a vă fura parola."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Deschideți fișierele partajate doar pe disk.rxagentlik.az."
+      },
+      {
+       "id": "report",
+       "label": "Raportați site-ul",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Raportând pagina falsă, îi protejați și pe colegi."
+      }
+     ]
+    },
+    {
+     "id": "old-links",
+     "label": "Partajările mele: 4 fișiere sunt deschise oricui",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "rxagentlik-disk",
+      "url": [
+       {
+        "text": "https://disk.rxagentlik.az/paylasimlar",
+        "reveal": "rxagentlik.az"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "close-links",
+       "label": "Dezactivați linkurile deschise",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Cea mai simplă protecție este să închideți partajările de care nu mai aveți nevoie."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Fiecare link lăsat deschis înseamnă un risc nou în fiecare zi."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "link-settings",
+   "prompt": "Această setare de partajare este sigură?",
+   "cards": [
+    {
+     "id": "anyone-forever",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Setare de partajare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Tabelul cu salariile: oricine are linkul, editare, fără termen"
+        }
+       ]
+      ],
+      "buttons": [
+       "Gata"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un fișier confidențial, deschis oricui și fără termen. Odată ce linkul se răspândește, nu mai există cale de întoarcere."
+    },
+    {
+     "id": "named-week",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Setare de partajare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Raportul proiectului: 2 persoane, vizualizare, 7 zile"
+        }
+       ]
+      ],
+      "buttons": [
+       "Gata"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Acces restrâns, doar vizualizare și o dată de expirare. Aceasta este setarea corectă."
+    },
+    {
+     "id": "whole-org",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Setare de partajare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Lista HR: toată organizația"
+        }
+       ]
+      ],
+      "buttons": [
+       "Gata"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un document confidențial nu este pentru toată organizația, ci doar pentru persoane nominalizate."
+    },
+    {
+     "id": "public-ad",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Setare de partajare"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Anunț de angajare: oricine are linkul"
+        }
+       ]
+      ],
+      "buttons": [
+       "Gata"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Anunțul este public și se află deja pe site. Aici, un link deschis este în regulă."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "who-needs-what",
+   "prompt": "Găsiți setarea potrivită pentru fiecare nevoie.",
+   "pairs": [
+    {
+     "id": "partner",
+     "left": "Un partener trebuie să citească un document",
+     "right": "Vizualizare, pe nume, 7 zile"
+    },
+    {
+     "id": "coauthor",
+     "left": "Un coleg scrie documentul împreună cu dumneavoastră",
+     "right": "Editare, doar pentru acea persoană"
+    },
+    {
+     "id": "public",
+     "left": "Un anunț publicat pe site",
+     "right": "Link deschis pentru oricine"
+    }
+   ],
+   "explain": "Partajați cât mai restrâns posibil: cu cine, cu ce drepturi și pentru cât timp."
+  },
+  {
+   "type": "choice",
+   "id": "personal-cloud",
+   "question": {
+    "prompt": "Puteți încărca un fișier confidențial în cloudul personal ca să lucrați de acasă?",
+    "options": [
+     {
+      "id": "strong",
+      "label": "Da, am o parolă puternică",
+      "correct": false,
+      "feedback": "O parolă puternică nu readuce fișierul sub controlul organizației."
+     },
+     {
+      "id": "work",
+      "label": "Nu, folosesc discul de serviciu sau o cale permisă de organizație",
+      "correct": true,
+      "feedback": "Corect. Pe discul de serviciu, fișierul este protejat și poate fi recuperat."
+     },
+     {
+      "id": "delete-later",
+      "label": "Da, îl șterg mai târziu",
+      "correct": false,
+      "feedback": "Un fișier șters rămâne adesea în coșul de gunoi și pe alte dispozitive."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "cloud"
+    }
+   },
+   "explain": "Fișierele de serviciu rămân în sistemele de serviciu. Dacă aveți îndoieli, întrebați suportul IT."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Nu folosiți niciodată opțiunea „Oricine are linkul” pentru fișiere confidențiale.",
+    "Partajați pe nume, doar pentru vizualizare și cu o dată de expirare.",
+    "Închideți periodic partajările vechi."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

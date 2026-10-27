@@ -22,7 +22,7 @@ export function ReportSection({ title, note, headers, rows, formatDate, formatDa
           <thead>
             <tr>
               {headers.map((h, i) => (
-                <th key={i} className="border-b-2 border-ink px-1.5 py-1.5 text-left font-bold">
+                <th key={i} className="border-b-2 border-ink px-1.5 py-1.5 text-start font-bold">
                   {h}
                 </th>
               ))}

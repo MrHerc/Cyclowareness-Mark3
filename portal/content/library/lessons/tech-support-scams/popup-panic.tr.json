@@ -1,0 +1,398 @@
+{
+  "id": "popup-panic",
+  "title": "Ekranda panik",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ts1-tutor",
+      "beats": [
+        {
+          "id": "ts1-b1",
+          "say": "Merhaba! Bugün ekranınızda aniden beliren korkutucu uyarıları tanımayı öğreneceğiz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "ts1-b2",
+          "say": "Böyle bir pencerenin amacı, sizi korkutup bir numarayı aramanızı sağlamaktır.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2a-sistem-muhafize",
+              "tone": "warning",
+              "title": [
+                {
+                  "text": "Bilgisayarınız engellendi"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Sistem dört virüs tespit etti.",
+                    "spot": "virus"
+                  }
+                ],
+                [
+                  {
+                    "text": "Destek hattı: +994 12 000 70 05",
+                    "spot": "phone"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Hemen ara"
+              ]
+            }
+          },
+          "highlight": "phone"
+        },
+        {
+          "id": "ts1-b3",
+          "say": "Gerçek bir uyarı size asla telefon numarası vermez ve sizi asla aceleye getirmez.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        },
+        {
+          "id": "ts1-b4",
+          "say": "Kural basit: aramayın, pencereyi kapatın, gerekirse tarayıcıyı zorla kapatın.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "ts1-hotspot",
+      "prompt": "Bu pencerenin bir hile olduğunu gösteren işaretleri bulun.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2a-sistem-muhafize",
+        "tone": "warning",
+        "title": [
+          {
+            "text": "Uyarı: bilgisayarınız engellendi"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Sistem dört virüs tespit etti ve kişisel verileriniz risk altında."
+            }
+          ],
+          [
+            {
+              "text": "Bu pencereyi kapatmayın, aksi takdirde tüm dosyalarınız silinecektir.",
+              "spot": "dont-close"
+            }
+          ],
+          [
+            {
+              "text": "Destek hattını hemen arayın: +994 12 000 70 05",
+              "spot": "phone"
+            }
+          ],
+          [
+            {
+              "text": "Kalan süre: 04:58",
+              "spot": "timer"
+            }
+          ]
+        ],
+        "buttons": [
+          "Hemen ara"
+        ]
+      },
+      "spots": [
+        {
+          "id": "dont-close",
+          "label": "Kapatma yasağı",
+          "explain": "Gerçek bir sistem pencereyi kapatmanızı asla yasaklamaz. Bu, sizi ekranın başında tutmak için yaratılmış bir korku."
+        },
+        {
+          "id": "phone",
+          "label": "Telefon numarası",
+          "explain": "İşletim sistemi ekranda asla destek numarası göstermez. Bu numara dolandırıcıya ait."
+        },
+        {
+          "id": "timer",
+          "label": "Geri sayım",
+          "explain": "Sayaç sizi aceleye getirmek için orada. Düşünmeye zaman bırakmayan bir uyarı sahtedir."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "simulation",
+      "id": "ts1-sim",
+      "environment": "browser",
+      "title": "Haberleri okurken",
+      "intro": "Bir haber sitesinde haber okuyorsunuz ve birdenbire pencereler açılmaya başlıyor. Her biri için doğru adımı seçin.",
+      "steps": [
+        {
+          "id": "popup-appears",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-sistem-muhafize",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Tehdit algılandı"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bilgisayarınızda zararlı yazılım var. Hemen destek hattını arayın: +994 12 000 70 05"
+                }
+              ]
+            ],
+            "buttons": [
+              "Hemen ara",
+              "Tara"
+            ]
+          },
+          "say": "Az önce kırmızı bir uyarı açıldı.",
+          "actions": [
+            {
+              "id": "close",
+              "label": "Pencereyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Böyle bir pencereyi kapatmak yeterlidir, doğru yanıt da budur."
+            },
+            {
+              "id": "call",
+              "label": "Gösterilen numarayı ara",
+              "kind": "call-back",
+              "outcome": "compromised",
+              "feedback": "Sahte destek görevlisi sizi daha da korkutacaktır. Bu numarayı asla aramayın."
+            },
+            {
+              "id": "scan",
+              "label": "“Tara” düğmesine bas",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "O düğme başka bir sahte sayfa açar. Penceredeki hiçbir şeye dokunmayın."
+            }
+          ]
+        },
+        {
+          "id": "fullscreen-lock",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-sistem-muhafize",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Ekran kilitlendi"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bilgisayarı kapatmayın. Destek almadan bu pencereyi kapatırsanız verileriniz kaybolacaktır."
+                }
+              ]
+            ],
+            "buttons": [
+              "Destek hattını ara"
+            ]
+          },
+          "say": "Şimdi pencere tüm ekranı kapladı ve bir ses çalıyor.",
+          "actions": [
+            {
+              "id": "force-quit",
+              "label": "Tarayıcıyı zorla kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Tarayıcıyı zorla kapattığınızda bu sahte ekran da kaybolur."
+            },
+            {
+              "id": "call",
+              "label": "Destek hattını ara",
+              "kind": "call-back",
+              "outcome": "compromised",
+              "feedback": "Ses ve tam ekran yalnızca sizi korkutmak için. Ararsanız cihazınızın kontrolünü ele geçirmeye çalışırlar."
+            }
+          ]
+        },
+        {
+          "id": "real-update",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Tarayıcı güncellemeye hazır"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Değişikliklerin uygulanması için tarayıcıyı yeniden başlatın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Daha sonra",
+              "Güncelle"
+            ]
+          },
+          "say": "Bu, tarayıcının kendi sakin bildirimi.",
+          "actions": [
+            {
+              "id": "update",
+              "label": "Güncelle",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Doğru. Gerçek bir güncelleme sakindir, numara vermez ve sizi aceleye getirmez."
+            },
+            {
+              "id": "later",
+              "label": "Daha sonra",
+              "kind": "later",
+              "outcome": "safe",
+              "feedback": "Bu da olur. İstediğiniz zaman güncelleyebilirsiniz, bir tehlike yok."
+            },
+            {
+              "id": "call",
+              "label": "Ne olur ne olmaz, destek hattını ara",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "Buna gerek yok. Basit bir güncelleme bildirimi için kimseyi aramanız gerekmez."
+            }
+          ]
+        },
+        {
+          "id": "popup-returns",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-sistem-muhafize",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Tehdit devam ediyor"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Sorun çözülmedi. Yardım için hemen arayın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Hemen ara"
+            ]
+          },
+          "say": "Pencereyi kapattınız, ama geri geldi.",
+          "actions": [
+            {
+              "id": "close-all",
+              "label": "Tarayıcıyı tamamen kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Tarayıcıyı tamamen kapattığınızda bu sayfalar da kaybolur."
+            },
+            {
+              "id": "report",
+              "label": "BT destek ekibine haber ver",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "İyi bir adım. Kendi BT destek ekibinizi arayıp durumu sorabilirsiniz."
+            },
+            {
+              "id": "call",
+              "label": "Numarayı ara",
+              "kind": "call-back",
+              "outcome": "compromised",
+              "feedback": "Pencerenin geri gelmesi hilenin bir parçası. O numarayı aramayın."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "ts1-match",
+      "prompt": "Her işareti doğru tepkiyle eşleştirin.",
+      "pairs": [
+        {
+          "id": "fullscreen",
+          "left": "Tüm ekranı kaplayan bir pencere",
+          "right": "Tarayıcıyı zorla kapatın"
+        },
+        {
+          "id": "phone",
+          "left": "Ekranda bir destek numarası",
+          "right": "Gerçek bir uyarı numara vermez"
+        },
+        {
+          "id": "timer",
+          "left": "Geri sayım yapan bir sayaç",
+          "right": "Bu aciliyet bir yalan"
+        },
+        {
+          "id": "sound",
+          "left": "Alarm ve bip sesi",
+          "right": "Sizi korkutmak için orada"
+        }
+      ],
+      "explain": "Bu işaretlerin hepsi sizi korkutmak için var. Sakin olun ve pencereyi kapatın."
+    },
+    {
+      "type": "choice",
+      "id": "ts1-choice",
+      "question": {
+        "prompt": "Bir pencere açılıyor ve bir numarayı aramanızı söylüyor. İlk adım nedir?",
+        "options": [
+          {
+            "id": "close",
+            "label": "Pencereyi kapatır, gerekirse tarayıcıyı zorla kapatırım",
+            "correct": true,
+            "feedback": "Doğru. Böyle bir uyarı zararsızdır ve kapattığınızda kaybolur."
+          },
+          {
+            "id": "call",
+            "label": "Ne olur ne olmaz diye gösterilen numarayı ararım",
+            "correct": false,
+            "feedback": "O numara dolandırıcıya ait. Ararsanız cihazınızın kontrolünü ele geçirmeye çalışırlar."
+          },
+          {
+            "id": "restart",
+            "label": "Bilgisayarı hemen kapatırım",
+            "correct": false,
+            "feedback": "Buna gerek yok. Pencereyi ya da tarayıcıyı kapatmak yeterli."
+          }
+        ]
+      },
+      "explain": "Korkutucu pencere sizi bir telefon görüşmesine çekmek istiyor. Aramayın, sadece pencereyi kapatın."
+    },
+    {
+      "type": "recap",
+      "id": "ts1-recap",
+      "points": [
+        "Birdenbire açılan korkutucu bir pencereye güvenmeyin",
+        "Gösterdiği numarayı asla aramayın",
+        "Pencereyi kapatın, gerekirse tarayıcıyı zorla kapatın"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -148,13 +148,13 @@ export default async function LeadershipPage() {
           <CardBody className="pt-3">
             {/* Long department names and translated headers can need more room than a phone gives the card. */}
             <ScrollRegion label={tr("departments")}>
-              <table className="w-full text-left text-caption">
+              <table className="w-full text-start text-caption">
                 <thead className="text-tab text-ink-subtle">
                   <tr className="border-b border-line">
                     <th className="py-2 font-semibold">{tr("department")}</th>
-                    <th className="py-2 text-right font-semibold">{tr("headcount")}</th>
-                    <th className="py-2 text-right font-semibold">{tr("completionShort")}</th>
-                    <th className="py-2 text-right font-semibold">{tr("avgRisk")}</th>
+                    <th className="py-2 text-end font-semibold">{tr("headcount")}</th>
+                    <th className="py-2 text-end font-semibold">{tr("completionShort")}</th>
+                    <th className="py-2 text-end font-semibold">{tr("avgRisk")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
@@ -165,9 +165,9 @@ export default async function LeadershipPage() {
                       return (
                         <tr key={r.id}>
                           <td className="py-2.5 font-semibold">{r.name}</td>
-                          <td className="py-2.5 text-right tabular-nums">{r.learners}</td>
-                          <td className="py-2.5 text-right tabular-nums">{r.completion}%</td>
-                          <td className="py-2.5 text-right">
+                          <td className="py-2.5 text-end tabular-nums">{r.learners}</td>
+                          <td className="py-2.5 text-end tabular-nums">{r.completion}%</td>
+                          <td className="py-2.5 text-end">
                             <Pill tone={b === "high" ? "risk" : b === "medium" ? "warn" : "safe"} className="tabular-nums">
                               {r.risk}
                             </Pill>

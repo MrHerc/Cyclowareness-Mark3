@@ -1,0 +1,514 @@
+{
+  "id": "robot-check-trap",
+  "title": "Robot doğrulaması",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "fc1-tutor",
+      "beats": [
+        {
+          "id": "fc1-b1",
+          "say": "Merhaba! Bugün kendini robot doğrulaması gibi gösteren sahte sayfaları tanımayı öğreneceğiz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "fc1-b2",
+          "say": "Böyle bir sayfa sizden üç adım ister: tuşlara basmanızı, bir metni yapıştırmanızı ve onaylamanızı.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "w2a-xezer-forum-fake",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "İnsan olduğunuzu doğrulayın"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "1. Gösterilen tuşlara aynı anda basın."
+                  }
+                ],
+                [
+                  {
+                    "text": "2. Kopyalanan metni yapıştırın.",
+                    "spot": "paste"
+                  }
+                ],
+                [
+                  {
+                    "text": "3. Enter tuşuna basın."
+                  }
+                ]
+              ],
+              "buttons": [
+                "Ben robot değilim"
+              ]
+            }
+          },
+          "highlight": "paste"
+        },
+        {
+          "id": "fc1-b3",
+          "say": "Gerçek bir doğrulama sizden asla klavyeyle komut yazmanızı istemez.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        },
+        {
+          "id": "fc1-b4",
+          "say": "Kural şu: bir site size ne yazmanızı söylerse söylesin, yazmayın ve sayfayı kapatın.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "fc1-hotspot",
+      "prompt": "Bu doğrulama sayfasındaki uyarı işaretlerini bulun.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "w2a-xezer-forum-fake",
+        "tone": "app",
+        "title": [
+          {
+            "text": "İnsan olduğunuzu doğrulayın"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Devam etmek için aşağıdaki adımları tamamlayın:"
+            }
+          ],
+          [
+            {
+              "text": "1. Klavyenizde pencere açan tuşlara basın.",
+              "spot": "keys"
+            }
+          ],
+          [
+            {
+              "text": "2. Kopyalanan metni kutuya yapıştırın.",
+              "spot": "paste"
+            }
+          ],
+          [
+            {
+              "text": "3. Enter tuşuyla onaylayın.",
+              "spot": "enter"
+            }
+          ],
+          [
+            {
+              "text": "Bu doğrulama botları tespit etmek için gereklidir.",
+              "spot": "excuse"
+            }
+          ]
+        ],
+        "buttons": [
+          "Ben robot değilim"
+        ]
+      },
+      "spots": [
+        {
+          "id": "keys",
+          "label": "Tuşlara basma",
+          "explain": "Gerçek bir doğrulama sizden asla klavye tuşlarına basmanızı istemez. Gizli bir komut tam da bu yolla çalıştırılır."
+        },
+        {
+          "id": "paste",
+          "label": "Yapıştırma",
+          "explain": "Yapıştırdığınız metin aslında gizli bir komuttur. Bir site söyledi diye hiçbir şeyi yapıştırmayın."
+        },
+        {
+          "id": "enter",
+          "label": "Onay tuşu",
+          "explain": "Onayladığınız anda komut çalışır ve zararlı yazılım yüklenir. Bu adımı atmayın."
+        },
+        {
+          "id": "excuse",
+          "label": "Sahte bahane",
+          "explain": "Botları tespit etmek yalnızca bir bahane. Gerçek bir doğrulama sizden resim seçmenizi ya da bir kutuyu işaretlemenizi ister."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "simulation",
+      "id": "fc1-sim",
+      "environment": "browser",
+      "title": "Forum sitesinde",
+      "intro": "Bir konferans sitesinde birkaç doğrulamayla karşılaşıyorsunuz. Her biri için doğru adımı seçin.",
+      "steps": [
+        {
+          "id": "clickfix",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-xezer-forum-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İnsan olduğunuzu doğrulayın"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Devam etmek için gösterilen tuşlara basın ve metni yapıştırın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Başla",
+              "Kapat"
+            ]
+          },
+          "say": "Sayfa sizden tuşlara basmanızı ve bir metin yapıştırmanızı istiyor.",
+          "actions": [
+            {
+              "id": "close",
+              "label": "Sayfayı kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Komut yazmanızı isteyen bir doğrulama sahtedir; bu yüzden sayfayı kapatmak doğru adımdır."
+            },
+            {
+              "id": "do",
+              "label": "Adımları uygula",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Yapıştırdığınız gizli komut zararlı yazılım yükledi. Bu tür adımları asla uygulamayın."
+            },
+            {
+              "id": "report",
+              "label": "BT destek ekibine bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "İyi bir adım. Bu sayfayı BT destek ekibine göstermek iş arkadaşlarınızı da korur."
+            }
+          ]
+        },
+        {
+          "id": "real-captcha",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-xezer-forum",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Resimleri seçin"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Robot olmadığınızı göstermek için trafik ışığı olan resimleri seçin."
+                }
+              ]
+            ],
+            "buttons": [
+              "Doğrula",
+              "Yenile"
+            ]
+          },
+          "say": "Bu, sıradan bir resim doğrulaması.",
+          "actions": [
+            {
+              "id": "complete",
+              "label": "Resimleri seç ve doğrula",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğru. Gerçek bir doğrulama böyle görünür: resim seçersiniz ya da bir kutuyu işaretlersiniz."
+            },
+            {
+              "id": "close",
+              "label": "Sayfayı kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Bu da olur. Devam etmek istemiyorsanız sayfayı kapatabilirsiniz."
+            },
+            {
+              "id": "report",
+              "label": "Saldırı olarak bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Bu doğrulama güvenli, bildirmenize gerek yok. Yalnızca komut isteyen doğrulamalar sahtedir."
+            }
+          ]
+        },
+        {
+          "id": "fix-pdf",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "senedoxu-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Belge açılmıyor"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "PDF görüntülenemedi. Sorunu gidermek için aşağıdaki komutu kopyalayıp çalıştırın."
+                }
+              ],
+              [
+                {
+                  "text": "[sitenin kopyaladığı bilinmeyen metin]"
+                }
+              ]
+            ],
+            "buttons": [
+              "Düzelt",
+              "Kapat"
+            ]
+          },
+          "say": "Bu sayfa, bir belgeyi açabilmeniz için size bir komut veriyor.",
+          "actions": [
+            {
+              "id": "close",
+              "label": "Sayfayı kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Belgenin açılmadığını söyleyen bir sayfa da aynı tuzaktır; sayfayı kapatın."
+            },
+            {
+              "id": "fix",
+              "label": "Komutu çalıştır",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Bu komut bilgisayara zararlı yazılım yükledi. Belgenin açılmadığını söyleyen bir sayfaya güvenmeyin."
+            },
+            {
+              "id": "report",
+              "label": "BT destek ekibine bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "İyi bir seçim. BT destek ekibi sayfayı inceleyip başkalarını uyarabilir."
+            }
+          ]
+        },
+        {
+          "id": "fix-meeting",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-gorus-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Toplantı hatası"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Toplantıya katılmak için bu komutu çalıştırın, ardından sayfayı yenileyin."
+                }
+              ]
+            ],
+            "buttons": [
+              "Komutu çalıştır",
+              "Kapat"
+            ]
+          },
+          "say": "Şimdi de toplantı uygulamasında bir hata olduğunu söylüyor.",
+          "actions": [
+            {
+              "id": "close",
+              "label": "Sayfayı kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Hiçbir toplantı uygulaması sizden komut çalıştırmanızı istemez; bu da bir tuzak."
+            },
+            {
+              "id": "fix",
+              "label": "Komutu çalıştır",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Komut zararlı bir yazılımı başlattı. Bir hatayı düzelteceğini iddia eden her komut aynı hiledir."
+            },
+            {
+              "id": "report",
+              "label": "BT destek ekibine bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Harika. Böyle sahte hata sayfalarını BT destek ekibine bildirmek herkesin işine yarar."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "fc1-swipe",
+      "prompt": "Her doğrulama gerçek mi, yoksa tuzak mı?",
+      "cards": [
+        {
+          "id": "image-captcha",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-xezer-forum",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Kutuyu işaretleyin"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "“Ben robot değilim” kutusunu işaretleyin ve devam edin."
+                }
+              ]
+            ],
+            "buttons": [
+              "Devam et"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Bu sıradan bir doğrulama. Bir kutuyu işaretlemek ya da resim seçmek güvenlidir."
+        },
+        {
+          "id": "keystroke-captcha",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-xezer-forum-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Doğrulamayı tamamlayın"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Pencere açan tuşlara basın ve metni yapıştırın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Başla"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Komut yazmanızı isteyen bir doğrulama sahtedir. Sayfayı kapatın."
+        },
+        {
+          "id": "letters-captcha",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2a-xezer-forum",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Harfleri yazın"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Resimdeki harfleri aşağıdaki kutuya yazın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Doğrula"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Bu sıradan bir doğrulama. Resimdeki harfleri yazmak bilgisayarınızda hiçbir şey başlatmaz."
+        },
+        {
+          "id": "paste-run",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "senedoxu-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Devam etmek için"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bu metni kopyalayıp Çalıştır penceresine yapıştırın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Kopyala"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Bir sitenin kopyalamanızı söylediği metni asla çalıştırmayın. O metin gizli bir komuttur."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "fc1-choice",
+      "question": {
+        "prompt": "Gerçek bir robot doğrulaması sizden ne isteyebilir? Uygun olanların hepsini seçin.",
+        "options": [
+          {
+            "id": "tick",
+            "label": "Bir kutuyu işaretlemek",
+            "correct": true,
+            "feedback": "Doğru. Kutu işaretlemek sıradan ve güvenli bir doğrulamadır."
+          },
+          {
+            "id": "images",
+            "label": "Resim seçmek",
+            "correct": true,
+            "feedback": "Doğru. Resim seçmek de gerçek bir doğrulama türüdür."
+          },
+          {
+            "id": "letters",
+            "label": "Resimdeki harfleri yazmak",
+            "correct": true,
+            "feedback": "Doğru. Harf yazmak bilgisayarınızda hiçbir şey başlatmaz."
+          },
+          {
+            "id": "keys",
+            "label": "Tuşlara basıp bir metin yapıştırmak",
+            "correct": false,
+            "feedback": "Tuzak tam olarak bu. Gerçek bir doğrulama sizi asla bilgisayarınızın kendi pencerelerine yönlendirmez."
+          }
+        ],
+        "multi": true
+      },
+      "explain": "Gerçek bir doğrulama sayfanın içinde kalır. Sizi tuşlara basmaya ve metin yapıştırmaya yönlendiren bir doğrulama sahtedir."
+    },
+    {
+      "type": "recap",
+      "id": "fc1-recap",
+      "points": [
+        "Gerçek bir doğrulama sizden asla komut yazmanızı istemez",
+        "Bir site söyledi diye hiçbir metni yapıştırmayın",
+        "Böyle bir sayfayı kapatın ve BT destek ekibine bildirin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

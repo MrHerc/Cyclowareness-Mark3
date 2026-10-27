@@ -1,0 +1,462 @@
+{
+ "id": "store-picks",
+ "title": "Bien choisir dans la boutique",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sp-tutor",
+   "beats": [
+    {
+     "id": "sp-b1",
+     "say": "Bonjour ! Une extension de navigateur est un petit programme. Elle peut voir et modifier les pages que vous ouvrez.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "sp-b2",
+     "say": "L’autorisation la plus large, c’est celle-ci : lire et modifier toutes vos données sur tous les sites web.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "w2c-pulsuz-vpn",
+       "app": "Pulsuz VPN Sürət",
+       "permissions": [
+        {
+         "label": [
+          {
+           "text": "Lire et modifier toutes vos données sur tous les sites web",
+           "spot": "all-sites"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "Gérer vos paramètres de proxy"
+          }
+         ],
+         "needed": true
+        }
+       ]
+      }
+     },
+     "highlight": "all-sites"
+    },
+    {
+     "id": "sp-b3",
+     "say": "Une extension peut être honnête aujourd’hui et devenir un espion demain, en une seule mise à jour.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "sp-b4",
+     "say": "N’installez que ce dont vous avez besoin, et uniquement depuis la boutique officielle. Sur un ordinateur professionnel, seulement ce que le support technique a approuvé.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "sp-swipe",
+   "prompt": "Faut-il installer cette extension ou la refuser ?",
+   "cards": [
+    {
+     "id": "free-vpn",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-pulsuz-vpn",
+      "app": "Pulsuz VPN Sürət",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Lire et modifier toutes vos données sur tous les sites web"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Lire votre historique de navigation"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Gérer vos paramètres de proxy"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une extension de VPN gratuit voit tout votre trafic et gagne souvent son argent avec vos données. Pour le travail, utilisez uniquement le VPN fourni par votre organisation."
+    },
+    {
+     "id": "weather",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-hava",
+      "app": "Hava Bu Gün",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Afficher la météo de Bakou"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Lire et modifier toutes vos données sur tous les sites web"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Lire les données que vous copiez et collez"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une prévision météo n’a besoin ni de vos pages ni de ce que vous copiez. Si l’autorisation dépasse la tâche, refusez."
+    },
+    {
+     "id": "screenshot",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-ekran-sekli",
+      "app": "Ekran Şəkli",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Voir uniquement la page ouverte quand vous cliquez sur le bouton"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Enregistrer les images dans le dossier Téléchargements"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Les autorisations correspondent à la tâche et ne servent que lorsque vous cliquez sur le bouton. Une extension comme celle-ci n’ajoute pas de risque réel."
+    },
+    {
+     "id": "outside-store",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://pulsuz-elaveler.example.info/pdf-ustasi-pro.zip"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une extension téléchargée hors de la boutique n’a été soumise à aucun contrôle. N’installez des extensions que depuis la boutique officielle du navigateur."
+    },
+    {
+     "id": "notes",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-qisa-qeyd",
+      "app": "Qısa Qeyd",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Enregistrer vos notes dans ce navigateur"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "L’extension ne touche pas à vos sites et garde les notes uniquement dans le stockage du navigateur. Le risque est faible."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "sp-choice",
+   "question": {
+    "prompt": "Une extension dont vous n’avez eu besoin qu’une fois est toujours dans votre navigateur. Que faites-vous ?",
+    "options": [
+     {
+      "id": "remove",
+      "label": "Je la supprime, et je la réinstallerai si j’en ai de nouveau besoin",
+      "correct": true,
+      "feedback": "Exact. Une extension que vous n’utilisez pas ne vous apporte rien, mais son risque, lui, reste."
+     },
+     {
+      "id": "disable",
+      "label": "Je me contente de la désactiver",
+      "correct": false,
+      "feedback": "La désactiver aide, mais une extension oubliée se réactive d’un simple clic. Si vous n’en avez pas besoin, supprimez-la."
+     },
+     {
+      "id": "keep",
+      "label": "Je la garde, j’en aurai peut-être besoin un jour",
+      "correct": false,
+      "feedback": "L’extension peut changer de propriétaire, et une mise à jour peut en faire un espion. Ne gardez pas ce dont vous n’avez pas besoin."
+     }
+    ]
+   },
+   "explain": "Chaque extension est une porte d’entrée vers vos pages. Moins d’extensions, c’est moins de risques."
+  },
+  {
+   "type": "simulation",
+   "id": "sp-sim",
+   "environment": "browser",
+   "title": "Boutique d’extensions",
+   "intro": "Vous cherchez une extension qui affiche rapidement les taux de change. À chaque étape, choisissez quoi faire.",
+   "steps": [
+    {
+     "id": "copy-store",
+     "label": "Mezenne Pro : téléchargement gratuit",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-xezri-brauzer-fake",
+      "url": [
+       {
+        "text": "https://xezri-elaveler.example.info/mezenne-pro",
+        "reveal": "xezri-elaveler.example.info"
+       }
+      ]
+     },
+     "say": "Le premier résultat de la recherche ressemble à la boutique.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Télécharger l’extension",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Ce n’est pas la boutique officielle, mais une copie. Rien de ce qui vient d’ici n’a été contrôlé."
+      },
+      {
+       "id": "check",
+       "label": "Vérifier l’adresse",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Ce domaine n’est pas l’adresse de la boutique. Ouvrez la boutique depuis le menu du navigateur."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. N’installez des extensions que depuis la boutique du navigateur lui-même."
+      }
+     ]
+    },
+    {
+     "id": "store-page",
+     "label": "Mezenne Pro : 4,1 étoiles, 80 000 utilisateurs",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-xezri-brauzer",
+      "url": [
+       {
+        "text": "https://magaza.xezri.example/elave/mezenne-pro",
+        "reveal": "xezri.example"
+       }
+      ]
+     },
+     "say": "Vous êtes maintenant dans la boutique officielle. Avant l’installation, le navigateur va afficher les autorisations.",
+     "actions": [
+      {
+       "id": "add",
+       "label": "Ajouter au navigateur",
+       "kind": "install",
+       "outcome": "safe",
+       "feedback": "La boutique officielle, c’est un bon début. Maintenant, lisez attentivement les autorisations."
+      },
+      {
+       "id": "skip",
+       "label": "Pas besoin",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "C’est aussi un bon choix. Vous pouvez consulter les taux sur le site de votre banque.",
+       "next": "installed"
+      }
+     ]
+    },
+    {
+     "id": "perms",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-mezenne-pro",
+      "app": "Məzənnə Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Afficher les taux de change"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Lire et modifier toutes vos données sur tous les sites web"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Voir vos onglets et votre historique de navigation"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Pour afficher des taux de change, faut-il vraiment ces autorisations ?",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Ajouter l’extension",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Les taux de change n’ont besoin ni de tous les sites ni de votre historique. Une autorisation aussi large ouvre la porte à l’espionnage."
+      },
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. Si l’autorisation ne correspond pas à la tâche, n’installez pas l’extension."
+      }
+     ]
+    },
+    {
+     "id": "installed",
+     "label": "Extensions installées : 7, inutilisées depuis six mois : 4",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-xezri-brauzer",
+      "url": [
+       {
+        "text": "https://magaza.xezri.example/elavelerim",
+        "reveal": "xezri.example"
+       }
+      ]
+     },
+     "say": "Votre navigateur contient aussi d’anciennes extensions. Qu’en faites-vous ?",
+     "actions": [
+      {
+       "id": "remove-unused",
+       "label": "Supprimer les quatre extensions inutilisées",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Excellent. Chaque extension supprimée ferme une porte d’entrée vers vos pages."
+      },
+      {
+       "id": "keep-all",
+       "label": "Tout garder",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Les extensions inutilisées continuent de se mettre à jour et de voir vos pages. Supprimez celles dont vous n’avez pas besoin."
+      }
+     ]
+    },
+    {
+     "id": "malware-flag",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "db-xezri-brauzer",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Hava Bu Gün a été désactivée"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Un logiciel malveillant a été détecté dans cette extension."
+        }
+       ],
+       [
+        {
+         "text": "Elle a aussi été retirée de la boutique."
+        }
+       ]
+      ],
+      "buttons": [
+       "Réactiver",
+       "Supprimer"
+      ]
+     },
+     "say": "Le navigateur a désactivé de lui-même l’une des extensions.",
+     "actions": [
+      {
+       "id": "remove-report",
+       "label": "La supprimer et prévenir le support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Le support technique vérifiera ce que l’extension a collecté et vous aidera à modifier vos mots de passe."
+      },
+      {
+       "id": "enable",
+       "label": "Réactiver",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Le navigateur ne l’a pas désactivée sans raison. Une fois réactivée, l’extension continue de collecter des données."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "sp-recap",
+   "points": [
+    "N’installez une extension que si vous en avez besoin, et uniquement depuis la boutique officielle",
+    "Méfiez-vous de toute extension qui veut accéder à vos données sur tous les sites",
+    "Supprimez les extensions que vous n’utilisez pas"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

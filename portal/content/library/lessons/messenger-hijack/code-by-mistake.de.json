@@ -1,0 +1,542 @@
+{
+ "id": "code-by-mistake",
+ "title": "Ein Code aus Versehen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "mh1-tutor",
+   "beats": [
+    {
+     "id": "mh1-b1",
+     "say": "Hallo! Heute lernen wir, wie Sie Kriminelle erkennen, die Ihren Messenger-Account übernehmen wollen.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "mh1-b2",
+     "say": "Dafür brauchen die Kriminellen nur den sechsstelligen Code, der auf Ihrem Smartphone ankommt.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "sohbet",
+       "sender": [
+        {
+         "text": "Söhbət"
+        }
+       ],
+       "time": "10:03",
+       "messages": [
+        [
+         {
+          "text": "Ihr Söhbət-Code: "
+         },
+         {
+          "text": "731 064",
+          "spot": "code"
+         },
+         {
+          "text": ". Geben Sie diesen Code an niemanden weiter."
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "code"
+    },
+    {
+     "id": "mh1-b3",
+     "say": "Geben Sie diesen Code niemals weiter: nicht an Freundinnen und Freunde, nicht an Kolleginnen und Kollegen und nicht einmal an den Support.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "mh1-b4",
+     "say": "Wenn jemand per Nachricht um Geld bittet, rufen Sie die Person an und fragen Sie selbst nach.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "mh1-scenario",
+   "title": "Die Nachricht einer Kollegin",
+   "start": "start",
+   "nodes": [
+    {
+     "id": "start",
+     "text": "Ihre Kollegin Rəna schreibt Ihnen, und eine Minute später kommt ein Söhbət-Code auf Ihr Smartphone. Was tun Sie?",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "sohbet",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Rəna Quliyeva"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Hallo, sorry, ich habe aus Versehen einen Code an deine Nummer geschickt."
+          }
+         ],
+         "time": "10:02"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Kannst du mir bitte den sechsstelligen Code schicken, den du bekommen hast?"
+          }
+         ],
+         "time": "10:02"
+        }
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "Ich schicke den Code nicht und rufe Rəna an",
+       "next": "call",
+       "feedback": "Richtig. Der Code ist der Schlüssel zu Ihrem eigenen Account, und ein normaler Anruf zeigt, ob Rəna wirklich geschrieben hat."
+      },
+      {
+       "label": "Ich schicke den Code, sie ist ja meine Kollegin",
+       "next": "taken",
+       "feedback": "Das war der Code für Ihren eigenen Account, nicht für den von Rəna. Sobald Sie ihn senden, gehört Ihr Account jemand anderem."
+      },
+      {
+       "label": "Ich antworte nicht und lösche die Nachricht",
+       "outcome": "risky",
+       "feedback": "Den Code nicht herauszugeben, ist richtig. Aber Rənas Account wurde gestohlen. Rufen Sie sie also an und sagen Sie ihr Bescheid."
+      }
+     ]
+    },
+    {
+     "id": "call",
+     "text": "Ich habe nichts geschickt! Ich komme seit gestern Abend nicht mehr in meinen Account.",
+     "speaker": "Rəna (am Telefon)",
+     "voice": "young-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Ich habe nichts geschickt! <breath> Ich komme seit gestern Abend nicht mehr in meinen Account.",
+     "choices": [
+      {
+       "label": "Ich sage ihr, sie soll sich mit ihrer Nummer neu anmelden, und wir warnen die Arbeitsgruppe",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Mit der neuen Anmeldung bekommt Rəna ihren Account zurück, und die Gruppe fällt nicht auf die gefälschten Nachrichten herein."
+      },
+      {
+       "label": "Mir ist nichts passiert, also lasse ich es auf sich beruhen",
+       "outcome": "risky",
+       "feedback": "Die Kriminellen schreiben von Rənas Account aus auch andere Kontakte an. Wenn Sie ihr und der Gruppe helfen, schützen Sie alle."
+      }
+     ]
+    },
+    {
+     "id": "taken",
+     "text": "Sie haben den Code geschickt. Kurz darauf meldet Söhbət Sie ab, und in Ihrem Namen geht eine Bitte um Geld an die Gruppe.",
+     "choices": [
+      {
+       "label": "Ich melde mich mit meiner Nummer neu an und aktiviere die Zwei-Faktor-Authentisierung",
+       "outcome": "risky",
+       "feedback": "So holen Sie Ihren Account richtig zurück. Am besten ist es aber, den Code gar nicht erst weiterzugeben."
+      },
+      {
+       "label": "Ich warte ab, vielleicht regelt sich das von selbst",
+       "outcome": "compromised",
+       "feedback": "Während Sie warten, bitten die Kriminellen weiter Ihre Freunde um Geld. Melden Sie sich sofort mit Ihrer Nummer neu an."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "mh1-sim",
+   "environment": "phone",
+   "title": "Nachrichten am Morgen",
+   "intro": "Auf Ihrem Smartphone sind mehrere Nachrichten eingegangen. Öffnen Sie jede einzelne und wählen Sie den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "group-money",
+     "label": "09:12 Abteilungsgruppe",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Abteilungsgruppe"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Elnarə Hüseynova: Hallo zusammen. Ich brauche dringend 300 Manat, ich zahle sie heute Abend zurück."
+         }
+        ],
+        "time": "09:12"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Elnarə Hüseynova: Die Kartennummer schicke ich privat. Ruft nicht an, ich bin in einem Meeting."
+         }
+        ],
+        "time": "09:12"
+       }
+      ]
+     },
+     "say": "In der Gruppe kommt eine Nachricht vom Account Ihrer Abteilungsleiterin an.",
+     "actions": [
+      {
+       "id": "call",
+       "label": "Elnarə anrufen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein Anruf unter der Nummer, die Sie kennen, zeigt sofort, wer die Nachricht geschrieben hat."
+      },
+      {
+       "id": "send",
+       "label": "Geld schicken und nach der Kartennummer fragen",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Das Geld landet auf der Karte der Kriminellen. Eine dringende Bitte um Geld mit dem Zusatz „Ruft nicht an“ ist ein klassischer Trick."
+      },
+      {
+       "id": "report",
+       "label": "In der Gruppe als Fälschung melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Guter Schritt. Rufen Sie danach Elnarə an und helfen Sie ihr, ihren Account zurückzubekommen."
+      }
+     ]
+    },
+    {
+     "id": "code-sms",
+     "label": "09:20 Söhbət",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sohbet",
+      "sender": [
+       {
+        "text": "Söhbət"
+       }
+      ],
+      "time": "09:20",
+      "messages": [
+       [
+        {
+         "text": "Ihr Söhbət-Code: 731 064. Geben Sie diesen Code an niemanden weiter."
+        }
+       ]
+      ]
+     },
+     "say": "Ein Söhbət-Code ist angekommen, obwohl Sie keinen angefordert haben.",
+     "actions": [
+      {
+       "id": "keep",
+       "label": "Code niemandem weitergeben",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. Kommt ein Code, den Sie nicht angefordert haben, versucht jemand, in Ihren Account zu gelangen."
+      },
+      {
+       "id": "delete",
+       "label": "SMS löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Auch das ist in Ordnung. Wichtig ist nur, dass der Code an niemanden geht."
+      }
+     ]
+    },
+    {
+     "id": "friend-asks",
+     "label": "09:21 Aysel Məmmədova",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Aysel Məmmədova"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hey, Liebes, hast du einen Code bekommen? Ich habe meinen aus Versehen an deine Nummer geschickt."
+         }
+        ],
+        "time": "09:21"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Schick ihn mir bitte schnell, mein Handy wird gerade gesperrt."
+         }
+        ],
+        "time": "09:21"
+       }
+      ]
+     },
+     "say": "Eine Minute später schreibt Ihnen Ihre Freundin Aysel.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Aysel den Code schicken",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Das war der Code für Ihren Account. Jetzt ist Ihr Account in den Händen der Kriminellen, die schon Aysels Account gestohlen haben."
+      },
+      {
+       "id": "call",
+       "label": "Aysel anrufen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein Code, der bei Ihnen ankommt, gehört zu Ihrem Account, und mit dem Anruf warnen Sie die echte Aysel."
+      },
+      {
+       "id": "block",
+       "label": "Blockieren",
+       "kind": "block",
+       "outcome": "risky",
+       "feedback": "Den Code nicht herauszugeben, ist richtig. Aber Aysels Account wurde gestohlen. Sagen Sie ihr also auf anderem Weg Bescheid."
+      }
+     ]
+    },
+    {
+     "id": "new-device",
+     "label": "09:30 Söhbət",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "Neues Gerät verknüpft"
+       }
+      ],
+      "body": [
+       {
+        "text": "Computer, Gəncə. Falls Sie das nicht waren, prüfen Sie Ihre verknüpften Geräte."
+       }
+      ],
+      "time": "09:30"
+     },
+     "say": "Jetzt hat Söhbət eine Benachrichtigung über ein neues Gerät geschickt.",
+     "actions": [
+      {
+       "id": "check",
+       "label": "Öffnen und Gerät entfernen",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Sobald Sie ein unbekanntes Gerät entfernen, kann es Ihre Nachrichten nicht mehr lesen."
+      },
+      {
+       "id": "ignore",
+       "label": "Benachrichtigung schließen",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Dieses Gerät sieht alle Ihre Chats. Schauen Sie bei einer solchen Benachrichtigung sofort nach."
+      }
+     ]
+    },
+    {
+     "id": "fake-support",
+     "label": "09:41 Söhbət-Support",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2a-sohbet-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Söhbət-Support"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Auf Ihrem Account wurde eine verdächtige Anmeldung festgestellt. Ihr Account wird in einer Stunde gesperrt."
+         }
+        ],
+        "time": "09:41"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Schreiben Sie zur Bestätigung den Code, den Sie auf Ihrem Smartphone erhalten haben, hier in den Chat."
+         }
+        ],
+        "time": "09:41"
+       }
+      ]
+     },
+     "say": "Die letzte Nachricht gibt vor, vom Söhbət-Support zu kommen.",
+     "actions": [
+      {
+       "id": "block",
+       "label": "Blockieren und melden",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Richtig. Der echte Support fragt nie nach Ihrem Code."
+      },
+      {
+       "id": "share",
+       "label": "Code senden",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Hinter diesem Chat steckt nicht der Support, sondern Kriminelle. Sobald Sie den Code senden, gehört Ihr Account ihnen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "mh1-hotspot",
+   "prompt": "Finden Sie die Warnsignale in dieser Nachricht.",
+   "artifact": {
+    "kind": "chat",
+    "brandRef": "sohbet",
+    "app": "generic",
+    "contact": [
+     {
+      "text": "Abteilungsgruppe"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Elnarə Hüseynova: "
+       },
+       {
+        "text": "Ich brauche dringend 300 Manat",
+        "spot": "urgent"
+       },
+       {
+        "text": ", "
+       },
+       {
+        "text": "ich zahle sie heute Abend zurück.",
+        "spot": "return"
+       }
+      ],
+      "time": "09:12"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Die Kartennummer schicke ich privat.",
+        "spot": "card"
+       },
+       {
+        "text": " "
+       },
+       {
+        "text": "Ruft nicht an, ich bin in einem Meeting.",
+        "spot": "no-call"
+       }
+      ],
+      "time": "09:12"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "urgent",
+     "label": "Dringende Bitte um Geld",
+     "explain": "Wer drängt, lässt Ihnen keine Zeit zum Nachdenken. Eine dringende Bitte um Geld sollten Sie immer prüfen."
+    },
+    {
+     "id": "no-call",
+     "label": "Bitte nicht anrufen",
+     "explain": "Dass Sie nicht anrufen sollen, ist das stärkste Warnsignal. Die Kriminellen können nicht riskieren, dass Sie ihre Stimme hören, deshalb schreiben sie."
+    },
+    {
+     "id": "card",
+     "label": "Eine fremde Karte",
+     "explain": "Das Geld geht auf eine Karte, die Sie nicht kennen. Nichts beweist, dass diese Karte Elnarə gehört."
+    },
+    {
+     "id": "return",
+     "label": "Ein Rückzahlungsversprechen",
+     "explain": "Das Versprechen, das Geld schnell zurückzuzahlen, soll Sie beruhigen. Rufen Sie zuerst an und prüfen Sie nach."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "choice",
+   "id": "mh1-choice",
+   "question": {
+    "prompt": "Ihr Account wurde bereits gestohlen. Was ist der erste Schritt?",
+    "options": [
+     {
+      "id": "relogin",
+      "label": "Ich melde mich mit meiner Nummer neu bei Söhbət an",
+      "correct": true,
+      "feedback": "Richtig. Der neue Code kommt nur auf Ihr Smartphone, und der Account gehört wieder Ihnen."
+     },
+     {
+      "id": "new-account",
+      "label": "Ich lege einen neuen Account an und vergesse den alten",
+      "correct": false,
+      "feedback": "Der alte Account bleibt in fremden Händen, und die Kriminellen bitten Ihre Freunde weiter um Geld."
+     },
+     {
+      "id": "write",
+      "label": "Ich schreibe den Kriminellen und bitte sie, mir den Account zurückzugeben",
+      "correct": false,
+      "feedback": "Die Kriminellen geben ihn nicht zurück und verlangen vielleicht sogar Geld. Melden Sie sich mit Ihrer Nummer neu an."
+     }
+    ]
+   },
+   "explain": "Melden Sie sich mit Ihrer Nummer neu an, aktivieren Sie die Zwei-Faktor-Authentisierung und warnen Sie Ihre Freunde auf anderem Weg."
+  },
+  {
+   "type": "recap",
+   "id": "mh1-recap",
+   "points": [
+    "Geben Sie den Code niemandem, auch nicht Freunden",
+    "Prüfen Sie eine Bitte um Geld mit einem normalen Anruf",
+    "Ist der Account weg, melden Sie sich mit Ihrer Nummer neu an"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

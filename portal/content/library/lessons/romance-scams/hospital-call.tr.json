@@ -1,0 +1,509 @@
+{
+ "id": "hospital-call",
+ "title": "Hastaneden gelen arama",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "hc-tutor",
+   "beats": [
+    {
+     "id": "hc-b1",
+     "say": "Bu kez dolandırıcı sizi arıyor ve yurt dışındaki bir hastanede doktor olduğunu söylüyor.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "hc-b2",
+     "say": "İnternetten tanıştığınız arkadaşınızın kaza geçirdiğini ve ameliyat için acilen paraya ihtiyacı olduğunu söylüyor.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2e-nordhaven-klinika",
+       "caller": [
+        {
+         "text": "Nordhaven Clinic"
+        }
+       ],
+       "number": [
+        {
+         "text": "+44 7700 900 418",
+         "spot": "number"
+        }
+       ],
+       "label": "Uluslararası"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "hc-b3",
+     "say": "Aciliyet, korku ve gizlilik: üçü bir araya geldiyse karşınızda bir dolandırıcılık var demektir.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "hc-b4",
+     "say": "Para göndermeden önce aramayı sonlandırın, numarayı kendiniz bulun ve ailenizle konuşun.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "hc-choice",
+   "question": {
+    "prompt": "Arayan kişi, arkadaşınızın hastanede olduğunu ve bugün paraya ihtiyaç olduğunu söylüyor. İlk adımınız ne olur?",
+    "options": [
+     {
+      "id": "hang-up",
+      "label": "Aramayı sonlandırır, hastanenin numarasını kendim bulurum",
+      "correct": true,
+      "feedback": "Doğru. Kendi bulduğunuz numarayı aramak, sahte doktoru hemen ortaya çıkarır."
+     },
+     {
+      "id": "pay",
+      "label": "Parayı hemen gönderir, sonra sorarım",
+      "correct": false,
+      "feedback": "Gönderdiğiniz para geri gelmez. Aciliyet tam da bunun için yaratılır."
+     },
+     {
+      "id": "card",
+      "label": "Parayı kendileri çeksin diye kart bilgilerimi veririm",
+      "correct": false,
+      "feedback": "Kart bilgilerinizle istedikleri kadar para çekebilirler. Telefonda asla kart bilgisi vermeyin."
+     },
+     {
+      "id": "secret",
+      "label": "Kimseye söylemeyeceğime söz veririm",
+      "correct": false,
+      "feedback": "Gizlilik dolandırıcının işine yarar. Aileniz duruma soğukkanlılıkla bakabilir."
+     }
+    ]
+   },
+   "explain": "Telefonda acil para, özellikle de kripto para istenmesi dolandırıcılık işaretidir. Aramayı sonlandırın ve kendiniz kontrol edin."
+  },
+  {
+   "type": "simulation",
+   "id": "hc-sim",
+   "environment": "call",
+   "title": "Gece gelen arama",
+   "intro": "Gece saat birde yurt dışından bir arama geliyor. Arayanın söylediklerini okuyun ve yanıtınızı seçin.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Uluslararası",
+      "voice": "woman"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Yanıtla",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Aramayı yanıtlamak tehlikeli değil. Önemli olan ne söylediğiniz."
+      },
+      {
+       "id": "decline",
+       "label": "Reddet",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Bu da olur. Endişeleniyorsanız numarayı daha sonra kendiniz kontrol edin.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "doctor",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Uluslararası",
+      "voice": "woman"
+     },
+     "say": "Ben Doktor Helena Mart, Nordhaven Clinic adına arıyorum. Kamran Aliyev kaza geçirdi ve acil durum kişisi olarak sizi gösterdi.",
+     "spoken": "Ben Doktor Helena Mart, <breath> Nordhaven Clinic adına arıyorum. Kamran Aliyev kaza geçirdi, acil durum kişisi olarak da sizi gösterdi.",
+     "actions": [
+      {
+       "id": "video",
+       "label": "Kamran'la görüntülü görüşmek istiyorum",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "İyi bir kontrol. Dolandırıcı, görüntülü görüşmenin neden imkânsız olduğuna dair her zaman bir sebep bulur."
+      },
+      {
+       "id": "panic",
+       "label": "Ne gerekiyor? Yardım edeceğim",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Şok olmanız çok doğal ama bu soru, para talebine kapı açar. Önce kontrol edin."
+      },
+      {
+       "id": "hang-up",
+       "label": "Aramayı sonlandır",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "İyi bir karar. Kliniğin numarasını kendiniz bulup arayabilirsiniz.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "demand",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Uluslararası",
+      "voice": "woman"
+     },
+     "say": "Bilinci kapalı. Ameliyat için bugün dört bin sekiz yüz manat ön ödeme gerekiyor, sigortası bunu karşılamıyor.",
+     "spoken": "Bilinci kapalı. <breath> Ameliyat için bugün dört bin sekiz yüz manat ön ödeme gerekiyor, sigortası, ee, bunu karşılamıyor.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Göndereyim, bilgileri verin",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Para dolandırıcıya gitti. Telefonda gelen acil para taleplerini her zaman kendiniz kontrol edin."
+      },
+      {
+       "id": "card",
+       "label": "Kart bilgilerimi vereyim",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Kart bilgilerinizle istedikleri kadar para çekebilirler. Bu bilgileri telefonda asla söylemeyin."
+      },
+      {
+       "id": "check",
+       "label": "Kliniğin numarasını bulup kendim arayacağım",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru. Kendi bulduğunuz numara sizi yeniden dolandırıcıya ulaştırmaz."
+      }
+     ]
+    },
+    {
+     "id": "push",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Uluslararası",
+      "voice": "woman"
+     },
+     "say": "Vakit yok! Kripto para da olur, cüzdan adresini size SMS ile gönderiyorum. Bunu kimseye söylemeyin.",
+     "spoken": "Vakit yok! <breath> Kripto para da olur, cüzdan adresini size SMS ile gönderiyorum. Bunu kimseye söylemeyin.",
+     "actions": [
+      {
+       "id": "crypto",
+       "label": "Kripto parayla öderim",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Kripto para transferini kimse geri alamaz. Telefonda acil kripto para istenmesi dolandırıcılık işaretidir."
+      },
+      {
+       "id": "sister",
+       "label": "Önce kız kardeşimle konuşmam gerekiyor",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Çok iyi. Dolandırıcı ailenizden korkar, çünkü onlar oyunu hemen fark eder."
+      },
+      {
+       "id": "hang-up",
+       "label": "Aramayı sonlandır",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Doğru. Kripto para, baskı ve gizlilik bir aradaysa bu dolandırıcılıktır."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2e-nordhaven-klinika",
+      "caller": [
+       {
+        "text": "Nordhaven Clinic"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Uluslararası",
+      "voice": "woman"
+     },
+     "actions": [
+      {
+       "id": "call-back",
+       "label": "Bu numarayı geri ara",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Bu numara dolandırıcıya ait ve size aynı hikâyeyi anlatır. Numarayı kendiniz bulun."
+      },
+      {
+       "id": "family",
+       "label": "Aileme anlatacağım",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru. Ailenizle konuşmak baskıyı hemen hafifletir."
+      },
+      {
+       "id": "block",
+       "label": "Numarayı engelle",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Güzel. Numarayı engelleyin, tanışma platformundaki profili de bildirin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "hc-swipe",
+   "prompt": "Hangi mesaj normal, hangisi bir uyarı işareti?",
+   "cards": [
+    {
+     "id": "video-date",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Elçin"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bu akşam saat 8'de görüntülü görüşelim mi? Cumartesi de bir kafede buluşuruz."
+         }
+        ],
+        "time": "18:20"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Görüntülü görüşme ve halka açık bir yerde buluşma önermek normaldir. Dolandırıcının kaçındığı şey de tam olarak budur."
+    },
+    {
+     "id": "visa",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Mark Leon"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Seni görmeye gelebilmem için vizeye para lazım, 600 AZN. Gelir gelmez geri ödeyeceğim, söz veriyorum."
+         }
+        ],
+        "time": "23:10"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Hiç görmediğiniz birinin bilet, vize ya da gümrük için para istemesi klasik bir dolandırıcılıktır."
+    },
+    {
+     "id": "withdraw-fee",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2e-kriptonova",
+      "app": "KriptoNova",
+      "title": [
+       {
+        "text": "Kazancınız: 2.340 AZN"
+       }
+      ],
+      "body": [
+       {
+        "text": "Paranızı çekmek için önce %15 vergi ödeyin."
+       }
+      ],
+      "time": "09:05"
+     },
+     "verdict": "threat",
+     "explain": "Para çekmeden önce ödeme isteyen platform sahtedir. Kazanç rakamı uydurmadır."
+    },
+    {
+     "id": "report-done",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2e-gorusek",
+      "app": "Görüşək",
+      "title": [
+       {
+        "text": "Bildiriminiz incelendi"
+       }
+      ],
+      "body": [
+       {
+        "text": "Bildirdiğiniz profil sahteydi ve kapatıldı. Teşekkür ederiz."
+       }
+      ],
+      "time": "14:30"
+     },
+     "verdict": "safe",
+     "explain": "Bu, platformdan gelen sıradan bir bildirim ve sizden hiçbir şey istemiyor. Sahte profili bildirmek başkalarını korur."
+    },
+    {
+     "id": "secret",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Kamran Aliyev"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ailene söyleme, bizi anlamazlar. Bu sadece ikimizin sırrı."
+         }
+        ],
+        "time": "22:45"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Sizi ailenizden uzaklaştırmak isteyen biri bir şey saklıyordur. Gizlilik isteği bir uyarı işaretidir."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "hc-scenario",
+   "title": "Kız kardeşiniz soruyor",
+   "start": "sister",
+   "nodes": [
+    {
+     "id": "sister",
+     "text": "Endişeli görünüyorsun. Ne oldu, biri seni rahatsız mı ediyor?",
+     "speaker": "Nigar (kız kardeşiniz)",
+     "voice": "woman-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Endişeli görünüyorsun. <breath> Ne oldu, biri seni rahatsız mı ediyor?",
+     "character": "nigar",
+     "choices": [
+      {
+       "label": "Ona her şeyi anlatıp yazışmayı gösteriyorum",
+       "next": "search",
+       "feedback": "Doğru. Bunu konuşmak, dolandırıcının gücünü elinden alır."
+      },
+      {
+       "label": "Bir şey yok, Kamran kimseye söylememi istemedi",
+       "outcome": "risky",
+       "feedback": "Gizlilik dolandırıcının işine yarar. Yakın biriyle konuşmak en güçlü korumadır."
+      }
+     ]
+    },
+    {
+     "id": "search",
+     "text": "Gel, Kamran'ın fotoğrafını birlikte ters görsel aramayla kontrol edelim. Bak, fotoğraf başka bir isimle, yabancı bir mankenin sayfasında çıktı!",
+     "speaker": "Nigar (kız kardeşiniz)",
+     "voice": "woman-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Gel, Kamran'ın fotoğrafını birlikte ters görsel aramayla kontrol edelim. <breath> Bak, fotoğraf başka bir isimle, yabancı bir mankenin sayfasında çıktı!",
+     "character": "nigar",
+     "choices": [
+      {
+       "label": "Profili bildirip engelliyorum ve bir daha asla para göndermiyorum",
+       "outcome": "safe",
+       "feedback": "Çok iyi. Hem kendinizi hem de başkalarını korudunuz."
+      },
+      {
+       "label": "Belki biri onun fotoğrafını çalmıştır, yazışmaya devam edeceğim",
+       "outcome": "risky",
+       "feedback": "Sahte profiller çalıntı fotoğraflarla kurulur. Kontrolün gösterdiğine güvenin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "hc-recap",
+   "points": [
+    "Telefonda acil para istenirse aramayı sonlandırın ve numarayı kendiniz bulun.",
+    "Kripto para, baskı ve gizlilik bir aradaysa bu dolandırıcılıktır.",
+    "Para göndermeden önce ailenizle konuşun ve sahte profili bildirin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,389 @@
+{
+ "id": "the-support-call",
+ "title": "مكالمة «الدعم الفني»",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ts2-tutor",
+   "beats": [
+    {
+     "id": "ts2-b1",
+     "say": "هذه المرة يأتي الاحتيال عبر الهاتف: يتصل بك فريق أمن مزيف يدعي أنه من البنك.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "ts2-b2",
+     "say": "يقولون إن بطاقتك تعرضت للسرقة، وإن عليك نقل أموالك إلى حساب آمن.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "ts2-b3",
+     "say": "لا يوجد حساب آمن كهذا، ولا يطلب منك أي بنك تثبيت تطبيق.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "ts2-b4",
+     "say": "أغلق الخط، واتصل بنفسك بالرقم المكتوب على ظهر بطاقتك.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ts2-scenario",
+   "title": "مكالمة من البنك",
+   "start": "claim",
+   "nodes": [
+    {
+     "id": "claim",
+     "text": "هناك عملية دفع مشبوهة على بطاقتك. يجب أن ننقل أموالك إلى حساب آمن.",
+     "speaker": "أمن SahilBank",
+     "voice": "man-2",
+     "channel": "phone",
+     "spoken": "هناك عملية دفع مشبوهة على بطاقتك. <breath> يجب أن ننقل أموالك إلى حساب آمن.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "sahilbank-fake",
+       "caller": [
+        {
+         "text": "أمن SahilBank"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 54 30"
+        }
+       ],
+       "label": "جوال"
+      }
+     },
+     "choices": [
+      {
+       "label": "سأنهي المكالمة وأتصل بنفسي بالرقم المكتوب على ظهر بطاقتي",
+       "next": "verify",
+       "feedback": "صحيح. الطريقة الوحيدة للتحقق أن تجد الرقم بنفسك وتتصل به."
+      },
+      {
+       "label": "سأعطيهم بيانات بطاقتي ليتحققوا",
+       "outcome": "compromised",
+       "feedback": "البنك الحقيقي لا يطلب رقم بطاقتك ولا الرمز. وبهذه البيانات سيفرغون حسابك."
+      },
+      {
+       "label": "سأثبت التطبيق الذي يطلبونه",
+       "outcome": "compromised",
+       "feedback": "هذا التطبيق يسلمهم جوالك. والبنك لا يطلب منك أبدًا تثبيت تطبيق كهذا."
+      }
+     ]
+    },
+    {
+     "id": "verify",
+     "text": "لم نرسل أي تحذير من هذا النوع.",
+     "speaker": "موظفة البنك (الرقم المكتوب على ظهر بطاقتك)",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "لم نرسل <breath> أي تحذير من هذا النوع.",
+     "choices": [
+      {
+       "label": "سأبلغ عن المكالمة والرقم المشبوه",
+       "outcome": "safe",
+       "feedback": "رائع. يستطيع البنك الآن مراقبة حسابك وتحذير الآخرين أيضًا."
+      },
+      {
+       "label": "لن أقلق، فربما كان الأمر مجرد خطأ",
+       "outcome": "risky",
+       "feedback": "قد يتصل المحتال مرة أخرى. وإخبار البنك بما حدث يحميك."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ts2-sim-call",
+   "environment": "call",
+   "title": "مكالمة الدعم المزيفة",
+   "intro": "تصلك مكالمة من بنكك. اقرأ ما يقوله المتصل، واختر ردك في كل مرة.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "أمن SahilBank"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "جوال",
+      "voice": "man-3"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "رد",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "الرد بحد ذاته ليس خطيرًا. المهم ألا تعطي أي معلومات."
+      },
+      {
+       "id": "decline",
+       "label": "رفض",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "هذا مناسب أيضًا. بعد ذلك اتصل بنفسك بالرقم المكتوب على ظهر بطاقتك.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pitch",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "أمن SahilBank"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "جوال",
+      "voice": "man-3"
+     },
+     "say": "مرحبًا، معك تورال من إدارة الأمن في SahilBank. تم سحب ألف ومئتي مانات، عذرًا، من بطاقتك.",
+     "spoken": "مرحبًا، <breath> معك تورال من إدارة الأمن في SahilBank. تم سحب ألف ومئتي مانات <cough> عذرًا، من بطاقتك.",
+     "actions": [
+      {
+       "id": "listen",
+       "label": "أستمع ولا أقول شيئًا",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "جيد. يمكنك أن تستمع، ما دمت لا تعطي أي معلومات."
+      },
+      {
+       "id": "hang",
+       "label": "إنهاء المكالمة",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "اختيار صحيح. البنك لا يتصل بهذه الطريقة، لذلك فإنهاء المكالمة هو الصواب.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "ask-code",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "أمن SahilBank"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "جوال",
+      "voice": "man-3"
+     },
+     "say": "وصل إلى جوالك للتو رمز تحقق للتأكيد. اقرأ لي هذا الرمز من فضلك.",
+     "spoken": "وصل إلى جوالك للتو رمز تحقق للتأكيد. <breath> اقرأ لي هذا الرمز من فضلك.",
+     "actions": [
+      {
+       "id": "refuse",
+       "label": "لن أقرأ الرمز",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "صحيح. رمز التحقق الذي يصلك هو مفتاح حسابك، فلا تخبر به أحدًا أبدًا."
+      },
+      {
+       "id": "read",
+       "label": "سأقرأ الرمز",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "في اللحظة التي تقرؤه فيها، يدخلون إلى حسابك. والبنك لا يطلب هذا الرمز أبدًا.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "install",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "أمن SahilBank"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "جوال",
+      "voice": "man-3"
+     },
+     "say": "لكي أتمكن من مساعدتك، ثبت من فضلك تطبيق UzaqMasa، واسمح لي بالاتصال بجهازك.",
+     "spoken": "لكي أتمكن من مساعدتك، أمم، ثبت من فضلك تطبيق UzaqMasa، <breath> واسمح لي بالاتصال بجهازك.",
+     "actions": [
+      {
+       "id": "refuse",
+       "label": "لن أثبت التطبيق",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "صحيح. لا تثبت أبدًا تطبيق وصول عن بعد لمجرد أن متصلًا طلب منك ذلك."
+      },
+      {
+       "id": "install",
+       "label": "تثبيت التطبيق",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "الآن يرى المتصل شاشتك ويتحكم في جوالك. لا تثبت تطبيقًا كهذا أبدًا.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "انتهت المكالمة. ماذا تفعل الآن؟",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "sahilbank-fake",
+      "caller": [
+       {
+        "text": "أمن SahilBank"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 54 30"
+       }
+      ],
+      "label": "جوال",
+      "voice": "man-3"
+     },
+     "actions": [
+      {
+       "id": "call-card",
+       "label": "الاتصال بالرقم المكتوب على ظهر البطاقة",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "صحيح. سيؤكد البنك أن المكالمة كانت مزيفة، وسيتحقق من حسابك."
+      },
+      {
+       "id": "redial",
+       "label": "معاودة الاتصال بالرقم الذي اتصل بك",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "هذا الرقم يوصلك إلى المحتال مرة أخرى. خذ الرقم من بطاقتك فقط."
+      },
+      {
+       "id": "ignore",
+       "label": "عدم فعل أي شيء",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "قد يحاول المحتال مرة أخرى. ولتكون في أمان، اتصل بالبنك بنفسك."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "ts2-order",
+   "prompt": "رتب الخطوات عندما يدعي متصل كهذا أنه من البنك.",
+   "items": [
+    {
+     "id": "hang",
+     "label": "أغلق الخط"
+    },
+    {
+     "id": "find",
+     "label": "ابحث عن الرقم المكتوب على ظهر بطاقتك"
+    },
+    {
+     "id": "call",
+     "label": "اتصل بهذا الرقم بنفسك"
+    },
+    {
+     "id": "tell",
+     "label": "أخبر البنك بما حدث"
+    }
+   ],
+   "explain": "هذه هي الطريقة الوحيدة للتحقق: أغلق الخط، واتصل بالرقم الذي وجدته بنفسك."
+  },
+  {
+   "type": "choice",
+   "id": "ts2-choice",
+   "question": {
+    "prompt": "سبق أن ثبت تطبيق المساعدة الذي طلبه المتصل. ماذا تفعل الآن؟",
+    "options": [
+     {
+      "id": "disconnect",
+      "label": "سأقطع الاتصال، وأبلغ الدعم الفني، وأتصل بالبنك بنفسي",
+      "correct": true,
+      "feedback": "صحيح. قطع الاتصال يوقف وصولهم، ثم يكون طلب المساعدة هو التصرف الصحيح."
+     },
+     {
+      "id": "keep",
+      "label": "سأبقي التطبيق، فربما أحتاج إليه",
+      "correct": false,
+      "feedback": "ما دام التطبيق موجودًا، فهم يتحكمون في جوالك. اقطع الاتصال واحذفه فورًا."
+     },
+     {
+      "id": "wait",
+      "label": "سأنتظر، فلم يحدث شيء",
+      "correct": false,
+      "feedback": "الانتظار يزيد الضرر. كلما أبلغت أسرع، أنقذت أكثر."
+     }
+    ]
+   },
+   "explain": "إذا كان التطبيق مثبتًا بالفعل، فاقطع الاتصال فورًا، وأبلغ الدعم الفني، واتصل بالبنك على الرقم المكتوب على بطاقتك."
+  },
+  {
+   "type": "recap",
+   "id": "ts2-recap",
+   "points": [
+    "لا يوجد شيء اسمه «حساب آمن»",
+    "لا تثبت أي تطبيق لمجرد أن متصلًا طلب ذلك",
+    "أغلق الخط، واتصل بنفسك بالرقم المكتوب على بطاقتك"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

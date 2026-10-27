@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { db, t } from "../db";
+import { logFailure } from "../db/errors";
 import { rateLimit } from "../rate-limit";
 import { clientIp, ipRateKey } from "../request";
 import { queueEmail } from "../mail";
@@ -119,7 +120,7 @@ export async function requestDemoAction(_: DemoState, form: FormData): Promise<D
     }
     return { ok: true };
   } catch (error) {
-    console.error("[demo] request failed", error);
+    logFailure("[demo] request failed", error);
     return { error: "failed", values: echoValues(form) };
   }
 }

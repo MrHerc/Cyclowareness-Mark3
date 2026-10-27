@@ -1,0 +1,416 @@
+{
+  "id": "adviser-call",
+  "title": "Anruf aus der Anlageberatung",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ac-tutor",
+      "beats": [
+        {
+          "id": "ac-b1",
+          "say": "Hallo! Heute geht es um den gefährlichsten Moment beim Anlagebetrug: den Anruf des persönlichen Beraters.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "ac-b2",
+          "say": "Alles beginnt mit einer Anzeige oder einer Messenger-Gruppe. Achten Sie auf die Worte „garantierte Rendite“.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "brandRef": "w2d-bakutrade",
+              "app": "whatsapp",
+              "contact": [
+                {
+                  "text": "BakuTrade Pro | Anleger"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Heute wieder +18 %!"
+                    }
+                  ],
+                  "time": "19:02"
+                },
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Garantierte Rendite, ganz ohne Risiko.",
+                      "spot": "guarantee"
+                    }
+                  ],
+                  "time": "19:03"
+                }
+              ]
+            }
+          },
+          "highlight": "guarantee"
+        },
+        {
+          "id": "ac-b3",
+          "say": "Keine seriöse Geldanlage verspricht hohe garantierte Renditen.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "ac-b4",
+          "say": "Prüfen Sie die Lizenz selbst in der offiziellen Liste der Zentralbank. Eine ausländische Lizenz reicht hier nicht aus.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "certificate"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ac-sim",
+      "environment": "call",
+      "title": "BakuTrade Pro ruft an",
+      "intro": "Sie haben Ihre Nummer über das Formular einer Anzeige hinterlassen. Jetzt ruft ein Berater an. Wählen Sie Ihre Antworten.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2d-bakutrade",
+            "caller": [
+              {
+                "text": "BakuTrade Pro"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Vereinigtes Königreich",
+            "voice": "young-man-2"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Annehmen",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Den Anruf anzunehmen ist nicht gefährlich. Entscheidend ist, worauf Sie sich einlassen."
+            },
+            {
+              "id": "decline",
+              "label": "Ablehnen",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Auch das ist in Ordnung. Einen unbekannten Anruf aus dem Ausland müssen Sie nicht annehmen.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pitch",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2d-bakutrade",
+            "caller": [
+              {
+                "text": "BakuTrade Pro"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Vereinigtes Königreich",
+            "voice": "young-man-2"
+          },
+          "say": "Guten Tag, hier spricht Cavid Əlizadə, Ihr persönlicher Berater bei BakuTrade Pro. Wir garantieren Ihnen dreißig Prozent im Monat, ganz ohne Risiko.",
+          "spoken": "Guten Tag, <breath> hier spricht Cavid Əlizadə, Ihr persönlicher Berater bei BakuTrade Pro. Wir garantieren Ihnen, äh, dreißig Prozent im Monat, ganz ohne Risiko.",
+          "actions": [
+            {
+              "id": "interested",
+              "label": "Klingt gut, was muss ich tun?",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Garantierte hohe Renditen sind das wichtigste Zeichen für Betrug. Wenn Sie weitermachen, wird man Geld von Ihnen verlangen."
+            },
+            {
+              "id": "licence",
+              "label": "Ich prüfe Ihre Lizenz in der Liste der Zentralbank",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Richtig. Prüfen Sie die Lizenz selbst in der offiziellen Liste, statt sich auf das Wort des Anrufers zu verlassen.",
+              "next": "licence-push"
+            },
+            {
+              "id": "hang",
+              "label": "Auflegen",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Gute Entscheidung. Das Versprechen garantierter Renditen ist Grund genug, aufzulegen.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "deposit",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2d-bakutrade",
+            "caller": [
+              {
+                "text": "BakuTrade Pro"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Vereinigtes Königreich",
+            "voice": "young-man-2"
+          },
+          "say": "Wunderbar! Für den Start brauchen Sie nur 250 Manat. Nennen Sie mir Ihre Kartennummer und den Sicherheitscode auf der Rückseite, dann eröffne ich Ihr Konto.",
+          "spoken": "Wunderbar! <breath> Für den Start brauchen Sie nur 250 Manat. Nennen Sie mir Ihre Kartennummer und den Sicherheitscode auf der Rückseite, dann eröffne ich Ihr Konto.",
+          "actions": [
+            {
+              "id": "give-card",
+              "label": "Ich lese meine Kartendaten vor",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Ihre Kartendaten sind jetzt beim Betrüger. Rufen Sie direkt nach dem Gespräch Ihre Bank an und lassen Sie die Karte sperren.",
+              "next": "remote"
+            },
+            {
+              "id": "refuse",
+              "label": "Kartendaten gebe ich nicht am Telefon heraus",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Richtig. Nennen Sie niemandem am Telefon Ihre Kartennummer oder den Sicherheitscode auf der Rückseite.",
+              "next": "licence-push"
+            },
+            {
+              "id": "hang",
+              "label": "Auflegen",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Gute Entscheidung. Wenn ein Anrufer nach Kartendaten fragt, ist Auflegen die richtige Antwort.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "licence-push",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2d-bakutrade",
+            "caller": [
+              {
+                "text": "BakuTrade Pro"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Vereinigtes Königreich",
+            "voice": "young-man-2"
+          },
+          "say": "Wir haben eine europäische Lizenz, ich habe Ihnen das Zertifikat gerade geschickt. Die Prüfung bei der Zentralbank können Sie sich sparen.",
+          "spoken": "Wir haben eine europäische Lizenz, äh, ich habe Ihnen das Zertifikat gerade geschickt. <breath> Die Prüfung bei der Zentralbank können Sie sich sparen.",
+          "actions": [
+            {
+              "id": "accept",
+              "label": "Wenn es ein Zertifikat gibt, ist alles in Ordnung",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Das Bild eines Zertifikats ist leicht zu fälschen. Die Zentralbank hat gewarnt, dass eine ausländische Lizenz nicht dazu berechtigt, hier tätig zu sein."
+            },
+            {
+              "id": "check",
+              "label": "Ich prüfe trotzdem die offizielle Liste",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Sehr gut. Ein Berater, der Sie vom Prüfen abhalten will, verrät sich selbst."
+            },
+            {
+              "id": "hang",
+              "label": "Auflegen",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Richtig. Wenn der Druck steigt, ist Auflegen die beste Antwort.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "remote",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2d-bakutrade",
+            "caller": [
+              {
+                "text": "BakuTrade Pro"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Vereinigtes Königreich",
+            "voice": "young-man-2"
+          },
+          "say": "Lassen Sie mich Ihnen beim Trading helfen. Installieren Sie die App EkranPaylaş, damit ich Ihren Bildschirm sehen kann.",
+          "spoken": "Lassen Sie mich Ihnen, äh, beim Trading helfen. <breath> Installieren Sie die App EkranPaylaş, damit ich Ihren Bildschirm sehen kann.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "Ich installiere die App",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Mit dieser App kann er Ihren Bildschirm und Ihre Banking-App steuern. Installieren Sie so etwas nie, nur weil ein Anrufer darum bittet."
+            },
+            {
+              "id": "refuse",
+              "label": "Ich installiere keine App",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Richtig. Ein echter Berater will nie Ihren Bildschirm fernsteuern."
+            },
+            {
+              "id": "hang",
+              "label": "Auflegen",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Gute Entscheidung. Beenden Sie jeden Anruf sofort, bei dem jemand Fernzugriff verlangt."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Das Gespräch ist beendet. Was jetzt?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "w2d-bakutrade",
+            "caller": [
+              {
+                "text": "BakuTrade Pro"
+              }
+            ],
+            "number": [
+              {
+                "text": "+44 7700 900 418"
+              }
+            ],
+            "label": "Vereinigtes Königreich",
+            "voice": "young-man-2"
+          },
+          "actions": [
+            {
+              "id": "check-list",
+              "label": "Liste der Zentralbank prüfen",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Richtig. Steht das Unternehmen nicht auf der Liste, melden Sie es der Polizei unter 102."
+            },
+            {
+              "id": "call-back",
+              "label": "Den Berater zurückrufen",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "Mit einem Rückruf geben Sie dem Betrüger das Gespräch wieder in die Hand. Prüfen Sie über eine offizielle Quelle."
+            },
+            {
+              "id": "block",
+              "label": "Nummer blockieren",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Gut. Wenn Sie Kartendaten genannt haben, rufen Sie außerdem sofort Ihre Bank an."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "ac-choice",
+      "question": {
+        "prompt": "Eine Kollegin sagt: „Ich habe im ersten Monat 200 Manat verdient und mir auszahlen lassen. Die Plattform ist also echt.“",
+        "options": [
+          {
+            "id": "bait",
+            "label": "Die erste Auszahlung ist ein Köder, eine große Summe zahlen sie nicht aus",
+            "correct": true,
+            "feedback": "Richtig. Mit einer kleinen Auszahlung locken sie eine viel größere Einzahlung heraus."
+          },
+          {
+            "id": "join",
+            "label": "Dann ist sie echt, ich mache auch mit",
+            "correct": false,
+            "feedback": "Eine erfolgreiche Auszahlung beweist nicht, dass die Plattform legal ist. Prüfen Sie die Lizenz in der offiziellen Liste."
+          },
+          {
+            "id": "more",
+            "label": "Die Kollegin sollte mehr anlegen, damit der Gewinn wächst",
+            "correct": false,
+            "feedback": "Genau darauf warten die Kriminellen. Nach einer großen Einzahlung funktionieren Auszahlungen plötzlich nicht mehr."
+          }
+        ]
+      },
+      "explain": "Verlassen Sie sich auf die Lizenzliste der Zentralbank, nicht auf das Wort der Plattform."
+    },
+    {
+      "type": "order",
+      "id": "ac-order",
+      "prompt": "Sie haben Geld an eine betrügerische Plattform geschickt. Bringen Sie die Schritte in die richtige Reihenfolge.",
+      "items": [
+        {
+          "id": "stop",
+          "label": "Nicht weiterzahlen und den Kontakt abbrechen"
+        },
+        {
+          "id": "bank",
+          "label": "Die Bank anrufen und die Karte sperren lassen"
+        },
+        {
+          "id": "evidence",
+          "label": "Chats, Nummern und Überweisungsbelege aufbewahren"
+        },
+        {
+          "id": "police",
+          "label": "Den Fall der Polizei unter 102 melden"
+        }
+      ],
+      "explain": "Danach tauchen Dienste auf, die versprechen, Ihr Geld zurückzuholen. Das ist ein zweiter Betrug – zahlen Sie dort nichts."
+    },
+    {
+      "type": "recap",
+      "id": "ac-recap",
+      "points": [
+        "Garantierte hohe Renditen sind ein Zeichen für Betrug.",
+        "Prüfen Sie die Lizenz selbst in der offiziellen Liste der Zentralbank.",
+        "Installieren Sie nie eine App und nennen Sie nie Kartendaten, nur weil ein Anrufer es verlangt."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

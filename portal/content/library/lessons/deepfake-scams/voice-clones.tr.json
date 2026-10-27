@@ -1,0 +1,527 @@
+{
+  "id": "voice-clones",
+  "title": "Klonlanmış sesler",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "few-seconds",
+          "say": "Yapay zekâ, bir kişinin sesini kısa bir kayıttan, bazen yalnızca birkaç saniyelik bir kayıttan kopyalayabilir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          }
+        },
+        {
+          "id": "the-ask",
+          "say": "Dolandırıcı, yöneticinizin ya da bir yakınınızın sesiyle arar ve acilen para, kod ya da belge ister.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [
+                {
+                  "text": "Kamran Babayev"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 70 000 18 42",
+                  "spot": "number"
+                }
+              ],
+              "label": "Cep"
+            }
+          }
+        },
+        {
+          "id": "spoofed-number",
+          "say": "Numara da sahte olabilir. Ekranınızdaki ad ve numara kanıt değildir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [
+                {
+                  "text": "Kamran Babayev"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 70 000 18 42",
+                  "spot": "number"
+                }
+              ],
+              "label": "Cep"
+            }
+          },
+          "highlight": "number"
+        },
+        {
+          "id": "code-word",
+          "say": "Ailenizle ve ekibinizle gizli bir doğrulama kelimesi belirleyin. Sahte ses bu kelimeyi bilemez.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "boss-call",
+      "title": "Yöneticinizden gelen arama",
+      "start": "call",
+      "nodes": [
+        {
+          "id": "call",
+          "text": "Merhaba, toplantıdayım, uzun konuşamam. Bir yükleniciye acilen 18.000 manat göndermemiz gerekiyor. Kimseye söylemeyin, sonra açıklarım.",
+          "speaker": "Kamran Babayev'in sesi",
+          "voice": "older-man",
+          "channel": "phone",
+          "spoken": "Merhaba, <breath> toplantıdayım, uzun konuşamam. Bir yükleniciye acilen 18.000 manat göndermemiz gerekiyor. Kimseye söylemeyin, ee, sonra açıklarım.",
+          "character": "kamran",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [
+                {
+                  "text": "Kamran Babayev"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 70 000 18 42",
+                  "spot": "number"
+                }
+              ],
+              "label": "Cep"
+            }
+          },
+          "choices": [
+            {
+              "label": "Hemen yap",
+              "outcome": "compromised",
+              "feedback": "Para bir dolandırıcıya gitti. Aciliyet ve gizlilik bir aradaysa bu, en güçlü uyarı işaretidir."
+            },
+            {
+              "label": "Doğrulama kelimesini sor",
+              "next": "pressure",
+              "feedback": "İyi fikir. Bakalım nasıl yanıt verecek."
+            },
+            {
+              "label": "Kendim geri arayacağımı söyle",
+              "next": "callback",
+              "feedback": "Doğru. Zaten bildiğiniz bir numarayı arayın."
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "text": "Ne kelimesi? Hiç vaktim yok! Beni tanımıyor musunuz?",
+          "speaker": "Kamran Babayev'in sesi",
+          "voice": "older-man",
+          "channel": "phone",
+          "spoken": "Ne kelimesi? Hiç vaktim yok! <short pause> Beni tanımıyor musunuz?",
+          "character": "kamran",
+          "choices": [
+            {
+              "label": "Özür dile ve parayı gönder",
+              "outcome": "compromised",
+              "feedback": "Baskı, dolandırıcının başlıca aracıdır. Gerçek bir yönetici doğrulama yapmanızı anlayışla karşılar."
+            },
+            {
+              "label": "Telefonu kapatıp kendim geri ararım",
+              "next": "callback",
+              "feedback": "Doğru. Kelime yoksa iş de yok."
+            }
+          ]
+        },
+        {
+          "id": "callback",
+          "text": "Hayır, sizi hiç aramadım.",
+          "speaker": "Kamran Babayev (rehberinizdeki numara)",
+          "voice": "older-man",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Hayır, <breath> sizi hiç aramadım.",
+          "character": "kamran",
+          "choices": [
+            {
+              "label": "Güvenlik ekibine bildir",
+              "outcome": "safe",
+              "feedback": "Tebrikler. Güvenlik ekibi iş arkadaşlarınızı da uyaracak."
+            },
+            {
+              "label": "Kimseye söyleme, para kaybı olmadı",
+              "outcome": "risky",
+              "feedback": "Dolandırıcı başka birini deneyecek. Bildirmek herkesi korur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "voice-message",
+      "prompt": "Bu sohbetteki uyarı işaretlerini bulun.",
+      "artifact": {
+        "kind": "chat",
+        "app": "whatsapp",
+        "contact": [
+          {
+            "text": "+994 55 000 40 17"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Selam, benim, Elvin. "
+              },
+              {
+                "text": "Telefonum bozuldu, bu yeni numaram.",
+                "spot": "new-number"
+              }
+            ],
+            "time": "21:04"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Benim, Elvin. Duyuyor musun? Başım dertte, acilen yardımına ihtiyacım var.",
+                "spot": "voice"
+              }
+            ],
+            "time": "21:04",
+            "voice": "young-man",
+            "manner": "natural",
+            "spoken": "Benim, Elvin. <breath> Duyuyor musun? Başım dertte, acilen yardımına ihtiyacım var."
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Bugün acilen 600 manata ihtiyacım var.",
+                "spot": "urgent"
+              },
+              {
+                "text": " "
+              },
+              {
+                "text": "Lütfen evde kimseye söyleme.",
+                "spot": "secret"
+              }
+            ],
+            "time": "21:05"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Bu karta gönder, arkadaşımın kartı.",
+                "spot": "card"
+              }
+            ],
+            "time": "21:05"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "new-number",
+          "label": "Yeni numara",
+          "explain": "“Yeni numara” hikâyesi, doğrulamak için eski numarayı aramanızı engeller."
+        },
+        {
+          "id": "voice",
+          "label": "Sesli mesaj",
+          "explain": "Ses tanıdık gelse de sahte olabilir. Onu kopyalamak için kısa bir kayıt yeterlidir."
+        },
+        {
+          "id": "urgent",
+          "label": "Acil para",
+          "explain": "Acil para talebi, dolandırıcılığın temel işaretidir."
+        },
+        {
+          "id": "secret",
+          "label": "Gizlilik",
+          "explain": "Kimseye söylememenizi istemeleri, doğrulama yapmanızı engellemek içindir."
+        },
+        {
+          "id": "card",
+          "label": "Başkasının kartı",
+          "explain": "Para başka birinin kartına gidiyor. Bu, izleri gizler."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "relative-call",
+      "environment": "call",
+      "title": "Akşam gelen arama",
+      "intro": "Akşam bilinmeyen bir numara arıyor. Ses çok tanıdık geliyor. Ne yaparsınız?",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Bilinmeyen numara"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 73 26"
+              }
+            ],
+            "label": "Cep",
+            "voice": "child"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Yanıtla",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Yanıtlamak tehlikeli değildir. Önemli olan sonra ne yaptığınızdır."
+            },
+            {
+              "id": "decline",
+              "label": "Reddet",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olur. Endişeleniyorsanız yakınınızı bildiğiniz numaradan kendiniz arayın.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "plea",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Bilinmeyen numara"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 73 26"
+              }
+            ],
+            "label": "Cep",
+            "voice": "child"
+          },
+          "say": "Alo, benim, Nermin! Kaza oldu, polis beni bırakmıyor. Hemen 900 manata ihtiyacım var, aileye söyleme!",
+          "spoken": "Alo, <breath> benim, Nermin! Kaza oldu, polis beni, ee, bırakmıyor. Hemen 900 manata ihtiyacım var, <breath> aileye söyleme!",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Nereye göndereyim?",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Hemen kabul etmeniz, dolandırıcının tam da istediği şeydir. Önce doğrulayın."
+            },
+            {
+              "id": "code-word",
+              "label": "Doğrulama kelimemiz ne?",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğru. Klonlanmış ses, aranızda belirlediğiniz kelimeyi bilemez."
+            },
+            {
+              "id": "hang-up",
+              "label": "Telefonu kapatıp kendim geri ararım",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Doğru. Nermin'i bildiğiniz eski numaradan arayın.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Bilinmeyen numara"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 73 26"
+              }
+            ],
+            "label": "Cep",
+            "voice": "child"
+          },
+          "say": "Ne kelimesi? Ben burada ağlıyorum, sen kelime soruyorsun! Polis bekliyor, acele et!",
+          "spoken": "Ne kelimesi? <breath> Ben burada ağlıyorum, sen kelime soruyorsun! Polis bekliyor, <breath> acele et!",
+          "actions": [
+            {
+              "id": "send",
+              "label": "Tamam, parayı gönderiyorum",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Para bir dolandırıcıya gitti. Gözyaşları ve acele, doğrulamayı atlamanız için var."
+            },
+            {
+              "id": "hang-up",
+              "label": "Telefonu kapat",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Doğru. Doğrulama kelimesi yoksa konuşma da yok."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Arama sona erdi. Şimdi ne yapacaksınız?",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "Bilinmeyen numara"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 73 26"
+              }
+            ],
+            "label": "Cep",
+            "voice": "child"
+          },
+          "actions": [
+            {
+              "id": "call-back",
+              "label": "Nermin'in eski numarasını ara",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Doğru: Nermin evde ve hiçbir şey olmamış. Aileyi de uyarın."
+            },
+            {
+              "id": "ignore",
+              "label": "Hiçbir şey yapma",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Dolandırıcı yeniden arayabilir ya da başka bir yakınınızı deneyebilir. Ailenize haber verin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "verify-steps",
+      "prompt": "Şüpheli bir aramadan sonraki adımları doğru sıraya dizin.",
+      "items": [
+        {
+          "id": "hang-up",
+          "label": "Hiçbir söz vermeden telefonu kapatın"
+        },
+        {
+          "id": "call-known",
+          "label": "Rehberinizdeki numarayı kendiniz arayın"
+        },
+        {
+          "id": "confirm",
+          "label": "Talebin gerçek olup olmadığını sorun"
+        },
+        {
+          "id": "report",
+          "label": "Durumu güvenlik ekibine bildirin"
+        }
+      ],
+      "explain": "Kanıt ekranda değildir. Kanıt, kendi başlattığınız ikinci aramadadır."
+    },
+    {
+      "type": "match",
+      "id": "tricks",
+      "prompt": "Her hileyi doğru tepkiyle eşleştirin.",
+      "pairs": [
+        {
+          "id": "boss-voice",
+          "left": "Yöneticinin sesiyle acil para transferi",
+          "right": "Bilinen numaradan geri arayın"
+        },
+        {
+          "id": "new-number",
+          "left": "Bir yakınınızın yeni numarası",
+          "right": "Doğrulamak için eski numarayı arayın"
+        },
+        {
+          "id": "video-face",
+          "left": "Görüntülü görüşmede tanıdık bir yüz",
+          "right": "Doğrulama kelimesini sorun"
+        },
+        {
+          "id": "keep-secret",
+          "left": "Gizli tutma ricası",
+          "right": "Mutlaka ikinci bir kişiye haber verin"
+        }
+      ],
+      "explain": "Her hilenin basit bir kontrolü vardır. Bunu alışkanlık edinin."
+    },
+    {
+      "type": "choice",
+      "id": "exec-video",
+      "question": {
+        "prompt": "Görüntülü görüşmede müdür sizden gizli bir raporu kişisel bir e-posta adresine göndermenizi istiyor. Ne yaparsınız?",
+        "options": [
+          {
+            "id": "send",
+            "label": "Gönderirim, onu ekranda görüyorum",
+            "correct": false,
+            "feedback": "Görüntü sahte olabilir. Yüz kanıt değildir."
+          },
+          {
+            "id": "verify",
+            "label": "Resmî bir kanaldan ayrıca onay alırım",
+            "correct": true,
+            "feedback": "Doğru. Gizli dosyalar yalnızca onaydan sonra ve resmî kanallardan gönderilir."
+          },
+          {
+            "id": "wave",
+            "label": "Kameranın önünde elini sallamasını isterim",
+            "correct": false,
+            "feedback": "Bu, bazı sahte görüntüleri bozabilir ama güvenilir bir kontrol değildir."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "ceo"
+        }
+      },
+      "explain": "Ne kadar gerçek görünürse görünsün, olağan dışı bir talebi başka bir kanaldan doğrulayın."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Tanıdık bir ses, yüz ya da numara kanıt değildir.",
+        "Telefonu kapatın ve bildiğiniz bir numaradan geri arayın.",
+        "Ailenizle ve ekibinizle bir doğrulama kelimesi belirleyin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

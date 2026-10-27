@@ -1,0 +1,731 @@
+{
+  "id": "ceo-fraud",
+  "title": "المدير المزيف",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "money-trap",
+      "beats": [
+        {
+          "id": "intro",
+          "say": "أحيانًا لا يحتوي الفخ على رابط ولا على ملف. مجرد طلب مالي عاجل باسم مديرك.",
+          "mood": "talk",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "ceo"
+          }
+        },
+        {
+          "id": "address",
+          "say": "الاسم مألوف، لكن العنوان ليس عنوان الوكالة. يستطيع أي شخص أن يكتب أي اسم في خانة المرسل.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "poctam",
+              "from": {
+                "name": [
+                  {
+                    "text": "رؤوف كريموف"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "rauf.kerimov.ofis@"
+                  },
+                  {
+                    "text": "poctam.az",
+                    "spot": "free-mail"
+                  }
+                ]
+              },
+              "to": "s.huseynova@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "عاجل وسري"
+                }
+              ],
+              "time": "15:05",
+              "body": [
+                [
+                  {
+                    "text": "مرحبًا سابينا،"
+                  }
+                ],
+                [
+                  {
+                    "text": "يجب أن نحول اليوم 18,400 AZN إلى أحد الشركاء قبل الساعة 16:00.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "لا تخبري أحدًا بعد، فالمفاوضات سرية.",
+                    "spot": "secrecy"
+                  }
+                ],
+                [
+                  {
+                    "text": "أنا في اجتماع، لا تتصلي، اكتبي لي فقط.",
+                    "spot": "no-call"
+                  }
+                ],
+                [
+                  {
+                    "text": "البيانات البنكية في المرفق."
+                  }
+                ]
+              ],
+              "attachments": [
+                {
+                  "name": [
+                    {
+                      "text": "Rekvizitler.pdf"
+                    }
+                  ],
+                  "size": "64 KB"
+                }
+              ]
+            }
+          },
+          "highlight": "free-mail"
+        },
+        {
+          "id": "secrecy",
+          "say": "طلب الكتمان ومنع الاتصال موجودان لهدف واحد: منعك من التحقق.",
+          "mood": "alert",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "poctam",
+              "from": {
+                "name": [
+                  {
+                    "text": "رؤوف كريموف"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "rauf.kerimov.ofis@"
+                  },
+                  {
+                    "text": "poctam.az",
+                    "spot": "free-mail"
+                  }
+                ]
+              },
+              "to": "s.huseynova@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "عاجل وسري"
+                }
+              ],
+              "time": "15:05",
+              "body": [
+                [
+                  {
+                    "text": "مرحبًا سابينا،"
+                  }
+                ],
+                [
+                  {
+                    "text": "يجب أن نحول اليوم 18,400 AZN إلى أحد الشركاء قبل الساعة 16:00.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "لا تخبري أحدًا بعد، فالمفاوضات سرية.",
+                    "spot": "secrecy"
+                  }
+                ],
+                [
+                  {
+                    "text": "أنا في اجتماع، لا تتصلي، اكتبي لي فقط.",
+                    "spot": "no-call"
+                  }
+                ],
+                [
+                  {
+                    "text": "البيانات البنكية في المرفق."
+                  }
+                ]
+              ],
+              "attachments": [
+                {
+                  "name": [
+                    {
+                      "text": "Rekvizitler.pdf"
+                    }
+                  ],
+                  "size": "64 KB"
+                }
+              ]
+            }
+          },
+          "highlight": "secrecy"
+        },
+        {
+          "id": "second-channel",
+          "say": "تحقق دائمًا من طلبات الأموال أو البيانات البنكية بطريقة أخرى. اتصل بنفسك على رقم تعرفه مسبقًا.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          },
+          "checkpoint": {
+            "prompt": "وماذا لو وصل الطلب من العنوان الحقيقي للمدير؟",
+            "options": [
+              {
+                "id": "skip",
+                "label": "إذن لا داعي للتحقق",
+                "correct": false,
+                "feedback": "ربما تم اختراق صندوق البريد. تحقق دائمًا من طلبات الأموال عبر الهاتف."
+              },
+              {
+                "id": "check",
+                "label": "أتحقق عبر الهاتف رغم ذلك",
+                "correct": true,
+                "feedback": "صحيح. قد يتم الاستيلاء على العنوان الحقيقي أيضًا."
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "new-bank-details",
+      "prompt": "ابحث عن العلامات: المورد الحقيقي يراسلك من ofistechizat.az.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "ofistechizat-fake",
+        "from": {
+          "name": [
+            {
+              "text": "غونل علييفا، شركة OfisTəchizat",
+              "reveal": "kamran@ofis-techizat.az"
+            }
+          ],
+          "address": [
+            {
+              "text": "kamran@"
+            },
+            {
+              "text": "ofis-techizat.az",
+              "spot": "look-alike"
+            }
+          ]
+        },
+        "to": "muhasibat@xidmetagentliyi.az",
+        "subject": [
+          {
+            "text": "تغيرت بياناتنا البنكية"
+          }
+        ],
+        "time": "11:18",
+        "body": [
+          [
+            {
+              "text": "زملائي الأعزاء،"
+            }
+          ],
+          [
+            {
+              "text": "بما أننا غيرنا البنك، "
+            },
+            {
+              "text": "نرجو تحويل المدفوعات إلى الحساب الجديد اعتبارًا من هذا الشهر.",
+              "spot": "new-account"
+            }
+          ],
+          [
+            {
+              "text": "رقم الآيبان: AZ21ULDZ00000000137010001944"
+            }
+          ],
+          [
+            {
+              "text": "يرجى عدم تحويل المبالغ إلى الحساب القديم، فسترتد الأموال.",
+              "spot": "old-account"
+            }
+          ],
+          [
+            {
+              "text": "يرجى سداد فاتورة سبتمبر هذا الأسبوع لتجنب الغرامة.",
+              "spot": "pressure"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "look-alike",
+          "label": "عنوان مشابه",
+          "explain": "العنوان الحقيقي هو ofistechizat.az، وهنا أضيفت إليه شرطة قصيرة (-)."
+        },
+        {
+          "id": "new-account",
+          "label": "حساب جديد",
+          "explain": "تغيير البيانات البنكية هو الشكل التقليدي لهذا الاحتيال. تحقق دائمًا عبر الرقم المذكور في العقد."
+        },
+        {
+          "id": "old-account",
+          "label": "منع الدفع إلى الحساب القديم",
+          "explain": "منع الدفع إلى الحساب القديم يدفعك إلى الحساب الجديد دون تحقق."
+        },
+        {
+          "id": "pressure",
+          "label": "الضغط بالغرامة",
+          "explain": "الخوف من الغرامة يجعلك تستعجل. والضغط هو بالضبط ما يستدعي التحقق."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "intro",
+      "id": "your-turn",
+      "title": "دورك الآن",
+      "body": "الجمعة، 15:05. أنت وحدك في إدارة الحسابات، ويجب إرسال الدفعات قبل الساعة 16:00.",
+      "mood": "think",
+      "visual": {
+        "kind": "illustration",
+        "id": "ceo"
+      }
+    },
+    {
+      "type": "simulation",
+      "id": "vendor-callback",
+      "environment": "call",
+      "title": "مكالمة من المورد",
+      "intro": "بعد رسالة البيانات البنكية مباشرة، يرن جوالك. استمع إلى المتصل وقرر.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat-fake",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 61 27"
+              }
+            ],
+            "label": "جوال",
+            "voice": "woman"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "رد",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "الرد على المكالمة ليس خطيرًا. المهم هو ما توافق عليه."
+            },
+            {
+              "id": "decline",
+              "label": "رفض",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "هذا خيار جيد أيضًا. قبل الدفع، اتصل بالمورد بنفسك على الرقم المذكور في العقد.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pitch",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat-fake",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 61 27"
+              }
+            ],
+            "label": "جوال",
+            "voice": "woman"
+          },
+          "say": "مرحبًا، معك غونل علييفا من OfisTəchizat. هل وصلتك رسالتنا؟ نرجو منك دفع فاتورة سبتمبر اليوم إلى الحساب الجديد.",
+          "spoken": "مرحبًا، <breath> معك غونل علييفا من OfisTəchizat. هل وصلتك رسالتنا؟ نرجو منك دفع فاتورة سبتمبر اليوم، أمم، إلى الحساب الجديد.",
+          "actions": [
+            {
+              "id": "agree",
+              "label": "حسنًا، سأدفع اليوم",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "المكالمة تكرر قصة الرسالة، ولا تثبت شيئًا. تحقق من أي تغيير في البيانات البنكية عبر الرقم المذكور في العقد."
+            },
+            {
+              "id": "verify",
+              "label": "سأتحقق عبر الرقم المذكور في العقد",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "صحيح: الرسالة والمكالمة قد تأتيان من المحتال نفسه. تحقق عبر قناة أخرى."
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat-fake",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 61 27"
+              }
+            ],
+            "label": "جوال",
+            "voice": "woman"
+          },
+          "say": "ليس لدينا وقت، فمديرنا منزعج. إذا أردت التحقق، فاتصل بي على هذا الرقم نفسه.",
+          "spoken": "ليس لدينا وقت، <breath> فمديرنا منزعج. إذا أردت التحقق، فاتصل بي على هذا الرقم نفسه.",
+          "actions": [
+            {
+              "id": "hang",
+              "label": "إنهاء المكالمة",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "صحيح. عندما يزداد الضغط، أغلق الخط بأدب وتحقق بنفسك."
+            },
+            {
+              "id": "his-number",
+              "label": "سأتصل بهذا الرقم للتأكد",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "الرقم الذي تقدمه لك المتصلة هو رقم جوالها الخاص. لا تثق إلا بالرقم المذكور في العقد."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "انتهت المكالمة. ماذا تفعل الآن؟",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat-fake",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 50 000 61 27"
+              }
+            ],
+            "label": "جوال",
+            "voice": "woman"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "الاتصال بالرقم المذكور في العقد",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "صحيح. اتصل بالرقم الرسمي بنفسك، ومن الأفضل أن يكون ذلك من هاتف آخر."
+            },
+            {
+              "id": "ignore",
+              "label": "لن أفعل شيئًا، فقط لن أدفع",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "الأموال في أمان، لكن المورد والزملاء لا يعلمون بما حدث، وسيحاول المحتال مع شخص آخر."
+            }
+          ]
+        },
+        {
+          "id": "real-supplier",
+          "label": "الاتصال برقم العقد",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "ofistechizat",
+            "caller": [
+              {
+                "text": "OfisTəchizat MMC"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 31 00"
+              }
+            ],
+            "label": "الرقم المذكور في العقد",
+            "voice": "woman-2"
+          },
+          "say": "OfisTəchizat، معك غونل علييفا. لا، لم نغير بياناتنا البنكية، ولم نتصل بك.",
+          "spoken": "OfisTəchizat، <breath> معك غونل علييفا. لا، لم نغير، أمم، بياناتنا البنكية، ولم نتصل بك.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "إبلاغ إدارة الحسابات وفريق الأمن السيبراني",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "رائع. أبلغ عن الرسالة دون حذفها: سيحظر الفريق النطاق المزيف وينبه الزملاء."
+            },
+            {
+              "id": "keep-quiet",
+              "label": "لم أدفع، وهذا يكفي",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "الأموال في أمان، لكن الرسالة نفسها قد تصل إلى زملائك. الإبلاغ يحميهم."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "money-requests",
+      "prompt": "هل هذا الطلب آمن أم فخ؟",
+      "cards": [
+        {
+          "id": "gift-cards",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "رؤوف كريموف (رقم جديد)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "مرحبًا، هذا رقمي الجديد."
+                  }
+                ],
+                "time": "12:02"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "اشتر بسرعة خمس بطاقات هدايا بقيمة 200 مانات لكل منها، وأرسل لي الرموز. سأعيد لك المبلغ."
+                  }
+                ],
+                "time": "12:03"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "رقم جديد مع بطاقات هدايا: هذا احتيال تقليدي. اتصل برقم مديرك القديم لتتحقق."
+        },
+        {
+          "id": "report-request",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "رؤوف كريموف"
+                }
+              ],
+              "address": [
+                {
+                  "text": "r.kerimov@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "اجتماع الغد"
+              }
+            ],
+            "time": "09:40",
+            "body": [
+              [
+                {
+                  "text": "سابينا، أحضري من فضلك التقرير الربعي إلى اجتماع الغد. شكرًا."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "العنوان صحيح، والطلب عادي يخص العمل. لا أموال ولا كتمان."
+        },
+        {
+          "id": "broken-phone",
+          "artifact": {
+            "kind": "sms",
+            "sender": [
+              {
+                "text": "+994 55 000 71 48"
+              }
+            ],
+            "time": "14:15",
+            "messages": [
+              [
+                {
+                  "text": "مرحبًا، أنا رؤوف كريموف، جوالي معطل. المطلوب تحويل 3,000 AZN بسرعة إلى أحد الشركاء، وقد أرسلت لك التفاصيل بالبريد الإلكتروني."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "رقم غير معروف، وحجة الجوال المعطل، وطلب مالي عاجل. اتصل برقم المدير الذي تعرفه."
+        },
+        {
+          "id": "usual-invoice",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "ofistechizat",
+            "from": {
+              "name": [
+                {
+                  "text": "OfisTəchizat MMC"
+                }
+              ],
+              "address": [
+                {
+                  "text": "muhasibat@ofistechizat.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "فاتورة سبتمبر"
+              }
+            ],
+            "time": "10:30",
+            "body": [
+              [
+                {
+                  "text": "مرحبًا. مرفقة فاتورة شهر سبتمبر. يتم الدفع إلى الحساب المذكور في العقد كالمعتاد."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Faktura_sentyabr.pdf"
+                  }
+                ],
+                "size": "120 KB"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "عنوان معروف، وفاتورة متوقعة، ولا تغيير في البيانات البنكية. رسالة عادية."
+        },
+        {
+          "id": "hacked-mailbox",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "رؤوف كريموف"
+                }
+              ],
+              "address": [
+                {
+                  "text": "r.kerimov@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "دفعة عاجلة"
+              }
+            ],
+            "time": "16:48",
+            "body": [
+              [
+                {
+                  "text": "المطلوب تحويل 9,750 AZN اليوم إلى شريك جديد، والتفاصيل أدناه."
+                }
+              ],
+              [
+                {
+                  "text": "لا تتصل، أنا في اجتماع."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "العنوان حقيقي، لكن صندوق البريد قد يكون مخترقًا. طلب مالي عاجل مع منع الاتصال سبب يكفي للتحقق."
+        },
+        {
+          "id": "approval-flow",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "إلفين محمدوف"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "سابينا، أرسلت مستندات دفعات الغد للاعتماد في النظام. ألقي نظرة عليها عندما يتسنى لك."
+                  }
+                ],
+                "time": "11:05"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "إجراء عادي: يتم اعتماد الدفعات في النظام الرسمي وفق القواعد، ولا أحد يستعجلك."
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "money-steps",
+      "prompt": "رتب خطوات التعامل مع طلب مالي مشبوه.",
+      "items": [
+        {
+          "id": "pause",
+          "label": "لا تدفع، وتوقف قليلًا"
+        },
+        {
+          "id": "verify",
+          "label": "تحقق عبر رقم تعرفه"
+        },
+        {
+          "id": "report",
+          "label": "إذا كان الطلب مزيفًا، فاضغط «الإبلاغ عن تصيد»"
+        }
+      ],
+      "explain": "توقف، ثم تحقق، ثم أبلغ. لا يوجد زر «الإبلاغ عن تصيد»؟ أعد توجيه الرسالة إلى فريق الأمن السيبراني. وإذا كنت قد دفعت بالفعل، فاتصل فورًا بالبنك وبفريق الأمن السيبراني."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "تحقق من طلبات الأموال والبيانات البنكية بطريقة أخرى.",
+        "الاستعجال مع الكتمان من أبرز سمات الاحتيال.",
+        "لا تحذف الرسالة، بل اضغط «الإبلاغ عن تصيد»."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

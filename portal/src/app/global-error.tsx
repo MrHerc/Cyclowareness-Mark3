@@ -1,7 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
-import { DEFAULT_LOCALE, LOCALE_COOKIE, UI_ALIAS, browserUiLocale, isLocale, type Locale } from "@/i18n/config";
+import { DEFAULT_LOCALE, LOCALE_COOKIE, UI_ALIAS, browserUiLocale, dirOf, isLocale, type Locale } from "@/i18n/config";
 
 /**
  * Last-resort boundary when the root layout itself fails (no fonts, no translations available).
@@ -12,6 +12,13 @@ const TEXT: Record<Locale, { title: string; body: string; retry: string }> = {
   az: { title: "Nəsə alınmadı", body: "Bu səhifəni yükləmək alınmadı. Bir az sonra yenidən cəhd edin.", retry: "Yenidən cəhd et" },
   en: { title: "Something went wrong", body: "We couldn't load this page. Try again in a moment.", retry: "Try again" },
   ru: { title: "Что-то пошло не так", body: "Не удалось загрузить страницу. Попробуйте чуть позже.", retry: "Повторить" },
+  tr: { title: "Bir sorun oluştu", body: "Bu sayfa yüklenemedi. Birazdan tekrar deneyin.", retry: "Tekrar dene" },
+  ro: { title: "A apărut o eroare", body: "Nu am putut încărca această pagină. Încercați din nou peste câteva momente.", retry: "Încercați din nou" },
+  ka: { title: "მოხდა შეცდომა", body: "ამ გვერდის ჩატვირთვა ვერ მოხერხდა. სცადეთ ცოტა ხანში.", retry: "ხელახლა ცდა" },
+  uk: { title: "Щось пішло не так", body: "Не вдалося завантажити цю сторінку. Спробуйте ще раз за мить.", retry: "Спробувати ще раз" },
+  de: { title: "Etwas ist schiefgelaufen", body: "Diese Seite konnte nicht geladen werden. Versuchen Sie es gleich noch einmal.", retry: "Erneut versuchen" },
+  fr: { title: "Une erreur s’est produite", body: "Impossible de charger cette page. Réessayez dans un instant.", retry: "Réessayer" },
+  ar: { title: "حدث خطأ ما", body: "تعذر تحميل هذه الصفحة. حاول مرة أخرى بعد لحظات.", retry: "إعادة المحاولة" },
 };
 
 const subscribe = () => () => {};
@@ -20,14 +27,15 @@ function browserLocale(): Locale {
   const cookie = document.cookie.match(new RegExp(`(?:^|;\\s*)${LOCALE_COOKIE}=([^;]+)`))?.[1];
   // As the server does for a signed-out visitor (i18n/request.ts); the browser has no country to go by.
   if (isLocale(cookie)) return cookie;
-  return (cookie && UI_ALIAS[cookie]) || browserUiLocale(navigator.languages.join(","), null);
+  // Own keys only, as on the server: "constructor" or "__proto__" must not read Object.prototype.
+  return (cookie && Object.hasOwn(UI_ALIAS, cookie) && UI_ALIAS[cookie]) || browserUiLocale(navigator.languages.join(","), null);
 }
 
 export default function GlobalError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   const locale = useSyncExternalStore(subscribe, browserLocale, (): Locale => DEFAULT_LOCALE);
   const t = TEXT[locale];
   return (
-    <html lang={locale}>
+    <html lang={locale} dir={dirOf(locale)}>
       <body style={{ margin: 0, fontFamily: "system-ui, sans-serif", background: "#f7f6fb", color: "#16123a" }}>
         <main style={{ minHeight: "100dvh", display: "grid", placeItems: "center", padding: 24, textAlign: "center" }}>
           <div style={{ maxWidth: 420 }}>

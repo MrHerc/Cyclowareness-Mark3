@@ -1,0 +1,416 @@
+{
+ "id": "chat-safely",
+ "title": "Conversații în siguranță",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Aplicațiile de mesagerie sunt practice. Dar un fișier de serviciu trimis într-un cont personal iese de sub controlul organizației, uneori pentru ani de zile.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Un nume cunoscut pe un număr nou poate fi, de fapt, un escroc. Verificați sunând la numărul vechi, pe care îl aveți deja.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "+994 50 000 47 09",
+         "spot": "unknown-number"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Bună ziua, Narmina. Sunt Elchin Gasimov. "
+          },
+          {
+           "text": "Acesta e numărul meu nou, pe cel vechi l-am pierdut.",
+           "spot": "new-number"
+          }
+         ],
+         "time": "09:12"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Directorul are nevoie urgent de un raport. "
+          },
+          {
+           "text": "Trimiteți-mi tabelul financiar chiar aici.",
+           "spot": "work-file"
+          }
+         ],
+         "time": "09:13"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Sunt în ședință, nu pot vorbi, doar scrieți-mi.",
+           "spot": "no-call"
+          }
+         ],
+         "time": "09:13"
+        }
+       ]
+      }
+     },
+     "highlight": "new-number"
+    },
+    {
+     "id": "b3",
+     "say": "Mesajele temporare ajută, dar cealaltă persoană poate face oricând o captură de ecran. Informațiile sensibile nu au ce căuta în aplicațiile de mesagerie.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Pentru serviciu, folosiți instrumentul aprobat de organizație. Nu știți care este? Întrebați echipa de suport IT.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "new-number-chat",
+   "prompt": "Ce este suspect în această conversație?",
+   "artifact": {
+    "kind": "chat",
+    "app": "whatsapp",
+    "contact": [
+     {
+      "text": "+994 50 000 47 09",
+      "spot": "unknown-number"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Bună ziua, Narmina. Sunt Elchin Gasimov. "
+       },
+       {
+        "text": "Acesta e numărul meu nou, pe cel vechi l-am pierdut.",
+        "spot": "new-number"
+       }
+      ],
+      "time": "09:12"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Directorul are nevoie urgent de un raport. "
+       },
+       {
+        "text": "Trimiteți-mi tabelul financiar chiar aici.",
+        "spot": "work-file"
+       }
+      ],
+      "time": "09:13"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Sunt în ședință, nu pot vorbi, doar scrieți-mi.",
+        "spot": "no-call"
+       }
+      ],
+      "time": "09:13"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "unknown-number",
+     "label": "Număr nesalvat",
+     "explain": "Niciun nume, doar un număr. Singura dovadă a identității vine chiar de la expeditor."
+    },
+    {
+     "id": "new-number",
+     "label": "Povestea cu numărul nou",
+     "explain": "Acesta este cel mai frecvent început. Sunați la numărul vechi ca să verificați."
+    },
+    {
+     "id": "work-file",
+     "label": "Fișier de serviciu trimis pe mesagerie",
+     "explain": "Documentele financiare se trimit doar printr-un canal de serviciu aprobat."
+    },
+    {
+     "id": "no-call",
+     "label": "Evită apelul",
+     "explain": "Escrocul nu vrea să-i auziți vocea. Fiți atenți la orice solicitare însoțită de refuzul unui apel."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "verify",
+   "question": {
+    "prompt": "Cum verificați că este într-adevăr Elchin?",
+    "options": [
+     {
+      "id": "call-new",
+      "label": "Sun la numărul nou",
+      "correct": false,
+      "feedback": "Acel număr îi aparține escrocului. Poate răspunde chiar el sau poate folosi o voce clonată."
+     },
+     {
+      "id": "call-known",
+      "label": "Îl sun la numărul vechi sau la telefonul de la birou",
+      "correct": true,
+      "feedback": "Corect. Un canal pe care îl cunoașteți deja este cea mai sigură verificare."
+     },
+     {
+      "id": "photo",
+      "label": "Mă uit la fotografia de profil",
+      "correct": false,
+      "feedback": "Copierea unei fotografii de pe internet durează un minut."
+     },
+     {
+      "id": "ask-detail",
+      "label": "Îl întreb care este adresa biroului",
+      "correct": false,
+      "feedback": "Aceasta este o informație publică. Oricine poate răspunde."
+     }
+    ]
+   },
+   "explain": "Verificați întotdeauna printr-un canal pe care îl cunoașteți deja: numărul vechi, telefonul de la birou sau în persoană."
+  },
+  {
+   "type": "swipe",
+   "id": "what-goes-where",
+   "prompt": "Acest mesaj este sigur sau riscant?",
+   "cards": [
+    {
+     "id": "family-group",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Grupul familiei · 38 de membri"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Proiect de buget 2027, final.xlsx"
+         }
+        ],
+        "time": "22:40"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un fișier de serviciu a ajuns în grupul familiei. Astfel de greșeli se întâmplă cel mai des când ne grăbim."
+    },
+    {
+     "id": "vpn-password",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Chatul departamentului · 214 membri"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Parola pentru accesul de la distanță: Baki2026! Folosiți-o toți."
+         }
+        ],
+        "time": "13:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O parolă comună, postată într-un grup mare. Este suficient să se piardă un telefon și accesul se deschide pentru toți."
+    },
+    {
+     "id": "internal-link",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Samir Babayev · chat intern de serviciu"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Am încărcat raportul final în sistemul intern, vă rog să vă uitați acolo."
+         }
+        ],
+        "time": "10:30"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Fișierul în sine nu este trimis, ci rămâne în sistemul intern. Acesta este modul corect."
+    },
+    {
+     "id": "meeting-time",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Grupul ședinței"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ședința de mâine s-a mutat la ora 10."
+         }
+        ],
+        "time": "18:02"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Nimic sensibil, doar o simplă reamintire. Păstrați documentele și cifrele în canalul aprobat."
+    },
+    {
+     "id": "id-photo",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Contabilitate"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Pentru verificarea salariului, trimiteți fotografii cu ambele fețe ale cărții de identitate."
+         }
+        ],
+        "time": "11:48"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Contabilitatea are deja datele dumneavoastră. Fotografia unui act de identitate este folosită pentru a deschide conturi false."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "wrong-group",
+   "title": "Grupul greșit",
+   "start": "sent",
+   "nodes": [
+    {
+     "id": "sent",
+     "text": "Ați trimis din greșeală lista de telefoane a angajaților într-un grup de cartier cu 300 de persoane. Au trecut două minute.",
+     "choices": [
+      {
+       "label": "Șterg mesajul pentru toți și îi spun imediat managerului",
+       "next": "manager",
+       "feedback": "Un început bun. Ștergerea încetinește răspândirea, iar raportarea limitează paguba."
+      },
+      {
+       "label": "Șterg mesajul discret, cu siguranță nu l-a văzut nimeni",
+       "outcome": "risky",
+       "feedback": "Poate că cineva l-a descărcat deja. Dacă tăceți, nimeni nu poate acționa la timp."
+      },
+      {
+       "label": "Nu fac nimic, oricum e prea târziu",
+       "outcome": "compromised",
+       "feedback": "Fișierul rămâne în grup și se răspândește. Nu e prea târziu, acționați acum."
+      }
+     ]
+    },
+    {
+     "id": "manager",
+     "text": "Ce anume era în fișier?",
+     "speaker": "Manager",
+     "voice": "older-man",
+     "channel": "phone",
+     "manner": "firm",
+     "spoken": "<breath> Ce anume era în fișier?",
+     "choices": [
+      {
+       "label": "Spun exact: nume și numere de mobil pentru 120 de angajați",
+       "next": "reply",
+       "feedback": "Un răspuns sincer și precis grăbește reacția."
+      },
+      {
+       "label": "Bagatelizez: doar un tabel fără importanță",
+       "outcome": "risky",
+       "feedback": "O echipă care nu știe ce s-a scurs nu poate lua decizii bune. Colegii dumneavoastră nu vor fi pregătiți pentru apelurile escrocilor."
+      }
+     ]
+    },
+    {
+     "id": "reply",
+     "text": "Cineva din grup scrie: „Am deschis fișierul, interesant.” Ce faceți?",
+     "choices": [
+      {
+       "label": "Îl rog politicos să-l șteargă și îi spun managerului",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Ați încercat să opriți răspândirea și ați raportat totul deschis."
+      },
+      {
+       "label": "Mă cert cu el și îl amenin",
+       "outcome": "risky",
+       "feedback": "Amenințările cresc tensiunea și fac fișierul și mai interesant. Cereți-i politicos și lăsați organizația să se ocupe de rest."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Trimiteți fișierele de serviciu doar prin instrumentul aprobat.",
+    "Verificați un număr nou printr-un canal pe care îl cunoașteți deja.",
+    "Dacă ați trimis ceva în locul greșit, ștergeți imediat și raportați."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

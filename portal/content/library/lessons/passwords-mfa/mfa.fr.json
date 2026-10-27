@@ -1,0 +1,403 @@
+{
+ "id": "mfa",
+ "title": "La double authentification",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "second-step",
+   "beats": [
+    {
+     "id": "why",
+     "say": "Même si votre mot de passe est volé, une deuxième étape peut protéger le compte. C’est ce qu’on appelle la double authentification.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "best",
+     "say": "Les plus sûres sont les clés d’accès et les clés de sécurité physiques. Elles ne fonctionnent pas sur les faux sites.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "code",
+     "say": "Le code n’est destiné qu’à vous. Quiconque vous le demande, même au nom de votre banque, est un escroc.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "ulduzbank",
+       "sender": [
+        {
+         "text": "UlduzBank"
+        }
+       ],
+       "time": "14:02",
+       "messages": [
+        [
+         {
+          "text": "Code de connexion : 482 913. "
+         },
+         {
+          "text": "Ne communiquez ce code à personne, pas même à un employé de la banque.",
+          "spot": "code-warning"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "code-warning"
+    },
+    {
+     "id": "prompts",
+     "say": "Si vous recevez sans cesse des demandes d’approbation inattendues, quelqu’un essaie de se connecter avec votre mot de passe.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     },
+     "checkpoint": {
+      "prompt": "Que faites-vous face à une demande inattendue ?",
+      "options": [
+       {
+        "id": "approve",
+        "label": "L’approuver pour que ça s’arrête",
+        "correct": false,
+        "feedback": "Si vous approuvez, l’attaquant entre dans votre compte."
+       },
+       {
+        "id": "deny",
+        "label": "La refuser et changer mon mot de passe",
+        "correct": true,
+        "feedback": "Exact. Prévenez ensuite aussi la Sécurité informatique."
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "night-push",
+   "environment": "phone",
+   "title": "Demandes nocturnes",
+   "intro": "Il est deux heures du matin et vous dormez. Votre téléphone vous demande sans arrêt d’approuver une connexion.",
+   "steps": [
+    {
+     "id": "push-1",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "tesdiqleyici",
+      "app": "Təsdiqləyici",
+      "title": [
+       {
+        "text": "Approuver la connexion ?"
+       }
+      ],
+      "body": [
+       {
+        "text": "Portail Xidmət Agentliyi. Ordinateur Windows."
+       }
+      ],
+      "time": "02:14"
+     },
+     "say": "Vous n’êtes en train de vous connecter nulle part.",
+     "actions": [
+      {
+       "id": "approve",
+       "label": "Approuver",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Ce n’est pas vous qui vous connectez, c’est donc quelqu’un d’autre. Approuver laisse entrer la personne qui a votre mot de passe."
+      },
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. Refusez toujours une demande inattendue."
+      }
+     ]
+    },
+    {
+     "id": "push-5",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "tesdiqleyici",
+      "app": "Təsdiqləyici",
+      "title": [
+       {
+        "text": "Approuver la connexion ?"
+       }
+      ],
+      "body": [
+       {
+        "text": "Cinquième demande. Ordinateur Windows."
+       }
+      ],
+      "time": "02:16"
+     },
+     "say": "Les demandes continuent d’arriver.",
+     "actions": [
+      {
+       "id": "approve",
+       "label": "Approuver pour que ça s’arrête",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Le bombardement de notifications mise exactement là-dessus : que, de guerre lasse, vous finissiez par approuver. Approuver ouvre le compte."
+      },
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. Des demandes répétées signifient que quelqu’un connaît votre mot de passe."
+      },
+      {
+       "id": "report",
+       "label": "Ce n’est pas moi, signaler",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Très bien. Votre signalement alerte immédiatement l’équipe sécurité."
+      }
+     ]
+    },
+    {
+     "id": "fake-it-chat",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek-fake",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Support informatique"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour, une vérification de nuit est en cours. Approuvez la dernière demande pour que votre compte ne soit pas bloqué."
+         }
+        ],
+        "time": "02:17"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "agree",
+       "label": "D’accord, j’approuve",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Le support informatique ne vous demande jamais d’approuver une demande. C’est la seconde moitié de l’attaque."
+      },
+      {
+       "id": "block",
+       "label": "Bloquer et signaler",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Exact. Un numéro inconnu qui écrit en pleine nuit, ce n’est pas le support, c’est l’attaquant."
+      }
+     ]
+    },
+    {
+     "id": "change-now",
+     "label": "Vous avez ouvert le portail vous-même",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "xidmet-agentliyi",
+      "brand": "Xidmət Agentliyi",
+      "url": [
+       {
+        "text": "https://portal.xidmetagentliyi.az/profil/parol"
+       }
+      ],
+      "fields": [
+       "Ancien mot de passe",
+       "Nouvelle phrase de passe"
+      ],
+      "button": "Modifier"
+     },
+     "say": "Votre mot de passe a été volé. Que faites-vous ?",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Modifier le mot de passe maintenant",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Exact. Prévenez ensuite l’équipe sécurité pour qu’elle ferme toutes les sessions ouvertes."
+      },
+      {
+       "id": "later",
+       "label": "Je verrai demain matin",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "L’attaquant connaît votre mot de passe et va réessayer. Changez-le maintenant."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "strongest-factor",
+   "question": {
+    "prompt": "Quelle deuxième étape résiste le mieux à l’hameçonnage ?",
+    "options": [
+     {
+      "id": "sms",
+      "label": "Code SMS",
+      "correct": false,
+      "feedback": "Un faux site peut demander le code, et votre carte SIM peut être transférée à quelqu’un d’autre."
+     },
+     {
+      "id": "app",
+      "label": "Application d’authentification",
+      "correct": false,
+      "feedback": "Mieux que le SMS, mais vous pouvez quand même saisir le code sur un faux site."
+     },
+     {
+      "id": "key",
+      "label": "Clé d’accès ou clé de sécurité",
+      "correct": true,
+      "feedback": "Exact. Une clé ne fonctionne qu’avec le site authentique."
+     },
+     {
+      "id": "email",
+      "label": "Code envoyé par e-mail",
+      "correct": false,
+      "feedback": "Si votre messagerie est piratée, le code l’est aussi."
+     }
+    ]
+   },
+   "explain": "N’importe quelle deuxième étape vaut mieux qu’un mot de passe seul. Choisissez une clé quand c’est possible."
+  },
+  {
+   "type": "hotspot",
+   "id": "code-request",
+   "prompt": "Trouvez le danger dans ces messages.",
+   "artifact": {
+    "kind": "chat",
+    "app": "whatsapp",
+    "contact": [
+     {
+      "text": "+994 50 000 26 43",
+      "spot": "unknown-number",
+      "reveal": "Absent de vos contacts"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Salut Aynur ! C’est Nigar, voici mon nouveau numéro."
+       }
+      ],
+      "time": "20:31"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Je t’ai envoyé un code par erreur sur ton numéro.",
+        "spot": "mistake"
+       }
+      ],
+      "time": "20:31"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Tu peux me renvoyer le code à six chiffres que tu viens de recevoir ?",
+        "spot": "ask-code"
+       }
+      ],
+      "time": "20:32"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Vite, il expire dans deux minutes.",
+        "spot": "urgency"
+       }
+      ],
+      "time": "20:32"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "unknown-number",
+     "label": "Numéro inconnu",
+     "explain": "Un prénom familier, mais un nouveau numéro. Appelez votre amie à son ancien numéro pour vérifier."
+    },
+    {
+     "id": "mistake",
+     "label": "« Envoyé par erreur »",
+     "explain": "Un code n’arrive pas par erreur sur votre numéro. Quelqu’un essaie d’entrer dans votre compte."
+    },
+    {
+     "id": "ask-code",
+     "label": "Demande de code",
+     "explain": "Si vous donnez ce code, l’escroc prend le contrôle de votre compte et écrit à vos amis en se faisant passer pour vous."
+    },
+    {
+     "id": "urgency",
+     "label": "Précipitation",
+     "explain": "Avec si peu de temps, impossible de réfléchir. N’envoyez jamais de code à personne."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "setup-authenticator",
+   "prompt": "Remettez dans l’ordre les étapes pour configurer une application d’authentification.",
+   "items": [
+    {
+     "id": "turn-on",
+     "label": "Activer la double authentification dans les paramètres de votre compte"
+    },
+    {
+     "id": "scan",
+     "label": "Scanner avec l’application le QR code affiché à l’écran"
+    },
+    {
+     "id": "enter-code",
+     "label": "Saisir le code affiché par l’application"
+    },
+    {
+     "id": "backup",
+     "label": "Conserver les codes de secours en lieu sûr"
+    }
+   ],
+   "explain": "Les codes de secours vous permettent de retrouver l’accès si vous perdez votre téléphone."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Quand c’est possible, choisissez une clé d’accès ou une application d’authentification.",
+    "Ne communiquez jamais un code à personne, ni à voix haute ni par écrit.",
+    "Refusez les demandes inattendues, changez votre mot de passe, signalez."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

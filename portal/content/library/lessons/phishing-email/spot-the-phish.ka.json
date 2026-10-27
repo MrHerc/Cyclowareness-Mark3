@@ -1,0 +1,394 @@
+{
+ "id": "spot-the-phish",
+ "title": "იპოვეთ ფიშინგი",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "meet-the-phish",
+   "beats": [
+    {
+     "id": "hello",
+     "say": "გამარჯობა! მე თქვენი უსაფრთხოების დამხმარე ვარ. დღეს ისწავლით, როგორ ამოიცნოთ ყალბი წერილი რამდენიმე წამში.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": { "kind": "illustration", "id": "hook" }
+    },
+    {
+     "id": "sender",
+     "say": "ჯერ გამგზავნის მისამართი შეამოწმეთ. აქ ერთი ასოა შეცვლილი და ამის შემჩნევა ძნელია.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "xidmet-agentliyi-fake",
+       "from": {
+        "name": [ { "text": "ბუღალტერია" } ],
+        "address": [ { "text": "muhasibat@" }, { "text": "xidmetagentIiyi.az", "spot": "sender-domain" } ]
+       },
+       "to": "e.mammadov@xidmetagentliyi.az",
+       "subject": [ { "text": "სექტემბრის სახელფასო უწყისი" } ],
+       "time": "09:12",
+       "body": [
+        [ { "text": "პატივცემულო მომხმარებელო,", "spot": "greeting" } ],
+        [
+         { "text": "თქვენი სექტემბრის სახელფასო უწყისი მზადაა. " },
+         { "text": "თუ 24 საათის განმავლობაში არ დაადასტურებთ, თქვენი ხელფასის გადახდა შეჩერდება.", "spot": "urgency" }
+        ],
+        [ { "text": "უწყისის ნახვა", "spot": "link", "link": { "label": "უწყისის ნახვა", "href": "https://xidmetagentliyi-az.maas-portal.info/giris" } } ],
+        [ { "text": "ბუღალტერია" } ]
+       ]
+      }
+     },
+     "highlight": "sender-domain",
+     "checkpoint": {
+      "prompt": "რას ამოწმებთ პირველ რიგში საეჭვო წერილში?",
+      "options": [
+       { "id": "address", "label": "გამგზავნის მისამართი", "correct": true, "feedback": "სწორია. ყალბ წერილს ხშირად სწორედ მისამართი ამხელს ყველაზე სწრაფად." },
+       { "id": "logo", "label": "ლოგო და დიზაინი", "correct": false, "feedback": "ლოგოსა და დიზაინის გაყალბება ადვილია. შეამოწმეთ მისამართი." },
+       { "id": "time", "label": "გაგზავნის დრო", "correct": false, "feedback": "დრო არაფერს გეტყვით. თაღლითები დღე-ღამის ნებისმიერ დროს წერენ." }
+      ]
+     }
+    },
+    {
+     "id": "urgency",
+     "say": "ვადა და მუქარა. როცა წერილი გაჩქარებთ, ეს თქვენთვის გაჩერების სიგნალია.",
+     "mood": "alert",
+     "gesture": "point-down",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "xidmet-agentliyi-fake",
+       "from": {
+        "name": [ { "text": "ბუღალტერია" } ],
+        "address": [ { "text": "muhasibat@" }, { "text": "xidmetagentIiyi.az", "spot": "sender-domain" } ]
+       },
+       "to": "e.mammadov@xidmetagentliyi.az",
+       "subject": [ { "text": "სექტემბრის სახელფასო უწყისი" } ],
+       "time": "09:12",
+       "body": [
+        [ { "text": "პატივცემულო მომხმარებელო,", "spot": "greeting" } ],
+        [
+         { "text": "თქვენი სექტემბრის სახელფასო უწყისი მზადაა. " },
+         { "text": "თუ 24 საათის განმავლობაში არ დაადასტურებთ, თქვენი ხელფასის გადახდა შეჩერდება.", "spot": "urgency" }
+        ],
+        [ { "text": "უწყისის ნახვა", "spot": "link", "link": { "label": "უწყისის ნახვა", "href": "https://xidmetagentliyi-az.maas-portal.info/giris" } } ],
+        [ { "text": "ბუღალტერია" } ]
+       ]
+      }
+     },
+     "highlight": "urgency"
+    },
+    {
+     "id": "link",
+     "say": "არ დააჭიროთ. კომპიუტერზე ბმულს კურსორი მიუტანეთ და მისამართი წაიკითხეთ, ტელეფონზე კი საიტი თავად გახსენით.",
+     "mood": "talk",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "xidmet-agentliyi-fake",
+       "from": {
+        "name": [ { "text": "ბუღალტერია" } ],
+        "address": [ { "text": "muhasibat@" }, { "text": "xidmetagentIiyi.az", "spot": "sender-domain" } ]
+       },
+       "to": "e.mammadov@xidmetagentliyi.az",
+       "subject": [ { "text": "სექტემბრის სახელფასო უწყისი" } ],
+       "time": "09:12",
+       "body": [
+        [ { "text": "პატივცემულო მომხმარებელო,", "spot": "greeting" } ],
+        [
+         { "text": "თქვენი სექტემბრის სახელფასო უწყისი მზადაა. " },
+         { "text": "თუ 24 საათის განმავლობაში არ დაადასტურებთ, თქვენი ხელფასის გადახდა შეჩერდება.", "spot": "urgency" }
+        ],
+        [ { "text": "უწყისის ნახვა", "spot": "link", "link": { "label": "უწყისის ნახვა", "href": "https://xidmetagentliyi-az.maas-portal.info/giris" } } ],
+        [ { "text": "ბუღალტერია" } ]
+       ]
+      }
+     },
+     "highlight": "link"
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "morning-inbox",
+   "environment": "inbox",
+   "title": "დილის ფოსტა",
+   "intro": "დილის ცხრა საათია და ხუთი ახალი წერილი გელოდებათ. გახსენით თითოეული და აირჩიეთ სწორი ნაბიჯი.",
+   "steps": [
+    {
+     "id": "payslip",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi-fake",
+      "from": {
+       "name": [ { "text": "ბუღალტერია" } ],
+       "address": [ { "text": "muhasibat@xidmetagentIiyi.az", "reveal": "„agent“-ის შემდეგ დიდი ლათინური „I“ წერია და არა პატარა „l“" } ]
+      },
+      "subject": [ { "text": "სექტემბრის სახელფასო უწყისი" } ],
+      "time": "09:02",
+      "body": [
+       [ { "text": "პატივცემულო მომხმარებელო," } ],
+       [ { "text": "თქვენი სახელფასო უწყისი მზადაა. თუ 24 საათის განმავლობაში არ დაადასტურებთ, ხელფასის გადახდა შეჩერდება." } ],
+       [ { "text": "უწყისის ნახვა", "link": { "label": "უწყისის ნახვა", "href": "https://maas-portal.info/giris" } } ]
+      ]
+     },
+     "say": "გამგზავნის მისამართი ასო-ასო წაიკითხეთ.",
+     "actions": [
+      { "id": "report", "label": "ფიშინგის შესახებ შეტყობინება", "kind": "report", "outcome": "safe", "feedback": "სწორია. მისამართში პატარა l-ის ნაცვლად დიდი I წერია: ეს მსგავსი დომენია." },
+      { "id": "click", "label": "ბმულის გახსნა", "kind": "click-link", "outcome": "compromised", "feedback": "ბმული maas-portal.info-ზე მიდის და არა სააგენტოს საიტზე. იქ აკრეფილი პაროლი თაღლითის ხელში მოხვდება." },
+      { "id": "delete", "label": "წაშლა", "kind": "delete", "outcome": "risky", "feedback": "თქვენ საფრთხე აღარ გემუქრებათ, მაგრამ ეს წერილი კოლეგებმაც მიიღეს. შეატყობინეთ, რომ გუნდმა ის ყველასთვის წაშალოს." }
+     ]
+    },
+    {
+     "id": "report-draft",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi",
+      "from": {
+       "name": [ { "text": "ელვინ მამედოვი" } ],
+       "address": [ { "text": "e.mammadov@xidmetagentliyi.az" } ]
+      },
+      "subject": [ { "text": "ანგარიშის საბოლოო ვერსია" } ],
+      "time": "08:47",
+      "body": [
+       [ { "text": "გამარჯობა, აინურ," } ],
+       [ { "text": "ანგარიშის საბოლოო ვერსია, რომელიც განვიხილეთ, შიდა პორტალზე ავტვირთე. როცა ნახავთ, მომწერეთ." } ]
+      ]
+     },
+     "actions": [
+      { "id": "reply", "label": "პასუხი", "kind": "reply", "outcome": "safe", "feedback": "სწორია. ნაცნობი კოლეგა, სააგენტოს დომენი, არც ბმული და არც აჩქარება." },
+      { "id": "report", "label": "ფიშინგის შესახებ შეტყობინება", "kind": "report", "outcome": "risky", "feedback": "ეს წერილი ნამდვილია: სწორი დომენი და არანაირი თხოვნა." }
+     ]
+    },
+    {
+     "id": "sign-request",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "docusfera-fake",
+      "from": {
+       "name": [ { "text": "DocuSfera" } ],
+       "address": [ { "text": "noreply@docusfera-imza.test" } ]
+      },
+      "subject": [ { "text": "დოკუმენტი თქვენს ხელმოწერას ელოდება" } ],
+      "time": "08:31",
+      "body": [
+       [ { "text": "ხელმძღვანელობამ ხელმოსაწერად გამოგიგზავნათ „Muqavile_2025.pdf“." } ],
+       [ { "text": "სანახავად შედით სამსახურებრივი ელფოსტით." } ],
+       [ { "text": "დოკუმენტის ნახვა", "link": { "label": "დოკუმენტის ნახვა", "href": "https://docusfera-imza.test/doc" } } ]
+      ]
+     },
+     "actions": [
+      { "id": "click", "label": "ბმულის გახსნა", "kind": "click-link", "outcome": "compromised", "feedback": "დომენი docusfera-imza.test იყო და არა თავად სერვისის დომენი. გვერდი, რომელიც იხსნება, თქვენი სამსახურებრივი პაროლის მოსაპარადაა შექმნილი." },
+      { "id": "report", "label": "ფიშინგის შესახებ შეტყობინება", "kind": "report", "outcome": "safe", "feedback": "სწორია: მოულოდნელი თხოვნა ხელმოწერაზე, თანაც უცნაური დომენიდან. თუ ეჭვი გეპარებათ, გამგზავნს ნაცნობ ნომერზე დაურეკეთ." }
+     ]
+    },
+    {
+     "id": "maintenance",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [ { "text": "IT მხარდაჭერა" } ],
+       "address": [ { "text": "it@xidmetagentliyi.az" } ]
+      },
+      "subject": [ { "text": "გეგმური ტექნიკური სამუშაოები" } ],
+      "time": "08:15",
+      "body": [
+       [ { "text": "შაბათს, 20:00-დან 22:00-მდე, ელფოსტა მიუწვდომელი იქნება. თქვენგან არანაირი ქმედება არ არის საჭირო." } ]
+      ]
+     },
+     "actions": [
+      { "id": "ok", "label": "უსაფრთხოდ მონიშვნა", "kind": "mark-safe", "outcome": "safe", "feedback": "სწორია. ოფიციალური მისამართი, არც ბმული და არც რაიმე თხოვნა." },
+      { "id": "report", "label": "ფიშინგის შესახებ შეტყობინება", "kind": "report", "outcome": "risky", "feedback": "ეს წერილი ნამდვილია: ის მხოლოდ ინფორმაციისთვისაა და არაფერს ითხოვს." }
+     ]
+    },
+    {
+     "id": "bonus-list",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi-fake",
+      "from": {
+       "name": [ { "text": "ადამიანური რესურსების სამსახური" } ],
+       "address": [ { "text": "kadrlar@xidmetagentliyi-az.com" } ]
+      },
+      "subject": [ { "text": "სადღესასწაულო პრემიების სია" } ],
+      "time": "07:58",
+      "body": [
+       [ { "text": "პატივცემულო თანამშრომელო," } ],
+       [ { "text": "პრემიის მიმღებთა სია თან ერთვის. დღესვე შეამოწმეთ, არის თუ არა სიაში თქვენი სახელი." } ]
+      ],
+      "attachments": [ { "name": [ { "text": "Mukafat_siyahisi.html" } ], "size": "12 კბ" } ]
+     },
+     "actions": [
+      { "id": "open", "label": "დანართის გახსნა", "kind": "open-attachment", "outcome": "compromised", "feedback": "„სია“ სინამდვილეში .html ფაილია, რომელიც შესვლის ყალბ გვერდს აჩვენებს. თანაც დომენი -az.com-ით მთავრდებოდა." },
+      { "id": "report", "label": "ფიშინგის შესახებ შეტყობინება", "kind": "report", "outcome": "safe", "feedback": "სწორია: უცნაური დომენი, მაცდური თემა და .html დანართი. პრემიების შესახებ HR-ს თავად ჰკითხეთ." }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "find-the-signs",
+   "prompt": "დააჭირეთ სიყალბის ნიშნებს.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "e-xidmet-fake",
+    "from": {
+     "name": [ { "text": "E-Xidmet პორტალი", "reveal": "bildiris@e-xidmet-portal.info" } ],
+     "address": [ { "text": "bildiris@" }, { "text": "e-xidmet-portal.info", "spot": "sender-domain" } ]
+    },
+    "subject": [ { "text": "გადაუხდელი ჯარიმა: ბოლო გაფრთხილება" } ],
+    "time": "11:47",
+    "body": [
+     [ { "text": "პატივცემულო მოქალაქევ,", "spot": "greeting" } ],
+     [ { "text": "საგზაო მოძრაობის წესების დარღვევისთვის თქვენს სახელზე 40 AZN-ის ჯარიმა დაირიცხა." } ],
+     [ { "text": "თუ ჯარიმას 48 საათში არ გადაიხდით, თანხა გაორმაგდება და საქმე სასამართლოს გადაეცემა.", "spot": "threat" } ],
+     [ { "text": "ჯარიმის გადახდა", "spot": "link", "link": { "label": "ჯარიმის გადახდა", "href": "https://e-xidmet-portal.info/cerime?id=58213" } } ]
+    ]
+   },
+   "spots": [
+    { "id": "sender-domain", "label": "უცნობი დომენი", "explain": "ოფიციალური სამსახური ასეთი მისამართიდან არ წერს. სახელი ისეა მოგონილი, რომ ოფიციალური ჩანდეს." },
+    { "id": "greeting", "label": "ზოგადი მიმართვა", "explain": "ნამდვილ შეტყობინებაში, როგორც წესი, თქვენი სახელი და საქმის ნომერი წერია." },
+    { "id": "threat", "label": "მუქარა და ვადა", "explain": "შიში და მოკლე ვადა გაიძულებთ, შეუმოწმებლად გადაიხადოთ." },
+    { "id": "link", "label": "ყალბი ბმული", "explain": "ეს ბმული თქვენი ბარათის მონაცემებს აგროვებს. ჯარიმები ოფიციალურ პორტალზე შეამოწმეთ, რომელსაც თავად გახსნით." }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "first-move",
+   "question": {
+    "prompt": "რას აკეთებთ, როცა საეჭვო წერილს იღებთ?",
+    "options": [
+     { "id": "report", "label": "ვაჭერ ღილაკს „ფიშინგის შესახებ შეტყობინება“", "correct": true, "feedback": "სწორია. ასეთი ღილაკი არ გაქვთ? წერილი IT უსაფრთხოების სამსახურს გადაუგზავნეთ. ასე გუნდი მას ყველასთვის დაბლოკავს." },
+     { "id": "click", "label": "ვხსნი ბმულს, რომ შევამოწმო", "correct": false, "feedback": "ერთმა დაჭერამაც შეიძლება მავნე გვერდი გახსნას. ამის ნაცვლად მისამართი შეამოწმეთ." },
+     { "id": "reply", "label": "ვპასუხობ და გამგზავნს ვეკითხები", "correct": false, "feedback": "თქვენი პასუხი პირდაპირ თაღლითთან მივა. რა თქმა უნდა, ის გეტყვით, რომ ყველაფერი რიგზეა." },
+     { "id": "forward", "label": "ვუგზავნი კოლეგებს, რომ ნახონ", "correct": false, "feedback": "ასე საფრთხეს უფრო ავრცელებთ. შეატყობინეთ და გუნდი თავად შეამოწმებს." }
+    ]
+   },
+   "explain": "როცა საეჭვო წერილის შესახებ შეატყობინებთ, საკუთარ თავსაც იცავთ და კოლეგებსაც. თუ თქვენს ფოსტაში ღილაკი „ფიშინგის შესახებ შეტყობინება“ არ არის, წერილი IT უსაფრთხოების სამსახურს გადაუგზავნეთ."
+  },
+  {
+   "type": "swipe",
+   "id": "safe-or-phish",
+   "prompt": "უსაფრთხოა თუ საფრთხეა?",
+   "cards": [
+    {
+     "id": "card-blocked",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank-fake",
+      "sender": [ { "text": "UlduzBank" } ],
+      "time": "08:03",
+      "messages": [
+       [ { "text": "UlduzBank: თქვენი ბარათი დაიბლოკა. განსაბლოკად შედით: " }, { "text": "https://ulduzbank-az.info/kart" } ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "გამგზავნის სახელის გაყალბება შესაძლებელია, ბმული კი ბანკის საიტზე არ მიდის. თუ ეჭვი გეპარებათ, დარეკეთ ბარათის უკანა მხარეს მითითებულ ნომერზე."
+    },
+    {
+     "id": "meeting",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi",
+      "from": {
+       "name": [ { "text": "ელვინ მამედოვი" } ],
+       "address": [ { "text": "e.mammadov@xidmetagentliyi.az" } ]
+      },
+      "subject": [ { "text": "ხვალინდელი შეხვედრა" } ],
+      "time": "10:21",
+      "body": [
+       [ { "text": "გამარჯობა, აინურ," } ],
+       [ { "text": "ხვალ 10:00-ზე მე-3 ოთახში შევხვდებით. დღის წესრიგი გუშინდელ წერილშია." } ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "ნაცნობი კოლეგა, სწორი მისამართი, არც ბმული და არც თხოვნა. ჩვეულებრივი სამუშაო წერილია."
+    },
+    {
+     "id": "courier",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "cevikkargo-fake",
+      "sender": [ { "text": "+994 70 000 88 31" } ],
+      "time": "13:40",
+      "messages": [
+       [ { "text": "ÇevikKargo: თქვენი ამანათი საწყობშია შეჩერებული. გადაიხადეთ 1,20 AZN-ის საფასური:" }, { "text": "https://cevik-kargo.info/odenis" } ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "მცირე თანხა თქვენს სიფხიზლეს ადუნებს. ნამდვილი მიზანი თქვენი ბარათის მონაცემების მოპარვაა."
+    },
+    {
+     "id": "holidays",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi",
+      "from": {
+       "name": [ { "text": "ადამიანური რესურსების სამსახური" } ],
+       "address": [ { "text": "kadrlar@xidmetagentliyi.az" } ]
+      },
+      "subject": [ { "text": "უქმე დღეები" } ],
+      "time": "16:05",
+      "body": [
+       [ { "text": "ძვირფასო კოლეგებო," } ],
+       [ { "text": "ნოემბრის უქმე დღეების სამუშაო განრიგი შიდა პორტალზეა განთავსებული." } ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "ზოგადი მიმართვა ყოველთვის საფრთხეს არ ნიშნავს. მისამართი სწორია, არც ბმულია და არც აჩქარება."
+    },
+    {
+     "id": "mailbox-full",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek-fake",
+      "from": {
+       "name": [ { "text": "IT მხარდაჭერა" } ],
+       "address": [ { "text": "it-destek@xidmetagentliyi-az.com" } ]
+      },
+      "subject": [ { "text": "თქვენი საფოსტო ყუთი გავსებულია" } ],
+      "time": "07:58",
+      "body": [
+       [ { "text": "თქვენი საფოსტო ყუთი 98%-ით არის სავსე. დღესვე დაადასტურეთ შესვლა, რომ წერილები არ დაკარგოთ." } ],
+       [ { "text": "შესვლის დადასტურება", "link": { "label": "შესვლის დადასტურება", "href": "https://xidmetagentliyi-az.com/poct" } } ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "მისამართი ზედმეტი -az.com-ით მთავრდება, ეს კი სააგენტოს დომენი არ არის. შესვლას ბმულით არავინ ადასტურებს."
+    },
+    {
+     "id": "card-payment",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank",
+      "sender": [ { "text": "UlduzBank" } ],
+      "time": "19:12",
+      "messages": [
+       [ { "text": "UlduzBank: თქვენი ბარათით შესრულდა 23,40 AZN-ის გადახდა. თუ გადახდა თქვენ არ განგიხორციელებიათ, დარეკეთ ბარათის უკანა მხარეს მითითებულ ნომერზე." } ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "ბმული არ არის და გირჩევთ, დარეკოთ ნომერზე, რომელიც უკვე გაქვთ. ჩვეულებრივი შეტყობინებაა."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "შეამოწმეთ მისამართი: თუნდაც ერთი სხვა ასო სიყალბის ნიშანია.",
+    "აჩქარება და მუქარა გაჩერების სიგნალია.",
+    "ბმულები დაჭერამდე შეამოწმეთ, ეჭვის შემთხვევაში კი შეატყობინეთ."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

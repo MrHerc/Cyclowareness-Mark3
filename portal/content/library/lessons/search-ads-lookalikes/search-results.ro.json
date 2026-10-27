@@ -1,0 +1,411 @@
+{
+ "id": "search-results",
+ "title": "Rezultatele căutării",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sr-tutor",
+   "beats": [
+    {
+     "id": "sr-b1",
+     "say": "Bună ziua! Mulți oameni ajung pe site-urile oficiale prin căutare, nu scriind adresa. Escrocii știu și ei asta.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "sr-b2",
+     "say": "Ei plătesc reclame ca să apară chiar în capul listei. Lângă un astfel de rezultat scrie un cuvânt mic: Sponsorizat.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2c-tapan",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Tapan: adeverință de la portalul cetățeanului"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Sponsorizat",
+          "spot": "ad-label"
+         },
+         {
+          "text": "  vetendasportal-gov.example"
+         }
+        ],
+        [
+         {
+          "text": "Vatandash Portal: obțineți adeverința în 5 minute"
+         }
+        ],
+        [
+         {
+          "text": "vetendasportal.gov.az"
+         }
+        ],
+        [
+         {
+          "text": "Vatandash Portal: adeverințe online"
+         }
+        ]
+       ],
+       "buttons": [
+        "Căutați"
+       ]
+      }
+     },
+     "highlight": "ad-label"
+    },
+    {
+     "id": "sr-b3",
+     "say": "Un site fals seamănă foarte mult cu cel real: o literă diferită, un cuvânt în plus sau altă terminație.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "sr-b4",
+     "say": "Verificați o singură dată adresa oficială și salvați-o în marcaje. Apoi deschideți-o mereu de acolo.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "sr-hotspot",
+   "prompt": "Găsiți locurile periculoase din rezultatele căutării.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2c-tapan",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Tapan: adeverință de la portalul cetățeanului"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Sponsorizat",
+       "spot": "ad-label"
+      },
+      {
+       "text": "  "
+      },
+      {
+       "text": "vetendasportal-gov.example",
+       "spot": "lookalike"
+      }
+     ],
+     [
+      {
+       "text": "Site oficial. Obțineți adeverința în 5 minute",
+       "spot": "fake-official"
+      }
+     ],
+     [
+      {
+       "text": "Sponsorizat  "
+      },
+      {
+       "text": "vetendaspotral.example.info",
+       "spot": "typo"
+      }
+     ],
+     [
+      {
+       "text": "Vatandash Portal: conectare și adeverințe"
+      }
+     ],
+     [
+      {
+       "text": "vetendasportal.gov.az"
+      }
+     ],
+     [
+      {
+       "text": "Vatandash Portal: adeverințe online"
+      }
+     ]
+    ],
+    "buttons": [
+     "Căutați"
+    ]
+   },
+   "spots": [
+    {
+     "id": "ad-label",
+     "label": "Eticheta de reclamă",
+     "explain": "Pentru acest rezultat s-a plătit ca să apară primul. Și escrocii pot cumpăra reclame, așa că nu vă conectați niciodată printr-o reclamă."
+    },
+    {
+     "id": "lookalike",
+     "label": "Cuvânt în plus",
+     "explain": "La adresă s-a adăugat cuvântul gov, dar terminația este alta. Adresa portalului oficial se termină în gov.az."
+    },
+    {
+     "id": "fake-official",
+     "label": "Mențiune oficială falsă",
+     "explain": "Oricine poate scrie cuvintele „site oficial”. Ce este oficial arată finalul adresei, nu textul."
+    },
+    {
+     "id": "typo",
+     "label": "Litere inversate",
+     "explain": "Două litere din cuvântul portal și-au schimbat locul. Când vă grăbiți, este greu de observat."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "sr-choice",
+   "question": {
+    "prompt": "Vă conectați des la portalul cetățeanului. Care este calea cea mai sigură?",
+    "options": [
+     {
+      "id": "bookmark",
+      "label": "Verific o singură dată adresa oficială și o salvez în marcaje",
+      "correct": true,
+      "feedback": "Corect. Un marcaj deschide de fiecare dată aceeași adresă, iar reclamele nu mai au niciun rol."
+     },
+     {
+      "id": "first-result",
+      "label": "Caut de fiecare dată și apăs pe primul rezultat",
+      "correct": false,
+      "feedback": "Primul rezultat poate fi o reclamă. Escrocii se bazează exact pe acest obicei."
+     },
+     {
+      "id": "sms-link",
+      "label": "Folosesc linkul primit prin SMS",
+      "correct": false,
+      "feedback": "Oricine poate trimite un link prin SMS. Deschideți chiar dumneavoastră site-ul oficial."
+     }
+    ]
+   },
+   "explain": "Salvați în marcaje site-urile pe care le folosiți des. Astfel, nici rezultatele căutării, nici reclamele nu vă mai pot păcăli."
+  },
+  {
+   "type": "simulation",
+   "id": "sr-sim",
+   "environment": "browser",
+   "title": "Descărcarea unui program",
+   "intro": "Mâine aveți o întâlnire online și trebuie să descărcați aplicația Gorush. Începeți cu o căutare.",
+   "steps": [
+    {
+     "id": "results",
+     "label": "Descărcare Gorush: rezultatele căutării",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tapan",
+      "url": [
+       {
+        "text": "https://tapan.example/axtar?q=gorus+yukle",
+        "reveal": "tapan.example"
+       }
+      ]
+     },
+     "say": "Sus este o reclamă, iar sub ea, site-ul propriu al aplicației.",
+     "actions": [
+      {
+       "id": "ad",
+       "label": "Sponsorizat: gorus-app-download.example.net",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Reclama v-a dus pe alt site. Nu este prea târziu: uitați-vă la adresă.",
+       "next": "fake-site"
+      },
+      {
+       "id": "organic",
+       "label": "gorus.example: site oficial",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Corect. Ați sărit peste reclamă și ați deschis site-ul propriu al aplicației.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "fake-site",
+     "label": "Gorush: descărcare gratuită",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-gorus-fake",
+      "url": [
+       {
+        "text": "https://gorus-app-download.example.net/yukle",
+        "reveal": "gorus-app-download.example.net"
+       }
+      ]
+     },
+     "say": "Pagina seamănă mult cu site-ul real. Uitați-vă la adresă.",
+     "actions": [
+      {
+       "id": "download",
+       "label": "Descărcați",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Acest site nu aparține producătorului aplicației. Nu vă puteți încrede într-un program de instalare descărcat de aici.",
+       "next": "fake-file"
+      },
+      {
+       "id": "leave",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Adresa nu era a site-ului propriu al aplicației. Mergeți chiar dumneavoastră pe site-ul oficial.",
+       "next": "real-site"
+      },
+      {
+       "id": "check",
+       "label": "Verificați adresa",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Numele seamănă, dar domeniul este altul. Nu aveți încredere în acest site.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "fake-file",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "w2c-gorus-fake",
+      "name": [
+       {
+        "text": "GorusSetup_2026.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "84 MB",
+      "source": [
+       {
+        "text": "gorus-app-download.example.net"
+       }
+      ]
+     },
+     "say": "Fișierul s-a descărcat. Îl deschideți?",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Pe lângă aplicație, acest program de instalare pune pe computer și un program care fură parole. Nu deschideți niciodată un fișier de pe un site fals.",
+       "next": "after-bad"
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. Ștergeți fișierul, anunțați suportul IT și luați aplicația de pe site-ul oficial.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "after-bad",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "qoruyucu",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Qoruyucu: program suspect"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "GorusSetup_2026.exe a încercat să citească parolele salvate în browser."
+        }
+       ]
+      ],
+      "buttons": [
+       "Puneți în carantină",
+       "Închideți"
+      ]
+     },
+     "say": "Antivirusul a găsit ceva. Acum acționați repede.",
+     "actions": [
+      {
+       "id": "isolate",
+       "label": "Deconectați computerul de la rețea și sunați la suportul IT",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă procedura dumneavoastră nu prevede altceva, deconectați computerul de la rețea fără să-l opriți și sunați imediat."
+      },
+      {
+       "id": "ignore",
+       "label": "Închideți și lucrați mai departe",
+       "kind": "cancel",
+       "outcome": "compromised",
+       "feedback": "Programul rulează în continuare și vă poate trimite parolele escrocilor. Raportați imediat."
+      }
+     ]
+    },
+    {
+     "id": "real-site",
+     "label": "Gorush: descărcare pentru computer",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "gorus",
+      "url": [
+       {
+        "text": "https://gorus.example/yukle",
+        "reveal": "gorus.example"
+       }
+      ]
+     },
+     "say": "Acesta este site-ul propriu al aplicației.",
+     "actions": [
+      {
+       "id": "ask-it",
+       "label": "Cereți suportului IT să o instaleze",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Aceasta este cea mai bună cale. Pe un computer de serviciu, programele le instalează suportul IT.",
+       "next": "results"
+      },
+      {
+       "id": "download",
+       "label": "Descărcați",
+       "kind": "install",
+       "outcome": "safe",
+       "feedback": "Corect, acesta este site-ul oficial. Pe un computer de serviciu, verificați mai întâi regulile suportului IT.",
+       "next": "results"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "sr-recap",
+   "points": [
+    "Pentru conectare, folosiți un marcaj, nu o reclamă",
+    "Citiți finalul adresei și comparați-l cu adresa oficială",
+    "Luați programe doar de pe site-ul oficial sau de la suportul IT"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

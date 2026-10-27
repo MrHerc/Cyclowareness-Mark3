@@ -12,9 +12,11 @@ export function svgLogoProblem(svg: string): "script" | "handler" | "external_re
   for (const m of svg.matchAll(/(?:^|[\s"'/])(?:xlink:)?href\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]*))/gi)) {
     if (!fragmentOnly(m[1] ?? m[2] ?? m[3] ?? "")) return "external_ref";
   }
-  // url(...) in presentation attributes, style attributes and <style> blocks.
-  for (const m of svg.matchAll(/url\(\s*(?:"([^"]*)"|'([^']*)'|([^)]*))\s*\)/gi)) {
-    if (!fragmentOnly(m[1] ?? m[2] ?? m[3] ?? "")) return "external_ref";
+  // url(...) in presentation attributes, style attributes and <style> blocks: the value, quoted or bare,
+  // must start with "#". Only that first character is read: capturing up to ")" re-scans the rest of the
+  // file from every unclosed "url(" (quadratic, minutes of blocked server for a 512 KB logo).
+  for (const m of svg.matchAll(/url\(\s*["']?\s*(#?)/gi)) {
+    if (!m[1]) return "external_ref";
   }
   if (/@import\b/i.test(svg)) return "external_ref";
   return null;

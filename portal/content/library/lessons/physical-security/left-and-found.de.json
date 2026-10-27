@@ -1,0 +1,323 @@
+{
+ "id": "left-and-found",
+ "title": "Vergessen und gefunden",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "usb",
+     "say": "Ein USB-Stick, der auf dem Flur liegt, ist kein Geschenk. Schließen Sie ihn nie an, sondern geben Sie ihn beim Sicherheitsteam ab.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "shoulder",
+     "say": "Vielleicht schaut Ihnen jemand über die Schulter und beobachtet Bildschirm und Tastatur. Sehen Sie sich um, bevor Sie ein Passwort eingeben.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "laptop",
+     "say": "Lassen Sie einen Laptop nie allein im Auto oder im Café. Für Diebe ist er die leichteste Beute.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     }
+    },
+    {
+     "id": "check",
+     "say": "Prüfen Sie Ihren Platz, bevor Sie gehen: Unterlagen weggeschlossen, Geräte gesperrt, Ausdrucke abgeholt.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "desk-pc",
+   "environment": "desktop",
+   "title": "Am Arbeitsplatz",
+   "intro": "Sie sitzen an Ihrem Schreibtisch. Entscheiden Sie über einen gefundenen USB-Stick, einen Druckauftrag und das Verlassen Ihres Platzes.",
+   "steps": [
+    {
+     "id": "usb-found",
+     "label": "Am Aufzug gefunden",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Ixtisar_siyahisi_2026.xlsx"
+       }
+      ],
+      "type": "lnk",
+      "size": "3 KB",
+      "source": [
+       {
+        "text": "USB: ARXIV (F:)"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "plug",
+       "label": "Anschließen und nachsehen",
+       "kind": "plug-in",
+       "outcome": "risky",
+       "feedback": "Der Dateiname – angeblich eine Liste mit Stellenstreichungen – ist ein Köder für Ihre Neugier. Schließen Sie keinen gefundenen USB-Stick an."
+      },
+      {
+       "id": "hand-in",
+       "label": "Beim Sicherheitsteam abgeben",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Schließen Sie ein gefundenes Gerät nie an – überlassen Sie es den Fachleuten.",
+       "next": "print-done"
+      }
+     ]
+    },
+    {
+     "id": "usb-file",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Ixtisar_siyahisi_2026.xlsx"
+       }
+      ],
+      "type": "lnk",
+      "size": "3 KB",
+      "source": [
+       {
+        "text": "USB: ARXIV (F:)"
+       }
+      ]
+     },
+     "say": "Achten Sie auf den tatsächlichen Dateityp.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Öffnen",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Das ist keine Tabelle, sondern eine Verknüpfung. Beim Öffnen wird ein versteckter Befehl ausgeführt."
+      },
+      {
+       "id": "eject",
+       "label": "Gerät auswerfen",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Richtig entschieden. Werfen Sie den Stick aus, ohne etwas zu öffnen, und geben Sie ihn beim Sicherheitsteam ab."
+      }
+     ]
+    },
+    {
+     "id": "print-done",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "db-cap-xidmeti",
+      "app": "Druckdienst",
+      "title": [
+       {
+        "text": "Ihr Dokument wurde gedruckt"
+       }
+      ],
+      "body": [
+       {
+        "text": "Vetendas_muracietleri.pdf, gemeinsam genutzter Drucker, 3. Stock"
+       }
+      ],
+      "time": "11:20"
+     },
+     "actions": [
+      {
+       "id": "collect",
+       "label": "Ich hole es sofort ab",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Wer am gemeinsam genutzten Drucker vorbeikommt, kann lesen, was dort liegt."
+      },
+      {
+       "id": "later",
+       "label": "Ich hole es heute Abend ab",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Die Bürgerdaten liegen dann stundenlang im Drucker. Holen Sie Ausdrucke sofort ab."
+      }
+     ]
+    },
+    {
+     "id": "leave-desk",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Bürgerdaten sind auf dem Bildschirm geöffnet"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Der Computer sperrt sich in 15 Minuten automatisch."
+        }
+       ]
+      ],
+      "buttons": [
+       "Bildschirm sperren",
+       "Offen lassen"
+      ]
+     },
+     "say": "Sie stehen auf, um zum Drucker zu gehen.",
+     "actions": [
+      {
+       "id": "lock",
+       "label": "Bildschirm sperren",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. Mit der Windows-Taste und L sperren Sie den Bildschirm in einer Sekunde."
+      },
+      {
+       "id": "leave",
+       "label": "Offen lassen, ich bin in zwei Minuten zurück",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Zwei Minuten reichen, damit jemand die Daten liest oder verschickt."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "cafe-laptop",
+   "title": "Laptop im Café",
+   "start": "cafe",
+   "nodes": [
+    {
+     "id": "cafe",
+     "text": "Sie arbeiten in einem Café an Ihrem Dienstlaptop. Sie müssen kurz zur Theke, um Ihre Bestellung abzuholen.",
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     },
+     "choices": [
+      {
+       "label": "Ich lasse ihn aufgeklappt, es dauert ja nur eine Minute",
+       "outcome": "compromised",
+       "feedback": "Eine Minute reicht, um ihn zu stehlen, und auf dem offenen Bildschirm liegen die Daten frei."
+      },
+      {
+       "label": "Ich bitte die Person am Nebentisch, darauf aufzupassen",
+       "outcome": "risky",
+       "feedback": "Eine fremde Person ist nicht für Ihr Gerät verantwortlich. Nehmen Sie den Laptop mit."
+      },
+      {
+       "label": "Ich klappe den Laptop zu und nehme ihn mit",
+       "next": "neighbour",
+       "feedback": "Richtig. Das Gerät bleibt immer bei Ihnen."
+      }
+     ]
+    },
+    {
+     "id": "neighbour",
+     "text": "Entschuldigung, ich habe auf Ihrem Bildschirm gesehen, dass Sie bei der Behörde arbeiten. Wie heißt denn Ihr Chef? Ich habe dort etwas zu erledigen.",
+     "speaker": "Mann am Nebentisch",
+     "voice": "man-2",
+     "channel": "in-person",
+     "spoken": "Entschuldigung, ich habe auf Ihrem Bildschirm gesehen, dass Sie bei der Behörde arbeiten. <breath> Wie heißt denn Ihr Chef? Ich habe dort etwas zu erledigen.",
+     "choices": [
+      {
+       "label": "Ich nenne Namen und Durchwahl meiner Führungskraft",
+       "outcome": "risky",
+       "feedback": "Geben Sie Fremden keine internen Details. Solche Angaben dienen später als Köder für einen Anruf oder eine E-Mail."
+      },
+      {
+       "label": "Ich verweise ihn auf die Nummer des Empfangs auf der offiziellen Website",
+       "outcome": "safe",
+       "feedback": "Höflich und ohne interne Details – gut gemacht. Halten Sie Ihren Bildschirm außerdem von fremden Blicken fern."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "found-usb",
+   "prompt": "Sie haben auf dem Flur einen USB-Stick gefunden. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "no-plug",
+     "label": "Ihn an keinen Computer anschließen"
+    },
+    {
+     "id": "note",
+     "label": "Notieren, wo und wann Sie ihn gefunden haben"
+    },
+    {
+     "id": "hand-in",
+     "label": "Ihn beim Sicherheitsteam abgeben"
+    },
+    {
+     "id": "warn",
+     "label": "Kolleginnen und Kollegen warnen, ähnliche Sticks nicht anzuschließen"
+    }
+   ],
+   "explain": "Ein gefundenes Gerät ist ein Beweisstück: Geben Sie es so ab, wie es ist, ohne es zu öffnen."
+  },
+  {
+   "type": "match",
+   "id": "left-behind",
+   "prompt": "Ordnen Sie jeder Situation den richtigen Schritt zu.",
+   "pairs": [
+    {
+     "id": "car",
+     "left": "Der Laptop liegt auf dem Autositz",
+     "right": "Mitnehmen"
+    },
+    {
+     "id": "draft",
+     "left": "Eine vertrauliche Entwurfsseite",
+     "right": "In den Aktenvernichter geben"
+    },
+    {
+     "id": "watcher",
+     "left": "Jemand schaut auf Ihren Bildschirm",
+     "right": "Bildschirm wegdrehen oder sperren"
+    },
+    {
+     "id": "badge-desk",
+     "left": "Ihr Ausweis liegt auf dem Schreibtisch",
+     "right": "Immer bei sich tragen"
+    }
+   ],
+   "explain": "Alles, was unbeaufsichtigt bleibt, ist eine Gelegenheit für Angreifer."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Schließen Sie nie einen gefundenen USB-Stick an – geben Sie ihn beim Sicherheitsteam ab.",
+    "Sperren Sie den Bildschirm, wenn Sie aufstehen, und holen Sie Ausdrucke sofort ab.",
+    "Lassen Sie Laptops und Unterlagen nie unbeaufsichtigt."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

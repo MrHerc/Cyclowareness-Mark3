@@ -1,0 +1,281 @@
+{
+ "id": "unknown-usb",
+ "title": "Bilinmeyen USB bellek",
+ "minutes": 2,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "curiosity",
+     "say": "Yerde bulunan bir USB bellek insanları meraklandırır. Saldırganlar da tam olarak buna güvenir.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "plug-is-enough",
+     "say": "Takmak bile yetebilir. Bazı cihazlar kendini klavye gibi gösterir ve komutları kendi kendine yazar.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "hand-over",
+     "say": "Bu yüzden bulduğunuz bir belleği asla takmayın. Güvenlik ekibine teslim edin.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "approved",
+     "say": "İş yerinde yalnızca BT destek ekibinizin verdiği ya da onayladığı bellekleri kullanın.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "charging",
+     "say": "Halka açık yerlerde telefonunuzu kendi adaptörünüzle, duvardaki prizden şarj edin. Telefonunuz bir cihaza güvenip güvenmeyeceğinizi sorarsa reddedin.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "courier-sms",
+   "prompt": "Bu mesajdaki uyarı işaretlerini bulun.",
+   "artifact": {
+    "kind": "sms",
+    "sender": [
+     {
+      "text": "+994 51 000 77 63",
+      "spot": "number"
+     }
+    ],
+    "time": "09:48",
+    "messages": [
+     [
+      {
+       "text": "Merhaba, ben Nigar, müdürün yeni asistanıyım."
+      }
+     ],
+     [
+      {
+       "text": "Masanıza bir USB bellek bıraktık, "
+      },
+      {
+       "text": "içinde müdürün sunumu var.",
+       "spot": "authority"
+      }
+     ],
+     [
+      {
+       "text": "Lütfen hemen takıp dosyayı açın, ",
+       "spot": "action"
+      },
+      {
+       "text": "toplantı 10 dakika sonra başlıyor.",
+       "spot": "urgent"
+      }
+     ],
+     [
+      {
+       "text": "Kimseye söylemeyin, sürpriz olacak.",
+       "spot": "secret"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "number",
+     "label": "Bilinmeyen numara",
+     "explain": "Bir iş talebi, tanımadığınız kişisel bir numaradan geliyor."
+    },
+    {
+     "id": "authority",
+     "label": "Müdürün adı",
+     "explain": "Acele edip kontrolleri atlamanız için müdür öne sürülüyor."
+    },
+    {
+     "id": "action",
+     "label": "Takın ve açın",
+     "explain": "Bilinmeyen bir belleği takmanızın istenmesi asıl tehlikedir."
+    },
+    {
+     "id": "urgent",
+     "label": "Zaman baskısı",
+     "explain": "On dakika size düşünecek zaman bırakmaz."
+    },
+    {
+     "id": "secret",
+     "label": "Gizlilik",
+     "explain": "Gizlilik istenmesi, durumu kontrol etmenizi engeller."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "scenario",
+   "id": "car-park-drive",
+   "title": "Otoparktaki USB bellek",
+   "start": "found",
+   "nodes": [
+    {
+     "id": "found",
+     "text": "Sabah otoparkta üzerinde “Maaşlar 2026, gizli” yazan bir USB bellek buluyorsunuz.",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     },
+     "choices": [
+      {
+       "label": "Ne olduğunu görmek için iş bilgisayarıma takarım",
+       "outcome": "compromised",
+       "feedback": "Bellek zararlı yazılım çalıştırdı. “Gizli” yazısı sizi meraklandırmak içindi."
+      },
+      {
+       "label": "Evdeki bilgisayarımda kontrol ederim",
+       "outcome": "risky",
+       "feedback": "Evdeki cihazınıza da virüs bulaşabilir, üstelik iş hesaplarınız orada da açık olabilir."
+      },
+      {
+       "label": "Güvenlik ekibine götürürüm",
+       "next": "colleague",
+       "feedback": "Doğru seçim."
+      }
+     ]
+    },
+    {
+     "id": "colleague",
+     "text": "Bana verin, ben bir bakayım. Bilgisayarımda antivirüs var.",
+     "speaker": "Tural (iş arkadaşı)",
+     "voice": "man-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Bana verin, ben bir bakayım. <breath> Bilgisayarımda antivirüs var.",
+     "choices": [
+      {
+       "label": "Veririm, antivirüs onu korur",
+       "outcome": "risky",
+       "feedback": "Antivirüs her saldırıyı yakalamaz, özellikle klavye gibi davranan cihazları."
+      },
+      {
+       "label": "Kibarca reddeder ve belleği teslim ederim",
+       "next": "security",
+       "feedback": "Çok iyi. Kural herkes için aynı."
+      }
+     ]
+    },
+    {
+     "id": "security",
+     "text": "Teşekkür ederiz. Bu tür cihazları ağdan yalıtılmış bir bilgisayarda ayrıca kontrol ediyoruz.",
+     "speaker": "Güvenlik ekibi",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Teşekkür ederiz. <breath> Bu tür cihazları ağdan yalıtılmış bir bilgisayarda ayrıca kontrol ediyoruz.",
+     "choices": [
+      {
+       "label": "Belleği nerede ve ne zaman bulduğumu anlatırım",
+       "outcome": "safe",
+       "feedback": "Harika. Böylece başka bellekler olup olmadığını araştırabilirler."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "airport-charging",
+   "question": {
+    "prompt": "Havalimanında telefonunuzun şarjı bitmek üzere. Hangi seçenekler güvenli?",
+    "options": [
+     {
+      "id": "own-adapter",
+      "label": "Kendi adaptörümü duvardaki prize takarım",
+      "correct": true,
+      "feedback": "En basit ve en güvenli yol."
+     },
+     {
+      "id": "power-bank",
+      "label": "Kendi taşınabilir şarj cihazımla şarj ederim",
+      "correct": true,
+      "feedback": "Harika, işin içinde bilinmeyen bir cihaz yok."
+     },
+     {
+      "id": "strangers-cable",
+      "label": "Bir yabancının ödünç verdiği kabloyu kullanırım",
+      "correct": false,
+      "feedback": "Bir yabancının kablosunun içinde bir cihaz gizlenmiş olabilir."
+     },
+     {
+      "id": "trust-yes",
+      "label": "Cihaza güvenmem istendiğinde “Evet” düğmesine dokunurum",
+      "correct": false,
+      "feedback": "Bu, cihaza verilerinize erişim izni verir. Şarj etmek için güvenmeye gerek yoktur."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "phone-lock"
+    }
+   },
+   "explain": "Halka açık USB girişleri üzerinden yapılan saldırılar nadirdir, ama korunmak kolaydır: kendi adaptörünüzü kullanın ve cihaza güvenmeyin."
+  },
+  {
+   "type": "match",
+   "id": "media-rules",
+   "prompt": "Her durumu doğru adımla eşleştirin.",
+   "pairs": [
+    {
+     "id": "gift-drive",
+     "left": "Bir konferansta hediye edilen USB bellek",
+     "right": "Önce BT destek ekibine kontrol ettirin"
+    },
+    {
+     "id": "carry-files",
+     "left": "İş dosyalarını eve götürmeniz gerekiyor",
+     "right": "Onaylı bir depolama aracı ya da onaylı bulutu kullanın"
+    },
+    {
+     "id": "courier",
+     "left": "Bir kurye müdür için USB bellek getiriyor",
+     "right": "Belleği güvenlik ekibine teslim edin"
+    },
+    {
+     "id": "lost",
+     "left": "İş için kullandığınız USB belleği kaybettiniz",
+     "right": "Hemen bildirin"
+    }
+   ],
+   "explain": "Bilinmeyen depolama araçları asla takılmaz, iş verileri yalnızca onaylı yollarla taşınır."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Bulduğunuz ya da tanımadığınız bir belleği asla takmayın, teslim edin.",
+    "İş yerinde yalnızca onaylı depolama araçlarını kullanın.",
+    "Kendi adaptörünüzle şarj edin ve tanımadığınız cihazlara asla güvenmeyin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

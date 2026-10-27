@@ -63,7 +63,7 @@ export default async function ApprovalsPage({ searchParams }: PageProps<"/admin/
                       <Pill tone={m.origin === "ai" ? "violet" : m.origin === "template" ? "cyan" : "brand"}>{tr(`origin.${m.origin}`)}</Pill>
                       {m.sourceRef ? <Pill>{m.sourceRef}</Pill> : null}
                       {m.requiresTwo ? <Pill tone="warn">{tr("requiresTwo")}</Pill> : null}
-                      <span className="ml-auto text-tab text-ink-subtle">{format.dateTime(m.createdAt, { dateStyle: "medium" })}</span>
+                      <span className="ms-auto text-tab text-ink-subtle">{format.dateTime(m.createdAt, { dateStyle: "medium" })}</span>
                     </div>
                     <div>
                       <h2 className="text-title-sm font-semibold">{m.title}</h2>

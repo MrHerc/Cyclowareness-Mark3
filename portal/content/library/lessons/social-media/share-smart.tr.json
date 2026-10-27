@@ -1,0 +1,369 @@
+{
+  "id": "share-smart",
+  "title": "Akıllıca paylaşın",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Merhaba! Sosyal medyada paylaştığınız her fotoğraf ve her cümle, birileri için bir bilgidir. Gelin, birlikte bakalım.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Ofiste çekilmiş bir fotoğrafta giriş kartınız, açık bir ekran ya da beyaz tahtadaki notlar görünebilir. Bunlar bir saldırı için hazır malzemedir.",
+          "mood": "alert",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        },
+        {
+          "id": "b3",
+          "say": "Seyahatlerinizi önceden duyurmayın: bu, herkese evinizin boş olduğunu ve size ulaşmanın zor olduğunu söyler. Fotoğrafları döndükten sonra paylaşın.",
+          "mood": "think",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "travel"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Sahte profiller de vardır. Hayalinizdeki işi sunan bir işe alım uzmanı, aslında kurumunuz hakkında bilgi topluyor olabilir. Profilin ne zaman açıldığına bakın.",
+          "mood": "alert",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "app": "generic",
+              "contact": [
+                {
+                  "text": "Reşad Memmedli"
+                },
+                {
+                  "text": " · NovaHire Group, 3 bağlantı",
+                  "spot": "profile"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "them",
+                  "body": [
+                    {
+                      "text": "Merhaba! Profilinizi gördüm. Yurt dışında yüksek maaşlı bir iş tam size göre."
+                    }
+                  ],
+                  "time": "11:02"
+                }
+              ]
+            }
+          },
+          "highlight": "profile"
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "safe-post",
+      "question": {
+        "prompt": "Hangi paylaşım en güvenli?",
+        "options": [
+          {
+            "id": "badge-selfie",
+            "label": "Ofiste yeni giriş kartımla çektiğim bir selfie",
+            "correct": false,
+            "feedback": "Kartın tasarımı, adınız ve göreviniz görünüyor. Bu, sahte bir kart için hazır bir şablondur."
+          },
+          {
+            "id": "trip-plan",
+            "label": "“Yarından itibaren bir haftalığına tatildeyim”",
+            "correct": false,
+            "feedback": "Bu paylaşım, evinizin ne zaman boş olduğunu ve size ne zaman ulaşılamayacağını herkese söyler."
+          },
+          {
+            "id": "after-trip",
+            "label": "Döndükten sonra paylaştığım bir doğa fotoğrafı",
+            "correct": true,
+            "feedback": "Doğru. Yer ve zaman geçmişte kalmış, işle ilgili hiçbir şey de görünmüyor."
+          },
+          {
+            "id": "desk-photo",
+            "label": "Arkada monitörü açık duran masam",
+            "correct": false,
+            "feedback": "Ekrandaki bir belge, e-posta ya da sistem adı, fotoğraf yakınlaştırılarak okunabilir."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "eye"
+        }
+      },
+      "explain": "Paylaşmadan önce arka plana bakın: kart, ekran, beyaz tahta, kâğıtlar."
+    },
+    {
+      "type": "hotspot",
+      "id": "fake-recruiter",
+      "prompt": "Sahte işe alım uzmanının uyarı işaretlerini bulun.",
+      "artifact": {
+        "kind": "chat",
+        "app": "generic",
+        "contact": [
+          {
+            "text": "Reşad Memmedli"
+          },
+          {
+            "text": " · NovaHire Group, 3 bağlantı",
+            "spot": "profile"
+          }
+        ],
+        "messages": [
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Merhaba! Profilinizi gördüm. "
+              },
+              {
+                "text": "Yurt dışında aylık 6.000 dolar maaşlı bir iş sizi bekliyor.",
+                "spot": "too-good"
+              }
+            ],
+            "time": "11:02"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Görüşmeden önce kısa bir soru: "
+              },
+              {
+                "text": "kurumunuz hangi e-posta sistemini ve hangi yazılımları kullanıyor?",
+                "spot": "internal-info"
+              }
+            ],
+            "time": "11:03"
+          },
+          {
+            "from": "them",
+            "body": [
+              {
+                "text": "Formu iş e-postanızla doldurun: "
+              },
+              {
+                "text": "novahire-careers.example.net/apply",
+                "spot": "link"
+              },
+              {
+                "text": " Kontenjan sınırlı, başvurular bugün kapanıyor.",
+                "spot": "urgency"
+              }
+            ],
+            "time": "11:04"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "profile",
+          "label": "Yeni profil, az bağlantı",
+          "explain": "Gerçek işe alım uzmanlarının genellikle uzun bir geçmişi ve ortak bağlantıları olur. Üç bağlantılı bir profil daha yeni açılmıştır."
+        },
+        {
+          "id": "too-good",
+          "label": "Gerçek olamayacak kadar iyi",
+          "explain": "Daha görüşme bile yapılmadan teklif edilen yüksek maaş bir yemdir. Heyecan, tetikte olmanızı zorlaştırır."
+        },
+        {
+          "id": "internal-info",
+          "label": "Kurumunuzla ilgili sorular",
+          "explain": "Bir işe alım uzmanının kurumunuzun sistemlerini bilmesine gerek yoktur. Bu, saldırı öncesinde yapılan bir keşiftir."
+        },
+        {
+          "id": "link",
+          "label": "İş e-postanızı isteyen dış bağlantı",
+          "explain": "İş e-postanızı dışarıdaki bir forma girmek, adresinizi oltalama (phishing) listelerine ekler. Form ayrıca parolanızı da isteyebilir."
+        },
+        {
+          "id": "urgency",
+          "label": "Aceleye getirme baskısı",
+          "explain": "“Bugün kapanıyor” ifadesi, durup düşünmemeniz için oraya yazılmıştır."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "messages",
+      "prompt": "Bu mesaj güvenli mi, yoksa bir tehdit mi?",
+      "cards": [
+        {
+          "id": "vote-code",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Günel Rzayeva"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Selam! Kızım bir yarışmaya katılıyor, ne olur ona oy ver. SMS ile bir kod gelecek, onu bana gönder."
+                  }
+                ],
+                "time": "20:14"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "O kod, hesabınızın anahtarıdır. Mesaj bir arkadaşınızın hesabından gelse bile kodu asla paylaşmayın."
+        },
+        {
+          "id": "login-alert",
+          "artifact": {
+            "kind": "sms",
+            "sender": [
+              {
+                "text": "Kontakto"
+              }
+            ],
+            "time": "08:30",
+            "messages": [
+              [
+                {
+                  "text": "Hesabınıza yeni bir giriş yapıldı: Bakü, telefon. Bu siz değilseniz uygulamada Güvenlik bölümünü açın."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Bağlantı yok, kod istenmiyor; mesaj sizi uygulamanın kendisine yönlendiriyor. Kontrolü uygulamanın içinden yapın."
+        },
+        {
+          "id": "boss-number",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Kamran Aliyev · ortak kişi yok"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Merhaba, aynı alanda çalışıyoruz. Departman müdürünüzün cep numarasını gönderebilir misiniz?"
+                  }
+                ],
+                "time": "15:47"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Tanımadığınız biri yöneticinize ulaşmanın yolunu arıyor. İletişim bilgilerini yalnızca resmî kanallardan verin."
+        },
+        {
+          "id": "meeting-moved",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Aysel Guliyeva (iş arkadaşı)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Yarınki toplantı 11'e alındı, oda aynı."
+                  }
+                ],
+                "time": "17:05"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Tanıdık bir iş arkadaşı, bir istek yok, hassas bir bilgi yok. Bu mesaj güvenli."
+        },
+        {
+          "id": "press-office",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Resmî Basın Ofisi"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hesabınızı doğrulamak için unvanınızı, iş e-postanızı ve doğum tarihinizi gönderin."
+                  }
+                ],
+                "time": "10:21"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Resmî kurumlar bu bilgileri sosyal medyada istemez. Yanıt vermeyin ve profili bildirin."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "privacy",
+      "prompt": "Her ayarı size sağladığı korumayla eşleştirin.",
+      "pairs": [
+        {
+          "id": "friends-only",
+          "left": "Profil yalnızca arkadaşlara açık",
+          "right": "Yabancılar fotoğraflarınızı göremez"
+        },
+        {
+          "id": "location-off",
+          "left": "Konum kapalı",
+          "right": "Kimse nerede olduğunuzu göremez"
+        },
+        {
+          "id": "tag-review",
+          "left": "Etiketler önce onayınıza gelir",
+          "right": "Kimse sizi onayınız olmadan etiketleyemez"
+        },
+        {
+          "id": "two-step",
+          "left": "İki adımlı doğrulama",
+          "right": "Parolanız sızsa bile hesabınız güvende kalır"
+        }
+      ],
+      "explain": "Bu ayarları zaman zaman kontrol edin. Uygulamalara eklenen yeni özellikler ayarlarınızı değiştirebilir."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Arka plana bakın: kart, ekran, kâğıtlar.",
+        "Seyahat fotoğraflarını döndükten sonra paylaşın.",
+        "Tanımadığınız kişilere asla iş bilgisi ya da kod vermeyin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

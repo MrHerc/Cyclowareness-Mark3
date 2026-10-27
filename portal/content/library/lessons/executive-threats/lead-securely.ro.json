@@ -1,0 +1,433 @@
+{
+  "id": "lead-securely",
+  "title": "Un lider protejat",
+  "minutes": 4,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Atacatorii îi aleg intenționat pe lideri. O singură semnătură sau un singur apel de la dumneavoastră poate pune în mișcare sume mari și decizii importante.",
+          "mood": "think",
+          "gesture": "wave",
+          "visual": { "kind": "illustration", "id": "ceo" }
+        },
+        {
+          "id": "b2",
+          "say": "Acest atac se numește whaling. E-mailul este adaptat funcției și discursurilor dumneavoastră, așa că pare foarte convingător.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "from": {
+                "name": [{ "text": "Fondul de Cooperare Internațională" }],
+                "address": [
+                  { "text": "director@" },
+                  { "text": "intl-cooperation-fund.example.net", "spot": "domain" }
+                ]
+              },
+              "to": "Anar Hasanov",
+              "subject": [{ "text": "Strict personal: invitație ca vorbitor principal" }],
+              "time": "08:05",
+              "body": [
+                [{ "text": "Stimate domnule Hasanov," }],
+                [{ "text": "V-am urmărit interviul televizat de săptămâna trecută și ne-am dori să fiți vorbitorul nostru principal.", "spot": "public-info" }],
+                [
+                  { "text": "Pentru a vedea programul, conectați-vă cu contul de serviciu: " },
+                  { "text": "forum-portal.example.net/login", "spot": "login-link" }
+                ],
+                [{ "text": "Invitația este confidențială, vă rugăm să nu o transmiteți asistentului dumneavoastră.", "spot": "bypass" }]
+              ]
+            }
+          },
+          "highlight": "public-info"
+        },
+        {
+          "id": "b3",
+          "say": "Inteligența artificială vă poate copia vocea dintr-o înregistrare scurtă. Un apel care pare să vină de la dumneavoastră, adresat adjunctului, poate fi fals.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": { "kind": "illustration", "id": "deepfake" }
+        },
+        {
+          "id": "b4",
+          "say": "Și asistentul dumneavoastră este o țintă. Stabiliți împreună ca orice cerere de bani sau de date să fie verificată pe un al doilea canal, chiar dacă vine de la dumneavoastră.",
+          "mood": "talk",
+          "gesture": "shield-up",
+          "visual": { "kind": "illustration", "id": "handshake" }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "whaling-email",
+      "prompt": "Găsiți semnalele de alarmă ale unui e-mail de whaling.",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": [{ "text": "Fondul de Cooperare Internațională" }],
+          "address": [
+            { "text": "director@" },
+            { "text": "intl-cooperation-fund.example.net", "spot": "domain" }
+          ]
+        },
+        "to": "Anar Hasanov",
+        "subject": [{ "text": "Strict personal: invitație ca vorbitor principal" }],
+        "time": "08:05",
+        "body": [
+          [{ "text": "Stimate domnule Hasanov," }],
+          [{ "text": "V-am urmărit interviul televizat de săptămâna trecută și ne-am dori să fiți vorbitorul nostru principal.", "spot": "public-info" }],
+          [
+            { "text": "Pentru a vedea programul, conectați-vă cu contul de serviciu: " },
+            { "text": "forum-portal.example.net/login", "spot": "login-link" }
+          ],
+          [{ "text": "Invitația este confidențială, vă rugăm să nu o transmiteți asistentului dumneavoastră.", "spot": "bypass" }]
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Domeniu necunoscut",
+          "explain": "Oricine poate înregistra un nume care sună oficial. Căutați chiar dumneavoastră organizația și verificați."
+        },
+        {
+          "id": "public-info",
+          "label": "Încredere construită pe informații publice",
+          "explain": "Interviul dumneavoastră este public. Faptul că îl menționează nu dovedește că vă cunosc."
+        },
+        {
+          "id": "login-link",
+          "label": "Conectare cu contul de serviciu",
+          "explain": "Nu aveți nevoie de parola de serviciu ca să citiți o invitație. Scopul este furtul contului unui lider."
+        },
+        {
+          "id": "bypass",
+          "label": "Asistentul, lăsat deoparte",
+          "explain": "Asistentul este filtrul dumneavoastră de verificare. Tratați cu suspiciune orice e-mail care vrea să îl țină deoparte."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "scenario",
+      "id": "voice-call",
+      "title": "O voce cunoscută",
+      "start": "call",
+      "nodes": [
+        {
+          "id": "call",
+          "text": "Aprobați în seara asta plata către partenerul nostru, documentele vi le trimit mai târziu.",
+          "speaker": "Vocea ministrului (20:00)",
+          "voice": "older-man",
+          "channel": "phone",
+          "spoken": "Aprobați în seara asta plata către partenerul nostru, <breath> documentele vi le trimit mai târziu.",
+          "character": "minister",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [{ "text": "Număr necunoscut" }],
+              "number": [{ "text": "+994 70 000 22 65" }],
+              "label": "Mobil"
+            }
+          },
+          "choices": [
+            {
+              "label": "Închid și sun chiar eu la numărul cunoscut al ministrului",
+              "next": "check",
+              "feedback": "Corect. O voce poate fi falsificată, iar un număr cunoscut este o verificare de încredere."
+            },
+            {
+              "label": "Vocea îmi este cunoscută, aprob plata",
+              "outcome": "compromised",
+              "feedback": "O voce cunoscută nu mai este o dovadă. Banii au ajuns în contul unui escroc."
+            }
+          ]
+        },
+        {
+          "id": "check",
+          "text": "Ministrul este în avion și nu a sunat pe nimeni.",
+          "speaker": "Asistentul ministrului",
+          "voice": "man-3",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Ministrul este în avion <breath> și nu a sunat pe nimeni.",
+          "character": "assistant",
+          "choices": [
+            {
+              "label": "Raportez imediat echipei de securitate și avertizez departamentul financiar",
+              "next": "morning",
+              "feedback": "Corect. Atacatorul ar putea încerca acum cu alt coleg."
+            },
+            {
+              "label": "Nimic, oricum nu am plătit",
+              "outcome": "risky",
+              "feedback": "Dumneavoastră sunteți în siguranță, dar adjunctul ar putea fi următorul. Raportarea îi protejează pe toți."
+            }
+          ]
+        },
+        {
+          "id": "morning",
+          "text": "Dimineața, echipa vă întreabă: cum vorbim despre asta?",
+          "choices": [
+            {
+              "label": "Vorbesc deschis și reamintesc tuturor regula de verificare",
+              "outcome": "safe",
+              "feedback": "Excelent. Când liderul vorbește deschis, echipa ia regula în serios."
+            },
+            {
+              "label": "Păstrăm tăcerea, ne afectează reputația",
+              "outcome": "risky",
+              "feedback": "Tăcerea îi lasă pe ceilalți neprotejați. Deschiderea construiește încredere."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "assistant-requests",
+      "prompt": "Este sigură această cerere adresată asistentului dumneavoastră?",
+      "cards": [
+        {
+          "id": "gift-cards",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [{ "text": "Anar Hasanov (director)" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Sunt în ședință, nu pot să sun. Cumpărați astăzi 10 carduri cadou și trimiteți-mi aici fotografii cu codurile." }],
+                "time": "13:12"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Codurile cardurilor cadou sunt ca banii gheață și nu pot fi recuperate. Evitarea unui apel este încă un semnal de alarmă."
+        },
+        {
+          "id": "agenda",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Anar Hasanov" }],
+              "address": [{ "text": "a.hasanov@idare.example" }]
+            },
+            "subject": [{ "text": "Agenda ședinței de mâine" }],
+            "time": "17:30",
+            "body": [
+              [{ "text": "Agenda este atașată. Ședința are loc la etajul trei." }]
+            ],
+            "attachments": [
+              {
+                "name": [{ "text": "Gundelik.pdf" }],
+                "size": "96 KB"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Domeniu corect, subiect așteptat, nicio cerere de bani sau de date."
+        },
+        {
+          "id": "calendar",
+          "artifact": {
+            "kind": "sms",
+            "sender": [{ "text": "+994 55 000 19 04" }],
+            "time": "21:48",
+            "messages": [
+              [{ "text": "Sunt directorul dumneavoastră, am un număr nou. Trimiteți-mi calendarul meu și unde au loc ședințele de mâine." }]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Calendarul unui lider dezvăluie unde se va afla. Verificați un număr nou printr-un canal cunoscut."
+        },
+        {
+          "id": "second-signature",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "idare-maliyye",
+            "app": "generic",
+            "contact": [{ "text": "Finanțe · sistem intern" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Cererea de plată a fost creată în sistemul intern și așteaptă a doua semnătură, așa cum prevăd regulile." }],
+                "time": "10:05"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Cererea trece prin sistemul oficial și are nevoie de a doua semnătură. Acesta este procesul corect."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "evening-payment",
+      "environment": "desktop",
+      "title": "O plată de seară",
+      "intro": "Este ora 19:52. În sistemul financiar, o plată urgentă vă așteaptă aprobarea.",
+      "steps": [
+        {
+          "id": "approve",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "idare-maliyye",
+            "tone": "app",
+            "title": [{ "text": "Aprobarea plății: 48.000 AZN" }],
+            "body": [
+              [{ "text": "Beneficiar: Qafqaz Terefdash LLC, cont bancar nou" }],
+              [{ "text": "Notă: cerere telefonică a ministrului – plata în seara asta, documentele mai târziu." }]
+            ],
+            "buttons": ["Amânați", "Aprobați"]
+          },
+          "say": "Uitați-vă la beneficiar și la notă.",
+          "actions": [
+            {
+              "id": "hold",
+              "label": "Amânați și verificați",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Corect. O plată urgentă către un cont nou se verifică întotdeauna pe un canal pe care îl cunoașteți."
+            },
+            {
+              "id": "approve",
+              "label": "Aprobați",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Un cont nou, urgența și documentele „mai târziu” sunt semne de fraudă. Banii au ajuns într-un cont fals."
+            }
+          ]
+        },
+        {
+          "id": "which-number",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "idare-maliyye",
+            "tone": "app",
+            "title": [{ "text": "Cum verificați instrucțiunea?" }],
+            "body": [
+              [{ "text": "Nota indică un număr de contact: +994 50 000 71 30" }]
+            ],
+            "buttons": ["Numărul din notă", "Numărul pe care îl știu"]
+          },
+          "actions": [
+            {
+              "id": "known",
+              "label": "Sunați-l pe asistentul ministrului la numărul pe care îl știți",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Corect. Un număr pe care îl cunoașteți deja demască imediat o instrucțiune falsă."
+            },
+            {
+              "id": "note",
+              "label": "Sunați la numărul din notă",
+              "kind": "call-back",
+              "outcome": "compromised",
+              "feedback": "Numărul din notă este al atacatorului, care va „confirma” ordinul."
+            }
+          ]
+        },
+        {
+          "id": "confirmed-fake",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "it-tehlukesizlik",
+            "tone": "system",
+            "title": [{ "text": "Instrucțiunea era falsă" }],
+            "body": [
+              [{ "text": "Asistentul spune că ministrul nu a dat un astfel de ordin." }]
+            ],
+            "buttons": ["Anulați", "Raportați"]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Raportați incidentul echipei de securitate",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Excelent. Atacatorul va încerca apoi cu alt semnatar, iar raportul dumneavoastră îi avertizează pe toți."
+            },
+            {
+              "id": "cancel",
+              "label": "Anulați plata și treceți mai departe",
+              "kind": "cancel",
+              "outcome": "risky",
+              "feedback": "E bine că ați oprit plata, dar atacatorul va încerca cu altcineva. Raportați."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "first-hour",
+      "question": {
+        "prompt": "Ce trebuie să facă un lider în prima oră a unui incident?",
+        "options": [
+          {
+            "id": "call-team",
+            "label": "Implică imediat echipa de securitate",
+            "correct": true,
+            "feedback": "Corect. Cu cât specialiștii încep mai devreme, cu atât pagubele sunt mai mici."
+          },
+          {
+            "id": "separate-channel",
+            "label": "Alege un canal de comunicare în afara e-mailului de serviciu",
+            "correct": true,
+            "feedback": "Corect. Atacatorul ar putea citi e-mailurile, așa că folosiți telefonul sau un canal separat."
+          },
+          {
+            "id": "approve-isolation",
+            "label": "Aprobă izolarea sistemelor de îndată ce o recomandă specialiștii",
+            "correct": true,
+            "feedback": "Corect. O decizie rapidă de la vârf oprește răspândirea."
+          },
+          {
+            "id": "hide",
+            "label": "Ascunde incidentul, ca să protejeze reputația",
+            "correct": false,
+            "feedback": "Ascunderea provoacă pagube mai mari mai târziu și poate încălca obligațiile de raportare."
+          },
+          {
+            "id": "pay-fast",
+            "label": "Răspunde rapid la cererea de răscumpărare",
+            "correct": false,
+            "feedback": "Orice contact cu atacatorii se decide împreună cu specialiștii și cu juriștii."
+          }
+        ],
+        "multi": true,
+        "visual": { "kind": "illustration", "id": "alarm" }
+      },
+      "explain": "În prima oră, liderul accelerează deciziile și sprijină echipa."
+    },
+    {
+      "type": "order",
+      "id": "payment-check",
+      "prompt": "Verificați o cerere urgentă de plată în ordinea corectă.",
+      "items": [
+        { "id": "pause", "label": "Puneți cererea în așteptare" },
+        { "id": "call-back", "label": "Sunați înapoi la un număr cunoscut" },
+        { "id": "second", "label": "Obțineți aprobarea unei a doua persoane" },
+        { "id": "execute", "label": "Abia apoi executați plata" }
+      ],
+      "explain": "Urgența este arma principală a atacatorului. Câteva minute de verificare previn o pierdere mare."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Oricât de sus ar veni cererea, verificați-o pe un al doilea canal.",
+        "Stabiliți dinainte regula de verificare cu asistentul.",
+        "În caz de incident, decideți calm, deschis și rapid."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

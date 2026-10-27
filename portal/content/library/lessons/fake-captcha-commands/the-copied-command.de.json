@@ -1,0 +1,335 @@
+{
+ "id": "the-copied-command",
+ "title": "Der kopierte Befehl",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fc2-tutor",
+   "beats": [
+    {
+     "id": "fc2-b1",
+     "say": "Diesmal fordert Sie eine gefälschte Seite auf, einen Text zu kopieren und in das Fenster „Ausführen“ einzufügen.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    },
+    {
+     "id": "fc2-b2",
+     "say": "Dieser Text ist in Wahrheit ein versteckter Befehl. Sobald er ausgeführt wird, installiert er Schadsoftware.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "ransomware"
+     }
+    },
+    {
+     "id": "fc2-b3",
+     "say": "Fügen Sie nie einen Text in das Fenster „Ausführen“ ein, den Sie auf Anweisung einer Website kopiert haben.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "fc2-b4",
+     "say": "Ist es schon passiert, trennen Sie die Netzwerkverbindung und informieren Sie sofort den IT-Support.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "fc2-sim",
+   "environment": "desktop",
+   "title": "Das Fenster „Ausführen“",
+   "intro": "Eine Seite behauptete, ein Dokument lasse sich nicht öffnen, und führte Sie hierher. Wählen Sie jedes Mal den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "run-box",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Ausführen"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Der von der Website kopierte Text wurde in das Feld eingefügt:"
+        }
+       ],
+       [
+        {
+         "text": "[von der Website kopierter, unbekannter Text]"
+        }
+       ]
+      ],
+      "buttons": [
+       "Abbrechen",
+       "OK"
+      ]
+     },
+     "say": "Das Fenster „Ausführen“ ist geöffnet. Darin steht ein unbekannter Text, den die Website kopiert hat.",
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Abbrechen und schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Mit „Abbrechen“ verhindern Sie, dass der Text ausgeführt wird. Erzählen Sie danach dem IT-Support, was passiert ist."
+      },
+      {
+       "id": "run",
+       "label": "Mit „OK“ ausführen",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Der Befehl wurde ausgeführt und hat im Hintergrund Schadsoftware installiert. Führen Sie in einem solchen Fenster nie etwas aus."
+      },
+      {
+       "id": "report",
+       "label": "Dem IT-Support melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Gute Wahl. Der IT-Support kann herausfinden, was passiert ist."
+      }
+     ]
+    },
+    {
+     "id": "script-window",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Unbekanntes Skript"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ein unbekanntes Skript soll ausgeführt werden. Fortfahren?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Stoppen",
+       "Fortfahren"
+      ]
+     },
+     "say": "Jetzt öffnet sich ein unbekanntes Fenster und bittet um die Erlaubnis, fortzufahren.",
+     "actions": [
+      {
+       "id": "stop",
+       "label": "Stoppen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn Sie ein Skript stoppen, mit dem Sie nicht gerechnet haben, verhindern Sie den Schaden."
+      },
+      {
+       "id": "continue",
+       "label": "Fortfahren",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Das Skript lief weiter und hat Schadsoftware installiert. Lassen Sie kein unbekanntes Skript zu."
+      }
+     ]
+    },
+    {
+     "id": "real-update",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sistem-yenileme",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Ein System-Update steht bereit"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Möchten Sie das Update jetzt installieren?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Später",
+       "Aktualisieren"
+      ]
+     },
+     "say": "Das ist das Update-Fenster des Systems selbst.",
+     "actions": [
+      {
+       "id": "update",
+       "label": "Aktualisieren",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Richtig. Das eigene Update des Systems ist sicher und verlangt nie einen Befehl von Ihnen."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "safe",
+       "feedback": "Auch das ist in Ordnung. Sie können das Update zu einem passenden Zeitpunkt installieren."
+      },
+      {
+       "id": "report",
+       "label": "Als verdächtig melden",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Das ist nicht nötig. Es handelt sich um den gewöhnlichen Update-Hinweis des Systems."
+      }
+     ]
+    },
+    {
+     "id": "beacon",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "it-tehlukesizlik",
+      "app": "IT-Sicherheit",
+      "title": [
+       {
+        "text": "Ungewöhnliche Netzwerkaktivität"
+       }
+      ],
+      "body": [
+       {
+        "text": "Ihr Computer sendet Daten an einen unbekannten Server."
+       }
+      ],
+      "time": "14:20"
+     },
+     "say": "Eine Benachrichtigung meldet, dass der Computer sich mit einer unbekannten Adresse verbindet.",
+     "actions": [
+      {
+       "id": "disconnect",
+       "label": "Internetverbindung trennen",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn Sie die Verbindung trennen, können keine Daten mehr abfließen."
+      },
+      {
+       "id": "report",
+       "label": "Dem IT-Support melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Jetzt kann der IT-Support den Computer prüfen und bereinigen."
+      },
+      {
+       "id": "ignore",
+       "label": "Schließen und weiterarbeiten",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Die Schadsoftware sendet weiter Daten. Ignorieren Sie eine solche Benachrichtigung nie."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "fc2-order",
+   "prompt": "Sie haben den Befehl einer Website ausgeführt. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "disconnect",
+     "label": "Netzwerkkabel ziehen oder WLAN ausschalten"
+    },
+    {
+     "id": "report",
+     "label": "Sofort den IT-Support anrufen"
+    },
+    {
+     "id": "tell",
+     "label": "Sagen, was Sie wo eingefügt haben"
+    },
+    {
+     "id": "password",
+     "label": "Passwörter von einem anderen, sauberen Gerät aus ändern"
+    }
+   ],
+   "explain": "Trennen Sie zuerst die Verbindung und rufen Sie dann sofort an. Schalten Sie den Computer nicht aus, sofern Ihr Notfallplan nichts anderes vorsieht."
+  },
+  {
+   "type": "choice",
+   "id": "fc2-choice",
+   "question": {
+    "prompt": "Eine Website fordert Sie auf, einen Text zu kopieren und in das Fenster „Ausführen“ einzufügen. Was tun Sie?",
+    "options": [
+     {
+      "id": "refuse",
+      "label": "Ich tue es nicht und schließe die Seite",
+      "correct": true,
+      "feedback": "Richtig. Keine Website verlangt, dass Sie einen Befehl ausführen. Das ist eine Falle."
+     },
+     {
+      "id": "paste",
+      "label": "Ich füge ihn ein, damit ich weitermachen kann",
+      "correct": false,
+      "feedback": "Dieser Text ist ein versteckter Befehl und installiert Schadsoftware. Fügen Sie ihn nie ein."
+     },
+     {
+      "id": "official",
+      "label": "Ich füge ihn ein, wenn die Website offiziell aussieht",
+      "correct": false,
+      "feedback": "Ein offizielles Aussehen lässt sich leicht fälschen. Die Regel ist einfach: Führen Sie einen solchen Text nie aus."
+     }
+    ]
+   },
+   "explain": "Der Text, den Sie auf Anweisung einer Website kopieren sollen, ist ein versteckter Befehl. Fügen Sie ihn nicht ein, schließen Sie die Seite."
+  },
+  {
+   "type": "match",
+   "id": "fc2-match",
+   "prompt": "Ordnen Sie jeder Situation die richtige Reaktion zu.",
+   "pairs": [
+    {
+     "id": "robot",
+     "left": "Eine Prüfung verlangt, dass Sie Tasten drücken",
+     "right": "Gefälscht – Seite schließen"
+    },
+    {
+     "id": "pdf",
+     "left": "„Das Dokument lässt sich nicht öffnen, führen Sie einen Befehl aus“",
+     "right": "Dieselbe Falle – nicht ausführen"
+    },
+    {
+     "id": "real",
+     "left": "Eine echte Prüfung",
+     "right": "Bilder auswählen oder ein Kästchen anklicken"
+    },
+    {
+     "id": "done",
+     "left": "Sie haben den Befehl bereits ausgeführt",
+     "right": "Verbindung trennen und melden"
+    }
+   ],
+   "explain": "Jede Seite, die einen Befehl verlangt, ist gefälscht. Haben Sie ihn bereits ausgeführt, trennen Sie die Verbindung und informieren Sie den IT-Support."
+  },
+  {
+   "type": "recap",
+   "id": "fc2-recap",
+   "points": [
+    "Fügen Sie nie einen Text von einer Website in das Fenster „Ausführen“ ein",
+    "Jede Seite, die einen Befehl verlangt, ist gefälscht",
+    "Ist es schon passiert, trennen Sie die Verbindung und informieren Sie den IT-Support"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

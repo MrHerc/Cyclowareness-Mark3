@@ -2,6 +2,7 @@ import "server-only";
 import { createConnection as tcpConnect } from "node:net";
 import { connect as tlsConnect } from "node:tls";
 import { createSocket } from "node:dgram";
+import type { LookupAddress } from "node:dns";
 import { hostname } from "node:os";
 import { and, asc, eq, gte, inArray, isNotNull, isNull, lt, ne, notInArray, or, sql } from "drizzle-orm";
 import { createTranslator } from "next-intl";
@@ -9,10 +10,11 @@ import type { PgColumn, PgTable } from "drizzle-orm/pg-core";
 import type { DB } from "./db/client";
 import * as t from "./db/schema";
 import type { TenantSettings } from "./db/schema";
+import { logFailure } from "./db/errors";
 import { campaignTick, sendQueuedSms } from "./services/campaigns";
 import { retryQueued, queueEmail, renderEmailHtml } from "./mail";
 import { decryptSecret, hmac } from "./crypto";
-import { destinationProblem } from "./net-guard";
+import { guardedRequest, pinnedLookup, vetDestination } from "./net-guard";
 import { appUrl, env } from "./env";
 import { DOMAIN_PROOF_GRACE_DAYS, domainProofFound, domainProofRecord } from "./auth/domain-proof";
 import { audit } from "./services/audit";
@@ -24,7 +26,7 @@ import { targetTraining } from "./services/secops";
 import { dayKey } from "../lib/domain/gamification";
 import { featuresFor, withDefaults } from "../lib/tenant-defaults";
 import { bakuDayPlus, todayInBaku } from "../lib/time";
-import { LOCALES, isLocale, pick } from "../i18n/config";
+import { LOCALES, isLocale, pick, type Locale } from "../i18n/config";
 import { messagesFor } from "../i18n/translator";
 
 /**
@@ -45,7 +47,7 @@ export async function runJobs(db: DB, now = new Date()): Promise<Record<string, 
     try {
       out[name] = await fn();
     } catch (error) {
-      console.error(`[jobs] ${name} failed`, error);
+      logFailure(`[jobs] ${name} failed`, error);
       out[name] = -1;
     }
   };
@@ -75,8 +77,8 @@ const MAX_ATTEMPTS = 6;
 function isNetworkError(error: unknown): boolean {
   const e = error as { name?: string; code?: string; cause?: { code?: string } };
   const message = String((error as Error)?.message);
-  // "unresolvable" comes from the destination check: a DNS outage, like ENOTFOUND from fetch.
-  return e?.name === "TimeoutError" || e?.name === "AbortError" || /^(ECONNREFUSED|ECONNRESET|ENOTFOUND|EHOSTUNREACH|ETIMEDOUT|EAI_AGAIN)$/.test(e?.code ?? e?.cause?.code ?? "") || message === "syslog timeout" || message === "fetch failed" || message === "unresolvable";
+  // "unresolvable" comes from the destination check: a DNS outage, like ENOTFOUND. "request_failed": any failure to reach the webhook (guardedRequest).
+  return e?.name === "TimeoutError" || e?.name === "AbortError" || /^(ECONNREFUSED|ECONNRESET|ENOTFOUND|EHOSTUNREACH|ETIMEDOUT|EAI_AGAIN)$/.test(e?.code ?? e?.cause?.code ?? "") || message === "syslog timeout" || message === "request_failed" || message === "unresolvable";
 }
 
 /** Rows looked at per tick at most (besides the time budget). */
@@ -152,18 +154,16 @@ async function deliverEvent(db: DB, d: typeof t.webhookDeliveries.$inferSelect, 
   try {
     if (d.target === "webhook") {
       if (!i.webhookUrl) throw new Error("no webhook address");
-      const url = new URL(i.webhookUrl);
-      const problem = await destinationProblem(url.hostname, Number(url.port || 443), "webhook");
-      if (problem) throw new Error(problem);
       const secret = decryptSecret(i.webhookSecretEnc);
       if (!secret) throw new Error("no signing secret");
       const body = JSON.stringify({ id: d.id, ...d.payload });
       // Signed at the moment of sending: receivers reject timestamps older than five minutes.
       const ts = Math.floor(Date.now() / 1000).toString();
-      const res = await fetch(i.webhookUrl, {
+      // The destination is checked again and the connection pinned to the approved addresses; the answer's body is not read.
+      const res = await guardedRequest(i.webhookUrl, {
+        kind: "webhook",
+        maxBytes: 0,
         method: "POST",
-        redirect: "error",
-        signal: AbortSignal.timeout(10_000),
         headers: {
           "content-type": "application/json",
           "user-agent": "Cyclowareness-Webhooks/1.0",
@@ -176,14 +176,14 @@ async function deliverEvent(db: DB, d: typeof t.webhookDeliveries.$inferSelect, 
         body,
       });
       code = res.status;
-      ok = res.ok;
+      ok = res.status >= 200 && res.status < 300;
       if (!ok) error = `HTTP ${res.status}`;
     } else {
       if (!i.syslogHost) throw new Error("no syslog server");
       const port = i.syslogPort ?? 6514;
-      const problem = await destinationProblem(i.syslogHost, port, "syslog");
-      if (problem) throw new Error(problem);
-      await sendSyslog(i.syslogHost, port, i.syslogTransport ?? "tls", formatSyslog(d.event, d.payload, i.syslogFormat ?? "cef", new Date()));
+      const vetted = await vetDestination(i.syslogHost, port, "syslog");
+      if (vetted.problem !== null) throw new Error(vetted.problem);
+      await sendSyslog(i.syslogHost, vetted.addresses, port, i.syslogTransport ?? "tls", formatSyslog(d.event, d.payload, i.syslogFormat ?? "cef", new Date()));
       ok = true;
     }
   } catch (e) {
@@ -238,20 +238,23 @@ function flatten(o: Record<string, unknown>): Record<string, string> {
   return out;
 }
 
-function sendSyslog(host: string, port: number, transport: "tls" | "tcp" | "udp", message: string): Promise<void> {
+/** `addresses`: what the destination check approved for `host`; the connection goes there, never to a second lookup. */
+export function sendSyslog(host: string, addresses: LookupAddress[], port: number, transport: "tls" | "tcp" | "udp", message: string): Promise<void> {
   // TCP framing: octet counting (RFC 6587 §3.4.1).
   const framed = `${Buffer.byteLength(message)} ${message}`;
   return new Promise((resolve, reject) => {
     if (transport === "udp") {
-      const s = createSocket(host.includes(":") ? "udp6" : "udp4");
-      s.send(Buffer.from(message), port, host, (err) => {
+      const [to] = addresses;
+      const s = createSocket(to.family === 6 ? "udp6" : "udp4");
+      s.send(Buffer.from(message), port, to.address, (err) => {
         s.close();
         if (err) reject(err);
         else resolve();
       });
       return;
     }
-    const socket = transport === "tls" ? tlsConnect({ host, port, servername: host, timeout: 10_000 }) : tcpConnect({ host, port, timeout: 10_000 });
+    const lookup = pinnedLookup(addresses);
+    const socket = transport === "tls" ? tlsConnect({ host, port, servername: host, lookup, timeout: 10_000 }) : tcpConnect({ host, port, lookup, timeout: 10_000 });
     socket.once(transport === "tls" ? "secureConnect" : "connect", () => socket.end(framed, () => resolve()));
     socket.once("timeout", () => {
       socket.destroy();
@@ -565,7 +568,18 @@ async function managerAlerts(db: DB, tenant: TenantLite, now: Date): Promise<num
 
 /* ───────── automatic refresher ───────── */
 
-const REFRESHER_TITLE: Record<string, string> = { az: "Qısa təkrar dərs", en: "Short refresher", ru: "Короткое повторение" };
+const REFRESHER_TITLE: Record<string, string> = {
+  az: "Qısa təkrar dərs",
+  en: "Short refresher",
+  ru: "Короткое повторение",
+  tr: "Kısa tekrar dersi",
+  ro: "Recapitulare scurtă",
+  ka: "მოკლე გამეორება",
+  uk: "Коротке повторення",
+  de: "Kurze Auffrischung",
+  fr: "Petite remise à niveau",
+  ar: "مراجعة قصيرة",
+} satisfies Record<Locale, string>;
 
 /**
  * People at or above the risk threshold get one short refresher a month (no penalty, no XP loss):

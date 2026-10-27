@@ -55,6 +55,11 @@ export const PERMISSION_FEATURE: Partial<Record<Permission, Feature>> = {
   "studio.write": "studio",
   "leadership.read": "leadership",
   "sessions.write": "live_sessions",
+  "reports.read": "reports",
+  "league.read": "league",
+  "paths.write": "paths",
+  "support.manage": "support",
+  "feedback.read": "feedback",
 };
 
 /** Roles an administrator may hand out (super admin is platform-only). */
@@ -65,4 +70,17 @@ export const PRIVILEGED_ROLES: Role[] = ["tenant_admin", "super_admin", "analyst
 
 export function isPrivileged(role: Role): boolean {
   return PRIVILEGED_ROLES.includes(role);
+}
+
+/** Roles that open the admin console (every role but learner). They never sign in with a text-message code. */
+export function isConsoleRole(role: Role): boolean {
+  return can(role, "admin.access");
+}
+
+/**
+ * Whether two-step verification is mandatory for a role: always for the platform operator, and for every console role when
+ * the organisation's "require two-step verification" rule is on (the default for new organisations).
+ */
+export function twoFactorRequired(role: Role, organisationRequires: boolean): boolean {
+  return role === "super_admin" || (organisationRequires && isConsoleRole(role));
 }

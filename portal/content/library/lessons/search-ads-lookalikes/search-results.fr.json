@@ -1,0 +1,411 @@
+{
+ "id": "search-results",
+ "title": "Les résultats de recherche",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sr-tutor",
+   "beats": [
+    {
+     "id": "sr-b1",
+     "say": "Bonjour ! Beaucoup de gens accèdent aux sites officiels en faisant une recherche, plutôt qu’en saisissant l’adresse. Les escrocs le savent aussi.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "sr-b2",
+     "say": "Ils achètent des annonces pour apparaître tout en haut. Un tel résultat porte une petite mention à côté : Sponsorisé.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2c-tapan",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Tapan : attestation portail citoyen"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Sponsorisé",
+          "spot": "ad-label"
+         },
+         {
+          "text": "  vetendasportal-gov.example"
+         }
+        ],
+        [
+         {
+          "text": "Vatandash Portal : votre attestation en 5 minutes"
+         }
+        ],
+        [
+         {
+          "text": "vetendasportal.gov.az"
+         }
+        ],
+        [
+         {
+          "text": "Vatandash Portal : attestations en ligne"
+         }
+        ]
+       ],
+       "buttons": [
+        "Rechercher"
+       ]
+      }
+     },
+     "highlight": "ad-label"
+    },
+    {
+     "id": "sr-b3",
+     "say": "Un faux site ressemble beaucoup au vrai : une lettre différente, un mot en plus ou une autre terminaison.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "sr-b4",
+     "say": "Vérifiez une fois l’adresse officielle et ajoutez-la à vos favoris. Ensuite, ouvrez-la toujours depuis vos favoris.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "sr-hotspot",
+   "prompt": "Trouvez les éléments dangereux dans les résultats de recherche.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2c-tapan",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Tapan : attestation portail citoyen"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Sponsorisé",
+       "spot": "ad-label"
+      },
+      {
+       "text": "  "
+      },
+      {
+       "text": "vetendasportal-gov.example",
+       "spot": "lookalike"
+      }
+     ],
+     [
+      {
+       "text": "Site officiel. Votre attestation en 5 minutes",
+       "spot": "fake-official"
+      }
+     ],
+     [
+      {
+       "text": "Sponsorisé  "
+      },
+      {
+       "text": "vetendaspotral.example.info",
+       "spot": "typo"
+      }
+     ],
+     [
+      {
+       "text": "Vatandash Portal : connexion et attestations"
+      }
+     ],
+     [
+      {
+       "text": "vetendasportal.gov.az"
+      }
+     ],
+     [
+      {
+       "text": "Vatandash Portal : attestations en ligne"
+      }
+     ]
+    ],
+    "buttons": [
+     "Rechercher"
+    ]
+   },
+   "spots": [
+    {
+     "id": "ad-label",
+     "label": "Mention publicitaire",
+     "explain": "Ce résultat a été payé pour apparaître en haut. Les escrocs peuvent aussi acheter des annonces : ne passez jamais par une annonce pour vous connecter."
+    },
+    {
+     "id": "lookalike",
+     "label": "Mot en plus",
+     "explain": "Le mot « gov » a été ajouté à l’adresse, mais la fin est différente. L’adresse du portail officiel se termine par gov.az."
+    },
+    {
+     "id": "fake-official",
+     "label": "Fausse mention officielle",
+     "explain": "N’importe qui peut écrire « site officiel ». C’est la fin de l’adresse qui montre ce qui est officiel, pas le texte."
+    },
+    {
+     "id": "typo",
+     "label": "Lettres inversées",
+     "explain": "Dans le mot « portal », deux lettres ont été inversées. C’est difficile à remarquer quand on est pressé."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "sr-choice",
+   "question": {
+    "prompt": "Vous vous connectez souvent au portail citoyen. Quelle est la méthode la plus sûre ?",
+    "options": [
+     {
+      "id": "bookmark",
+      "label": "Je vérifie une fois l’adresse officielle et je l’ajoute à mes favoris",
+      "correct": true,
+      "feedback": "Exact. Un favori ouvre toujours la même adresse, et les annonces ne jouent plus aucun rôle."
+     },
+     {
+      "id": "first-result",
+      "label": "Je fais une recherche à chaque fois et je clique sur le premier résultat",
+      "correct": false,
+      "feedback": "Le premier résultat peut être une annonce. Les escrocs comptent justement sur cette habitude."
+     },
+     {
+      "id": "sms-link",
+      "label": "J’utilise le lien reçu par SMS",
+      "correct": false,
+      "feedback": "N’importe qui peut envoyer un lien par SMS. Ouvrez vous-même le site officiel."
+     }
+    ]
+   },
+   "explain": "Ajoutez à vos favoris les sites que vous utilisez souvent. Ainsi, ni les résultats de recherche ni les annonces ne pourront vous tromper."
+  },
+  {
+   "type": "simulation",
+   "id": "sr-sim",
+   "environment": "browser",
+   "title": "Télécharger un programme",
+   "intro": "Vous avez une réunion en ligne demain et devez télécharger l’application Gorush. Vous commencez par une recherche.",
+   "steps": [
+    {
+     "id": "results",
+     "label": "Télécharger Gorush : résultats de recherche",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tapan",
+      "url": [
+       {
+        "text": "https://tapan.example/axtar?q=gorus+yukle",
+        "reveal": "tapan.example"
+       }
+      ]
+     },
+     "say": "Tout en haut, il y a une annonce, et juste en dessous, le site de l’application elle-même.",
+     "actions": [
+      {
+       "id": "ad",
+       "label": "Sponsorisé : gorus-app-download.example.net",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "L’annonce a ouvert un autre site. Il n’est pas trop tard : regardez l’adresse.",
+       "next": "fake-site"
+      },
+      {
+       "id": "organic",
+       "label": "gorus.example : site officiel",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Exact. Vous avez ignoré l’annonce et ouvert le site de l’application elle-même.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "fake-site",
+     "label": "Gorush : téléchargement gratuit",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-gorus-fake",
+      "url": [
+       {
+        "text": "https://gorus-app-download.example.net/yukle",
+        "reveal": "gorus-app-download.example.net"
+       }
+      ]
+     },
+     "say": "La page ressemble beaucoup au vrai site. Regardez l’adresse.",
+     "actions": [
+      {
+       "id": "download",
+       "label": "Télécharger",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Ce site n’appartient pas à l’éditeur de l’application. Un programme d’installation venant d’ici n’est pas digne de confiance.",
+       "next": "fake-file"
+      },
+      {
+       "id": "leave",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Cette adresse n’était pas celle du site de l’application. Allez vous-même sur le site officiel.",
+       "next": "real-site"
+      },
+      {
+       "id": "check",
+       "label": "Vérifier l’adresse",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Le nom se ressemble, mais le domaine est différent. Ne faites pas confiance à ce site.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "fake-file",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "w2c-gorus-fake",
+      "name": [
+       {
+        "text": "GorusSetup_2026.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "84 Mo",
+      "source": [
+       {
+        "text": "gorus-app-download.example.net"
+       }
+      ]
+     },
+     "say": "Le fichier est téléchargé. Allez-vous l’ouvrir ?",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "En plus de l’application, ce programme d’installation installe un logiciel qui vole les mots de passe. N’ouvrez jamais un fichier venant d’un faux site.",
+       "next": "after-bad"
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Exact. Supprimez le fichier, prévenez le support technique et téléchargez l’application sur le site officiel.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "after-bad",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "qoruyucu",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Qoruyucu : programme suspect"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "GorusSetup_2026.exe a tenté de lire les mots de passe enregistrés dans votre navigateur."
+        }
+       ]
+      ],
+      "buttons": [
+       "Mettre en quarantaine",
+       "Fermer"
+      ]
+     },
+     "say": "L’antivirus a détecté quelque chose. Maintenant, agissez vite.",
+     "actions": [
+      {
+       "id": "isolate",
+       "label": "Se déconnecter du réseau et appeler le support technique",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Exact. Sauf consigne contraire de votre procédure, déconnectez l’ordinateur du réseau sans l’éteindre et appelez immédiatement."
+      },
+      {
+       "id": "ignore",
+       "label": "Fermer et continuer à travailler",
+       "kind": "cancel",
+       "outcome": "compromised",
+       "feedback": "Le programme continue de tourner et peut envoyer vos mots de passe. Signalez-le immédiatement."
+      }
+     ]
+    },
+    {
+     "id": "real-site",
+     "label": "Gorush : télécharger pour votre ordinateur",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "gorus",
+      "url": [
+       {
+        "text": "https://gorus.example/yukle",
+        "reveal": "gorus.example"
+       }
+      ]
+     },
+     "say": "Voici le site de l’application elle-même.",
+     "actions": [
+      {
+       "id": "ask-it",
+       "label": "Demander au support technique de l’installer",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "C’est la meilleure solution. Sur un ordinateur professionnel, c’est le support technique qui installe les programmes.",
+       "next": "results"
+      },
+      {
+       "id": "download",
+       "label": "Télécharger",
+       "kind": "install",
+       "outcome": "safe",
+       "feedback": "Exact, c’est le site officiel. Sur un ordinateur professionnel, vérifiez d’abord les règles du support technique.",
+       "next": "results"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "sr-recap",
+   "points": [
+    "Pour vous connecter, passez par un favori, pas par une annonce",
+    "Lisez la fin de l’adresse et comparez-la avec l’adresse officielle",
+    "Ne téléchargez des programmes que sur le site officiel ou via le support technique"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

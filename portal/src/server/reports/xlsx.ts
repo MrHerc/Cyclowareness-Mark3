@@ -12,8 +12,8 @@ function esc(s: string): string {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
-    // Characters not allowed in XML 1.0.
-    .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
+    // Characters outside XML 1.0's Char production (controls, U+FFFE/U+FFFF, unpaired surrogates): one makes the whole file unreadable.
+    .replace(/[^\t\n\r\u0020-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/gu, "");
 }
 
 function colName(i: number): string {

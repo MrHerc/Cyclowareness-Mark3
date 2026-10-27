@@ -1,0 +1,323 @@
+{
+ "id": "first-15-minutes",
+ "title": "Die ersten 15 Minuten",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Sie haben auf einen Link geklickt oder Ihr Passwort eingegeben? Das kann jedem passieren.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Die ersten fünfzehn Minuten zählen am meisten, denn gestohlene Passwörter werden oft sofort benutzt.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "15",
+      "label": "Minuten, die am meisten zählen"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Ändern Sie das Passwort auf der echten Website, informieren Sie das Sicherheitsteam und bewahren Sie die E-Mail auf.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Vertuschen Sie nichts. Schweigen verschafft dem Angreifer Zeit. Eine ehrliche Meldung schützt alle.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "after-the-click",
+   "environment": "desktop",
+   "title": "Sie haben Ihr Passwort eingegeben",
+   "intro": "Sie haben Ihr E-Mail-Passwort auf einer gefälschten Seite eingegeben und gerade erst den Fehler bemerkt. Die nächsten Schritte liegen bei Ihnen.",
+   "steps": [
+    {
+     "id": "retry-trap",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Anmeldung fehlgeschlagen"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Falsches Passwort. Versuchen Sie es noch einmal oder verwenden Sie ein anderes Passwort."
+        }
+       ]
+      ],
+      "buttons": [
+       "Schließen",
+       "Erneut versuchen"
+      ]
+     },
+     "say": "Die Seite zeigt eine Fehlermeldung.",
+     "actions": [
+      {
+       "id": "retry",
+       "label": "Erneut versuchen",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Gefälschte Websites zeigen einen Fehler an, damit Sie das Passwort noch einmal eingeben – manchmal sogar ein anderes."
+      },
+      {
+       "id": "close",
+       "label": "Schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig, geben Sie nichts mehr ein. Schließen Sie die Seite und gehen Sie zum nächsten Schritt."
+      }
+     ]
+    },
+    {
+     "id": "the-email",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ispoct-fake",
+      "from": {
+       "name": [
+        {
+         "text": "İşPoçt-Admin"
+        }
+       ],
+       "address": [
+        {
+         "text": "admin@ispoct-mail.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Ihr Postfach ist zu 98 % voll"
+       }
+      ],
+      "time": "09:41",
+      "body": [
+       [
+        {
+         "text": "Erweitern Sie Ihren Speicherplatz, damit keine E-Mails gelöscht werden: "
+        },
+        {
+         "text": "ispoct-mail.example.net/yer",
+         "link": {
+          "label": "ispoct-mail.example.net/yer",
+          "href": "https://ispoct-mail.example.net/yer"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Die E-Mail liegt noch in Ihrem Posteingang.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Phishing melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Dank Ihrer Meldung kann das Sicherheitsteam die E-Mail auch aus anderen Postfächern entfernen."
+      },
+      {
+       "id": "forward",
+       "label": "An das Sicherheitsteam weiterleiten",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Gut. So gehen Sie vor, wenn es keine Schaltfläche zum Melden gibt. Rufen Sie das Sicherheitsteam zusätzlich an."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen, damit sie niemand sieht",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Die E-Mail ist ein Beweisstück. Gelöscht, kann sie dem Sicherheitsteam nicht mehr helfen, den Angriff nachzuverfolgen."
+      }
+     ]
+    },
+    {
+     "id": "change-password",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "İşPoçt",
+      "url": [
+       {
+        "text": "https://poct.idare.example/parol"
+       }
+      ],
+      "fields": [
+       "Aktuelles Passwort",
+       "Neues Passwort"
+      ],
+      "button": "Passwort ändern"
+     },
+     "say": "Sie haben die Adresse selbst eingetippt. Ändern Sie jetzt das Passwort.",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Passwort ändern",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Richtig, die Website ist echt. Das neue Passwort darf dem alten nicht ähneln."
+      },
+      {
+       "id": "later",
+       "label": "Ich ändere es morgen",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Gestohlene Passwörter werden schnell benutzt. Wer wartet, verschafft dem Angreifer Zeit."
+      }
+     ]
+    },
+    {
+     "id": "reused",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Dieses Passwort wird auch anderswo verwendet"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ihr altes E-Mail-Passwort wird auch für das Büroportal und die Kontakto-Seite verwendet."
+        }
+       ]
+      ],
+      "buttons": [
+       "Später",
+       "Alle ändern"
+      ]
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "Alle ändern",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Richtig. Angreifer probieren ein gestohlenes Passwort auch auf anderen Websites aus."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Jedes Konto mit demselben Passwort ist jetzt in Gefahr. Ändern Sie die Passwörter noch heute."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "mistake-first-step",
+   "prompt": "Ordnen Sie jedem Fehler den ersten Schritt zu.",
+   "pairs": [
+    {
+     "id": "clicked",
+     "left": "Ich habe geklickt, aber nichts eingegeben",
+     "right": "Seite schließen und die E-Mail melden"
+    },
+    {
+     "id": "password",
+     "left": "Ich habe mein Passwort auf einer gefälschten Seite eingegeben",
+     "right": "Passwort auf der echten Website ändern und melden"
+    },
+    {
+     "id": "code",
+     "left": "Ich habe einem Anrufer meinen Bestätigungscode genannt",
+     "right": "Sofort das Sicherheitsteam anrufen"
+    },
+    {
+     "id": "card",
+     "left": "Ich habe meine Kartendaten eingegeben",
+     "right": "Die Bank unter der Nummer auf der Karte anrufen"
+    }
+   ],
+   "explain": "Melden Sie es jedes Mal. Fachleute suchen nach Spuren, die Sie selbst nicht sehen."
+  },
+  {
+   "type": "choice",
+   "id": "approved-push",
+   "question": {
+    "prompt": "Auf Ihrem Smartphone ist eine Anmeldeanfrage eingegangen, und Sie haben versehentlich auf „Bestätigen“ getippt. Was jetzt?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Ich rufe sofort das Sicherheitsteam an und ändere mein Passwort",
+      "correct": true,
+      "feedback": "Richtig. Sie haben den Angreifer hereingelassen. Das Sicherheitsteam wirft ihn wieder hinaus, indem es die Anmeldesitzungen beendet."
+     },
+     {
+      "id": "nothing",
+      "label": "Nichts, es war ja nur einmal",
+      "correct": false,
+      "feedback": "Eine einzige Bestätigung reicht: Der Angreifer ist bereits in Ihrem Konto."
+     },
+     {
+      "id": "phone-off",
+      "label": "Ich schalte das Smartphone aus",
+      "correct": false,
+      "feedback": "Das Ausschalten des Smartphones wirft den Angreifer nicht hinaus. Er ist bereits drin."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "mfa-phone"
+    }
+   },
+   "explain": "Eine versehentliche Bestätigung und ein weitergegebener Code verlangen denselben dringenden Schritt: sofort melden."
+  },
+  {
+   "type": "password",
+   "id": "new-password",
+   "prompt": "Erstellen Sie ein neues Passwort als Ersatz für das gestohlene: Es darf dem alten in keiner Weise ähneln.",
+   "targetScore": 4,
+   "tips": [
+    "Ändern Sie das alte nicht nur leicht ab: Aysel2027 statt Aysel2026 reicht nicht",
+    "Verbinden Sie vier zufällige Wörter mit Leerzeichen",
+    "Speichern Sie das neue Passwort im Passwort-Manager"
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Geben Sie nichts mehr ein: Schließen Sie die Seite und bewahren Sie die E-Mail auf.",
+    "Ändern Sie das Passwort auf der echten Website und überall dort, wo Sie es sonst noch verwendet haben.",
+    "Einen Code weitergegeben oder auf „Bestätigen“ getippt? Rufen Sie sofort das Sicherheitsteam an."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

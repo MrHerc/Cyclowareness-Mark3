@@ -1,0 +1,526 @@
+{
+ "id": "consent-screen",
+ "title": "İzin ekranı",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac1-tutor",
+   "beats": [
+    {
+     "id": "ac1-b1",
+     "say": "Merhaba! Bugün parola yerine izin isteyen bir tuzağı tanıyacağız.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "ac1-b2",
+     "say": "Uygulama şunu söylüyor: “Belgeyi görüntülemek için e-postalarınızı okumama ve sizin adınıza e-posta göndermeme izin verin.”",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "w2b-dokubaxis",
+       "app": "DokuBaxış Viewer",
+       "permissions": [
+        {
+         "label": [
+          {
+           "text": "Profilinizi görme"
+          }
+         ],
+         "needed": true
+        },
+        {
+         "label": [
+          {
+           "text": "E-postalarınızı okuma ve sizin adınıza e-posta gönderme",
+           "spot": "mail"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "Siz yokken de erişimi sürdürme"
+          }
+         ],
+         "needed": false
+        }
+       ]
+      }
+     },
+     "highlight": "mail"
+    },
+    {
+     "id": "ac1-b3",
+     "say": "Tek bir tıklamayla uygulama posta kutunuza girer. Parolanızı değiştirseniz bile izin olduğu gibi kalır.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "ac1-b4",
+     "say": "Kural şu: uygulamanın adını ve istediği izinleri okuyun. Tanımadığınız bir uygulamaya asla izin vermeyin.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ac1-hotspot",
+   "prompt": "Bu uygulamanın ihtiyaç duymadığı istekleri bulun.",
+   "artifact": {
+    "kind": "permission",
+    "brandRef": "w2b-dokubaxis",
+    "app": "DokuBaxış Viewer",
+    "permissions": [
+     {
+      "label": [
+       {
+        "text": "Profilinizi görme"
+       }
+      ],
+      "needed": true
+     },
+     {
+      "label": [
+       {
+        "text": "E-postalarınızı okuma ve sizin adınıza e-posta gönderme",
+        "spot": "mail"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Tüm dosyalarınızı okuma ve değiştirme",
+        "spot": "files"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Kişilerinizi görme",
+        "spot": "contacts"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Siz yokken de erişimi sürdürme",
+        "spot": "offline"
+       }
+      ],
+      "needed": false
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "mail",
+     "label": "E-posta okuma ve gönderme",
+     "explain": "Bir belgeyi görüntülemek için e-posta erişimi gerekmez. Bu izinle uygulama sizin adınıza oltalama (phishing) e-postaları gönderebilir."
+    },
+    {
+     "id": "files",
+     "label": "Tüm dosyalar",
+     "explain": "Tek bir belgeyi gösteren uygulamanın tüm dosyalarınıza ihtiyacı yoktur. Bu izin veri çalmak içindir."
+    },
+    {
+     "id": "contacts",
+     "label": "Kişiler",
+     "explain": "Kişi listeniz, bir sonraki saldırının hedef listesidir. Bir belgenin buna ihtiyacı yoktur."
+    },
+    {
+     "id": "offline",
+     "label": "Kalıcı erişim",
+     "explain": "Bu, uygulamanın siz oturumu kapattıktan sonra, hatta parolanızı değiştirdikten sonra bile hesabınızda kalması demektir."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "ac1-swipe",
+   "prompt": "Hangi izin isteği normal, hangisi tuzak? Kaydırın.",
+   "cards": [
+    {
+     "id": "meeting-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "gorus",
+      "app": "Görüş",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Takviminizi görme"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Profilinizi görme"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Görüş, kurumunuzun bilinen uygulamasıdır ve yalnızca işi için gerekenleri ister."
+    },
+    {
+     "id": "greeting-card",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-bayram-tebriki",
+      "app": "Bayram Təbriki",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Kişilerinizi görme"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Sizin adınıza e-posta gönderme"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Bir tebrik kartı için ne kişi listeniz ne de sizin adınıza e-posta gönderme hakkı gerekir. Bu izinler, sizin adınıza oltalama e-postaları yaymak içindir."
+    },
+    {
+     "id": "salary-calc",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-maas-kalkulyatoru",
+      "app": "Maaş Kalkulyatoru",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "E-postalarınızı okuma"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Siz yokken de erişimi sürdürme"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Bir hesap makinesinin e-postalarınıza ihtiyacı yoktur. Kalıcı erişim ise uygulamayı hesabınızın içinde tutar."
+    },
+    {
+     "id": "editor",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "senedyaz",
+      "app": "SənədYaz",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Seçtiğiniz dosyayı açma ve kaydetme"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Bilinen belge düzenleyici yalnızca seçtiğiniz dosyayı istiyor. Bu izin, yaptığı işe uygundur."
+    },
+    {
+     "id": "pdf-tool",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "pdf-birlesdirici",
+      "app": "PDF Birləşdirici Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Tüm dosyalarınızı okuma ve değiştirme"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "E-postalarınızı okuma ve gönderme"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Dosya birleştirmek için ne e-posta erişimi ne de tüm dosyalarınıza erişim gerekir. Böyle bir uygulamaya izin vermeyin."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac1-sim",
+   "environment": "browser",
+   "title": "Paylaşılan bütçe belgesi",
+   "intro": "İş arkadaşınız Nigar adına sizinle bir bütçe belgesi paylaşıldı. Bağlantıyı açtınız, şimdi her ekranda karar verin.",
+   "steps": [
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "İşPoçt",
+      "url": [
+       {
+        "text": "https://giris.idare.example/icaze"
+       }
+      ],
+      "fields": [
+       "E-posta",
+       "Parola"
+      ],
+      "button": "Giriş yap"
+     },
+     "say": "Adrese bakın: bu, kurumunuzun gerçek giriş sayfası.",
+     "actions": [
+      {
+       "id": "sign-in",
+       "label": "Giriş yap",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Adres gerçek, yani parolanız bir suçluya gitmiyor. Tuzak bir sonraki pencerede."
+      },
+      {
+       "id": "close",
+       "label": "Sekmeyi kapat",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bu da güvenli. Ama diyelim ki giriş yaptınız: bir sonraki pencereye bakalım."
+      }
+     ]
+    },
+    {
+     "id": "consent",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-dokubaxis",
+      "app": "DokuBaxış Viewer",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Profilinizi görme"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "E-postalarınızı okuma ve sizin adınıza e-posta gönderme"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Tüm dosyalarınızı okuma ve değiştirme"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Siz yokken de erişimi sürdürme"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Belge açılmadan önce bu pencere çıktı.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Reddet",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Doğru. Bir belgeyi görüntülemek için e-posta erişimi, tüm dosyalara erişim ya da kalıcı erişim gerekmez.",
+       "next": "known-app"
+      },
+      {
+       "id": "allow",
+       "label": "İzin ver",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Uygulama artık e-postalarınızı okuyor ve sizin adınıza yazıyor. Parolanızı değiştirmek onu durdurmaz."
+      }
+     ]
+    },
+    {
+     "id": "connected-apps",
+     "label": "Bağlı uygulamalar: DokuBaxış Viewer, e-postaya ve dosyalara kalıcı erişim",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/tetbiqler"
+       }
+      ]
+     },
+     "say": "Ertesi gün hesabınıza bakıyorsunuz.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "İzni iptal etmeleri için BT destek ekibine bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru. Uygulamayı ancak iznin iptal edilmesi kaldırır. Uzman ayrıca geride iz kalıp kalmadığını da kontrol eder."
+      },
+      {
+       "id": "password-only",
+       "label": "Yalnızca parolayı değiştir",
+       "kind": "update",
+       "outcome": "risky",
+       "feedback": "Parola değişir, ama uygulamanın izni yerinde kalır. İzni BT destek ekibinin iptal etmesi gerekir."
+      },
+      {
+       "id": "leave",
+       "label": "Olduğu gibi bırak",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Uygulama her gün e-postalarınızı okumaya devam edecek. Bugün bildirin."
+      }
+     ]
+    },
+    {
+     "id": "known-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "idare-komekci",
+      "app": "İdarə Köməkçisi",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Profilinizi görme"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Takviminizi görme"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "say": "Şimdi de kurumunuzun kendi asistan uygulaması izin istiyor.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "İzin ver",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Doğru. Bilinen bir iş uygulaması yalnızca işi için gerekenleri ister."
+      },
+      {
+       "id": "deny",
+       "label": "Reddet",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "Temkinli olmanız anlaşılır, ama bu bilinen bir uygulama ve az şey istiyor. Emin olamazsanız BT destek ekibine sorun."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ac1-choice",
+   "question": {
+    "prompt": "En tehlikeli izinler hangileri? Uygun olanların hepsini seçin.",
+    "options": [
+     {
+      "id": "send",
+      "label": "Sizin adınıza e-posta gönderme",
+      "correct": true,
+      "feedback": "Doğru. Bu izinle uygulama, sizin adınıza iş arkadaşlarınıza oltalama e-postaları gönderir."
+     },
+     {
+      "id": "offline",
+      "label": "Siz yokken de erişimi sürdürme",
+      "correct": true,
+      "feedback": "Doğru. Bu, uygulamanın siz oturumu kapattıktan sonra da hesabınızda kalması demektir."
+     },
+     {
+      "id": "profile",
+      "label": "Adınızı ve profil fotoğrafınızı görme",
+      "correct": false,
+      "feedback": "Bu, normal bir girişin gerektirdiği küçük bir izindir."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "E-posta, dosyalar ve kalıcı erişim en geniş izinlerdir. Bunları tanımadığınız bir uygulamaya asla vermeyin."
+  },
+  {
+   "type": "recap",
+   "id": "ac1-recap",
+   "points": [
+    "İzin ekranında uygulamanın adını ve istediği izinleri okuyun",
+    "Tanımadığınız bir uygulamaya e-posta, dosya ya da kalıcı erişim izni vermeyin",
+    "Yanlışlıkla izin verdiyseniz izni BT destek ekibine iptal ettirin"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

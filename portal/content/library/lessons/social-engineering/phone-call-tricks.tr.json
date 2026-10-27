@@ -1,0 +1,553 @@
+{
+  "id": "phone-call-tricks",
+  "title": "Telefon aramalarındaki hileler",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l1-tutor",
+      "beats": [
+        {
+          "id": "l1-b1",
+          "say": "Merhaba! Ben güvenlik yardımcınızım. Bugün telefonla gelen dolandırıcılıkları fark etmeyi öğreneceksiniz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "l1-b2",
+          "say": "Ekranda bankanın adı görünüyor, ama arayanın adını ve numarasını taklit etmek kolaydır.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "sahilbank",
+              "caller": [
+                {
+                  "text": "SahilBank",
+                  "spot": "caller-name"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 12 000 00 00",
+                  "spot": "caller-number"
+                }
+              ],
+              "label": "Gelen arama"
+            }
+          },
+          "highlight": "caller-name"
+        },
+        {
+          "id": "l1-b3",
+          "say": "Dolandırıcılar sizi aceleye getirir: kartınız bloke edildi, paranız gidiyor. Korku ve acele, onların en büyük silahıdır.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          },
+          "checkpoint": {
+            "prompt": "Arayan kişi, size SMS ile gelen kodu soruyor. Ne yaparsınız?",
+            "options": [
+              {
+                "id": "say-code",
+                "label": "Kodu okurum",
+                "correct": false,
+                "feedback": "Bu kodla hesabınıza girilebilir ya da bir ödeme onaylanabilir. Banka bu kodu asla sormaz."
+              },
+              {
+                "id": "call-back",
+                "label": "Telefonu kapatırım, bankayı kendim ararım",
+                "correct": true,
+                "feedback": "Doğru. Bu kontrol, dolandırıcının planını tamamen bozar."
+              }
+            ]
+          }
+        },
+        {
+          "id": "l1-b5",
+          "say": "Altın kural: telefonu kapatın ve resmî numarayı kendiniz arayın. Numarayı kartınızdan ya da resmî web sitesinden alın.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "bank-vishing",
+      "environment": "call",
+      "title": "Bankadan bir arama",
+      "intro": "Ekranda bankanızın adı görünüyor. Arayanı dinleyin ve her adımda yanıtınızı seçin.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Banka",
+            "voice": "man"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Yanıtla",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Telefonu açmak tehlikeli değil. Önemli olan, ne söylediğiniz."
+            },
+            {
+              "id": "decline",
+              "label": "Reddet",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olur. İçiniz rahat etmezse kartınızın arkasındaki numarayı kendiniz arayın.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "alarm",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Banka",
+            "voice": "man"
+          },
+          "say": "Merhaba, ben SahilBank güvenlik biriminden Fuad Memmedov. Şu anda biri kartınızdan bin iki yüz manat çekmeye çalışıyor.",
+          "spoken": "Merhaba, <breath> ben SahilBank güvenlik biriminden Fuad Memmedov. Şu anda biri kartınızdan, ee, bin iki yüz manat çekmeye çalışıyor.",
+          "actions": [
+            {
+              "id": "card",
+              "label": "Kartın son hanelerini söylerim",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Bankanız sizi zaten tanır, bu bilgiye ihtiyacı yoktur. Verdiğiniz her bilgi dolandırıcıyı daha inandırıcı kılar."
+            },
+            {
+              "id": "keep",
+              "label": "Telefonda kart bilgisi paylaşmam",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Doğru. Gelen bir aramada kart bilgilerinizi asla vermeyin; ad da numara da taklit edilebilir."
+            }
+          ]
+        },
+        {
+          "id": "code",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Banka",
+            "voice": "man"
+          },
+          "say": "Bunu durdurmak için beş dakikanız var. Telefonunuza az önce gelen kodu bana okuyun ve kimseye söylemeyin.",
+          "spoken": "Bunu durdurmak için beş dakikanız var. <breath> Telefonunuza az önce gelen kodu bana okuyun ve kimseye söylemeyin.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Kodu okurum",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "SMS ile gelen kod bir ödemeyi onaylar. Kodu okumak, parayı kendi elinizle göndermek demektir."
+            },
+            {
+              "id": "hang",
+              "label": "Aramayı sonlandır",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Doğru. Hiçbir banka SMS kodunu telefonda sormaz.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "safe-account",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Banka",
+            "voice": "man"
+          },
+          "say": "O zaman paranızı korumak için güvenli bir hesaba aktarın. Hesap bilgilerini şimdi SMS ile gönderiyorum.",
+          "spoken": "O zaman, ee, paranızı korumak için güvenli bir hesaba aktarın. <breath> Hesap bilgilerini şimdi SMS ile gönderiyorum.",
+          "actions": [
+            {
+              "id": "transfer",
+              "label": "Parayı güvenli hesaba aktarırım",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Güvenli hesap diye bir şey yok: o hesap dolandırıcıya ait. Banka sizden asla para aktarmanızı istemez."
+            },
+            {
+              "id": "hang",
+              "label": "Aramayı sonlandır",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Harika bir karar. Para aktarmanızı istemek, dolandırıcılığın son adımıdır."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Görüşme sona erdi. Şimdi ne yaparsınız?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Banka",
+            "voice": "man"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "Kartın üzerindeki numarayı ara",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Doğru. Resmî numarayı kendiniz arayın, mümkünse başka bir telefondan; böylece hat açık kalamaz."
+            },
+            {
+              "id": "redial",
+              "label": "Gelen numarayı geri ara",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "Numara taklit edilebilir. Numarayı kartınızdan ya da bankanın resmî web sitesinden alın."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l1-choice-spoof",
+      "question": {
+        "prompt": "Ekranda bankanın resmî numarası görünüyor. Arama gerçek mi?",
+        "options": [
+          {
+            "id": "yes-number",
+            "label": "Evet, numara doğruysa arama gerçektir",
+            "correct": false,
+            "feedback": "Numara taklit edilebilir. Ekrandaki numara bir kanıt değildir."
+          },
+          {
+            "id": "call-back",
+            "label": "Bilemem, bu yüzden kendim geri ararım",
+            "correct": true,
+            "feedback": "Doğru. Resmî numarayı kendiniz arayın, mümkünse başka bir telefondan; böylece dolandırıcı hattı açık tutamaz."
+          },
+          {
+            "id": "ask-name",
+            "label": "Adını sorarım, bu yeterli",
+            "correct": false,
+            "feedback": "Dolandırıcı istediği adı verebilir. Ad sormak bir doğrulama değildir."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 00 00"
+              }
+            ],
+            "label": "Gelen arama"
+          }
+        }
+      },
+      "explain": "Arayanın adı ve numarası sahte olabilir. En güvenli yol, telefonu kapatıp resmî numarayı kendiniz aramaktır."
+    },
+    {
+      "type": "swipe",
+      "id": "l1-swipe",
+      "prompt": "Güvenli mi, dolandırıcılık mı?",
+      "cards": [
+        {
+          "id": "police-safe-account",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Arama: +994 12 000 11 22"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Polisten arıyoruz. Adınıza kredi çekilmiş. Paranızı hemen güvenli bir hesaba aktarın."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Polis asla paranızı güvenli bir hesaba aktarmanızı istemez. Bu, çok bilinen bir dolandırıcılık yöntemidir."
+        },
+        {
+          "id": "bank-call-back",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "sahilbank",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Arama: SahilBank"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Kartınızda şüpheli bir ödeme gördük. Bize hiçbir bilgi vermeyin; kartınızın arkasındaki numarayı arayın."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Sizden hiçbir şey istemiyor ve sizi resmî numaraya yönlendiriyor. Doğrulamak için kartınızdaki numarayı arayın."
+        },
+        {
+          "id": "support-password",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek-fake",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Arama: Teknik destek"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "E-posta hesabınızda virüs var. Parolanızı söyleyin, uzaktan temizleyeyim."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Teknik destek ekibinin parolanıza ihtiyacı yoktur. Parolanızı asla kimseye söylemeyin."
+        },
+        {
+          "id": "support-planned",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Arama: Teknik destek"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Dün açtığınız destek talebiyle ilgili arıyorum. Bilgisayarınızı yarın güncelleyeceğiz, sizin bir şey yapmanıza gerek yok."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Talebi siz açtınız ve sizden hiçbir şey istenmiyor. Bu, sıradan bir iş araması."
+        },
+        {
+          "id": "remote-app",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "sahilbank",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Arama: SahilBank"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hesabınızı korumak için bu uygulamayı yükleyin, ekranınızı görebileyim."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Uzaktan erişim uygulaması, telefonunuzun tamamını onlara teslim eder. Banka bunu asla istemez."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "l1-scenario",
+      "title": "Bir destek araması",
+      "start": "n1",
+      "nodes": [
+        {
+          "id": "n1",
+          "text": "Merhaba, ben teknik destekten Elvin. Hesabınız engelleniyor, parolanızı hemen doğrulamamız gerekiyor.",
+          "speaker": "Arayan",
+          "voice": "man-3",
+          "channel": "phone",
+          "spoken": "Merhaba, ben teknik destekten Elvin. <breath> Hesabınız engelleniyor, parolanızı hemen doğrulamamız gerekiyor.",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "it-destek-fake",
+              "caller": [
+                {
+                  "text": "Teknik destek"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 12 000 33 44"
+                }
+              ],
+              "label": "Gelen arama"
+            }
+          },
+          "choices": [
+            {
+              "label": "Parolamı söylerim",
+              "outcome": "compromised",
+              "feedback": "Parolanız artık başka birinin elinde. Parolanızı hemen değiştirin ve durumu resmî numaradan destek ekibine bildirin."
+            },
+            {
+              "label": "Kim olduğunu sorarım",
+              "next": "n2",
+              "feedback": "İyi bir başlangıç, ama alacağınız yanıta tamamen güvenmeyin."
+            },
+            {
+              "label": "Telefonu kapatırım, destek ekibini kendim ararım",
+              "outcome": "safe",
+              "feedback": "Mükemmel. Gerçek teknik destek ekibi parolanızı asla sormaz."
+            }
+          ]
+        },
+        {
+          "id": "n2",
+          "text": "Ben Elvin Hasanov, üçüncü kattayım. Acele edin, hesap beş dakika içinde silinecek. Bari şu programı yükleyin.",
+          "speaker": "Arayan",
+          "voice": "man-3",
+          "channel": "phone",
+          "spoken": "Ben Elvin Hasanov, üçüncü kattayım. Acele edin, ee, hesap beş dakika içinde silinecek. Bari şu programı yükleyin.",
+          "choices": [
+            {
+              "label": "Programı yüklerim",
+              "next": "n3",
+              "feedback": "Uzaktan erişim programıyla bilgisayarınızı görebilir ve kontrol edebilir."
+            },
+            {
+              "label": "Kendim geri arayacağımı söylerim",
+              "outcome": "safe",
+              "feedback": "Doğru karar. Acele ettirmek bir uyarı işaretidir; geri aramak ise en iyi doğrulamadır."
+            }
+          ]
+        },
+        {
+          "id": "n3",
+          "text": "Bilinmeyen bir program açılıyor ve imleç kendi kendine hareket ediyor.",
+          "choices": [
+            {
+              "label": "İnternet bağlantısını keserim, destek ekibini ararım",
+              "outcome": "risky",
+              "feedback": "Doğru tepki. Hızlı bildirmek zararı sınırlar."
+            },
+            {
+              "label": "Utanırım ve kimseye söylemem",
+              "outcome": "compromised",
+              "feedback": "Sessiz kalmak saldırgana zaman kazandırır. Bildirmekte utanılacak bir şey yok; bu herkesi korur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "l1-recap",
+      "points": [
+        "Arayanın adı ve numarası sahte olabilir",
+        "Kodu, PIN'i ya da parolayı asla kimseye söylemeyin",
+        "Telefonu kapatın ve resmî numarayı kendiniz arayın"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

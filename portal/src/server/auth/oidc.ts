@@ -1,7 +1,7 @@
 import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { signValue, unsignValue } from "../crypto";
-import { destinationProblem } from "../net-guard";
+import { guardedRequest } from "../net-guard";
 
 /**
  * Minimal OpenID Connect relying party (authorization code flow with PKCE, state and nonce).
@@ -11,15 +11,21 @@ export type OidcProvider = { issuer: string; authorizationEndpoint: string; toke
 
 const trimSlash = (s: string) => s.replace(/\/+$/, "");
 
-async function getJson(url: string, init?: RequestInit): Promise<Record<string, unknown>> {
+/** Discovery documents, token answers and key sets are small; a provider that sends more is refused. */
+export const OIDC_MAX_RESPONSE_BYTES = 256 * 1024;
+
+async function getJson(url: string, init: { method?: string; headers?: Record<string, string>; body?: string } = {}): Promise<Record<string, unknown>> {
   // A tenant's issuer must be a public host: the platform must not probe its own network for a customer.
-  if (process.env.NODE_ENV === "production") {
-    const u = new URL(url);
-    if (await destinationProblem(u.hostname, Number(u.port || 443), "https")) throw new Error("blocked_endpoint");
+  const res = await guardedRequest(url, { ...init, headers: { accept: "application/json", ...init.headers }, kind: "https", vet: process.env.NODE_ENV === "production", maxBytes: OIDC_MAX_RESPONSE_BYTES });
+  if (res.status < 200 || res.status > 299) throw new Error(`http_${res.status}`);
+  // application/json, or a JSON subtype such as application/jwk-set+json.
+  if (!/^application\/([\w.-]+\+)?json\s*(;|$)/i.test(res.headers["content-type"] ?? "")) throw new Error("bad_content_type");
+  let body: unknown;
+  try {
+    body = JSON.parse(res.body.toString("utf8"));
+  } catch {
+    throw new Error("bad_json");
   }
-  const res = await fetch(url, { ...init, cache: "no-store", redirect: "error", signal: AbortSignal.timeout(10_000) });
-  if (!res.ok) throw new Error(`http_${res.status}`);
-  const body = (await res.json()) as unknown;
   if (!body || typeof body !== "object") throw new Error("bad_json");
   return body as Record<string, unknown>;
 }
@@ -33,11 +39,27 @@ function endpoint(value: unknown): string {
   return url.toString();
 }
 
+/**
+ * The sign-in page people are sent to must be on the issuer's own host. Amazon Cognito is the one known provider that
+ * serves it elsewhere: the user pool's domain under amazoncognito.com.
+ */
+function ownSignInHost(signIn: string, issuer: string): boolean {
+  const a = new URL(signIn).hostname;
+  const i = new URL(issuer).hostname;
+  return a === i || (/^cognito-idp\.[a-z0-9-]+\.amazonaws\.com$/.test(i) && a.endsWith(".amazoncognito.com"));
+}
+
+/** Discovered providers for five minutes: /api/sso/start is anonymous, so a visit must not mean a request to the provider. */
+const DISCOVERY_TTL_MS = 5 * 60_000;
+const discovered = new Map<string, { at: number; provider: OidcProvider }>();
+
 export async function discover(issuer: string): Promise<OidcProvider> {
+  const cached = discovered.get(issuer);
+  if (cached && Date.now() - cached.at < DISCOVERY_TTL_MS) return cached.provider;
   const d = await getJson(`${trimSlash(endpoint(issuer))}/.well-known/openid-configuration`);
   if (typeof d.issuer !== "string" || trimSlash(d.issuer) !== trimSlash(issuer)) throw new Error("issuer_mismatch");
   const methods = Array.isArray(d.token_endpoint_auth_methods_supported) ? (d.token_endpoint_auth_methods_supported as unknown[]) : [];
-  return {
+  const provider: OidcProvider = {
     issuer: d.issuer,
     authorizationEndpoint: endpoint(d.authorization_endpoint),
     tokenEndpoint: endpoint(d.token_endpoint),
@@ -45,6 +67,11 @@ export async function discover(issuer: string): Promise<OidcProvider> {
     // client_secret_basic is the default; use the form field only when the provider does not offer basic.
     secretPost: methods.length > 0 && !methods.includes("client_secret_basic") && methods.includes("client_secret_post"),
   };
+  if (!ownSignInHost(provider.authorizationEndpoint, issuer)) throw new Error("foreign_authorization_endpoint");
+  const now = Date.now();
+  for (const [key, entry] of discovered) if (now - entry.at >= DISCOVERY_TTL_MS) discovered.delete(key);
+  discovered.set(issuer, { at: now, provider });
+  return provider;
 }
 
 /** Short-lived, signed cookie that carries the login attempt from /api/sso/start to the callback. */
@@ -80,7 +107,7 @@ export async function exchangeCode(p: OidcProvider, input: { code: string; redir
   const headers: Record<string, string> = { "content-type": "application/x-www-form-urlencoded", accept: "application/json" };
   if (input.clientSecret && p.secretPost) body.set("client_secret", input.clientSecret);
   else if (input.clientSecret) headers.authorization = `Basic ${Buffer.from(`${encodeURIComponent(input.clientId)}:${encodeURIComponent(input.clientSecret)}`).toString("base64")}`;
-  const tokens = await getJson(p.tokenEndpoint, { method: "POST", headers, body });
+  const tokens = await getJson(p.tokenEndpoint, { method: "POST", headers, body: body.toString() });
   if (typeof tokens.id_token !== "string") throw new Error("no_id_token");
   return tokens.id_token;
 }

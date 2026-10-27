@@ -1,0 +1,366 @@
+{
+  "id": "passphrases",
+  "title": "Passphrasen",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "long-beats-complex",
+      "beats": [
+        {
+          "id": "short",
+          "say": "Das sieht kompliziert aus. Aber ein Name, eine Jahreszahl und ein Ausrufezeichen sind genau das Muster, das Angreifer zuerst ausprobieren.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "stat",
+            "value": "Aynur1985!",
+            "label": "Wirkt komplex, ist leicht zu knacken"
+          }
+        },
+        {
+          "id": "phrase",
+          "say": "Besser: eine Passphrase aus vier oder mehr zufälligen Wörtern. Lang, leicht zu merken und sehr schwer zu erraten.",
+          "mood": "happy",
+          "gesture": "nod",
+          "visual": {
+            "kind": "stat",
+            "value": "veilchen ziegel ozean uhr",
+            "label": "Nur ein Beispiel – denken Sie sich Ihre eigene aus"
+          },
+          "stage": "back"
+        },
+        {
+          "id": "length",
+          "say": "Länge schlägt Komplexität. Nehmen Sie mindestens fünfzehn Zeichen. Leerzeichen oder Bindestriche zwischen den Wörtern sind in Ordnung.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "stat",
+            "value": "15+",
+            "label": "Zeichen als empfohlene Mindestlänge"
+          },
+          "checkpoint": {
+            "prompt": "Welches Passwort ist stärker?",
+            "options": [
+              {
+                "id": "swaps",
+                "label": "Pa$$w0rd2026",
+                "correct": false,
+                "feedback": "Solche Ersatzzeichen für Buchstaben kennen Programme zum Knacken von Passwörtern längst."
+              },
+              {
+                "id": "words",
+                "label": "kamel laterne zitrone wolke",
+                "correct": true,
+                "feedback": "Richtig. Vier zufällige Wörter sind lang und unvorhersehbar."
+              }
+            ]
+          }
+        },
+        {
+          "id": "stuffing",
+          "say": "Wenn bei einer Website Daten abfließen, probieren Angreifer das erbeutete Passwort auch auf anderen Websites aus. Deshalb braucht jedes Konto ein eigenes.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        }
+      ]
+    },
+    {
+      "type": "password",
+      "id": "make-passphrase",
+      "prompt": "Erstellen Sie Ihre eigene Passphrase.",
+      "targetScore": 4,
+      "tips": [
+        "Geben Sie hier nicht Ihr echtes Passwort ein, das ist nur eine Übung.",
+        "Wählen Sie vier oder mehr zufällige Wörter.",
+        "Vermeiden Sie Liedtexte, Gedichte und Sprichwörter.",
+        "Lassen Sie Namen, Datumsangaben und Ihren Arbeitsplatz weg."
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "leak-alert",
+      "prompt": "Finden Sie die Anzeichen einer Fälschung in dieser Warnung vor einem Datenleck.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "xidmet-agentliyi-fake",
+        "from": {
+          "name": [
+            {
+              "text": "Sicherheitszentrum",
+              "reveal": "security@xidmetagentliyi-az.com"
+            }
+          ],
+          "address": [
+            {
+              "text": "security@"
+            },
+            {
+              "text": "xidmetagentliyi-az.com",
+              "spot": "sender-domain"
+            }
+          ]
+        },
+        "to": "a.hasanova@xidmetagentliyi.az",
+        "subject": [
+          {
+            "text": "Ihr Passwort wurde in einem Datenleck gefunden"
+          }
+        ],
+        "time": "08:47",
+        "body": [
+          [
+            {
+              "text": "Sehr geehrte Benutzerin, sehr geehrter Benutzer,",
+              "spot": "greeting"
+            }
+          ],
+          [
+            {
+              "text": "Ihr Passwort wurde in einer Datenbank gefunden, die im Internet veröffentlicht wurde."
+            }
+          ],
+          [
+            {
+              "text": "Um Ihr Konto zu schützen, "
+            },
+            {
+              "text": "geben Sie in diesem Formular Ihr altes und Ihr neues Passwort ein.",
+              "spot": "old-password"
+            }
+          ],
+          [
+            {
+              "text": "Formular öffnen",
+              "spot": "link",
+              "link": {
+                "label": "Formular öffnen",
+                "href": "https://parol-yenile.info/forma"
+              }
+            }
+          ],
+          [
+            {
+              "text": "Wenn Sie nicht innerhalb einer Stunde handeln, wird das Konto gelöscht.",
+              "spot": "urgency"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender-domain",
+          "label": "Gefälschte Domain",
+          "explain": "Die Domain der Agentur ist xidmetagentliyi.az, ohne -az.com am Ende."
+        },
+        {
+          "id": "greeting",
+          "label": "Allgemeine Anrede",
+          "explain": "Ihr eigenes Sicherheitsteam würde Sie mit Ihrem Namen ansprechen."
+        },
+        {
+          "id": "old-password",
+          "label": "Fragt nach dem alten Passwort",
+          "explain": "Ein echter Dienst verlangt nicht, dass Sie Ihr altes Passwort in ein Formular aus einer E-Mail eingeben. Ändern Sie es selbst auf der Website, die Sie kennen."
+        },
+        {
+          "id": "link",
+          "label": "Fremder Link",
+          "explain": "Der Link führt zu einer anderen Domain, nicht zur Website der Agentur."
+        },
+        {
+          "id": "urgency",
+          "label": "Drohung mit einer Stunde Frist",
+          "explain": "Eine knappe Frist und eine Drohung sollen Sie zu unüberlegtem Handeln drängen."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "reset-page",
+      "environment": "browser",
+      "title": "Passwort zurücksetzen",
+      "intro": "Nach einer Warnung vor einem Datenleck öffnet sich im Browser eine Seite zum Zurücksetzen des Passworts. Lesen Sie die Adresse und entscheiden Sie.",
+      "steps": [
+        {
+          "id": "leak-page",
+          "label": "Ihr Passwort wurde in einem Datenleck gefunden",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi-fake",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "hesab-yoxla.info"
+              },
+              {
+                "text": "hesab-yoxla.info",
+                "spot": "real-domain"
+              },
+              {
+                "text": "/sizma"
+              }
+            ]
+          },
+          "say": "Die Seite macht Ihnen Angst und setzt Sie unter Zeitdruck. Wem gehört diese Adresse?",
+          "actions": [
+            {
+              "id": "reset-here",
+              "label": "Passwort hier zurücksetzen",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Folgen Sie nach einer Warnung vor einem Datenleck nicht dem Link. Ändern Sie das Passwort auf einer Website, die Sie selbst aufrufen."
+            },
+            {
+              "id": "close",
+              "label": "Tab schließen, ich öffne das Portal selbst",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig: hesab-yoxla.info ist nicht die Website der Agentur. Öffnen Sie das Portal selbst über ein Lesezeichen.",
+              "next": "real-reset"
+            }
+          ]
+        },
+        {
+          "id": "fake-reset",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi-fake",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "parol-yenile.info"
+              },
+              {
+                "text": "parol-yenile.info",
+                "spot": "real-domain"
+              },
+              {
+                "text": "/agentlik"
+              }
+            ],
+            "fields": [
+              "E-Mail",
+              "Altes Passwort",
+              "Neues Passwort"
+            ],
+            "button": "Passwort zurücksetzen"
+          },
+          "say": "Das Formular will auch Ihr altes Passwort. Prüfen Sie die Adresse.",
+          "actions": [
+            {
+              "id": "submit",
+              "label": "Passwort zurücksetzen",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Ein gefälschtes Formular, das nach dem alten Passwort fragt, stiehlt es. Ändern Sie es sofort im offiziellen Portal und melden Sie den Vorfall."
+            },
+            {
+              "id": "close",
+              "label": "Tab schließen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig. Die Domain parol-yenile.info gehört nicht zur Agentur, also geben Sie hier nichts ein."
+            },
+            {
+              "id": "report",
+              "label": "Website melden",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Sehr gut. Wenn Sie die gefälschte Website melden, kann sie auch für andere gesperrt werden."
+            }
+          ]
+        },
+        {
+          "id": "real-reset",
+          "label": "Sie haben das Portal selbst geöffnet",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/profil/parol",
+                "reveal": "xidmetagentliyi.az"
+              }
+            ],
+            "fields": [
+              "Altes Passwort",
+              "Neue Passphrase"
+            ],
+            "button": "Ändern"
+          },
+          "say": "Das ist das eigene Portal der Agentur. Was tun Sie jetzt?",
+          "actions": [
+            {
+              "id": "change",
+              "label": "Passwort ändern",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Richtig, Sie haben es im offiziellen Portal geändert. Nehmen Sie als neues Passwort eine lange Passphrase, die Sie nirgendwo sonst verwenden."
+            },
+            {
+              "id": "later",
+              "label": "Ich ändere es später",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Wenn das Passwort in einem Datenleck aufgetaucht ist, probiert es vielleicht schon jemand aus. Ändern Sie es jetzt im offiziellen Portal."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "true-rules",
+      "question": {
+        "prompt": "Welche Regeln stimmen?",
+        "options": [
+          {
+            "id": "length",
+            "label": "Länge zählt mehr als Komplexität",
+            "correct": true,
+            "feedback": "Richtig. Ein langes Passwort ist viel schwerer zu knacken."
+          },
+          {
+            "id": "unique",
+            "label": "Für jedes Konto ein eigenes Passwort",
+            "correct": true,
+            "feedback": "Richtig. Dann gefährdet ein Datenleck nur ein einziges Konto."
+          },
+          {
+            "id": "monthly",
+            "label": "Das Passwort jeden Monat ändern",
+            "correct": false,
+            "feedback": "Wer ohne Anlass wechselt, landet oft bei schwachen, ähnlichen Passwörtern. Ändern Sie es sofort, wenn Sie ein Datenleck vermuten."
+          },
+          {
+            "id": "birth-year",
+            "label": "Ein Geburtsjahr hilft beim Merken",
+            "correct": false,
+            "feedback": "Ein Geburtsjahr ist leicht herauszufinden, und Angreifer probieren es als Erstes aus."
+          }
+        ],
+        "multi": true
+      },
+      "explain": "Aktuelle Empfehlung: lange, einzigartige Passwörter, die nach einem Datenleck sofort geändert werden. Wenn die Regeln Ihrer Organisation abweichen, halten Sie sich an diese."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Eine lange Passphrase schlägt ein kurzes, komplexes Passwort.",
+        "Für jedes Konto ein eigenes Passwort.",
+        "Nach einem Datenleck das Passwort sofort ändern."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

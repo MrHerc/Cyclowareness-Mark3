@@ -1,0 +1,532 @@
+{
+  "id": "ai-lures-fake-apps",
+  "title": "فخاخ من صنع الذكاء الاصطناعي",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l2-tutor",
+      "beats": [
+        {
+          "id": "l2-b1",
+          "say": "الذكاء الاصطناعي يساعد المحتالين أيضًا: رسائل بلا أخطاء، وأصوات مقنعة، وتطبيقات مزيفة.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          }
+        },
+        {
+          "id": "l2-b2",
+          "say": "قد لا تحتوي رسالة التصيد الإلكتروني اليوم على أي خطأ لغوي. فتحقق من المرسل ومن الطلب، لا من القواعد اللغوية.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "idare-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "نرمين حسينوفا"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "n.huseynova@"
+                  },
+                  {
+                    "text": "idare-mail.test",
+                    "spot": "domain"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "بيانات للتقرير"
+                }
+              ],
+              "time": "09:10",
+              "body": [
+                [
+                  {
+                    "text": "عزيزي الزميل، أود أن أطلب منك خدمة صغيرة تخص التقرير الذي سنقدمه إلى الوزارة."
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "l2-b3",
+          "say": "تطبيقات روبوتات المحادثة وإضافات المتصفح التي تعرض نسخة «Pro» مجانًا قد تسرق بياناتك.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        },
+        {
+          "id": "l2-b4",
+          "say": "لا تثبت التطبيقات والإضافات إلا من مصدر اعتمدته جهتك.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l2-sim",
+      "environment": "browser",
+      "title": "نسخة Pro مجانية",
+      "intro": "عرض عليك إعلان نسخة «Pro» مجانية من روبوت محادثة. تحقق من الصفحات وقرر في كل خطوة.",
+      "steps": [
+        {
+          "id": "pro-page",
+          "label": "NeyroSöhbət Pro: جميع الميزات مجانًا",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "neyrosohbet-fake",
+            "url": [
+              {
+                "text": "https://neyrosohbet-pro.test",
+                "reveal": "neyrosohbet-pro.test"
+              }
+            ]
+          },
+          "say": "انظر إلى شريط العنوان.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "تثبيت الإضافة",
+              "kind": "install",
+              "outcome": "risky",
+              "feedback": "تثبيت إضافة من موقع غير رسمي أمر محفوف بالمخاطر. لا تأخذ الإضافات إلا من مصدر تسمح به جهتك."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق علامة التبويب",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. نسخة «Pro» المجانية من أي خدمة لا تأتي من موقع غريب.",
+              "next": "fake-login"
+            }
+          ]
+        },
+        {
+          "id": "extension",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "neyrosohbet-fake",
+            "tone": "system",
+            "title": [
+              {
+                "text": "هل تريد إضافة «NeyroSöhbət Pro»؟"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "يمكن لهذه الإضافة قراءة جميع بياناتك وتغييرها في كل موقع تزوره."
+                }
+              ]
+            ],
+            "buttons": [
+              "إلغاء",
+              "إضافة إلى المتصفح"
+            ]
+          },
+          "actions": [
+            {
+              "id": "add",
+              "label": "إضافة إلى المتصفح",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "أصبحت الإضافة الآن ترى بريد عملك الإلكتروني وكل صفحة تفتحها. احذفها وأبلغ فريق الأمن السيبراني."
+            },
+            {
+              "id": "cancel",
+              "label": "إلغاء",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. إضافة روبوت المحادثة لا تحتاج إلى قراءة كل المواقع."
+            }
+          ]
+        },
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "neyrosohbet-fake",
+            "brand": "NeyroSöhbət",
+            "url": [
+              {
+                "text": "https://neyrosohbet.login-pro.test",
+                "reveal": "login-pro.test"
+              }
+            ],
+            "fields": [
+              "بريد العمل الإلكتروني",
+              "كلمة المرور"
+            ],
+            "button": "تسجيل الدخول"
+          },
+          "actions": [
+            {
+              "id": "login",
+              "label": "تسجيل الدخول",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "وصلت كلمة مرور عملك إلى محتال. غيرها الآن وأبلغ عن الحادثة."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق علامة التبويب",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. العنوان ليس النطاق الخاص بالخدمة."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن الموقع",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "أحسنت. الإبلاغ عن موقع مزيف يحمي الآخرين أيضًا."
+            }
+          ]
+        },
+        {
+          "id": "setup-file",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "zeka-foto",
+            "name": [
+              {
+                "text": "ZekaFoto_AI_Setup.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "48 MB",
+            "source": [
+              {
+                "text": "zeka-foto-free.test"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "البرنامج ليس من مصدر رسمي وقد يكون ضارًا. والدعم الفني هو من يثبت البرامج على أجهزة العمل."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "صحيح. برامج «الذكاء الاصطناعي» المجانية من أكثر الأقنعة شيوعًا للبرمجيات الضارة."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l2-hotspot",
+      "prompt": "ابحث عن الفخاخ في هذه الرسالة الخالية من الأخطاء اللغوية.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "idare-fake",
+        "from": {
+          "name": [
+            {
+              "text": "نرمين حسينوفا"
+            }
+          ],
+          "address": [
+            {
+              "text": "n.huseynova@"
+            },
+            {
+              "text": "idare-mail.test",
+              "spot": "domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "عاجل: "
+          },
+          {
+            "text": "اليوم قبل الساعة 15:00",
+            "spot": "deadline"
+          }
+        ],
+        "time": "09:10",
+        "body": [
+          [
+            {
+              "text": "عزيزي الزميل، نعد تقريرًا للوزارة."
+            }
+          ],
+          [
+            {
+              "text": "ارفع أرقام هويات جميع موظفي الإدارة وأرقام هواتفهم",
+              "spot": "request"
+            },
+            {
+              "text": " "
+            },
+            {
+              "text": "إلى هذا النموذج",
+              "spot": "link",
+              "link": {
+                "label": "إلى هذا النموذج",
+                "href": "https://forma-yukle.test/idare"
+              }
+            },
+            {
+              "text": "."
+            }
+          ],
+          [
+            {
+              "text": "لا تتصل، فأنا في اجتماع.",
+              "spot": "no-call"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "نطاق غريب",
+          "explain": "اسم المديرة مألوف، لكن النطاق ليس نطاق الجهة. واللغة السليمة لا تخفي ذلك."
+        },
+        {
+          "id": "deadline",
+          "label": "مهلة صارمة",
+          "explain": "الاستعجال لا يترك لك وقتًا للتحقق."
+        },
+        {
+          "id": "request",
+          "label": "طلب بيانات شخصية",
+          "explain": "لا مكان لأرقام هويات الزملاء وهواتفهم في نموذج خارجي."
+        },
+        {
+          "id": "link",
+          "label": "نموذج خارجي",
+          "explain": "النموذج ليس جزءًا من نظام الجهة، ولا أحد يعرف في أي أيد ستقع البيانات."
+        },
+        {
+          "id": "no-call",
+          "label": "«لا تتصل»",
+          "explain": "الهدف من هذا منعك من التحقق. ولهذا السبب بالذات، اتصل بالرقم الذي تعرفه."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "l2-swipe",
+      "prompt": "آمن أم فخ؟",
+      "cards": [
+        {
+          "id": "voice-note",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "المدير"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "مرحبًا، هذا أنا. أرسل رمز التأكيد إلى هذا الرقم فورًا، وسأشرح لك لاحقًا."
+                  }
+                ],
+                "voice": "man-2",
+                "spoken": "مرحبًا، هذا أنا. <breath> أرسل رمز التأكيد إلى هذا الرقم فورًا، وسأشرح لك لاحقًا."
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "يمكن تقليد الصوت بالذكاء الاصطناعي. اتصل بنفسك بمديرك على رقمه المعروف لديك."
+        },
+        {
+          "id": "photo-perms",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "zeka-foto",
+            "app": "Zəka Foto",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "الكاميرا"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "معرض الصور"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "جهات الاتصال"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "قراءة الرسائل النصية"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "محرر الصور لا يحتاج إلى جهات الاتصال ولا إلى الرسائل النصية. لا تثبت تطبيقًا يطلب أذونات زائدة."
+        },
+        {
+          "id": "komekci-notif",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "idare-komekci",
+            "app": "İdarə Köməkçisi",
+            "title": [
+              {
+                "text": "ملخصك جاهز"
+              }
+            ],
+            "body": [
+              {
+                "text": "يمكنك فتحه عبر البوابة الداخلية."
+              }
+            ],
+            "time": "11:05"
+          },
+          "verdict": "safe",
+          "explain": "أداة الجهة المعتمدة ترسل إشعارًا متوقعًا، ولا تطلب الضغط على رابط أو إدخال رمز."
+        },
+        {
+          "id": "pro-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "neyrosohbet-fake",
+            "sender": [
+              {
+                "text": "NeyroPro"
+              }
+            ],
+            "time": "12:30",
+            "messages": [
+              [
+                {
+                  "text": "احصل على NeyroSöhbət Pro مجانًا لمدة سنة! للتفعيل: neyrosohbet-pro.test"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "عرض Pro المجاني قد يكون فخًا. تحقق من اشتراكك في التطبيق الرسمي للخدمة فقط."
+        },
+        {
+          "id": "approved-list",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "الدعم الفني"
+                }
+              ],
+              "address": [
+                {
+                  "text": "destek@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "أدوات الذكاء الاصطناعي المعتمدة"
+              }
+            ],
+            "time": "14:00",
+            "body": [
+              [
+                {
+                  "text": "القائمة متاحة على البوابة الداخلية. وإذا احتجت إلى أداة جديدة، فأرسل إلينا طلبًا."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "الرسالة من عنوان داخلي، ولا تحتوي على رابط أو ملف. وهذه معلومات مفيدة."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l2-choice",
+      "question": {
+        "prompt": "تطلب إضافة متصفح إذنًا «بقراءة جميع بياناتك في كل المواقع». ماذا يعني ذلك؟",
+        "options": [
+          {
+            "id": "normal",
+            "label": "كل الإضافات تطلب هذا، والأمر طبيعي",
+            "correct": false,
+            "feedback": "هذا أوسع إذن على الإطلاق. فالإضافة تستطيع أن ترى بريدك الإلكتروني والصفحات التي تكتب فيها كلمات المرور."
+          },
+          {
+            "id": "sees-all",
+            "label": "تستطيع أن ترى كل صفحة أفتحها، بما فيها بريد العمل",
+            "correct": true,
+            "feedback": "صحيح. لا تثبت مثل هذه الإضافة إلا إذا فحصتها جهتك واعتمدتها."
+          },
+          {
+            "id": "only-ai",
+            "label": "سترى صفحة روبوت المحادثة فقط",
+            "correct": false,
+            "feedback": "لا. عبارة «كل المواقع» تعني فعلًا كل المواقع."
+          }
+        ]
+      },
+      "explain": "مهما بدت الإضافة مفيدة، فأذوناتها هي التي تبين ما تستطيع فعله."
+    },
+    {
+      "type": "recap",
+      "id": "l2-recap",
+      "points": [
+        "خلو الرسالة من الأخطاء اللغوية لا يجعلها حقيقية: تحقق من المرسل ومن الطلب.",
+        "لا تأخذ تطبيقات وإضافات «Pro» إلا من مصدر معتمد.",
+        "إذا طلب منك صوت مألوف مالًا أو رمزًا، فاتصل بنفسك بالرقم الذي تعرفه."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

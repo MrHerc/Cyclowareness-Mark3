@@ -1,0 +1,525 @@
+{
+ "id": "home-network",
+ "title": "الشبكة المنزلية",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sc2-tutor",
+   "beats": [
+    {
+     "id": "sc2-b1",
+     "say": "في المنزل، يتشارك جهاز الراوتر والتلفاز وكاميرا مراقبة الطفل شبكة واحدة. فإذا كان أحدها ضعيفًا، أصبحت كلها في خطر.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    {
+     "id": "sc2-b2",
+     "say": "إذا وصلك إشعار كهذا، فهناك من يشاهد كاميرتك دون علمك.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2f-korpe-gozu",
+       "app": "Körpə Gözü",
+       "title": [
+        {
+         "text": "مشاهدة مباشرة من جهاز جديد"
+        }
+       ],
+       "body": [
+        {
+         "text": "جهاز غير معروف، من خارج البلاد",
+         "spot": "unknown-device"
+        }
+       ],
+       "time": "01:07"
+      }
+     },
+     "highlight": "unknown-device"
+    },
+    {
+     "id": "sc2-b3",
+     "say": "الكاميرا في غرفة الطفل تصور أكثر اللحظات خصوصية. فامنحها أقوى حماية.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "sc2-b4",
+     "say": "لنلق نظرة على الإعدادات معًا: أيها آمن، وأيها يشكل خطرًا؟",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "sc2-swipe",
+   "prompt": "هل هذا الإعداد آمن أم يشكل تهديدًا؟",
+   "cards": [
+    {
+     "id": "upnp-on",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-evsebeke",
+      "tone": "system",
+      "title": [
+       {
+        "text": "جهاز الراوتر: UPnP"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "مفعل. يمكن للأجهزة فتح المنافذ بنفسها."
+        }
+       ]
+      ],
+      "buttons": [
+       "حفظ"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "تتيح هذه الميزة للأجهزة أن تفتح الأبواب بنفسها. إذا لم تكن بحاجة إليها، فأوقفها."
+    },
+    {
+     "id": "guest-network",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-evsebeke",
+      "tone": "system",
+      "title": [
+       {
+        "text": "شبكة الضيوف: Home-Devices"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "الكاميرا والتلفاز والمكنسة الروبوتية متصلة هنا. أما الجوالات والحواسيب المحمولة فتبقى على الشبكة الرئيسية."
+        }
+       ]
+      ],
+      "buttons": [
+       "حفظ"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "صحيح. حتى لو تعرض جهاز ضعيف للاختراق، فلن يصل إلى جوالك أو حاسوبك."
+    },
+    {
+     "id": "router-default",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-evsebeke",
+      "tone": "system",
+      "title": [
+       {
+        "text": "لوحة تحكم جهاز الراوتر"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "المستخدم: admin. كلمة المرور: الافتراضية المطبوعة أسفل الجهاز."
+        }
+       ]
+      ],
+      "buttons": [
+       "حفظ"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "جهاز الراوتر هو الباب الأمامي لمنزلك كله. استبدل كلمة المرور الافتراضية بعبارة مرور طويلة."
+    },
+    {
+     "id": "auto-update",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-baxiskam",
+      "app": "BaxışKam",
+      "title": [
+       {
+        "text": "تم تحديث البرنامج الثابت تلقائيًا"
+       }
+      ],
+      "body": [
+       {
+        "text": "تم تثبيت الإصدار 5.2.8."
+       }
+      ],
+      "time": "03:00"
+     },
+     "verdict": "safe",
+     "explain": "التحديثات التلقائية تسد الثغرات المعروفة من تلقاء نفسها. أبق هذا الإعداد مفعلًا."
+    },
+    {
+     "id": "port-forward",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-evsebeke",
+      "tone": "system",
+      "title": [
+       {
+        "text": "إعادة توجيه المنافذ"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "المنفذ 554: الكاميرا، مفتوح للجميع على الإنترنت"
+        }
+       ]
+      ],
+      "buttons": [
+       "حفظ"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "هذه القاعدة تكشف الكاميرا للإنترنت بأكمله. احذفها، ولا تشاهد عن بعد إلا عبر التطبيق الرسمي."
+    },
+    {
+     "id": "wifi-security",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-evsebeke",
+      "tone": "system",
+      "title": [
+       {
+        "text": "أمان شبكة Wi-Fi"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "WPA3، عبارة مرور طويلة"
+        }
+       ]
+      ],
+      "buttons": [
+       "حفظ"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "التشفير الحديث وعبارة المرور الطويلة يبقيان الغرباء خارج شبكتك المنزلية."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "sc2-sim",
+   "environment": "phone",
+   "title": "إشعار ليلي",
+   "intro": "الساعة الواحدة بعد منتصف الليل. يصلك إشعار من كاميرا مراقبة الطفل. اتخذ القرار الصحيح في كل خطوة.",
+   "steps": [
+    {
+     "id": "night-alert",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-korpe-gozu",
+      "app": "Körpə Gözü",
+      "title": [
+       {
+        "text": "مشاهدة مباشرة من جهاز جديد"
+       }
+      ],
+      "body": [
+       {
+        "text": "جهاز غير معروف، من خارج البلاد، 01:07"
+       }
+      ],
+      "time": "01:07"
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "فتح الإشعار",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "صحيح. اعرف أولًا ما يحدث من خلال تطبيقك أنت."
+      },
+      {
+       "id": "ignore",
+       "label": "تأجيله حتى الصباح",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "هناك من يشاهد غرفة الطفل الآن. هذا لا يحتمل التأجيل."
+      }
+     ]
+    },
+    {
+     "id": "sessions",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-korpe-gozu",
+      "tone": "app",
+      "title": [
+       {
+        "text": "الأجهزة النشطة: 2"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "جوالك، باكو"
+        }
+       ],
+       [
+        {
+         "text": "جهاز غير معروف، من خارج البلاد، 01:07"
+        }
+       ]
+      ],
+      "buttons": [
+       "تسجيل الخروج من الكل",
+       "إغلاق"
+      ]
+     },
+     "say": "هناك جهازان متصلان بالكاميرا.",
+     "actions": [
+      {
+       "id": "sign-out",
+       "label": "تسجيل الخروج من كل الأجهزة وتغيير كلمة المرور",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "أحسنت. خرج جهاز الغريب، وكلمة المرور الجديدة تمنعه من العودة."
+      },
+      {
+       "id": "close",
+       "label": "إغلاق",
+       "kind": "cancel",
+       "outcome": "compromised",
+       "feedback": "يبقى جهاز الغريب متصلًا ويواصل المشاهدة. سجل الخروج من كل الأجهزة فورًا."
+      }
+     ]
+    },
+    {
+     "id": "group-tip",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "مجموعة أولياء الأمور"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "تعرضت كاميرتنا للاختراق أيضًا. هذا التطبيق يحميها، نزله من هنا: "
+         },
+         {
+          "text": "korpe-qoruyucu.example.info/qoru.apk",
+          "link": {
+           "label": "korpe-qoruyucu.example.info/qoru.apk",
+           "href": "https://korpe-qoruyucu.example.info/qoru.apk"
+          }
+         }
+        ],
+        "time": "08:20"
+       }
+      ]
+     },
+     "say": "في الصباح، تشارك مجموعة أولياء الأمور نصيحة.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "فتح الرابط",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "التطبيق المجهول المصدر قد يستولي على جوالك بدلًا من حماية كاميرتك. لا تثبت التطبيقات إلا من المتجر الرسمي.",
+       "next": "apk"
+      },
+      {
+       "id": "ignore",
+       "label": "عدم الضغط على الرابط",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "صحيح. الرابط الذي يبدو كأنه مساعدة قد يكون فخًا جديدًا.",
+       "next": "update-offer"
+      }
+     ]
+    },
+    {
+     "id": "apk",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "KorpeQoruyucu.apk"
+       }
+      ],
+      "type": "apk",
+      "size": "8.4 MB",
+      "source": [
+       {
+        "text": "korpe-qoruyucu.example.info"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "install",
+       "label": "تثبيت",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "كان هذا التطبيق سيطلب أذونات واسعة، وقد يسرق بياناتك. لا تثبته."
+      },
+      {
+       "id": "cancel",
+       "label": "إلغاء",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "قرار صائب. ما يحمي الكاميرا هو كلمة المرور والتحديثات والتحقق بخطوتين، لا تطبيق إضافي."
+      }
+     ]
+    },
+    {
+     "id": "update-offer",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-korpe-gozu",
+      "app": "Körpə Gözü",
+      "title": [
+       {
+        "text": "التحديث والتحقق بخطوتين"
+       }
+      ],
+      "body": [
+       {
+        "text": "حدث الكاميرا، وفعل التحقق بخطوتين للحساب."
+       }
+      ],
+      "time": "08:35"
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "التحديث والتفعيل",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "صحيح. التحديث يسد الثغرة، والتحقق بخطوتين يجعل كلمة المرور المسروقة بلا فائدة."
+      },
+      {
+       "id": "later",
+       "label": "لاحقًا",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "ما زالت الكاميرا تعمل بالثغرة القديمة. حدثها اليوم."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "sc2-scenario",
+   "title": "صوت من الكاميرا",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "في المساء، يصدر صوت غريب من مكبر صوت كاميرا مراقبة الطفل. هناك شخص يتحدث إلى الطفل.",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     },
+     "choices": [
+      {
+       "label": "أفصل الكاميرا عن الكهرباء",
+       "next": "n2",
+       "feedback": "صحيح. اقطع الصورة والصوت أولًا، ثم أغلق باب الوصول."
+      },
+      {
+       "label": "أرد وأسأل من المتحدث",
+       "outcome": "risky",
+       "feedback": "الحديث يضيع الوقت بينما تواصل الكاميرا العمل. أطفئها أولًا."
+      },
+      {
+       "label": "لا بد أنني تخيلت ذلك",
+       "outcome": "compromised",
+       "feedback": "ما زال الغريب يرى ويسمع. أطفئ الكاميرا فورًا."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "الكاميرا مطفأة الآن. ماذا بعد؟",
+     "choices": [
+      {
+       "label": "أغير كلمة المرور، وأحدث الكاميرا، وأفعل التحقق بخطوتين، وأبلغ الشرطة",
+       "outcome": "safe",
+       "feedback": "أحسنت. أصبح الوصول مغلقًا تمامًا، والشرطة تتولى التحقيق في مثل هذه الحالات."
+      },
+      {
+       "label": "أشتري كاميرا جديدة وأضع لها كلمة المرور القديمة",
+       "outcome": "risky",
+       "feedback": "كلمة المرور القديمة ستفتح الكاميرا الجديدة أيضًا. اجعل لكل جهاز كلمة مرور قوية خاصة به."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "sc2-choice",
+   "question": {
+    "prompt": "اشتريت تلفازًا ذكيًا جديدًا. ما الخطوات اللازمة؟",
+    "options": [
+     {
+      "id": "guest",
+      "label": "توصيله بشبكة الضيوف",
+      "correct": true,
+      "feedback": "صحيح. حتى لو تعرض التلفاز للاختراق، فلن يصل إلى جوالك أو حاسوبك."
+     },
+     {
+      "id": "auto-update",
+      "label": "تفعيل التحديثات التلقائية",
+      "correct": true,
+      "feedback": "صحيح. التحديثات تسد الثغرات المعروفة من تلقاء نفسها."
+     },
+     {
+      "id": "keep-default",
+      "label": "الإبقاء على كلمة مرور الحساب الافتراضية",
+      "correct": false,
+      "feedback": "كلمة المرور الافتراضية معروفة للجميع. غيرها فورًا."
+     },
+     {
+      "id": "all-permissions",
+      "label": "السماح بكل طلبات الوصول إلى الميكروفون وجهات الاتصال",
+      "correct": false,
+      "feedback": "كل إذن لا تحتاج إليه خطر إضافي. لا تسمح إلا بالميزات التي تستخدمها."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "مكان الجهاز الذكي شبكة منفصلة، مع تحديثات منتظمة وكلمة مرور خاصة به. وأوقف الأذونات التي لا تحتاج إليها."
+  },
+  {
+   "type": "recap",
+   "id": "sc2-recap",
+   "points": [
+    "ضع الأجهزة الذكية على شبكة ضيوف منفصلة.",
+    "أوقف UPnP وإعادة توجيه المنافذ.",
+    "وصول غريب؟ سجل الخروج من كل الأجهزة، وغير كلمة المرور."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,411 @@
+{
+ "id": "stop-fake-news",
+ "title": "Fake News stoppen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Fake News sehen oft aus wie eine offizielle Entscheidung und verbreiten sich schnell in Gruppenchats.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Keine Quelle, kein Datum, dafür Zeitdruck und die Aufforderung, die Meldung an alle weiterzuschicken.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "Abteilungsgruppe"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Weitergeleitet. ",
+           "spot": "fwd"
+          },
+          {
+           "text": "Ab morgen werden alle Gehaltskarten ausgetauscht! "
+          },
+          {
+           "text": "An alle weiterleiten!",
+           "spot": "share-all"
+          }
+         ],
+         "time": "08:40"
+        }
+       ]
+      }
+     },
+     "highlight": "fwd"
+    },
+    {
+     "id": "b3",
+     "say": "Prüfen Sie die Meldung vor dem Teilen auf der Website der Organisation und bei seriösen Nachrichtenmedien.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Ist sie falsch, melden Sie sie bei der Plattform und posten Sie eine kurze Richtigstellung in der Gruppe.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "flag"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "group-news",
+   "environment": "phone",
+   "title": "Meldungen in Ihren Chats",
+   "intro": "In Ihren Arbeits- und Familienchats tauchen Meldungen auf. Was tun Sie jeweils?",
+   "steps": [
+    {
+     "id": "salary-card",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Abteilungsgruppe"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Weitergeleitet. Dringend! Ab morgen werden die Gehaltskarten aller Beschäftigten im öffentlichen Dienst ausgetauscht. Aktualisieren Sie Ihre Daten, damit die alte Karte nicht gesperrt wird: "
+         },
+         {
+          "text": "maas-kart-yeni.example.net",
+          "link": {
+           "label": "maas-kart-yeni.example.net",
+           "href": "https://maas-kart-yeni.example.net"
+          }
+         }
+        ],
+        "time": "08:45"
+       }
+      ]
+     },
+     "say": "Jemand aus dem Kollegenkreis hat das gepostet, aber ohne Quelle.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Diese Seite sammelt Kartendaten. Änderungen bei Gehaltskarten gibt die Buchhaltung über offizielle Kanäle bekannt."
+      },
+      {
+       "id": "verify",
+       "label": "Bei der Buchhaltung nachfragen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Prüfen Sie eine interne Entscheidung bei einer internen Quelle, unter einer Nummer, die Sie kennen."
+      },
+      {
+       "id": "warn",
+       "label": "Antworten: Ungeprüft, Link nicht öffnen",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Gut, Sie haben Ihre Kolleginnen und Kollegen geschützt. Zeigen Sie die Nachricht auch dem Sicherheitsteam."
+      },
+      {
+       "id": "share",
+       "label": "An die Familiengruppe senden",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Wer ungeprüfte Meldungen verbreitet, zieht andere mit in die Falle."
+      }
+     ]
+    },
+    {
+     "id": "news-site",
+     "label": "Offiziell: Alle Schulden für Strom, Gas und Wasser erlassen – Anmeldung nur noch heute",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-gundem24-fake",
+      "url": [
+       {
+        "text": "https://gundem24-az.example.net/xeber/borclar-silinir"
+       }
+      ]
+     },
+     "say": "Das sieht aus wie eine bekannte Nachrichtenseite. Prüfen Sie die Adresse.",
+     "actions": [
+      {
+       "id": "register",
+       "label": "Anmelden",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Die Adresse von Gündəm24 ist gundem24.example – das hier ist eine Kopie. Das Formular sammelt personenbezogene Daten."
+      },
+      {
+       "id": "share",
+       "label": "Teilen",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Sie würden eine geklonte Website verbreiten. Prüfen Sie vor dem Teilen Adresse und Quelle."
+      },
+      {
+       "id": "verify",
+       "label": "Offizielle Website prüfen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine solche Entscheidung stünde auf der eigenen Website der Organisation."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Gut. Die Adresse war nicht die echte Domain von Gündəm24."
+      }
+     ]
+    },
+    {
+     "id": "relatives-ask",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Familiengruppe"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Arbeitet hier jemand bei einer Behörde? Es heißt, in Baku wird ab morgen für drei Tage das Internet abgeschaltet. Stimmt das?"
+         }
+        ],
+        "time": "19:20"
+       }
+      ]
+     },
+     "say": "Ihre Verwandten vertrauen Ihnen.",
+     "actions": [
+      {
+       "id": "confirm",
+       "label": "Stimmt wahrscheinlich, bereitet euch vor",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Das Wort einer Person aus dem öffentlichen Dienst verleiht einer Meldung Gewicht. Bestätigen Sie nichts, was Sie nicht wissen."
+      },
+      {
+       "id": "check",
+       "label": "Weiß ich nicht, ich prüfe eine offizielle Quelle und melde mich",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein ehrliches „Ich weiß es nicht“ stoppt eine Falschmeldung."
+      },
+      {
+       "id": "forward",
+       "label": "An andere Gruppen weiterleiten",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Damit würden Sie die Falschmeldung zu noch mehr Menschen tragen."
+      }
+     ]
+    },
+    {
+     "id": "fake-office-page",
+     "label": "Ministerium für Soziale Dienste: 50 offene Stellen. Bewerbungsgebühr 10 AZN",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn-fake",
+      "url": [
+       {
+        "text": "https://kontakto.example/sxn.nazirlik.vakansiya"
+       }
+      ]
+     },
+     "say": "Diese Seite wurde im Namen Ihres eigenen Ministeriums angelegt.",
+     "actions": [
+      {
+       "id": "apply",
+       "label": "Bewerben",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Das Ministerium verlangt keine Bewerbungsgebühr. Die gefälschte Seite sammelt Geld und Daten von Menschen."
+      },
+      {
+       "id": "report",
+       "label": "Bei der Plattform melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Informieren Sie auch die Pressestelle, damit sie eine offizielle Warnung veröffentlichen kann."
+      },
+      {
+       "id": "press",
+       "label": "Pressestelle informieren",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Melden Sie die Seite auch bei der Plattform, damit sie schneller entfernt wird."
+      },
+      {
+       "id": "skip",
+       "label": "Ignorieren, nicht meine Aufgabe",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Die gefälschte Seite betrügt Menschen im Namen Ihrer Behörde. Das Melden dauert nur eine Minute."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "check-tools",
+   "prompt": "Ordnen Sie jedem Zweifel die passende Prüfung zu.",
+   "pairs": [
+    {
+     "id": "no-source",
+     "left": "Die Meldung nennt keine Quelle",
+     "right": "Auf der offiziellen Website der Organisation suchen"
+    },
+    {
+     "id": "old-photo",
+     "left": "Das Foto wirkt bekannt und alt",
+     "right": "Eine umgekehrte Bildersuche starten"
+    },
+    {
+     "id": "site-address",
+     "left": "Die Website sieht aus wie eine bekannte Nachrichtenseite",
+     "right": "Die Adresse mit der echten Domain vergleichen"
+    },
+    {
+     "id": "fear",
+     "left": "Die Meldung macht Angst und setzt Sie unter Druck",
+     "right": "Innehalten und vor dem Teilen prüfen"
+    }
+   ],
+   "explain": "Ein paar Sekunden Prüfung können verhindern, dass eine Falschmeldung Tausende erreicht."
+  },
+  {
+   "type": "scenario",
+   "id": "shared-by-mistake",
+   "title": "Versehentlich geteilt",
+   "start": "shared",
+   "nodes": [
+    {
+     "id": "shared",
+     "text": "Heute Morgen haben Sie die Meldung „Die Gehaltskarten werden ausgetauscht“ in der Familiengruppe gepostet. Am Mittag erfahren Sie, dass sie falsch ist.",
+     "choices": [
+      {
+       "label": "Ich lösche sie und poste eine Richtigstellung",
+       "next": "relative",
+       "feedback": "Richtig. Eine Richtigstellung stoppt auch die Weitergabe durch alle, die die Meldung schon gesehen haben."
+      },
+      {
+       "label": "Ich lösche sie still und leise",
+       "outcome": "risky",
+       "feedback": "Wer sie gesehen hat, gibt sie vielleicht schon weiter. Eine kurze Richtigstellung unterbricht die Kette."
+      },
+      {
+       "label": "Ich tue nichts, es ist zu spät",
+       "outcome": "risky",
+       "feedback": "Es ist nicht zu spät: Eine Richtigstellung bremst die Verbreitung immer noch."
+      }
+     ]
+    },
+    {
+     "id": "relative",
+     "text": "Ich habe den Link geöffnet und meine Kartendaten eingegeben. Was mache ich jetzt?",
+     "speaker": "Ihr Verwandter",
+     "voice": "young-man",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Ich habe den Link geöffnet und meine Kartendaten eingegeben. <breath> Was mache ich jetzt?",
+     "choices": [
+      {
+       "label": "Ruf sofort die Bank unter der Nummer auf deiner Karte an und lass die Karte sperren",
+       "outcome": "safe",
+       "feedback": "Richtig. Je schneller die Karte gesperrt ist, desto geringer ist das Risiko, Geld zu verlieren."
+      },
+      {
+       "label": "Keine Sorge, vielleicht passiert ja nichts",
+       "outcome": "compromised",
+       "feedback": "Kriminelle setzen Kartendaten oft sofort ein."
+      },
+      {
+       "label": "Lösch einfach, was du auf der Website eingegeben hast",
+       "outcome": "risky",
+       "feedback": "Die Daten sind schon bei den Kriminellen. Nur die Bank kann die Karte sperren."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "speak-for-office",
+   "question": {
+    "prompt": "Jemand von der Presse schreibt Ihnen: „Können Sie die Entscheidung Ihres Ministeriums kommentieren?“ Was tun Sie?",
+    "options": [
+     {
+      "id": "press",
+      "label": "Ich verweise an die Pressestelle",
+      "correct": true,
+      "feedback": "Richtig. Nur die Pressestelle spricht für die Organisation."
+     },
+     {
+      "id": "guess",
+      "label": "Ich sage, was ich weiß",
+      "correct": false,
+      "feedback": "Ein Kommentar aus Halbwissen kann zur nächsten Falschmeldung werden, und auch die „Presseanfrage“ kann falsch sein."
+     },
+     {
+      "id": "doc",
+      "label": "Ich schicke ein Foto des internen Dokuments",
+      "correct": false,
+      "feedback": "Interne Dokumente dürfen nicht geteilt werden, und ein Foto kann sich ohne Kontext verbreiten."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "social"
+    }
+   },
+   "explain": "Offizielle Stellungnahmen kommen von der Pressestelle. Das schützt Sie und die Organisation."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Prüfen Sie die Quelle vor dem Teilen auf der eigenen Website der Organisation.",
+    "Bestätigen Sie keine Meldungen, bei denen Sie unsicher sind – für die Organisation spricht die Pressestelle.",
+    "Melden Sie gefälschte Seiten und Falschmeldungen. Haben Sie versehentlich etwas geteilt, posten Sie eine Richtigstellung."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

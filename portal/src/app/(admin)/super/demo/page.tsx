@@ -58,7 +58,7 @@ export default async function DemoRequestsPage({ searchParams }: PageProps<"/sup
                     <p className="mt-1 text-caption text-ink-muted">
                       {d.name} ·{" "}
                       <a href={`mailto:${d.email}`} className="text-brand-600 hover:underline">
-                        {d.email}
+                        <bdi>{d.email}</bdi>
                       </a>
                     </p>
                     <p className="mt-1 text-tab text-ink-subtle">

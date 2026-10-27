@@ -22,7 +22,7 @@ import { riskBand } from "@/lib/domain/risk";
 import { requestNow } from "@/lib/time";
 import { isLocale, pick } from "@/i18n/config";
 import { cn } from "@/lib/cn";
-import { riskTitle, riskTitles } from "@/lib/risk-title";
+import { riskTitle } from "@/lib/risk-title";
 import { personForPage } from "./person";
 
 const DAY = 86_400_000;
@@ -162,7 +162,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
             <ul className="mt-3 grid grid-cols-[minmax(0,1fr)] gap-1 text-caption text-ink-muted">
               <li className="flex items-center gap-2">
                 <Mail className="size-4 shrink-0" />
-                <span className="min-w-0 truncate">{u.email}</span>
+                <bdi className="min-w-0 truncate">{u.email}</bdi>
               </li>
               <li className="flex items-center gap-2">
                 <Building2 className="size-4 shrink-0" />
@@ -172,7 +172,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
             </ul>
           </div>
           {allowed(v, "people.write") ? (
-            <div className="flex max-w-full flex-wrap justify-end gap-2 sm:ml-auto sm:max-w-sm [&>button]:max-w-full [&>button]:whitespace-normal">
+            <div className="flex max-w-full flex-wrap justify-end gap-2 sm:ms-auto sm:max-w-sm [&>button]:max-w-full [&>button]:whitespace-normal">
               <PersonActions
                 isSelf={u.id === v.user.id}
                 departments={departments.map((d) => ({ id: d.id, name: d.name }))}
@@ -242,15 +242,15 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
             </div>
             <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-caption">
               <dt className="text-ink-muted">{tr("lessonsCompleted")}</dt>
-              <dd className="text-right font-semibold">{Number(lessonsAgg[0].n)}</dd>
+              <dd className="text-end font-semibold">{Number(lessonsAgg[0].n)}</dd>
               <dt className="text-ink-muted">{tr("timeSpent")}</dt>
-              <dd className="text-right font-semibold">{hours ? tr("hours", { hours: format.number(hours, { maximumFractionDigits: 1 }) }) : tr("notYet")}</dd>
+              <dd className="text-end font-semibold">{hours ? tr("hours", { hours: format.number(hours, { maximumFractionDigits: 1 }) }) : tr("notYet")}</dd>
               <dt className="text-ink-muted">{tr("firstActive")}</dt>
-              <dd className="text-right font-semibold">{firstActive ? format.relativeTime(firstActive) : tr("notYet")}</dd>
+              <dd className="text-end font-semibold">{firstActive ? format.relativeTime(firstActive) : tr("notYet")}</dd>
               <dt className="text-ink-muted">{tr("lastActive")}</dt>
-              <dd className="text-right font-semibold">{u.lastActiveAt ? format.relativeTime(u.lastActiveAt) : tr("notYet")}</dd>
+              <dd className="text-end font-semibold">{u.lastActiveAt ? format.relativeTime(u.lastActiveAt) : tr("notYet")}</dd>
               <dt className="text-ink-muted">{tr("activeDays")}</dt>
-              <dd className="text-right font-semibold">{tr("ofThirty", { count: activeDays })}</dd>
+              <dd className="text-end font-semibold">{tr("ofThirty", { count: activeDays })}</dd>
             </dl>
           </CardBody>
         </Card>
@@ -354,10 +354,9 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
                 {risks.map((r) => (
                   <li key={r.id} className="flex items-start gap-2 rounded-md bg-sunken px-3 py-2 text-caption">
                     <Pill tone={r.severity === "high" || r.severity === "critical" ? "risk" : "warn"}>{tc(`severity.${r.severity}`)}</Pill>
-                    {/* Newer titles carry every language; an older one is in the learner's language, shown only when it matches the console's. */}
+                    {/* A system title carries every language and is shown in the console's; a plain one (typed by a person: an incident, a material) as it is. */}
                     <span>
-                      <b>{ts(`kind.${r.kind}`)}</b>
-                      {riskTitles(r.title) || u.locale === locale ? <> · {riskTitle(r.title, locale)}</> : null}
+                      <b>{ts(`kind.${r.kind}`)}</b> · {riskTitle(r.title, locale)}
                     </span>
                   </li>
                 ))}
@@ -382,7 +381,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
                     {pick(m.title, locale)}
                   </Link>
                   <Pill tone={status.tone}>{status.label}</Pill>
-                  <span className="w-11 shrink-0 text-right tabular-nums">{p?.percent ?? 0}%</span>
+                  <span className="w-11 shrink-0 text-end tabular-nums">{p?.percent ?? 0}%</span>
                 </div>
               );
             })}

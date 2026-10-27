@@ -1,0 +1,527 @@
+{
+ "id": "fake-shops",
+ "title": "متجر مزيف",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fs-tutor",
+   "beats": [
+    {
+     "id": "fs-b1",
+     "say": "مرحبًا! ستتعلم في هذا الدرس كيف تكشف المتاجر المزيفة على وسائل التواصل الاجتماعي.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "fs-b2",
+     "say": "انظر إلى هذا الإعلان: مكيف هواء غالي الثمن بسعر 299 مانات فقط، لليوم فقط، والدفع مقدمًا.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "kontakto",
+       "app": "Kontakto",
+       "title": [
+        {
+         "text": "إعلان ممول: Serin Klimat Sale"
+        }
+       ],
+       "body": [
+        {
+         "text": "مكيف هواء بسعر 299 AZN فقط بدلًا من 1,199! "
+        },
+        {
+         "text": "لليوم فقط، والدفع مقدمًا بنسبة 100%.",
+         "spot": "prepay"
+        }
+       ],
+       "time": "13:05"
+      }
+     },
+     "highlight": "prepay"
+    },
+    {
+     "id": "fs-b3",
+     "say": "المحتال يأخذ المال أولًا، ثم يغلق الصفحة ويختفي.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "fs-b4",
+     "say": "القاعدة بسيطة: لا تدفع مقدمًا أبدًا لصفحة لا تعرفها، وادفع عند الاستلام كلما أمكنك ذلك.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "fs-swipe",
+   "prompt": "أي عروض المتاجر هذه آمن، وأيها يمثل تهديدًا؟",
+   "cards": [
+    {
+     "id": "rush",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Serin Klimat Sale"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "العرض ينتهي اليوم، وبقيت 3 قطع فقط. الدفع بالتحويل من بطاقة إلى بطاقة فقط، و100% مقدمًا."
+         }
+        ],
+        "time": "13:12"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "الضغط مع اشتراط الدفع المسبق من بطاقة إلى بطاقة فقط هو العلامة الأبرز للمتجر المزيف. واسترداد هذا المال صعب جدًا."
+    },
+    {
+     "id": "official",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Serin Klimat، منذ 2014"
+       }
+      ],
+      "body": [
+       {
+        "text": "مكيف هواء بسعر 1,149 AZN. الدفع عند الاستلام نقدًا أو بالبطاقة. المتجر ومركز الصيانة في حي نريمانوف."
+       }
+      ],
+      "time": "10:20"
+     },
+     "verdict": "safe",
+     "explain": "سعر واقعي، وصفحة عمرها سنوات، والدفع عند الاستلام. ترى البضاعة أولًا ثم تدفع."
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2e-serin-klimat-fake",
+      "url": [
+       {
+        "text": "https://serin-klimat-endirim.example.net/kampaniya"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "هذا ليس الموقع الرسمي للمتجر. الكلمة الإضافية في الاسم والنطاق الغريب يدلان على صفحة مزيفة."
+    },
+    {
+     "id": "cod",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Laman Handmade"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "مرحبًا! أشحن الطلبات عبر CevikKargo، وتدفع لمندوب التوصيل عند الاستلام."
+         }
+        ],
+        "time": "11:47"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "الدفع عند الاستلام يحميك، فأنت لا تدفع أبدًا قبل أن ترى البضاعة."
+    },
+    {
+     "id": "new-page",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Phone Outlet Baku"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "صفحتنا جديدة، لكن لدينا 20 ألف متابع. أغلقنا التعليقات لمنع الرسائل المزعجة. أرسل عربونًا بقيمة 50 AZN."
+         }
+        ],
+        "time": "16:30"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "صفحة جديدة، وتعليقات مغلقة، وطلب عربون، كلها معًا علامة تحذير خطيرة. فالمتابعون يمكن شراؤهم."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "fs-sim",
+   "environment": "phone",
+   "title": "عرض مكيف الهواء",
+   "intro": "رأيت إعلانًا لمكيف هواء رخيص على Kontakto. اتخذ قرارك خطوة بخطوة على جوالك.",
+   "steps": [
+    {
+     "id": "ad",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "إعلان ممول: Serin Klimat Sale"
+       }
+      ],
+      "body": [
+       {
+        "text": "مكيف هواء بسعر 299 AZN فقط بدلًا من 1,199! لليوم فقط، والدفع مقدمًا بنسبة 100%."
+       }
+      ],
+      "time": "13:05"
+     },
+     "say": "يبدو الإعلان مغريًا جدًا. ولا بأس في الاطلاع عليه.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "فتح الإعلان",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "الاطلاع على الإعلان ليس خطيرًا. القرار الحقيقي يأتي قبل الدفع."
+      },
+      {
+       "id": "hide",
+       "label": "إخفاء الإعلان",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "اختيار جيد. السعر المنخفض أكثر من اللازم كثيرًا ما يكون طعمًا.",
+       "next": "real-shop"
+      }
+     ]
+    },
+    {
+     "id": "prepay",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Serin Klimat Sale"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "مرحبًا! العرض ينتهي اليوم الساعة 18:00."
+         }
+        ],
+        "time": "13:12"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "أرسل اسمك وعنوانك، وقم بتحويل 299 AZN إلى هذه البطاقة: **** **** **** 0000. التوصيل غدًا."
+         }
+        ],
+        "time": "13:12"
+       }
+      ]
+     },
+     "say": "البائع يطلب الدفع المسبق فورًا.",
+     "actions": [
+      {
+       "id": "ask-cod",
+       "label": "هل يمكنني الدفع عند الاستلام؟",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "سؤال جيد. المتجر الحقيقي يوافق عادة على الدفع عند الاستلام."
+      },
+      {
+       "id": "pay",
+       "label": "تحويل 299 AZN الآن",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "ذهب المال إلى بطاقة شخص غريب. واسترداد الدفعة المسبقة صعب جدًا.",
+       "next": "gone"
+      },
+      {
+       "id": "report",
+       "label": "الإبلاغ عن الصفحة",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "أحسنت. الصفحة التي أبلغت عنها لن تستطيع خداع مشترين آخرين.",
+       "next": "real-shop"
+      }
+     ]
+    },
+    {
+     "id": "deposit",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Serin Klimat Sale"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "هل يمكنني الدفع عند الاستلام؟"
+         }
+        ],
+        "time": "13:14"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "لا يتوفر الدفع عند الاستلام بسعر التخفيض. أرسل عربونًا بقيمة 50 AZN على الأقل، وادفع الباقي للمندوب."
+         }
+        ],
+        "time": "13:15"
+       }
+      ]
+     },
+     "say": "وهذه هي الذريعة: الآن يطلب عربونًا.",
+     "actions": [
+      {
+       "id": "pay-deposit",
+       "label": "إرسال عربون بقيمة 50 AZN",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "العربون دفع مسبق أيضًا. يأخذه المتجر المزيف ثم يختفي."
+      },
+      {
+       "id": "check",
+       "label": "سأبحث بنفسي عن الصفحة الرسمية للمتجر",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "صحيح. التحقق من الصفحة الرسمية ومن تقييمات المشترين لا يستغرق سوى دقائق.",
+       "next": "real-shop"
+      },
+      {
+       "id": "block",
+       "label": "حظر",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "جيد. الغريب الذي يرفض البيع دون دفع مسبق لا يستحق مواصلة الحديث معه.",
+       "next": "real-shop"
+      }
+     ]
+    },
+    {
+     "id": "gone",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "المحادثة غير متاحة"
+       }
+      ],
+      "body": [
+       {
+        "text": "صفحة Serin Klimat Sale محذوفة أو قامت بحظرك."
+       }
+      ],
+      "time": "09:30"
+     },
+     "say": "في اليوم التالي لم يصل أي مكيف، واختفت الصفحة.",
+     "actions": [
+      {
+       "id": "bank",
+       "label": "الاتصال بالبنك على الرقم المدون على البطاقة",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "صحيح. إذا علم البنك بسرعة، فيمكنه محاولة إيقاف التحويل."
+      },
+      {
+       "id": "evidence",
+       "label": "حفظ لقطات الشاشة وإبلاغ الشرطة",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "خطوة جيدة. المحادثة وإيصال التحويل دليل تستفيد منه الشرطة."
+      },
+      {
+       "id": "wait",
+       "label": "الانتظار بضعة أيام",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "كل ساعة مهمة. الانتظار يقلل فرصة استرداد المال."
+      }
+     ]
+    },
+    {
+     "id": "real-shop",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Serin Klimat"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "مرحبًا! هذه صفحتنا الرسمية الوحيدة. مكيف الهواء بسعر 1,149 AZN، والدفع عند الاستلام نقدًا أو بالبطاقة."
+         }
+        ],
+        "time": "14:02"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "أي صفحة تطلب دفعًا مسبقًا باسمنا ليست تابعة لنا."
+         }
+        ],
+        "time": "14:02"
+       }
+      ]
+     },
+     "say": "هذه هي الصفحة الرسمية للمتجر.",
+     "actions": [
+      {
+       "id": "order",
+       "label": "الطلب مع الدفع عند الاستلام",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "اختيار رائع. تدفع بعد أن ترى البضاعة وتفحصها."
+      },
+      {
+       "id": "tell",
+       "label": "إبلاغ المتجر بالصفحة المزيفة",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "جيد. يمكن للمتجر الإبلاغ عن الصفحة المزيفة والعمل على إزالتها."
+      },
+      {
+       "id": "back",
+       "label": "العودة إلى الصفحة الرخيصة",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "العودة إلى الصفحة المزيفة تعرض أموالك للخطر. التزم بالمتجر الرسمي."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "fs-match",
+   "prompt": "طابق كل علامة مع معناها.",
+   "pairs": [
+    {
+     "id": "age",
+     "left": "صفحة أنشئت قبل أسبوع",
+     "right": "المتاجر المزيفة تظهر بسرعة وتختفي بسرعة"
+    },
+    {
+     "id": "reviews",
+     "left": "التعليقات معطلة",
+     "right": "إسكات المشترين غير الراضين"
+    },
+    {
+     "id": "card",
+     "left": "الدفع المسبق من بطاقة إلى بطاقة فقط",
+     "right": "استرداد المال صعب جدًا"
+    },
+    {
+     "id": "price",
+     "left": "السعر ثلث سعر السوق",
+     "right": "طعم ليدفعك إلى الاستعجال"
+    }
+   ],
+   "explain": "علامة واحدة تكفي لتتوقف. تحقق من المتجر عبر موقعه الرسمي وتقييمات المشترين."
+  },
+  {
+   "type": "choice",
+   "id": "fs-choice",
+   "question": {
+    "prompt": "تشتري من متجر إلكتروني لا تعرفه. ما أكثر طرق الدفع أمانًا؟",
+    "options": [
+     {
+      "id": "cod",
+      "label": "الدفع عند الاستلام، عندما تصلك البضاعة",
+      "correct": true,
+      "feedback": "صحيح. أنت لا تدفع قبل أن ترى البضاعة، فلا يحصل المتجر المزيف على شيء."
+     },
+     {
+      "id": "card",
+      "label": "التحويل إلى البطاقة الشخصية للبائع",
+      "correct": false,
+      "feedback": "التحويل إلى بطاقة شخصية لا يمكن إلغاؤه. وهذا بالضبط ما يريده المحتالون."
+     },
+     {
+      "id": "half",
+      "label": "إرسال نصف المبلغ عربونًا",
+      "correct": false,
+      "feedback": "العربون دفع مسبق أيضًا. يأخذه المتجر المزيف ثم يختفي."
+     },
+     {
+      "id": "crypto",
+      "label": "الدفع بالعملات المشفرة",
+      "correct": false,
+      "feedback": "لا أحد يستطيع إلغاء تحويل بالعملات المشفرة. إذا طلبها منك متجر، فابتعد عنه."
+     }
+    ]
+   },
+   "explain": "إذا كان الدفع المسبق إلزاميًا، فادفع فقط لمتجر رسمي تعرفه منذ زمن طويل. وإذا ساورك الشك، فلا تشتر."
+  },
+  {
+   "type": "recap",
+   "id": "fs-recap",
+   "points": [
+    "لا تدفع مقدمًا أبدًا لصفحة لا تعرفها.",
+    "ادفع عند الاستلام كلما أمكنك: انظر إلى البضاعة أولًا، ثم ادفع.",
+    "تحقق من عمر الصفحة ومن التقييمات، ولا تثق بسعر منخفض أكثر من اللازم."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,459 @@
+{
+ "id": "parcel-fee",
+ "title": "Taxa pentru colet",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pf-tutor",
+   "beats": [
+    {
+     "id": "pf-b1",
+     "say": "Bună ziua! Astăzi vom vedea cum o plată măruntă printr-un link se transformă într-o pierdere mare.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "pf-b2",
+     "say": "Taxa este de doar un manat douăzeci. Escrocul nu vrea taxa, ci datele cardului dumneavoastră.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "w2d-tezkuryer-fake",
+       "sender": [
+        {
+         "text": "+994 51 000 83 17"
+        }
+       ],
+       "time": "10:47",
+       "messages": [
+        [
+         {
+          "text": "TezKuryer: coletul dumneavoastră este reținut la vamă. "
+         },
+         {
+          "text": "Achitați o taxă de 1,20 AZN: ",
+          "spot": "fee"
+         },
+         {
+          "text": "tezkuryer-gomruk.example.net/odenis",
+          "link": {
+           "label": "tezkuryer-gomruk.example.net/odenis",
+           "href": "https://tezkuryer-gomruk.example.net/odenis"
+          }
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "fee"
+    },
+    {
+     "id": "pf-b3",
+     "say": "Colet, amendă sau ajutor social: orice ar fi, nu plătiți niciodată printr-un link primit prin SMS.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "pf-b4",
+     "say": "În schimb, deschideți chiar dumneavoastră aplicația sau portalul oficial și verificați acolo.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "pf-hotspot",
+   "prompt": "Găsiți semnele de fraudă din acest SMS.",
+   "artifact": {
+    "kind": "sms",
+    "brandRef": "w2d-tezkuryer-fake",
+    "sender": [
+     {
+      "text": "+994 51 000 83 17",
+      "spot": "sender"
+     }
+    ],
+    "time": "10:47",
+    "messages": [
+     [
+      {
+       "text": "TezKuryer: coletul dumneavoastră TZ48120577AZ este reținut la vamă. Trebuie să achitați "
+      },
+      {
+       "text": "o taxă vamală de 1,20 AZN",
+       "spot": "small-fee"
+      },
+      {
+       "text": "."
+      }
+     ],
+     [
+      {
+       "text": "Plătiți aici: "
+      },
+      {
+       "text": "tezkuryer-gomruk.example.net/odenis",
+       "spot": "link",
+       "link": {
+        "label": "tezkuryer-gomruk.example.net/odenis",
+        "href": "https://tezkuryer-gomruk.example.net/odenis"
+       }
+      }
+     ],
+     [
+      {
+       "text": "Dacă taxa nu este achitată în 24 de ore, coletul va fi returnat expeditorului.",
+       "spot": "deadline"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Un număr de mobil obișnuit",
+     "explain": "SMS-urile companiilor sosesc de obicei sub un nume. Și numele poate fi falsificat, așa că nu vă bazați niciodată doar pe acest semn."
+    },
+    {
+     "id": "small-fee",
+     "label": "O sumă foarte mică",
+     "explain": "O sumă foarte mică vă face să lăsați garda jos. Adevărata țintă sunt numărul cardului, codul de pe spatele lui și codul primit prin SMS."
+    },
+    {
+     "id": "link",
+     "label": "Adresă falsă",
+     "explain": "Acesta nu este site-ul oficial al firmei de curierat: la nume s-au adăugat cuvinte în plus. Nu atingeți linkul, deschideți chiar dumneavoastră aplicația oficială."
+    },
+    {
+     "id": "deadline",
+     "label": "Vă grăbește",
+     "explain": "Termenul limită există ca să nu mai stați pe gânduri. O firmă de curierat reală vă lasă timp să verificați."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "pf-sim",
+   "environment": "phone",
+   "title": "Mesaje de-a lungul zilei",
+   "intro": "Pe parcursul zilei primiți pe telefon mai multe mesaje. Alegeți reacția potrivită pentru fiecare.",
+   "steps": [
+    {
+     "id": "redeliver-sms",
+     "label": "10:47 SMS nou",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2d-tezkuryer-fake",
+      "sender": [
+       {
+        "text": "+994 51 000 83 17"
+       }
+      ],
+      "time": "10:47",
+      "messages": [
+       [
+        {
+         "text": "TezKuryer: curierul nostru nu v-a găsit. Achitați 0,90 AZN pentru o nouă livrare: "
+        },
+        {
+         "text": "tezkuryer-catdirilma.example.net/odenis",
+         "link": {
+          "label": "tezkuryer-catdirilma.example.net/odenis",
+          "href": "https://tezkuryer-catdirilma.example.net/odenis"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Numele unei firme de curierat cunoscute și o sumă mică.",
+     "actions": [
+      {
+       "id": "open-link",
+       "label": "Deschideți linkul",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Pagina arată ca site-ul firmei de curierat, dar adresa este falsă. Acum vedeți ce vă cere.",
+       "next": "bank-code"
+      },
+      {
+       "id": "report",
+       "label": "Raportați ca spam",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Raportați SMS-ul, apoi verificați coletul în aplicația oficială.",
+       "next": "real-app"
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Bine. Dacă așteptați un colet, verificați-l în aplicația oficială.",
+       "next": "real-app"
+      }
+     ]
+    },
+    {
+     "id": "bank-code",
+     "label": "Pagina a cerut datele cardului și codul primit prin SMS",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "10:49",
+      "messages": [
+       [
+        {
+         "text": "Cod: 518204. Plată de 412,00 AZN, TZK GLOBAL PAY. Nu comunicați nimănui acest cod."
+        }
+       ]
+      ]
+     },
+     "say": "Banca v-a trimis un cod. Uitați-vă la sumă.",
+     "actions": [
+      {
+       "id": "type-code",
+       "label": "Introduceți codul pe site",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Cu acest cod aprobați patru sute doisprezece manați, nu unul. Sunați acum la bancă, la numărul de pe spatele cardului."
+      },
+      {
+       "id": "call-bank",
+       "label": "Sunați la bancă, la numărul de pe card",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Corect. Suma de lângă cod este mult mai mare decât cea de pe pagină, așa că cereți acum blocarea cardului."
+      },
+      {
+       "id": "ignore",
+       "label": "Nu introduceți codul nicăieri",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Bine, plata nu a trecut. Dar datele cardului sunt deja pe acel site, așa că sunați la bancă și blocați cardul."
+      }
+     ]
+    },
+    {
+     "id": "real-app",
+     "label": "Aplicația oficială TezKuryer",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2d-tezkuryer",
+      "app": "TezKuryer",
+      "title": [
+       {
+        "text": "TZ77015342AZ: coletul este pe drum"
+       }
+      ],
+      "body": [
+       {
+        "text": "Livrare pe 4 octombrie. Nu este necesară nicio plată suplimentară."
+       }
+      ],
+      "time": "11:05"
+     },
+     "say": "Această notificare vine din aplicația oficială.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți în aplicație",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. Aplicația oficială nu arată nicio taxă suplimentară, deci SMS-ul era fals."
+      },
+      {
+       "id": "later",
+       "label": "Verificați mai târziu",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "Nicio problemă. Dacă ar exista o taxă de plătit, ați vedea-o și în aplicația oficială."
+      }
+     ]
+    },
+    {
+     "id": "fine-sms",
+     "label": "13:20 SMS nou",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2d-yol-nezaret-fake",
+      "sender": [
+       {
+        "text": "YolNezaret"
+       }
+      ],
+      "time": "13:20",
+      "messages": [
+       [
+        {
+         "text": "Ați primit o amendă de 80 AZN pentru depășirea vitezei. Plătiți astăzi cu 50% reducere: "
+        },
+        {
+         "text": "yolnezaret-cerime.example.net/endirim",
+         "link": {
+          "label": "yolnezaret-cerime.example.net/endirim",
+          "href": "https://yolnezaret-cerime.example.net/endirim"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Acum, o amendă. Atenție la reducere.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Plătiți cu reducere",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Reducerea există ca să vă grăbească. Pagina din spatele linkului colectează datele cardului."
+      },
+      {
+       "id": "verify",
+       "label": "Verific chiar eu amenzile pe portal",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă amenda este reală, o veți găsi pe portalul oficial."
+      },
+      {
+       "id": "report",
+       "label": "Raportați ca spam",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bine. Dacă aveți dubii, sunați la poliție, la 102, și întrebați."
+      }
+     ]
+    },
+    {
+     "id": "aunt-chat",
+     "label": "16:02 Mătușa Sabina",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Mătușa Sabina"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Vecina mi-a trimis linkul ăsta, dau ajutor pentru familii, azi e ultima zi."
+         }
+        ],
+        "time": "16:01"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "ailedestek-qeydiyyat.example.net",
+          "link": {
+           "label": "ailedestek-qeydiyyat.example.net",
+           "href": "https://ailedestek-qeydiyyat.example.net"
+          }
+         }
+        ],
+        "time": "16:01"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Să-mi trec datele cardului?"
+         }
+        ],
+        "time": "16:02"
+       }
+      ]
+     },
+     "say": "O rudă vă cere un sfat.",
+     "actions": [
+      {
+       "id": "advise-stop",
+       "label": "Nu, hai să verificăm împreună pe portalul oficial",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Excelent. Pentru ajutoarele sociale de stat nu este nevoie niciodată de înscriere printr-un link, iar ele pot fi verificate pe portalul oficial."
+      },
+      {
+       "id": "advise-go",
+       "label": "Grăbește-te, azi e ultima zi",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Trucul cu „ultima zi” a funcționat. Pagina îi va fura datele cardului, așa că trebuie să-și sune banca imediat."
+      },
+      {
+       "id": "open-it",
+       "label": "Stai să deschid eu linkul",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Și deschiderea linkului ca să verificați este riscantă. Oricum, adresa nu este cea a portalului oficial."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "pf-choice",
+   "question": {
+    "prompt": "V-ați introdus deja datele cardului pe o pagină falsă. Ce faceți mai întâi?",
+    "options": [
+     {
+      "id": "call-bank",
+      "label": "Sunați la bancă, la numărul de pe spatele cardului, și blocați-l",
+      "correct": true,
+      "feedback": "Corect. Cu cât cardul este blocat mai repede, cu atât pierdeți mai puțin."
+     },
+     {
+      "id": "wait",
+      "label": "Așteptați să vedeți dacă dispar bani din cont",
+      "correct": false,
+      "feedback": "Așteptarea îi dă timp escrocului. După ce banii au plecat, poate fi prea târziu."
+     },
+     {
+      "id": "reply-sms",
+      "label": "Răspundeți la SMS și cereți banii înapoi",
+      "correct": false,
+      "feedback": "Escrocul nu îi va returna, ci vă va cere un cod nou. Întrerupeți orice contact."
+     }
+    ]
+   },
+   "explain": "Apoi raportați incidentul la poliție, la 102, și păstrați mesajul ca dovadă."
+  },
+  {
+   "type": "recap",
+   "id": "pf-recap",
+   "points": [
+    "Colet, amendă sau ajutor social: nu plătiți niciodată printr-un link primit prin SMS.",
+    "Pentru verificare, deschideți chiar dumneavoastră aplicația sau portalul oficial.",
+    "Ați introdus datele cardului? Sunați imediat la bancă, apoi la poliție, la 102."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

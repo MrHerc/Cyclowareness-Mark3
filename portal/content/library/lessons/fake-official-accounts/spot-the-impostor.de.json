@@ -1,0 +1,518 @@
+{
+ "id": "spot-the-impostor",
+ "title": "Den falschen Account entlarven",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Kriminelle legen im Namen von Ministerien und Amtsträgern gefälschte Seiten und Kanäle an.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Achten Sie auf die Adresse, nicht auf den Namen: Schon ein zusätzlicher Buchstabe, ein zusätzliches Wort oder eine zusätzliche Zahl verrät die Fälschung.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "nd-sxn-fake",
+       "url": [
+        {
+         "text": "https://kontakto.example/"
+        },
+        {
+         "text": "sxn.rasmi.az2",
+         "spot": "handle"
+        }
+       ]
+      }
+     },
+     "highlight": "handle"
+    },
+    {
+     "id": "b3",
+     "say": "Ein falscher Account setzt Sie unter Zeitdruck und verlangt Geld, Kartendaten oder einen Klick.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Öffnen Sie im Zweifel die Website der Organisation selbst und prüfen Sie dort die Liste der offiziellen Accounts.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "official-messages",
+   "environment": "phone",
+   "title": "Nachrichten im Namen einer Behörde",
+   "intro": "Auf Ihrem Smartphone kommen Nachrichten im Namen eines Ministeriums an. Wählen Sie jeweils den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "aid-channel",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "nd-sxn-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Ministerium für Soziale Dienste | Offiziell"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Liebe Bürgerinnen und Bürger! Jede Familie erhält eine einmalige staatliche Zahlung von 300 AZN."
+         }
+        ],
+        "time": "10:02"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Um die Zahlung zu erhalten, geben Sie noch heute Ihre Kartendaten ein:"
+         },
+         {
+          "text": "sxn-yardim.example.net/qeydiyyat",
+          "link": {
+           "label": "sxn-yardim.example.net/qeydiyyat",
+           "href": "https://sxn-yardim.example.net/qeydiyyat"
+          }
+         }
+        ],
+        "time": "10:02"
+       }
+      ]
+     },
+     "say": "Der Name des Kanals wirkt offiziell. Aber wohin führt der Link?",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Diese Seite stiehlt Kartendaten. Ein Ministerium verlangt nie per Nachricht Ihre vollständigen Kartendaten, um eine Hilfe auszuzahlen."
+      },
+      {
+       "id": "report",
+       "label": "Kanal melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Adresse gehört nicht zur Website des Ministeriums, und mit einer Meldung wird der Kanal schneller geschlossen."
+      },
+      {
+       "id": "block",
+       "label": "Blockieren",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Gut, der Kanal kann Sie nicht mehr erreichen. Melden Sie ihn auch, damit andere geschützt sind."
+      },
+      {
+       "id": "share",
+       "label": "An die Familiengruppe senden",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Wer eine ungeprüfte Nachricht teilt, schickt auch die eigene Familie in die Falle. Prüfen Sie zuerst die offizielle Website."
+      }
+     ]
+    },
+    {
+     "id": "real-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "nd-sxn",
+      "sender": [
+       {
+        "text": "SXN"
+       }
+      ],
+      "time": "11:30",
+      "messages": [
+       [
+        {
+         "text": "Ihr Antrag 2026-118 ist eingegangen. Den Status sehen Sie in Ihrem Benutzerkonto auf sxn.example."
+        }
+       ]
+      ]
+     },
+     "say": "Letzte Woche haben Sie beim Ministerium einen Antrag gestellt.",
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Als sicher markieren",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Nachricht passt zu Ihrem Antrag, enthält keinen Link und verlangt nichts."
+      },
+      {
+       "id": "report",
+       "label": "Melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Vorsicht ist gut, aber diese Nachricht ist echt: Es wird nichts verlangt, und Sie rufen die Website selbst auf."
+      }
+     ]
+    },
+    {
+     "id": "boss-new-number",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Amtsleitung (neue Nummer)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hallo. Das ist meine neue Nummer. Ich bin im Meeting und kann nicht telefonieren."
+         }
+        ],
+        "time": "12:15"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Schicken Sie mir bitte dringend hier im Chat eine Kopie des offiziellen Schreibens von heute Morgen."
+         }
+        ],
+        "time": "12:16"
+       }
+      ]
+     },
+     "say": "Eine vertraute Funktion, aber eine Nummer, die Sie nicht kennen.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Schreiben senden",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Ein offizielles Dokument ist an eine unbekannte Nummer gegangen. Kriminelle schreiben oft auf diese Weise im Namen von Führungskräften."
+      },
+      {
+       "id": "verify",
+       "label": "Die bekannte Nummer der Amtsleitung anrufen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Prüfen Sie eine neue Nummer immer über einen Kanal, den Sie bereits kennen."
+      },
+      {
+       "id": "report",
+       "label": "Melden und blockieren",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Informieren Sie auch das Sicherheitsteam: Kolleginnen und Kollegen könnten dieselbe Nachricht bekommen."
+      },
+      {
+       "id": "ask",
+       "label": "Wer ist da?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Wer antwortet, hält den Chat am Laufen, und die Kriminellen haben schon eine überzeugende Erklärung parat. Prüfen Sie es lieber telefonisch."
+      }
+     ]
+    },
+    {
+     "id": "giveaway-page",
+     "label": "Ministerium für Soziale Dienste: 1.000 kostenlose Laptops! Anmeldegebühr 5 AZN",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn-fake",
+      "url": [
+       {
+        "text": "https://kontakto.example/sxn.resmi.official"
+       }
+      ]
+     },
+     "say": "Jemand aus Ihrem Freundeskreis hat diese Seite geteilt.",
+     "actions": [
+      {
+       "id": "join",
+       "label": "Mitmachen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Eine staatliche Stelle verlangt nie eine Gebühr für einen Gewinn. Diese gefälschte Seite sammelt Kartendaten."
+      },
+      {
+       "id": "report",
+       "label": "Seite melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Das zusätzliche Wort in der Adresse verrät die Fälschung, und nach einer Meldung wird die Seite entfernt."
+      },
+      {
+       "id": "verify",
+       "label": "Auf der Website des Ministeriums prüfen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Gute Gewohnheit. Wenn es auf der Website kein solches Gewinnspiel gibt, melden Sie die Seite."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-channel-signs",
+   "prompt": "Tippen Sie auf die Warnsignale eines gefälschten Kanals.",
+   "artifact": {
+    "kind": "chat",
+    "brandRef": "nd-sxn-fake",
+    "app": "telegram",
+    "contact": [
+     {
+      "text": "Ministerium für Soziale Dienste"
+     },
+     {
+      "text": " @sxn_rasmi",
+      "spot": "handle"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Heute ist der letzte Tag! ",
+        "spot": "urgent"
+       },
+       {
+        "text": "Um Ihre Entschädigung zu erhalten, "
+       },
+       {
+        "text": "überweisen Sie eine Anmeldegebühr von 5 AZN",
+        "spot": "fee"
+       },
+       {
+        "text": ": "
+       },
+       {
+        "text": "sxn-kompensasiya.example.net",
+        "spot": "link",
+        "link": {
+         "label": "sxn-kompensasiya.example.net",
+         "href": "https://sxn-kompensasiya.example.net"
+        }
+       }
+      ],
+      "time": "16:40"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Kommentare sind deaktiviert, bitte keine Fragen.",
+        "spot": "no-questions"
+       }
+      ],
+      "time": "16:41"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "handle",
+     "label": "Benutzername",
+     "explain": "Der offizielle Benutzername lautet @sxn_resmi. Hier wurde ein Buchstabe verändert."
+    },
+    {
+     "id": "urgent",
+     "label": "Zeitdruck",
+     "explain": "Kriminelle setzen Sie unter Druck, damit Sie keine Zeit zum Nachdenken haben."
+    },
+    {
+     "id": "fee",
+     "label": "Gebührenforderung",
+     "explain": "Für den Erhalt einer staatlichen Zahlung müssen Sie nie etwas bezahlen."
+    },
+    {
+     "id": "link",
+     "label": "Link",
+     "explain": "Das ist nicht die Domain des Ministeriums, sxn.example."
+    },
+    {
+     "id": "no-questions",
+     "label": "Deaktivierte Kommentare",
+     "explain": "Wer die Kommentare abschaltet, bringt Menschen zum Schweigen, die andere warnen würden."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "real-or-fake",
+   "prompt": "Offiziell oder gefälscht?",
+   "cards": [
+    {
+     "id": "official-list",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn",
+      "url": [
+       {
+        "text": "https://sxn.example/elaqe/sosial-sebekeler"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Das ist die eigene Website des Ministeriums. Die Liste der offiziellen Accounts entnehmen Sie einer solchen Seite."
+    },
+    {
+     "id": "extra-word",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "nd-sxn-fake",
+      "url": [
+       {
+        "text": "https://kontakto.example/sxn.resmi.official"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Das zusätzliche Wort am Ende ist ein typisches Warnsignal für eine Fälschung. Die offizielle Adresse lautet sxn.resmi."
+    },
+    {
+     "id": "job-fee",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "nd-sxn-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Ministerium für Soziale Dienste | Personalabteilung"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Die Buchung eines Vorstellungsgesprächs kostet 20 AZN. Ihr Termin wird nach der Zahlung reserviert."
+         }
+        ],
+        "time": "13:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Eine staatliche Stelle verlangt per Nachricht kein Geld für ein Vorstellungsgespräch oder eine Bewerbung."
+    },
+    {
+     "id": "post-to-site",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Ministerium für Soziale Dienste"
+       }
+      ],
+      "body": [
+       {
+        "text": "Die Sprechzeiten haben sich geändert. Einzelheiten auf sxn.example."
+       }
+      ],
+      "time": "09:10"
+     },
+     "verdict": "safe",
+     "explain": "Die Nachricht verlangt nichts und verweist auf die offizielle Website. Prüfen Sie die Einzelheiten trotzdem direkt auf der Website."
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "verify-account",
+   "prompt": "Wie prüfen Sie, ob ein Account offiziell ist? Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "open-site",
+     "label": "Die Website der Organisation selbst in den Browser eingeben"
+    },
+    {
+     "id": "find-list",
+     "label": "Auf der Website die Links zu den offiziellen Accounts suchen"
+    },
+    {
+     "id": "compare",
+     "label": "Die Adresse des Accounts Buchstabe für Buchstabe vergleichen"
+    },
+    {
+     "id": "report",
+     "label": "Wenn sie nicht übereinstimmt: den Account bei der Plattform melden"
+    }
+   ],
+   "explain": "Beginnen Sie die Prüfung immer auf der eigenen Website der Organisation, nie über einen Link aus der Nachricht."
+  },
+  {
+   "type": "choice",
+   "id": "badge",
+   "question": {
+    "prompt": "Neben dem Namen des Accounts steht ein Verifizierungshaken. Beweist das, dass der Account offiziell ist?",
+    "options": [
+     {
+      "id": "yes",
+      "label": "Ja, der Haken ist eine Garantie",
+      "correct": false,
+      "feedback": "Auf manchen Plattformen lässt sich der Haken kaufen, und Fälscher setzen ein Haken-Symbol auch direkt in den Namen."
+     },
+     {
+      "id": "followers",
+      "label": "Ja, wenn er viele Follower hat",
+      "correct": false,
+      "feedback": "Follower lassen sich kaufen, und eine alte Seite lässt sich einfach umbenennen."
+     },
+     {
+      "id": "site",
+      "label": "Nein, ich gleiche ihn mit dem Link auf der Website der Organisation ab",
+      "correct": true,
+      "feedback": "Richtig. Der Link auf der eigenen Website der Organisation ist die zuverlässigste Prüfung."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "badge-id"
+    }
+   },
+   "explain": "Haken, Follower und ein professionell wirkendes Logo lassen sich fälschen. Die eigene Website der Organisation dagegen nicht."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Prüfen Sie die Adresse des Accounts, nicht den Namen: Schon ein einziger Buchstabe kann anders sein.",
+    "Offizielle Stellen verlangen per Nachricht keine Kartendaten, Gebühren oder dringenden Zahlungen.",
+    "Öffnen Sie im Zweifel die Website selbst und melden Sie den falschen Account."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

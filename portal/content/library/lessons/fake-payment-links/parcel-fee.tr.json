@@ -1,0 +1,459 @@
+{
+  "id": "parcel-fee",
+  "title": "Kargo ücreti",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "pf-tutor",
+      "beats": [
+        {
+          "id": "pf-b1",
+          "say": "Merhaba! Bugün küçücük bir ödeme bağlantısının nasıl büyük bir kayba dönüştüğünü göreceğiz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "pf-b2",
+          "say": "Ücret yalnızca bir manat yirmi. Dolandırıcının peşinde olduğu şey bu ücret değil, kart bilgileriniz.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "brandRef": "w2d-tezkuryer-fake",
+              "sender": [
+                {
+                  "text": "+994 51 000 83 17"
+                }
+              ],
+              "time": "10:47",
+              "messages": [
+                [
+                  {
+                    "text": "TezKuryer: kargonuz gümrükte bekletiliyor. "
+                  },
+                  {
+                    "text": "1,20 AZN ücreti ödeyiniz: ",
+                    "spot": "fee"
+                  },
+                  {
+                    "text": "tezkuryer-gomruk.example.net/odenis",
+                    "link": {
+                      "label": "tezkuryer-gomruk.example.net/odenis",
+                      "href": "https://tezkuryer-gomruk.example.net/odenis"
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "fee"
+        },
+        {
+          "id": "pf-b3",
+          "say": "Kargo, ceza ya da sosyal yardım: konu ne olursa olsun, SMS'teki bir bağlantı üzerinden asla ödeme yapmayın.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "pf-b4",
+          "say": "Bunun yerine resmî uygulamayı ya da portalı kendiniz açın ve orada kontrol edin.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "pf-hotspot",
+      "prompt": "Bu SMS'teki dolandırıcılık işaretlerini bulun.",
+      "artifact": {
+        "kind": "sms",
+        "brandRef": "w2d-tezkuryer-fake",
+        "sender": [
+          {
+            "text": "+994 51 000 83 17",
+            "spot": "sender"
+          }
+        ],
+        "time": "10:47",
+        "messages": [
+          [
+            {
+              "text": "TezKuryer: TZ48120577AZ numaralı kargonuz gümrükte bekletilmektedir. "
+            },
+            {
+              "text": "1,20 AZN gümrük ücreti",
+              "spot": "small-fee"
+            },
+            {
+              "text": " ödenmelidir."
+            }
+          ],
+          [
+            {
+              "text": "Ödeme için: "
+            },
+            {
+              "text": "tezkuryer-gomruk.example.net/odenis",
+              "spot": "link",
+              "link": {
+                "label": "tezkuryer-gomruk.example.net/odenis",
+                "href": "https://tezkuryer-gomruk.example.net/odenis"
+              }
+            }
+          ],
+          [
+            {
+              "text": "24 saat içinde ödenmezse kargo göndericiye iade edilecektir.",
+              "spot": "deadline"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender",
+          "label": "Sıradan bir cep telefonu numarası",
+          "explain": "Şirketlerin SMS'leri genellikle bir adla gelir. Ad da taklit edilebilir, bu yüzden yalnızca bu işarete güvenmeyin."
+        },
+        {
+          "id": "small-fee",
+          "label": "Çok küçük bir tutar",
+          "explain": "Küçük bir tutar dikkatinizi gevşetir. Asıl hedef kart numaranız, kartın arkasındaki kod ve SMS kodudur."
+        },
+        {
+          "id": "link",
+          "label": "Sahte adres",
+          "explain": "Bu, kargo şirketinin resmî sitesi değil; ada fazladan kelimeler eklenmiş. Bağlantıya dokunmayın, resmî uygulamayı kendiniz açın."
+        },
+        {
+          "id": "deadline",
+          "label": "Acele ettirme",
+          "explain": "Süre sınırı, düşünmenizi engellemek için konmuş. Gerçek bir kargo şirketi size kontrol etmeniz için zaman tanır."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "pf-sim",
+      "environment": "phone",
+      "title": "Gün boyu gelen mesajlar",
+      "intro": "Gün içinde telefonunuza birkaç mesaj geliyor. Her biri için doğru tepkiyi seçin.",
+      "steps": [
+        {
+          "id": "redeliver-sms",
+          "label": "10:47 Yeni SMS",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "w2d-tezkuryer-fake",
+            "sender": [
+              {
+                "text": "+994 51 000 83 17"
+              }
+            ],
+            "time": "10:47",
+            "messages": [
+              [
+                {
+                  "text": "TezKuryer: kuryemiz size ulaşamadı. Yeniden teslimat için 0,90 AZN ödeyiniz: "
+                },
+                {
+                  "text": "tezkuryer-catdirilma.example.net/odenis",
+                  "link": {
+                    "label": "tezkuryer-catdirilma.example.net/odenis",
+                    "href": "https://tezkuryer-catdirilma.example.net/odenis"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Tanıdık bir kargo şirketi adı ve küçük bir tutar.",
+          "actions": [
+            {
+              "id": "open-link",
+              "label": "Bağlantıyı aç",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Sayfa kargo şirketinin sitesine benziyor, ama adres sahte. Şimdi sizden ne istediğine bakın.",
+              "next": "bank-code"
+            },
+            {
+              "id": "report",
+              "label": "Spam olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. SMS'i bildirin, ardından kargonuzu resmî uygulamadan kontrol edin.",
+              "next": "real-app"
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Güzel. Bir kargo bekliyorsanız resmî uygulamadan kontrol edin.",
+              "next": "real-app"
+            }
+          ]
+        },
+        {
+          "id": "bank-code",
+          "label": "Sayfa kart bilgilerinizi ve SMS kodunu istedi",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank",
+            "sender": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "time": "10:49",
+            "messages": [
+              [
+                {
+                  "text": "Doğrulama kodu: 518204. Ödeme: 412,00 AZN, TZK GLOBAL PAY. Bu kodu kimseyle paylaşmayınız."
+                }
+              ]
+            ]
+          },
+          "say": "Bankanız bir kod gönderdi. Tutara bakın.",
+          "actions": [
+            {
+              "id": "type-code",
+              "label": "Kodu siteye yaz",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Bu kodla bir manatı değil, dört yüz on iki manatı onaylıyorsunuz. Hemen kartınızın arkasındaki numaradan bankayı arayın."
+            },
+            {
+              "id": "call-bank",
+              "label": "Bankayı kartın arkasındaki numaradan ara",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Doğru. Kodun yanındaki tutar sayfada yazandan çok daha yüksek, bu yüzden kartı hemen bloke ettirin."
+            },
+            {
+              "id": "ignore",
+              "label": "Kodu hiçbir yere yazma",
+              "kind": "ignore",
+              "outcome": "safe",
+              "feedback": "Güzel, ödeme gerçekleşmedi. Ama kart bilgileriniz zaten o sitede, bu yüzden bankayı arayın ve kartı bloke ettirin."
+            }
+          ]
+        },
+        {
+          "id": "real-app",
+          "label": "Resmî TezKuryer uygulaması",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2d-tezkuryer",
+            "app": "TezKuryer",
+            "title": [
+              {
+                "text": "TZ77015342AZ: yolda"
+              }
+            ],
+            "body": [
+              {
+                "text": "Teslimat 4 Ekim'de. Ek ödeme gerekmiyor."
+              }
+            ],
+            "time": "11:05"
+          },
+          "say": "Bu bildirim resmî uygulamadan geliyor.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Uygulamada aç",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Doğru. Resmî uygulama ek bir ücret göstermiyor, demek ki SMS sahteydi."
+            },
+            {
+              "id": "later",
+              "label": "Sonra bak",
+              "kind": "ignore",
+              "outcome": "safe",
+              "feedback": "Sorun değil. Ödenmesi gereken bir ücret olsaydı onu resmî uygulamada da görürdünüz."
+            }
+          ]
+        },
+        {
+          "id": "fine-sms",
+          "label": "13:20 Yeni SMS",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "w2d-yol-nezaret-fake",
+            "sender": [
+              {
+                "text": "YolNezaret"
+              }
+            ],
+            "time": "13:20",
+            "messages": [
+              [
+                {
+                  "text": "Hız sınırını aştığınız için 80 AZN para cezası kesilmiştir. Bugün öderseniz %50 indirim: "
+                },
+                {
+                  "text": "yolnezaret-cerime.example.net/endirim",
+                  "link": {
+                    "label": "yolnezaret-cerime.example.net/endirim",
+                    "href": "https://yolnezaret-cerime.example.net/endirim"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Şimdi de bir ceza. İndirime dikkat edin.",
+          "actions": [
+            {
+              "id": "pay",
+              "label": "İndirimli öde",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "İndirim sizi acele ettirmek için orada. Bağlantının arkasındaki sayfa kart bilgilerini topluyor."
+            },
+            {
+              "id": "verify",
+              "label": "Cezaları portaldan kendim kontrol ederim",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğru. Ceza gerçekse resmî portalda görünür."
+            },
+            {
+              "id": "report",
+              "label": "Spam olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Güzel. Emin değilseniz 102 numaralı hattan polisi arayıp sorun."
+            }
+          ]
+        },
+        {
+          "id": "aunt-chat",
+          "label": "16:02 Sebine Teyze",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Sebine Teyze"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Komşu bu linki gönderdi, aile desteği veriyorlarmış, bugün son günmüş."
+                  }
+                ],
+                "time": "16:01"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "ailedestek-qeydiyyat.example.net",
+                    "link": {
+                      "label": "ailedestek-qeydiyyat.example.net",
+                      "href": "https://ailedestek-qeydiyyat.example.net"
+                    }
+                  }
+                ],
+                "time": "16:01"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Kart bilgilerimi gireyim mi?"
+                  }
+                ],
+                "time": "16:02"
+              }
+            ]
+          },
+          "say": "Bir akrabanız sizden tavsiye istiyor.",
+          "actions": [
+            {
+              "id": "advise-stop",
+              "label": "Girmeyin, resmî portaldan birlikte bakalım",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Harika. Devletin sosyal yardımları için hiçbir zaman bir bağlantı üzerinden kayıt istenmez; bunları resmî portaldan kontrol edebilirsiniz."
+            },
+            {
+              "id": "advise-go",
+              "label": "Acele edin, bugün son gün",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "“Son gün” hilesi işe yaradı. Sayfa teyzenizin kart bilgilerini çalacak, bu yüzden hemen bankasını araması gerekiyor."
+            },
+            {
+              "id": "open-it",
+              "label": "Bir dakika, ben bağlantıyı açayım",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Kontrol etmek için açmak da risklidir. Üstelik bu adres resmî portal değil."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "pf-choice",
+      "question": {
+        "prompt": "Kart bilgilerinizi sahte bir sayfaya zaten girdiniz. İlk olarak ne yaparsınız?",
+        "options": [
+          {
+            "id": "call-bank",
+            "label": "Kartın arkasındaki numaradan bankayı arar ve kartı bloke ettiririm",
+            "correct": true,
+            "feedback": "Doğru. Kart ne kadar erken bloke edilirse kaybınız o kadar az olur."
+          },
+          {
+            "id": "wait",
+            "label": "Hesaptan para çıkıp çıkmadığını görmek için beklerim",
+            "correct": false,
+            "feedback": "Beklemek dolandırıcıya zaman kazandırır. Para gittikten sonra çok geç olabilir."
+          },
+          {
+            "id": "reply-sms",
+            "label": "SMS'e yanıt verir ve paramı geri isterim",
+            "correct": false,
+            "feedback": "Dolandırıcı parayı geri vermez, üstüne bir de yeni bir kod ister. İletişimi kesin."
+          }
+        ]
+      },
+      "explain": "Ardından durumu 102 numaralı hattan polise bildirin ve mesajı kanıt olarak saklayın."
+    },
+    {
+      "type": "recap",
+      "id": "pf-recap",
+      "points": [
+        "Kargo, ceza ya da sosyal yardım: SMS'teki bir bağlantı üzerinden asla ödeme yapmayın.",
+        "Kontrol etmek için resmî uygulamayı ya da portalı kendiniz açın.",
+        "Kart bilgilerinizi mi girdiniz? Hemen bankayı, ardından 102 numaralı hattan polisi arayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

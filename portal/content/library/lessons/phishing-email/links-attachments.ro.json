@@ -1,0 +1,483 @@
+{
+ "id": "links-attachments",
+ "title": "Linkuri și atașamente",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "read-the-link",
+   "beats": [
+    {
+     "id": "intro",
+     "say": "Textul unui link spune un lucru, iar adresa lui, altul. Haideți să învățăm să citim adresa.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "padlock",
+     "say": "Lacătul arată doar că conexiunea este criptată. Și site-urile false au lacăt.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     },
+     "checkpoint": {
+      "prompt": "Lacătul dovedește că un site este autentic?",
+      "options": [
+       {
+        "id": "yes",
+        "label": "Da",
+        "correct": false,
+        "feedback": "Nu. Și escrocii obțin foarte ușor un lacăt."
+       },
+       {
+        "id": "no",
+        "label": "Nu",
+        "correct": true,
+        "feedback": "Corect. Verificați întotdeauna numele site-ului."
+       }
+      ]
+     }
+    },
+    {
+     "id": "owner",
+     "say": "Numele site-ului se termină la prima bară oblică simplă. Ultima lui parte, împreună cu terminația, arată cine este proprietarul.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "xidmet-agentliyi-fake",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "xidmetagentliyi.az.",
+         "spot": "decoy"
+        },
+        {
+         "text": "hesab-yoxla.info",
+         "spot": "real-domain"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "real-domain"
+    },
+    {
+     "id": "decoy",
+     "say": "Numele cunoscut din față este doar decor. Oricine îl poate pune în fața propriului site.",
+     "mood": "alert",
+     "gesture": "point-down",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "xidmet-agentliyi-fake",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "xidmetagentliyi.az.",
+         "spot": "decoy"
+        },
+        {
+         "text": "hesab-yoxla.info",
+         "spot": "real-domain"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "decoy"
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "whose-link",
+   "question": {
+    "prompt": "Cui aparține de fapt acest link?",
+    "options": [
+     {
+      "id": "bank",
+      "label": "UlduzBank",
+      "correct": false,
+      "feedback": "Numele băncii este în față, dar proprietarul este numele de la sfârșit."
+     },
+     {
+      "id": "owner",
+      "label": "az-giris.info",
+      "correct": true,
+      "feedback": "Corect. Finalul numelui site-ului arată adevăratul proprietar."
+     },
+     {
+      "id": "path",
+      "label": "kart",
+      "correct": false,
+      "feedback": "Acesta nu este numele site-ului, ci calea paginii, de după bara oblică."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ulduzbank-fake",
+      "url": [
+       {
+        "text": "https://ulduzbank.az-giris.info/kart"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "Aici, ulduzbank.az este doar decor. Site-ul aparține domeniului az-giris.info."
+  },
+  {
+   "type": "simulation",
+   "id": "link-to-login",
+   "environment": "browser",
+   "title": "După clic",
+   "intro": "Ați deschis un link dintr-un e-mail. Citiți adresa din browser și decideți ce faceți.",
+   "steps": [
+    {
+     "id": "fake-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "xidmet-agentliyi-fake",
+      "brand": "Xidmət Agentliyi",
+      "url": [
+       {
+        "text": "https://xidmetagentliyi.az.",
+        "reveal": "hesab-yoxla.info"
+       },
+       {
+        "text": "hesab-yoxla.info",
+        "spot": "real-domain"
+       },
+       {
+        "text": "/giris"
+       }
+      ],
+      "fields": [
+       "E-mail",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "say": "Uitați-vă la finalul adresei: cine este adevăratul proprietar?",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Conectați-vă",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Pagina aparține domeniului hesab-yoxla.info, nu agenției. Schimbați-vă imediat parola și raportați incidentul."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Numele cunoscut din față este doar decor; domeniul real era hesab-yoxla.info."
+      },
+      {
+       "id": "report",
+       "label": "Raportați site-ul",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Raportarea ajută ca site-ul fals să fie blocat și pentru ceilalți."
+      }
+     ]
+    },
+    {
+     "id": "download",
+     "label": "Se descarcă factura",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "ofistechizat-fake",
+      "name": [
+       {
+        "text": "Factura_0925.pdf.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "2,1 MB",
+      "source": [
+       {
+        "text": "ofis-techizat.com"
+       }
+      ]
+     },
+     "say": "Browserul a descărcat un fișier. Verificați cum se termină numele lui.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Tipul real al fișierului este .exe, adică un program. O factură nu este niciodată un program."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. Ștergeți programul care se dă drept document și raportați e-mailul."
+      },
+      {
+       "id": "scan",
+       "label": "Scanați cu antivirusul",
+       "kind": "scan",
+       "outcome": "safe",
+       "feedback": "Un obicei bun. Dar un fișier care se termină în .pdf.exe poate fi șters și fără scanare."
+      }
+     ]
+    },
+    {
+     "id": "real-portal",
+     "label": "Ați deschis portalul din marcaje",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "xidmet-agentliyi",
+      "brand": "Xidmət Agentliyi",
+      "url": [
+       {
+        "text": "https://portal.xidmetagentliyi.az/giris",
+        "reveal": "xidmetagentliyi.az"
+       }
+      ],
+      "fields": [
+       "E-mail",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "say": "De data aceasta, ați deschis adresa chiar dumneavoastră. Ce faceți acum?",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Conectați-vă",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Corect. Acesta este domeniul oficial al agenției, iar pagina ați deschis-o chiar dumneavoastră."
+      },
+      {
+       "id": "report",
+       "label": "Raportați site-ul",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Acesta este portalul oficial al agenției. Puteți avea încredere într-un site pe care îl deschideți dumneavoastră din marcaje."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "invoice-trap",
+   "prompt": "Găsiți semnalele de alarmă din acest e-mail.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "ofistechizat-fake",
+    "from": {
+     "name": [
+      {
+       "text": "OfisTəchizat MMC",
+       "reveal": "hesab@ofis-techizat.com"
+      }
+     ],
+     "address": [
+      {
+       "text": "hesab@"
+      },
+      {
+       "text": "ofis-techizat.com",
+       "spot": "sender-domain"
+      }
+     ]
+    },
+    "to": "s.huseynova@xidmetagentliyi.az",
+    "subject": [
+     {
+      "text": "Factura nr. 0925: plată restantă"
+     }
+    ],
+    "time": "14:32",
+    "body": [
+     [
+      {
+       "text": "Bună ziua,"
+      }
+     ],
+     [
+      {
+       "text": "Vă trimitem atașată factura restantă."
+      },
+      {
+       "text": "Deschideți-o și activați macrocomenzile, altfel textul nu se afișează.",
+       "spot": "enable-content"
+      }
+     ],
+     [
+      {
+       "text": "Dacă fișierul nu se deschide, descărcați-l de aici: "
+      },
+      {
+       "text": "https://qisa.example/f8Rt",
+       "spot": "short-link"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Factura_0925.pdf.zip",
+        "spot": "double-ext",
+        "reveal": "Tipul fișierului: arhivă ZIP (.zip)"
+       }
+      ],
+      "size": "312 KB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender-domain",
+     "label": "Domeniu aproape identic",
+     "explain": "Seamănă cu adresa unui furnizor cunoscut, dar domeniul este altul. Verificați adresa reală în propriile evidențe."
+    },
+    {
+     "id": "enable-content",
+     "label": "Activarea macrocomenzilor",
+     "explain": "Macrocomenzile pot rula comenzi ascunse. Office le blochează în fișierele venite de pe internet, iar o factură reală nu vă cere niciodată să ocoliți această protecție."
+    },
+    {
+     "id": "short-link",
+     "label": "Link scurtat",
+     "explain": "Nu vedeți unde duce. Îndemnul de a descărca fișierul printr-un link este un truc clasic."
+    },
+    {
+     "id": "double-ext",
+     "label": "Extensie dublă",
+     "explain": "Numele începe ca al unui PDF, dar fișierul este de fapt o arhivă ZIP. În ea se poate ascunde un program."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "link-check",
+   "prompt": "Acest link este sigur sau o capcană?",
+   "cards": [
+    {
+     "id": "home",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "xidmet-agentliyi",
+      "url": [
+       {
+        "text": "https://xidmetagentliyi.az/elanlar"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Numele site-ului este exact adresa agenției."
+    },
+    {
+     "id": "portal",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "xidmet-agentliyi",
+      "url": [
+       {
+        "text": "https://portal.xidmetagentliyi.az/mezuniyyet"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Partea „portal” din față este o secțiune a agenției. Finalul este tot xidmetagentliyi.az."
+    },
+    {
+     "id": "decoy",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "xidmet-agentliyi-fake",
+      "url": [
+       {
+        "text": "https://xidmetagentliyi.az-portal.info/giris"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Se termină în az-portal.info. Numele agenției a fost pus în față doar ca decor."
+    },
+    {
+     "id": "swap",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "xidmet-agentliyi-fake",
+      "url": [
+       {
+        "text": "https://xidmetaqentliyi.az/maas"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "În locul literei g apare un q. Este un site complet diferit."
+    },
+    {
+     "id": "short",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://qisa.example/a8Zq"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un link scurtat ascunde unde duce. Dacă l-ați primit pe neașteptate, nu îl deschideți."
+    },
+    {
+     "id": "bank",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ulduzbank",
+      "url": [
+       {
+        "text": "https://ulduzbank.az/kartlar"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Aceasta este chiar adresa băncii, care se termină în ulduzbank.az. Totuși, cel mai sigur este să tastați dumneavoastră adresa băncii."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Adevăratul proprietar al unui site se află la finalul numelui său.",
+    "Verificați mai întâi linkurile scurtate și fișierele neașteptate.",
+    "Dacă un fișier vă cere să activați macrocomenzile, închideți-l și raportați-l."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

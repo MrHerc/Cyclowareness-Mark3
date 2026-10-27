@@ -1,0 +1,481 @@
+{
+ "id": "accidental-insider",
+ "title": "Dikkatsizlik hataları",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ai-tutor",
+   "beats": [
+    {
+     "id": "ai-b1",
+     "say": "Merhaba! Birçok veri sızıntısı kötü niyetle değil, sıradan bir hatayla başlar.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "ai-b2",
+     "say": "Otomatik tamamlama yanlış adresi seçebilir. Göndermeden önce alıcıya bir kez daha bakın.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Harici alıcı"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Bu e-posta kurum dışına gönderiliyor: "
+         },
+         {
+          "text": "rauf.aliyev@kur-tikinti.example",
+          "spot": "wrong"
+         }
+        ],
+        [
+         {
+          "text": "Ek: Maaş_tablosu_2026.xlsx"
+         }
+        ]
+       ],
+       "buttons": [
+        "Yine de gönder",
+        "İptal"
+       ]
+      }
+     },
+     "highlight": "wrong"
+    },
+    {
+     "id": "ai-b3",
+     "say": "İş dosyalarını kişisel bulut depolama alanına ya da kurumunuzun onaylamadığı uygulamalara yüklemeyin.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    {
+     "id": "ai-b4",
+     "say": "Bir hata yaptıysanız saklamayın. Hızlı bildirmek zararı sınırlar, saklamak ise durumu kötüleştirir.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ai-sim",
+   "environment": "desktop",
+   "title": "Sıradan bir iş günü",
+   "intro": "Bugün birkaç talep geldi. Her biri için verileri nasıl güvende tutacağınızı seçin.",
+   "steps": [
+    {
+     "id": "personal-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Nigar Aliyeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "nigar.aliyeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Rapor için liste"
+       }
+      ],
+      "time": "09:20",
+      "body": [
+       [
+        {
+         "text": "Merhaba, bu akşam evden çalışacağım."
+        }
+       ],
+       [
+        {
+         "text": "Lütfen personel listesini (kimlik numaraları, telefonlar) kişisel adresime gönderin: nigar.84@poctam.example"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Listeyi kişisel adresine gönder",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Kişisel veriler kurumunuzun denetiminden çıktı. Kişisel bir posta kutusu kurumunuz tarafından korunmaz ve veriler sızabilir."
+      },
+      {
+       "id": "reply",
+       "label": "Yanıtla: kişisel adrese gönderemem",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Doğru. Evden çalışırken onaylı araçlar kullanılır, örneğin VPN üzerinden iş e-postası."
+      }
+     ]
+    },
+    {
+     "id": "shadow-it",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "fayldasi",
+      "tone": "app",
+      "title": [
+       {
+        "text": "FaylDaşı: ücretsiz dosya aktarımı"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Layihe_smeta.xlsx (2,4 GB) yüklendi."
+        }
+       ],
+       [
+        {
+         "text": "Bağlantıya sahip olan herkes dosyayı indirebilir.",
+         "spot": "public"
+        }
+       ]
+      ],
+      "buttons": [
+       "Bağlantıyı kopyala",
+       "İptal"
+      ]
+     },
+     "say": "Dosya e-posta için çok büyüktü, siz de ücretsiz bir site buldunuz.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Bağlantıyı kopyala ve iş ortağına gönder",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Bağlantıyı alan herkes dosyayı açabilir. Kurumunuzun bu hizmet üzerinde hiçbir denetimi yok."
+      },
+      {
+       "id": "cancel",
+       "label": "İptal et ve BT'ye onaylı yolu sor",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. BT destek ekibi, büyük bir dosyayı güvenle göndermenin onaylı yolunu size gösterir."
+      }
+     ]
+    },
+    {
+     "id": "wrong-recipient",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Harici alıcı"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Bu e-posta kurum dışına gönderiliyor: "
+        },
+        {
+         "text": "rauf.aliyev@kur-tikinti.example",
+         "spot": "wrong"
+        }
+       ],
+       [
+        {
+         "text": "Ek: Maaş_tablosu_2026.xlsx"
+        }
+       ]
+      ],
+      "buttons": [
+       "Yine de gönder",
+       "İptal"
+      ]
+     },
+     "say": "Maaş tablosunu Rauf'a gönderiyorsunuz. Adresi kontrol edin.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Yine de gönder",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Maaş tablosu başka bir şirkete gitti. Bu bir kişisel veri sızıntısıdır."
+      },
+      {
+       "id": "cancel",
+       "label": "İptal et ve alıcıyı kontrol et",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. İş arkadaşınız Rauf Alizade, ama otomatik tamamlama iş ortağı olan bir şirketteki Rauf Aliyev'i seçti."
+      }
+     ]
+    },
+    {
+     "id": "sent-wrong",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "İşPoçt",
+      "title": [
+       {
+        "text": "E-posta gönderildi"
+       }
+      ],
+      "body": [
+       {
+        "text": "Üç aylık rapor: aysel.quliyeva@poctam.example (kişisel adres)"
+       }
+      ],
+      "time": "16:41"
+     },
+     "say": "Başka bir e-posta ise çoktan yanlış adrese gitti.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Hemen güvenlik ekibine haber ver",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru. Ne kadar erken bildirirseniz e-postayı geri çekme ve zararı sınırlama şansı o kadar artar."
+      },
+      {
+       "id": "ask",
+       "label": "Alıcıya yaz: lütfen silin",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Rica etmek iyidir ama yeterli değildir. Önce güvenlik ekibine haber verin, sonra ne yapılacağını onlar söyler."
+      },
+      {
+       "id": "hide",
+       "label": "Kimseye söyleme",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Saklanan hata büyür. Profesyonel davranış, hatayı bildirmektir."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "ai-swipe",
+   "prompt": "Güvenli mi, riskli mi?",
+   "cards": [
+    {
+     "id": "badge-photo",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Gönderiniz yayında"
+       }
+      ],
+      "body": [
+       {
+        "text": "“İlk iş günüm!” Fotoğrafta giriş kartınız ve ekrandaki bir kurum içi sistem görünüyor."
+       }
+      ],
+      "time": "12:10"
+     },
+     "verdict": "threat",
+     "explain": "Giriş kartı ve iş ekranı, saldırganlara sahte kart yapmak ve hedef seçmek için gereken bilgiyi verir."
+    },
+    {
+     "id": "portal-share",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Leyla Rzayeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "leyla.rzayeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Maliyet tahmini paylaşıldı"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Dosyayı kurum içi portalda yalnızca departmanımızla paylaştım."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Onaylı bir kurum içi alan ve sınırlı erişim. Doğru paylaşım yolu budur."
+    },
+    {
+     "id": "group-password",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Ofis grubu (34 kişi)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Ortak sistemin şifresi: Arxiv#2026"
+         }
+        ],
+        "time": "09:02"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Grupta paylaşılan bir parola birçok kişiye, bazen de dışarıdan kişilere ulaşır. Parolalar asla paylaşılmaz."
+    },
+    {
+     "id": "personal-cloud",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "buludxidmet",
+      "name": [
+       {
+        "text": "Layihe_budce_2027.xlsx"
+       }
+      ],
+      "type": "xls",
+      "size": "1,4 MB",
+      "source": [
+       {
+        "text": "Kişisel bulut klasörü: bağlantıya sahip olan herkes görüntüleyebilir"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Kişisel bulutta iş dosyası kurumunuzun denetiminden çıkar, herkese açık bir bağlantı da isteyen herkesi içeri alır."
+    },
+    {
+     "id": "locked-screen",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "idare",
+      "app": "İdarə",
+      "title": [
+       {
+        "text": "Ekran kilitlendi"
+       }
+      ],
+      "body": [
+       {
+        "text": "Masanızdan kalkarken ekranı kilitlediniz."
+       }
+      ],
+      "time": "13:00"
+     },
+     "verdict": "safe",
+     "explain": "Doğru. Kilitli ekran, kimsenin sizin adınıza işlem yapmasına izin vermez."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ai-match",
+   "prompt": "Her riski doğru alışkanlıkla eşleştirin.",
+   "pairs": [
+    {
+     "id": "autocomplete",
+     "left": "Otomatik tamamlama",
+     "right": "Göndermeden önce alıcıyı kontrol edin"
+    },
+    {
+     "id": "cloud",
+     "left": "Kişisel bulut ve ücretsiz siteler",
+     "right": "Yalnızca onaylı paylaşım araçları"
+    },
+    {
+     "id": "photo",
+     "left": "Ofisten fotoğraf paylaşmak",
+     "right": "Kadrajda ekran, giriş kartı ya da evrak olmasın"
+    },
+    {
+     "id": "sent",
+     "left": "Yanlış kişiye gönderilen e-posta",
+     "right": "Hemen güvenlik ekibine haber verin"
+    }
+   ],
+   "explain": "Bu alışkanlıklar, dikkatsizlikten kaynaklanan sızıntıların çoğunu önler."
+  },
+  {
+   "type": "choice",
+   "id": "ai-choice",
+   "question": {
+    "prompt": "Bir iş arkadaşınız şöyle diyor: “Bu ücretsiz uygulama işleri hızlandırıyor, kurun, BT'ye de söylemeyin.” Ne yaparsınız?",
+    "options": [
+     {
+      "id": "ask-it",
+      "label": "BT'ye bu uygulamayı ya da onaylı bir alternatifini sorarım",
+      "correct": true,
+      "feedback": "Doğru. BT ekibi uygulamanın güvenli olup olmadığını kontrol edebilir ya da size onaylı bir alternatif sunabilir."
+     },
+     {
+      "id": "install",
+      "label": "Kurarım, herkes kullanıyor",
+      "correct": false,
+      "feedback": "Kontrol edilmemiş bir uygulama iş verilerini dışarıya gönderebilir. “Herkes kullanıyor” olması güvenli olduğu anlamına gelmez."
+     },
+     {
+      "id": "home-pc",
+      "label": "Dosyaları kişisel dizüstü bilgisayarıma kopyalar, orada çalışırım",
+      "correct": false,
+      "feedback": "Bu da gölge BT'dir: veriler korunmayan bir cihaza taşınır."
+     }
+    ]
+   },
+   "explain": "Kurumunuzun onaylamadığı uygulama ve cihazlara gölge BT (shadow IT) denir. Bir şeye ihtiyacınız varsa BT'den onaylı bir yol isteyin."
+  },
+  {
+   "type": "recap",
+   "id": "ai-recap",
+   "points": [
+    "Göndermeden önce alıcıyı kontrol edin",
+    "İş dosyalarını yalnızca onaylı sistemlerde tutun",
+    "Hata mı yaptınız? Hemen bildirin"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,6 +1,6 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { refresh } from "next/cache";
 import QRCode from "qrcode";
@@ -9,7 +9,7 @@ import { actionViewer, getSession } from "../auth/viewer";
 import { verifyPassword } from "../auth/password";
 import { newBackupCodes, newTotpKey, totpUri, verifyTotp } from "../auth/totp";
 import { invalidateUserSessions } from "../auth/session";
-import { isPrivileged } from "../auth/permissions";
+import { twoFactorRequired } from "../auth/permissions";
 import { audit } from "../services/audit";
 import { clientIp } from "../request";
 import { rateLimit } from "../rate-limit";
@@ -41,15 +41,16 @@ export async function confirmTotpAction(code: string): Promise<{ ok: false; erro
   if (!verifyTotp(u.secret, code.replace(/\s/g, ""))) return { ok: false, error: "wrongCode" };
   const backup = newBackupCodes();
   await db().update(t.users).set({ totpEnabled: true, totpRecovery: backup.hashes }).where(eq(t.users.id, v.user.id));
-  // The current session already proved the second factor.
+  // The current session already proved the second factor; every other one (perhaps someone else's) has to sign in again.
   await db().update(t.sessions).set({ twoFactorVerified: true }).where(eq(t.sessions.id, v.sessionId));
+  await invalidateUserSessions(v.user.id, v.sessionId);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "auth.2fa_on", ip: await clientIp() });
   return { ok: true, codes: backup.codes };
 }
 
 export async function disableTotpAction(password: string): Promise<{ ok: boolean; error?: string }> {
   const v = await actionViewer();
-  if (v.tenant.settings.identity.requireAdmin2fa && isPrivileged(v.user.role)) return { ok: false, error: "required" };
+  if (twoFactorRequired(v.user.role, v.tenant.settings.identity.requireAdmin2fa)) return { ok: false, error: "required" };
   if (!(await checkPassword(v.user.id, password))) return { ok: false, error: "wrongPassword" };
   await db().update(t.users).set({ totpEnabled: false, totpSecret: null, totpRecovery: null }).where(eq(t.users.id, v.user.id));
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "auth.2fa_off", ip: await clientIp() });
@@ -88,7 +89,14 @@ export async function setAvatarAction(dataUrl: string | null): Promise<{ ok: boo
 
 export async function requestDeletionAction(): Promise<{ ok: boolean }> {
   const v = await actionViewer();
-  await db().update(t.users).set({ deletionRequestedAt: new Date() }).where(eq(t.users.id, v.user.id));
+  // Each request notifies every administrator: a few per hour, and a pending request is not made again.
+  if (!(await rateLimit(`deletion-request:${v.user.id}`, 5, 60 * 60_000)).ok) return { ok: false };
+  const [requested] = await db()
+    .update(t.users)
+    .set({ deletionRequestedAt: new Date() })
+    .where(and(eq(t.users.id, v.user.id), isNull(t.users.deletionRequestedAt)))
+    .returning({ id: t.users.id });
+  if (!requested) return { ok: true };
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "person.deletion_requested", targetType: "user", targetId: v.user.id });
   const admins = await db()
     .select({ id: t.users.id, locale: t.users.locale })

@@ -1,0 +1,442 @@
+{
+  "id": "lost-phone",
+  "title": "Kaybolan telefon",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "c-tutor",
+      "beats": [
+        {
+          "id": "c-b1",
+          "say": "Telefon kaybolabilir ya da çalınabilir. Onu önceden koruyalım ve böyle bir durumda ne yapacağımızı öğrenelim.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "c-b2",
+          "say": "Birincisi: ekran kilidi. En az altı haneli bir PIN kodu, yanında da parmak izi ya da yüz tanıma.",
+          "mood": "think",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          },
+          "checkpoint": {
+            "prompt": "Doğum yılınız iyi bir PIN kodu olur mu?",
+            "options": [
+              {
+                "id": "yes",
+                "label": "Evet, hatırlaması kolay",
+                "correct": false,
+                "feedback": "Doğum yılı kolayca bulunur; çoğu zaman sosyal medya profilinde açıkça yazılıdır."
+              },
+              {
+                "id": "no",
+                "label": "Hayır, rastgele bir PIN seçerim",
+                "correct": true,
+                "feedback": "Doğru. En az altı haneli, rastgele bir PIN seçin."
+              }
+            ]
+          }
+        },
+        {
+          "id": "c-b4",
+          "say": "İkincisi: yedekleme. Fotoğraflarınız ve kişi listeniz buluttaysa telefonu kaybettiğinizde yalnızca cihazı kaybedersiniz.",
+          "mood": "talk",
+          "gesture": "nod",
+          "visual": {
+            "kind": "illustration",
+            "id": "cloud"
+          }
+        },
+        {
+          "id": "c-b5",
+          "say": "Telefonunuz mu kayboldu? Hızlı davranın: onu uzaktan kilitleyin, kurumunuza hemen haber verin, gerekirse verilerini silin.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "lost-phone-flow",
+      "environment": "phone",
+      "title": "Telefon kayboldu",
+      "intro": "Akşam iş telefonunuzu bir takside unuttunuz. Bir iş arkadaşınızın telefonundan adım adım ilerleyin.",
+      "steps": [
+        {
+          "id": "locate",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "cihaz-tapici",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İş telefonu"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Son görülme: Nerimanov bölgesi, 5 dakika önce."
+                }
+              ],
+              [
+                {
+                  "text": "Telefon hareket ediyor."
+                }
+              ]
+            ],
+            "buttons": [
+              "Kilitle",
+              "Verileri sil",
+              "Bekle"
+            ]
+          },
+          "say": "Cihaz bulma hizmeti telefonu haritada gösteriyor.",
+          "actions": [
+            {
+              "id": "lock",
+              "label": "Kilitle ve mesaj göster",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Doğru. Kilitlemek bir dakika sürer ve yabancıların telefona girmesini engeller."
+            },
+            {
+              "id": "wipe",
+              "label": "Hemen sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Silmek son adımdır: sildikten sonra telefon haritada bulunamaz. Önce kilitleyin."
+            },
+            {
+              "id": "wait",
+              "label": "Sabaha kadar bekle",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Geçen her saat hırsıza daha fazla zaman tanır. Telefonu hemen kilitleyin."
+            }
+          ]
+        },
+        {
+          "id": "tell-it",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "BT Destek"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Merhaba! BT destek ekibi, nasıl yardımcı olabiliriz?"
+                  }
+                ],
+                "time": "21:08"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "İş telefonum kayboldu, hesabımı kilitleyin",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Doğru. Destek ekibi iş hesabınızı kilitlediğinde kimse telefondaki e-postaları açamaz."
+            },
+            {
+              "id": "tomorrow",
+              "label": "Yarın işe gidince söylerim",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "O telefonda iş e-postanız açık. Kurumunuza hemen haber vermek zararın büyük kısmını önler."
+            }
+          ]
+        },
+        {
+          "id": "sim-block",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "kehkesan-mobil",
+            "tone": "app",
+            "title": [
+              {
+                "text": "SIM kartı bloke et"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "+994 55 000 18 40"
+                }
+              ],
+              [
+                {
+                  "text": "Bloke edilen numaraya SMS kodları gelmez."
+                }
+              ]
+            ],
+            "buttons": [
+              "Bloke et",
+              "İptal"
+            ]
+          },
+          "say": "Şimdi mobil operatörünüzün uygulamasındasınız.",
+          "actions": [
+            {
+              "id": "block",
+              "label": "Bloke et",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Doğru. SIM bloke edilince hırsız, hesaplarınızı sıfırlamak için gereken SMS kodlarını alamaz."
+            },
+            {
+              "id": "cancel",
+              "label": "İptal",
+              "kind": "cancel",
+              "outcome": "risky",
+              "feedback": "SIM etkin kalırsa SMS kodları çalınan telefona gelmeye devam eder."
+            }
+          ]
+        },
+        {
+          "id": "found-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "cihaz-tapici-fake",
+            "sender": [
+              {
+                "text": "+994 70 000 45 67"
+              }
+            ],
+            "time": "21:30",
+            "messages": [
+              [
+                {
+                  "text": "Kaybolan telefonunuz bulundu. Nerede olduğunu görmek için giriş yapınız: "
+                },
+                {
+                  "text": "cihaz-tapildi.test",
+                  "link": {
+                    "label": "cihaz-tapildi.test",
+                    "href": "https://cihaz-tapildi.test/giris"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Yarım saat sonra şu SMS geliyor.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Bağlantıyı aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Hırsızlıktan sonra gelen bu tür mesajlar, telefonun kilidini açabilecek hesap parolasını çalmayı amaçlar."
+            },
+            {
+              "id": "block",
+              "label": "Engelle ve bildir",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Doğru. Telefonun konumunu yalnızca cihaz bulma hizmetinde, kendiniz kontrol edin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "c-order",
+      "prompt": "Telefonunuz kayboldu. Adımları doğru sıraya dizin.",
+      "items": [
+        {
+          "id": "lock-remote",
+          "label": "Telefonu cihaz bulma hizmetiyle kilitleyin"
+        },
+        {
+          "id": "tell-support",
+          "label": "Kurumunuzun teknik destek ekibine hemen haber verin"
+        },
+        {
+          "id": "block-sim",
+          "label": "SIM kartı bloke ettirmek için mobil operatörünüzü arayın"
+        },
+        {
+          "id": "change-passwords",
+          "label": "Önemli parolalarınızı başka bir cihazdan değiştirin"
+        },
+        {
+          "id": "wipe",
+          "label": "Telefon bulunamayacaksa verilerini uzaktan silin"
+        }
+      ],
+      "explain": "Önce kilitleyin ve bildirin, ardından SIM kartı ve parolaları koruma altına alın. Silmeyi en sona bırakın, çünkü silinen telefonu bulmak daha zordur. Kurumunuzun prosedürü farklı bir sıra öngörüyorsa ona uyun."
+    },
+    {
+      "type": "swipe",
+      "id": "c-swipe",
+      "prompt": "Güvenli mi, tuzak mı?",
+      "cards": [
+        {
+          "id": "support-locked",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Teknik destek"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Kaybolan telefonunuzu kayda aldık ve iş hesabınızı geçici olarak durdurduk. Yeni parolanız için ofise gelin."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Ne bağlantı ne de kod isteniyor; sizi bizzat ofise çağırıyorlar. Doğru prosedür budur."
+        },
+        {
+          "id": "finder-passcode",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "+44 7700 900654"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Telefonunuzu buldum. Sahibi olduğunuzu doğrulayabilmem için ekran kilidi kodunu bana yazın."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Telefonu iade etmek için kilit kodu gerekmez. Kodu vermeyin; teslimi polis aracılığıyla ayarlayın."
+        },
+        {
+          "id": "update-reminder",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "it-destek",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Teknik destek"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hatırlatma: telefonlar için yeni bir sistem güncellemesi yayımlandı. Ayarlar bölümünden yükleyin."
+                  }
+                ]
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Bağlantı yok; sizi telefonunuzun kendi Ayarlar bölümüne yönlendiriyor. Güncellemeler de tam olarak orada yüklenir."
+        },
+        {
+          "id": "cloud-full",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "buludxidmet-fake",
+            "sender": [
+              {
+                "text": "BuludXidmet"
+              }
+            ],
+            "time": "19:12",
+            "messages": [
+              [
+                {
+                  "text": "Bulut depolama alanınız doldu, fotoğraflarınız bugün silinecek. Ödemeyi buradan yapınız: "
+                },
+                {
+                  "text": "bulud-yaddas.test"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Gerçek bir uyarı uygulamanın kendi içinde görünür. Bağlantı üzerinden ödeme yapmayın; uygulamayı kendiniz açın."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "c-choice-lock",
+      "question": {
+        "prompt": "Hangi ekran kilitleri güçlüdür?",
+        "options": [
+          {
+            "id": "none",
+            "label": "Kilit yok",
+            "correct": false,
+            "feedback": "Kilitsiz bir telefonu bulan herkes her şeyi görür."
+          },
+          {
+            "id": "birth-year",
+            "label": "Doğum yılınız",
+            "correct": false,
+            "feedback": "Doğum yılı kolayca bulunur; çoğu zaman sosyal medya profilinde açıkça yazılıdır."
+          },
+          {
+            "id": "random-pin",
+            "label": "En az altı haneli, rastgele bir PIN",
+            "correct": true,
+            "feedback": "Doğru. Uzun ve rastgele bir PIN'i tahmin etmek zordur."
+          },
+          {
+            "id": "bio-pin",
+            "label": "Parmak izi ya da yüz tanıma, yanında güçlü bir PIN",
+            "correct": true,
+            "feedback": "Doğru. Hem kullanışlıdır hem de yedek PIN güçlüdür."
+          }
+        ],
+        "multi": true
+      },
+      "explain": "Telefon kaybolduğunda ilk koruma kilittir. Parmak izi pratiktir ama asıl PIN yine de güçlü olmalı."
+    },
+    {
+      "type": "recap",
+      "id": "c-recap",
+      "points": [
+        "Güçlü bir ekran kilidi ve otomatik güncellemeler",
+        "Yedeklemeyi ve cihaz bulma hizmetini önceden açın",
+        "Telefon kayboldu mu: kilitleyin, bildirin, gerekirse silin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

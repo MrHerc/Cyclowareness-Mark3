@@ -1,0 +1,387 @@
+{
+ "id": "after-mistake",
+ "title": "Hatadan sonra",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Herkes bazen hata yapar: bir bağlantıya dokunur, bir kodu söyler. Önemli olan, sonraki beş dakikadır.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Hatanızı saklamayın ve tek başınıza düzeltmeye çalışmayın. Gizlenen bir hata saldırgana zaman kazandırır.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Dürüst olun: neye dokundunuz, ne yazdınız, ne söylediniz. Uzmanın bunları bilmesi gerekir.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Ardından uzmanlar hesabı kilitler ve cihazı kontrol eder. Amaç, suçlu aramak değil, zararı durdurmaktır.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "gave-code",
+   "title": "Kodu söylediniz",
+   "start": "call-ended",
+   "nodes": [
+    {
+     "id": "call-ended",
+     "text": "Arayan kişi BT destek ekibinden olduğunu söyledi, siz de telefonunuza gelen kodu ona okudunuz. Görüşmeden sonra içinize şüphe düştü.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "BT Destek"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 50 000 38 17"
+        }
+       ],
+       "label": "Mobil"
+      }
+     },
+     "choices": [
+      {
+       "label": "Bildiğim destek numarasını hemen ararım",
+       "next": "honest",
+       "feedback": "Doğru. Her dakika önemli, saldırgan şu anda hesabınıza giriş yapıyor olabilir."
+      },
+      {
+       "label": "Utandığım için kimseye söylemem",
+       "outcome": "compromised",
+       "feedback": "Saldırgan artık hesabınızda ve kimsenin bundan haberi yok. Sessiz kalmak durumu daha da kötüleştirir."
+      },
+      {
+       "label": "Parolayı kendim değiştiririm, bu yeterli",
+       "outcome": "risky",
+       "feedback": "İyi bir adım, ama yeterli değil. Saldırgan, bir uzmanın sonlandırması gereken açık bir oturumda kalmaya devam edebilir."
+      }
+     ]
+    },
+    {
+     "id": "honest",
+     "text": "Kodu ne zaman verdiniz ve arayan kişi başka ne istedi?",
+     "speaker": "Güvenlik ekibi",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "firm",
+     "spoken": "Kodu ne zaman verdiniz <breath> ve arayan kişi başka ne istedi?",
+     "choices": [
+      {
+       "label": "Kod dahil her şeyi olduğu gibi anlatırım",
+       "next": "manager",
+       "feedback": "Doğru. Dürüst bilgiler sayesinde uzman neyi kilitlemesi gerektiğini tam olarak bilir."
+      },
+      {
+       "label": "Sadece bir arama olduğunu, kod vermediğimi söylerim",
+       "outcome": "risky",
+       "feedback": "Hikâyenin yalnızca yarısını duyan uzman, hesabın ele geçirildiğini bilemez. Dürüstlük zaman kazandırır."
+      }
+     ]
+    },
+    {
+     "id": "manager",
+     "text": "Uzman tüm oturumları sonlandırdı ve sizden yeni bir parola belirlemenizi istedi. Yöneticiniz soruyor: “Ne oldu?”",
+     "choices": [
+      {
+       "label": "Ekip de uyarılsın diye açıkça anlatırım",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Anlattıklarınız iş arkadaşlarınızı aynı aramaya karşı korur."
+      },
+      {
+       "label": "Hiçbir şey olmadığını söylerim",
+       "outcome": "risky",
+       "feedback": "Aynı arama iş arkadaşlarınıza da gelebilir. Konuşmak onları korur."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "next-day-inbox",
+   "environment": "inbox",
+   "title": "Ertesi gün",
+   "intro": "Dün sahte bir bağlantıyı açtınız ve bunu bildirdiniz. Bugün gelen kutunuzda sizi üç e-posta bekliyor.",
+   "steps": [
+    {
+     "id": "ticket",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik",
+      "from": {
+       "name": [
+        {
+         "text": "BT Güvenlik"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Bildiriminiz: INC-2026-0412"
+       }
+      ],
+      "time": "08:20",
+      "body": [
+       [
+        {
+         "text": "Bildiriminiz için teşekkür ederiz. Hesabınızdaki tüm açık oturumlar sonlandırıldı."
+        }
+       ],
+       [
+        {
+         "text": "Bugün kurumun portalında parolanızı değiştirin. Size bağlantı göndermiyoruz: portalı kendiniz açın."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Güvenli olarak işaretle",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Doğru. Adres kurumunuza ait, bağlantı yok ve sizden hiçbir şey istenmiyor."
+      },
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Dikkatli olmak iyidir, ama bu e-posta gerçek: adres kurumunuza ait ve bağlantı yok."
+      }
+     ]
+    },
+    {
+     "id": "second-trap",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik-fake",
+      "from": {
+       "name": [
+        {
+         "text": "BT Güvenlik"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare-secure.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Acil: Hesabınız hacklendi"
+       }
+      ],
+      "time": "09:02",
+      "body": [
+       [
+        {
+         "text": "Dünkü güvenlik olayının ardından hesabınızı bir saat içinde yeniden doğrulayınız."
+        }
+       ],
+       [
+        {
+         "text": "Doğrulamak için: "
+        },
+        {
+         "text": "idare-secure.example.net/yoxla",
+         "link": {
+          "label": "idare-secure.example.net/yoxla",
+          "href": "https://idare-secure.example.net/yoxla"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Saldırganlar bazen ikinci kez yazar.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru, adres kurumunuzun alan adına ait değil. Saldırganlar çoğu zaman aynı kişiye geri döner."
+      },
+      {
+       "id": "click",
+       "label": "Bağlantıyı aç",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Bu ikinci bir tuzaktı. Gerçek ekip, parolanızı portalda kendiniz değiştirmenizi istemişti."
+      },
+      {
+       "id": "delete",
+       "label": "Sil",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Siz güvendesiniz, ama bu e-posta saldırının hâlâ sürdüğünü gösteriyor. Bildirin."
+      }
+     ]
+    },
+    {
+     "id": "colleague",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Nigar Guliyeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "n.quliyeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Sizden garip bir e-posta geldi"
+       }
+      ],
+      "time": "09:40",
+      "body": [
+       [
+        {
+         "text": "Merhaba, dün gece adresinizden “Fatura” adlı, içinde bağlantı olan bir e-posta geldi. Bunu siz mi gönderdiniz?"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Güvenlik ekibine ilet",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Doğru. Saldırgan hesabınızdan başkalarına yazdıysa uzmanların bunu bilmesi gerekir."
+      },
+      {
+       "id": "reply",
+       "label": "Yanıtla: ben değilim, açmayın",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Güzel, iş arkadaşınızı uyardınız. E-postayı güvenlik ekibine de iletin."
+      },
+      {
+       "id": "delete",
+       "label": "Sil",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "İş arkadaşınız bağlantıyı açabilir ve uzman da saldırının yayıldığını öğrenemez."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "what-happens-next",
+   "prompt": "Bildirimden sonra genellikle ne olur? Sıraya koyun.",
+   "items": [
+    {
+     "id": "report",
+     "label": "Durumu bildirirsiniz"
+    },
+    {
+     "id": "lock",
+     "label": "Uzman hesabı kilitler ve oturumları sonlandırır"
+    },
+    {
+     "id": "check",
+     "label": "Bilgisayar ve posta kutusu kontrol edilir"
+    },
+    {
+     "id": "back",
+     "label": "Yeni bir parola belirler ve işinize dönersiniz"
+    }
+   ],
+   "explain": "Bu olağan bir süreçtir. Ne kadar erken bildirirseniz, o kadar kısa sürer."
+  },
+  {
+   "type": "choice",
+   "id": "fear-of-blame",
+   "question": {
+    "prompt": "Bir iş arkadaşınız diyor ki: “Bildirirsem azar işitirim.” Ne yanıt verirsiniz?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Hızlı bildirim zararı sınırlar, saklamak ise büyütür",
+      "correct": true,
+      "feedback": "Doğru. Hızlı ve dürüst bilgi, uzmanlar için en değerli yardımdır."
+     },
+     {
+      "id": "hide",
+      "label": "Haklısınız, kimse bilmesin",
+      "correct": false,
+      "feedback": "Saklanan bir hata büyür ve tüm kuruma zarar verebilir."
+     },
+     {
+      "id": "fix",
+      "label": "Önce kendiniz düzeltmeyi deneyin",
+      "correct": false,
+      "feedback": "Tek başına düzeltmeye çalışmak izleri yok edebilir ve zaman kaybettirir."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "handshake"
+    }
+   },
+   "explain": "Tehlikeyi büyüten hata değil, sessizliktir."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Bir hata yaptıysanız hemen ve dürüstçe bildirin.",
+    "Sonraki e-postalara dikkat edin: saldırgan yeniden yazabilir.",
+    "Amaç, suçlu aramak değil, zararı durdurmaktır."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

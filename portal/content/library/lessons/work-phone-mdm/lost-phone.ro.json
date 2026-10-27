@@ -1,0 +1,379 @@
+{
+ "id": "lost-phone",
+ "title": "Telefonul de serviciu pierdut",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Ați pierdut telefonul de serviciu sau vi l-a furat cineva? Nu vă fie jenă și nu așteptați. Fiecare minut contează.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": { "kind": "illustration", "id": "phone-lock" }
+    },
+    {
+     "id": "b2",
+     "say": "Sunați imediat la suportul IT de pe alt telefon. Colegii de acolo îl pot bloca de la distanță și pot verifica unde se află.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": { "kind": "illustration", "id": "alarm" }
+    },
+    {
+     "id": "b3",
+     "say": "S-ar putea să urmeze un mesaj ca acesta. Este o încercare de a vă fura parola și de a debloca telefonul.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "sender": [{ "text": "Serviciu Dispozitive" }],
+       "time": "20:14",
+       "messages": [
+        [
+         { "text": "Telefonul dumneavoastră a fost găsit. Conectați-vă ca să vedeți unde se află: " },
+         { "text": "cihaz-tapildi.example.net", "spot": "link" }
+        ]
+       ]
+      }
+     },
+     "highlight": "link"
+    },
+    {
+     "id": "b4",
+     "say": "Chiar dacă persoana care sună spune că este de la suportul IT, nu spuneți nimănui PIN-ul sau codul primit prin SMS.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": { "kind": "illustration", "id": "mfa-phone" }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "first-steps",
+   "prompt": "Ați pierdut telefonul de serviciu. Puneți pașii în ordine.",
+   "items": [
+    { "id": "report", "label": "Sunați la suportul IT de pe alt telefon" },
+    { "id": "lock", "label": "Cereți blocarea telefonului de la distanță" },
+    { "id": "sim", "label": "Sunați la operator și blocați cartela SIM" },
+    { "id": "passwords", "label": "Schimbați parolele de serviciu de pe alt dispozitiv" },
+    { "id": "wipe", "label": "Dacă telefonul nu este găsit, cereți ștergerea lui de la distanță" }
+   ],
+   "explain": "Raportarea și blocarea durează câteva minute și previn cea mai mare parte a pagubelor. Ștergerea vine la final, ca telefonul să mai poată fi localizat. Dacă procedura organizației dumneavoastră stabilește altă ordine, urmați-o."
+  },
+  {
+   "type": "simulation",
+   "id": "fake-support-call",
+   "environment": "call",
+   "title": "Un apel de la suport",
+   "intro": "Aseară v-ați pierdut telefonul de serviciu. Azi-dimineață, cineva de la suportul IT vă sună pe numărul personal.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [{ "text": "Suport IT" }],
+      "number": [{ "text": "+994 12 000 45 17" }],
+      "label": "Mobil",
+      "voice": "young-man"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Răspundeți",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Nu este periculos să răspundeți. Contează ce spuneți."
+      },
+      {
+       "id": "decline",
+       "label": "Respingeți",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Și așa este bine. Sunați chiar dumneavoastră la suportul IT, pe numărul oficial.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [{ "text": "Suport IT" }],
+      "number": [{ "text": "+994 12 000 45 17" }],
+      "label": "Mobil",
+      "voice": "young-man"
+     },
+     "say": "Bună ziua, vă sunăm de la suportul IT. Ca să vă blocăm telefonul, v-am trimis un cod prin SMS. Vă rog să mi-l citiți.",
+     "spoken": "Bună ziua, <breath> vă sunăm de la suportul IT. Ca să vă blocăm telefonul, v-am trimis un cod prin SMS. Vă rog, ăă, să mi-l citiți.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Citiți codul",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Cu acest cod, altcineva se conectează la contul dumneavoastră. Suportul IT nu are nevoie de cod ca să blocheze un telefon."
+      },
+      {
+       "id": "verify",
+       "label": "Sun eu la numărul oficial",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Excelent. O verificare la numărul oficial demască imediat un apel fals.",
+       "next": "after"
+      },
+      {
+       "id": "hang",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Corect. Suportul IT adevărat nu cere niciodată coduri sau parole.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pin",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [{ "text": "Suport IT" }],
+      "number": [{ "text": "+994 12 000 45 17" }],
+      "label": "Mobil",
+      "voice": "young-man"
+     },
+     "say": "Bine, atunci spuneți-mi PIN-ul de blocare a ecranului. Deblocăm telefonul de la distanță și vă salvăm datele.",
+     "spoken": "Bine, <sigh> atunci spuneți-mi PIN-ul de blocare a ecranului. Deblocăm telefonul de la distanță și vă salvăm datele.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Spuneți PIN-ul",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Cine are telefonul îl va debloca cu acest PIN. Sistemul de gestionare nu are nevoie de PIN-ul dumneavoastră ca să blocheze telefonul."
+      },
+      {
+       "id": "keep",
+       "label": "Nu vă spun PIN-ul",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. PIN-ul este doar al dumneavoastră și nu îl comunicați nimănui."
+      },
+      {
+       "id": "hang",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bună decizie. Când presiunea crește, cel mai bine este să încheiați apelul.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Apelul s-a încheiat. Ce faceți acum?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [{ "text": "Suport IT" }],
+      "number": [{ "text": "+994 12 000 45 17" }],
+      "label": "Mobil",
+      "voice": "young-man"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "Sunați la numărul oficial al suportului IT",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Corect. Raportați acest apel, pentru că atacatorul vă știe numele și numărul."
+      },
+      {
+       "id": "ignore",
+       "label": "Nu faceți nimic",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Atacatorul îl va suna apoi pe alt coleg. Dacă raportați, suportul IT îi poate avertiza pe toți."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "after-loss",
+   "prompt": "Mesaje primite după pierderea telefonului. Sigur sau amenințare?",
+   "cards": [
+    {
+     "id": "found-sms",
+     "artifact": {
+      "kind": "sms",
+      "sender": [{ "text": "Serviciu Dispozitive" }],
+      "time": "20:14",
+      "messages": [
+       [
+        { "text": "Telefonul dumneavoastră a fost găsit. Conectați-vă ca să îl vedeți pe hartă: " },
+        {
+         "text": "cihaz-tapildi.example.net/map",
+         "link": { "label": "cihaz-tapildi.example.net/map", "href": "https://cihaz-tapildi.example.net/map" }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un mesaj fals despre telefonul „găsit” vă vânează parola. Doar suportul IT verifică unde se află telefonul."
+    },
+    {
+     "id": "sim-blocked",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "kehkesan-mobil",
+      "sender": [{ "text": "Kehkesan" }],
+      "time": "20:31",
+      "messages": [
+       [
+        { "text": "Cartela SIM a fost blocată la cererea dumneavoastră. Pentru o cartelă nouă, veniți cu actul de identitate la un punct de vânzare." }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Nu are link, nu cere nimic și vă confirmă propria solicitare. Este o notificare obișnuită."
+    },
+    {
+     "id": "ticket-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [{ "text": "Suport IT" }],
+       "address": [{ "text": "it-support@idare.example" }]
+      },
+      "subject": [{ "text": "Tichetul 4471: telefon blocat" }],
+      "time": "20:40",
+      "body": [
+       [
+        { "text": "Telefonul dumneavoastră de serviciu a fost blocat de la distanță. Veniți mâine la ora 10:00 la etajul 2 pentru un dispozitiv nou." }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Adresa este a organizației dumneavoastră, nu există niciun link și nu vi se cere parola. Este răspunsul la raportarea dumneavoastră."
+    },
+    {
+     "id": "ransom-chat",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [{ "text": "+994 55 000 63 21" }],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         { "text": "Telefonul tău e la mine. Transferă 100 AZN și ți-l dau înapoi. Dacă anunți poliția, public tot ce e pe el." }
+        ],
+        "time": "21:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Nu trimiteți bani și păstrați conversația. Arătați-o suportului IT și poliției."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "taxi",
+   "title": "Telefonul uitat în taxi",
+   "start": "night",
+   "nodes": [
+    {
+     "id": "night",
+     "text": "Seara, acasă, vă dați seama că ați uitat telefonul de serviciu într-un taxi. Este ora 22:00.",
+     "choices": [
+      {
+       "label": "Sun imediat la suportul IT",
+       "next": "morning",
+       "feedback": "Corect. Puteți raporta și noaptea, iar telefonul este blocat imediat."
+      },
+      {
+       "label": "Aștept până dimineață, poate mă sună șoferul",
+       "outcome": "risky",
+       "feedback": "Într-o singură noapte se pot face multe cu un telefon. Raportați acum, iar dacă șoferul sună, cu atât mai bine."
+      }
+     ]
+    },
+    {
+     "id": "morning",
+     "text": "Bună ziua, aseară v-ați uitat telefonul în taxiul meu. Vi l-am adus, era blocat, nu am atins nimic.",
+     "speaker": "Șoferul de taxi (dimineața, la birou)",
+     "voice": "older-man",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Bună ziua, aseară v-ați uitat telefonul în taxiul meu. <breath> Vi l-am adus, era blocat, nu am atins nimic.",
+     "choices": [
+      {
+       "label": "Îl predau suportului IT pentru verificare",
+       "outcome": "safe",
+       "feedback": "Excelent. Un telefon care nu a fost la dumneavoastră trebuie verificat, iar specialistul decide."
+      },
+      {
+       "label": "Îl deblochez și mă apuc imediat de lucru",
+       "outcome": "risky",
+       "feedback": "Telefonul a stat o noapte în mâinile altcuiva. Lăsați mai întâi suportul IT să îl verifice."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "best-lock",
+   "question": {
+    "prompt": "Ce vă protejează cel mai bine datele dacă pierdeți telefonul?",
+    "options": [
+     {
+      "id": "pin-bio",
+      "label": "Un PIN de cel puțin 6 cifre, plus amprenta",
+      "correct": true,
+      "feedback": "Corect. Un PIN lung este greu de ghicit, iar amprenta face utilizarea zilnică ușoară."
+     },
+     {
+      "id": "birth-year",
+      "label": "Un PIN de 4 cifre, cu anul nașterii",
+      "correct": false,
+      "feedback": "Anul nașterii se găsește ușor pe rețelele sociale. Alegeți cel puțin 6 cifre aleatorii."
+     },
+     {
+      "id": "pattern",
+      "label": "Un model de deblocare simplu",
+      "correct": false,
+      "feedback": "Un model simplu poate fi ghicit după urmele de pe ecran sau văzut peste umărul dumneavoastră."
+     },
+     {
+      "id": "none",
+      "label": "Fără blocare, telefonul este mereu la mine",
+      "correct": false,
+      "feedback": "Un telefon se poate pierde într-o clipă. Fără blocare, e-mailul de serviciu este la îndemâna oricui."
+     }
+    ],
+    "visual": { "kind": "illustration", "id": "lock" }
+   },
+   "explain": "O blocare puternică a ecranului este prima barieră care protejează datele de pe un telefon pierdut."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Dacă pierdeți telefonul, sunați imediat la suportul IT de pe alt telefon.",
+    "Nu spuneți nimănui un cod, un PIN sau o parolă, oricine ar suna.",
+    "Înainte să folosiți un telefon recuperat, lăsați suportul IT să îl verifice."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

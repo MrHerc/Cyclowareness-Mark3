@@ -1,0 +1,333 @@
+{
+ "id": "lookalike-domains",
+ "title": "Täuschend ähnliche Adressen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ld-tutor",
+   "beats": [
+    {
+     "id": "ld-b1",
+     "say": "Auf dem Smartphone ist die Adressleiste kurz, und ein Großteil der Adresse bleibt verborgen. Genau darauf setzen Kriminelle.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "ld-b2",
+     "say": "Sehen Sie sich diese Adresse an: Der offizielle Name steht vorne, aber wem die Website wirklich gehört, zeigt der Teil am Ende.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://vetendasportal.gov."
+        },
+        {
+         "text": "az-arayis.example",
+         "spot": "real-owner"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "real-owner"
+    },
+    {
+     "id": "ld-b3",
+     "say": "Es gibt noch weitere Tricks: Buchstaben werden vertauscht, ein Wort wird ergänzt, oder eine ähnlich aussehende Ziffer ersetzt einen Buchstaben.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "ld-b4",
+     "say": "Geben Sie bei einer verdächtigen Adresse nichts ein, schließen Sie die Seite und informieren Sie den IT-Support.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ld-match",
+   "prompt": "Ordnen Sie jeder gefälschten Adresse die offizielle Adresse zu, die sie nachahmt.",
+   "pairs": [
+    {
+     "id": "gov",
+     "left": "vetendasportal.gov.az-arayis.example",
+     "right": "vetendasportal.gov.az"
+    },
+    {
+     "id": "sahil",
+     "left": "sahi1bank.example.info",
+     "right": "sahilbank.az"
+    },
+    {
+     "id": "ulduz",
+     "left": "ulduzbnak.example",
+     "right": "ulduzbank.az"
+    },
+    {
+     "id": "mail",
+     "left": "idare-poct-giris.example.info",
+     "right": "poct.idare.example"
+    }
+   ],
+   "explain": "Der Unterschied ist klein: der offizielle Name vorangestellt, eine Ziffer, zwei vertauschte Buchstaben oder ein zusätzliches Wort. Lesen Sie die Adresse immer vom Ende her."
+  },
+  {
+   "type": "simulation",
+   "id": "ld-sim",
+   "environment": "phone",
+   "title": "Eine Bescheinigung auf dem Smartphone",
+   "intro": "Sie möchten eine Bescheinigung über Ihr Smartphone abrufen. Lesen Sie bei jedem Schritt die Adresse bis ganz zum Ende.",
+   "steps": [
+    {
+     "id": "search-ad",
+     "label": "Gesponsert: Vətəndaş Portalı, offizielle Website",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tapan",
+      "url": [
+       {
+        "text": "https://tapan.example/axtar?q=vetendas+portali+arayis",
+        "reveal": "tapan.example"
+       }
+      ]
+     },
+     "say": "Das erste Suchergebnis ist eine Anzeige.",
+     "actions": [
+      {
+       "id": "ad",
+       "label": "Anzeige öffnen",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Die Anzeige hat Sie auf eine andere Website geführt. Lesen Sie jetzt die Adresse genau.",
+       "next": "fake-login"
+      },
+      {
+       "id": "official",
+       "label": "Ergebnis vetendasportal.gov.az öffnen",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Richtig. Sie haben die Anzeige übersprungen und das Ergebnis gewählt, dessen Adresse auf gov.az endet.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2c-vetendas-portal-fake",
+      "brand": "Vətəndaş Portalı",
+      "url": [
+       {
+        "text": "https://vetendasportal.gov.az-arayis.example/giris",
+        "reveal": "az-arayis.example"
+       }
+      ],
+      "fields": [
+       "FIN-Code",
+       "Passwort"
+      ],
+      "button": "Anmelden"
+     },
+     "say": "Auf dem Smartphone sehen Sie nur den Anfang der Adresse. Lesen Sie sie bis zum Ende.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Anmelden",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Die Adresse begann mit gov.az, endete aber nicht damit. Ihr FIN-Code und Ihr Passwort sind bei den Kriminellen gelandet."
+      },
+      {
+       "id": "close",
+       "label": "Seite schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Wem eine Website gehört, zeigt das Ende der Adresse – und diese Adresse endete nicht auf gov.az.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "new-login",
+     "label": "10:16 Vətəndaş Portalı",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2c-vetendas-portal",
+      "app": "Vətəndaş Portalı",
+      "title": [
+       {
+        "text": "Neue Anmeldung"
+       }
+      ],
+      "body": [
+       {
+        "text": "Jemand hat sich von einem unbekannten Gerät aus bei Ihrem Konto angemeldet."
+       }
+      ],
+      "time": "10:16"
+     },
+     "say": "Eine Minute später kam diese Benachrichtigung.",
+     "actions": [
+      {
+       "id": "fix",
+       "label": "Ich öffne das Portal selbst und ändere das Passwort",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Öffnen Sie das Portal über Ihr Lesezeichen, ändern Sie das Passwort und melden Sie sich auf allen Geräten ab."
+      },
+      {
+       "id": "later",
+       "label": "Ich sehe später nach",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Die Kriminellen sind bereits in Ihrem Konto. Jede Minute zählt."
+      }
+     ]
+    },
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2c-vetendas-portal",
+      "brand": "Vətəndaş Portalı",
+      "url": [
+       {
+        "text": "https://vetendasportal.gov.az/giris",
+        "reveal": "vetendasportal.gov.az"
+       }
+      ],
+      "fields": [
+       "FIN-Code",
+       "Passwort"
+      ],
+      "button": "Anmelden"
+     },
+     "say": "Diese Adresse endet auf gov.az.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Anmelden",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Richtig, das ist das offizielle Portal selbst. Speichern Sie es jetzt als Lesezeichen."
+      },
+      {
+       "id": "check",
+       "label": "Adresse prüfen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Eine sehr gute Gewohnheit. Die Domain endet auf gov.az, und davor steht kein zusätzliches Wort."
+      }
+     ]
+    },
+    {
+     "id": "bank-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank-fake",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "19:42",
+      "messages": [
+       [
+        {
+         "text": "Ihre Karte wurde vorübergehend gesperrt. Zum Entsperren: "
+        },
+        {
+         "text": "sahilbank.az-kart.example/ac",
+         "link": {
+          "label": "sahilbank.az-kart.example/ac",
+          "href": "https://sahilbank.az-kart.example/ac"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Am Abend kommt eine SMS im Namen der Bank.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Die Adresse beginnt mit dem Namen der Bank, aber wem sie gehört, zeigt der Teil am Ende. Öffnen Sie stattdessen selbst die App der Bank."
+      },
+      {
+       "id": "report",
+       "label": "Als Spam melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Prüfen Sie Ihre Karte in der App der Bank oder rufen Sie die Nummer auf der Kartenrückseite an."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Das geht auch. Rufen Sie im Zweifel selbst die Bank unter der Nummer auf der Rückseite Ihrer Karte an."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "ld-order",
+   "prompt": "Bringen Sie die Schritte zum Prüfen einer Adresse auf dem Smartphone in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "tap",
+     "label": "Auf die Adressleiste tippen, um die vollständige Adresse zu sehen"
+    },
+    {
+     "id": "end",
+     "label": "Den letzten Teil der Domain suchen"
+    },
+    {
+     "id": "compare",
+     "label": "Ihn Buchstabe für Buchstabe mit der offiziellen Adresse vergleichen"
+    },
+    {
+     "id": "leave",
+     "label": "Weicht etwas ab: Seite schließen, ohne etwas einzugeben"
+    }
+   ],
+   "explain": "Auf dem Smartphone ist das Ende der Adresse oft verborgen. Zeigen Sie die Adresse deshalb zuerst vollständig an. Steht der offizielle Name nicht am Ende, ist die Website gefälscht."
+  },
+  {
+   "type": "recap",
+   "id": "ld-recap",
+   "points": [
+    "Lassen Sie sich auf dem Smartphone die vollständige Adresse anzeigen und lesen Sie sie vom Ende her",
+    "Auch wenn der offizielle Name vorne steht: Wem die Website gehört, zeigt der Teil am Ende",
+    "Haben Sie ein Passwort eingegeben, ändern Sie es auf der offiziellen Website und melden Sie den Vorfall"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

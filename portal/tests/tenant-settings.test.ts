@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { defaultSettings, withDefaults } from "@/lib/tenant-defaults";
+import { LOCALES } from "@/i18n/config";
 
 describe("withDefaults", () => {
   it("fills missing groups and keys from the defaults", () => {
@@ -36,7 +37,7 @@ describe("withDefaults", () => {
     for (const raw of [null, undefined, "x", 42, [], { integrations: "nope", locales: "az" }]) {
       const s = withDefaults(raw);
       expect(s.defaultLocale).toBe("az");
-      expect(s.locales).toEqual(["az", "en", "ru"]);
+      expect(s.locales).toEqual([...LOCALES]);
       expect(Array.isArray(s.integrations.webhookEvents)).toBe(true);
     }
   });

@@ -1,0 +1,401 @@
+{
+ "id": "camera-panel",
+ "title": "Panoul camerei",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sc1-tutor",
+   "beats": [
+    {
+     "id": "sc1-b1",
+     "say": "Bună ziua! Camerele sunt utile acasă și la serviciu. Dar dacă parola nu a fost schimbată niciodată, poate privi și un străin.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "sc1-b2",
+     "say": "Majoritatea camerelor noi vin cu o parolă implicită. Listele cu aceste parole sunt la îndemâna oricui pe internet.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2f-baxiskam",
+       "tone": "system",
+       "title": [
+        {
+         "text": "BaxışKam: prima conectare"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Nume de utilizator: admin"
+         }
+        ],
+        [
+         {
+          "text": "Parolă: admin",
+          "spot": "default-pass"
+         }
+        ]
+       ],
+       "buttons": [
+        "Conectați-vă"
+       ]
+      }
+     },
+     "highlight": "default-pass"
+    },
+    {
+     "id": "sc1-b3",
+     "say": "În 2025, în Azerbaidjan au fost descoperite accesări neautorizate ale camerelor din locuințe și birouri, iar imaginile au ajuns pe site-uri din străinătate.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "2025",
+      "label": "Acces neautorizat descoperit la camerele din locuințe și birouri"
+     }
+    },
+    {
+     "id": "sc1-b4",
+     "say": "Sunt suficienți trei pași: schimbați parola, actualizați firmware-ul și închideți accesul deschis din internet.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "password",
+   "id": "sc1-password",
+   "prompt": "Creați o parolă nouă pentru panoul camerei.",
+   "targetScore": 4,
+   "tips": [
+    "Nu introduceți aici parola reală, este doar un exercițiu.",
+    "Alegeți o frază din patru cuvinte aleatorii.",
+    "Nu refolosiți parola de la Wi-Fi sau de la e-mail.",
+    "Păstrați parola într-un manager de parole."
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "sc1-sim",
+   "environment": "browser",
+   "title": "Configurarea camerei",
+   "intro": "Configurați o cameră nouă. Uitați-vă la fiecare fereastră a panoului și alegeți butonul corect.",
+   "steps": [
+    {
+     "id": "first-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-baxiskam",
+      "brand": "BaxışKam",
+      "url": [
+       {
+        "text": "http://192.168.1.64/login"
+       }
+      ],
+      "fields": [
+       "Nume de utilizator",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "say": "Vă conectați pentru prima dată la panoul camerei.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Conectați-vă",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Corect, aceasta este adresa camerei în rețeaua de acasă. Schimbați parola imediat după prima conectare."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Fără să vă conectați, nu puteți schimba parola implicită. Camera rămâne deschisă pentru oricine."
+      }
+     ]
+    },
+    {
+     "id": "change-default",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-baxiskam",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Se folosește parola implicită"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Pentru siguranța dumneavoastră, schimbați parola acum."
+        }
+       ]
+      ],
+      "buttons": [
+       "Schimbați parola",
+       "Amintiți-mi mai târziu"
+      ]
+     },
+     "actions": [
+      {
+       "id": "change",
+       "label": "Schimbați parola",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Schimbarea parolei implicite este cel mai important pas pentru o cameră."
+      },
+      {
+       "id": "later",
+       "label": "Amintiți-mi mai târziu",
+       "kind": "later",
+       "outcome": "compromised",
+       "feedback": "Accesul cu o parolă implicită nu cere nicio pricepere. Instrumentele automate caută astfel de camere tot timpul."
+      }
+     ]
+    },
+    {
+     "id": "firmware",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-baxiskam",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Firmware nou: 5.2.8"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Au fost remediate vulnerabilități de securitate. Actualizarea durează aproximativ trei minute."
+        }
+       ]
+      ],
+      "buttons": [
+       "Actualizați",
+       "Mai târziu"
+      ]
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "Actualizați",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Corect. Atacatorii cunosc foarte bine vulnerabilitățile firmware-ului vechi."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Fără actualizare, vulnerabilitățile cunoscute rămân neremediate. Actualizați-l astăzi."
+      }
+     ]
+    },
+    {
+     "id": "remote-access",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-baxiskam",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Acces de la distanță"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Activați UPnP și redirecționarea porturilor ca să urmăriți camera direct de pe internet?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Păstrați activat",
+       "Dezactivați"
+      ]
+     },
+     "say": "Acum camera vă oferă acces direct de pe internet.",
+     "actions": [
+      {
+       "id": "open-port",
+       "label": "Păstrați activat",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Cu un port deschis, camera este vizibilă pentru tot internetul. Atacatorii găsesc ușor astfel de dispozitive deschise cu instrumente speciale de căutare."
+      },
+      {
+       "id": "off",
+       "label": "Dezactivați",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă trebuie să urmăriți camera de la distanță, folosiți aplicația oficială a producătorului, nu deschideți un port."
+      }
+     ]
+    },
+    {
+     "id": "public-link",
+     "label": "Creați un link public pentru transmisiunea live? Oricine are linkul o va putea urmări.",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-baxiskam",
+      "url": [
+       {
+        "text": "http://192.168.1.64/paylas"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "share",
+       "label": "Creați linkul",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Odată ce linkul circulă, nu veți mai ști niciodată cine privește. Adăugați membrii familiei în aplicație, fiecare cu propriul cont."
+      },
+      {
+       "id": "private",
+       "label": "Nu creați un link public",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Imaginea trebuie să o vadă doar apropiații dumneavoastră, fiecare conectat cu propriul cont."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "sc1-hotspot",
+   "prompt": "Găsiți setările riscante din fereastra de stare a înregistratorului video.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2f-baxiskam",
+    "tone": "system",
+    "title": [
+     {
+      "text": "Intrarea biroului districtual: înregistrator video"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Model: BX-DVR 8"
+      }
+     ],
+     [
+      {
+       "text": "Utilizator: admin, parolă: implicită",
+       "spot": "default"
+      }
+     ],
+     [
+      {
+       "text": "Firmware: 2019, fără actualizări",
+       "spot": "old-firmware"
+      }
+     ],
+     [
+      {
+       "text": "Redirecționarea porturilor: activată, 8000",
+       "spot": "open-port"
+      }
+     ],
+     [
+      {
+       "text": "Camera 3: biroul resurselor umane, îndreptată spre ecranele calculatoarelor",
+       "spot": "screens"
+      }
+     ],
+     [
+      {
+       "text": "Data și ora: corecte"
+      }
+     ]
+    ],
+    "buttons": [
+     "Închideți"
+    ]
+   },
+   "spots": [
+    {
+     "id": "default",
+     "label": "Parolă implicită",
+     "explain": "Atacatorii iau parolele implicite din liste gata făcute. Schimbarea parolei este prima sarcină."
+    },
+    {
+     "id": "old-firmware",
+     "label": "Firmware vechi",
+     "explain": "Un dispozitiv lăsat șapte ani fără actualizări are vulnerabilități cunoscute. Dacă nu mai apar actualizări, dispozitivul trebuie înlocuit."
+    },
+    {
+     "id": "open-port",
+     "label": "Port deschis",
+     "explain": "Un port deschis face înregistratorul vizibil pentru tot internetul. Dacă nu este necesar, închideți-l."
+    },
+    {
+     "id": "screens",
+     "label": "Cameră îndreptată spre ecrane",
+     "explain": "Această cameră filmează ecranele de lucru și documentele. Dacă imaginile sunt furate, odată cu ele pleacă și datele confidențiale."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "sc1-choice",
+   "question": {
+    "prompt": "Un coleg a adus de acasă o cameră Wi-Fi și vrea să o conecteze la serviciu. Ce îi spuneți?",
+    "options": [
+     {
+      "id": "it-approved",
+      "label": "Suportul IT trebuie să o aprobe și să o conecteze",
+      "correct": true,
+      "feedback": "Corect. În rețeaua de serviciu intră doar dispozitivele aprobate."
+     },
+     {
+      "id": "password-enough",
+      "label": "E în regulă, dacă schimbă parola",
+      "correct": false,
+      "feedback": "Parola contează, dar un dispozitiv neverificat poate deschide o ușă spre rețeaua de serviciu. Decizia aparține suportului IT."
+     },
+     {
+      "id": "guest-quiet",
+      "label": "Conectează-o la Wi-Fi-ul pentru oaspeți, nu află nimeni",
+      "correct": false,
+      "feedback": "Un dispozitiv conectat fără să anunțați pe nimeni este un risc pentru birou. Orice cameră trece prin suportul IT."
+     }
+    ]
+   },
+   "explain": "La serviciu, camerele și dispozitivele inteligente le conectează doar suportul IT. Un dispozitiv uitat rămâne ani de zile fără actualizări."
+  },
+  {
+   "type": "recap",
+   "id": "sc1-recap",
+   "points": [
+    "Schimbați parola implicită din prima zi.",
+    "Actualizați firmware-ul și închideți porturile deschise.",
+    "La serviciu, folosiți doar dispozitive aprobate."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

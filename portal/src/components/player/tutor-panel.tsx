@@ -9,6 +9,7 @@ import { Mascot } from "@/components/mascot/mascot";
 import { cn } from "@/lib/cn";
 import { useVoiceAvailability } from "./narrator";
 import { VoiceNotice } from "./voice-notice";
+import { langProps } from "./rich";
 
 type SpeechRecognitionLike = {
   lang: string;
@@ -20,7 +21,7 @@ type SpeechRecognitionLike = {
   stop: () => void;
 };
 
-const LANG_TAG: Record<string, string> = { az: "az-AZ", en: "en-US", ru: "ru-RU" };
+const LANG_TAG: Record<string, string> = { az: "az-AZ", en: "en-US", ru: "ru-RU", tr: "tr-TR", ro: "ro-RO", ka: "ka-GE", uk: "uk-UA", de: "de-DE", fr: "fr-FR", ar: "ar-SA" };
 
 /** "Ask" in the lesson player: typed or spoken question, streamed answer, read aloud (`voice` off: typed and read only). */
 export function TutorPanel({
@@ -133,12 +134,12 @@ export function TutorPanel({
     <Dialog open={open} onClose={onClose} title={t("title")} size="md">
       <div className="flex items-start gap-3">
         <Mascot mood={state === "thinking" ? "think" : answer ? "happy" : "curious"} talking={speaking && state !== "thinking"} guide={{ listen: listening }} className="size-20 shrink-0" />
-        <div className="min-h-20 flex-1 rounded-2xl rounded-tl-sm bg-sunken px-4 py-3 text-body-sm">
-          {state === "thinking" && !answer ? <span className="text-ink-muted">{t("thinking")}</span> : state === "error" ? <span className="text-risk-700">{t("error")}</span> : state === "limited" ? <span className="text-risk-700">{tc("errors.rateLimited")}</span> : answer ? <span lang={answerLang !== locale ? answerLang : undefined}>{answer}</span> : <span className="text-ink-muted">{t("empty")}</span>}
+        <div className="min-h-20 flex-1 rounded-2xl rounded-ss-sm bg-sunken px-4 py-3 text-body-sm">
+          {state === "thinking" && !answer ? <span className="text-ink-muted">{t("thinking")}</span> : state === "error" ? <span className="text-risk-700">{t("error")}</span> : state === "limited" ? <span className="text-risk-700">{tc("errors.rateLimited")}</span> : answer ? <span {...langProps(answerLang !== locale ? answerLang : undefined)} className="block">{answer}</span> : <span className="text-ink-muted">{t("empty")}</span>}
         </div>
       </div>
       {mode === "offline" && answer ? <p className="mt-2 text-tab text-ink-subtle">{t("offline")}</p> : null}
-      {voice && soundOn && voiceMissing && answer && state === "idle" ? <VoiceNotice lang={answerLang} className="mt-2" /> : null}
+      <VoiceNotice show={Boolean(voice && soundOn && voiceMissing && answer && state === "idle")} lang={answerLang} className="mt-2" />
       <div className="mt-4 flex flex-wrap gap-2">
         {suggestions.map((s) => (
           <button key={s} type="button" onClick={() => ask(s)} className="rounded-pill bg-brand-50 px-3 py-1.5 text-caption font-semibold text-brand-700 hover:bg-brand-100 pointer-coarse:min-h-11">

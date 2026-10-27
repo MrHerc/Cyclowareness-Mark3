@@ -1,0 +1,558 @@
+{
+ "id": "drag-test",
+ "title": "Verschieben Sie das Fenster",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "dt-tutor",
+   "beats": [
+    {
+     "id": "dt-b1",
+     "say": "Hallo! Manche Websites öffnen zur Anmeldung ein kleines Fenster. Heute lernen Sie, ein gefälschtes Fenster zu erkennen.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "dt-b2",
+     "say": "Kriminelle zeichnen dieses Fenster einfach in die Webseite hinein, wie ein Bild. Sogar die Adressleiste sieht echt aus.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "İşPoçt: Anmelden"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "https://poct.idare.example/giris",
+          "spot": "fake-bar"
+         }
+        ],
+        [
+         {
+          "text": "Melden Sie sich mit Ihrer dienstlichen E-Mail-Adresse an, um das Dokument anzusehen."
+         }
+        ]
+       ],
+       "buttons": [
+        "Anmelden",
+        "Abbrechen"
+       ]
+      }
+     },
+     "highlight": "fake-bar"
+    },
+    {
+     "id": "dt-b3",
+     "say": "Der Test ist einfach: Greifen Sie das Fenster mit der Maus und ziehen Sie es aus dem Browser heraus. Ein gefälschtes Fenster kann die Seite nicht verlassen.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "dt-b4",
+     "say": "Wenn Ihr Passwort-Manager das Passwort nicht automatisch ausfüllt, brechen Sie ab. Geben Sie die Adresse selbst in einem neuen Tab ein.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "dt-swipe",
+   "prompt": "Welchem Anmeldefenster können Sie vertrauen?",
+   "cards": [
+    {
+     "id": "edge-cut",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "İşPoçt: Anmelden"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Sie haben das Fenster zur Seite gezogen."
+        }
+       ],
+       [
+        {
+         "text": "Es stieß an den Rand der Seite und wurde abgeschnitten."
+        }
+       ]
+      ],
+      "buttons": [
+       "Anmelden"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein echtes Fenster verlässt den Browser und lässt sich überallhin auf dem Bildschirm verschieben. Wird es abgeschnitten, ist es ein Bild, das in die Seite gezeichnet wurde."
+    },
+    {
+     "id": "moves-out",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "app",
+      "title": [
+       {
+        "text": "İşPoçt: Anmelden"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Sie haben das Fenster zur Seite gezogen: Es hat den Browser verlassen und liegt jetzt auf dem Desktop."
+        }
+       ],
+       [
+        {
+         "text": "ParolSeyf hat das Passwort von selbst angeboten."
+        }
+       ]
+      ],
+      "buttons": [
+       "Anmelden"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Das Fenster bewegt sich unabhängig vom Browser, und der Passwort-Manager erkennt die Website. Das sind Merkmale eines echten Fensters."
+    },
+    {
+     "id": "no-fill",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Für diese Website wurde kein gespeichertes Passwort gefunden."
+        }
+       ],
+       [
+        {
+         "text": "Im Fenster angezeigte Adresse: poct.idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Schließen"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein Passwort-Manager prüft die tatsächliche Adresse der Website, nicht den Text im Fenster. Findet er kein Passwort, ist es eine andere Website."
+    },
+    {
+     "id": "moves-along",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "İşPoçt: Anmelden"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Sie haben den Browser selbst zur Seite gezogen."
+        }
+       ],
+       [
+        {
+         "text": "Das Anmeldefenster ist mitgewandert."
+        }
+       ]
+      ],
+      "buttons": [
+       "Anmelden"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein echtes Fenster bleibt, wo es ist. Bewegt es sich zusammen mit dem Browser, ist es Teil der Seite."
+    },
+    {
+     "id": "own-tab",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Neuer Tab: poct.idare.example"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Sie haben die Adresse selbst eingegeben."
+        }
+       ],
+       [
+        {
+         "text": "Der Passwort-Manager hat das Passwort ausgefüllt."
+        }
+       ]
+      ],
+      "buttons": [
+       "Anmelden"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Wenn Sie die Adresse selbst eingeben, hat ein gefälschtes Fenster keine Chance. Das ist der zuverlässigste Weg."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "dt-sim",
+   "environment": "browser",
+   "title": "Ausschreibungsdokument",
+   "intro": "Ein Lieferant hat Ihnen einen Link zu einem Ausschreibungsdokument geschickt. Die Website will, dass Sie sich anmelden, bevor sie es anzeigt. Gehen Sie vorsichtig vor.",
+   "steps": [
+    {
+     "id": "doc-page",
+     "label": "Ausschreibungsdokument: Beschaffung von Büromöbeln",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tender-baza",
+      "url": [
+       {
+        "text": "https://tender-baza.example.net/sened/4471"
+       }
+      ]
+     },
+     "say": "Das Dokument ist gesperrt. Die Website bietet eine Anmeldung mit Ihrem dienstlichen Konto an.",
+     "actions": [
+      {
+       "id": "open-login",
+       "label": "Mit İşPoçt anmelden",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Der Klick auf die Schaltfläche ist noch nicht gefährlich. Der eigentliche Test ist das Fenster, das sich jetzt öffnet."
+      },
+      {
+       "id": "check-address",
+       "label": "Adresse prüfen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Das ist die Ausschreibungs-Website, nicht Ihr dienstliches Postfach. Beobachten Sie das Anmeldefenster, das sich gleich öffnet, ganz genau."
+      },
+      {
+       "id": "close-tab",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Eine umsichtige Entscheidung. Öffnen Sie Ihr Postfach selbst und bitten Sie den Lieferanten auf anderem Weg um das Dokument.",
+       "next": "own-tab"
+      }
+     ]
+    },
+    {
+     "id": "popup",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "İşPoçt: Anmelden"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "https://poct.idare.example/giris"
+        }
+       ],
+       [
+        {
+         "text": "Melden Sie sich mit Ihrer dienstlichen E-Mail-Adresse an, um das Dokument anzusehen."
+        }
+       ],
+       [
+        {
+         "text": "E-Mail: aysel.quliyeva@idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Anmelden",
+       "Abbrechen"
+      ]
+     },
+     "say": "Das Fenster zeigt die richtige Adresse. Aber das beweist noch gar nichts.",
+     "actions": [
+      {
+       "id": "drag",
+       "label": "Fenster aus dem Browser ziehen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Der richtige Test. Sehen wir nach, ob das Fenster den Browser verlassen kann."
+      },
+      {
+       "id": "autofill",
+       "label": "Mit ParolSeyf ausfüllen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Gute Idee. Der Passwort-Manager prüft die tatsächliche Adresse der Website.",
+       "next": "pm-check"
+      },
+      {
+       "id": "type-pass",
+       "label": "Passwort eingeben und anmelden",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Die Adressleiste im Fenster war nur ein Bild. Ihr Passwort ging an den Betreiber der Ausschreibungs-Website.",
+       "next": "leaked"
+      },
+      {
+       "id": "cancel",
+       "label": "Abbrechen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Gut. Geben Sie nie ein Passwort in ein Fenster ein, bei dem Sie sich nicht sicher sind.",
+       "next": "own-tab"
+      }
+     ]
+    },
+    {
+     "id": "drag-result",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "İşPoçt: Anmelden"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Das Fenster stieß an den Rand der Seite und wurde abgeschnitten."
+        }
+       ],
+       [
+        {
+         "text": "Es hat den Browser nicht verlassen."
+        }
+       ]
+      ],
+      "buttons": [
+       "Anmelden",
+       "Abbrechen"
+      ]
+     },
+     "say": "Das Fenster wurde am Seitenrand abgeschnitten. Ein echtes Fenster tut das nie.",
+     "actions": [
+      {
+       "id": "close-it",
+       "label": "Fenster und Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein Fenster, das die Seite nicht verlassen kann, ist gefälscht. Geben Sie dort also nichts ein.",
+       "next": "own-tab"
+      },
+      {
+       "id": "type-anyway",
+       "label": "Trotzdem anmelden",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Sie hatten bereits gesehen, dass das Fenster gefälscht war. Ihr Passwort ist jetzt bei den Kriminellen.",
+       "next": "leaked"
+      },
+      {
+       "id": "report",
+       "label": "Seite dem IT-Support melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Der IT-Support kann die Seite sperren und so auch Ihre Kolleginnen und Kollegen schützen.",
+       "next": "own-tab"
+      }
+     ]
+    },
+    {
+     "id": "pm-check",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Kein gespeichertes Passwort für tender-baza.example.net."
+        }
+       ]
+      ],
+      "buttons": [
+       "Manuell eingeben",
+       "Schließen"
+      ]
+     },
+     "say": "Der Passwort-Manager hat für diese Website kein Passwort gefunden.",
+     "actions": [
+      {
+       "id": "type-manual",
+       "label": "Passwort manuell eingeben",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Der Passwort-Manager hatte recht: Diese Website ist nicht Ihr Postfach. Das eingegebene Passwort ging an die Kriminellen.",
+       "next": "leaked"
+      },
+      {
+       "id": "stop",
+       "label": "Abbrechen und Fenster schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn der Passwort-Manager nichts ausfüllt, ist Abbrechen der beste Schritt."
+      }
+     ]
+    },
+    {
+     "id": "own-tab",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "İşPoçt",
+      "url": [
+       {
+        "text": "https://poct.idare.example/giris"
+       }
+      ],
+      "fields": [
+       "Dienstliche E-Mail",
+       "Passwort"
+      ],
+      "button": "Anmelden"
+     },
+     "say": "Sie haben die Adresse in einem neuen Tab eingegeben. Der Passwort-Manager hat das Passwort ausgefüllt.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Anmelden",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn Sie die Adresse selbst eingeben, hat ein gefälschtes Fenster keine Chance.",
+       "next": "doc-page"
+      },
+      {
+       "id": "check",
+       "label": "Adresse prüfen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Das ist Ihr echtes dienstliches Postfach, und der Passwort-Manager hat es erkannt. Die Anmeldung ist sicher.",
+       "next": "doc-page"
+      }
+     ]
+    },
+    {
+     "id": "leaked",
+     "label": "Dokument nicht gefunden",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tender-baza",
+      "url": [
+       {
+        "text": "https://tender-baza.example.net/sened/4471"
+       }
+      ]
+     },
+     "say": "Das Passwort ist weg, und das Dokument hat sich nie geöffnet. Handeln Sie jetzt schnell.",
+     "actions": [
+      {
+       "id": "change-report",
+       "label": "Passwort ändern und IT-Support anrufen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Ändern Sie das Passwort in einem neuen Tab und lassen Sie den IT-Support alle offenen Anmeldesitzungen beenden."
+      },
+      {
+       "id": "retry",
+       "label": "Erneut anmelden",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Die Website sammelt Ihr Passwort ein zweites Mal ein. Hier wartet kein Dokument, sondern eine Falle für Passwörter."
+      },
+      {
+       "id": "ignore",
+       "label": "Nichts tun",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Mit diesem Passwort können die Kriminellen Ihr Postfach bereits öffnen. Ändern Sie es und melden Sie den Vorfall sofort."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "dt-order",
+   "prompt": "Bringen Sie die Schritte in die richtige Reihenfolge, wenn ein Anmeldefenster verdächtig aussieht.",
+   "items": [
+    {
+     "id": "drag",
+     "label": "Fenster aus dem Browser ziehen"
+    },
+    {
+     "id": "close",
+     "label": "Kann es die Seite nicht verlassen: Fenster und Tab schließen"
+    },
+    {
+     "id": "own-tab",
+     "label": "Adresse in einem neuen Tab eingeben und sich dort anmelden"
+    },
+    {
+     "id": "report",
+     "label": "Seite dem IT-Support melden"
+    }
+   ],
+   "explain": "Erst testen, dann schließen, dann die Adresse selbst eingeben. Melden Sie die Seite, damit auch Ihre Kolleginnen und Kollegen geschützt sind."
+  },
+  {
+   "type": "recap",
+   "id": "dt-recap",
+   "points": [
+    "Ziehen Sie ein Anmeldefenster aus dem Browser heraus: Ein gefälschtes kann die Seite nicht verlassen",
+    "Wenn der Passwort-Manager nichts ausfüllt, brechen Sie ab",
+    "Geben Sie im Zweifel die Adresse selbst in einem neuen Tab ein"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

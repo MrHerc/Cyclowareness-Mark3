@@ -1,0 +1,423 @@
+{
+ "id": "update-turns",
+ "title": "Extensia care s-a schimbat",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ut-tutor",
+   "beats": [
+    {
+     "id": "ut-b1",
+     "say": "O extensie poate funcționa cinstit ani la rând. Apoi i se schimbă proprietarul, iar o singură actualizare o transformă în spion.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "ut-b2",
+     "say": "Astfel de actualizări au ajuns automat în milioane de browsere. Utilizatorii nu au observat nimic.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "4,3 milioane",
+      "label": "de dispozitive afectate în 2025 de extensii de încredere de ani de zile, transformate în programe-spion"
+     }
+    },
+    {
+     "id": "ut-b3",
+     "say": "Atenție dacă o extensie cere brusc permisiuni noi, dacă vi s-a schimbat motorul de căutare sau dacă reclamele s-au înmulțit.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2c-pdf-ustasi",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Extensia PDF Ustası a fost dezactivată"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Versiunea nouă cere mai multe permisiuni:"
+         }
+        ],
+        [
+         {
+          "text": "Citește și modifică toate datele dumneavoastră de pe toate site-urile",
+          "spot": "new-perm"
+         }
+        ]
+       ],
+       "buttons": [
+        "Acceptați permisiunile",
+        "Eliminați extensia"
+       ]
+      }
+     },
+     "highlight": "new-perm"
+    },
+    {
+     "id": "ut-b4",
+     "say": "Atunci eliminați extensia, anunțați suportul IT și schimbați parolele pe care vi le indică.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ut-scenario",
+   "title": "PDF Ustası s-a schimbat",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Dimineața deschideți browserul. Un mesaj din colț spune: extensia PDF Ustası a fost dezactivată pentru că cere permisiuni noi.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2c-pdf-ustasi",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Extensia PDF Ustası a fost dezactivată"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Versiunea nouă cere mai multe permisiuni."
+         }
+        ]
+       ],
+       "buttons": [
+        "Vedeți permisiunile",
+        "Eliminați extensia"
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "Accept permisiunile, o folosesc de un an",
+       "next": "n2-bad",
+       "outcome": "compromised",
+       "feedback": "Încrederea veche nu face sigură o permisiune nouă. Această actualizare poate să fi transformat extensia în spion."
+      },
+      {
+       "label": "Mai întâi mă uit ce permisiuni cere",
+       "next": "n2",
+       "outcome": "safe",
+       "feedback": "Corect. Permisiunile noi arată ce vrea să facă acum extensia."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Permisiuni noi: citește și modifică datele de pe toate site-urile, citește ce copiați. Pentru a deschide un PDF nu este nevoie de nimic din toate acestea.",
+     "choices": [
+      {
+       "label": "Elimin extensia și îi scriu suportului IT",
+       "next": "n3",
+       "outcome": "safe",
+       "feedback": "Corect. Suportul IT va căuta această extensie și pe alte calculatoare."
+      },
+      {
+       "label": "O las dezactivată și mă uit mai târziu",
+       "next": "n3",
+       "outcome": "risky",
+       "feedback": "O extensie dezactivată rămâne în browser și revine cu un singur clic. Este mai sigur să o eliminați."
+      }
+     ]
+    },
+    {
+     "id": "n2-bad",
+     "text": "După o săptămână, motorul de căutare s-a schimbat de la sine, iar pe site-uri apar reclame necunoscute.",
+     "choices": [
+      {
+       "label": "Elimin extensia și sun la suportul IT",
+       "next": "n3",
+       "outcome": "safe",
+       "feedback": "Târziu, dar este pasul corect. Suportul IT va verifica ce date s-au scurs."
+      },
+      {
+       "label": "Mă obișnuiesc cu reclamele",
+       "outcome": "compromised",
+       "feedback": "Extensia vede în continuare fiecare pagină pe care o deschideți. Reclamele sunt semnul că lucrează."
+      }
+     ]
+    },
+    {
+     "id": "n3",
+     "text": "Vă mulțumesc. Extensia aceasta a colectat date de pe toate site-urile. Schimbați parolele de la poșta de serviciu și de la portal, iar noi vom închide sesiunile deschise.",
+     "speaker": "Ayten, suportul IT",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Vă mulțumesc. <breath> Extensia aceasta a colectat date de pe toate site-urile. Schimbați parolele de la poșta de serviciu și de la portal, iar noi vom închide sesiunile deschise.",
+     "choices": [
+      {
+       "label": "Schimb parolele acum",
+       "outcome": "safe",
+       "feedback": "Excelent. Tot ce a colectat extensia nu mai este valabil."
+      },
+      {
+       "label": "Am eliminat extensia, este suficient",
+       "outcome": "risky",
+       "feedback": "Extensia a dispărut, dar datele pe care le-a colectat sunt la escroc. Parolele trebuie schimbate."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ut-sim",
+   "environment": "desktop",
+   "title": "Computerul de serviciu",
+   "intro": "Pe computerul de serviciu se întâmplă lucruri ciudate. Răspundeți corect la fiecare avertisment.",
+   "steps": [
+    {
+     "id": "ad-tab",
+     "label": "Felicitări! Ați câștigat un telefon",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://endirim-kupon.example.info/hediyye",
+        "reveal": "endirim-kupon.example.info"
+       }
+      ]
+     },
+     "say": "Browserul a deschis singur o filă nouă.",
+     "actions": [
+      {
+       "id": "claim",
+       "label": "Revendicați premiul",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "O filă care se deschide singură cu un premiu este o capcană. Pagina v-ar fi cerut datele cardului."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Filele care se deschid singure sunt adesea opera unei extensii dăunătoare, așa că haideți să găsim cauza."
+      }
+     ]
+    },
+    {
+     "id": "search-changed",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "db-xezri-brauzer",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Motorul de căutare a fost schimbat"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Căutările dumneavoastră merg acum la axtar-tez.example.info."
+        }
+       ],
+       [
+        {
+         "text": "Modificat de: extensia Kupon Tapan"
+        }
+       ]
+      ],
+      "buttons": [
+       "Păstrați modificarea",
+       "Reveniți la setarea anterioară"
+      ]
+     },
+     "say": "Browserul vă anunță că setarea de căutare a fost schimbată.",
+     "actions": [
+      {
+       "id": "keep",
+       "label": "Păstrați modificarea",
+       "kind": "mark-safe",
+       "outcome": "risky",
+       "feedback": "Căutările dumneavoastră merg acum pe site-ul unui străin, care vede tot ce scrieți. Reveniți la setarea anterioară."
+      },
+      {
+       "id": "restore",
+       "label": "Reveniți la setarea anterioară",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Acum să ne uităm la extensia care a făcut asta."
+      }
+     ]
+    },
+    {
+     "id": "ext-list",
+     "label": "Extensii: Kupon Tapan, Ekran Şəkli, Qısa Qeyd",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-xezri-brauzer",
+      "url": [
+       {
+        "text": "https://magaza.xezri.example/elavelerim",
+        "reveal": "xezri.example"
+       }
+      ]
+     },
+     "say": "În listă este o extensie pe care nu ați instalat-o niciodată.",
+     "actions": [
+      {
+       "id": "remove",
+       "label": "Eliminați Kupon Tapan",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. O extensie pe care nu o recunoașteți nu are ce căuta în browser."
+      },
+      {
+       "id": "keep",
+       "label": "Păstrați-le pe toate",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Kupon Tapan v-a schimbat căutarea și deschide file. Dacă o păstrați, îi lăsați datele dumneavoastră la îndemână."
+      }
+     ]
+    },
+    {
+     "id": "bundle-file",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "w2c-kupon-tapan",
+      "name": [
+       {
+        "text": "Pulsuz_PDF_Cevirici_setup.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "6,2 MB",
+      "source": [
+       {
+        "text": "pulsuz-pdf-cevir.example.info"
+       }
+      ]
+     },
+     "say": "Dosarul Descărcări arată de unde a venit extensia.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Acest convertor gratuit a instalat extensia pe ascuns. Dacă îl deschideți din nou, extensia revine."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. Acest fișier a venit cu un program gratuit și a instalat extensia fără să vă întrebe."
+      }
+     ]
+    },
+    {
+     "id": "av-alert",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "qoruyucu",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Qoruyucu: amenințare detectată"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Extensia Kupon Tapan trimitea datele din browser către un server necunoscut."
+        }
+       ],
+       [
+        {
+         "text": "Extensia a fost eliminată."
+        }
+       ]
+      ],
+      "buttons": [
+       "Anunțați suportul IT",
+       "Închideți"
+      ]
+     },
+     "say": "Și antivirusul a găsit ceva.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Anunțați suportul IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Suportul IT va verifica ce date s-au scurs și vă va ajuta să schimbați parolele."
+      },
+      {
+       "id": "close",
+       "label": "Închideți",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Extensia a dispărut, dar datele colectate au plecat deja. Raportați neapărat incidentul."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ut-match",
+   "prompt": "Asociați fiecare permisiune cu ceea ce face posibil.",
+   "pairs": [
+    {
+     "id": "all-sites",
+     "left": "Citește și modifică datele de pe toate site-urile",
+     "right": "Vă citește e-mailurile, modifică o pagină de plată"
+    },
+    {
+     "id": "clipboard",
+     "left": "Citește ce copiați",
+     "right": "Vede o parolă sau un număr de card pe care l-ați copiat"
+    },
+    {
+     "id": "history",
+     "left": "Citește istoricul de navigare",
+     "right": "Știe ce site-uri vizitați"
+    },
+    {
+     "id": "downloads",
+     "left": "Gestionează descărcările",
+     "right": "Descarcă fișiere în numele dumneavoastră"
+    }
+   ],
+   "explain": "Fiecare permisiune este o putere. Nu îi dați unei extensii o putere de care nu are nevoie pentru sarcina ei."
+  },
+  {
+   "type": "recap",
+   "id": "ut-recap",
+   "points": [
+    "Eliminați extensia care cere permisiuni noi după o actualizare",
+    "Un motor de căutare schimbat de la sine, reclamele noi și filele care apar singure sunt semnale de alarmă",
+    "Eliminați extensia, anunțați suportul IT, schimbați parolele"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

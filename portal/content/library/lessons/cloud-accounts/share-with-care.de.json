@@ -1,0 +1,376 @@
+{
+ "id": "share-with-care",
+ "title": "Mit Bedacht teilen",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Die Cloud ist praktisch: Dateien lassen sich von überall öffnen. Doch ein falsch geteilter Link lässt sich ebenfalls von überall öffnen.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Prüfen Sie beim Erstellen eines Links drei Dinge: wer ihn öffnen kann, ob man die Datei bearbeiten darf und wie lange der Link gültig bleibt.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Manchmal wird gar kein Passwort verlangt, Sie sollen nur eine App zulassen. Ein einziges Tippen kann einem Angreifer den Schlüssel zu Ihrem Konto in die Hand geben.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "DocuSfera"
+         }
+        ],
+        "address": [
+         {
+          "text": "no-reply@docusfera-share.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Leyla Quliyeva hat ein Dokument mit Ihnen geteilt"
+        }
+       ],
+       "time": "10:41",
+       "body": [
+        [
+         {
+          "text": "Dokument: Quartalsbudget, endgültige Fassung"
+         }
+        ],
+        [
+         {
+          "text": "Um das Dokument zu öffnen, erlauben Sie der App DocuSfera Viewer den Zugriff auf Ihr Konto.",
+          "spot": "grant"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "grant"
+    },
+    {
+     "id": "b4",
+     "say": "Wenn Sie die App zugelassen haben, reicht eine Passwortänderung womöglich nicht aus. Bitten Sie den IT-Support, der App sofort den Zugriff zu entziehen.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "consent-prompt",
+   "prompt": "Finden Sie heraus, was diese App über ihre eigentliche Aufgabe hinaus verlangt.",
+   "artifact": {
+    "kind": "permission",
+    "app": "PDF Merger Pro",
+    "permissions": [
+     {
+      "label": [
+       {
+        "text": "Ihren Namen und Ihre E-Mail-Adresse sehen"
+       }
+      ],
+      "needed": true
+     },
+     {
+      "label": [
+       {
+        "text": "Ihre E-Mails lesen, senden und löschen",
+        "spot": "mail"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Vollzugriff auf alle Ihre Dateien",
+        "spot": "files"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Ihre Kontakte verwalten",
+        "spot": "contacts"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Zugriff behalten, auch wenn Sie die App nicht nutzen",
+        "spot": "offline"
+       }
+      ],
+      "needed": false
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "mail",
+     "label": "Vollzugriff auf das Postfach",
+     "explain": "Zum Zusammenführen von PDFs braucht niemand Ihre E-Mails. Mit dieser Berechtigung kann jemand in Ihrem Namen E-Mails versenden."
+    },
+    {
+     "id": "files",
+     "label": "Alle Dateien",
+     "explain": "Die App braucht nur die Datei, die Sie auswählen, nicht Ihre ganze Cloud."
+    },
+    {
+     "id": "contacts",
+     "label": "Kontakte",
+     "explain": "Ihre Kontaktliste wird zur Zielliste für die nächste Phishing-Welle."
+    },
+    {
+     "id": "offline",
+     "label": "Dauerhafter Zugriff",
+     "explain": "Die App kann weiter zugreifen, auch wenn Sie sie längst geschlossen haben. Eine Passwortänderung unterbindet das nicht immer."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "link-settings",
+   "question": {
+    "prompt": "Sie schicken einen Bericht an zwei Teammitglieder, die ihn lesen sollen. Welchen Link wählen Sie?",
+    "options": [
+     {
+      "id": "anyone-edit",
+      "label": "Jeder mit dem Link, mit Bearbeitungsrecht",
+      "correct": false,
+      "feedback": "Gerät der Link in falsche Hände, kann jeder die Datei öffnen und ändern."
+     },
+     {
+      "id": "two-view",
+      "label": "Nur die beiden Teammitglieder, nur Lesezugriff, mit Ablaufdatum",
+      "correct": true,
+      "feedback": "Richtig. Minimaler Zugriff, minimales Risiko."
+     },
+     {
+      "id": "org-edit",
+      "label": "Alle in der Organisation, mit Bearbeitungsrecht",
+      "correct": false,
+      "feedback": "Hunderte Menschen, die die Datei nicht brauchen, könnten sie öffnen und ändern."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "folder"
+    }
+   },
+   "explain": "Vergeben Sie so wenig Zugriff wie möglich: an namentlich genannte Personen, nur mit den nötigen Rechten und mit einem Enddatum."
+  },
+  {
+   "type": "swipe",
+   "id": "cloud-cards",
+   "prompt": "Ist diese Freigabe sicher oder riskant?",
+   "cards": [
+    {
+     "id": "expected-share",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "DocuSfera"
+        }
+       ],
+       "address": [
+        {
+         "text": "no-reply@docusfera.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Samir Babayev hat die Datei „Quartalsbericht“ mit Ihnen geteilt"
+       }
+      ],
+      "time": "09:15",
+      "body": [
+       [
+        {
+         "text": "Samir: Hier ist der Bericht, über den wir gestern gesprochen haben."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Ein bekannter Kollege, eine erwartete Datei, die eigene Domain des Dienstes. Prüfen Sie trotzdem die Adressleiste, wenn sich die Datei öffnet."
+    },
+    {
+     "id": "salary-files",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "DocuSfera"
+        }
+       ],
+       "address": [
+        {
+         "text": "share@docusfera-files.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "3 Dateien für Sie: Gehaltserhöhung 2027.pdf"
+       }
+      ],
+      "time": "16:58",
+      "body": [
+       [
+        {
+         "text": "Die Dateien werden in 24 Stunden gelöscht. Bestätigen Sie Ihr E-Mail-Passwort, um sie anzusehen."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Falsche Domain, ein verlockendes Thema, Zeitdruck und die Frage nach dem Passwort. Eine klassische Falle."
+    },
+    {
+     "id": "open-link",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://docusfera.example/s/Hx82kQ?access=anyone&role=editor"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Mit diesem Link kann jeder die Datei bearbeiten. Ändern Sie die Zugriffsstufe, bevor Sie ihn versenden."
+    },
+    {
+     "id": "personal-cloud",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Günay (Team)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ich habe die Unterlagen in meine private Cloud hochgeladen, damit ich von zu Hause aus arbeiten kann."
+         }
+        ],
+        "time": "18:40"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Eine private Cloud liegt außerhalb der Kontrolle Ihrer Organisation. Speichern Sie Arbeitsdateien nur im zugelassenen Dienst."
+    },
+    {
+     "id": "cleanup-notice",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "IT-Support"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Alte offene Links werden deaktiviert"
+       }
+      ],
+      "time": "11:00",
+      "body": [
+       [
+        {
+         "text": "Am Freitag werden offene Links, die älter als 90 Tage sind, automatisch deaktiviert. Sie müssen nichts tun."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Richtige Adresse, kein Link, keine Aufforderung. Das ist eine sinnvolle Aufräumaktion."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "access-levels",
+   "prompt": "Ordnen Sie jeder Zugriffsstufe ihre Bedeutung zu.",
+   "pairs": [
+    {
+     "id": "viewer",
+     "left": "Betrachter",
+     "right": "Kann nur lesen"
+    },
+    {
+     "id": "commenter",
+     "left": "Kommentator",
+     "right": "Liest und hinterlässt Anmerkungen"
+    },
+    {
+     "id": "editor",
+     "left": "Bearbeiter",
+     "right": "Kann die Datei ändern"
+    },
+    {
+     "id": "anyone",
+     "left": "Jeder mit dem Link",
+     "right": "Auch Außenstehende können die Datei öffnen"
+    }
+   ],
+   "explain": "Bearbeitungsrechte, die niemand braucht, erhöhen das Risiko von Fehlern oder schädlichen Änderungen."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Teilen Sie Links nur mit namentlich genannten Personen und nur mit den nötigen Rechten.",
+    "Lassen Sie nie eine unbekannte App in Ihr Konto.",
+    "Arbeitsdateien gehören nicht in private Clouds."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

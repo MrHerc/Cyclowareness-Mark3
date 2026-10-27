@@ -1,0 +1,417 @@
+{
+ "id": "qr-traps",
+ "title": "QR-пастки",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "hidden-link",
+     "say": "Вітаю! QR-код — це просто приховане посилання. З вигляду не скажеш, куди воно веде.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "qr"
+     }
+    },
+    {
+     "id": "stickers",
+     "say": "Шахраї клеять власні наліпки з QR-кодами на паркомати, меню й афіші.",
+     "mood": "think",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "qr",
+       "caption": [
+        {
+         "text": "ShaharPark. Скануйте, щоб оплатити"
+        }
+       ],
+       "destination": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "seherpark-odenis.info",
+         "spot": "domain"
+        },
+        {
+         "text": "/pay"
+        }
+       ]
+      }
+     }
+    },
+    {
+     "id": "check-domain",
+     "say": "Коли телефон зчитає код, він покаже адресу. Перш ніж відкривати, перевірте домен: чи справді він належить цій організації?",
+     "mood": "talk",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "qr",
+       "caption": [
+        {
+         "text": "ShaharPark. Скануйте, щоб оплатити"
+        }
+       ],
+       "destination": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "seherpark-odenis.info",
+         "spot": "domain"
+        },
+        {
+         "text": "/pay"
+        }
+       ]
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "email-qr",
+     "say": "QR-код у листі теж може бути пасткою. Якщо сторінка просить ваш пароль чи дані картки, зупиніться.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "scan-or-not",
+   "prompt": "Які QR-коди можна безпечно відкривати?",
+   "cards": [
+    {
+     "id": "parking-fine",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Паркомат. У вас штраф — скануйте й оплатіть"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://seherpark-cerime.info/pay"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Штрафи не стягують через наліпки. Перевіряйте штрафи лише на офіційному порталі чи в застосунку."
+    },
+    {
+     "id": "cafe-menu",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Чайхана «Чинар». Меню"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://cinar-cayxana.az/menyu"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Домен збігається з назвою закладу, а сторінка лише показує меню. Нічого не вимагають."
+    },
+    {
+     "id": "mfa-email",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Термін підтвердження облікового запису спливає. Скануйте, щоб поновити"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://rxagentlik-login.info/verify"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Лист із QR-кодом для підтвердження облікового запису — класична пастка. Відкрийте портал самостійно через закладку."
+    },
+    {
+     "id": "certificate-check",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Довідка DovletPortal. Перевірте справжність"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://dovletportal.az/yoxla/7F3K2"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Код веде на власну адресу порталу, який видав документ, і не просить жодних даних."
+    },
+    {
+     "id": "free-wifi",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Безкоштовний Wi-Fi. Скануйте, щоб підключитися"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://free-wifi-baku.top/login?card=1"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Для безкоштовного інтернету картка ніколи не потрібна. Невідомий домен плюс запит даних картки — це пастка."
+    },
+    {
+     "id": "donation",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Допоможіть дітям. Скануйте, щоб зробити пожертву"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://qisalt.info/x7Qa"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Скорочене посилання приховує справжню адресу. Робіть пожертви лише на офіційному сайті благодійної організації."
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "email-qr",
+   "prompt": "Знайдіть у цьому листі підозрілі деталі.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "ІТ-підтримка"
+      }
+     ],
+     "address": [
+      {
+       "text": "it-destek@rxagentlik-support.info",
+       "spot": "sender"
+      }
+     ]
+    },
+    "to": "aynur.mammadova@rxagentlik.az",
+    "subject": [
+     {
+      "text": "ТЕРМІНОВО: ",
+      "spot": "urgent"
+     },
+     {
+      "text": "поновіть двоетапну перевірку"
+     }
+    ],
+    "time": "09:12",
+    "body": [
+     [
+      {
+       "text": "Шановний колего!"
+      }
+     ],
+     [
+      {
+       "text": "Ми оновлюємо систему безпеки. "
+      },
+      {
+       "text": "Якщо ви не підтвердите дані протягом 24 годин, ваш обліковий запис буде заблоковано.",
+       "spot": "threat"
+      }
+     ],
+     [
+      {
+       "text": "Відскануйте телефоном QR-код нижче.",
+       "spot": "qr"
+      }
+     ],
+     [
+      {
+       "text": "З повагою, ІТ-підтримка"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender",
+     "label": "Чужий домен",
+     "explain": "Домен відправника не наш: це не rxagentlik.az."
+    },
+    {
+     "id": "urgent",
+     "label": "Терміновість",
+     "explain": "Слово «терміново» підштовхує діяти не замислюючись."
+    },
+    {
+     "id": "threat",
+     "label": "Погроза",
+     "explain": "Погроза блокуванням потрібна, щоб на вас тиснути. Справжня підтримка рідко так пише."
+    },
+    {
+     "id": "qr",
+     "label": "QR-код",
+     "explain": "QR-код ховає посилання від поштового фільтра й переводить вас на телефон, який захищений гірше."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "fine-notice",
+   "question": {
+    "prompt": "На лобовому склі — повідомлення про штраф із QR-кодом. Що ви зробите?",
+    "options": [
+     {
+      "id": "scan-pay",
+      "label": "Відсканую й одразу оплачу",
+      "correct": false,
+      "feedback": "Фальшива сторінка може викрасти дані вашої картки."
+     },
+     {
+      "id": "official",
+      "label": "Перевірю штраф самостійно на офіційному порталі",
+      "correct": true,
+      "feedback": "Правильно. Якщо штраф справжній, він там буде."
+     },
+     {
+      "id": "call-number",
+      "label": "Зателефоную за номером із повідомлення",
+      "correct": false,
+      "feedback": "Номер теж може належати шахраям."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "Повідомлення про штраф. Оплатіть протягом 3 днів"
+       }
+      ],
+      "destination": [
+       {
+        "text": "https://seherpark-cerime.info/odenis"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "Не довіряйте жодним контактам із повідомлення. Відкрийте офіційний канал самостійно."
+  },
+  {
+   "type": "scenario",
+   "id": "payment-sticker",
+   "title": "Наліпка для оплати",
+   "start": "counter",
+   "nodes": [
+    {
+     "id": "counter",
+     "text": "На стійці в кафе — наліпка з QR-кодом для швидкої оплати. Вона наклеєна трохи криво.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "qr",
+       "caption": [
+        {
+         "text": "Швидка оплата"
+        }
+       ],
+       "destination": [
+        {
+         "text": "https://sahilpay-odenis.top/p/1942"
+        }
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "Відсканувати й спершу перевірити адресу",
+       "next": "address",
+       "feedback": "Гарний початок. Перевіряти адресу — важливо."
+      },
+      {
+       "label": "Відсканувати й одразу оплатити",
+       "outcome": "compromised",
+       "feedback": "Адреса виявилася фальшивою. Дані вашої картки потрапили до шахраїв."
+      },
+      {
+       "label": "Запитати на касі, чи це їхня наліпка",
+       "next": "cashier",
+       "feedback": "Чудова ідея. Запитати — найпростіша перевірка."
+      }
+     ]
+    },
+    {
+     "id": "address",
+     "text": "Телефон показує адресу: sahilpay-odenis.top. Назви кафе в ній немає.",
+     "choices": [
+      {
+       "label": "Усе одно оплатити, я поспішаю",
+       "outcome": "compromised",
+       "feedback": "Поспішний платіж пішов шахраєві. Дивна адреса була достатнім попередженням."
+      },
+      {
+       "label": "Не відкривати й сказати на касі",
+       "next": "cashier",
+       "feedback": "Правильне рішення."
+      }
+     ]
+    },
+    {
+     "id": "cashier",
+     "text": "Це не наша наліпка! Будь ласка, оплатіть карткою через термінал.",
+     "speaker": "Касирка",
+     "voice": "young-woman",
+     "channel": "in-person",
+     "manner": "firm",
+     "spoken": "Це не наша наліпка! <short pause> Будь ласка, оплатіть карткою через термінал.",
+     "choices": [
+      {
+       "label": "Оплатити через термінал",
+       "outcome": "safe",
+       "feedback": "Чудово. Ви захистили себе й наступних відвідувачів."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "QR-код — це приховане посилання: перевіряйте адресу, перш ніж відкривати.",
+    "Сплачуйте штрафи й рахунки лише через офіційні канали.",
+    "Ніколи не вводьте пароль чи дані картки на сторінці, відкритій через QR-код."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

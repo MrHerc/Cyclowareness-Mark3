@@ -2,6 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 import { parseEmailMarkup, stripEmailMarkup } from "@/lib/email-markup";
 
 vi.stubEnv("APP_SECRET", "test-only-app-secret-0123456789-abcdefghij-0123456789");
+// The provider's key set, as the OIDC client fetches it (tests/oidc-fetch.test.ts covers the request itself).
+const guardedRequest = vi.fn();
+vi.mock("@/server/net-guard", async (original) => ({ ...(await original<typeof import("@/server/net-guard")>()), guardedRequest: (...args: unknown[]) => guardedRequest(...args) }));
 const { codeChallenge, openState, sealState, verifyIdToken } = await import("@/server/auth/oidc");
 const { renderEmailHtml } = await import("@/server/mail");
 
@@ -13,7 +16,7 @@ async function signedToken(claims: Record<string, unknown>) {
   const jwk = await crypto.subtle.exportKey("jwk", pair.publicKey);
   const head = `${b64({ alg: "RS256", kid: "k1" })}.${b64(claims)}`;
   const sig = Buffer.from(await crypto.subtle.sign("RSASSA-PKCS1-v1_5", pair.privateKey, Buffer.from(head))).toString("base64url");
-  vi.stubGlobal("fetch", async () => new Response(JSON.stringify({ keys: [{ ...jwk, kid: "k1", use: "sig" }] })));
+  guardedRequest.mockResolvedValue({ status: 200, headers: { "content-type": "application/json" }, body: Buffer.from(JSON.stringify({ keys: [{ ...jwk, kid: "k1", use: "sig" }] })) });
   return `${head}.${sig}`;
 }
 

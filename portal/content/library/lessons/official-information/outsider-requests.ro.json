@@ -1,0 +1,388 @@
+{
+  "id": "outsider-requests",
+  "title": "Solicitări din afară",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l3-tutor",
+      "beats": [
+        {
+          "id": "l3-b1",
+          "say": "Jurnaliști, auditori, alte ministere: toți pot cere informații. Iar escrocii scriu și ei în numele lor.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": { "kind": "illustration", "id": "handshake" }
+        },
+        {
+          "id": "l3-b2",
+          "say": "Într-un e-mail de la un auditor, verificați adresa. Un audit real este anunțat din timp de conducere.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "etalon-audit-fake",
+              "from": {
+                "name": [{ "text": "Etalon Audit" }],
+                "address": [
+                  { "text": "yoxlama@" },
+                  { "text": "etalon-audit-az.test", "spot": "domain" }
+                ]
+              },
+              "subject": [{ "text": "Audit planificat: documente" }],
+              "time": "11:40",
+              "body": [
+                [{ "text": "Am convenit deja cu conducerea dumneavoastră. Trimiteți astăzi documentele de resurse umane și cele financiare." }]
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "l3-b3",
+          "say": "Urgența, o adresă de e-mail personală și cuvintele „nu-i spuneți managerului” sunt semnale de alarmă serioase.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": { "kind": "illustration", "id": "mask" }
+        },
+        {
+          "id": "l3-b4",
+          "say": "Verificați solicitarea sunând la un număr pe care îl cunoașteți deja. Răspunsul îl dă conducerea sau biroul de presă.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": { "kind": "illustration", "id": "badge-id" }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "l3-sim",
+      "environment": "call",
+      "title": "Vă sună un minister",
+      "intro": "Vă sună cineva care spune că lucrează la alt minister. Citiți ce spune și alegeți răspunsul.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "regional-nazirlik-fake",
+            "caller": [{ "text": "Ministerul Relațiilor Regionale" }],
+            "number": [{ "text": "+994 12 000 36 18" }],
+            "label": "Minister",
+            "voice": "man-2"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Răspundeți",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Nu este periculos să răspundeți. Contează ce informații dați."
+            },
+            {
+              "id": "decline",
+              "label": "Respingeți",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Și așa este bine. Dacă este nevoie, sunați chiar dumneavoastră la numărul oficial al ministerului.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "ask",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "regional-nazirlik-fake",
+            "caller": [{ "text": "Ministerul Relațiilor Regionale" }],
+            "number": [{ "text": "+994 12 000 36 18" }],
+            "label": "Minister",
+            "voice": "man-2"
+          },
+          "say": "Bună ziua, sunt Samir Guliyev de la Ministerul Relațiilor Regionale. Pentru un proiect comun, avem nevoie de lista angajaților din departamentul dumneavoastră, cu numerele de mobil.",
+          "spoken": "Bună ziua, <breath> sunt Samir Guliyev de la Ministerul Relațiilor Regionale. Pentru un proiect comun, ăă, avem nevoie de lista angajaților din departamentul dumneavoastră, cu numerele de mobil.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Vă trimit lista",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Datele angajaților nu se dau unei persoane a cărei identitate nu ați verificat-o."
+            },
+            {
+              "id": "verify",
+              "label": "Vă rog să trimiteți o scrisoare oficială",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Corect. Solicitările dintre instituții vin prin scrisori oficiale, iar conducerea le răspunde."
+            },
+            {
+              "id": "hang",
+              "label": "Închideți apelul",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Bună decizie. Acum verificați solicitarea pe un canal oficial.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "push",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "regional-nazirlik-fake",
+            "caller": [{ "text": "Ministerul Relațiilor Regionale" }],
+            "number": [{ "text": "+994 12 000 36 18" }],
+            "label": "Minister",
+            "voice": "man-2"
+          },
+          "say": "Nu avem timp de scrisori, viceministrul vrea lista astăzi. Trimiteți-o pe e-mailul meu personal, vă dau eu adresa.",
+          "spoken": "Nu avem timp de scrisori, viceministrul vrea lista astăzi. <breath> Trimiteți-o pe e-mailul meu personal, vă dau eu adresa.",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Bine, o trimit acum",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Lista a ajuns la o adresă necunoscută. Cu ea, fiecare coleg poate deveni ținta unui phishing personalizat."
+            },
+            {
+              "id": "keep",
+              "label": "Nu partajez nimic fără aprobarea managerului meu",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Corect. Presiunea și o adresă de e-mail personală sunt principalele semne ale unei înșelătorii."
+            },
+            {
+              "id": "hang",
+              "label": "Închideți apelul",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Corect. Când presiunea crește, cea mai simplă protecție este să închideți.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Apelul s-a încheiat. Ce faceți acum?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "regional-nazirlik-fake",
+            "caller": [{ "text": "Ministerul Relațiilor Regionale" }],
+            "number": [{ "text": "+994 12 000 36 18" }],
+            "label": "Minister",
+            "voice": "man-2"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "Sunați la numărul de pe site-ul oficial al ministerului",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Corect. Când găsiți chiar dumneavoastră numărul, un apel fals iese imediat la iveală."
+            },
+            {
+              "id": "report",
+              "label": "Anunțați managerul și echipa de securitate",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Foarte bine. Astfel de apeluri ajung de obicei la mai mulți colegi, iar raportarea îi protejează pe toți."
+            },
+            {
+              "id": "ignore",
+              "label": "Nu faceți nimic",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Apelantul va încerca să sune alt coleg. Raportarea îi protejează și pe ceilalți."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l3-hotspot",
+      "prompt": "Găsiți semnalele de alarmă din acest e-mail trimis de un auditor fals.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "etalon-audit-fake",
+        "from": {
+          "name": [{ "text": "Etalon Audit" }],
+          "address": [
+            { "text": "audit.etalon@" },
+            { "text": "poct-mail.example", "spot": "free-mail" }
+          ]
+        },
+        "subject": [
+          { "text": "Inspecție planificată: " },
+          { "text": "răspundeți astăzi până la ora 17:00", "spot": "deadline" }
+        ],
+        "time": "10:12",
+        "body": [
+          [{ "text": "Bună ziua, în numele ministerului efectuăm un audit la instituția dumneavoastră." }],
+          [
+            { "text": "Pentru a verifica sistemul de la distanță, scrieți " },
+            { "text": "numele de utilizator și parola dumneavoastră", "spot": "credentials" },
+            { "text": " în răspuns." }
+          ],
+          [{ "text": "Auditul este confidențial, nu informați managerul dumneavoastră.", "spot": "secrecy" }]
+        ]
+      },
+      "spots": [
+        {
+          "id": "free-mail",
+          "label": "Adresă de e-mail gratuită",
+          "explain": "O firmă de audit scrie de pe propriul domeniu. Inspecțiile oficiale nu vin de la o adresă de e-mail personală."
+        },
+        {
+          "id": "deadline",
+          "label": "Termen strict",
+          "explain": "Urgența are rolul de a vă face să răspundeți fără să verificați."
+        },
+        {
+          "id": "credentials",
+          "label": "Cerere de parolă",
+          "explain": "Niciun auditor nu vă cere parola. Dacă este nevoie de acces, suportul IT îl acordă pe calea oficială."
+        },
+        {
+          "id": "secrecy",
+          "label": "Secret față de manager",
+          "explain": "Un audit real este convenit cu conducerea. Cererea de a păstra secretul este un semn de fraudă."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "l3-swipe",
+      "prompt": "Această solicitare este sigură sau periculoasă?",
+      "cards": [
+        {
+          "id": "journalist-docs",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "paytaxt-xeber",
+            "from": {
+              "name": [{ "text": "Leyla Abbasova, Paytaxt Xəbər" }],
+              "address": [{ "text": "l.abbasova@paytaxtxeber.example" }]
+            },
+            "subject": [{ "text": "Comentariu anonim" }],
+            "time": "12:15",
+            "body": [
+              [{ "text": "Nu vă vom publica numele. Îmi puteți trimite o copie a raportului de inspecție?" }]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Biroul de presă vorbește cu jurnaliștii în numele instituției. Nu transmiteți din proprie inițiativă documente interne."
+        },
+        {
+          "id": "press-stats",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Biroul de presă" }],
+              "address": [{ "text": "press@idare.example" }]
+            },
+            "subject": [{ "text": "Statistici anuale" }],
+            "time": "12:40",
+            "body": [
+              [{ "text": "Vă rog să ne trimiteți cea mai recentă versiune a statisticilor anuale publicate pe site, trebuie să răspundem unui jurnalist." }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Biroul de presă al instituției vă cere informații publice. Este o solicitare obișnuită de serviciu."
+        },
+        {
+          "id": "registered-letter",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "senedaxini",
+            "from": {
+              "name": [{ "text": "SənədAxını" }],
+              "address": [{ "text": "bildiris@senedaxini.idare.example" }]
+            },
+            "subject": [{ "text": "Corespondență primită nr. 1847" }],
+            "time": "13:05",
+            "body": [
+              [{ "text": "O solicitare oficială de la Ministerul Relațiilor Regionale a fost înregistrată de registratură și v-a fost repartizată." }]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Solicitarea a fost înregistrată oficial și a sosit prin sistemul intern. Răspunsul se trimite pe aceeași cale."
+        },
+        {
+          "id": "telegram-ministry",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [{ "text": "Kamran | Minister" }],
+            "messages": [
+              {
+                "from": "them",
+                "body": [{ "text": "Salut, trimite-mi astăzi aici proiectul de decizie, scrisoarea oficială vine mâine." }]
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Documentele oficiale nu se cer prin aplicații de mesagerie. „Scrisoarea oficială vine mâine” este un truc de presiune."
+        },
+        {
+          "id": "auditor-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "etalon-audit-fake",
+            "sender": [{ "text": "EtalonAudit" }],
+            "time": "14:20",
+            "messages": [
+              [{ "text": "Pentru audit este nevoie de acces la sistem. Răspundeți la acest SMS cu parola dumneavoastră." }]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Niciun auditor nu cere parola. Raportați un astfel de mesaj echipei de securitate."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l3-choice",
+      "question": {
+        "prompt": "Un jurnalist vă sună și vă cere un comentariu despre o inspecție la instituția dumneavoastră.",
+        "options": [
+          {
+            "id": "comment",
+            "label": "Spun ce știu, dacă nu îmi menționează numele",
+            "correct": false,
+            "feedback": "Chiar și un comentariu anonim înseamnă informații ale instituției. Doar o persoană autorizată vorbește în numele ei."
+          },
+          {
+            "id": "press",
+            "label": "Îl îndrum politicos către biroul de presă",
+            "correct": true,
+            "feedback": "Corect. Biroul de presă înregistrează solicitarea și dă un răspuns oficial."
+          },
+          {
+            "id": "hang",
+            "label": "Închid fără să spun nimic",
+            "correct": false,
+            "feedback": "Nu se scurge nimic, dar jurnalistul rămâne fără răspuns. Este mai bine să îi dați datele de contact ale biroului de presă."
+          }
+        ]
+      },
+      "explain": "Solicitărilor din afară le răspunde instituția, nu dumneavoastră personal. Mai întâi verificați identitatea pe un canal oficial."
+    },
+    {
+      "type": "recap",
+      "id": "l3-recap",
+      "points": [
+        "Verificați solicitările din afară sunând la un număr oficial pe care îl găsiți chiar dumneavoastră.",
+        "Urgența, o adresă de e-mail personală și „nu-i spuneți managerului” sunt semne de fraudă.",
+        "În numele instituției răspunde conducerea sau biroul de presă."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

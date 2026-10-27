@@ -1,0 +1,364 @@
+{
+ "id": "work-anywhere",
+ "title": "Wo immer Sie arbeiten",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "protection-stays",
+     "say": "Wenn Sie im Homeoffice oder im Café arbeiten, kommt der Schutz des Büros nicht mit. Den müssen Sie selbst aufbauen.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "vpn",
+     "say": "Verbinden Sie sich mit dienstlichen Systemen nur über das VPN Ihrer Organisation. Kostenlose VPN-Apps können Ihre Daten an Dritte weitergeben.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "vpn"
+     }
+    },
+    {
+     "id": "open-wifi",
+     "say": "Den Namen eines offenen Café-WLANs kann jeder fälschen. Nutzen Sie nach Möglichkeit lieber den Hotspot Ihres Smartphones.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    {
+     "id": "shoulder",
+     "say": "Wer hinter Ihnen sitzt, sieht Ihren Bildschirm und das Passwort, das Sie eintippen. Setzen Sie sich mit dem Rücken zur Wand und nutzen Sie einen Blickschutzfilter.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "family",
+     "say": "Der Dienstlaptop ist nicht für die Familie. Ein Spiel, das jemand zu Hause herunterlädt, kann Schadsoftware mitbringen.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "cafe-networks",
+   "prompt": "Welche WLAN-Netze in diesem Café sind verdächtig?",
+   "artifact": {
+    "kind": "wifi",
+    "networks": [
+     {
+      "ssid": [
+       {
+        "text": "Cinar_Pulsuz_WiFi",
+        "spot": "twin"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Cinar-Cayxana"
+       }
+      ],
+      "secured": true,
+      "signal": 3
+     },
+     {
+      "ssid": [
+       {
+        "text": "Free_Internet_BAKU",
+        "spot": "free"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "RXAgentlik-Staff",
+        "spot": "staff"
+       }
+      ],
+      "secured": false,
+      "signal": 2
+     },
+     {
+      "ssid": [
+       {
+        "text": "Aynurs Handy"
+       }
+      ],
+      "secured": true,
+      "signal": 4
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "twin",
+     "label": "Täuschend ähnlicher Name",
+     "explain": "Ein offenes WLAN, das den Namen des Cafés nachahmt. Es hat kein Passwort und ist womöglich gefälscht. Fragen Sie das Personal nach dem echten Netz."
+    },
+    {
+     "id": "free",
+     "label": "Unbekannter Betreiber",
+     "explain": "Ein offenes WLAN ohne bekannten Betreiber kann Sie auf eine gefälschte Anmeldeseite umleiten."
+    },
+    {
+     "id": "staff",
+     "label": "Name Ihrer Organisation",
+     "explain": "Das Netz Ihrer Organisation gibt es in keinem Café. Dieses wurde eingerichtet, um Sie zu täuschen."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "swipe",
+   "id": "home-setup",
+   "prompt": "Was davon ist im Homeoffice sicher?",
+   "cards": [
+    {
+     "id": "default-router",
+     "artifact": {
+      "kind": "login",
+      "brand": "HomeRouter",
+      "url": [
+       {
+        "text": "http://192.168.1.1"
+       }
+      ],
+      "fields": [
+       "Benutzername: admin",
+       "Passwort: admin"
+      ],
+      "button": "Anmelden"
+     },
+     "verdict": "threat",
+     "explain": "Standardpasswörter ab Werk sind öffentlich bekannt. Ändern Sie das Router-Passwort sofort."
+    },
+    {
+     "id": "share-password",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Tural, Kollege"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ich komme von zu Hause nicht ins System. Sag mir kurz dein Passwort, nur für eine Minute."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein Passwort gibt man nie weiter, auch nicht an einen Kollegen. Schlagen Sie ihm vor, sich an den IT-Support zu wenden."
+    },
+    {
+     "id": "vpn-update",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "IT-Support"
+        }
+       ],
+       "address": [
+        {
+         "text": "it@rxagentlik.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Neue Version der VPN-App"
+       }
+      ],
+      "time": "08:30",
+      "body": [
+       [
+        {
+         "text": "Das Update wird automatisch auf Ihrem Dienstcomputer installiert. Bitte laden Sie nichts herunter."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Die Domain stimmt, und Sie werden nicht aufgefordert, etwas herunterzuladen."
+    },
+    {
+     "id": "free-vpn",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://super-free-vpn.top/download"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein unbekanntes kostenloses VPN kann Ihren Datenverkehr mitlesen. Nutzen Sie für die Arbeit nur das VPN Ihrer Organisation."
+    },
+    {
+     "id": "home-wifi",
+     "artifact": {
+      "kind": "wifi",
+      "networks": [
+       {
+        "ssid": [
+         {
+          "text": "Ev_5G"
+         }
+        ],
+        "secured": true,
+        "signal": 4
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Ein passwortgeschütztes Heimnetz. Wenn auch das Router-Passwort geändert wurde, ist das ein guter Anfang."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "home-and-cafe",
+   "title": "Zu Hause und im Café",
+   "start": "evening",
+   "nodes": [
+    {
+     "id": "evening",
+     "text": "Kann ich ein Spiel auf deinem Dienstlaptop installieren? Meiner ist zu langsam.",
+     "speaker": "Familienmitglied",
+     "voice": "young-man",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Kann ich ein Spiel auf deinem Dienstlaptop installieren? <short pause> Meiner ist zu langsam.",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     },
+     "choices": [
+      {
+       "label": "Na gut, aber nur für eine Stunde",
+       "outcome": "compromised",
+       "feedback": "Mit dem Spiel kam Schadsoftware, und Ihre dienstlichen Konten sind jetzt in Gefahr."
+      },
+      {
+       "label": "Nein, der Dienstlaptop ist nur für die Arbeit",
+       "next": "cafe",
+       "feedback": "Richtig. Erklären Sie in Ruhe, warum."
+      }
+     ]
+    },
+    {
+     "id": "cafe",
+     "text": "Am nächsten Tag arbeiten Sie in einem Café. Sie müssen zur Theke, um zu bestellen, und Ihr Laptop ist aufgeklappt.",
+     "choices": [
+      {
+       "label": "Offen lassen, es sind ja nur zwei Minuten",
+       "outcome": "risky",
+       "feedback": "Zwei Minuten reichen, um hineinzuschauen, einen Stick anzuschließen oder den Laptop mitzunehmen."
+      },
+      {
+       "label": "Bildschirm sperren und den Laptop mitnehmen",
+       "next": "call",
+       "feedback": "Eine sehr gute Gewohnheit."
+      }
+     ]
+    },
+    {
+     "id": "call",
+     "text": "Zurück am Tisch ruft Ihre Führungskraft an und fragt nach Zahlen aus einem vertraulichen Projekt. In der Nähe sitzen andere Gäste.",
+     "choices": [
+      {
+       "label": "Die Zahlen laut nennen",
+       "outcome": "risky",
+       "feedback": "Die Leute in der Nähe hören mit. Vertrauliches bespricht man nicht in der Öffentlichkeit."
+      },
+      {
+       "label": "Sagen, dass ich von einem ruhigen Ort aus zurückrufe",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Führen Sie vertrauliche Gespräche nur dort, wo niemand mithören kann."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "home-router",
+   "question": {
+    "prompt": "Welche Schritte sind für Ihren Router zu Hause wichtig?",
+    "options": [
+     {
+      "id": "admin-password",
+      "label": "Das Standardpasswort für den Admin-Zugang ändern",
+      "correct": true,
+      "feedback": "Ein Standardpasswort kann jeder nachschlagen."
+     },
+     {
+      "id": "firmware",
+      "label": "Die Firmware des Routers aktualisieren",
+      "correct": true,
+      "feedback": "Updates schließen bekannte Sicherheitslücken."
+     },
+     {
+      "id": "encryption",
+      "label": "Die Verschlüsselung WPA3 oder WPA2 wählen",
+      "correct": true,
+      "feedback": "Die Verschlüsselung schützt Ihr Netz vor dem Abhören."
+     },
+     {
+      "id": "no-password",
+      "label": "Das WLAN für mehr Tempo ohne Passwort lassen",
+      "correct": false,
+      "feedback": "Dann kann sich jeder verbinden, und schneller wird es dadurch auch nicht."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "wifi"
+    }
+   },
+   "explain": "Der Router ist die Tür Ihres Zuhauses zum Internet. Ein Standardpasswort und veraltete Firmware lassen diese Tür offen."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Verbinden Sie sich mit dienstlichen Systemen nur über das VPN Ihrer Organisation.",
+    "Nutzen Sie den Hotspot Ihres Smartphones statt eines offenen WLANs.",
+    "Teilen Sie den Dienstlaptop nicht mit der Familie und sperren Sie den Bildschirm."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,425 @@
+{
+  "id": "which-copy-survived",
+  "title": "Hangi kopya kurtuldu?",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "br1-tutor",
+      "beats": [
+        {
+          "id": "br1-b1",
+          "say": "Merhaba! Arşiv departmanı on yıllık belgeleri saklıyor. Bugün bu belgelerin kopyalarını doğru şekilde nasıl saklayacağınızı öğreneceksiniz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        },
+        {
+          "id": "br1-b2",
+          "say": "Fidye yazılımı yalnızca bilgisayarı şifrelemez. Bilgisayara takılı USB belleği ve ağ klasörünü de kilitler.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "tone": "warning",
+              "title": [
+                {
+                  "text": "Dosyalarınız şifrelendi"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Belgeler klasörü kilitlendi."
+                  }
+                ],
+                [
+                  {
+                    "text": "Bağlı sürücüler ve ağ klasörü de kilitlendi.",
+                    "spot": "connected"
+                  }
+                ]
+              ],
+              "buttons": [
+                "Öde"
+              ]
+            }
+          },
+          "highlight": "connected"
+        },
+        {
+          "id": "br1-b3",
+          "say": "Kural şu: üç kopya, iki farklı ortam, bir kopya başka bir yerde. En az bir kopya ağdan tamamen ayrı olmalı.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "stat",
+            "value": "3-2-1",
+            "label": "3 kopya, 2 farklı ortam, 1 kopya başka bir yerde"
+          }
+        },
+        {
+          "id": "br1-b4",
+          "say": "Bir de şunu unutmayın: denenmemiş bir kopya, ihtiyaç duyduğunuzda boş çıkabilir. Zaman zaman geri yüklemeyi deneyin.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "br1-choice",
+      "question": {
+        "prompt": "Ekranda bir fidye notu var. Büyük ihtimalle hangi kopya kurtuldu?",
+        "options": [
+          {
+            "id": "usb",
+            "label": "Bilgisayara takılı bırakılan USB bellek",
+            "correct": false,
+            "feedback": "Bağlı bir sürücü, bilgisayarın bir parçası gibidir. Fidye yazılımı onu da şifreler."
+          },
+          {
+            "id": "sync",
+            "label": "Otomatik olarak eşitlenen bulut klasörü",
+            "correct": false,
+            "feedback": "Eşitleme, şifrelenmiş dosyaları da buluta kopyalar. Bazen eski sürümler kalır, ama buna güvenemezsiniz."
+          },
+          {
+            "id": "network",
+            "label": "Departmanın ağ klasörü",
+            "correct": false,
+            "feedback": "Bilgisayar ağ klasörüne erişebiliyorsa fidye yazılımı da erişebilir."
+          },
+          {
+            "id": "offline",
+            "label": "Cuma günü çıkarılıp kasaya kilitlenen disk",
+            "correct": true,
+            "feedback": "Doğru. Bilgisayardan ve ağdan ayrılmış bir disk, saldırı sırasında erişilemez durumda kalır."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "ransomware"
+        }
+      },
+      "explain": "Saldırıdan kurtulan kopya, ağ dışında olandır. Bu yüzden bir kopya her zaman çıkarılıp ayrı bir yerde saklanır."
+    },
+    {
+      "type": "simulation",
+      "id": "br1-sim",
+      "environment": "desktop",
+      "title": "Arşiv departmanı",
+      "intro": "Arşiv departmanında çalışıyorsunuz. Cuma akşamından pazartesiye kadar her pencerede doğru kararı verin.",
+      "steps": [
+        {
+          "id": "backup-done",
+          "label": "Cuma, 17:40",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2f-ehtiyat-komekcisi",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Haftalık yedek hazır"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "ARXIV-DISK: on yıllık belgeler, 212 GB. Diski şimdi çıkarabilirsiniz."
+                }
+              ]
+            ],
+            "buttons": [
+              "Diski çıkar",
+              "Bağlı tut"
+            ]
+          },
+          "say": "Haftalık yedek hazır.",
+          "actions": [
+            {
+              "id": "eject",
+              "label": "Diski çıkar",
+              "kind": "eject",
+              "outcome": "safe",
+              "feedback": "Doğru. Çıkarılmış bir disk, bir sonraki saldırıda şifrelenemez."
+            },
+            {
+              "id": "keep",
+              "label": "Bağlı tut",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Bağlı bir disk, bilgisayarla birlikte şifrelenebilir. Yedekleme biter bitmez diski çıkarın."
+            }
+          ]
+        },
+        {
+          "id": "restore-test",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "w2f-ehtiyat-komekcisi",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Geri yükleme kontrolü"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Deneme olarak son kopyadan bir klasör geri yüklensin mi?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Geri yüklemeyi dene",
+              "Atla"
+            ]
+          },
+          "actions": [
+            {
+              "id": "test",
+              "label": "Geri yüklemeyi dene",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Çok iyi. Yalnızca açılabilen bir kopya gerçek bir kopyadır."
+            },
+            {
+              "id": "skip",
+              "label": "Atla",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Kopya bozuk olabilir ve bunu en kötü anda öğrenirsiniz. Geri yüklemeyi düzenli olarak deneyin."
+            }
+          ]
+        },
+        {
+          "id": "personal-cloud",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "buludxidmet",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Klasör kişisel hesabınıza yüklensin mi?"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Arxiv_2016_2026: 212 GB. Hesap: sevda.k@poct-mail.example.net"
+                }
+              ]
+            ],
+            "buttons": [
+              "Yükle",
+              "Reddet"
+            ]
+          },
+          "actions": [
+            {
+              "id": "upload",
+              "label": "Yükle",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "İş belgeleri yalnızca kurumunuzun onayladığı yerlerde saklanır. Kişisel bulut kopyayı korumaz ve verilerin sızmasına yol açabilir."
+            },
+            {
+              "id": "decline",
+              "label": "Reddet",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Ek bir kopya gerekiyorsa BT destek ekibi onu onaylı bir yerde oluşturur."
+            }
+          ]
+        },
+        {
+          "id": "ransom-monday",
+          "label": "Pazartesi, 09:05",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Dosyalarınız şifrelendi"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Ağ klasörü ve bağlı sürücüler kilitlendi. Anahtarı almak için 72 saat içinde ödeme yapın."
+                }
+              ]
+            ],
+            "buttons": [
+              "Öde",
+              "Kapat"
+            ]
+          },
+          "say": "Pazartesi sabahı ekranda bu mesaj var.",
+          "actions": [
+            {
+              "id": "isolate",
+              "label": "Kabloyu çıkar, Wi-Fi'yi kapat",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Doğru. Bilgisayarı kapatmadan ağdan ayırın ve hemen BT destek ekibini arayın."
+            },
+            {
+              "id": "pay",
+              "label": "Öde",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Ödeme yapmak dosyaların geri geleceğini garanti etmez. Kurtarma, ayrı sakladığınız kopyadan yapılacak."
+            }
+          ]
+        },
+        {
+          "id": "sync-alert",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "buludxidmet",
+            "app": "BuludXidmət",
+            "title": [
+              {
+                "text": "1.240 dosya değişti"
+              }
+            ],
+            "body": [
+              {
+                "text": "Departman klasörü buluta eşitlendi."
+              }
+            ],
+            "time": "09:07"
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "BT destek ekibine haber ver",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru, eşitleme şifrelenmiş dosyaları da kopyaladı. Bir uzman eski sürümleri geri yükleyecek."
+            },
+            {
+              "id": "restore-self",
+              "label": "Buluttan kendim geri yükle",
+              "kind": "open",
+              "outcome": "risky",
+              "feedback": "Zararlı yazılım bulaşmış bir bilgisayara geri yüklenen dosyalar yeniden şifrelenebilir. Uzmanlar geri yüklemeyi temiz bir bilgisayarda yapar."
+            }
+          ]
+        },
+        {
+          "id": "offline-disk",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "it-tehlukesizlik",
+            "app": "BT Güvenlik",
+            "title": [
+              {
+                "text": "Diski kasadan getirin"
+              }
+            ],
+            "body": [
+              {
+                "text": "ARXIV-DISK'i hiçbir yere takmayın. Geri yüklemeyi temiz bir bilgisayarda birlikte yapacağız."
+              }
+            ],
+            "time": "10:30"
+          },
+          "actions": [
+            {
+              "id": "hand-over",
+              "label": "Diski uzmana teslim ediyorum",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Çok iyi. Geri yükleme, temizlenmiş bir bilgisayarda ve bir uzmanın kontrolünde yapılacak."
+            },
+            {
+              "id": "plug",
+              "label": "Diski kendim bu bilgisayara takıyorum",
+              "kind": "plug-in",
+              "outcome": "compromised",
+              "feedback": "Son kopya da zararlı yazılım bulaşmış bilgisayarda şifrelenebilir. Diski yalnızca uzmana verin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "br1-match",
+      "prompt": "Kuralın her parçasını anlamıyla eşleştirin.",
+      "pairs": [
+        {
+          "id": "three",
+          "left": "3 kopya",
+          "right": "Orijinal dosya ve iki yedek"
+        },
+        {
+          "id": "two",
+          "left": "2 farklı ortam",
+          "right": "Örneğin harici bir disk ve onaylı bir bulut"
+        },
+        {
+          "id": "one",
+          "left": "1 kopya başka bir yerde",
+          "right": "Başka bir binada ve ağ dışında"
+        },
+        {
+          "id": "test",
+          "left": "Geri yükleme testi",
+          "right": "Kopyanın açıldığını düzenli olarak kontrol etmek"
+        }
+      ],
+      "explain": "Üç kopya, iki ortam ve başka bir yerde bir kopya olursa biri kaybolduğunda diğeri kalır. Geri yükleme testi, kopyanın çalıştığını kanıtlar."
+    },
+    {
+      "type": "choice",
+      "id": "br1-work-files",
+      "question": {
+        "prompt": "Önemli iş belgelerini nerede saklarsınız?",
+        "options": [
+          {
+            "id": "approved",
+            "label": "Kurumumun onaylı klasöründe",
+            "correct": true,
+            "feedback": "Doğru. Oradaki kopyaları BT destek ekibi oluşturur ve kontrol eder."
+          },
+          {
+            "id": "desktop-usb",
+            "label": "Masaüstünde; akşamları da kendi USB belleğime kopyalıyorum",
+            "correct": false,
+            "feedback": "Kişisel bir USB bellek kaybolabilir ya da ona zararlı yazılım bulaşabilir. Böyle bir kopyayı kimse kontrol etmez."
+          },
+          {
+            "id": "personal-cloud",
+            "label": "Kişisel bulut hesabımda, pratik oluyor",
+            "correct": false,
+            "feedback": "Kişisel bir hesapta iş belgesi kurumunuzun kontrolünden çıkar. Bu da bir veri sızıntısıdır."
+          }
+        ]
+      },
+      "explain": "Onaylı bir yerde saklanan dosyanın kopyasını BT destek ekibi korur ve gerektiğinde geri yükler. Başka bir yerde tutulan iş dosyası ne korunur ne de geri yüklenir."
+    },
+    {
+      "type": "recap",
+      "id": "br1-recap",
+      "points": [
+        "Üç kopya, iki ortam, bir kopya başka bir yerde.",
+        "En az bir kopyayı ağ dışında tutun.",
+        "Geri yüklemeyi düzenli olarak deneyin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

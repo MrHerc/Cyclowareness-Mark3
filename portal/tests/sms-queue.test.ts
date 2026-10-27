@@ -97,3 +97,17 @@ describe("SMS simulations", () => {
     expect(await sendQueuedSms(db)).toBe(1);
   });
 });
+
+describe("launch on the organisation's plan", () => {
+  it("refuses a channel or template the plan no longer includes, scheduled launches too", async () => {
+    await db.update(t.tenants).set({ plan: "essentials" }).where(eq(t.tenants.id, tenantId));
+    const { campaign, res } = await launchSms();
+    expect(res).toEqual({ ok: false, reason: "plan" });
+    expect(await recipients(campaign.id)).toEqual([]);
+    await db.update(t.tenants).set({ plan: "professional", features: { qr_trap: false } }).where(eq(t.tenants.id, tenantId));
+    const [qr] = await db.insert(t.campaigns).values({ tenantId, name: "QR", channel: "email", templateKey: "mfa-qr", audience: "all", status: "scheduled", scheduledAt: new Date() }).returning();
+    expect(await launchCampaign(db, qr.id, null)).toEqual({ ok: false, reason: "plan" });
+    await db.update(t.tenants).set({ plan: "enterprise_hrm", features: {} }).where(eq(t.tenants.id, tenantId));
+    expect((await launchSms()).res).toEqual({ ok: true, count: 3 });
+  });
+});

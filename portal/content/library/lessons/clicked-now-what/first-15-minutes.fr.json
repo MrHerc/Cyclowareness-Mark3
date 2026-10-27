@@ -1,0 +1,323 @@
+{
+ "id": "first-15-minutes",
+ "title": "Les 15 premières minutes",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Vous avez cliqué sur un lien ou saisi votre mot de passe ? Cela peut arriver à tout le monde.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Les quinze premières minutes comptent le plus : les mots de passe volés sont souvent utilisés immédiatement.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "15",
+      "label": "minutes décisives"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Changez le mot de passe sur le vrai site, prévenez l’équipe sécurité et gardez l’e-mail.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Ne cachez rien. Le silence laisse du temps à l’attaquant, alors qu’un signalement honnête protège tout le monde.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "after-the-click",
+   "environment": "desktop",
+   "title": "Vous avez saisi votre mot de passe",
+   "intro": "Vous avez saisi le mot de passe de votre messagerie sur une fausse page, et vous venez de vous en rendre compte. La suite dépend de vous.",
+   "steps": [
+    {
+     "id": "retry-trap",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Échec de la connexion"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Mot de passe incorrect. Réessayez ou utilisez un autre mot de passe."
+        }
+       ]
+      ],
+      "buttons": [
+       "Fermer",
+       "Réessayer"
+      ]
+     },
+     "say": "La page affiche une erreur.",
+     "actions": [
+      {
+       "id": "retry",
+       "label": "Réessayer",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Les faux sites affichent une erreur pour que vous tapiez à nouveau le mot de passe, et parfois même un autre."
+      },
+      {
+       "id": "close",
+       "label": "Fermer",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact, ne saisissez plus rien. Fermez la page et passez à l’étape suivante."
+      }
+     ]
+    },
+    {
+     "id": "the-email",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ispoct-fake",
+      "from": {
+       "name": [
+        {
+         "text": "İşPoçt Admin"
+        }
+       ],
+       "address": [
+        {
+         "text": "admin@ispoct-mail.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Votre messagerie est pleine à 98 %"
+       }
+      ],
+      "time": "09:41",
+      "body": [
+       [
+        {
+         "text": "Augmentez votre espace de stockage pour que vos e-mails ne soient pas supprimés : "
+        },
+        {
+         "text": "ispoct-mail.example.net/yer",
+         "link": {
+          "label": "ispoct-mail.example.net/yer",
+          "href": "https://ispoct-mail.example.net/yer"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "L’e-mail est toujours dans votre boîte de réception.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Grâce à votre signalement, l’équipe sécurité peut aussi retirer cet e-mail des autres boîtes de réception."
+      },
+      {
+       "id": "forward",
+       "label": "Transférer à l’équipe sécurité",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Bien. Faites-le s’il n’y a pas de bouton de signalement, puis appelez aussi l’équipe."
+      },
+      {
+       "id": "delete",
+       "label": "Le supprimer pour que personne ne le voie",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "L’e-mail est une preuve. Une fois supprimé, il ne peut plus aider l’équipe sécurité à remonter la piste de l’attaque."
+      }
+     ]
+    },
+    {
+     "id": "change-password",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "İşPoçt",
+      "url": [
+       {
+        "text": "https://poct.idare.example/parol"
+       }
+      ],
+      "fields": [
+       "Mot de passe actuel",
+       "Nouveau mot de passe"
+      ],
+      "button": "Modifier le mot de passe"
+     },
+     "say": "Vous avez tapé l’adresse vous-même. Changez le mot de passe.",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Modifier le mot de passe",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Exact, ce site est le vrai. Le nouveau mot de passe ne doit pas ressembler à l’ancien."
+      },
+      {
+       "id": "later",
+       "label": "Je le changerai demain",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Les mots de passe volés sont vite utilisés. Attendre laisse du temps à l’attaquant."
+      }
+     ]
+    },
+    {
+     "id": "reused",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Ce mot de passe est utilisé ailleurs"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "L’ancien mot de passe de votre messagerie est aussi utilisé sur le portail de l’entreprise et sur la page Kontakto."
+        }
+       ]
+      ],
+      "buttons": [
+       "Plus tard",
+       "Tout modifier"
+      ]
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "Tout modifier",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Exact. Les attaquants essaient aussi un mot de passe volé sur d’autres sites."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Tous les comptes qui ont le même mot de passe sont maintenant exposés. Changez-les tous aujourd’hui."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "mistake-first-step",
+   "prompt": "Associez chaque erreur à la première chose à faire.",
+   "pairs": [
+    {
+     "id": "clicked",
+     "left": "J’ai cliqué, mais je n’ai rien saisi",
+     "right": "Fermer la page et signaler l’e-mail"
+    },
+    {
+     "id": "password",
+     "left": "J’ai saisi mon mot de passe sur une fausse page",
+     "right": "Le changer sur le vrai site et signaler"
+    },
+    {
+     "id": "code",
+     "left": "J’ai donné mon code de vérification à quelqu’un au téléphone",
+     "right": "Appeler tout de suite l’équipe sécurité"
+    },
+    {
+     "id": "card",
+     "left": "J’ai saisi les données de ma carte bancaire",
+     "right": "Appeler la banque au numéro inscrit sur votre carte"
+    }
+   ],
+   "explain": "Signalez à chaque fois : les spécialistes cherchent des traces que vous ne pouvez pas voir."
+  },
+  {
+   "type": "choice",
+   "id": "approved-push",
+   "question": {
+    "prompt": "Une demande de connexion est arrivée sur votre téléphone, et vous avez appuyé sur « Approuver » par erreur. Que faire ?",
+    "options": [
+     {
+      "id": "report",
+      "label": "J’appelle tout de suite l’équipe sécurité et je change mon mot de passe",
+      "correct": true,
+      "feedback": "Exact. Vous avez laissé entrer l’attaquant ; l’équipe sécurité va l’expulser en fermant les sessions."
+     },
+     {
+      "id": "nothing",
+      "label": "Rien, ce n’était qu’une fois",
+      "correct": false,
+      "feedback": "Une seule approbation suffit : l’attaquant est déjà dans votre compte."
+     },
+     {
+      "id": "phone-off",
+      "label": "J’éteins le téléphone",
+      "correct": false,
+      "feedback": "Éteindre le téléphone ne fait pas sortir l’attaquant. Il est déjà entré."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "mfa-phone"
+    }
+   },
+   "explain": "Une approbation donnée par erreur et un code communiqué appellent la même réaction urgente : signaler immédiatement."
+  },
+  {
+   "type": "password",
+   "id": "new-password",
+   "prompt": "Créez un nouveau mot de passe pour remplacer celui qui a été volé : rien à voir avec l’ancien.",
+   "targetScore": 4,
+   "tips": [
+    "Ne vous contentez pas de retoucher l’ancien : Aysel2027 au lieu d’Aysel2026, ça ne suffit pas",
+    "Assemblez quatre mots pris au hasard, séparés par des espaces",
+    "Enregistrez le nouveau mot de passe dans le gestionnaire de mots de passe"
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Ne saisissez plus rien : fermez la page et gardez l’e-mail.",
+    "Changez le mot de passe sur le vrai site, et partout ailleurs où vous l’avez utilisé.",
+    "Vous avez donné un code ou appuyé sur « Approuver » ? Appelez tout de suite l’équipe sécurité."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

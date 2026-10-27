@@ -1,0 +1,333 @@
+{
+  "id": "lookalike-domains",
+  "title": "Benzer adresler",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ld-tutor",
+      "beats": [
+        {
+          "id": "ld-b1",
+          "say": "Telefonda adres çubuğu kısadır ve adresin büyük kısmı gizli kalır. Dolandırıcılar buna güvenir.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "ld-b2",
+          "say": "Şu adrese bakın: resmî ad başta geliyor, ama sitenin gerçek sahibi sondaki kısımdır.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "url": [
+                {
+                  "text": "https://vetendasportal.gov."
+                },
+                {
+                  "text": "az-arayis.example",
+                  "spot": "real-owner"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "real-owner"
+        },
+        {
+          "id": "ld-b3",
+          "say": "Başka hileler de var: harflerin yeri değişir, bir kelime eklenir ya da bir harfin yerine ona benzeyen bir rakam konur.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "ld-b4",
+          "say": "Adres şüpheliyse hiçbir şey yazmayın, sayfayı kapatın ve BT destek ekibine haber verin.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "ld-match",
+      "prompt": "Her sahte adresi, taklit ettiği resmî adresle eşleştirin.",
+      "pairs": [
+        {
+          "id": "gov",
+          "left": "vetendasportal.gov.az-arayis.example",
+          "right": "vetendasportal.gov.az"
+        },
+        {
+          "id": "sahil",
+          "left": "sahi1bank.example.info",
+          "right": "sahilbank.az"
+        },
+        {
+          "id": "ulduz",
+          "left": "ulduzbnak.example",
+          "right": "ulduzbank.az"
+        },
+        {
+          "id": "mail",
+          "left": "idare-poct-giris.example.info",
+          "right": "poct.idare.example"
+        }
+      ],
+      "explain": "Fark küçüktür: başa konmuş resmî ad, bir rakam, yeri değişmiş iki harf ya da fazladan bir kelime. Adresi her zaman sondan okuyun."
+    },
+    {
+      "type": "simulation",
+      "id": "ld-sim",
+      "environment": "phone",
+      "title": "Telefondan belge almak",
+      "intro": "Telefonunuzdan bir belge almak istiyorsunuz. Her adımda adresi sonuna kadar okuyun.",
+      "steps": [
+        {
+          "id": "search-ad",
+          "label": "Sponsorlu: Vətəndaş Portalı, resmî site",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tapan",
+            "url": [
+              {
+                "text": "https://tapan.example/axtar?q=vetendas+portali+arayis",
+                "reveal": "tapan.example"
+              }
+            ]
+          },
+          "say": "Aramadaki ilk sonuç bir reklam.",
+          "actions": [
+            {
+              "id": "ad",
+              "label": "Reklamı aç",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Reklam sizi başka bir siteye götürdü. Şimdi adresi dikkatle okuyun.",
+              "next": "fake-login"
+            },
+            {
+              "id": "official",
+              "label": "vetendasportal.gov.az sonucunu aç",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "Doğru. Reklamı atlayıp adresi gov.az ile biten sonucu seçtiniz.",
+              "next": "real-login"
+            }
+          ]
+        },
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2c-vetendas-portal-fake",
+            "brand": "Vətəndaş Portalı",
+            "url": [
+              {
+                "text": "https://vetendasportal.gov.az-arayis.example/giris",
+                "reveal": "az-arayis.example"
+              }
+            ],
+            "fields": [
+              "FİN kodu",
+              "Parola"
+            ],
+            "button": "Giriş yap"
+          },
+          "say": "Telefonda adresin yalnızca başı görünür. Sonuna kadar okuyun.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Giriş yap",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Adres gov.az ile başlıyordu ama onunla bitmiyordu. FİN kodunuz ve parolanız dolandırıcıya gitti."
+            },
+            {
+              "id": "close",
+              "label": "Sayfayı kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Sitenin gerçek sahibi adresin sonundadır ve bu adres gov.az ile bitmiyordu.",
+              "next": "real-login"
+            }
+          ]
+        },
+        {
+          "id": "new-login",
+          "label": "10:16 Vətəndaş Portalı",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2c-vetendas-portal",
+            "app": "Vətəndaş Portalı",
+            "title": [
+              {
+                "text": "Yeni giriş"
+              }
+            ],
+            "body": [
+              {
+                "text": "Hesabınıza bilinmeyen bir cihazdan giriş yapıldı."
+              }
+            ],
+            "time": "10:16"
+          },
+          "say": "Bir dakika sonra bu bildirim geldi.",
+          "actions": [
+            {
+              "id": "fix",
+              "label": "Portalı kendim açar ve parolayı değiştiririm",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Doğru. Portalı yer işaretinizden açın, parolayı değiştirin ve tüm cihazlardaki oturumları kapatın."
+            },
+            {
+              "id": "later",
+              "label": "Sonra bakarım",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Dolandırıcı zaten hesabınızın içinde. Her dakika önemli."
+            }
+          ]
+        },
+        {
+          "id": "real-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "w2c-vetendas-portal",
+            "brand": "Vətəndaş Portalı",
+            "url": [
+              {
+                "text": "https://vetendasportal.gov.az/giris",
+                "reveal": "vetendasportal.gov.az"
+              }
+            ],
+            "fields": [
+              "FİN kodu",
+              "Parola"
+            ],
+            "button": "Giriş yap"
+          },
+          "say": "Bu adres gov.az ile bitiyor.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Giriş yap",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Doğru, burası resmî portalın ta kendisi. Şimdi onu yer işaretlerinize ekleyin."
+            },
+            {
+              "id": "check",
+              "label": "Adresi kontrol et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Harika bir alışkanlık. Alan adı gov.az ile bitiyor ve önünde fazladan bir kelime yok."
+            }
+          ]
+        },
+        {
+          "id": "bank-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank-fake",
+            "sender": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "time": "19:42",
+            "messages": [
+              [
+                {
+                  "text": "Kartınız geçici olarak bloke edilmiştir. Blokeyi kaldırmak için: "
+                },
+                {
+                  "text": "sahilbank.az-kart.example/ac",
+                  "link": {
+                    "label": "sahilbank.az-kart.example/ac",
+                    "href": "https://sahilbank.az-kart.example/ac"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Akşam, banka adına bir SMS geliyor.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Bağlantıyı aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Adres bankanın adıyla başlıyor, ama sitenin sahibi sondaki kısımdır. Bankanın uygulamasını kendiniz açın."
+            },
+            {
+              "id": "report",
+              "label": "Spam olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. Kartınızı bankanın uygulamasından ya da kartın arkasındaki numarayı arayarak kontrol edin."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Bu da olur. Emin değilseniz kartınızın arkasındaki numaradan bankayı kendiniz arayın."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "ld-order",
+      "prompt": "Telefonda bir adresi kontrol etme adımlarını sıraya koyun.",
+      "items": [
+        {
+          "id": "tap",
+          "label": "Adresin tamamını görmek için adres çubuğuna dokunun"
+        },
+        {
+          "id": "end",
+          "label": "Alan adının son kısmını bulun"
+        },
+        {
+          "id": "compare",
+          "label": "Resmî adresle harf harf karşılaştırın"
+        },
+        {
+          "id": "leave",
+          "label": "Bir fark varsa hiçbir şey yazmadan kapatın"
+        }
+      ],
+      "explain": "Telefonda adresin sonu çoğu zaman gizlidir, bu yüzden önce adresi tamamen açın. Resmî ad sonda değilse site sahtedir."
+    },
+    {
+      "type": "recap",
+      "id": "ld-recap",
+      "points": [
+        "Telefonda adresin tamamını açın ve sondan okuyun",
+        "Resmî ad başta olsa bile sitenin gerçek sahibi sondaki kısımdır",
+        "Parola yazdıysanız resmî sitede değiştirin ve durumu bildirin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

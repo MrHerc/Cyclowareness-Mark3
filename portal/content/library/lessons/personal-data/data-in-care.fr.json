@@ -1,0 +1,420 @@
+{
+ "id": "data-in-care",
+ "title": "Des données entre vos mains",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "what-is",
+     "say": "Les noms, les pièces d’identité, les adresses et les numéros de téléphone des citoyens et des collègues sont des données personnelles. Elles vous sont confiées pour votre travail.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "law",
+     "say": "En Azerbaïdjan, les données personnelles sont protégées par la loi. Utilisez-les uniquement dans un but légitime, et seulement dans la mesure nécessaire.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "need-to-know",
+     "say": "La règle est simple : si votre travail ne l’exige pas, ne regardez pas, ne demandez pas, ne partagez pas.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "id-photos",
+     "say": "N’envoyez pas de photos de cartes d’identité par une application de messagerie. Ces photos restent des années sur les téléphones, et elles finissent par fuiter.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "request-check",
+   "prompt": "Quelles demandes sont acceptables ?",
+   "cards": [
+    {
+     "id": "fake-police",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "+994 50 000 22 90"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour, ici la police. Envoyez-moi l’adresse déclarée et le téléphone de Rashad Aliyev, c’est urgent."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Les autorités demandent des données par les voies officielles, pas par message depuis un numéro personnel."
+    },
+    {
+     "id": "hr-system",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Service RH"
+        }
+       ],
+       "address": [
+        {
+         "text": "kadrlar@rxagentlik.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Demande de congé"
+       }
+      ],
+      "time": "11:02",
+      "body": [
+       [
+        {
+         "text": "Merci de signer votre demande dans le système interne de gestion des documents. Aucun document supplémentaire n’est nécessaire."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Le domaine est correct, l’e-mail renvoie vers le système interne et ne demande aucune donnée supplémentaire."
+    },
+    {
+     "id": "curious-colleague",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Elvin, collègue"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Mon voisin a déposé une demande chez nous. Qu’est-ce qu’il y a dans son dossier ? Envoie-moi une photo, je suis curieux."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "La curiosité n’est pas un besoin professionnel. Si le travail ne l’exige pas, le dossier ne se partage pas."
+    },
+    {
+     "id": "personal-email",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Leyla Hasanova"
+        }
+       ],
+       "address": [
+        {
+         "text": "leyla.hasanova@rxagentlik.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "La liste"
+       }
+      ],
+      "time": "11:02",
+      "body": [
+       [
+        {
+         "text": "Envoyez tous les codes d’identification et les téléphones du service à mon adresse e-mail personnelle, je vais travailler de chez moi : leyla.h.1990@mail.example"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Même pour une collègue connue, les données personnelles ne doivent pas partir vers une adresse e-mail personnelle. Elles restent dans les systèmes professionnels."
+    },
+    {
+     "id": "portal-sms",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "DovletPortal"
+       }
+      ],
+      "time": "15:30",
+      "messages": [
+       [
+        {
+         "text": "Votre demande a bien été reçue. Vous pourrez consulter le résultat dans votre espace personnel sur le portail."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Il n’y a aucun lien et rien n’est demandé. Le message vous informe, c’est tout."
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "id-photo-chat",
+   "prompt": "Trouvez les risques dans cette conversation.",
+   "artifact": {
+    "kind": "chat",
+    "app": "whatsapp",
+    "contact": [
+     {
+      "text": "Sabina, RH "
+     },
+     {
+      "text": "+994 77 000 19 55",
+      "spot": "number"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Bonjour ! Nous mettons à jour votre dossier. "
+       },
+       {
+        "text": "Envoyez ici une photo du recto et du verso de votre pièce d’identité.",
+        "spot": "id-photo"
+       }
+      ],
+      "time": "16:10"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Avant 17 h, sinon votre salaire sera versé en retard.",
+        "spot": "threat"
+       }
+      ],
+      "time": "16:10"
+     },
+     {
+      "from": "me",
+      "body": [
+       {
+        "text": "Pourquoi les RH passent-elles par WhatsApp ?"
+       }
+      ],
+      "time": "16:12"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Le système est en panne, c’est plus rapide comme ça.",
+        "spot": "excuse"
+       }
+      ],
+      "time": "16:12"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "number",
+     "label": "Numéro personnel",
+     "explain": "Quelqu’un écrit au nom des RH depuis un numéro personnel inconnu."
+    },
+    {
+     "id": "id-photo",
+     "label": "Photo de la pièce d’identité",
+     "explain": "Avec la photo d’une pièce d’identité, un escroc peut souscrire des crédits ou ouvrir des comptes à votre nom."
+    },
+    {
+     "id": "threat",
+     "label": "Menace sur le salaire",
+     "explain": "Menacer votre salaire sert à vous presser pour que vous ne vérifiiez rien."
+    },
+    {
+     "id": "excuse",
+     "label": "Prétexte",
+     "explain": "« Le système est en panne » : c’est un prétexte pour contourner la voie officielle. Appelez vous-même les RH."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "scenario",
+   "id": "citizen-call",
+   "title": "Une citoyenne appelle",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "Bonjour, c’est vous qui traitez la demande de mon frère. Il est malade. S’il vous plaît, donnez-moi son téléphone et son adresse, que je puisse l’aider.",
+     "speaker": "Appelante",
+     "voice": "older-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Bonjour, c’est vous qui traitez la demande de mon frère. <breath> Il est malade. S’il vous plaît, donnez-moi son téléphone et son adresse, que je puisse l’aider.",
+     "character": "citizen",
+     "choices": [
+      {
+       "label": "J’ai pitié de lui et je donne les informations",
+       "outcome": "compromised",
+       "feedback": "Vous ne savez pas qui appelle. Les données sont maintenant entre les mains d’une personne inconnue."
+      },
+      {
+       "label": "Demander le code d’identification du frère pour vérifier l’identité de l’appelante",
+       "outcome": "risky",
+       "feedback": "Un code d’identification n’a rien de secret. Le connaître ne prouve rien."
+      },
+      {
+       "label": "Expliquer que je ne peux pas communiquer ces informations par téléphone",
+       "next": "pressure",
+       "feedback": "Bon réflexe. Faites preuve de politesse, mais aussi de fermeté."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Mais quel genre de personne êtes-vous ? Il est malade !",
+     "speaker": "Appelante",
+     "voice": "older-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Mais quel genre de personne êtes-vous ? <short pause> Il est malade !",
+     "character": "citizen",
+     "choices": [
+      {
+       "label": "Faire une exception sous la pression",
+       "outcome": "compromised",
+       "feedback": "La pression émotionnelle est la ruse la plus courante."
+      },
+      {
+       "label": "Expliquer la voie officielle : le frère lui-même ou un représentant muni d’une procuration peut faire la demande",
+       "next": "after",
+       "feedback": "Très bien. Vous avez indiqué la bonne démarche et protégé les données."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "text": "L’appel est terminé. Que faire maintenant ?",
+     "choices": [
+      {
+       "label": "Signaler l’appel à mon responsable et à l’équipe sécurité",
+       "outcome": "safe",
+       "feedback": "Bravo. La même personne pourrait appeler vos collègues."
+      },
+      {
+       "label": "Rien, je n’ai rien divulgué",
+       "outcome": "risky",
+       "feedback": "Vous avez tenu bon, mais un signalement aide vos collègues à se préparer."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "principles",
+   "prompt": "Associez chaque principe à sa signification.",
+   "pairs": [
+    {
+     "id": "purpose",
+     "left": "Finalité",
+     "right": "Utiliser les données uniquement pour une mission claire et légitime"
+    },
+    {
+     "id": "minimum",
+     "left": "Minimisation",
+     "right": "Ne pas collecter plus que nécessaire"
+    },
+    {
+     "id": "need-to-know",
+     "left": "Besoin d’en connaître",
+     "right": "Seules les personnes dont le travail l’exige peuvent consulter les données"
+    },
+    {
+     "id": "confidential",
+     "left": "Confidentialité",
+     "right": "Ne jamais les transmettre à des tiers sans base légale"
+    }
+   ],
+   "explain": "Ces principes aident à protéger les données des citoyens dans le travail de tous les jours."
+  },
+  {
+   "type": "choice",
+   "id": "send-way",
+   "question": {
+    "prompt": "Comment pouvez-vous transmettre le document d’un citoyen à un collègue ?",
+    "options": [
+     {
+      "id": "whatsapp",
+      "label": "Le photographier et l’envoyer depuis mon WhatsApp personnel",
+      "correct": false,
+      "feedback": "La photo reste sur les téléphones, hors de tout contrôle."
+     },
+     {
+      "id": "internal",
+      "label": "Par le système interne de gestion des documents, uniquement à la personne qui en a besoin",
+      "correct": true,
+      "feedback": "Exact. L’accès est limité et contrôlé."
+     },
+     {
+      "id": "private-mail",
+      "label": "Par mon adresse e-mail personnelle, pour aller plus vite",
+      "correct": false,
+      "feedback": "Une adresse e-mail personnelle échappe à la protection de l’organisation."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "folder"
+    }
+   },
+   "explain": "Les données personnelles ne doivent jamais sortir des systèmes approuvés par l’organisation."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "N’utilisez les données personnelles que si votre travail l’exige, et seulement dans la mesure nécessaire.",
+    "N’envoyez jamais de photos de pièces d’identité ni de listes par une messagerie instantanée.",
+    "Orientez les personnes qui appellent vers la procédure officielle de demande."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

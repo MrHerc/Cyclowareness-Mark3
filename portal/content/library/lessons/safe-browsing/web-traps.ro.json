@@ -1,0 +1,320 @@
+{
+ "id": "web-traps",
+ "title": "Capcane pe web",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "padlock",
+     "say": "Lacătul din bara de adrese spune un singur lucru: conexiunea este criptată. Nu spune cine administrează site-ul.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "read-domain",
+     "say": "Majoritatea site-urilor frauduloase au și ele lacăt. Așa că citiți chiar domeniul.",
+     "mood": "think",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "sahilbank-giris.info",
+         "spot": "domain"
+        },
+        {
+         "text": "/login"
+        }
+       ]
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "search-ads",
+     "say": "Primul rezultat al unei căutări poate fi o reclamă. Escrocii cumpără reclame cu numele unor site-uri cunoscute.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "fake-update",
+     "say": "Dacă un site web spune că browserul dumneavoastră este învechit și vă oferă o actualizare de descărcat, este o capcană. Browserele se actualizează singure.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "warnings",
+     "say": "Dacă browserul afișează un avertisment roșu, întoarceți-vă. Vă oprește ca să vă protejeze.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-portal",
+   "prompt": "Găsiți elementele suspecte ale acestei pagini de conectare.",
+   "artifact": {
+    "kind": "login",
+    "brand": "DövlətPortal",
+    "url": [
+     {
+      "text": "https://",
+      "spot": "padlock"
+     },
+     {
+      "text": "dovletportal-az",
+      "spot": "lookalike"
+     },
+     {
+      "text": ".online",
+      "spot": "tld"
+     },
+     {
+      "text": "/giris"
+     }
+    ],
+    "fields": [
+     "Cod personal de identificare",
+     "Parolă"
+    ],
+    "button": "Conectați-vă"
+   },
+   "spots": [
+    {
+     "id": "padlock",
+     "label": "Lacăt",
+     "explain": "Există un lacăt, dar asta înseamnă doar criptare. Nu dovedește că site-ul este autentic."
+    },
+    {
+     "id": "lookalike",
+     "label": "Nume aproape identic",
+     "explain": "La numele oficial s-au adăugat o cratimă și „az”. Este un domeniu fals, aproape identic cu cel real."
+    },
+    {
+     "id": "tld",
+     "label": "Terminație greșită",
+     "explain": "Domeniul se termină în .online. Portalul oficial se află la dovletportal.az."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "swipe",
+   "id": "click-or-not",
+   "prompt": "Ce linkuri pot fi deschise în siguranță?",
+   "cards": [
+    {
+     "id": "free-download",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://free-download-pdf.top/Sened_pulsuz.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un fișier de program de pe un site de descărcări gratuite este adesea rău intenționat. Obțineți programele prin suportul IT."
+    },
+    {
+     "id": "official",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://dovletportal.az/xidmetler/arayis"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Domeniul este chiar portalul oficial: dovletportal.az. Fără cuvinte sau cratime în plus."
+    },
+    {
+     "id": "subdomain-trick",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://sahilbank.az.hesab-yoxla.info/login"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Domeniul real este ultima parte: hesab-yoxla.info. Partea sahilbank.az din față este doar o momeală."
+    },
+    {
+     "id": "update-exe",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://brauzer-yenile.top/update.exe"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Actualizările browserului nu se descarcă de pe site-uri web. Browserul se actualizează singur."
+    },
+    {
+     "id": "bank-path",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://www.sahilbank.az/az/kartlar"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Domeniul este sahilbank.az. Restul este doar calea către pagină."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "padlock-meaning",
+   "question": {
+    "prompt": "În bara de adrese apare un lacăt. Ce înseamnă?",
+    "options": [
+     {
+      "id": "safe-site",
+      "label": "Site-ul este verificat și sigur",
+      "correct": false,
+      "feedback": "Nu. Și site-urile false obțin ușor un lacăt."
+     },
+     {
+      "id": "encrypted",
+      "label": "Conexiunea dintre dumneavoastră și site este criptată",
+      "correct": true,
+      "feedback": "Corect. Dar site-ul poate fi totuși fals."
+     },
+     {
+      "id": "state-approved",
+      "label": "Site-ul este aprobat de stat",
+      "correct": false,
+      "feedback": "Lacătul nu înseamnă niciun fel de aprobare din partea statului."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://"
+       },
+       {
+        "text": "sahilbank-giris.info",
+        "spot": "domain"
+       },
+       {
+        "text": "/login"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "Lacătul este necesar, dar nu suficient. Citiți întotdeauna domeniul în sine."
+  },
+  {
+   "type": "scenario",
+   "id": "sudden-popup",
+   "title": "O fereastră pop-up neașteptată",
+   "start": "popup",
+   "nodes": [
+    {
+     "id": "popup",
+     "text": "Citiți un site de știri. Brusc, o fereastră roșie umple ecranul: computerul dumneavoastră este infectat, sunați la +994 12 000 04 19. Se aude o alarmă.",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     },
+     "choices": [
+      {
+       "label": "Sunați la numărul afișat",
+       "next": "operator",
+       "feedback": "Este o înșelătorie cu suport tehnic fals. Să vedem ce se întâmplă."
+      },
+      {
+       "label": "Dați clic pe butonul „Curățați”",
+       "outcome": "compromised",
+       "feedback": "Butonul a descărcat malware. Nu dați clic pe nimic într-o astfel de fereastră."
+      },
+      {
+       "label": "Închideți fila sau, dacă e nevoie, tot browserul",
+       "next": "restore",
+       "feedback": "Corect. Fereastra este doar o pagină web, computerul dumneavoastră nu este infectat."
+      }
+     ]
+    },
+    {
+     "id": "operator",
+     "text": "Trebuie să ne conectăm de la distanță la computerul dumneavoastră. Instalați acest program și citiți-mi codul de pe ecran.",
+     "speaker": "Operator",
+     "voice": "man",
+     "channel": "phone",
+     "spoken": "Trebuie să ne conectăm de la distanță la computerul dumneavoastră. <breath> Instalați acest program și citiți-mi codul de pe ecran.",
+     "choices": [
+      {
+       "label": "Instalați programul",
+       "outcome": "compromised",
+       "feedback": "Escrocul are acum acces complet la computerul dumneavoastră. Deconectați-l de la rețea și raportați imediat."
+      },
+      {
+       "label": "Închideți telefonul și anunțați suportul IT",
+       "outcome": "risky",
+       "feedback": "V-ați oprit la timp. Dar nu sunați niciodată la un număr afișat într-o astfel de fereastră."
+      }
+     ]
+    },
+    {
+     "id": "restore",
+     "text": "Redeschideți browserul. Acesta vă propune să restabiliți filele anterioare.",
+     "choices": [
+      {
+       "label": "Nu restabiliți filele și trimiteți un mesaj scurt suportului IT",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Fereastra nu a instalat nimic, iar suportul IT este la curent."
+      },
+      {
+       "label": "Restabiliți filele",
+       "outcome": "risky",
+       "feedback": "Aceeași fereastră falsă se poate deschide din nou. Renunțați la restabilire."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Lacătul înseamnă doar criptare: citiți domeniul.",
+    "Aveți încredere în marcaje sau în adresele pe care le tastați, nu în reclame.",
+    "Ferestrele pop-up de tipul „Actualizați acum” sau „Computerul este infectat” sunt capcane."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,294 @@
+{
+  "id": "deepfake-voice",
+  "title": "Vocea falsă a directorului",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Inteligența artificială poate copia vocea unui lider dintr-o înregistrare scurtă. Discursurile și interviurile sunt suficiente.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": { "kind": "illustration", "id": "deepfake" }
+        },
+        {
+          "id": "b2",
+          "say": "Atât numele, cât și numărul de pe ecran pot fi falsificate. Un apel care pare cunoscut nu este o dovadă.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [{ "text": "Saadat Mammadli" }],
+              "number": [{ "text": "+994 50 000 47 12", "spot": "number" }],
+              "label": "Mobil"
+            }
+          },
+          "highlight": "number"
+        },
+        {
+          "id": "b3",
+          "say": "Stabiliți dinainte o frază de verificare. Dacă apelantul nu o știe, încheiați apelul.",
+          "mood": "talk",
+          "gesture": "shield-up",
+          "visual": { "kind": "illustration", "id": "handshake" }
+        },
+        {
+          "id": "b4",
+          "say": "Cea mai sigură cale: închideți și sunați persoana respectivă chiar dumneavoastră, la numărul pe care îl cunoașteți.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": { "kind": "illustration", "id": "mfa-phone" }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "cloned-call",
+      "environment": "call",
+      "title": "Vocea doamnei viceministru",
+      "intro": "Este ora opt seara. Vă sună telefonul, iar pe ecran apare numele doamnei viceministru.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "caller": [{ "text": "Saadat Mammadli" }],
+            "number": [{ "text": "+994 50 000 47 12" }],
+            "label": "Mobil",
+            "voice": "older-woman"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Răspundeți",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Nu este periculos să răspundeți. Contează ce faceți mai departe."
+            },
+            {
+              "id": "decline",
+              "label": "Respingeți",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Și această variantă este bună. Dacă aveți îndoieli, sunați-o chiar dumneavoastră pe doamna viceministru, la numărul pe care îl cunoașteți.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "request",
+          "artifact": {
+            "kind": "call",
+            "caller": [{ "text": "Saadat Mammadli" }],
+            "number": [{ "text": "+994 50 000 47 12" }],
+            "label": "Mobil",
+            "voice": "older-woman"
+          },
+          "say": "Bună seara, sunt eu, Saadat. Sunt bolnavă și răgușită. Transferați șaptezeci și cinci de mii de manați unui partener, în seara asta, urgent.",
+          "spoken": "Bună seara, sunt eu, Saadat. <throat-clearing> Sunt bolnavă și răgușită. Transferați șaptezeci și cinci de mii de manați unui partener, ăă, în seara asta, urgent.",
+          "actions": [
+            {
+              "id": "phrase",
+              "label": "Vă rog să spuneți fraza noastră de verificare",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Corect. O frază convenită este o verificare mai sigură decât vocea."
+            },
+            {
+              "id": "pay",
+              "label": "Bine, fac transferul acum",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "O voce cunoscută nu mai este o dovadă. Aceasta a fost generată cu inteligență artificială, iar banii sunt pierduți."
+            },
+            {
+              "id": "hang",
+              "label": "Închid și vă sun eu înapoi",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Bună decizie. Acum sunați-o pe doamna viceministru la numărul pe care îl cunoașteți.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pressure",
+          "artifact": {
+            "kind": "call",
+            "caller": [{ "text": "Saadat Mammadli" }],
+            "number": [{ "text": "+994 50 000 47 12" }],
+            "label": "Mobil",
+            "voice": "older-woman"
+          },
+          "say": "Ce frază? N-am timp, mă așteaptă ministrul! Vă trimit documentele mâine, faceți transferul acum.",
+          "spoken": "Ce frază? <breath> N-am timp, mă așteaptă ministrul! Vă trimit documentele mâine, faceți transferul acum.",
+          "actions": [
+            {
+              "id": "hang",
+              "label": "Închideți apelul",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Corect. Un apelant care nu știe fraza și face presiuni este fals."
+            },
+            {
+              "id": "pay",
+              "label": "Bine, fac transferul",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Presiunea arată că cineva încearcă să evite verificarea. Banii s-ar putea să nu se mai întoarcă niciodată."
+            },
+            {
+              "id": "details",
+              "label": "Trimiteți-mi numărul de cont",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Dacă prelungiți discuția, atacatorul are mai multe șanse. Închideți."
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Apelul s-a încheiat. Ce faceți acum?",
+          "artifact": {
+            "kind": "call",
+            "caller": [{ "text": "Saadat Mammadli" }],
+            "number": [{ "text": "+994 50 000 47 12" }],
+            "label": "Mobil",
+            "voice": "older-woman"
+          },
+          "actions": [
+            {
+              "id": "callback",
+              "label": "Sunați la numărul doamnei viceministru din agenda telefonică a organizației",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Corect. Un număr pe care îl formați chiar dumneavoastră demască imediat apelul fals."
+            },
+            {
+              "id": "report",
+              "label": "Raportați incidentul echipei de securitate",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Excelent. Raportul dumneavoastră avertizează departamentul financiar și colegii despre același apel."
+            },
+            {
+              "id": "ignore",
+              "label": "Nu faceți nimic",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Atacatorul ar putea suna acum un alt coleg. Verificați și raportați."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "check-phrase",
+      "question": {
+        "prompt": "Care este o frază de verificare bună?",
+        "options": [
+          {
+            "id": "secret",
+            "label": "Un cuvânt care nu e scris nicăieri și pe care îl știm doar noi doi",
+            "correct": true,
+            "feedback": "Corect. Un cuvânt care nu apare online nu poate fi copiat."
+          },
+          {
+            "id": "birthday",
+            "label": "Data de naștere a doamnei viceministru",
+            "correct": false,
+            "feedback": "O dată de naștere poate fi găsită online."
+          },
+          {
+            "id": "office",
+            "label": "Numele organizației și numărul biroului",
+            "correct": false,
+            "feedback": "Multă lume le știe, deci nu sunt o verificare."
+          }
+        ],
+        "visual": { "kind": "illustration", "id": "key" }
+      },
+      "explain": "Stabiliți fraza în persoană și nu o trimiteți niciodată prin e-mail sau prin mesaj."
+    },
+    {
+      "type": "match",
+      "id": "voice-signs",
+      "prompt": "Asociați fiecare situație cu ce înseamnă.",
+      "pairs": [
+        { "id": "voice", "left": "Vocea este cunoscută", "right": "Nu e o dovadă, poate fi copiată" },
+        { "id": "caller-id", "left": "Un nume cunoscut pe ecran", "right": "Și numărul poate fi falsificat" },
+        { "id": "urgent", "left": "Urgent și secret", "right": "O încercare de a ocoli verificarea" },
+        { "id": "phrase", "left": "Fraza de verificare este corectă", "right": "Cea mai sigură verificare la telefon" }
+      ],
+      "explain": "Aveți încredere în regula convenită, nu în voce sau în numele de pe ecran."
+    },
+    {
+      "type": "scenario",
+      "id": "video-call",
+      "title": "Un apel video",
+      "start": "screen",
+      "nodes": [
+        {
+          "id": "screen",
+          "text": "Trimiteți-i partenerului avansul în seara asta.",
+          "speaker": "Ministrul (apel video, sunetul se întrerupe)",
+          "voice": "older-man",
+          "channel": "video",
+          "spoken": "Trimiteți-i partenerului avansul <short pause> în seara asta.",
+          "character": "minister",
+          "visual": { "kind": "illustration", "id": "deepfake" },
+          "choices": [
+            {
+              "label": "Închei apelul și îl sun pe asistent la numărul pe care îl știu",
+              "next": "assistant",
+              "feedback": "Corect. Și imaginea video poate fi falsificată, iar regula celui de-al doilea canal rămâne valabilă."
+            },
+            {
+              "label": "Îi văd fața, deci e real",
+              "outcome": "compromised",
+              "feedback": "Inteligența artificială poate falsifica și imaginea video. O simplă imagine nu este o dovadă."
+            }
+          ]
+        },
+        {
+          "id": "assistant",
+          "text": "Ministrul este în deplasare și nu a sunat pe nimeni.",
+          "speaker": "Asistentul ministrului",
+          "voice": "man-3",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Ministrul este în deplasare <breath> și nu a sunat pe nimeni.",
+          "character": "assistant",
+          "choices": [
+            {
+              "label": "Raportez echipei de securitate și notez ora și numele contului",
+              "outcome": "safe",
+              "feedback": "Excelent. Aceste notițe îi ajută pe specialiști să reconstituie atacul."
+            },
+            {
+              "label": "Nu s-a transferat niciun ban, așa că nu spun nimănui",
+              "outcome": "risky",
+              "feedback": "Următoarea țintă poate fi doamna viceministru sau departamentul financiar. Raportarea îi protejează pe toți."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "O voce, o față sau un nume cunoscut nu sunt o dovadă.",
+        "Cereți fraza de verificare, închideți și sunați chiar dumneavoastră înapoi.",
+        "Raportați imediat un apel fals echipei de securitate."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

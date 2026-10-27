@@ -1,0 +1,446 @@
+{
+ "id": "ai-fakes",
+ "title": "ШІ-підробки: фото й новини",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "seconds",
+     "say": "Штучний інтелект за лічені секунди створює правдоподібні фото, відео й новини.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "celebrity",
+     "say": "Інвестиційна реклама з фальшивим відео відомої людини — дуже поширене шахрайство.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "db-bulvar-xeber-fake",
+       "from": {
+        "name": [
+         {
+          "text": "BulvarXəbər"
+         }
+        ],
+        "address": [
+         {
+          "text": "xeber@"
+         },
+         {
+          "text": "bulvar-xeber.example.net",
+          "spot": "domain"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Сенсація: відомий телеведучий розкрив секрет у прямому ефірі",
+         "spot": "sensation"
+        }
+       ],
+       "time": "08:05",
+       "body": [
+        [
+         {
+          "text": "Ведучий вклав 250 манатів у нову платформу й тепер заробляє 3000 на місяць.",
+          "spot": "promise"
+         }
+        ],
+        [
+         {
+          "text": "Банки приховують це від вас!",
+          "spot": "secret"
+         }
+        ],
+        [
+         {
+          "text": "Кількість місць обмежена, реєструйтеся лише сьогодні: ",
+          "spot": "rush"
+         },
+         {
+          "text": "neftinvest.example.net",
+          "link": {
+           "label": "neftinvest.example.net",
+           "href": "https://neftinvest.example.net/qeydiyyat"
+          }
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "promise"
+    },
+    {
+     "id": "details",
+     "say": "Пальці, написи й освітлення іноді виглядають неправильно, але помітити це вдається не завжди.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "rule",
+     "say": "Перевіряйте новини на офіційному сайті й ніколи не вірте обіцянкам великих прибутків.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-ad",
+   "prompt": "Знайдіть тривожні ознаки в цьому листі.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "db-bulvar-xeber-fake",
+    "from": {
+     "name": [
+      {
+       "text": "BulvarXəbər"
+      }
+     ],
+     "address": [
+      {
+       "text": "xeber@"
+      },
+      {
+       "text": "bulvar-xeber.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Сенсація: відомий телеведучий розкрив секрет у прямому ефірі",
+      "spot": "sensation"
+     }
+    ],
+    "time": "08:05",
+    "body": [
+     [
+      {
+       "text": "Ведучий вклав 250 манатів у нову платформу й тепер заробляє 3000 на місяць.",
+       "spot": "promise"
+      }
+     ],
+     [
+      {
+       "text": "Банки приховують це від вас!",
+       "spot": "secret"
+      }
+     ],
+     [
+      {
+       "text": "Кількість місць обмежена, реєструйтеся лише сьогодні: ",
+       "spot": "rush"
+      },
+      {
+       "text": "neftinvest.example.net",
+       "link": {
+        "label": "neftinvest.example.net",
+        "href": "https://neftinvest.example.net/qeydiyyat"
+       }
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Фальшивий домен",
+     "explain": "Справжня адреса новинного сайту інша. Читайте адресу до кінця."
+    },
+    {
+     "id": "sensation",
+     "label": "Сенсаційний заголовок",
+     "explain": "Сенсація потрібна, щоб ви натиснули на посилання під впливом емоцій."
+    },
+    {
+     "id": "promise",
+     "label": "Обіцянка великого прибутку",
+     "explain": "Жодна законна інвестиція не обіцяє гарантованого великого прибутку."
+    },
+    {
+     "id": "secret",
+     "label": "Прихований секрет",
+     "explain": "Історія про приховану таємницю відводить вас від офіційних джерел."
+    },
+    {
+     "id": "rush",
+     "label": "Лише сьогодні",
+     "explain": "Поспіх не залишає часу подумати й перевірити."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "invest-browser",
+   "environment": "browser",
+   "title": "По той бік реклами",
+   "intro": "Припустімо, ви перейшли за посиланням із реклами. На кожному кроці на сайті ухвалюйте правильне рішення.",
+   "steps": [
+    {
+     "id": "fake-article",
+     "label": "Ведучий розкрив секрет у прямому ефірі: 3000 на місяць",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-bulvar-xeber-fake",
+      "url": [
+       {
+        "text": "https://",
+        "reveal": "bulvar-xeber.example.net"
+       },
+       {
+        "text": "bulvar-xeber.example.net",
+        "spot": "domain"
+       },
+       {
+        "text": "/neftinvest"
+       }
+      ]
+     },
+     "say": "У відео голос і манера — точнісінько як у ведучого.",
+     "actions": [
+      {
+       "id": "register",
+       "label": "Переглянути відео й зареєструватися",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Відео створено за допомогою штучного інтелекту — ведучий нічого такого не казав. Сторінка веде на шахрайську платформу."
+      },
+      {
+       "id": "close",
+       "label": "Закрити вкладку",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Правильно. Обіцянки великого прибутку й фальшивого домену цілком достатньо.",
+       "next": "real-news"
+      }
+     ]
+    },
+    {
+     "id": "invest-form",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "db-neftinvest",
+      "brand": "NeftInvest Pro",
+      "url": [
+       {
+        "text": "https://neftinvest.example.net/qeydiyyat",
+        "reveal": "neftinvest.example.net"
+       }
+      ],
+      "fields": [
+       "Прізвище та ім’я",
+       "Телефон",
+       "Номер картки",
+       "CVV"
+      ],
+      "button": "Інвестувати 250 манатів"
+     },
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Інвестувати 250 манатів",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Дані вашої картки потрапили до шахраїв, і гроші не повернуться. Негайно зателефонуйте в банк і заблокуйте картку."
+      },
+      {
+       "id": "close",
+       "label": "Закрити вкладку",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Правильно. Дані картки ніколи не вводять на платформі, якої ви не знаєте."
+      }
+     ]
+    },
+    {
+     "id": "real-news",
+     "label": "Ведучий: реклама з моїм ім’ям — фальшива",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-bulvar-xeber",
+      "url": [
+       {
+        "text": "https://bulvar-xeber.example/xeberler/saxta-reklam",
+        "reveal": "bulvar-xeber.example"
+       }
+      ]
+     },
+     "say": "Це справжня адреса новинного сайту.",
+     "actions": [
+      {
+       "id": "read",
+       "label": "Прочитати статтю",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Правильно. Перевірити сумнівну новину в офіційному джерелі — найнадійніший спосіб."
+      },
+      {
+       "id": "share",
+       "label": "Поділитися з рідними",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Гарна ідея. Поширюючи офіційне спростування, ви захищаєте й інших."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "believe-or-check",
+   "prompt": "Цьому можна довіряти чи це небезпечно?",
+   "cards": [
+    {
+     "id": "weather",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "db-bulvar-xeber",
+      "app": "BulvarXəbər",
+      "title": [
+       {
+        "text": "Завтра в Баку очікується дощ"
+       }
+      ],
+      "body": [
+       {
+        "text": "Температура від 14 до 18 градусів."
+       }
+      ],
+      "time": "07:30"
+     },
+     "verdict": "safe",
+     "explain": "Звичайна новина, яка нічого не просить."
+    },
+    {
+     "id": "aid-link",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Група мікрорайону"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Кожна сім’я отримає 500 манатів допомоги, реєструйтеся тут: "
+         },
+         {
+          "text": "yardim-az.example.net",
+          "link": {
+           "label": "yardim-az.example.net",
+           "href": "https://yardim-az.example.net"
+          }
+         }
+        ],
+        "time": "19:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Державна допомога надходить через офіційний портал, а не за посиланням у груповому чаті."
+    },
+    {
+     "id": "crypto-star",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Реклама"
+       }
+      ],
+      "body": [
+       {
+        "text": "Відомий футболіст роздає гроші: введіть дані картки, щоб отримати подарунок."
+       }
+      ],
+      "time": "21:00"
+     },
+     "verdict": "threat",
+     "explain": "Безкоштовні гроші від імені знаменитості — класичне шахрайство. Фото й відео можуть бути створені штучним інтелектом."
+    },
+    {
+     "id": "portal",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "e-xidmet",
+      "app": "e-Xidmət",
+      "title": [
+       {
+        "text": "Статус вашої заяви змінився"
+       }
+      ],
+      "body": [
+       {
+        "text": "Подробиці — в особистому кабінеті на порталі."
+       }
+      ],
+      "time": "10:45"
+     },
+     "verdict": "safe",
+     "explain": "Ні посилання, ні оплати не просять — сповіщення відсилає вас на офіційний портал."
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "check-news",
+   "prompt": "Ви бачите шокувальну новину. Розставте перевірки в правильному порядку.",
+   "items": [
+    {
+     "id": "pause",
+     "label": "Зупиніться й не поширюйте одразу"
+    },
+    {
+     "id": "source",
+     "label": "Подивіться на джерело й адресу сайту"
+    },
+    {
+     "id": "official",
+     "label": "Пошукайте цю новину на офіційному сайті чи в надійному джерелі"
+    },
+    {
+     "id": "decide",
+     "label": "Поширюйте, лише якщо новину підтверджено, а про фейк повідомте"
+    }
+   ],
+   "explain": "Спершу стримайте емоції, потім перевірте. Поширювати — в останню чергу."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Правдоподібні фото й відео можуть бути створені штучним інтелектом.",
+    "Обіцянки великого прибутку чи безкоштовних грошей — це шахрайство.",
+    "Перш ніж поширювати новину, перевірте її в офіційному джерелі."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

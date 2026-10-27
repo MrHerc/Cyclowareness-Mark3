@@ -1,0 +1,323 @@
+{
+  "id": "left-and-found",
+  "title": "Unutulanlar ve bulunanlar",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "usb",
+          "say": "Koridorda bulunan bir USB bellek hediye değildir. Onu asla bilgisayara takmayın, güvenliğe teslim edin.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "usb"
+          }
+        },
+        {
+          "id": "shoulder",
+          "say": "Biri arkanızdan ekranınızı ve klavyenizi izliyor olabilir. Parola yazarken etrafınıza bakın.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "laptop",
+          "say": "Dizüstü bilgisayarınızı arabada ya da kafede asla yalnız bırakmayın. Bir hırsız için bundan kolay ganimet yoktur.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "travel"
+          }
+        },
+        {
+          "id": "check",
+          "say": "Masanızdan ayrılmadan önce kontrol edin: belgeler kilit altında, cihazlar kilitli, çıktılar alınmış olsun.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "desk-pc",
+      "environment": "desktop",
+      "title": "Masanızda",
+      "intro": "Masanızdasınız. Bulunan bir USB bellek, bir yazdırma işi ve yerinizden kalkma konusunda ne yapacağınıza karar verin.",
+      "steps": [
+        {
+          "id": "usb-found",
+          "label": "Asansörün yanında bulundu",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Kadro_azaltma_listesi_2026.xlsx"
+              }
+            ],
+            "type": "lnk",
+            "size": "3 KB",
+            "source": [
+              {
+                "text": "USB: ARSIV (F:)"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "plug",
+              "label": "Takıp bak",
+              "kind": "plug-in",
+              "outcome": "risky",
+              "feedback": "Dosya adı merakınızı kışkırtmak için konmuş bir yem. Bulduğunuz USB belleği bilgisayara takmayın."
+            },
+            {
+              "id": "hand-in",
+              "label": "Güvenliğe teslim et",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. Bulunan bir cihazı asla takmayın, uzmanlara teslim edin.",
+              "next": "print-done"
+            }
+          ]
+        },
+        {
+          "id": "usb-file",
+          "artifact": {
+            "kind": "file",
+            "name": [
+              {
+                "text": "Kadro_azaltma_listesi_2026.xlsx"
+              }
+            ],
+            "type": "lnk",
+            "size": "3 KB",
+            "source": [
+              {
+                "text": "USB: ARSIV (F:)"
+              }
+            ]
+          },
+          "say": "Dosyanın gerçek türüne bakın.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Aç",
+              "kind": "open",
+              "outcome": "compromised",
+              "feedback": "Bu bir tablo değil, bir kısayol. Açtığınızda gizli bir komut çalışır."
+            },
+            {
+              "id": "eject",
+              "label": "Cihazı çıkar",
+              "kind": "eject",
+              "outcome": "safe",
+              "feedback": "Doğru karar. Hiçbir şey açmadan cihazı çıkarın ve güvenliğe teslim edin."
+            }
+          ]
+        },
+        {
+          "id": "print-done",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "db-cap-xidmeti",
+            "app": "Yazdırma hizmeti",
+            "title": [
+              {
+                "text": "Belgeniz yazdırıldı"
+              }
+            ],
+            "body": [
+              {
+                "text": "Vatandaş_başvuruları.pdf, ortak yazıcı, 3. kat"
+              }
+            ],
+            "time": "11:20"
+          },
+          "actions": [
+            {
+              "id": "collect",
+              "label": "Hemen gidip alırım",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Doğru. Ortak yazıcının yanından geçen herkes orada kalan belgeyi okuyabilir."
+            },
+            {
+              "id": "later",
+              "label": "Akşam alırım",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Vatandaşların verileri saatlerce yazıcıda kalacak. Çıktılarınızı hemen alın."
+            }
+          ]
+        },
+        {
+          "id": "leave-desk",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Ekranda vatandaşların verileri açık"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bilgisayar 15 dakika sonra kendiliğinden kilitlenecek."
+                }
+              ]
+            ],
+            "buttons": [
+              "Ekranı kilitle",
+              "Açık bırak"
+            ]
+          },
+          "say": "Yazıcıya gitmek için yerinizden kalkıyorsunuz.",
+          "actions": [
+            {
+              "id": "lock",
+              "label": "Ekranı kilitle",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Doğru. Windows tuşuyla L tuşuna birlikte basmak ekranı bir saniyede kilitler."
+            },
+            {
+              "id": "leave",
+              "label": "Açık bırak, iki dakikaya dönerim",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "İki dakika, birinin verileri okuması ya da göndermesi için yeterlidir."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "cafe-laptop",
+      "title": "Kafede dizüstü bilgisayar",
+      "start": "cafe",
+      "nodes": [
+        {
+          "id": "cafe",
+          "text": "Bir kafede iş bilgisayarınızla çalışıyorsunuz. Siparişinizi almak için kasaya gitmeniz gerekiyor.",
+          "visual": {
+            "kind": "illustration",
+            "id": "travel"
+          },
+          "choices": [
+            {
+              "label": "Açık bırakırım, sadece bir dakika",
+              "outcome": "compromised",
+              "feedback": "Bir dakika, bilgisayarı çalmak için yeterlidir; açık ekran da verileri ortaya serer."
+            },
+            {
+              "label": "Yan masadaki kişiden göz kulak olmasını rica ederim",
+              "outcome": "risky",
+              "feedback": "Bir yabancı cihazınızın bekçisi değildir. Dizüstü bilgisayarınızı yanınıza alın."
+            },
+            {
+              "label": "Bilgisayarın kapağını kapatıp yanıma alırım",
+              "next": "neighbour",
+              "feedback": "Doğru. Cihaz her zaman yanınızda olmalı."
+            }
+          ]
+        },
+        {
+          "id": "neighbour",
+          "text": "Affedersiniz, ekranınızdan gördüm, ajansta çalışıyormuşsunuz. Yöneticinizin adı neydi? Orada bir işim var da.",
+          "speaker": "Yan masadaki adam",
+          "voice": "man-2",
+          "channel": "in-person",
+          "spoken": "Affedersiniz, ekranınızdan gördüm, ajansta çalışıyormuşsunuz. <breath> Yöneticinizin adı neydi? Orada bir işim var da.",
+          "choices": [
+            {
+              "label": "Yöneticimin adını ve dahili numarasını veririm",
+              "outcome": "risky",
+              "feedback": "Tanımadığınız birine kurum içi bilgi vermeyin. Bu bilgiler daha sonra bir arama ya da e-posta için yem olur."
+            },
+            {
+              "label": "Onu resmî sitedeki resepsiyon numarasına yönlendiririm",
+              "outcome": "safe",
+              "feedback": "Kibar davrandınız ve hiçbir kurum içi bilgi vermediniz, tebrikler. Ekranınızı da başkalarının göremeyeceği şekilde tutun."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "found-usb",
+      "prompt": "Koridorda bir USB bellek buldunuz. Adımları sıraya koyun.",
+      "items": [
+        {
+          "id": "no-plug",
+          "label": "Belleği hiçbir bilgisayara takmayın"
+        },
+        {
+          "id": "note",
+          "label": "Nerede ve ne zaman bulduğunuzu not edin"
+        },
+        {
+          "id": "hand-in",
+          "label": "Güvenlik ekibine teslim edin"
+        },
+        {
+          "id": "warn",
+          "label": "İş arkadaşlarınıza benzer bellekleri takmamalarını söyleyin"
+        }
+      ],
+      "explain": "Bulunan bir cihaz delildir: onu açmadan, olduğu gibi teslim edin."
+    },
+    {
+      "type": "match",
+      "id": "left-behind",
+      "prompt": "Her durumu doğru adımla eşleştirin.",
+      "pairs": [
+        {
+          "id": "car",
+          "left": "Dizüstü bilgisayar arabanın koltuğunda",
+          "right": "Yanınıza alın"
+        },
+        {
+          "id": "draft",
+          "left": "Gizli bir taslak sayfa",
+          "right": "Kâğıt öğütücüde imha edin"
+        },
+        {
+          "id": "watcher",
+          "left": "Biri ekranınıza bakıyor",
+          "right": "Ekranı başka yöne çevirin ya da kilitleyin"
+        },
+        {
+          "id": "badge-desk",
+          "left": "Giriş kartınız masanın üzerinde duruyor",
+          "right": "Kartınızı her zaman üzerinizde taşıyın"
+        }
+      ],
+      "explain": "Gözetimsiz bırakılan her şey saldırgan için bir fırsattır."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Bulduğunuz USB belleği asla takmayın, güvenliğe teslim edin.",
+        "Yerinizden kalkarken ekranı kilitleyin, çıktılarınızı hemen alın.",
+        "Dizüstü bilgisayarları ve belgeleri asla gözetimsiz bırakmayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

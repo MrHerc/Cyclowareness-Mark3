@@ -1,0 +1,253 @@
+{
+ "id": "links-attachments",
+ "title": "ბმულები და დანართები",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "read-the-link",
+   "beats": [
+    {
+     "id": "intro",
+     "say": "ბმულის ტექსტი ერთს ამბობს, მისი მისამართი კი სხვას. მოდით, ვისწავლოთ მისამართის წაკითხვა.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": { "kind": "illustration", "id": "browser" }
+    },
+    {
+     "id": "padlock",
+     "say": "ბოქლომი მხოლოდ იმას ნიშნავს, რომ კავშირი დაშიფრულია. ყალბ საიტებსაც აქვთ ბოქლომი.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": { "kind": "illustration", "id": "lock" },
+     "checkpoint": {
+      "prompt": "ამტკიცებს თუ არა ბოქლომი, რომ საიტი ნამდვილია?",
+      "options": [
+       { "id": "yes", "label": "დიახ", "correct": false, "feedback": "არა. თაღლითებიც ადვილად იღებენ ბოქლომს." },
+       { "id": "no", "label": "არა", "correct": true, "feedback": "სწორია. ყოველთვის შეამოწმეთ საიტის სახელი." }
+      ]
+     }
+    },
+    {
+     "id": "owner",
+     "say": "საიტის სახელი პირველ ერთმაგ დახრილ ხაზთან მთავრდება. ბოლო ნაწილი, დაბოლოებასთან ერთად, მფლობელს გვიჩვენებს.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "xidmet-agentliyi-fake",
+       "url": [
+        { "text": "https://" },
+        { "text": "xidmetagentliyi.az.", "spot": "decoy" },
+        { "text": "hesab-yoxla.info", "spot": "real-domain" },
+        { "text": "/giris" }
+       ]
+      }
+     },
+     "highlight": "real-domain"
+    },
+    {
+     "id": "decoy",
+     "say": "წინ დაწერილი ნაცნობი სახელი უბრალოდ შენიღბვაა. ნებისმიერს შეუძლია, ის საკუთარი საიტის სახელის წინ დაწეროს.",
+     "mood": "alert",
+     "gesture": "point-down",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "xidmet-agentliyi-fake",
+       "url": [
+        { "text": "https://" },
+        { "text": "xidmetagentliyi.az.", "spot": "decoy" },
+        { "text": "hesab-yoxla.info", "spot": "real-domain" },
+        { "text": "/giris" }
+       ]
+      }
+     },
+     "highlight": "decoy"
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "whose-link",
+   "question": {
+    "prompt": "სინამდვილეში ვის ეკუთვნის ეს ბმული?",
+    "options": [
+     { "id": "bank", "label": "UlduzBank", "correct": false, "feedback": "ბანკის სახელი წინ წერია, მაგრამ მფლობელი ბოლოში დაწერილი სახელია." },
+     { "id": "owner", "label": "az-giris.info", "correct": true, "feedback": "სწორია. საიტის სახელის ბოლო ნაწილი ნამდვილ მფლობელს გვიჩვენებს." },
+     { "id": "path", "label": "kart", "correct": false, "feedback": "ეს საიტის სახელი არ არის, არამედ გვერდის გზა დახრილი ხაზის შემდეგ." }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ulduzbank-fake",
+      "url": [ { "text": "https://ulduzbank.az-giris.info/kart" } ]
+     }
+    }
+   },
+   "explain": "აქ ulduzbank.az უბრალოდ შენიღბვაა. საიტი az-giris.info-ს ეკუთვნის."
+  },
+  {
+   "type": "simulation",
+   "id": "link-to-login",
+   "environment": "browser",
+   "title": "დაჭერის შემდეგ",
+   "intro": "თქვენ წერილიდან ბმული გახსენით. წაიკითხეთ მისამართი ბრაუზერში და გადაწყვიტეთ, რა გააკეთოთ.",
+   "steps": [
+    {
+     "id": "fake-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "xidmet-agentliyi-fake",
+      "brand": "Xidmət Agentliyi",
+      "url": [
+       { "text": "https://xidmetagentliyi.az.", "reveal": "hesab-yoxla.info" },
+       { "text": "hesab-yoxla.info", "spot": "real-domain" },
+       { "text": "/giris" }
+      ],
+      "fields": [ "ელფოსტა", "პაროლი" ],
+      "button": "შესვლა"
+     },
+     "say": "შეხედეთ მისამართის ბოლოს: ვინ არის ნამდვილი მფლობელი?",
+     "actions": [
+      { "id": "login", "label": "შესვლა", "kind": "enter-credentials", "outcome": "compromised", "feedback": "გვერდი hesab-yoxla.info-ს ეკუთვნის და არა სააგენტოს. ახლავე შეცვალეთ პაროლი და შეატყობინეთ უსაფრთხოების სამსახურს." },
+      { "id": "close", "label": "ჩანართის დახურვა", "kind": "cancel", "outcome": "safe", "feedback": "სწორია. წინ დაწერილი ნაცნობი სახელი მხოლოდ შენიღბვა იყო, ნამდვილი დომენი კი hesab-yoxla.info იყო." },
+      { "id": "report", "label": "საიტის შესახებ შეტყობინება", "kind": "report", "outcome": "safe", "feedback": "შესანიშნავია. როცა შეატყობინებთ, ყალბ საიტს სხვებისთვისაც დაბლოკავენ." }
+     ]
+    },
+    {
+     "id": "download",
+     "label": "ინვოისი იტვირთება",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "ofistechizat-fake",
+      "name": [ { "text": "Faktura_0925.pdf.exe" } ],
+      "type": "exe",
+      "size": "2,1 მბ",
+      "source": [ { "text": "ofis-techizat.com" } ]
+     },
+     "say": "ბრაუზერმა ფაილი ჩამოტვირთა. შეამოწმეთ, რით მთავრდება მისი სახელი.",
+     "actions": [
+      { "id": "open", "label": "გახსნა", "kind": "open-attachment", "outcome": "compromised", "feedback": "ფაილის ნამდვილი ტიპია .exe, ანუ პროგრამა. ინვოისი არასოდეს არის პროგრამა." },
+      { "id": "delete", "label": "წაშლა", "kind": "delete", "outcome": "safe", "feedback": "სწორია. დოკუმენტად შენიღბული პროგრამა წაშალეთ, წერილის შესახებ კი შეატყობინეთ." },
+      { "id": "scan", "label": "ანტივირუსით შემოწმება", "kind": "scan", "outcome": "safe", "feedback": "კარგი ჩვევაა. მაგრამ .pdf.exe-ით დაბოლოებული ფაილი შემოწმების გარეშეც შეგიძლიათ წაშალოთ." }
+     ]
+    },
+    {
+     "id": "real-portal",
+     "label": "პორტალი სანიშნიდან გახსენით",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "xidmet-agentliyi",
+      "brand": "Xidmət Agentliyi",
+      "url": [ { "text": "https://portal.xidmetagentliyi.az/giris", "reveal": "xidmetagentliyi.az" } ],
+      "fields": [ "ელფოსტა", "პაროლი" ],
+      "button": "შესვლა"
+     },
+     "say": "ამჯერად მისამართი თავად გახსენით. ახლა რას იზამთ?",
+     "actions": [
+      { "id": "login", "label": "შესვლა", "kind": "enter-credentials", "outcome": "safe", "feedback": "სწორია. ეს სააგენტოს ოფიციალური დომენია და გვერდი თავად გახსენით." },
+      { "id": "report", "label": "საიტის შესახებ შეტყობინება", "kind": "report", "outcome": "risky", "feedback": "ეს სააგენტოს ოფიციალური პორტალია. საიტს, რომელსაც თავად ხსნით სანიშნიდან, შეგიძლიათ ენდოთ." }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "invoice-trap",
+   "prompt": "იპოვეთ ამ წერილში საგანგაშო ნიშნები.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "ofistechizat-fake",
+    "from": {
+     "name": [ { "text": "OfisTəchizat MMC", "reveal": "hesab@ofis-techizat.com" } ],
+     "address": [ { "text": "hesab@" }, { "text": "ofis-techizat.com", "spot": "sender-domain" } ]
+    },
+    "to": "s.huseynova@xidmetagentliyi.az",
+    "subject": [ { "text": "ინვოისი №0925: გადახდის ვადა გასულია" } ],
+    "time": "14:32",
+    "body": [
+     [ { "text": "გამარჯობა," } ],
+     [
+      { "text": "ვადაგადაცილებული ინვოისი თან ერთვის. " },
+      { "text": "გახსენით და ჩართეთ მაკროები, თორემ ტექსტი არ გამოჩნდება.", "spot": "enable-content" }
+     ],
+     [
+      { "text": "თუ ფაილი არ იხსნება, ჩამოტვირთეთ აქედან: " },
+      { "text": "https://qisa.example/f8Rt", "spot": "short-link" }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [ { "text": "Faktura_0925.pdf.zip", "spot": "double-ext", "reveal": "ფაილის ტიპი: ZIP არქივი (.zip)" } ],
+      "size": "312 კბ"
+     }
+    ]
+   },
+   "spots": [
+    { "id": "sender-domain", "label": "მსგავსი დომენი", "explain": "ნაცნობ მომწოდებელს ჰგავს, მაგრამ დომენი სხვაა. ნამდვილი მისამართი საკუთარ ჩანაწერებში გადაამოწმეთ." },
+    { "id": "enable-content", "label": "მაკროების ჩართვა", "explain": "მაკროებს ფარული ბრძანებების გაშვება შეუძლია. Office ინტერნეტიდან მიღებულ ფაილებში მათ ბლოკავს, ნამდვილი ინვოისი კი არასოდეს მოგთხოვთ ამ დაცვის გვერდის ავლას." },
+    { "id": "short-link", "label": "მოკლე ბმული", "explain": "ვერ ხედავთ, სად მიდის. როცა ფაილის ბმულით ჩამოტვირთვას გაიძულებენ, ეს კლასიკური ხრიკია." },
+    { "id": "double-ext", "label": "ორმაგი გაფართოება", "explain": "სახელი PDF-ის მსგავსად იწყება, მაგრამ სინამდვილეში ეს ZIP არქივია. შიგნით შეიძლება პროგრამა იმალებოდეს." }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "link-check",
+   "prompt": "ეს ბმული უსაფრთხოა თუ სახიფათო?",
+   "cards": [
+    {
+     "id": "home",
+     "artifact": { "kind": "url", "brandRef": "xidmet-agentliyi", "url": [ { "text": "https://xidmetagentliyi.az/elanlar" } ] },
+     "verdict": "safe",
+     "explain": "საიტის სახელი ზუსტად სააგენტოს მისამართს ემთხვევა."
+    },
+    {
+     "id": "portal",
+     "artifact": { "kind": "url", "brandRef": "xidmet-agentliyi", "url": [ { "text": "https://portal.xidmetagentliyi.az/mezuniyyet" } ] },
+     "verdict": "safe",
+     "explain": "წინ დაწერილი „portal“ სააგენტოს საკუთარი განყოფილებაა. ბოლოში მაინც xidmetagentliyi.az წერია."
+    },
+    {
+     "id": "decoy",
+     "artifact": { "kind": "url", "brandRef": "xidmet-agentliyi-fake", "url": [ { "text": "https://xidmetagentliyi.az-portal.info/giris" } ] },
+     "verdict": "threat",
+     "explain": "ბმული az-portal.info-თი მთავრდება. სააგენტოს სახელი უბრალოდ წინ წერია."
+    },
+    {
+     "id": "swap",
+     "artifact": { "kind": "url", "brandRef": "xidmet-agentliyi-fake", "url": [ { "text": "https://xidmetaqentliyi.az/maas" } ] },
+     "verdict": "threat",
+     "explain": "g-ს ნაცვლად q წერია. ეს სულ სხვა საიტია."
+    },
+    {
+     "id": "short",
+     "artifact": { "kind": "url", "url": [ { "text": "https://qisa.example/a8Zq" } ] },
+     "verdict": "threat",
+     "explain": "შემოკლებული ბმული მალავს, სად მიდის. თუ მოულოდნელად მიიღეთ, არ გახსნათ."
+    },
+    {
+     "id": "bank",
+     "artifact": { "kind": "url", "brandRef": "ulduzbank", "url": [ { "text": "https://ulduzbank.az/kartlar" } ] },
+     "verdict": "safe",
+     "explain": "ეს ბანკის საკუთარი მისამართია, რომელიც ulduzbank.az-ით მთავრდება. მაინც ჯობია, ბანკის მისამართი თავად აკრიფოთ."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "საიტის ნამდვილი მფლობელი მისი სახელის ბოლოშია.",
+    "მოკლე ბმულები და მოულოდნელი ფაილები ჯერ შეამოწმეთ.",
+    "თუ ფაილი მაკროების ჩართვას მოგთხოვთ, დახურეთ და შეატყობინეთ."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

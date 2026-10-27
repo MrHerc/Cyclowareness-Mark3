@@ -1,0 +1,379 @@
+{
+  "id": "badge-sense",
+  "title": "بطاقة دخولك",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "key",
+          "say": "بطاقتك مفتاح للمبنى. لا تعرها لأحد أبدًا، ولا حتى لزميل.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          }
+        },
+        {
+          "id": "photos",
+          "say": "لا تنشر صورًا تظهر فيها بطاقتك، فالصورة تسهل تزوير بطاقة مثلها.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "uniform",
+          "say": "قد يأتي المهاجم في زي فني أو مندوب توصيل أو مفتش. والزي الرسمي ليس إثباتًا للهوية.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "lost",
+          "say": "فقدت بطاقتك؟ أبلغ عن ذلك فورًا ليتم إيقافها. وأخفها عندما تغادر المبنى.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "badge-phone",
+      "environment": "phone",
+      "title": "رسائل عن بطاقة الدخول",
+      "intro": "خلال اليوم تصل إلى جوالك رسائل عن بطاقتك. تعامل مع كل رسالة منها بالطريقة الصحيحة.",
+      "steps": [
+        {
+          "id": "borrow",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "إلنور حسينوف"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "مرحبًا، نسيت بطاقتي في البيت. اترك بطاقتك عند نقطة الحراسة، وسأعيدها إليك في المساء."
+                  }
+                ],
+                "time": "08:52"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "lend",
+              "label": "حسنًا، سأتركها هناك",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "كل دخول ببطاقتك يسجل باسمك. لا تعرها أبدًا."
+            },
+            {
+              "id": "decline",
+              "label": "لا، خذ بطاقة مؤقتة من نقطة الحراسة",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "صحيح. في نقطة الحراسة يتحققون من الهوية ويصدرون بطاقة مؤقتة."
+            }
+          ]
+        },
+        {
+          "id": "tagged",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "kontakto",
+            "app": "Kontakto",
+            "title": [
+              {
+                "text": "أشارت إليك غولنار في صورة"
+              }
+            ],
+            "body": [
+              {
+                "text": "«أول يوم مع الفريق!» 24 إعجابًا"
+              }
+            ],
+            "time": "13:15"
+          },
+          "say": "بطاقتك ظاهرة بوضوح في الصورة.",
+          "actions": [
+            {
+              "id": "ask-remove",
+              "label": "أطلب من غولنار أن تغير الصورة",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "صحيح. صورة البطاقة قد تساعد شخصًا على تزويرها أو على دخول المبنى."
+            },
+            {
+              "id": "like",
+              "label": "أضع إعجابًا وأتابع",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "الصورة متاحة للجميع، ويظهر فيها تصميم البطاقة واسمك. لا تشارك صور بطاقة الدخول."
+            }
+          ]
+        },
+        {
+          "id": "recon-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "db-alov-servis-fake",
+            "sender": [
+              {
+                "text": "AlovServis"
+              }
+            ],
+            "time": "15:30",
+            "messages": [
+              [
+                {
+                  "text": "سنأتي غدًا لفحص طفايات الحريق. في أي طابق تقع غرفة الخوادم، ومتى تتغير نوبة الحراسة؟"
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "أرد: الطابق الثالث، 20:00",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "هذا استطلاع تمهيدًا لهجوم. لا تعط أي تفاصيل عن المبنى."
+            },
+            {
+              "id": "report",
+              "label": "أبلغ فريق الأمن السيبراني",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "صحيح. المقاول الحقيقي لا يسألك عن هذا في رسالة نصية."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "لم تفصح عن شيء، وهذا جيد. لكن الإبلاغ يحمي زملاءك أيضًا."
+            }
+          ]
+        },
+        {
+          "id": "badge-phish",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "idare-fake",
+            "sender": [
+              {
+                "text": "Idare"
+              }
+            ],
+            "time": "17:05",
+            "messages": [
+              [
+                {
+                  "text": "صلاحية بطاقة دخولك على وشك الانتهاء. أكمل تحديث بياناتك حتى لا يتم إيقافها:"
+                },
+                {
+                  "text": "kart-yenile.example.net",
+                  "link": {
+                    "label": "kart-yenile.example.net",
+                    "href": "https://kart-yenile.example.net"
+                  }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح الرابط",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "الرابط يقود إلى صفحة مزيفة تطلب كلمة مرور العمل. نقطة الحراسة وحدها هي التي تجدد بطاقات الدخول."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن تصيد",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "صحيح. تعامل مع أمور بطاقة الدخول شخصيًا في نقطة الحراسة."
+            },
+            {
+              "id": "block",
+              "label": "حظر",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "جيد. والأفضل من ذلك أن تبلغ فريق الأمن السيبراني أيضًا."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "uniform",
+      "title": "الزائر بالزي الرسمي",
+      "start": "door",
+      "nodes": [
+        {
+          "id": "door",
+          "text": "مرحبًا، نحن من Alov Servis، جئنا لفحص طفايات الحريق. افتح غرفة الخوادم، ففيها طفاية أيضًا.",
+          "speaker": "رجل بزي رسمي",
+          "voice": "man",
+          "channel": "in-person",
+          "spoken": "مرحبًا، نحن من Alov Servis، جئنا لفحص طفايات الحريق. <breath> افتح غرفة الخوادم، ففيها طفاية أيضًا.",
+          "visual": {
+            "kind": "illustration",
+            "id": "badge-id"
+          },
+          "choices": [
+            {
+              "label": "أفتح غرفة الخوادم",
+              "outcome": "compromised",
+              "feedback": "الزي الرسمي وصندوق العدة لا يثبتان الهوية. لا يدخل أحد غرفة الخوادم دون تحقق."
+            },
+            {
+              "label": "أطلب بطاقة الزائر وأمر العمل",
+              "next": "paper",
+              "feedback": "جيد. لنر ما الذي سيقدمه."
+            },
+            {
+              "label": "أتصل بالحراس",
+              "next": "guard",
+              "feedback": "صحيح. دع الحراس يقررون."
+            }
+          ]
+        },
+        {
+          "id": "paper",
+          "text": "الأوراق في السيارة. نحن نأتي كل شهر، ألا تعرفني؟",
+          "speaker": "رجل بزي رسمي",
+          "voice": "man",
+          "channel": "in-person",
+          "spoken": "الأوراق في السيارة. <short pause> نحن نأتي كل شهر، ألا تعرفني؟",
+          "choices": [
+            {
+              "label": "آه، صحيح، تفضل",
+              "outcome": "compromised",
+              "feedback": "الإحساس بأنك تعرفه جزء من الحيلة. لا دخول بلا بطاقة زائر."
+            },
+            {
+              "label": "أتصل بالحراس",
+              "next": "guard",
+              "feedback": "صحيح. دع الحراس يقررون."
+            }
+          ]
+        },
+        {
+          "id": "guard",
+          "text": "لا يوجد أي فحص مقرر مع Alov Servis هذا الشهر. وقد اتجه الرجل نحو المخرج.",
+          "speaker": "حارس الأمن",
+          "voice": "older-man",
+          "channel": "in-person",
+          "manner": "firm",
+          "spoken": "لا يوجد أي فحص مقرر مع Alov Servis هذا الشهر. <breath> وقد اتجه الرجل نحو المخرج.",
+          "character": "guard",
+          "choices": [
+            {
+              "label": "أكتب إلى فريق الأمن السيبراني وأصف الرجل",
+              "outcome": "safe",
+              "feedback": "رائع. سيراجعون الكاميرات وينبهون الحراس عند المداخل الأخرى."
+            },
+            {
+              "label": "لقد غادر، فلا توجد مشكلة",
+              "outcome": "risky",
+              "feedback": "قد يعود في يوم آخر أو من باب آخر. الإبلاغ مهم."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "badge-rules",
+      "prompt": "طابق كل موقف مع الخطوة الصحيحة.",
+      "pairs": [
+        {
+          "id": "lend",
+          "left": "يطلب منك زميل بطاقتك",
+          "right": "وجهه إلى نقطة الحراسة"
+        },
+        {
+          "id": "photo",
+          "left": "يجري التقاط صورة جماعية للفريق",
+          "right": "أخف البطاقة أولًا"
+        },
+        {
+          "id": "outside",
+          "left": "تذهب للتسوق بعد العمل",
+          "right": "ضع البطاقة في حقيبتك"
+        },
+        {
+          "id": "no-badge",
+          "left": "فني بزي رسمي ليست معه بطاقة زائر",
+          "right": "اتصل بالحراس"
+        }
+      ],
+      "explain": "بطاقتك هي هويتك. استخدمها داخل المبنى فقط، ولا تدع أحدًا غيرك يستخدمها."
+    },
+    {
+      "type": "choice",
+      "id": "why-hide",
+      "question": {
+        "prompt": "لماذا تخفي بطاقتك خارج المبنى؟",
+        "options": [
+          {
+            "id": "dirt",
+            "label": "حتى لا تتسخ",
+            "correct": false,
+            "feedback": "السبب أمني، ولا علاقة له بالنظافة."
+          },
+          {
+            "id": "target",
+            "label": "لأنها تكشف اسمك ومكان عملك، ويمكن سرقتها",
+            "correct": true,
+            "feedback": "صحيح: البطاقة الظاهرة تدل المهاجم على من يستهدف. وبعض البطاقات يمكن نسخها عن قرب."
+          },
+          {
+            "id": "rule",
+            "label": "إنها مجرد قاعدة",
+            "correct": false,
+            "feedback": "هناك سبب: البطاقة تحميك وتحمي المبنى."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "badge-id"
+        }
+      },
+      "explain": "ضع البطاقة في مكان ظاهر داخل المبنى، وأخفها عندما تغادر."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "لا تعر بطاقتك لأحد، ولا تنشر صورًا لها.",
+        "الزي الرسمي ليس إثباتًا للهوية: لا دخول بلا بطاقة زائر.",
+        "فقدت بطاقتك؟ أبلغ عن ذلك فورًا."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

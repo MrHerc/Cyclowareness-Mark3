@@ -1,0 +1,532 @@
+{
+ "id": "ai-lures-fake-apps",
+ "title": "Pièges fabriqués par l’IA",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l2-tutor",
+   "beats": [
+    {
+     "id": "l2-b1",
+     "say": "L’IA aide aussi les escrocs : des e-mails impeccables, des voix convaincantes, de fausses applications.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "l2-b2",
+     "say": "Un e-mail d’hameçonnage peut désormais ne contenir aucune faute. Vérifiez l’expéditeur et la demande, pas la grammaire.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "idare-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Narmin Huseynova"
+         }
+        ],
+        "address": [
+         {
+          "text": "n.huseynova@"
+         },
+         {
+          "text": "idare-mail.test",
+          "spot": "domain"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Données pour le rapport"
+        }
+       ],
+       "time": "09:10",
+       "body": [
+        [
+         {
+          "text": "Bonjour, je me permets de vous solliciter pour un petit service concernant le rapport que nous remettons au ministère."
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "l2-b3",
+     "say": "Les applications de chatbot « Pro » gratuites et les extensions de navigateur peuvent voler vos données.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    },
+    {
+     "id": "l2-b4",
+     "say": "N’installez des applications et des extensions qu’à partir d’une source approuvée par votre institution.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "l2-sim",
+   "environment": "browser",
+   "title": "Version Pro gratuite",
+   "intro": "Une publicité vous a proposé un chatbot « Pro » gratuit. Examinez les pages et décidez à chaque étape.",
+   "steps": [
+    {
+     "id": "pro-page",
+     "label": "NeyroSöhbət Pro : toutes les fonctionnalités gratuitement",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "neyrosohbet-fake",
+      "url": [
+       {
+        "text": "https://neyrosohbet-pro.test",
+        "reveal": "neyrosohbet-pro.test"
+       }
+      ]
+     },
+     "say": "Regardez la barre d’adresse.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Installer l’extension",
+       "kind": "install",
+       "outcome": "risky",
+       "feedback": "Installer une extension depuis un site non officiel est risqué. N’installez d’extensions que depuis une source autorisée par votre institution."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. La version « Pro gratuite » d’un service ne se distribue pas sur un site qui n’est pas le sien.",
+       "next": "fake-login"
+      }
+     ]
+    },
+    {
+     "id": "extension",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "neyrosohbet-fake",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Ajouter « NeyroSöhbət Pro » ?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Cette extension peut lire et modifier toutes vos données sur tous les sites que vous consultez."
+        }
+       ]
+      ],
+      "buttons": [
+       "Annuler",
+       "Ajouter l’extension"
+      ]
+     },
+     "actions": [
+      {
+       "id": "add",
+       "label": "Ajouter l’extension",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "L’extension voit maintenant votre messagerie électronique professionnelle et chaque page que vous ouvrez. Supprimez-la et prévenez l’équipe sécurité."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Une extension de chatbot n’a pas besoin de lire tous les sites web."
+      }
+     ]
+    },
+    {
+     "id": "fake-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "neyrosohbet-fake",
+      "brand": "NeyroSöhbət",
+      "url": [
+       {
+        "text": "https://neyrosohbet.login-pro.test",
+        "reveal": "login-pro.test"
+       }
+      ],
+      "fields": [
+       "Adresse e-mail professionnelle",
+       "Mot de passe"
+      ],
+      "button": "Se connecter"
+     },
+     "actions": [
+      {
+       "id": "login",
+       "label": "Se connecter",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Votre mot de passe professionnel a été envoyé à un escroc. Modifiez-le immédiatement et signalez l’incident."
+      },
+      {
+       "id": "close",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Cette adresse n’est pas le domaine du service."
+      },
+      {
+       "id": "report",
+       "label": "Signaler le site",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bravo. Signaler un faux site protège aussi les autres."
+      }
+     ]
+    },
+    {
+     "id": "setup-file",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "zeka-foto",
+      "name": [
+       {
+        "text": "ZekaFoto_AI_Setup.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "48 Mo",
+      "source": [
+       {
+        "text": "zeka-foto-free.test"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Ce programme ne vient pas d’une source officielle et peut être malveillant. Sur les ordinateurs professionnels, c’est le support technique qui installe les programmes."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Exact. Les programmes « IA » gratuits sont un déguisement très courant pour les logiciels malveillants."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l2-hotspot",
+   "prompt": "Trouvez les pièges dans cet e-mail rédigé dans une langue impeccable.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "idare-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Narmin Huseynova"
+      }
+     ],
+     "address": [
+      {
+       "text": "n.huseynova@"
+      },
+      {
+       "text": "idare-mail.test",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Urgent : "
+     },
+     {
+      "text": "aujourd’hui avant 15:00",
+      "spot": "deadline"
+     }
+    ],
+    "time": "09:10",
+    "body": [
+     [
+      {
+       "text": "Bonjour, nous préparons un rapport pour le ministère."
+      }
+     ],
+     [
+      {
+       "text": "Merci de renseigner les numéros d’identité et de téléphone de toutes les personnes du service",
+       "spot": "request"
+      },
+      {
+       "text": " "
+      },
+      {
+       "text": "dans ce formulaire",
+       "spot": "link",
+       "link": {
+        "label": "dans ce formulaire",
+        "href": "https://forma-yukle.test/idare"
+       }
+      },
+      {
+       "text": "."
+      }
+     ],
+     [
+      {
+       "text": "Ne m’appelez pas, je suis en réunion.",
+       "spot": "no-call"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Domaine externe",
+     "explain": "Le nom de la responsable vous est familier, mais le domaine n’est pas celui de l’institution. Une langue parfaite ne cache pas ce détail."
+    },
+    {
+     "id": "deadline",
+     "label": "Délai très court",
+     "explain": "L’urgence ne laisse pas le temps de vérifier."
+    },
+    {
+     "id": "request",
+     "label": "Demande de données personnelles",
+     "explain": "Les numéros d’identité et de téléphone de vos collègues ne se saisissent pas dans un formulaire externe."
+    },
+    {
+     "id": "link",
+     "label": "Formulaire externe",
+     "explain": "Ce formulaire n’est pas dans le système de l’institution. Personne ne sait entre quelles mains les données vont finir."
+    },
+    {
+     "id": "no-call",
+     "label": "« Ne m’appelez pas »",
+     "explain": "Cette phrase sert à vous empêcher de vérifier. C’est justement pour cela qu’il faut appeler le numéro que vous connaissez."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "l2-swipe",
+   "prompt": "Fiable ou piège ?",
+   "cards": [
+    {
+     "id": "voice-note",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Responsable"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour, c’est moi. Envoyez tout de suite le code de confirmation à ce numéro, je vous expliquerai plus tard."
+         }
+        ],
+        "voice": "man-2",
+        "spoken": "Bonjour, c’est moi. <breath> Envoyez tout de suite le code de confirmation à ce numéro, je vous expliquerai plus tard."
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une voix peut être imitée grâce à l’IA. Appelez vous-même votre responsable, au numéro que vous connaissez."
+    },
+    {
+     "id": "photo-perms",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "zeka-foto",
+      "app": "Zəka Foto",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Appareil photo"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Galerie photos"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Contacts"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Lire les SMS"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une application de retouche photo n’a besoin ni de vos contacts ni de vos SMS. N’installez pas une application qui demande des autorisations superflues."
+    },
+    {
+     "id": "komekci-notif",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "idare-komekci",
+      "app": "İdarə Köməkçisi",
+      "title": [
+       {
+        "text": "Votre résumé est prêt"
+       }
+      ],
+      "body": [
+       {
+        "text": "Vous pouvez l’ouvrir sur le portail interne."
+       }
+      ],
+      "time": "11:05"
+     },
+     "verdict": "safe",
+     "explain": "L’outil approuvé par l’institution envoie une notification attendue, sans lien et sans demande de code."
+    },
+    {
+     "id": "pro-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "neyrosohbet-fake",
+      "sender": [
+       {
+        "text": "NeyroPro"
+       }
+      ],
+      "time": "12:30",
+      "messages": [
+       [
+        {
+         "text": "NeyroSöhbət Pro gratuit pendant 1 an ! Activez-le ici : neyrosohbet-pro.test"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une offre Pro gratuite peut être un piège. Vérifiez votre abonnement uniquement dans l’application officielle du service."
+    },
+    {
+     "id": "approved-list",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "Support technique"
+        }
+       ],
+       "address": [
+        {
+         "text": "destek@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Outils d’IA approuvés"
+       }
+      ],
+      "time": "14:00",
+      "body": [
+       [
+        {
+         "text": "La liste se trouve sur le portail interne. Si vous avez besoin d’un nouvel outil, envoyez-nous une demande."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "L’e-mail vient d’une adresse interne, sans lien ni fichier. C’est une information utile."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "l2-choice",
+   "question": {
+    "prompt": "Une extension de navigateur demande à « lire toutes vos données sur tous les sites web ». Qu’est-ce que cela signifie ?",
+    "options": [
+     {
+      "id": "normal",
+      "label": "Toutes les extensions demandent cela, c’est normal",
+      "correct": false,
+      "feedback": "C’est l’autorisation la plus large qui existe. L’extension peut voir votre messagerie et les pages où vous saisissez vos mots de passe."
+     },
+     {
+      "id": "sees-all",
+      "label": "Elle peut voir toutes les pages que j’ouvre, y compris ma messagerie professionnelle",
+      "correct": true,
+      "feedback": "Exact. N’installez une telle extension que si votre institution l’a vérifiée et approuvée."
+     },
+     {
+      "id": "only-ai",
+      "label": "Elle ne verra que la page du chatbot",
+      "correct": false,
+      "feedback": "Non. « Tous les sites web », cela veut vraiment dire tous les sites web."
+     }
+    ]
+   },
+   "explain": "Aussi utile qu’une extension paraisse, ce sont ses autorisations qui montrent ce qu’elle peut faire."
+  },
+  {
+   "type": "recap",
+   "id": "l2-recap",
+   "points": [
+    "Une langue impeccable ne rend pas un e-mail authentique : vérifiez l’expéditeur et la demande.",
+    "N’installez des applications et des extensions « Pro » qu’à partir d’une source approuvée.",
+    "Si une voix familière vous demande de l’argent ou un code, appelez vous-même le numéro que vous connaissez."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

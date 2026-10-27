@@ -47,7 +47,7 @@ export function DepartmentsTree({ departments, people }: { departments: Dept[]; 
     if (!visible) return null;
     return (
       <li key={d.id}>
-        <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3.5 hover:bg-sunken/40" style={{ paddingLeft: `${1 + depth * 1.75}rem` }}>
+        <div className="flex flex-wrap items-center gap-3 border-b border-line px-4 py-3.5 hover:bg-sunken/40" style={{ paddingInlineStart: `${1 + depth * 1.75}rem` }}>
           {depth ? <CornerDownRight className="size-4 text-ink-disabled" /> : <FolderTree className="size-4 text-brand-600" />}
           <div className="min-w-0 flex-1">
             <p className="text-body-sm font-semibold">{d.name}</p>
@@ -84,10 +84,10 @@ export function DepartmentsTree({ departments, people }: { departments: Dept[]; 
       <div className="flex flex-wrap items-center gap-3">
         <label className="relative w-full sm:w-80">
           <span className="sr-only">{t("search")}</span>
-          <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-ink-subtle" />
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="pl-10" />
+          <Search className="pointer-events-none absolute top-1/2 start-3.5 size-4 -translate-y-1/2 text-ink-subtle" />
+          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} className="ps-10" />
         </label>
-        <Button className="ml-auto" icon={<Plus />} onClick={() => setEdit({ name: "", parentId: null, headUserId: null, mode: "add" })}>
+        <Button className="ms-auto" icon={<Plus />} onClick={() => setEdit({ name: "", parentId: null, headUserId: null, mode: "add" })}>
           {t("add")}
         </Button>
       </div>

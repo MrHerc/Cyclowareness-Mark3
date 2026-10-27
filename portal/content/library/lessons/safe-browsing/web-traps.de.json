@@ -1,0 +1,320 @@
+{
+  "id": "web-traps",
+  "title": "Fallen im Web",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "padlock",
+          "say": "Das Schloss-Symbol in der Adresszeile sagt nur eines: Die Verbindung ist verschlüsselt. Wer die Website betreibt, verrät es nicht.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "read-domain",
+          "say": "Die meisten betrügerischen Websites haben ebenfalls ein Schloss-Symbol. Lesen Sie deshalb die Domain selbst.",
+          "mood": "think",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "sahilbank-giris.info",
+                  "spot": "domain"
+                },
+                {
+                  "text": "/login"
+                }
+              ]
+            }
+          },
+          "highlight": "domain"
+        },
+        {
+          "id": "search-ads",
+          "say": "Das oberste Suchergebnis kann eine Anzeige sein. Kriminelle kaufen Anzeigen mit den Namen bekannter Websites.",
+          "mood": "talk",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "fake-update",
+          "say": "Wenn eine Website behauptet, Ihr Browser sei veraltet, und ein Update zum Herunterladen anbietet, ist das eine Falle. Browser aktualisieren sich selbst.",
+          "mood": "alert",
+          "visual": {
+            "kind": "illustration",
+            "id": "update"
+          }
+        },
+        {
+          "id": "warnings",
+          "say": "Wenn Ihr Browser eine rote Warnung anzeigt, gehen Sie zurück. Er hält Sie auf, um Sie zu schützen.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "fake-portal",
+      "prompt": "Finden Sie die verdächtigen Stellen auf dieser Anmeldeseite.",
+      "artifact": {
+        "kind": "login",
+        "brand": "DövlətPortal",
+        "url": [
+          {
+            "text": "https://",
+            "spot": "padlock"
+          },
+          {
+            "text": "dovletportal-az",
+            "spot": "lookalike"
+          },
+          {
+            "text": ".online",
+            "spot": "tld"
+          },
+          {
+            "text": "/giris"
+          }
+        ],
+        "fields": [
+          "Persönliche ID-Nummer",
+          "Passwort"
+        ],
+        "button": "Anmelden"
+      },
+      "spots": [
+        {
+          "id": "padlock",
+          "label": "Schloss-Symbol",
+          "explain": "Das Schloss-Symbol ist da, bedeutet aber nur Verschlüsselung. Es beweist nicht, dass die Website echt ist."
+        },
+        {
+          "id": "lookalike",
+          "label": "Täuschend ähnlicher Name",
+          "explain": "An den offiziellen Namen wurden ein Bindestrich und „az“ angehängt. Das ist eine gefälschte, täuschend ähnliche Domain."
+        },
+        {
+          "id": "tld",
+          "label": "Falsche Endung",
+          "explain": "Die Domain endet auf .online. Das offizielle Portal ist unter dovletportal.az erreichbar."
+        }
+      ],
+      "minToFind": 2
+    },
+    {
+      "type": "swipe",
+      "id": "click-or-not",
+      "prompt": "Welche Links können Sie gefahrlos öffnen?",
+      "cards": [
+        {
+          "id": "free-download",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://free-download-pdf.top/Sened_pulsuz.exe"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Eine Programmdatei von einer Gratis-Download-Seite ist oft schädlich. Beziehen Sie Software über den IT-Support."
+        },
+        {
+          "id": "official",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://dovletportal.az/xidmetler/arayis"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Die Domain ist das offizielle Portal selbst: dovletportal.az. Keine zusätzlichen Wörter, keine Bindestriche."
+        },
+        {
+          "id": "subdomain-trick",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://sahilbank.az.hesab-yoxla.info/login"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Die echte Domain ist der letzte Teil: hesab-yoxla.info. Das „sahilbank.az“ davor ist nur ein Köder."
+        },
+        {
+          "id": "update-exe",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://brauzer-yenile.top/update.exe"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Browser-Updates lädt man nicht von Websites herunter. Der Browser aktualisiert sich selbst."
+        },
+        {
+          "id": "bank-path",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://www.sahilbank.az/az/kartlar"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Die Domain ist sahilbank.az. Der Rest ist nur der Pfad zur Seite."
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "padlock-meaning",
+      "question": {
+        "prompt": "In der Adresszeile ist ein Schloss-Symbol zu sehen. Was bedeutet das?",
+        "options": [
+          {
+            "id": "safe-site",
+            "label": "Die Website ist geprüft und sicher",
+            "correct": false,
+            "feedback": "Nein. Auch gefälschte Websites bekommen ganz leicht ein Schloss-Symbol."
+          },
+          {
+            "id": "encrypted",
+            "label": "Die Verbindung zwischen Ihnen und der Website ist verschlüsselt",
+            "correct": true,
+            "feedback": "Richtig. Die Website kann aber trotzdem gefälscht sein."
+          },
+          {
+            "id": "state-approved",
+            "label": "Die Website ist staatlich zugelassen",
+            "correct": false,
+            "feedback": "Das Schloss-Symbol ist keinerlei staatliche Zulassung."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://"
+              },
+              {
+                "text": "sahilbank-giris.info",
+                "spot": "domain"
+              },
+              {
+                "text": "/login"
+              }
+            ]
+          }
+        }
+      },
+      "explain": "Das Schloss-Symbol ist notwendig, reicht aber nicht aus. Lesen Sie immer die Domain selbst."
+    },
+    {
+      "type": "scenario",
+      "id": "sudden-popup",
+      "title": "Plötzliches Pop-up",
+      "start": "popup",
+      "nodes": [
+        {
+          "id": "popup",
+          "text": "Sie lesen ein Nachrichtenportal. Plötzlich füllt ein rotes Fenster den Bildschirm: „Ihr Computer ist infiziert, rufen Sie +994 12 000 04 19 an.“ Ein Alarmton ertönt.",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          },
+          "choices": [
+            {
+              "label": "Die Nummer anrufen",
+              "next": "operator",
+              "feedback": "Das ist die Betrugsmasche mit dem falschen Tech-Support. Mal sehen, wie es weitergeht."
+            },
+            {
+              "label": "Auf „Bereinigen“ klicken",
+              "outcome": "compromised",
+              "feedback": "Die Schaltfläche hat Schadsoftware heruntergeladen. Klicken Sie in einem solchen Fenster auf nichts."
+            },
+            {
+              "label": "Den Tab schließen, notfalls den ganzen Browser",
+              "next": "restore",
+              "feedback": "Richtig. Das Fenster ist nur eine Webseite, Ihr Computer ist nicht infiziert."
+            }
+          ]
+        },
+        {
+          "id": "operator",
+          "text": "Wir müssen uns per Fernzugriff mit Ihrem Computer verbinden. Installieren Sie dieses Programm und lesen Sie mir den Code auf dem Bildschirm vor.",
+          "speaker": "Mitarbeiter der Hotline",
+          "voice": "man",
+          "channel": "phone",
+          "spoken": "Wir müssen uns per Fernzugriff mit Ihrem Computer verbinden. <breath> Installieren Sie dieses Programm und lesen Sie mir den Code auf dem Bildschirm vor.",
+          "choices": [
+            {
+              "label": "Das Programm installieren",
+              "outcome": "compromised",
+              "feedback": "Der Betrüger hat jetzt vollen Zugriff auf Ihren Computer. Trennen Sie ihn vom Netzwerk und melden Sie den Vorfall sofort."
+            },
+            {
+              "label": "Auflegen und den IT-Support informieren",
+              "outcome": "risky",
+              "feedback": "Sie haben rechtzeitig aufgehört. Rufen Sie aber nie eine Nummer aus einem solchen Fenster an."
+            }
+          ]
+        },
+        {
+          "id": "restore",
+          "text": "Sie öffnen den Browser erneut. Er bietet an, die vorherigen Tabs wiederherzustellen.",
+          "choices": [
+            {
+              "label": "Nicht wiederherstellen und dem IT-Support kurz Bescheid geben",
+              "outcome": "safe",
+              "feedback": "Gut gemacht. Das Fenster hat nichts installiert, und der IT-Support weiß Bescheid."
+            },
+            {
+              "label": "Tabs wiederherstellen",
+              "outcome": "risky",
+              "feedback": "Dasselbe gefälschte Fenster kann sich wieder öffnen. Verzichten Sie auf die Wiederherstellung."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Das Schloss-Symbol bedeutet nur Verschlüsselung – lesen Sie die Domain.",
+        "Vertrauen Sie Lesezeichen oder selbst eingetippten Adressen, nicht Anzeigen.",
+        "Pop-ups wie „Jetzt aktualisieren“ oder „Sie sind infiziert“ sind Fallen."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

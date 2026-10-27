@@ -1,0 +1,478 @@
+{
+ "id": "phone-backup",
+ "title": "Copia de rezervă a telefonului",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "br2-tutor",
+   "beats": [
+    {
+     "id": "br2-b1",
+     "say": "Când pierdeți telefonul, cea mai mare pierdere sunt adesea fotografiile de familie. Ca să le protejați, ajung câteva minute.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "br2-b2",
+     "say": "Dacă ați văzut o astfel de notificare, fotografiile din ultimele luni nu au nicio copie.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2f-telefon-ayarlari",
+       "app": "Setări",
+       "title": [
+        {
+         "text": "Copia de rezervă este dezactivată"
+        }
+       ],
+       "body": [
+        {
+         "text": "Ultima copie de rezervă: acum 143 de zile",
+         "spot": "days"
+        }
+       ],
+       "time": "21:10"
+      }
+     },
+     "highlight": "days"
+    },
+    {
+     "id": "br2-b3",
+     "say": "Dar atenție: un mesaj care spune că spațiul de stocare este plin și că fotografiile vor fi șterse este o înșelătorie foarte des întâlnită.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "buludxidmet-fake",
+       "sender": [
+        {
+         "text": "BuludXidmet"
+        }
+       ],
+       "time": "10:02",
+       "messages": [
+        [
+         {
+          "text": "Spațiul dumneavoastră de stocare este plin. Fotografiile vor fi șterse în 24 de ore."
+         }
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "id": "br2-b4",
+     "say": "Activați copia de rezervă din setările telefonului, apoi restaurați o fotografie ca să verificați că funcționează.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "br2-order",
+   "prompt": "Configurați copia de rezervă pe telefon. Puneți pașii în ordine.",
+   "items": [
+    {
+     "id": "turn-on",
+     "label": "Activați copia de rezervă automată din Setări"
+    },
+    {
+     "id": "first-run",
+     "label": "Conectați telefonul la Wi-Fi și la încărcător, apoi așteptați prima copie de rezervă"
+    },
+    {
+     "id": "check-date",
+     "label": "Verificați că ultima copie de rezervă are data de azi"
+    },
+    {
+     "id": "test-restore",
+     "label": "Deschideți o fotografie pe alt dispozitiv ca să testați restaurarea"
+    }
+   ],
+   "explain": "O copie de rezervă ajută doar dacă funcționează, așa că verificați data și restaurați o fotografie. Protejați și contul de cloud cu verificarea în doi pași."
+  },
+  {
+   "type": "hotspot",
+   "id": "br2-hotspot",
+   "prompt": "Găsiți semnalele de alarmă din acest mesaj.",
+   "artifact": {
+    "kind": "sms",
+    "brandRef": "buludxidmet-fake",
+    "sender": [
+     {
+      "text": "BuludXidmet"
+     }
+    ],
+    "time": "10:02",
+    "messages": [
+     [
+      {
+       "text": "Spațiul dumneavoastră de stocare este plin în proporție de 100%.",
+       "spot": "full"
+      }
+     ],
+     [
+      {
+       "text": "Toate fotografiile dumneavoastră vor fi șterse în 24 de ore.",
+       "spot": "deadline"
+      }
+     ],
+     [
+      {
+       "text": "Treceți la un abonament superior pentru doar 1,99 AZN: ",
+       "spot": "small-fee"
+      },
+      {
+       "text": "buludxidmet-plan.example.info",
+       "spot": "link"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "full",
+     "label": "Spațiu de stocare plin",
+     "explain": "Când spațiul de stocare este plin, copiile noi nu se mai fac, dar fotografiile vechi nu sunt șterse imediat. Verificați chiar dumneavoastră spațiul de stocare în setările telefonului."
+    },
+    {
+     "id": "deadline",
+     "label": "Termen-limită",
+     "explain": "Frica și termenul-limită vă împing să plătiți fără să vă gândiți."
+    },
+    {
+     "id": "small-fee",
+     "label": "Sumă mică",
+     "explain": "O sumă mică vă face să lăsați garda jos. Adevăratul scop sunt datele cardului dumneavoastră."
+    },
+    {
+     "id": "link",
+     "label": "Domeniu ciudat",
+     "explain": "Acesta nu este domeniul serviciului de cloud. Schimbați abonamentul doar din setările telefonului."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "br2-sim",
+   "environment": "phone",
+   "title": "Unde sunt fotografiile dumneavoastră?",
+   "intro": "Pe telefon aveți câteva notificări. Pentru fiecare, alegeți pasul care vă protejează fotografiile.",
+   "steps": [
+    {
+     "id": "backup-off",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-telefon-ayarlari",
+      "app": "Setări",
+      "title": [
+       {
+        "text": "Copia de rezervă este dezactivată"
+       }
+      ],
+      "body": [
+       {
+        "text": "Ultima copie de rezervă: acum 143 de zile. O activați acum?"
+       }
+      ],
+      "time": "21:10"
+     },
+     "actions": [
+      {
+       "id": "turn-on",
+       "label": "Activați copia de rezervă",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. De acum înainte, fotografiile sunt copiate automat în fiecare noapte."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Dacă pierdeți telefonul astăzi, pierdeți odată cu el fotografiile din ultimele cinci luni. Activați acum copia de rezervă."
+      }
+     ]
+    },
+    {
+     "id": "storage-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "buludxidmet-fake",
+      "sender": [
+       {
+        "text": "BuludXidmet"
+       }
+      ],
+      "time": "10:02",
+      "messages": [
+       [
+        {
+         "text": "Spațiul dumneavoastră de stocare este plin. Fotografiile vor fi șterse în 24 de ore. Treceți la un abonament superior: "
+        },
+        {
+         "text": "buludxidmet-plan.example.info",
+         "link": {
+          "label": "buludxidmet-plan.example.info",
+          "href": "https://buludxidmet-plan.example.info/odenis"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Dimineața sosește un astfel de mesaj.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Deschideți linkul",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Linkul nu duce la site-ul serviciului de cloud. Verificați spațiul de stocare doar în setările telefonului.",
+       "next": "card-page"
+      },
+      {
+       "id": "report",
+       "label": "Raportați ca spam",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Este un mesaj fals: un serviciu real nu amenință că vă șterge fotografiile într-o zi.",
+       "next": "free-app"
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Corect. Verificați chiar dumneavoastră spațiul de stocare, în setări.",
+       "next": "free-app"
+      }
+     ]
+    },
+    {
+     "id": "card-page",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "buludxidmet-fake",
+      "brand": "BuludXidmət",
+      "url": [
+       {
+        "text": "https://buludxidmet-plan.example.info/odenis"
+       }
+      ],
+      "fields": [
+       "Numărul cardului",
+       "Data expirării",
+       "CVV"
+      ],
+      "button": "Plătiți 1,99 AZN"
+     },
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Plătiți 1,99 AZN",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Datele cardului au ajuns la escroc. Sunați imediat la bancă, la numărul de pe spatele cardului, și blocați-l."
+      },
+      {
+       "id": "close",
+       "label": "Închideți pagina",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bine că v-ați oprit. Verificați abonamentul de stocare doar în setările telefonului."
+      }
+     ]
+    },
+    {
+     "id": "free-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2f-foto-ehtiyat",
+      "app": "Foto Ehtiyat Pulsuz",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Fotografii și videoclipuri"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Contacte"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Mesaje SMS"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Jurnalul de apeluri"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Ați găsit în magazin o aplicație gratuită pentru copii de rezervă.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Refuzați",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect, o copie de rezervă a fotografiilor nu are nevoie de acces la SMS-uri sau la contacte. Copia de rezervă integrată în telefon este suficientă."
+      },
+      {
+       "id": "allow",
+       "label": "Permiteți",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Cu acces la SMS-uri, aplicația vă poate citi codurile primite de la bancă. Ștergeți imediat o astfel de aplicație."
+      }
+     ]
+    },
+    {
+     "id": "lost-phone",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-telefon-ayarlari",
+      "app": "Setări",
+      "title": [
+       {
+        "text": "Restaurați din copia de rezervă?"
+       }
+      ],
+      "body": [
+       {
+        "text": "Ultima copie de rezervă: ieri, la 02:10. Fotografii: 4.812"
+       }
+      ],
+      "time": "19:45"
+     },
+     "say": "O lună mai târziu, pierdeți telefonul la metrou. Vă conectați pe un telefon nou.",
+     "actions": [
+      {
+       "id": "restore",
+       "label": "Restaurați",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Pentru că ați avut activată copia de rezervă, toate fotografiile de familie sunt la locul lor."
+      },
+      {
+       "id": "fresh",
+       "label": "Configurați ca telefon nou",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Așa, fotografiile nu vor ajunge pe telefonul nou. Restaurați din copia de rezervă."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "br2-scenario",
+   "title": "Ați pierdut telefonul",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Seara v-ați pierdut telefonul la metrou. Ce faceți mai întâi când ajungeți acasă?",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     },
+     "choices": [
+      {
+       "label": "Blochez telefonul de pe alt dispozitiv și verific unde se află",
+       "next": "n2",
+       "feedback": "Corect. Blocarea îl împiedică pe cel care l-a găsit să ajungă la fotografiile și la conturile dumneavoastră."
+      },
+      {
+       "label": "Aștept până dimineață, poate mă sună cineva",
+       "outcome": "risky",
+       "feedback": "Pe un telefon neblocat, conturile dumneavoastră sunt în pericol. Blocați-l imediat."
+      },
+      {
+       "label": "Îmi postez numărul și adresa pe rețelele sociale",
+       "outcome": "risky",
+       "feedback": "Datele personale le oferă escrocilor o nouă oportunitate. Mai întâi blocați telefonul."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Telefonul nu a fost găsit. A doua zi primiți un SMS: „Telefonul dumneavoastră a fost găsit, conectați-vă ca să vedeți unde se află”.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "+994 50 000 64 18"
+        }
+       ],
+       "time": "11:20",
+       "messages": [
+        [
+         {
+          "text": "Telefonul dumneavoastră a fost găsit. Conectați-vă la cont ca să vedeți unde se află: cihaz-tap.example.info"
+         }
+        ]
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "Deschid linkul și mă conectez",
+       "outcome": "compromised",
+       "feedback": "Această capcană îi vânează pe cei care și-au pierdut telefonul. Parola contului ajunge direct la escroc."
+      },
+      {
+       "label": "Nu îl deschid și restaurez telefonul nou din copia de rezervă",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Fotografiile sunt în siguranță în copia de rezervă, iar un astfel de mesaj nu merită încredere."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "br2-recap",
+   "points": [
+    "Activați copia de rezervă automată pe telefon.",
+    "Restaurați o fotografie ca să verificați copia.",
+    "„Spațiu de stocare plin”? Verificați în setări, nu prin link."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

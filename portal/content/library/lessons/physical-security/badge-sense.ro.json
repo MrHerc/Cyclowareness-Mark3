@@ -1,0 +1,379 @@
+{
+ "id": "badge-sense",
+ "title": "Ecusonul de acces",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "key",
+     "say": "Ecusonul dumneavoastră este cheia clădirii. Nu-l împrumutați niciodată, nici măcar unui coleg.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "photos",
+     "say": "Nu postați fotografii în care se vede ecusonul. O fotografie ușurează falsificarea unui ecuson.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "uniform",
+     "say": "Un atacator poate veni îmbrăcat ca tehnician, curier sau inspector. Uniforma nu este un act de identitate.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "lost",
+     "say": "V-ați pierdut ecusonul? Raportați imediat, ca să fie blocat. Când ieșiți din clădire, ascundeți-l.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "badge-phone",
+   "environment": "phone",
+   "title": "Mesaje despre ecuson",
+   "intro": "Pe parcursul zilei, primiți pe telefon mesaje despre ecusonul dumneavoastră. Răspundeți corect la fiecare.",
+   "steps": [
+    {
+     "id": "borrow",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Elnur Huseynov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Salut, mi-am uitat ecusonul acasă. Lasă-mi ecusonul tău la punctul de pază, ți-l dau înapoi diseară."
+         }
+        ],
+        "time": "08:52"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "lend",
+       "label": "Bine, ți-l las",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Fiecare intrare făcută cu ecusonul dumneavoastră este înregistrată pe numele dumneavoastră. Nu-l împrumutați niciodată."
+      },
+      {
+       "id": "decline",
+       "label": "Nu, ia un ecuson temporar de la punctul de pază",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. La punctul de pază i se verifică actul de identitate și primește un ecuson temporar."
+      }
+     ]
+    },
+    {
+     "id": "tagged",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Gulnar v-a etichetat într-o fotografie"
+       }
+      ],
+      "body": [
+       {
+        "text": "„Prima zi cu echipa!” 24 de aprecieri"
+       }
+      ],
+      "time": "13:15"
+     },
+     "say": "Ecusonul dumneavoastră se vede clar în fotografie.",
+     "actions": [
+      {
+       "id": "ask-remove",
+       "label": "Rugați-o pe Gulnar să schimbe fotografia",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Corect. O fotografie a ecusonului poate ajuta pe cineva să-l falsifice sau să intre în clădire."
+      },
+      {
+       "id": "like",
+       "label": "Apreciați și treceți mai departe",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Fotografia este publică și arată aspectul ecusonului și numele dumneavoastră. Nu distribuiți fotografii cu ecusonul."
+      }
+     ]
+    },
+    {
+     "id": "recon-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "db-alov-servis-fake",
+      "sender": [
+       {
+        "text": "AlovServis"
+       }
+      ],
+      "time": "15:30",
+      "messages": [
+       [
+        {
+         "text": "Venim mâine să verificăm stingătoarele. La ce etaj e camera serverelor și la ce oră se schimbă paza?"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Răspundeți: etajul 3, ora 20:00",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Așa se culeg informații pentru un atac. Nu dați detalii despre clădire."
+      },
+      {
+       "id": "report",
+       "label": "Raportați echipei de securitate",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Un furnizor adevărat nu vă cere asemenea informații prin SMS."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Nu ați divulgat nimic, iar asta e bine. Dar raportarea îi protejează și pe colegii dumneavoastră."
+      }
+     ]
+    },
+    {
+     "id": "badge-phish",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "idare-fake",
+      "sender": [
+       {
+        "text": "Idare"
+       }
+      ],
+      "time": "17:05",
+      "messages": [
+       [
+        {
+         "text": "Ecusonul dumneavoastră de acces expiră. Actualizați-vă datele ca să nu fie blocat: "
+        },
+        {
+         "text": "kart-yenile.example.net",
+         "link": {
+          "label": "kart-yenile.example.net",
+          "href": "https://kart-yenile.example.net"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți linkul",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Linkul duce la o pagină falsă care vă cere parola de serviciu. Ecusoanele se reînnoiesc doar la punctul de pază."
+      },
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Problemele legate de ecuson se rezolvă personal, la punctul de pază."
+      },
+      {
+       "id": "block",
+       "label": "Blocați",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bine. Ideal ar fi să anunțați și echipa de securitate."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "uniform",
+   "title": "Vizitatorul în uniformă",
+   "start": "door",
+   "nodes": [
+    {
+     "id": "door",
+     "text": "Bună ziua, suntem de la Alov Servis, verificăm stingătoarele. Deschideți-ne camera serverelor, e unul și acolo.",
+     "speaker": "Bărbat în uniformă",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Bună ziua, suntem de la Alov Servis, verificăm stingătoarele. <breath> Deschideți-ne camera serverelor, e unul și acolo.",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     },
+     "choices": [
+      {
+       "label": "Deschid camera serverelor",
+       "outcome": "compromised",
+       "feedback": "Uniforma și trusa de scule nu sunt acte de identitate. Nimeni nu intră neverificat în camera serverelor."
+      },
+      {
+       "label": "Cer ecusonul de vizitator și comanda de intervenție",
+       "next": "paper",
+       "feedback": "Bine. Să vedem ce vă arată."
+      },
+      {
+       "label": "Chem paza",
+       "next": "guard",
+       "feedback": "Corect. Lăsați paza să decidă."
+      }
+     ]
+    },
+    {
+     "id": "paper",
+     "text": "Actele sunt în dubă. Venim în fiecare lună, nu mă recunoașteți?",
+     "speaker": "Bărbat în uniformă",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Actele sunt în dubă. <short pause> Venim în fiecare lună, nu mă recunoașteți?",
+     "choices": [
+      {
+       "label": "A, da, poftiți",
+       "outcome": "compromised",
+       "feedback": "Senzația că îl cunoașteți face parte din truc. Fără ecuson de vizitator, nu se intră."
+      },
+      {
+       "label": "Chem paza",
+       "next": "guard",
+       "feedback": "Corect. Lăsați paza să decidă."
+      }
+     ]
+    },
+    {
+     "id": "guard",
+     "text": "Luna aceasta nu este programată nicio verificare din partea Alov Servis. Bărbatul a pornit spre ieșire.",
+     "speaker": "Agent de pază",
+     "voice": "older-man",
+     "channel": "in-person",
+     "manner": "firm",
+     "spoken": "Luna aceasta nu este programată nicio verificare din partea Alov Servis. <breath> Bărbatul a pornit spre ieșire.",
+     "character": "guard",
+     "choices": [
+      {
+       "label": "Scriu echipei de securitate și îl descriu",
+       "outcome": "safe",
+       "feedback": "Excelent. Vor verifica înregistrările camerelor și vor avertiza posturile de la celelalte intrări."
+      },
+      {
+       "label": "A plecat, deci nu e nicio problemă",
+       "outcome": "risky",
+       "feedback": "Poate reveni în altă zi sau pe altă ușă. Raportarea contează."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "badge-rules",
+   "prompt": "Asociați fiecare situație cu pasul corect.",
+   "pairs": [
+    {
+     "id": "lend",
+     "left": "Un coleg vă cere ecusonul",
+     "right": "Trimiteți-l la punctul de pază"
+    },
+    {
+     "id": "photo",
+     "left": "Se face o fotografie cu echipa",
+     "right": "Ascundeți mai întâi ecusonul"
+    },
+    {
+     "id": "outside",
+     "left": "Mergeți la cumpărături după serviciu",
+     "right": "Puneți ecusonul în geantă"
+    },
+    {
+     "id": "no-badge",
+     "left": "Un tehnician în uniformă nu are ecuson de vizitator",
+     "right": "Chemați paza"
+    }
+   ],
+   "explain": "Ecusonul este identitatea dumneavoastră. Folosiți-l doar în clădire și numai personal."
+  },
+  {
+   "type": "choice",
+   "id": "why-hide",
+   "question": {
+    "prompt": "De ce să vă ascundeți ecusonul în afara clădirii?",
+    "options": [
+     {
+      "id": "dirt",
+      "label": "Ca să nu se murdărească",
+      "correct": false,
+      "feedback": "Motivul este securitatea, nu curățenia."
+     },
+     {
+      "id": "target",
+      "label": "Arată numele și locul de muncă și poate fi furat",
+      "correct": true,
+      "feedback": "Corect: un ecuson la vedere îi arată atacatorului pe cine să abordeze. Unele ecusoane pot fi chiar copiate de aproape."
+     },
+     {
+      "id": "rule",
+      "label": "Pur și simplu așa e regula",
+      "correct": false,
+      "feedback": "Există un motiv: ecusonul vă protejează pe dumneavoastră și clădirea."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "badge-id"
+    }
+   },
+   "explain": "În clădire, purtați ecusonul la vedere; când plecați, ascundeți-l."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Nu împrumutați niciodată ecusonul și nu postați fotografii cu el.",
+    "Uniforma nu este un act de identitate: fără ecuson de vizitator, nu se intră.",
+    "V-ați pierdut ecusonul? Raportați imediat."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

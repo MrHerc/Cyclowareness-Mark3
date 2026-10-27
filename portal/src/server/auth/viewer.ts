@@ -4,7 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { db, t } from "../db";
 import type { Role, TenantBranding, TenantSettings } from "../db/schema";
-import { can, isPrivileged, PERMISSION_FEATURE, type Permission } from "./permissions";
+import { can, PERMISSION_FEATURE, twoFactorRequired, type Permission } from "./permissions";
 import { invalidateSession, readSessionToken, renewedExpiry, sessionIdFromToken, shouldRenew } from "./session";
 import { cookies } from "next/headers";
 import { currentPath } from "../request";
@@ -72,10 +72,11 @@ export const getSession = cache(async (): Promise<Viewer | null> => {
   if (user.status !== "active") return null;
 
   const now = new Date();
-  if (now.getTime() - session.lastSeenAt.getTime() > SEEN_THROTTLE_MS || shouldRenew(session.expiresAt)) {
+  const renew = shouldRenew(session.expiresAt, session.createdAt);
+  if (now.getTime() - session.lastSeenAt.getTime() > SEEN_THROTTLE_MS || renew) {
     await db()
       .update(t.sessions)
-      .set({ lastSeenAt: now, ...(shouldRenew(session.expiresAt) ? { expiresAt: renewedExpiry() } : {}) })
+      .set({ lastSeenAt: now, ...(renew ? { expiresAt: renewedExpiry(session.createdAt) } : {}) })
       .where(eq(t.sessions.id, id));
     await db().update(t.users).set({ lastActiveAt: now }).where(eq(t.users.id, user.id));
   }
@@ -153,9 +154,9 @@ export function allowed(v: Viewer, permission: Permission): boolean {
   return can(v.user.role, permission) && (!feature || v.tenant.features.has(feature));
 }
 
-/** The tenant's "admins use 2FA" rule applies to this privileged user, who has not set it up yet. */
+/** Two-step verification is mandatory for this user (twoFactorRequired), who has not set it up yet. */
 export function twoFactorGap(v: Viewer): boolean {
-  return v.tenant.settings.identity.requireAdmin2fa && isPrivileged(v.user.role) && !v.user.totpEnabled;
+  return twoFactorRequired(v.user.role, v.tenant.settings.identity.requireAdmin2fa) && !v.user.totpEnabled;
 }
 
 /** For admin pages: permission + plan feature + the tenant's "admins use 2FA" rule. */

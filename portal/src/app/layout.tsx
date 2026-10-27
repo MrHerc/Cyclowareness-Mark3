@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import type { CSSProperties } from "react";
-import { Geologica, Noto_Sans_Georgian } from "next/font/google";
+import { Geologica, Noto_Sans_Arabic, Noto_Sans_Georgian } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getTranslations } from "next-intl/server";
+import { dirOf } from "@/i18n/config";
 import { getViewer } from "@/server/auth/viewer";
 import { brandStyle } from "@/lib/color";
 import { Toaster } from "@/components/ui/toast";
@@ -16,7 +17,10 @@ const geologica = Geologica({
   variable: "--font-geologica",
   display: "swap",
 });
-const georgian = Noto_Sans_Georgian({ subsets: ["georgian"], variable: "--font-georgian", display: "swap" });
+// Not preloaded: their unicode-range faces download only on a page that shows Georgian or Arabic text.
+const georgian = Noto_Sans_Georgian({ subsets: ["georgian"], variable: "--font-georgian", display: "swap", preload: false });
+// No Arial fallback face: it has no unicode-range, so Latin words in Arabic text would render in Arial instead of Geologica.
+const arabic = Noto_Sans_Arabic({ subsets: ["arabic"], variable: "--font-arabic", display: "swap", preload: false, adjustFontFallback: false });
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("common");
@@ -41,7 +45,7 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const [locale, viewer] = await Promise.all([getLocale(), getViewer()]);
   const style = brandStyle(viewer?.tenant.branding.primary, viewer?.tenant.branding.accent) as CSSProperties;
   return (
-    <html lang={locale} className={`${geologica.variable} ${georgian.variable}`} data-motion={viewer?.user.motion ?? "full"} style={style}>
+    <html lang={locale} dir={dirOf(locale)} className={`${geologica.variable} ${georgian.variable} ${arabic.variable}`} data-motion={viewer?.user.motion ?? "full"} style={style}>
       <body>
         <NextIntlClientProvider>
           <AzNumbersGate>

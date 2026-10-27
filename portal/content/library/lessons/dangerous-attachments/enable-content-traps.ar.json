@@ -1,0 +1,468 @@
+{
+  "id": "enable-content-traps",
+  "title": "فخاخ «تمكين التحرير» ووحدات الماكرو",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ec-tutor",
+      "beats": [
+        {
+          "id": "ec-b1",
+          "say": "يفتح المستند القادم من الإنترنت أولًا في «طريقة العرض المحمية»، أي للقراءة فقط. وهذه الطريقة هي درع حمايتك.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "ec-b2",
+          "say": "إذا ظهر على صفحة فارغة نص كهذا، فتوقف. فالمستند الحقيقي لا يطلب منك الضغط على أزرار.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "senedyaz",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "طريقة العرض المحمية: هذا الملف وارد من الإنترنت"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "المستند فارغ، ولا تظهر فيه سوى صورة مكتوب عليها:"
+                  }
+                ],
+                [
+                  {
+                    "text": "لرؤية النص، اضغط «تمكين التحرير»، ثم «تمكين المحتوى».",
+                    "spot": "lure"
+                  }
+                ]
+              ],
+              "buttons": [
+                "تمكين التحرير",
+                "إغلاق"
+              ]
+            }
+          },
+          "highlight": "lure"
+        },
+        {
+          "id": "ec-b3",
+          "say": "وحدات الماكرو أوامر مخفية داخل المستند، ويمكنها أن تثبت برمجيات ضارة على الحاسوب.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "ec-b4",
+          "say": "ولا تقبل أبدًا عرضًا من أي موقع لتنزيل برنامج عرض خاص من أجل فتح مستند.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ec-sim-doc",
+      "environment": "desktop",
+      "title": "فتح مستند",
+      "intro": "فتحت مرفقًا بعنوان «شروط المناقصة». اقرأ كل نافذة، واتخذ قرارك في كل خطوة.",
+      "steps": [
+        {
+          "id": "protected-view",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "senedyaz",
+            "tone": "app",
+            "title": [
+              {
+                "text": "طريقة العرض المحمية: هذا الملف وارد من الإنترنت"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "المستند فارغ، ولا تظهر فيه سوى صورة مكتوب عليها:"
+                }
+              ],
+              [
+                {
+                  "text": "لرؤية النص، اضغط «تمكين التحرير»، ثم «تمكين المحتوى».",
+                  "spot": "lure"
+                }
+              ]
+            ],
+            "buttons": [
+              "تمكين التحرير",
+              "إغلاق"
+            ]
+          },
+          "say": "المستند فارغ، ويطلب منك الضغط على زر.",
+          "actions": [
+            {
+              "id": "enable",
+              "label": "تمكين التحرير",
+              "kind": "enable-content",
+              "outcome": "risky",
+              "feedback": "لقد خرجت من «طريقة العرض المحمية»، وهي موجودة أصلًا للحماية من ملفات كهذه."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق المستند",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. الصفحة الفارغة التي تطلب منك الضغط على زر فخ.",
+              "next": "it-alert"
+            },
+            {
+              "id": "report",
+              "label": "إبلاغ فريق الأمن السيبراني",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "رائع. أبلغت عن الملف دون تمكين التحرير.",
+              "next": "it-alert"
+            }
+          ]
+        },
+        {
+          "id": "macro-blocked",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "senedyaz",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "خطر أمني: تم حظر وحدات الماكرو"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "تم حظر وحدات الماكرو في هذا المستند لأن الملف وارد من الإنترنت."
+                }
+              ],
+              [
+                {
+                  "text": "مكتوب في المستند: «ارفع الحظر عن الملف من خصائصه، واسمح بتشغيل وحدات الماكرو».",
+                  "spot": "unblock"
+                }
+              ]
+            ],
+            "buttons": [
+              "معرفة المزيد",
+              "إغلاق"
+            ]
+          },
+          "say": "حظر التطبيق وحدات الماكرو، لكن المستند يطلب منك رفع الحظر عنها.",
+          "actions": [
+            {
+              "id": "allow",
+              "label": "رفع الحظر والسماح بوحدات الماكرو",
+              "kind": "enable-content",
+              "outcome": "compromised",
+              "feedback": "اشتغلت وحدات الماكرو المخفية وثبتت برمجيات ضارة. اقطع الاتصال بالشبكة، واتصل بفريق الأمن السيبراني فورًا."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق المستند",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "توقفت في الوقت المناسب. لقد حماك التطبيق، ولم تتجاوز حمايته."
+            }
+          ]
+        },
+        {
+          "id": "it-alert",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "it-destek",
+            "app": "الدعم الفني",
+            "title": [
+              {
+                "text": "تنبيه: مستندات مناقصة مزيفة"
+              }
+            ],
+            "body": [
+              {
+                "text": "تنتشر مستندات ضارة بعنوان «شروط المناقصة». إذا وصلك أحدها، فأبلغ عنه."
+              }
+            ],
+            "time": "11:02"
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "الإبلاغ عن الرسالة",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "صحيح. يساعد بلاغك فريق تقنية المعلومات على حذف الرسالة من جميع صناديق البريد."
+            },
+            {
+              "id": "ignore",
+              "label": "تجاهل",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "أغلقت الملف، لكن الرسالة لا تزال موجودة. أبلغ عنها حتى لا يفتحها زملاؤك."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ec-sim-viewer",
+      "environment": "browser",
+      "title": "برنامج عرض PDF مزيف",
+      "intro": "يعرض عليك رابط في رسالة بريد إلكتروني برنامجًا لفتح المستند. ماذا تفعل؟",
+      "steps": [
+        {
+          "id": "viewer-page",
+          "label": "يلزم تحديث Sənəd Oxu لعرض هذا المستند",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "senedoxu-fake",
+            "url": [
+              {
+                "text": "https://senedoxu-yenile.example.net/bax"
+              }
+            ]
+          },
+          "say": "انظر إلى شريط العنوان.",
+          "actions": [
+            {
+              "id": "install",
+              "label": "التنزيل والتثبيت",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "برنامج العرض المزيف هذا من البرمجيات الضارة. ومتصفحك يستطيع فتح ملفات PDF بنفسه."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق علامة التبويب",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. لا يثبت البرامج إلا فريق تقنية المعلومات أو مركز البرامج المعتمد في جهتك."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن الموقع",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "رائع. الإبلاغ عن الموقع يحمي زملاءك أيضًا."
+            }
+          ]
+        },
+        {
+          "id": "viewer-download",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "senedoxu-fake",
+            "name": [
+              {
+                "text": "SenedOxu_Yenileme.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "5.7 MB",
+            "source": [
+              {
+                "text": "senedoxu-yenile.example.net"
+              }
+            ]
+          },
+          "say": "بدأ تنزيل ملف من تلقاء نفسه. تحقق من نوع الملف.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "هذا برنامج من موقع مزيف، وفتحه يصيب الحاسوب بالبرمجيات الضارة."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "صحيح. احذف أي ملف لم تطلب تنزيله، ولا تفتحه."
+            },
+            {
+              "id": "report",
+              "label": "إبلاغ فريق تقنية المعلومات",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "رائع. يستطيع فريق تقنية المعلومات حظر هذا الموقع على الجميع."
+            }
+          ]
+        },
+        {
+          "id": "portal-pdf",
+          "label": "Telimat_2026.pdf",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "idare",
+            "url": [
+              {
+                "text": "https://portal.idare.example/senedler/telimat-2026.pdf"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح المستند",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "صحيح. إنها البوابة الداخلية، والملف يفتح في المتصفح، ولا يلزم تثبيت أي شيء."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن الموقع",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "هذه بوابة جهتك نفسها، ولا تطلب تثبيت أي شيء. احتفظ بالإبلاغ للحالات المشبوهة."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "ec-hotspot",
+      "prompt": "ابحث عن علامات الفخ في هذه الرسالة.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "docusfera-fake",
+        "from": {
+          "name": [
+            {
+              "text": "DocuSfera"
+            }
+          ],
+          "address": [
+            {
+              "text": "imza@docusfera-sened.example.net",
+              "spot": "domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "عقد بانتظار توقيعك"
+          }
+        ],
+        "time": "15:47",
+        "body": [
+          [
+            {
+              "text": "تم إنشاء المستند بصيغة قديمة."
+            }
+          ],
+          [
+            {
+              "text": "لعرضه، اضغط أولًا «تمكين التحرير»، ثم «تمكين المحتوى».",
+              "spot": "enable"
+            }
+          ],
+          [
+            {
+              "text": "إذا لم يفتح المستند، فقم بتحديث برنامج العرض من هنا: ",
+              "spot": "viewer"
+            },
+            {
+              "text": "تنزيل Sənəd Oxu",
+              "spot": "viewer",
+              "link": {
+                "label": "Sənəd Oxu",
+                "href": "https://senedoxu-yenile.example.net/yukle"
+              }
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Muqavile_imza.xlsm",
+                "spot": "macro"
+              }
+            ],
+            "size": "210 KB"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "نطاق مختلف",
+          "explain": "تستخدم الرسالة اسم خدمة التوقيع، لكن النطاق مختلف. أبلغ عنها."
+        },
+        {
+          "id": "enable",
+          "label": "طلب التمكين",
+          "explain": "يمكن قراءة المستند الحقيقي دون تمكين التحرير أو وحدات الماكرو."
+        },
+        {
+          "id": "macro",
+          "label": "ملف بوحدات ماكرو",
+          "explain": "ملف Office الذي ينتهي امتداده بالحرف «m» (مثل xlsm أو docm) قد يحتوي على وحدات ماكرو."
+        },
+        {
+          "id": "viewer",
+          "label": "رابط لتنزيل برنامج",
+          "explain": "طلب برنامج خاص لفتح مستند علامة على برنامج عرض مزيف."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "order",
+      "id": "ec-order",
+      "prompt": "مستند يطلب تشغيل وحدات الماكرو. رتب الخطوات.",
+      "items": [
+        {
+          "id": "stop",
+          "label": "عدم الضغط على أي زر"
+        },
+        {
+          "id": "close",
+          "label": "إغلاق المستند"
+        },
+        {
+          "id": "report",
+          "label": "إبلاغ فريق الأمن السيبراني عن الرسالة"
+        },
+        {
+          "id": "verify",
+          "label": "إن كان الملف متوقعًا، فالتحقق من المرسل عبر رقم تعرفه"
+        }
+      ],
+      "explain": "توقف أولًا وأغلق المستند، ثم أبلغ. ولا تتحقق من المرسل إلا عبر رقم تعرفه مسبقًا."
+    },
+    {
+      "type": "recap",
+      "id": "ec-recap",
+      "points": [
+        "المستند الفارغ الذي يطلب منك الضغط على زر فخ",
+        "لا تضغط «تمكين التحرير» ولا تسمح بوحدات الماكرو: أغلق المستند وأبلغ",
+        "لا تنزل أبدًا برنامجًا من موقع لفتح مستند"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

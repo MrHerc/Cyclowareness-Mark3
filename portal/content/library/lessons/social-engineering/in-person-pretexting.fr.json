@@ -1,0 +1,510 @@
+{
+ "id": "in-person-pretexting",
+ "title": "Les ruses en face à face",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "l3-tutor",
+   "beats": [
+    {
+     "id": "l3-b1",
+     "say": "Un escroc n’est pas toujours derrière un écran. Parfois, il se tient devant la porte, un carton dans les bras.",
+     "mood": "talk",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "l3-b2",
+     "say": "Ne tenez pas la porte à quelqu’un qui n’a pas de badge. Envoyez-le poliment à l’accueil.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "l3-b3",
+     "say": "Un prétendu technicien peut porter un uniforme et vous presser. Vérifiez vous-même cette visite auprès du support informatique.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     },
+     "checkpoint": {
+      "prompt": "Un technicien que personne n’attendait se présente. Que faites-vous ?",
+      "options": [
+       {
+        "id": "let-in",
+        "label": "Il porte un uniforme, je le laisse entrer",
+        "correct": false,
+        "feedback": "N’importe qui peut porter un uniforme. Renseignez-vous vous-même sur cette visite auprès du support informatique."
+       },
+       {
+        "id": "check",
+        "label": "J’appelle moi-même le support informatique pour vérifier",
+        "correct": true,
+        "feedback": "Exact. Vérifiez une visite inattendue par le canal officiel."
+       }
+      ]
+     }
+    },
+    {
+     "id": "l3-b5",
+     "say": "Un seul réflexe dans tous les cas : s’arrêter, vérifier, signaler. Vérifiez par la voie officielle et faites part de vos doutes à l’équipe sécurité.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "flag"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "visitor-at-door",
+   "environment": "phone",
+   "title": "Un technicien à la porte",
+   "intro": "C’est le matin, au bureau. Vous recevez des messages au sujet d’un visiteur qui veut entrer dans le bâtiment.",
+   "steps": [
+    {
+     "id": "no-badge",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Support informatique (nouveau)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour, je viens réparer votre imprimante et je suis à l’entrée. J’ai oublié mon badge chez moi, vous pouvez descendre m’ouvrir ?"
+         }
+        ],
+        "time": "09:12"
+       }
+      ]
+     },
+     "say": "Un technicien inconnu, et sans badge.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "J’arrive, je vous ouvre",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Laisser entrer quelqu’un sans badge, c’est ouvrir la porte à n’importe qui. Envoyez la personne à l’accueil."
+      },
+      {
+       "id": "verify",
+       "label": "J’appelle le numéro officiel du support informatique",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Vérifiez vous-même, par le canal officiel, la visite d’un technicien inattendu."
+      }
+     ]
+    },
+    {
+     "id": "reception",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "idare",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Accueil"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Un technicien nommé Orkhan est à l’accueil et donne votre nom. Aucune visite n’est prévue. On le laisse entrer ?"
+         }
+        ],
+        "time": "09:15"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "let-in",
+       "label": "Laissez-le entrer, c’est moi qui l’ai fait venir",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Ce n’est pas vous qui l’avez fait venir. Désormais, un inconnu circule librement dans le bâtiment en votre nom."
+      },
+      {
+       "id": "wait",
+       "label": "Il attend à l’accueil le temps que je vérifie",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Exact. Un visiteur s’enregistre à l’accueil et n’est pas laissé seul tant qu’il n’a pas été vérifié."
+      }
+     ]
+    },
+    {
+     "id": "boss-pressure",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Kamran Aliyev (nouveau numéro)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "C’est moi qui ai fait venir le technicien. Accompagnez-le vous-même à la salle des serveurs. Je suis en réunion, ne m’appelez pas."
+         }
+        ],
+        "time": "09:17"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "escort",
+       "label": "D’accord, je l’accompagne",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Le nom du responsable et la consigne « ne m’appelez pas » sont là pour vous empêcher de vérifier. Un inconnu n’entre jamais dans la salle des serveurs."
+      },
+      {
+       "id": "verify",
+       "label": "J’appelle mon responsable au numéro que je connais",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Très bien. Quand votre responsable écrit depuis un nouveau numéro, vérifiez toujours en l’appelant à l’ancien numéro, celui que vous connaissez."
+      },
+      {
+       "id": "block",
+       "label": "Bloquer et signaler",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Exact. Prévenez ensuite votre responsable et l’équipe sécurité."
+      }
+     ]
+    },
+    {
+     "id": "real-it",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Support informatique"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Nous ne vous avons envoyé aucun technicien aujourd’hui. Vous avez bien fait d’écrire ; la sécurité est en route vers l’accueil."
+         }
+        ],
+        "time": "09:20"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "thanks",
+       "label": "Merci, je préviens aussi l’accueil",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Exact. Pause, vérification, signalement : les trois étapes y sont."
+      },
+      {
+       "id": "go-down",
+       "label": "Je descends lui parler moi-même",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "N’allez pas affronter une personne suspecte sans renfort. L’équipe sécurité va s’en occuper."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "l3-hotspot-email",
+   "prompt": "Trouvez les éléments suspects dans cet e-mail.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "idare-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Services généraux",
+       "reveal": "texnik@servis-idare.test"
+      }
+     ],
+     "address": [
+      {
+       "text": "texnik@servis-idare.test",
+       "spot": "outside-address"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "URGENT : ",
+      "spot": "urgent-subject"
+     },
+     {
+      "text": "réparation dans la salle des serveurs"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Bonjour,"
+      }
+     ],
+     [
+      {
+       "text": "Aujourd’hui à 15:00, le technicien Orkhan contrôlera la climatisation de la salle des serveurs."
+      }
+     ],
+     [
+      {
+       "text": "Nous avons pris du retard, alors "
+      },
+      {
+       "text": "laissez-le entrer sans accompagnement",
+       "spot": "unescorted"
+      },
+      {
+       "text": "."
+      }
+     ],
+     [
+      {
+       "text": "Merci de "
+      },
+      {
+       "text": "ne pas transférer cet e-mail",
+       "spot": "no-forward"
+      },
+      {
+       "text": "."
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "outside-address",
+     "label": "Adresse externe",
+     "explain": "Une équipe interne écrit depuis la messagerie de l’organisation. Cette adresse appartient à un autre domaine."
+    },
+    {
+     "id": "urgent-subject",
+     "label": "Urgence",
+     "explain": "L’urgence en lettres capitales vous pousse à agir sans vérifier."
+    },
+    {
+     "id": "unescorted",
+     "label": "Entrée sans accompagnement",
+     "explain": "Un visiteur est toujours accompagné, surtout dans la salle des serveurs."
+    },
+    {
+     "id": "no-forward",
+     "label": "Demande de discrétion",
+     "explain": "Vous demander de n’en parler à personne vise à empêcher toute vérification."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "l3-choice-tailgate",
+   "question": {
+    "prompt": "Un homme, les bras chargés de cartons, veut entrer derrière vous sans badge.",
+    "options": [
+     {
+      "id": "hold-door",
+      "label": "Je lui tiens la porte, il a les mains prises",
+      "correct": false,
+      "feedback": "La politesse, c’est bien, mais un inconnu entre alors sans aucun contrôle."
+     },
+     {
+      "id": "send-reception",
+      "label": "Je l’envoie poliment à l’accueil",
+      "correct": true,
+      "feedback": "Exact. L’accueil vérifiera son identité et le conduira à la bonne personne."
+     },
+     {
+      "id": "ask-and-let",
+      "label": "Je lui demande qui il est et je le laisse entrer",
+      "correct": false,
+      "feedback": "Vous ne pouvez pas vérifier sa réponse. Laissez l’accueil ou la sécurité décider."
+     }
+    ]
+   },
+   "explain": "Entrer derrière quelqu’un, ce qu’on appelle le talonnage, est l’attaque physique la plus simple. Chacun utilise son propre badge, et les invités passent par l’accueil."
+  },
+  {
+   "type": "swipe",
+   "id": "l3-swipe",
+   "prompt": "Sans danger ou piège ?",
+   "cards": [
+    {
+     "id": "no-badge-door",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Support technique (nouveau)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour, je viens voir votre imprimante. J’ai oublié mon badge chez moi, vous pouvez descendre m’ouvrir ?"
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Il ne faut pas laisser entrer quelqu’un sans badge. Envoyez la personne à l’accueil."
+    },
+    {
+     "id": "planned-maintenance",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "Support technique"
+        }
+       ],
+       "address": [
+        {
+         "text": "support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Travaux prévus samedi"
+       }
+      ],
+      "time": "11:05",
+      "body": [
+       [
+        {
+         "text": "La messagerie sera indisponible samedi de 10:00 à 12:00. Vous n’avez rien à faire."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Aucun lien, aucun mot de passe, aucun accès demandé. C’est une simple information."
+    },
+    {
+     "id": "found-usb",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Samir (collègue)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "J’ai trouvé dans le couloir une clé USB marquée « Salaires 2026 ». On l’ouvre sur ton ordinateur ?"
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une clé USB trouvée peut contenir un logiciel malveillant. Ne l’ouvrez pas, remettez-la à votre équipe sécurité."
+    },
+    {
+     "id": "guest-at-reception",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "idare",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Accueil"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Votre invité, M. Tural, s’est enregistré à l’accueil et a reçu un badge visiteur. Il vous attend."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "L’invité est enregistré et vous attend. Allez le chercher vous-même et accompagnez-le."
+    },
+    {
+     "id": "menu-qr",
+     "artifact": {
+      "kind": "qr",
+      "brandRef": "idare-fake",
+      "caption": [
+       {
+        "text": "Menu de la cantine : scannez et connectez-vous avec votre mot de passe professionnel"
+       }
+      ],
+      "destination": [
+       {
+        "text": "menyu-idare.test/login"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Nul besoin d’un mot de passe professionnel pour consulter un menu. Un QR code de ce genre sert à le voler."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "l3-recap",
+   "points": [
+    "Envoyez à l’accueil toute personne sans badge",
+    "Ne branchez jamais une clé USB trouvée sur un ordinateur",
+    "Toujours : s’arrêter, vérifier, signaler"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

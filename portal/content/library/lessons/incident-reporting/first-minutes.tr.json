@@ -1,0 +1,386 @@
+{
+ "id": "first-minutes",
+ "title": "İlk dakikalar",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "İlk dakikalar her şeyden önemlidir. Saldırgan acele eder, bu yüzden sizin ondan daha hızlı olmanız gerekir.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Bir şeyler ters görünüyorsa durun: tanımadığınız bir giriş, kendi kendine açılan bir pencere, kaybolan dosyalar.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "ispoct",
+       "app": "İşPoçt",
+       "title": [
+        {
+         "text": "Yeni bir cihazdan giriş yapıldı"
+        }
+       ],
+       "body": [
+        {
+         "text": "Hesabınıza saat 03:12'de "
+        },
+        {
+         "text": "Gence'de bilinmeyen bir cihazdan",
+         "spot": "place"
+        },
+        {
+         "text": " giriş yapıldı."
+        }
+       ],
+       "time": "08:31"
+      }
+     },
+     "highlight": "place"
+    },
+    {
+     "id": "b3",
+     "say": "Acil bir durumda BT destek ekibini ya da güvenlik ekibini arayın. E-posta sonraya kalabilir.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Bilgisayardan şüpheleniyorsanız bildirimi o bilgisayardan yapmayın. Saldırgan e-postaları okuyor olabilir, bu yüzden telefonla arayın.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "strange-morning",
+   "environment": "desktop",
+   "title": "Garip bir sabah",
+   "intro": "Sabah bilgisayarınızı açıyorsunuz ve birkaç garip şey fark ediyorsunuz. Her birine nasıl tepki verirsiniz?",
+   "steps": [
+    {
+     "id": "new-login",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "İşPoçt",
+      "title": [
+       {
+        "text": "Yeni bir cihazdan giriş yapıldı"
+       }
+      ],
+      "body": [
+       {
+        "text": "Hesabınıza saat 03:12'de Gence'de bilinmeyen bir cihazdan giriş yapıldı."
+       }
+      ],
+      "time": "08:31"
+     },
+     "say": "Bu girişi siz yapmadıysanız ne yaparsınız?",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Ben değildim: bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru: tanımadığınız bir giriş, parolanızın başkasının elinde olduğunu gösterir. Hızlı bildirim hesabınızı kurtarır."
+      },
+      {
+       "id": "ignore",
+       "label": "Kapat",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Saldırgan hâlâ hesabınızda ve zaman kazanıyor. Böyle bir uyarıyı hemen bildirin."
+      }
+     ]
+    },
+    {
+     "id": "remote-request",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "texkomek-24",
+      "tone": "app",
+      "title": [
+       {
+        "text": "TexKömək 24 bağlanmak istiyor"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Bir operatör ekranınızı görmek ve bilgisayarınızı kontrol etmek istiyor."
+        }
+       ]
+      ],
+      "buttons": [
+       "Reddet",
+       "İzin ver"
+      ]
+     },
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Reddet",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Doğru, siz destek istemediniz. Bunun gibi beklenmedik bir isteği de bildirin."
+      },
+      {
+       "id": "allow",
+       "label": "İzin ver",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Uzaktaki kişi artık bilgisayarınızı kontrol ediyor. Kendiniz çağırmadığınız bir desteğe asla izin vermeyin."
+      },
+      {
+       "id": "report",
+       "label": "Reddet ve bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Beklenmedik bir uzaktan erişim isteği hemen bildirilmelidir."
+      }
+     ]
+    },
+    {
+     "id": "encrypted",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Dosyalarınız şifrelendi"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Dosyalarınızı geri almak için 72 saat içinde ödeme yapın. Bilgisayarı kapatırsanız dosyalar silinecek."
+        }
+       ]
+      ],
+      "buttons": [
+       "Ödeme sayfası"
+      ]
+     },
+     "say": "Ekranda bir fidye talebi var. İlk adımınız ne olur?",
+     "actions": [
+      {
+       "id": "disconnect",
+       "label": "Kabloyu çıkar, Wi-Fi'yi kapat",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Doğru, ağ bağlantısını kesmek yayılmayı durdurur. Bilgisayarı açık bırakın ve hemen arayın."
+      },
+      {
+       "id": "shutdown",
+       "label": "Bilgisayarı kapat",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Bilgisayarı kapatmak bellekteki izleri silebilir. Prosedürünüz aksini söylemiyorsa ağ bağlantısını kesin ve bilgisayarı açık bırakın."
+      },
+      {
+       "id": "pay",
+       "label": "Ödeme sayfasını aç",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Ödeme yapmak dosyalarınızı geri alacağınızı garanti etmez. Asla ödeme yapmayın, kararı uzmanlara bırakın."
+      }
+     ]
+    },
+    {
+     "id": "call-line",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "it-tehlukesizlik",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Güvenlik hattı"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Acil güvenlik olayı: +994 12 000 15 15"
+        }
+       ],
+       [
+        {
+         "text": "Acil değilse: “Bildir” düğmesi veya security@idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Sonra",
+       "Ara"
+      ]
+     },
+     "actions": [
+      {
+       "id": "call",
+       "label": "Şimdi ara",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Doğru. Acil bir güvenlik olayını telefonla bildirin: uzman size ne yapmanız gerektiğini hemen söyler."
+      },
+      {
+       "id": "later",
+       "label": "Yarın e-posta gönder",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Şifreleme yayılıyor ve her dakika önemli. Üstelik bu posta kutusu da artık güvenli olmayabilir."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "who-to-tell",
+   "question": {
+    "prompt": "Hesabınıza yabancı biri giriş yaptı. Kime haber verirsiniz?",
+    "options": [
+     {
+      "id": "security",
+      "label": "BT destek ekibine ya da güvenlik ekibine",
+      "correct": true,
+      "feedback": "Doğru. Hesabı yalnızca onlar kilitleyip inceleyebilir."
+     },
+     {
+      "id": "manager",
+      "label": "Yöneticime de",
+      "correct": true,
+      "feedback": "Doğru. Yöneticiniz işlerin düzenlenmesine yardımcı olur, ama uzmanın yerini tutmaz."
+     },
+     {
+      "id": "colleagues",
+      "label": "Yalnızca departmanımdaki iş arkadaşlarıma",
+      "correct": false,
+      "feedback": "İş arkadaşlarınız hesabı kilitleyemez, bu yüzden zaman kaybedilir."
+     },
+     {
+      "id": "social",
+      "label": "Herkes bilsin diye sosyal medyada paylaşırım",
+      "correct": false,
+      "feedback": "Bir güvenlik olayını paylaşmak saldırgana ve diğer dolandırıcılara yardım eder."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "badge-id"
+    }
+   },
+   "explain": "Sorunu uzman çözer, yöneticiniz bilgilendirilir, başka kimseye gerek yoktur."
+  },
+  {
+   "type": "match",
+   "id": "how-to-report",
+   "prompt": "Her durum için doğru bildirim yolunu seçin.",
+   "pairs": [
+    {
+     "id": "phish",
+     "left": "Şüpheli bir e-posta geldi",
+     "right": "“Bildir” düğmesiyle gönderin"
+    },
+    {
+     "id": "ransom",
+     "left": "Ekranda bir fidye talebi var",
+     "right": "Ağ bağlantısını kesin ve telefonla arayın"
+    },
+    {
+     "id": "phone",
+     "left": "İş telefonu kayboldu",
+     "right": "Uzaktan kilitleyebilmeleri için hemen arayın"
+    },
+    {
+     "id": "misdirect",
+     "left": "Bir dosya yanlış kişiye gitti",
+     "right": "Yöneticinize ve güvenlik ekibine haber verin"
+    }
+   ],
+   "explain": "Acil ya da yayılan durumlarda telefonla arayın. Diğerlerini “Bildir” düğmesiyle veya e-postayla bildirin."
+  },
+  {
+   "type": "scenario",
+   "id": "colleague-says-wait",
+   "title": "Bekleyelim mi?",
+   "start": "window",
+   "nodes": [
+    {
+     "id": "window",
+     "text": "Merak etme, herhalde güncellemedir. Ortalığı ayağa kaldırma.",
+     "speaker": "Tural (iş arkadaşı), garip pencereye bakıyor",
+     "voice": "man-2",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Merak etme, ee, herhalde güncellemedir. Ortalığı ayağa kaldırma.",
+     "choices": [
+      {
+       "label": "Yine de BT destek ekibini ararım",
+       "next": "specialist",
+       "feedback": "Doğru. Yanlış alarm sorun değildir, geç yapılan bildirim ise sorundur."
+      },
+      {
+       "label": "Beklerim, belki kendiliğinden geçer",
+       "outcome": "risky",
+       "feedback": "Beklemek saldırgana zaman kazandırır. Şüpheniz varsa arayın."
+      }
+     ]
+    },
+    {
+     "id": "specialist",
+     "text": "Ne gördünüz ve ne yaptınız?",
+     "speaker": "BT destek",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Ne gördünüz <short pause> ve ne yaptınız?",
+     "choices": [
+      {
+       "label": "Kısaca anlatırım: ne oldu, ne zaman, hangi bilgisayarda, ne yaptım",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Kesin bilgilerle uzman hemen işe başlayabilir."
+      },
+      {
+       "label": "Pencereyi kapattım, hatırlamıyorum",
+       "outcome": "risky",
+       "feedback": "Her ayrıntı işe yarar. Bir dahaki sefere ekranın fotoğrafını telefonunuzla çekin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Bir şeyler ters görünüyorsa durun ve hemen bildirin.",
+    "Acil durumda telefonla arayın. Şüpheli bir bilgisayardan bildirim yapmayın.",
+    "Yanlış alarm sorun değildir, gecikme ise tehlikelidir."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

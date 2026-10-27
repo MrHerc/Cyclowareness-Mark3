@@ -40,6 +40,8 @@ const nextConfig: NextConfig = {
     return [
       { source: "/:path*", headers: securityHeaders },
       { source: "/rive/:file*", headers: [{ key: "Cache-Control", value: "public, max-age=86400" }] },
+      // Narration clips are named by a hash of their text and voice: a changed sentence is a new file.
+      { source: "/generated/tts/:path*", headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }] },
       // The service worker must be revalidated on every load so updates reach people quickly.
       { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache" }, { key: "Content-Type", value: "application/javascript; charset=utf-8" }] },
     ];

@@ -1,0 +1,335 @@
+{
+  "id": "the-copied-command",
+  "title": "Kopyalanan komut",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "fc2-tutor",
+      "beats": [
+        {
+          "id": "fc2-b1",
+          "say": "Bu kez sahte bir sayfa, bir metni kopyalayıp Çalıştır penceresine yapıştırmanızı istiyor.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "download"
+          }
+        },
+        {
+          "id": "fc2-b2",
+          "say": "O metin aslında gizli bir komuttur ve çalıştığı anda zararlı yazılım yükler.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "ransomware"
+          }
+        },
+        {
+          "id": "fc2-b3",
+          "say": "Bir sitenin kopyalamanızı söylediği hiçbir metni Çalıştır penceresine yapıştırmayın.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        },
+        {
+          "id": "fc2-b4",
+          "say": "Bunu zaten yaptıysanız, ağ bağlantısını kesin ve hemen BT destek ekibine haber verin.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "fc2-sim",
+      "environment": "desktop",
+      "title": "Çalıştır penceresi",
+      "intro": "Bir sayfa, belgenin açılmadığını söyleyip sizi buraya yönlendirdi. Her seferinde doğru adımı seçin.",
+      "steps": [
+        {
+          "id": "run-box",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Çalıştır"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Sitenin kopyaladığı metin kutuya yapıştırıldı:"
+                }
+              ],
+              [
+                {
+                  "text": "[sitenin kopyaladığı bilinmeyen metin]"
+                }
+              ]
+            ],
+            "buttons": [
+              "İptal",
+              "Tamam"
+            ]
+          },
+          "say": "Çalıştır penceresi açık ve içinde sitenin kopyaladığı bilinmeyen bir metin var.",
+          "actions": [
+            {
+              "id": "cancel",
+              "label": "İptal et ve kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. İptal etmek metnin çalışmasını engeller; ardından olanları BT destek ekibine anlatın."
+            },
+            {
+              "id": "run",
+              "label": "“Tamam” ile çalıştır",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Komut çalıştı ve arka planda zararlı yazılım yükledi. Böyle bir pencerede asla hiçbir şey çalıştırmayın."
+            },
+            {
+              "id": "report",
+              "label": "BT destek ekibine bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "İyi bir seçim. BT destek ekibi neler olduğunu araştırabilir."
+            }
+          ]
+        },
+        {
+          "id": "script-window",
+          "artifact": {
+            "kind": "dialog",
+            "tone": "warning",
+            "title": [
+              {
+                "text": "Bilinmeyen komut dosyası"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bilinmeyen bir komut dosyası çalıştırılmak üzere. Devam edilsin mi?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Durdur",
+              "Devam et"
+            ]
+          },
+          "say": "Şimdi de bilinmeyen bir pencere açılıyor ve devam etmek için izin istiyor.",
+          "actions": [
+            {
+              "id": "stop",
+              "label": "Durdur",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Beklemediğiniz bir komut dosyasını durdurmak zararı önler."
+            },
+            {
+              "id": "continue",
+              "label": "Devam et",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "Komut dosyası çalışmaya devam etti ve zararlı yazılım yükledi. Bilinmeyen bir komut dosyasına izin vermeyin."
+            }
+          ]
+        },
+        {
+          "id": "real-update",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "sistem-yenileme",
+            "tone": "system",
+            "title": [
+              {
+                "text": "Sistem güncellemesi hazır"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Güncellemeyi şimdi uygulamak istiyor musunuz?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Daha sonra",
+              "Güncelle"
+            ]
+          },
+          "say": "Bu, sistemin kendi güncelleme penceresi.",
+          "actions": [
+            {
+              "id": "update",
+              "label": "Güncelle",
+              "kind": "update",
+              "outcome": "safe",
+              "feedback": "Doğru. Sistemin kendi güncellemesi güvenlidir ve sizden asla komut istemez."
+            },
+            {
+              "id": "later",
+              "label": "Daha sonra",
+              "kind": "later",
+              "outcome": "safe",
+              "feedback": "Bu da olur. Güncellemeyi size uygun bir zamanda uygulayabilirsiniz."
+            },
+            {
+              "id": "report",
+              "label": "Şüpheli olarak bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Buna gerek yok. Bu, sistemin sıradan güncelleme bildirimi."
+            }
+          ]
+        },
+        {
+          "id": "beacon",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "it-tehlukesizlik",
+            "app": "BT Güvenlik",
+            "title": [
+              {
+                "text": "Olağan dışı ağ etkinliği"
+              }
+            ],
+            "body": [
+              {
+                "text": "Bilgisayarınız bilinmeyen bir sunucuya veri gönderiyor."
+              }
+            ],
+            "time": "14:20"
+          },
+          "say": "Bir bildirim bilgisayarın bilinmeyen bir adrese bağlandığını söylüyor.",
+          "actions": [
+            {
+              "id": "disconnect",
+              "label": "İnterneti kes",
+              "kind": "disconnect",
+              "outcome": "safe",
+              "feedback": "Doğru. Bağlantıyı kesmek verilerin dışarı çıkmasını durdurur."
+            },
+            {
+              "id": "report",
+              "label": "BT destek ekibine bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Harika. Artık BT destek ekibi bilgisayarı kontrol edip temizleyebilir."
+            },
+            {
+              "id": "ignore",
+              "label": "Kapat ve çalışmaya devam et",
+              "kind": "ignore",
+              "outcome": "compromised",
+              "feedback": "Yazılım veri göndermeye devam ediyor. Böyle bir bildirimi asla görmezden gelmeyin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "fc2-order",
+      "prompt": "Bir sitenin verdiği komutu çalıştırdınız. Adımları sıraya koyun.",
+      "items": [
+        {
+          "id": "disconnect",
+          "label": "Kabloyu çıkarın ya da Wi-Fi'yi kapatın"
+        },
+        {
+          "id": "report",
+          "label": "Hemen BT destek ekibini arayın"
+        },
+        {
+          "id": "tell",
+          "label": "Neyi nereye yapıştırdığınızı anlatın"
+        },
+        {
+          "id": "password",
+          "label": "Parolaları başka, temiz bir cihazdan değiştirin"
+        }
+      ],
+      "explain": "Önce ağ bağlantısını kesin, sonra hemen arayın. Prosedürünüz aksini söylemiyorsa bilgisayarı kapatmayın."
+    },
+    {
+      "type": "choice",
+      "id": "fc2-choice",
+      "question": {
+        "prompt": "Bir site, bir metni kopyalayıp Çalıştır penceresine yapıştırmanızı söylüyor. Ne yaparsınız?",
+        "options": [
+          {
+            "id": "refuse",
+            "label": "Yapmam ve sayfayı kapatırım",
+            "correct": true,
+            "feedback": "Doğru. Hiçbir site sizden komut çalıştırmanızı istemez; bu bir tuzak."
+          },
+          {
+            "id": "paste",
+            "label": "Devam edebilmek için yapıştırırım",
+            "correct": false,
+            "feedback": "O metin gizli bir komuttur ve zararlı yazılım yükler. Asla yapıştırmayın."
+          },
+          {
+            "id": "official",
+            "label": "Site resmî görünüyorsa yapıştırırım",
+            "correct": false,
+            "feedback": "Resmî bir görünümü taklit etmek kolaydır. Kural basit: böyle bir metni asla çalıştırmayın."
+          }
+        ]
+      },
+      "explain": "Bir sitenin kopyalamanızı söylediği metin gizli bir komuttur. Yapıştırmayın, sayfayı kapatın."
+    },
+    {
+      "type": "match",
+      "id": "fc2-match",
+      "prompt": "Her durumu doğru tepkiyle eşleştirin.",
+      "pairs": [
+        {
+          "id": "robot",
+          "left": "Bir doğrulama sizden tuşlara basmanızı istiyor",
+          "right": "Sahtedir, sayfayı kapatın"
+        },
+        {
+          "id": "pdf",
+          "left": "Belge açılmıyor, bir komut çalıştırmanız isteniyor",
+          "right": "Aynı tuzak, yapmayın"
+        },
+        {
+          "id": "real",
+          "left": "Gerçek bir doğrulama",
+          "right": "Resim seçmek ya da kutu işaretlemek"
+        },
+        {
+          "id": "done",
+          "left": "Komutu zaten çalıştırdınız",
+          "right": "Ağ bağlantısını kesin ve bildirin"
+        }
+      ],
+      "explain": "Komut isteyen her sayfa sahtedir. Komutu zaten çalıştırdıysanız ağ bağlantısını kesin ve BT destek ekibine haber verin."
+    },
+    {
+      "type": "recap",
+      "id": "fc2-recap",
+      "points": [
+        "Bir siteden aldığınız metni asla Çalıştır penceresine yapıştırmayın",
+        "Komut isteyen her sayfa sahtedir",
+        "Bunu yaptıysanız ağ bağlantısını kesin ve BT destek ekibine haber verin"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

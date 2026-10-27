@@ -1,0 +1,526 @@
+{
+ "id": "consent-screen",
+ "title": "Ecranul de permisiuni",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac1-tutor",
+   "beats": [
+    {
+     "id": "ac1-b1",
+     "say": "Bună ziua! Astăzi învățăm despre o capcană care vă cere permisiunea, nu parola.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "ac1-b2",
+     "say": "Aplicația vă spune: ca să vedeți documentul, permiteți-mi să vă citesc e-mailurile și să trimit mesaje în numele dumneavoastră.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "w2b-dokubaxis",
+       "app": "DokuBaxış Viewer",
+       "permissions": [
+        {
+         "label": [
+          {
+           "text": "Vizualizarea profilului dumneavoastră"
+          }
+         ],
+         "needed": true
+        },
+        {
+         "label": [
+          {
+           "text": "Citirea e-mailurilor și trimiterea de mesaje în numele dumneavoastră",
+           "spot": "mail"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "Păstrarea accesului și în absența dumneavoastră"
+          }
+         ],
+         "needed": false
+        }
+       ]
+      }
+     },
+     "highlight": "mail"
+    },
+    {
+     "id": "ac1-b3",
+     "say": "Un singur clic, și aplicația ajunge în căsuța dumneavoastră de e-mail. Chiar dacă vă schimbați parola, permisiunea rămâne.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "ac1-b4",
+     "say": "Regula: citiți numele aplicației și permisiunile și nu acordați niciodată acces unei aplicații pe care nu o cunoașteți.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ac1-hotspot",
+   "prompt": "Găsiți permisiunile de care această aplicație nu are nevoie.",
+   "artifact": {
+    "kind": "permission",
+    "brandRef": "w2b-dokubaxis",
+    "app": "DokuBaxış Viewer",
+    "permissions": [
+     {
+      "label": [
+       {
+        "text": "Vizualizarea profilului dumneavoastră"
+       }
+      ],
+      "needed": true
+     },
+     {
+      "label": [
+       {
+        "text": "Citirea e-mailurilor și trimiterea de mesaje în numele dumneavoastră",
+        "spot": "mail"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Citirea și modificarea tuturor fișierelor dumneavoastră",
+        "spot": "files"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Vizualizarea persoanelor de contact",
+        "spot": "contacts"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Păstrarea accesului și în absența dumneavoastră",
+        "spot": "offline"
+       }
+      ],
+      "needed": false
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "mail",
+     "label": "Citirea și trimiterea e-mailurilor",
+     "explain": "Pentru a vedea un document nu este nevoie de acces la e-mail. Cu această permisiune, aplicația poate trimite mesaje de phishing în numele dumneavoastră."
+    },
+    {
+     "id": "files",
+     "label": "Toate fișierele",
+     "explain": "O aplicație care afișează un singur document nu are nevoie de toate fișierele dumneavoastră. Scopul este furtul de date."
+    },
+    {
+     "id": "contacts",
+     "label": "Persoane de contact",
+     "explain": "Lista dumneavoastră de contacte este lista de ținte pentru următorul atac. Un document nu are nevoie de ea."
+    },
+    {
+     "id": "offline",
+     "label": "Acces permanent",
+     "explain": "Înseamnă că aplicația rămâne în contul dumneavoastră după ce vă deconectați și chiar după ce vă schimbați parola."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "ac1-swipe",
+   "prompt": "Care cerere de permisiuni este normală și care este o capcană? Glisați.",
+   "cards": [
+    {
+     "id": "meeting-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "gorus",
+      "app": "Görüş",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Vizualizarea calendarului dumneavoastră"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Vizualizarea profilului dumneavoastră"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Görüş este aplicația cunoscută a organizației și cere doar ce îi trebuie pentru ceea ce face."
+    },
+    {
+     "id": "greeting-card",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-bayram-tebriki",
+      "app": "Bayram Təbriki",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Vizualizarea persoanelor de contact"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Trimiterea de e-mailuri în numele dumneavoastră"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O felicitare nu are nevoie nici de persoanele de contact, nici de dreptul de a trimite e-mailuri. Scopul este să răspândească phishingul în numele dumneavoastră."
+    },
+    {
+     "id": "salary-calc",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-maas-kalkulyatoru",
+      "app": "Maaş Kalkulyatoru",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Citirea e-mailurilor dumneavoastră"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Păstrarea accesului și în absența dumneavoastră"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un calculator de salariu nu are nevoie de e-mailul dumneavoastră. Accesul permanent ține aplicația în contul dumneavoastră."
+    },
+    {
+     "id": "editor",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "senedyaz",
+      "app": "SənədYaz",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Deschiderea și salvarea fișierului pe care îl alegeți"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Editorul cunoscut cere acces doar la fișierul pe care îl alegeți. Permisiunea se potrivește cu ceea ce face."
+    },
+    {
+     "id": "pdf-tool",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "pdf-birlesdirici",
+      "app": "PDF Birləşdirici Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Citirea și modificarea tuturor fișierelor dumneavoastră"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Citirea și trimiterea e-mailurilor dumneavoastră"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Pentru a combina fișiere nu este nevoie nici de e-mail, nici de toate fișierele dumneavoastră. Nu acordați acces unei astfel de aplicații."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac1-sim",
+   "environment": "browser",
+   "title": "Documentul de buget partajat",
+   "intro": "Cineva v-a partajat un document de buget în numele colegei dumneavoastră Nigar. Ați deschis linkul; acum decideți pe fiecare ecran.",
+   "steps": [
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "IshPocht",
+      "url": [
+       {
+        "text": "https://giris.idare.example/icaze"
+       }
+      ],
+      "fields": [
+       "E-mail",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "say": "Uitați-vă la adresă: aceasta este pagina reală de conectare a organizației.",
+     "actions": [
+      {
+       "id": "sign-in",
+       "label": "Conectați-vă",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Adresa este reală, deci parola nu ajunge la un infractor. Capcana se află în fereastra următoare."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Și așa este sigur. Dar să presupunem că v-ați conectat: haideți să vedem fereastra următoare."
+      }
+     ]
+    },
+    {
+     "id": "consent",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-dokubaxis",
+      "app": "DokuBaxış Viewer",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Vizualizarea profilului dumneavoastră"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Citirea e-mailurilor și trimiterea de mesaje în numele dumneavoastră"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Citirea și modificarea tuturor fișierelor dumneavoastră"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Păstrarea accesului și în absența dumneavoastră"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Înainte să se deschidă documentul, a apărut această fereastră.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Nu permiteți",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Pentru a vedea un document nu este nevoie de e-mail, de acces la toate fișierele sau de acces permanent.",
+       "next": "known-app"
+      },
+      {
+       "id": "allow",
+       "label": "Permiteți",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Acum aplicația vă citește e-mailurile și scrie în numele dumneavoastră. Schimbarea parolei nu o oprește."
+      }
+     ]
+    },
+    {
+     "id": "connected-apps",
+     "label": "Aplicații conectate: DokuBaxış Viewer, acces permanent la e-mail și la fișiere",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/tetbiqler"
+       }
+      ]
+     },
+     "say": "A doua zi vă verificați contul.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați suportului IT, ca să revoce accesul",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Doar revocarea permisiunii elimină aplicația, iar un specialist va verifica și dacă au rămas urme."
+      },
+      {
+       "id": "password-only",
+       "label": "Schimbați doar parola",
+       "kind": "update",
+       "outcome": "risky",
+       "feedback": "Parola se schimbă, dar aplicația își păstrează permisiunea. Suportul IT trebuie să o revoce."
+      },
+      {
+       "id": "leave",
+       "label": "Lăsați așa",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Aplicația vă va citi e-mailurile în fiecare zi. Raportați-o chiar azi."
+      }
+     ]
+    },
+    {
+     "id": "known-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "idare-komekci",
+      "app": "İdarə Köməkçisi",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Vizualizarea profilului dumneavoastră"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Vizualizarea calendarului dumneavoastră"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "say": "Acum vă cere permisiunea chiar aplicația de asistent a organizației.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Permiteți",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Corect. O aplicație de serviciu cunoscută cere doar ce îi trebuie pentru ceea ce face."
+      },
+      {
+       "id": "deny",
+       "label": "Nu permiteți",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "Prudența este de înțeles, dar această aplicație este cunoscută și cere puțin. Dacă aveți dubii, întrebați suportul IT."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ac1-choice",
+   "question": {
+    "prompt": "Care permisiuni sunt cele mai periculoase? Alegeți toate variantele corecte.",
+    "options": [
+     {
+      "id": "send",
+      "label": "Trimiterea de e-mailuri în numele dumneavoastră",
+      "correct": true,
+      "feedback": "Corect. Cu această permisiune, aplicația le trimite colegilor mesaje de phishing în numele dumneavoastră."
+     },
+     {
+      "id": "offline",
+      "label": "Păstrarea accesului și în absența dumneavoastră",
+      "correct": true,
+      "feedback": "Corect. Înseamnă că aplicația rămâne în contul dumneavoastră și după ce vă deconectați."
+     },
+     {
+      "id": "profile",
+      "label": "Vizualizarea numelui și a fotografiei de profil",
+      "correct": false,
+      "feedback": "Este o permisiune minoră, de care are nevoie orice conectare obișnuită."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Accesul la e-mail, la fișiere și accesul permanent sunt cele mai mari permisiuni. Nu le acordați niciodată unei aplicații pe care nu o cunoașteți."
+  },
+  {
+   "type": "recap",
+   "id": "ac1-recap",
+   "points": [
+    "Pe un ecran de permisiuni, citiți numele aplicației și permisiunile",
+    "Nu acordați unei aplicații necunoscute acces la e-mail, la fișiere sau acces permanent",
+    "Dacă ați acordat accesul din greșeală, cereți suportului IT să îl revoce"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

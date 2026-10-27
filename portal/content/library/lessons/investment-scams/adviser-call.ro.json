@@ -1,0 +1,416 @@
+{
+ "id": "adviser-call",
+ "title": "Apelul consultantului",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac-tutor",
+   "beats": [
+    {
+     "id": "ac-b1",
+     "say": "Bună ziua! Astăzi vorbim despre cel mai periculos moment al unei înșelătorii cu investiții: apelul consultantului personal.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "ac-b2",
+     "say": "Totul începe cu o reclamă sau cu un grup pe o aplicație de mesagerie. Observați cuvintele „profit garantat”.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2d-bakutrade",
+       "app": "whatsapp",
+       "contact": [
+        {
+         "text": "BakuTrade Pro | Investitori"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Încă +18% astăzi!"
+          }
+         ],
+         "time": "19:02"
+        },
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Profit garantat, fără niciun risc.",
+           "spot": "guarantee"
+          }
+         ],
+         "time": "19:03"
+        }
+       ]
+      }
+     },
+     "highlight": "guarantee"
+    },
+    {
+     "id": "ac-b3",
+     "say": "Nicio investiție legitimă nu promite profituri mari și garantate.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "ac-b4",
+     "say": "Verificați chiar dumneavoastră licența, în lista oficială a Băncii Centrale. O licență străină nu este suficientă aici.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "certificate"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac-sim",
+   "environment": "call",
+   "title": "Vă sună BakuTrade Pro",
+   "intro": "V-ați lăsat numărul într-un formular dintr-o reclamă. Acum vă sună un consultant. Alegeți ce răspundeți.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Regatul Unit",
+      "voice": "young-man-2"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Răspundeți",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Nu este periculos să răspundeți. Contează la ce vă dați acordul."
+      },
+      {
+       "id": "decline",
+       "label": "Respingeți",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Și așa este bine. Nu este obligatoriu să răspundeți la un număr străin necunoscut.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pitch",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Regatul Unit",
+      "voice": "young-man-2"
+     },
+     "say": "Bună ziua, sunt Javid Alizada, consultantul dumneavoastră personal de la BakuTrade Pro. Vă garantăm treizeci la sută pe lună, fără niciun risc.",
+     "spoken": "Bună ziua, <breath> sunt Javid Alizada, consultantul dumneavoastră personal de la BakuTrade Pro. Vă garantăm, ăă, treizeci la sută pe lună, fără niciun risc.",
+     "actions": [
+      {
+       "id": "interested",
+       "label": "Sună bine, ce trebuie să fac?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Profiturile mari garantate sunt principalul semn de fraudă. Dacă mergeți mai departe, vi se vor cere bani."
+      },
+      {
+       "id": "licence",
+       "label": "Vă verific licența în lista Băncii Centrale",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Verificați licența chiar dumneavoastră, în lista oficială, nu pe cuvântul lor.",
+       "next": "licence-push"
+      },
+      {
+       "id": "hang",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bună decizie. Promisiunea unui profit garantat este un motiv suficient ca să închideți.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "deposit",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Regatul Unit",
+      "voice": "young-man-2"
+     },
+     "say": "Excelent! Pentru început aveți nevoie de doar 250 de manați. Spuneți-mi numărul cardului și codul de pe spate, iar eu vă deschid contul.",
+     "spoken": "Excelent! <breath> Pentru început aveți nevoie de doar 250 de manați. Spuneți-mi numărul cardului și codul de pe spate, iar eu vă deschid contul.",
+     "actions": [
+      {
+       "id": "give-card",
+       "label": "Îi dictez datele cardului",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Datele cardului au ajuns la escroc. Imediat după apel, sunați la bancă și blocați cardul.",
+       "next": "remote"
+      },
+      {
+       "id": "refuse",
+       "label": "Nu dau datele cardului la telefon",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Nu spuneți nimănui la telefon numărul cardului sau codul de pe spatele lui.",
+       "next": "licence-push"
+      },
+      {
+       "id": "hang",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bună decizie. Să închideți un apel în care vi se cer datele cardului este răspunsul corect.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "licence-push",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Regatul Unit",
+      "voice": "young-man-2"
+     },
+     "say": "Avem licență europeană, tocmai v-am trimis certificatul. Nu e nevoie să verificați la Banca Centrală.",
+     "spoken": "Avem licență europeană, ăă, tocmai v-am trimis certificatul. <breath> Nu e nevoie să verificați la Banca Centrală.",
+     "actions": [
+      {
+       "id": "accept",
+       "label": "Dacă există un certificat, e în regulă",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Imaginea unui certificat se falsifică ușor. Banca Centrală a avertizat că o licență străină nu dă dreptul de a activa aici."
+      },
+      {
+       "id": "check",
+       "label": "Tot verific în lista oficială",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Un consultant care încearcă să vă împiedice să verificați se dă singur de gol."
+      },
+      {
+       "id": "hang",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Corect. Când presiunea crește, cel mai bun răspuns este să încheiați apelul.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "remote",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Regatul Unit",
+      "voice": "young-man-2"
+     },
+     "say": "Vă ajut eu să tranzacționați. Instalați aplicația EkranPaylash, ca să vă pot vedea ecranul.",
+     "spoken": "Vă ajut, ăă, eu să tranzacționați. <breath> Instalați aplicația EkranPaylash, ca să vă pot vedea ecranul.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Instalez aplicația",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Cu această aplicație, el vă poate controla ecranul și aplicația bancară. Nu instalați niciodată așa ceva doar pentru că vă cere cineva la telefon."
+      },
+      {
+       "id": "refuse",
+       "label": "Nu instalez nicio aplicație",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Un consultant adevărat nu vă cere niciodată să vă controleze ecranul."
+      },
+      {
+       "id": "hang",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bună decizie. Încheiați imediat orice apel în care vi se cere acces la distanță."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Apelul s-a încheiat. Ce faceți acum?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2d-bakutrade",
+      "caller": [
+       {
+        "text": "BakuTrade Pro"
+       }
+      ],
+      "number": [
+       {
+        "text": "+44 7700 900 418"
+       }
+      ],
+      "label": "Regatul Unit",
+      "voice": "young-man-2"
+     },
+     "actions": [
+      {
+       "id": "check-list",
+       "label": "Verificați lista Băncii Centrale",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă firma nu apare în listă, raportați-o la poliție, la 102."
+      },
+      {
+       "id": "call-back",
+       "label": "Sunați-l înapoi pe consultant",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Dacă sunați înapoi, îi dați din nou escrocului controlul asupra conversației. Verificați dintr-o sursă oficială."
+      },
+      {
+       "id": "block",
+       "label": "Blocați numărul",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bine. Dacă ați dat datele cardului, sunați imediat și la bancă."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ac-choice",
+   "question": {
+    "prompt": "O colegă vă spune: „În prima lună am câștigat 200 de manați și i-am retras. Deci platforma e reală.”",
+    "options": [
+     {
+      "id": "bait",
+      "label": "Prima retragere este o momeală, o sumă mare nu o vor mai da înapoi",
+      "correct": true,
+      "feedback": "Corect. Vă lasă să retrageți puțin ca să obțină apoi o depunere mult mai mare."
+     },
+     {
+      "id": "join",
+      "label": "Deci e reală, intru și eu",
+      "correct": false,
+      "feedback": "O retragere reușită nu dovedește că platforma este legală. Verificați licența în lista oficială."
+     },
+     {
+      "id": "more",
+      "label": "Ar trebui să investească mai mult, ca să crească profitul",
+      "correct": false,
+      "feedback": "Exact asta așteaptă escrocii. După o depunere mare, retragerile nu mai funcționează brusc."
+     }
+    ]
+   },
+   "explain": "Aveți încredere în lista de licențe a Băncii Centrale, nu în ce spune platforma."
+  },
+  {
+   "type": "order",
+   "id": "ac-order",
+   "prompt": "Puneți în ordine pașii de urmat după ce ați trimis bani unei platforme frauduloase.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Nu mai plătiți nimic și întrerupeți orice contact"
+    },
+    {
+     "id": "bank",
+     "label": "Sunați la bancă și blocați cardul"
+    },
+    {
+     "id": "evidence",
+     "label": "Păstrați conversațiile, numerele și dovezile transferurilor"
+    },
+    {
+     "id": "police",
+     "label": "Raportați la poliție, la 102"
+    }
+   ],
+   "explain": "Apoi vor apărea servicii care promit să vă recupereze banii. Este o a doua înșelătorie, nu le plătiți nimic."
+  },
+  {
+   "type": "recap",
+   "id": "ac-recap",
+   "points": [
+    "Profiturile mari garantate sunt un semn de fraudă.",
+    "Verificați chiar dumneavoastră licența în lista oficială a Băncii Centrale.",
+    "Nu instalați nicio aplicație și nu dați datele cardului la cererea cuiva care vă sună."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

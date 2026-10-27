@@ -1,0 +1,366 @@
+{
+ "id": "passphrases",
+ "title": "Fraze de acces",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "long-beats-complex",
+   "beats": [
+    {
+     "id": "short",
+     "say": "Parola aceasta pare complexă, dar un nume, un an și un semn de exclamare sunt primul tipar pe care îl încearcă atacatorii.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "stat",
+      "value": "Aynur1985!",
+      "label": "Pare complexă, dar se sparge ușor"
+     }
+    },
+    {
+     "id": "phrase",
+     "say": "Mai bine: o frază de acces din patru sau mai multe cuvinte alese la întâmplare. Este lungă, ușor de reținut și foarte greu de ghicit.",
+     "mood": "happy",
+     "gesture": "nod",
+     "visual": {
+      "kind": "stat",
+      "value": "fluture nisip ocean ceas",
+      "label": "Doar un exemplu, creați-vă propria frază"
+     },
+     "stage": "back"
+    },
+    {
+     "id": "length",
+     "say": "Lungimea contează mai mult decât complexitatea. Folosiți cel puțin cincisprezece caractere; spațiile sau cratimele dintre cuvinte sunt permise.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "stat",
+      "value": "15+",
+      "label": "caractere, minimul recomandat"
+     },
+     "checkpoint": {
+      "prompt": "Care parolă este mai puternică?",
+      "options": [
+       {
+        "id": "swaps",
+        "label": "Pa$$w0rd2026",
+        "correct": false,
+        "feedback": "Înlocuirile de litere sunt bine cunoscute de programele care sparg parole."
+       },
+       {
+        "id": "words",
+        "label": "cămilă felinar lămâie nor",
+        "correct": true,
+        "feedback": "Corect. Patru cuvinte alese la întâmplare formează o parolă lungă și imprevizibilă."
+       }
+      ]
+     }
+    },
+    {
+     "id": "stuffing",
+     "say": "Când un site suferă o scurgere de date, atacatorii încearcă aceeași parolă și pe alte site-uri. De aceea, fiecare cont are nevoie de propria parolă.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    }
+   ]
+  },
+  {
+   "type": "password",
+   "id": "make-passphrase",
+   "prompt": "Creați-vă propria frază de acces.",
+   "targetScore": 4,
+   "tips": [
+    "Nu introduceți aici parola reală, acesta este doar un exercițiu.",
+    "Alegeți patru sau mai multe cuvinte la întâmplare.",
+    "Evitați versurile de cântece, poeziile și proverbele.",
+    "Nu includeți nume, date calendaristice sau numele locului de muncă."
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "leak-alert",
+   "prompt": "Găsiți semnele unui fals în această alertă despre o scurgere de date.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "xidmet-agentliyi-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Centrul de securitate",
+       "reveal": "security@xidmetagentliyi-az.com"
+      }
+     ],
+     "address": [
+      {
+       "text": "security@"
+      },
+      {
+       "text": "xidmetagentliyi-az.com",
+       "spot": "sender-domain"
+      }
+     ]
+    },
+    "to": "a.hasanova@xidmetagentliyi.az",
+    "subject": [
+     {
+      "text": "Parola dumneavoastră a fost găsită într-o scurgere de date"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Stimate utilizator,",
+       "spot": "greeting"
+      }
+     ],
+     [
+      {
+       "text": "Parola dumneavoastră a fost găsită într-o bază de date publicată pe internet."
+      }
+     ],
+     [
+      {
+       "text": "Pentru a vă proteja contul, "
+      },
+      {
+       "text": "introduceți parola veche și parola nouă în acest formular.",
+       "spot": "old-password"
+      }
+     ],
+     [
+      {
+       "text": "Deschideți formularul",
+       "spot": "link",
+       "link": {
+        "label": "Deschideți formularul",
+        "href": "https://parol-yenile.info/forma"
+       }
+      }
+     ],
+     [
+      {
+       "text": "Dacă nu acționați în decurs de o oră, contul va fi șters.",
+       "spot": "urgency"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender-domain",
+     "label": "Domeniu fals",
+     "explain": "Domeniul agenției este xidmetagentliyi.az, fără -az.com la final."
+    },
+    {
+     "id": "greeting",
+     "label": "Formulă de adresare generică",
+     "explain": "Echipa de securitate a organizației v-ar scrie pe nume."
+    },
+    {
+     "id": "old-password",
+     "label": "Cere parola veche",
+     "explain": "Un serviciu real nu vă cere să introduceți parola veche într-un formular primit pe e-mail. Schimbați-o dumneavoastră, pe site-ul pe care îl cunoașteți."
+    },
+    {
+     "id": "link",
+     "label": "Link străin",
+     "explain": "Linkul duce la alt domeniu, nu la site-ul agenției."
+    },
+    {
+     "id": "urgency",
+     "label": "Amenințare cu termen de o oră",
+     "explain": "Un termen scurt și o amenințare vă împing să acționați fără să vă gândiți."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "reset-page",
+   "environment": "browser",
+   "title": "Resetarea parolei",
+   "intro": "După un avertisment despre o scurgere de date, în browser se deschide o pagină de resetare a parolei. Citiți adresa și decideți.",
+   "steps": [
+    {
+     "id": "leak-page",
+     "label": "Parola dumneavoastră a fost găsită într-o scurgere de date",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "xidmet-agentliyi-fake",
+      "url": [
+       {
+        "text": "https://",
+        "reveal": "hesab-yoxla.info"
+       },
+       {
+        "text": "hesab-yoxla.info",
+        "spot": "real-domain"
+       },
+       {
+        "text": "/sizma"
+       }
+      ]
+     },
+     "say": "Pagina vă sperie și vă grăbește. A cui este adresa?",
+     "actions": [
+      {
+       "id": "reset-here",
+       "label": "Resetați parola aici",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "După un avertisment despre o scurgere de date, nu urmați linkul. Schimbați parola pe un site pe care îl deschideți dumneavoastră."
+      },
+      {
+       "id": "close",
+       "label": "Închid fila și deschid eu portalul",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect: hesab-yoxla.info nu este site-ul agenției. Deschideți dumneavoastră portalul, din marcaje.",
+       "next": "real-reset"
+      }
+     ]
+    },
+    {
+     "id": "fake-reset",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "xidmet-agentliyi-fake",
+      "brand": "Xidmət Agentliyi",
+      "url": [
+       {
+        "text": "https://",
+        "reveal": "parol-yenile.info"
+       },
+       {
+        "text": "parol-yenile.info",
+        "spot": "real-domain"
+       },
+       {
+        "text": "/agentlik"
+       }
+      ],
+      "fields": [
+       "E-mail",
+       "Parola veche",
+       "Parola nouă"
+      ],
+      "button": "Resetați parola"
+     },
+     "say": "Formularul vă cere și parola veche. Verificați adresa.",
+     "actions": [
+      {
+       "id": "submit",
+       "label": "Resetați parola",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Un formular fals care cere parola veche o fură. Schimbați-o imediat pe portalul oficial și raportați incidentul."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Domeniul parol-yenile.info nu este al agenției, așa că nu introduceți nimic aici."
+      },
+      {
+       "id": "report",
+       "label": "Raportați site-ul",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Raportarea site-ului fals ajută la blocarea lui și pentru ceilalți."
+      }
+     ]
+    },
+    {
+     "id": "real-reset",
+     "label": "Ați deschis dumneavoastră portalul",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "xidmet-agentliyi",
+      "brand": "Xidmət Agentliyi",
+      "url": [
+       {
+        "text": "https://portal.xidmetagentliyi.az/profil/parol",
+        "reveal": "xidmetagentliyi.az"
+       }
+      ],
+      "fields": [
+       "Parola veche",
+       "Fraza de acces nouă"
+      ],
+      "button": "Schimbați"
+     },
+     "say": "Acesta este chiar portalul agenției. Ce faceți acum?",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Schimbați parola",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Corect, ați schimbat-o pe portalul oficial. Alegeți ca parolă nouă o frază lungă, pe care nu o folosiți nicăieri în altă parte."
+      },
+      {
+       "id": "later",
+       "label": "O schimb mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Dacă parola a ajuns publică, este posibil ca cineva să o încerce deja. Schimbați-o acum, pe portalul oficial."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "true-rules",
+   "question": {
+    "prompt": "Care dintre aceste reguli sunt corecte?",
+    "options": [
+     {
+      "id": "length",
+      "label": "Lungimea contează mai mult decât complexitatea",
+      "correct": true,
+      "feedback": "Corect. O parolă lungă este mult mai greu de spart."
+     },
+     {
+      "id": "unique",
+      "label": "O parolă separată pentru fiecare cont",
+      "correct": true,
+      "feedback": "Corect. Astfel, o scurgere de date pune în pericol un singur cont."
+     },
+     {
+      "id": "monthly",
+      "label": "Schimbați-vă parola în fiecare lună",
+      "correct": false,
+      "feedback": "Schimbarea fără motiv duce adesea la parole slabe și asemănătoare. Schimbați-o imediat dacă bănuiți o scurgere de date."
+     },
+     {
+      "id": "birth-year",
+      "label": "Anul nașterii vă ajută să o rețineți",
+      "correct": false,
+      "feedback": "Anul nașterii este ușor de aflat, iar atacatorii îl încearcă primul."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Recomandările actuale: parole lungi și unice, schimbate imediat după o scurgere de date. Dacă regulile organizației dumneavoastră sunt altele, respectați-le."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "O frază de acces lungă este mai sigură decât o parolă scurtă și complexă.",
+    "O parolă separată pentru fiecare cont.",
+    "După o scurgere de date, schimbați imediat parola."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

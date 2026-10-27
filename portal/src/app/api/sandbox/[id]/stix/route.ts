@@ -1,12 +1,14 @@
 import { isUuid } from "@/lib/ids";
 import { and, eq } from "drizzle-orm";
 import { allowed, getViewer, twoFactorGap } from "@/server/auth/viewer";
-import { deniedResponse } from "@/server/auth/api";
+import { deniedResponse, rscProbe } from "@/server/auth/api";
 import { db, t } from "@/server/db";
 import { toStix } from "@/server/sandbox/analyze";
 
 /** STIX 2.1 bundle of one sandbox analysis. Analysts get any; employees only their own. */
 export async function GET(request: Request, { params }: RouteContext<"/api/sandbox/[id]/stix">) {
+  const probe = rscProbe(request);
+  if (probe) return probe;
   const v = await getViewer();
   if (!v) return deniedResponse(request, 401);
   const { id } = await params;

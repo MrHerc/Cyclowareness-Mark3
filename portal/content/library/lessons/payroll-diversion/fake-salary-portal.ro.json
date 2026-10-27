@@ -1,0 +1,505 @@
+{
+ "id": "fake-salary-portal",
+ "title": "Portalul de salarii fals",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pd2-tutor",
+   "beats": [
+    {
+     "id": "pd2-b1",
+     "say": "Acum vă aflați în rolul unui angajat obișnuit și vreți să vă vedeți fluturașul de salariu.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "pd2-b2",
+     "say": "Primul rezultat al căutării este adesea o reclamă. Escrocii își plasează acolo portalurile false, sub formă de reclame.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "w2f-kadr-kabineti-fake",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "kadr-kabineti-giris.example.net",
+         "spot": "ad-domain"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "ad-domain"
+    },
+    {
+     "id": "pd2-b3",
+     "say": "Pagina falsă arată exact ca cea reală. Dacă vă introduceți parola, contul dumneavoastră poate fi preluat, iar apoi poate fi schimbat și contul în care primiți salariul.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "w2f-kadr-kabineti-fake",
+       "brand": "Kadr Kabineti",
+       "url": [
+        {
+         "text": "https://kadr-kabineti-giris.example.net/giris"
+        }
+       ],
+       "fields": [
+        "E-mail de serviciu",
+        "Parolă"
+       ],
+       "button": "Conectați-vă"
+      }
+     }
+    },
+    {
+     "id": "pd2-b4",
+     "say": "Tastați chiar dumneavoastră adresa portalului sau deschideți-l dintr-un marcaj. Și păstrați activată verificarea în doi pași.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "pd2-choice",
+   "question": {
+    "prompt": "Ați căutat „kadr kabineti”. Cum intrați în portal?",
+    "options": [
+     {
+      "id": "ad",
+      "label": "Anunț: Kadr Kabineti, conectare oficială (kadr-kabineti-giris.example.net)",
+      "correct": false,
+      "feedback": "Spațiul publicitar se cumpără, așa că un site fals poate apărea chiar în vârful listei. Acest domeniu nu este al organizației dumneavoastră."
+     },
+     {
+      "id": "lookalike",
+      "label": "kadr-kabineti.example.org: fluturaș de salariu",
+      "correct": false,
+      "feedback": "Numele seamănă, dar domeniul nu este al organizației dumneavoastră. Un nume aproape identic este cel mai răspândit truc."
+     },
+     {
+      "id": "typed",
+      "label": "Îl tastez chiar eu: kabinet.seherxidmetleri.example",
+      "correct": true,
+      "feedback": "Corect. O adresă pe care o tastați sau pe care ați salvat-o ca marcaj nu depinde de reclame."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-tapinti",
+      "url": [
+       {
+        "text": "https://axtar.example/?q=kadr+kabineti"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "Escrocii folosesc reclamele din motoarele de căutare ca să aducă portalurile false în vârful listei. Verificați o dată adresa portalului și salvați-o ca marcaj."
+  },
+  {
+   "type": "simulation",
+   "id": "pd2-sim",
+   "environment": "browser",
+   "title": "Fluturașul de salariu",
+   "intro": "Ați deschis browserul ca să vă vedeți fluturașul de salariu. Urmăriți bara de adrese și luați decizia corectă la fiecare pas.",
+   "steps": [
+    {
+     "id": "search",
+     "label": "Anunț: Kadr Kabineti, conectare oficială pentru fluturașul de salariu",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-tapinti",
+      "url": [
+       {
+        "text": "https://axtar.example/?q=kadr+kabineti",
+        "reveal": "axtar.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "ad",
+       "label": "Deschideți rezultatul sponsorizat",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Această reclamă duce la un portal fals. În bara de adrese nu apare domeniul organizației dumneavoastră.",
+       "next": "fake-login"
+      },
+      {
+       "id": "bookmark",
+       "label": "Deschideți Kadr Kabineti din marcaje",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. Un marcaj vă duce întotdeauna la adresa reală.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kadr-kabineti-giris.example.net/giris",
+        "reveal": "kadr-kabineti-giris.example.net"
+       }
+      ],
+      "fields": [
+       "E-mail de serviciu",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "say": "Uitați-vă la bara de adrese.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Conectați-vă",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Parola dumneavoastră a ajuns la escroc. Schimbați-o imediat pe portalul real și sunați la resurse umane."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect, domeniul nu este al organizației dumneavoastră. Deschideți portalul din marcaje.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-code",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kadr-kabineti-giris.example.net/tesdiq",
+        "reveal": "kadr-kabineti-giris.example.net"
+       }
+      ],
+      "fields": [
+       "Codul din SMS"
+      ],
+      "button": "Confirmați"
+     },
+     "say": "Acum site-ul vă cere codul trimis pe telefon.",
+     "actions": [
+      {
+       "id": "code",
+       "label": "Confirmați",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Cu acest cod, escrocul intră complet în contul dumneavoastră. Introduceți un cod doar pe site-ul real și doar atunci când vă conectați chiar dumneavoastră."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bine că v-ați oprit. Acum schimbați-vă parola pe portalul real și anunțați resursele umane."
+      }
+     ]
+    },
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kabinet.seherxidmetleri.example/giris",
+        "reveal": "seherxidmetleri.example"
+       }
+      ],
+      "fields": [
+       "E-mail de serviciu",
+       "Parolă"
+      ],
+      "button": "Conectați-vă"
+     },
+     "say": "Aceasta este chiar adresa organizației dumneavoastră.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Conectați-vă",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Corect. Domeniul aparține organizației dumneavoastră, iar pagina ați deschis-o chiar dumneavoastră."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Acesta este portalul real. După ce ați verificat adresa, vă puteți conecta în siguranță."
+      }
+     ]
+    },
+    {
+     "id": "mfa-offer",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-kadr-kabineti",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Verificarea în doi pași este dezactivată"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Activați-o acum ca să vă protejați contul. Telefonul dumneavoastră va confirma fiecare conectare."
+        }
+       ]
+      ],
+      "buttons": [
+       "Activați",
+       "Mai târziu"
+      ]
+     },
+     "actions": [
+      {
+       "id": "enable",
+       "label": "Activați",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Chiar dacă vă este furată parola, al doilea pas îi blochează accesul unui străin."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Fără verificarea în doi pași, o singură parolă deschide totul. Activați-o astăzi."
+      }
+     ]
+    },
+    {
+     "id": "bank-details",
+     "label": "Datele dumneavoastră bancare: ultima modificare la 14.03.2025, făcută de resursele umane",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-kadr-kabineti",
+      "url": [
+       {
+        "text": "https://kabinet.seherxidmetleri.example/rekvizitler",
+        "reveal": "seherxidmetleri.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "check",
+       "label": "Verificați contul",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Un obicei bun. Dacă vedeți o modificare pe care nu ați făcut-o, sunați imediat la resurse umane."
+      },
+      {
+       "id": "skip",
+       "label": "Ieșiți fără să verificați",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Dacă un străin ar fi schimbat datele, ați afla abia în ziua de salariu. O verificare rapidă durează câteva secunde."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "pd2-swipe",
+   "prompt": "Sigur sau înșelătorie?",
+   "cards": [
+    {
+     "id": "boss-gift-cards",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Sabina Aliyeva, manager"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Sunt într-o ședință și nu pot suna. Cumpărați repede cinci carduri BonusMarket de câte 100 de manați și trimiteți-mi codurile aici. Vă dau banii înapoi."
+         }
+        ],
+        "time": "11:02"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Codul unui card cadou este ca banii gheață și nu se mai întoarce niciodată. Ca să verificați, sunați-o pe Sabina la un număr pe care îl cunoașteți."
+    },
+    {
+     "id": "salary-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "09:00",
+      "messages": [
+       [
+        {
+         "text": "Salariul de 1.240,00 AZN a fost virat pe cardul dumneavoastră. Sold: 1.386,50 AZN."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Nu conține niciun link și nu vă cere nimic. Este un mesaj informativ obișnuit."
+    },
+    {
+     "id": "fake-hr-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "sender": [
+       {
+        "text": "KadrKabinet"
+       }
+      ],
+      "time": "08:41",
+      "messages": [
+       [
+        {
+         "text": "Salariul dumneavoastră este blocat. Actualizați-vă datele bancare: "
+        },
+        {
+         "text": "kadr-kabinet.example.info/yenile",
+         "link": {
+          "label": "kadr-kabinet.example.info/yenile",
+          "href": "https://kadr-kabinet.example.info/yenile"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Resursele umane nu deblochează niciodată un salariu printr-un link primit prin SMS. Deschideți chiar dumneavoastră portalul sau sunați echipa."
+    },
+    {
+     "id": "payslip-ready",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-kadr-kabineti",
+      "app": "Kadr Kabineti",
+      "title": [
+       {
+        "text": "Fluturașul de salariu pe septembrie este gata"
+       }
+      ],
+      "body": [
+       {
+        "text": "Consultați secțiunea „Salariu” din portal."
+       }
+      ],
+      "time": "10:15"
+     },
+     "verdict": "safe",
+     "explain": "Această notificare nu conține niciun link și vă trimite la portalul pe care îl cunoașteți. Deschideți-l din marcaje."
+    },
+    {
+     "id": "colleague-code",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Gunel, contabilitate"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "O să primești un cod de la Kadr Kabineti. Spune-mi-l, te rog, ca să corectez statul de plată."
+         }
+        ],
+        "time": "13:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un cod de conectare este doar pentru dumneavoastră. Cine vă obține codul intră în contul dumneavoastră."
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "pd2-order",
+   "prompt": "V-ați introdus parola pe un portal fals. Puneți pașii în ordine.",
+   "items": [
+    {
+     "id": "change-password",
+     "label": "Schimbați imediat parola pe portalul real"
+    },
+    {
+     "id": "call",
+     "label": "Sunați la resurse umane și la echipa de securitate"
+    },
+    {
+     "id": "check-details",
+     "label": "Verificați împreună cu ei datele bancare și conectările recente"
+    },
+    {
+     "id": "enable-mfa",
+     "label": "Activați verificarea în doi pași"
+    }
+   ],
+   "explain": "Mai întâi schimbați parola, apoi sunați, ca orice modificare a datelor bancare să fie oprită. Dacă ați introdus și un cod, spuneți neapărat acest lucru."
+  },
+  {
+   "type": "recap",
+   "id": "pd2-recap",
+   "points": [
+    "Deschideți portalul dintr-un marcaj, nu din rezultatele căutării.",
+    "Păstrați activată verificarea în doi pași.",
+    "Verificați telefonic orice cerere de carduri cadou sau de coduri."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

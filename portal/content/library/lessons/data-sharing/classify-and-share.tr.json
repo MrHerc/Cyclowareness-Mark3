@@ -1,0 +1,389 @@
+{
+ "id": "classify-and-share",
+ "title": "Sınıflandırın ve paylaşın",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "levels",
+     "say": "Her belgenin bir gizlilik derecesi vardır: herkese açık, kuruma özel ya da gizli. Bu derece, belgeyi kimin görebileceğini gösterir.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "public-internal",
+     "say": "Herkese açık belgeyi herkes görebilir, web sitesindeki bir duyuru gibi. Kuruma özel belge ise yalnızca çalışanlar içindir.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "confidential",
+     "say": "Gizli belge yalnızca adı belirlenmiş kişiler içindir. Sızarsa hem insanlar hem de kurum ciddi zarar görür.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "public-link",
+     "say": "Herkese açık bir bağlantı, dosyayı bütün internete açar. Dosyayı yalnızca adı belirlenmiş kişilerle paylaşın ve bir bitiş tarihi belirleyin.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "rxagentlik-disk",
+       "url": [
+        {
+         "text": "https://disk.rxagentlik.az/s/8Kq2Lm?access="
+        },
+        {
+         "text": "anyone",
+         "spot": "public"
+        }
+       ]
+      }
+     },
+     "highlight": "public"
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "share-requests",
+   "environment": "phone",
+   "title": "Paylaşım talepleri",
+   "intro": "Telefonunuza üç talep geldi. Belgenin gizlilik derecesine göre karar verin: paylaşacak mısınız, paylaşmayacak mısınız?",
+   "steps": [
+    {
+     "id": "phone-book",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Nigar (eski iş arkadaşı)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Selam! Yeni işimde lazım oldu: şirketin iç telefon rehberini bana gönderebilir misin?"
+         }
+        ],
+        "time": "10:14"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "keep",
+       "label": "Kuruma özel, gönderemem",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Kuruma özel belgeler yalnızca çalışanlar içindir ve eski bir iş arkadaşı artık kurumun dışından biridir."
+      },
+      {
+       "id": "share",
+       "label": "Dosyayı gönderirim",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Telefon rehberi kuruma özeldir. Dışarıda, oltalama (phishing) saldırıları için hazır bir hedef listesine dönüşür."
+      }
+     ]
+    },
+    {
+     "id": "job-ad",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "merkez-konsalting",
+      "from": {
+       "name": [
+        {
+         "text": "Elçin Rzayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "e.rzayev@merkez-konsalting.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "İş ilanı"
+       }
+      ],
+      "time": "11:02",
+      "body": [
+       [
+        {
+         "text": "Merhaba, web sitenizdeki iş ilanını bize gönderebilir misiniz? Öğrencilerimizle paylaşmak istiyoruz."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "share",
+       "label": "İlanı gönderirim",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Doğru. İş ilanı herkese açıktır ve zaten web sitesinde yayımlanmıştır."
+      },
+      {
+       "id": "keep",
+       "label": "Hiçbir şey göndermem",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Güvenli, ama herkese açık bir belgeyi saklamaya gerek yok. Web sitesindeki bağlantıyı göndermeniz yeterli."
+      }
+     ]
+    },
+    {
+     "id": "applications",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "+994 55 000 63 21"
+       }
+      ],
+      "time": "12:30",
+      "messages": [
+       [
+        {
+         "text": "Merhaba, ben gazeteciyim. Vatandaş başvurularının listesini gönderirseniz adınızı asla anmayız."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "keep",
+       "label": "Reddeder ve basın birimine yönlendiririm",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Başvurular gizlidir ve medyayla yalnızca basın birimi görüşür."
+      },
+      {
+       "id": "share",
+       "label": "Listeyi gönderirim",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Gizli bir liste kurumun dışına çıktı. Bu, vatandaşların kişisel verilerinin sızması demektir."
+      },
+      {
+       "id": "report",
+       "label": "Bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Güzel. Böyle bir talebi güvenlik ekibine ve yöneticinize de bildirin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "classify",
+   "prompt": "Her belgeyi gizlilik derecesiyle eşleştirin.",
+   "pairs": [
+    {
+     "id": "job-ad",
+     "left": "Web sitesinde yayımlanmış bir iş ilanı",
+     "right": "Herkese açık"
+    },
+    {
+     "id": "phone-book",
+     "left": "İç telefon rehberi",
+     "right": "Kuruma özel"
+    },
+    {
+     "id": "applications",
+     "left": "Vatandaş başvurularının listesi",
+     "right": "Gizli"
+    }
+   ],
+   "explain": "Emin değilseniz daha yüksek dereceyi seçin ve belgenin sahibine sorun."
+  },
+  {
+   "type": "hotspot",
+   "id": "misdelivered",
+   "prompt": "Bu e-posta size yanlışlıkla geldi. Paylaşım hatalarını bulun.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "rxagentlik",
+    "from": {
+     "name": [
+      {
+       "text": "Reşad Aliyev"
+      }
+     ],
+     "address": [
+      {
+       "text": "reshad.aliyev@rxagentlik.az"
+      }
+     ]
+    },
+    "to": "aynur.mammadova@rxagentlik.az",
+    "subject": [
+     {
+      "text": "Başvuru listesi"
+     }
+    ],
+    "time": "11:40",
+    "body": [
+     [
+      {
+       "text": "Merhaba Leyla Hanım,",
+       "spot": "greeting"
+      }
+     ],
+     [
+      {
+       "text": "Ekte "
+      },
+      {
+       "text": "kimlik kodlarıyla birlikte vatandaş başvurularının tam listesi",
+       "spot": "full-list"
+      },
+      {
+       "text": " yer alıyor."
+      }
+     ],
+     [
+      {
+       "text": "Listeyi buluta da yükledim, "
+      },
+      {
+       "text": "bağlantıya sahip olan herkes açabilir.",
+       "spot": "anyone"
+      }
+     ],
+     [
+      {
+       "text": "Arşiv şifresi: Muraciet2026",
+       "spot": "password"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Muracietler_tam.zip"
+       }
+      ],
+      "size": "2,4 MB"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "greeting",
+     "label": "Yanlış alıcı",
+     "explain": "E-posta Leyla Hanım'a yazılmış, ama size gelmiş. Bu, otomatik tamamlama hatasıdır."
+    },
+    {
+     "id": "full-list",
+     "label": "Gereğinden fazla veri",
+     "explain": "Görev için kimlik kodlarıyla birlikte tam listeye gerek yoktu. Yalnızca gerekeni gönderin."
+    },
+    {
+     "id": "anyone",
+     "label": "Herkese açık bağlantı",
+     "explain": "Gizli bir dosyanın asla herkese açık bağlantısı olmamalıdır. Bağlantı kimin eline geçerse dosyayı açabilir."
+    },
+    {
+     "id": "password",
+     "label": "Aynı e-postada parola",
+     "explain": "Dosyayla aynı e-postada gönderilen parola hiçbir şeyi korumaz. Parolayı başka bir kanaldan gönderin."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "sent-wrong",
+   "prompt": "Gizli bir dosyayı yanlış kişiye gönderdiniz. Adımları sıraya koyun.",
+   "items": [
+    {
+     "id": "close-link",
+     "label": "Paylaşım bağlantısını hemen kapatın"
+    },
+    {
+     "id": "report",
+     "label": "Yöneticinize ve güvenlik ekibine haber verin"
+    },
+    {
+     "id": "ask-delete",
+     "label": "Yöneticinizin ve güvenlik ekibinin yönlendirmesiyle alıcıdan dosyayı silmesini isteyin"
+    },
+    {
+     "id": "record",
+     "label": "Neyin, kime ve ne zaman gittiğini not edin"
+    }
+   ],
+   "explain": "Bu hatayı herkes yapabilir. Hızlı bildirmek zararı azaltır, saklamak ise büyütür."
+  },
+  {
+   "type": "choice",
+   "id": "link-setting",
+   "question": {
+    "prompt": "Bir proje dosyasını kurum dışındaki bir iş ortağına gönderiyorsunuz. Hangi ayar doğru?",
+    "options": [
+     {
+      "id": "anyone",
+      "label": "Bağlantıya sahip olan herkes, süresiz",
+      "correct": false,
+      "feedback": "Bağlantı başkalarına iletilebilir ve dosyayı herkes açabilir."
+     },
+     {
+      "id": "named",
+      "label": "Yalnızca adı belirlenmiş kişi, 7 gün süreyle",
+      "correct": true,
+      "feedback": "Doğru. Erişim dar ve süreyle sınırlı."
+     },
+     {
+      "id": "personal-cloud",
+      "label": "Kişisel bulut hesabıma yükleyip bağlantıyı gönderirim",
+      "correct": false,
+      "feedback": "Kişisel hesap, kurumun denetiminin dışındadır."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "cloud"
+    }
+   },
+   "explain": "Paylaşımı olabildiğince dar tutun: kiminle, ne kadar süreyle ve hangi yetkilerle."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Göndermeden önce belgenin gizlilik derecesini ve alıcıyı kontrol edin.",
+    "Bağlantıları kişiyle ve süreyle sınırlayın, parolaları ayrı gönderin.",
+    "Yanlış kişiye gönderdiyseniz saklamayın, hemen bildirin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

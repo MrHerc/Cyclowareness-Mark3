@@ -1,0 +1,295 @@
+{
+  "id": "after-mistake",
+  "title": "După o greșeală",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Oricui i se poate întâmpla să dea clic pe un link sau să dicteze un cod. Contează ce faceți în următoarele cinci minute.",
+          "mood": "talk",
+          "gesture": "nod",
+          "visual": { "kind": "illustration", "id": "handshake" }
+        },
+        {
+          "id": "b2",
+          "say": "Nu ascundeți greșeala și nu încercați s-o reparați fără ajutor. O greșeală trecută sub tăcere îi dă timp atacatorului.",
+          "mood": "alert",
+          "gesture": "shake",
+          "visual": { "kind": "illustration", "id": "mask" }
+        },
+        {
+          "id": "b3",
+          "say": "Spuneți sincer pe ce ați dat clic, ce ați introdus și ce ați spus. Specialistul trebuie să știe.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": { "kind": "illustration", "id": "eye" }
+        },
+        {
+          "id": "b4",
+          "say": "Apoi specialiștii blochează contul și verifică dispozitivul. Scopul este să oprim pagubele, nu să căutăm un vinovat.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": { "kind": "illustration", "id": "shield" }
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "gave-code",
+      "title": "Ați dictat codul",
+      "start": "call-ended",
+      "nodes": [
+        {
+          "id": "call-ended",
+          "text": "Apelantul a spus că este de la suportul IT, iar dumneavoastră i-ați dictat codul primit pe telefon. După apel, ați început să aveți îndoieli.",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "caller": [{ "text": "Suport IT" }],
+              "number": [{ "text": "+994 50 000 38 17" }],
+              "label": "Mobil"
+            }
+          },
+          "choices": [
+            {
+              "label": "Sun imediat la numărul de suport pe care îl cunosc",
+              "next": "honest",
+              "feedback": "Corect. Fiecare minut contează, iar atacatorul s-ar putea conecta chiar acum."
+            },
+            {
+              "label": "Mi-e rușine și nu spun nimănui",
+              "outcome": "compromised",
+              "feedback": "Atacatorul este acum în contul dumneavoastră și nimeni nu știe. Tăcerea agravează situația."
+            },
+            {
+              "label": "Schimb eu parola, e suficient",
+              "outcome": "risky",
+              "feedback": "Un pas bun, dar insuficient. Atacatorul poate rămâne într-o sesiune deschisă, pe care trebuie s-o închidă un specialist."
+            }
+          ]
+        },
+        {
+          "id": "honest",
+          "text": "Când ați dat codul și ce altceva a mai vrut apelantul?",
+          "speaker": "Echipa de securitate",
+          "voice": "woman",
+          "channel": "phone",
+          "manner": "firm",
+          "spoken": "Când ați dat codul <breath> și ce altceva a mai vrut apelantul?",
+          "choices": [
+            {
+              "label": "Povestesc totul așa cum a fost, inclusiv despre cod",
+              "next": "manager",
+              "feedback": "Corect. Cu detalii sincere, specialistul știe exact ce trebuie blocat."
+            },
+            {
+              "label": "Spun că a fost doar un apel și că n-am dat niciun cod",
+              "outcome": "risky",
+              "feedback": "Dacă află doar jumătate din poveste, specialistul nu știe că atacatorul a preluat contul. Sinceritatea economisește timp."
+            }
+          ]
+        },
+        {
+          "id": "manager",
+          "text": "Specialistul a închis toate sesiunile și v-a rugat să stabiliți o parolă nouă. Managerul vă întreabă: ce s-a întâmplat?",
+          "choices": [
+            {
+              "label": "Explic deschis, ca să fie avertizată și echipa",
+              "outcome": "safe",
+              "feedback": "Excelent. Povestea dumneavoastră îi protejează pe colegi de același apel."
+            },
+            {
+              "label": "Spun că nu s-a întâmplat nimic",
+              "outcome": "risky",
+              "feedback": "Același apel poate ajunge și la colegi. Dacă vorbiți, îi protejați."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "next-day-inbox",
+      "environment": "inbox",
+      "title": "A doua zi",
+      "intro": "Ieri ați deschis un link fals și l-ați raportat. Astăzi vă așteaptă trei e-mailuri noi.",
+      "steps": [
+        {
+          "id": "ticket",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-tehlukesizlik",
+            "from": {
+              "name": [{ "text": "Securitate IT" }],
+              "address": [{ "text": "security@idare.example" }]
+            },
+            "subject": [{ "text": "Raportul dumneavoastră: INC-2026-0412" }],
+            "time": "08:20",
+            "body": [
+              [{ "text": "Vă mulțumim pentru raportare. Toate sesiunile deschise ale contului dumneavoastră au fost închise." }],
+              [{ "text": "Astăzi, schimbați-vă parola pe portalul organizației. Nu vă trimitem niciun link: deschideți portalul chiar dumneavoastră." }]
+            ]
+          },
+          "actions": [
+            {
+              "id": "safe",
+              "label": "Marcați ca sigur",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Corect. Adresa este a organizației dumneavoastră, nu există niciun link și nu vi se cere nimic."
+            },
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Prudența e bună, dar acest e-mail este autentic: vine de la adresa organizației și nu conține niciun link."
+            }
+          ]
+        },
+        {
+          "id": "second-trap",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-tehlukesizlik-fake",
+            "from": {
+              "name": [{ "text": "Securitate IT" }],
+              "address": [{ "text": "security@idare-secure.example.net" }]
+            },
+            "subject": [{ "text": "Urgent: contul dumneavoastră a fost compromis" }],
+            "time": "09:02",
+            "body": [
+              [{ "text": "După incidentul de ieri, confirmați din nou contul în cel mult o oră." }],
+              [
+                { "text": "Confirmați aici: " },
+                {
+                  "text": "idare-secure.example.net/yoxla",
+                  "link": { "label": "idare-secure.example.net/yoxla", "href": "https://idare-secure.example.net/yoxla" }
+                }
+              ]
+            ]
+          },
+          "say": "Uneori, atacatorii scriu a doua oară.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Raportați phishing",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Corect, adresa nu aparține domeniului organizației dumneavoastră. Atacatorii revin adesea la aceeași persoană."
+            },
+            {
+              "id": "click",
+              "label": "Deschideți linkul",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Aceasta a fost a doua capcană. Echipa reală v-a cerut să schimbați parola chiar dumneavoastră, pe portal."
+            },
+            {
+              "id": "delete",
+              "label": "Ștergeți",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Dumneavoastră sunteți în siguranță, dar acest e-mail arată că atacul continuă. Raportați-l."
+            }
+          ]
+        },
+        {
+          "id": "colleague",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [{ "text": "Nigar Guliyeva" }],
+              "address": [{ "text": "n.quliyeva@idare.example" }]
+            },
+            "subject": [{ "text": "Am primit un e-mail ciudat de la dumneavoastră" }],
+            "time": "09:40",
+            "body": [
+              [{ "text": "Bună ziua! Aseară mi-a venit de la adresa dumneavoastră un e-mail intitulat „Factură”, cu un link în el. L-ați trimis dumneavoastră?" }]
+            ]
+          },
+          "actions": [
+            {
+              "id": "forward",
+              "label": "Redirecționați către echipa de securitate",
+              "kind": "forward",
+              "outcome": "safe",
+              "feedback": "Corect. Dacă atacatorul le-a scris altora din contul dumneavoastră, specialiștii trebuie să afle."
+            },
+            {
+              "id": "reply",
+              "label": "Răspundeți: „Nu eu l-am trimis, nu îl deschideți”",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Bine, v-ați avertizat colega. Redirecționați e-mailul și către echipa de securitate."
+            },
+            {
+              "id": "delete",
+              "label": "Ștergeți",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Colega ar putea deschide linkul, iar specialistul nu va afla că atacul s-a extins."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "what-happens-next",
+      "prompt": "Ce se întâmplă de obicei după ce raportați? Puneți etapele în ordine.",
+      "items": [
+        { "id": "report", "label": "Raportați incidentul" },
+        { "id": "lock", "label": "Specialistul blochează contul și închide sesiunile" },
+        { "id": "check", "label": "Computerul și căsuța de e-mail sunt verificate" },
+        { "id": "back", "label": "Stabiliți o parolă nouă și vă întoarceți la lucru" }
+      ],
+      "explain": "Aceasta este procedura obișnuită. Cu cât raportați mai repede, cu atât durează mai puțin."
+    },
+    {
+      "type": "choice",
+      "id": "fear-of-blame",
+      "question": {
+        "prompt": "Un coleg spune: „Dacă raportez, o să mă certe șefii.” Ce îi răspundeți?",
+        "options": [
+          {
+            "id": "report",
+            "label": "O raportare rapidă limitează pagubele, iar ascunderea le mărește",
+            "correct": true,
+            "feedback": "Corect. Informațiile rapide și sincere sunt cel mai valoros ajutor pentru specialiști."
+          },
+          {
+            "id": "hide",
+            "label": "Ai dreptate, să nu afle nimeni",
+            "correct": false,
+            "feedback": "O greșeală ascunsă crește și poate afecta întreaga organizație."
+          },
+          {
+            "id": "fix",
+            "label": "Încearcă mai întâi s-o repari pe cont propriu",
+            "correct": false,
+            "feedback": "Dacă încercați s-o reparați fără ajutor, puteți distruge urmele și pierdeți timp."
+          }
+        ],
+        "visual": { "kind": "illustration", "id": "handshake" }
+      },
+      "explain": "Pericolul crește din cauza tăcerii, nu a greșelii."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Dacă ați greșit, raportați imediat și sincer.",
+        "Urmăriți cu atenție următoarele e-mailuri: atacatorul poate scrie din nou.",
+        "Scopul este să oprim pagubele, nu să căutăm un vinovat."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

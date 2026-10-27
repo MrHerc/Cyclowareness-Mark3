@@ -1,0 +1,420 @@
+{
+ "id": "data-in-care",
+ "title": "Date în grija dumneavoastră",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "what-is",
+     "say": "Numele, actele de identitate, adresele și numerele de telefon ale cetățenilor și ale colegilor sunt date cu caracter personal, care vă sunt încredințate pentru muncă.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "law",
+     "say": "În Azerbaidjan, datele cu caracter personal sunt protejate prin lege. Folosiți-le doar într-un scop legal și doar în măsura necesară.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "need-to-know",
+     "say": "Regula este simplă: dacă munca dumneavoastră nu o cere, nu vă uitați, nu întrebați și nu partajați.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "id-photos",
+     "say": "Nu trimiteți fotografii ale actelor de identitate prin aplicații de mesagerie. Astfel de fotografii rămân ani de zile pe telefoane și ajung în mâini străine.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "request-check",
+   "prompt": "Care solicitări sunt în regulă?",
+   "cards": [
+    {
+     "id": "fake-police",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "+994 50 000 22 90"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună ziua, sunt de la poliție. Trimiteți-mi adresa de domiciliu și telefonul lui Rashad Aliyev, e urgent."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Autoritățile solicită datele pe canale oficiale, nu printr-un mesaj de pe un număr personal."
+    },
+    {
+     "id": "hr-system",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Departamentul de resurse umane"
+        }
+       ],
+       "address": [
+        {
+         "text": "kadrlar@rxagentlik.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Cerere de concediu"
+       }
+      ],
+      "time": "11:02",
+      "body": [
+       [
+        {
+         "text": "Vă rugăm să semnați cererea în sistemul intern de documente. Nu sunt necesare alte documente."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Domeniul este corect, mesajul trimite la sistemul intern și nu cere date suplimentare."
+    },
+    {
+     "id": "curious-colleague",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Elvin, coleg"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Vecinul meu a depus o cerere la noi. Ce scrie în dosarul lui? Trimite-mi o poză, sunt curios."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Curiozitatea nu este o nevoie de serviciu. Dacă munca nu o cere, dosarul nu se partajează."
+    },
+    {
+     "id": "personal-email",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Leyla Hasanova"
+        }
+       ],
+       "address": [
+        {
+         "text": "leyla.hasanova@rxagentlik.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Lista"
+       }
+      ],
+      "time": "11:02",
+      "body": [
+       [
+        {
+         "text": "Trimite-mi pe e-mailul personal toate codurile personale de identificare și telefoanele din departament, lucrez de acasă: leyla.h.1990@mail.example"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Chiar și când le cere o colegă cunoscută, datele personale nu au voie să ajungă într-o căsuță de e-mail personală. Ele rămân în sistemele de serviciu."
+    },
+    {
+     "id": "portal-sms",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "DovletPortal"
+       }
+      ],
+      "time": "15:30",
+      "messages": [
+       [
+        {
+         "text": "Cererea dumneavoastră a fost primită. Rezultatul îl puteți vedea în contul dumneavoastră de pe portal."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Nu există niciun link și nu vi se cere nimic. Mesajul doar vă informează."
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "id-photo-chat",
+   "prompt": "Găsiți riscurile din această conversație.",
+   "artifact": {
+    "kind": "chat",
+    "app": "whatsapp",
+    "contact": [
+     {
+      "text": "Sabina, HR "
+     },
+     {
+      "text": "+994 77 000 19 55",
+      "spot": "number"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Bună! Vă actualizăm datele de personal. "
+       },
+       {
+        "text": "Trimiteți aici fotografii cu ambele fețe ale actului de identitate.",
+        "spot": "id-photo"
+       }
+      ],
+      "time": "16:10"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Până la ora 17:00, altfel vi se amână salariul.",
+        "spot": "threat"
+       }
+      ],
+      "time": "16:10"
+     },
+     {
+      "from": "me",
+      "body": [
+       {
+        "text": "De ce îmi scrie HR-ul pe WhatsApp?"
+       }
+      ],
+      "time": "16:12"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Sistemul nu funcționează, așa e mai repede.",
+        "spot": "excuse"
+       }
+      ],
+      "time": "16:12"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "number",
+     "label": "Număr personal",
+     "explain": "Cineva scrie în numele HR-ului de pe un număr personal necunoscut."
+    },
+    {
+     "id": "id-photo",
+     "label": "Fotografia actului de identitate",
+     "explain": "Cu o fotografie a actului de identitate, un escroc poate obține credite sau deschide conturi în numele dumneavoastră."
+    },
+    {
+     "id": "threat",
+     "label": "Amenințarea cu salariul",
+     "explain": "Amenințarea cu salariul are scopul să vă grăbească, ca să săriți peste verificări."
+    },
+    {
+     "id": "excuse",
+     "label": "Scuza",
+     "explain": "„Sistemul nu funcționează” este o scuză pentru a ocoli calea oficială. Sunați chiar dumneavoastră la HR."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "scenario",
+   "id": "citizen-call",
+   "title": "Un cetățean la telefon",
+   "start": "call",
+   "nodes": [
+    {
+     "id": "call",
+     "text": "Bună ziua, cererea fratelui meu este la dumneavoastră. E bolnav, vă rog să-mi dați telefonul și adresa lui, ca să-l pot ajuta.",
+     "speaker": "Apelantă",
+     "voice": "older-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Bună ziua, cererea fratelui meu este la dumneavoastră. <breath> E bolnav, vă rog să-mi dați telefonul și adresa lui, ca să-l pot ajuta.",
+     "character": "citizen",
+     "choices": [
+      {
+       "label": "Mi-e milă de el și îi dau datele",
+       "outcome": "compromised",
+       "feedback": "Nu știți cine sună. Datele sunt acum în mâinile unui străin."
+      },
+      {
+       "label": "Îi cer codul personal de identificare al fratelui, ca să verific cine sună",
+       "outcome": "risky",
+       "feedback": "Codul personal de identificare nu este un secret. Faptul că îl cunoaște nu dovedește nimic."
+      },
+      {
+       "label": "Îi explic că nu pot da aceste date la telefon",
+       "next": "pressure",
+       "feedback": "Corect. Vorbiți politicos, dar cu fermitate."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Ce fel de om sunteți? E bolnav!",
+     "speaker": "Apelantă",
+     "voice": "older-woman",
+     "channel": "phone",
+     "manner": "worried",
+     "spoken": "Ce fel de om sunteți? <short pause> E bolnav!",
+     "character": "citizen",
+     "choices": [
+      {
+       "label": "Fac o excepție sub presiune",
+       "outcome": "compromised",
+       "feedback": "Presiunea emoțională este trucul cel mai des folosit."
+      },
+      {
+       "label": "Îi explic calea oficială: cererea o poate depune fratele însuși sau un reprezentant cu procură",
+       "next": "after",
+       "feedback": "Excelent. Ați arătat calea corectă și ați protejat datele."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "text": "Apelul s-a încheiat. Ce faceți acum?",
+     "choices": [
+      {
+       "label": "Raportez apelul managerului și echipei de securitate",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Aceeași persoană îi poate suna și pe colegii dumneavoastră."
+      },
+      {
+       "label": "Nimic, nu am dat nicio informație",
+       "outcome": "risky",
+       "feedback": "Ați rezistat presiunii, dar raportul îi ajută pe colegi să fie pregătiți."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "principles",
+   "prompt": "Asociați fiecare principiu cu sensul lui.",
+   "pairs": [
+    {
+     "id": "purpose",
+     "left": "Limitarea scopului",
+     "right": "Folosiți datele doar pentru o sarcină clară și legală"
+    },
+    {
+     "id": "minimum",
+     "left": "Reducerea la minimum",
+     "right": "Nu colectați mai mult decât este necesar"
+    },
+    {
+     "id": "need-to-know",
+     "left": "Nevoia de a cunoaște",
+     "right": "Au acces doar persoanele a căror muncă o cere"
+    },
+    {
+     "id": "confidential",
+     "left": "Confidențialitatea",
+     "right": "Nu le dați niciodată terților fără temei legal"
+    }
+   ],
+   "explain": "Aceste principii vă ajută să protejați datele cetățenilor în munca de zi cu zi."
+  },
+  {
+   "type": "choice",
+   "id": "send-way",
+   "question": {
+    "prompt": "Cum puteți trimite unui coleg documentul unui cetățean?",
+    "options": [
+     {
+      "id": "whatsapp",
+      "label": "Îl fotografiez și îl trimit de pe WhatsApp-ul personal",
+      "correct": false,
+      "feedback": "Fotografia rămâne pe telefoane, în afara oricărui control."
+     },
+     {
+      "id": "internal",
+      "label": "Prin sistemul intern de documente, doar persoanei care are nevoie de el",
+      "correct": true,
+      "feedback": "Corect. Accesul este limitat și controlat."
+     },
+     {
+      "id": "private-mail",
+      "label": "Pe e-mailul personal, ca să meargă mai repede",
+      "correct": false,
+      "feedback": "E-mailul personal se află în afara protecției organizației."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "folder"
+    }
+   },
+   "explain": "Datele cu caracter personal nu trebuie să iasă niciodată din sistemele aprobate ale organizației."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Folosiți datele personale doar când munca o cere și doar cât este necesar.",
+    "Nu trimiteți niciodată fotografii ale actelor de identitate sau liste prin aplicații de mesagerie.",
+    "Îndrumați persoanele care sună către calea oficială de solicitare."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,7 +1,8 @@
+import { notFound } from "next/navigation";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
 import { CalendarDays, Trophy } from "lucide-react";
 import { db } from "@/server/db";
-import { allowed, requirePermission } from "@/server/auth/viewer";
+import { allowed, hasFeature, requirePermission } from "@/server/auth/viewer";
 import { departmentLeague } from "@/server/services/league";
 import { Card } from "@/components/ui/card";
 import { ButtonLink } from "@/components/ui/button";
@@ -20,6 +21,7 @@ export async function generateMetadata() {
 
 export default async function AdminLeague() {
   const v = await requirePermission("league.read");
+  if (!hasFeature(v, "league")) notFound();
   const [tr, tl, tc, format, locale] = await Promise.all([getTranslations("admin.league"), getTranslations("learner.league"), getTranslations("common"), getFormatter(), getLocale()]);
   const rows = await departmentLeague(db(), v.tenant.id);
   const now = new Date();

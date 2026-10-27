@@ -17,6 +17,14 @@ describe("safePath", () => {
     for (const v of ["//evil.example", "/\\evil.example", "/\\\\evil.example", "/\t/evil.example", "/\n/evil.example", "/\r\n/evil.example", "https://evil.example/x", "javascript:alert(1)"]) {
       expect(safePath(v), JSON.stringify(v)).toBe("/app");
     }
+    // Dot segments that collapse into "//host" once the path is normalised.
+    for (const v of ["/.//evil.com", "/a/..//evil.com", "/%2e//evil.com", "/..//evil.com", "/%2e%2e//evil.com", "/x/./..//evil.com/p?q=1"]) {
+      expect(safePath(v), JSON.stringify(v)).toBe("/app");
+    }
+    // Backslash, tab and newline forms, raw (a decoded ?from= or ?next=) and after a dot segment.
+    for (const v of ["/\\evil.com", "/.\\evil.com", "/./\\/evil.com", "/\t/evil.com", "/./\t/evil.com", "/\n/evil.com"]) {
+      expect(safePath(v), JSON.stringify(v)).toBe("/app");
+    }
     // Percent-encoded control characters stay encoded in a path, so this is a same-site path, not a host.
     expect(safePath("/%09/evil.example/")).toBe("/%09/evil.example/");
   });

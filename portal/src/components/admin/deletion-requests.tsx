@@ -23,7 +23,7 @@ export function DeletionRequests({ people }: { people: { id: string; name: strin
             <span className="min-w-0 flex-1">
               <span className="block text-body-sm font-semibold">{p.name}</span>
               <span className="text-tab text-ink-subtle">
-                {p.email} · {format.dateTime(new Date(p.at), { dateStyle: "medium" })}
+                <bdi>{p.email}</bdi> · {format.dateTime(new Date(p.at), { dateStyle: "medium" })}
               </span>
             </span>
             <Button size="sm" variant="secondary" disabled={pending} onClick={() => start(async () => void (await decideDeletionAction(p.id, false)))}>

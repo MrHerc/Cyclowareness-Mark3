@@ -1,0 +1,460 @@
+{
+ "id": "why-a-manager",
+ "title": "De ce un manager de parole",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Fiecare cont are nevoie de propria parolă lungă. Nimeni nu le poate ține minte pe toate.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Nu folosiți niciodată aceeași parolă de două ori: dacă un site suferă o scurgere de date, atacatorii o încearcă pe toate conturile dumneavoastră.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Managerul de parole al organizației creează o parolă puternică pentru fiecare cont și o păstrează într-un seif criptat.",
+     "mood": "talk",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "parolseyf",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Parolă creată"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "28 de caractere, aleatorii",
+          "spot": "gen"
+         }
+        ]
+       ],
+       "buttons": [
+        "Salvați"
+       ]
+      }
+     },
+     "highlight": "gen"
+    },
+    {
+     "id": "b4",
+     "say": "Țineți minte o singură parolă principală, lungă, și protejați seiful cu verificarea în doi pași.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "where-passwords-live",
+   "prompt": "Este un loc sigur pentru o parolă?",
+   "cards": [
+    {
+     "id": "excel",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Toate_parolele.xlsx"
+       }
+      ],
+      "type": "xls",
+      "size": "18 KB",
+      "source": [
+       {
+        "text": "Desktop"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Fișierul nu este criptat: oricine ajunge la computer vede toate parolele dintr-odată."
+    },
+    {
+     "id": "vault",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "parolseyf",
+      "app": "ParolSeyf",
+      "title": [
+       {
+        "text": "Date de conectare salvate în seif"
+       }
+      ],
+      "body": [
+       {
+        "text": "portal.idare.example"
+       }
+      ],
+      "time": "09:05"
+     },
+     "verdict": "safe",
+     "explain": "Parola stă în seiful criptat și se deschide doar cu parola dumneavoastră principală."
+    },
+    {
+     "id": "saved-messages",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Mesaje salvate"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Parola de la e-mail: Aysel1990"
+         }
+        ],
+        "time": "08:31"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O aplicație de mesagerie nu este un seif. Dacă telefonul se pierde sau contul este preluat de altcineva, parolele ajung și ele în mâini străine."
+    },
+    {
+     "id": "shared-vault",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Seif partajat: Biroul de presă"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "3 membri. Panoul de administrare al site-ului, contul de pe rețelele sociale."
+        }
+       ]
+      ],
+      "buttons": [
+       "Închideți"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Echipa partajează parolele într-un seif criptat, iar accesul poate fi retras oricând."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "password-requests",
+   "environment": "phone",
+   "title": "Cereri de parole",
+   "intro": "Astăzi, mai multe persoane vă cer parole. Răspundeți fiecăreia pe telefon.",
+   "steps": [
+    {
+     "id": "colleague-asks",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Sabina Huseynova"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună! Poți să-mi scrii aici parola de la panoul de administrare al site-ului? Vreau să postez știrile de azi."
+         }
+        ],
+        "time": "10:12"
+       }
+      ]
+     },
+     "say": "Este colega dumneavoastră și chiar are nevoie de acces.",
+     "actions": [
+      {
+       "id": "type",
+       "label": "Scrieți parola",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Parola rămâne în chat și se poate scurge dacă un telefon se pierde. Partajați-o din seif."
+      },
+      {
+       "id": "vault",
+       "label": "Ți-o partajez în seif",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Corect. În seif, parola rămâne criptată, iar accesul poate fi retras la nevoie."
+      },
+      {
+       "id": "sms",
+       "label": "Ți-o trimit prin SMS",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Nici SMS-ul nu este criptat și rămâne în telefon. Partajați parolele doar prin seif."
+      }
+     ]
+    },
+    {
+     "id": "fake-share-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "parolseyf-fake",
+      "from": {
+       "name": [
+        {
+         "text": "ParolSeyf"
+        }
+       ],
+       "address": [
+        {
+         "text": "no-reply@parolseyf-share.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Elnur Karimov a partajat un seif cu dumneavoastră"
+       }
+      ],
+      "time": "11:40",
+      "body": [
+       [
+        {
+         "text": "Conectați-vă pentru a vedea seiful „Finanțe”: "
+        },
+        {
+         "text": "parolseyf-share.example.net/seyf",
+         "link": {
+          "label": "parolseyf-share.example.net/seyf",
+          "href": "https://parolseyf-share.example.net/seyf"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Nu vă așteptați la nicio partajare.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Deschideți linkul",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "O partajare reală apare chiar în aplicația ParolSeyf. Linkul acesta vrea să vă fure parola principală."
+      },
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect: adresa nu aparține ParolSeyf. Deschideți chiar dumneavoastră aplicația ca să verificați partajările."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Dumneavoastră sunteți în siguranță, dar și colegii pot primi același e-mail. Raportați-l."
+      }
+     ]
+    },
+    {
+     "id": "fake-support",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "parolseyf-fake",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Suport ParolSeyf"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Am găsit o eroare în seiful dumneavoastră. Pentru a-l restaura, scrieți aici parola principală și codul pe care îl primiți."
+         }
+        ],
+        "time": "14:03"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "send",
+       "label": "Scrieți parola principală",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Parola principală deblochează toate parolele dumneavoastră. Nicio echipă de suport nu v-o cere niciodată."
+      },
+      {
+       "id": "block",
+       "label": "Blocați",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Corect. Nimeni, nici măcar suportul IT, nu vă cere parola principală sau codul."
+      },
+      {
+       "id": "report",
+       "label": "Raportați",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Anunțați și echipa de securitate, ca să-i poată avertiza pe colegi."
+      }
+     ]
+    },
+    {
+     "id": "reused-alert",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Această parolă este folosită în 3 conturi"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Aceeași parolă este salvată pentru IshPocht, portalul biroului și pagina Kontakto."
+        }
+       ]
+      ],
+      "buttons": [
+       "Mai târziu",
+       "Schimbați parolele"
+      ]
+     },
+     "say": "ParolSeyf v-a verificat parolele.",
+     "actions": [
+      {
+       "id": "update",
+       "label": "Schimbați parolele",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Corect. Generatorul creează o parolă separată pentru fiecare cont, așa că o scurgere de date nu mai deschide nimic altceva."
+      },
+      {
+       "id": "later",
+       "label": "Mai târziu",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "O parolă refolosită este o slăbiciune pe care atacatorii o adoră. O singură scurgere de date ar deschide toate cele trei conturi."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "password",
+   "id": "master-password",
+   "prompt": "Creați o parolă principală: o frază lungă, de cel puțin 15 caractere.",
+   "targetScore": 4,
+   "tips": [
+    "Uniți patru sau cinci cuvinte la întâmplare, cu spații între ele",
+    "Nu folosiți această parolă nicăieri altundeva",
+    "Evitați numele, datele de naștere și citatele celebre"
+   ]
+  },
+  {
+   "type": "match",
+   "id": "manager-terms",
+   "prompt": "Asociați fiecare termen cu sensul lui.",
+   "pairs": [
+    {
+     "id": "vault",
+     "left": "Seif",
+     "right": "Spațiu criptat pentru parolele dumneavoastră"
+    },
+    {
+     "id": "master",
+     "left": "Parolă principală",
+     "right": "Singura parolă care deschide seiful"
+    },
+    {
+     "id": "generator",
+     "left": "Generator",
+     "right": "Creează parole lungi și aleatorii"
+    },
+    {
+     "id": "shared",
+     "left": "Seif partajat",
+     "right": "Permite unei echipe să partajeze parole în siguranță"
+    }
+   ],
+   "explain": "Managerul ține minte parolele; dumneavoastră păziți doar parola principală."
+  },
+  {
+   "type": "choice",
+   "id": "shared-account",
+   "question": {
+    "prompt": "Trei persoane din departamentul dumneavoastră gestionează același cont de pe rețelele sociale. Cum ar trebui să partajeze parola?",
+    "options": [
+     {
+      "id": "own",
+      "label": "Câte un cont propriu pentru fiecare, dacă se poate; altfel, un seif partajat",
+      "correct": true,
+      "feedback": "Corect. Când cineva pleacă din echipă, accesul îi este retras într-un singur pas."
+     },
+     {
+      "id": "group-chat",
+      "label": "Postați parola în chatul echipei",
+      "correct": false,
+      "feedback": "O parolă postată într-un chat de grup rămâne acolo ani de zile, iar noii membri o văd și ei."
+     },
+     {
+      "id": "note",
+      "label": "Scrieți-o pe un bilețel lipit pe monitor",
+      "correct": false,
+      "feedback": "Oricine intră în birou poate vedea parola și o poate fotografia."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "key"
+    }
+   },
+   "explain": "Chiar și pentru un cont comun, parola stă în seif, nu în chaturi sau pe hârtie."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "O parolă separată pentru fiecare cont: managerul o creează și o ține minte.",
+    "Partajați parolele într-un seif partajat, niciodată într-un chat.",
+    "Nu spuneți nimănui parola principală și protejați seiful cu verificarea în doi pași."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

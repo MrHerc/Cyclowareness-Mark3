@@ -216,19 +216,19 @@ function TrainingFields({ value, onChange, modules, departments, people }: { val
             </Field>
             <Field label={t("people")} htmlFor="tr-people">
               <div className="relative">
-                <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-subtle" />
-                <Input id="tr-people" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("pickPeople")} className="pl-9" autoComplete="off" />
+                <Search className="pointer-events-none absolute top-1/2 start-3 size-4 -translate-y-1/2 text-ink-subtle" />
+                <Input id="tr-people" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t("pickPeople")} className="ps-9" autoComplete="off" />
               </div>
             </Field>
             {matches.length ? (
               <ul className="grid gap-1 rounded-lg border border-line p-1">
                 {matches.map((p) => (
                   <li key={p.id}>
-                    <button type="button" onClick={() => toggle(p.id)} className={cn("flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-caption hover:bg-sunken", value.userIds.has(p.id) && "bg-brand-50")}>
+                    <button type="button" onClick={() => toggle(p.id)} className={cn("flex w-full items-center gap-3 rounded-md px-3 py-2 text-start text-caption hover:bg-sunken", value.userIds.has(p.id) && "bg-brand-50")}>
                       <span className="min-w-0 flex-1">
                         <b className="block truncate">{p.name}</b>
                         <span className="block truncate text-ink-subtle">
-                          {p.email}
+                          <bdi>{p.email}</bdi>
                           {p.department ? ` · ${p.department}` : ""}
                         </span>
                       </span>

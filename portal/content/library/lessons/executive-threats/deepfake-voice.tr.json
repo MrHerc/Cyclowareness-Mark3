@@ -1,0 +1,366 @@
+{
+ "id": "deepfake-voice",
+ "title": "Yöneticinin sahte sesi",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Yapay zekâ, kısa bir kayıttan bir üst yöneticinin sesini kopyalayabilir. Konuşmalar ve röportajlar bunun için yeterlidir.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Ekranda görünen ad ve numara da sahte olabilir. Tanıdık görünen bir arama kanıt değildir.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Saadet Memmedli"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 50 000 47 12",
+         "spot": "number"
+        }
+       ],
+       "label": "Mobil"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "b3",
+     "say": "Önceden bir doğrulama kelimesi belirleyin. Arayan kişi bu kelimeyi bilmiyorsa görüşmeyi sonlandırın.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "En güvenli yol şudur: telefonu kapatın ve kişiyi bildiğiniz numaradan kendiniz arayın.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "cloned-call",
+   "environment": "call",
+   "title": "Bakan yardımcısının sesi",
+   "intro": "Akşam saat sekiz. Telefonunuz çalıyor ve ekranda bakan yardımcısının adı görünüyor.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Saadet Memmedli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "older-woman"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Yanıtla",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Aramayı yanıtlamak tehlikeli değildir. Önemli olan, sonra ne yaptığınızdır."
+      },
+      {
+       "id": "decline",
+       "label": "Reddet",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Bu da olur. İçiniz rahat etmiyorsa bakan yardımcısını bildiğiniz numaradan kendiniz arayın.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "request",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Saadet Memmedli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "older-woman"
+     },
+     "say": "Merhaba, benim, Saadet. Hastayım, sesim kısık. Bu akşam bir iş ortağına acilen yetmiş beş bin manat aktarın.",
+     "spoken": "Merhaba, benim, Saadet. <throat-clearing> Hastayım, sesim kısık. Bu akşam bir iş ortağına, ee, acilen yetmiş beş bin manat aktarın.",
+     "actions": [
+      {
+       "id": "phrase",
+       "label": "Lütfen doğrulama kelimemizi söyleyin",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru. Önceden kararlaştırdığınız bir kelime, sesten daha güçlü bir kontroldür."
+      },
+      {
+       "id": "pay",
+       "label": "Peki, hemen aktarıyorum",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Tanıdık bir ses artık kanıt değildir. Bu ses yapay zekâyla üretilmişti ve para gitti."
+      },
+      {
+       "id": "hang",
+       "label": "Kapatıyorum, sizi ben geri ararım",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Doğru karar. Şimdi bakan yardımcısını bildiğiniz numaradan arayın.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Saadet Memmedli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "older-woman"
+     },
+     "say": "Ne kelimesi? Vaktim yok, bakan bekliyor! Belgeleri yarın gönderirim, parayı hemen aktarın.",
+     "spoken": "Ne kelimesi? <breath> Vaktim yok, bakan bekliyor! Belgeleri yarın gönderirim, parayı hemen aktarın.",
+     "actions": [
+      {
+       "id": "hang",
+       "label": "Telefonu kapat",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Doğru. Doğrulama kelimesini bilmeyen ve sizi sıkıştıran kişi sahtedir."
+      },
+      {
+       "id": "pay",
+       "label": "Peki, aktarıyorum",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Baskı, doğrulamadan kaçmanın bir işaretidir. Para hiç geri gelmeyebilir."
+      },
+      {
+       "id": "details",
+       "label": "Hesap numarasını bana gönderin",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Konuşmayı sürdürmek saldırgana daha fazla fırsat verir. Telefonu kapatın."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Görüşme sona erdi. Şimdi ne yaparsınız?",
+     "artifact": {
+      "kind": "call",
+      "caller": [
+       {
+        "text": "Saadet Memmedli"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 50 000 47 12"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "older-woman"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "Bakan yardımcısını rehberdeki numaradan ara",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Doğru. Kendiniz çevirdiğiniz bir numara sahte aramayı hemen ortaya çıkarır."
+      },
+      {
+       "id": "report",
+       "label": "Güvenlik ekibine bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Bildiriminiz finans birimini ve iş arkadaşlarınızı aynı aramaya karşı uyarır."
+      },
+      {
+       "id": "ignore",
+       "label": "Hiçbir şey yapma",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Saldırgan şimdi başka bir iş arkadaşınızı arayabilir. Doğrulayın ve bildirin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "check-phrase",
+   "question": {
+    "prompt": "İyi bir doğrulama kelimesi hangisidir?",
+    "options": [
+     {
+      "id": "secret",
+      "label": "Hiçbir yerde yazılı olmayan, yalnızca ikimizin bildiği bir kelime",
+      "correct": true,
+      "feedback": "Doğru. İnternette bulunmayan bir kelime kopyalanamaz."
+     },
+     {
+      "id": "birthday",
+      "label": "Bakan yardımcısının doğum tarihi",
+      "correct": false,
+      "feedback": "Doğum tarihi internette bulunabilir."
+     },
+     {
+      "id": "office",
+      "label": "Kurumun adı ve oda numarası",
+      "correct": false,
+      "feedback": "Bunu pek çok kişi bilir, bu yüzden bir doğrulama sayılmaz."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "key"
+    }
+   },
+   "explain": "Kelimeyi yüz yüze kararlaştırın ve asla e-postayla ya da mesajla göndermeyin."
+  },
+  {
+   "type": "match",
+   "id": "voice-signs",
+   "prompt": "Her durumu anlamıyla eşleştirin.",
+   "pairs": [
+    {
+     "id": "voice",
+     "left": "Ses tanıdık",
+     "right": "Kanıt değildir, kopyalanabilir"
+    },
+    {
+     "id": "caller-id",
+     "left": "Ekranda tanıdık bir ad",
+     "right": "Numara da sahte olabilir"
+    },
+    {
+     "id": "urgent",
+     "left": "Acil ve gizli",
+     "right": "Doğrulamayı atlatma girişimi"
+    },
+    {
+     "id": "phrase",
+     "left": "Doğrulama kelimesi doğru",
+     "right": "En güvenilir sesli doğrulama"
+    }
+   ],
+   "explain": "Sese ya da ekrandaki ada değil, kararlaştırılan kurala güvenin."
+  },
+  {
+   "type": "scenario",
+   "id": "video-call",
+   "title": "Görüntülü görüşme",
+   "start": "screen",
+   "nodes": [
+    {
+     "id": "screen",
+     "text": "Ortağa avansı bu akşam gönderin.",
+     "speaker": "Bakan (görüntülü görüşme, ses kesik kesik geliyor)",
+     "voice": "older-man",
+     "channel": "video",
+     "spoken": "Ortağa avansı <short pause> bu akşam gönderin.",
+     "character": "minister",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     },
+     "choices": [
+      {
+       "label": "Görüşmeyi sonlandırıp asistanı bildiğim numaradan ararım",
+       "next": "assistant",
+       "feedback": "Doğru. Görüntü de sahte olabilir, ikinci kanal kuralı yine geçerlidir."
+      },
+      {
+       "label": "Yüzünü görüyorum, demek ki gerçek",
+       "outcome": "compromised",
+       "feedback": "Yapay zekâ görüntüyü de taklit edebilir. Tek başına görüntü kanıt değildir."
+      }
+     ]
+    },
+    {
+     "id": "assistant",
+     "text": "Bakan şu anda seyahatte ve kimseyi aramadı.",
+     "speaker": "Bakanın asistanı",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Bakan şu anda seyahatte <breath> ve kimseyi aramadı.",
+     "character": "assistant",
+     "choices": [
+      {
+       "label": "Güvenlik ekibine bildirip saati ve hesap adını not ederim",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Bu notlar uzmanların saldırının izini sürmesine yardımcı olur."
+      },
+      {
+       "label": "Para gitmedi, o yüzden kimseye söylemem",
+       "outcome": "risky",
+       "feedback": "Sıradaki hedef bakan yardımcısı ya da finans birimi olabilir. Bildirmek herkesi korur."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Tanıdık bir ses, yüz ya da ad kanıt değildir.",
+    "Doğrulama kelimesini sorun, telefonu kapatın ve kendiniz geri arayın.",
+    "Sahte bir aramayı hemen güvenlik ekibine bildirin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

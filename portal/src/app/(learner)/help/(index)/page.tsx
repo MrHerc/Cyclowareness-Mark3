@@ -62,7 +62,7 @@ export default async function HelpPage() {
                   <summary className="cursor-pointer list-none text-body-sm font-semibold marker:hidden">
                     <span className="flex items-center justify-between gap-3">
                       {f.q}
-                      <ChevronRight className="size-4 shrink-0 transition-transform group-open:rotate-90" />
+                      <ChevronRight className="size-4 shrink-0 transition-transform group-open:rotate-90 rtl:group-open:-rotate-90" />
                     </span>
                   </summary>
                   <p className="mt-2 text-body-sm text-ink-muted">{f.a}</p>

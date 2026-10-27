@@ -1,0 +1,403 @@
+{
+ "id": "mfa",
+ "title": "Verificarea în doi pași",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "second-step",
+   "beats": [
+    {
+     "id": "why",
+     "say": "Chiar dacă vi se fură parola, un al doilea pas vă poate proteja contul. Acesta se numește verificare în doi pași.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "best",
+     "say": "Cele mai sigure sunt cheile de acces și cheile de securitate. Ele nu funcționează pe site-urile false.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "code",
+     "say": "Codul este doar pentru dumneavoastră. Oricine vi-l cere, chiar dacă se prezintă drept banca dumneavoastră, este un escroc.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "ulduzbank",
+       "sender": [
+        {
+         "text": "UlduzBank"
+        }
+       ],
+       "time": "14:02",
+       "messages": [
+        [
+         {
+          "text": "Cod de conectare: 482 913. "
+         },
+         {
+          "text": "Nu comunicați acest cod nimănui, nici măcar angajaților băncii.",
+          "spot": "code-warning"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "code-warning"
+    },
+    {
+     "id": "prompts",
+     "say": "Dacă primiți întruna cereri de aprobare la care nu vă așteptați, cineva încearcă să se conecteze cu parola dumneavoastră.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     },
+     "checkpoint": {
+      "prompt": "Ce faceți cu o cerere neașteptată?",
+      "options": [
+       {
+        "id": "approve",
+        "label": "O aprob, ca să înceteze",
+        "correct": false,
+        "feedback": "Dacă o aprobați, atacatorul intră în cont."
+       },
+       {
+        "id": "deny",
+        "label": "O resping și îmi schimb parola",
+        "correct": true,
+        "feedback": "Corect. Apoi anunțați și echipa de securitate IT."
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "night-push",
+   "environment": "phone",
+   "title": "Cereri în miez de noapte",
+   "intro": "Este ora două noaptea și dormiți. Telefonul vă cere întruna să aprobați o conectare.",
+   "steps": [
+    {
+     "id": "push-1",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "tesdiqleyici",
+      "app": "Təsdiqləyici",
+      "title": [
+       {
+        "text": "Aprobați conectarea?"
+       }
+      ],
+      "body": [
+       {
+        "text": "Portalul Xidmət Agentliyi. Computer cu Windows."
+       }
+      ],
+      "time": "02:14"
+     },
+     "say": "Dumneavoastră nu încercați să vă conectați nicăieri.",
+     "actions": [
+      {
+       "id": "approve",
+       "label": "Aprobați",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Nu vă conectați dumneavoastră, deci este altcineva. Dacă aprobați, în cont intră persoana care are parola dumneavoastră."
+      },
+      {
+       "id": "deny",
+       "label": "Respingeți",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Respingeți întotdeauna o cerere la care nu vă așteptați."
+      }
+     ]
+    },
+    {
+     "id": "push-5",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "tesdiqleyici",
+      "app": "Təsdiqləyici",
+      "title": [
+       {
+        "text": "Aprobați conectarea?"
+       }
+      ],
+      "body": [
+       {
+        "text": "A cincea cerere. Computer cu Windows."
+       }
+      ],
+      "time": "02:16"
+     },
+     "say": "Cererile continuă să vină.",
+     "actions": [
+      {
+       "id": "approve",
+       "label": "Aprobați, ca să înceteze",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Bombardarea cu notificări (push bombing) mizează exact pe asta: că obosiți și aprobați. Dacă aprobați, atacatorul intră în cont."
+      },
+      {
+       "id": "deny",
+       "label": "Respingeți",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Cererile repetate înseamnă că cineva vă cunoaște parola."
+      },
+      {
+       "id": "report",
+       "label": "Nu sunt eu – raportez",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excelent. Prin raportare, echipa de securitate află imediat despre atac."
+      }
+     ]
+    },
+    {
+     "id": "fake-it-chat",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek-fake",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Suport IT"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bună ziua, rulăm o verificare de noapte. Aprobați ultima cerere, ca să nu vi se blocheze contul."
+         }
+        ],
+        "time": "02:17"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "agree",
+       "label": "Bine, aprob",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Suportul IT nu vă cere niciodată să aprobați o cerere. Aceasta este a doua jumătate a atacului."
+      },
+      {
+       "id": "block",
+       "label": "Blocați și raportați",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Corect. Un număr necunoscut care vă scrie noaptea nu este suportul, ci atacatorul."
+      }
+     ]
+    },
+    {
+     "id": "change-now",
+     "label": "Ați deschis dumneavoastră portalul",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "xidmet-agentliyi",
+      "brand": "Xidmət Agentliyi",
+      "url": [
+       {
+        "text": "https://portal.xidmetagentliyi.az/profil/parol"
+       }
+      ],
+      "fields": [
+       "Parola veche",
+       "Fraza de acces nouă"
+      ],
+      "button": "Schimbați"
+     },
+     "say": "Parola dumneavoastră a fost furată. Ce faceți acum?",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Schimbați parola acum",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Corect. Apoi anunțați echipa de securitate, ca să închidă toate sesiunile deschise."
+      },
+      {
+       "id": "later",
+       "label": "Mă ocup de asta dimineață",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Atacatorul vă cunoaște parola și va încerca din nou. Schimbați-o acum."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "strongest-factor",
+   "question": {
+    "prompt": "Care dintre metodele pentru al doilea pas rezistă cel mai bine la phishing?",
+    "options": [
+     {
+      "id": "sms",
+      "label": "Cod prin SMS",
+      "correct": false,
+      "feedback": "Un site fals vă poate cere codul, iar numărul de pe SIM vă poate fi transferat altcuiva."
+     },
+     {
+      "id": "app",
+      "label": "Aplicație de autentificare",
+      "correct": false,
+      "feedback": "Este mai bună decât SMS-ul, dar puteți totuși introduce codul pe un site fals."
+     },
+     {
+      "id": "key",
+      "label": "Cheie de acces sau cheie de securitate",
+      "correct": true,
+      "feedback": "Corect. O cheie funcționează doar cu site-ul autentic."
+     },
+     {
+      "id": "email",
+      "label": "Cod trimis prin e-mail",
+      "correct": false,
+      "feedback": "Dacă cineva vă preia e-mailul, preia și codul."
+     }
+    ]
+   },
+   "explain": "Orice pas suplimentar este mai bun decât parola singură. Alegeți o cheie atunci când puteți."
+  },
+  {
+   "type": "hotspot",
+   "id": "code-request",
+   "prompt": "Găsiți semnalele de alarmă din aceste mesaje.",
+   "artifact": {
+    "kind": "chat",
+    "app": "whatsapp",
+    "contact": [
+     {
+      "text": "+994 50 000 26 43",
+      "spot": "unknown-number",
+      "reveal": "Nu figurează în contactele dumneavoastră"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Bună, Aynur! Sunt Nigar, acesta e numărul meu nou."
+       }
+      ],
+      "time": "20:31"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Ți-am trimis din greșeală un cod pe numărul tău.",
+        "spot": "mistake"
+       }
+      ],
+      "time": "20:31"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Te rog, trimite-mi codul din șase cifre pe care tocmai l-ai primit.",
+        "spot": "ask-code"
+       }
+      ],
+      "time": "20:32"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Grăbește-te, expiră în două minute.",
+        "spot": "urgency"
+       }
+      ],
+      "time": "20:32"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "unknown-number",
+     "label": "Număr necunoscut",
+     "explain": "Un nume cunoscut, dar un număr nou. Ca să verificați, sunați-o pe prietena dumneavoastră la numărul vechi."
+    },
+    {
+     "id": "mistake",
+     "label": "„Trimis din greșeală”",
+     "explain": "Un cod nu ajunge din greșeală pe numărul dumneavoastră. Cineva încearcă să intre în contul dumneavoastră."
+    },
+    {
+     "id": "ask-code",
+     "label": "Cerere de cod",
+     "explain": "Dacă dați acest cod, escrocul vă preia contul și le scrie prietenilor în numele dumneavoastră."
+    },
+    {
+     "id": "urgency",
+     "label": "Grabă",
+     "explain": "Timpul scurt nu vă lasă să vă gândiți. Nu trimiteți niciodată un cod nimănui."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "setup-authenticator",
+   "prompt": "Puneți în ordine pașii de configurare a unei aplicații de autentificare.",
+   "items": [
+    {
+     "id": "turn-on",
+     "label": "Activați verificarea în doi pași din setările contului"
+    },
+    {
+     "id": "scan",
+     "label": "Scanați cu aplicația codul QR de pe ecran"
+    },
+    {
+     "id": "enter-code",
+     "label": "Introduceți codul afișat de aplicație"
+    },
+    {
+     "id": "backup",
+     "label": "Păstrați codurile de rezervă într-un loc sigur"
+    }
+   ],
+   "explain": "Codurile de rezervă vă ajută să intrați din nou în cont dacă pierdeți telefonul."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Când puteți, alegeți o cheie de acces sau o aplicație de autentificare.",
+    "Nu spuneți și nu trimiteți nimănui niciun cod.",
+    "Respingeți cererile neașteptate, schimbați-vă parola și raportați."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

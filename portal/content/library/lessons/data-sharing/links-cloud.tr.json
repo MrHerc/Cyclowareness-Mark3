@@ -1,0 +1,441 @@
+{
+ "id": "links-cloud",
+ "title": "Bağlantılar ve bulut klasörleri",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Bulut klasörleri kullanışlıdır, ama tek bir yanlış ayar bir dosyayı bütün internete açabilir.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "“Bağlantıya sahip olan herkes” ayarında, bağlantı başkasına iletilirse dosyayı yabancılar da açabilir.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "rxagentlik-disk",
+       "url": [
+        {
+         "text": "https://disk.rxagentlik.az/qovluq/budce-2027?paylasim="
+        },
+        {
+         "text": "hamiya-acik",
+         "spot": "public"
+        }
+       ]
+      }
+     },
+     "highlight": "public"
+    },
+    {
+     "id": "b3",
+     "say": "Doğru yol şu: yalnızca adı belirlenmiş kişiler, yalnızca görüntüleme izni ve bir bitiş tarihi.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "İş dosyalarını kişisel bulut hesabınıza yüklemeyin. Orada kurum onları ne koruyabilir ne de kurtarabilir.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "share-folder",
+   "environment": "browser",
+   "title": "Dosyayı paylaşın",
+   "intro": "Bütçe taslağını kurum dışındaki bir iş ortağına göndermeniz gerekiyor. Paylaşımı bulut diskinde kendiniz ayarlayın.",
+   "steps": [
+    {
+     "id": "file-page",
+     "label": "Bütçe taslağı 2027.xlsx",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "rxagentlik-disk",
+      "url": [
+       {
+        "text": "https://disk.rxagentlik.az/fayllar/Budce_layihesi_2027.xlsx",
+        "reveal": "rxagentlik.az"
+       }
+      ]
+     },
+     "say": "Dosyayı nasıl paylaşırsınız?",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Paylaş",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Güzel, dosya iş diskinde kalıyor. Şimdi paylaşım ayarlarına bakın."
+      },
+      {
+       "id": "personal",
+       "label": "Kişisel buluta taşı",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Kişisel hesap, kurumun denetimi dışındadır. İş dosyaları iş diskinde kalır."
+      }
+     ]
+    },
+    {
+     "id": "who-can-open",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Paylaş: Bütçe taslağı 2027.xlsx"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Kimler açabilir?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Bağlantıya sahip olan herkes",
+       "Yalnızca belirli kişiler"
+      ]
+     },
+     "actions": [
+      {
+       "id": "named",
+       "label": "Yalnızca belirli kişiler",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Dosya yalnızca sizin seçtiğiniz kişilere açılır."
+      },
+      {
+       "id": "anyone",
+       "label": "Bağlantıya sahip olan herkes",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Bağlantı başkalarına iletilebilir ya da yanlış bir yere düşebilir. O zaman dosyayı herkes açabilir."
+      }
+     ]
+    },
+    {
+     "id": "rights",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Kime ve nasıl?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Alıcı: e.rzayev@merkez-konsalting.example"
+        }
+       ],
+       [
+        {
+         "text": "Erişim: görüntüleme ya da düzenleme"
+        }
+       ],
+       [
+        {
+         "text": "Süre sonu: 7 gün sonra ya da hiçbir zaman"
+        }
+       ]
+      ],
+      "buttons": [
+       "Düzenleme, süresiz",
+       "Görüntüleme, 7 gün"
+      ]
+     },
+     "actions": [
+      {
+       "id": "view",
+       "label": "Görüntüleme, 7 gün",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Mükemmel. İş ortağı dosyayı görebilir ama değiştiremez ve erişim bir hafta sonra sona erer."
+      },
+      {
+       "id": "edit",
+       "label": "Düzenleme, süresiz",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "İş ortağının düzenleme yapmasına gerek yok ve süresiz erişim yıllarca açık kalır."
+      }
+     ]
+    },
+    {
+     "id": "fake-share",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "rxagentlik-disk-fake",
+      "brand": "RXAgentlik Disk",
+      "url": [
+       {
+        "text": "https://rxagentlik-disk.example.net/giris",
+        "reveal": "rxagentlik-disk.example.net"
+       }
+      ],
+      "fields": [
+       "E-posta",
+       "Parola"
+      ],
+      "button": "Giriş yap"
+     },
+     "say": "Bir saat sonra paylaşılan bir dosyanın sayfası açılıyor. Adresi kontrol edin.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Giriş yap",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Bu alan adı sizin iş diskiniz değil. Paylaşılan dosya, parolanızı çalmak için bir bahane."
+      },
+      {
+       "id": "close",
+       "label": "Sekmeyi kapat",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Doğru. Paylaşılan dosyaları yalnızca disk.rxagentlik.az adresinde açın."
+      },
+      {
+       "id": "report",
+       "label": "Siteyi bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Sahte sayfayı bildirmek iş arkadaşlarınızı da korur."
+      }
+     ]
+    },
+    {
+     "id": "old-links",
+     "label": "Paylaşımlarım: 4 dosya herkese açık",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "rxagentlik-disk",
+      "url": [
+       {
+        "text": "https://disk.rxagentlik.az/paylasimlar",
+        "reveal": "rxagentlik.az"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "close-links",
+       "label": "Açık bağlantıları kapat",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Artık ihtiyaç duymadığınız paylaşımları kapatmak en basit korunma yoludur."
+      },
+      {
+       "id": "later",
+       "label": "Daha sonra",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Açık bırakılan her bağlantı her gün yeni bir risk demektir."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "link-settings",
+   "prompt": "Bu paylaşım ayarı güvenli mi?",
+   "cards": [
+    {
+     "id": "anyone-forever",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Paylaşım ayarı"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Maaş tablosu: bağlantıya sahip olan herkes, düzenleme, süresiz"
+        }
+       ]
+      ],
+      "buttons": [
+       "Bitti"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Herkese ve süresiz açık bir gizli dosya. Bağlantı bir kez yayılırsa geri dönüşü yoktur."
+    },
+    {
+     "id": "named-week",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Paylaşım ayarı"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Proje raporu: 2 kişi, görüntüleme, 7 gün"
+        }
+       ]
+      ],
+      "buttons": [
+       "Bitti"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Dar erişim, yalnızca görüntüleme ve bir bitiş tarihi. Doğru ayar."
+    },
+    {
+     "id": "whole-org",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Paylaşım ayarı"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "İK listesi: kurumdaki herkes"
+        }
+       ]
+      ],
+      "buttons": [
+       "Bitti"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Gizli bir belge kurumun tamamı için değil, yalnızca adı belirlenmiş kişiler içindir."
+    },
+    {
+     "id": "public-ad",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Paylaşım ayarı"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "İş ilanı: bağlantıya sahip olan herkes"
+        }
+       ]
+      ],
+      "buttons": [
+       "Bitti"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "İlan herkese açık ve zaten web sitesinde. Burada açık bağlantı sorun değil."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "who-needs-what",
+   "prompt": "Her ihtiyaç için doğru ayarı bulun.",
+   "pairs": [
+    {
+     "id": "partner",
+     "left": "Bir iş ortağının bir belgeyi okuması gerekiyor",
+     "right": "Görüntüleme, kişiye özel, 7 gün"
+    },
+    {
+     "id": "coauthor",
+     "left": "Bir iş arkadaşı belgeyi sizinle birlikte yazıyor",
+     "right": "Düzenleme, yalnızca o kişi"
+    },
+    {
+     "id": "public",
+     "left": "Web sitesinde yayımlanmış bir duyuru",
+     "right": "Herkese açık bağlantı"
+    }
+   ],
+   "explain": "Paylaşımı olabildiğince dar tutun: kiminle, hangi yetkilerle, ne kadar süreyle."
+  },
+  {
+   "type": "choice",
+   "id": "personal-cloud",
+   "question": {
+    "prompt": "Evden çalışmak için gizli bir dosyayı kişisel bulut hesabınıza yükleyebilir misiniz?",
+    "options": [
+     {
+      "id": "strong",
+      "label": "Evet, parolam güçlü",
+      "correct": false,
+      "feedback": "Güçlü bir parola, dosyayı yeniden kurumun denetimine sokmaz."
+     },
+     {
+      "id": "work",
+      "label": "Hayır, iş diskini ya da kurumun izin verdiği bir yolu kullanırım",
+      "correct": true,
+      "feedback": "Doğru. İş diskinde dosya korunur ve kurtarılabilir."
+     },
+     {
+      "id": "delete-later",
+      "label": "Evet, sonra silerim",
+      "correct": false,
+      "feedback": "Silinen bir dosya çoğu zaman çöp kutusunda ve başka cihazlarda kalır."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "cloud"
+    }
+   },
+   "explain": "İş dosyaları iş sistemlerinde kalır. Emin değilseniz BT destek ekibine sorun."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Gizli dosyalar için asla “Bağlantıya sahip olan herkes” ayarını kullanmayın.",
+    "Kişiye özel, yalnızca görüntüleme izniyle ve bir bitiş tarihiyle paylaşın.",
+    "Eski paylaşımları düzenli olarak kapatın."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

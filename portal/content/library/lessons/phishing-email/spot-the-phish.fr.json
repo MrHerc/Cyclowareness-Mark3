@@ -1,0 +1,887 @@
+{
+ "id": "spot-the-phish",
+ "title": "Repérez l’hameçon",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "meet-the-phish",
+   "beats": [
+    {
+     "id": "hello",
+     "say": "Bonjour ! Je suis votre assistant sécurité. Aujourd’hui, vous allez apprendre à repérer un faux e-mail en quelques secondes.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "sender",
+     "say": "D’abord, vérifiez l’adresse de l’expéditeur. Ici, une lettre a été remplacée, et c’est difficile à voir.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "xidmet-agentliyi-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Comptabilité"
+         }
+        ],
+        "address": [
+         {
+          "text": "muhasibat@"
+         },
+         {
+          "text": "xidmetagentIiyi.az",
+          "spot": "sender-domain"
+         }
+        ]
+       },
+       "to": "e.mammadov@xidmetagentliyi.az",
+       "subject": [
+        {
+         "text": "Bulletin de paie de septembre"
+        }
+       ],
+       "time": "09:12",
+       "body": [
+        [
+         {
+          "text": "Cher utilisateur,",
+          "spot": "greeting"
+         }
+        ],
+        [
+         {
+          "text": "Votre bulletin de paie de septembre est disponible. "
+         },
+         {
+          "text": "Si vous ne confirmez pas sous 24 heures, le versement de votre salaire sera suspendu.",
+          "spot": "urgency"
+         }
+        ],
+        [
+         {
+          "text": "Consulter le bulletin de paie",
+          "spot": "link",
+          "link": {
+           "label": "Consulter le bulletin de paie",
+           "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+          }
+         }
+        ],
+        [
+         {
+          "text": "Service comptabilité"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "sender-domain",
+     "checkpoint": {
+      "prompt": "Que vérifiez-vous en premier dans un e-mail suspect ?",
+      "options": [
+       {
+        "id": "address",
+        "label": "L’adresse de l’expéditeur",
+        "correct": true,
+        "feedback": "Exact. C’est souvent l’adresse qui trahit un faux le plus vite."
+       },
+       {
+        "id": "logo",
+        "label": "Le logo et la mise en page",
+        "correct": false,
+        "feedback": "Un logo et une mise en page se copient facilement. Vérifiez plutôt l’adresse."
+       },
+       {
+        "id": "time",
+        "label": "L’heure d’envoi",
+        "correct": false,
+        "feedback": "L’heure ne prouve rien. Les escrocs écrivent à toute heure."
+       }
+      ]
+     }
+    },
+    {
+     "id": "urgency",
+     "say": "Un délai et une menace. Quand un e-mail vous presse, c’est le signal qu’il faut vous arrêter.",
+     "mood": "alert",
+     "gesture": "point-down",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "xidmet-agentliyi-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Comptabilité"
+         }
+        ],
+        "address": [
+         {
+          "text": "muhasibat@"
+         },
+         {
+          "text": "xidmetagentIiyi.az",
+          "spot": "sender-domain"
+         }
+        ]
+       },
+       "to": "e.mammadov@xidmetagentliyi.az",
+       "subject": [
+        {
+         "text": "Bulletin de paie de septembre"
+        }
+       ],
+       "time": "09:12",
+       "body": [
+        [
+         {
+          "text": "Cher utilisateur,",
+          "spot": "greeting"
+         }
+        ],
+        [
+         {
+          "text": "Votre bulletin de paie de septembre est disponible. "
+         },
+         {
+          "text": "Si vous ne confirmez pas sous 24 heures, le versement de votre salaire sera suspendu.",
+          "spot": "urgency"
+         }
+        ],
+        [
+         {
+          "text": "Consulter le bulletin de paie",
+          "spot": "link",
+          "link": {
+           "label": "Consulter le bulletin de paie",
+           "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+          }
+         }
+        ],
+        [
+         {
+          "text": "Service comptabilité"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "urgency"
+    },
+    {
+     "id": "link",
+     "say": "N’appuyez pas sur le lien. Sur un ordinateur, survolez-le pour lire l’adresse ; sur un téléphone, ouvrez le site vous-même.",
+     "mood": "talk",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "xidmet-agentliyi-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Comptabilité"
+         }
+        ],
+        "address": [
+         {
+          "text": "muhasibat@"
+         },
+         {
+          "text": "xidmetagentIiyi.az",
+          "spot": "sender-domain"
+         }
+        ]
+       },
+       "to": "e.mammadov@xidmetagentliyi.az",
+       "subject": [
+        {
+         "text": "Bulletin de paie de septembre"
+        }
+       ],
+       "time": "09:12",
+       "body": [
+        [
+         {
+          "text": "Cher utilisateur,",
+          "spot": "greeting"
+         }
+        ],
+        [
+         {
+          "text": "Votre bulletin de paie de septembre est disponible. "
+         },
+         {
+          "text": "Si vous ne confirmez pas sous 24 heures, le versement de votre salaire sera suspendu.",
+          "spot": "urgency"
+         }
+        ],
+        [
+         {
+          "text": "Consulter le bulletin de paie",
+          "spot": "link",
+          "link": {
+           "label": "Consulter le bulletin de paie",
+           "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+          }
+         }
+        ],
+        [
+         {
+          "text": "Service comptabilité"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "link"
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "morning-inbox",
+   "environment": "inbox",
+   "title": "La boîte de réception du matin",
+   "intro": "Il est neuf heures du matin, et cinq nouveaux e-mails vous attendent. Ouvrez-les un par un et choisissez la bonne action.",
+   "steps": [
+    {
+     "id": "payslip",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Comptabilité"
+        }
+       ],
+       "address": [
+        {
+         "text": "muhasibat@xidmetagentIiyi.az",
+         "reveal": "Après « agent », c’est un « I » majuscule, et non un « l » minuscule"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Bulletin de paie de septembre"
+       }
+      ],
+      "time": "09:02",
+      "body": [
+       [
+        {
+         "text": "Cher utilisateur,"
+        }
+       ],
+       [
+        {
+         "text": "Votre bulletin de paie est disponible. Si vous ne confirmez pas sous 24 heures, le versement sera suspendu."
+        }
+       ],
+       [
+        {
+         "text": "Consulter le bulletin de paie",
+         "link": {
+          "label": "Consulter le bulletin de paie",
+          "href": "https://maas-portal.info/giris"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Lisez l’adresse de l’expéditeur lettre par lettre.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. L’adresse contient un I majuscule à la place d’un l minuscule : c’est un domaine trompeur."
+      },
+      {
+       "id": "click",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Le lien mène à maas-portal.info, et non au site de l’agence. Un mot de passe saisi là-bas part directement chez l’escroc."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Vous êtes à l’abri, mais vos collègues l’ont reçu aussi. Signalez-le pour que l’équipe le supprime pour tout le monde."
+      }
+     ]
+    },
+    {
+     "id": "report-draft",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi",
+      "from": {
+       "name": [
+        {
+         "text": "Elvin Mammadov"
+        }
+       ],
+       "address": [
+        {
+         "text": "e.mammadov@xidmetagentliyi.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Version finale du rapport"
+       }
+      ],
+      "time": "08:47",
+      "body": [
+       [
+        {
+         "text": "Bonjour Aynur,"
+        }
+       ],
+       [
+        {
+         "text": "J’ai déposé sur le portail interne la version finale du rapport dont nous avons parlé. Dites-moi quand vous l’aurez consultée."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "reply",
+       "label": "Répondre",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Exact. Un collègue connu, le domaine de l’agence, aucun lien et aucune urgence."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Cet e-mail est authentique : le bon domaine, et aucune demande."
+      }
+     ]
+    },
+    {
+     "id": "sign-request",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "docusfera-fake",
+      "from": {
+       "name": [
+        {
+         "text": "DocuSfera"
+        }
+       ],
+       "address": [
+        {
+         "text": "noreply@docusfera-imza.test"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Un document attend votre signature"
+       }
+      ],
+      "time": "08:31",
+      "body": [
+       [
+        {
+         "text": "La direction vous a envoyé « Muqavile_2025.pdf » à signer."
+        }
+       ],
+       [
+        {
+         "text": "Connectez-vous avec votre adresse e-mail professionnelle pour le consulter."
+        }
+       ],
+       [
+        {
+         "text": "Consulter le document",
+         "link": {
+          "label": "Consulter le document",
+          "href": "https://docusfera-imza.test/doc"
+         }
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "click",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Le domaine était docusfera-imza.test, et non celui du vrai service. La page qui s’ouvre est conçue pour voler votre mot de passe professionnel."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact : une demande de signature inattendue, venant d’un domaine étrange. En cas de doute, appelez l’expéditeur à un numéro que vous connaissez."
+      }
+     ]
+    },
+    {
+     "id": "maintenance",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "Support informatique"
+        }
+       ],
+       "address": [
+        {
+         "text": "it@xidmetagentliyi.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Maintenance programmée"
+       }
+      ],
+      "time": "08:15",
+      "body": [
+       [
+        {
+         "text": "La messagerie sera indisponible samedi de 20:00 à 22:00. Vous n’avez rien à faire."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "ok",
+       "label": "Marquer comme fiable",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Exact. Une adresse officielle, aucun lien, et rien ne vous est demandé."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Cet e-mail est authentique : il informe et ne demande rien."
+      }
+     ]
+    },
+    {
+     "id": "bonus-list",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Service RH"
+        }
+       ],
+       "address": [
+        {
+         "text": "kadrlar@xidmetagentliyi-az.com"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Liste des primes pour les fêtes"
+       }
+      ],
+      "time": "07:58",
+      "body": [
+       [
+        {
+         "text": "Cher collaborateur,"
+        }
+       ],
+       [
+        {
+         "text": "Vous trouverez en pièce jointe la liste des bénéficiaires de la prime. Vérifiez votre nom dès aujourd’hui."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Mukafat_siyahisi.html"
+         }
+        ],
+        "size": "12 Ko"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir la pièce jointe",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "La « liste » est un fichier .html qui affiche une fausse page de connexion. En plus, le domaine se terminait par -az.com."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact : un domaine étrange, un sujet alléchant et une pièce jointe .html. Pour les primes, renseignez-vous vous-même auprès des RH."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "find-the-signs",
+   "prompt": "Appuyez sur les signes qui trahissent un faux.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "e-xidmet-fake",
+    "from": {
+     "name": [
+      {
+       "text": "E-Xidmet Portal",
+       "reveal": "bildiris@e-xidmet-portal.info"
+      }
+     ],
+     "address": [
+      {
+       "text": "bildiris@"
+      },
+      {
+       "text": "e-xidmet-portal.info",
+       "spot": "sender-domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Amende impayée : dernier avis"
+     }
+    ],
+    "time": "11:47",
+    "body": [
+     [
+      {
+       "text": "Cher citoyen,",
+       "spot": "greeting"
+      }
+     ],
+     [
+      {
+       "text": "Une amende de 40 AZN pour infraction routière a été émise à votre nom."
+      }
+     ],
+     [
+      {
+       "text": "Sans paiement sous 48 heures, le montant sera doublé et le dossier sera transmis au tribunal.",
+       "spot": "threat"
+      }
+     ],
+     [
+      {
+       "text": "Payer l’amende",
+       "spot": "link",
+       "link": {
+        "label": "Payer l’amende",
+        "href": "https://e-xidmet-portal.info/cerime?id=58213"
+       }
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender-domain",
+     "label": "Domaine inconnu",
+     "explain": "Un service officiel n’écrit pas depuis une adresse pareille. Le nom est inventé pour faire officiel."
+    },
+    {
+     "id": "greeting",
+     "label": "Formule d’appel impersonnelle",
+     "explain": "Un vrai avis indique en général votre nom et un numéro de dossier."
+    },
+    {
+     "id": "threat",
+     "label": "Menace et délai",
+     "explain": "La peur et un délai très court vous poussent à payer sans vérifier."
+    },
+    {
+     "id": "link",
+     "label": "Faux lien",
+     "explain": "Le lien sert à récupérer vos données de carte bancaire. Pour vérifier vos amendes, ouvrez vous-même le portail officiel."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "first-move",
+   "question": {
+    "prompt": "Que faites-vous d’un e-mail suspect ?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Je clique sur le bouton « Signaler comme hameçonnage »",
+      "correct": true,
+      "feedback": "Exact. Pas de bouton de ce type ? Transférez l’e-mail à votre contact de la Sécurité informatique. L’équipe pourra alors le bloquer pour tout le monde."
+     },
+     {
+      "id": "click",
+      "label": "J’ouvre le lien pour vérifier",
+      "correct": false,
+      "feedback": "Un seul clic peut ouvrir une page malveillante. Vérifiez plutôt l’adresse."
+     },
+     {
+      "id": "reply",
+      "label": "Je réponds pour interroger l’expéditeur",
+      "correct": false,
+      "feedback": "Votre réponse part directement chez l’escroc. Évidemment, il vous dira que tout va bien."
+     },
+     {
+      "id": "forward",
+      "label": "Je le transfère à des collègues pour avoir leur avis",
+      "correct": false,
+      "feedback": "Vous propagez ainsi le danger. Signalez-le, et l’équipe l’examinera."
+     }
+    ]
+   },
+   "explain": "Signaler, c’est vous protéger, vous et vos collègues. Si votre messagerie n’a pas de bouton « Signaler comme hameçonnage », transférez l’e-mail à la Sécurité informatique."
+  },
+  {
+   "type": "swipe",
+   "id": "safe-or-phish",
+   "prompt": "Sans danger ou piège ?",
+   "cards": [
+    {
+     "id": "card-blocked",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank-fake",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "08:03",
+      "messages": [
+       [
+        {
+         "text": "UlduzBank : votre carte a été bloquée. Pour la débloquer, connectez-vous : "
+        },
+        {
+         "text": "https://ulduzbank-az.info/kart"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Le nom de l’expéditeur peut être usurpé, et le lien ne mène pas au site de la banque. En cas de doute, appelez le numéro au dos de votre carte."
+    },
+    {
+     "id": "meeting",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi",
+      "from": {
+       "name": [
+        {
+         "text": "Elvin Mammadov"
+        }
+       ],
+       "address": [
+        {
+         "text": "e.mammadov@xidmetagentliyi.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Réunion de demain"
+       }
+      ],
+      "time": "10:21",
+      "body": [
+       [
+        {
+         "text": "Bonjour Aynur,"
+        }
+       ],
+       [
+        {
+         "text": "Rendez-vous demain à 10:00 en salle 3. L’ordre du jour est dans l’e-mail d’hier."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Un collègue connu, la bonne adresse, aucun lien et aucune demande. Un e-mail de travail ordinaire."
+    },
+    {
+     "id": "courier",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "cevikkargo-fake",
+      "sender": [
+       {
+        "text": "+994 70 000 88 31"
+       }
+      ],
+      "time": "13:40",
+      "messages": [
+       [
+        {
+         "text": "ÇevikKargo : votre colis est retenu à l’entrepôt. Réglez des frais de 1,20 AZN : "
+        },
+        {
+         "text": "https://cevik-kargo.info/odenis"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "La petite somme endort votre méfiance. Le vrai but est de voler vos données de carte bancaire."
+    },
+    {
+     "id": "holidays",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "xidmet-agentliyi",
+      "from": {
+       "name": [
+        {
+         "text": "Service RH"
+        }
+       ],
+       "address": [
+        {
+         "text": "kadrlar@xidmetagentliyi.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Jours fériés"
+       }
+      ],
+      "time": "16:05",
+      "body": [
+       [
+        {
+         "text": "Chers collègues,"
+        }
+       ],
+       [
+        {
+         "text": "Le planning de travail pour les jours fériés de novembre est disponible sur le portail interne."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Une formule d’appel générale n’est pas toujours une menace. L’adresse est la bonne, sans lien ni urgence."
+    },
+    {
+     "id": "mailbox-full",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Support informatique"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-destek@xidmetagentliyi-az.com"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Votre messagerie est pleine"
+       }
+      ],
+      "time": "07:58",
+      "body": [
+       [
+        {
+         "text": "Votre messagerie est pleine à 98 %. Confirmez votre connexion dès aujourd’hui pour ne pas perdre d’e-mails."
+        }
+       ],
+       [
+        {
+         "text": "Confirmer la connexion",
+         "link": {
+          "label": "Confirmer la connexion",
+          "href": "https://xidmetagentliyi-az.com/poct"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "L’adresse se termine par un -az.com en trop, qui n’est pas le domaine de l’agence. Une connexion ne se confirme jamais par un lien."
+    },
+    {
+     "id": "card-payment",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "19:12",
+      "messages": [
+       [
+        {
+         "text": "UlduzBank : un paiement de 23,40 AZN a été effectué avec votre carte. Si ce n’est pas vous, appelez le numéro au dos de votre carte."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Aucun lien, et le message vous renvoie vers un numéro que vous avez déjà. Une notification normale."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Vérifiez l’adresse : une seule lettre différente suffit à trahir un faux.",
+    "L’urgence et les menaces sont le signal qu’il faut vous arrêter.",
+    "Vérifiez les liens avant de cliquer, et signalez en cas de doute."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

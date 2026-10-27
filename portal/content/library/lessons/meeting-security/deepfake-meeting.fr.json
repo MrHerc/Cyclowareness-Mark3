@@ -1,0 +1,343 @@
+{
+ "id": "deepfake-meeting",
+ "title": "Le faux participant",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "dm-tutor",
+   "beats": [
+    {
+     "id": "dm-b1",
+     "say": "Aujourd’hui, l’IA peut imiter un visage et une voix familiers pendant un appel vidéo.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "dm-b2",
+     "say": "Un paiement urgent, le secret et une demande qui contourne les règles habituelles : réunis, ils doivent vous alerter.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "gorus",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Rashad Mammadov (directeur)"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Caméra allumée, la voix est légèrement décalée par rapport aux lèvres."
+         }
+        ],
+        [
+         {
+          "text": "« Virez 46 000 manats sur un nouveau compte aujourd’hui avant 15:00. C’est confidentiel, n’en parlez à personne. »",
+          "spot": "urgent"
+         }
+        ]
+       ],
+       "buttons": [
+        "Réactiver le micro",
+        "Quitter"
+       ]
+      }
+     },
+     "highlight": "urgent"
+    },
+    {
+     "id": "dm-b3",
+     "say": "L’image peut sembler parfaite. Jugez donc la demande, pas le visage.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "dm-b4",
+     "say": "Quittez la réunion et appelez vous-même cette personne à un numéro que vous connaissez déjà.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "dm-sim",
+   "environment": "desktop",
+   "title": "Réunion urgente",
+   "intro": "Vous avez reçu une invitation urgente du directeur et vous avez rejoint la réunion. Regardez ce qu’on vous demande, puis décidez.",
+   "steps": [
+    {
+     "id": "the-ask",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Rashad Mammadov (directeur)"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Caméra allumée, la voix est légèrement décalée par rapport aux lèvres."
+        }
+       ],
+       [
+        {
+         "text": "« Virez 46 000 manats sur un nouveau compte aujourd’hui avant 15:00. C’est confidentiel, n’en parlez à personne. »",
+         "spot": "urgent"
+        }
+       ]
+      ],
+      "buttons": [
+       "Réactiver le micro",
+       "Quitter"
+      ]
+     },
+     "say": "Le directeur est en vidéo, et sa voix vous semble familière.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "D’accord, je fais le virement tout de suite",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "La vidéo était un deepfake, et l’argent est parti chez un escroc. Un visage familier ne valide pas une demande de paiement."
+      },
+      {
+       "id": "verify",
+       "label": "Je vais confirmer en vous appelant au numéro que je connais",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Un second canal démasque vite la supercherie."
+      },
+      {
+       "id": "wave-test",
+       "label": "Faites un signe de la main à la caméra, s’il vous plaît",
+       "kind": "verify",
+       "outcome": "risky",
+       "feedback": "Ce genre de test n’est plus fiable : une fausse vidéo peut aussi faire un signe de la main. Vérifiez par un autre canal."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Conversation de la réunion"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Rashad Mammadov : Ne m’appelez pas, je n’ai pas mon téléphone sur moi.",
+         "spot": "no-call"
+        }
+       ],
+       [
+        {
+         "text": "Sevda Karimli (cheffe comptable) : Je suis là aussi, tout est en ordre."
+        }
+       ]
+      ],
+      "buttons": [
+       "Envoyer"
+      ]
+     },
+     "say": "Voilà qu’une autre personne que vous connaissez confirme à son tour.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Si tout le monde est d’accord, je fais le virement",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Chaque participant de la réunion peut être faux. Dans ce type d’attaque, la réunion entière est parfois truquée."
+      },
+      {
+       "id": "leave",
+       "label": "Quitter la réunion et suspendre le paiement",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Exact. « Ne m’appelez pas », c’est justement la meilleure raison d’appeler."
+      }
+     ]
+    },
+    {
+     "id": "new-number",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "+994 50 000 64 27"
+       }
+      ],
+      "body": [
+       {
+        "text": "Rashad Mammadov : C’est mon nouveau numéro. Le virement est fait ?"
+       }
+      ],
+      "time": "14:22"
+     },
+     "say": "Après la réunion, un message arrive.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler à l’équipe sécurité",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact : l’escroc insiste par un autre canal. Gardez le message, c’est une preuve."
+      },
+      {
+       "id": "reply",
+       "label": "Répondre : pas encore, je m’en occupe",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Un nouveau numéro ne se vérifie qu’en passant par l’ancien, celui que vous connaissez. Ce numéro est celui de l’escroc."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "dm-scenario",
+   "title": "L’appel de vérification",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "M. Rashad est à Gandja aujourd’hui, en rendez-vous toute la journée. Il n’a organisé aucune réunion.",
+     "speaker": "L’assistante Aygun Rahimova (numéro interne)",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Monsieur Rashad est à Gandja aujourd’hui, <breath> en rendez-vous toute la journée. Il n’a organisé aucune réunion.",
+     "choices": [
+      {
+       "label": "Je préviens tout de suite l’équipe sécurité et le service Finances",
+       "next": "n2",
+       "feedback": "Exact. L’attaquant peut aussi viser d’autres collègues."
+      },
+      {
+       "label": "Il a sûrement oublié, je fais le virement",
+       "outcome": "compromised",
+       "feedback": "L’assistante a confirmé qu’il n’y avait aucune réunion. L’argent serait parti chez un escroc."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Merci. Vous avez gardé l’invitation, la conversation de la réunion et le message ?",
+     "speaker": "Équipe sécurité",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Merci. <breath> Vous avez gardé l’invitation, la conversation de la réunion et le message ?",
+     "choices": [
+      {
+       "label": "J’ai tout gardé et je vous l’envoie",
+       "outcome": "safe",
+       "feedback": "Très bien. Ces preuves aident l’enquête et permettent d’avertir les autres."
+      },
+      {
+       "label": "J’ai tout supprimé parce que j’avais honte",
+       "outcome": "risky",
+       "feedback": "Sans preuves, l’enquête est plus difficile. La prochaine fois, ne supprimez rien : il n’y a aucune honte à avoir."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "dm-choice",
+   "question": {
+    "prompt": "Quel est le moyen le plus fiable de vérifier le « directeur » de la réunion ?",
+    "options": [
+     {
+      "id": "known",
+      "label": "Quitter la réunion et l’appeler au numéro que je connais déjà",
+      "correct": true,
+      "feedback": "Exact. L’escroc ne contrôle pas ce canal."
+     },
+     {
+      "id": "question",
+      "label": "Lui poser une question personnelle pendant la réunion",
+      "correct": false,
+      "feedback": "La réponse se trouve peut-être sur les réseaux sociaux, ou il peut esquiver. Un canal séparé est plus fiable."
+     },
+     {
+      "id": "quality",
+      "label": "Examiner attentivement la qualité de la vidéo",
+      "correct": false,
+      "feedback": "Les fausses vidéos actuelles sont très convaincantes. Ne vous fiez pas à l’image."
+     },
+     {
+      "id": "reply-invite",
+      "label": "Répondre à l’e-mail d’invitation",
+      "correct": false,
+      "feedback": "La réponse repartirait chez l’escroc. Choisissez vous-même le canal."
+     }
+    ]
+   },
+   "explain": "Un second canal, c’est un canal que vous choisissez et que vous connaissez déjà : le numéro interne, le numéro enregistré dans vos contacts, ou une rencontre en personne."
+  },
+  {
+   "type": "order",
+   "id": "dm-order",
+   "prompt": "Un paiement urgent est demandé en réunion. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "hold",
+     "label": "Ne pas effectuer le paiement"
+    },
+    {
+     "id": "leave",
+     "label": "Quitter la réunion"
+    },
+    {
+     "id": "call",
+     "label": "Appeler vous-même un numéro que vous connaissez"
+    },
+    {
+     "id": "report",
+     "label": "Signaler à l’équipe sécurité et conserver les preuves"
+    }
+   ],
+   "explain": "Bloquez d’abord l’argent, puis vérifiez et signalez. L’urgence ne passe jamais avant la vérification."
+  },
+  {
+   "type": "recap",
+   "id": "dm-recap",
+   "points": [
+    "Un visage et une voix familiers ne sont pas une preuve",
+    "Paiement urgent et secret exigé : arrêtez tout",
+    "Rappelez vous-même à un numéro que vous connaissez"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

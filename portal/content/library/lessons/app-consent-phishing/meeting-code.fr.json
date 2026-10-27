@@ -1,0 +1,451 @@
+{
+ "id": "meeting-code",
+ "title": "Le code de réunion",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac2-tutor",
+   "beats": [
+    {
+     "id": "ac2-b1",
+     "say": "Bonjour ! Voyons maintenant une invitation à un forum international et un code de réunion.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "ac2-b2",
+     "say": "L’escroc vous envoie un code et l’adresse de la vraie page de connexion de votre entreprise.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2b-nordvale-fake",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Leyla K. | Nordvale Council"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Pour rejoindre la réunion, saisissez ce code : "
+          },
+          {
+           "text": "QK7-MN4P",
+           "spot": "code"
+          }
+         ],
+         "time": "10:04"
+        }
+       ]
+      }
+     },
+     "highlight": "code"
+    },
+    {
+     "id": "ac2-b3",
+     "say": "Si vous saisissez ce code, son appareil entre dans votre compte en se faisant passer pour vous, sans avoir besoin de votre mot de passe.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "ac2-b4",
+     "say": "La règle : si vous n’avez pas lancé la connexion vous-même, ne saisissez jamais de code, nulle part.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ac2-scenario",
+   "title": "Invitation à un forum",
+   "start": "invite",
+   "nodes": [
+    {
+     "id": "invite",
+     "text": "Bonjour ! Nous aimerions vous inviter à intervenir lors de notre forum à Vienne, en novembre. Cela vous intéresse ?",
+     "speaker": "Leyla, Nordvale Council (nouveau message)",
+     "voice": "young-woman",
+     "channel": "message",
+     "spoken": "Bonjour ! <breath> Nous aimerions vous inviter à intervenir lors de notre forum à Vienne, en novembre. Cela vous intéresse ?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Merci. Envoyez-moi l’invitation officielle sur ma messagerie professionnelle, pour que je puisse la faire valider par ma direction",
+       "next": "code",
+       "feedback": "Exact. Une invitation officielle passe par un canal officiel, et vous pouvez la vérifier."
+      },
+      {
+       "label": "Très intéressant ! Que dois-je faire ?",
+       "next": "code",
+       "feedback": "Votre intérêt est naturel. Mais il vaut mieux faire passer une conversation avec une personne inconnue par un canal officiel."
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "text": "Parfait ! Faisons une courte réunion en ligne demain. Pour la rejoindre, saisissez ce code sur la page de connexion de votre entreprise : QK7-MN4P.",
+     "speaker": "Leyla, Nordvale Council",
+     "voice": "young-woman",
+     "channel": "message",
+     "spoken": "Parfait ! Faisons une courte réunion en ligne demain. <breath> Pour la rejoindre, saisissez ce code sur la page de connexion de votre entreprise : QK7-MN4P.",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Je n’ai pas lancé cette connexion, donc je ne saisis ce code nulle part",
+       "next": "pressure",
+       "feedback": "Exact. Si un code vous arrive par message, la connexion appartient à quelqu’un d’autre."
+      },
+      {
+       "label": "La page est celle de mon entreprise, donc elle est sûre. Je saisis le code",
+       "outcome": "compromised",
+       "feedback": "La page était authentique, mais c’est l’escroc qui a lancé la connexion. Son appareil est maintenant dans votre messagerie."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Nous manquons de temps, et votre ministère a donné son accord. Saisissez simplement le code, cela prend deux minutes.",
+     "speaker": "Leyla, Nordvale Council",
+     "voice": "young-woman",
+     "channel": "message",
+     "spoken": "Nous manquons de temps, euh, et votre ministère a donné son accord. Saisissez simplement le code, cela prend deux minutes.",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Je vais chercher le numéro sur le site officiel du forum pour appeler moi-même, et je vais prévenir le support technique",
+       "outcome": "safe",
+       "feedback": "Bravo. Un véritable organisateur accepte volontiers la vérification, alors qu’un escroc disparaît."
+      },
+      {
+       "label": "D’accord, je le saisis",
+       "outcome": "compromised",
+       "feedback": "La pression fait partie du piège. Dès que vous saisissez le code, votre compte s’ouvre à l’appareil de l’escroc."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac2-sim",
+   "environment": "phone",
+   "title": "Invitation sur votre téléphone",
+   "intro": "Des messages au nom du forum arrivent sur votre téléphone. Ouvrez-les un par un et choisissez la bonne action.",
+   "steps": [
+    {
+     "id": "code-chat",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2b-nordvale-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Leyla K. | Nordvale Council"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour ! Votre table ronde au forum de Vienne est confirmée."
+         }
+        ],
+        "time": "10:02"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Code pour rejoindre la réunion : QK7-MN4P"
+         }
+        ],
+        "time": "10:03"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Saisissez le code sur cette page : "
+         },
+         {
+          "text": "giris.idare.example/cihaz",
+          "link": {
+           "label": "giris.idare.example/cihaz",
+           "href": "https://giris.idare.example/cihaz"
+          }
+         }
+        ],
+        "time": "10:03"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Si vous n’avez pas lancé la connexion, un code envoyé par message est un piège.",
+       "next": "slides"
+      },
+      {
+       "id": "official",
+       "label": "Merci de m’envoyer l’invitation officielle sur ma messagerie professionnelle",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Un véritable organisateur peut le faire, un escroc se dérobera.",
+       "next": "slides"
+      },
+      {
+       "id": "open-page",
+       "label": "Ouvrir la page",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "La page est authentique, mais quelqu’un d’autre a lancé cette connexion. Regardez bien l’écran suivant."
+      }
+     ]
+    },
+    {
+     "id": "device-confirm",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Vous connectez-vous sur un autre appareil ?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Code : QK7-MN4P"
+        }
+       ],
+       [
+        {
+         "text": "Si vous n’avez pas lancé cette connexion vous-même, ne continuez pas."
+        }
+       ]
+      ],
+      "buttons": [
+       "Continuer",
+       "Annuler"
+      ]
+     },
+     "say": "La page s’est ouverte. Dès que vous saisissez le code, cette question apparaît.",
+     "actions": [
+      {
+       "id": "continue",
+       "label": "Continuer",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "L’appareil de l’escroc est maintenant dans votre compte. Appelez immédiatement le support technique."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. L’avertissement de la page elle-même était clair : vous n’avez pas lancé cette connexion."
+      }
+     ]
+    },
+    {
+     "id": "slides",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-nordvale-slides",
+      "app": "Nordvale Slides",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Voir votre profil"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Lire et envoyer vos e-mails"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Conserver l’accès même en votre absence"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "L’organisatrice envoie maintenant un lien vers les diapositives. Celui-ci demande aussi une autorisation.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. Pour consulter des diapositives, inutile d’accéder à vos e-mails."
+      },
+      {
+       "id": "allow",
+       "label": "Autoriser",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Cette application lit maintenant vos e-mails. Demandez au support technique de révoquer l’autorisation."
+      }
+     ]
+    },
+    {
+     "id": "tell-support",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Support technique"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "J’ai reçu un code et une demande d’autorisation au nom d’un forum."
+         }
+        ],
+        "time": "10:20"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Merci ! Avez-vous saisi le code ou autorisé quelque chose ?"
+         }
+        ],
+        "time": "10:21"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "yes",
+       "label": "Oui, je l’ai saisi par erreur",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Le dire tout de suite, c’est la bonne réaction. Un spécialiste va fermer la connexion et révoquer l’autorisation."
+      },
+      {
+       "id": "no",
+       "label": "Non, je n’ai rien saisi",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bravo. Un spécialiste va aussi prévenir vos autres collègues."
+      },
+      {
+       "id": "silent",
+       "label": "Ne pas répondre",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Tout le monde peut se tromper, mais cacher son erreur aggrave les dégâts. Une réponse honnête fait gagner du temps."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ac2-match",
+   "prompt": "Associez chaque situation à la bonne action.",
+   "pairs": [
+    {
+     "id": "code-message",
+     "left": "Quelqu’un vous a envoyé un code par message",
+     "right": "Ne le saisir nulle part et le signaler"
+    },
+    {
+     "id": "own-tv",
+     "left": "Vous avez vous-même lancé la connexion sur un téléviseur",
+     "right": "Vous pouvez saisir le code affiché à l’écran"
+    },
+    {
+     "id": "unknown-app",
+     "left": "Une application inconnue demande un accès permanent",
+     "right": "Refuser"
+    },
+    {
+     "id": "mistake",
+     "left": "Vous avez saisi un code ou autorisé une application par erreur",
+     "right": "Appeler immédiatement le support technique"
+    }
+   ],
+   "explain": "Un code n’est sûr que s’il vient d’un appareil sur lequel vous avez vous-même lancé la connexion. Dans tous les autres cas, arrêtez-vous et signalez-le."
+  },
+  {
+   "type": "choice",
+   "id": "ac2-choice",
+   "question": {
+    "prompt": "L’organisatrice vous dit : « La page appartient à votre propre entreprise, ne vous inquiétez pas. » Est-ce une raison pour saisir le code ?",
+    "options": [
+     {
+      "id": "no",
+      "label": "Non. La page est authentique, mais c’est quelqu’un d’autre qui a lancé la connexion",
+      "correct": true,
+      "feedback": "Exact. Dans ce piège, la page et le code sont authentiques : seule la personne qui a lancé la connexion n’est pas celle qu’elle prétend être."
+     },
+     {
+      "id": "real-address",
+      "label": "Oui, si l’adresse est authentique, il n’y a aucun danger",
+      "correct": false,
+      "feedback": "Vérifier l’adresse protège un mot de passe, pas un code. Le code va sur l’appareil de la personne qui a lancé la connexion."
+     },
+     {
+      "id": "famous",
+      "label": "Oui, si l’organisatrice vient d’un forum connu",
+      "correct": false,
+      "feedback": "N’importe qui peut écrire un nom connu. Vérifiez le forum sur son site officiel."
+     }
+    ]
+   },
+   "explain": "Un code remet une clé à l’appareil qui a lancé la connexion. Si ce n’est pas vous qui l’avez lancée, ne saisissez pas le code."
+  },
+  {
+   "type": "recap",
+   "id": "ac2-recap",
+   "points": [
+    "Ne saisissez jamais sur une page de connexion un code reçu par message",
+    "Même sur une vraie page, vérifiez qui a lancé la connexion",
+    "En cas d’erreur, prévenez immédiatement le support technique"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

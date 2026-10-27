@@ -10,11 +10,24 @@ import type { Permission } from "./permissions";
 
 /** For route handlers: the viewer, or the response to send when the checks fail (see deniedResponse). */
 export async function apiViewer(permission: Permission, request?: Request): Promise<Viewer | Response> {
+  const probe = request && rscProbe(request);
+  if (probe) return probe;
   const v = await getViewer();
   if (!v) return deniedResponse(request, 401);
   if (twoFactorGap(v)) return deniedResponse(request, 403, "/profile?section=security&required=1");
   if (!allowed(v, permission)) return deniedResponse(request, 403);
   return v;
+}
+
+/**
+ * The empty answer to an RSC request (`rsc: 1`) for a route handler, else null. Signing in from a
+ * download link ends in a server action's redirect(next), and Next pre-renders that target with this
+ * header (createRedirectRenderResult in next/dist/server/app-render/action-handler.js), as the client
+ * router does for a <Link>; neither can use a file. An empty 204 makes the browser load the URL itself,
+ * so the download (and its audit entry and rate limit) happens once. Called before any other work.
+ */
+export function rscProbe(request: Request): Response | null {
+  return request.headers.get("rsc") === "1" ? new Response(null, { status: 204 }) : null;
 }
 
 /** A link opened in the browser (an emailed report, a bookmarked export), as opposed to a fetch from the app. */

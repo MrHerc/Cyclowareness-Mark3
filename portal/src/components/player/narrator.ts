@@ -1,22 +1,36 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { wordAt, type NarrationClips } from "@/lib/tts/clips";
+import { speechText, wordOffsets, wordsOf } from "@/lib/tts/text";
+
+export { speechText, wordsOf };
 
 /**
- * Narration through the browser's speech engine (Web Speech API), with word timing for the
- * karaoke highlight. A pre-generated TTS provider can replace `speak` later without UI changes.
- * When the engine gives no word boundaries, timing is estimated from the speech rate.
+ * Narration with word timing for the karaoke highlight: a lesson's pre-generated clip for the text when
+ * there is one (natural voice, exact word times), otherwise the browser's speech engine (Web Speech
+ * API), whose timing is estimated from the speech rate when it gives no word boundaries.
  * Text is read only by a voice of its own language; without one the narrator stays silent.
  */
 export type Voice = "tutor" | "man" | "man-2" | "man-3" | "woman" | "woman-2" | "young-woman" | "young-man" | "young-man-2" | "older-man" | "older-woman" | "child";
 
-const FEMALE = /(female|woman|zira|aria|jenny|samantha|susan|hazel|libby|sonia|michelle|natasha|ava|emma|serena|karen|moira|tessa|google uk english female|google us english)/i;
-const MALE = /(male|man|david|mark|guy|davis|christopher|eric|ryan|george|daniel|james|thomas|alex|fred|google uk english male)/i;
+// Whole names only ("man" is in "German" and "Romanian"), with Edge's natural voices of the library
+// languages; Edge also lists "AvaMultilingual"-style names.
+const voiceNames = (names: string) => new RegExp(`\\b(${names})(multilingual)?\\b`, "i");
+const FEMALE = voiceNames(
+  "female|woman|zira|aria|jenny|samantha|susan|hazel|libby|sonia|michelle|natasha|ava|emma|serena|karen|moira|tessa|banu|eka|zariyah|emel|alina|polina|svetlana|dariya|katja|seraphina|amala|denise|vivienne|eloise|google uk english female|google us english",
+);
+const MALE = voiceNames("male|man|david|mark|guy|davis|christopher|eric|ryan|george|daniel|james|thomas|alex|fred|andrew|babek|giorgi|hamed|ahmet|emil|ostap|dmitry|conrad|florian|henri|r[eé]my|google uk english male");
+
+/** Among equally good voices, the region a language is read in by default: Arabic as in Saudi Arabia. */
+const PREFERRED_REGION: Record<string, string> = { ar: "sa" };
+
+const baseTag = (x: string) => x.toLowerCase().split(/[-_]/)[0];
+const regionTag = (x: string) => x.toLowerCase().split(/[-_]/)[1] ?? "";
 
 /** "az", "az-AZ" and "az_AZ" (Android) all name Azerbaijani. */
 function sameLanguage(tag: string, lang: string): boolean {
-  const base = (x: string) => x.toLowerCase().split(/[-_]/)[0];
-  return base(tag) === base(lang);
+  return baseTag(tag) === baseTag(lang);
 }
 
 /**
@@ -54,15 +68,24 @@ export function useVoiceAvailability(lang: string): VoiceAvailability {
 /** How long speak() waits for an empty voice list to fill before leaving the voice to the engine. */
 const VOICE_WAIT_MS = 1500;
 
-function pickVoice(voices: SpeechSynthesisVoice[], lang: string, voice: Voice): { v: SpeechSynthesisVoice | null; pitch: number; rateMul: number } {
-  const quality = (x: SpeechSynthesisVoice) => (/(natural|neural|online|premium|enhanced)/i.test(x.name) ? 2 : 0) + (x.localService ? 0 : 1);
+type VoiceLike = Pick<SpeechSynthesisVoice, "name" | "lang" | "localService">;
+
+/**
+ * The engine voice for a text: only voices of its language; natural/neural/online voices first, then
+ * network voices, then the language's usual region; then the gender the `Voice` asks for ("tutor" is a
+ * woman). Pitch and rate shape the age.
+ */
+export function pickVoice<V extends VoiceLike>(voices: readonly V[], lang: string, voice: Voice): { v: V | null; pitch: number; rateMul: number } {
+  const quality = (x: V) => (/(natural|neural|online|premium|enhanced)/i.test(x.name) ? 2 : 0) + (x.localService ? 0 : 1);
+  const region = PREFERRED_REGION[baseTag(lang)];
+  const regional = (x: V) => (region && regionTag(x.lang) === region ? 1 : 0);
   // Voices of the language only: speak() stays silent when there is none.
-  const sorted = voices.filter((x) => sameLanguage(x.lang, lang)).sort((a, b) => quality(b) - quality(a));
+  const sorted = voices.filter((x) => sameLanguage(x.lang, lang)).sort((a, b) => quality(b) - quality(a) || regional(b) - regional(a));
   const female = sorted.filter((x) => FEMALE.test(x.name) && !/\bmale\b/i.test(x.name.replace(/female/i, "")));
   const male = sorted.filter((x) => MALE.test(x.name) && !FEMALE.test(x.name));
   const wantsMale = /man|male/.test(voice) && !/woman/.test(voice);
   const wantsFemale = /woman/.test(voice) || voice === "tutor";
-  let v: SpeechSynthesisVoice | null = sorted[0] ?? null;
+  let v: V | null = sorted[0] ?? null;
   if (wantsMale && male.length) v = male[voice.endsWith("-2") ? 1 % male.length : voice.endsWith("-3") ? 2 % male.length : 0];
   if (wantsFemale && female.length) v = female[voice.endsWith("-2") ? 1 % female.length : 0];
   const pitch = voice === "child" ? 1.45 : voice.startsWith("young") ? 1.12 : voice.startsWith("older") ? 0.82 : voice === "tutor" ? 1.05 : 1;
@@ -70,25 +93,30 @@ function pickVoice(voices: SpeechSynthesisVoice[], lang: string, voice: Voice): 
 }
 
 /** BCP 47 tags for the utterance when the engine lists no voices at all and picks one itself. */
-const LANG_TAG: Record<string, string> = { az: "az-AZ", en: "en-US", ru: "ru-RU" };
+const LANG_TAG: Record<string, string> = { az: "az-AZ", en: "en-US", ru: "ru-RU", tr: "tr-TR", ro: "ro-RO", ka: "ka-GE", uk: "uk-UA", de: "de-DE", fr: "fr-FR", ar: "ar-SA" };
 
-export function speechText(text: string): string {
-  return text.replace(/<[^>]+>/g, " ").replace(/\s{2,}/g, " ").trim();
-}
+const clampRate = (rate: number) => Math.max(0.5, Math.min(2, rate));
+const clampVolume = (volume: number) => Math.max(0, Math.min(1, volume));
 
-export function wordsOf(text: string): string[] {
-  return speechText(text).split(/\s+/).filter(Boolean);
-}
-
-export function useNarrator({ enabled, rate, lang = "en" }: { enabled: boolean; rate: number; lang?: string }) {
+/**
+ * `clips`: the lesson's pre-generated clips for `lang` (src/server/narration.ts), keyed by speechText;
+ * a text without a clip, or in another language, goes to the speech engine. `volume`: 0–1.
+ */
+export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: { enabled: boolean; rate: number; lang?: string; clips?: NarrationClips | null; volume?: number }) {
   const [speaking, setSpeaking] = useState(false);
   const [paused, setPaused] = useState(false);
   const timers = useRef<number[]>([]);
   const token = useRef(0);
   // A speak() waiting for the voice list to load (see VOICE_WAIT_MS).
   const waiting = useRef<(() => void) | null>(null);
+  // One audio element for every clip; `endClip` detaches the playing clip (listeners, frame loop).
+  const audio = useRef<HTMLAudioElement | null>(null);
+  const endClip = useRef<(() => void) | null>(null);
   const supported = typeof window !== "undefined" && "speechSynthesis" in window;
-  const voice = useVoiceAvailability(lang);
+  const hasClips = !!clips && Object.keys(clips).length > 0;
+  const engineVoice = useVoiceAvailability(lang);
+  // The lesson's own clips read it whatever voices this browser has.
+  const voice: VoiceAvailability = hasClips ? "available" : engineVoice;
 
   const clearTimers = () => {
     timers.current.forEach((id) => window.clearTimeout(id));
@@ -102,6 +130,7 @@ export function useNarrator({ enabled, rate, lang = "en" }: { enabled: boolean; 
   const stop = useCallback(() => {
     token.current++;
     clearTimers();
+    endClip.current?.();
     if (supported) {
       clearWaiting();
       // cancel() does not clear the engine's paused state, and a later speak() would sit silently in the paused queue.
@@ -114,11 +143,22 @@ export function useNarrator({ enabled, rate, lang = "en" }: { enabled: boolean; 
 
   useEffect(() => stop, [stop]);
 
+  // A clip takes speed and volume changes at once; an utterance keeps the values it started with.
+  useEffect(() => {
+    const el = audio.current;
+    if (!el) return;
+    el.defaultPlaybackRate = clampRate(rate);
+    el.playbackRate = clampRate(rate);
+    el.volume = clampVolume(volume);
+  }, [rate, volume]);
+
   /**
    * Speaks text. onWord(i) fires as each word starts; onEnd when finished.
    * With sound off nothing is spoken and onEnd is not called (the learner continues manually).
    * Without a voice for the language nothing is spoken either: the whole text shows, onEnd is not
    * called and onError("language-unavailable") is, as after an engine failure.
+   * A text with a clip plays it (in the clip's voice, whatever `voice` asks); a clip that cannot be
+   * loaded falls back to the engine, and a browser that refuses to play gives onError("not-allowed").
    */
   const speak = useCallback(
     (text: string, opts: { voice?: Voice; lang?: string; onWord?: (i: number) => void; onEnd?: () => void; onError?: (error: string) => void } = {}) => {
@@ -126,18 +166,13 @@ export function useNarrator({ enabled, rate, lang = "en" }: { enabled: boolean; 
       const my = ++token.current;
       const clean = speechText(text);
       const words = wordsOf(clean);
-      if (!enabled || !supported || !clean) {
+      const useLang = opts.lang ?? lang;
+      const clip = clips && sameLanguage(useLang, lang) && Object.hasOwn(clips, clean) ? clips[clean] : undefined;
+      if (!enabled || !clean || (!clip && !supported)) {
         opts.onWord?.(words.length);
         return;
       }
-      const offsets: number[] = [];
-      let pos = 0;
-      for (const w of words) {
-        const at = clean.indexOf(w, pos);
-        offsets.push(at);
-        pos = at + w.length;
-      }
-      const useLang = opts.lang ?? lang;
+      const offsets = wordOffsets(clean, words);
       const say = () => {
         const voices = window.speechSynthesis.getVoices();
         // Never read the text with another language's voice: show it whole and let the learner go on
@@ -152,8 +187,9 @@ export function useNarrator({ enabled, rate, lang = "en" }: { enabled: boolean; 
         const u = new SpeechSynthesisUtterance(clean);
         u.lang = v?.lang ?? LANG_TAG[useLang] ?? useLang;
         if (v) u.voice = v;
-        u.rate = Math.max(0.5, Math.min(2, rate * rateMul));
+        u.rate = clampRate(rate * rateMul);
         u.pitch = pitch;
+        u.volume = clampVolume(volume);
         let gotBoundary = false;
         u.onboundary = (e) => {
           if (my !== token.current || e.name === "sentence") return;
@@ -196,37 +232,120 @@ export function useNarrator({ enabled, rate, lang = "en" }: { enabled: boolean; 
         };
         window.speechSynthesis.speak(u);
       };
-      // Chrome lists no voices until shortly after the first request: wait for the list briefly; an
-      // engine that never lists any is left to choose a voice from the utterance's language.
-      if (window.speechSynthesis.getVoices().length) {
-        say();
+      const viaEngine = () => {
+        if (!supported) {
+          opts.onWord?.(words.length);
+          opts.onError?.("synthesis-unavailable");
+          return;
+        }
+        // Chrome lists no voices until shortly after the first request: wait for the list briefly; an
+        // engine that never lists any is left to choose a voice from the utterance's language.
+        if (window.speechSynthesis.getVoices().length) {
+          say();
+          return;
+        }
+        const start = () => {
+          if (my !== token.current) return;
+          clearWaiting();
+          clearTimers();
+          say();
+        };
+        waiting.current = start;
+        window.speechSynthesis.addEventListener("voiceschanged", start);
+        timers.current.push(window.setTimeout(start, VOICE_WAIT_MS));
+      };
+      if (!clip) {
+        viaEngine();
         return;
       }
-      const start = () => {
-        if (my !== token.current) return;
-        clearWaiting();
-        clearTimers();
-        say();
+
+      // The clip: words follow the playback position frame by frame (timeupdate comes only ~4 times a second).
+      const el = (audio.current ??= new Audio());
+      let frame = 0;
+      let shown = -1;
+      const tick = () => {
+        const i = Math.min(wordAt(clip.words, el.currentTime * 1000), Math.max(words.length - 1, 0));
+        if (i !== shown) {
+          shown = i;
+          opts.onWord?.(i);
+        }
+        frame = window.requestAnimationFrame(tick);
       };
-      waiting.current = start;
-      window.speechSynthesis.addEventListener("voiceschanged", start);
-      timers.current.push(window.setTimeout(start, VOICE_WAIT_MS));
+      const onPlaying = () => {
+        window.cancelAnimationFrame(frame);
+        setSpeaking(true);
+        tick();
+      };
+      const onPause = () => window.cancelAnimationFrame(frame);
+      const onEnded = () => {
+        halt();
+        setSpeaking(false);
+        opts.onWord?.(words.length);
+        opts.onEnd?.();
+      };
+      const onFailed = () => fail("network", true);
+      // Detaches this clip: stop() and a newer speak() call it, so its events can no longer fire.
+      const halt = () => {
+        endClip.current = null;
+        window.cancelAnimationFrame(frame);
+        el.removeEventListener("playing", onPlaying);
+        el.removeEventListener("pause", onPause);
+        el.removeEventListener("ended", onEnded);
+        el.removeEventListener("error", onFailed);
+        el.pause();
+      };
+      const fail = (error: string, fallback: boolean) => {
+        if (my !== token.current || endClip.current !== halt) return;
+        halt();
+        setSpeaking(false);
+        if (fallback) viaEngine();
+        else {
+          opts.onWord?.(words.length);
+          opts.onError?.(error);
+        }
+      };
+      el.addEventListener("playing", onPlaying);
+      el.addEventListener("pause", onPause);
+      el.addEventListener("ended", onEnded);
+      el.addEventListener("error", onFailed);
+      endClip.current = halt;
+      el.preload = "auto";
+      el.src = clip.url;
+      // Loading a source resets playbackRate to the default rate.
+      el.defaultPlaybackRate = clampRate(rate);
+      el.playbackRate = clampRate(rate);
+      el.volume = clampVolume(volume);
+      el.play().catch((e: unknown) => {
+        const name = e instanceof DOMException ? e.name : "";
+        // AbortError: paused or replaced before it started.
+        if (name !== "AbortError") fail(name === "NotAllowedError" ? "not-allowed" : "network", name !== "NotAllowedError");
+      });
     },
-    [enabled, supported, rate, lang, stop],
+    [enabled, supported, rate, lang, stop, clips, volume],
   );
 
   const pause = useCallback(() => {
+    if (endClip.current) {
+      audio.current?.pause();
+      setPaused(true);
+      return;
+    }
     // Pausing an idle engine would leave it paused for the next utterance.
     if (!supported || !window.speechSynthesis.speaking) return;
     window.speechSynthesis.pause();
     setPaused(true);
   }, [supported]);
   const resume = useCallback(() => {
+    if (endClip.current) {
+      audio.current?.play().catch(() => {});
+      setPaused(false);
+      return;
+    }
     if (!supported) return;
     window.speechSynthesis.resume();
     setPaused(false);
   }, [supported]);
 
-  /** `voice`: whether the hook's language has a voice here; "missing" means speak() stays silent for it. */
-  return { speak, stop, pause, resume, speaking, paused, supported, voice };
+  /** `voice`: whether the hook's language has a voice here (its clips count); "missing" means speak() stays silent for it. */
+  return { speak, stop, pause, resume, speaking, paused, supported: supported || hasClips, voice };
 }

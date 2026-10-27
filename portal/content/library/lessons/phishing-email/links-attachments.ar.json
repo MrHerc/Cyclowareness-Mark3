@@ -1,0 +1,483 @@
+{
+  "id": "links-attachments",
+  "title": "الروابط والمرفقات",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "read-the-link",
+      "beats": [
+        {
+          "id": "intro",
+          "say": "نص الرابط يقول شيئًا، وعنوانه يقول شيئًا آخر. لنتعلم معًا كيف نقرأ العنوان.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "padlock",
+          "say": "رمز القفل يعني فقط أن الاتصال مشفر. وللمواقع المزيفة رمز قفل أيضًا.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          },
+          "checkpoint": {
+            "prompt": "هل يثبت رمز القفل أن الموقع حقيقي؟",
+            "options": [
+              {
+                "id": "yes",
+                "label": "نعم",
+                "correct": false,
+                "feedback": "لا. يحصل المحتالون على رمز القفل بسهولة أيضًا."
+              },
+              {
+                "id": "no",
+                "label": "لا",
+                "correct": true,
+                "feedback": "صحيح. تحقق دائمًا من اسم الموقع."
+              }
+            ]
+          }
+        },
+        {
+          "id": "owner",
+          "say": "اسم الموقع ينتهي عند أول شرطة مائلة منفردة. والجزء الأخير منه، مع نهايته، يدل على المالك.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "xidmet-agentliyi-fake",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "xidmetagentliyi.az.",
+                  "spot": "decoy"
+                },
+                {
+                  "text": "hesab-yoxla.info",
+                  "spot": "real-domain"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "real-domain"
+        },
+        {
+          "id": "decoy",
+          "say": "الاسم المألوف في البداية مجرد تمويه. يستطيع أي شخص أن يضعه أمام اسم موقعه.",
+          "mood": "alert",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "xidmet-agentliyi-fake",
+              "url": [
+                {
+                  "text": "https://"
+                },
+                {
+                  "text": "xidmetagentliyi.az.",
+                  "spot": "decoy"
+                },
+                {
+                  "text": "hesab-yoxla.info",
+                  "spot": "real-domain"
+                },
+                {
+                  "text": "/giris"
+                }
+              ]
+            }
+          },
+          "highlight": "decoy"
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "whose-link",
+      "question": {
+        "prompt": "من المالك الحقيقي لهذا الرابط؟",
+        "options": [
+          {
+            "id": "bank",
+            "label": "UlduzBank",
+            "correct": false,
+            "feedback": "اسم البنك موجود في البداية، لكن المالك هو الاسم الموجود في النهاية."
+          },
+          {
+            "id": "owner",
+            "label": "az-giris.info",
+            "correct": true,
+            "feedback": "صحيح. نهاية اسم الموقع تكشف مالكه الحقيقي."
+          },
+          {
+            "id": "path",
+            "label": "kart",
+            "correct": false,
+            "feedback": "هذا ليس اسم الموقع، بل مسار الصفحة بعد الشرطة المائلة."
+          }
+        ],
+        "visual": {
+          "kind": "artifact",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "ulduzbank-fake",
+            "url": [
+              {
+                "text": "https://ulduzbank.az-giris.info/kart"
+              }
+            ]
+          }
+        }
+      },
+      "explain": "هنا ulduzbank.az مجرد تمويه، والموقع يعود إلى az-giris.info."
+    },
+    {
+      "type": "simulation",
+      "id": "link-to-login",
+      "environment": "browser",
+      "title": "بعد الضغط",
+      "intro": "فتحت رابطًا من رسالة بريد إلكتروني. اقرأ العنوان في المتصفح وقرر ما ستفعله.",
+      "steps": [
+        {
+          "id": "fake-login",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi-fake",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://xidmetagentliyi.az.",
+                "reveal": "hesab-yoxla.info"
+              },
+              {
+                "text": "hesab-yoxla.info",
+                "spot": "real-domain"
+              },
+              {
+                "text": "/giris"
+              }
+            ],
+            "fields": [
+              "البريد الإلكتروني",
+              "كلمة المرور"
+            ],
+            "button": "تسجيل الدخول"
+          },
+          "say": "انظر إلى نهاية العنوان: من المالك الحقيقي؟",
+          "actions": [
+            {
+              "id": "login",
+              "label": "تسجيل الدخول",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "الصفحة تعود إلى hesab-yoxla.info، وليس إلى الوكالة. غير كلمة مرورك الآن وأبلغ عن الأمر."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق علامة التبويب",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. الاسم المألوف في البداية مجرد تمويه، والنطاق الحقيقي كان hesab-yoxla.info."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن الموقع",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "رائع. الإبلاغ يساعد على حظر الموقع المزيف لدى الجميع أيضًا."
+            }
+          ]
+        },
+        {
+          "id": "download",
+          "label": "تنزيل الفاتورة",
+          "artifact": {
+            "kind": "file",
+            "brandRef": "ofistechizat-fake",
+            "name": [
+              {
+                "text": "Faktura_0925.pdf.exe"
+              }
+            ],
+            "type": "exe",
+            "size": "2.1 MB",
+            "source": [
+              {
+                "text": "ofis-techizat.com"
+              }
+            ]
+          },
+          "say": "جرى تنزيل ملف عبر المتصفح. تحقق من نهاية اسمه.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "فتح",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "النوع الحقيقي للملف هو .exe، أي برنامج. والفاتورة لا تكون برنامجًا أبدًا."
+            },
+            {
+              "id": "delete",
+              "label": "حذف",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "صحيح. احذف البرنامج الذي يتنكر في صورة مستند، وأبلغ عن الرسالة."
+            },
+            {
+              "id": "scan",
+              "label": "الفحص ببرنامج مكافحة الفيروسات",
+              "kind": "scan",
+              "outcome": "safe",
+              "feedback": "عادة جيدة. لكن الملف الذي ينتهي اسمه بالامتداد .pdf.exe يمكن حذفه دون فحص."
+            }
+          ]
+        },
+        {
+          "id": "real-portal",
+          "label": "فتحت البوابة من الإشارات المرجعية",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/giris",
+                "reveal": "xidmetagentliyi.az"
+              }
+            ],
+            "fields": [
+              "البريد الإلكتروني",
+              "كلمة المرور"
+            ],
+            "button": "تسجيل الدخول"
+          },
+          "say": "هذه المرة فتحت العنوان بنفسك. ماذا تفعل الآن؟",
+          "actions": [
+            {
+              "id": "login",
+              "label": "تسجيل الدخول",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "صحيح. هذا هو النطاق الرسمي للوكالة، وقد فتحت الصفحة بنفسك."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن الموقع",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "هذه هي البوابة الرسمية للوكالة. يمكنك الوثوق بموقع تفتحه بنفسك من الإشارات المرجعية."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "invoice-trap",
+      "prompt": "ابحث عن علامات التحذير في هذه الرسالة.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "ofistechizat-fake",
+        "from": {
+          "name": [
+            {
+              "text": "OfisTəchizat MMC",
+              "reveal": "hesab@ofis-techizat.com"
+            }
+          ],
+          "address": [
+            {
+              "text": "hesab@"
+            },
+            {
+              "text": "ofis-techizat.com",
+              "spot": "sender-domain"
+            }
+          ]
+        },
+        "to": "s.huseynova@xidmetagentliyi.az",
+        "subject": [
+          {
+            "text": "الفاتورة رقم 0925: تأخر السداد"
+          }
+        ],
+        "time": "14:32",
+        "body": [
+          [
+            {
+              "text": "مرحبًا،"
+            }
+          ],
+          [
+            {
+              "text": "تجد الفاتورة المتأخرة في المرفق. "
+            },
+            {
+              "text": "افتحها وقم بتمكين وحدات الماكرو، وإلا فلن يظهر النص.",
+              "spot": "enable-content"
+            }
+          ],
+          [
+            {
+              "text": "إذا لم يفتح الملف، فقم بتنزيله من هنا: "
+            },
+            {
+              "text": "https://qisa.example/f8Rt",
+              "spot": "short-link"
+            }
+          ]
+        ],
+        "attachments": [
+          {
+            "name": [
+              {
+                "text": "Faktura_0925.pdf.zip",
+                "spot": "double-ext",
+                "reveal": "نوع الملف: أرشيف ZIP (.zip)"
+              }
+            ],
+            "size": "312 KB"
+          }
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender-domain",
+          "label": "نطاق مشابه",
+          "explain": "يشبه اسم مورد معروف، لكن النطاق مختلف. تحقق من العنوان الحقيقي في سجلاتك الخاصة."
+        },
+        {
+          "id": "enable-content",
+          "label": "تمكين وحدات الماكرو",
+          "explain": "وحدات الماكرو قادرة على تشغيل أوامر خفية. يحظرها Office في الملفات القادمة من الإنترنت، والفاتورة الحقيقية لا تطلب منك أبدًا تجاوز هذا الحظر."
+        },
+        {
+          "id": "short-link",
+          "label": "رابط مختصر",
+          "explain": "لا يمكنك أن ترى إلى أين يؤدي. ودفعك إلى التنزيل عبر رابط حيلة تقليدية."
+        },
+        {
+          "id": "double-ext",
+          "label": "امتداد مزدوج",
+          "explain": "يبدأ الاسم كأنه ملف PDF، لكنه في الحقيقة أرشيف zip، وقد يختبئ داخله برنامج."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "swipe",
+      "id": "link-check",
+      "prompt": "هل هذا الرابط آمن أم فخ؟",
+      "cards": [
+        {
+          "id": "home",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi",
+            "url": [
+              {
+                "text": "https://xidmetagentliyi.az/elanlar"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "اسم الموقع مطابق تمامًا لعنوان الوكالة."
+        },
+        {
+          "id": "portal",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/mezuniyyet"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "الجزء portal في البداية قسم تابع للوكالة نفسها، والنهاية تبقى xidmetagentliyi.az."
+        },
+        {
+          "id": "decoy",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi-fake",
+            "url": [
+              {
+                "text": "https://xidmetagentliyi.az-portal.info/giris"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "ينتهي العنوان بالنطاق az-portal.info. واسم الوكالة مكتوب في البداية فقط."
+        },
+        {
+          "id": "swap",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi-fake",
+            "url": [
+              {
+                "text": "https://xidmetaqentliyi.az/maas"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "حرف q حل محل حرف g. إنه موقع مختلف تمامًا."
+        },
+        {
+          "id": "short",
+          "artifact": {
+            "kind": "url",
+            "url": [
+              {
+                "text": "https://qisa.example/a8Zq"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "الرابط المختصر يخفي وجهته. إذا وصلك دون أن تتوقعه، فلا تفتحه."
+        },
+        {
+          "id": "bank",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "ulduzbank",
+            "url": [
+              {
+                "text": "https://ulduzbank.az/kartlar"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "هذا عنوان البنك نفسه، وينتهي بالنطاق ulduzbank.az. ومع ذلك، الأفضل دائمًا أن تكتب عنوان البنك بنفسك."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "المالك الحقيقي للموقع تجده في نهاية اسمه.",
+        "تحقق أولًا من الروابط المختصرة والملفات غير المتوقعة.",
+        "إذا طلب منك ملف تمكين وحدات الماكرو، فأغلقه وأبلغ عنه."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

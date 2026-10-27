@@ -2,6 +2,9 @@ import { Mail, MessageSquare, Paperclip, Phone, QrCode, Usb } from "lucide-react
 import { templateText, type CampaignTemplate } from "@/lib/campaigns/templates";
 import { cn } from "@/lib/cn";
 
+/** Quotation marks per language; «…» for the rest (az, ru, uk, ar). */
+const QUOTES: Record<string, [string, string]> = { en: ["“", "”"], tr: ["“", "”"], ro: ["„", "”"], ka: ["„", "“"], de: ["„", "“"], fr: ["« ", " »"] };
+
 /** Realistic preview of a simulation as the recipient would see it. */
 export function TemplatePreview({ tpl, locale, compact = false }: { tpl: CampaignTemplate; locale: string; compact?: boolean }) {
   const body = templateText(tpl.body, locale);
@@ -12,7 +15,7 @@ export function TemplatePreview({ tpl, locale, compact = false }: { tpl: Campaig
           <MessageSquare className="size-3.5" />
           {tpl.sender.address}
         </p>
-        <p className={cn("rounded-2xl rounded-bl-sm bg-surface px-3 py-2 text-caption shadow-xs", compact && "line-clamp-3")}>
+        <p className={cn("rounded-2xl rounded-es-sm bg-surface px-3 py-2 text-caption shadow-xs", compact && "line-clamp-3")}>
           {body} <span className="text-brand-600 underline">sk-kargo.info/a7K</span>
         </p>
       </div>
@@ -20,13 +23,14 @@ export function TemplatePreview({ tpl, locale, compact = false }: { tpl: Campaig
   }
   if (tpl.channel === "voice" || tpl.channel === "usb") {
     const Icon = tpl.channel === "voice" ? Phone : Usb;
+    const [open, close] = QUOTES[locale] ?? ["«", "»"];
     return (
       <div className="rounded-xl bg-ink p-3 text-white">
         <p className="flex items-center gap-1.5 text-tab font-semibold opacity-80">
           <Icon className="size-3.5" />
           {templateText(tpl.sender.name, locale)} · {tpl.sender.address}
         </p>
-        <p className={cn("mt-1.5 text-caption italic", compact && "line-clamp-3")}>{locale === "en" ? `“${body}”` : `«${body}»`}</p>
+        <p className={cn("mt-1.5 text-caption italic", compact && "line-clamp-3")}>{open + body + close}</p>
       </div>
     );
   }

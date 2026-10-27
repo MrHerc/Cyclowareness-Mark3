@@ -166,7 +166,7 @@ export default async function SecurityPage() {
           </div>
           {/* One cat for every width: tucked into the corner on phones, its own column from md up. */}
           <div className="absolute end-1 top-1 md:static md:justify-self-center">
-            <Mascot mood={BAND_MASCOT[band].mood} gesture={v.user.motion === "still" ? undefined : BAND_MASCOT[band].gesture} gestureKey={band} still={v.user.motion === "still"} className="size-14 md:size-36 lg:size-44" />
+            <Mascot mood={BAND_MASCOT[band].mood} gesture={v.user.motion === "still" ? undefined : BAND_MASCOT[band].gesture} gestureKey={band} still={v.user.motion === "still"} className="size-14 md:size-36 lg:size-44" auto />
           </div>
         </div>
       </Card>

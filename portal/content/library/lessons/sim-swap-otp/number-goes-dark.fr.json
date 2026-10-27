@@ -1,0 +1,466 @@
+{
+ "id": "number-goes-dark",
+ "title": "Soudain, plus de réseau",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ss1-tutor",
+   "beats": [
+    {
+     "id": "ss1-b1",
+     "say": "Bonjour ! Aujourd’hui, nous parlons des criminels qui s’emparent de votre numéro de téléphone pour voler vos codes SMS.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "ss1-b2",
+     "say": "Quand un criminel trompe l’opérateur pour faire transférer votre numéro sur sa propre carte SIM, votre téléphone perd soudain le réseau.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2b-sahiltel",
+       "app": "SahilTel",
+       "title": [
+        {
+         "text": "Aucun service",
+         "spot": "no-service"
+        }
+       ],
+       "body": [
+        {
+         "text": "Appels d’urgence uniquement. Carte SIM non reconnue."
+        }
+       ],
+       "time": "00:14"
+      }
+     },
+     "highlight": "no-service"
+    },
+    {
+     "id": "ss1-b3",
+     "say": "Chaque année, des millions de manats sont volés sur des cartes bancaires, surtout parce que des personnes ont communiqué leurs codes et leurs données.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "stat",
+      "value": "Des millions de manats",
+      "label": "volés chaque année sur des cartes bancaires"
+     }
+    },
+    {
+     "id": "ss1-b4",
+     "say": "Si votre numéro cesse de fonctionner en pleine nuit, n’attendez pas le matin. Appelez votre opérateur depuis un autre téléphone.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ss1-sim",
+   "environment": "phone",
+   "title": "Une heure du matin",
+   "intro": "Il fait nuit, et votre téléphone est posé à côté de vous. Regardez chaque notification et choisissez la bonne action.",
+   "steps": [
+    {
+     "id": "no-service",
+     "label": "00:14 Aucun service",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2b-sahiltel",
+      "app": "SahilTel",
+      "title": [
+       {
+        "text": "Aucun service"
+       }
+      ],
+      "body": [
+       {
+        "text": "Appels d’urgence uniquement. Carte SIM non reconnue."
+       }
+      ],
+      "time": "00:14"
+     },
+     "actions": [
+      {
+       "id": "call-operator",
+       "label": "Appeler l’opérateur depuis un autre téléphone",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Si votre numéro a été transféré sur une autre carte, l’opérateur peut la bloquer et vous rendre votre numéro."
+      },
+      {
+       "id": "sleep",
+       "label": "Éteindre le téléphone et dormir",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "C’est exactement ce qu’espère le criminel. Toute la nuit, c’est lui qui recevra vos codes SMS."
+      }
+     ]
+    },
+    {
+     "id": "bank-login",
+     "label": "00:27 UlduzBank Mobil",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ulduzbank-app",
+      "app": "UlduzBank Mobil",
+      "title": [
+       {
+        "text": "Connexion depuis un nouvel appareil"
+       }
+      ],
+      "body": [
+       {
+        "text": "Android, Gandja, 00:27. Si ce n’était pas vous, verrouillez votre carte."
+       }
+      ],
+      "time": "00:27"
+     },
+     "say": "La carte SIM ne fonctionne plus, mais l’application de la banque vous joint encore grâce à la connexion internet de la maison.",
+     "actions": [
+      {
+       "id": "freeze",
+       "label": "Ouvrir l’application et verrouiller la carte",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Exact. Aucun argent ne peut sortir d’une carte verrouillée, et vous pourrez la déverrouiller plus tard avec la banque."
+      },
+      {
+       "id": "call-bank",
+       "label": "Appeler depuis un autre téléphone le numéro inscrit au dos de la carte",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Bien vu. Le numéro au dos de la carte est celui de la vraie banque : demandez-lui de bloquer la carte."
+      },
+      {
+       "id": "dismiss",
+       "label": "Ignorer",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Le criminel reçoit déjà vos codes SMS. Il peut vider le compte en quelques minutes."
+      }
+     ]
+    },
+    {
+     "id": "push-request",
+     "label": "00:33 Təsdiqləyici",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "tesdiqleyici",
+      "app": "Təsdiqləyici",
+      "title": [
+       {
+        "text": "Demande de connexion : İşPoçt"
+       }
+      ],
+      "body": [
+       {
+        "text": "Gandja, 00:33. Est-ce bien vous qui vous connectez ?"
+       }
+      ],
+      "time": "00:33"
+     },
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Bravo. Le criminel a votre numéro, mais cette validation n’existe que sur votre téléphone."
+      },
+      {
+       "id": "approve",
+       "label": "Approuver",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Vous lui avez vous-même ouvert la porte. N’approuvez jamais une demande inattendue, surtout la nuit."
+      }
+     ]
+    },
+    {
+     "id": "messenger-moved",
+     "label": "00:41 Söhbət",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "Votre compte a été ouvert sur un autre téléphone"
+       }
+      ],
+      "body": [
+       {
+        "text": "Ce numéro a été enregistré sur un nouvel appareil."
+       }
+      ],
+      "time": "00:41"
+     },
+     "say": "Votre compte de messagerie instantanée est lui aussi lié à votre numéro.",
+     "actions": [
+      {
+       "id": "warn-family",
+       "label": "Prévenir la famille et les amis par un autre moyen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Le criminel risque de demander de l’argent à vos proches en votre nom : prévenez-les d’abord."
+      },
+      {
+       "id": "ignore",
+       "label": "Ignorer",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Cette nuit, vos amis risquent de recevoir de votre part une demande d’argent urgente. Prévenez-les dès maintenant."
+      }
+     ]
+    },
+    {
+     "id": "recovery-sms",
+     "label": "08:05 UlduzBank",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank-fake",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "08:05",
+      "messages": [
+       [
+        {
+         "text": "Votre carte a été bloquée à la suite d’une activité suspecte. Pour la réactiver, saisissez les données de votre carte ici : "
+        },
+        {
+         "text": "ulduzbank-berpa.example",
+         "link": {
+          "label": "ulduzbank-berpa.example",
+          "href": "https://ulduzbank-berpa.example/kart"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Au matin, vous avez récupéré votre numéro. Regardez ce message.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme spam",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Les criminels profitent d’un véritable incident pour frapper une deuxième fois."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Bien vu. Ne réglez les questions de carte que dans l’application de la banque ou au numéro inscrit sur la carte."
+      },
+      {
+       "id": "open-link",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Ce n’est pas le site de la banque. Si vous saisissez les données de votre carte, vous perdez de l’argent une deuxième fois."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "ss1-order",
+   "prompt": "Votre numéro a soudain cessé de fonctionner. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "operator",
+     "label": "Appeler l’opérateur depuis un autre téléphone et récupérer votre numéro"
+    },
+    {
+     "id": "bank",
+     "label": "Appeler la banque au numéro inscrit sur votre carte et faire verrouiller la carte"
+    },
+    {
+     "id": "passwords",
+     "label": "Modifier les mots de passe des comptes importants et remplacer les SMS par une application d’authentification"
+    },
+    {
+     "id": "it",
+     "label": "Informer le support technique au sujet de vos comptes professionnels"
+    },
+    {
+     "id": "police",
+     "label": "Si de l’argent a disparu, le signaler à la police au 102"
+    }
+   ],
+   "explain": "Récupérez d’abord votre numéro, pour que les nouveaux codes n’arrivent plus chez le criminel. Juste après, faites verrouiller votre carte par la banque."
+  },
+  {
+   "type": "swipe",
+   "id": "ss1-swipe",
+   "prompt": "Quels messages sont normaux, lesquels sont des menaces ? Faites glisser les cartes.",
+   "cards": [
+    {
+     "id": "own-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "14:02",
+      "messages": [
+       [
+        {
+         "text": "Votre code de connexion : 482193. Ne communiquez ce code à personne."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Si vous avez vous-même demandé ce code, c’est un message normal. Saisissez-le vous-même, et nulle part ailleurs."
+    },
+    {
+     "id": "sim-changed",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2b-sahiltel",
+      "sender": [
+       {
+        "text": "SahilTel"
+       }
+      ],
+      "time": "23:52",
+      "messages": [
+       [
+        {
+         "text": "Nous avons reçu une demande de remplacement de la carte SIM associée à votre numéro."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Si vous n’avez pas demandé de nouvelle carte SIM, c’est le premier signe d’une attaque. Appelez immédiatement votre opérateur."
+    },
+    {
+     "id": "tell-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ulduzbank-fake",
+      "sender": [
+       {
+        "text": "UlduzBank"
+       }
+      ],
+      "time": "10:18",
+      "messages": [
+       [
+        {
+         "text": "Votre carte est bloquée. Pour la débloquer, communiquez le code que vous allez recevoir au conseiller qui vous appellera."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une banque ne vous demande jamais de communiquer un code à ses employés. Ce message sert à voler le code."
+    },
+    {
+     "id": "night-login",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ulduzbank-app",
+      "app": "UlduzBank Mobil",
+      "title": [
+       {
+        "text": "Connexion depuis un nouvel appareil"
+       }
+      ],
+      "body": [
+       {
+        "text": "Android, Gandja, 02:14"
+       }
+      ],
+      "time": "02:14"
+     },
+     "verdict": "threat",
+     "explain": "Quelqu’un s’est connecté depuis un autre appareil pendant votre sommeil. Verrouillez la carte et appelez la banque."
+    },
+    {
+     "id": "own-push",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "tesdiqleyici",
+      "app": "Təsdiqləyici",
+      "title": [
+       {
+        "text": "Demande de connexion : İşPoçt"
+       }
+      ],
+      "body": [
+       {
+        "text": "Bakou, 09:01. Est-ce bien vous qui vous connectez ?"
+       }
+      ],
+      "time": "09:01"
+     },
+     "verdict": "safe",
+     "explain": "Si vous êtes en train de vous connecter, la demande est normale. Refusez toute demande inattendue."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ss1-choice",
+   "question": {
+    "prompt": "Quelle protection fonctionne encore si votre numéro passe entre les mains de quelqu’un d’autre ?",
+    "options": [
+     {
+      "id": "sms",
+      "label": "Un code envoyé par SMS",
+      "correct": false,
+      "feedback": "Quand le numéro passe chez un criminel, les codes SMS le suivent. Pour les comptes importants, c’est une protection faible."
+     },
+     {
+      "id": "app",
+      "label": "Une application d’authentification ou une clé d’accès",
+      "correct": true,
+      "feedback": "Exact. Elles sont liées à votre appareil, pas à votre carte SIM."
+     },
+     {
+      "id": "long-password",
+      "label": "Un mot de passe plus long",
+      "correct": false,
+      "feedback": "Un long mot de passe, c’est bien. Mais s’il peut être réinitialisé avec un code SMS, le criminel entre quand même."
+     }
+    ]
+   },
+   "explain": "Pour les comptes importants, comme la banque, la messagerie électronique et les services publics, choisissez si possible une application d’authentification ou une clé d’accès plutôt que les SMS."
+  },
+  {
+   "type": "recap",
+   "id": "ss1-recap",
+   "points": [
+    "Si votre numéro cesse soudain de fonctionner, appelez immédiatement l’opérateur depuis un autre téléphone",
+    "Appelez ensuite la banque et faites verrouiller votre carte",
+    "Pour les comptes importants, utilisez une application d’authentification ou une clé d’accès plutôt que les SMS"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,441 @@
+{
+  "id": "links-cloud",
+  "title": "Links und Cloud-Ordner",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "b1",
+          "say": "Cloud-Ordner sind praktisch, aber eine einzige falsche Einstellung kann eine Datei für das ganze Internet öffnen.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "cloud"
+          }
+        },
+        {
+          "id": "b2",
+          "say": "Bei der Einstellung „Jeder mit dem Link“ können auch Fremde die Datei öffnen, sobald der Link weitergegeben wird.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "url",
+              "brandRef": "rxagentlik-disk",
+              "url": [
+                {
+                  "text": "https://disk.rxagentlik.az/qovluq/budce-2027?paylasim="
+                },
+                {
+                  "text": "hamiya-acik",
+                  "spot": "public"
+                }
+              ]
+            }
+          },
+          "highlight": "public"
+        },
+        {
+          "id": "b3",
+          "say": "Der richtige Weg: nur namentlich bestimmte Personen, nur Lesezugriff und ein Ablaufdatum.",
+          "mood": "talk",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "lock"
+          }
+        },
+        {
+          "id": "b4",
+          "say": "Laden Sie dienstliche Dateien nicht in ein privates Cloud-Konto hoch. Dort kann die Organisation sie weder schützen noch wiederherstellen.",
+          "mood": "think",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "folder"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "share-folder",
+      "environment": "browser",
+      "title": "Datei teilen",
+      "intro": "Sie sollen den Budgetentwurf an einen externen Partner schicken. Richten Sie die Freigabe selbst im Cloud-Speicher ein.",
+      "steps": [
+        {
+          "id": "file-page",
+          "label": "Budgetentwurf 2027.xlsx",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "rxagentlik-disk",
+            "url": [
+              {
+                "text": "https://disk.rxagentlik.az/fayllar/Budce_layihesi_2027.xlsx",
+                "reveal": "rxagentlik.az"
+              }
+            ]
+          },
+          "say": "Wie teilen Sie die Datei?",
+          "actions": [
+            {
+              "id": "share",
+              "label": "Teilen",
+              "kind": "share",
+              "outcome": "safe",
+              "feedback": "Gut, die Datei bleibt im dienstlichen Speicher. Sehen Sie sich jetzt die Freigabeeinstellungen an."
+            },
+            {
+              "id": "personal",
+              "label": "In meine private Cloud verschieben",
+              "kind": "open",
+              "outcome": "risky",
+              "feedback": "Ein privates Konto liegt außerhalb der Kontrolle der Organisation. Dienstliche Dateien bleiben im dienstlichen Speicher."
+            }
+          ]
+        },
+        {
+          "id": "who-can-open",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Teilen: Budgetentwurf 2027.xlsx"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Wer darf die Datei öffnen?"
+                }
+              ]
+            ],
+            "buttons": [
+              "Jeder mit dem Link",
+              "Nur bestimmte Personen"
+            ]
+          },
+          "actions": [
+            {
+              "id": "named",
+              "label": "Nur bestimmte Personen",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Richtig. Nur die Personen, die Sie auswählen, können die Datei öffnen."
+            },
+            {
+              "id": "anyone",
+              "label": "Jeder mit dem Link",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Der Link kann weitergeleitet werden oder an der falschen Stelle landen. Dann kann jeder die Datei öffnen."
+            }
+          ]
+        },
+        {
+          "id": "rights",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "An wen und wie?"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Empfänger: e.rzayev@merkez-konsalting.example"
+                }
+              ],
+              [
+                {
+                  "text": "Zugriff: Anzeigen oder Bearbeiten"
+                }
+              ],
+              [
+                {
+                  "text": "Ablauf: in 7 Tagen oder nie"
+                }
+              ]
+            ],
+            "buttons": [
+              "Bearbeiten, ohne Ablaufdatum",
+              "Anzeigen, 7 Tage"
+            ]
+          },
+          "actions": [
+            {
+              "id": "view",
+              "label": "Anzeigen, 7 Tage",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Ausgezeichnet. Der Partner kann die Datei ansehen, aber nicht ändern, und der Zugriff endet nach einer Woche."
+            },
+            {
+              "id": "edit",
+              "label": "Bearbeiten, ohne Ablaufdatum",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Der Partner muss nichts bearbeiten, und ein unbefristeter Zugriff bleibt jahrelang bestehen."
+            }
+          ]
+        },
+        {
+          "id": "fake-share",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "rxagentlik-disk-fake",
+            "brand": "RXAgentlik Disk",
+            "url": [
+              {
+                "text": "https://rxagentlik-disk.example.net/giris",
+                "reveal": "rxagentlik-disk.example.net"
+              }
+            ],
+            "fields": [
+              "E-Mail",
+              "Passwort"
+            ],
+            "button": "Anmelden"
+          },
+          "say": "Eine Stunde später öffnet sich eine Seite mit einer geteilten Datei. Prüfen Sie die Adresse.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Anmelden",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Die Domain gehört nicht zu Ihrem dienstlichen Speicher. Die geteilte Datei ist nur ein Vorwand, um Ihr Passwort zu stehlen."
+            },
+            {
+              "id": "close",
+              "label": "Tab schließen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig. Öffnen Sie geteilte Dateien nur unter disk.rxagentlik.az."
+            },
+            {
+              "id": "report",
+              "label": "Website melden",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Ausgezeichnet. Wenn Sie die gefälschte Seite melden, schützen Sie auch Ihre Kolleginnen und Kollegen."
+            }
+          ]
+        },
+        {
+          "id": "old-links",
+          "label": "Meine Freigaben: 4 Dateien sind für alle offen",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "rxagentlik-disk",
+            "url": [
+              {
+                "text": "https://disk.rxagentlik.az/paylasimlar",
+                "reveal": "rxagentlik.az"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "close-links",
+              "label": "Offene Links deaktivieren",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Richtig. Freigaben zu beenden, die Sie nicht mehr brauchen, ist der einfachste Schutz."
+            },
+            {
+              "id": "later",
+              "label": "Später",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Jeder offene Link ist jeden Tag aufs Neue ein Risiko."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "link-settings",
+      "prompt": "Ist diese Freigabeeinstellung sicher?",
+      "cards": [
+        {
+          "id": "anyone-forever",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Freigabeeinstellung"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Gehaltstabelle: jeder mit dem Link, Bearbeiten, ohne Ablaufdatum"
+                }
+              ]
+            ],
+            "buttons": [
+              "Fertig"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Eine vertrauliche Datei, für alle offen und ohne Ablaufdatum. Hat sich der Link erst verbreitet, lässt sich das nicht mehr rückgängig machen."
+        },
+        {
+          "id": "named-week",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Freigabeeinstellung"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Projektbericht: 2 Personen, Anzeigen, 7 Tage"
+                }
+              ]
+            ],
+            "buttons": [
+              "Fertig"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Eng begrenzter Zugriff, nur Anzeigen und ein Ablaufdatum. Die richtige Einstellung."
+        },
+        {
+          "id": "whole-org",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Freigabeeinstellung"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Personalliste: alle in der Organisation"
+                }
+              ]
+            ],
+            "buttons": [
+              "Fertig"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Ein vertrauliches Dokument ist nicht für die ganze Organisation bestimmt, sondern nur für namentlich bestimmte Personen."
+        },
+        {
+          "id": "public-ad",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "rxagentlik-disk",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Freigabeeinstellung"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Stellenanzeige: jeder mit dem Link"
+                }
+              ]
+            ],
+            "buttons": [
+              "Fertig"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Die Anzeige ist öffentlich und steht bereits auf der Website. Ein offener Link ist hier in Ordnung."
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "who-needs-what",
+      "prompt": "Finden Sie für jeden Bedarf die richtige Einstellung.",
+      "pairs": [
+        {
+          "id": "partner",
+          "left": "Ein Partner soll ein Dokument lesen",
+          "right": "Anzeigen, namentlich, 7 Tage"
+        },
+        {
+          "id": "coauthor",
+          "left": "Eine Kollegin schreibt am Dokument mit",
+          "right": "Bearbeiten, nur diese Person"
+        },
+        {
+          "id": "public",
+          "left": "Eine auf der Website veröffentlichte Mitteilung",
+          "right": "Offener Link für alle"
+        }
+      ],
+      "explain": "Halten Sie Freigaben so eng wie möglich: wer, mit welchen Rechten und wie lange."
+    },
+    {
+      "type": "choice",
+      "id": "personal-cloud",
+      "question": {
+        "prompt": "Dürfen Sie eine vertrauliche Datei in Ihre private Cloud hochladen, um im Homeoffice daran zu arbeiten?",
+        "options": [
+          {
+            "id": "strong",
+            "label": "Ja, mein Passwort ist stark",
+            "correct": false,
+            "feedback": "Ein starkes Passwort bringt die Datei nicht unter die Kontrolle der Organisation zurück."
+          },
+          {
+            "id": "work",
+            "label": "Nein, ich nutze den dienstlichen Speicher oder einen Weg, den die Organisation erlaubt",
+            "correct": true,
+            "feedback": "Richtig. Im dienstlichen Speicher ist die Datei geschützt und lässt sich wiederherstellen."
+          },
+          {
+            "id": "delete-later",
+            "label": "Ja, ich lösche sie später wieder",
+            "correct": false,
+            "feedback": "Eine gelöschte Datei bleibt oft im Papierkorb und auf anderen Geräten erhalten."
+          }
+        ],
+        "visual": {
+          "kind": "illustration",
+          "id": "cloud"
+        }
+      },
+      "explain": "Dienstliche Dateien bleiben in dienstlichen Systemen. Fragen Sie im Zweifel den IT-Support."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Nutzen Sie für vertrauliche Dateien nie die Einstellung „Jeder mit dem Link“.",
+        "Teilen Sie namentlich, nur zum Anzeigen und mit Ablaufdatum.",
+        "Beenden Sie alte Freigaben regelmäßig."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

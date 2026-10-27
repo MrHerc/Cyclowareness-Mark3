@@ -17,7 +17,7 @@ describe("notificationsSchema", () => {
 
   it("rejects an unknown kind, an unknown language and an over-long subject", () => {
     expect(notificationsSchema.safeParse({ ...base, templates: { newsletter: { en: { subject: "x", body: "y {{link}}" } } } }).success).toBe(false);
-    expect(notificationsSchema.safeParse({ ...base, templates: { assignment: { de: { subject: "x", body: "y {{link}}" } } } }).success).toBe(false);
+    expect(notificationsSchema.safeParse({ ...base, templates: { assignment: { it: { subject: "x", body: "y {{link}}" } } } }).success).toBe(false);
     expect(notificationsSchema.safeParse({ ...base, templates: { assignment: { en: { subject: "x".repeat(201), body: "y {{link}}" } } } }).success).toBe(false);
   });
 

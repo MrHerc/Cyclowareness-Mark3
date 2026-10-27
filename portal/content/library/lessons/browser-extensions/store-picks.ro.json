@@ -1,0 +1,462 @@
+{
+ "id": "store-picks",
+ "title": "Alegerea din magazin",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sp-tutor",
+   "beats": [
+    {
+     "id": "sp-b1",
+     "say": "Bună ziua! O extensie de browser este un program mic. Ea poate vedea și modifica paginile pe care le deschideți.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "sp-b2",
+     "say": "Cea mai largă permisiune sună așa: citește și modifică toate datele dumneavoastră de pe toate site-urile.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "w2c-pulsuz-vpn",
+       "app": "Pulsuz VPN Sürət",
+       "permissions": [
+        {
+         "label": [
+          {
+           "text": "Citește și modifică toate datele dumneavoastră de pe toate site-urile",
+           "spot": "all-sites"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "Gestionează setările proxy"
+          }
+         ],
+         "needed": true
+        }
+       ]
+      }
+     },
+     "highlight": "all-sites"
+    },
+    {
+     "id": "sp-b3",
+     "say": "O extensie poate fi cinstită astăzi și se poate transforma mâine în spion, cu o singură actualizare.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "update"
+     }
+    },
+    {
+     "id": "sp-b4",
+     "say": "Instalați doar ce vă trebuie și doar din magazinul oficial. Pe computerul de serviciu, doar ce aprobă suportul IT.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "sp-swipe",
+   "prompt": "Ați instala această extensie sau ați refuza-o?",
+   "cards": [
+    {
+     "id": "free-vpn",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-pulsuz-vpn",
+      "app": "Pulsuz VPN Sürət",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Citește și modifică toate datele dumneavoastră de pe toate site-urile"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Citește istoricul de navigare"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Gestionează setările proxy"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O extensie VPN gratuită vede tot traficul și adesea câștigă bani din datele dumneavoastră. Pentru serviciu, folosiți doar VPN-ul oferit de birou."
+    },
+    {
+     "id": "weather",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-hava",
+      "app": "Hava Bu Gün",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Afișează prognoza meteo pentru Baku"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Citește și modifică toate datele dumneavoastră de pe toate site-urile"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Citește datele pe care le copiați și le lipiți"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O prognoză meteo nu are nevoie de paginile dumneavoastră și nici de ce copiați. Dacă permisiunea este mai mare decât sarcina, refuzați."
+    },
+    {
+     "id": "screenshot",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-ekran-sekli",
+      "app": "Ekran Şəkli",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Vede doar pagina deschisă, atunci când apăsați butonul"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Salvează imaginile în dosarul Descărcări"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Permisiunile se potrivesc cu sarcina și funcționează doar când apăsați butonul. O astfel de extensie nu adaugă un risc real."
+    },
+    {
+     "id": "outside-store",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://pulsuz-elaveler.example.info/pdf-ustasi-pro.zip"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "O extensie din afara magazinului nu a trecut prin nicio verificare. Instalați extensii doar din magazinul oficial al browserului."
+    },
+    {
+     "id": "notes",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-qisa-qeyd",
+      "app": "Qısa Qeyd",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Stochează notițele în acest browser"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Extensia nu vă atinge site-urile și păstrează notițele doar în spațiul de stocare propriu al browserului. Riscul este mic."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "sp-choice",
+   "question": {
+    "prompt": "O extensie de care ați avut nevoie o singură dată este încă în browser. Ce faceți?",
+    "options": [
+     {
+      "id": "remove",
+      "label": "O elimin și o reinstalez dacă voi avea vreodată nevoie de ea",
+      "correct": true,
+      "feedback": "Corect. O extensie pe care nu o folosiți nu vă aduce nimic, dar riscul rămâne."
+     },
+     {
+      "id": "disable",
+      "label": "Doar o dezactivez",
+      "correct": false,
+      "feedback": "Dezactivarea ajută, dar o extensie uitată revine cu un singur clic. Dacă nu vă trebuie, eliminați-o."
+     },
+     {
+      "id": "keep",
+      "label": "O păstrez, poate îmi va trebui cândva",
+      "correct": false,
+      "feedback": "Extensia își poate schimba proprietarul, iar o actualizare o poate transforma în spion. Nu păstrați ce nu vă trebuie."
+     }
+    ]
+   },
+   "explain": "Fiecare extensie este o ușă spre paginile dumneavoastră. Mai puține extensii înseamnă mai puțin risc."
+  },
+  {
+   "type": "simulation",
+   "id": "sp-sim",
+   "environment": "browser",
+   "title": "Magazinul de extensii",
+   "intro": "Vreți o extensie care să afișeze rapid cursurile de schimb. Alegeți ce faceți la fiecare pas.",
+   "steps": [
+    {
+     "id": "copy-store",
+     "label": "Mezenne Pro: descărcare gratuită",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-xezri-brauzer-fake",
+      "url": [
+       {
+        "text": "https://xezri-elaveler.example.info/mezenne-pro",
+        "reveal": "xezri-elaveler.example.info"
+       }
+      ]
+     },
+     "say": "Prima pagină din rezultatele căutării arată ca magazinul.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Descărcați extensia",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Acesta nu este magazinul oficial, ci o copie a lui. Nimic de aici nu a trecut prin verificări."
+      },
+      {
+       "id": "check",
+       "label": "Verificați adresa",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Acest domeniu nu este adresa proprie a magazinului. Deschideți magazinul din meniul browserului."
+      },
+      {
+       "id": "close",
+       "label": "Închideți fila",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Corect. Instalați extensii doar din magazinul propriu al browserului."
+      }
+     ]
+    },
+    {
+     "id": "store-page",
+     "label": "Mezenne Pro: 4,1 stele, 80 de mii de utilizatori",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-xezri-brauzer",
+      "url": [
+       {
+        "text": "https://magaza.xezri.example/elave/mezenne-pro",
+        "reveal": "xezri.example"
+       }
+      ]
+     },
+     "say": "Acum sunteți în magazinul oficial. Înainte de instalare, browserul vă va arăta permisiunile.",
+     "actions": [
+      {
+       "id": "add",
+       "label": "Adăugați în browser",
+       "kind": "install",
+       "outcome": "safe",
+       "feedback": "Magazinul oficial este un început bun. Acum citiți cu atenție permisiunile."
+      },
+      {
+       "id": "skip",
+       "label": "Nu este necesar",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Și aceasta este o alegere bună. Cursurile le puteți vedea pe site-ul băncii dumneavoastră.",
+       "next": "installed"
+      }
+     ]
+    },
+    {
+     "id": "perms",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2c-mezenne-pro",
+      "app": "Məzənnə Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Afișează cursurile de schimb valutar"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Citește și modifică toate datele dumneavoastră de pe toate site-urile"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Vede filele și istoricul de navigare"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Ca să afișeze cursurile de schimb, are nevoie de aceste permisiuni?",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Adăugați extensia",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Pentru cursurile de schimb nu sunt necesare nici toate site-urile, nici istoricul dumneavoastră. O permisiune atât de largă deschide calea spre spionaj."
+      },
+      {
+       "id": "deny",
+       "label": "Refuzați",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă permisiunea nu se potrivește cu sarcina, nu instalați extensia."
+      }
+     ]
+    },
+    {
+     "id": "installed",
+     "label": "Extensii instalate: 7, nefolosite în ultimele șase luni: 4",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "db-xezri-brauzer",
+      "url": [
+       {
+        "text": "https://magaza.xezri.example/elavelerim",
+        "reveal": "xezri.example"
+       }
+      ]
+     },
+     "say": "În browserul dumneavoastră sunt și extensii vechi. Ce faceți cu ele?",
+     "actions": [
+      {
+       "id": "remove-unused",
+       "label": "Eliminați cele patru extensii nefolosite",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Excelent. Fiecare extensie eliminată închide o ușă spre paginile dumneavoastră."
+      },
+      {
+       "id": "keep-all",
+       "label": "Păstrați-le pe toate",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Extensiile nefolosite se actualizează în continuare și vă pot vedea paginile. Eliminați ce nu vă trebuie."
+      }
+     ]
+    },
+    {
+     "id": "malware-flag",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "db-xezri-brauzer",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Extensia Hava Bu Gün a fost dezactivată"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "În această extensie a fost găsit malware."
+        }
+       ],
+       [
+        {
+         "text": "Extensia a fost eliminată și din magazin."
+        }
+       ]
+      ],
+      "buttons": [
+       "Reactivați",
+       "Eliminați"
+      ]
+     },
+     "say": "Browserul a dezactivat singur una dintre extensii.",
+     "actions": [
+      {
+       "id": "remove-report",
+       "label": "Eliminați-o și anunțați suportul IT",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Suportul IT va verifica ce date a colectat extensia și vă va ajuta să schimbați parolele."
+      },
+      {
+       "id": "enable",
+       "label": "Reactivați",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Browserul nu a dezactivat-o degeaba. Odată reactivată, extensia continuă să colecteze date."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "sp-recap",
+   "points": [
+    "Instalați o extensie doar când aveți nevoie de ea și doar din magazinul oficial",
+    "Atenție la orice extensie care vrea acces la datele de pe toate site-urile",
+    "Eliminați extensiile pe care nu le folosiți"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

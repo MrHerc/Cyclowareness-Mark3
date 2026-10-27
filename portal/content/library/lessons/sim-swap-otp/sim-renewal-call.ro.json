@@ -1,0 +1,404 @@
+{
+ "id": "sim-renewal-call",
+ "title": "Apelul pentru înlocuirea SIM-ului",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ss2-tutor",
+   "beats": [
+    {
+     "id": "ss2-b1",
+     "say": "Bună ziua! Acum să analizăm un apel făcut în numele operatorului: o ofertă de înlocuire gratuită a cartelei SIM.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "ss2-b2",
+     "say": "Pe ecran pot apărea numele operatorului și un număr cunoscut. Amândouă pot fi falsificate.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "brandRef": "w2b-sahiltel-fake",
+       "caller": [
+        {
+         "text": "Serviciul Clienți SahilTel"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 44 10",
+         "spot": "number"
+        }
+       ],
+       "label": "Baku"
+      }
+     },
+     "highlight": "number"
+    },
+    {
+     "id": "ss2-b3",
+     "say": "Nu spuneți niciodată un cod primit cuiva care vă sună, chiar dacă pretinde că este de la operator, de la bancă sau de la poliție.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "ss2-b4",
+     "say": "Dacă operatorul vă oferă un PIN pentru contul de client, setați-l. Așa, un SIM swap devine mult mai greu.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ss2-choice",
+   "question": {
+    "prompt": "Cineva vă sună din partea operatorului și spune: „Vă înlocuim cartela SIM, citiți-mi codul.” Ce faceți?",
+    "options": [
+     {
+      "id": "hang-up",
+      "label": "Închid și sun chiar eu la numărul oficial al operatorului",
+      "correct": true,
+      "feedback": "Corect. Când sunați chiar dumneavoastră la numărul oficial, știți cu cine vorbiți."
+     },
+     {
+      "id": "read-code",
+      "label": "Numărul este al operatorului, deci citesc codul",
+      "correct": false,
+      "feedback": "Numărul de pe ecran poate fi falsificat. Acest cod vă mută numărul pe cartela altcuiva."
+     },
+     {
+      "id": "ask-id",
+      "label": "Îi cer celui care sună numele și numărul de angajat",
+      "correct": false,
+      "feedback": "Un infractor poate inventa și un nume, și un număr. Singura verificare reală este un apel pe care îl faceți chiar dumneavoastră."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2b-sahiltel-fake",
+      "caller": [
+       {
+        "text": "Serviciul Clienți SahilTel"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 44 10"
+       }
+      ],
+      "label": "Baku"
+     }
+    }
+   },
+   "explain": "Un apel în care vi se cere un cod este cel mai periculos apel. Închideți și sunați chiar dumneavoastră operatorul."
+  },
+  {
+   "type": "simulation",
+   "id": "ss2-sim",
+   "environment": "call",
+   "title": "Apel de la SahilTel",
+   "intro": "Vă sună telefonul. Citiți ce spune apelanta și alegeți ce răspundeți.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2b-sahiltel-fake",
+      "caller": [
+       {
+        "text": "Serviciul Clienți SahilTel"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 44 10"
+       }
+      ],
+      "label": "Baku",
+      "voice": "young-woman"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Răspundeți",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Nu este periculos să răspundeți. Important este să nu dați niciun cod."
+      },
+      {
+       "id": "decline",
+       "label": "Respingeți",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Și așa este bine. Dacă vă îngrijorează ceva, sunați chiar dumneavoastră operatorul.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "offer",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2b-sahiltel-fake",
+      "caller": [
+       {
+        "text": "Serviciul Clienți SahilTel"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 44 10"
+       }
+      ],
+      "label": "Baku",
+      "voice": "young-woman"
+     },
+     "say": "Bună ziua, sunt Gunel de la SahilTel. Cartelele SIM vechi, mă scuzați, se dezactivează luna aceasta, așa că vă înlocuim cartela gratuit.",
+     "spoken": "Bună ziua, <breath> sunt Gunel de la SahilTel. Cartelele SIM vechi <cough> mă scuzați, se dezactivează luna aceasta, așa că vă înlocuim cartela gratuit.",
+     "actions": [
+      {
+       "id": "go-on",
+       "label": "Bine, ce trebuie să fac?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Încă nu ați pierdut nimic, dar discuția se îndreaptă spre un cod. Aveți grijă."
+      },
+      {
+       "id": "own-call",
+       "label": "Sun chiar eu la numărul oficial al operatorului",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă înlocuirea este reală, linia oficială o va confirma.",
+       "next": "after"
+      },
+      {
+       "id": "hang",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "O decizie bună. Verificați la linia oficială orice ofertă la care nu vă așteptați.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2b-sahiltel-fake",
+      "caller": [
+       {
+        "text": "Serviciul Clienți SahilTel"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 44 10"
+       }
+      ],
+      "label": "Baku",
+      "voice": "young-woman"
+     },
+     "say": "Tocmai ați primit pe telefon un cod de șase cifre. Citiți-mi-l, vă rog, ca să putem activa cartela nouă.",
+     "spoken": "Tocmai ați primit pe telefon un cod de șase cifre. <breath> Citiți-mi-l, vă rog, ca să putem activa cartela nouă.",
+     "actions": [
+      {
+       "id": "read",
+       "label": "Citesc codul",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Cu acest cod, numărul dumneavoastră trece pe cartela infractorului. De acum, codurile de la bancă ajung la el."
+      },
+      {
+       "id": "refuse",
+       "label": "Nu spun codul nimănui",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Codul este doar pentru dumneavoastră, oricine l-ar cere."
+      },
+      {
+       "id": "hang",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Cel mai bun răspuns la un apel în care vi se cere un cod este să îl încheiați.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2b-sahiltel-fake",
+      "caller": [
+       {
+        "text": "Serviciul Clienți SahilTel"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 44 10"
+       }
+      ],
+      "label": "Baku",
+      "voice": "young-woman"
+     },
+     "say": "Dacă nu îmi spuneți codul, numărul dumneavoastră va fi dezactivat chiar în seara asta. Este procedura standard, nu mai avem timp.",
+     "spoken": "Dacă nu îmi spuneți codul, <breath> numărul dumneavoastră va fi dezactivat chiar în seara asta. Este, ăă, procedura standard, nu mai avem timp.",
+     "actions": [
+      {
+       "id": "give-in",
+       "label": "Bine, vă spun codul",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Amenințarea are rolul de a vă grăbi. Dacă dați codul, numărul dumneavoastră ajunge chiar în seara asta la infractor."
+      },
+      {
+       "id": "office",
+       "label": "Dacă e nevoie, vin chiar eu la magazinul dumneavoastră",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Un răspuns bun. Dacă vreodată aveți nevoie de un SIM nou, îl puteți schimba chiar dumneavoastră la un magazin al operatorului."
+      },
+      {
+       "id": "hang",
+       "label": "Închideți apelul",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Corect. Când presiunea crește, încheiați discuția."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Apelul s-a încheiat. Ce faceți acum?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "w2b-sahiltel-fake",
+      "caller": [
+       {
+        "text": "Serviciul Clienți SahilTel"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 44 10"
+       }
+      ],
+      "label": "Baku",
+      "voice": "young-woman"
+     },
+     "actions": [
+      {
+       "id": "official",
+       "label": "Sunați la numărul oficial al operatorului",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Corect. Semnalați apelul și întrebați dacă puteți seta un PIN pentru contul de client."
+      },
+      {
+       "id": "redial",
+       "label": "Sunați înapoi la numărul care v-a apelat",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Numărul acela vă poate duce direct la infractor. Luați numărul de pe site-ul oficial al operatorului."
+      },
+      {
+       "id": "nothing",
+       "label": "Nu faceți nimic",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Infractorul va încerca din nou, pe altă cale. Dacă anunțați operatorul, vă protejați numărul."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ss2-match",
+   "prompt": "Asociați fiecare situație cu pasul corect.",
+   "pairs": [
+    {
+     "id": "asks-code",
+     "left": "Cineva vă sună și vă cere un cod",
+     "right": "Nu spuneți codul, încheiați apelul"
+    },
+    {
+     "id": "no-service",
+     "left": "Telefonul afișează brusc „Fără serviciu”",
+     "right": "Sunați operatorul de pe alt telefon"
+    },
+    {
+     "id": "pin-offer",
+     "left": "Operatorul vă oferă un PIN pentru contul de client",
+     "right": "Setați-l și nu îl spuneți nimănui"
+    },
+    {
+     "id": "sms-only",
+     "left": "Un cont important este protejat doar prin coduri SMS",
+     "right": "Treceți la o aplicație de autentificare sau la o cheie de acces"
+    }
+   ],
+   "explain": "Nu spuneți nimănui niciun cod, acționați repede când numărul rămâne fără semnal și nu lăsați conturile importante să depindă doar de SMS."
+  },
+  {
+   "type": "choice",
+   "id": "ss2-choice-code",
+   "question": {
+    "prompt": "Când este în regulă să spuneți cuiva un cod primit pe telefon?",
+    "options": [
+     {
+      "id": "never",
+      "label": "Niciodată: îl introduc doar pe un site sau într-o aplicație pe care am deschis-o eu",
+      "correct": true,
+      "feedback": "Corect. Un cod este ca semnătura dumneavoastră și trebuie să rămână numai în mâinile dumneavoastră."
+     },
+     {
+      "id": "knows-me",
+      "label": "Dacă cel care sună îmi știe numele și codul personal de identificare",
+      "correct": false,
+      "feedback": "Aceste date s-ar putea să fi fost divulgate. Cine vă cunoaște datele și totuși vă cere codul este un escroc."
+     },
+     {
+      "id": "family",
+      "label": "Dacă mi-l cere o rudă într-un mesaj",
+      "correct": false,
+      "feedback": "Și contul rudei poate fi preluat de altcineva. Sunați-o chiar dumneavoastră, printr-un apel telefonic obișnuit."
+     }
+    ]
+   },
+   "explain": "Băncile și instituțiile statului nu cer coduri primite prin SMS. Oricine v-ar cere codul, încheiați discuția."
+  },
+  {
+   "type": "recap",
+   "id": "ss2-recap",
+   "points": [
+    "Nu spuneți nimănui un cod primit, oricine v-ar suna",
+    "Încheiați un apel suspect și sunați chiar dumneavoastră la numărul oficial al operatorului",
+    "Dacă operatorul vă oferă un PIN pentru contul de client, setați-l"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

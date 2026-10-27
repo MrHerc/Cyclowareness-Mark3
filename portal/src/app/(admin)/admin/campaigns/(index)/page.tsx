@@ -124,7 +124,7 @@ export default async function CampaignsPage({ searchParams }: PageProps<"/admin/
                             <dt className="text-tab text-ink-subtle">{tr(k === "clicked" ? "col.clicked" : `col.${k}`)}</dt>
                             <dd>
                               <span className={k === "clicked" ? "text-body-sm font-bold text-risk-600" : k === "reported" ? "text-body-sm font-bold text-safe-700" : "text-body-sm font-bold"}>{s[k]}</span>
-                              {k !== "sent" ? <span className="ml-1 text-tab text-ink-muted">{share}%</span> : null}
+                              {k !== "sent" ? <span className="ms-1 text-tab text-ink-muted">{share}%</span> : null}
                               <ProgressBar decorative size="sm" value={k === "sent" ? 100 : share} tone={k === "clicked" ? "risk" : k === "reported" ? "safe" : "brand"} className="mt-1.5" />
                             </dd>
                           </div>
@@ -140,7 +140,7 @@ export default async function CampaignsPage({ searchParams }: PageProps<"/admin/
                       </span>
                     </div>
                   )}
-                  <ChevronRight className="ml-auto hidden size-5 text-ink-subtle sm:block" />
+                  <ChevronRight className="ms-auto hidden size-5 text-ink-subtle sm:block" />
                 </Link>
               </li>
             );

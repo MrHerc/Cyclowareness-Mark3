@@ -1,0 +1,366 @@
+{
+  "id": "passphrases",
+  "title": "عبارات المرور",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "long-beats-complex",
+      "beats": [
+        {
+          "id": "short",
+          "say": "تبدو معقدة، لكن الاسم مع سنة وعلامة تعجب هو أول نمط يجربه المهاجمون.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "stat",
+            "value": "Aynur1985!",
+            "label": "تبدو معقدة، لكن كسرها سهل"
+          }
+        },
+        {
+          "id": "phrase",
+          "say": "الأفضل منها عبارة مرور من أربع كلمات عشوائية أو أكثر. طويلة، وسهلة التذكر، وتخمينها صعب جدًا.",
+          "mood": "happy",
+          "gesture": "nod",
+          "visual": {
+            "kind": "stat",
+            "value": "بنفسج طوب محيط ساعة",
+            "label": "مجرد مثال، أنشئ عبارتك الخاصة"
+          },
+          "stage": "back"
+        },
+        {
+          "id": "length",
+          "say": "الطول أهم من التعقيد. اجعلها خمسة عشر حرفًا على الأقل، ولا بأس بالمسافات أو الشرطات بين الكلمات.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "stat",
+            "value": "15+",
+            "label": "حرفًا: الحد الأدنى الموصى به"
+          },
+          "checkpoint": {
+            "prompt": "أي كلمة مرور أقوى؟",
+            "options": [
+              {
+                "id": "swaps",
+                "label": "Pa$$w0rd2026",
+                "correct": false,
+                "feedback": "أدوات كسر كلمات المرور تعرف جيدًا حيل استبدال الحروف بالرموز."
+              },
+              {
+                "id": "words",
+                "label": "جمل فانوس ليمون غيمة",
+                "correct": true,
+                "feedback": "صحيح. أربع كلمات عشوائية تعطيك كلمة مرور طويلة يصعب توقعها."
+              }
+            ]
+          }
+        },
+        {
+          "id": "stuffing",
+          "say": "عندما تتسرب بيانات موقع واحد، يجرب المهاجمون كلمة المرور نفسها على مواقع أخرى. لذلك يحتاج كل حساب إلى كلمة مرور خاصة به.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        }
+      ]
+    },
+    {
+      "type": "password",
+      "id": "make-passphrase",
+      "prompt": "أنشئ عبارة مرور خاصة بك.",
+      "targetScore": 4,
+      "tips": [
+        "لا تكتب كلمة مرورك الحقيقية هنا، فهذا مجرد تمرين.",
+        "اختر أربع كلمات عشوائية أو أكثر.",
+        "تجنب كلمات الأغاني والقصائد والأمثال.",
+        "لا تستخدم الأسماء والتواريخ واسم جهة عملك."
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "leak-alert",
+      "prompt": "ابحث عن علامات التزييف في تنبيه التسرب هذا.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "xidmet-agentliyi-fake",
+        "from": {
+          "name": [
+            {
+              "text": "مركز الأمن السيبراني",
+              "reveal": "security@xidmetagentliyi-az.com"
+            }
+          ],
+          "address": [
+            {
+              "text": "security@"
+            },
+            {
+              "text": "xidmetagentliyi-az.com",
+              "spot": "sender-domain"
+            }
+          ]
+        },
+        "to": "a.hasanova@xidmetagentliyi.az",
+        "subject": [
+          {
+            "text": "تم العثور على كلمة مرورك في بيانات مسربة"
+          }
+        ],
+        "time": "08:47",
+        "body": [
+          [
+            {
+              "text": "عزيزي المستخدم،",
+              "spot": "greeting"
+            }
+          ],
+          [
+            {
+              "text": "عثرنا على كلمة مرورك في قاعدة بيانات مسربة على الإنترنت."
+            }
+          ],
+          [
+            {
+              "text": "لحماية حسابك، "
+            },
+            {
+              "text": "أدخل كلمة المرور القديمة والجديدة في هذا النموذج.",
+              "spot": "old-password"
+            }
+          ],
+          [
+            {
+              "text": "فتح النموذج",
+              "spot": "link",
+              "link": {
+                "label": "فتح النموذج",
+                "href": "https://parol-yenile.info/forma"
+              }
+            }
+          ],
+          [
+            {
+              "text": "إذا لم تتصرف خلال ساعة واحدة، فسيتم حذف الحساب.",
+              "spot": "urgency"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender-domain",
+          "label": "نطاق مزيف",
+          "explain": "نطاق الوكالة هو xidmetagentliyi.az، ولا يوجد في نهايته -az.com."
+        },
+        {
+          "id": "greeting",
+          "label": "تحية عامة",
+          "explain": "فريق الأمن السيبراني في جهتك سيخاطبك باسمك."
+        },
+        {
+          "id": "old-password",
+          "label": "طلب كلمة المرور القديمة",
+          "explain": "الخدمة الحقيقية لا تطلب منك كتابة كلمة مرورك القديمة في نموذج وصلك عبر رسالة. غيرها بنفسك على الموقع الذي تعرفه."
+        },
+        {
+          "id": "link",
+          "label": "رابط غريب",
+          "explain": "الرابط يؤدي إلى نطاق آخر، وليس إلى موقع الوكالة."
+        },
+        {
+          "id": "urgency",
+          "label": "تهديد بمهلة ساعة",
+          "explain": "المهلة القصيرة والتهديد يدفعانك إلى التصرف دون تفكير."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "reset-page",
+      "environment": "browser",
+      "title": "إعادة تعيين كلمة المرور",
+      "intro": "بعد تحذير من تسرب البيانات، تفتح في المتصفح صفحة لإعادة تعيين كلمة المرور. اقرأ العنوان وقرر.",
+      "steps": [
+        {
+          "id": "leak-page",
+          "label": "تم العثور على كلمة مرورك في بيانات مسربة",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi-fake",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "hesab-yoxla.info"
+              },
+              {
+                "text": "hesab-yoxla.info",
+                "spot": "real-domain"
+              },
+              {
+                "text": "/sizma"
+              }
+            ]
+          },
+          "say": "الصفحة تخيفك وتستعجلك. لمن هذا العنوان؟",
+          "actions": [
+            {
+              "id": "reset-here",
+              "label": "إعادة تعيين كلمة المرور هنا",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "بعد تحذير من التسرب، لا تتبع الرابط. غير كلمة المرور على موقع تفتحه بنفسك."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق علامة التبويب، سأفتح البوابة بنفسي",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح: hesab-yoxla.info ليس موقع الوكالة. افتح البوابة بنفسك من الإشارات المرجعية.",
+              "next": "real-reset"
+            }
+          ]
+        },
+        {
+          "id": "fake-reset",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi-fake",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "parol-yenile.info"
+              },
+              {
+                "text": "parol-yenile.info",
+                "spot": "real-domain"
+              },
+              {
+                "text": "/agentlik"
+              }
+            ],
+            "fields": [
+              "البريد الإلكتروني",
+              "كلمة المرور القديمة",
+              "كلمة المرور الجديدة"
+            ],
+            "button": "إعادة تعيين كلمة المرور"
+          },
+          "say": "النموذج يطلب كلمة مرورك القديمة أيضًا. تحقق من العنوان.",
+          "actions": [
+            {
+              "id": "submit",
+              "label": "إعادة تعيين كلمة المرور",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "النموذج المزيف الذي يطلب كلمة المرور القديمة يسرقها. غيرها الآن على البوابة الرسمية وأبلغ عن الموقع."
+            },
+            {
+              "id": "close",
+              "label": "إغلاق علامة التبويب",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "صحيح. parol-yenile.info ليس نطاق الوكالة، فلا تكتب أي شيء هنا."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ عن الموقع",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "رائع. الإبلاغ عن الموقع المزيف يساعد على حظره لدى الآخرين أيضًا."
+            }
+          ]
+        },
+        {
+          "id": "real-reset",
+          "label": "فتحت البوابة بنفسك",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/profil/parol",
+                "reveal": "xidmetagentliyi.az"
+              }
+            ],
+            "fields": [
+              "كلمة المرور القديمة",
+              "عبارة المرور الجديدة"
+            ],
+            "button": "تغيير"
+          },
+          "say": "هذه بوابة الوكالة نفسها. ماذا تفعل الآن؟",
+          "actions": [
+            {
+              "id": "change",
+              "label": "تغيير كلمة المرور",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "صحيح، غيرتها على البوابة الرسمية. اجعل الجديدة عبارة طويلة لا تستخدمها في أي مكان آخر."
+            },
+            {
+              "id": "later",
+              "label": "سأغيرها لاحقًا",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "إذا تسربت كلمة المرور، فقد يكون أحدهم يجربها الآن. غيرها على البوابة الرسمية فورًا."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "true-rules",
+      "question": {
+        "prompt": "ما القواعد الصحيحة؟",
+        "options": [
+          {
+            "id": "length",
+            "label": "الطول أهم من التعقيد",
+            "correct": true,
+            "feedback": "صحيح. كسر كلمة المرور الطويلة أصعب بكثير."
+          },
+          {
+            "id": "unique",
+            "label": "كلمة مرور مستقلة لكل حساب",
+            "correct": true,
+            "feedback": "صحيح. عندها لا يعرض التسرب الواحد للخطر إلا حسابًا واحدًا."
+          },
+          {
+            "id": "monthly",
+            "label": "تغيير كلمة المرور كل شهر",
+            "correct": false,
+            "feedback": "التغيير دون سبب يؤدي غالبًا إلى كلمات مرور ضعيفة ومتشابهة. غيرها فورًا إذا شككت في حدوث تسرب."
+          },
+          {
+            "id": "birth-year",
+            "label": "سنة الميلاد تساعدك على التذكر",
+            "correct": false,
+            "feedback": "من السهل معرفة سنة الميلاد، والمهاجمون يجربونها أولًا."
+          }
+        ],
+        "multi": true
+      },
+      "explain": "النصيحة الحالية: كلمات مرور طويلة وفريدة، يتم تغييرها فورًا بعد أي تسرب. وإذا كانت قواعد جهتك مختلفة، فاتبعها."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "عبارة المرور الطويلة أقوى من كلمة المرور القصيرة المعقدة.",
+        "كلمة مرور مستقلة لكل حساب.",
+        "بعد أي تسرب، غير كلمة المرور فورًا."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

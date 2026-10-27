@@ -1,0 +1,482 @@
+{
+ "id": "lost-phone",
+ "title": "Diensthandy verloren",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Diensthandy verloren oder gestohlen? Schämen Sie sich nicht und warten Sie nicht. Jede Minute zählt.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Rufen Sie sofort von einem anderen Telefon aus den IT-Support an. Dort kann man das Gerät aus der Ferne sperren und prüfen, wo es sich befindet.",
+     "mood": "alert",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Danach kann eine Nachricht wie diese kommen. Das ist ein Versuch, Ihr Passwort zu stehlen und das Smartphone zu entsperren.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "Geräteservice"
+        }
+       ],
+       "time": "20:14",
+       "messages": [
+        [
+         {
+          "text": "Ihr Smartphone wurde gefunden. Melden Sie sich an, um zu sehen, wo es ist: "
+         },
+         {
+          "text": "cihaz-tapildi.example.net",
+          "spot": "link"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "link"
+    },
+    {
+     "id": "b4",
+     "say": "Auch wenn jemand am Telefon behauptet, vom IT-Support zu sein: Verraten Sie niemandem Ihre PIN oder einen SMS-Code.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "first-steps",
+   "prompt": "Sie haben Ihr Diensthandy verloren. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "report",
+     "label": "Von einem anderen Telefon aus den IT-Support anrufen"
+    },
+    {
+     "id": "lock",
+     "label": "Das Smartphone aus der Ferne sperren lassen"
+    },
+    {
+     "id": "sim",
+     "label": "Den Mobilfunkanbieter anrufen und die SIM-Karte sperren lassen"
+    },
+    {
+     "id": "passwords",
+     "label": "Von einem anderen Gerät aus die dienstlichen Passwörter ändern"
+    },
+    {
+     "id": "wipe",
+     "label": "Falls es nicht gefunden wird, aus der Ferne löschen lassen"
+    }
+   ],
+   "explain": "Melden und Sperren dauern nur Minuten und verhindern den größten Teil des Schadens. Gelöscht wird zuletzt, damit das Smartphone noch gefunden werden kann. Wenn das Verfahren Ihrer Organisation eine andere Reihenfolge vorsieht, halten Sie sich daran."
+  },
+  {
+   "type": "simulation",
+   "id": "fake-support-call",
+   "environment": "call",
+   "title": "Ein Anruf vom Support",
+   "intro": "Ihr Diensthandy ist seit gestern Abend verschwunden. Heute Morgen bekommen Sie auf Ihrer privaten Nummer einen Anruf vom IT-Support.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [
+       {
+        "text": "IT-Support"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 45 17"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "young-man"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Annehmen",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Den Anruf anzunehmen ist nicht gefährlich. Entscheidend ist, was Sie sagen."
+      },
+      {
+       "id": "decline",
+       "label": "Ablehnen",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "Das geht auch. Rufen Sie den IT-Support selbst unter der offiziellen Nummer an.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [
+       {
+        "text": "IT-Support"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 45 17"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "young-man"
+     },
+     "say": "Guten Tag, hier ist der IT-Support. Um Ihr Smartphone zu sperren, haben wir Ihnen einen SMS-Code geschickt. Bitte lesen Sie ihn vor.",
+     "spoken": "Guten Tag, <breath> hier ist der IT-Support. Um Ihr Smartphone zu sperren, haben wir Ihnen einen SMS-Code geschickt. Bitte, äh, lesen Sie ihn vor.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Code vorlesen",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Mit diesem Code kann sich jemand bei Ihrem Konto anmelden. Zum Sperren eines Smartphones braucht der Support Ihren Code nicht."
+      },
+      {
+       "id": "verify",
+       "label": "Ich rufe selbst die offizielle Nummer an",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Ein Rückruf unter der offiziellen Nummer entlarvt einen falschen Anruf sofort.",
+       "next": "after"
+      },
+      {
+       "id": "hang",
+       "label": "Auflegen",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Richtig. Der echte IT-Support fragt nie nach Codes oder Passwörtern.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pin",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [
+       {
+        "text": "IT-Support"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 45 17"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "young-man"
+     },
+     "say": "Na gut, dann nennen Sie mir die PIN Ihrer Bildschirmsperre. Wir entsperren das Smartphone aus der Ferne und sichern Ihre Daten.",
+     "spoken": "Na gut, <sigh> dann nennen Sie mir die PIN Ihrer Bildschirmsperre. Wir entsperren das Smartphone aus der Ferne und sichern Ihre Daten.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "PIN nennen",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Wer das Smartphone hat, öffnet es mit dieser PIN. Zum Sperren braucht das Verwaltungssystem Ihre PIN nie."
+      },
+      {
+       "id": "keep",
+       "label": "Ich nenne meine PIN nicht",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Richtig. Ihre PIN gehört nur Ihnen und wird nie weitergegeben."
+      },
+      {
+       "id": "hang",
+       "label": "Auflegen",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Gute Entscheidung. Wenn der Druck steigt, ist Auflegen der richtige Schritt.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "Das Gespräch ist beendet. Was jetzt?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "it-destek-fake",
+      "caller": [
+       {
+        "text": "IT-Support"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 12 000 45 17"
+       }
+      ],
+      "label": "Mobil",
+      "voice": "young-man"
+     },
+     "actions": [
+      {
+       "id": "callback",
+       "label": "Offizielle Nummer des IT-Supports anrufen",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Richtig. Melden Sie diesen Anruf, denn die Kriminellen kennen Ihren Namen und Ihre Nummer."
+      },
+      {
+       "id": "ignore",
+       "label": "Nichts tun",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Als Nächstes rufen die Kriminellen bei anderen Kolleginnen und Kollegen an. Wenn Sie den Anruf melden, kann der Support alle warnen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "after-loss",
+   "prompt": "Nachrichten nach dem Verlust des Smartphones. Sicher oder eine Bedrohung?",
+   "cards": [
+    {
+     "id": "found-sms",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "Geräteservice"
+       }
+      ],
+      "time": "20:14",
+      "messages": [
+       [
+        {
+         "text": "Ihr Smartphone wurde gefunden. Melden Sie sich an, um es auf der Karte zu sehen: "
+        },
+        {
+         "text": "cihaz-tapildi.example.net/map",
+         "link": {
+          "label": "cihaz-tapildi.example.net/map",
+          "href": "https://cihaz-tapildi.example.net/map"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Eine gefälschte Fundmeldung ist auf Ihr Passwort aus. Den Standort des Smartphones prüft nur der IT-Support."
+    },
+    {
+     "id": "sim-blocked",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "kehkesan-mobil",
+      "sender": [
+       {
+        "text": "Kəhkəşan"
+       }
+      ],
+      "time": "20:31",
+      "messages": [
+       [
+        {
+         "text": "Ihre SIM-Karte wurde auf Ihren Wunsch gesperrt. Für eine neue Karte kommen Sie bitte mit Ihrem Ausweis in ein Kundencenter."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Kein Link, keine Forderung, und die Nachricht bestätigt Ihren eigenen Auftrag. Das ist eine normale Mitteilung."
+    },
+    {
+     "id": "ticket-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "IT-Support"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Ticket 4471: Smartphone gesperrt"
+       }
+      ],
+      "time": "20:40",
+      "body": [
+       [
+        {
+         "text": "Ihr Diensthandy wurde aus der Ferne gesperrt. Kommen Sie morgen um 10:00 Uhr in den 2. Stock. Dort erhalten Sie ein neues Gerät."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Die Adresse gehört Ihrer Organisation, und es gibt weder einen Link noch eine Passwortabfrage. Das ist die Antwort auf Ihre Meldung."
+    },
+    {
+     "id": "ransom-chat",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "+994 55 000 63 21"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ich habe Ihr Handy. Überweisen Sie 100 AZN, dann bekommen Sie es zurück. Wenn Sie die Polizei einschalten, veröffentliche ich alles, was darauf ist."
+         }
+        ],
+        "time": "21:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Schicken Sie kein Geld und löschen Sie den Chat nicht. Zeigen Sie ihn dem IT-Support und der Polizei."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "taxi",
+   "title": "Im Taxi vergessen",
+   "start": "night",
+   "nodes": [
+    {
+     "id": "night",
+     "text": "Abends zu Hause merken Sie, dass Sie Ihr Diensthandy im Taxi vergessen haben. Es ist 22:00 Uhr.",
+     "choices": [
+      {
+       "label": "Ich rufe sofort den IT-Support an",
+       "next": "morning",
+       "feedback": "Richtig. Auch nachts können Sie den Verlust melden, und das Smartphone wird sofort gesperrt."
+      },
+      {
+       "label": "Ich warte bis morgen, vielleicht ruft der Fahrer an",
+       "outcome": "risky",
+       "feedback": "In einer Nacht lässt sich mit einem Smartphone viel anstellen. Melden Sie den Verlust jetzt. Wenn der Fahrer anruft, umso besser."
+      }
+     ]
+    },
+    {
+     "id": "morning",
+     "text": "Guten Tag, Sie haben gestern Abend Ihr Handy in meinem Taxi liegen lassen. Ich habe es vorbeigebracht. Es war gesperrt, ich habe nichts angefasst.",
+     "speaker": "Taxifahrer (morgens, im Büro)",
+     "voice": "older-man",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Guten Tag, Sie haben gestern Abend Ihr Handy in meinem Taxi liegen lassen. <breath> Ich habe es vorbeigebracht. Es war gesperrt, ich habe nichts angefasst.",
+     "choices": [
+      {
+       "label": "Ich gebe es dem IT-Support zur Prüfung",
+       "outcome": "safe",
+       "feedback": "Ausgezeichnet. Ein Smartphone, das nicht in Ihren Händen war, muss geprüft werden, und darüber entscheiden die Fachleute."
+      },
+      {
+       "label": "Ich entsperre es und arbeite gleich weiter",
+       "outcome": "risky",
+       "feedback": "Das Smartphone war eine Nacht lang in fremden Händen. Lassen Sie es zuerst vom IT-Support prüfen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "best-lock",
+   "question": {
+    "prompt": "Was schützt Ihre Daten am besten, wenn ein Smartphone verloren geht?",
+    "options": [
+     {
+      "id": "pin-bio",
+      "label": "Eine PIN mit mindestens 6 Ziffern plus Fingerabdruck",
+      "correct": true,
+      "feedback": "Richtig. Eine lange PIN ist schwer zu erraten, und mit dem Fingerabdruck bleibt die tägliche Nutzung bequem."
+     },
+     {
+      "id": "birth-year",
+      "label": "Eine 4-stellige PIN mit Ihrem Geburtsjahr",
+      "correct": false,
+      "feedback": "Ein Geburtsjahr lässt sich in sozialen Netzwerken leicht herausfinden. Wählen Sie mindestens 6 zufällige Ziffern."
+     },
+     {
+      "id": "pattern",
+      "label": "Ein einfaches Entsperrmuster",
+      "correct": false,
+      "feedback": "Ein einfaches Muster lässt sich an Fingerspuren auf dem Display ablesen oder beim Blick über die Schulter erkennen."
+     },
+     {
+      "id": "none",
+      "label": "Keine Sperre, das Smartphone ist immer bei mir",
+      "correct": false,
+      "feedback": "Ein Smartphone ist schnell verloren. Ohne Sperre stehen die dienstlichen E-Mails jedem offen."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "lock"
+    }
+   },
+   "explain": "Eine starke Bildschirmsperre ist die erste Hürde zum Schutz der Daten auf einem verlorenen Smartphone."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Geht das Smartphone verloren, rufen Sie sofort von einem anderen Telefon aus den IT-Support an.",
+    "Nennen Sie niemandem einen Code, eine PIN oder ein Passwort, ganz gleich, wer anruft.",
+    "Lassen Sie ein zurückgegebenes Smartphone vom IT-Support prüfen, bevor Sie es wieder benutzen."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

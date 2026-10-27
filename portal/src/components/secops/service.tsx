@@ -114,7 +114,7 @@ export function SessionEditor({ initial }: { initial: SessionDraft | null }) {
               <Input id="s-loc" value={f.location} onChange={(e) => { edit("location"); setF({ ...f, location: e.target.value }); }} maxLength={300} {...invalid(fieldError("location"), "s-loc")} />
             </Field>
             <Field label={t("form.host")} htmlFor="s-host" error={fieldError("host")}>
-              <Input id="s-host" value={f.host} onChange={(e) => { edit("host"); setF({ ...f, host: e.target.value }); }} maxLength={120} {...invalid(fieldError("host"), "s-host")} />
+              <Input id="s-host" dir="ltr" value={f.host} onChange={(e) => { edit("host"); setF({ ...f, host: e.target.value }); }} maxLength={120} {...invalid(fieldError("host"), "s-host")} />
             </Field>
           </div>
         </div>

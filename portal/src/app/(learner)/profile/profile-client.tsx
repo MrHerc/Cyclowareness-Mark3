@@ -464,7 +464,7 @@ export function DataSection({ pendingSince }: { pendingSince: string | null }) {
           </Button>
         </div>
       ) : (
-        <button type="button" onClick={() => setOpen(true)} className="flex items-center gap-3 rounded-lg border border-line p-4 text-left hover:bg-risk-50">
+        <button type="button" onClick={() => setOpen(true)} className="flex items-center gap-3 rounded-lg border border-line p-4 text-start hover:bg-risk-50">
           <Trash2 className="size-5 text-risk-600" />
           <span>
             <span className="block text-body-sm font-semibold text-risk-600">{t("deletion")}</span>
@@ -501,7 +501,7 @@ export function DataSection({ pendingSince }: { pendingSince: string | null }) {
 export function TourReset() {
   const t = useTranslations("learner.profile");
   return (
-    <button type="button" className="flex w-full items-center gap-3 rounded-lg px-1 py-3 text-left hover:bg-sunken" onClick={() => resetTourAction().then(() => toast(t("tourReset")))}>
+    <button type="button" className="flex w-full items-center gap-3 rounded-lg px-1 py-3 text-start hover:bg-sunken" onClick={() => resetTourAction().then(() => toast(t("tourReset")))}>
       <Signpost className="size-5 text-brand-600" />
       <span className="flex-1 text-body-sm font-semibold">{t("tour")}</span>
       <ChevronRight className="size-4 text-ink-subtle" />
@@ -515,7 +515,7 @@ export function ProblemButton() {
   const [open, setOpen] = useState(false);
   return (
     <>
-      <button type="button" className="flex w-full items-center gap-3 rounded-lg px-1 py-3 text-left hover:bg-sunken" onClick={() => setOpen(true)}>
+      <button type="button" className="flex w-full items-center gap-3 rounded-lg px-1 py-3 text-start hover:bg-sunken" onClick={() => setOpen(true)}>
         <MessageSquareWarning className="size-5 text-brand-600" />
         <span className="flex-1 text-body-sm font-semibold">{tp("reportProblem")}</span>
         <ChevronRight className="size-4 text-ink-subtle" />

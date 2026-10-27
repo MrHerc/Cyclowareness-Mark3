@@ -4,6 +4,7 @@ import { createContext, useContext, type ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { paragraphs, type Rich, type Span } from "@/lib/content/types";
 import { cn } from "@/lib/cn";
+import { langAttrs } from "@/i18n/config";
 
 /**
  * How an artifact is being shown: plain view, as a "find the signs" hotspot exercise, with a
@@ -37,6 +38,11 @@ export const ContentLangProvider = ContentLangCtx.Provider;
 
 export function useContentLang() {
   return useContext(ContentLangCtx);
+}
+
+/** `lang` and `dir` for text in `lang` (an Arabic lesson reads right to left in an English interface); none for undefined. */
+export function langProps(lang: string | undefined): { lang?: string; dir?: "rtl" | "ltr" } {
+  return lang ? langAttrs(lang) : {};
 }
 
 /** `boldFrom`: the part of the text from this index on is bold (an email address after its "@"). */
@@ -85,14 +91,14 @@ function SpanView({ span, boldFrom }: { span: Span; boldFrom?: number }) {
       {body}
       {lensHere ? (
         <>
-          <span aria-hidden className="pointer-events-none absolute -top-3 left-0 z-20 size-11 animate-rise rounded-full border-[3px] border-brand-600 bg-white/30">
+          <span aria-hidden className="pointer-events-none absolute -top-3 start-0 z-20 size-11 animate-rise rounded-full border-[3px] border-brand-600 bg-white/30">
             <span className="absolute -right-3 -bottom-2 h-1.5 w-5 rotate-45 rounded-pill bg-ink" />
           </span>
-          <span role="tooltip" className="absolute top-full left-0 z-30 mt-2 block w-max max-w-72 animate-rise rounded-md bg-ink px-3 py-2 text-left text-caption leading-snug font-normal text-white shadow-overlay">
-            <span className="block text-tab-sm font-semibold text-white/70" lang={contentLang ? locale : undefined}>
+          <span role="tooltip" className="absolute top-full start-0 z-30 mt-2 block w-max max-w-72 animate-rise rounded-md bg-ink px-3 py-2 text-start text-caption leading-snug font-normal text-white shadow-overlay">
+            <span className="block text-tab-sm font-semibold text-white/70" {...langProps(contentLang ? locale : undefined)}>
               {t("lensActually")}
             </span>
-            <span className="font-bold text-white">{mode.lens!.reveal}</span>
+            <bdi className="font-bold text-white">{mode.lens!.reveal}</bdi>
           </span>
         </>
       ) : null}
@@ -106,7 +112,7 @@ function SpanView({ span, boldFrom }: { span: Span; boldFrom?: number }) {
           e.stopPropagation();
           mode.hotspot!.onSpot(spot);
         }}
-        className="rounded-[4px] text-left hover:bg-warn-50 focus-visible:outline-2 focus-visible:outline-brand-600"
+        className="rounded-[4px] text-start hover:bg-warn-50 focus-visible:outline-2 focus-visible:outline-brand-600"
       >
         {content}
       </button>
@@ -130,15 +136,31 @@ function boldOffsets(paras: Span[][], on: boolean): (number | undefined)[][] {
   );
 }
 
-/** Renders rich text (string, a line of spans or paragraphs of spans). `boldAfterAt` bolds an address's domain. */
-export function RichText({ value, className, as: Tag = "div", boldAfterAt = false }: { value: Rich | undefined | null; className?: string; as?: "div" | "span"; boldAfterAt?: boolean }) {
+/**
+ * Renders rich text (string, a line of spans or paragraphs of spans). `boldAfterAt` bolds an address's domain.
+ * An address (`ltr`, or `boldAfterAt`) reads left to right in every language.
+ */
+export function RichText({
+  value,
+  className,
+  as: Tag = "div",
+  boldAfterAt = false,
+  ltr = boldAfterAt,
+}: {
+  value: Rich | undefined | null;
+  className?: string;
+  as?: "div" | "span";
+  boldAfterAt?: boolean;
+  ltr?: boolean;
+}) {
   const lang = useContentLang();
   const paras = paragraphs(value);
   if (!paras.length) return null;
   const bold = boldOffsets(paras, boldAfterAt);
+  const attrs = { ...langProps(lang), ...(ltr && { dir: "ltr" as const }) };
   if (Tag === "span" || paras.length === 1) {
     return (
-      <Tag className={className} lang={lang}>
+      <Tag className={className} {...attrs}>
         {paras[0].map((s, i) => (
           <SpanView key={i} span={s} boldFrom={bold[0][i]} />
         ))}
@@ -146,7 +168,7 @@ export function RichText({ value, className, as: Tag = "div", boldAfterAt = fals
     );
   }
   return (
-    <div className={cn("grid gap-2.5", className)} lang={lang}>
+    <div className={cn("grid gap-2.5", className)} {...attrs}>
       {paras.map((p, i) => (
         <p key={i}>
           {p.map((s, j) => (

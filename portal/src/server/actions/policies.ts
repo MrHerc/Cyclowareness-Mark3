@@ -4,6 +4,7 @@ import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { refresh } from "next/cache";
 import { unstable_rethrow } from "next/navigation";
 import { db, t } from "../db";
+import { logFailure } from "../db/errors";
 import { actionViewer } from "../auth/viewer";
 import { verifyPassword } from "../auth/password";
 import { audit } from "../services/audit";
@@ -21,7 +22,7 @@ export async function signPolicyAction(prev: SignState, form: FormData): Promise
     return await signPolicy(prev, form);
   } catch (error) {
     unstable_rethrow(error);
-    console.error("[policies] sign failed", error);
+    logFailure("[policies] sign failed", error);
     return { error: "generic" };
   }
 }

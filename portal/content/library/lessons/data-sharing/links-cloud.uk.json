@@ -1,0 +1,441 @@
+{
+ "id": "links-cloud",
+ "title": "Посилання та хмарні папки",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Хмарні папки зручні, але одне неправильне налаштування може відкрити файл усьому інтернету.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Якщо вибрано «Усі, хто має посилання», а посилання передали далі, файл зможуть відкрити й сторонні люди.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "rxagentlik-disk",
+       "url": [
+        {
+         "text": "https://disk.rxagentlik.az/qovluq/budce-2027?paylasim="
+        },
+        {
+         "text": "hamiya-acik",
+         "spot": "public"
+        }
+       ]
+      }
+     },
+     "highlight": "public"
+    },
+    {
+     "id": "b3",
+     "say": "Правильно так: лише конкретні люди, доступ тільки на перегляд і термін дії.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Не завантажуйте робочі файли в особистий хмарний обліковий запис. Там організація не зможе ні захистити, ні відновити їх.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "share-folder",
+   "environment": "browser",
+   "title": "Надайте доступ до файлу",
+   "intro": "Вам потрібно надіслати проєкт бюджету зовнішньому партнерові. Налаштуйте доступ на хмарному диску самостійно.",
+   "steps": [
+    {
+     "id": "file-page",
+     "label": "Проєкт бюджету 2027.xlsx",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "rxagentlik-disk",
+      "url": [
+       {
+        "text": "https://disk.rxagentlik.az/fayllar/Budce_layihesi_2027.xlsx",
+        "reveal": "rxagentlik.az"
+       }
+      ]
+     },
+     "say": "Як ви надасте доступ до файлу?",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Надати доступ",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Добре, файл залишається на робочому диску. Тепер погляньте на налаштування доступу."
+      },
+      {
+       "id": "personal",
+       "label": "Перенести в особисту хмару",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Особистий обліковий запис — поза контролем організації. Робочі файли мають залишатися на робочому диску."
+      }
+     ]
+    },
+    {
+     "id": "who-can-open",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Надати доступ: Проєкт бюджету 2027.xlsx"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Хто може відкривати файл?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Усі, хто має посилання",
+       "Лише вказані люди"
+      ]
+     },
+     "actions": [
+      {
+       "id": "named",
+       "label": "Лише вказані люди",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Правильно. Файл відкриється лише для тих, кого ви виберете."
+      },
+      {
+       "id": "anyone",
+       "label": "Усі, хто має посилання",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Посилання можуть переслати, або воно потрапить не туди. Тоді файл зможе відкрити будь-хто."
+      }
+     ]
+    },
+    {
+     "id": "rights",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Кому і як?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Одержувач: e.rzayev@merkez-konsalting.example"
+        }
+       ],
+       [
+        {
+         "text": "Доступ: перегляд або редагування"
+        }
+       ],
+       [
+        {
+         "text": "Термін дії: 7 днів або безстроково"
+        }
+       ]
+      ],
+      "buttons": [
+       "Редагування, без терміну дії",
+       "Перегляд, 7 днів"
+      ]
+     },
+     "actions": [
+      {
+       "id": "view",
+       "label": "Перегляд, 7 днів",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Чудово. Партнер бачить файл, але не може його змінити, а доступ завершиться за тиждень."
+      },
+      {
+       "id": "edit",
+       "label": "Редагування, без терміну дії",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Партнерові не потрібно редагувати файл, а безстроковий доступ лишається відкритим роками."
+      }
+     ]
+    },
+    {
+     "id": "fake-share",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "rxagentlik-disk-fake",
+      "brand": "RXAgentlik Disk",
+      "url": [
+       {
+        "text": "https://rxagentlik-disk.example.net/giris",
+        "reveal": "rxagentlik-disk.example.net"
+       }
+      ],
+      "fields": [
+       "Електронна пошта",
+       "Пароль"
+      ],
+      "button": "Увійти"
+     },
+     "say": "Через годину відкривається сторінка спільного файлу. Перевірте адресу.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Увійти",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Це не домен вашого робочого диска. Спільний файл — лише привід викрасти пароль."
+      },
+      {
+       "id": "close",
+       "label": "Закрити вкладку",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Правильно. Відкривайте спільні файли лише на disk.rxagentlik.az."
+      },
+      {
+       "id": "report",
+       "label": "Повідомити про сайт",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Чудово. Повідомлення про фальшиву сторінку захищає й колег."
+      }
+     ]
+    },
+    {
+     "id": "old-links",
+     "label": "Мої спільні файли: 4 файли відкриті для всіх",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "rxagentlik-disk",
+      "url": [
+       {
+        "text": "https://disk.rxagentlik.az/paylasimlar",
+        "reveal": "rxagentlik.az"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "close-links",
+       "label": "Закрити відкриті посилання",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Правильно. Закривати доступ, який більше не потрібен, — найпростіший захист."
+      },
+      {
+       "id": "later",
+       "label": "Пізніше",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Кожне посилання, яке лишається відкритим, щодня створює новий ризик."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "link-settings",
+   "prompt": "Чи безпечне це налаштування доступу?",
+   "cards": [
+    {
+     "id": "anyone-forever",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Налаштування доступу"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Таблиця зарплат: усі, хто має посилання, редагування, без терміну дії"
+        }
+       ]
+      ],
+      "buttons": [
+       "Готово"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Конфіденційний файл відкритий для всіх і безстроково. Якщо посилання пошириться, скасувати це вже не вдасться."
+    },
+    {
+     "id": "named-week",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Налаштування доступу"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Звіт про проєкт: 2 особи, перегляд, 7 днів"
+        }
+       ]
+      ],
+      "buttons": [
+       "Готово"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Вузький доступ, лише перегляд і термін дії. Це правильне налаштування."
+    },
+    {
+     "id": "whole-org",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Налаштування доступу"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Кадровий список: усі в організації"
+        }
+       ]
+      ],
+      "buttons": [
+       "Готово"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Конфіденційний документ — не для всієї організації, а лише для конкретних людей."
+    },
+    {
+     "id": "public-ad",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "rxagentlik-disk",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Налаштування доступу"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Оголошення про вакансію: усі, хто має посилання"
+        }
+       ]
+      ],
+      "buttons": [
+       "Готово"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Оголошення публічне й уже є на вебсайті. Тут відкрите посилання доречне."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "who-needs-what",
+   "prompt": "Знайдіть правильне налаштування для кожної потреби.",
+   "pairs": [
+    {
+     "id": "partner",
+     "left": "Партнерові потрібно прочитати документ",
+     "right": "Перегляд, для конкретної особи, 7 днів"
+    },
+    {
+     "id": "coauthor",
+     "left": "Колега пише документ разом із вами",
+     "right": "Редагування, лише для цієї людини"
+    },
+    {
+     "id": "public",
+     "left": "Оголошення, опубліковане на вебсайті",
+     "right": "Відкрите посилання для всіх"
+    }
+   ],
+   "explain": "Надавайте доступ якомога вужче: кому, з якими правами й на який термін."
+  },
+  {
+   "type": "choice",
+   "id": "personal-cloud",
+   "question": {
+    "prompt": "Чи можна завантажити конфіденційний файл у особисту хмару, щоб попрацювати вдома?",
+    "options": [
+     {
+      "id": "strong",
+      "label": "Так, у мене надійний пароль",
+      "correct": false,
+      "feedback": "Надійний пароль не повертає файл під контроль організації."
+     },
+     {
+      "id": "work",
+      "label": "Ні, я користуюся робочим диском або способом, який дозволяє організація",
+      "correct": true,
+      "feedback": "Правильно. На робочому диску файл захищений, і його можна відновити."
+     },
+     {
+      "id": "delete-later",
+      "label": "Так, я потім його видалю",
+      "correct": false,
+      "feedback": "Видалений файл часто лишається в кошику та на інших пристроях."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "cloud"
+    }
+   },
+   "explain": "Робочі файли мають залишатися в робочих системах. Якщо сумніваєтеся, запитайте техпідтримку."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Ніколи не обирайте «Усі, хто має посилання» для конфіденційних файлів.",
+    "Надавайте доступ конкретним людям, лише на перегляд і з терміном дії.",
+    "Регулярно закривайте доступ до старих спільних файлів."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

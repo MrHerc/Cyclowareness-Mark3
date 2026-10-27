@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, Globe, Lock, Plus, RotateCw, ScanSearch, ShieldAlert, X, FileBadge2 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { dirOf } from "@/i18n/config";
 import { useClientFormat } from "@/lib/client-format";
 
 export type Cert = { subject: string; org: string | null; altNames: string[]; issuer: string; from: string; to: string; fingerprint: string };
@@ -50,6 +51,7 @@ export function BrowserApp({
   reported: boolean;
 }) {
   const t = useTranslations("learner.lab.vm.browser");
+  const locale = useLocale();
   const format = useClientFormat();
   // Certificate validity is a Baku day (YYYY-MM-DD), shown in the UI language.
   const day = (d: string) => format.dateTime(new Date(`${d}T12:00:00+04:00`), { dateStyle: "medium" });
@@ -163,7 +165,10 @@ export function BrowserApp({
         </p>
       ) : null}
 
-      <div className="relative min-h-0 flex-1 overflow-y-auto">{tab.page}</div>
+      {/* The page is in the learner's language: it reads in that direction inside the left-to-right VM. */}
+      <div dir={dirOf(locale)} className="relative min-h-0 flex-1 overflow-y-auto">
+        {tab.page}
+      </div>
 
       {pop === "info" ? (
         <Popover onClose={() => setPop(null)} label={t("siteInfo")}>

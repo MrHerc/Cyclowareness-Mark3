@@ -38,10 +38,10 @@ export function AnalysisResult({
         <Icon className={cn("size-10", a.verdict === "malicious" ? "text-risk-600" : a.verdict === "suspicious" ? "text-warn-700" : "text-safe-600")} />
         <div className="min-w-0 flex-1">
           <p className="font-mono text-tab text-ink-subtle">SB-{a.number}</p>
-          <p className="truncate font-mono text-body-sm font-semibold">{a.kind === "url" ? defang(a.objectName) : a.objectName}</p>
+          <p dir="ltr" className="truncate font-mono text-body-sm font-semibold">{a.kind === "url" ? defang(a.objectName) : a.objectName}</p>
           <p className="mt-1 text-caption text-ink-muted">{t(`sandbox.verdictBody.${a.verdict}`)}</p>
         </div>
-        <div className="text-right">
+        <div className="text-end">
           <VerdictBadge verdict={a.verdict} />
           <p className="mt-1 text-title font-bold tabular-nums">
             {a.score}
@@ -69,7 +69,7 @@ export function AnalysisResult({
               {a.iocs.slice(0, 12).map((i, k) => (
                 <li key={k} className="flex gap-2 font-mono text-tab">
                   <span className="w-24 shrink-0 text-ink-subtle">{ts(`iocTypes.${i.type as "domain"}`)}</span>
-                  <span className="min-w-0 break-all">{i.type === "url" || i.type === "domain" ? defang(i.value) : i.value}</span>
+                  <span dir="ltr" className="min-w-0 break-all">{i.type === "url" || i.type === "domain" ? defang(i.value) : i.value}</span>
                 </li>
               ))}
             </ul>

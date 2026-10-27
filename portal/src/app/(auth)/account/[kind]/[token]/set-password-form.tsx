@@ -53,13 +53,15 @@ export function SetPasswordForm({ kind, token, name, email }: { kind: "invite" |
       <div>
         <p className="text-caption font-semibold text-brand-600">{t("account.greeting", { name })}</p>
         <h1 className={cn("mt-1", authTitle)}>{kind === "invite" ? t("account.titleInvite") : t("account.titleReset")}</h1>
-        <p className="mt-1.5 text-caption text-ink-muted">{email}</p>
+        <p className="mt-1.5 text-caption text-ink-muted">
+          <bdi>{email}</bdi>
+        </p>
       </div>
       <input type="hidden" name="token" value={token} />
       <input type="hidden" name="kind" value={kind} />
       <input type="text" name="username" autoComplete="username" value={email} readOnly hidden />
       <Field label={t("account.passwordLabel")} htmlFor="password">
-        <div className="relative">
+        <div dir="ltr" className="relative">
           <LockKeyhole aria-hidden className={authInputIcon} />
           <Input id="password" name="password" type="password" autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} autoFocus className={authInput} />
         </div>
@@ -70,7 +72,7 @@ export function SetPasswordForm({ kind, token, name, email }: { kind: "invite" |
         ))}
       </div>
       <Field label={t("account.confirmLabel")} htmlFor="confirm" error={error}>
-        <div className="relative">
+        <div dir="ltr" className="relative">
           <LockKeyhole aria-hidden className={authInputIcon} />
           <Input id="confirm" name="confirm" type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} aria-invalid={!!error} className={authInput} />
         </div>

@@ -1,0 +1,558 @@
+{
+  "id": "drag-test",
+  "title": "Pencereyi sürükleyin",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "dt-tutor",
+      "beats": [
+        {
+          "id": "dt-b1",
+          "say": "Merhaba! Bazı siteler giriş yapmanız için küçük bir pencere açar. Bugün sahte olanını nasıl fark edeceğinizi öğreneceksiniz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        },
+        {
+          "id": "dt-b2",
+          "say": "Dolandırıcı bu pencereyi sayfanın içine, bir resim gibi çizer. Adres çubuğu bile doğru görünür.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "ispoct-fake",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "İşPoçt: giriş"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "https://poct.idare.example/giris",
+                    "spot": "fake-bar"
+                  }
+                ],
+                [
+                  {
+                    "text": "Belgeyi görüntülemek için iş e-postanızla giriş yapın."
+                  }
+                ]
+              ],
+              "buttons": [
+                "Giriş yap",
+                "İptal"
+              ]
+            }
+          },
+          "highlight": "fake-bar"
+        },
+        {
+          "id": "dt-b3",
+          "say": "Bunu anlamanın yolu basit: pencereyi tutun ve tarayıcının dışına sürükleyin. Sahte pencere sayfadan dışarı çıkamaz.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "dt-b4",
+          "say": "Parola yöneticiniz parolayı doldurmuyorsa durun. Adresi yeni bir sekmede kendiniz yazın.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "dt-swipe",
+      "prompt": "Hangi giriş penceresine güvenebilirsiniz?",
+      "cards": [
+        {
+          "id": "edge-cut",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İşPoçt: giriş"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Pencereyi kenara sürüklediniz."
+                }
+              ],
+              [
+                {
+                  "text": "Pencere sayfanın kenarına gelince kesildi."
+                }
+              ]
+            ],
+            "buttons": [
+              "Giriş yap"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Gerçek pencere tarayıcıdan çıkar ve ekranın her yerine gidebilir. Kesiliyorsa, sayfanın içine çizilmiş bir resimdir."
+        },
+        {
+          "id": "moves-out",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İşPoçt: giriş"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Pencereyi kenara sürüklediniz: tarayıcıdan çıktı ve masaüstüne geçti."
+                }
+              ],
+              [
+                {
+                  "text": "ParolSeyf parolayı kendiliğinden doldurmayı önerdi."
+                }
+              ]
+            ],
+            "buttons": [
+              "Giriş yap"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Pencere tarayıcıdan bağımsız hareket ediyor ve parola yöneticisi siteyi tanıyor. Bunlar gerçek bir pencerenin işaretleridir."
+        },
+        {
+          "id": "no-fill",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "system",
+            "title": [
+              {
+                "text": "ParolSeyf"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Bu site için kayıtlı parola bulunamadı."
+                }
+              ],
+              [
+                {
+                  "text": "Pencerede yazan adres: poct.idare.example"
+                }
+              ]
+            ],
+            "buttons": [
+              "Kapat"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Parola yöneticisi penceredeki yazıya değil, sitenin gerçek adresine bakar. Parola bulamıyorsa karşınızdaki başka bir sitedir."
+        },
+        {
+          "id": "moves-along",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İşPoçt: giriş"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Tarayıcının kendisini kenara sürüklediniz."
+                }
+              ],
+              [
+                {
+                  "text": "Giriş penceresi de onunla birlikte hareket etti."
+                }
+              ]
+            ],
+            "buttons": [
+              "Giriş yap"
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Gerçek pencere olduğu yerde kalır. Tarayıcıyla birlikte hareket ediyorsa sayfanın bir parçasıdır."
+        },
+        {
+          "id": "own-tab",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct",
+            "tone": "app",
+            "title": [
+              {
+                "text": "Yeni sekme: poct.idare.example"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Adresi kendiniz yazdınız."
+                }
+              ],
+              [
+                {
+                  "text": "Parola yöneticisi parolayı doldurdu."
+                }
+              ]
+            ],
+            "buttons": [
+              "Giriş yap"
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Adresi kendiniz yazdığınızda sahte pencerenin araya girme imkânı kalmaz. En güvenilir yol budur."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "dt-sim",
+      "environment": "browser",
+      "title": "İhale belgesi",
+      "intro": "Bir tedarikçi, ihale belgesine giden bir bağlantı gönderdi. Site, belgeyi göstermek için giriş yapmanızı istiyor. Dikkatli ilerleyin.",
+      "steps": [
+        {
+          "id": "doc-page",
+          "label": "İhale belgesi: ofis mobilyası alımı",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tender-baza",
+            "url": [
+              {
+                "text": "https://tender-baza.example.net/sened/4471"
+              }
+            ]
+          },
+          "say": "Belge kilitli. Site, iş hesabınızla giriş yapmanızı öneriyor.",
+          "actions": [
+            {
+              "id": "open-login",
+              "label": "İşPoçt ile giriş yap",
+              "kind": "click-link",
+              "outcome": "safe",
+              "feedback": "Düğmeye basmak henüz tehlikeli değil. Asıl sınav, şimdi açılacak olan pencere."
+            },
+            {
+              "id": "check-address",
+              "label": "Adresi kontrol et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Burası iş e-postanızın sitesi değil, ihale sitesi. Birazdan açılacak giriş penceresine çok dikkatli bakın."
+            },
+            {
+              "id": "close-tab",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Temkinli bir seçim. E-postanızı kendiniz açın, belgeyi de tedarikçiden başka bir yoldan isteyin.",
+              "next": "own-tab"
+            }
+          ]
+        },
+        {
+          "id": "popup",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İşPoçt: giriş"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "https://poct.idare.example/giris"
+                }
+              ],
+              [
+                {
+                  "text": "Belgeyi görüntülemek için iş e-postanızla giriş yapın."
+                }
+              ],
+              [
+                {
+                  "text": "E-posta: aysel.quliyeva@idare.example"
+                }
+              ]
+            ],
+            "buttons": [
+              "Giriş yap",
+              "İptal"
+            ]
+          },
+          "say": "Pencerede doğru adres görünüyor. Ama bu henüz hiçbir şeyi kanıtlamaz.",
+          "actions": [
+            {
+              "id": "drag",
+              "label": "Pencereyi tarayıcının dışına sürükle",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğru sınama. Bakalım pencere tarayıcıdan çıkabilecek mi."
+            },
+            {
+              "id": "autofill",
+              "label": "ParolSeyf ile doldur",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "İyi fikir. Parola yöneticisi sitenin gerçek adresini kontrol eder.",
+              "next": "pm-check"
+            },
+            {
+              "id": "type-pass",
+              "label": "Parolayı yaz ve giriş yap",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Penceredeki adres çubuğu yalnızca bir resimdi. Parolanız ihale sitesinin sahibine gitti.",
+              "next": "leaked"
+            },
+            {
+              "id": "cancel",
+              "label": "İptal",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Güzel. Emin olmadığınız bir pencereye asla parola yazmayın.",
+              "next": "own-tab"
+            }
+          ]
+        },
+        {
+          "id": "drag-result",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "ispoct-fake",
+            "tone": "app",
+            "title": [
+              {
+                "text": "İşPoçt: giriş"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "Pencere sayfanın kenarına gelince kesildi."
+                }
+              ],
+              [
+                {
+                  "text": "Tarayıcının dışına çıkamadı."
+                }
+              ]
+            ],
+            "buttons": [
+              "Giriş yap",
+              "İptal"
+            ]
+          },
+          "say": "Pencere sayfanın kenarında kesildi. Gerçek bir pencere bunu asla yapmaz.",
+          "actions": [
+            {
+              "id": "close-it",
+              "label": "Pencereyi ve sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Sayfadan çıkamayan pencere sahtedir, bu yüzden içine hiçbir şey yazmayın.",
+              "next": "own-tab"
+            },
+            {
+              "id": "type-anyway",
+              "label": "Yine de giriş yap",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Pencerenin sahte olduğunu zaten görmüştünüz. Parolanız dolandırıcıya gitti.",
+              "next": "leaked"
+            },
+            {
+              "id": "report",
+              "label": "Siteyi BT destek ekibine bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Harika. BT destek ekibi siteyi engelleyip iş arkadaşlarınızı da koruyabilir.",
+              "next": "own-tab"
+            }
+          ]
+        },
+        {
+          "id": "pm-check",
+          "artifact": {
+            "kind": "dialog",
+            "brandRef": "parolseyf",
+            "tone": "system",
+            "title": [
+              {
+                "text": "ParolSeyf"
+              }
+            ],
+            "body": [
+              [
+                {
+                  "text": "tender-baza.example.net için kayıtlı parola yok."
+                }
+              ]
+            ],
+            "buttons": [
+              "Elle yaz",
+              "Kapat"
+            ]
+          },
+          "say": "Parola yöneticisi bu site için parola bulamadı.",
+          "actions": [
+            {
+              "id": "type-manual",
+              "label": "Parolayı elle yaz",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Parola yöneticisi haklıydı: bu site iş e-postanızın sitesi değil. Yazdığınız parola dolandırıcıya gitti.",
+              "next": "leaked"
+            },
+            {
+              "id": "stop",
+              "label": "Dur ve pencereyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. Parola yöneticisi parolayı doldurmuyorsa en iyisi durmaktır."
+            }
+          ]
+        },
+        {
+          "id": "own-tab",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "ispoct",
+            "brand": "İşPoçt",
+            "url": [
+              {
+                "text": "https://poct.idare.example/giris"
+              }
+            ],
+            "fields": [
+              "İş e-postası",
+              "Parola"
+            ],
+            "button": "Giriş yap"
+          },
+          "say": "Adresi yeni bir sekmede kendiniz yazdınız. Parola yöneticisi parolayı doldurdu.",
+          "actions": [
+            {
+              "id": "login",
+              "label": "Giriş yap",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Doğru. Adresi kendiniz yazdığınızda sahte pencerenin araya girme imkânı kalmaz.",
+              "next": "doc-page"
+            },
+            {
+              "id": "check",
+              "label": "Adresi kontrol et",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Burası gerçek iş e-postanızın sitesi; parola yöneticisi de onu tanıdı. Giriş yapmak güvenli.",
+              "next": "doc-page"
+            }
+          ]
+        },
+        {
+          "id": "leaked",
+          "label": "Belge bulunamadı",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2c-tender-baza",
+            "url": [
+              {
+                "text": "https://tender-baza.example.net/sened/4471"
+              }
+            ]
+          },
+          "say": "Parola gitti, belge de hiç açılmadı. Şimdi hızlı davranın.",
+          "actions": [
+            {
+              "id": "change-report",
+              "label": "Parolayı değiştir ve BT destek ekibini ara",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Doğru. Parolayı yeni bir sekmede değiştirin ve BT destek ekibinden tüm açık oturumları kapatmasını isteyin."
+            },
+            {
+              "id": "retry",
+              "label": "Tekrar giriş yap",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Site parolanızı ikinci kez topluyor. Bu bir belge değil, parola tuzağı."
+            },
+            {
+              "id": "ignore",
+              "label": "Hiçbir şey yapma",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Dolandırıcı bu parolayla e-postanızı şimdiden açabilir. Parolayı hemen değiştirin ve durumu bildirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "dt-order",
+      "prompt": "Giriş penceresi şüpheli göründüğünde atılacak adımları sıraya koyun.",
+      "items": [
+        {
+          "id": "drag",
+          "label": "Pencereyi tarayıcının dışına sürükleyin"
+        },
+        {
+          "id": "close",
+          "label": "Dışarı çıkamıyorsa pencereyi ve sekmeyi kapatın"
+        },
+        {
+          "id": "own-tab",
+          "label": "Adresi yeni bir sekmede yazın ve orada giriş yapın"
+        },
+        {
+          "id": "report",
+          "label": "Siteyi BT destek ekibine bildirin"
+        }
+      ],
+      "explain": "Önce sınayın, sonra kapatın, ardından adresi kendiniz yazın. Siteyi bildirin ki iş arkadaşlarınız da korunsun."
+    },
+    {
+      "type": "recap",
+      "id": "dt-recap",
+      "points": [
+        "Giriş penceresini tarayıcının dışına sürükleyin: sahtesi sayfadan çıkamaz",
+        "Parola yöneticisi parolayı doldurmuyorsa durun",
+        "Şüpheye düştüğünüzde adresi yeni bir sekmede kendiniz yazın"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

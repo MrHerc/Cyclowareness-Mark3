@@ -1,0 +1,527 @@
+{
+  "id": "fake-shops",
+  "title": "Fake-Shops",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "fs-tutor",
+      "beats": [
+        {
+          "id": "fs-b1",
+          "say": "Hallo! In dieser Lektion lernen Sie, Fake-Shops in sozialen Netzwerken zu erkennen.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "fs-b2",
+          "say": "Sehen Sie sich diese Anzeige an: eine teure Klimaanlage für nur 299 Manat, nur heute und nur gegen Vorkasse.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "notification",
+              "brandRef": "kontakto",
+              "app": "Kontakto",
+              "title": [
+                {
+                  "text": "Gesponsert: Sərin Klimat Sale"
+                }
+              ],
+              "body": [
+                {
+                  "text": "Klimaanlage für nur 299 AZN statt 1.199! "
+                },
+                {
+                  "text": "Nur heute, 100 % Vorkasse.",
+                  "spot": "prepay"
+                }
+              ],
+              "time": "13:05"
+            }
+          },
+          "highlight": "prepay"
+        },
+        {
+          "id": "fs-b3",
+          "say": "Die Kriminellen kassieren zuerst das Geld, dann löschen sie die Seite und verschwinden.",
+          "mood": "think",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "fs-b4",
+          "say": "Die Regel ist einfach: Leisten Sie bei einer unbekannten Seite nie Vorkasse, und zahlen Sie wann immer möglich erst bei Lieferung.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "fs-swipe",
+      "prompt": "Welches Shop-Angebot ist sicher und welches eine Falle?",
+      "cards": [
+        {
+          "id": "rush",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "w2e-serin-klimat-fake",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Sərin Klimat Sale"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Das Angebot endet heute, nur noch 3 Stück. Bezahlung nur per Überweisung von Karte zu Karte, 100 % im Voraus."
+                  }
+                ],
+                "time": "13:12"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Zeitdruck und dazu nur Vorkasse von Karte zu Karte – das ist das wichtigste Zeichen für einen Fake-Shop. Dieses Geld bekommen Sie nur sehr schwer zurück."
+        },
+        {
+          "id": "official",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "kontakto",
+            "app": "Kontakto",
+            "title": [
+              {
+                "text": "Sərin Klimat, seit 2014"
+              }
+            ],
+            "body": [
+              {
+                "text": "Klimaanlage 1.149 AZN. Zahlung bei Lieferung, bar oder mit Karte. Geschäft und Servicecenter in Nərimanov."
+              }
+            ],
+            "time": "10:20"
+          },
+          "verdict": "safe",
+          "explain": "Ein realistischer Preis, eine Seite, die es seit Jahren gibt, und Zahlung bei Lieferung. Sie sehen die Ware zuerst und zahlen danach."
+        },
+        {
+          "id": "lookalike",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "w2e-serin-klimat-fake",
+            "url": [
+              {
+                "text": "https://serin-klimat-endirim.example.net/kampaniya"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Das ist nicht die offizielle Website des Shops. Ein zusätzliches Wort im Namen und eine seltsame Domain verraten die gefälschte Seite."
+        },
+        {
+          "id": "cod",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Ləman Handmade"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hallo! Ich verschicke Bestellungen mit ÇevikKargo, Sie bezahlen den Kurier, wenn die Ware ankommt."
+                  }
+                ],
+                "time": "11:47"
+              }
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Zahlung bei Lieferung schützt Sie. Sie zahlen nie, bevor Sie die Ware gesehen haben."
+        },
+        {
+          "id": "new-page",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Phone Outlet Baku"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Unsere Seite ist neu, aber wir haben 20.000 Follower. Die Kommentare haben wir wegen Spam deaktiviert. Schicken Sie eine Anzahlung von 50 AZN."
+                  }
+                ],
+                "time": "16:30"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Eine neue Seite, deaktivierte Kommentare und eine verlangte Anzahlung sind zusammen ein ernstes Warnsignal. Follower kann man kaufen."
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "fs-sim",
+      "environment": "phone",
+      "title": "Angebot für eine Klimaanlage",
+      "intro": "Sie haben auf Kontakto eine Anzeige für eine günstige Klimaanlage gesehen. Entscheiden Sie Schritt für Schritt auf Ihrem Smartphone.",
+      "steps": [
+        {
+          "id": "ad",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "kontakto",
+            "app": "Kontakto",
+            "title": [
+              {
+                "text": "Gesponsert: Sərin Klimat Sale"
+              }
+            ],
+            "body": [
+              {
+                "text": "Klimaanlage für nur 299 AZN statt 1.199! Nur heute, 100 % Vorkasse."
+              }
+            ],
+            "time": "13:05"
+          },
+          "say": "Die Anzeige ist sehr verlockend. Anschauen ist in Ordnung.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Anzeige öffnen",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Anschauen ist nicht gefährlich. Die eigentliche Entscheidung fällt vor dem Bezahlen."
+            },
+            {
+              "id": "hide",
+              "label": "Anzeige ausblenden",
+              "kind": "ignore",
+              "outcome": "safe",
+              "feedback": "Gute Wahl. Ein viel zu niedriger Preis ist oft ein Köder.",
+              "next": "real-shop"
+            }
+          ]
+        },
+        {
+          "id": "prepay",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "w2e-serin-klimat-fake",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Sərin Klimat Sale"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hallo! Das Angebot endet heute um 18:00 Uhr."
+                  }
+                ],
+                "time": "13:12"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Schicken Sie Ihren Namen und Ihre Adresse und überweisen Sie 299 AZN auf diese Karte: **** **** **** 0000. Lieferung morgen."
+                  }
+                ],
+                "time": "13:12"
+              }
+            ]
+          },
+          "say": "Der Verkäufer verlangt sofort Vorkasse.",
+          "actions": [
+            {
+              "id": "ask-cod",
+              "label": "Kann ich bei Lieferung bezahlen?",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Gute Frage. Ein echter Shop ist mit Zahlung bei Lieferung in der Regel einverstanden."
+            },
+            {
+              "id": "pay",
+              "label": "Jetzt 299 AZN überweisen",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Das Geld ist auf der Karte einer fremden Person gelandet. Vorkasse bekommt man nur sehr schwer zurück.",
+              "next": "gone"
+            },
+            {
+              "id": "report",
+              "label": "Seite melden",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Gut gemacht. Die gemeldete Seite kann keine anderen Kaufenden mehr täuschen.",
+              "next": "real-shop"
+            }
+          ]
+        },
+        {
+          "id": "deposit",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "w2e-serin-klimat-fake",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Sərin Klimat Sale"
+              }
+            ],
+            "messages": [
+              {
+                "from": "me",
+                "body": [
+                  {
+                    "text": "Kann ich bei Lieferung bezahlen?"
+                  }
+                ],
+                "time": "13:14"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Zum Aktionspreis gibt es keine Zahlung bei Lieferung. Schicken Sie mindestens 50 AZN Anzahlung, den Rest zahlen Sie dem Kurier."
+                  }
+                ],
+                "time": "13:15"
+              }
+            ]
+          },
+          "say": "Jetzt kommt die Ausrede: Plötzlich soll es eine Anzahlung sein.",
+          "actions": [
+            {
+              "id": "pay-deposit",
+              "label": "50 AZN Anzahlung schicken",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Auch eine Anzahlung ist Vorkasse. Der Fake-Shop kassiert sie und verschwindet."
+            },
+            {
+              "id": "check",
+              "label": "Die offizielle Seite des Shops selbst suchen",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Richtig. Die offizielle Seite und die Bewertungen von Kaufenden zu prüfen, dauert nur ein paar Minuten.",
+              "next": "real-shop"
+            },
+            {
+              "id": "block",
+              "label": "Blockieren",
+              "kind": "block",
+              "outcome": "safe",
+              "feedback": "Gut. Eine fremde Person, die nur gegen Vorkasse verkauft, ist das Gespräch nicht wert.",
+              "next": "real-shop"
+            }
+          ]
+        },
+        {
+          "id": "gone",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "kontakto",
+            "app": "Kontakto",
+            "title": [
+              {
+                "text": "Chat nicht verfügbar"
+              }
+            ],
+            "body": [
+              {
+                "text": "Sərin Klimat Sale wurde gelöscht oder hat Sie blockiert."
+              }
+            ],
+            "time": "09:30"
+          },
+          "say": "Am nächsten Tag kam keine Klimaanlage, und die Seite ist verschwunden.",
+          "actions": [
+            {
+              "id": "bank",
+              "label": "Bank unter der Nummer auf der Karte anrufen",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Richtig. Wenn die Bank schnell Bescheid weiß, kann sie versuchen, die Überweisung zu stoppen."
+            },
+            {
+              "id": "evidence",
+              "label": "Screenshots sichern, Polizei informieren",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Guter Schritt. Der Chat und der Überweisungsbeleg sind Beweise für die Polizei."
+            },
+            {
+              "id": "wait",
+              "label": "Ein paar Tage abwarten",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Jede Stunde zählt. Wer wartet, verringert die Chance, das Geld zurückzubekommen."
+            }
+          ]
+        },
+        {
+          "id": "real-shop",
+          "artifact": {
+            "kind": "chat",
+            "brandRef": "w2e-serin-klimat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Sərin Klimat"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Hallo! Das ist unsere einzige offizielle Seite. Klimaanlage 1.149 AZN, Zahlung bei Lieferung bar oder mit Karte."
+                  }
+                ],
+                "time": "14:02"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Jede Seite, die in unserem Namen Vorkasse verlangt, gehört nicht zu uns."
+                  }
+                ],
+                "time": "14:02"
+              }
+            ]
+          },
+          "say": "Das ist die offizielle Seite des Shops.",
+          "actions": [
+            {
+              "id": "order",
+              "label": "Mit Zahlung bei Lieferung bestellen",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Sehr gute Wahl. Sie zahlen erst, nachdem Sie die Ware gesehen und geprüft haben."
+            },
+            {
+              "id": "tell",
+              "label": "Dem Shop die gefälschte Seite zeigen",
+              "kind": "forward",
+              "outcome": "safe",
+              "feedback": "Gut. Der Shop kann die gefälschte Seite melden und entfernen lassen."
+            },
+            {
+              "id": "back",
+              "label": "Zurück zur günstigen Seite",
+              "kind": "open",
+              "outcome": "risky",
+              "feedback": "Auf der gefälschten Seite ist Ihr Geld in Gefahr. Bleiben Sie beim offiziellen Shop."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "match",
+      "id": "fs-match",
+      "prompt": "Ordnen Sie jedem Anzeichen zu, was es bedeutet.",
+      "pairs": [
+        {
+          "id": "age",
+          "left": "Seite vor einer Woche erstellt",
+          "right": "Fake-Shops tauchen schnell auf und verschwinden schnell"
+        },
+        {
+          "id": "reviews",
+          "left": "Kommentare sind deaktiviert",
+          "right": "Unzufriedene Kaufende sollen nicht zu Wort kommen"
+        },
+        {
+          "id": "card",
+          "left": "Nur Vorkasse von Karte zu Karte",
+          "right": "Das Geld ist kaum zurückzuholen"
+        },
+        {
+          "id": "price",
+          "left": "Preis bei einem Drittel des Marktpreises",
+          "right": "Ein Köder, damit Sie sich beeilen"
+        }
+      ],
+      "explain": "Schon ein Anzeichen reicht, um innezuhalten. Prüfen Sie den Shop auf seiner offiziellen Website und in Bewertungen von Kaufenden."
+    },
+    {
+      "type": "choice",
+      "id": "fs-choice",
+      "question": {
+        "prompt": "Sie kaufen in einem Onlineshop, den Sie nicht kennen. Wie bezahlen Sie am sichersten?",
+        "options": [
+          {
+            "id": "cod",
+            "label": "Bei Lieferung, wenn Sie die Ware erhalten",
+            "correct": true,
+            "feedback": "Richtig. Sie zahlen nie, bevor Sie die Ware sehen, und ein Fake-Shop geht leer aus."
+          },
+          {
+            "id": "card",
+            "label": "Per Überweisung auf die private Karte des Verkäufers",
+            "correct": false,
+            "feedback": "Eine Überweisung auf eine private Karte lässt sich nicht rückgängig machen. Genau darauf setzen die Kriminellen."
+          },
+          {
+            "id": "half",
+            "label": "Die Hälfte als Anzahlung schicken",
+            "correct": false,
+            "feedback": "Auch eine Anzahlung ist Vorkasse. Der Fake-Shop kassiert sie und verschwindet."
+          },
+          {
+            "id": "crypto",
+            "label": "Mit Kryptowährung bezahlen",
+            "correct": false,
+            "feedback": "Eine Krypto-Überweisung kann niemand rückgängig machen. Verlangt ein Shop das, lassen Sie die Finger davon."
+          }
+        ]
+      },
+      "explain": "Wenn Vorkasse verlangt wird, zahlen Sie nur bei einem offiziellen Shop, den Sie schon lange kennen. Im Zweifel kaufen Sie nicht."
+    },
+    {
+      "type": "recap",
+      "id": "fs-recap",
+      "points": [
+        "Leisten Sie nie Vorkasse bei einer Seite, die Sie nicht kennen.",
+        "Zahlen Sie wenn möglich bei Lieferung: erst die Ware sehen, dann bezahlen.",
+        "Prüfen Sie Alter und Bewertungen der Seite, und trauen Sie keinem viel zu niedrigen Preis."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

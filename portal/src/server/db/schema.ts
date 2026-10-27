@@ -369,6 +369,8 @@ export const learningPaths = pgTable("learning_paths", {
   recurrence: jsonb("recurrence").$type<Record<string, string>>().notNull(),
   standards: jsonb("standards").$type<string[]>().notNull(),
   moduleSlugs: jsonb("module_slugs").$type<string[]>().notNull(),
+  // Practice labs, always shown after the modules (lessons first, then labs).
+  labIds: jsonb("lab_ids").$type<string[]>().notNull().default([]),
   createdAt: createdAt(),
 }, (t) => [unique("learning_paths_key_tenant_idx").on(t.key, t.tenantId).nullsNotDistinct()]);
 
@@ -1003,6 +1005,17 @@ export const tutorCache = pgTable("tutor_cache", {
   lessonId: uuid("lesson_id").notNull(),
   question: text("question").notNull(),
   answer: text("answer").notNull(),
+  model: text("model").notNull(),
+  createdAt: createdAt(),
+});
+
+/** AI output that is the same for every learner and costly to make, e.g. a lesson's subtitles in a language the library does not ship. */
+export const aiCache = pgTable("ai_cache", {
+  id: text("id").primaryKey(), // sha256 of the kind and every input, including a hash of the source text
+  kind: text("kind", { enum: ["subtitles"] }).notNull(),
+  lessonId: uuid("lesson_id").notNull().references(() => lessons.id, { onDelete: "cascade" }),
+  locale: text("locale").notNull(),
+  payload: jsonb("payload").$type<unknown>().notNull(),
   model: text("model").notNull(),
   createdAt: createdAt(),
 });

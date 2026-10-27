@@ -1,0 +1,389 @@
+{
+  "id": "the-support-call",
+  "title": "Destek araması",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "ts2-tutor",
+      "beats": [
+        {
+          "id": "ts2-b1",
+          "say": "Bu kez dolandırıcılık telefonla geliyor: sahte bir banka güvenlik ekibi sizi arıyor.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "ts2-b2",
+          "say": "Kartınızın çalındığını ve paranızı hemen güvenli bir hesaba aktarmanız gerektiğini söylüyorlar.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        },
+        {
+          "id": "ts2-b3",
+          "say": "Böyle bir güvenli hesap yoktur ve hiçbir banka sizden uygulama yüklemenizi istemez.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        },
+        {
+          "id": "ts2-b4",
+          "say": "Aramayı sonlandırın ve kartınızın arkasındaki numarayı kendiniz arayın.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "key"
+          }
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "ts2-scenario",
+      "title": "Bankadan gelen arama",
+      "start": "claim",
+      "nodes": [
+        {
+          "id": "claim",
+          "text": "Kartınızda şüpheli bir ödeme var. Paranızı güvenli bir hesaba aktarmamız gerekiyor.",
+          "speaker": "SahilBank Güvenlik",
+          "voice": "man-2",
+          "channel": "phone",
+          "spoken": "Kartınızda şüpheli bir ödeme var. <breath> Paranızı güvenli bir hesaba aktarmamız gerekiyor.",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "call",
+              "brandRef": "sahilbank-fake",
+              "caller": [
+                {
+                  "text": "SahilBank Güvenlik"
+                }
+              ],
+              "number": [
+                {
+                  "text": "+994 12 000 54 30"
+                }
+              ],
+              "label": "Cep"
+            }
+          },
+          "choices": [
+            {
+              "label": "Aramayı sonlandırır, kartımın arkasındaki numarayı kendim ararım",
+              "next": "verify",
+              "feedback": "Doğru. Kontrol etmenin tek yolu, numarayı kendiniz bulup aramaktır."
+            },
+            {
+              "label": "Kontrol edebilmeleri için kart bilgilerimi veririm",
+              "outcome": "compromised",
+              "feedback": "Gerçek bir banka kart numaranızı ya da kodunuzu sormaz. Bu bilgilerle hesabınızı boşaltırlar."
+            },
+            {
+              "label": "İstedikleri uygulamayı yüklerim",
+              "outcome": "compromised",
+              "feedback": "Uygulama telefonunuzu onlara teslim eder. Hiçbir banka sizden böyle bir uygulama yüklemenizi istemez."
+            }
+          ]
+        },
+        {
+          "id": "verify",
+          "text": "Biz böyle bir uyarı göndermedik.",
+          "speaker": "Banka görevlisi (kartın arkasındaki numara)",
+          "voice": "woman",
+          "channel": "phone",
+          "manner": "natural",
+          "spoken": "Biz böyle bir uyarı <breath> göndermedik.",
+          "choices": [
+            {
+              "label": "Aramayı ve şüpheli numarayı bildiririm",
+              "outcome": "safe",
+              "feedback": "Harika. Banka artık hesabınızı izleyebilir ve başkalarını da uyarabilir."
+            },
+            {
+              "label": "Endişelenmem, muhtemelen bir hataydı",
+              "outcome": "risky",
+              "feedback": "Dolandırıcı tekrar arayabilir. Olanları bankaya anlatmak sizi korur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "ts2-sim-call",
+      "environment": "call",
+      "title": "Sahte destek araması",
+      "intro": "Bankanızdan bir arama geliyor. Arayan kişinin söylediklerini okuyun ve her seferinde cevabınızı seçin.",
+      "steps": [
+        {
+          "id": "ring",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank-fake",
+            "caller": [
+              {
+                "text": "SahilBank Güvenlik"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 54 30"
+              }
+            ],
+            "label": "Cep",
+            "voice": "man-3"
+          },
+          "actions": [
+            {
+              "id": "answer",
+              "label": "Yanıtla",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "Telefonu açmak tek başına tehlikeli değildir. Önemli olan hiçbir bilgi vermemenizdir."
+            },
+            {
+              "id": "decline",
+              "label": "Reddet",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "Bu da olur. Ardından kartınızın arkasındaki numarayı kendiniz arayın.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "pitch",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank-fake",
+            "caller": [
+              {
+                "text": "SahilBank Güvenlik"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 54 30"
+              }
+            ],
+            "label": "Cep",
+            "voice": "man-3"
+          },
+          "say": "Merhaba, ben SahilBank güvenlik biriminden Tural. Kartınızdan bin iki yüz manat, pardon, çekildi.",
+          "spoken": "Merhaba, <breath> ben SahilBank güvenlik biriminden Tural. Kartınızdan bin iki yüz manat <cough> pardon, çekildi.",
+          "actions": [
+            {
+              "id": "listen",
+              "label": "Dinlerim ama bir şey söylemem",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "İyi. Hiçbir bilgi vermediğiniz sürece dinleyebilirsiniz."
+            },
+            {
+              "id": "hang",
+              "label": "Aramayı sonlandır",
+              "kind": "hang-up",
+              "outcome": "safe",
+              "feedback": "Doğru seçim. Banka böyle aramaz, bu yüzden aramayı sonlandırmak doğrudur.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "ask-code",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank-fake",
+            "caller": [
+              {
+                "text": "SahilBank Güvenlik"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 54 30"
+              }
+            ],
+            "label": "Cep",
+            "voice": "man-3"
+          },
+          "say": "Onay için telefonunuza az önce bir kod geldi. Lütfen o kodu bana okuyun.",
+          "spoken": "Onay için telefonunuza az önce bir kod geldi. <breath> Lütfen o kodu bana okuyun.",
+          "actions": [
+            {
+              "id": "refuse",
+              "label": "Kodu okumam",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Doğru. Gelen kod hesabınızın anahtarıdır; onu asla kimseye söylemeyin."
+            },
+            {
+              "id": "read",
+              "label": "Kodu okurum",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Kodu okuduğunuz anda hesabınıza girerler. Banka bu kodu asla sormaz.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "install",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank-fake",
+            "caller": [
+              {
+                "text": "SahilBank Güvenlik"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 54 30"
+              }
+            ],
+            "label": "Cep",
+            "voice": "man-3"
+          },
+          "say": "Size yardımcı olabilmem için lütfen UzaqMasa uygulamasını yükleyin ve bağlanmama izin verin.",
+          "spoken": "Size yardımcı olabilmem için, ee, lütfen UzaqMasa uygulamasını yükleyin ve <breath> bağlanmama izin verin.",
+          "actions": [
+            {
+              "id": "refuse",
+              "label": "Uygulamayı yüklemem",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Doğru. Arayan biri istedi diye asla uzaktan erişim uygulaması yüklemeyin."
+            },
+            {
+              "id": "install",
+              "label": "Uygulamayı yükle",
+              "kind": "install",
+              "outcome": "compromised",
+              "feedback": "Artık arayan kişi ekranınızı görüyor ve telefonunuzu kontrol ediyor. Böyle bir uygulamayı asla yüklemeyin.",
+              "next": "after"
+            }
+          ]
+        },
+        {
+          "id": "after",
+          "label": "Görüşme sona erdi. Şimdi ne yaparsınız?",
+          "artifact": {
+            "kind": "call",
+            "brandRef": "sahilbank-fake",
+            "caller": [
+              {
+                "text": "SahilBank Güvenlik"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 12 000 54 30"
+              }
+            ],
+            "label": "Cep",
+            "voice": "man-3"
+          },
+          "actions": [
+            {
+              "id": "call-card",
+              "label": "Kartın arkasındaki numarayı ara",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Doğru. Banka aramanın sahte olduğunu doğrulayacak ve hesabınızı kontrol edecek."
+            },
+            {
+              "id": "redial",
+              "label": "Arayan numarayı geri ara",
+              "kind": "call-back",
+              "outcome": "risky",
+              "feedback": "O numara sizi yine dolandırıcıya bağlar. Numarayı yalnızca kartınızdan alın."
+            },
+            {
+              "id": "ignore",
+              "label": "Hiçbir şey yapma",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Dolandırıcı tekrar deneyebilir. Güvende olmak için bankayı kendiniz arayın."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "ts2-order",
+      "prompt": "Kendini banka olarak tanıtan böyle bir aramada adımları sıraya koyun.",
+      "items": [
+        {
+          "id": "hang",
+          "label": "Aramayı sonlandırın"
+        },
+        {
+          "id": "find",
+          "label": "Kartınızın arkasındaki numarayı bulun"
+        },
+        {
+          "id": "call",
+          "label": "O numarayı kendiniz arayın"
+        },
+        {
+          "id": "tell",
+          "label": "Olanları bankaya anlatın"
+        }
+      ],
+      "explain": "Kontrol etmenin tek yolu budur: aramayı sonlandırın ve kendi bulduğunuz numarayı arayın."
+    },
+    {
+      "type": "choice",
+      "id": "ts2-choice",
+      "question": {
+        "prompt": "Arayan kişinin istediği yardım uygulamasını zaten yüklediniz. Şimdi ne yaparsınız?",
+        "options": [
+          {
+            "id": "disconnect",
+            "label": "Bağlantıyı keser, BT destek ekibine haber verir ve bankayı kendim ararım",
+            "correct": true,
+            "feedback": "Doğru. Bağlantıyı kesmek erişimi durdurur; ardından yardım istemek doğru adımdır."
+          },
+          {
+            "id": "keep",
+            "label": "Uygulamayı yüklü bırakırım, belki lazım olur",
+            "correct": false,
+            "feedback": "Uygulama yüklü kaldığı sürece telefonunuzu onlar kontrol edebilir. Bağlantıyı kesin ve uygulamayı hemen kaldırın."
+          },
+          {
+            "id": "wait",
+            "label": "Beklerim, nasılsa bir şey olmadı",
+            "correct": false,
+            "feedback": "Beklemek zararı büyütür. Ne kadar erken bildirirseniz o kadar çok şeyi kurtarabilirsiniz."
+          }
+        ]
+      },
+      "explain": "Uygulama zaten yüklüyse hemen bağlantıyı kesin, BT destek ekibine haber verin ve kartınızdaki numaradan bankayı arayın."
+    },
+    {
+      "type": "recap",
+      "id": "ts2-recap",
+      "points": [
+        "Güvenli hesap diye bir şey yoktur",
+        "Arayan biri istedi diye uygulama yüklemeyin",
+        "Aramayı sonlandırın ve kartınızdaki numarayı kendiniz arayın"
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

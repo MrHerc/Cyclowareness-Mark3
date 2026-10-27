@@ -1,0 +1,369 @@
+{
+ "id": "share-smart",
+ "title": "Partagez malin",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Bonjour ! Chaque photo et chaque phrase que vous publiez sur les réseaux sociaux est une information pour quelqu’un. Regardons cela ensemble.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Une photo prise au bureau peut montrer votre badge, un écran ouvert ou les notes d’un tableau blanc. C’est du matériel tout prêt pour une attaque.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "N’annoncez pas vos voyages à l’avance : vous dites à tout le monde que votre logement est vide et qu’on peut difficilement vous joindre. Publiez les photos après coup.",
+     "mood": "think",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Les faux profils existent aussi. Un recruteur qui fait miroiter un emploi de rêve est peut-être en train de collecter des informations sur votre organisation. Vérifiez depuis quand le profil existe.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Rashad Mammadli"
+        },
+        {
+         "text": " · NovaHire Group, 3 relations",
+         "spot": "profile"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Bonjour ! J’ai vu votre profil. Un poste très bien payé à l’étranger vous irait parfaitement."
+          }
+         ],
+         "time": "11:02"
+        }
+       ]
+      }
+     },
+     "highlight": "profile"
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "safe-post",
+   "question": {
+    "prompt": "Quelle publication est la plus sûre ?",
+    "options": [
+     {
+      "id": "badge-selfie",
+      "label": "Un selfie au bureau avec mon nouveau badge",
+      "correct": false,
+      "feedback": "On y voit le design du badge, votre nom et votre fonction. De quoi fabriquer un faux badge sans effort."
+     },
+     {
+      "id": "trip-plan",
+      "label": "En vacances pour une semaine à partir de demain",
+      "correct": false,
+      "feedback": "Ce message indique quand votre logement est vide et quand on ne peut pas vous joindre."
+     },
+     {
+      "id": "after-trip",
+      "label": "Une photo de nature après mon retour",
+      "correct": true,
+      "feedback": "Exact. Le lieu et le moment appartiennent au passé, et rien de professionnel n’est visible."
+     },
+     {
+      "id": "desk-photo",
+      "label": "Mon bureau, avec l’écran allumé en arrière-plan",
+      "correct": false,
+      "feedback": "Un document, un e-mail ou le nom d’un système affiché à l’écran peut se lire en zoomant."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "eye"
+    }
+   },
+   "explain": "Avant de publier, vérifiez l’arrière-plan : badge, écran, tableau blanc, papiers."
+  },
+  {
+   "type": "hotspot",
+   "id": "fake-recruiter",
+   "prompt": "Trouvez les signes d’un faux recruteur.",
+   "artifact": {
+    "kind": "chat",
+    "app": "generic",
+    "contact": [
+     {
+      "text": "Rashad Mammadli"
+     },
+     {
+      "text": " · NovaHire Group, 3 relations",
+      "spot": "profile"
+     }
+    ],
+    "messages": [
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Bonjour ! J’ai vu votre profil. "
+       },
+       {
+        "text": "Un poste à l’étranger payé 6 000 dollars par mois vous attend.",
+        "spot": "too-good"
+       }
+      ],
+      "time": "11:02"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Une petite question avant l’entretien : "
+       },
+       {
+        "text": "quelle messagerie électronique et quels logiciels votre organisation utilise-t-elle ?",
+        "spot": "internal-info"
+       }
+      ],
+      "time": "11:03"
+     },
+     {
+      "from": "them",
+      "body": [
+       {
+        "text": "Remplissez le formulaire avec votre adresse e-mail professionnelle : "
+       },
+       {
+        "text": "novahire-careers.example.net/apply",
+        "spot": "link"
+       },
+       {
+        "text": " Places limitées, clôture aujourd’hui.",
+        "spot": "urgency"
+       }
+      ],
+      "time": "11:04"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "profile",
+     "label": "Profil récent, peu de relations",
+     "explain": "Les vrais recruteurs ont généralement un long historique et des contacts en commun. Un profil qui n’a que trois relations vient d’être créé."
+    },
+    {
+     "id": "too-good",
+     "label": "Trop beau pour être vrai",
+     "explain": "Un gros salaire avant tout entretien, c’est un appât. L’enthousiasme fait baisser la garde."
+    },
+    {
+     "id": "internal-info",
+     "label": "Questions sur votre organisation",
+     "explain": "Un recruteur n’a pas besoin de connaître les systèmes de votre organisation. C’est du repérage avant une attaque."
+    },
+    {
+     "id": "link",
+     "label": "Lien externe qui demande l’adresse e-mail professionnelle",
+     "explain": "Saisir votre adresse e-mail professionnelle dans un formulaire externe l’ajoute à une liste de cibles d’hameçonnage. Le formulaire peut aussi demander un mot de passe."
+    },
+    {
+     "id": "urgency",
+     "label": "Pression pour agir vite",
+     "explain": "« Clôture aujourd’hui » est là pour que vous ne preniez pas le temps de réfléchir."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "messages",
+   "prompt": "Ce message est-il sûr, ou s’agit-il d’une menace ?",
+   "cards": [
+    {
+     "id": "vote-code",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Gunel Rzayeva"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Coucou ! Ma fille participe à un concours, vote pour elle s’il te plaît. Tu vas recevoir un code par SMS, envoie-le-moi."
+         }
+        ],
+        "time": "20:14"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ce code est la clé de votre compte. Ne le partagez jamais, même si le message vient du compte d’une personne que vous connaissez."
+    },
+    {
+     "id": "login-alert",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "Kontakto"
+       }
+      ],
+      "time": "08:30",
+      "messages": [
+       [
+        {
+         "text": "Nouvelle connexion à votre compte : Bakou, téléphone. Si ce n’était pas vous, ouvrez Sécurité dans l’application."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Pas de lien ni de demande de code : le message vous renvoie vers l’application elle-même. Faites la vérification dans l’application."
+    },
+    {
+     "id": "boss-number",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Kamran Aliyev · aucun contact en commun"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bonjour, nous travaillons dans le même domaine. Pourriez-vous m’envoyer le numéro de portable de votre chef de service ?"
+         }
+        ],
+        "time": "15:47"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un inconnu cherche un moyen de joindre votre responsable. Ne donnez des coordonnées que par les canaux officiels."
+    },
+    {
+     "id": "meeting-moved",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Aysel Guliyeva (collègue)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "La réunion de demain est décalée à 11 h, même salle."
+         }
+        ],
+        "time": "17:05"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Une collègue connue, aucune demande, rien de sensible. Ce message est sûr."
+    },
+    {
+     "id": "press-office",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Service de presse officiel"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Pour vérifier votre compte, envoyez votre fonction, votre adresse e-mail professionnelle et votre date de naissance."
+         }
+        ],
+        "time": "10:21"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Les organismes officiels ne demandent pas ces informations sur les réseaux sociaux. Ne répondez pas et signalez le profil."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "privacy",
+   "prompt": "Associez chaque paramètre à ce qu’il vous apporte.",
+   "pairs": [
+    {
+     "id": "friends-only",
+     "left": "Profil visible par vos amis uniquement",
+     "right": "Les inconnus ne voient pas vos photos"
+    },
+    {
+     "id": "location-off",
+     "left": "Localisation désactivée",
+     "right": "Personne ne voit où vous êtes"
+    },
+    {
+     "id": "tag-review",
+     "left": "Validation des identifications",
+     "right": "Personne ne peut vous identifier sans votre accord"
+    },
+    {
+     "id": "two-step",
+     "left": "Double authentification",
+     "right": "Le compte reste protégé même en cas de fuite du mot de passe"
+    }
+   ],
+   "explain": "Vérifiez ces paramètres de temps en temps. Les nouvelles fonctionnalités des applications peuvent les modifier."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Vérifiez l’arrière-plan : badge, écran, papiers.",
+    "Publiez vos photos de voyage après votre retour.",
+    "Ne donnez jamais d’informations professionnelles ni de codes à des inconnus."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

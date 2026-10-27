@@ -1,4 +1,5 @@
 import { isUuid } from "@/lib/ids";
+import { safePath } from "@/lib/safe-path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getFormatter, getLocale, getTranslations } from "next-intl/server";
@@ -11,6 +12,7 @@ import { Notice } from "@/components/ui/layout";
 import { Markdown, headingsOf } from "@/lib/markdown";
 import { numericDate } from "@/lib/time";
 import { policyTextFor } from "@/lib/policy-text";
+import { langAttrs, type Locale } from "@/i18n/config";
 import { SignForm } from "./sign-form";
 
 async function load(id: string, tenantId: string) {
@@ -50,8 +52,10 @@ export default async function PolicyReader({ params, searchParams }: PageProps<"
   const { title, bodyMd: body, summary, lang: shownLanguage } = policyTextFor(version, locale, v.tenant.settings.defaultLocale);
   // The policy text in another language than the page (no translation yet) carries its own `lang`.
   const textLang = shownLanguage !== locale ? shownLanguage : undefined;
+  const textAttrs = textLang ? langAttrs(textLang) : {};
   const toc = headingsOf(body);
-  const from = typeof sp.from === "string" && sp.from.startsWith("/") && !sp.from.startsWith("//") ? sp.from : "/";
+  // Where the close button goes back to; "/" from older notifications is the public site, so it becomes /app.
+  const from = safePath(sp.from);
   const [signed] = await db()
     .select({ at: t.policySignoffs.signedAt })
     .from(t.policySignoffs)
@@ -65,7 +69,7 @@ export default async function PolicyReader({ params, searchParams }: PageProps<"
           <Link href={from} aria-label={tc("close")} className="grid size-10 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink">
             <X className="size-5" />
           </Link>
-          <p lang={textLang} className="truncate text-body-sm font-semibold">
+          <p {...textAttrs} className="truncate text-body-sm font-semibold">
             {title}
           </p>
         </div>
@@ -76,20 +80,20 @@ export default async function PolicyReader({ params, searchParams }: PageProps<"
             <Pill tone="brand">{tr("version", { version: version.version })}</Pill>
             {version.publishedAt ? <span className="text-caption text-ink-muted">{tr("published", { date: numericDate(version.publishedAt) })}</span> : null}
           </div>
-          <h1 lang={textLang} className="mt-4 text-headline font-bold text-balance">
+          <h1 {...textAttrs} className="mt-4 text-headline font-bold text-balance">
             {title}
           </h1>
           {summary ? (
-            <p lang={textLang} className="mt-3 text-lead text-ink-muted">
+            <p {...textAttrs} className="mt-3 text-lead text-ink-muted">
               {summary}
             </p>
           ) : null}
           {textLang ? (
             <Notice tone="info" className="mt-5">
-              {tp("otherLanguage", { language: tp(`language.${shownLanguage as "az" | "en" | "ru"}`) })}
+              {tp("otherLanguage", { language: tp(`language.${shownLanguage as Locale}`) })}
             </Notice>
           ) : null}
-          <div lang={textLang} className="mt-8">
+          <div {...textAttrs} className="mt-8">
             <Markdown source={body} skipTitle />
           </div>
 
@@ -113,7 +117,7 @@ export default async function PolicyReader({ params, searchParams }: PageProps<"
           <nav aria-label={tr("contents")} className="hidden lg:block">
             <div className="sticky top-24">
               <p className="mb-2 text-caption font-semibold text-ink-muted">{tr("contents")}</p>
-              <ol lang={textLang} className="grid gap-1 text-caption">
+              <ol {...textAttrs} className="grid gap-1 text-caption">
                 {toc
                   .filter((h) => h.level === 2)
                   .map((h) => (

@@ -1,0 +1,505 @@
+{
+ "id": "fake-salary-portal",
+ "title": "بوابة رواتب مزيفة",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pd2-tutor",
+   "beats": [
+    {
+     "id": "pd2-b1",
+     "say": "والآن أنت موظف عادي، وتريد الاطلاع على كشف راتبك.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "pd2-b2",
+     "say": "غالبًا ما تكون أول نتيجة في البحث إعلانًا. والمحتالون ينشرون هناك بوابات مزيفة على شكل إعلانات.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "w2f-kadr-kabineti-fake",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "kadr-kabineti-giris.example.net",
+         "spot": "ad-domain"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "ad-domain"
+    },
+    {
+     "id": "pd2-b3",
+     "say": "الصفحة المزيفة تشبه الحقيقية تمامًا. فإذا كتبت فيها كلمة مرورك، فقد يستولي المحتال على حسابك ثم يغير حساب راتبك.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "w2f-kadr-kabineti-fake",
+       "brand": "Kadr Kabineti",
+       "url": [
+        {
+         "text": "https://kadr-kabineti-giris.example.net/giris"
+        }
+       ],
+       "fields": [
+        "بريد العمل الإلكتروني",
+        "كلمة المرور"
+       ],
+       "button": "تسجيل الدخول"
+      }
+     }
+    },
+    {
+     "id": "pd2-b4",
+     "say": "اكتب عنوان البوابة بنفسك، أو افتحها من الإشارات المرجعية. وأبق التحقق بخطوتين مفعلًا.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "pd2-choice",
+   "question": {
+    "prompt": "بحثت عن «kadr kabineti». كيف تدخل إلى البوابة؟",
+    "options": [
+     {
+      "id": "ad",
+      "label": "إعلان: Kadr Kabineti، تسجيل الدخول الرسمي (kadr-kabineti-giris.example.net)",
+      "correct": false,
+      "feedback": "يمكن لأي شخص شراء المساحة الإعلانية، لذا قد يظهر موقع مزيف في أعلى النتائج. وهذا النطاق ليس نطاق جهتك."
+     },
+     {
+      "id": "lookalike",
+      "label": "kadr-kabineti.example.org: كشف الراتب",
+      "correct": false,
+      "feedback": "الاسم يبدو مشابهًا، لكن النطاق ليس نطاق جهتك. والاسم المشابه هو الحيلة الأكثر شيوعًا."
+     },
+     {
+      "id": "typed",
+      "label": "أكتبه بنفسي: kabinet.seherxidmetleri.example",
+      "correct": true,
+      "feedback": "صحيح. العنوان الذي تكتبه بنفسك أو تحفظه في الإشارات المرجعية لا يتأثر بالإعلانات."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-tapinti",
+      "url": [
+       {
+        "text": "https://axtar.example/?q=kadr+kabineti"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "يستغل المحتالون إعلانات البحث لدفع البوابات المزيفة إلى أعلى النتائج. تحقق من عنوان البوابة مرة واحدة، واحفظه في الإشارات المرجعية."
+  },
+  {
+   "type": "simulation",
+   "id": "pd2-sim",
+   "environment": "browser",
+   "title": "كشف الراتب",
+   "intro": "فتحت المتصفح للاطلاع على كشف راتبك. راقب شريط العنوان، واتخذ القرار الصحيح في كل خطوة.",
+   "steps": [
+    {
+     "id": "search",
+     "label": "إعلان: Kadr Kabineti، تسجيل الدخول الرسمي إلى كشف الراتب",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-tapinti",
+      "url": [
+       {
+        "text": "https://axtar.example/?q=kadr+kabineti",
+        "reveal": "axtar.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "ad",
+       "label": "فتح نتيجة الإعلان",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "يقودك هذا الإعلان إلى بوابة مزيفة. ونطاق جهتك غير موجود في شريط العنوان.",
+       "next": "fake-login"
+      },
+      {
+       "id": "bookmark",
+       "label": "فتح Kadr Kabineti من الإشارات المرجعية",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "صحيح. الإشارة المرجعية تنقلك دائمًا إلى العنوان الحقيقي.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kadr-kabineti-giris.example.net/giris",
+        "reveal": "kadr-kabineti-giris.example.net"
+       }
+      ],
+      "fields": [
+       "بريد العمل الإلكتروني",
+       "كلمة المرور"
+      ],
+      "button": "تسجيل الدخول"
+     },
+     "say": "انظر إلى شريط العنوان.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "تسجيل الدخول",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "وصلت كلمة مرورك إلى المحتال. غيرها فورًا على البوابة الحقيقية، واتصل بالموارد البشرية."
+      },
+      {
+       "id": "close",
+       "label": "إغلاق علامة التبويب",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "صحيح، فالنطاق ليس نطاق جهتك. افتح البوابة من الإشارات المرجعية.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-code",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kadr-kabineti-giris.example.net/tesdiq",
+        "reveal": "kadr-kabineti-giris.example.net"
+       }
+      ],
+      "fields": [
+       "رمز SMS"
+      ],
+      "button": "تأكيد"
+     },
+     "say": "يطلب الموقع الآن الرمز المرسل إلى جوالك.",
+     "actions": [
+      {
+       "id": "code",
+       "label": "تأكيد",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "بهذا الرمز يدخل المحتال إلى حسابك بالكامل. لا تكتب الرمز إلا في الموقع الحقيقي، وعندما تكون أنت من يسجل الدخول."
+      },
+      {
+       "id": "close",
+       "label": "إغلاق علامة التبويب",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "من الجيد أنك توقفت. والآن غير كلمة مرورك على البوابة الحقيقية، وأبلغ الموارد البشرية."
+      }
+     ]
+    },
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kabinet.seherxidmetleri.example/giris",
+        "reveal": "seherxidmetleri.example"
+       }
+      ],
+      "fields": [
+       "بريد العمل الإلكتروني",
+       "كلمة المرور"
+      ],
+      "button": "تسجيل الدخول"
+     },
+     "say": "هذا هو عنوان جهتك نفسها.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "تسجيل الدخول",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "صحيح. النطاق يخص جهتك، وقد فتحت الصفحة بنفسك."
+      },
+      {
+       "id": "close",
+       "label": "إغلاق علامة التبويب",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "هذه هي البوابة الحقيقية. وبعد أن تتحقق من العنوان، يصبح تسجيل الدخول آمنًا."
+      }
+     ]
+    },
+    {
+     "id": "mfa-offer",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-kadr-kabineti",
+      "tone": "app",
+      "title": [
+       {
+        "text": "التحقق بخطوتين غير مفعل"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "فعله الآن لحماية حسابك. سيؤكد جوالك كل عملية تسجيل دخول."
+        }
+       ]
+      ],
+      "buttons": [
+       "تفعيل",
+       "لاحقًا"
+      ]
+     },
+     "actions": [
+      {
+       "id": "enable",
+       "label": "تفعيل",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "أحسنت. حتى لو سرق أحدهم كلمة مرورك، فالخطوة الثانية تمنعه من الدخول."
+      },
+      {
+       "id": "later",
+       "label": "لاحقًا",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "بدون التحقق بخطوتين، تفتح كلمة مرور واحدة كل شيء. فعله اليوم."
+      }
+     ]
+    },
+    {
+     "id": "bank-details",
+     "label": "بياناتك البنكية: غيرتها الموارد البشرية آخر مرة في 14 مارس 2025",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-kadr-kabineti",
+      "url": [
+       {
+        "text": "https://kabinet.seherxidmetleri.example/rekvizitler",
+        "reveal": "seherxidmetleri.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "check",
+       "label": "التحقق من الحساب",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "عادة جيدة. إذا رأيت تغييرًا لم تطلبه، فاتصل بالموارد البشرية فورًا."
+      },
+      {
+       "id": "skip",
+       "label": "المغادرة دون النظر",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "إذا غيرها شخص غريب، فلن تكتشف ذلك إلا يوم صرف الراتب. ونظرة سريعة لا تستغرق سوى ثوان."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "pd2-swipe",
+   "prompt": "آمن أم فخ؟",
+   "cards": [
+    {
+     "id": "boss-gift-cards",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "سابينا علييفا، المديرة"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "أنا في اجتماع ولا أستطيع الاتصال. اشتر بسرعة خمس بطاقات BonusMarket بقيمة 100 مانات لكل منها، وأرسل لي الرموز هنا. سأعيد لك المبلغ لاحقًا."
+         }
+        ],
+        "time": "11:02"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "رمز بطاقة الهدايا مثل النقود تمامًا، ولا يمكن استرداده. اتصل بمديرتك على رقم تعرفه للتحقق."
+    },
+    {
+     "id": "salary-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "09:00",
+      "messages": [
+       [
+        {
+         "text": "تم إيداع راتب بمبلغ 1,240.00 AZN في بطاقتك. الرصيد: 1,386.50 AZN."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "لا يوجد رابط، ولا تطلب الرسالة شيئًا. هذه رسالة إشعار عادية."
+    },
+    {
+     "id": "fake-hr-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "sender": [
+       {
+        "text": "KadrKabinet"
+       }
+      ],
+      "time": "08:41",
+      "messages": [
+       [
+        {
+         "text": "راتبك معلق. حدث بياناتك البنكية: "
+        },
+        {
+         "text": "kadr-kabinet.example.info/yenile",
+         "link": {
+          "label": "kadr-kabinet.example.info/yenile",
+          "href": "https://kadr-kabinet.example.info/yenile"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "الموارد البشرية لا تعيد صرف الراتب أبدًا عبر رابط في رسالة نصية. افتح البوابة بنفسك أو اتصل بالفريق."
+    },
+    {
+     "id": "payslip-ready",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-kadr-kabineti",
+      "app": "Kadr Kabineti",
+      "title": [
+       {
+        "text": "كشف راتب سبتمبر جاهز"
+       }
+      ],
+      "body": [
+       {
+        "text": "اطلع عليه في قسم «الراتب» في البوابة."
+       }
+      ],
+      "time": "10:15"
+     },
+     "verdict": "safe",
+     "explain": "لا يحتوي هذا الإشعار على رابط، ويوجهك إلى البوابة التي تعرفها. افتحها من الإشارات المرجعية."
+    },
+    {
+     "id": "colleague-code",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "غونل، إدارة الحسابات"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "سيصلك رمز من Kadr Kabineti، أخبرني به لأصحح جدول الرواتب."
+         }
+        ],
+        "time": "13:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "رمز تسجيل الدخول لك وحدك. ومن يحصل على رمزك يدخل إلى حسابك."
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "pd2-order",
+   "prompt": "كتبت كلمة مرورك في بوابة مزيفة. رتب الخطوات بالترتيب الصحيح.",
+   "items": [
+    {
+     "id": "change-password",
+     "label": "غير كلمة المرور على البوابة الحقيقية فورًا"
+    },
+    {
+     "id": "call",
+     "label": "اتصل بالموارد البشرية وفريق الأمن السيبراني"
+    },
+    {
+     "id": "check-details",
+     "label": "راجع معهم البيانات البنكية وعمليات تسجيل الدخول الأخيرة"
+    },
+    {
+     "id": "enable-mfa",
+     "label": "فعل التحقق بخطوتين"
+    }
+   ],
+   "explain": "غير كلمة المرور أولًا، ثم اتصل لإيقاف أي تغيير في البيانات البنكية. وإذا كنت قد كتبت رمزًا أيضًا، فاحرص على ذكر ذلك."
+  },
+  {
+   "type": "recap",
+   "id": "pd2-recap",
+   "points": [
+    "افتح البوابة من الإشارات المرجعية، لا من نتائج البحث.",
+    "أبق التحقق بخطوتين مفعلًا.",
+    "تحقق بمكالمة هاتفية من طلبات بطاقات الهدايا والرموز."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

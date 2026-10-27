@@ -1,0 +1,451 @@
+{
+ "id": "meeting-code",
+ "title": "Der Meeting-Code",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac2-tutor",
+   "beats": [
+    {
+     "id": "ac2-b1",
+     "say": "Hallo! Jetzt sehen wir uns eine Einladung zu einem internationalen Forum und einen Meeting-Code an.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "ac2-b2",
+     "say": "Die Betrügerin schickt Ihnen einen Code und dazu die echte Anmeldeseite Ihrer Organisation.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "w2b-nordvale-fake",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Leyla K. | Nordvale Council"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Um am Meeting teilzunehmen, geben Sie diesen Code ein: "
+          },
+          {
+           "text": "QK7-MN4P",
+           "spot": "code"
+          }
+         ],
+         "time": "10:04"
+        }
+       ]
+      }
+     },
+     "highlight": "code"
+    },
+    {
+     "id": "ac2-b3",
+     "say": "Wenn Sie den Code eingeben, kommt das Gerät der Betrügerin in Ihr Konto, und zwar so, als wären Sie es selbst. Ihr Passwort braucht sie dafür nicht.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    },
+    {
+     "id": "ac2-b4",
+     "say": "Die Regel: Wenn Sie die Anmeldung nicht selbst gestartet haben, geben Sie nirgendwo einen Code ein.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ac2-scenario",
+   "title": "Einladung zum Forum",
+   "start": "invite",
+   "nodes": [
+    {
+     "id": "invite",
+     "text": "Hallo! Wir würden uns freuen, wenn Sie im November auf unserem Forum in Wien einen Vortrag halten. Hätten Sie Interesse?",
+     "speaker": "Leyla, Nordvale Council (neue Nachricht)",
+     "voice": "young-woman",
+     "channel": "message",
+     "spoken": "Hallo! <breath> Wir würden uns freuen, wenn Sie im November auf unserem Forum in Wien einen Vortrag halten. Hätten Sie Interesse?",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Vielen Dank. Bitte schicken Sie die offizielle Einladung an meine dienstliche E-Mail-Adresse, damit ich sie mit meiner Leitung abstimmen kann",
+       "next": "code",
+       "feedback": "Richtig. Eine offizielle Einladung kommt über einen offiziellen Kanal, und Sie können sie überprüfen."
+      },
+      {
+       "label": "Sehr interessant! Was muss ich tun?",
+       "next": "code",
+       "feedback": "Interesse ist ganz natürlich. Ein Gespräch mit einer fremden Person verlagern Sie aber besser auf einen offiziellen Kanal."
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "text": "Wunderbar! Dann machen wir morgen ein kurzes Online-Meeting. Um teilzunehmen, geben Sie bitte diesen Code auf der Anmeldeseite Ihrer Organisation ein: QK7-MN4P.",
+     "speaker": "Leyla, Nordvale Council",
+     "voice": "young-woman",
+     "channel": "message",
+     "spoken": "Wunderbar! Dann machen wir morgen ein kurzes Online-Meeting. <breath> Um teilzunehmen, geben Sie bitte diesen Code auf der Anmeldeseite Ihrer Organisation ein: QK7-MN4P.",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Ich habe diese Anmeldung nicht gestartet, also gebe ich den Code nirgendwo ein",
+       "next": "pressure",
+       "feedback": "Richtig. Wenn Sie einen Code per Nachricht bekommen, gehört die Anmeldung jemand anderem."
+      },
+      {
+       "label": "Die Seite gehört meiner Organisation, also ist das sicher. Ich gebe den Code ein",
+       "outcome": "compromised",
+       "feedback": "Die Seite war echt, aber die Anmeldung hat die Betrügerin gestartet. Jetzt ist ihr Gerät in Ihrem Postfach."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "text": "Die Zeit drängt, und Ihr Ministerium hat schon zugestimmt. Geben Sie einfach den Code ein, das dauert nur zwei Minuten.",
+     "speaker": "Leyla, Nordvale Council",
+     "voice": "young-woman",
+     "channel": "message",
+     "spoken": "Die Zeit drängt, äh, und Ihr Ministerium hat schon zugestimmt. Geben Sie einfach den Code ein, das dauert nur zwei Minuten.",
+     "character": "leyla",
+     "choices": [
+      {
+       "label": "Ich suche die Nummer auf der offiziellen Website des Forums, rufe selbst an und informiere den IT-Support",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Wer wirklich ein Forum organisiert, freut sich über die Rückfrage, Kriminelle tauchen dagegen ab."
+      },
+      {
+       "label": "Na gut, ich gebe ihn ein",
+       "outcome": "compromised",
+       "feedback": "Der Druck gehört zur Falle. Sobald Sie den Code eingeben, öffnet sich Ihr Konto für das Gerät der Betrügerin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac2-sim",
+   "environment": "phone",
+   "title": "Einladung auf dem Smartphone",
+   "intro": "Auf Ihrem Smartphone kommen Nachrichten im Namen des Forums an. Öffnen Sie jede einzelne und wählen Sie den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "code-chat",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2b-nordvale-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Leyla K. | Nordvale Council"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hallo! Ihre Teilnahme an der Podiumsdiskussion beim Forum in Wien ist bestätigt."
+         }
+        ],
+        "time": "10:02"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Code zur Teilnahme am Meeting: QK7-MN4P"
+         }
+        ],
+        "time": "10:03"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Geben Sie den Code auf dieser Seite ein: "
+         },
+         {
+          "text": "giris.idare.example/cihaz",
+          "link": {
+           "label": "giris.idare.example/cihaz",
+           "href": "https://giris.idare.example/cihaz"
+          }
+         }
+        ],
+        "time": "10:03"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn Sie die Anmeldung nicht selbst gestartet haben, ist ein Code per Nachricht eine Falle.",
+       "next": "slides"
+      },
+      {
+       "id": "official",
+       "label": "Bitte schicken Sie die offizielle Einladung an meine dienstliche E-Mail-Adresse",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Gute Antwort. Wer wirklich ein Forum organisiert, kann das ohne Weiteres, Kriminelle weichen aus.",
+       "next": "slides"
+      },
+      {
+       "id": "open-page",
+       "label": "Seite öffnen",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Die Seite ist echt, aber jemand anderes hat diese Anmeldung gestartet. Achten Sie genau auf den nächsten Bildschirm."
+      }
+     ]
+    },
+    {
+     "id": "device-confirm",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Melden Sie sich auf einem anderen Gerät an?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Code: QK7-MN4P"
+        }
+       ],
+       [
+        {
+         "text": "Wenn Sie diese Anmeldung nicht selbst gestartet haben, fahren Sie nicht fort."
+        }
+       ]
+      ],
+      "buttons": [
+       "Weiter",
+       "Abbrechen"
+      ]
+     },
+     "say": "Die Seite hat sich geöffnet. Sobald Sie den Code eingeben, erscheint diese Frage.",
+     "actions": [
+      {
+       "id": "continue",
+       "label": "Weiter",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Das Gerät der Betrügerin ist jetzt in Ihrem Konto. Rufen Sie sofort den IT-Support an."
+      },
+      {
+       "id": "cancel",
+       "label": "Abbrechen",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Seite selbst hat Sie gewarnt: Sie haben diese Anmeldung nicht gestartet."
+      }
+     ]
+    },
+    {
+     "id": "slides",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-nordvale-slides",
+      "app": "Nordvale Slides",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Ihr Profil sehen"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Ihre E-Mails lesen und senden"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Zugriff behalten, auch wenn Sie nicht da sind"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Jetzt hat die Veranstalterin einen Link zu den Folien geschickt. Auch hier wird eine Berechtigung verlangt.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Ablehnen",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Richtig. Um Folien anzusehen, braucht niemand Zugriff auf Ihre E-Mails."
+      },
+      {
+       "id": "allow",
+       "label": "Zulassen",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Diese App liest jetzt Ihre E-Mails. Bitten Sie den IT-Support, die Berechtigung zu widerrufen."
+      }
+     ]
+    },
+    {
+     "id": "tell-support",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "it-destek",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "IT-Support"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Ich habe im Namen eines Forums einen Code und eine Berechtigungsanfrage bekommen."
+         }
+        ],
+        "time": "10:20"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Danke! Haben Sie den Code eingegeben oder etwas zugelassen?"
+         }
+        ],
+        "time": "10:21"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "yes",
+       "label": "Ja, ich habe ihn versehentlich eingegeben",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Sofort Bescheid zu sagen, ist genau richtig. Eine Fachkraft beendet die Anmeldung und widerruft die Berechtigung."
+      },
+      {
+       "id": "no",
+       "label": "Nein, ich habe nichts eingegeben",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Eine Fachkraft warnt jetzt auch Ihre anderen Kolleginnen und Kollegen."
+      },
+      {
+       "id": "silent",
+       "label": "Nicht antworten",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Fehler kann jeder machen, aber wer sie verschweigt, vergrößert den Schaden. Eine ehrliche Antwort spart Zeit."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ac2-match",
+   "prompt": "Ordnen Sie jeder Situation den richtigen Schritt zu.",
+   "pairs": [
+    {
+     "id": "code-message",
+     "left": "Jemand hat Ihnen einen Code per Nachricht geschickt",
+     "right": "Nirgendwo eingeben und melden"
+    },
+    {
+     "id": "own-tv",
+     "left": "Sie haben die Anmeldung selbst am Fernseher gestartet",
+     "right": "Sie können den Code vom Bildschirm eingeben"
+    },
+    {
+     "id": "unknown-app",
+     "left": "Eine unbekannte App verlangt dauerhaften Zugriff",
+     "right": "Ablehnen"
+    },
+    {
+     "id": "mistake",
+     "left": "Sie haben versehentlich einen Code eingegeben oder eine App zugelassen",
+     "right": "Sofort den IT-Support anrufen"
+    }
+   ],
+   "explain": "Ein Code ist nur dann sicher, wenn er von einem Gerät stammt, auf dem Sie die Anmeldung selbst gestartet haben. In allen anderen Fällen gilt: stoppen und melden."
+  },
+  {
+   "type": "choice",
+   "id": "ac2-choice",
+   "question": {
+    "prompt": "Die Veranstalterin sagt: „Die Seite gehört Ihrer eigenen Organisation, keine Sorge.“ Ist das ein Grund, den Code einzugeben?",
+    "options": [
+     {
+      "id": "no",
+      "label": "Nein. Die Seite ist echt, aber jemand anderes hat die Anmeldung gestartet",
+      "correct": true,
+      "feedback": "Richtig. Bei dieser Falle sind Seite und Code echt. Falsch ist nur die Person, die die Anmeldung gestartet hat."
+     },
+     {
+      "id": "real-address",
+      "label": "Ja, wenn die Adresse echt ist, besteht keine Gefahr",
+      "correct": false,
+      "feedback": "Die Prüfung der Adresse schützt ein Passwort, aber keinen Code. Der Code geht an das Gerät der Person, die die Anmeldung gestartet hat."
+     },
+     {
+      "id": "famous",
+      "label": "Ja, wenn die Veranstalterin zu einem bekannten Forum gehört",
+      "correct": false,
+      "feedback": "Einen bekannten Namen kann jeder eintippen. Prüfen Sie das Forum über seine offizielle Website."
+     }
+    ]
+   },
+   "explain": "Mit dem Code übergeben Sie dem Gerät, das die Anmeldung gestartet hat, einen Schlüssel. Haben Sie die Anmeldung nicht selbst gestartet, geben Sie den Code nicht ein."
+  },
+  {
+   "type": "recap",
+   "id": "ac2-recap",
+   "points": [
+    "Geben Sie einen Code, den Sie per Nachricht bekommen haben, auf keiner Anmeldeseite ein",
+    "Prüfen Sie auch auf einer echten Seite, wer die Anmeldung gestartet hat",
+    "Ist Ihnen ein Fehler passiert, informieren Sie sofort den IT-Support"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

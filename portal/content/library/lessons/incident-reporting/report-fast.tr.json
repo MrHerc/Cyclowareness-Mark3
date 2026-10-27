@@ -1,0 +1,450 @@
+{
+ "id": "report-fast",
+ "title": "Hızlı ve sakin",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Güvenlik olayı yalnızca büyük bir saldırı değildir. Şüpheli bir bağlantıya dokunmak, telefonu kaybetmek ya da bir e-postayı yanlış kişiye göndermek de güvenlik olayı sayılır.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Herkes hata yapar. Hızlı bildirim, sorunun büyümesini önler. Ne kadar erken söylerseniz, zarar o kadar küçük olur.",
+     "mood": "happy",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Kendi başınıza araştırma yapmayın ve hiçbir şeyi silmeyin. Şüpheli e-posta, mesaj ya da dosya, uzman için bir kanıttır.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b5",
+     "say": "Bildirimi kısa tutun: ne oldu, ne zaman oldu, hangi cihazda oldu ve şimdiye kadar ne yaptınız.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "report-button",
+   "environment": "inbox",
+   "title": "“Bildir” düğmesi",
+   "intro": "Gelen kutunuzda iki şüpheli e-posta var. Her birini açın ve doğru adımı seçin.",
+   "steps": [
+    {
+     "id": "quota",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ispoct-fake",
+      "from": {
+       "name": [
+        {
+         "text": "İşPoçt Sistem Yöneticisi"
+        }
+       ],
+       "address": [
+        {
+         "text": "admin@ispoct-mail.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Posta kutunuz %98 dolu"
+       }
+      ],
+      "time": "08:47",
+      "body": [
+       [
+        {
+         "text": "Depolama alanı eklemezseniz yeni e-postalarınız 24 saat içinde silinecektir."
+        }
+       ],
+       [
+        {
+         "text": "Alan eklemek için: "
+        },
+        {
+         "text": "ispoct-mail.example.net/kvota",
+         "link": {
+          "label": "ispoct-mail.example.net/kvota",
+          "href": "https://ispoct-mail.example.net/kvota"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Gönderenin adresine bakın.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru. Bildiriminiz sayesinde uzmanlar aynı e-postayı herkesin gelen kutusundan kaldırabilir."
+      },
+      {
+       "id": "click",
+       "label": "Bağlantıyı aç",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Adres, kurumunuzun alan adına ait değildi. Posta kutusu alanı hiçbir zaman bir bağlantı üzerinden artırılmaz."
+      },
+      {
+       "id": "delete",
+       "label": "Sil",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Siz güvendesiniz, ancak iş arkadaşlarınız hâlâ hedefte ve kanıt da yok oldu. Silmek yerine bildirin."
+      },
+      {
+       "id": "forward",
+       "label": "İş arkadaşlarına ilet",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "E-postayı iletmek tehdidi yayar. “Bildir” düğmesi yoksa e-postayı yalnızca güvenlik ekibine iletin."
+      }
+     ]
+    },
+    {
+     "id": "password-reply",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek-fake",
+      "from": {
+       "name": [
+        {
+         "text": "BT Destek"
+        }
+       ],
+       "address": [
+        {
+         "text": "support@idare-helpdesk.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Hesap kontrolü"
+       }
+      ],
+      "time": "09:15",
+      "body": [
+       [
+        {
+         "text": "Sistem güncelleniyor. Hesabınızın açık kalması için bu e-postayı kullanıcı adınız ve parolanızla yanıtlayınız."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Oltalama olarak bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru, gerçek BT destek ekibi parolanızı asla sormaz. Bildirim iş arkadaşlarınızı da uyarır."
+      },
+      {
+       "id": "reply",
+       "label": "Parolayla yanıtla",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Parolanız saldırgana gitti. Böyle bir durumda parolanızı hemen değiştirin ve durumu bildirin."
+      },
+      {
+       "id": "delete",
+       "label": "Sil",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Siz parolanızı vermediniz, ama başka biri verebilir. Bildirirseniz uzmanlar herkesi korur."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "is-it-incident",
+   "prompt": "Bu bildirilmeli mi? Tehdit mi, normal mi?",
+   "cards": [
+    {
+     "id": "wrong-recipient",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Siz"
+        }
+       ],
+       "address": [
+        {
+         "text": "l.aliyeva@idare.example"
+        }
+       ]
+      },
+      "to": "kamran.aliyev.1990@mail.example",
+      "subject": [
+       {
+        "text": "Personel listesi"
+       }
+      ],
+      "time": "10:02",
+      "body": [
+       [
+        {
+         "text": "İstediğiniz liste ektedir."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "personel_listesi.xlsx"
+         }
+        ],
+        "size": "240 KB"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Liste, kurum dışındaki kişisel bir adrese gitti. Bu bir veri sızıntısıdır, hemen bildirin."
+    },
+    {
+     "id": "unasked-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ispoct",
+      "sender": [
+       {
+        "text": "İşPoçt"
+       }
+      ],
+      "time": "03:17",
+      "messages": [
+       [
+        {
+         "text": "Giriş kodunuz: 482913. Bu kodu kimseyle paylaşmayın."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "İstemediğiniz bir kod gelmesi, birinin parolanızı bildiği anlamına gelir. Parolanızı değiştirin ve bildirin."
+    },
+    {
+     "id": "training-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "BT Destek"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Cuma günü güvenlik eğitimi"
+       }
+      ],
+      "time": "12:30",
+      "body": [
+       [
+        {
+         "text": "Cuma günü saat 11:00'de ana salonda kısa bir eğitim yapılacaktır. Kayıt gerekmez."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Adres doğru, bağlantı yok, bir istek de yok. Bu sıradan bir duyuru."
+    },
+    {
+     "id": "clicked-link",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Tural (iş arkadaşı)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Dün o e-postadaki bağlantıyı açtım ama hiçbir şey yazmadım. Bir şey olmaz herhalde, değil mi?"
+         }
+        ],
+        "time": "09:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Yalnızca bağlantıyı açmak bile saldırgana bilgi verebilir ya da bir indirmeyi başlatabilir. Kararı uzman versin, bu durum mutlaka bildirilmeli."
+    },
+    {
+     "id": "lost-phone",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Leyla (ekip)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "İş telefonumu takside unuttum. Yarın bakarım, acelesi yok."
+         }
+        ],
+        "time": "19:45"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Kaybolan bir iş telefonu acil bir güvenlik olayıdır. Destek ekibi telefonu uzaktan kilitleyebilir ya da silebilir."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "first-step",
+   "question": {
+    "prompt": "Sahte bir sayfaya parolanızı yazdınız. İlk adım nedir?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Hemen bildiririm ve parolamı değiştiririm",
+      "correct": true,
+      "feedback": "Doğru. Her dakika önemlidir. Bu iki adım saldırganın yolunu keser."
+     },
+     {
+      "id": "silent",
+      "label": "Utandığım için kimseye söylemem",
+      "correct": false,
+      "feedback": "Sessiz kalmak saldırgana zaman kazandırır. Bildirmek hem sizi hem de kurumu korur."
+     },
+     {
+      "id": "delete",
+      "label": "İz kalmasın diye e-postayı silerim",
+      "correct": false,
+      "feedback": "E-posta bir kanıttır. Silerseniz uzmanlar başka kimlerin hedef alındığını göremez."
+     },
+     {
+      "id": "recheck",
+      "label": "Kontrol etmek için bağlantıyı yeniden açarım",
+      "correct": false,
+      "feedback": "Bağlantıyı yeniden açmak riski artırır. Araştırmayı uzmanlara bırakın."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "alarm"
+    }
+   },
+   "explain": "Hızlı bildirin, kanıtı saklayın, araştırmayı uzmanlara bırakın."
+  },
+  {
+   "type": "order",
+   "id": "strange-program",
+   "prompt": "Bilgisayarınızda garip bir program çalışıyor. Adımları sıraya koyun.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Yaptığınız işi bırakın"
+    },
+    {
+     "id": "disconnect",
+     "label": "Ağ bağlantısını kesin, bilgisayarı kapatmayın"
+    },
+    {
+     "id": "call",
+     "label": "BT destek ekibini telefonla arayın"
+    },
+    {
+     "id": "note",
+     "label": "Gördüklerinizi kısaca not edin"
+    }
+   ],
+   "explain": "Ağ bağlantısını kesmek yayılmayı durdurur, bilgisayarı kapatmak ise bellekteki izleri silebilir. Kurumunuzun prosedürü farklı bir şey söylüyorsa ona uyun. Durumu telefonla bildirin."
+  },
+  {
+   "type": "match",
+   "id": "good-report",
+   "prompt": "Her soruyu bildirimdeki cevabıyla eşleştirin.",
+   "pairs": [
+    {
+     "id": "what",
+     "left": "Ne oldu?",
+     "right": "Sahte bir sayfaya parolamı yazdım"
+    },
+    {
+     "id": "when",
+     "left": "Ne zaman?",
+     "right": "Bugün saat 09:40'ta"
+    },
+    {
+     "id": "where",
+     "left": "Hangi cihazda?",
+     "right": "İş bilgisayarında, e-posta uygulamasında"
+    },
+    {
+     "id": "done",
+     "left": "Ne yaptınız?",
+     "right": "Parolamı değiştirdim, e-postayı sakladım"
+    }
+   ],
+   "explain": "Kısa ve net bir bildirim uzmanın zamanını kurtarır."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Şüpheye düştüğünüzde hemen bildirin. Hata yapmak utanılacak bir şey değildir.",
+    "Kendi başınıza araştırma yapmayın ve hiçbir şeyi silmeyin.",
+    "Kısa tutun: ne oldu, ne zaman, nerede ve ne yaptınız."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

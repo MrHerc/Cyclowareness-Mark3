@@ -9,10 +9,10 @@ import { queueEmail } from "../mail";
 import { sendSms, smsAvailable } from "../sms";
 import { recomputeRisk } from "./risk";
 import { appUrl, env } from "../env";
-import { TEMPLATE_BY_KEY, templateText, type CampaignTemplate } from "../../lib/campaigns/templates";
-import { withDefaults } from "../../lib/tenant-defaults";
+import { TEMPLATE_BY_KEY, clickRiskTitle, templateOnPlan, templateText, type CampaignTemplate } from "../../lib/campaigns/templates";
+import { featuresFor, withDefaults } from "../../lib/tenant-defaults";
 import { bakuDayPlus } from "../../lib/time";
-import { encodeRiskTitle } from "../../lib/risk-title";
+import { dirOf, type Locale } from "../../i18n/config";
 
 const DAY = 86_400_000;
 
@@ -29,7 +29,7 @@ export async function campaignAudience(db: DB, c: { tenantId: string; audience: 
   return users.filter((u) => u.departmentId && scope.has(u.departmentId));
 }
 
-export type LaunchBlock = "mail" | "sms" | "voice" | "empty";
+export type LaunchBlock = "mail" | "sms" | "voice" | "empty" | "plan";
 
 /** Whether a channel can deliver right now. Development simulates delivery and logs it. */
 export async function launchBlocker(db: DB, tenantId: string, channel: CampaignTemplate["channel"], audienceSize: number): Promise<LaunchBlock | null> {
@@ -60,7 +60,9 @@ function emailHtml(tpl: CampaignTemplate, locale: string, token: string): { subj
   const pixel = `<img src="${appUrl()}/api/t/${token}/open" width="1" height="1" alt="" style="display:block;border:0">`;
   // The language templateText fell back to, so mail clients read and spell-check the text in it.
   const lang = locale in tpl.body ? locale : "en";
-  const html = `<!doctype html><html lang="${lang}"><body style="margin:0;font-family:Segoe UI,Arial,sans-serif;color:#222;background:#fff"><div style="max-width:600px;padding:24px">${paragraphs}${attachment}${qr}${button}${pixel}</div></body></html>`;
+  // Repeated on the content block: some mail clients drop the attributes of <html>.
+  const dir = dirOf(lang);
+  const html = `<!doctype html><html lang="${lang}" dir="${dir}"><body style="margin:0;font-family:Segoe UI,Arial,sans-serif;color:#222;background:#fff"><div dir="${dir}" style="max-width:600px;padding:24px${dir === "rtl" ? ";text-align:right" : ""}">${paragraphs}${attachment}${qr}${button}${pixel}</div></body></html>`;
   const text = `${body}\n\n${cta ? `${cta}: ` : ""}${link}`;
   return { subject, text, html, lang };
 }
@@ -71,8 +73,10 @@ export async function launchCampaign(db: DB, campaignId: string, actorId: string
   if (!c || (c.status !== "draft" && c.status !== "scheduled")) return { ok: false, reason: "empty" };
   const tpl = TEMPLATE_BY_KEY.get(c.templateKey);
   if (!tpl) return { ok: false, reason: "empty" };
+  // Checked at every launch, scheduled ones included: a downgrade or an operator override may have switched the channel off since saving.
+  const [tenant] = await db.select({ plan: t.tenants.plan, features: t.tenants.features }).from(t.tenants).where(eq(t.tenants.id, c.tenantId));
   const audience = await campaignAudience(db, c);
-  const block = await launchBlocker(db, c.tenantId, tpl.channel, audience.length);
+  const block = !tenant || !templateOnPlan(tpl, featuresFor(tenant.plan, tenant.features)) ? "plan" : await launchBlocker(db, c.tenantId, tpl.channel, audience.length);
   if (block) {
     // A scheduled launch also records the missed time: the campaign goes back to draft without it.
     const missed = c.status === "scheduled" && c.scheduledAt ? { scheduledAt: c.scheduledAt.toISOString() } : {};
@@ -100,15 +104,6 @@ export async function launchCampaign(db: DB, campaignId: string, actorId: string
   }
   await audit(db, { tenantId: c.tenantId, actorId, action: "campaign.launched", targetType: "campaign", targetId: c.id, meta: { recipients: count, channel: tpl.channel } });
   return { ok: true, count };
-}
-
-/** In every UI language: the person may switch languages before the risk closes, and admins read it in theirs. */
-function clickTitle(name: string): string {
-  return encodeRiskTitle({
-    az: `«${name}» fişinq simulyasiyasındakı linki açmısınız.`,
-    en: `You opened the link in the “${name}” phishing simulation.`,
-    ru: `Вы открыли ссылку в фишинговой симуляции «${name}».`,
-  });
 }
 
 /** A recipient opened the simulated message (tracking pixel). Frozen once the campaign is cancelled, like clicks. */
@@ -150,7 +145,7 @@ export async function recordClick(db: DB, token: string, via: "link" | "qr") {
       userId: row.user.id,
       kind: "phishing_click",
       severity: "medium",
-      title: clickTitle(row.c.name),
+      title: clickRiskTitle(row.c.name),
       sourceRef: row.c.id,
       moduleId: mod?.id ?? null,
       dueDate: bakuDayPlus(14, now),
@@ -182,12 +177,26 @@ const BLOCKED_TITLE: Record<string, (name: string) => string> = {
   az: (name) => `«${name}» kampaniyası planlaşdırılmış vaxtda başlamadı və qaralamalara qaytarıldı.`,
   en: (name) => `The campaign “${name}” did not start at its scheduled time and is back in drafts.`,
   ru: (name) => `Кампания «${name}» не запустилась в запланированное время и возвращена в черновики.`,
-};
+  tr: (name) => `“${name}” kampanyası planlanan saatte başlamadı ve taslaklara geri döndü.`,
+  ro: (name) => `Campania „${name}” nu a pornit la ora programată și a revenit la ciorne.`,
+  ka: (name) => `კამპანია „${name}“ დაგეგმილ დროს არ დაიწყო და მონახაზებში დაბრუნდა.`,
+  uk: (name) => `Кампанія «${name}» не запустилася в запланований час і повернулася до чернеток.`,
+  de: (name) => `Die Kampagne „${name}“ ist nicht zur geplanten Zeit gestartet und wieder ein Entwurf.`,
+  fr: (name) => `La campagne « ${name} » n’a pas démarré à l’heure prévue et est revenue dans les brouillons.`,
+  ar: (name) => `لم تبدأ الحملة «${name}» في موعدها المجدول وأعيدت إلى المسودات.`,
+} satisfies Record<Locale, (name: string) => string>;
 const BLOCKED_REASON: Record<string, Record<LaunchBlock, string>> = {
-  az: { empty: "Auditoriyada aktiv əməkdaş yoxdur.", mail: "E-poçt göndərişi qurulmayıb (Tənzimləmələr → E-poçt).", sms: "SMS provayderi qurulmayıb.", voice: "Səsli zənglər üçün telefoniya provayderi lazımdır." },
-  en: { empty: "The audience has no active people.", mail: "Email sending is not set up (Settings → Email).", sms: "No SMS provider is configured.", voice: "Voice calls need a telephony provider." },
-  ru: { empty: "В аудитории нет активных сотрудников.", mail: "Отправка почты не настроена (Настройки → Почта).", sms: "Не настроен SMS-провайдер.", voice: "Для звонков нужен провайдер телефонии." },
-};
+  az: { empty: "Auditoriyada aktiv əməkdaş yoxdur.", mail: "E-poçt göndərişi qurulmayıb (Tənzimləmələr → E-poçt).", sms: "SMS provayderi qurulmayıb.", voice: "Səsli zənglər üçün telefoniya provayderi lazımdır.", plan: "Bu kanal və ya şablon təşkilatınızın planına daxil deyil." },
+  en: { empty: "The audience has no active people.", mail: "Email sending is not set up (Settings → Email).", sms: "No SMS provider is configured.", voice: "Voice calls need a telephony provider.", plan: "This channel or template is not part of your organisation's plan." },
+  ru: { empty: "В аудитории нет активных сотрудников.", mail: "Отправка почты не настроена (Настройки → Почта).", sms: "Не настроен SMS-провайдер.", voice: "Для звонков нужен провайдер телефонии.", plan: "Этот канал или шаблон не входит в тариф вашей организации." },
+  tr: { empty: "Hedef kitlede aktif çalışan yok.", mail: "E-posta gönderimi ayarlanmamış (Ayarlar → E-posta).", sms: "SMS sağlayıcısı yapılandırılmamış.", voice: "Sesli aramalar için bir telefon hizmeti sağlayıcısı gerekir.", plan: "Bu kanal veya şablon kuruluşunuzun planına dahil değil." },
+  ro: { empty: "Publicul țintă nu are persoane active.", mail: "Trimiterea e-mailurilor nu este configurată (Setări → E-mail).", sms: "Nu este configurat niciun furnizor de SMS.", voice: "Apelurile vocale necesită un furnizor de telefonie.", plan: "Acest canal sau șablon nu este inclus în planul organizației dumneavoastră." },
+  ka: { empty: "აუდიტორიაში აქტიური თანამშრომელი არ არის.", mail: "ელფოსტით გაგზავნა არ არის გამართული (პარამეტრები → ელფოსტა).", sms: "SMS-პროვაიდერი არ არის გამართული.", voice: "ზარებისთვის საჭიროა სატელეფონო პროვაიდერი.", plan: "ეს არხი ან შაბლონი თქვენი ორგანიზაციის პაკეტში არ შედის." },
+  uk: { empty: "В аудиторії немає активних працівників.", mail: "Надсилання пошти не налаштовано (Налаштування → Пошта).", sms: "SMS-провайдера не налаштовано.", voice: "Для дзвінків потрібен провайдер телефонії.", plan: "Цей канал або шаблон не входить до тарифу вашої організації." },
+  de: { empty: "Die Zielgruppe enthält keine aktiven Personen.", mail: "Der E-Mail-Versand ist nicht eingerichtet (Einstellungen → E-Mail).", sms: "Es ist kein SMS-Anbieter konfiguriert.", voice: "Für Anrufe ist ein Telefonie-Anbieter erforderlich.", plan: "Dieser Kanal oder diese Vorlage ist nicht im Tarif Ihrer Organisation enthalten." },
+  fr: { empty: "Le public cible ne compte aucune personne active.", mail: "L’envoi d’e-mails n’est pas configuré (Paramètres → E-mail).", sms: "Aucun fournisseur SMS n’est configuré.", voice: "Les appels vocaux nécessitent un fournisseur de téléphonie.", plan: "Ce canal ou ce modèle ne fait pas partie de l’offre de votre organisation." },
+  ar: { empty: "لا يوجد موظفون نشطون في الجمهور المستهدف.", mail: "لم يتم إعداد إرسال البريد الإلكتروني (الإعدادات ← البريد الإلكتروني).", sms: "لم يتم إعداد مزود خدمة الرسائل النصية.", voice: "تتطلب المكالمات الصوتية مزود خدمة اتصالات هاتفية.", plan: "هذه القناة أو هذا القالب غير مشمول في باقة جهتك." },
+} satisfies Record<Locale, Record<LaunchBlock, string>>;
 
 /**
  * A scheduled campaign that cannot launch goes back to draft (the launch_blocked audit entry

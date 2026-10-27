@@ -75,11 +75,11 @@ describe("Markdown", () => {
   });
 
   it("renders - and * bullets as one unordered list", () => {
-    expect(md("- a\n* b")).toContain('<ul class="list-disc pl-6"><li>a</li><li>b</li></ul>');
+    expect(md("- a\n* b")).toContain('<ul class="list-disc ps-6"><li>a</li><li>b</li></ul>');
   });
 
   it("renders 1) items as an ordered list", () => {
-    expect(md("1) a\n2) b")).toContain('<ol class="list-decimal pl-6"><li>a</li><li>b</li></ol>');
+    expect(md("1) a\n2) b")).toContain('<ol class="list-decimal ps-6"><li>a</li><li>b</li></ol>');
   });
 
   it("starts a new list when the list kind changes", () => {

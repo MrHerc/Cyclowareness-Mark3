@@ -1,0 +1,323 @@
+{
+ "id": "left-and-found",
+ "title": "Uitate și găsite",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "usb",
+     "say": "Un stick USB găsit pe coridor nu este un cadou. Nu-l conectați niciodată; predați-l echipei de securitate.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "shoulder",
+     "say": "Cineva se poate uita din spate la ecranul și la tastatura dumneavoastră. Când tastați o parolă, uitați-vă în jur.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "laptop",
+     "say": "Nu lăsați niciodată laptopul nesupravegheat în mașină sau într-o cafenea. Este cea mai ușoară pradă pentru un hoț.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     }
+    },
+    {
+     "id": "check",
+     "say": "Înainte să plecați, verificați biroul: documentele sunt sub cheie, dispozitivele sunt blocate, iar foile imprimate au fost luate de la imprimantă.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "desk-pc",
+   "environment": "desktop",
+   "title": "La birou",
+   "intro": "Sunteți la birou. Decideți ce faceți cu un stick USB găsit, cu un document trimis la imprimantă și cu ecranul atunci când vă ridicați.",
+   "steps": [
+    {
+     "id": "usb-found",
+     "label": "Găsit lângă lift",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Lista_concedieri_2026.xlsx"
+       }
+      ],
+      "type": "lnk",
+      "size": "3 KB",
+      "source": [
+       {
+        "text": "USB: ARHIVA (F:)"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "plug",
+       "label": "Conectați-l și aruncați o privire",
+       "kind": "plug-in",
+       "outcome": "risky",
+       "feedback": "Numele fișierului este o momeală pentru curiozitatea dumneavoastră. Nu conectați un stick USB găsit."
+      },
+      {
+       "id": "hand-in",
+       "label": "Predați-l echipei de securitate",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Nu conectați niciodată un dispozitiv găsit; predați-l specialiștilor.",
+       "next": "print-done"
+      }
+     ]
+    },
+    {
+     "id": "usb-file",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Lista_concedieri_2026.xlsx"
+       }
+      ],
+      "type": "lnk",
+      "size": "3 KB",
+      "source": [
+       {
+        "text": "USB: ARHIVA (F:)"
+       }
+      ]
+     },
+     "say": "Uitați-vă la tipul real al fișierului.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Deschideți",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Nu este o foaie de calcul, ci o comandă rapidă. Dacă o deschideți, pornește în ascuns o comandă."
+      },
+      {
+       "id": "eject",
+       "label": "Scoateți dispozitivul",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Decizia corectă. Scoateți-l fără să deschideți nimic și predați-l echipei de securitate."
+      }
+     ]
+    },
+    {
+     "id": "print-done",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "db-cap-xidmeti",
+      "app": "Serviciul de imprimare",
+      "title": [
+       {
+        "text": "Documentul dumneavoastră a fost imprimat"
+       }
+      ],
+      "body": [
+       {
+        "text": "Cereri_cetateni.pdf, imprimanta comună, etajul 3"
+       }
+      ],
+      "time": "11:20"
+     },
+     "actions": [
+      {
+       "id": "collect",
+       "label": "Merg acum să-l iau",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Corect. Oricine trece pe lângă o imprimantă comună poate citi ce a rămas acolo."
+      },
+      {
+       "id": "later",
+       "label": "Îl iau diseară",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Datele cetățenilor vor sta ore întregi la imprimantă. Luați imediat documentele imprimate."
+      }
+     ]
+    },
+    {
+     "id": "leave-desk",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Pe ecran sunt deschise datele cetățenilor"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Computerul se va bloca automat în 15 minute."
+        }
+       ]
+      ],
+      "buttons": [
+       "Blocați ecranul",
+       "Lăsați-l așa"
+      ]
+     },
+     "say": "Vă ridicați să mergeți la imprimantă.",
+     "actions": [
+      {
+       "id": "lock",
+       "label": "Blocați ecranul",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Tasta Windows plus L blochează ecranul într-o secundă."
+      },
+      {
+       "id": "leave",
+       "label": "Îl las așa, mă întorc în două minute",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Două minute sunt suficiente ca cineva să citească sau să trimită datele."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "cafe-laptop",
+   "title": "Laptopul în cafenea",
+   "start": "cafe",
+   "nodes": [
+    {
+     "id": "cafe",
+     "text": "Lucrați pe laptopul de serviciu într-o cafenea. Trebuie să mergeți la tejghea ca să vă luați comanda.",
+     "visual": {
+      "kind": "illustration",
+      "id": "travel"
+     },
+     "choices": [
+      {
+       "label": "Îl las deschis, e doar un minut",
+       "outcome": "compromised",
+       "feedback": "Un minut este suficient ca laptopul să fie furat, iar un ecran deschis expune datele."
+      },
+      {
+       "label": "Îl rog pe cel de la masa alăturată să se uite după laptop",
+       "outcome": "risky",
+       "feedback": "Un necunoscut nu este paznicul dispozitivului dumneavoastră. Luați laptopul cu dumneavoastră."
+      },
+      {
+       "label": "Închid laptopul și îl iau cu mine",
+       "next": "neighbour",
+       "feedback": "Corect. Dispozitivul trebuie să fie mereu cu dumneavoastră."
+      }
+     ]
+    },
+    {
+     "id": "neighbour",
+     "text": "Scuzați-mă, am văzut pe ecran că lucrați la agenție. Cum se numește managerul dumneavoastră? Am ceva de rezolvat acolo.",
+     "speaker": "Bărbat de la masa alăturată",
+     "voice": "man-2",
+     "channel": "in-person",
+     "spoken": "Scuzați-mă, am văzut pe ecran că lucrați la agenție. <breath> Cum se numește managerul dumneavoastră? Am ceva de rezolvat acolo.",
+     "choices": [
+      {
+       "label": "Îi spun numele managerului și numărul lui de interior",
+       "outcome": "risky",
+       "feedback": "Nu dați detalii interne unui necunoscut. Ele devin momeală pentru un apel sau un e-mail ulterior."
+      },
+      {
+       "label": "Îl îndrum spre numărul recepției de pe site-ul oficial",
+       "outcome": "safe",
+       "feedback": "Politicos și fără detalii interne, foarte bine. Și feriți-vă ecranul de privirile altora."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "found-usb",
+   "prompt": "Ați găsit un stick USB pe coridor. Puneți pașii în ordine.",
+   "items": [
+    {
+     "id": "no-plug",
+     "label": "Nu-l conectați la niciun computer"
+    },
+    {
+     "id": "note",
+     "label": "Notați unde și când l-ați găsit"
+    },
+    {
+     "id": "hand-in",
+     "label": "Predați-l echipei de securitate"
+    },
+    {
+     "id": "warn",
+     "label": "Spuneți-le colegilor să nu conecteze stickuri asemănătoare"
+    }
+   ],
+   "explain": "Un dispozitiv găsit este o probă: predați-l așa cum este, fără să-l deschideți."
+  },
+  {
+   "type": "match",
+   "id": "left-behind",
+   "prompt": "Asociați fiecare situație cu pasul corect.",
+   "pairs": [
+    {
+     "id": "car",
+     "left": "Laptopul este pe scaunul din mașină",
+     "right": "Luați-l cu dumneavoastră"
+    },
+    {
+     "id": "draft",
+     "left": "O ciornă confidențială",
+     "right": "Distrugeți-o în distrugătorul de documente"
+    },
+    {
+     "id": "watcher",
+     "left": "Cineva se uită la ecranul dumneavoastră",
+     "right": "Întoarceți ecranul sau blocați-l"
+    },
+    {
+     "id": "badge-desk",
+     "left": "Ecusonul dumneavoastră a rămas pe birou",
+     "right": "Țineți-l mereu asupra dumneavoastră"
+    }
+   ],
+   "explain": "Tot ce lăsați nesupravegheat este o ocazie pentru un atacator."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Nu conectați niciodată un stick USB găsit; predați-l echipei de securitate.",
+    "Blocați ecranul când plecați de la birou și luați imediat documentele de la imprimantă.",
+    "Nu lăsați niciodată laptopuri sau documente nesupravegheate."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

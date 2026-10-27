@@ -62,7 +62,7 @@ export function Dialog({
               <h2 className="text-title font-semibold">{title}</h2>
               {description ? <p className="mt-1.5 text-body-sm text-ink-muted">{description}</p> : null}
             </div>
-            <button type="button" onClick={onClose} aria-label={t("close")} className="-mt-1 -mr-2 grid size-10 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink">
+            <button type="button" onClick={onClose} aria-label={t("close")} className="-mt-1 -me-2 grid size-10 place-items-center rounded-full text-ink-muted hover:bg-sunken hover:text-ink">
               <X className="size-5" />
             </button>
           </header>

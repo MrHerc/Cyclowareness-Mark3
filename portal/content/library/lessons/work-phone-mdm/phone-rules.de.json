@@ -1,0 +1,569 @@
+{
+ "id": "phone-rules",
+ "title": "Regeln fürs Diensthandy",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Ihr Diensthandy ist ein Stück Ihrer Organisation, das Sie in der Tasche tragen. Darauf liegen dienstliche E-Mails, Dokumente und Kontakte.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Das Verwaltungsprofil schützt das Smartphone. Geht es verloren, kann der IT-Support es sperren und die dienstlichen Daten löschen.",
+     "mood": "talk",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "nc-iscihaz",
+       "app": "İşCihaz",
+       "title": [
+        {
+         "text": "Smartphone geschützt"
+        }
+       ],
+       "body": [
+        {
+         "text": "Dieses Gerät wird nach den Sicherheitsregeln Ihrer Organisation verwaltet."
+        }
+       ],
+       "time": "09:00"
+      }
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Installieren Sie niemals ein Profil über einen Link aus einer Nachricht. Ein gefälschtes Profil kann Kriminellen die Kontrolle über Ihr Smartphone geben.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "it-destek-fake",
+       "sender": [
+        {
+         "text": "IT-Support"
+        }
+       ],
+       "time": "11:42",
+       "messages": [
+        [
+         {
+          "text": "Ihr Profil läuft ab. Installieren Sie ein neues: "
+         },
+         {
+          "text": "iscihaz-profil.example.net",
+          "spot": "link"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "link"
+    },
+    {
+     "id": "b4",
+     "say": "Installieren Sie Apps nur aus dem offiziellen App-Store oder über die Geräte-App Ihrer Organisation und prüfen Sie jede Berechtigung.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "new-phone",
+   "environment": "phone",
+   "title": "Ihr neues Diensthandy",
+   "intro": "Sie haben gerade ein neues Diensthandy bekommen. Sehen Sie sich jede Benachrichtigung an und treffen Sie die richtige Entscheidung.",
+   "steps": [
+    {
+     "id": "enroll",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-iscihaz",
+      "app": "İşCihaz",
+      "title": [
+       {
+        "text": "Registrierung abschließen"
+       }
+      ],
+      "body": [
+       {
+        "text": "Der IT-Support hat Ihr Gerät vorbereitet. Schließen Sie die Registrierung ab, um dienstliche E-Mails zu erhalten."
+       }
+      ],
+      "time": "09:05"
+     },
+     "say": "Diese App hat der IT-Support selbst installiert.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Benachrichtigung öffnen",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Registrierung über die eigene App Ihrer Organisation ist der sicherste Weg."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Ein nicht registriertes Smartphone ist nicht geschützt. Erledigen Sie das gleich am ersten Tag."
+      }
+     ]
+    },
+    {
+     "id": "profile-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "it-destek-fake",
+      "sender": [
+       {
+        "text": "IT-Support"
+       }
+      ],
+      "time": "11:42",
+      "messages": [
+       [
+        {
+         "text": "Liebe Kollegin, lieber Kollege, Ihr MDM-Profil läuft heute ab. Installieren Sie das neue Profil, damit Ihr Smartphone nicht gesperrt wird: "
+        },
+        {
+         "text": "iscihaz-profil.example.net/new",
+         "link": {
+          "label": "iscihaz-profil.example.net/new",
+          "href": "https://iscihaz-profil.example.net/new"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Prüfen Sie den Absender und die Adresse des Links.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Link öffnen",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Das ist nicht die Domain Ihrer Organisation. Profile kommen nur aus der İşCihaz-App oder vom IT-Support.",
+       "next": "profile-install"
+      },
+      {
+       "id": "report",
+       "label": "Melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Mit Ihrer Meldung kann der IT-Support auch alle anderen warnen.",
+       "next": "qr-permission"
+      },
+      {
+       "id": "block",
+       "label": "Blockieren",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Gut. Informieren Sie zusätzlich den IT-Support, damit Ihre Kolleginnen und Kollegen gewarnt werden.",
+       "next": "qr-permission"
+      }
+     ]
+    },
+    {
+     "id": "profile-install",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "nc-iscihaz-fake",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Profil installieren?"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "iscihaz-profil.example.net möchte ein Konfigurationsprofil installieren."
+        }
+       ],
+       [
+        {
+         "text": "Das Profil fügt ein Zertifikat sowie VPN- und E-Mail-Einstellungen hinzu."
+        }
+       ]
+      ],
+      "buttons": [
+       "Ablehnen",
+       "Zulassen"
+      ]
+     },
+     "say": "Die Website will ein Profil auf Ihr Smartphone laden.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Ablehnen",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein solches Profil kann Ihren gesamten Internetverkehr über den Server des Angreifers leiten."
+      },
+      {
+       "id": "allow",
+       "label": "Zulassen",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Ein gefälschtes Profil übergibt die Kontrolle über das Smartphone an Fremde. Rufen Sie sofort den IT-Support an."
+      }
+     ]
+    },
+    {
+     "id": "qr-permission",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-qr-oxuyucu",
+      "app": "QR Oxuyucu",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Kamera"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Kontakte"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Genauer Standort"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Bedienungshilfen: Bildschirm steuern"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Was braucht ein QR-Code-Scanner wirklich?",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Zulassen",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Ein QR-Code-Scanner braucht nur die Kamera. Über die Bedienungshilfen kann eine App den Bildschirm lesen und für Sie tippen."
+      },
+      {
+       "id": "deny",
+       "label": "Nicht zulassen",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Richtig. Erteilen Sie nur, was die Funktion wirklich braucht – hier nur die Kamera."
+      }
+     ]
+    },
+    {
+     "id": "chat-apk",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "sohbet",
+      "name": [
+       {
+        "text": "Shift_schedule.apk"
+       }
+      ],
+      "type": "apk",
+      "size": "5,4 MB",
+      "source": [
+       {
+        "text": "Söhbət: Rəşad Məmmədov"
+       }
+      ]
+     },
+     "say": "Ein Kollege hat Ihnen im Messenger eine Datei geschickt.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Installieren",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Ein Schichtplan ist niemals eine Installationsdatei. Eine .apk-Datei aus einem Chat bringt Schadsoftware auf das Smartphone."
+      },
+      {
+       "id": "cancel",
+       "label": "Abbrechen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Möglicherweise wurde der Account Ihres Kollegen übernommen. Informieren Sie deshalb den IT-Support."
+      }
+     ]
+    },
+    {
+     "id": "os-update",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sistem-yenileme",
+      "tone": "system",
+      "title": [
+       {
+        "text": "System-Update"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Ein Sicherheits-Update steht bereit. Das Smartphone wird neu gestartet. Das dauert etwa 10 Minuten."
+        }
+       ]
+      ],
+      "buttons": [
+       "Später",
+       "Jetzt aktualisieren"
+      ]
+     },
+     "actions": [
+      {
+       "id": "update",
+       "label": "Jetzt aktualisieren",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Richtig. Updates schließen Lücken, die Angreifer bereits kennen."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Jeder Tag Aufschub lässt die Lücke offen. Aktualisieren Sie spätestens heute Abend."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "app-asks",
+   "prompt": "Ist diese Anfrage auf einem Diensthandy sicher oder eine Bedrohung?",
+   "cards": [
+    {
+     "id": "map-location",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-yolxerite",
+      "app": "YolXəritə",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Standort: nur während der Nutzung der App"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Eine Karten-App braucht den Standort, und zwar nur, solange sie geöffnet ist. Die Berechtigung passt zur Aufgabe."
+    },
+    {
+     "id": "game-sms",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-super-oyunlar",
+      "app": "Super Oyunlar",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "SMS lesen"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Kontakte"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein Spiel braucht weder SMS noch Kontakte. Mit SMS-Zugriff kann es Ihre Anmeldecodes mitlesen."
+    },
+    {
+     "id": "battery-access",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "nc-batareya",
+      "app": "Batareya Qoruyucu",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Bedienungshilfen: Bildschirm steuern"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Über anderen Apps einblenden"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Zum Akkusparen muss keine App den Bildschirm steuern. Genau diese Berechtigungen verlangen Banking-Trojaner."
+    },
+    {
+     "id": "lock-notice",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-iscihaz",
+      "app": "İşCihaz",
+      "title": [
+       {
+        "text": "Bildschirmsperre erforderlich"
+       }
+      ],
+      "body": [
+       {
+        "text": "Richten Sie eine PIN mit mindestens 6 Ziffern ein, um dienstliche E-Mails zu nutzen."
+       }
+      ],
+      "time": "09:20"
+     },
+     "verdict": "safe",
+     "explain": "Das ist die eigene App Ihrer Organisation, und sie schickt keinen Link. Eine starke Bildschirmsperre ist der erste Schutz, wenn das Smartphone verloren geht."
+    },
+    {
+     "id": "torch-notifications",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "fener-pro",
+      "app": "Fənər Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Zugriff auf Benachrichtigungen"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Eine Taschenlampe muss keine Benachrichtigungen lesen. Mit diesem Zugriff sieht sie eingehende Codes und Nachrichten."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "permission-power",
+   "prompt": "Ordnen Sie jeder Berechtigung zu, was sie erlaubt.",
+   "pairs": [
+    {
+     "id": "sms",
+     "left": "SMS lesen",
+     "right": "Bank- und Anmeldecodes sehen"
+    },
+    {
+     "id": "accessibility",
+     "left": "Bedienungshilfen",
+     "right": "Den Bildschirm lesen und für Sie tippen"
+    },
+    {
+     "id": "notifications",
+     "left": "Zugriff auf Benachrichtigungen",
+     "right": "Messenger-Nachrichten lesen"
+    },
+    {
+     "id": "unknown-sources",
+     "left": "Unbekannte Apps installieren",
+     "right": "Software von außerhalb des App-Stores installieren"
+    }
+   ],
+   "explain": "Diese vier Berechtigungen sind die weitreichendsten. Erteilen Sie sie nur Apps, die der IT-Support freigegeben hat."
+  },
+  {
+   "type": "choice",
+   "id": "slow-phone",
+   "question": {
+    "prompt": "Jemand aus Ihrem Freundeskreis rät Ihnen, das Verwaltungsprofil von Ihrem langsamen Diensthandy zu entfernen. Was tun Sie?",
+    "options": [
+     {
+      "id": "support",
+      "label": "Das Profil behalten und den IT-Support kontaktieren",
+      "correct": true,
+      "feedback": "Richtig. Das Profil ist der Schutz des Smartphones, und der IT-Support behebt das Problem."
+     },
+     {
+      "id": "remove",
+      "label": "Das Profil entfernen, damit das Smartphone schneller wird",
+      "correct": false,
+      "feedback": "Ohne das Profil lässt sich ein verlorenes Smartphone nicht aus der Ferne sperren. Meist funktionieren dann auch die dienstlichen E-Mails nicht mehr."
+     },
+     {
+      "id": "reset",
+      "label": "Das Smartphone auf Werkseinstellungen zurücksetzen",
+      "correct": false,
+      "feedback": "Dabei werden das Profil und die dienstlichen Daten gelöscht, ohne dass der IT-Support davon weiß. Sprechen Sie zuerst mit dem IT-Support."
+     },
+     {
+      "id": "friend",
+      "label": "Es einer technikaffinen Person aus dem Freundeskreis zur Reparatur geben",
+      "correct": false,
+      "feedback": "Auf dem Smartphone liegen dienstliche Daten. Geben Sie es nur dem IT-Support."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "phone-lock"
+    }
+   },
+   "explain": "Das Verwaltungsprofil schützt Ihr Diensthandy. Ändern darf es nur der IT-Support."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Profile und dienstliche Apps kommen nur aus der İşCihaz-App oder vom IT-Support.",
+    "Berechtigungen müssen zur Aufgabe der App passen. SMS und Bedienungshilfen sind am gefährlichsten.",
+    "Bildschirmsperre und Updates sind der erste Schutz Ihres Smartphones."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,335 @@
+{
+ "id": "the-copied-command",
+ "title": "La commande copiée",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fc2-tutor",
+   "beats": [
+    {
+     "id": "fc2-b1",
+     "say": "Cette fois, une fausse page vous dit de copier un texte et de le coller dans la fenêtre « Exécuter ».",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    },
+    {
+     "id": "fc2-b2",
+     "say": "Ce texte est en réalité une commande cachée : quand elle s’exécute, elle installe un logiciel malveillant.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "ransomware"
+     }
+    },
+    {
+     "id": "fc2-b3",
+     "say": "Ne collez jamais dans la fenêtre « Exécuter » un texte qu’un site vous dit de copier.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "fc2-b4",
+     "say": "Si c’est déjà fait, déconnectez l’ordinateur du réseau et prévenez immédiatement le support technique.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "fc2-sim",
+   "environment": "desktop",
+   "title": "La fenêtre « Exécuter »",
+   "intro": "Une page affirmait qu’un document ne s’ouvrait pas, et ses instructions mènent ici. Choisissez à chaque fois la bonne réaction.",
+   "steps": [
+    {
+     "id": "run-box",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Exécuter"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Le texte copié par le site a été collé dans la zone :"
+        }
+       ],
+       [
+        {
+         "text": "[texte inconnu copié par le site]"
+        }
+       ]
+      ],
+      "buttons": [
+       "Annuler",
+       "OK"
+      ]
+     },
+     "say": "La fenêtre « Exécuter » est ouverte, et elle contient un texte inconnu copié par le site.",
+     "actions": [
+      {
+       "id": "cancel",
+       "label": "Annuler et fermer",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Annuler empêche le texte de s’exécuter ; expliquez ensuite au support technique ce qui s’est passé."
+      },
+      {
+       "id": "run",
+       "label": "Valider avec OK",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "La commande s’est exécutée et a installé un logiciel malveillant en arrière-plan. N’exécutez jamais rien dans une fenêtre comme celle-ci."
+      },
+      {
+       "id": "report",
+       "label": "Signaler au support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bon choix. Le support technique peut déterminer ce qui s’est passé."
+      }
+     ]
+    },
+    {
+     "id": "script-window",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Script inconnu"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Un script inconnu tente de s’exécuter. Continuer ?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Arrêter",
+       "Continuer"
+      ]
+     },
+     "say": "Une fenêtre inconnue s’ouvre maintenant et demande l’autorisation de continuer.",
+     "actions": [
+      {
+       "id": "stop",
+       "label": "Arrêter",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Arrêter un script inattendu évite les dégâts."
+      },
+      {
+       "id": "continue",
+       "label": "Continuer",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Le script a continué et installé un logiciel malveillant. N’autorisez jamais un script inconnu."
+      }
+     ]
+    },
+    {
+     "id": "real-update",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sistem-yenileme",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Une mise à jour du système est prête"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Voulez-vous installer la mise à jour maintenant ?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Plus tard",
+       "Mettre à jour"
+      ]
+     },
+     "say": "Voici la fenêtre de mise à jour du système lui-même.",
+     "actions": [
+      {
+       "id": "update",
+       "label": "Mettre à jour",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. La mise à jour du système lui-même est sans danger et ne vous demande jamais de commande."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "safe",
+       "feedback": "C’est bien aussi. Vous pouvez installer la mise à jour au moment qui vous convient."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme suspect",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "C’est inutile. Il s’agit de la notification de mise à jour habituelle du système."
+      }
+     ]
+    },
+    {
+     "id": "beacon",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "it-tehlukesizlik",
+      "app": "Sécurité informatique",
+      "title": [
+       {
+        "text": "Activité réseau inhabituelle"
+       }
+      ],
+      "body": [
+       {
+        "text": "Votre ordinateur envoie des données à un serveur inconnu."
+       }
+      ],
+      "time": "14:20"
+     },
+     "say": "Une notification indique que l’ordinateur se connecte à une adresse inconnue.",
+     "actions": [
+      {
+       "id": "disconnect",
+       "label": "Couper la connexion internet",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Couper la connexion empêche les données de sortir."
+      },
+      {
+       "id": "report",
+       "label": "Signaler au support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Le support technique peut maintenant vérifier et nettoyer l’ordinateur."
+      },
+      {
+       "id": "ignore",
+       "label": "La fermer et continuer à travailler",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Le logiciel continue d’envoyer des données. N’ignorez jamais une notification comme celle-ci."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "fc2-order",
+   "prompt": "Vous avez exécuté la commande qu’un site vous a donnée. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "disconnect",
+     "label": "Débrancher le câble réseau ou couper le Wi-Fi"
+    },
+    {
+     "id": "report",
+     "label": "Appeler immédiatement le support technique"
+    },
+    {
+     "id": "tell",
+     "label": "Dire ce que vous avez collé, et où"
+    },
+    {
+     "id": "password",
+     "label": "Changer les mots de passe depuis un autre appareil, sain"
+    }
+   ],
+   "explain": "Commencez par couper la connexion, puis appelez immédiatement. Sauf si votre procédure prévoit autre chose, n’éteignez pas l’ordinateur."
+  },
+  {
+   "type": "choice",
+   "id": "fc2-choice",
+   "question": {
+    "prompt": "Un site vous dit de copier un texte et de le coller dans la fenêtre « Exécuter ». Que faites-vous ?",
+    "options": [
+     {
+      "id": "refuse",
+      "label": "Je ne le fais pas, et je ferme la page",
+      "correct": true,
+      "feedback": "Bonne réponse. Aucun site ne vous demande d’exécuter une commande : c’est un piège."
+     },
+     {
+      "id": "paste",
+      "label": "Je le colle pour pouvoir continuer",
+      "correct": false,
+      "feedback": "Ce texte est une commande cachée qui installe un logiciel malveillant. Ne le collez jamais."
+     },
+     {
+      "id": "official",
+      "label": "Je le colle si le site a l’air officiel",
+      "correct": false,
+      "feedback": "Un air officiel est facile à imiter. La règle est simple : n’exécutez jamais ce genre de texte."
+     }
+    ]
+   },
+   "explain": "Le texte qu’un site vous dit de copier est une commande cachée. Ne le collez pas, fermez la page."
+  },
+  {
+   "type": "match",
+   "id": "fc2-match",
+   "prompt": "Associez chaque situation à la bonne réaction.",
+   "pairs": [
+    {
+     "id": "robot",
+     "left": "Une vérification vous demande d’appuyer sur des touches",
+     "right": "C’est un faux, fermez la page"
+    },
+    {
+     "id": "pdf",
+     "left": "Un document ne s’ouvre pas, il faudrait exécuter une commande",
+     "right": "Même piège, ne le faites pas"
+    },
+    {
+     "id": "real",
+     "left": "Une vraie vérification",
+     "right": "Choisir des images ou cocher une case"
+    },
+    {
+     "id": "done",
+     "left": "Vous avez déjà exécuté la commande",
+     "right": "Déconnectez-vous du réseau et signalez-le"
+    }
+   ],
+   "explain": "Toute page qui demande une commande est fausse. Si vous l’avez déjà exécutée, déconnectez l’ordinateur du réseau et prévenez le support technique."
+  },
+  {
+   "type": "recap",
+   "id": "fc2-recap",
+   "points": [
+    "Ne collez jamais dans la fenêtre « Exécuter » un texte venu d’un site",
+    "Toute page qui demande une commande est fausse",
+    "Si c’est fait, déconnectez l’ordinateur du réseau et prévenez le support technique"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

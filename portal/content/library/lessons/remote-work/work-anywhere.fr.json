@@ -1,0 +1,364 @@
+{
+ "id": "work-anywhere",
+ "title": "Où que vous travailliez",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "protection-stays",
+     "say": "Quand vous travaillez de chez vous ou depuis un café, la protection du bureau ne vous suit pas. C’est à vous de la mettre en place.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "vpn",
+     "say": "Connectez-vous aux systèmes de travail uniquement par le VPN de votre organisation. Les applications VPN gratuites peuvent transmettre vos données à des tiers.",
+     "mood": "talk",
+     "visual": {
+      "kind": "illustration",
+      "id": "vpn"
+     }
+    },
+    {
+     "id": "open-wifi",
+     "say": "N’importe qui peut imiter le nom du réseau ouvert d’un café. Si vous le pouvez, utilisez plutôt le partage de connexion de votre téléphone.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    {
+     "id": "shoulder",
+     "say": "Les personnes derrière vous peuvent voir votre écran et le mot de passe que vous tapez. Asseyez-vous dos au mur et utilisez un filtre de confidentialité.",
+     "mood": "alert",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "family",
+     "say": "L’ordinateur portable professionnel n’est pas fait pour la famille. Un jeu téléchargé par quelqu’un de la maison peut apporter un logiciel malveillant.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "cafe-networks",
+   "prompt": "Quels réseaux de ce café sont suspects ?",
+   "artifact": {
+    "kind": "wifi",
+    "networks": [
+     {
+      "ssid": [
+       {
+        "text": "Cinar_Pulsuz_WiFi",
+        "spot": "twin"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Cinar-Cayxana"
+       }
+      ],
+      "secured": true,
+      "signal": 3
+     },
+     {
+      "ssid": [
+       {
+        "text": "Free_Internet_BAKU",
+        "spot": "free"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "RXAgentlik-Staff",
+        "spot": "staff"
+       }
+      ],
+      "secured": false,
+      "signal": 2
+     },
+     {
+      "ssid": [
+       {
+        "text": "Téléphone d’Aynur"
+       }
+      ],
+      "secured": true,
+      "signal": 4
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "twin",
+     "label": "Nom trompeur",
+     "explain": "Un réseau ouvert qui imite le nom du café. Il n’a pas de mot de passe et il est peut-être faux. Demandez au personnel le nom du vrai réseau."
+    },
+    {
+     "id": "free",
+     "label": "Propriétaire inconnu",
+     "explain": "Un réseau ouvert dont on ne connaît pas le propriétaire peut vous envoyer vers une fausse page de connexion."
+    },
+    {
+     "id": "staff",
+     "label": "Le nom de votre organisation",
+     "explain": "Le réseau de votre organisation ne peut pas se trouver dans un café. Celui-ci a été créé pour vous tromper."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "swipe",
+   "id": "home-setup",
+   "prompt": "Parmi ces situations de télétravail, lesquelles sont sûres ?",
+   "cards": [
+    {
+     "id": "default-router",
+     "artifact": {
+      "kind": "login",
+      "brand": "HomeRouter",
+      "url": [
+       {
+        "text": "http://192.168.1.1"
+       }
+      ],
+      "fields": [
+       "Nom d’utilisateur : admin",
+       "Mot de passe : admin"
+      ],
+      "button": "Se connecter"
+     },
+     "verdict": "threat",
+     "explain": "Les mots de passe par défaut sont connus de tous. Changez tout de suite celui du routeur."
+    },
+    {
+     "id": "share-password",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Tural, collègue"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Je n’arrive pas à me connecter au système depuis chez moi. Donne-moi ton mot de passe, juste une minute."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un mot de passe ne se partage jamais, même avec un collègue. Proposez-lui de contacter le support technique."
+    },
+    {
+     "id": "vpn-update",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Support informatique"
+        }
+       ],
+       "address": [
+        {
+         "text": "it@rxagentlik.az"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Nouvelle version de l’application VPN"
+       }
+      ],
+      "time": "08:30",
+      "body": [
+       [
+        {
+         "text": "La mise à jour s’installera automatiquement sur votre ordinateur professionnel. Ne téléchargez rien."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Le domaine est correct, et on ne vous demande de rien télécharger."
+    },
+    {
+     "id": "free-vpn",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://super-free-vpn.top/download"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un VPN gratuit inconnu peut lire votre trafic. Pour le travail, utilisez uniquement le VPN de l’organisation."
+    },
+    {
+     "id": "home-wifi",
+     "artifact": {
+      "kind": "wifi",
+      "networks": [
+       {
+        "ssid": [
+         {
+          "text": "Ev_5G"
+         }
+        ],
+        "secured": true,
+        "signal": 4
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Un réseau domestique protégé par un mot de passe. Si le mot de passe du routeur a aussi été changé, c’est un bon début."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "home-and-cafe",
+   "title": "À la maison et au café",
+   "start": "evening",
+   "nodes": [
+    {
+     "id": "evening",
+     "text": "Je peux installer un jeu sur ton ordinateur du travail ? Le mien est trop lent.",
+     "speaker": "Un membre de la famille",
+     "voice": "young-man",
+     "channel": "in-person",
+     "manner": "natural",
+     "spoken": "Je peux installer un jeu sur ton ordinateur du travail ? <short pause> Le mien est trop lent.",
+     "visual": {
+      "kind": "illustration",
+      "id": "download"
+     },
+     "choices": [
+      {
+       "label": "D’accord, juste pour une heure",
+       "outcome": "compromised",
+       "feedback": "Un logiciel malveillant est arrivé avec le jeu, et vos comptes professionnels sont maintenant en danger."
+      },
+      {
+       "label": "Non, l’ordinateur du travail sert uniquement au travail",
+       "next": "cafe",
+       "feedback": "Exact. Expliquez calmement pourquoi."
+      }
+     ]
+    },
+    {
+     "id": "cafe",
+     "text": "Le lendemain, vous travaillez dans un café. Vous devez aller commander au comptoir, et votre ordinateur portable est ouvert.",
+     "choices": [
+      {
+       "label": "Le laisser ouvert, ce n’est que deux minutes",
+       "outcome": "risky",
+       "feedback": "Deux minutes suffisent pour regarder, brancher une clé ou emporter l’ordinateur."
+      },
+      {
+       "label": "Verrouiller l’écran et emporter l’ordinateur avec moi",
+       "next": "call",
+       "feedback": "Excellente habitude."
+      }
+     ]
+    },
+    {
+     "id": "call",
+     "text": "De retour à votre table, votre responsable vous appelle et vous demande des chiffres d’un projet confidentiel. Des gens sont assis tout près.",
+     "choices": [
+      {
+       "label": "Donner les chiffres à voix haute",
+       "outcome": "risky",
+       "feedback": "Les gens autour de vous peuvent entendre. Les conversations confidentielles n’ont pas lieu en public."
+      },
+      {
+       "label": "Dire que je rappelle depuis un endroit calme",
+       "outcome": "safe",
+       "feedback": "Bravo. Ne passez d’appels confidentiels que là où personne ne peut vous entendre."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "home-router",
+   "question": {
+    "prompt": "Quelles mesures comptent pour votre routeur domestique ?",
+    "options": [
+     {
+      "id": "admin-password",
+      "label": "Changer le mot de passe administrateur par défaut",
+      "correct": true,
+      "feedback": "N’importe qui peut trouver un mot de passe par défaut."
+     },
+     {
+      "id": "firmware",
+      "label": "Mettre à jour le micrologiciel du routeur",
+      "correct": true,
+      "feedback": "Les mises à jour corrigent les failles connues."
+     },
+     {
+      "id": "encryption",
+      "label": "Choisir le chiffrement WPA3 ou WPA2",
+      "correct": true,
+      "feedback": "Il protège votre réseau contre les écoutes."
+     },
+     {
+      "id": "no-password",
+      "label": "Laisser le Wi-Fi sans mot de passe pour gagner en vitesse",
+      "correct": false,
+      "feedback": "N’importe qui pourrait s’y connecter, et ça ne le rend pas plus rapide."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "wifi"
+    }
+   },
+   "explain": "Le routeur est la porte d’entrée de votre maison sur internet. Un mot de passe par défaut et un vieux micrologiciel la laissent grande ouverte."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Connectez-vous aux systèmes de travail uniquement par le VPN de l’organisation.",
+    "Utilisez le partage de connexion de votre téléphone plutôt qu’un Wi-Fi ouvert.",
+    "Ne prêtez pas l’ordinateur du travail à votre famille, et verrouillez l’écran."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

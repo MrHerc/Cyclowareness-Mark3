@@ -1,0 +1,389 @@
+{
+ "id": "classify-and-share",
+ "title": "Classifier, puis partager",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "levels",
+     "say": "Chaque document a un niveau de classification : public, interne ou confidentiel. Ce niveau indique qui peut le consulter.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "folder"
+     }
+    },
+    {
+     "id": "public-internal",
+     "say": "Public, c’est pour tout le monde, comme une annonce sur le site web. Interne, c’est réservé au personnel.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "confidential",
+     "say": "Confidentiel, c’est uniquement pour des personnes désignées nommément. En cas de fuite, les personnes concernées et l’organisation subissent un préjudice grave.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "public-link",
+     "say": "Un lien ouvert à tous expose le fichier à tout internet. Partagez uniquement avec des personnes désignées, et fixez une date d’expiration.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "rxagentlik-disk",
+       "url": [
+        {
+         "text": "https://disk.rxagentlik.az/s/8Kq2Lm?access="
+        },
+        {
+         "text": "anyone",
+         "spot": "public"
+        }
+       ]
+      }
+     },
+     "highlight": "public"
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "share-requests",
+   "environment": "phone",
+   "title": "Demandes de partage",
+   "intro": "Trois demandes sont arrivées sur votre téléphone. Décidez selon le niveau du document : partager ou non ?",
+   "steps": [
+    {
+     "id": "phone-book",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Nigar (ancienne collègue)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Salut ! J’en ai besoin dans mon nouveau travail : tu pourrais m’envoyer l’annuaire interne ?"
+         }
+        ],
+        "time": "10:14"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "keep",
+       "label": "C’est interne, je ne peux pas l’envoyer",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Les documents internes sont réservés au personnel, et une ancienne collègue est désormais une personne extérieure."
+      },
+      {
+       "id": "share",
+       "label": "J’envoie le fichier",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "L’annuaire est interne. À l’extérieur, c’est une liste toute prête de cibles pour l’hameçonnage."
+      }
+     ]
+    },
+    {
+     "id": "job-ad",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "merkez-konsalting",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Rzayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "e.rzayev@merkez-konsalting.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Offre d’emploi"
+       }
+      ],
+      "time": "11:02",
+      "body": [
+       [
+        {
+         "text": "Bonjour, pourriez-vous m’envoyer l’offre d’emploi publiée sur votre site ? Nous aimerions la diffuser auprès de nos étudiants."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "share",
+       "label": "J’envoie l’offre",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Exact. Une offre d’emploi est publique, et elle figure déjà sur le site."
+      },
+      {
+       "id": "keep",
+       "label": "Je n’envoie rien",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "C’est sans risque, mais un document public n’a pas besoin d’être caché. Il suffit d’envoyer le lien vers le site."
+      }
+     ]
+    },
+    {
+     "id": "applications",
+     "artifact": {
+      "kind": "sms",
+      "sender": [
+       {
+        "text": "+994 55 000 63 21"
+       }
+      ],
+      "time": "12:30",
+      "messages": [
+       [
+        {
+         "text": "Bonjour, je suis journaliste. Si vous m’envoyez la liste des demandes des citoyens, nous ne citerons jamais votre nom."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "keep",
+       "label": "Je refuse et je l’oriente vers le service de presse",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Les demandes sont confidentielles, et seul le service de presse parle aux médias."
+      },
+      {
+       "id": "share",
+       "label": "J’envoie la liste",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Une liste confidentielle est sortie de l’organisation. C’est une fuite de données personnelles de citoyens."
+      },
+      {
+       "id": "report",
+       "label": "Signaler",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bien. Signalez aussi ce genre de demande à l’équipe sécurité et à votre responsable."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "classify",
+   "prompt": "Associez chaque document à son niveau.",
+   "pairs": [
+    {
+     "id": "job-ad",
+     "left": "Une offre d’emploi publiée sur le site web",
+     "right": "Public"
+    },
+    {
+     "id": "phone-book",
+     "left": "L’annuaire téléphonique interne",
+     "right": "Interne"
+    },
+    {
+     "id": "applications",
+     "left": "La liste des demandes des citoyens",
+     "right": "Confidentiel"
+    }
+   ],
+   "explain": "En cas de doute, choisissez le niveau le plus élevé et demandez au propriétaire du document."
+  },
+  {
+   "type": "hotspot",
+   "id": "misdelivered",
+   "prompt": "Cet e-mail vous est parvenu par erreur. Repérez les erreurs de partage.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "rxagentlik",
+    "from": {
+     "name": [
+      {
+       "text": "Rashad Aliyev"
+      }
+     ],
+     "address": [
+      {
+       "text": "reshad.aliyev@rxagentlik.az"
+      }
+     ]
+    },
+    "to": "aynur.mammadova@rxagentlik.az",
+    "subject": [
+     {
+      "text": "Liste des demandes"
+     }
+    ],
+    "time": "11:40",
+    "body": [
+     [
+      {
+       "text": "Bonjour Leyla,",
+       "spot": "greeting"
+      }
+     ],
+     [
+      {
+       "text": "Voici en pièce jointe la "
+      },
+      {
+       "text": "liste complète des demandes des citoyens, avec leurs codes d’identification",
+       "spot": "full-list"
+      },
+      {
+       "text": "."
+      }
+     ],
+     [
+      {
+       "text": "Je l’ai aussi déposée dans le cloud, "
+      },
+      {
+       "text": "toute personne disposant du lien peut l’ouvrir.",
+       "spot": "anyone"
+      }
+     ],
+     [
+      {
+       "text": "Mot de passe de l’archive : Muraciet2026",
+       "spot": "password"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Muracietler_tam.zip"
+       }
+      ],
+      "size": "2,4 Mo"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "greeting",
+     "label": "Mauvais destinataire",
+     "explain": "L’e-mail s’adresse à Leyla, mais c’est vous qui l’avez reçu. C’est une erreur de saisie semi-automatique de l’adresse."
+    },
+    {
+     "id": "full-list",
+     "label": "Trop de données",
+     "explain": "La tâche ne nécessitait pas la liste complète avec les codes d’identification. N’envoyez que le nécessaire."
+    },
+    {
+     "id": "anyone",
+     "label": "Ouvrir le lien",
+     "explain": "Un fichier confidentiel ne doit jamais être partagé par un lien ouvert. Toute personne qui obtient le lien peut l’ouvrir."
+    },
+    {
+     "id": "password",
+     "label": "Mot de passe dans le même e-mail",
+     "explain": "Un mot de passe envoyé dans le même e-mail que le fichier ne protège rien. Envoyez-le par un autre canal."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "order",
+   "id": "sent-wrong",
+   "prompt": "Vous avez envoyé un fichier confidentiel à la mauvaise personne. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "close-link",
+     "label": "Désactiver immédiatement le lien de partage"
+    },
+    {
+     "id": "report",
+     "label": "Prévenir votre responsable et l’équipe sécurité"
+    },
+    {
+     "id": "ask-delete",
+     "label": "Sur leurs conseils, demander au destinataire de supprimer le fichier"
+    },
+    {
+     "id": "record",
+     "label": "Noter ce qui a été envoyé, à qui et quand"
+    }
+   ],
+   "explain": "Tout le monde peut faire cette erreur. La signaler vite limite les dégâts, la cacher les aggrave."
+  },
+  {
+   "type": "choice",
+   "id": "link-setting",
+   "question": {
+    "prompt": "Vous envoyez un fichier de projet à un partenaire externe. Quel paramètre de partage choisir ?",
+    "options": [
+     {
+      "id": "anyone",
+      "label": "Toute personne disposant du lien, sans date d’expiration",
+      "correct": false,
+      "feedback": "Le lien peut être transféré, et n’importe qui pourrait ouvrir le fichier."
+     },
+     {
+      "id": "named",
+      "label": "Uniquement la personne désignée, pendant 7 jours",
+      "correct": true,
+      "feedback": "Exact. L’accès est restreint et limité dans le temps."
+     },
+     {
+      "id": "personal-cloud",
+      "label": "Le déposer sur mon cloud personnel et envoyer un lien",
+      "correct": false,
+      "feedback": "Un compte personnel échappe au contrôle de l’organisation."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "cloud"
+    }
+   },
+   "explain": "Partagez de la façon la plus restreinte possible : avec qui, pour combien de temps et avec quels droits."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Avant d’envoyer, vérifiez le niveau du document et le destinataire.",
+    "Limitez les liens à des personnes désignées et dans le temps, et envoyez les mots de passe à part.",
+    "En cas d’erreur d’envoi, ne la cachez pas : signalez-la tout de suite."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,505 @@
+{
+ "id": "fake-salary-portal",
+ "title": "Gefälschtes Gehaltsportal",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "pd2-tutor",
+   "beats": [
+    {
+     "id": "pd2-b1",
+     "say": "Jetzt wechseln Sie die Rolle: Sie möchten einfach nur Ihre eigene Gehaltsabrechnung ansehen.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "pd2-b2",
+     "say": "Das oberste Suchergebnis ist oft eine Anzeige. Genau dort platzieren Kriminelle gefälschte Portale als Werbung.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "w2f-kadr-kabineti-fake",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "kadr-kabineti-giris.example.net",
+         "spot": "ad-domain"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "ad-domain"
+    },
+    {
+     "id": "pd2-b3",
+     "say": "Die gefälschte Seite sieht genauso aus wie die echte. Geben Sie dort Ihr Passwort ein, übernehmen Kriminelle Ihr Konto und ändern danach die Bankverbindung für Ihr Gehalt.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "w2f-kadr-kabineti-fake",
+       "brand": "Kadr Kabineti",
+       "url": [
+        {
+         "text": "https://kadr-kabineti-giris.example.net/giris"
+        }
+       ],
+       "fields": [
+        "Dienstliche E-Mail",
+        "Passwort"
+       ],
+       "button": "Anmelden"
+      }
+     }
+    },
+    {
+     "id": "pd2-b4",
+     "say": "Geben Sie die Adresse des Portals selbst ein oder öffnen Sie es über ein Lesezeichen. Und lassen Sie die Zwei-Faktor-Authentisierung eingeschaltet.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "pd2-choice",
+   "question": {
+    "prompt": "Sie haben nach „kadr kabineti“ gesucht. Wie gelangen Sie zum Portal?",
+    "options": [
+     {
+      "id": "ad",
+      "label": "Anzeige: Kadr Kabineti, offizielle Anmeldung (kadr-kabineti-giris.example.net)",
+      "correct": false,
+      "feedback": "Werbeplätze werden gekauft, deshalb kann ganz oben eine gefälschte Website stehen. Diese Domain gehört nicht Ihrer Organisation."
+     },
+     {
+      "id": "lookalike",
+      "label": "kadr-kabineti.example.org: Gehaltsabrechnung",
+      "correct": false,
+      "feedback": "Der Name sieht ähnlich aus, aber die Domain gehört nicht Ihrer Organisation. Ein täuschend ähnlicher Name ist der häufigste Trick."
+     },
+     {
+      "id": "typed",
+      "label": "Ich gebe sie selbst ein: kabinet.seherxidmetleri.example",
+      "correct": true,
+      "feedback": "Richtig. Eine Adresse, die Sie selbst eingeben oder als Lesezeichen gespeichert haben, hängt nicht von Werbung ab."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-tapinti",
+      "url": [
+       {
+        "text": "https://axtar.example/?q=kadr+kabineti"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "Kriminelle nutzen Suchanzeigen, um gefälschte Portale ganz nach oben zu bringen. Prüfen Sie die Adresse des Portals einmal und speichern Sie sie als Lesezeichen."
+  },
+  {
+   "type": "simulation",
+   "id": "pd2-sim",
+   "environment": "browser",
+   "title": "Gehaltsabrechnung",
+   "intro": "Sie haben den Browser geöffnet, um Ihre Gehaltsabrechnung anzusehen. Achten Sie auf die Adressleiste und entscheiden Sie bei jedem Schritt richtig.",
+   "steps": [
+    {
+     "id": "search",
+     "label": "Anzeige: Kadr Kabineti, offizielle Anmeldung zur Gehaltsabrechnung",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-tapinti",
+      "url": [
+       {
+        "text": "https://axtar.example/?q=kadr+kabineti",
+        "reveal": "axtar.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "ad",
+       "label": "Anzeige öffnen",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Diese Anzeige führt zu einem gefälschten Portal. In der Adressleiste steht nicht die Domain Ihrer Organisation.",
+       "next": "fake-login"
+      },
+      {
+       "id": "bookmark",
+       "label": "Kadr Kabineti über ein Lesezeichen öffnen",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein Lesezeichen führt Sie immer zur echten Adresse.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kadr-kabineti-giris.example.net/giris",
+        "reveal": "kadr-kabineti-giris.example.net"
+       }
+      ],
+      "fields": [
+       "Dienstliche E-Mail",
+       "Passwort"
+      ],
+      "button": "Anmelden"
+     },
+     "say": "Achten Sie auf die Adressleiste.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Anmelden",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Ihr Passwort ist bei den Kriminellen gelandet. Ändern Sie es sofort im echten Portal und rufen Sie die Personalabteilung an."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig, die Domain gehört nicht Ihrer Organisation. Öffnen Sie das Portal über Ihre Lesezeichen.",
+       "next": "real-login"
+      }
+     ]
+    },
+    {
+     "id": "fake-code",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kadr-kabineti-giris.example.net/tesdiq",
+        "reveal": "kadr-kabineti-giris.example.net"
+       }
+      ],
+      "fields": [
+       "SMS-Code"
+      ],
+      "button": "Bestätigen"
+     },
+     "say": "Jetzt verlangt die Website den Code, der an Ihr Smartphone geschickt wurde.",
+     "actions": [
+      {
+       "id": "code",
+       "label": "Bestätigen",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Mit dem Code gelangen die Kriminellen vollständig in Ihr Konto. Geben Sie einen Code nur auf der echten Website ein, und nur dann, wenn Sie sich selbst anmelden."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Gut, dass Sie abgebrochen haben. Ändern Sie jetzt Ihr Passwort im echten Portal und informieren Sie die Personalabteilung."
+      }
+     ]
+    },
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2f-kadr-kabineti",
+      "brand": "Kadr Kabineti",
+      "url": [
+       {
+        "text": "https://kabinet.seherxidmetleri.example/giris",
+        "reveal": "seherxidmetleri.example"
+       }
+      ],
+      "fields": [
+       "Dienstliche E-Mail",
+       "Passwort"
+      ],
+      "button": "Anmelden"
+     },
+     "say": "Das ist die eigene Adresse Ihrer Organisation.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Anmelden",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Richtig. Die Domain gehört Ihrer Organisation, und Sie haben die Seite selbst geöffnet."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Das ist das echte Portal. Wenn Sie die Adresse geprüft haben, können Sie sich gefahrlos anmelden."
+      }
+     ]
+    },
+    {
+     "id": "mfa-offer",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2f-kadr-kabineti",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Zwei-Faktor-Authentisierung ist ausgeschaltet"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Aktivieren Sie sie jetzt, um Ihr Konto zu schützen. Ihr Smartphone bestätigt dann jede Anmeldung."
+        }
+       ]
+      ],
+      "buttons": [
+       "Aktivieren",
+       "Später"
+      ]
+     },
+     "actions": [
+      {
+       "id": "enable",
+       "label": "Aktivieren",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Selbst wenn Ihr Passwort gestohlen wird, hält der zweite Faktor Fremde fern."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Ohne Zwei-Faktor-Authentisierung öffnet ein einziges Passwort alles. Aktivieren Sie sie noch heute."
+      }
+     ]
+    },
+    {
+     "id": "bank-details",
+     "label": "Ihre Bankverbindung: zuletzt geändert am 14.03.2025 von der Personalabteilung",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2f-kadr-kabineti",
+      "url": [
+       {
+        "text": "https://kabinet.seherxidmetleri.example/rekvizitler",
+        "reveal": "seherxidmetleri.example"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "check",
+       "label": "Konto prüfen",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Eine gute Gewohnheit. Wenn Sie eine Änderung sehen, die Sie nicht selbst vorgenommen haben, rufen Sie sofort die Personalabteilung an."
+      },
+      {
+       "id": "skip",
+       "label": "Gehen, ohne nachzusehen",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Hätten Fremde die Bankverbindung geändert, würden Sie es erst merken, wenn das Gehalt ausbleibt. Ein kurzer Blick dauert nur Sekunden."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "pd2-swipe",
+   "prompt": "Sicher oder Falle?",
+   "cards": [
+    {
+     "id": "boss-gift-cards",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Səbinə Əliyeva, Vorgesetzte"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Ich bin in einem Meeting und kann nicht telefonieren. Kaufen Sie schnell fünf BonusMarket-Karten zu je 100 Manat und schicken Sie mir die Codes hierher. Ich gebe Ihnen das Geld zurück."
+         }
+        ],
+        "time": "11:02"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Der Code einer Geschenkkarte ist wie Bargeld, und das Geld kommt nie zurück. Rufen Sie Ihre Vorgesetzte zur Prüfung unter einer Nummer an, die Sie kennen."
+    },
+    {
+     "id": "salary-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank",
+      "sender": [
+       {
+        "text": "SahilBank"
+       }
+      ],
+      "time": "09:00",
+      "messages": [
+       [
+        {
+         "text": "Gehalt in Höhe von 1.240,00 AZN wurde Ihrer Karte gutgeschrieben. Kontostand: 1.386,50 AZN."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Die Nachricht enthält keinen Link und verlangt nichts. Das ist eine ganz normale Information."
+    },
+    {
+     "id": "fake-hr-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "w2f-kadr-kabineti-fake",
+      "sender": [
+       {
+        "text": "KadrKabinet"
+       }
+      ],
+      "time": "08:41",
+      "messages": [
+       [
+        {
+         "text": "Ihr Gehalt wurde zurückgehalten. Aktualisieren Sie Ihre Bankverbindung: "
+        },
+        {
+         "text": "kadr-kabinet.example.info/yenile",
+         "link": {
+          "label": "kadr-kabinet.example.info/yenile",
+          "href": "https://kadr-kabinet.example.info/yenile"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Die Personalabteilung gibt ein Gehalt nie über einen Link in einer SMS frei. Öffnen Sie das Portal selbst oder rufen Sie das Team an."
+    },
+    {
+     "id": "payslip-ready",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-kadr-kabineti",
+      "app": "Kadr Kabineti",
+      "title": [
+       {
+        "text": "Ihre Gehaltsabrechnung für September liegt vor"
+       }
+      ],
+      "body": [
+       {
+        "text": "Sie finden sie im Bereich „Gehalt“ des Portals."
+       }
+      ],
+      "time": "10:15"
+     },
+     "verdict": "safe",
+     "explain": "Diese Benachrichtigung enthält keinen Link und verweist auf das Portal, das Sie kennen. Öffnen Sie es über Ihre Lesezeichen."
+    },
+    {
+     "id": "colleague-code",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Günel, Buchhaltung"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Du bekommst gleich einen Code von Kadr Kabineti. Sag ihn mir bitte, damit ich die Gehaltsliste korrigieren kann."
+         }
+        ],
+        "time": "13:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Ein Anmeldecode ist nur für Sie bestimmt. Wer Ihren Code bekommt, kommt in Ihr Konto."
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "pd2-order",
+   "prompt": "Sie haben Ihr Passwort in einem gefälschten Portal eingegeben. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "change-password",
+     "label": "Sofort das Passwort im echten Portal ändern"
+    },
+    {
+     "id": "call",
+     "label": "Personalabteilung und Sicherheitsteam anrufen"
+    },
+    {
+     "id": "check-details",
+     "label": "Gemeinsam Bankverbindung und letzte Anmeldungen prüfen"
+    },
+    {
+     "id": "enable-mfa",
+     "label": "Zwei-Faktor-Authentisierung aktivieren"
+    }
+   ],
+   "explain": "Ändern Sie zuerst das Passwort und rufen Sie dann an, damit jede Änderung der Bankverbindung gestoppt wird. Wenn Sie auch einen Code eingegeben haben, sagen Sie das unbedingt dazu."
+  },
+  {
+   "type": "recap",
+   "id": "pd2-recap",
+   "points": [
+    "Öffnen Sie das Portal über ein Lesezeichen, nicht über die Suche.",
+    "Lassen Sie die Zwei-Faktor-Authentisierung eingeschaltet.",
+    "Prüfen Sie Bitten um Geschenkkarten oder Codes telefonisch."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

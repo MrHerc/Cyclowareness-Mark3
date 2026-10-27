@@ -1,0 +1,469 @@
+{
+ "id": "event-wifi-charging",
+ "title": "شبكات Wi-Fi والشحن في الفعاليات",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "في الفعاليات، يتصل مئات الأشخاص بشبكة واحدة. ويستطيع المهاجم أن ينشئ شبكة أخرى بالاسم نفسه.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "wifi"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "الشبكة المفتوحة ذات الإشارة القوية والاسم المشابه قد تكون فخًا. اسأل مكتب التسجيل عن الاسم الصحيح.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "wifi",
+       "networks": [
+        {
+         "ssid": [
+          {
+           "text": "ReqemYol-Forum"
+          }
+         ],
+         "secured": true,
+         "signal": 3
+        },
+        {
+         "ssid": [
+          {
+           "text": "ReqemYol-Forum-FREE",
+           "spot": "twin"
+          }
+         ],
+         "secured": false,
+         "signal": 4
+        }
+       ]
+      }
+     },
+     "highlight": "twin"
+    },
+    {
+     "id": "b3",
+     "say": "للعمل، استخدم بيانات الجوال أو الشبكة الافتراضية الخاصة التابعة لجهتك. ولا تكتب أبدًا كلمة مرور العمل في صفحة تسجيل الدخول إلى شبكة Wi-Fi.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "vpn"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "بدلًا من محطة الشحن العامة، استخدم شاحنك الخاص في مقبس الكهرباء، أو شاحنك المتنقل.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "forum-wifi",
+   "environment": "browser",
+   "title": "شبكة Wi-Fi في المنتدى",
+   "intro": "اتصلت في المنتدى بشبكة مفتوحة، ثم فتح المتصفح صفحة تلقائيًا. اختر الخطوة الصحيحة في كل صفحة.",
+   "steps": [
+    {
+     "id": "portal-login",
+     "label": "ReqemYol-Forum-FREE",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "nc-reqemyol-fake",
+      "brand": "شبكة Wi-Fi لمنتدى RəqəmYol",
+      "url": [
+       {
+        "text": "http://wifi-reqemyol-forum.example.net/login"
+       }
+      ],
+      "fields": [
+       "بريد العمل الإلكتروني",
+       "كلمة مرور بريد العمل"
+      ],
+      "button": "الاتصال بالإنترنت"
+     },
+     "say": "ما الذي تطلبه صفحة شبكة Wi-Fi هذه؟",
+     "actions": [
+      {
+       "id": "login",
+       "label": "الاتصال بالإنترنت",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "صفحة شبكة Wi-Fi لا تحتاج أبدًا إلى كلمة مرور العمل. والآن يراها من يدير هذه الشبكة المفتوحة."
+      },
+      {
+       "id": "close",
+       "label": "إغلاق علامة التبويب",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "صحيح. اخرج من الشبكة، واسأل مكتب التسجيل عن الاسم الصحيح."
+      },
+      {
+       "id": "disconnect",
+       "label": "قطع الاتصال بالشبكة",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "ممتاز. الخروج من شبكة مفتوحة غير معروفة هو أسرع وسيلة للحماية."
+      }
+     ]
+    },
+    {
+     "id": "cert-warning",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "اتصالك ليس آمنًا"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "شهادة الأمان الخاصة بالموقع poct.idare.example غير صالحة."
+        }
+       ],
+       [
+        {
+         "text": "ربما يحاول أحد قراءة بياناتك."
+        }
+       ]
+      ],
+      "buttons": [
+       "الرجوع",
+       "المتابعة على أي حال"
+      ]
+     },
+     "say": "تفتح بريد العمل، فيعرض المتصفح تحذيرًا.",
+     "actions": [
+      {
+       "id": "back",
+       "label": "الرجوع",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "صحيح. قد يعني هذا التحذير أن أحدًا يتوسط اتصالك، فانتقل إلى بيانات الجوال."
+      },
+      {
+       "id": "proceed",
+       "label": "المتابعة على أي حال",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "تجاهل التحذير قد يسلم كلمة مرورك لمن يتوسط الاتصال. ارجع وغير الشبكة."
+      }
+     ]
+    },
+    {
+     "id": "setup-download",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-reqemyol-fake",
+      "name": [
+       {
+        "text": "ReqemYol_WiFi_Setup.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "4.1 MB",
+      "source": [
+       {
+        "text": "wifi-reqemyol-forum.example.net"
+       }
+      ]
+     },
+     "say": "تعرض عليك الصفحة برنامجًا للاتصال بالشبكة.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "فتح الملف",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "الاتصال بشبكة Wi-Fi لا يحتاج إلى أي برنامج. وهذا الملف يثبت برمجيات ضارة على الحاسوب."
+      },
+      {
+       "id": "delete",
+       "label": "حذف",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "صحيح. شبكة الفعالية لا تتطلب منك أبدًا تثبيت أي برنامج."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "network-list",
+   "prompt": "أي الشبكات في الفعالية تبدو مشبوهة؟ حددها.",
+   "artifact": {
+    "kind": "wifi",
+    "networks": [
+     {
+      "ssid": [
+       {
+        "text": "ReqemYol-Forum"
+       }
+      ],
+      "secured": true,
+      "signal": 3
+     },
+     {
+      "ssid": [
+       {
+        "text": "ReqemYol-Forum-FREE",
+        "spot": "free"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "ReqemYol_Forum",
+        "spot": "twin"
+       }
+      ],
+      "secured": false,
+      "signal": 4
+     },
+     {
+      "ssid": [
+       {
+        "text": "Pulsuz_Sarj_WiFi",
+        "spot": "charge"
+       }
+      ],
+      "secured": false,
+      "signal": 2
+     },
+     {
+      "ssid": [
+       {
+        "text": "Lumera-Guest"
+       }
+      ],
+      "secured": true,
+      "signal": 1
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "free",
+     "label": "إضافة كلمة FREE",
+     "explain": "الشبكة مفتوحة، وأضيفت إلى اسمها كلمة FREE. أما الاسم الرسمي فتحصل عليه من مكتب التسجيل."
+    },
+    {
+     "id": "twin",
+     "label": "اسم مشابه",
+     "explain": "الاسم يكاد يطابق الاسم الرسمي، ولا يختلف عنه إلا في رمز واحد. وقد تكون هذه شبكة «التوأم الشرير» المزيفة."
+    },
+    {
+     "id": "charge",
+     "label": "اسم جذاب",
+     "explain": "الشبكة المفتوحة التي تعرض شيئًا مجانيًا علامة معروفة على الفخ."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "choice",
+   "id": "charging",
+   "question": {
+    "prompt": "لم يبق في بطارية جوالك سوى 5%، وفي القاعة محطة شحن USB عامة. ماذا تفعل؟",
+    "options": [
+     {
+      "id": "own-adapter",
+      "label": "توصيل شاحني الخاص بمقبس في الجدار",
+      "correct": true,
+      "feedback": "صحيح. المقبس ينقل الكهرباء فقط، ولا ينقل البيانات."
+     },
+     {
+      "id": "powerbank",
+      "label": "الشحن من شاحني المتنقل",
+      "correct": true,
+      "feedback": "صحيح. شاحنك المتنقل يبقى تحت سيطرتك."
+     },
+     {
+      "id": "trust",
+      "label": "التوصيل بالمحطة والضغط على «الوثوق»",
+      "correct": false,
+      "feedback": "الوثوق يمنح الجهاز المتصل وصولًا إلى بيانات جوالك. والشحن لا يحتاج إلى ذلك."
+     },
+     {
+      "id": "stranger-cable",
+      "label": "استعارة كابل الضيف الجالس بجانبي",
+      "correct": false,
+      "feedback": "الكابل غير المعروف قد يخفي بداخله شريحة إلكترونية. احمل معك الكابل والشاحن الخاصين بك."
+     }
+    ],
+    "multi": true,
+    "visual": {
+     "kind": "illustration",
+     "id": "usb"
+    }
+   },
+   "explain": "الأكثر أمانًا أن تستخدم شاحنك الخاص في مقبس الكهرباء، أو شاحنك المتنقل. وإذا سألك الجوال، فاختر «عدم الوثوق»."
+  },
+  {
+   "type": "swipe",
+   "id": "event-messages",
+   "prompt": "أشياء تصلك أثناء الفعالية. هل هي آمنة أم تهديد؟",
+   "cards": [
+    {
+     "id": "badge-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "nc-reqemyol",
+      "sender": [
+       {
+        "text": "ReqemYol"
+       }
+      ],
+      "time": "08:30",
+      "messages": [
+       [
+        {
+         "text": "بطاقة الدخول الخاصة بك جاهزة. أحضر بطاقة هويتك إلى مكتب التسجيل."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "لا رابط، ولا شيء تدفعه، ولا شيء تكتبه. هذا تذكير عادي."
+    },
+    {
+     "id": "cert-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "nc-reqemyol-fake",
+      "from": {
+       "name": [
+        {
+         "text": "منتدى RəqəmYol"
+        }
+       ],
+       "address": [
+        {
+         "text": "sertifikat@reqemyol-forum.example.info"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "شهادة حضورك"
+       }
+      ],
+      "time": "17:05",
+      "body": [
+       [
+        {
+         "text": "سجل الدخول ببريد العمل الإلكتروني لتنزيل الشهادة: "
+        },
+        {
+         "text": "reqemyol-forum.example.info/certificate",
+         "link": {
+          "label": "reqemyol-forum.example.info/certificate",
+          "href": "https://reqemyol-forum.example.info/certificate"
+         }
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "الموقع الرسمي هو reqemyol-forum.example، وهذا نطاق مختلف. والشهادة لا تحتاج أبدًا إلى كلمة مرور العمل."
+    },
+    {
+     "id": "qr-table",
+     "artifact": {
+      "kind": "qr",
+      "caption": [
+       {
+        "text": "ملصق على الطاولة: امسح الرمز للاتصال بشبكة Wi-Fi مجانية"
+       }
+      ],
+      "destination": [
+       {
+        "text": "http://wifi-giris.example.info/connect"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "يستطيع أي شخص أن يضع ملصقًا، والعنوان ليس عنوان المنتدى. اسأل مكتب التسجيل عن اسم الشبكة."
+    },
+    {
+     "id": "session-note",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "nc-reqemyol",
+      "app": "RəqəmYol Forum",
+      "title": [
+       {
+        "text": "تبدأ الجلسة بعد 15 دقيقة"
+       }
+      ],
+      "body": [
+       {
+        "text": "جلسة حوارية عن الأمن السيبراني، القاعة B."
+       }
+      ],
+      "time": "13:45"
+     },
+     "verdict": "safe",
+     "explain": "هذا الإشعار من التطبيق الذي ثبته من المتجر الرسمي. لا رابط فيه ولا طلب."
+    },
+    {
+     "id": "trust-prompt",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "هل تريد الوثوق بهذا الجهاز؟"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "يريد الجهاز المتصل الوصول إلى ملفات جوالك."
+        }
+       ]
+      ],
+      "buttons": [
+       "عدم الوثوق",
+       "الوثوق"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "محطة الشحن لا ينبغي أن تطلب ملفاتك. اختر «عدم الوثوق»، وسيستمر الشحن."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "اسأل مكتب التسجيل عن اسم الشبكة، واستخدم للعمل بيانات الجوال أو الشبكة الافتراضية الخاصة (VPN).",
+    "لا تكتب أبدًا كلمة مرور العمل في صفحة شبكة Wi-Fi، ولا تتجاهل تحذير الشهادة.",
+    "اشحن جوالك بشاحنك الخاص في مقبس الكهرباء، أو بشاحنك المتنقل."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,483 @@
+{
+ "id": "links-attachments",
+ "title": "Посилання та вкладення",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "read-the-link",
+   "beats": [
+    {
+     "id": "intro",
+     "say": "Текст посилання каже одне, а його адреса — зовсім інше. Навчімося читати адресу.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "padlock",
+     "say": "Замок у адресному рядку означає лише одне: з’єднання зашифроване. У фальшивих сайтів замок теж буває.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     },
+     "checkpoint": {
+      "prompt": "Чи доводить замок, що сайт справжній?",
+      "options": [
+       {
+        "id": "yes",
+        "label": "Так",
+        "correct": false,
+        "feedback": "Ні. Шахраї теж легко отримують замок."
+       },
+       {
+        "id": "no",
+        "label": "Ні",
+        "correct": true,
+        "feedback": "Правильно. Завжди перевіряйте назву сайту."
+       }
+      ]
+     }
+    },
+    {
+     "id": "owner",
+     "say": "Назва сайту триває до першої одинарної косої риски. Остання частина цієї назви, разом із закінченням, і вказує на власника.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "xidmet-agentliyi-fake",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "xidmetagentliyi.az.",
+         "spot": "decoy"
+        },
+        {
+         "text": "hesab-yoxla.info",
+         "spot": "real-domain"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "real-domain"
+    },
+    {
+     "id": "decoy",
+     "say": "Знайома назва на початку — лише прикраса. Будь-хто може дописати її перед назвою власного сайту.",
+     "mood": "alert",
+     "gesture": "point-down",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "url",
+       "brandRef": "xidmet-agentliyi-fake",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "xidmetagentliyi.az.",
+         "spot": "decoy"
+        },
+        {
+         "text": "hesab-yoxla.info",
+         "spot": "real-domain"
+        },
+        {
+         "text": "/giris"
+        }
+       ]
+      }
+     },
+     "highlight": "decoy"
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "whose-link",
+   "question": {
+    "prompt": "Кому насправді належить це посилання?",
+    "options": [
+     {
+      "id": "bank",
+      "label": "UlduzBank",
+      "correct": false,
+      "feedback": "Назва банку стоїть на початку, але власника показує назва в кінці."
+     },
+     {
+      "id": "owner",
+      "label": "az-giris.info",
+      "correct": true,
+      "feedback": "Правильно. Кінець назви сайту показує справжнього власника."
+     },
+     {
+      "id": "path",
+      "label": "kart",
+      "correct": false,
+      "feedback": "Це не назва сайту, а шлях до сторінки після косої риски."
+     }
+    ],
+    "visual": {
+     "kind": "artifact",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ulduzbank-fake",
+      "url": [
+       {
+        "text": "https://ulduzbank.az-giris.info/kart"
+       }
+      ]
+     }
+    }
+   },
+   "explain": "Тут ulduzbank.az — лише прикраса. Сайт належить az-giris.info."
+  },
+  {
+   "type": "simulation",
+   "id": "link-to-login",
+   "environment": "browser",
+   "title": "Після натискання",
+   "intro": "Ви відкрили посилання з листа. Прочитайте адресу в браузері й вирішіть, що робити.",
+   "steps": [
+    {
+     "id": "fake-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "xidmet-agentliyi-fake",
+      "brand": "Xidmət Agentliyi",
+      "url": [
+       {
+        "text": "https://xidmetagentliyi.az.",
+        "reveal": "hesab-yoxla.info"
+       },
+       {
+        "text": "hesab-yoxla.info",
+        "spot": "real-domain"
+       },
+       {
+        "text": "/giris"
+       }
+      ],
+      "fields": [
+       "Електронна пошта",
+       "Пароль"
+      ],
+      "button": "Увійти"
+     },
+     "say": "Подивіться на кінець адреси: хто справжній власник?",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Увійти",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Сторінка належить hesab-yoxla.info, а не агентству. Негайно змініть пароль і повідомте службі безпеки."
+      },
+      {
+       "id": "close",
+       "label": "Закрити вкладку",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Правильно. Знайома назва на початку — лише прикраса, а справжнім доменом був hesab-yoxla.info."
+      },
+      {
+       "id": "report",
+       "label": "Повідомити про сайт",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Чудово. Ваше повідомлення допоможе заблокувати фальшивий сайт і для всіх інших."
+      }
+     ]
+    },
+    {
+     "id": "download",
+     "label": "Завантаження рахунку",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "ofistechizat-fake",
+      "name": [
+       {
+        "text": "Faktura_0925.pdf.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "2,1 МБ",
+      "source": [
+       {
+        "text": "ofis-techizat.com"
+       }
+      ]
+     },
+     "say": "Браузер завантажив файл. Перевірте, чим закінчується його назва.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Відкрити",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Справжній тип файлу — .exe, тобто програма. Рахунок ніколи не буває програмою."
+      },
+      {
+       "id": "delete",
+       "label": "Видалити",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Правильно. Програму, що видає себе за документ, видаліть, а про лист повідомте."
+      },
+      {
+       "id": "scan",
+       "label": "Перевірити антивірусом",
+       "kind": "scan",
+       "outcome": "safe",
+       "feedback": "Добра звичка. Але файл, що закінчується на .pdf.exe, можна видалити й без перевірки."
+      }
+     ]
+    },
+    {
+     "id": "real-portal",
+     "label": "Ви відкрили портал зі своєї закладки",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "xidmet-agentliyi",
+      "brand": "Xidmət Agentliyi",
+      "url": [
+       {
+        "text": "https://portal.xidmetagentliyi.az/giris",
+        "reveal": "xidmetagentliyi.az"
+       }
+      ],
+      "fields": [
+       "Електронна пошта",
+       "Пароль"
+      ],
+      "button": "Увійти"
+     },
+     "say": "Цього разу ви відкрили адресу самі. Що далі?",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Увійти",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Правильно. Це офіційний домен агентства, і сторінку ви відкрили самостійно."
+      },
+      {
+       "id": "report",
+       "label": "Повідомити про сайт",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Це офіційний портал агентства. Сайту, який ви самі відкрили із закладки, можна довіряти."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "invoice-trap",
+   "prompt": "Знайдіть у цьому листі тривожні ознаки.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "ofistechizat-fake",
+    "from": {
+     "name": [
+      {
+       "text": "OfisTəchizat MMC",
+       "reveal": "hesab@ofis-techizat.com"
+      }
+     ],
+     "address": [
+      {
+       "text": "hesab@"
+      },
+      {
+       "text": "ofis-techizat.com",
+       "spot": "sender-domain"
+      }
+     ]
+    },
+    "to": "s.huseynova@xidmetagentliyi.az",
+    "subject": [
+     {
+      "text": "Рахунок № 0925: оплату прострочено"
+     }
+    ],
+    "time": "14:32",
+    "body": [
+     [
+      {
+       "text": "Добрий день!"
+      }
+     ],
+     [
+      {
+       "text": "Прострочений рахунок — у вкладенні. "
+      },
+      {
+       "text": "Відкрийте його й увімкніть макроси, інакше текст не відобразиться.",
+       "spot": "enable-content"
+      }
+     ],
+     [
+      {
+       "text": "Якщо файл не відкривається, завантажте його тут: "
+      },
+      {
+       "text": "https://qisa.example/f8Rt",
+       "spot": "short-link"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Faktura_0925.pdf.zip",
+        "spot": "double-ext",
+        "reveal": "Тип файлу: ZIP-архів (.zip)"
+       }
+      ],
+      "size": "312 КБ"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "sender-domain",
+     "label": "Домен-двійник",
+     "explain": "Він нагадує домен відомого постачальника, але відрізняється. Справжню адресу перевірте у власних записах."
+    },
+    {
+     "id": "enable-content",
+     "label": "Прохання ввімкнути макроси",
+     "explain": "Макроси можуть потай виконувати команди. Office блокує їх у файлах з інтернету, і справжній рахунок ніколи не попросить обійти цей захист."
+    },
+    {
+     "id": "short-link",
+     "label": "Скорочене посилання",
+     "explain": "Не видно, куди воно веде. Підштовхувати вас завантажити файл за посиланням — класична хитрість."
+    },
+    {
+     "id": "double-ext",
+     "label": "Подвійне розширення",
+     "explain": "Назва починається як PDF, але насправді це ZIP-архів. Усередині може ховатися програма."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "link-check",
+   "prompt": "Це посилання безпечне чи небезпечне?",
+   "cards": [
+    {
+     "id": "home",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "xidmet-agentliyi",
+      "url": [
+       {
+        "text": "https://xidmetagentliyi.az/elanlar"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Назва сайту точно збігається з адресою агентства."
+    },
+    {
+     "id": "portal",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "xidmet-agentliyi",
+      "url": [
+       {
+        "text": "https://portal.xidmetagentliyi.az/mezuniyyet"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Частина «portal» на початку — це розділ сайту самого агентства. А закінчення все одно xidmetagentliyi.az."
+    },
+    {
+     "id": "decoy",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "xidmet-agentliyi-fake",
+      "url": [
+       {
+        "text": "https://xidmetagentliyi.az-portal.info/giris"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Адреса закінчується на az-portal.info. Назву агентства просто дописали на початку."
+    },
+    {
+     "id": "swap",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "xidmet-agentliyi-fake",
+      "url": [
+       {
+        "text": "https://xidmetaqentliyi.az/maas"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Замість g стоїть q. Це зовсім інший сайт."
+    },
+    {
+     "id": "short",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://qisa.example/a8Zq"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Скорочене посилання приховує, куди воно веде. Якщо ви його не чекали, не відкривайте."
+    },
+    {
+     "id": "bank",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ulduzbank",
+      "url": [
+       {
+        "text": "https://ulduzbank.az/kartlar"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Це власна адреса банку, вона закінчується на ulduzbank.az. І все ж найкраще вводити адресу банку самостійно."
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Справжнього власника сайту видно в кінці його назви.",
+    "Скорочені посилання й несподівані файли спершу перевіряйте.",
+    "Якщо файл просить увімкнути макроси, закрийте його й повідомте службі безпеки."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

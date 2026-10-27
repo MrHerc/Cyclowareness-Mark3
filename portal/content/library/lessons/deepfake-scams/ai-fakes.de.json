@@ -1,0 +1,446 @@
+{
+  "id": "ai-fakes",
+  "title": "KI-Fälschungen: Bilder und Falschmeldungen",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "seconds",
+          "say": "KI kann in Sekunden echt wirkende Bilder, Videos und Meldungen erzeugen.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "social"
+          }
+        },
+        {
+          "id": "celebrity",
+          "say": "Anlagewerbung mit einem gefälschten Video einer bekannten Person ist eine sehr verbreitete Betrugsmasche.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "db-bulvar-xeber-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "BulvarXəbər"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "xeber@"
+                  },
+                  {
+                    "text": "bulvar-xeber.example.net",
+                    "spot": "domain"
+                  }
+                ]
+              },
+              "subject": [
+                {
+                  "text": "Sensation: Bekannter Moderator verrät live im Fernsehen sein Geheimnis",
+                  "spot": "sensation"
+                }
+              ],
+              "time": "08:05",
+              "body": [
+                [
+                  {
+                    "text": "Der Moderator hat 250 Manat in eine neue Plattform gesteckt und verdient jetzt 3.000 Manat im Monat.",
+                    "spot": "promise"
+                  }
+                ],
+                [
+                  {
+                    "text": "Das verschweigen Ihnen die Banken!",
+                    "spot": "secret"
+                  }
+                ],
+                [
+                  {
+                    "text": "Nur wenige Plätze frei, Anmeldung nur heute: ",
+                    "spot": "rush"
+                  },
+                  {
+                    "text": "neftinvest.example.net",
+                    "link": {
+                      "label": "neftinvest.example.net",
+                      "href": "https://neftinvest.example.net/qeydiyyat"
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "promise"
+        },
+        {
+          "id": "details",
+          "say": "Finger, Schriftzüge und Licht stimmen manchmal nicht, aber das ist nicht immer zu erkennen.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "rule",
+          "say": "Prüfen Sie Meldungen auf der offiziellen Website, und trauen Sie keinem Versprechen hoher Gewinne.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "browser"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "fake-ad",
+      "prompt": "Finden Sie die Warnsignale in dieser E-Mail.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "db-bulvar-xeber-fake",
+        "from": {
+          "name": [
+            {
+              "text": "BulvarXəbər"
+            }
+          ],
+          "address": [
+            {
+              "text": "xeber@"
+            },
+            {
+              "text": "bulvar-xeber.example.net",
+              "spot": "domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Sensation: Bekannter Moderator verrät live im Fernsehen sein Geheimnis",
+            "spot": "sensation"
+          }
+        ],
+        "time": "08:05",
+        "body": [
+          [
+            {
+              "text": "Der Moderator hat 250 Manat in eine neue Plattform gesteckt und verdient jetzt 3.000 Manat im Monat.",
+              "spot": "promise"
+            }
+          ],
+          [
+            {
+              "text": "Das verschweigen Ihnen die Banken!",
+              "spot": "secret"
+            }
+          ],
+          [
+            {
+              "text": "Nur wenige Plätze frei, Anmeldung nur heute: ",
+              "spot": "rush"
+            },
+            {
+              "text": "neftinvest.example.net",
+              "link": {
+                "label": "neftinvest.example.net",
+                "href": "https://neftinvest.example.net/qeydiyyat"
+              }
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "domain",
+          "label": "Gefälschte Domain",
+          "explain": "Die echte Adresse der Nachrichtenseite sieht anders aus. Lesen Sie die Adresse bis zum Ende."
+        },
+        {
+          "id": "sensation",
+          "label": "Reißerische Schlagzeile",
+          "explain": "Die Sensation soll Sie dazu bringen, aus einem Gefühl heraus zu klicken."
+        },
+        {
+          "id": "promise",
+          "label": "Versprechen hoher Gewinne",
+          "explain": "Keine seriöse Geldanlage garantiert hohe Renditen."
+        },
+        {
+          "id": "secret",
+          "label": "Verschwiegenes Geheimnis",
+          "explain": "Die Geschichte vom verschwiegenen Geheimnis soll Sie von offiziellen Quellen weglocken."
+        },
+        {
+          "id": "rush",
+          "label": "Nur heute",
+          "explain": "Zeitdruck lässt Ihnen keine Zeit zum Nachdenken und Prüfen."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "invest-browser",
+      "environment": "browser",
+      "title": "Hinter der Anzeige",
+      "intro": "Angenommen, Sie haben den Link in der Anzeige geöffnet. Treffen Sie auf der Website bei jedem Schritt die richtige Entscheidung.",
+      "steps": [
+        {
+          "id": "fake-article",
+          "label": "Moderator verrät live sein Geheimnis: 3.000 Manat im Monat",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "db-bulvar-xeber-fake",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "bulvar-xeber.example.net"
+              },
+              {
+                "text": "bulvar-xeber.example.net",
+                "spot": "domain"
+              },
+              {
+                "text": "/neftinvest"
+              }
+            ]
+          },
+          "say": "Die Person im Video spricht genau wie der Moderator.",
+          "actions": [
+            {
+              "id": "register",
+              "label": "Video ansehen und registrieren",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Das Video wurde mit KI erstellt, der Moderator hat das nie gesagt. Die Seite führt zu einer betrügerischen Plattform."
+            },
+            {
+              "id": "close",
+              "label": "Tab schließen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig. Ein Versprechen hoher Gewinne und eine gefälschte Domain sind Warnung genug.",
+              "next": "real-news"
+            }
+          ]
+        },
+        {
+          "id": "invest-form",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "db-neftinvest",
+            "brand": "NeftInvest Pro",
+            "url": [
+              {
+                "text": "https://neftinvest.example.net/qeydiyyat",
+                "reveal": "neftinvest.example.net"
+              }
+            ],
+            "fields": [
+              "Vollständiger Name",
+              "Telefon",
+              "Kartennummer",
+              "CVV"
+            ],
+            "button": "250 Manat investieren"
+          },
+          "actions": [
+            {
+              "id": "pay",
+              "label": "250 Manat investieren",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Ihre Kartendaten sind bei Kriminellen gelandet, und das Geld kommt nicht zurück. Rufen Sie sofort Ihre Bank an und lassen Sie die Karte sperren."
+            },
+            {
+              "id": "close",
+              "label": "Tab schließen",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Richtig. Geben Sie Kartendaten nie auf einer Plattform ein, die Sie nicht kennen."
+            }
+          ]
+        },
+        {
+          "id": "real-news",
+          "label": "Moderator: Die Werbung mit meinem Namen ist gefälscht",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "db-bulvar-xeber",
+            "url": [
+              {
+                "text": "https://bulvar-xeber.example/xeberler/saxta-reklam",
+                "reveal": "bulvar-xeber.example"
+              }
+            ]
+          },
+          "say": "Das ist die echte Adresse der Nachrichtenseite.",
+          "actions": [
+            {
+              "id": "read",
+              "label": "Artikel lesen",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Richtig. Eine zweifelhafte Meldung an der offiziellen Quelle zu prüfen, ist der zuverlässigste Weg."
+            },
+            {
+              "id": "share",
+              "label": "Mit der Familie teilen",
+              "kind": "share",
+              "outcome": "safe",
+              "feedback": "Gute Idee. Wer das offizielle Dementi teilt, schützt auch andere."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "swipe",
+      "id": "believe-or-check",
+      "prompt": "Können Sie dem vertrauen, oder ist es gefährlich?",
+      "cards": [
+        {
+          "id": "weather",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "db-bulvar-xeber",
+            "app": "BulvarXəbər",
+            "title": [
+              {
+                "text": "Morgen wird in Baku Regen erwartet"
+              }
+            ],
+            "body": [
+              {
+                "text": "Temperaturen von 14 bis 18 Grad."
+              }
+            ],
+            "time": "07:30"
+          },
+          "verdict": "safe",
+          "explain": "Eine gewöhnliche Meldung, die nichts von Ihnen verlangt."
+        },
+        {
+          "id": "aid-link",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "Nachbarschaftsgruppe"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Jede Familie bekommt 500 Manat Unterstützung, hier anmelden: "
+                  },
+                  {
+                    "text": "yardim-az.example.net",
+                    "link": {
+                      "label": "yardim-az.example.net",
+                      "href": "https://yardim-az.example.net"
+                    }
+                  }
+                ],
+                "time": "19:20"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Staatliche Hilfen laufen über das offizielle Portal, nicht über einen Link in einem Gruppenchat."
+        },
+        {
+          "id": "crypto-star",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "kontakto",
+            "app": "Kontakto",
+            "title": [
+              {
+                "text": "Gesponsert"
+              }
+            ],
+            "body": [
+              {
+                "text": "Berühmter Fußballer verschenkt Geld: Geben Sie Ihre Kartendaten ein, um Ihr Geschenk zu erhalten."
+              }
+            ],
+            "time": "21:00"
+          },
+          "verdict": "threat",
+          "explain": "Geschenktes Geld im Namen eines Prominenten ist eine klassische Betrugsmasche. Bild und Video können mit KI erstellt sein."
+        },
+        {
+          "id": "portal",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "e-xidmet",
+            "app": "e-Xidmət",
+            "title": [
+              {
+                "text": "Der Status Ihres Antrags hat sich geändert"
+              }
+            ],
+            "body": [
+              {
+                "text": "Details finden Sie in Ihrem persönlichen Konto im Portal."
+              }
+            ],
+            "time": "10:45"
+          },
+          "verdict": "safe",
+          "explain": "Es wird weder ein Link noch eine Zahlung verlangt, und Sie werden an das offizielle Portal verwiesen."
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "check-news",
+      "prompt": "Sie sehen eine schockierende Meldung. Bringen Sie die Prüfschritte in die richtige Reihenfolge.",
+      "items": [
+        {
+          "id": "pause",
+          "label": "Innehalten und nicht sofort teilen"
+        },
+        {
+          "id": "source",
+          "label": "Quelle und Adresse der Website ansehen"
+        },
+        {
+          "id": "official",
+          "label": "Die Meldung auf der offiziellen Website oder in einer vertrauenswürdigen Quelle suchen"
+        },
+        {
+          "id": "decide",
+          "label": "Nur teilen, wenn sie bestätigt ist, und melden, wenn sie gefälscht ist"
+        }
+      ],
+      "explain": "Erst die Gefühle bremsen, dann prüfen. Geteilt wird zuletzt."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Echt wirkende Bilder und Videos können mit KI erstellt sein.",
+        "Versprechen hoher Gewinne oder geschenktes Geld sind Betrug.",
+        "Prüfen Sie Meldungen an einer offiziellen Quelle, bevor Sie sie teilen."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

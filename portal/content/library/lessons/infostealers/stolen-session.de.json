@@ -1,0 +1,353 @@
+{
+ "id": "stolen-session",
+ "title": "Gestohlene Anmeldesitzung",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "is2-tutor",
+   "beats": [
+    {
+     "id": "is2-b1",
+     "say": "Hallo! Am Morgen sehen Sie, dass Ihr Dienst-Postfach in der Nacht vierzig E-Mails ins Ausland verschickt hat.",
+     "mood": "alert",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "is2-b2",
+     "say": "Niemand kannte Ihr Passwort. Ein Programm hat Ihre Anmeldesitzung, also das Cookie, aus dem Browser gestohlen.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "ispoct",
+       "app": "İşPoçt",
+       "title": [
+        {
+         "text": "Neue Anmeldung"
+        }
+       ],
+       "body": [
+        {
+         "text": "Amsterdam, 03:05, unbekannter Browser",
+         "spot": "location"
+        }
+       ],
+       "time": "03:05"
+      }
+     },
+     "highlight": "location"
+    },
+    {
+     "id": "is2-b3",
+     "say": "Das Cookie sagt der Website, dass Sie bereits angemeldet sind. Deshalb fragt die Website weder nach einem Passwort noch nach einem Code.",
+     "mood": "talk",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "is2-b4",
+     "say": "Drei Dinge helfen: ein sauberes Gerät, die Abmeldung von allen Sitzungen und der IT-Support.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "is2-match",
+   "prompt": "Was können Kriminelle mit den gestohlenen Daten tun? Ordnen Sie zu.",
+   "pairs": [
+    {
+     "id": "cookie",
+     "left": "Anmeldesitzung im Browser",
+     "right": "Ohne Passwort und Code ins Konto gelangen"
+    },
+    {
+     "id": "saved",
+     "left": "Im Browser gespeicherte Passwörter",
+     "right": "In Ihre Konten auf anderen Websites gelangen"
+    },
+    {
+     "id": "card",
+     "left": "Per Autofill gespeicherte Kartendaten",
+     "right": "In Ihrem Namen online bezahlen"
+    },
+    {
+     "id": "messenger",
+     "left": "Anmeldesitzung in der Messenger-App",
+     "right": "Ihre Chats lesen und in Ihrem Namen schreiben"
+    }
+   ],
+   "explain": "Ein Infostealer nimmt all das auf einmal mit. Ändern Sie deshalb alle Passwörter, nicht nur eines, und melden Sie sich von allen Sitzungen ab."
+  },
+  {
+   "type": "simulation",
+   "id": "is2-sim",
+   "environment": "browser",
+   "title": "An einem sauberen Arbeitscomputer",
+   "intro": "Sie sitzen an Ihrem Arbeitscomputer, und er ist sauber. Öffnen Sie Ihr Postfach und wählen Sie auf jedem Bildschirm den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "sent-folder",
+     "label": "Gesendet: heute Nacht um 03:12 Uhr, 40 E-Mails an unbekannte Adressen",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://poct.idare.example/gonderilenler"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "call-it",
+       "label": "IT-Support anrufen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Eine Fachkraft kann das Konto sofort schützen und sehen, was verschickt wurde."
+      },
+      {
+       "id": "delete",
+       "label": "E-Mails löschen",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Löschen holt gesendete E-Mails nicht zurück, vernichtet aber Beweise. Informieren Sie zuerst den IT-Support."
+      },
+      {
+       "id": "later",
+       "label": "Schließen, später ansehen",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Der Angreifer ist noch im Konto und schreibt weiter. Jede Minute zählt."
+      }
+     ]
+    },
+    {
+     "id": "new-login",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Anmeldung von einem neuen Gerät"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Windows, unbekannter Browser"
+        }
+       ],
+       [
+        {
+         "text": "Amsterdam, heute 03:05"
+        }
+       ],
+       [
+        {
+         "text": "Waren Sie das?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Das war ich nicht",
+       "Das war ich"
+      ]
+     },
+     "actions": [
+      {
+       "id": "not-me",
+       "label": "Das war ich nicht",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Das System markiert die Anmeldung als verdächtig, und der IT-Support sieht sie."
+      },
+      {
+       "id": "me",
+       "label": "Das war ich",
+       "kind": "mark-safe",
+       "outcome": "compromised",
+       "feedback": "Damit haben Sie gerade die Anmeldung des Angreifers bestätigt. Jetzt behandelt das System den Angreifer wie Sie."
+      }
+     ]
+    },
+    {
+     "id": "change-password",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "İşPoçt",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/parol"
+       }
+      ],
+      "fields": [
+       "Aktuelles Passwort",
+       "Neues Passwort",
+       "Neues Passwort wiederholen"
+      ],
+      "button": "Passwort ändern"
+     },
+     "say": "Die Adresse ist echt, und der Computer ist sauber.",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Passwort ändern",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Richtig. Geben Sie ein neues Passwort nur auf einem sauberen Gerät ein, sonst stiehlt das Programm auch dieses."
+      },
+      {
+       "id": "skip",
+       "label": "Später",
+       "kind": "cancel",
+       "outcome": "risky",
+       "feedback": "Das alte Passwort ist womöglich gestohlen. Ändern Sie es jetzt, von diesem sauberen Computer aus."
+      }
+     ]
+    },
+    {
+     "id": "sessions",
+     "label": "Aktive Sitzungen: 3 Geräte. Von allen abmelden?",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/sessiyalar"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "sign-out-all",
+       "label": "Von allen Geräten abmelden",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Das gestohlene Cookie funktioniert nicht mehr, und der Angreifer müsste sich neu anmelden."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Eine Passwortänderung beendet nicht immer eine offene Sitzung. Der Angreifer könnte noch im Konto sein."
+      }
+     ]
+    },
+    {
+     "id": "forward-rule",
+     "label": "Neue Regel, 03:07: alle E-Mails an arxiv@poct-yedek.example weiterleiten",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://poct.idare.example/qaydalar"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "show-it",
+       "label": "Regel dem IT-Support zeigen",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Auch nachdem der Angreifer weg war, hat ihm diese Regel weiter Ihre E-Mails geschickt."
+      },
+      {
+       "id": "leave",
+       "label": "So lassen",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "Das ist eine versteckte Weiterleitung. Jede neue E-Mail, die Sie bekommen, geht an den Angreifer."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "is2-choice",
+   "question": {
+    "prompt": "Wie ist der Angreifer ohne Ihr Passwort und ohne Code in Ihr Postfach gelangt?",
+    "options": [
+     {
+      "id": "cookie",
+      "label": "Mit einer Anmeldesitzung, die aus dem Browser gestohlen wurde",
+      "correct": true,
+      "feedback": "Richtig. Die Sitzung zeigt, dass die Anmeldung bereits erfolgt ist, deshalb wird kein Code abgefragt."
+     },
+     {
+      "id": "guess",
+      "label": "Er hat das Passwort erraten",
+      "correct": false,
+      "feedback": "Dann hätte das System nach einem Code gefragt. Hier waren weder Passwort noch Code nötig."
+     },
+     {
+      "id": "server",
+      "label": "Der Mailserver wurde gehackt",
+      "correct": false,
+      "feedback": "Der Server ist in Ordnung. Gestohlen wurde die Sitzung in Ihrem Browser."
+     }
+    ]
+   },
+   "explain": "Wird ein Cookie gestohlen, hilft auch die Zwei-Faktor-Authentisierung nicht. Lassen Sie deshalb keinen Infostealer auf Ihren Computer."
+  },
+  {
+   "type": "order",
+   "id": "is2-order",
+   "prompt": "Ein Computer ist infiziert. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "isolate",
+     "label": "Den infizierten Computer vom Netzwerk trennen"
+    },
+    {
+     "id": "report",
+     "label": "Sofort den IT-Support informieren"
+    },
+    {
+     "id": "passwords",
+     "label": "Passwörter von einem sauberen Gerät aus ändern"
+    },
+    {
+     "id": "sessions",
+     "label": "Von allen Sitzungen abmelden"
+    },
+    {
+     "id": "rebuild",
+     "label": "Den Computer vom IT-Support neu aufsetzen lassen"
+    }
+   ],
+   "explain": "Wenn Sie ein Passwort auf dem infizierten Computer ändern, stiehlt das Programm auch das neue. Als sauber gilt der Computer erst, wenn er neu aufgesetzt wurde."
+  },
+  {
+   "type": "recap",
+   "id": "is2-recap",
+   "points": [
+    "Eine gestohlene Anmeldesitzung verschafft Zugang ohne Passwort und Code",
+    "Ändern Sie Passwörter von einem sauberen Gerät aus und melden Sie sich dann von allen Sitzungen ab",
+    "Lassen Sie den infizierten Computer vom IT-Support neu aufsetzen"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

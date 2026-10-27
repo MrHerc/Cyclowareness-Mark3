@@ -1,0 +1,527 @@
+{
+ "id": "fake-shops",
+ "title": "Sahte mağaza",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "fs-tutor",
+   "beats": [
+    {
+     "id": "fs-b1",
+     "say": "Merhaba! Bu derste sosyal medyadaki sahte mağazaları nasıl fark edeceğinizi öğreneceksiniz.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "fs-b2",
+     "say": "Şu reklama bakın: pahalı bir klima sadece 299 manat. Kampanya yalnızca bugün geçerli ve ödeme peşin.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "kontakto",
+       "app": "Kontakto",
+       "title": [
+        {
+         "text": "Sponsorlu: Sərin Klimat İndirim"
+        }
+       ],
+       "body": [
+        {
+         "text": "Klima 1.199 değil, sadece 299 AZN! "
+        },
+        {
+         "text": "Yalnızca bugün, %100 ön ödemeyle.",
+         "spot": "prepay"
+        }
+       ],
+       "time": "13:05"
+      }
+     },
+     "highlight": "prepay"
+    },
+    {
+     "id": "fs-b3",
+     "say": "Dolandırıcı önce parayı alır, sonra sayfayı kapatıp ortadan kaybolur.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "fs-b4",
+     "say": "Kural basit: tanımadığınız bir sayfaya asla ön ödeme yapmayın, mümkün olduğunda kapıda ödemeyi seçin.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "fs-swipe",
+   "prompt": "Hangi mağaza teklifi güvenli, hangisi tehlikeli?",
+   "cards": [
+    {
+     "id": "rush",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Sərin Klimat İndirim"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Kampanya bugün bitiyor, sadece 3 adet kaldı. Ödeme yalnızca karttan karta, %100 peşin."
+         }
+        ],
+        "time": "13:12"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Baskı ve yalnızca karttan karta ön ödeme, sahte mağazanın başlıca işaretidir. Bu parayı geri almak çok zordur."
+    },
+    {
+     "id": "official",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Sərin Klimat, 2014'ten beri"
+       }
+      ],
+      "body": [
+       {
+        "text": "Klima 1.149 AZN. Kapıda ödeme, nakit ya da kartla. Nerimanov'da mağaza ve servis merkezi."
+       }
+      ],
+      "time": "10:20"
+     },
+     "verdict": "safe",
+     "explain": "Gerçekçi bir fiyat, yıllardır açık bir sayfa ve kapıda ödeme. Önce ürünü görür, sonra ödersiniz."
+    },
+    {
+     "id": "lookalike",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2e-serin-klimat-fake",
+      "url": [
+       {
+        "text": "https://serin-klimat-endirim.example.net/kampaniya"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Bu, mağazanın resmî sitesi değil. Mağaza adına eklenmiş fazladan bir kelime ve tuhaf bir alan adı, sahte sayfayı ele verir."
+    },
+    {
+     "id": "cod",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Leman Handmade"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Merhaba! Siparişleri ÇevikKargo ile gönderiyorum, ödemeyi ürün gelince kuryeye yaparsınız."
+         }
+        ],
+        "time": "11:47"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Kapıda ödeme sizi korur. Ürünü görmeden hiçbir ödeme yapmazsınız."
+    },
+    {
+     "id": "new-page",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Phone Outlet Baku"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Sayfamız yeni ama 20 bin takipçimiz var. Spam yüzünden yorumları kapattık. 50 AZN kapora gönderin."
+         }
+        ],
+        "time": "16:30"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Yeni bir sayfa, kapalı yorumlar ve kapora isteği bir aradaysa bu ciddi bir uyarıdır. Takipçi satın alınabilir."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "fs-sim",
+   "environment": "phone",
+   "title": "Klima kampanyası",
+   "intro": "Kontakto'da ucuz bir klima reklamı gördünüz. Telefonunuzda adım adım karar verin.",
+   "steps": [
+    {
+     "id": "ad",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Sponsorlu: Sərin Klimat İndirim"
+       }
+      ],
+      "body": [
+       {
+        "text": "Klima 1.199 değil, sadece 299 AZN! Yalnızca bugün, %100 ön ödemeyle."
+       }
+      ],
+      "time": "13:05"
+     },
+     "say": "Reklam çok cazip. Bakmakta bir sakınca yok.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Reklamı aç",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Bakmak tehlikeli değil. Asıl karar, ödeme yapmadan önce verilir."
+      },
+      {
+       "id": "hide",
+       "label": "Reklamı gizle",
+       "kind": "ignore",
+       "outcome": "safe",
+       "feedback": "İyi seçim. Aşırı düşük bir fiyat çoğu zaman bir yemdir.",
+       "next": "real-shop"
+      }
+     ]
+    },
+    {
+     "id": "prepay",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Sərin Klimat İndirim"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Merhaba! Kampanya bugün saat 18:00'de bitiyor."
+         }
+        ],
+        "time": "13:12"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Adınızı ve adresinizi gönderin, 299 AZN tutarını şu karta aktarın: **** **** **** 0000. Teslimat yarın."
+         }
+        ],
+        "time": "13:12"
+       }
+      ]
+     },
+     "say": "Satıcı hemen ön ödeme istiyor.",
+     "actions": [
+      {
+       "id": "ask-cod",
+       "label": "Kapıda ödeme yapabilir miyim?",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Güzel soru. Gerçek bir mağaza genellikle kapıda ödemeyi kabul eder."
+      },
+      {
+       "id": "pay",
+       "label": "Hemen 299 AZN gönder",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Para bir yabancının kartına gitti. Ön ödemeyi geri almak çok zordur.",
+       "next": "gone"
+      },
+      {
+       "id": "report",
+       "label": "Sayfayı bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Çok iyi. Bildirdiğiniz sayfa artık başka alıcıları kandıramaz.",
+       "next": "real-shop"
+      }
+     ]
+    },
+    {
+     "id": "deposit",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat-fake",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Sərin Klimat İndirim"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Kapıda ödeme yapabilir miyim?"
+         }
+        ],
+        "time": "13:14"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "İndirimli fiyatta kapıda ödeme yok. En az 50 AZN kapora gönderin, kalanını kuryeye ödersiniz."
+         }
+        ],
+        "time": "13:15"
+       }
+      ]
+     },
+     "say": "İşte bahane geldi: şimdi de kapora istiyorlar.",
+     "actions": [
+      {
+       "id": "pay-deposit",
+       "label": "50 AZN kapora gönder",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Kapora da bir ön ödemedir. Sahte mağaza onu alır ve ortadan kaybolur."
+      },
+      {
+       "id": "check",
+       "label": "Mağazanın resmî sayfasını kendim bulacağım",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Doğru. Resmî sayfayı ve alıcı yorumlarını kontrol etmek yalnızca birkaç dakikanızı alır.",
+       "next": "real-shop"
+      },
+      {
+       "id": "block",
+       "label": "Engelle",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Güzel. Ön ödeme almadan satış yapmayan bir yabancıyla konuşmaya bile değmez.",
+       "next": "real-shop"
+      }
+     ]
+    },
+    {
+     "id": "gone",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Sohbet kullanılamıyor"
+       }
+      ],
+      "body": [
+       {
+        "text": "Sərin Klimat İndirim hesabı silindi ya da sizi engelledi."
+       }
+      ],
+      "time": "09:30"
+     },
+     "say": "Ertesi gün klima gelmedi, sayfa da ortadan kayboldu.",
+     "actions": [
+      {
+       "id": "bank",
+       "label": "Bankayı kartın üzerindeki numaradan ara",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Doğru. Banka durumu erkenden öğrenirse aktarımı durdurmaya çalışabilir."
+      },
+      {
+       "id": "evidence",
+       "label": "Ekran görüntülerini kaydet, polise bildir",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Doğru adım. Yazışma ve havale dekontu polis için delildir."
+      },
+      {
+       "id": "wait",
+       "label": "Birkaç gün bekle",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Her saat önemli. Beklemek, paranın geri alınma şansını azaltır."
+      }
+     ]
+    },
+    {
+     "id": "real-shop",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "w2e-serin-klimat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Sərin Klimat"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Merhaba! Tek resmî sayfamız bu. Klima 1.149 AZN, kapıda nakit ya da kartla ödeme."
+         }
+        ],
+        "time": "14:02"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Adımıza ön ödeme isteyen hiçbir sayfa bize ait değildir."
+         }
+        ],
+        "time": "14:02"
+       }
+      ]
+     },
+     "say": "Bu, mağazanın resmî sayfası.",
+     "actions": [
+      {
+       "id": "order",
+       "label": "Kapıda ödemeyle sipariş ver",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Harika bir seçim. Ürünü görüp kontrol ettikten sonra ödersiniz."
+      },
+      {
+       "id": "tell",
+       "label": "Sahte sayfayı mağazaya göster",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Güzel. Mağaza sahte sayfayı bildirip kaldırtabilir."
+      },
+      {
+       "id": "back",
+       "label": "Ucuz sayfaya geri dön",
+       "kind": "open",
+       "outcome": "risky",
+       "feedback": "Sahte sayfaya geri dönmek paranızı riske atar. Resmî mağazayla devam edin."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "fs-match",
+   "prompt": "Her işareti anlamıyla eşleştirin.",
+   "pairs": [
+    {
+     "id": "age",
+     "left": "Sayfa bir hafta önce açılmış",
+     "right": "Sahte mağazalar hızla açılır, hızla kapanır"
+    },
+    {
+     "id": "reviews",
+     "left": "Yorumlar kapatılmış",
+     "right": "Memnun olmayan alıcılar susturuluyor"
+    },
+    {
+     "id": "card",
+     "left": "Yalnızca karttan karta ön ödeme",
+     "right": "Parayı geri almak çok zordur"
+    },
+    {
+     "id": "price",
+     "left": "Fiyat, piyasa fiyatının üçte biri",
+     "right": "Sizi acele ettirmek için atılan yem"
+    }
+   ],
+   "explain": "Durmak için tek bir işaret yeterli. Mağazayı resmî sitesinden ve alıcı yorumlarından kontrol edin."
+  },
+  {
+   "type": "choice",
+   "id": "fs-choice",
+   "question": {
+    "prompt": "Tanımadığınız bir internet mağazasından alışveriş yapıyorsunuz. En güvenli ödeme yolu hangisi?",
+    "options": [
+     {
+      "id": "cod",
+      "label": "Ürünü teslim alırken kapıda ödemek",
+      "correct": true,
+      "feedback": "Doğru. Ürünü görmeden ödeme yapmazsınız, böylece sahte mağaza hiçbir şey alamaz."
+     },
+     {
+      "id": "card",
+      "label": "Satıcının kişisel kartına para aktarmak",
+      "correct": false,
+      "feedback": "Kişisel karta yapılan aktarım geri alınamaz. Dolandırıcıların istediği de tam olarak budur."
+     },
+     {
+      "id": "half",
+      "label": "Yarısını kapora olarak göndermek",
+      "correct": false,
+      "feedback": "Kapora da bir ön ödemedir. Sahte mağaza onu alır ve ortadan kaybolur."
+     },
+     {
+      "id": "crypto",
+      "label": "Kripto parayla ödemek",
+      "correct": false,
+      "feedback": "Kripto para transferini kimse geri alamaz. Bir mağaza bunu istiyorsa uzak durun."
+     }
+    ]
+   },
+   "explain": "Ön ödeme şartsa, yalnızca uzun zamandır tanıdığınız resmî bir mağazaya ödeme yapın. Şüpheniz varsa satın almayın."
+  },
+  {
+   "type": "recap",
+   "id": "fs-recap",
+   "points": [
+    "Tanımadığınız bir sayfaya asla ön ödeme yapmayın.",
+    "Mümkünse kapıda ödeyin: önce ürünü görün, sonra ödeyin.",
+    "Sayfanın ne zamandır açık olduğunu ve yorumları kontrol edin, aşırı düşük fiyata güvenmeyin."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

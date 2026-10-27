@@ -1,0 +1,526 @@
+{
+ "id": "consent-screen",
+ "title": "شاشة الأذونات",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ac1-tutor",
+   "beats": [
+    {
+     "id": "ac1-b1",
+     "say": "مرحبًا! سنتعرف اليوم على فخ يطلب منك إذنًا بدلًا من كلمة المرور.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "ac1-b2",
+     "say": "يقول لك التطبيق: لكي أعرض لك المستند، اسمح لي بقراءة بريدك والإرسال باسمك.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "w2b-dokubaxis",
+       "app": "DokuBaxış Viewer",
+       "permissions": [
+        {
+         "label": [
+          {
+           "text": "عرض ملفك الشخصي"
+          }
+         ],
+         "needed": true
+        },
+        {
+         "label": [
+          {
+           "text": "قراءة بريدك والإرسال باسمك",
+           "spot": "mail"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "الاحتفاظ بالوصول عندما لا تكون موجودًا"
+          }
+         ],
+         "needed": false
+        }
+       ]
+      }
+     },
+     "highlight": "mail"
+    },
+    {
+     "id": "ac1-b3",
+     "say": "ضغطة واحدة، ويصبح التطبيق داخل صندوق بريدك. وحتى لو غيرت كلمة المرور، يبقى الإذن قائمًا.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "ac1-b4",
+     "say": "القاعدة: اقرأ اسم التطبيق والأذونات، ولا تسمح أبدًا لتطبيق لا تعرفه.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ac1-hotspot",
+   "prompt": "ابحث عن الطلبات التي لا يحتاج إليها هذا التطبيق.",
+   "artifact": {
+    "kind": "permission",
+    "brandRef": "w2b-dokubaxis",
+    "app": "DokuBaxış Viewer",
+    "permissions": [
+     {
+      "label": [
+       {
+        "text": "عرض ملفك الشخصي"
+       }
+      ],
+      "needed": true
+     },
+     {
+      "label": [
+       {
+        "text": "قراءة بريدك والإرسال باسمك",
+        "spot": "mail"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "قراءة جميع ملفاتك وتعديلها",
+        "spot": "files"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "عرض جهات الاتصال الخاصة بك",
+        "spot": "contacts"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "الاحتفاظ بالوصول عندما لا تكون موجودًا",
+        "spot": "offline"
+       }
+      ],
+      "needed": false
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "mail",
+     "label": "البريد والإرسال",
+     "explain": "عرض المستند لا يحتاج إلى الوصول إلى البريد. وبهذا الإذن يستطيع التطبيق إرسال رسائل تصيد إلكتروني باسمك."
+    },
+    {
+     "id": "files",
+     "label": "جميع الملفات",
+     "explain": "التطبيق الذي يعرض مستندًا واحدًا لا يحتاج إلى جميع ملفاتك. هذا الإذن لسرقة البيانات."
+    },
+    {
+     "id": "contacts",
+     "label": "جهات الاتصال",
+     "explain": "قائمة جهات اتصالك هي قائمة الأهداف للهجوم التالي. والمستند لا يحتاج إليها."
+    },
+    {
+     "id": "offline",
+     "label": "وصول دائم",
+     "explain": "هذا يعني أن التطبيق يبقى في حسابك بعد تسجيل خروجك، وحتى بعد تغيير كلمة المرور."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "ac1-swipe",
+   "prompt": "أي طلب إذن عادي وأيها فخ؟ اسحب البطاقة.",
+   "cards": [
+    {
+     "id": "meeting-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "gorus",
+      "app": "Görüş",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "عرض التقويم الخاص بك"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "عرض ملفك الشخصي"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "تطبيق Görüş معروف في الجهة، ولا يطلب إلا ما يحتاج إليه لأداء عمله."
+    },
+    {
+     "id": "greeting-card",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-bayram-tebriki",
+      "app": "Bayram Təbriki",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "عرض جهات الاتصال الخاصة بك"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "إرسال البريد باسمك"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "بطاقة التهنئة لا تحتاج إلى جهات اتصالك ولا إلى صلاحية إرسال البريد. هذا الإذن لنشر رسائل التصيد الإلكتروني باسمك."
+    },
+    {
+     "id": "salary-calc",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-maas-kalkulyatoru",
+      "app": "Maaş Kalkulyatoru",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "قراءة بريدك"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "الاحتفاظ بالوصول عندما لا تكون موجودًا"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "الآلة الحاسبة لا تحتاج إلى بريدك. والوصول الدائم يبقي التطبيق داخل حسابك."
+    },
+    {
+     "id": "editor",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "senedyaz",
+      "app": "SənədYaz",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "فتح الملف الذي تختاره وحفظه"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "محرر المستندات المعروف يطلب الملف الذي تختاره فقط. وهذا الإذن يناسب عمله."
+    },
+    {
+     "id": "pdf-tool",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "pdf-birlesdirici",
+      "app": "PDF Birləşdirici Pro",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "قراءة جميع ملفاتك وتعديلها"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "قراءة بريدك والإرسال منه"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "دمج الملفات لا يحتاج إلى البريد ولا إلى جميع ملفاتك. لا تسمح لتطبيق كهذا."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ac1-sim",
+   "environment": "browser",
+   "title": "مستند ميزانية مشترك",
+   "intro": "تمت مشاركة مستند ميزانية معك باسم زميلتك نيغار. فتحت الرابط، والآن قرر في كل شاشة.",
+   "steps": [
+    {
+     "id": "real-login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "İşPoçt",
+      "url": [
+       {
+        "text": "https://giris.idare.example/icaze"
+       }
+      ],
+      "fields": [
+       "البريد الإلكتروني",
+       "كلمة المرور"
+      ],
+      "button": "تسجيل الدخول"
+     },
+     "say": "انظر إلى العنوان: هذه صفحة تسجيل الدخول الحقيقية الخاصة بجهتك.",
+     "actions": [
+      {
+       "id": "sign-in",
+       "label": "تسجيل الدخول",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "العنوان حقيقي، لذلك لن تذهب كلمة المرور إلى مجرم. الفخ في النافذة التالية."
+      },
+      {
+       "id": "close",
+       "label": "إغلاق علامة التبويب",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "هذا آمن أيضًا. لكن لنفترض أنك سجلت الدخول، ولننظر إلى النافذة التالية."
+      }
+     ]
+    },
+    {
+     "id": "consent",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2b-dokubaxis",
+      "app": "DokuBaxış Viewer",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "عرض ملفك الشخصي"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "قراءة بريدك والإرسال باسمك"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "قراءة جميع ملفاتك وتعديلها"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "الاحتفاظ بالوصول عندما لا تكون موجودًا"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "قبل فتح المستند، ظهرت هذه النافذة.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "عدم السماح",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "صحيح. عرض المستند لا يحتاج إلى البريد، ولا إلى الوصول إلى جميع الملفات، ولا إلى وصول دائم.",
+       "next": "known-app"
+      },
+      {
+       "id": "allow",
+       "label": "السماح",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "أصبح التطبيق الآن يقرأ بريدك ويكتب باسمك. وتغيير كلمة المرور لا يوقفه."
+      }
+     ]
+    },
+    {
+     "id": "connected-apps",
+     "label": "التطبيقات المتصلة: DokuBaxış Viewer، وصول دائم إلى البريد والملفات",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "ispoct",
+      "url": [
+       {
+        "text": "https://hesab.idare.example/tetbiqler"
+       }
+      ]
+     },
+     "say": "في اليوم التالي تلقي نظرة على حسابك.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "أبلغ الدعم الفني ليلغي الإذن",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "صحيح. إلغاء الإذن وحده يزيل التطبيق، وسيبحث المختص أيضًا عن أي آثار."
+      },
+      {
+       "id": "password-only",
+       "label": "غير كلمة المرور فقط",
+       "kind": "update",
+       "outcome": "risky",
+       "feedback": "تتغير كلمة المرور، لكن التطبيق يحتفظ بإذنه. يجب أن يلغيه الدعم الفني."
+      },
+      {
+       "id": "leave",
+       "label": "ترك الأمر كما هو",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "سيواصل التطبيق قراءة بريدك كل يوم. أبلغ عنه اليوم."
+      }
+     ]
+    },
+    {
+     "id": "known-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "idare-komekci",
+      "app": "İdarə Köməkçisi",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "عرض ملفك الشخصي"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "عرض التقويم الخاص بك"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "say": "والآن يطلب الإذن تطبيق المساعد الخاص بجهتك.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "السماح",
+       "kind": "allow",
+       "outcome": "safe",
+       "feedback": "صحيح. تطبيق العمل المعروف لا يطلب إلا ما يحتاج إليه لأداء عمله."
+      },
+      {
+       "id": "deny",
+       "label": "عدم السماح",
+       "kind": "deny",
+       "outcome": "risky",
+       "feedback": "الحذر مفهوم، لكن هذا التطبيق معروف ولا يطلب إلا القليل. وإذا ساورك الشك، فاسأل الدعم الفني."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "ac1-choice",
+   "question": {
+    "prompt": "ما الأذونات الأكثر خطورة؟ اختر كل الإجابات الصحيحة.",
+    "options": [
+     {
+      "id": "send",
+      "label": "إرسال البريد باسمك",
+      "correct": true,
+      "feedback": "صحيح. بهذا الإذن يرسل التطبيق رسائل تصيد إلكتروني إلى زملائك باسمك."
+     },
+     {
+      "id": "offline",
+      "label": "الاحتفاظ بالوصول عندما لا تكون موجودًا",
+      "correct": true,
+      "feedback": "صحيح. هذا يعني أن التطبيق يبقى في حسابك بعد تسجيل خروجك."
+     },
+     {
+      "id": "profile",
+      "label": "عرض اسمك وصورة ملفك الشخصي",
+      "correct": false,
+      "feedback": "هذا إذن بسيط يحتاج إليه تسجيل الدخول العادي."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "البريد والملفات والوصول الدائم هي أكبر الأذونات. لا تمنحها أبدًا لتطبيق لا تعرفه."
+  },
+  {
+   "type": "recap",
+   "id": "ac1-recap",
+   "points": [
+    "في شاشة الأذونات، اقرأ اسم التطبيق والأذونات",
+    "لا تمنح تطبيقًا غير معروف الوصول إلى البريد أو الملفات، ولا وصولًا دائمًا",
+    "إذا سمحت له بالخطأ، فاطلب من الدعم الفني إلغاء الإذن"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

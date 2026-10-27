@@ -379,7 +379,13 @@ export function ScrollCat({ label, tapPrompt, buttonRef, onTap, onHover }: { lab
           aim={guide.aim}
           fire={shown.fire ?? undefined}
           act={guide.act}
+          // Between the lines the guide lives on its own (sleeps, grooms, plays); a line brings it back to sitting.
+          auto={guide.mood === "idle" && !guide.talking && !guide.aim}
           label={label}
+          // Toward the phone it peeks from; the Mascot turns it to the right in a right-to-left page, where the
+          // perch boxes sit on the phone's other side (-end-*).
+          // shortcut: perch.ts FOOT_X and BODY were measured on the left-facing cat, so in RTL the body check is
+          // about 8% of the box off; mirror them if the turned cat is seen covering a heading's letters.
           facing="left"
           // A canvas half a box wider, centred on the box: the sitting cat keeps its size and place (the engine
           // fits it by height), and the stretched body and tail of a jump have room instead of being cut off.

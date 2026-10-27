@@ -1,0 +1,403 @@
+{
+ "id": "insider-warning-signs",
+ "title": "Signaux d’alerte",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "iw-tutor",
+   "beats": [
+    {
+     "id": "iw-b1",
+     "say": "Parfois, quelqu’un de l’intérieur cherche à emporter des données délibérément. D’où l’importance d’en connaître les signes.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "iw-b2",
+     "say": "Demander le mot de passe de quelqu’un d’autre, ou s’intéresser à des fichiers sans rapport avec son poste : ce sont des signaux d’alerte sérieux.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "sohbet",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Tural Hasanov"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "On m’a coupé mes accès. "
+          },
+          {
+           "text": "Donne-moi ton mot de passe, je vais récupérer quelques dossiers dans l’archive.",
+           "spot": "ask-pass"
+          }
+         ],
+         "time": "18:47"
+        }
+       ]
+      }
+     },
+     "highlight": "ask-pass"
+    },
+    {
+     "id": "iw-b3",
+     "say": "Mais ne menez pas l’enquête vous-même, n’accusez personne et ne propagez pas de rumeurs. Un seul signe ne prouve pas une culpabilité.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "iw-b4",
+     "say": "Signalez ce que vous avez vu à l’équipe sécurité, en toute confidentialité. Les spécialistes vérifieront le reste.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "iw-sim",
+   "environment": "phone",
+   "title": "Messages de collègues",
+   "intro": "C’est le soir, et des messages de collègues arrivent sur votre téléphone. Choisissez la bonne réponse à chacun.",
+   "steps": [
+    {
+     "id": "ask-password",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Tural Hasanov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Salut, on m’a coupé mes accès par erreur."
+         }
+        ],
+        "time": "18:45"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Donne-moi ton mot de passe, je récupère les dossiers du projet dans l’archive et je te le rends demain."
+         }
+        ],
+        "time": "18:47"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "give",
+       "label": "Envoyer le mot de passe",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Tout ce qui est fait avec votre mot de passe est enregistré à votre nom. Ne le donnez jamais à personne, collègues compris."
+      },
+      {
+       "id": "refuse",
+       "label": "Je ne peux pas te donner mon mot de passe, contacte le support informatique",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Si ses accès ont été coupés, seuls le support informatique et son responsable peuvent régler le problème."
+      }
+     ]
+    },
+    {
+     "id": "ask-usb",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Tural Hasanov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bon. Alors copie les dossiers sur une clé USB, je passe la prendre ce soir."
+         }
+        ],
+        "time": "18:52"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "J’en aurai besoin dans mon nouveau poste."
+         }
+        ],
+        "time": "18:52"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "copy",
+       "label": "D’accord, je te les copie",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Les données de votre organisation ne partent pas chez un autre employeur. Les copier fait de vous un acteur de la fuite."
+      },
+      {
+       "id": "no",
+       "label": "Non, je ne peux pas faire ça",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Un « non » bref et calme suffit. Prévenez maintenant l’équipe sécurité."
+      }
+     ]
+    },
+    {
+     "id": "group-gossip",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Groupe du service"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Leyla : j’ai vu Tural aux archives en pleine nuit. On va vérifier son ordinateur, et après on prévient tout le monde."
+         }
+        ],
+        "time": "19:10"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "join",
+       "label": "D’accord, on vérifie",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Vérifier par vous-même peut compromettre des preuves et nuire à une personne innocente."
+      },
+      {
+       "id": "channel",
+       "label": "Pas dans le groupe. Signalons plutôt ce qu’on a vu à l’équipe sécurité, en toute confidentialité",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Les faits passent par le bon canal, et aucune rumeur ne démarre."
+      }
+     ]
+    },
+    {
+     "id": "security-reply",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Équipe sécurité"
+        }
+       ],
+       "address": [
+        {
+         "text": "tehlukesizlik@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Votre signalement a bien été enregistré"
+       }
+      ],
+      "time": "19:40",
+      "body": [
+       [
+        {
+         "text": "Merci pour votre signalement. Nous vous demandons de ne pas en parler à vos collègues ; nous vous contacterons si nécessaire."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "ok",
+       "label": "Répondre : bien compris",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Exact. La confidentialité protège à la fois l’enquête et votre collègue."
+      },
+      {
+       "id": "spread",
+       "label": "Transférer au groupe du service",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Diffuser le signalement nuit à l’enquête et peut faire injustement du tort à votre collègue."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "iw-signs",
+   "question": {
+    "prompt": "Lesquels sont des signaux d’alerte sérieux ?",
+    "options": [
+     {
+      "id": "access",
+      "label": "Demander l’accès à des systèmes sans rapport avec son poste",
+      "correct": true,
+      "feedback": "Exact. L’intérêt pour des accès dont on n’a pas besoin mérite l’attention."
+     },
+     {
+      "id": "password",
+      "label": "Demander le mot de passe de quelqu’un d’autre",
+      "correct": true,
+      "feedback": "Exact. Une personne qui dispose des bons accès n’a pas besoin du mot de passe d’une autre."
+     },
+     {
+      "id": "mass-copy",
+      "label": "Copier de nombreux fichiers sur une clé USB ou une adresse e-mail personnelle",
+      "correct": true,
+      "feedback": "Exact. Des données qui sortent de l’organisation, c’est le signe le plus clair."
+     },
+     {
+      "id": "late",
+      "label": "Travailler tard de temps en temps",
+      "correct": false,
+      "feedback": "En soi, c’est normal : beaucoup de gens travaillent tard. Un seul signe ne justifie pas une accusation."
+     },
+     {
+      "id": "questions",
+      "label": "Poser beaucoup de questions en réunion",
+      "correct": false,
+      "feedback": "C’est de l’intérêt pour le travail, pas une menace."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Un signal d’alerte n’est pas une accusation : c’est une raison de faire un signalement. Ce sont les spécialistes qui décident."
+  },
+  {
+   "type": "scenario",
+   "id": "iw-scenario",
+   "title": "Qu’avez-vous vu ?",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Depuis une semaine, Kamal copie chaque soir des fichiers confidentiels du projet sur une clé USB personnelle. Un jour, il a dit : « Ici, personne ne me reconnaît à ma juste valeur. »",
+     "choices": [
+      {
+       "label": "Je signale ce que j’ai vu à l’équipe sécurité, en toute confidentialité",
+       "next": "n2",
+       "feedback": "Exact. Vous transmettez des faits, les spécialistes en tirent les conclusions."
+      },
+      {
+       "label": "Je lui demande directement : pourquoi prends-tu ces fichiers ?",
+       "outcome": "risky",
+       "feedback": "Une accusation crée un conflit et peut pousser la personne à effacer ses traces. Laissez faire les spécialistes."
+      },
+      {
+       "label": "Je fouille moi-même son bureau le soir",
+       "outcome": "risky",
+       "feedback": "Fouiller de votre propre initiative peut enfreindre les règles et compromettre des preuves."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Merci. Notez, s’il vous plaît, ce que vous avez vu, quand et où.",
+     "speaker": "Équipe sécurité",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Merci. <breath> Notez, s’il vous plaît, ce que vous avez vu, quand et où.",
+     "choices": [
+      {
+       "label": "Je note uniquement ce que j’ai vu, avec les dates et les heures",
+       "outcome": "safe",
+       "feedback": "Très bien. Des faits précis sont la base d’une vérification équitable."
+      },
+      {
+       "label": "J’ajoute aussi mon avis sur sa personnalité",
+       "outcome": "risky",
+       "feedback": "Les suppositions peuvent mener à un résultat injuste. Notez uniquement les faits que vous avez constatés."
+      },
+      {
+       "label": "Je dis à mes collègues de se tenir à l’écart de lui",
+       "outcome": "risky",
+       "feedback": "C’est une rumeur, et elle peut faire injustement du tort à votre collègue. Seule l’équipe sécurité doit être informée."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "iw-order",
+   "prompt": "Vous remarquez un comportement suspect. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "calm",
+     "label": "Rester calme et n’accuser personne"
+    },
+    {
+     "id": "note",
+     "label": "Noter ce que vous avez vu, avec la date et l’heure"
+    },
+    {
+     "id": "report",
+     "label": "Le signaler à l’équipe sécurité, en toute confidentialité"
+    },
+    {
+     "id": "quiet",
+     "label": "Ensuite, ne pas en parler autour de vous"
+    }
+   ],
+   "explain": "Vous transmettez les faits ; l’enquête et la décision reviennent aux spécialistes. Si votre organisation prévoit un autre canal, utilisez-le."
+  },
+  {
+   "type": "recap",
+   "id": "iw-recap",
+   "points": [
+    "Ne communiquez jamais votre mot de passe ni des données de travail",
+    "N’accusez personne et ne menez pas l’enquête vous-même",
+    "Signalez les faits à l’équipe sécurité, en toute confidentialité"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

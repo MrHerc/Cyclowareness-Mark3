@@ -1,0 +1,387 @@
+{
+ "id": "after-mistake",
+ "title": "Après une erreur",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Tout le monde peut faire un faux pas : ouvrir un lien, dicter un code. Ce qui compte, ce sont les cinq minutes qui suivent.",
+     "mood": "talk",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Ne le cachez pas, et n’essayez pas de tout réparer de votre côté. Une erreur passée sous silence laisse du temps à l’attaquant.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Soyez honnête : sur quoi vous avez cliqué, ce que vous avez saisi, ce que vous avez dit. Le spécialiste doit le savoir.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b4",
+     "say": "Ensuite, les spécialistes verrouillent le compte et vérifient l’appareil. Le but est d’arrêter les dégâts, pas de trouver un coupable.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "gave-code",
+   "title": "Vous avez dicté le code",
+   "start": "call-ended",
+   "nodes": [
+    {
+     "id": "call-ended",
+     "text": "L’appelant disait être du support technique, et vous lui avez dicté le code reçu sur votre téléphone. Après l’appel, vous avez eu des doutes.",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Support technique"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 50 000 38 17"
+        }
+       ],
+       "label": "Mobile"
+      }
+     },
+     "choices": [
+      {
+       "label": "J’appelle tout de suite le numéro du support que je connais",
+       "next": "honest",
+       "feedback": "Bonne réponse. Chaque minute compte : l’attaquant est peut-être déjà en train de se connecter."
+      },
+      {
+       "label": "J’ai honte et je n’en parle à personne",
+       "outcome": "compromised",
+       "feedback": "L’attaquant est maintenant dans votre compte, et personne ne le sait. Le silence aggrave la situation."
+      },
+      {
+       "label": "Je change le mot de passe moi-même, ça suffit",
+       "outcome": "risky",
+       "feedback": "C’est un bon réflexe, mais il ne suffit pas. L’attaquant peut rester dans une session ouverte, qu’un spécialiste doit fermer."
+      }
+     ]
+    },
+    {
+     "id": "honest",
+     "text": "Quand avez-vous donné le code, et qu’est-ce que l’appelant voulait d’autre ?",
+     "speaker": "Équipe sécurité",
+     "voice": "woman",
+     "channel": "phone",
+     "manner": "firm",
+     "spoken": "Quand avez-vous donné le code <breath> et qu’est-ce que l’appelant voulait d’autre ?",
+     "choices": [
+      {
+       "label": "Je raconte tout comme ça s’est passé, code compris",
+       "next": "manager",
+       "feedback": "Bonne réponse. Avec des détails honnêtes, le spécialiste sait exactement quoi verrouiller."
+      },
+      {
+       "label": "Je dis qu’il y a seulement eu un appel et que je n’ai donné aucun code",
+       "outcome": "risky",
+       "feedback": "Avec la moitié de l’histoire, le spécialiste ne sait pas que le compte a été piraté. L’honnêteté fait gagner du temps."
+      }
+     ]
+    },
+    {
+     "id": "manager",
+     "text": "Le spécialiste a fermé toutes les sessions et vous a demandé de définir un nouveau mot de passe. Votre responsable vous demande : que s’est-il passé ?",
+     "choices": [
+      {
+       "label": "J’explique ouvertement, pour que l’équipe soit prévenue aussi",
+       "outcome": "safe",
+       "feedback": "Excellent. Votre récit protège vos collègues contre le même appel."
+      },
+      {
+       "label": "Je dis qu’il ne s’est rien passé",
+       "outcome": "risky",
+       "feedback": "Le même appel peut viser vos collègues. En parler les protège."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "next-day-inbox",
+   "environment": "inbox",
+   "title": "Le lendemain",
+   "intro": "Hier, vous avez ouvert un faux lien et vous l’avez signalé. Aujourd’hui, trois e-mails vous attendent dans votre boîte de réception.",
+   "steps": [
+    {
+     "id": "ticket",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik",
+      "from": {
+       "name": [
+        {
+         "text": "Sécurité informatique"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Votre signalement : INC-2026-0412"
+       }
+      ],
+      "time": "08:20",
+      "body": [
+       [
+        {
+         "text": "Merci pour votre signalement. Toutes les sessions ouvertes sur votre compte ont été fermées."
+        }
+       ],
+       [
+        {
+         "text": "Aujourd’hui, changez votre mot de passe sur le portail de l’organisation. Nous n’envoyons aucun lien : ouvrez le portail vous-même."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Marquer comme fiable",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. L’adresse est celle de votre organisation, il n’y a pas de lien et rien ne vous est demandé."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "La prudence a du bon, mais cet e-mail est authentique : il vient de l’adresse de votre organisation et ne contient aucun lien."
+      }
+     ]
+    },
+    {
+     "id": "second-trap",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Sécurité informatique"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare-secure.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Urgent : votre compte a été piraté"
+       }
+      ],
+      "time": "09:02",
+      "body": [
+       [
+        {
+         "text": "Suite à l’incident d’hier, confirmez de nouveau votre compte dans l’heure."
+        }
+       ],
+       [
+        {
+         "text": "Confirmer : "
+        },
+        {
+         "text": "idare-secure.example.net/yoxla",
+         "link": {
+          "label": "idare-secure.example.net/yoxla",
+          "href": "https://idare-secure.example.net/yoxla"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Les attaquants écrivent parfois une deuxième fois.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bonne réponse : l’adresse n’est pas sur le domaine de votre organisation. Les attaquants reviennent souvent vers la même personne."
+      },
+      {
+       "id": "click",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "C’était un deuxième piège. La vraie équipe vous avait demandé de changer le mot de passe vous-même, sur le portail."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Vous êtes à l’abri, mais cet e-mail montre que l’attaque continue. Signalez-le."
+      }
+     ]
+    },
+    {
+     "id": "colleague",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Nigar Guliyeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "n.quliyeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Un e-mail étrange envoyé depuis votre adresse"
+       }
+      ],
+      "time": "09:40",
+      "body": [
+       [
+        {
+         "text": "Bonjour, hier soir, j’ai reçu de votre adresse un e-mail intitulé « Facture », avec un lien. C’est bien vous qui l’avez envoyé ?"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Transférer à l’équipe sécurité",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Si l’attaquant a écrit à d’autres personnes depuis votre compte, les spécialistes doivent le savoir."
+      },
+      {
+       "id": "reply",
+       "label": "Répondre : ce n’est pas moi, ne l’ouvrez pas",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bien, vous avez prévenu votre collègue. Transférez aussi l’e-mail à l’équipe sécurité."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Votre collègue risque d’ouvrir le lien, et le spécialiste ne saura pas que l’attaque s’est propagée."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "what-happens-next",
+   "prompt": "Que se passe-t-il en général après votre signalement ? Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "report",
+     "label": "Vous signalez l’incident"
+    },
+    {
+     "id": "lock",
+     "label": "Le spécialiste verrouille le compte et ferme les sessions"
+    },
+    {
+     "id": "check",
+     "label": "L’ordinateur et la messagerie sont vérifiés"
+    },
+    {
+     "id": "back",
+     "label": "Vous définissez un nouveau mot de passe et reprenez le travail"
+    }
+   ],
+   "explain": "C’est la procédure habituelle. Plus vous signalez tôt, plus elle est courte."
+  },
+  {
+   "type": "choice",
+   "id": "fear-of-blame",
+   "question": {
+    "prompt": "Un collègue vous dit : « Si je le signale, je vais me faire taper sur les doigts. » Que lui répondez-vous ?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Signaler vite limite les dégâts, cacher l’erreur les aggrave",
+      "correct": true,
+      "feedback": "Bonne réponse. Une information rapide et honnête est l’aide la plus précieuse pour les spécialistes."
+     },
+     {
+      "id": "hide",
+      "label": "Tu as raison, personne ne doit le savoir",
+      "correct": false,
+      "feedback": "Une erreur cachée prend de l’ampleur et peut nuire à toute l’organisation."
+     },
+     {
+      "id": "fix",
+      "label": "Essaie d’abord de régler ça toi-même",
+      "correct": false,
+      "feedback": "Tenter de tout régler sans aide peut détruire des traces et faire perdre du temps."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "handshake"
+    }
+   },
+   "explain": "C’est le silence, et non l’erreur, qui fait grandir le danger."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Après un faux pas, signalez-le tout de suite et honnêtement.",
+    "Surveillez les e-mails suivants : l’attaquant peut écrire de nouveau.",
+    "Le but est d’arrêter les dégâts, pas de trouver un coupable."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

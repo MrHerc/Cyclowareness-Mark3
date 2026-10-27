@@ -1,0 +1,498 @@
+{
+  "id": "fake-video-call",
+  "title": "مكالمة الفيديو المزيفة",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "intro",
+      "beats": [
+        {
+          "id": "live-fake",
+          "say": "أصبح بالإمكان اليوم أن يظهر وجه مزيف مباشرة في مكالمة فيديو. يتكلم ويبتسم ويبدو حقيقيًا.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          }
+        },
+        {
+          "id": "traces",
+          "say": "أحيانًا تظهر حواف ضبابية أو شفاه لا تتطابق حركتها مع الكلام، لكن التزييف المتقن يخفي هذه الآثار.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "mask"
+          }
+        },
+        {
+          "id": "the-ask",
+          "say": "ثق بالقاعدة لا بعينيك: إذا كان الطلب مالًا أو رمز تحقق أو مستندًا، فتحقق بطريقة أخرى.",
+          "mood": "alert",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "rule",
+          "say": "اقطع المكالمة، واتصل بذلك الشخص بنفسك على الرقم الذي تعرفه.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "handshake"
+          }
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "colleague-video",
+      "environment": "phone",
+      "title": "مكالمة فيديو من زميلة",
+      "intro": "تراسلك زميلتك، ثم تبدأ مكالمة فيديو. اتخذ قرارك في كل خطوة.",
+      "steps": [
+        {
+          "id": "new-account",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "آينور قولييفا (حساب جديد)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "مرحبًا! تم إغلاق حسابي القديم، وهذا حسابي الجديد.",
+                    "spot": "new"
+                  }
+                ],
+                "time": "16:40"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "سأجري معك مكالمة فيديو الآن، أحتاج إلى مستند بشكل عاجل.",
+                    "spot": "urgent"
+                  }
+                ],
+                "time": "16:40"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "wait",
+              "label": "حسنًا، أنا بانتظارك",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "الحساب الجديد بحد ذاته علامة تحذير. والأفضل أن تتحقق أولًا عبر الرقم القديم."
+            },
+            {
+              "id": "verify",
+              "label": "سأتصل برقمك القديم أولًا",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "صحيح. قصة الحساب الجديد هدفها منعك من التحقق.",
+              "next": "real-aynur"
+            }
+          ]
+        },
+        {
+          "id": "video-ring",
+          "artifact": {
+            "kind": "call",
+            "caller": [
+              {
+                "text": "آينور قولييفا (حساب جديد)"
+              }
+            ],
+            "number": [
+              {
+                "text": "+994 55 000 62 19"
+              }
+            ],
+            "label": "مكالمة فيديو",
+            "voice": "young-woman"
+          },
+          "say": "يظهر وجه آينور على الشاشة.",
+          "actions": [
+            {
+              "id": "answer",
+              "label": "رد",
+              "kind": "answer",
+              "outcome": "safe",
+              "feedback": "الرد لا يضر حتى الآن. المهم هو ما ستطلبه آينور."
+            },
+            {
+              "id": "decline",
+              "label": "رفض",
+              "kind": "decline",
+              "outcome": "safe",
+              "feedback": "هذا تصرف سليم أيضًا. اتصل بآينور بنفسك على الرقم الذي تعرفه.",
+              "next": "real-aynur"
+            }
+          ]
+        },
+        {
+          "id": "the-ask",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "آينور قولييفا (حساب جديد)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "لقد رأيتني، أنا آينور فعلًا. أرسل قائمة طلبات المواطنين هنا، المدير ينتظر."
+                  }
+                ],
+                "time": "16:44"
+              }
+            ]
+          },
+          "say": "بعد المكالمة يصلك الطلب.",
+          "actions": [
+            {
+              "id": "send",
+              "label": "إرسال الملف",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "كان الفيديو مزيفًا، ووصلت القائمة إلى محتال. الوجه ليس دليلًا، فتحقق بطريقة أخرى."
+            },
+            {
+              "id": "verify",
+              "label": "سأتصل برقمك المعتاد أولًا",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "صحيح. زميلتك الحقيقية ستتفهم التحقق."
+            },
+            {
+              "id": "report",
+              "label": "الإبلاغ",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "خطوة جيدة. أبلغ عن الحساب، وأخبر فريق الأمن السيبراني أيضًا."
+            }
+          ]
+        },
+        {
+          "id": "real-aynur",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "آينور قولييفا"
+              }
+            ],
+            "messages": [
+              {
+                "from": "me",
+                "body": [
+                  {
+                    "text": "آينور، هل اتصلت بي بمكالمة فيديو قبل قليل؟"
+                  }
+                ],
+                "time": "16:47"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "لا! أنا في اجتماع. هل يراسلك أحد باسمي؟"
+                  }
+                ],
+                "time": "16:48"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "إبلاغ فريق الأمن السيبراني",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "رائع. سيحذرون بقية الزملاء أيضًا."
+            },
+            {
+              "id": "delete",
+              "label": "حذف المحادثة ونسيان الأمر",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "سيجرب المحتال مع زميل آخر. والإبلاغ يحمي الجميع."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "reliable-checks",
+      "question": {
+        "prompt": "أي طرق التحقق تؤكد بشكل موثوق هوية الشخص في مكالمة الفيديو؟",
+        "options": [
+          {
+            "id": "callback",
+            "label": "الاتصال بنفسك بالرقم الذي تعرفه",
+            "correct": true,
+            "feedback": "أنت من يبدأ هذه المكالمة، فلا يتحكم فيها المحتال."
+          },
+          {
+            "id": "code-word",
+            "label": "كلمة التحقق المتفق عليها",
+            "correct": true,
+            "feedback": "الصورة المزيفة لا تعرف هذه الكلمة."
+          },
+          {
+            "id": "face",
+            "label": "الوجه والصوت مألوفان",
+            "correct": false,
+            "feedback": "يمكن تزييف الوجوه والأصوات."
+          },
+          {
+            "id": "quality",
+            "label": "الصورة واضحة",
+            "correct": false,
+            "feedback": "وضوح الصورة لا يثبت شيئًا. فالصور المزيفة قد تكون واضحة أيضًا."
+          },
+          {
+            "id": "account",
+            "label": "المكالمة تأتي من حساب باسم مألوف",
+            "correct": false,
+            "feedback": "يمكن الاستيلاء على الحسابات أو إنشاء حسابات مزيفة."
+          }
+        ],
+        "multi": true,
+        "visual": {
+          "kind": "illustration",
+          "id": "deepfake"
+        }
+      },
+      "explain": "الدليل الموثوق ليس في الصورة، بل في التواصل الثاني الذي تبدؤه أنت بنفسك."
+    },
+    {
+      "type": "swipe",
+      "id": "follow-or-check",
+      "prompt": "هل هذا الطلب عادي أم خطير؟",
+      "cards": [
+        {
+          "id": "card-code",
+          "artifact": {
+            "kind": "chat",
+            "app": "generic",
+            "contact": [
+              {
+                "text": "تورال (قريب)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "رأيتني في الفيديو، إنه أنا فعلًا. أخبرني بالرمز الذي وصلك للتو لبطاقتك، أحتاجه لحجز تذكرة."
+                  }
+                ],
+                "time": "20:15"
+              }
+            ]
+          },
+          "verdict": "threat",
+          "explain": "لا ينبغي لأحد، ولا حتى لقريب، أن يطلب منك رمز بطاقتك. والفيديو ليس دليلًا."
+        },
+        {
+          "id": "meeting",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare",
+            "from": {
+              "name": [
+                {
+                  "text": "سابينا علييفا"
+                }
+              ],
+              "address": [
+                {
+                  "text": "s.aliyeva@idare.example"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "اجتماع الفريق غدًا الساعة 10:00"
+              }
+            ],
+            "time": "11:05",
+            "body": [
+              [
+                {
+                  "text": "رابط الاجتماع موجود في التقويم الداخلي. لا يوجد جدول أعمال مرفق، فقط احفظ الموعد."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "دعوة اجتماع عادية: نطاق الجهة نفسها، ولا تطلب منك شيئًا."
+        },
+        {
+          "id": "hr-video",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "idare-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "الموارد البشرية"
+                }
+              ],
+              "address": [
+                {
+                  "text": "hr@idare-hr.example.net"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "تجديد بطاقة الراتب"
+              }
+            ],
+            "time": "09:30",
+            "body": [
+              [
+                {
+                  "text": "انضم إلى اجتماع فيديو مدته 15 دقيقة، واعرض بطاقتك أمام الكاميرا."
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "لا توجد إدارة تطلب منك عرض بطاقتك أمام الكاميرا. كما أن النطاق ليس نطاق الجهة."
+        },
+        {
+          "id": "operator",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "kehkesan-mobil",
+            "sender": [
+              {
+                "text": "Kehkesan"
+              }
+            ],
+            "time": "13:10",
+            "messages": [
+              [
+                {
+                  "text": "رصيدك أقل من 5 مانات. استخدم التطبيق لشحن الرصيد."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "لا رابط ولا طلب لأي رمز. إشعار عادي من شركة الاتصالات."
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "abroad-relative",
+      "title": "مكالمة فيديو من الخارج",
+      "start": "call",
+      "nodes": [
+        {
+          "id": "call",
+          "text": "مرحبًا! أوقفتني الجمارك وأخذت جوالي. أتصل بك من حساب صديق. أرسل لي 1200 مانات، وسأعيدها إليك.",
+          "speaker": "تورال في الفيديو",
+          "voice": "man-3",
+          "channel": "video",
+          "manner": "worried",
+          "spoken": "مرحبًا! <breath> أوقفتني الجمارك وأخذت جوالي. أتصل بك من حساب صديق. أرسل لي 1200 مانات، أمم، وسأعيدها إليك.",
+          "character": "tural",
+          "visual": {
+            "kind": "illustration",
+            "id": "deepfake"
+          },
+          "choices": [
+            {
+              "label": "أرسل المال فورًا",
+              "outcome": "compromised",
+              "feedback": "ذهب المال إلى محتال. حساب شخص آخر مع طلب مال عاجل علامة تحذير."
+            },
+            {
+              "label": "أطلب كلمة التحقق المتفق عليها",
+              "next": "dodge",
+              "feedback": "خطوة جيدة. لنتابع ونرى ماذا سيقول."
+            },
+            {
+              "label": "أقول إنني سأتحقق مع العائلة أولًا",
+              "next": "check",
+              "feedback": "صحيح. تحقق عبر أرقام تعرفها."
+            }
+          ]
+        },
+        {
+          "id": "dodge",
+          "text": "الاتصال سيئ، لا أسمعك… لا وقت، أرسلها بسرعة!",
+          "speaker": "تورال في الفيديو (الصورة تتجمد)",
+          "voice": "man-3",
+          "channel": "video",
+          "manner": "worried",
+          "spoken": "الاتصال سيئ، لا أسمعك… <short pause> لا وقت، أرسلها بسرعة!",
+          "character": "tural",
+          "choices": [
+            {
+              "label": "حسنًا، سأرسلها",
+              "outcome": "compromised",
+              "feedback": "حجة الاتصال السيئ مجرد تهرب من سؤالك. لا كلمة تحقق، لا مال."
+            },
+            {
+              "label": "أنهي المكالمة وأتصل بالعائلة",
+              "next": "check",
+              "feedback": "قرار صحيح."
+            }
+          ]
+        },
+        {
+          "id": "check",
+          "text": "تقول زوجة تورال إنه في العمل اليوم وجواله معه.",
+          "choices": [
+            {
+              "label": "أبلغ الشرطة وأحذر العائلة",
+              "outcome": "safe",
+              "feedback": "رائع. فقد يحاول المحتال مع أفراد آخرين من العائلة."
+            },
+            {
+              "label": "لا أفعل شيئًا، فلم يضع أي مال",
+              "outcome": "risky",
+              "feedback": "سيحاول المحتال مرة أخرى. وتحذير العائلة يحمي الجميع."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "الوجه والصوت في الفيديو ليسا دليلًا.",
+        "طلب منك أحدهم مالًا أو رمز تحقق أو مستندًا؟ اتصل به بنفسك.",
+        "أبلغ فريق الأمن السيبراني أو الشرطة عن المكالمة المزيفة."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

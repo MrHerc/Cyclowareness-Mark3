@@ -1,0 +1,398 @@
+{
+ "id": "popup-panic",
+ "title": "Panik auf dem Bildschirm",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ts1-tutor",
+   "beats": [
+    {
+     "id": "ts1-b1",
+     "say": "Hallo! Heute lernen Sie, die beängstigenden Warnungen zu erkennen, die plötzlich auf Ihrem Bildschirm auftauchen.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "ts1-b2",
+     "say": "Ein solches Fenster will Ihnen Angst machen, damit Sie eine Nummer anrufen.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2a-sistem-muhafize",
+       "tone": "warning",
+       "title": [
+        {
+         "text": "Ihr Computer ist gesperrt"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Das System hat vier Viren gefunden.",
+          "spot": "virus"
+         }
+        ],
+        [
+         {
+          "text": "Support-Hotline: +994 12 000 70 05",
+          "spot": "phone"
+         }
+        ]
+       ],
+       "buttons": [
+        "Jetzt anrufen"
+       ]
+      }
+     },
+     "highlight": "phone"
+    },
+    {
+     "id": "ts1-b3",
+     "say": "Eine echte Warnung nennt Ihnen nie eine Telefonnummer und setzt Sie nie unter Zeitdruck.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    },
+    {
+     "id": "ts1-b4",
+     "say": "Die Regel ist einfach: Rufen Sie nicht an, schließen Sie das Fenster, und beenden Sie den Browser notfalls zwangsweise.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ts1-hotspot",
+   "prompt": "Finden Sie die Warnsignale, die zeigen, dass dieses Fenster ein Trick ist.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2a-sistem-muhafize",
+    "tone": "warning",
+    "title": [
+     {
+      "text": "Warnung: Ihr Computer ist gesperrt"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Das System hat vier Viren gefunden, und Ihre persönlichen Daten sind in Gefahr."
+      }
+     ],
+     [
+      {
+       "text": "Schließen Sie dieses Fenster nicht, sonst werden alle Ihre Dateien gelöscht.",
+       "spot": "dont-close"
+      }
+     ],
+     [
+      {
+       "text": "Rufen Sie jetzt die Support-Hotline an: +994 12 000 70 05",
+       "spot": "phone"
+      }
+     ],
+     [
+      {
+       "text": "Verbleibende Zeit: 04:58",
+       "spot": "timer"
+      }
+     ]
+    ],
+    "buttons": [
+     "Jetzt anrufen"
+    ]
+   },
+   "spots": [
+    {
+     "id": "dont-close",
+     "label": "Schließen verboten",
+     "explain": "Ein echtes System verbietet Ihnen nie, ein Fenster zu schließen. Das ist Angstmache, die Sie festhalten soll."
+    },
+    {
+     "id": "phone",
+     "label": "Telefonnummer",
+     "explain": "Ein Betriebssystem zeigt nie eine Support-Nummer auf dem Bildschirm an. Diese Nummer führt direkt zu den Kriminellen."
+    },
+    {
+     "id": "timer",
+     "label": "Countdown",
+     "explain": "Der Countdown soll Sie hetzen. Eine Warnung, die Ihnen keine Zeit zum Nachdenken lässt, ist gefälscht."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "simulation",
+   "id": "ts1-sim",
+   "environment": "browser",
+   "title": "Beim Nachrichtenlesen",
+   "intro": "Sie lesen eine Nachrichten-Website, und plötzlich öffnen sich Fenster. Wählen Sie für jedes Fenster den richtigen Schritt.",
+   "steps": [
+    {
+     "id": "popup-appears",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sistem-muhafize",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Bedrohung erkannt"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Auf Ihrem Computer wurde Schadsoftware gefunden. Rufen Sie jetzt den Support an: +994 12 000 70 05"
+        }
+       ]
+      ],
+      "buttons": [
+       "Jetzt anrufen",
+       "Scannen"
+      ]
+     },
+     "say": "Gerade hat sich eine rote Warnung geöffnet.",
+     "actions": [
+      {
+       "id": "close",
+       "label": "Fenster schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein solches Fenster einfach zu schließen, ist genau die richtige Reaktion."
+      },
+      {
+       "id": "call",
+       "label": "Angezeigte Nummer anrufen",
+       "kind": "call-back",
+       "outcome": "compromised",
+       "feedback": "Der falsche Support-Mitarbeiter am Telefon macht Ihnen nur noch mehr Angst. Rufen Sie diese Nummer nie an."
+      },
+      {
+       "id": "scan",
+       "label": "Auf „Scannen“ klicken",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Diese Schaltfläche öffnet nur eine weitere gefälschte Seite. Klicken Sie im Fenster nichts an."
+      }
+     ]
+    },
+    {
+     "id": "fullscreen-lock",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sistem-muhafize",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Bildschirm gesperrt"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Schalten Sie den Computer nicht aus. Wenn Sie dieses Fenster ohne den Support schließen, gehen Ihre Daten verloren."
+        }
+       ]
+      ],
+      "buttons": [
+       "Support anrufen"
+      ]
+     },
+     "say": "Jetzt füllt das Fenster den ganzen Bildschirm, und ein Warnton ertönt.",
+     "actions": [
+      {
+       "id": "force-quit",
+       "label": "Browser zwangsweise beenden",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn Sie den Browser zwangsweise beenden, verschwindet auch dieser gefälschte Bildschirm."
+      },
+      {
+       "id": "call",
+       "label": "Support anrufen",
+       "kind": "call-back",
+       "outcome": "compromised",
+       "feedback": "Warnton und Vollbild sollen Ihnen nur Angst machen. Wenn Sie anrufen, versuchen die Kriminellen, die Kontrolle über Ihr Gerät zu übernehmen."
+      }
+     ]
+    },
+    {
+     "id": "real-update",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Browser kann aktualisiert werden"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Starten Sie den Browser neu, um die Änderungen zu übernehmen."
+        }
+       ]
+      ],
+      "buttons": [
+       "Später",
+       "Aktualisieren"
+      ]
+     },
+     "say": "Das ist ein unaufgeregter Hinweis des Browsers selbst.",
+     "actions": [
+      {
+       "id": "update",
+       "label": "Aktualisieren",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein echtes Update kommt ruhig daher, nennt keine Nummer und setzt Sie nicht unter Druck."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "safe",
+       "feedback": "Auch das ist in Ordnung. Sie können aktualisieren, wann Sie möchten. Es besteht keine Gefahr."
+      },
+      {
+       "id": "call",
+       "label": "Sicherheitshalber den Support anrufen",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Das ist nicht nötig. Wegen eines einfachen Update-Hinweises müssen Sie niemanden anrufen."
+      }
+     ]
+    },
+    {
+     "id": "popup-returns",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sistem-muhafize",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Die Bedrohung besteht weiter"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Das Problem ist nicht behoben. Rufen Sie jetzt an, um Hilfe zu erhalten."
+        }
+       ]
+      ],
+      "buttons": [
+       "Jetzt anrufen"
+      ]
+     },
+     "say": "Sie haben das Fenster geschlossen, aber es ist wieder da.",
+     "actions": [
+      {
+       "id": "close-all",
+       "label": "Den ganzen Browser schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Wenn Sie den Browser vollständig schließen, verschwinden auch diese Seiten."
+      },
+      {
+       "id": "report",
+       "label": "Den IT-Support informieren",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Guter Schritt. Sie können Ihren eigenen IT-Support anrufen und dort nachfragen."
+      },
+      {
+       "id": "call",
+       "label": "Die Nummer anrufen",
+       "kind": "call-back",
+       "outcome": "compromised",
+       "feedback": "Dass das Fenster wiederkommt, gehört zum Trick. Rufen Sie diese Nummer nicht an."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ts1-match",
+   "prompt": "Ordnen Sie jedem Warnsignal die richtige Reaktion zu.",
+   "pairs": [
+    {
+     "id": "fullscreen",
+     "left": "Ein Fenster, das den ganzen Bildschirm füllt",
+     "right": "Browser zwangsweise beenden"
+    },
+    {
+     "id": "phone",
+     "left": "Eine Support-Nummer auf dem Bildschirm",
+     "right": "Eine echte Warnung nennt keine Nummer"
+    },
+    {
+     "id": "timer",
+     "left": "Ein Countdown",
+     "right": "Der Zeitdruck ist eine Lüge"
+    },
+    {
+     "id": "sound",
+     "left": "Alarm und Pieptöne",
+     "right": "Das soll Ihnen Angst machen"
+    }
+   ],
+   "explain": "All diese Signale sollen Ihnen Angst machen. Bleiben Sie ruhig und schließen Sie das Fenster."
+  },
+  {
+   "type": "choice",
+   "id": "ts1-choice",
+   "question": {
+    "prompt": "Ein Fenster taucht auf und fordert Sie auf, eine Nummer anzurufen. Was ist der erste Schritt?",
+    "options": [
+     {
+      "id": "close",
+      "label": "Ich schließe das Fenster und beende den Browser notfalls zwangsweise",
+      "correct": true,
+      "feedback": "Richtig. Eine solche Warnung ist harmlos und verschwindet, wenn Sie sie schließen."
+     },
+     {
+      "id": "call",
+      "label": "Sicherheitshalber rufe ich die angezeigte Nummer an",
+      "correct": false,
+      "feedback": "Diese Nummer gehört den Kriminellen. Wenn Sie anrufen, versuchen sie, die Kontrolle über Ihr Gerät zu übernehmen."
+     },
+     {
+      "id": "restart",
+      "label": "Ich schalte den Computer sofort aus",
+      "correct": false,
+      "feedback": "Das ist nicht nötig. Es genügt, das Fenster oder den Browser zu schließen."
+     }
+    ]
+   },
+   "explain": "Das beängstigende Fenster will Sie in ein Telefonat locken. Rufen Sie nicht an, schließen Sie es einfach."
+  },
+  {
+   "type": "recap",
+   "id": "ts1-recap",
+   "points": [
+    "Trauen Sie keinem beängstigenden Fenster, das aus dem Nichts auftaucht",
+    "Rufen Sie nie die angezeigte Nummer an",
+    "Schließen Sie das Fenster, und beenden Sie den Browser notfalls zwangsweise"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,393 @@
+{
+  "id": "sharing-official-documents",
+  "title": "Belgelerin paylaşılması",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "l2-tutor",
+      "beats": [
+        {
+          "id": "l2-b1",
+          "say": "Resmî belgeler yalnızca resmî kanallardan iletilir: iş e-postası ya da belge yönetim sistemi.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        },
+        {
+          "id": "l2-b2",
+          "say": "Kişisel mesajlaşma uygulamaları ve kişisel e-posta, kurumun denetimi dışındadır. Oraya giden bir belge kaybolabilir ya da sızabilir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "chat",
+              "app": "whatsapp",
+              "contact": [
+                {
+                  "text": "Nermin Hüseynova (kişisel)"
+                }
+              ],
+              "messages": [
+                {
+                  "from": "me",
+                  "body": [
+                    {
+                      "text": "Emir_taslağı_2027.pdf",
+                      "spot": "doc"
+                    }
+                  ],
+                  "time": "19:42"
+                }
+              ]
+            }
+          },
+          "highlight": "doc"
+        },
+        {
+          "id": "l2-b3",
+          "say": "Göndermeden önce alıcıyı okuyun. Otomatik tamamlama, başka birine ait benzer bir adı seçebilir.",
+          "mood": "think",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "dialog",
+              "brandRef": "ispoct",
+              "tone": "app",
+              "title": [
+                {
+                  "text": "Şimdi gönderilsin mi?"
+                }
+              ],
+              "body": [
+                [
+                  {
+                    "text": "Kime: "
+                  },
+                  {
+                    "text": "aysel.mamedova@poct-mail.example",
+                    "spot": "recipient"
+                  }
+                ],
+                [
+                  {
+                    "text": "Ek: Personel_listesi.xlsx"
+                  }
+                ]
+              ],
+              "buttons": [
+                "İptal",
+                "Gönder"
+              ]
+            }
+          },
+          "highlight": "recipient"
+        },
+        {
+          "id": "l2-b4",
+          "say": "Emin değilseniz göndermeyin, sorun. Bir belge yanlış yere gittiyse hemen bildirin.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "l2-hotspot",
+      "prompt": "Bu e-posta gönderilmeden önce içindeki hataları bulun.",
+      "artifact": {
+        "kind": "dialog",
+        "brandRef": "ispoct",
+        "tone": "app",
+        "title": [
+          {
+            "text": "Gönderilmeye hazır"
+          }
+        ],
+        "body": [
+          [
+            {
+              "text": "Kime: "
+            },
+            {
+              "text": "rauf.huseynov@poct-mail.example",
+              "spot": "personal-address"
+            }
+          ],
+          [
+            {
+              "text": "Bilgi: "
+            },
+            {
+              "text": "Tüm personel (212 kişi)",
+              "spot": "too-many"
+            }
+          ],
+          [
+            {
+              "text": "Ek: "
+            },
+            {
+              "text": "Vatandaş_başvuruları_kimlik_no.xlsx",
+              "spot": "personal-data"
+            }
+          ],
+          [
+            {
+              "text": "Metin: Dosya açılmazsa "
+            },
+            {
+              "text": "şifre: Baki2026",
+              "spot": "password"
+            }
+          ]
+        ],
+        "buttons": [
+          "Düzenle",
+          "Gönder"
+        ]
+      },
+      "spots": [
+        {
+          "id": "personal-address",
+          "label": "Kişisel e-posta adresi",
+          "explain": "Resmî belgeler iş adresine ya da belge sistemine gönderilir. Kişisel e-posta, kurumun denetimi dışındadır."
+        },
+        {
+          "id": "too-many",
+          "label": "Herkese bilgi kopyası",
+          "explain": "212 kişinin hepsinin bu dosyaya ihtiyacı yok. Yalnızca ihtiyacı olanları seçin."
+        },
+        {
+          "id": "personal-data",
+          "label": "Vatandaşların kimlik numaraları",
+          "explain": "Kişisel veri içeren bir dosya yalnızca onunla çalışan kişiye gider; en iyisi, sistemin içinde kalmasıdır."
+        },
+        {
+          "id": "password",
+          "label": "Aynı e-postada parola",
+          "explain": "Parolayı dosyayla birlikte göndermek korumayı boşa çıkarır. Parolayı başka bir kanaldan iletin."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "l2-sim",
+      "environment": "phone",
+      "title": "Ofis dışında",
+      "intro": "Ofis dışındasınız ve iş mesajları geliyor. Her biri için doğru adımı seçin.",
+      "steps": [
+        {
+          "id": "manager-whatsapp",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Nermin Hüseynova"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Merhaba, ofis dışındayım. Emir taslağını bana WhatsApp'tan atar mısınız, buradan bakarım."
+                  }
+                ],
+                "time": "18:10"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "share",
+              "label": "Dosyayı WhatsApp'tan gönder",
+              "kind": "share",
+              "outcome": "risky",
+              "feedback": "Kişisel bir mesajlaşma uygulamasında belge, kurumun denetiminden çıkar. Yöneticilerin de kullanabileceği resmî bir kanal var."
+            },
+            {
+              "id": "reply",
+              "label": "SənədAxını üzerinden göndereceğim",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Doğru. Belge resmî sistemde kalır, yöneticiniz de onu orada açabilir."
+            }
+          ]
+        },
+        {
+          "id": "old-colleague",
+          "artifact": {
+            "kind": "chat",
+            "app": "telegram",
+            "contact": [
+              {
+                "text": "Nazim (eski iş arkadaşı)"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Sizde yeni emir çıktı mı? Bir fotoğrafını at, kimseye söylemem."
+                  }
+                ],
+                "time": "18:25"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "keep",
+              "label": "Yayımlanınca web sitesinde görürsün",
+              "kind": "keep-private",
+              "outcome": "safe",
+              "feedback": "Doğru. Yayımlanmamış bir belge kurumun dışına çıkmaz."
+            },
+            {
+              "id": "share",
+              "label": "Fotoğrafını çekip gönder",
+              "kind": "share",
+              "outcome": "compromised",
+              "feedback": "Fotoğraf artık sizin denetiminizde değil. Her yere yayılabilir."
+            }
+          ]
+        },
+        {
+          "id": "wrong-recipient",
+          "label": "İş arkadaşınız Aysel Memmedova'ya yazmak istiyordunuz",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "ispoct",
+            "app": "İşPoçt",
+            "title": [
+              {
+                "text": "E-posta gönderildi"
+              }
+            ],
+            "body": [
+              {
+                "text": "Kime: aysel.mamedova@poct-mail.example. Ek: Personel_listesi.xlsx"
+              }
+            ],
+            "time": "18:40"
+          },
+          "say": "Alıcının adresine dikkatle bakın.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Yöneticiye ve güvenlik ekibine bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. Hızlı bildirmek, zararı sınırlamak için zaman kazandırır."
+            },
+            {
+              "id": "ignore",
+              "label": "Kimse fark etmez, boş ver",
+              "kind": "ignore",
+              "outcome": "risky",
+              "feedback": "Dosya artık dışarıdaki bir adreste. Saklamak zararı büyütür, bildirmek korur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "l2-choice",
+      "question": {
+        "prompt": "Resmî bir belgeyi üzerinde çalışmak için eve nasıl götürebilirsiniz?",
+        "options": [
+          {
+            "id": "personal-mail",
+            "label": "Kişisel adresime e-postayla gönderirim",
+            "correct": false,
+            "feedback": "Kişisel e-posta, kurumun denetimi dışındadır. Belge orada kalır ve sızabilir."
+          },
+          {
+            "id": "usb",
+            "label": "Kendi USB belleğime kopyalarım",
+            "correct": false,
+            "feedback": "USB bellekler kolayca kaybolur. Kurumunuzun izni olmadan resmî belgeleri dışarı taşımayın."
+          },
+          {
+            "id": "approved",
+            "label": "Kurumun izin verdiği yoldan: iş bilgisayarı ya da VPN",
+            "correct": true,
+            "feedback": "Doğru. Onaylı yol belgeyi korur ve denetim altında tutar."
+          }
+        ]
+      },
+      "explain": "Evden çalışma, kurumun kurallarına göre yapılır. Onaylı bir yol yoksa belge ofiste kalır."
+    },
+    {
+      "type": "scenario",
+      "id": "l2-scenario",
+      "title": "Ortak yazıcı",
+      "start": "p1",
+      "nodes": [
+        {
+          "id": "p1",
+          "text": "Gizli bir raporu koridordaki ortak yazıcıya gönderdiniz. Tam o sırada telefonunuz çalıyor.",
+          "choices": [
+            {
+              "label": "Telefonu açarım, yazıcıya sonra giderim",
+              "next": "p2",
+              "outcome": "risky",
+              "feedback": "Kâğıt yazıcıda duruyor ve yanından geçen herkes onu görebilir."
+            },
+            {
+              "label": "Önce kâğıdı alırım",
+              "next": "p2",
+              "outcome": "safe",
+              "feedback": "Doğru. Yazıcıda PIN ile yazdırma özelliği varsa onu kullanın."
+            }
+          ]
+        },
+        {
+          "id": "p2",
+          "text": "Yazıcıda başka birine ait, gizlilik derecesi taşıyan bir belge de unutulmuş.",
+          "choices": [
+            {
+              "label": "Kimin olduğunu anlamak için okurum",
+              "outcome": "risky",
+              "feedback": "Okumanıza gerek yok. Belgeyi güvenlik ekibine ya da departman müdürüne teslim edin."
+            },
+            {
+              "label": "Çöp kutusuna atarım",
+              "outcome": "risky",
+              "feedback": "Sıradan bir çöp kutusundan kâğıt almak kolaydır. Gizlilik derecesi taşıyan kâğıtlar kâğıt öğütücüde imha edilir."
+            },
+            {
+              "label": "Okumadan güvenlik ekibine teslim ederim",
+              "outcome": "safe",
+              "feedback": "Doğru. Belge sahibine geri döner ve kimse onu okumaz."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "l2-recap",
+      "points": [
+        "Resmî belgeler kişisel mesajlaşma uygulamaları ya da kişisel e-postayla değil, resmî kanallardan gönderilir.",
+        "Göndermeden önce alıcıyı ve eki kontrol edin, hataları hemen bildirin.",
+        "Gizlilik derecesi taşıyan kâğıtları yazıcıda bırakmayın ve sıradan bir çöp kutusuna atmayın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

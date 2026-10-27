@@ -1,3 +1,4 @@
+import { isIP } from "node:net";
 import { and, asc, eq, gte, isNotNull, isNull, lt, notInArray, or, sql } from "drizzle-orm";
 import nodemailer, { type Transporter } from "nodemailer";
 import type { DB } from "./db/client";
@@ -5,7 +6,8 @@ import * as t from "./db/schema";
 import type { TenantSettings } from "./db/schema";
 import { decryptSecret } from "./crypto";
 import { normaliseHost } from "./auth/domain-proof";
-import { destinationProblem } from "./net-guard";
+import { dirOf } from "../i18n/config";
+import { destinationProblem, vetDestination } from "./net-guard";
 import { env } from "./env";
 import { parseEmailMarkup } from "../lib/email-markup";
 import { EMAIL_BUTTON_LABEL, withDefaults } from "../lib/tenant-defaults";
@@ -27,8 +29,10 @@ function escapeHtml(s: string): string {
  * Simple branded HTML from plain text; URLs on their own line become buttons. With `markup`
  * (notification templates), **bold**, _italic_ and [text](https://…) links are rendered too. `lang` is the
  * language of the text (mail clients' screen readers and spell-checkers use it) and of the default button label.
+ * Text that includes what a person typed passes `button`: then only a paragraph that is exactly that trusted
+ * address becomes the button (null: none), and an address the person typed stays text.
  */
-export function renderEmailHtml(text: string, opts: { brand?: string; footer?: string; buttonLabel?: string; markup?: boolean; lang?: string } = {}): string {
+export function renderEmailHtml(text: string, opts: { brand?: string; footer?: string; buttonLabel?: string; markup?: boolean; lang?: string; button?: string | null } = {}): string {
   const lang = opts.lang ?? "en";
   const brand = opts.brand ?? "#4f46e5";
   const inline = (s: string) =>
@@ -47,13 +51,16 @@ export function renderEmailHtml(text: string, opts: { brand?: string; footer?: s
     .split(/\n{2,}/)
     .map((para) => {
       const trimmed = para.trim();
-      if (/^https?:\/\/\S+$/.test(trimmed)) {
+      if (opts.button === undefined ? /^https?:\/\/\S+$/.test(trimmed) : trimmed === opts.button) {
         return `<p style="margin:24px 0"><a href="${escapeHtml(trimmed)}" style="display:inline-block;background:${brand};color:#fff;text-decoration:none;font-weight:600;padding:12px 22px;border-radius:999px">${escapeHtml(opts.buttonLabel ?? EMAIL_BUTTON_LABEL[lang] ?? EMAIL_BUTTON_LABEL.en)}</a></p>`;
       }
       return `<p style="margin:0 0 14px;line-height:1.55">${inline(trimmed).replace(/\n/g, "<br>")}</p>`;
     })
     .join("");
-  return `<!doctype html><html lang="${escapeHtml(lang)}"><body style="margin:0;background:#f7f6fb;font-family:Segoe UI,Arial,sans-serif;color:#16123a"><div style="max-width:560px;margin:0 auto;padding:32px 20px"><div style="background:#fff;border:1px solid #e7e5f0;border-radius:20px;padding:28px">${body}</div>${opts.footer ? `<p style="font-size:12px;color:#6b6788;margin:16px 8px">${escapeHtml(opts.footer)}</p>` : ""}</div></body></html>`;
+  const dir = dirOf(lang);
+  // Outlook ignores dir on most elements, so a right-to-left mail also sets its alignment.
+  const align = dir === "rtl" ? ";text-align:right" : "";
+  return `<!doctype html><html lang="${escapeHtml(lang)}" dir="${dir}"><body style="margin:0;background:#f7f6fb;font-family:Segoe UI,Arial,sans-serif;color:#16123a"><div dir="${dir}" style="max-width:560px;margin:0 auto;padding:32px 20px${align}"><div style="background:#fff;border:1px solid #e7e5f0;border-radius:20px;padding:28px">${body}</div>${opts.footer ? `<p style="font-size:12px;color:#6b6788;margin:16px 8px">${escapeHtml(opts.footer)}</p>` : ""}</div></body></html>`;
 }
 
 type Transport = { transporter: Transporter; address: string; name: string; replyTo?: string };
@@ -105,13 +112,16 @@ async function transportFor(db: DB, tenantId: string | null, emailOverride?: Ten
   if (!tenant || !e?.enabled || !e.host) return "not_configured";
   // Re-checked at send time: a saved name may have been re-pointed at an internal address since.
   // A failed lookup is a DNS outage, not a configuration problem: the message waits for a retry.
-  const problem = await destinationProblem(e.host, e.port ?? 587, "smtp");
-  if (problem) return problem === "unresolvable" ? "unresolvable" : "blocked_destination";
+  const vetted = await vetDestination(e.host, e.port ?? 587, "smtp");
+  if (vetted.problem !== null) return vetted.problem === "unresolvable" ? "unresolvable" : "blocked_destination";
   const proven = !!tenant.domainVerifiedAt && !!tenant.branding.senderDomain && normaliseHost(tenant.branding.senderDomain) === tenant.domain;
   const address = e.fromAddress || (proven ? `no-reply@${tenant.domain}` : undefined);
   if (!address) return "not_configured";
   const transporter = nodemailer.createTransport({
-    host: e.host,
+    // The address the check approved, so nodemailer's own lookup cannot be re-pointed in between; TLS still checks the name.
+    // shortcut: only the first approved address is tried; hand nodemailer all of them if it ever takes a lookup option.
+    host: vetted.addresses[0].address,
+    servername: isIP(e.host) ? undefined : e.host,
     port: e.port ?? 587,
     secure: !!e.secure,
     requireTLS: !e.secure,
@@ -123,6 +133,11 @@ async function transportFor(db: DB, tenantId: string | null, emailOverride?: Ten
 
 function fromHeader(transport: Transport, fromName?: string): string {
   return `"${(fromName ?? transport.name).replace(/"/g, "")}" <${transport.address}>`;
+}
+
+/** Invitation and password-reset links (src/server/auth/links.ts) are bearer credentials: the token is replaced by "redacted". */
+export function redactAccountLinks(s: string): string {
+  return s.replace(/(\/account\/(?:invite|reset)\/)[A-Za-z0-9_-]+/g, "$1redacted");
 }
 
 /** Error stored on a simulation that was not sent because its campaign was cancelled meanwhile. */
@@ -152,7 +167,8 @@ async function simulationInfo(db: DB, m: { kind: string; text: string }): Promis
  * job runner sends it (bulk sends such as campaigns and invitations stay out of the request).
  */
 export async function queueEmail(db: DB, tenantId: string | null, mail: Mail, opts: { defer?: boolean } = {}): Promise<{ id: string; status: "sent" | "failed" | "logged" | "queued" }> {
-  const html = mail.html ?? renderEmailHtml(mail.text, { lang: mail.lang });
+  // Mail without its own HTML (the demo request) carries a visitor's words: no address in it becomes a button.
+  const html = mail.html ?? renderEmailHtml(mail.text, { lang: mail.lang, button: null });
   const [row] = await db
     .insert(t.outbox)
     .values({ tenantId, to: mail.to, subject: mail.subject, text: mail.text, html, kind: mail.kind, status: "queued" })
@@ -229,7 +245,11 @@ async function deliverRow(db: DB, id: string, opts: { fromName?: string; transpo
   try {
     const fromName = opts.fromName ?? sim.senderName;
     await transport.transporter.sendMail({ from: fromHeader(transport, fromName), replyTo: transport.replyTo, to: m.to, subject: m.subject, text: m.text, html: m.html });
-    await db.update(t.outbox).set({ status: "sent", sentAt: new Date(), attempts: m.attempts + 1, error: null }).where(eq(t.outbox.id, id));
+    // Delivered: the stored copy (the delivery log) no longer needs the live invitation or reset link.
+    await db
+      .update(t.outbox)
+      .set({ status: "sent", sentAt: new Date(), attempts: m.attempts + 1, error: null, text: redactAccountLinks(m.text), html: redactAccountLinks(m.html) })
+      .where(eq(t.outbox.id, id));
     return { status: "sent", stop: false };
   } catch (error) {
     // The raw server answer goes to the log; the outbox keeps a code the console can translate.

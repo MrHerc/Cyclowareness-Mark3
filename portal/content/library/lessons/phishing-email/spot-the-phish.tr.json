@@ -1,0 +1,887 @@
+{
+  "id": "spot-the-phish",
+  "title": "Oltalamayı fark edin",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "meet-the-phish",
+      "beats": [
+        {
+          "id": "hello",
+          "say": "Merhaba! Ben güvenlik yardımcınızım. Bugün sahte bir e-postayı saniyeler içinde fark etmeyi öğreneceksiniz.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "sender",
+          "say": "Önce gönderenin adresine bakın. Burada bir harf değiştirilmiş ve bunu fark etmek zor.",
+          "mood": "think",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "xidmet-agentliyi-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Muhasebe"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@"
+                  },
+                  {
+                    "text": "xidmetagentIiyi.az",
+                    "spot": "sender-domain"
+                  }
+                ]
+              },
+              "to": "e.mammadov@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "Eylül ayı maaş bordrosu"
+                }
+              ],
+              "time": "09:12",
+              "body": [
+                [
+                  {
+                    "text": "Sayın kullanıcı,",
+                    "spot": "greeting"
+                  }
+                ],
+                [
+                  {
+                    "text": "Eylül ayı maaş bordronuz hazır. "
+                  },
+                  {
+                    "text": "24 saat içinde onaylamazsanız ödemeniz durdurulacaktır.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "Bordroyu görüntüle",
+                    "spot": "link",
+                    "link": {
+                      "label": "Bordroyu görüntüle",
+                      "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+                    }
+                  }
+                ],
+                [
+                  {
+                    "text": "Muhasebe departmanı"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "sender-domain",
+          "checkpoint": {
+            "prompt": "Şüpheli bir e-postada ilk neye bakarsınız?",
+            "options": [
+              {
+                "id": "address",
+                "label": "Gönderenin adresine",
+                "correct": true,
+                "feedback": "Doğru. Sahteliği en hızlı ele veren çoğu zaman adrestir."
+              },
+              {
+                "id": "logo",
+                "label": "Logoya ve tasarıma",
+                "correct": false,
+                "feedback": "Logo ve tasarım kolayca kopyalanır. Adrese bakın."
+              },
+              {
+                "id": "time",
+                "label": "Gönderilme saatine",
+                "correct": false,
+                "feedback": "Saat hiçbir şey söylemez. Dolandırıcılar günün her saatinde yazar."
+              }
+            ]
+          }
+        },
+        {
+          "id": "urgency",
+          "say": "Hem süre sınırı hem tehdit. Bir e-posta sizi aceleye getiriyorsa, bu durmanız gerektiğinin işaretidir.",
+          "mood": "alert",
+          "gesture": "point-down",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "xidmet-agentliyi-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Muhasebe"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@"
+                  },
+                  {
+                    "text": "xidmetagentIiyi.az",
+                    "spot": "sender-domain"
+                  }
+                ]
+              },
+              "to": "e.mammadov@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "Eylül ayı maaş bordrosu"
+                }
+              ],
+              "time": "09:12",
+              "body": [
+                [
+                  {
+                    "text": "Sayın kullanıcı,",
+                    "spot": "greeting"
+                  }
+                ],
+                [
+                  {
+                    "text": "Eylül ayı maaş bordronuz hazır. "
+                  },
+                  {
+                    "text": "24 saat içinde onaylamazsanız ödemeniz durdurulacaktır.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "Bordroyu görüntüle",
+                    "spot": "link",
+                    "link": {
+                      "label": "Bordroyu görüntüle",
+                      "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+                    }
+                  }
+                ],
+                [
+                  {
+                    "text": "Muhasebe departmanı"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "urgency"
+        },
+        {
+          "id": "link",
+          "say": "Bağlantıya dokunmayın. Bilgisayarda imleci bağlantının üzerine getirip adresi okuyun; telefonda ise siteyi kendiniz açın.",
+          "mood": "talk",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "brandRef": "xidmet-agentliyi-fake",
+              "from": {
+                "name": [
+                  {
+                    "text": "Muhasebe"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "muhasibat@"
+                  },
+                  {
+                    "text": "xidmetagentIiyi.az",
+                    "spot": "sender-domain"
+                  }
+                ]
+              },
+              "to": "e.mammadov@xidmetagentliyi.az",
+              "subject": [
+                {
+                  "text": "Eylül ayı maaş bordrosu"
+                }
+              ],
+              "time": "09:12",
+              "body": [
+                [
+                  {
+                    "text": "Sayın kullanıcı,",
+                    "spot": "greeting"
+                  }
+                ],
+                [
+                  {
+                    "text": "Eylül ayı maaş bordronuz hazır. "
+                  },
+                  {
+                    "text": "24 saat içinde onaylamazsanız ödemeniz durdurulacaktır.",
+                    "spot": "urgency"
+                  }
+                ],
+                [
+                  {
+                    "text": "Bordroyu görüntüle",
+                    "spot": "link",
+                    "link": {
+                      "label": "Bordroyu görüntüle",
+                      "href": "https://xidmetagentliyi-az.maas-portal.info/giris"
+                    }
+                  }
+                ],
+                [
+                  {
+                    "text": "Muhasebe departmanı"
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "link"
+        }
+      ]
+    },
+    {
+      "type": "simulation",
+      "id": "morning-inbox",
+      "environment": "inbox",
+      "title": "Sabah gelen kutusu",
+      "intro": "Saat sabahın dokuzu ve sizi beş yeni e-posta bekliyor. Aralarında oltalama (phishing) e-postaları da olabilir. Her birini açın ve doğru adımı seçin.",
+      "steps": [
+        {
+          "id": "payslip",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "Muhasebe"
+                }
+              ],
+              "address": [
+                {
+                  "text": "muhasibat@xidmetagentIiyi.az",
+                  "reveal": "“agent” kısmından sonra küçük “l” harfi değil, büyük “I” harfi geliyor"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Eylül ayı maaş bordrosu"
+              }
+            ],
+            "time": "09:02",
+            "body": [
+              [
+                {
+                  "text": "Sayın kullanıcı,"
+                }
+              ],
+              [
+                {
+                  "text": "Maaş bordronuz hazır. 24 saat içinde onaylamazsanız ödemeniz durdurulacaktır."
+                }
+              ],
+              [
+                {
+                  "text": "Bordroyu görüntüle",
+                  "link": {
+                    "label": "Bordroyu görüntüle",
+                    "href": "https://maas-portal.info/giris"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Gönderenin adresini harf harf okuyun.",
+          "actions": [
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. Adreste küçük “l” yerine büyük “I” var: gerçeğine benzetilmiş sahte bir alan adı."
+            },
+            {
+              "id": "click",
+              "label": "Bağlantıyı aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Bağlantı kuruma değil, maas-portal.info adresine gidiyor. Orada yazdığınız parola doğrudan dolandırıcının eline geçer."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "risky",
+              "feedback": "Siz güvendesiniz, ama bu e-posta iş arkadaşlarınıza da geldi. Bildirin ki ekip onu herkesin kutusundan kaldırabilsin."
+            }
+          ]
+        },
+        {
+          "id": "report-draft",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "Elvin Memmedov"
+                }
+              ],
+              "address": [
+                {
+                  "text": "e.mammadov@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Raporun son sürümü"
+              }
+            ],
+            "time": "08:47",
+            "body": [
+              [
+                {
+                  "text": "Merhaba Aynur Hanım,"
+                }
+              ],
+              [
+                {
+                  "text": "Konuştuğumuz raporun son sürümünü kurum içi portala yükledim. Göz attığınızda bana haber verirseniz sevinirim."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "reply",
+              "label": "Yanıtla",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Doğru. Tanıdık bir iş arkadaşı, kurumun alan adı, bağlantı yok, acele de yok."
+            },
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Bu e-posta gerçek: alan adı doğru ve sizden hiçbir şey istenmiyor."
+            }
+          ]
+        },
+        {
+          "id": "sign-request",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "docusfera-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "DocuSfera"
+                }
+              ],
+              "address": [
+                {
+                  "text": "noreply@docusfera-imza.test"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Bir belge imzanızı bekliyor"
+              }
+            ],
+            "time": "08:31",
+            "body": [
+              [
+                {
+                  "text": "Yönetim, imzalamanız için size “Muqavile_2025.pdf” belgesini gönderdi."
+                }
+              ],
+              [
+                {
+                  "text": "Belgeyi görüntülemek için iş e-postanızla giriş yapın."
+                }
+              ],
+              [
+                {
+                  "text": "Belgeyi görüntüle",
+                  "link": {
+                    "label": "Belgeyi görüntüle",
+                    "href": "https://docusfera-imza.test/doc"
+                  }
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "click",
+              "label": "Bağlantıyı aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Alan adı hizmetin kendisine değil, docusfera-imza.test adresine aitti. Açılan sayfa, iş parolanızı çalmak için hazırlanmış."
+            },
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru: tuhaf bir alan adından gelen beklenmedik bir imza isteği. Emin değilseniz göndereni bildiğiniz bir numaradan arayın."
+            }
+          ]
+        },
+        {
+          "id": "maintenance",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek",
+            "from": {
+              "name": [
+                {
+                  "text": "BT Destek"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Planlı bakım çalışması"
+              }
+            ],
+            "time": "08:15",
+            "body": [
+              [
+                {
+                  "text": "Cumartesi günü 20:00 ile 22:00 arasında e-posta hizmeti kullanılamayacaktır. Sizden herhangi bir işlem gerekmemektedir."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "ok",
+              "label": "Güvenli olarak işaretle",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Doğru. Kurumun kendi adresi, bağlantı yok ve sizden hiçbir şey istenmiyor."
+            },
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Bu e-posta gerçek: yalnızca bilgi veriyor ve hiçbir şey istemiyor."
+            }
+          ]
+        },
+        {
+          "id": "bonus-list",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "İnsan Kaynakları Departmanı"
+                }
+              ],
+              "address": [
+                {
+                  "text": "kadrlar@xidmetagentliyi-az.com"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Bayram ikramiyesi listesi"
+              }
+            ],
+            "time": "07:58",
+            "body": [
+              [
+                {
+                  "text": "Değerli çalışanımız,"
+                }
+              ],
+              [
+                {
+                  "text": "İkramiye alacak çalışanların listesi ektedir. Lütfen adınızı bugün kontrol ediniz."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "Mukafat_siyahisi.html"
+                  }
+                ],
+                "size": "12 KB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "open",
+              "label": "Eki aç",
+              "kind": "open-attachment",
+              "outcome": "compromised",
+              "feedback": "Liste aslında sahte bir giriş sayfası gösteren bir .html dosyası. Üstelik gönderenin alan adı da -az.com ile bitiyordu."
+            },
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru: tuhaf bir alan adı, cazip bir konu ve .html uzantılı bir ek. İkramiyeleri İnsan Kaynaklarına kendiniz sorun."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "find-the-signs",
+      "prompt": "Sahteliği ele veren işaretlere dokunun.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "e-xidmet-fake",
+        "from": {
+          "name": [
+            {
+              "text": "E-Xidmet Portal",
+              "reveal": "bildiris@e-xidmet-portal.info"
+            }
+          ],
+          "address": [
+            {
+              "text": "bildiris@"
+            },
+            {
+              "text": "e-xidmet-portal.info",
+              "spot": "sender-domain"
+            }
+          ]
+        },
+        "subject": [
+          {
+            "text": "Ödenmemiş ceza: son uyarı"
+          }
+        ],
+        "time": "11:47",
+        "body": [
+          [
+            {
+              "text": "Sayın vatandaş,",
+              "spot": "greeting"
+            }
+          ],
+          [
+            {
+              "text": "Adınıza 40 AZN tutarında trafik cezası kesilmiştir."
+            }
+          ],
+          [
+            {
+              "text": "48 saat içinde ödenmezse tutar iki katına çıkacak ve dosyanız mahkemeye sevk edilecektir.",
+              "spot": "threat"
+            }
+          ],
+          [
+            {
+              "text": "Cezayı öde",
+              "spot": "link",
+              "link": {
+                "label": "Cezayı öde",
+                "href": "https://e-xidmet-portal.info/cerime?id=58213"
+              }
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender-domain",
+          "label": "Bilinmeyen alan adı",
+          "explain": "Resmî bir hizmet böyle bir adresten yazmaz. Bu ad, resmî görünsün diye uydurulmuş."
+        },
+        {
+          "id": "greeting",
+          "label": "Genel hitap",
+          "explain": "Gerçek bir bildirimde genellikle adınız ve bir dosya numarası yer alır."
+        },
+        {
+          "id": "threat",
+          "label": "Tehdit ve süre sınırı",
+          "explain": "Korku ve kısa süre, sizi kontrol etmeden ödemeye iter."
+        },
+        {
+          "id": "link",
+          "label": "Sahte bağlantı",
+          "explain": "Bu bağlantı kart bilgilerinizi toplar. Cezalarınızı resmî portalı kendiniz açarak kontrol edin."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "choice",
+      "id": "first-move",
+      "question": {
+        "prompt": "Şüpheli bir e-postayla ne yaparsınız?",
+        "options": [
+          {
+            "id": "report",
+            "label": "“Oltalama olarak bildir” düğmesine basarım",
+            "correct": true,
+            "feedback": "Doğru. Böyle bir düğme yok mu? O zaman e-postayı BT güvenlik ekibine iletin. Ekip de onu herkes için engelleyebilir."
+          },
+          {
+            "id": "click",
+            "label": "Kontrol etmek için bağlantıyı açarım",
+            "correct": false,
+            "feedback": "Tek bir tıklama zararlı bir sayfayı açabilir. Bunun yerine adresi kontrol edin."
+          },
+          {
+            "id": "reply",
+            "label": "Yanıt yazıp gönderene sorarım",
+            "correct": false,
+            "feedback": "Yanıtınız doğrudan dolandırıcıya gider. Elbette size her şeyin yolunda olduğunu söyleyecektir."
+          },
+          {
+            "id": "forward",
+            "label": "Baksınlar diye iş arkadaşlarıma iletirim",
+            "correct": false,
+            "feedback": "Bu, tehlikeyi yayar. Bildirin, ekip inceleyecektir."
+          }
+        ]
+      },
+      "explain": "Bildirmek hem sizi hem de iş arkadaşlarınızı korur. E-posta programınızda “Oltalama olarak bildir” düğmesi yoksa e-postayı BT güvenlik ekibine iletin."
+    },
+    {
+      "type": "swipe",
+      "id": "safe-or-phish",
+      "prompt": "Güvenli mi, tehdit mi?",
+      "cards": [
+        {
+          "id": "card-blocked",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ulduzbank-fake",
+            "sender": [
+              {
+                "text": "UlduzBank"
+              }
+            ],
+            "time": "08:03",
+            "messages": [
+              [
+                {
+                  "text": "UlduzBank: Kartınız bloke edilmiştir. Blokeyi kaldırmak için giriş yapınız: "
+                },
+                {
+                  "text": "https://ulduzbank-az.info/kart"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Gönderen adı taklit edilebilir ve bağlantı bankanın sitesine ait değil. Şüpheniz varsa kartınızın arkasındaki numarayı arayın."
+        },
+        {
+          "id": "meeting",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "Elvin Memmedov"
+                }
+              ],
+              "address": [
+                {
+                  "text": "e.mammadov@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Yarınki toplantı"
+              }
+            ],
+            "time": "10:21",
+            "body": [
+              [
+                {
+                  "text": "Merhaba Aynur Hanım,"
+                }
+              ],
+              [
+                {
+                  "text": "Yarın saat 10:00'da 3 numaralı odada görüşmek üzere. Gündem dünkü e-postada."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Tanıdık bir iş arkadaşı, doğru adres, bağlantı yok, istek de yok. Sıradan bir iş e-postası."
+        },
+        {
+          "id": "courier",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "cevikkargo-fake",
+            "sender": [
+              {
+                "text": "+994 70 000 88 31"
+              }
+            ],
+            "time": "13:40",
+            "messages": [
+              [
+                {
+                  "text": "ÇevikKargo: Kargonuz depoda bekletilmektedir. Teslimat için 1,20 AZN ücret ödeyiniz: "
+                },
+                {
+                  "text": "https://cevik-kargo.info/odenis"
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Tutarın küçüklüğü temkininizi gevşetir. Asıl amaç kart bilgilerinizi çalmaktır."
+        },
+        {
+          "id": "holidays",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "xidmet-agentliyi",
+            "from": {
+              "name": [
+                {
+                  "text": "İnsan Kaynakları"
+                }
+              ],
+              "address": [
+                {
+                  "text": "kadrlar@xidmetagentliyi.az"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Resmî tatiller"
+              }
+            ],
+            "time": "16:05",
+            "body": [
+              [
+                {
+                  "text": "Değerli çalışma arkadaşlarımız,"
+                }
+              ],
+              [
+                {
+                  "text": "Kasım tatillerine ilişkin çalışma takvimi kurum içi portalda yer almaktadır."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Genel bir hitap her zaman tehdit anlamına gelmez. Adres doğru, bağlantı yok, acele de yok."
+        },
+        {
+          "id": "mailbox-full",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-destek-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "BT destek"
+                }
+              ],
+              "address": [
+                {
+                  "text": "it-destek@xidmetagentliyi-az.com"
+                }
+              ]
+            },
+            "subject": [
+              {
+                "text": "Posta kutunuz dolu"
+              }
+            ],
+            "time": "07:58",
+            "body": [
+              [
+                {
+                  "text": "Posta kutunuz %98 dolu. E-postalarınızı kaybetmemek için giriş bilgilerinizi bugün doğrulayınız."
+                }
+              ],
+              [
+                {
+                  "text": "Girişi doğrula",
+                  "link": {
+                    "label": "Girişi doğrula",
+                    "href": "https://xidmetagentliyi-az.com/poct"
+                  }
+                }
+              ]
+            ]
+          },
+          "verdict": "threat",
+          "explain": "Adresin sonunda fazladan -az.com var ve bu, kurumun alan adı değil. Giriş bilgileri bir bağlantı üzerinden doğrulanmaz."
+        },
+        {
+          "id": "card-payment",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "ulduzbank",
+            "sender": [
+              {
+                "text": "UlduzBank"
+              }
+            ],
+            "time": "19:12",
+            "messages": [
+              [
+                {
+                  "text": "UlduzBank: Kartınızla 23,40 AZN tutarında ödeme yapılmıştır. İşlem size ait değilse kartınızın arkasındaki numarayı arayınız."
+                }
+              ]
+            ]
+          },
+          "verdict": "safe",
+          "explain": "Bağlantı yok ve sizi zaten bildiğiniz bir numaraya yönlendiriyor. Sıradan bir bildirim."
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Adresi kontrol edin: tek bir harf bile farklıysa e-posta sahtedir.",
+        "Aceleye getirme ve tehdit, durmanız gerektiğinin işaretidir.",
+        "Dokunmadan önce bağlantıyı kontrol edin, şüpheye düştüğünüzde bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

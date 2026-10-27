@@ -1,0 +1,343 @@
+{
+ "id": "deepfake-meeting",
+ "title": "Ein Deepfake im Meeting",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "dm-tutor",
+   "beats": [
+    {
+     "id": "dm-b1",
+     "say": "Heute kann KI in einer Videokonferenz ein vertrautes Gesicht und eine vertraute Stimme nachahmen.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "deepfake"
+     }
+    },
+    {
+     "id": "dm-b2",
+     "say": "Eine dringende Geldforderung, Geheimhaltung und eine Bitte, die von den üblichen Regeln abweicht: Zusammen sind sie ein Alarmsignal.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "gorus",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Rəşad Məmmədov (Direktor)"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Kamera an, die Stimme hinkt den Lippen leicht hinterher."
+         }
+        ],
+        [
+         {
+          "text": "„Überweisen Sie 46.000 Manat auf ein neues Konto, und zwar heute bis 15:00 Uhr. Das ist vertraulich, sagen Sie es niemandem.“",
+          "spot": "urgent"
+         }
+        ]
+       ],
+       "buttons": [
+        "Stummschaltung aufheben",
+        "Verlassen"
+       ]
+      }
+     },
+     "highlight": "urgent"
+    },
+    {
+     "id": "dm-b3",
+     "say": "Das Bild kann makellos aussehen. Beurteilen Sie deshalb die Bitte, nicht das Gesicht.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "dm-b4",
+     "say": "Verlassen Sie das Meeting und rufen Sie die Person selbst unter einer Nummer an, die Sie bereits kennen.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "dm-sim",
+   "environment": "desktop",
+   "title": "Dringendes Meeting",
+   "intro": "Vom Direktor kam eine dringende Einladung zu einem Meeting, und Sie sind beigetreten. Achten Sie darauf, was verlangt wird, und entscheiden Sie.",
+   "steps": [
+    {
+     "id": "the-ask",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Rəşad Məmmədov (Direktor)"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Kamera an, die Stimme hinkt den Lippen leicht hinterher."
+        }
+       ],
+       [
+        {
+         "text": "„Überweisen Sie 46.000 Manat auf ein neues Konto, und zwar heute bis 15:00 Uhr. Das ist vertraulich, sagen Sie es niemandem.“",
+         "spot": "urgent"
+        }
+       ]
+      ],
+      "buttons": [
+       "Stummschaltung aufheben",
+       "Verlassen"
+      ]
+     },
+     "say": "Der Direktor ist im Bild, und die Stimme klingt vertraut.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Gut, ich überweise es sofort",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Das Video war gefälscht, und das Geld ging an einen Betrüger. Ein vertrautes Gesicht bestätigt keine Zahlungsaufforderung."
+      },
+      {
+       "id": "verify",
+       "label": "Ich rufe Sie zur Bestätigung unter der Nummer an, die ich kenne",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Richtig. Ein zweiter Kanal entlarvt die Fälschung schnell."
+      },
+      {
+       "id": "wave-test",
+       "label": "Bitte winken Sie in die Kamera",
+       "kind": "verify",
+       "outcome": "risky",
+       "feedback": "Solche Tests sind nicht mehr zuverlässig, denn auch ein gefälschtes Video kann winken. Prüfen Sie über einen separaten Kanal."
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "gorus",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Meeting-Chat"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Rəşad Məmmədov: Rufen Sie nicht an, ich habe mein Handy nicht dabei.",
+         "spot": "no-call"
+        }
+       ],
+       [
+        {
+         "text": "Sevda Kərimli (Hauptbuchhalterin): Ich bin auch hier, alles ist in Ordnung."
+        }
+       ]
+      ],
+      "buttons": [
+       "Senden"
+      ]
+     },
+     "say": "Jetzt bestätigt es auch noch eine weitere bekannte Person.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Wenn alle einverstanden sind, überweise ich",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Jede Person im Meeting kann gefälscht sein. Bei solchen Angriffen wird manchmal das ganze Meeting gefälscht."
+      },
+      {
+       "id": "leave",
+       "label": "Meeting verlassen und Zahlung zurückhalten",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Richtig. „Rufen Sie nicht an“ ist der beste Grund, anzurufen."
+      }
+     ]
+    },
+    {
+     "id": "new-number",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "+994 50 000 64 27"
+       }
+      ],
+      "body": [
+       {
+        "text": "Rəşad Məmmədov: Das ist meine neue Nummer. Ist die Überweisung erledigt?"
+       }
+      ],
+      "time": "14:22"
+     },
+     "say": "Nach dem Meeting kommt eine Nachricht.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "An das Sicherheitsteam melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig, der Betrüger macht über einen anderen Kanal Druck. Bewahren Sie die Nachricht auf, sie ist ein Beweismittel."
+      },
+      {
+       "id": "reply",
+       "label": "Antworten: Noch nicht, ich mache es jetzt",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Eine neue Nummer prüfen Sie nur über die alte Nummer, die Sie kennen. Das hier ist die Nummer des Betrügers."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "dm-scenario",
+   "title": "Der Kontrollanruf",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Herr Məmmədov ist heute in Gəncə, den ganzen Tag in Besprechungen. Er hat kein Meeting angesetzt.",
+     "speaker": "Assistentin Aygün Rəhimova (interne Nummer)",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Herr Məmmədov ist heute in Gəncə, <breath> den ganzen Tag in Besprechungen. Er hat kein Meeting angesetzt.",
+     "choices": [
+      {
+       "label": "Ich informiere sofort das Sicherheitsteam und die Finanzabteilung",
+       "next": "n2",
+       "feedback": "Richtig. Die Kriminellen könnten es auch bei anderen Mitarbeitenden versuchen."
+      },
+      {
+       "label": "Er hat es wohl vergessen, ich überweise das Geld",
+       "outcome": "compromised",
+       "feedback": "Die Assistentin hat bestätigt, dass es kein Meeting gab. Das Geld wäre an einen Betrüger gegangen."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Danke. Haben Sie die Einladung, den Meeting-Chat und die Nachricht aufbewahrt?",
+     "speaker": "Sicherheitsteam",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Danke. <breath> Haben Sie die Einladung, den Meeting-Chat und die Nachricht aufbewahrt?",
+     "choices": [
+      {
+       "label": "Ich habe alles aufbewahrt und schicke es Ihnen",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Diese Beweise helfen bei der Untersuchung und warnen andere."
+      },
+      {
+       "label": "Ich habe alles gelöscht, weil es mir peinlich war",
+       "outcome": "risky",
+       "feedback": "Ohne Beweise ist die Untersuchung schwieriger. Löschen Sie beim nächsten Mal nichts, Sie müssen sich für nichts schämen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "dm-choice",
+   "question": {
+    "prompt": "Wie prüfen Sie den „Direktor“ aus dem Meeting am zuverlässigsten?",
+    "options": [
+     {
+      "id": "known",
+      "label": "Das Meeting verlassen und ihn unter der Nummer anrufen, die ich bereits kenne",
+      "correct": true,
+      "feedback": "Richtig. Diesen Kanal kontrolliert der Betrüger nicht."
+     },
+     {
+      "id": "question",
+      "label": "Ihm im Meeting eine persönliche Frage stellen",
+      "correct": false,
+      "feedback": "Die Antwort steht vielleicht in sozialen Netzwerken, oder er weicht aus. Ein separater Kanal ist zuverlässiger."
+     },
+     {
+      "id": "quality",
+      "label": "Genau auf die Videoqualität achten",
+      "correct": false,
+      "feedback": "Moderne gefälschte Videos sind sehr überzeugend. Verlassen Sie sich nicht auf das Bild."
+     },
+     {
+      "id": "reply-invite",
+      "label": "Auf die Einladungs-E-Mail antworten",
+      "correct": false,
+      "feedback": "Die Antwort ginge zurück an den Betrüger. Wählen Sie den Kanal selbst."
+     }
+    ]
+   },
+   "explain": "Ein zweiter Kanal ist einer, den Sie selbst wählen und bereits kennen: die interne Nummer, die Nummer in Ihren Kontakten oder ein persönliches Gespräch."
+  },
+  {
+   "type": "order",
+   "id": "dm-order",
+   "prompt": "In einem Meeting wird dringend Geld verlangt. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "hold",
+     "label": "Die Zahlung nicht ausführen"
+    },
+    {
+     "id": "leave",
+     "label": "Das Meeting verlassen"
+    },
+    {
+     "id": "call",
+     "label": "Selbst eine bekannte Nummer anrufen"
+    },
+    {
+     "id": "report",
+     "label": "An das Sicherheitsteam melden und die Beweise aufbewahren"
+    }
+   ],
+   "explain": "Halten Sie zuerst das Geld zurück, dann prüfen und melden Sie. Eile ist nie wichtiger als die Prüfung."
+  },
+  {
+   "type": "recap",
+   "id": "dm-recap",
+   "points": [
+    "Ein vertrautes Gesicht und eine vertraute Stimme sind kein Beweis",
+    "Dringende Geldforderung und Geheimhaltung? Dann stoppen Sie",
+    "Rufen Sie selbst unter einer bekannten Nummer zurück"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

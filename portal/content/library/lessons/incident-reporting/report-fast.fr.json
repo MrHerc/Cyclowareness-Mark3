@@ -1,0 +1,450 @@
+{
+ "id": "report-fast",
+ "title": "Vite et sans panique",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Un incident, ce n’est pas seulement une grande attaque. Un clic sur un lien suspect, un téléphone perdu ou un e-mail parti au mauvais destinataire comptent aussi.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Tout le monde fait des erreurs. Un signalement rapide empêche le problème de s’aggraver. Plus vous en parlez tôt, plus les dégâts restent limités.",
+     "mood": "happy",
+     "gesture": "nod",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Ne menez pas l’enquête vous-même et ne supprimez rien. L’e-mail, le message ou le fichier suspect est une preuve pour le spécialiste.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "b5",
+     "say": "Votre signalement doit être court : ce qui s’est passé, quand, sur quel appareil, et ce que vous avez déjà fait.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "report-button",
+   "environment": "inbox",
+   "title": "Le bouton Signaler",
+   "intro": "Deux e-mails suspects sont arrivés dans votre boîte de réception. Ouvrez-les un par un et choisissez la bonne réaction.",
+   "steps": [
+    {
+     "id": "quota",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ispoct-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Administrateur IshPocht"
+        }
+       ],
+       "address": [
+        {
+         "text": "admin@ispoct-mail.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Votre messagerie est pleine à 98 %"
+       }
+      ],
+      "time": "08:47",
+      "body": [
+       [
+        {
+         "text": "Si vous n’ajoutez pas d’espace, vos nouveaux e-mails seront supprimés dans 24 heures."
+        }
+       ],
+       [
+        {
+         "text": "Pour ajouter de l’espace : "
+        },
+        {
+         "text": "ispoct-mail.example.net/kvota",
+         "link": {
+          "label": "ispoct-mail.example.net/kvota",
+          "href": "https://ispoct-mail.example.net/kvota"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Regardez l’adresse de l’expéditeur.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bonne réponse. Grâce à votre signalement, les spécialistes peuvent retirer ce même e-mail des boîtes de réception de tous vos collègues."
+      },
+      {
+       "id": "click",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "L’adresse ne venait pas du domaine de votre organisation. On n’ajoute jamais d’espace à une messagerie en passant par un lien."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Vous êtes à l’abri, mais vos collègues restent des cibles et la preuve a disparu. Signalez l’e-mail au lieu de le supprimer."
+      },
+      {
+       "id": "forward",
+       "label": "Transférer aux collègues",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Transférer l’e-mail propage la menace. S’il n’y a pas de bouton Signaler, transférez-le uniquement à l’équipe sécurité."
+      }
+     ]
+    },
+    {
+     "id": "password-reply",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Support technique"
+        }
+       ],
+       "address": [
+        {
+         "text": "support@idare-helpdesk.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Vérification du compte"
+       }
+      ],
+      "time": "09:15",
+      "body": [
+       [
+        {
+         "text": "Le système est en cours de mise à jour. Pour que votre compte reste actif, répondez à cet e-mail en indiquant votre nom d’utilisateur et votre mot de passe."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact : un vrai support technique ne demande jamais votre mot de passe. Votre signalement avertit aussi vos collègues."
+      },
+      {
+       "id": "reply",
+       "label": "Répondre avec le mot de passe",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Votre mot de passe est tombé entre les mains de l’attaquant. Si cela arrive, changez-le immédiatement et signalez-le."
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "risky",
+       "feedback": "Vous n’avez pas donné votre mot de passe, mais quelqu’un d’autre pourrait le faire. Si vous signalez l’e-mail, les spécialistes protègent tout le monde."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "is-it-incident",
+   "prompt": "Faut-il le signaler ? Menace ou situation normale ?",
+   "cards": [
+    {
+     "id": "wrong-recipient",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Vous"
+        }
+       ],
+       "address": [
+        {
+         "text": "l.aliyeva@idare.example"
+        }
+       ]
+      },
+      "to": "kamran.aliyev.1990@mail.example",
+      "subject": [
+       {
+        "text": "Liste du personnel"
+       }
+      ],
+      "time": "10:02",
+      "body": [
+       [
+        {
+         "text": "Vous trouverez en pièce jointe la liste que vous m’avez demandée."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "isciler_siyahisi.xlsx"
+         }
+        ],
+        "size": "240 Ko"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "La liste est partie vers une adresse personnelle, hors de l’organisation. C’est une fuite de données : signalez-la tout de suite."
+    },
+    {
+     "id": "unasked-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "ispoct",
+      "sender": [
+       {
+        "text": "IshPocht"
+       }
+      ],
+      "time": "03:17",
+      "messages": [
+       [
+        {
+         "text": "Votre code de connexion : 482913. Ne le communiquez à personne."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un code que vous n’avez pas demandé signifie que quelqu’un connaît votre mot de passe. Changez-le et signalez-le."
+    },
+    {
+     "id": "training-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-destek",
+      "from": {
+       "name": [
+        {
+         "text": "Support technique"
+        }
+       ],
+       "address": [
+        {
+         "text": "it-support@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Formation à la sécurité vendredi"
+       }
+      ],
+      "time": "12:30",
+      "body": [
+       [
+        {
+         "text": "Une courte formation aura lieu vendredi à 11:00 dans la grande salle. Aucune inscription n’est nécessaire."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "La bonne adresse, aucun lien, aucune demande. C’est une information ordinaire."
+    },
+    {
+     "id": "clicked-link",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Tural (collègue)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Hier, j’ai ouvert le lien de cet e-mail, mais je n’ai rien saisi. Ça doit aller, non ?"
+         }
+        ],
+        "time": "09:20"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Le simple fait d’ouvrir le lien peut renseigner l’attaquant ou lancer un téléchargement. C’est à un spécialiste d’en juger : il faut le signaler."
+    },
+    {
+     "id": "lost-phone",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Leyla (équipe)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "J’ai oublié mon téléphone pro dans un taxi. Je le chercherai demain, ce n’est pas urgent."
+         }
+        ],
+        "time": "19:45"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un téléphone professionnel perdu est un incident urgent. Le support peut le verrouiller ou l’effacer à distance."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "first-step",
+   "question": {
+    "prompt": "Vous avez saisi votre mot de passe sur une fausse page. Quelle est la première chose à faire ?",
+    "options": [
+     {
+      "id": "report",
+      "label": "Le signaler immédiatement et changer le mot de passe",
+      "correct": true,
+      "feedback": "Bonne réponse. Chaque minute compte, et ces deux gestes ferment la porte à l’attaquant."
+     },
+     {
+      "id": "silent",
+      "label": "Je n’en parle à personne, parce que j’ai honte",
+      "correct": false,
+      "feedback": "Le silence laisse du temps à l’attaquant. Signaler, c’est vous protéger, vous et l’organisation."
+     },
+     {
+      "id": "delete",
+      "label": "Je supprime l’e-mail pour ne laisser aucune trace",
+      "correct": false,
+      "feedback": "L’e-mail est une preuve. Si vous le supprimez, les spécialistes ne peuvent plus voir qui d’autre a été visé."
+     },
+     {
+      "id": "recheck",
+      "label": "Je rouvre le lien pour vérifier",
+      "correct": false,
+      "feedback": "Le rouvrir augmente le risque. Laissez l’enquête aux spécialistes."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "alarm"
+    }
+   },
+   "explain": "Signalez vite, gardez les preuves et laissez l’enquête aux spécialistes."
+  },
+  {
+   "type": "order",
+   "id": "strange-program",
+   "prompt": "Un programme étrange tourne sur votre ordinateur. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Arrêter ce que vous êtes en train de faire"
+    },
+    {
+     "id": "disconnect",
+     "label": "Se déconnecter du réseau, sans éteindre l’ordinateur"
+    },
+    {
+     "id": "call",
+     "label": "Appeler le support technique par téléphone"
+    },
+    {
+     "id": "note",
+     "label": "Noter en quelques mots ce que vous avez vu"
+    }
+   ],
+   "explain": "Se déconnecter du réseau arrête la propagation, alors qu’éteindre l’ordinateur peut effacer des traces en mémoire. Si la procédure de votre organisation prévoit autre chose, suivez-la. Signalez l’incident par téléphone."
+  },
+  {
+   "type": "match",
+   "id": "good-report",
+   "prompt": "Associez chaque question à sa réponse dans le signalement.",
+   "pairs": [
+    {
+     "id": "what",
+     "left": "Que s’est-il passé ?",
+     "right": "J’ai saisi mon mot de passe sur une fausse page"
+    },
+    {
+     "id": "when",
+     "left": "Quand ?",
+     "right": "Aujourd’hui à 9 h 40"
+    },
+    {
+     "id": "where",
+     "left": "Sur quel appareil ?",
+     "right": "L’ordinateur de travail, dans la messagerie électronique"
+    },
+    {
+     "id": "done",
+     "left": "Qu’avez-vous fait ?",
+     "right": "J’ai changé le mot de passe et gardé l’e-mail"
+    }
+   ],
+   "explain": "Un signalement court et précis fait gagner du temps au spécialiste."
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "En cas de doute, signalez tout de suite. Une erreur n’a rien de honteux.",
+    "Ne menez pas l’enquête vous-même et ne supprimez rien.",
+    "Allez à l’essentiel : quoi, quand, où, et ce que vous avez fait."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,424 @@
+{
+ "id": "calm-response",
+ "title": "Gelassen reagieren",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "cr-tutor",
+   "beats": [
+    {
+     "id": "cr-b1",
+     "say": "Eine Erpresser-Mail ist angekommen. Jetzt üben wir die richtigen Schritte in der richtigen Reihenfolge.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "cr-b2",
+     "say": "Die ersten beiden Regeln: nicht zahlen und nicht antworten. Wer antwortet, wird zur neuen Zielscheibe.",
+     "mood": "alert",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "alarm"
+     }
+    },
+    {
+     "id": "cr-b3",
+     "say": "Wenn Sie das Passwort aus der E-Mail noch verwenden, ändern Sie es und aktivieren Sie die Zwei-Faktor-Authentisierung.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Passwort ändern"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Altes Passwort"
+         }
+        ],
+        [
+         {
+          "text": "Neues Passwort: mindestens 15 Zeichen",
+          "spot": "new"
+         }
+        ]
+       ],
+       "buttons": [
+        "Abbrechen",
+        "Ändern"
+       ]
+      }
+     },
+     "highlight": "new"
+    },
+    {
+     "id": "cr-b4",
+     "say": "Wenn die E-Mail an Ihre dienstliche Adresse ging, melden Sie sie dem Sicherheitsteam. Sie sind nicht schuld daran.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "cr-order",
+   "prompt": "Sie haben eine Erpresser-Mail erhalten. Bringen Sie die Schritte in die richtige Reihenfolge.",
+   "items": [
+    {
+     "id": "stop",
+     "label": "Nicht zahlen und nicht antworten"
+    },
+    {
+     "id": "report",
+     "label": "Die E-Mail dem Sicherheitsteam melden"
+    },
+    {
+     "id": "change",
+     "label": "Das Passwort aus der E-Mail überall ändern"
+    },
+    {
+     "id": "mfa",
+     "label": "Zwei-Faktor-Authentisierung aktivieren"
+    }
+   ],
+   "explain": "Zuerst innehalten, dann melden und das Passwort ändern. Die Zwei-Faktor-Authentisierung schützt das Konto auch dann, wenn ein altes Passwort durch ein Datenleck bekannt wird."
+  },
+  {
+   "type": "simulation",
+   "id": "cr-sim",
+   "environment": "desktop",
+   "title": "Morgens am Dienstrechner",
+   "intro": "Auf Ihrem Dienstrechner erscheint die Benachrichtigung über eine Erpresser-Mail. Wählen Sie bei jedem Schritt die richtige Reaktion.",
+   "steps": [
+    {
+     "id": "toast",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "İşPoçt",
+      "title": [
+       {
+        "text": "Ihr Passwort: Gunes2019. Sie haben 48 Stunden Zeit"
+       }
+      ],
+      "body": [
+       {
+        "text": "Ich habe Videos, die mit Ihrer Kamera aufgenommen wurden. Senden Sie Bitcoin, sonst bekommt sie jeder zu sehen."
+       }
+      ],
+      "time": "09:12"
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Richtig. Melden, ohne zu zahlen oder zu antworten, ist der beste erste Schritt.",
+       "next": "password"
+      },
+      {
+       "id": "reply",
+       "label": "Antworten: „Beweisen Sie es!“",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Sie haben geantwortet – und sofort kam eine Datei, angeblich der Beweis."
+      },
+      {
+       "id": "pay",
+       "label": "Bitcoin-Adresse kopieren und zahlen",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Das Geld ist weg und kommt nicht zurück. Wer zahlt, bekommt meist eine neue Forderung.",
+       "next": "password"
+      }
+     ]
+    },
+    {
+     "id": "proof",
+     "label": "Downloads",
+     "artifact": {
+      "kind": "file",
+      "name": [
+       {
+        "text": "Subut_video.zip"
+       }
+      ],
+      "type": "zip",
+      "size": "1,2 MB",
+      "source": [
+       {
+        "text": "Anonym: Antwort-E-Mail"
+       }
+      ]
+     },
+     "say": "Eine Antwort ist gekommen – angeblich mit dem Beweis.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Öffnen",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Das ist kein Beweis, sondern Schadsoftware. Öffnen Sie niemals Dateien aus einer Erpresser-Mail."
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Richtig. Öffnen Sie die Datei nicht und melden Sie die E-Mail dem Sicherheitsteam."
+      },
+      {
+       "id": "scan",
+       "label": "Mit dem Antivirenprogramm prüfen",
+       "kind": "scan",
+       "outcome": "safe",
+       "feedback": "Eine gute Gewohnheit, aber diese Datei müssen Sie gar nicht behalten. Löschen Sie sie und melden Sie die E-Mail."
+      }
+     ]
+    },
+    {
+     "id": "password",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Passwort ändern"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Das Passwort aus der E-Mail wurde in einem alten Datenleck gefunden."
+        }
+       ],
+       [
+        {
+         "text": "Neues Passwort: mindestens 15 Zeichen, auf keiner anderen Website verwendet."
+        }
+       ]
+      ],
+      "buttons": [
+       "Später",
+       "Passwort ändern"
+      ]
+     },
+     "say": "Sie verwenden dieses Passwort noch für einige Ihrer Konten.",
+     "actions": [
+      {
+       "id": "change",
+       "label": "Passwort ändern",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Das Passwort aus dem Datenleck öffnet dieses Konto nicht mehr. Ändern Sie es jetzt auch bei Ihren anderen Konten."
+      },
+      {
+       "id": "later",
+       "label": "Später",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Passwörter aus Datenlecks werden immer wieder ausprobiert, um Konten zu knacken. Schieben Sie die Änderung nicht auf."
+      }
+     ]
+    },
+    {
+     "id": "two-step",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Zwei-Faktor-Authentisierung"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Bei der Anmeldung zusätzlich zum Passwort eine Bestätigung über die App auf Ihrem Smartphone verlangen?"
+        }
+       ]
+      ],
+      "buttons": [
+       "Nicht jetzt",
+       "Aktivieren"
+      ]
+     },
+     "actions": [
+      {
+       "id": "enable",
+       "label": "Aktivieren",
+       "kind": "update",
+       "outcome": "safe",
+       "feedback": "Richtig. Selbst wenn das Passwort bekannt wird, schützt der zweite Faktor das Konto."
+      },
+      {
+       "id": "skip",
+       "label": "Nicht jetzt",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Ohne Zwei-Faktor-Authentisierung öffnet ein einziges Passwort alles. Aktivieren Sie sie noch heute."
+      }
+     ]
+    },
+    {
+     "id": "second-threat",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "İşPoçt",
+      "title": [
+       {
+        "text": "Nur noch 24 Stunden!"
+       }
+      ],
+      "body": [
+       {
+        "text": "Keine Zahlung eingegangen. Morgen werden die Videos verbreitet."
+       }
+      ],
+      "time": "08:30"
+     },
+     "say": "Einen Tag später kam eine neue Drohung.",
+     "actions": [
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Richtig. Auch eine wiederholte Drohung ist ein Bluff – zahlen Sie nicht und antworten Sie nicht."
+      },
+      {
+       "id": "report",
+       "label": "Melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Das Sicherheitsteam kann auch die neuen E-Mails blockieren."
+      },
+      {
+       "id": "bargain",
+       "label": "Antworten: „Geben Sie mir etwas Zeit“",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Wer verhandelt, macht den Kriminellen Hoffnung. Antworten Sie nicht, sondern melden Sie die E-Mail."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "cr-scenario",
+   "title": "Eine besorgte Kollegin",
+   "start": "panic",
+   "nodes": [
+    {
+     "id": "panic",
+     "text": "Schau mal, an meine private E-Mail-Adresse ist eine Erpresser-Mail gekommen, und da steht mein altes Passwort drin!",
+     "speaker": "Nərmin (Ihre Kollegin) zeigt ihr Smartphone",
+     "voice": "woman",
+     "channel": "in-person",
+     "manner": "worried",
+     "spoken": "Schau mal, <breath> an meine private E-Mail-Adresse ist eine Erpresser-Mail gekommen, und da steht mein altes Passwort drin!",
+     "character": "narmin",
+     "choices": [
+      {
+       "label": "Bleib ruhig, solche E-Mails gehen massenhaft raus, das ist ein Bluff. Nicht zahlen und nicht antworten",
+       "next": "reuse",
+       "feedback": "Richtig. Ein ruhiger, klarer Rat nimmt sofort die Panik heraus."
+      },
+      {
+       "label": "Zahl doch die Hälfte, dann lassen sie dich in Ruhe",
+       "outcome": "compromised",
+       "feedback": "Wer zahlt, bekommt neue Forderungen. Geld beendet die Drohung nicht."
+      },
+      {
+       "label": "Antworte und verlange einen Beweis",
+       "outcome": "risky",
+       "feedback": "Eine Antwort zeigt, dass die Adresse aktiv ist, und bringt noch mehr E-Mails."
+      }
+     ]
+    },
+    {
+     "id": "reuse",
+     "text": "Ich verwende das Passwort noch auf mehreren Websites. Was soll ich jetzt machen?",
+     "speaker": "Nərmin (Ihre Kollegin)",
+     "voice": "woman",
+     "channel": "in-person",
+     "manner": "worried",
+     "spoken": "Ich verwende das Passwort noch auf mehreren Websites, äh, was soll ich jetzt machen?",
+     "character": "narmin",
+     "choices": [
+      {
+       "label": "Ändere es überall, nimm für jede Website ein eigenes Passwort und aktiviere die Zwei-Faktor-Authentisierung",
+       "outcome": "safe",
+       "feedback": "Gut gemacht. Getrennte Passwörter verhindern, dass ein einziges Datenleck auf alle Konten übergreift."
+      },
+      {
+       "label": "Ändere nur das Passwort für dieses Postfach, der Rest ist egal",
+       "outcome": "risky",
+       "feedback": "Dasselbe Passwort wird auch auf anderen Websites ausprobiert. Es muss überall geändert werden."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "cr-choice",
+   "question": {
+    "prompt": "Ein jugendliches Familienmitglied erzählt, dass jemand mit der Veröffentlichung privater Videos droht und Geld verlangt. Was ist zu tun?",
+    "options": [
+     {
+      "id": "police",
+      "label": "Auf keinen Fall zahlen, zur Polizei gehen",
+      "correct": true,
+      "feedback": "Richtig. Auf keinen Fall zahlen, sondern zur Polizei gehen."
+     },
+     {
+      "id": "pay",
+      "label": "Einmal zahlen, damit es aufhört",
+      "correct": false,
+      "feedback": "Eine Zahlung beendet die Drohung nicht. Auf keinen Fall zahlen, sondern zur Polizei gehen."
+     },
+     {
+      "id": "hide",
+      "label": "Es geheim halten und niemandem davon erzählen",
+      "correct": false,
+      "feedback": "Schweigen hilft nur der Person, die droht. Auf keinen Fall zahlen, sondern zur Polizei gehen."
+     }
+    ]
+   },
+   "explain": "Wenn Kinder oder Jugendliche bedroht werden, zahlen Sie auf keinen Fall. Gehen Sie sofort zur Polizei."
+  },
+  {
+   "type": "recap",
+   "id": "cr-recap",
+   "points": [
+    "Nicht zahlen, nicht antworten und keine Dateien aus der E-Mail öffnen.",
+    "Das bekannt gewordene Passwort überall ändern und die Zwei-Faktor-Authentisierung aktivieren.",
+    "Wird ein Kind bedroht: auf keinen Fall zahlen, sondern zur Polizei gehen."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

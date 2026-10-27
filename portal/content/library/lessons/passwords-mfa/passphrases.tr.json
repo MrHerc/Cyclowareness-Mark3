@@ -1,0 +1,366 @@
+{
+  "id": "passphrases",
+  "title": "Parola cümleleri",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "long-beats-complex",
+      "beats": [
+        {
+          "id": "short",
+          "say": "Bu karmaşık görünüyor, ama bir ad, bir yıl ve bir ünlem işareti, saldırganların ilk denediği kalıptır.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "stat",
+            "value": "Aynur1985!",
+            "label": "Karmaşık görünür, kolayca kırılır"
+          }
+        },
+        {
+          "id": "phrase",
+          "say": "Daha iyisi: rastgele dört ya da daha fazla kelimeden oluşan bir parola cümlesi. Uzundur, kolay hatırlanır ve tahmin edilmesi çok zordur.",
+          "mood": "happy",
+          "gesture": "nod",
+          "visual": {
+            "kind": "stat",
+            "value": "menekşe tuğla okyanus saat",
+            "label": "Yalnızca bir örnek, kendinizinkini oluşturun"
+          },
+          "stage": "back"
+        },
+        {
+          "id": "length",
+          "say": "Uzunluk, karmaşıklıktan daha önemlidir. En az on beş karakter hedefleyin; kelimeler arasında boşluk ya da kısa çizgi kullanabilirsiniz.",
+          "mood": "talk",
+          "gesture": "recite",
+          "visual": {
+            "kind": "stat",
+            "value": "15+",
+            "label": "karakter, önerilen asgari uzunluk"
+          },
+          "checkpoint": {
+            "prompt": "Hangi parola daha güçlü?",
+            "options": [
+              {
+                "id": "swaps",
+                "label": "P@r0l@2026",
+                "correct": false,
+                "feedback": "Harfleri sembollerle değiştirme hilesi, parola kırma araçlarının çok iyi bildiği bir yöntemdir."
+              },
+              {
+                "id": "words",
+                "label": "deve fener limon bulut",
+                "correct": true,
+                "feedback": "Doğru. Rastgele dört kelime hem uzun hem de tahmin edilemezdir."
+              }
+            ]
+          }
+        },
+        {
+          "id": "stuffing",
+          "say": "Bir siteden veri sızdığında saldırganlar o parolayı başka sitelerde de dener. Bu yüzden her hesabın kendine ait bir parolası olmalı.",
+          "mood": "alert",
+          "gesture": "lean-in",
+          "visual": {
+            "kind": "illustration",
+            "id": "alarm"
+          }
+        }
+      ]
+    },
+    {
+      "type": "password",
+      "id": "make-passphrase",
+      "prompt": "Kendi parola cümlenizi oluşturun.",
+      "targetScore": 4,
+      "tips": [
+        "Buraya gerçek parolanızı yazmayın, bu bir alıştırma.",
+        "Rastgele dört ya da daha fazla kelime seçin.",
+        "Şarkı sözlerinden, şiirlerden ve atasözlerinden kaçının.",
+        "Adları, tarihleri ve iş yerinizi kullanmayın."
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "leak-alert",
+      "prompt": "Bu sızıntı uyarısında sahteliği ele veren işaretleri bulun.",
+      "artifact": {
+        "kind": "email",
+        "brandRef": "xidmet-agentliyi-fake",
+        "from": {
+          "name": [
+            {
+              "text": "Güvenlik Merkezi",
+              "reveal": "security@xidmetagentliyi-az.com"
+            }
+          ],
+          "address": [
+            {
+              "text": "security@"
+            },
+            {
+              "text": "xidmetagentliyi-az.com",
+              "spot": "sender-domain"
+            }
+          ]
+        },
+        "to": "a.hasanova@xidmetagentliyi.az",
+        "subject": [
+          {
+            "text": "Parolanız bir veri sızıntısında bulundu"
+          }
+        ],
+        "time": "08:47",
+        "body": [
+          [
+            {
+              "text": "Sayın kullanıcı,",
+              "spot": "greeting"
+            }
+          ],
+          [
+            {
+              "text": "Parolanız, internete sızdırılmış bir veritabanında tespit edilmiştir."
+            }
+          ],
+          [
+            {
+              "text": "Hesabınızı korumak için "
+            },
+            {
+              "text": "eski ve yeni parolanızı bu forma giriniz.",
+              "spot": "old-password"
+            }
+          ],
+          [
+            {
+              "text": "Formu aç",
+              "spot": "link",
+              "link": {
+                "label": "Formu aç",
+                "href": "https://parol-yenile.info/forma"
+              }
+            }
+          ],
+          [
+            {
+              "text": "Bir saat içinde işlem yapmazsanız hesabınız silinecektir.",
+              "spot": "urgency"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender-domain",
+          "label": "Sahte alan adı",
+          "explain": "Kurumun alan adı xidmetagentliyi.az; sonunda -az.com yoktur."
+        },
+        {
+          "id": "greeting",
+          "label": "Genel hitap",
+          "explain": "Kendi güvenlik ekibiniz size adınızla hitap ederdi."
+        },
+        {
+          "id": "old-password",
+          "label": "Eski parolayı istiyor",
+          "explain": "Gerçek bir hizmet, e-postadan açılan bir forma eski parolanızı yazmanızı istemez. Parolanızı bildiğiniz sitede kendiniz değiştirin."
+        },
+        {
+          "id": "link",
+          "label": "Başka siteye giden bağlantı",
+          "explain": "Bağlantı kurumun sitesine değil, başka bir alan adına gidiyor."
+        },
+        {
+          "id": "urgency",
+          "label": "Bir saatlik tehdit",
+          "explain": "Kısa süre ve tehdit, sizi düşünmeden harekete geçmeye iter."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "reset-page",
+      "environment": "browser",
+      "title": "Parolanızı sıfırlayın",
+      "intro": "Bir sızıntı uyarısının ardından tarayıcıda parola sıfırlama sayfası açılıyor. Adresi okuyun ve karar verin.",
+      "steps": [
+        {
+          "id": "leak-page",
+          "label": "Parolanız bir veri sızıntısında bulundu",
+          "artifact": {
+            "kind": "url",
+            "brandRef": "xidmet-agentliyi-fake",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "hesab-yoxla.info"
+              },
+              {
+                "text": "hesab-yoxla.info",
+                "spot": "real-domain"
+              },
+              {
+                "text": "/sizma"
+              }
+            ]
+          },
+          "say": "Sayfa sizi korkutuyor ve aceleye getiriyor. Bu adres kime ait?",
+          "actions": [
+            {
+              "id": "reset-here",
+              "label": "Parolayı burada sıfırla",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Sızıntı uyarısından sonra bağlantıya tıklamayın. Parolayı kendi açtığınız bir sitede değiştirin."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat, portalı kendim açacağım",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru: hesab-yoxla.info kurumun sitesi değil. Portalı yer işaretinizden kendiniz açın.",
+              "next": "real-reset"
+            }
+          ]
+        },
+        {
+          "id": "fake-reset",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi-fake",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://",
+                "reveal": "parol-yenile.info"
+              },
+              {
+                "text": "parol-yenile.info",
+                "spot": "real-domain"
+              },
+              {
+                "text": "/agentlik"
+              }
+            ],
+            "fields": [
+              "E-posta",
+              "Eski parola",
+              "Yeni parola"
+            ],
+            "button": "Parolayı sıfırla"
+          },
+          "say": "Form eski parolanızı da istiyor. Adresi kontrol edin.",
+          "actions": [
+            {
+              "id": "submit",
+              "label": "Parolayı sıfırla",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Eski parolayı isteyen sahte bir form, onu çalar. Parolanızı hemen resmî portalda değiştirin ve durumu bildirin."
+            },
+            {
+              "id": "close",
+              "label": "Sekmeyi kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "Doğru. parol-yenile.info kurumun alan adı değil, bu yüzden buraya hiçbir şey yazmayın."
+            },
+            {
+              "id": "report",
+              "label": "Siteyi bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Harika. Sahte siteyi bildirmeniz, başkaları için de engellenmesine yardımcı olur."
+            }
+          ]
+        },
+        {
+          "id": "real-reset",
+          "label": "Portalı kendiniz açtınız",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "xidmet-agentliyi",
+            "brand": "Xidmət Agentliyi",
+            "url": [
+              {
+                "text": "https://portal.xidmetagentliyi.az/profil/parol",
+                "reveal": "xidmetagentliyi.az"
+              }
+            ],
+            "fields": [
+              "Eski parola",
+              "Yeni parola cümlesi"
+            ],
+            "button": "Değiştir"
+          },
+          "say": "Bu, kurumun kendi portalı. Şimdi ne yaparsınız?",
+          "actions": [
+            {
+              "id": "change",
+              "label": "Parolayı değiştir",
+              "kind": "enter-credentials",
+              "outcome": "safe",
+              "feedback": "Doğru, parolayı resmî portalda değiştirdiniz. Yenisi, başka hiçbir yerde kullanmadığınız uzun bir cümle olsun."
+            },
+            {
+              "id": "later",
+              "label": "Daha sonra değiştiririm",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Parola sızdıysa biri onu şu anda deniyor olabilir. Hemen resmî portalda değiştirin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "true-rules",
+      "question": {
+        "prompt": "Hangi kurallar doğru?",
+        "options": [
+          {
+            "id": "length",
+            "label": "Uzunluk, karmaşıklıktan daha önemlidir",
+            "correct": true,
+            "feedback": "Doğru. Uzun bir parolayı kırmak çok daha zordur."
+          },
+          {
+            "id": "unique",
+            "label": "Her hesap için ayrı bir parola",
+            "correct": true,
+            "feedback": "Doğru. Böylece bir sızıntı yalnızca tek bir hesabı riske atar."
+          },
+          {
+            "id": "monthly",
+            "label": "Parolanızı her ay değiştirin",
+            "correct": false,
+            "feedback": "Sebepsiz yere değiştirmek çoğu zaman zayıf ve birbirine benzeyen parolalara yol açar. Sızıntıdan şüphelenirseniz hemen değiştirin."
+          },
+          {
+            "id": "birth-year",
+            "label": "Doğum yılı hatırlamayı kolaylaştırır",
+            "correct": false,
+            "feedback": "Doğum yılını bulmak kolaydır ve saldırganlar ilk onu dener."
+          }
+        ],
+        "multi": true
+      },
+      "explain": "Güncel öneri: uzun ve benzersiz parolalar kullanın, sızıntıdan sonra hemen değiştirin. Kurumunuzun kuralları farklıysa onlara uyun."
+    },
+    {
+      "type": "recap",
+      "id": "recap",
+      "points": [
+        "Uzun bir parola cümlesi, kısa ve karmaşık bir paroladan daha güçlüdür.",
+        "Her hesap için ayrı bir parola kullanın.",
+        "Sızıntıdan sonra parolayı hemen değiştirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -1,0 +1,478 @@
+{
+ "id": "phone-backup",
+ "title": "La sauvegarde du téléphone",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "br2-tutor",
+   "beats": [
+    {
+     "id": "br2-b1",
+     "say": "Quand on perd son téléphone, ce qu’on regrette le plus, ce sont souvent les photos de famille. Les protéger ne prend que quelques minutes.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "br2-b2",
+     "say": "Si vous avez déjà vu une notification comme celle-ci, les photos des derniers mois n’ont aucune copie.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "w2f-telefon-ayarlari",
+       "app": "Paramètres",
+       "title": [
+        {
+         "text": "Sauvegarde désactivée"
+        }
+       ],
+       "body": [
+        {
+         "text": "Dernière sauvegarde : il y a 143 jours",
+         "spot": "days"
+        }
+       ],
+       "time": "21:10"
+      }
+     },
+     "highlight": "days"
+    },
+    {
+     "id": "br2-b3",
+     "say": "Mais attention : un message qui annonce que votre espace de stockage est plein et que vos photos vont être supprimées est une arnaque très courante.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "brandRef": "buludxidmet-fake",
+       "sender": [
+        {
+         "text": "BuludXidmet"
+        }
+       ],
+       "time": "10:02",
+       "messages": [
+        [
+         {
+          "text": "Votre espace de stockage est plein. Vos photos seront supprimées dans 24 heures."
+         }
+        ]
+       ]
+      }
+     }
+    },
+    {
+     "id": "br2-b4",
+     "say": "Activez la sauvegarde dans les paramètres du téléphone lui-même, puis restaurez une photo pour vérifier que tout fonctionne.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "br2-order",
+   "prompt": "Configurez une sauvegarde sur votre téléphone. Remettez les étapes dans l’ordre.",
+   "items": [
+    {
+     "id": "turn-on",
+     "label": "Activer la sauvegarde automatique dans les Paramètres"
+    },
+    {
+     "id": "first-run",
+     "label": "Se connecter au Wi-Fi, brancher un chargeur et attendre la première sauvegarde"
+    },
+    {
+     "id": "check-date",
+     "label": "Vérifier que la date de la dernière sauvegarde est celle d’aujourd’hui"
+    },
+    {
+     "id": "test-restore",
+     "label": "Ouvrir une photo sur un autre appareil pour tester la restauration"
+    }
+   ],
+   "explain": "Une sauvegarde n’est utile que si elle fonctionne : vérifiez donc la date et restaurez une photo. Protégez aussi le compte cloud par une double authentification."
+  },
+  {
+   "type": "hotspot",
+   "id": "br2-hotspot",
+   "prompt": "Trouvez les signes d’arnaque dans ce message.",
+   "artifact": {
+    "kind": "sms",
+    "brandRef": "buludxidmet-fake",
+    "sender": [
+     {
+      "text": "BuludXidmet"
+     }
+    ],
+    "time": "10:02",
+    "messages": [
+     [
+      {
+       "text": "Votre espace de stockage est plein à 100 %.",
+       "spot": "full"
+      }
+     ],
+     [
+      {
+       "text": "Toutes vos photos seront supprimées sous 24 heures.",
+       "spot": "deadline"
+      }
+     ],
+     [
+      {
+       "text": "Passez à une offre supérieure pour seulement 1,99 AZN : ",
+       "spot": "small-fee"
+      },
+      {
+       "text": "buludxidmet-plan.example.info",
+       "spot": "link"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "full",
+     "label": "Stockage plein",
+     "explain": "Quand le stockage est plein, les nouvelles sauvegardes s’arrêtent, mais les anciennes photos ne sont pas supprimées d’un coup. Vérifiez vous-même l’espace de stockage dans les paramètres du téléphone."
+    },
+    {
+     "id": "deadline",
+     "label": "Délai",
+     "explain": "La peur et un délai très court vous poussent à payer sans réfléchir."
+    },
+    {
+     "id": "small-fee",
+     "label": "Petite somme",
+     "explain": "Une petite somme vous fait baisser la garde. Le vrai but est d’obtenir les données de votre carte."
+    },
+    {
+     "id": "link",
+     "label": "Domaine étrange",
+     "explain": "Ce n’est pas le domaine du service cloud. Changez d’offre uniquement dans les paramètres du téléphone."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "br2-sim",
+   "environment": "phone",
+   "title": "Où sont vos photos ?",
+   "intro": "Plusieurs notifications s’affichent sur votre téléphone. Pour chacune, choisissez l’action qui protège vos photos.",
+   "steps": [
+    {
+     "id": "backup-off",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-telefon-ayarlari",
+      "app": "Paramètres",
+      "title": [
+       {
+        "text": "Sauvegarde désactivée"
+       }
+      ],
+      "body": [
+       {
+        "text": "Dernière sauvegarde : il y a 143 jours. L’activer maintenant ?"
+       }
+      ],
+      "time": "21:10"
+     },
+     "actions": [
+      {
+       "id": "turn-on",
+       "label": "Activer la sauvegarde",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Exact. Désormais, vos photos sont copiées automatiquement chaque nuit."
+      },
+      {
+       "id": "later",
+       "label": "Plus tard",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Si le téléphone est perdu aujourd’hui, cinq mois de photos disparaissent avec lui. Activez la sauvegarde dès maintenant."
+      }
+     ]
+    },
+    {
+     "id": "storage-sms",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "buludxidmet-fake",
+      "sender": [
+       {
+        "text": "BuludXidmet"
+       }
+      ],
+      "time": "10:02",
+      "messages": [
+       [
+        {
+         "text": "Votre espace de stockage est plein. Vos photos seront supprimées dans 24 heures. Passez à une offre supérieure : "
+        },
+        {
+         "text": "buludxidmet-plan.example.info",
+         "link": {
+          "label": "buludxidmet-plan.example.info",
+          "href": "https://buludxidmet-plan.example.info/odenis"
+         }
+        }
+       ]
+      ]
+     },
+     "say": "Le matin, un message comme celui-ci arrive.",
+     "actions": [
+      {
+       "id": "click",
+       "label": "Ouvrir le lien",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Le lien ne mène pas au site du service cloud. Vérifiez l’espace de stockage uniquement dans les paramètres du téléphone.",
+       "next": "card-page"
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme spam",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bravo. C’est un faux : un vrai service ne menace pas de supprimer vos photos en une journée.",
+       "next": "free-app"
+      },
+      {
+       "id": "delete",
+       "label": "Supprimer",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Exact. Vérifiez vous-même votre espace de stockage dans les paramètres.",
+       "next": "free-app"
+      }
+     ]
+    },
+    {
+     "id": "card-page",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "buludxidmet-fake",
+      "brand": "BuludXidmət",
+      "url": [
+       {
+        "text": "https://buludxidmet-plan.example.info/odenis"
+       }
+      ],
+      "fields": [
+       "Numéro de carte",
+       "Date d’expiration",
+       "CVV"
+      ],
+      "button": "Payer 1,99 AZN"
+     },
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Payer 1,99 AZN",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Les données de votre carte sont parties chez l’escroc. Appelez tout de suite la banque au numéro inscrit au dos de la carte et faites-la bloquer."
+      },
+      {
+       "id": "close",
+       "label": "Fermer la page",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Vous avez bien fait de vous arrêter là. Vérifiez votre offre de stockage uniquement dans les paramètres du téléphone."
+      }
+     ]
+    },
+    {
+     "id": "free-app",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "w2f-foto-ehtiyat",
+      "app": "Foto Ehtiyat Pulsuz",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Photos et vidéos"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Contacts"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "SMS"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Journal d’appels"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Vous avez trouvé une application de sauvegarde gratuite dans la boutique d’applications.",
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact : une sauvegarde de photos n’a pas besoin d’accéder aux SMS ni aux contacts. La sauvegarde du téléphone suffit."
+      },
+      {
+       "id": "allow",
+       "label": "Autoriser",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Avec l’accès aux SMS, l’application peut lire vos codes bancaires. Supprimez tout de suite une application de ce genre."
+      }
+     ]
+    },
+    {
+     "id": "lost-phone",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "w2f-telefon-ayarlari",
+      "app": "Paramètres",
+      "title": [
+       {
+        "text": "Restaurer à partir de la sauvegarde ?"
+       }
+      ],
+      "body": [
+       {
+        "text": "Dernière sauvegarde : hier à 02:10. Photos : 4 812"
+       }
+      ],
+      "time": "19:45"
+     },
+     "say": "Un mois plus tard, vous perdez le téléphone dans le métro. Vous vous connectez sur un nouveau téléphone.",
+     "actions": [
+      {
+       "id": "restore",
+       "label": "Restaurer",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Bravo. La sauvegarde était activée : toutes les photos de famille sont là."
+      },
+      {
+       "id": "fresh",
+       "label": "Configurer comme un nouveau téléphone",
+       "kind": "later",
+       "outcome": "risky",
+       "feedback": "Dans ce cas, les photos n’arriveront pas sur le nouveau téléphone. Restaurez-les à partir de la sauvegarde."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "br2-scenario",
+   "title": "Le téléphone est perdu",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Ce soir, vous avez perdu votre téléphone dans le métro. En rentrant chez vous, que faites-vous en premier ?",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     },
+     "choices": [
+      {
+       "label": "Je verrouille le téléphone depuis un autre appareil et je regarde où il se trouve",
+       "next": "n2",
+       "feedback": "Exact. Le verrouillage empêche la personne qui l’a trouvé d’accéder à vos photos et à vos comptes."
+      },
+      {
+       "label": "J’attends demain matin, quelqu’un appellera peut-être",
+       "outcome": "risky",
+       "feedback": "Sur un téléphone non verrouillé, vos comptes sont en danger. Verrouillez-le tout de suite."
+      },
+      {
+       "label": "Je publie mon numéro et mon adresse sur les réseaux sociaux",
+       "outcome": "risky",
+       "feedback": "Publier vos données personnelles offre aux escrocs une nouvelle occasion d’agir. Verrouillez d’abord le téléphone."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Le téléphone n’a pas été retrouvé. Le lendemain, un SMS arrive : « Votre téléphone a été retrouvé, connectez-vous pour le voir ».",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "sms",
+       "sender": [
+        {
+         "text": "+994 50 000 64 18"
+        }
+       ],
+       "time": "11:20",
+       "messages": [
+        [
+         {
+          "text": "Votre téléphone a été retrouvé. Connectez-vous à votre compte pour voir où il se trouve : cihaz-tap.example.info"
+         }
+        ]
+       ]
+      }
+     },
+     "choices": [
+      {
+       "label": "J’ouvre le lien et je me connecte",
+       "outcome": "compromised",
+       "feedback": "Ce piège cible les personnes qui ont perdu un téléphone. Le mot de passe de votre compte part directement chez l’escroc."
+      },
+      {
+       "label": "Je ne l’ouvre pas, je restaure le nouveau téléphone à partir de la sauvegarde",
+       "outcome": "safe",
+       "feedback": "Bravo. Les photos sont en sécurité dans la sauvegarde, et un message comme celui-ci ne mérite pas votre confiance."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "br2-recap",
+   "points": [
+    "Activez la sauvegarde automatique sur votre téléphone.",
+    "Restaurez une photo pour vérifier.",
+    "« Stockage plein » ? Vérifiez les paramètres, pas le lien."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

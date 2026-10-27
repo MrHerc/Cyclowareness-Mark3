@@ -1,0 +1,481 @@
+{
+ "id": "accidental-insider",
+ "title": "Erreurs d’inattention",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ai-tutor",
+   "beats": [
+    {
+     "id": "ai-b1",
+     "say": "Bonjour ! Bien des fuites de données ne commencent pas par une mauvaise intention, mais par une simple erreur.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "desk"
+     }
+    },
+    {
+     "id": "ai-b2",
+     "say": "La saisie automatique peut choisir la mauvaise adresse. Avant d’envoyer, vérifiez encore une fois le destinataire.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct",
+       "tone": "system",
+       "title": [
+        {
+         "text": "Destinataire externe"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Cet e-mail part à l’extérieur de l’organisation : "
+         },
+         {
+          "text": "rauf.aliyev@kur-tikinti.example",
+          "spot": "wrong"
+         }
+        ],
+        [
+         {
+          "text": "Pièce jointe : Maas_cedveli_2026.xlsx"
+         }
+        ]
+       ],
+       "buttons": [
+        "Envoyer quand même",
+        "Annuler"
+       ]
+      }
+     },
+     "highlight": "wrong"
+    },
+    {
+     "id": "ai-b3",
+     "say": "Ne déposez pas vos fichiers de travail dans un cloud personnel ni dans des applications que votre organisation n’a pas approuvées.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "cloud"
+     }
+    },
+    {
+     "id": "ai-b4",
+     "say": "Si vous avez commis une erreur, ne la cachez pas. La signaler vite limite les dégâts, la cacher les aggrave.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "ai-sim",
+   "environment": "desktop",
+   "title": "Une journée de travail ordinaire",
+   "intro": "Plusieurs demandes sont arrivées aujourd’hui. Pour chacune, choisissez comment protéger les données.",
+   "steps": [
+    {
+     "id": "personal-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Nigar Aliyeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "nigar.aliyeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Liste pour le rapport"
+       }
+      ],
+      "time": "09:20",
+      "body": [
+       [
+        {
+         "text": "Bonjour, je travaille de chez moi ce soir."
+        }
+       ],
+       [
+        {
+         "text": "Merci de m’envoyer la liste du personnel (numéros de carte d’identité, téléphones) sur mon adresse personnelle : nigar.84@poctam.example"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "forward",
+       "label": "Envoyer la liste sur son adresse personnelle",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Des données personnelles ont échappé au contrôle de votre organisation. Une messagerie personnelle n’est pas protégée et peut fuiter."
+      },
+      {
+       "id": "reply",
+       "label": "Répondre : je ne peux pas l’envoyer sur une adresse personnelle",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Exact. Le télétravail passe par des outils approuvés, comme la messagerie professionnelle via le VPN."
+      }
+     ]
+    },
+    {
+     "id": "shadow-it",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "fayldasi",
+      "tone": "app",
+      "title": [
+       {
+        "text": "FaylDaşı : transfert de fichiers gratuit"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Layihe_smeta.xlsx (2,4 Go) a été transféré."
+        }
+       ],
+       [
+        {
+         "text": "Toute personne disposant du lien peut télécharger le fichier.",
+         "spot": "public"
+        }
+       ]
+      ],
+      "buttons": [
+       "Copier le lien",
+       "Annuler"
+      ]
+     },
+     "say": "Le fichier était trop lourd pour un e-mail, alors vous avez trouvé un site gratuit.",
+     "actions": [
+      {
+       "id": "share",
+       "label": "Copier le lien et l’envoyer au partenaire",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Quiconque reçoit le lien peut ouvrir le fichier. Votre organisation n’a aucun contrôle sur ce service."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler et demander la méthode approuvée au support informatique",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Le support informatique vous montrera la méthode approuvée pour envoyer un gros fichier en toute sécurité."
+      }
+     ]
+    },
+    {
+     "id": "wrong-recipient",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Destinataire externe"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Cet e-mail part à l’extérieur de l’organisation : "
+        },
+        {
+         "text": "rauf.aliyev@kur-tikinti.example",
+         "spot": "wrong"
+        }
+       ],
+       [
+        {
+         "text": "Pièce jointe : Maas_cedveli_2026.xlsx"
+        }
+       ]
+      ],
+      "buttons": [
+       "Envoyer quand même",
+       "Annuler"
+      ]
+     },
+     "say": "Vous envoyez le tableau des salaires à Rauf. Vérifiez l’adresse.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Envoyer quand même",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Le tableau des salaires est parti chez une entreprise extérieure. C’est une fuite de données personnelles."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler et vérifier le destinataire",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Votre collègue s’appelle Rauf Alizada, mais la saisie automatique a choisi Rauf Aliyev, d’une entreprise partenaire."
+      }
+     ]
+    },
+    {
+     "id": "sent-wrong",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "ispoct",
+      "app": "IshPocht",
+      "title": [
+       {
+        "text": "E-mail envoyé"
+       }
+      ],
+      "body": [
+       {
+        "text": "Rapport trimestriel : aysel.quliyeva@poctam.example (adresse personnelle)"
+       }
+      ],
+      "time": "16:41"
+     },
+     "say": "Un autre e-mail est déjà parti à la mauvaise adresse.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Prévenir immédiatement l’équipe sécurité",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Plus vous signalez tôt, plus il y a de chances de rappeler le message et de limiter les dégâts."
+      },
+      {
+       "id": "ask",
+       "label": "Écrire au destinataire : merci de le supprimer",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Demander, c’est bien, mais cela ne suffit pas. Prévenez d’abord l’équipe sécurité, elle vous dira quoi faire ensuite."
+      },
+      {
+       "id": "hide",
+       "label": "N’en parler à personne",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Une erreur cachée prend de l’ampleur. Signaler, c’est le bon réflexe professionnel."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "ai-swipe",
+   "prompt": "Sans danger ou risqué ?",
+   "cards": [
+    {
+     "id": "badge-photo",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "kontakto",
+      "app": "Kontakto",
+      "title": [
+       {
+        "text": "Votre publication est en ligne"
+       }
+      ],
+      "body": [
+       {
+        "text": "« Mon premier jour ! » La photo montre votre badge et un système interne à l’écran."
+       }
+      ],
+      "time": "12:10"
+     },
+     "verdict": "threat",
+     "explain": "Votre badge et votre écran de travail donnent aux attaquants de quoi fabriquer un faux badge et choisir leurs cibles."
+    },
+    {
+     "id": "portal-share",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Leyla Rzayeva"
+        }
+       ],
+       "address": [
+        {
+         "text": "leyla.rzayeva@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Devis partagé"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "J’ai partagé le fichier sur le portail interne, uniquement avec notre service."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Un espace interne approuvé et un accès limité : c’est la bonne façon de partager."
+    },
+    {
+     "id": "group-password",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Groupe du bureau (34 personnes)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Le mot de passe commun du système : Arxiv#2026"
+         }
+        ],
+        "time": "09:02"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Dans un groupe, un mot de passe atteint beaucoup de monde, parfois des personnes extérieures. Un mot de passe ne se partage jamais."
+    },
+    {
+     "id": "personal-cloud",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "buludxidmet",
+      "name": [
+       {
+        "text": "Layihe_budce_2027.xlsx"
+       }
+      ],
+      "type": "xls",
+      "size": "1,4 Mo",
+      "source": [
+       {
+        "text": "Dossier cloud personnel : toute personne disposant du lien peut le consulter"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Dans un cloud personnel, un fichier de travail échappe au contrôle de votre organisation, et un lien ouvert laisse entrer n’importe qui."
+    },
+    {
+     "id": "locked-screen",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "idare",
+      "app": "İdarə",
+      "title": [
+       {
+        "text": "Écran verrouillé"
+       }
+      ],
+      "body": [
+       {
+        "text": "Vous avez verrouillé l’écran en quittant votre bureau."
+       }
+      ],
+      "time": "13:00"
+     },
+     "verdict": "safe",
+     "explain": "Exact. Un écran verrouillé empêche quiconque d’agir en votre nom."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "ai-match",
+   "prompt": "Associez chaque risque à la bonne habitude.",
+   "pairs": [
+    {
+     "id": "autocomplete",
+     "left": "Saisie automatique",
+     "right": "Vérifier le destinataire avant d’envoyer"
+    },
+    {
+     "id": "cloud",
+     "left": "Cloud personnel et sites gratuits",
+     "right": "Uniquement des outils de partage approuvés"
+    },
+    {
+     "id": "photo",
+     "left": "Publier des photos prises au bureau",
+     "right": "Ni écrans, ni badges, ni documents dans le cadre"
+    },
+    {
+     "id": "sent",
+     "left": "Un e-mail envoyé à la mauvaise personne",
+     "right": "Prévenir immédiatement l’équipe sécurité"
+    }
+   ],
+   "explain": "Ces habitudes évitent la plupart des fuites dues à l’inattention."
+  },
+  {
+   "type": "choice",
+   "id": "ai-choice",
+   "question": {
+    "prompt": "Un collègue vous dit : « Cette application gratuite fait gagner du temps, installe-la et ne dis rien au support informatique. » Que faites-vous ?",
+    "options": [
+     {
+      "id": "ask-it",
+      "label": "Je demande l’avis du support informatique, ou une solution approuvée",
+      "correct": true,
+      "feedback": "Exact. Le support informatique peut vérifier si l’application est sûre ou vous proposer une solution approuvée."
+     },
+     {
+      "id": "install",
+      "label": "Je l’installe, tout le monde l’utilise",
+      "correct": false,
+      "feedback": "Une application non vérifiée peut envoyer des données de travail à l’extérieur. « Tout le monde l’utilise » ne veut pas dire qu’elle est sûre."
+     },
+     {
+      "id": "home-pc",
+      "label": "Je copie les fichiers sur mon ordinateur portable personnel et je travaille dessus",
+      "correct": false,
+      "feedback": "C’est aussi de l’informatique fantôme : les données passent sur un appareil non protégé."
+     }
+    ]
+   },
+   "explain": "Les applications et les appareils que votre organisation n’a pas approuvés, c’est ce qu’on appelle l’informatique fantôme (shadow IT). Si vous avez besoin d’un outil, demandez une solution approuvée au support informatique."
+  },
+  {
+   "type": "recap",
+   "id": "ai-recap",
+   "points": [
+    "Vérifiez le destinataire avant d’envoyer",
+    "Ne gardez vos fichiers de travail que dans des systèmes approuvés",
+    "Vous avez commis une erreur ? Signalez-la immédiatement"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

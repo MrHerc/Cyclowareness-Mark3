@@ -1,0 +1,558 @@
+{
+ "id": "drag-test",
+ "title": "Déplacez la fenêtre",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "dt-tutor",
+   "beats": [
+    {
+     "id": "dt-b1",
+     "say": "Bonjour ! Certains sites ouvrent une petite fenêtre pour vous connecter. Aujourd’hui, vous allez apprendre à repérer une fausse fenêtre.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "dt-b2",
+     "say": "L’escroc dessine cette fenêtre à l’intérieur de la page, comme une image. Même sa barre d’adresse a l’air authentique.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "ispoct-fake",
+       "tone": "app",
+       "title": [
+        {
+         "text": "IshPocht : connexion"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "https://poct.idare.example/giris",
+          "spot": "fake-bar"
+         }
+        ],
+        [
+         {
+          "text": "Connectez-vous avec votre adresse e-mail professionnelle pour consulter le document."
+         }
+        ]
+       ],
+       "buttons": [
+        "Se connecter",
+        "Annuler"
+       ]
+      }
+     },
+     "highlight": "fake-bar"
+    },
+    {
+     "id": "dt-b3",
+     "say": "Le test est simple : attrapez la fenêtre et faites-la glisser hors du navigateur. Une fausse fenêtre ne peut pas quitter la page.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "dt-b4",
+     "say": "Si votre gestionnaire de mots de passe ne remplit pas le mot de passe tout seul, arrêtez-vous. Saisissez vous-même l’adresse dans un nouvel onglet.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "dt-swipe",
+   "prompt": "Cette fenêtre de connexion est-elle fiable ?",
+   "cards": [
+    {
+     "id": "edge-cut",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht : connexion"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Vous avez fait glisser la fenêtre sur le côté."
+        }
+       ],
+       [
+        {
+         "text": "Elle a atteint le bord de la page et a été coupée."
+        }
+       ]
+      ],
+      "buttons": [
+       "Se connecter"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une vraie fenêtre sort du navigateur et se place n’importe où sur l’écran. Si elle est coupée, c’est une image dessinée dans la page."
+    },
+    {
+     "id": "moves-out",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht : connexion"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Vous avez fait glisser la fenêtre sur le côté : elle a quitté le navigateur et s’est placée sur le bureau."
+        }
+       ],
+       [
+        {
+         "text": "ParolSeyf a proposé le mot de passe de lui-même."
+        }
+       ]
+      ],
+      "buttons": [
+       "Se connecter"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "La fenêtre se déplace indépendamment du navigateur, et le gestionnaire de mots de passe reconnaît le site. Ce sont les signes d’une vraie fenêtre."
+    },
+    {
+     "id": "no-fill",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Aucun mot de passe enregistré pour ce site."
+        }
+       ],
+       [
+        {
+         "text": "Adresse affichée dans la fenêtre : poct.idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Fermer"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un gestionnaire de mots de passe vérifie l’adresse réelle du site, pas le texte affiché dans la fenêtre. S’il ne trouve aucun mot de passe, vous n’êtes pas sur le bon site."
+    },
+    {
+     "id": "moves-along",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht : connexion"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Vous avez fait glisser le navigateur lui-même sur le côté."
+        }
+       ],
+       [
+        {
+         "text": "La fenêtre de connexion s’est déplacée avec lui."
+        }
+       ]
+      ],
+      "buttons": [
+       "Se connecter"
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une vraie fenêtre reste à sa place. Si elle se déplace avec le navigateur, elle fait partie de la page."
+    },
+    {
+     "id": "own-tab",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct",
+      "tone": "app",
+      "title": [
+       {
+        "text": "Nouvel onglet : poct.idare.example"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Vous avez saisi l’adresse vous-même."
+        }
+       ],
+       [
+        {
+         "text": "Le gestionnaire de mots de passe a rempli le mot de passe."
+        }
+       ]
+      ],
+      "buttons": [
+       "Se connecter"
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Quand vous saisissez l’adresse vous-même, une fausse fenêtre ne peut pas s’interposer. C’est la méthode la plus sûre."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "dt-sim",
+   "environment": "browser",
+   "title": "Dossier d’appel d’offres",
+   "intro": "Un fournisseur vous a envoyé le lien d’un dossier d’appel d’offres. Pour l’afficher, le site vous demande de vous connecter. Avancez avec prudence.",
+   "steps": [
+    {
+     "id": "doc-page",
+     "label": "Dossier d’appel d’offres : achat de mobilier de bureau",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tender-baza",
+      "url": [
+       {
+        "text": "https://tender-baza.example.net/sened/4471"
+       }
+      ]
+     },
+     "say": "Le document est verrouillé. Le site vous propose de vous connecter avec votre compte professionnel.",
+     "actions": [
+      {
+       "id": "open-login",
+       "label": "Se connecter avec IshPocht",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Cliquer sur le bouton n’est pas encore dangereux. Le vrai test, c’est la fenêtre qui va s’ouvrir."
+      },
+      {
+       "id": "check-address",
+       "label": "Vérifier l’adresse",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "C’est le site d’appels d’offres, pas votre messagerie professionnelle. Observez très attentivement la fenêtre de connexion qui va s’ouvrir."
+      },
+      {
+       "id": "close-tab",
+       "label": "Fermer l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Un choix prudent. Ouvrez vous-même votre messagerie, et demandez le document au fournisseur par un autre moyen.",
+       "next": "own-tab"
+      }
+     ]
+    },
+    {
+     "id": "popup",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht : connexion"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "https://poct.idare.example/giris"
+        }
+       ],
+       [
+        {
+         "text": "Connectez-vous avec votre adresse e-mail professionnelle pour consulter le document."
+        }
+       ],
+       [
+        {
+         "text": "E-mail : aysel.quliyeva@idare.example"
+        }
+       ]
+      ],
+      "buttons": [
+       "Se connecter",
+       "Annuler"
+      ]
+     },
+     "say": "La fenêtre affiche la bonne adresse. Mais cela ne prouve encore rien.",
+     "actions": [
+      {
+       "id": "drag",
+       "label": "Faire glisser la fenêtre hors du navigateur",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "C’est le bon test. Voyons si la fenêtre peut quitter le navigateur."
+      },
+      {
+       "id": "autofill",
+       "label": "Remplir avec ParolSeyf",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Bonne idée. Le gestionnaire de mots de passe vérifie l’adresse réelle du site.",
+       "next": "pm-check"
+      },
+      {
+       "id": "type-pass",
+       "label": "Saisir le mot de passe et se connecter",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "La barre d’adresse de la fenêtre n’était qu’une image. Votre mot de passe est parti chez le propriétaire du site d’appels d’offres.",
+       "next": "leaked"
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bien. Ne saisissez jamais un mot de passe dans une fenêtre qui vous inspire le moindre doute.",
+       "next": "own-tab"
+      }
+     ]
+    },
+    {
+     "id": "drag-result",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "ispoct-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "IshPocht : connexion"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "La fenêtre a atteint le bord de la page et a été coupée."
+        }
+       ],
+       [
+        {
+         "text": "Elle n’a pas quitté le navigateur."
+        }
+       ]
+      ],
+      "buttons": [
+       "Se connecter",
+       "Annuler"
+      ]
+     },
+     "say": "La fenêtre a été coupée au bord de la page. Une vraie fenêtre ne fait jamais ça.",
+     "actions": [
+      {
+       "id": "close-it",
+       "label": "Fermer la fenêtre et l’onglet",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Une fenêtre qui ne peut pas quitter la page est fausse : n’y saisissez rien.",
+       "next": "own-tab"
+      },
+      {
+       "id": "type-anyway",
+       "label": "Se connecter quand même",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Vous aviez déjà vu que la fenêtre était fausse. Votre mot de passe est parti chez l’escroc.",
+       "next": "leaked"
+      },
+      {
+       "id": "report",
+       "label": "Signaler le site au support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Excellent. Le support technique peut bloquer le site et protéger aussi vos collègues.",
+       "next": "own-tab"
+      }
+     ]
+    },
+    {
+     "id": "pm-check",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "parolseyf",
+      "tone": "system",
+      "title": [
+       {
+        "text": "ParolSeyf"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Aucun mot de passe enregistré pour tender-baza.example.net."
+        }
+       ]
+      ],
+      "buttons": [
+       "Saisir manuellement",
+       "Fermer"
+      ]
+     },
+     "say": "Le gestionnaire de mots de passe n’a trouvé aucun mot de passe pour ce site.",
+     "actions": [
+      {
+       "id": "type-manual",
+       "label": "Saisir le mot de passe manuellement",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Le gestionnaire de mots de passe avait raison : ce site n’est pas votre messagerie. Le mot de passe saisi est parti chez l’escroc.",
+       "next": "leaked"
+      },
+      {
+       "id": "stop",
+       "label": "Arrêter et fermer la fenêtre",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Exact. Quand le gestionnaire de mots de passe ne remplit rien, le mieux est de s’arrêter."
+      }
+     ]
+    },
+    {
+     "id": "own-tab",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "ispoct",
+      "brand": "IshPocht",
+      "url": [
+       {
+        "text": "https://poct.idare.example/giris"
+       }
+      ],
+      "fields": [
+       "Adresse e-mail professionnelle",
+       "Mot de passe"
+      ],
+      "button": "Se connecter"
+     },
+     "say": "Vous avez saisi l’adresse dans un nouvel onglet. Le gestionnaire de mots de passe a rempli le mot de passe.",
+     "actions": [
+      {
+       "id": "login",
+       "label": "Se connecter",
+       "kind": "enter-credentials",
+       "outcome": "safe",
+       "feedback": "Exact. Quand vous saisissez l’adresse vous-même, une fausse fenêtre ne peut pas s’interposer.",
+       "next": "doc-page"
+      },
+      {
+       "id": "check",
+       "label": "Vérifier l’adresse",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "C’est bien votre vraie messagerie professionnelle, et le gestionnaire de mots de passe l’a reconnue. Vous pouvez vous connecter sans risque.",
+       "next": "doc-page"
+      }
+     ]
+    },
+    {
+     "id": "leaked",
+     "label": "Document introuvable",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tender-baza",
+      "url": [
+       {
+        "text": "https://tender-baza.example.net/sened/4471"
+       }
+      ]
+     },
+     "say": "Votre mot de passe est parti, et le document ne s’est jamais ouvert. Maintenant, agissez vite.",
+     "actions": [
+      {
+       "id": "change-report",
+       "label": "Modifier le mot de passe et appeler le support technique",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Modifiez le mot de passe dans un nouvel onglet, et demandez au support technique de fermer toutes les sessions ouvertes."
+      },
+      {
+       "id": "retry",
+       "label": "Se reconnecter",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Le site récupère votre mot de passe une deuxième fois. C’est un piège à mots de passe, pas un document."
+      },
+      {
+       "id": "ignore",
+       "label": "Ne rien faire",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "Avec ce mot de passe, l’escroc peut déjà ouvrir votre messagerie. Modifiez-le et signalez-le tout de suite."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "dt-order",
+   "prompt": "Remettez dans l’ordre les étapes à suivre quand une fenêtre de connexion semble suspecte.",
+   "items": [
+    {
+     "id": "drag",
+     "label": "Faire glisser la fenêtre hors du navigateur"
+    },
+    {
+     "id": "close",
+     "label": "Si elle ne peut pas en sortir, fermer la fenêtre et l’onglet"
+    },
+    {
+     "id": "own-tab",
+     "label": "Saisir l’adresse dans un nouvel onglet et s’y connecter"
+    },
+    {
+     "id": "report",
+     "label": "Signaler le site au support technique"
+    }
+   ],
+   "explain": "D’abord tester, puis fermer, puis saisir l’adresse vous-même. Signalez le site pour protéger aussi vos collègues."
+  },
+  {
+   "type": "recap",
+   "id": "dt-recap",
+   "points": [
+    "Faites glisser une fenêtre de connexion hors du navigateur : une fausse fenêtre ne peut pas en sortir",
+    "Si le gestionnaire de mots de passe ne remplit rien, arrêtez-vous",
+    "En cas de doute, saisissez vous-même l’adresse dans un nouvel onglet"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

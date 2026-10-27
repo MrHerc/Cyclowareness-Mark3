@@ -1,0 +1,475 @@
+{
+ "id": "device-and-votes",
+ "title": "الأجهزة والتصويت",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "mh2-tutor",
+   "beats": [
+    {
+     "id": "mh2-b1",
+     "say": "وهناك أيضًا طريقة صامتة للاستيلاء على الحساب: رابط تصويت، وجهاز مرتبط مخفي.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "social"
+     }
+    },
+    {
+     "id": "mh2-b2",
+     "say": "إذا رأيت إشعارًا كهذا، فحسابك مفتوح على جهاز آخر أيضًا.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "notification",
+       "brandRef": "sohbet",
+       "app": "Söhbət",
+       "title": [
+        {
+         "text": "تم ربط جهاز جديد",
+         "spot": "device"
+        }
+       ],
+       "body": [
+        {
+         "text": "حاسوب، كنجة. إذا لم تكن أنت، فراجع الأجهزة المرتبطة."
+        }
+       ],
+       "time": "21:14"
+      }
+     },
+     "highlight": "device"
+    },
+    {
+     "id": "mh2-b3",
+     "say": "لا تثق بصفحة تطلب منك تسجيل الدخول بحساب المراسلة قبل أن تصوت.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "mh2-b4",
+     "say": "فعل التحقق بخطوتين، وراجع الأجهزة المرتبطة من حين لآخر.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "mh2-swipe",
+   "prompt": "حدد لكل إشعار: هل هو آمن أم تهديد؟",
+   "cards": [
+    {
+     "id": "unasked-code",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sohbet",
+      "sender": [
+       {
+        "text": "Söhbət"
+       }
+      ],
+      "time": "23:40",
+      "messages": [
+       [
+        {
+         "text": "رمزك في Söhbət: 418 205. لا تشارك هذا الرمز مع أي شخص."
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "إذا لم تطلبه، فهناك من يحاول تسجيل الدخول برقمك. لا تشارك الرمز مع أي شخص."
+    },
+    {
+     "id": "linked",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "تم ربط جهاز جديد"
+       }
+      ],
+      "body": [
+       {
+        "text": "حاسوب، كنجة، 21:14"
+       }
+      ],
+      "time": "21:14"
+     },
+     "verdict": "threat",
+     "explain": "إذا لم تربطه أنت، فهناك من يقرأ محادثاتك. احذفه من الأجهزة المرتبطة فورًا."
+    },
+    {
+     "id": "vote-link",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "سيفينج علييفا"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "ابنتي تشارك في مسابقة رسم، أرجو أن تصوت لها: "
+         },
+         {
+          "text": "balaca-ressam.example.org/ses",
+          "link": {
+           "label": "balaca-ressam.example.org/ses",
+           "href": "https://balaca-ressam.example.org/ses"
+          }
+         }
+        ],
+        "time": "19:05"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "روابط التصويت من أكثر الطرق شيوعًا للاستيلاء على الحسابات. حتى لو أرسلها شخص تعرفه، لا تسجل الدخول في تلك الصفحة."
+    },
+    {
+     "id": "pin-on",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "sohbet",
+      "app": "Söhbət",
+      "title": [
+       {
+        "text": "تم تفعيل التحقق بخطوتين"
+       }
+      ],
+      "body": [
+       {
+        "text": "لقد أضفت حماية إضافية لحسابك."
+       }
+      ],
+      "time": "12:30"
+     },
+     "verdict": "safe",
+     "explain": "هذا تأكيد لخطوة قمت بها بنفسك. التحقق بخطوتين يحمي الحساب من سرقة الرمز."
+    },
+    {
+     "id": "meeting",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "مجموعة الإدارة"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "كامران أحمدوف: اجتماع الغد في الساعة العاشرة، في القاعة 214."
+         }
+        ],
+        "time": "17:48"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "هذه رسالة عمل عادية. لا تطلب رمزًا ولا مالًا، ولا تحتوي على رابط."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "mh2-sim",
+   "environment": "browser",
+   "title": "مسابقة الرسم",
+   "intro": "شخص تعرفه يطلب منك التصويت في مسابقة رسم للأطفال. اختر الخطوة الصحيحة في كل صفحة.",
+   "steps": [
+    {
+     "id": "vote-page",
+     "label": "التصويت لرسمة ليلى",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2a-balaca-ressam",
+      "url": [
+       {
+        "text": "https://balaca-ressam.example.org/ses"
+       }
+      ]
+     },
+     "say": "تبدو الصفحة جميلة، وفيها زر «تصويت».",
+     "actions": [
+      {
+       "id": "vote",
+       "label": "تصويت",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "زر التصويت ينقلك إلى صفحة تسجيل دخول. لم تخسر شيئًا بعد، لكن انتبه."
+      },
+      {
+       "id": "close",
+       "label": "إغلاق الصفحة",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "صحيح. إغلاق صفحة غير معروفة تطلب حسابًا مقابل التصويت هو الخطوة الأكثر أمانًا.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "login",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2a-sohbet-fake",
+      "brand": "Söhbət",
+      "url": [
+       {
+        "text": "https://sohbet-giris.example.org"
+       }
+      ],
+      "fields": [
+       "رقم الجوال"
+      ],
+      "button": "الحصول على الرمز"
+     },
+     "say": "تطلب منك الصفحة تسجيل الدخول بحساب Söhbət لكي تصوت.",
+     "actions": [
+      {
+       "id": "enter",
+       "label": "إدخال الرقم",
+       "kind": "enter-credentials",
+       "outcome": "risky",
+       "feedback": "برقمك يطلب المحتال رمزًا باسمك. وفي الخطوة التالية سيطلب منك هذا الرمز."
+      },
+      {
+       "id": "close",
+       "label": "إغلاق الصفحة",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "صحيح. هذا العنوان ليس عنوان Söhbət الرسمي، إذن فهي صفحة تسجيل دخول مزيفة.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "code",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sohbet-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "أدخل الرمز"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "اكتب رمز Söhbət المكون من ستة أرقام الذي وصل إلى جوالك."
+        }
+       ]
+      ],
+      "buttons": [
+       "تأكيد",
+       "إلغاء"
+      ]
+     },
+     "say": "والآن تطلب منك الصفحة أن تكتب فيها الرمز الذي وصل إلى جوالك.",
+     "actions": [
+      {
+       "id": "enter",
+       "label": "كتابة الرمز",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "بمجرد أن كتبته، أصبح حسابك مفتوحًا على جوال المحتال. رمز Söhbət لا تكتبه أبدًا في أي موقع إلكتروني."
+      },
+      {
+       "id": "cancel",
+       "label": "إلغاء",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "صحيح. الرمز مطلوب داخل تطبيق Söhbət نفسه فقط، وليس في أي صفحة.",
+       "next": "devices"
+      }
+     ]
+    },
+    {
+     "id": "pairing",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "w2a-sohbet-fake",
+      "tone": "app",
+      "title": [
+       {
+        "text": "تأكيد التصويت"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "افتح «الأجهزة المرتبطة» في تطبيق Söhbət وأدخل هذا الرمز:"
+        }
+       ],
+       [
+        {
+         "text": "[رمز تعرضه الصفحة]"
+        }
+       ]
+      ],
+      "buttons": [
+       "تم",
+       "إلغاء"
+      ]
+     },
+     "say": "تطلب الصفحة شيئًا جديدًا: ربط جهاز في التطبيق.",
+     "actions": [
+      {
+       "id": "pair",
+       "label": "ربط الجهاز",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "لقد ربطت حاسوب المحتال بحسابك. والآن يرى كل محادثاتك."
+      },
+      {
+       "id": "cancel",
+       "label": "إلغاء",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "صحيح. التصويت لا يتطلب ربط أي جهاز أبدًا."
+      }
+     ]
+    },
+    {
+     "id": "devices",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "sohbet",
+      "tone": "app",
+      "title": [
+       {
+        "text": "الأجهزة المرتبطة"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "حاسوب، كنجة. آخر نشاط: قبل دقيقتين."
+        }
+       ],
+       [
+        {
+         "text": "هل ربطت هذا الجهاز؟"
+        }
+       ]
+      ],
+      "buttons": [
+       "تسجيل الخروج",
+       "الإبقاء عليه"
+      ]
+     },
+     "say": "للاحتياط، تراجع الأجهزة المرتبطة في إعدادات Söhbət نفسه.",
+     "actions": [
+      {
+       "id": "logout",
+       "label": "تسجيل الخروج",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "صحيح. بمجرد أن تخرج جهازًا لا تعرفه من حسابك، لن يرى رسائلك بعد ذلك."
+      },
+      {
+       "id": "keep",
+       "label": "الإبقاء عليه",
+       "kind": "ignore",
+       "outcome": "compromised",
+       "feedback": "أنت لم تربط هذا الجهاز. إذا أبقيته، فسيواصل شخص ما قراءة محادثاتك."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "mh2-choice",
+   "question": {
+    "prompt": "ما أفضل ما يحمي حسابك في Söhbət من سرقة الرمز؟",
+    "options": [
+     {
+      "id": "two-step",
+      "label": "تفعيل التحقق بخطوتين",
+      "correct": true,
+      "feedback": "صحيح. حتى لو تمت سرقة الرمز، لن يدخل أحد دون الأرقام السرية التي حددتها."
+     },
+     {
+      "id": "photo",
+      "label": "إخفاء صورة ملفك الشخصي",
+      "correct": false,
+      "feedback": "خصوصية الصورة أمر جيد، لكنها لا تحمي الحساب. ما يحميه هو التحقق بخطوتين."
+     },
+     {
+      "id": "delete-chats",
+      "label": "حذف المحادثات باستمرار",
+      "correct": false,
+      "feedback": "هذا لا يمنع المحتال من الدخول. فعل التحقق بخطوتين."
+     }
+    ]
+   },
+   "explain": "التحقق بخطوتين يضع قفلًا ثانيًا على حسابك، ولا يعرفه أحد غيرك."
+  },
+  {
+   "type": "match",
+   "id": "mh2-match",
+   "prompt": "طابق كل موقف مع الخطوة الصحيحة.",
+   "pairs": [
+    {
+     "id": "code",
+     "left": "رمز لم تطلبه",
+     "right": "لا تشاركه مع أحد"
+    },
+    {
+     "id": "device",
+     "left": "إشعار بجهاز جديد",
+     "right": "احذفه من الأجهزة المرتبطة"
+    },
+    {
+     "id": "vote",
+     "left": "تسجيل دخول من أجل التصويت",
+     "right": "أغلق الصفحة"
+    },
+    {
+     "id": "money",
+     "left": "صديق يطلب المال",
+     "right": "تحقق بمكالمة هاتفية عادية"
+    }
+   ],
+   "explain": "الرمز والأجهزة والروابط هي أبواب حسابك. تحكم في كل منها بنفسك، ولا تفتح أيًا منها للآخرين."
+  },
+  {
+   "type": "recap",
+   "id": "mh2-recap",
+   "points": [
+    "لا تسجل الدخول بحساب Söhbət من أجل التصويت",
+    "عند وصول إشعار بجهاز جديد، راجع الأجهزة المرتبطة",
+    "فعل التحقق بخطوتين"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

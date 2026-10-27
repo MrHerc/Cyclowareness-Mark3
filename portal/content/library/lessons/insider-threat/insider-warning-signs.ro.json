@@ -1,0 +1,403 @@
+{
+ "id": "insider-warning-signs",
+ "title": "Semnale de alarmă",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "iw-tutor",
+   "beats": [
+    {
+     "id": "iw-b1",
+     "say": "Uneori, cineva din interior vrea să sustragă date intenționat. De aceea, este important să cunoașteți semnalele de alarmă.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "iw-b2",
+     "say": "Cererea parolei altcuiva și interesul pentru fișiere care nu țin de propriul post sunt semnale de alarmă serioase.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "sohbet",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Tural Hasanov"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Mi-au închis accesul. "
+          },
+          {
+           "text": "Dă-mi parola ta, iau câteva foldere din arhivă.",
+           "spot": "ask-pass"
+          }
+         ],
+         "time": "18:47"
+        }
+       ]
+      }
+     },
+     "highlight": "ask-pass"
+    },
+    {
+     "id": "iw-b3",
+     "say": "Dar nu investigați pe cont propriu, nu acuzați și nu răspândiți zvonuri. Un singur semnal nu dovedește vinovăția.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "iw-b4",
+     "say": "Raportați confidențial echipei de securitate ce ați văzut. Specialiștii vor verifica restul.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "iw-sim",
+   "environment": "phone",
+   "title": "Mesaje de la colegi",
+   "intro": "Este seară, iar pe telefon primiți mesaje de la colegi. Alegeți răspunsul potrivit pentru fiecare.",
+   "steps": [
+    {
+     "id": "ask-password",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Tural Hasanov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Salut, mi-au închis accesul din greșeală."
+         }
+        ],
+        "time": "18:45"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Dă-mi parola ta, iau folderele proiectului din arhivă și mâine ți-o dau înapoi."
+         }
+        ],
+        "time": "18:47"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "give",
+       "label": "Trimiteți parola",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Tot ce se face cu parola dumneavoastră se înregistrează pe numele dumneavoastră. Nu o dați nimănui, nici măcar colegilor."
+      },
+      {
+       "id": "refuse",
+       "label": "Nu-ți pot da parola mea, contactează suportul IT",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Dacă accesul a fost închis, doar echipa IT și managerul pot rezolva problema."
+      }
+     ]
+    },
+    {
+     "id": "ask-usb",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Tural Hasanov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Bine. Atunci copiază folderele pe un stick USB, trec diseară să-l iau."
+         }
+        ],
+        "time": "18:52"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "O să am nevoie de ele la noul loc de muncă."
+         }
+        ],
+        "time": "18:52"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "copy",
+       "label": "Bine, le copiez",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Datele organizației nu pleacă la un alt loc de muncă. Dacă le copiați, deveniți parte a scurgerii de date."
+      },
+      {
+       "id": "no",
+       "label": "Nu, nu pot face asta",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect, un „nu” calm și scurt este suficient. Acum anunțați echipa de securitate."
+      }
+     ]
+    },
+    {
+     "id": "group-gossip",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Grupul departamentului"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Leyla: L-am văzut pe Tural noaptea în arhivă. Hai să-i verificăm computerul și apoi să le spunem tuturor."
+         }
+        ],
+        "time": "19:10"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "join",
+       "label": "De acord, hai să verificăm",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "O verificare pe cont propriu poate compromite dovezile și poate face rău unei persoane nevinovate."
+      },
+      {
+       "id": "channel",
+       "label": "Nu în grup. Hai să raportăm confidențial echipei de securitate ce am văzut",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Corect. Faptele ajung pe canalul potrivit și nu pornește niciun zvon."
+      }
+     ]
+    },
+    {
+     "id": "security-reply",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Echipa de securitate"
+        }
+       ],
+       "address": [
+        {
+         "text": "tehlukesizlik@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Raportul dumneavoastră a fost înregistrat"
+       }
+      ],
+      "time": "19:40",
+      "body": [
+       [
+        {
+         "text": "Vă mulțumim. Vă rugăm să nu discutați acest subiect cu colegii. Vă vom contacta dacă va fi nevoie."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "ok",
+       "label": "Răspundeți: am înțeles",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Corect. Confidențialitatea protejează atât verificarea, cât și pe colegul dumneavoastră."
+      },
+      {
+       "id": "spread",
+       "label": "Redirecționați în grupul departamentului",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Dacă răspândiți raportul, afectați verificarea și îi puteți face rău pe nedrept colegului."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "iw-signs",
+   "question": {
+    "prompt": "Care dintre acestea sunt semnale de alarmă serioase?",
+    "options": [
+     {
+      "id": "access",
+      "label": "Cererea de acces la sisteme care nu țin de propriul post",
+      "correct": true,
+      "feedback": "Corect. Interesul pentru un acces de care persoana nu are nevoie merită atenție."
+     },
+     {
+      "id": "password",
+      "label": "Cererea parolei altcuiva",
+      "correct": true,
+      "feedback": "Corect. Cine are accesul potrivit nu are nevoie de parola altei persoane."
+     },
+     {
+      "id": "mass-copy",
+      "label": "Copierea multor fișiere pe un stick USB personal sau pe e-mailul personal",
+      "correct": true,
+      "feedback": "Corect. Datele care ies din organizație sunt cel mai clar semnal."
+     },
+     {
+      "id": "late",
+      "label": "Lucrul până târziu, din când în când",
+      "correct": false,
+      "feedback": "Luat separat, este ceva normal: mulți oameni lucrează până târziu. Un singur semnal nu este un motiv de acuzație."
+     },
+     {
+      "id": "questions",
+      "label": "Multe întrebări puse în ședințe",
+      "correct": false,
+      "feedback": "Este interes pentru muncă, nu o amenințare."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Un semnal nu este o acuzație, ci un motiv de raportare. Decizia le aparține specialiștilor."
+  },
+  {
+   "type": "scenario",
+   "id": "iw-scenario",
+   "title": "Ce ați văzut?",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "De o săptămână, Kamal copiază în fiecare seară fișiere confidențiale ale proiectului pe un stick USB personal. La un moment dat a spus: „Aici nimeni nu mă apreciază.”",
+     "choices": [
+      {
+       "label": "Raportez confidențial echipei de securitate ce am văzut",
+       "next": "n2",
+       "feedback": "Corect. Dumneavoastră transmiteți faptele, iar specialiștii trag concluziile."
+      },
+      {
+       "label": "Îl întreb direct: de ce iei fișierele?",
+       "outcome": "risky",
+       "feedback": "O acuzație provoacă un conflict și poate duce la ștergerea urmelor. Lăsați asta în seama specialiștilor."
+      },
+      {
+       "label": "Seara îi caut eu prin birou",
+       "outcome": "risky",
+       "feedback": "O căutare pe cont propriu poate încălca regulile și poate compromite dovezile."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Vă mulțumesc. Vă rog să notați ce ați văzut, când și unde.",
+     "speaker": "Echipa de securitate",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Vă mulțumesc. <breath> Vă rog să notați ce ați văzut, când și unde.",
+     "choices": [
+      {
+       "label": "Scriu doar ce am văzut, cu date și ore",
+       "outcome": "safe",
+       "feedback": "Excelent. Faptele precise sunt baza unei verificări corecte."
+      },
+      {
+       "label": "Adaug și părerile mele despre caracterul lui",
+       "outcome": "risky",
+       "feedback": "Presupunerile pot duce la un rezultat nedrept. Scrieți doar faptele pe care le-ați văzut."
+      },
+      {
+       "label": "Le spun colegilor să stea departe de el",
+       "outcome": "risky",
+       "feedback": "Acesta este un zvon și îi poate face rău pe nedrept colegului. Doar echipa de securitate trebuie să știe."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "iw-order",
+   "prompt": "Observați un comportament suspect. Ordonați pașii.",
+   "items": [
+    {
+     "id": "calm",
+     "label": "Păstrați-vă calmul și nu acuzați pe nimeni"
+    },
+    {
+     "id": "note",
+     "label": "Notați ce ați văzut, cu data și ora"
+    },
+    {
+     "id": "report",
+     "label": "Raportați confidențial echipei de securitate"
+    },
+    {
+     "id": "quiet",
+     "label": "După aceea, nu discutați subiectul cu alții"
+    }
+   ],
+   "explain": "Dumneavoastră transmiteți faptele, iar verificarea și decizia le aparțin specialiștilor. Dacă organizația a stabilit un alt canal, folosiți-l."
+  },
+  {
+   "type": "recap",
+   "id": "iw-recap",
+   "points": [
+    "Nu dați niciodată nimănui parola sau datele de serviciu",
+    "Nu acuzați și nu investigați pe cont propriu",
+    "Raportați confidențial faptele echipei de securitate"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

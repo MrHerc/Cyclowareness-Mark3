@@ -1,0 +1,510 @@
+{
+  "id": "bluff-letter",
+  "title": "Blöf e-postası",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "bl-tutor",
+      "beats": [
+        {
+          "id": "bl-b1",
+          "say": "Merhaba! Bazen korkutucu bir e-posta gelir: “Kameranızı hackledim. Ödeme yapın, yoksa özel videolarınızı yayımlarım.”",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "eye"
+          }
+        },
+        {
+          "id": "bl-b2",
+          "say": "E-postada eski parolalarınızdan biri bile yazıyor. Bu parola genellikle yıllar önceki bir veri sızıntısından gelir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "email",
+              "from": {
+                "name": [
+                  {
+                    "text": "Anonim"
+                  }
+                ],
+                "address": [
+                  {
+                    "text": "anonim.7781@mail-relay.example.net"
+                  }
+                ]
+              },
+              "to": "you@idare.example",
+              "subject": [
+                {
+                  "text": "Şifreniz: "
+                },
+                {
+                  "text": "Gunes2019",
+                  "spot": "password"
+                },
+                {
+                  "text": ". 48 saatiniz var"
+                }
+              ],
+              "time": "08:47",
+              "body": [
+                [
+                  {
+                    "text": "Cihazınıza girdim ve kameranızla özel videolarınızı kaydettim."
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "password"
+        },
+        {
+          "id": "bl-b3",
+          "say": "Bu tür e-postalar aynı anda binlerce kişiye gönderilir. Kameranızdan çekilmiş hiçbir video yoktur.",
+          "mood": "think",
+          "gesture": "shrug",
+          "visual": {
+            "kind": "illustration",
+            "id": "inbox"
+          }
+        },
+        {
+          "id": "bl-b4",
+          "say": "Kural şu: ödeme yapmayın, yanıt vermeyin ve parolanızı değiştirin. E-posta iş adresinize geldiyse güvenlik ekibine bildirin.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "bl-hotspot",
+      "prompt": "Dolandırıcının bu e-postadaki hilelerini bulun.",
+      "artifact": {
+        "kind": "email",
+        "from": {
+          "name": [
+            {
+              "text": "Anonim"
+            }
+          ],
+          "address": [
+            {
+              "text": "anonim.7781@mail-relay.example.net"
+            }
+          ]
+        },
+        "to": "you@idare.example",
+        "subject": [
+          {
+            "text": "Şifreniz: "
+          },
+          {
+            "text": "Gunes2019",
+            "spot": "password"
+          },
+          {
+            "text": ". 48 saatiniz var"
+          }
+        ],
+        "time": "08:47",
+        "body": [
+          [
+            {
+              "text": "Cihazınıza girdim ve kameranızla özel videolarınızı kaydettim.",
+              "spot": "camera"
+            }
+          ],
+          [
+            {
+              "text": "Kanıt olarak şifrenizi yazıyorum. Videoların yayımlanmasını istemiyorsanız aşağıdaki adrese 1.500 AZN değerinde bitcoin gönderin:"
+            }
+          ],
+          [
+            {
+              "text": "bc1q000000000000000000000000000000demo",
+              "spot": "btc"
+            }
+          ],
+          [
+            {
+              "text": "Ödeme için 48 saatiniz var. Bu e-postayı kimseye göstermeyin.",
+              "spot": "timer"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "password",
+          "label": "Eski parola",
+          "explain": "Bu parola eski bir veri sızıntısından alınmış. Cihazınızın ele geçirildiğini kanıtlamaz, ama bu parolayı hâlâ kullandığınız her yerde değiştirin."
+        },
+        {
+          "id": "camera",
+          "label": "Kamera iddiası",
+          "explain": "Bu bir blöf. Aynı metin binlerce adrese gönderilir ve ortada hiçbir video yoktur."
+        },
+        {
+          "id": "btc",
+          "label": "Bitcoin adresi",
+          "explain": "Kripto para ile yapılan ödeme geri alınamaz. Ödeme yaparsanız ardından yeni bir talep gelir."
+        },
+        {
+          "id": "timer",
+          "label": "48 saat",
+          "explain": "Bu süre sizi korkutmak ve düşünmenizi engellemek için konmuştur. Ödeme yapmayın, yanıt da vermeyin."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "match",
+      "id": "bl-match",
+      "prompt": "E-postadaki her iddiayı gerçeğiyle eşleştirin.",
+      "pairs": [
+        {
+          "id": "camera",
+          "left": "Kameranızı hackledim",
+          "right": "Kanıt yok, metin toplu olarak gönderiliyor"
+        },
+        {
+          "id": "password",
+          "left": "İşte şifreniz",
+          "right": "Eski bir veri sızıntısından alınmış"
+        },
+        {
+          "id": "house",
+          "left": "Evinizin fotoğrafı ekte",
+          "right": "Adres bir sızıntıdan, fotoğraf herkese açık bir haritadan"
+        },
+        {
+          "id": "timer",
+          "left": "48 saatiniz var",
+          "right": "Sizi korkutmak için uydurulmuş bir süre"
+        }
+      ],
+      "explain": "Dolandırıcının bildiği her şey herkese açık ya da sızdırılmış verilerdir. Hepsi sizi korkutmak için bir araya getirilmiştir."
+    },
+    {
+      "type": "simulation",
+      "id": "bl-sim",
+      "environment": "inbox",
+      "title": "İş e-postanız",
+      "intro": "Bakanlıktaki iş e-postanızın gelen kutusunu açıyorsunuz. Dört e-postanın her biri için doğru adımı seçin.",
+      "steps": [
+        {
+          "id": "sextortion",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "Anonim"
+                }
+              ],
+              "address": [
+                {
+                  "text": "anonim.7781@mail-relay.example.net"
+                }
+              ]
+            },
+            "to": "you@idare.example",
+            "subject": [
+              {
+                "text": "Şifreniz: Gunes2019. 48 saatiniz var"
+              }
+            ],
+            "time": "08:47",
+            "body": [
+              [
+                {
+                  "text": "Cihazınıza girdim ve kameranızla özel videolarınızı kaydettim."
+                }
+              ],
+              [
+                {
+                  "text": "Videoların yayımlanmasını istemiyorsanız şu adrese 1.500 AZN değerinde bitcoin gönderin: bc1q000000000000000000000000000000demo"
+                }
+              ],
+              [
+                {
+                  "text": "Ödeme için 48 saatiniz var."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. Güvenlik ekibi aynı e-postayı diğer iş arkadaşlarınızın gelen kutularından da kaldırabilir."
+            },
+            {
+              "id": "reply",
+              "label": "Yanıtla: kanıt gösterin",
+              "kind": "reply",
+              "outcome": "risky",
+              "feedback": "Yanıt vermek, adresinizin aktif olduğunu gösterir ve daha fazla e-posta almanıza yol açar. Yanıt vermeyin."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Silmek de olur. Ancak iş e-postasında önce bildirmek daha iyidir."
+            }
+          ]
+        },
+        {
+          "id": "house-photo",
+          "artifact": {
+            "kind": "email",
+            "from": {
+              "name": [
+                {
+                  "text": "Gözcü"
+                }
+              ],
+              "address": [
+                {
+                  "text": "watcher.0042@anon-post.example.net"
+                }
+              ]
+            },
+            "to": "you@idare.example",
+            "subject": [
+              {
+                "text": "Evinizin fotoğrafını görüyor musunuz?"
+              }
+            ],
+            "time": "09:05",
+            "body": [
+              [
+                {
+                  "text": "Bu sizin eviniz. Adresinizi de şifrenizi de biliyorum."
+                }
+              ],
+              [
+                {
+                  "text": "Bitcoin ile 1.500 AZN gönderin, yoksa videolar yayımlanacak."
+                }
+              ]
+            ],
+            "attachments": [
+              {
+                "name": [
+                  {
+                    "text": "ev_adresi.jpg"
+                  }
+                ],
+                "size": "212 KB"
+              }
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Doğru. Ev fotoğrafı herkese açık bir haritadan alınmış, yani bu da toplu gönderilen bir blöf."
+            },
+            {
+              "id": "open",
+              "label": "Fotoğrafı aç",
+              "kind": "open-attachment",
+              "outcome": "risky",
+              "feedback": "Fotoğrafın amacı sizi daha da korkutmak. Şüpheli bir eki açmayın, e-postayı bildirin."
+            },
+            {
+              "id": "promise",
+              "label": "Yanıtla: ödeyeceğim",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Ödeme yapmak, hatta ödeme sözü vermek bile yeni taleplere yol açar. Ödeme yapmayın, yanıt da vermeyin."
+            }
+          ]
+        },
+        {
+          "id": "security-notice",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-tehlukesizlik",
+            "from": {
+              "name": [
+                {
+                  "text": "BT Güvenlik"
+                }
+              ],
+              "address": [
+                {
+                  "text": "security@idare.example"
+                }
+              ]
+            },
+            "to": "you@idare.example",
+            "subject": [
+              {
+                "text": "Uyarı: şantaj e-postaları"
+              }
+            ],
+            "time": "09:20",
+            "body": [
+              [
+                {
+                  "text": "Bugün bazı iş arkadaşlarımıza eski bir parolanın yer aldığı şantaj e-postaları geldi."
+                }
+              ],
+              [
+                {
+                  "text": "Ödeme yapmayın ve yanıt vermeyin. E-postayı “Bildir” düğmesiyle bize iletin."
+                }
+              ],
+              [
+                {
+                  "text": "Bu parolayı hâlâ kullanıyorsanız değiştirin."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "safe",
+              "label": "Güvenli olarak işaretle",
+              "kind": "mark-safe",
+              "outcome": "safe",
+              "feedback": "Doğru. Bu e-posta sizden hiçbir şey istemiyor, yalnızca doğru kuralları hatırlatıyor."
+            },
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "risky",
+              "feedback": "Dikkatli olmanız iyi, ama bu e-posta kurumunuzun kendi adresinden geliyor ve sizden hiçbir şey istemiyor."
+            }
+          ]
+        },
+        {
+          "id": "fake-reset",
+          "artifact": {
+            "kind": "email",
+            "brandRef": "it-tehlukesizlik-fake",
+            "from": {
+              "name": [
+                {
+                  "text": "BT Güvenlik"
+                }
+              ],
+              "address": [
+                {
+                  "text": "security@idare-support.example.net"
+                }
+              ]
+            },
+            "to": "you@idare.example",
+            "subject": [
+              {
+                "text": "Hesabınız hacklendi: parolanızı hemen değiştirin"
+              }
+            ],
+            "time": "09:34",
+            "body": [
+              [
+                {
+                  "text": "Şantaj e-postası mı aldınız? Hesabınız tehlikede."
+                }
+              ],
+              [
+                {
+                  "text": "Parolanızı buradan değiştirin",
+                  "link": {
+                    "label": "Parolanızı buradan değiştirin",
+                    "href": "https://idare-support.example.net/parol"
+                  }
+                }
+              ],
+              [
+                {
+                  "text": "30 dakika içinde değiştirmezseniz hesabınız kilitlenecektir."
+                }
+              ]
+            ]
+          },
+          "actions": [
+            {
+              "id": "report",
+              "label": "Oltalama olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Çok iyi. Bu, korkudan beslenen ikinci bir tuzak ve alan adı kurumunuza ait değil."
+            },
+            {
+              "id": "click",
+              "label": "Bağlantıyı aç",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Sahte sayfa parolanızı çalardı. Parolanızı yalnızca kendiniz açtığınız resmî sistemde değiştirin."
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Silmek de olur. Bildirirseniz diğer iş arkadaşlarınız da korunur."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "bl-choice",
+      "question": {
+        "prompt": "Bir şantaj e-postasında evinizin haritadan alınmış fotoğrafı ve adresiniz var. Bu ne anlama gelir?",
+        "options": [
+          {
+            "id": "public",
+            "label": "Adres bir sızıntıdan, fotoğraf herkese açık bir haritadan alınmış",
+            "correct": true,
+            "feedback": "Doğru. Adresinizin bilinmesi, kameranızın ele geçirildiği anlamına gelmez."
+          },
+          {
+            "id": "real",
+            "label": "Gerçekten izleniyorum, ödeme yapmam gerekiyor",
+            "correct": false,
+            "feedback": "Ödeme yapmak hiçbir şeyi bitirmez, yeni bir talep getirir. E-postayı bildirin."
+          },
+          {
+            "id": "ask",
+            "label": "Yanıt verip kim olduklarını sormalıyım",
+            "correct": false,
+            "feedback": "Yanıt vermek, adresinizin aktif olduğunu gösterir. Dolandırıcı size daha fazla e-posta gönderir."
+          }
+        ]
+      },
+      "explain": "Dolandırıcı korku yaratmak için herkese açık ve sızdırılmış verileri birleştirir. Ödeme yapmayın, yanıt vermeyin. Kendinizi tehlikede hissediyorsanız polise başvurun."
+    },
+    {
+      "type": "recap",
+      "id": "bl-recap",
+      "points": [
+        "“Kameranızı hackledim” diyen toplu e-posta bir blöftür: ödeme yapmayın, yanıt vermeyin.",
+        "E-postadaki eski parolayı hâlâ kullanıyorsanız her yerde değiştirin.",
+        "Böyle bir e-posta iş adresinize geldiyse güvenlik ekibine bildirin."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

@@ -1,0 +1,478 @@
+{
+  "id": "phone-backup",
+  "title": "Telefon yedeği",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "br2-tutor",
+      "beats": [
+        {
+          "id": "br2-b1",
+          "say": "Telefon kaybolduğunda en büyük kayıp çoğu zaman aile fotoğraflarıdır. Onları korumak yalnızca birkaç dakikanızı alır.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "br2-b2",
+          "say": "Böyle bir bildirim gördüyseniz, son aylarda çektiğiniz fotoğrafların hiçbir kopyası yok demektir.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "notification",
+              "brandRef": "w2f-telefon-ayarlari",
+              "app": "Ayarlar",
+              "title": [
+                {
+                  "text": "Yedekleme kapalı"
+                }
+              ],
+              "body": [
+                {
+                  "text": "Son yedekleme: 143 gün önce",
+                  "spot": "days"
+                }
+              ],
+              "time": "21:10"
+            }
+          },
+          "highlight": "days"
+        },
+        {
+          "id": "br2-b3",
+          "say": "Ama dikkat: depolama alanınızın dolduğunu ve fotoğraflarınızın silineceğini söyleyen bir mesaj, dolandırıcıların en sevdiği hilelerden biridir.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "brandRef": "buludxidmet-fake",
+              "sender": [
+                {
+                  "text": "BuludXidmet"
+                }
+              ],
+              "time": "10:02",
+              "messages": [
+                [
+                  {
+                    "text": "Depolama alanınız doldu. Fotoğraflarınız 24 saat içinde silinecektir."
+                  }
+                ]
+              ]
+            }
+          }
+        },
+        {
+          "id": "br2-b4",
+          "say": "Yedeklemeyi telefonun kendi ayarlarından açın. Ardından çalıştığından emin olmak için bir fotoğrafı geri yükleyin.",
+          "mood": "happy",
+          "gesture": "recite",
+          "visual": {
+            "kind": "illustration",
+            "id": "cloud"
+          }
+        }
+      ]
+    },
+    {
+      "type": "order",
+      "id": "br2-order",
+      "prompt": "Telefonunuzda yedeklemeyi ayarlayın. Adımları doğru sıraya koyun.",
+      "items": [
+        {
+          "id": "turn-on",
+          "label": "Ayarlarda otomatik yedeklemeyi açın"
+        },
+        {
+          "id": "first-run",
+          "label": "Telefonu Wi-Fi ağına ve şarj cihazına bağlayın, ilk yedeklemeyi bekleyin"
+        },
+        {
+          "id": "check-date",
+          "label": "Son yedekleme tarihinin bugün olduğunu kontrol edin"
+        },
+        {
+          "id": "test-restore",
+          "label": "Geri yüklemeyi denemek için bir fotoğrafı başka bir cihazda açın"
+        }
+      ],
+      "explain": "Yedek ancak çalışıyorsa işe yarar; bu yüzden tarihi kontrol edin ve bir fotoğrafı geri yükleyin. Bulut hesabınızı da iki adımlı doğrulamayla koruyun."
+    },
+    {
+      "type": "hotspot",
+      "id": "br2-hotspot",
+      "prompt": "Bu mesajdaki dolandırıcılık işaretlerini bulun.",
+      "artifact": {
+        "kind": "sms",
+        "brandRef": "buludxidmet-fake",
+        "sender": [
+          {
+            "text": "BuludXidmet"
+          }
+        ],
+        "time": "10:02",
+        "messages": [
+          [
+            {
+              "text": "Depolama alanınız %100 dolu.",
+              "spot": "full"
+            }
+          ],
+          [
+            {
+              "text": "Tüm fotoğraflarınız 24 saat içinde silinecektir.",
+              "spot": "deadline"
+            }
+          ],
+          [
+            {
+              "text": "Sadece 1,99 AZN ödeyerek planınızı yükseltin: ",
+              "spot": "small-fee"
+            },
+            {
+              "text": "buludxidmet-plan.example.info",
+              "spot": "link"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "full",
+          "label": "Depolama dolu",
+          "explain": "Depolama alanı dolduğunda yeni yedeklemeler durur, ama eski fotoğraflar hemen silinmez. Depolama alanını telefonun ayarlarından kendiniz kontrol edin."
+        },
+        {
+          "id": "deadline",
+          "label": "Süre sınırı",
+          "explain": "Korku ve kısa bir süre, sizi düşünmeden ödeme yapmaya iter."
+        },
+        {
+          "id": "small-fee",
+          "label": "Küçük tutar",
+          "explain": "Küçük bir tutar şüphenizi azaltır. Asıl hedef, kart bilgilerinizdir."
+        },
+        {
+          "id": "link",
+          "label": "Şüpheli alan adı",
+          "explain": "Bu, bulut hizmetinin alan adı değil. Planınızı yalnızca telefonun ayarlarından değiştirin."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "br2-sim",
+      "environment": "phone",
+      "title": "Fotoğraflarınız nerede?",
+      "intro": "Telefonunuzda birkaç bildirim var. Her biri için fotoğraflarınızı koruyan adımı seçin.",
+      "steps": [
+        {
+          "id": "backup-off",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2f-telefon-ayarlari",
+            "app": "Ayarlar",
+            "title": [
+              {
+                "text": "Yedekleme kapalı"
+              }
+            ],
+            "body": [
+              {
+                "text": "Son yedekleme: 143 gün önce. Şimdi açılsın mı?"
+              }
+            ],
+            "time": "21:10"
+          },
+          "actions": [
+            {
+              "id": "turn-on",
+              "label": "Yedeklemeyi aç",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Doğru. Artık fotoğraflar her gece otomatik olarak kopyalanacak."
+            },
+            {
+              "id": "later",
+              "label": "Sonra",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "Telefon bugün kaybolursa beş aylık fotoğraflar da onunla birlikte gider. Yedeklemeyi şimdi açın."
+            }
+          ]
+        },
+        {
+          "id": "storage-sms",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "buludxidmet-fake",
+            "sender": [
+              {
+                "text": "BuludXidmet"
+              }
+            ],
+            "time": "10:02",
+            "messages": [
+              [
+                {
+                  "text": "Depolama alanınız doldu. Fotoğraflarınız 24 saat içinde silinecektir. Planınızı yükseltin: "
+                },
+                {
+                  "text": "buludxidmet-plan.example.info",
+                  "link": {
+                    "label": "buludxidmet-plan.example.info",
+                    "href": "https://buludxidmet-plan.example.info/odenis"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Sabah böyle bir mesaj geliyor.",
+          "actions": [
+            {
+              "id": "click",
+              "label": "Bağlantıyı aç",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Bağlantı, bulut hizmetinin sitesine gitmiyor. Depolama alanını yalnızca telefonun ayarlarından kontrol edin.",
+              "next": "card-page"
+            },
+            {
+              "id": "report",
+              "label": "Spam olarak bildir",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Çok iyi. Bu mesaj sahte: gerçek bir hizmet, fotoğraflarınızı bir gün içinde silmekle tehdit etmez.",
+              "next": "free-app"
+            },
+            {
+              "id": "delete",
+              "label": "Sil",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Doğru. Depolama alanınızı ayarlardan kendiniz kontrol edin.",
+              "next": "free-app"
+            }
+          ]
+        },
+        {
+          "id": "card-page",
+          "artifact": {
+            "kind": "login",
+            "brandRef": "buludxidmet-fake",
+            "brand": "BuludXidmət",
+            "url": [
+              {
+                "text": "https://buludxidmet-plan.example.info/odenis"
+              }
+            ],
+            "fields": [
+              "Kart numarası",
+              "Son kullanma tarihi",
+              "CVV"
+            ],
+            "button": "1,99 AZN öde"
+          },
+          "actions": [
+            {
+              "id": "pay",
+              "label": "1,99 AZN öde",
+              "kind": "enter-credentials",
+              "outcome": "compromised",
+              "feedback": "Kart bilgileriniz dolandırıcıya gitti. Hemen kartın arkasındaki numaradan bankanızı arayın ve kartı bloke ettirin."
+            },
+            {
+              "id": "close",
+              "label": "Sayfayı kapat",
+              "kind": "cancel",
+              "outcome": "safe",
+              "feedback": "İyi ki durdunuz. Depolama planınızı yalnızca telefonun ayarlarından kontrol edin."
+            }
+          ]
+        },
+        {
+          "id": "free-app",
+          "artifact": {
+            "kind": "permission",
+            "brandRef": "w2f-foto-ehtiyat",
+            "app": "Foto Ehtiyat Pulsuz",
+            "permissions": [
+              {
+                "label": [
+                  {
+                    "text": "Fotoğraflar ve videolar"
+                  }
+                ],
+                "needed": true
+              },
+              {
+                "label": [
+                  {
+                    "text": "Kişiler"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "SMS mesajları"
+                  }
+                ],
+                "needed": false
+              },
+              {
+                "label": [
+                  {
+                    "text": "Arama kaydı"
+                  }
+                ],
+                "needed": false
+              }
+            ]
+          },
+          "say": "Mağazada ücretsiz bir yedekleme uygulaması buldunuz.",
+          "actions": [
+            {
+              "id": "deny",
+              "label": "Reddet",
+              "kind": "deny",
+              "outcome": "safe",
+              "feedback": "Doğru, fotoğrafları yedeklemek için mesajlara ya da kişilere erişim gerekmez. Telefonun kendi yedeklemesi yeterlidir."
+            },
+            {
+              "id": "allow",
+              "label": "İzin ver",
+              "kind": "allow",
+              "outcome": "compromised",
+              "feedback": "SMS erişimi olan bir uygulama banka kodlarınızı okuyabilir. Böyle bir uygulamayı hemen silin."
+            }
+          ]
+        },
+        {
+          "id": "lost-phone",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2f-telefon-ayarlari",
+            "app": "Ayarlar",
+            "title": [
+              {
+                "text": "Yedekten geri yüklensin mi?"
+              }
+            ],
+            "body": [
+              {
+                "text": "Son yedekleme: dün 02:10. Fotoğraflar: 4.812"
+              }
+            ],
+            "time": "19:45"
+          },
+          "say": "Bir ay sonra telefonunuz metroda kayboluyor. Yeni bir telefonda hesabınıza giriş yapıyorsunuz.",
+          "actions": [
+            {
+              "id": "restore",
+              "label": "Geri yükle",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Çok iyi. Yedekleme açık olduğu için aile fotoğraflarının hepsi yerinde."
+            },
+            {
+              "id": "fresh",
+              "label": "Yeni telefon olarak kur",
+              "kind": "later",
+              "outcome": "risky",
+              "feedback": "O zaman fotoğraflar yeni telefona gelmez. Yedekten geri yükleyin."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "scenario",
+      "id": "br2-scenario",
+      "title": "Telefon kayboldu",
+      "start": "n1",
+      "nodes": [
+        {
+          "id": "n1",
+          "text": "Akşam telefonunuzu metroda kaybettiniz. Eve gelince ilk olarak ne yaparsınız?",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          },
+          "choices": [
+            {
+              "label": "Telefonu başka bir cihazdan kilitliyor ve nerede olduğuna bakıyorum",
+              "next": "n2",
+              "feedback": "Doğru. Kilitlemek, telefonu bulan kişinin fotoğraflarınıza ve hesaplarınıza ulaşmasını engeller."
+            },
+            {
+              "label": "Sabaha kadar bekliyorum, belki biri arar",
+              "outcome": "risky",
+              "feedback": "Kilitlenmemiş bir telefonda hesaplarınız risk altındadır. Telefonu hemen kilitleyin."
+            },
+            {
+              "label": "Numaramı ve adresimi sosyal medyada paylaşıyorum",
+              "outcome": "risky",
+              "feedback": "Kişisel bilgiler dolandırıcılara yeni bir fırsat verir. Önce telefonu kilitleyin."
+            }
+          ]
+        },
+        {
+          "id": "n2",
+          "text": "Telefon bulunamadı. Ertesi gün bir SMS geliyor: “Telefonunuz bulundu, görmek için giriş yapın.”",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "sender": [
+                {
+                  "text": "+994 50 000 64 18"
+                }
+              ],
+              "time": "11:20",
+              "messages": [
+                [
+                  {
+                    "text": "Telefonunuz bulundu. Nerede olduğunu görmek için hesabınıza giriş yapın: cihaz-tap.example.info"
+                  }
+                ]
+              ]
+            }
+          },
+          "choices": [
+            {
+              "label": "Bağlantıyı açıp giriş yapıyorum",
+              "outcome": "compromised",
+              "feedback": "Bu tuzak, telefonunu kaybedenleri hedef alır. Hesap parolanız doğrudan dolandırıcıya gider."
+            },
+            {
+              "label": "Açmıyorum, yeni telefonu yedekten geri yüklüyorum",
+              "outcome": "safe",
+              "feedback": "Çok iyi. Fotoğraflar yedekte güvende, böyle bir mesaja da güvenilmez."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "recap",
+      "id": "br2-recap",
+      "points": [
+        "Telefonunuzda otomatik yedeklemeyi açın.",
+        "Kontrol etmek için bir fotoğrafı geri yükleyin.",
+        "“Depolama dolu” mu? Bağlantıya değil, ayarlara bakın."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

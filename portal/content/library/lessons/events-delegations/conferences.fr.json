@@ -1,0 +1,455 @@
+{
+ "id": "conferences",
+ "title": "Conférences et délégations",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Les conférences et les rencontres officielles servent à nouer des contacts. Mais quelqu’un peut aussi y collecter des informations.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Une clé USB, une batterie externe ou un casque reçus en cadeau ne doivent pas être branchés sur votre ordinateur professionnel. Ils peuvent contenir un logiciel malveillant.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "usb"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Votre badge indique votre nom, votre fonction et un QR code. Gardez-le hors des photos, et rangez-le quand vous sortez.",
+     "mood": "think",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "kontakto",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Kontakto : nouvelle publication"
+        }
+       ],
+       "messages": [
+        {
+         "from": "me",
+         "body": [
+          {
+           "text": "Au forum ! "
+          },
+          {
+           "text": "Photo avec mon badge",
+           "spot": "badge"
+          }
+         ],
+         "time": "10:15"
+        }
+       ]
+      }
+     },
+     "highlight": "badge"
+    },
+    {
+     "id": "b4",
+     "say": "Montrez d’abord chaque appareil reçu en cadeau au support technique. Il le vérifiera et décidera.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "after-forum",
+   "environment": "desktop",
+   "title": "Après le forum",
+   "intro": "Vous rentrez du forum. Des cadeaux vous attendent sur votre bureau, et de nouveaux e-mails dans votre boîte de réception.",
+   "steps": [
+    {
+     "id": "gift-usb",
+     "label": "Un cadeau de la délégation en visite",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-nordvale",
+      "name": [
+       {
+        "text": "Présentation_coopération.pdf"
+       }
+      ],
+      "type": "lnk",
+      "size": "2 Ko",
+      "source": [
+       {
+        "text": "USB : NORDVALE (E:)"
+       }
+      ]
+     },
+     "say": "La délégation vous a remis sa présentation sur une clé USB.",
+     "actions": [
+      {
+       "id": "plug",
+       "label": "Brancher sur l’ordinateur",
+       "kind": "plug-in",
+       "outcome": "risky",
+       "feedback": "Vous ne savez pas ce que contient un appareil offert. Le support technique doit d’abord le vérifier."
+      },
+      {
+       "id": "hand-over",
+       "label": "Remettre au support technique",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Le support technique vérifie l’appareil sur un ordinateur isolé et vous transmet le fichier si nécessaire.",
+       "next": "partner-mail"
+      }
+     ]
+    },
+    {
+     "id": "usb-file",
+     "label": "La clé contient un seul fichier",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "nc-nordvale",
+      "name": [
+       {
+        "text": "Présentation_coopération.pdf"
+       }
+      ],
+      "type": "lnk",
+      "size": "2 Ko",
+      "source": [
+       {
+        "text": "USB : NORDVALE (E:)"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Ce n’est pas un PDF, mais un raccourci. L’ouvrir peut lancer une commande cachée."
+      },
+      {
+       "id": "eject",
+       "label": "Éjecter la clé",
+       "kind": "eject",
+       "outcome": "safe",
+       "feedback": "Bonne décision. Éjectez la clé sans ouvrir le fichier et remettez-la au support technique."
+      }
+     ]
+    },
+    {
+     "id": "partner-mail",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "nc-nordvale",
+      "from": {
+       "name": [
+        {
+         "text": "Stefan Morgan"
+        }
+       ],
+       "address": [
+        {
+         "text": "s.morgan.nordvale@mail.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Merci pour notre rencontre"
+       }
+      ],
+      "time": "10:24",
+      "body": [
+       [
+        {
+         "text": "Bonjour, j’ai été ravi de faire votre connaissance au forum."
+        }
+       ],
+       [
+        {
+         "text": "Pour préparer notre prochaine rencontre, pourriez-vous m’envoyer la liste du personnel de votre service, avec les fonctions et les numéros de téléphone ?"
+        }
+       ],
+       [
+        {
+         "text": "L’agenda de votre responsable pour la semaine prochaine me serait également utile."
+        }
+       ]
+      ]
+     },
+     "say": "Un invité rencontré au forum vous écrit.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "Envoyer la liste et l’agenda",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Une liste du personnel et l’agenda d’un responsable, c’est la carte de la prochaine attaque. Ce type de données ne sort que par les canaux officiels, avec une autorisation."
+      },
+      {
+       "id": "forward",
+       "label": "Transférer à votre responsable et à l’équipe sécurité",
+       "kind": "forward",
+       "outcome": "safe",
+       "feedback": "Exact. L’e-mail vient d’une adresse personnelle, et les demandes venant de l’extérieur passent par les canaux officiels."
+      },
+      {
+       "id": "official",
+       "label": "Répondre : Merci d’envoyer une demande officielle",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Bien. Une demande officielle est vérifiée, et c’est une personne habilitée qui y répond."
+      }
+     ]
+    },
+    {
+     "id": "bt-pair",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Bluetooth : demande d’association"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "« Casque Forum » souhaite se connecter à cet ordinateur."
+        }
+       ],
+       [
+        {
+         "text": "Code : 482 913"
+        }
+       ]
+      ],
+      "buttons": [
+       "Refuser",
+       "Associer"
+      ]
+     },
+     "actions": [
+      {
+       "id": "deny",
+       "label": "Refuser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Exact. N’acceptez jamais une demande d’association que vous n’avez pas lancée vous-même."
+      },
+      {
+       "id": "allow",
+       "label": "Associer",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Un appareil inconnu peut se faire passer pour un clavier et taper des commandes. Refusez ce genre de demande."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "forum-post",
+   "prompt": "Trouvez ce que cette publication ne devrait pas révéler.",
+   "artifact": {
+    "kind": "chat",
+    "brandRef": "kontakto",
+    "app": "generic",
+    "contact": [
+     {
+      "text": "Kontakto : nouvelle publication"
+     }
+    ],
+    "messages": [
+     {
+      "from": "me",
+      "body": [
+       {
+        "text": "Au RəqəmYol Forum ! "
+       },
+       {
+        "text": "Photo avec mon badge.",
+        "spot": "badge"
+       },
+       {
+        "text": " Demain à 10:00, "
+       },
+       {
+        "text": "notre délégation a rendez-vous dans le bâtiment 3 du ministère.",
+        "spot": "schedule"
+       },
+       {
+        "text": " Pour l’instant, "
+       },
+       {
+        "text": "je suis au Lumera Hotel, chambre 512",
+        "spot": "room"
+       },
+       {
+        "text": ", à demain !"
+       }
+      ],
+      "time": "21:40"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "badge",
+     "label": "Badge",
+     "explain": "Le badge indique le nom, la fonction et un QR code d’accès. On peut s’en servir pour fabriquer un faux badge ou pour vous cibler."
+    },
+    {
+     "id": "schedule",
+     "label": "Heure et lieu de la réunion",
+     "explain": "L’heure et le lieu des rencontres d’une délégation sont des informations de sécurité. Même après la réunion, restez vague."
+    },
+    {
+     "id": "room",
+     "label": "Chambre d’hôtel",
+     "explain": "Un numéro de chambre révèle qui loge où. Ne le communiquez jamais, nulle part."
+    }
+   ],
+   "minToFind": 2
+  },
+  {
+   "type": "choice",
+   "id": "gift-tablet",
+   "question": {
+    "prompt": "La délégation en visite vous offre une tablette. Que faites-vous ?",
+    "options": [
+     {
+      "id": "register",
+      "label": "Prévenir mon responsable et la remettre au support technique pour vérification",
+      "correct": true,
+      "feedback": "Exact. Un appareil offert est vérifié selon les règles de votre organisation et ne rejoint le réseau professionnel qu’avec une autorisation."
+     },
+     {
+      "id": "work-mail",
+      "label": "Y configurer tout de suite ma messagerie professionnelle",
+      "correct": false,
+      "feedback": "Un appareil non vérifié peut contenir un logiciel espion. N’ouvrez vos comptes professionnels que sur les appareils de votre organisation."
+     },
+     {
+      "id": "home",
+      "label": "L’emporter chez moi pour un usage personnel",
+      "correct": false,
+      "feedback": "L’appareil pourrait aussi ouvrir une porte vers votre réseau domestique et vos comptes personnels. Faites-le d’abord vérifier."
+     },
+     {
+      "id": "office-wifi",
+      "label": "La connecter au Wi-Fi du bureau pour la tester",
+      "correct": false,
+      "feedback": "Connecter un appareil non vérifié au réseau professionnel ouvre un accès aux systèmes internes."
+     }
+    ],
+    "visual": {
+     "kind": "illustration",
+     "id": "handshake"
+    }
+   },
+   "explain": "Tant qu’il n’a pas été vérifié, un appareil offert est l’appareil d’un inconnu. Prévenez votre responsable et remettez-le au support technique."
+  },
+  {
+   "type": "scenario",
+   "id": "delegation-visit",
+   "title": "Une délégation au bureau",
+   "start": "slides",
+   "nodes": [
+    {
+     "id": "slides",
+     "text": "Ma présentation est sur une clé USB. On la branche sur votre ordinateur ?",
+     "speaker": "Invité (en réunion)",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Ma présentation est sur une clé USB. <breath> On la branche sur votre ordinateur ?",
+     "character": "guest",
+     "choices": [
+      {
+       "label": "Ouvrons-la plutôt sur l’ordinateur isolé préparé par le support technique",
+       "next": "wifi",
+       "feedback": "Exact. Les fichiers de l’invité ne touchent jamais l’ordinateur ni le réseau professionnels."
+      },
+      {
+       "label": "Allez-y, le temps presse",
+       "outcome": "risky",
+       "feedback": "Une clé USB venue de l’extérieur peut introduire un logiciel malveillant sur un ordinateur professionnel. Utilisez un ordinateur réservé aux invités."
+      }
+     ]
+    },
+    {
+     "id": "wifi",
+     "text": "Autre chose, quel est le mot de passe du Wi-Fi du bureau ? Je dois consulter mes e-mails.",
+     "speaker": "Invité",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Autre chose, euh, quel est le mot de passe du Wi-Fi du bureau ? Je dois consulter mes e-mails.",
+     "character": "guest",
+     "choices": [
+      {
+       "label": "Je lui donne accès au réseau invités",
+       "next": "walk",
+       "feedback": "Exact. Le réseau invités est séparé des systèmes internes."
+      },
+      {
+       "label": "Je lui donne le mot de passe du réseau professionnel",
+       "outcome": "risky",
+       "feedback": "Le réseau professionnel donne accès aux systèmes internes. Les invités n’ont droit qu’au réseau invités."
+      }
+     ]
+    },
+    {
+     "id": "walk",
+     "text": "Ne vous dérangez pas, je vais faire le tour des bureaux tout seul.",
+     "speaker": "Invité (pendant la pause)",
+     "voice": "man",
+     "channel": "in-person",
+     "spoken": "Ne vous dérangez pas, <breath> je vais faire le tour des bureaux tout seul.",
+     "character": "guest",
+     "choices": [
+      {
+       "label": "J’accompagne l’invité",
+       "outcome": "safe",
+       "feedback": "Excellent. Dans les locaux, les invités se déplacent toujours accompagnés."
+      },
+      {
+       "label": "Je le laisse se promener, c’est notre invité",
+       "outcome": "risky",
+       "feedback": "Un invité non accompagné peut voir des bureaux ouverts et des documents posés sur les tables."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Remettez les appareils offerts au support technique sans les brancher.",
+    "Ne partagez ni votre badge, ni votre numéro de chambre, ni votre programme.",
+    "Les invités ont droit à un ordinateur réservé, au réseau invités et à un accompagnateur."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

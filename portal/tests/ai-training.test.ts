@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
+import { LOCALES } from "../src/i18n/config";
 import { generateVerified, ISSUE_CODES, matchLibrary, safetyIssues, schemaCheck, verifyDraft, type Issue, type LibraryModule, type TrainingDraft, type TrainingModel, type TrainingRequest } from "../src/server/ai-verify";
 
 const req: TrainingRequest = { prompt: "Teach staff to spot fake invoice emails", locale: "en", category: "email", difficulty: "Easy", minutes: 6, lessons: 1 };
@@ -63,6 +64,17 @@ describe("safety checker", () => {
     expect(m).toContain("bank.com");
     expect(m).toContain("phone number");
     expect(m).toContain("inappropriate word");
+  });
+
+  it("flags profanity in every interface language, but not a word that only starts like one", () => {
+    for (const word of ["Scheiße", "putain", "orospu", "muie", "ყლე", "курва", "شرموط"]) {
+      const d = good();
+      d.subtitle = `Spot it. ${word}!`;
+      expect(messages(safetyIssues(d)), word).toContain("inappropriate word");
+    }
+    const d = good();
+    d.subtitle = "A fickle sender: götürün, technique.";
+    expect(safetyIssues(d)).toEqual([]);
   });
 
   it("checks correct-answer counts, unknown illustrations and unmarked hotspot spots", () => {
@@ -131,7 +143,7 @@ describe("issue codes for the Studio", () => {
   });
 
   it("has a message for every code in every interface language", () => {
-    for (const locale of ["az", "en", "ru"]) {
+    for (const locale of LOCALES) {
       const secops = JSON.parse(fs.readFileSync(path.join(process.cwd(), "messages", locale, "secops.json"), "utf8"));
       for (const code of ISSUE_CODES) expect(secops.aiTrainer.issues[code], `${locale}: ${code}`).toBeTypeOf("string");
     }

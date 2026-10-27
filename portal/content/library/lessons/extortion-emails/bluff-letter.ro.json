@@ -1,0 +1,510 @@
+{
+ "id": "bluff-letter",
+ "title": "O amenințare fără acoperire",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "bl-tutor",
+   "beats": [
+    {
+     "id": "bl-b1",
+     "say": "Bună ziua! Uneori primiți un e-mail înspăimântător: „V-am spart camera. Plătiți, altfel vă public videoclipurile intime”.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "bl-b2",
+     "say": "În e-mail apare chiar și una dintre parolele dumneavoastră vechi. De obicei, ea provine dintr-o scurgere de date de acum câțiva ani.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "from": {
+        "name": [
+         {
+          "text": "Anonim"
+         }
+        ],
+        "address": [
+         {
+          "text": "anonim.7781@mail-relay.example.net"
+         }
+        ]
+       },
+       "to": "you@idare.example",
+       "subject": [
+        {
+         "text": "Parola dumneavoastră: "
+        },
+        {
+         "text": "Gunes2019",
+         "spot": "password"
+        },
+        {
+         "text": ". Aveți 48 de ore"
+        }
+       ],
+       "time": "08:47",
+       "body": [
+        [
+         {
+          "text": "Am pătruns în dispozitivul dumneavoastră și v-am filmat cu propria cameră în momente intime."
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "password"
+    },
+    {
+     "id": "bl-b3",
+     "say": "Astfel de e-mailuri pleacă în același timp către mii de oameni. Nu există niciun videoclip filmat cu camera dumneavoastră.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "bl-b4",
+     "say": "Regula este simplă: nu plătiți și nu răspundeți, schimbați parola, iar dacă mesajul a venit pe adresa de serviciu, raportați-l echipei de securitate.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "bl-hotspot",
+   "prompt": "Găsiți trucurile escrocului în acest e-mail.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Anonim"
+      }
+     ],
+     "address": [
+      {
+       "text": "anonim.7781@mail-relay.example.net"
+      }
+     ]
+    },
+    "to": "you@idare.example",
+    "subject": [
+     {
+      "text": "Parola dumneavoastră: "
+     },
+     {
+      "text": "Gunes2019",
+      "spot": "password"
+     },
+     {
+      "text": ". Aveți 48 de ore"
+     }
+    ],
+    "time": "08:47",
+    "body": [
+     [
+      {
+       "text": "Am pătruns în dispozitivul dumneavoastră și v-am filmat cu propria cameră în momente intime.",
+       "spot": "camera"
+      }
+     ],
+     [
+      {
+       "text": "Ca dovadă, vă scriu parola. Dacă nu vreți să vă public videoclipurile, trimiteți bitcoini în valoare de 1.500 AZN la adresa:"
+      }
+     ],
+     [
+      {
+       "text": "bc1q000000000000000000000000000000demo",
+       "spot": "btc"
+      }
+     ],
+     [
+      {
+       "text": "Aveți 48 de ore să plătiți. Nu arătați acest e-mail nimănui.",
+       "spot": "timer"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "password",
+     "label": "Parola veche",
+     "explain": "Această parolă provine dintr-o scurgere de date mai veche. Nu dovedește că cineva v-a spart dispozitivul, dar schimbați-o peste tot unde încă o folosiți."
+    },
+    {
+     "id": "camera",
+     "label": "Afirmația despre cameră",
+     "explain": "Este o cacealma. Același text pleacă spre mii de adrese și nu există niciun videoclip."
+    },
+    {
+     "id": "btc",
+     "label": "Adresa de bitcoin",
+     "explain": "O plată în criptomonede nu mai poate fi recuperată. Dacă plătiți, va urma o nouă cerere de bani."
+    },
+    {
+     "id": "timer",
+     "label": "48 de ore",
+     "explain": "Termenul există ca să vă sperie și să vă împiedice să gândiți limpede. Nu plătiți și nu răspundeți."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "match",
+   "id": "bl-match",
+   "prompt": "Asociați fiecare afirmație din e-mail cu adevărul.",
+   "pairs": [
+    {
+     "id": "camera",
+     "left": "V-am spart camera",
+     "right": "Nicio dovadă, textul este trimis în masă"
+    },
+    {
+     "id": "password",
+     "left": "Iată parola dumneavoastră",
+     "right": "Luată dintr-o scurgere de date mai veche"
+    },
+    {
+     "id": "house",
+     "left": "Atașez o fotografie a casei dumneavoastră",
+     "right": "Adresa vine dintr-o scurgere, fotografia de pe o hartă publică"
+    },
+    {
+     "id": "timer",
+     "left": "Aveți 48 de ore",
+     "right": "Un termen fals, ca să vă sperie"
+    }
+   ],
+   "explain": "Tot ce știe escrocul sunt date publice sau scurse. Le-a pus cap la cap ca să vă sperie."
+  },
+  {
+   "type": "simulation",
+   "id": "bl-sim",
+   "environment": "inbox",
+   "title": "Căsuța de e-mail de serviciu",
+   "intro": "Deschideți căsuța de e-mail de serviciu de la minister. Alegeți reacția corectă pentru fiecare dintre cele patru e-mailuri.",
+   "steps": [
+    {
+     "id": "sextortion",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Anonim"
+        }
+       ],
+       "address": [
+        {
+         "text": "anonim.7781@mail-relay.example.net"
+        }
+       ]
+      },
+      "to": "you@idare.example",
+      "subject": [
+       {
+        "text": "Parola dumneavoastră: Gunes2019. Aveți 48 de ore"
+       }
+      ],
+      "time": "08:47",
+      "body": [
+       [
+        {
+         "text": "Am pătruns în dispozitivul dumneavoastră și v-am filmat cu propria cameră în momente intime."
+        }
+       ],
+       [
+        {
+         "text": "Dacă nu vreți să vă public videoclipurile, trimiteți bitcoini în valoare de 1.500 AZN la adresa: bc1q000000000000000000000000000000demo"
+        }
+       ],
+       [
+        {
+         "text": "Aveți 48 de ore să plătiți."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Echipa de securitate poate elimina același e-mail și din căsuțele altor colegi."
+      },
+      {
+       "id": "reply",
+       "label": "Răspundeți: arătați-mi dovada",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "Un răspuns arată că adresa dumneavoastră este activă și vă aduce și mai multe e-mailuri. Nu răspundeți."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Ștergerea este în regulă. Totuși, în e-mailul de serviciu este mai bine să îl raportați mai întâi."
+      }
+     ]
+    },
+    {
+     "id": "house-photo",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Cel care vă urmărește"
+        }
+       ],
+       "address": [
+        {
+         "text": "watcher.0042@anon-post.example.net"
+        }
+       ]
+      },
+      "to": "you@idare.example",
+      "subject": [
+       {
+        "text": "Vedeți fotografia casei dumneavoastră?"
+       }
+      ],
+      "time": "09:05",
+      "body": [
+       [
+        {
+         "text": "Aceasta este casa dumneavoastră. Vă știu adresa și parola."
+        }
+       ],
+       [
+        {
+         "text": "Trimiteți 1.500 AZN în bitcoini, altfel videoclipurile vor fi publicate."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "adresa_casei.jpg"
+         }
+        ],
+        "size": "212 KB"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Corect. Fotografia casei provine de pe o hartă publică, așa că și acesta este o cacealma trimisă în masă."
+      },
+      {
+       "id": "open",
+       "label": "Deschideți fotografia",
+       "kind": "open-attachment",
+       "outcome": "risky",
+       "feedback": "Fotografia este acolo ca să vă sperie și mai tare. Nu deschideți un atașament suspect, ci raportați e-mailul."
+      },
+      {
+       "id": "promise",
+       "label": "Răspundeți: voi plăti",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Dacă plătiți sau promiteți că plătiți, vor urma noi cereri de bani. Nu plătiți și nu răspundeți."
+      }
+     ]
+    },
+    {
+     "id": "security-notice",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik",
+      "from": {
+       "name": [
+        {
+         "text": "Securitate IT"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare.example"
+        }
+       ]
+      },
+      "to": "you@idare.example",
+      "subject": [
+       {
+        "text": "Atenție: e-mailuri de șantaj"
+       }
+      ],
+      "time": "09:20",
+      "body": [
+       [
+        {
+         "text": "Astăzi, unii colegi au primit e-mailuri de șantaj în care apare o parolă veche."
+        }
+       ],
+       [
+        {
+         "text": "Nu plătiți și nu răspundeți. Trimiteți e-mailul cu butonul „Raportați”."
+        }
+       ],
+       [
+        {
+         "text": "Dacă încă folosiți acea parolă, schimbați-o."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "safe",
+       "label": "Marcați ca sigur",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Corect. Acest e-mail nu vă cere nimic, doar repetă regulile corecte."
+      },
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Prudența este bună, dar acest e-mail vine de la adresa propriei organizații și nu vă cere nimic."
+      }
+     ]
+    },
+    {
+     "id": "fake-reset",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "it-tehlukesizlik-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Securitate IT"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare-support.example.net"
+        }
+       ]
+      },
+      "to": "you@idare.example",
+      "subject": [
+       {
+        "text": "Contul dumneavoastră a fost spart: schimbați-vă parola acum"
+       }
+      ],
+      "time": "09:34",
+      "body": [
+       [
+        {
+         "text": "Ați primit un e-mail de șantaj? Contul dumneavoastră este în pericol."
+        }
+       ],
+       [
+        {
+         "text": "Schimbați parola aici",
+         "link": {
+          "label": "Schimbați parola aici",
+          "href": "https://idare-support.example.net/parol"
+         }
+        }
+       ],
+       [
+        {
+         "text": "Dacă nu o schimbați în 30 de minute, contul va fi blocat."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Raportați phishing",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Foarte bine. Este o a doua capcană, care profită de frică, iar domeniul nu este al organizației dumneavoastră."
+      },
+      {
+       "id": "click",
+       "label": "Deschideți linkul",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Pagina falsă v-ar fi furat parola. Schimbați-o doar în sistemul oficial, deschis direct de dumneavoastră."
+      },
+      {
+       "id": "delete",
+       "label": "Ștergeți",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Ștergerea este în regulă. Dacă îl raportați, îi protejați și pe ceilalți colegi."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "bl-choice",
+   "question": {
+    "prompt": "Un e-mail de șantaj conține adresa dumneavoastră și o imagine a casei luată de pe o hartă. Ce înseamnă asta?",
+    "options": [
+     {
+      "id": "public",
+      "label": "Adresa provine dintr-o scurgere de date, iar fotografia de pe o hartă publică",
+      "correct": true,
+      "feedback": "Corect. Faptul că escrocul vă știe adresa nu înseamnă că v-a spart camera."
+     },
+     {
+      "id": "real",
+      "label": "Chiar mă urmăresc, deci trebuie să plătesc",
+      "correct": false,
+      "feedback": "Plata nu pune capăt la nimic, ci aduce o nouă cerere de bani. Raportați e-mailul."
+     },
+     {
+      "id": "ask",
+      "label": "Ar trebui să răspund și să întreb cine sunt",
+      "correct": false,
+      "feedback": "Un răspuns arată că adresa dumneavoastră este activă. Escrocul vă va trimite și mai multe e-mailuri."
+     }
+    ]
+   },
+   "explain": "Escrocul combină date publice cu date scurse ca să vă inspire frică. Nu plătiți și nu răspundeți, iar dacă vă simțiți în pericol, contactați poliția."
+  },
+  {
+   "type": "recap",
+   "id": "bl-recap",
+   "points": [
+    "Un e-mail trimis în masă de tipul „v-am spart camera” este o cacealma: nu plătiți și nu răspundeți.",
+    "Dacă încă folosiți parola veche din e-mail, schimbați-o peste tot.",
+    "În e-mailul de serviciu, raportați un astfel de mesaj echipei de securitate."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

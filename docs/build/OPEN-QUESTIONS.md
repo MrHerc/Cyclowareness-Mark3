@@ -3,7 +3,7 @@
 Qalan hər şey hazırdır və lokalda işləyir. Aşağıdakılar ya xarici hesab/açar, ya da biznes qərarı tələb edir.
 
 ## Açarlar və provayderlər
-1. **Anthropic API açarı və model.** `ANTHROPIC_API_KEY` olmadan Sİ müəllim dərs mətnindən cavab verir, studiya qaralaması isə «Sİ qoşulmayıb» deyir. Default model `claude-opus-5-5`; xərc üçün `ANTHROPIC_MODEL=claude-haiku-5-5` də işləyir. Hansı?
+1. **Anthropic API açarı və model.** `ANTHROPIC_API_KEY` olmadan Sİ müəllim dərs mətnindən cavab verir, studiya qaralaması isə «Sİ qoşulmayıb» deyir. Müəllimin ayrıca modeli var: `ANTHROPIC_TUTOR_MODEL` (default `claude-haiku-5-5`). Studiya qaralaması `ANTHROPIC_MODEL` ilə işləyir (default `claude-opus-5-5`); xərc üçün orada da `ANTHROPIC_MODEL=claude-haiku-5-5` işləyir. Hansı?
 2. **Səs (TTS).** Hazırda brauzerin nitq sintezi. Orijinal kimi əvvəlcədən yazılmış kliplər üçün provayder lazımdır (ElevenLabs və ya Azure Speech) və AZ səsinin seçimi.
 3. **SMTP.** Dəvətlər, xatırlatmalar və hesabat məktubları SMTP olmadan «qeydə alındı» statusu ilə qalır (Tənzimləmələr → Poçt → Jurnal). Hansı server?
 4. **SMS/səs provayderi.** `SMS_PROVIDER=webhook` interfeysi var; real provayder (məs. Twilio, yerli operator şlüzü) və göndərən adı.
@@ -11,7 +11,7 @@ Qalan hər şey hazırdır və lokalda işləyir. Aşağıdakılar ya xarici hes
 
 ## Məzmun və dillər
 6. **AZ/RU dərs məzmunu.** ✅ Həll olundu (2026-10-26). 106 dərsin az və ru versiyası peşəkar tərcümə və doğma redaktə ilə hazırlandı (ADR-023), canlı tenantdan çıxarış lazım olmadı. Qalan iki məsələ: Azərbaycan səsinin keyfiyyəti cihazdan asılıdır (sual 2), buraxılışdan əvvəl doğma dildə danışan mütəxəssisin son baxışı tövsiyə olunur.
-7. **7 əlavə interfeys dili.** İctimai sayt 10 dildədir; tətbiqin özü AZ/EN/RU. TR/RO/KA/UK/DE/FR/IT lazımdırmı?
+7. **7 əlavə interfeys dili.** ✅ Həll olundu (2026-10-27). Tətbiq və ictimai sayt eyni 10 dildədir: AZ/EN/RU/TR/RO/KA/UK/DE/FR/AR. İtalyan dili çıxarıldı, Səudiyyə Ərəbistanı üçün sağdan sola yazılan ərəb dili əlavə olundu (ADR-025). Yeni 7 dilin tərcümələri hazırlanır; buraxılışdan əvvəl doğma dildə danışan mütəxəssisin son baxışı tövsiyə olunur.
 8. **Hüquqi mətnlər.** Məxfilik Siyasəti və İstifadə Şərtləri AZ-dadır (Təminatçı rekvizitləri «sonradan göstəriləcək»). Şirkət adı, VÖEN, ünvan və EN/RU tərcümələri.
 9. **Məqbul istifadə siyasəti (AZ, RU).** Tərcümələr hazırdır (`content/policies/acceptable-use.az.md`, `acceptable-use.ru.md`, `passwords.ru.md`), hüquqi baxış tövsiyə olunur.
 

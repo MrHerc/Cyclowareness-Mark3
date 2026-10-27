@@ -1,0 +1,411 @@
+{
+ "id": "search-results",
+ "title": "Suchergebnisse",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "sr-tutor",
+   "beats": [
+    {
+     "id": "sr-b1",
+     "say": "Hallo! Viele Menschen rufen offizielle Websites über die Suche auf, statt die Adresse einzutippen. Das wissen auch Kriminelle.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "sr-b2",
+     "say": "Die Kriminellen kaufen Anzeigen, um ganz oben zu erscheinen. Neben einem solchen Treffer steht ein kleines Wort: „Gesponsert“.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "dialog",
+       "brandRef": "w2c-tapan",
+       "tone": "app",
+       "title": [
+        {
+         "text": "Tapan: Bürgerportal Bescheinigung"
+        }
+       ],
+       "body": [
+        [
+         {
+          "text": "Gesponsert",
+          "spot": "ad-label"
+         },
+         {
+          "text": "  vetendasportal-gov.example"
+         }
+        ],
+        [
+         {
+          "text": "Vətəndaş Portalı: Ihre Bescheinigung in 5 Minuten"
+         }
+        ],
+        [
+         {
+          "text": "vetendasportal.gov.az"
+         }
+        ],
+        [
+         {
+          "text": "Vətəndaş Portalı: Online-Bescheinigungen"
+         }
+        ]
+       ],
+       "buttons": [
+        "Suchen"
+       ]
+      }
+     },
+     "highlight": "ad-label"
+    },
+    {
+     "id": "sr-b3",
+     "say": "Eine gefälschte Website sieht der echten sehr ähnlich: ein Buchstabe anders, ein zusätzliches Wort oder eine andere Endung.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "sr-b4",
+     "say": "Prüfen Sie die offizielle Adresse einmal und speichern Sie sie als Lesezeichen. Öffnen Sie die Website danach immer von dort.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "sr-hotspot",
+   "prompt": "Finden Sie die gefährlichen Stellen in den Suchergebnissen.",
+   "artifact": {
+    "kind": "dialog",
+    "brandRef": "w2c-tapan",
+    "tone": "app",
+    "title": [
+     {
+      "text": "Tapan: Bürgerportal Bescheinigung"
+     }
+    ],
+    "body": [
+     [
+      {
+       "text": "Gesponsert",
+       "spot": "ad-label"
+      },
+      {
+       "text": "  "
+      },
+      {
+       "text": "vetendasportal-gov.example",
+       "spot": "lookalike"
+      }
+     ],
+     [
+      {
+       "text": "Offizielle Website. Ihre Bescheinigung in 5 Minuten",
+       "spot": "fake-official"
+      }
+     ],
+     [
+      {
+       "text": "Gesponsert  "
+      },
+      {
+       "text": "vetendaspotral.example.info",
+       "spot": "typo"
+      }
+     ],
+     [
+      {
+       "text": "Vətəndaş Portalı: Anmeldung und Bescheinigungen"
+      }
+     ],
+     [
+      {
+       "text": "vetendasportal.gov.az"
+      }
+     ],
+     [
+      {
+       "text": "Vətəndaş Portalı: Online-Bescheinigungen"
+      }
+     ]
+    ],
+    "buttons": [
+     "Suchen"
+    ]
+   },
+   "spots": [
+    {
+     "id": "ad-label",
+     "label": "Werbekennzeichnung",
+     "explain": "Für diesen Platz ganz oben wurde bezahlt. Auch Kriminelle können Anzeigen kaufen. Melden Sie sich deshalb nie über eine Anzeige an."
+    },
+    {
+     "id": "lookalike",
+     "label": "Zusätzliches Wort",
+     "explain": "In die Adresse wurde das Wort gov eingefügt, aber die Endung ist eine andere. Die Adresse des offiziellen Portals endet auf gov.az."
+    },
+    {
+     "id": "fake-official",
+     "label": "Angeblich offiziell",
+     "explain": "Die Worte „Offizielle Website“ kann jeder schreiben. Ob eine Website offiziell ist, zeigt das Ende der Adresse, nicht der Text."
+    },
+    {
+     "id": "typo",
+     "label": "Vertauschte Buchstaben",
+     "explain": "Im Wort portal haben zwei Buchstaben die Plätze getauscht. Wer es eilig hat, bemerkt das kaum."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "sr-choice",
+   "question": {
+    "prompt": "Sie melden sich oft beim Bürgerportal an. Was ist der sicherste Weg?",
+    "options": [
+     {
+      "id": "bookmark",
+      "label": "Ich prüfe die offizielle Adresse einmal und speichere sie als Lesezeichen",
+      "correct": true,
+      "feedback": "Richtig. Ein Lesezeichen öffnet jedes Mal dieselbe Adresse, und Anzeigen spielen keine Rolle mehr."
+     },
+     {
+      "id": "first-result",
+      "label": "Ich suche jedes Mal und klicke auf das erste Ergebnis",
+      "correct": false,
+      "feedback": "Das erste Ergebnis kann eine Anzeige sein. Kriminelle setzen genau auf diese Gewohnheit."
+     },
+     {
+      "id": "sms-link",
+      "label": "Ich nutze den Link, der per SMS kam",
+      "correct": false,
+      "feedback": "Einen Link per SMS kann jeder schicken. Öffnen Sie die offizielle Website selbst."
+     }
+    ]
+   },
+   "explain": "Speichern Sie Websites, die Sie oft nutzen, als Lesezeichen. Dann können Suchergebnisse und Anzeigen Sie nicht täuschen."
+  },
+  {
+   "type": "simulation",
+   "id": "sr-sim",
+   "environment": "browser",
+   "title": "Ein Programm herunterladen",
+   "intro": "Sie haben morgen ein Online-Meeting und müssen dafür die App Görüş herunterladen. Sie beginnen mit einer Suche.",
+   "steps": [
+    {
+     "id": "results",
+     "label": "Görüş herunterladen: Suchergebnisse",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-tapan",
+      "url": [
+       {
+        "text": "https://tapan.example/axtar?q=gorus+yukle",
+        "reveal": "tapan.example"
+       }
+      ]
+     },
+     "say": "Ganz oben steht eine Anzeige, darunter die eigene Website der App.",
+     "actions": [
+      {
+       "id": "ad",
+       "label": "Gesponsert: gorus-app-download.example.net",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Die Anzeige hat Sie auf eine andere Website geführt. Es ist noch nicht zu spät: Sehen Sie sich die Adresse an.",
+       "next": "fake-site"
+      },
+      {
+       "id": "organic",
+       "label": "gorus.example: offizielle Website",
+       "kind": "click-link",
+       "outcome": "safe",
+       "feedback": "Richtig. Sie haben die Anzeige übersprungen und die eigene Website der App geöffnet.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "fake-site",
+     "label": "Görüş: kostenloser Download",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "w2c-gorus-fake",
+      "url": [
+       {
+        "text": "https://gorus-app-download.example.net/yukle",
+        "reveal": "gorus-app-download.example.net"
+       }
+      ]
+     },
+     "say": "Die Seite sieht der echten Website sehr ähnlich. Sehen Sie sich die Adresse an.",
+     "actions": [
+      {
+       "id": "download",
+       "label": "Herunterladen",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "Diese Website gehört nicht dem Hersteller der App. Einem Installationsprogramm von hier können Sie nicht vertrauen.",
+       "next": "fake-file"
+      },
+      {
+       "id": "leave",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Die Adresse gehörte nicht zur eigenen Website der App. Rufen Sie die offizielle Website selbst auf.",
+       "next": "real-site"
+      },
+      {
+       "id": "check",
+       "label": "Adresse prüfen",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Der Name sieht ähnlich aus, aber die Domain ist eine andere. Vertrauen Sie dieser Website nicht.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "fake-file",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "w2c-gorus-fake",
+      "name": [
+       {
+        "text": "GorusSetup_2026.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "84 MB",
+      "source": [
+       {
+        "text": "gorus-app-download.example.net"
+       }
+      ]
+     },
+     "say": "Die Datei ist heruntergeladen. Öffnen Sie sie?",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Öffnen",
+       "kind": "open",
+       "outcome": "compromised",
+       "feedback": "Dieses Installationsprogramm richtet zusammen mit der App ein Programm ein, das Passwörter stiehlt. Öffnen Sie nie eine Datei von einer gefälschten Website.",
+       "next": "after-bad"
+      },
+      {
+       "id": "delete",
+       "label": "Löschen",
+       "kind": "delete",
+       "outcome": "safe",
+       "feedback": "Richtig. Löschen Sie die Datei, informieren Sie den IT-Support und holen Sie sich die App von der offiziellen Website.",
+       "next": "real-site"
+      }
+     ]
+    },
+    {
+     "id": "after-bad",
+     "artifact": {
+      "kind": "dialog",
+      "brandRef": "qoruyucu",
+      "tone": "warning",
+      "title": [
+       {
+        "text": "Qoruyucu: verdächtiges Programm"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "GorusSetup_2026.exe hat versucht, die in Ihrem Browser gespeicherten Passwörter auszulesen."
+        }
+       ]
+      ],
+      "buttons": [
+       "Unter Quarantäne stellen",
+       "Schließen"
+      ]
+     },
+     "say": "Das Antivirenprogramm hat etwas gefunden. Handeln Sie jetzt schnell.",
+     "actions": [
+      {
+       "id": "isolate",
+       "label": "Vom Netzwerk trennen und IT-Support anrufen",
+       "kind": "disconnect",
+       "outcome": "safe",
+       "feedback": "Richtig. Sofern Ihre internen Vorgaben nichts anderes vorsehen, trennen Sie den Computer vom Netzwerk, ohne ihn herunterzufahren, und rufen Sie sofort an."
+      },
+      {
+       "id": "ignore",
+       "label": "Schließen und weiterarbeiten",
+       "kind": "cancel",
+       "outcome": "compromised",
+       "feedback": "Das Programm läuft weiter und kann Ihre Passwörter versenden. Melden Sie den Vorfall sofort."
+      }
+     ]
+    },
+    {
+     "id": "real-site",
+     "label": "Görüş: Download für Ihren Computer",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "gorus",
+      "url": [
+       {
+        "text": "https://gorus.example/yukle",
+        "reveal": "gorus.example"
+       }
+      ]
+     },
+     "say": "Das ist die eigene Website der App.",
+     "actions": [
+      {
+       "id": "ask-it",
+       "label": "IT-Support um die Installation bitten",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Das ist der beste Weg. Auf einem dienstlichen Computer installiert der IT-Support die Programme.",
+       "next": "results"
+      },
+      {
+       "id": "download",
+       "label": "Herunterladen",
+       "kind": "install",
+       "outcome": "safe",
+       "feedback": "Richtig, das ist die offizielle Website. Prüfen Sie auf einem dienstlichen Computer aber zuerst die Regeln Ihres IT-Supports.",
+       "next": "results"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "sr-recap",
+   "points": [
+    "Melden Sie sich über ein Lesezeichen an, nicht über eine Anzeige",
+    "Lesen Sie das Ende der Adresse und vergleichen Sie es mit der offiziellen Adresse",
+    "Holen Sie Programme nur von der offiziellen Website oder über den IT-Support"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

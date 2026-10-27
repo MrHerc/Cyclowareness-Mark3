@@ -119,6 +119,7 @@ export function PersonActions({
           <Field label={tp("phone")} htmlFor="e-phone" error={phoneError}>
             <Input
               id="e-phone"
+              type="tel"
               value={phone}
               onChange={(e) => {
                 setPhone(e.target.value);

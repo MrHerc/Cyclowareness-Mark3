@@ -133,12 +133,12 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
                   </div>
                   {!inc.autoTrainingAt ? <p className="text-caption text-ink-muted">{tr("notAssigned")}</p> : null}
                   <ScrollRegion label={tr("trainingProgress")}>
-                    <table className="w-full min-w-[34rem] text-left text-caption">
+                    <table className="w-full min-w-[34rem] text-start text-caption">
                       <thead className="text-tab text-ink-subtle">
                         <tr className="border-b border-line">
                           <th className="py-2 font-semibold">{tr("person")}</th>
                           <th className="py-2 font-semibold">{tr("progress")}</th>
-                          <th className="py-2 text-right font-semibold">{tr("score")}</th>
+                          <th className="py-2 text-end font-semibold">{tr("score")}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-line">
@@ -166,7 +166,7 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
                                   <Pill tone={status === "completed" ? "safe" : status === "not_started" ? (riskBy.get(uid) === "open" ? "warn" : "neutral") : "brand"}>{tr(`progressStatus.${status}`)}</Pill>
                                 )}
                               </td>
-                              <td className="py-2.5 text-right tabular-nums">
+                              <td className="py-2.5 text-end tabular-nums">
                                 {score === undefined ? (
                                   "—"
                                 ) : (
@@ -198,7 +198,7 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
                   {inc.iocs.map((i, k) => (
                     <li key={k} className="flex gap-2 font-mono text-tab">
                       <span className="w-24 shrink-0 text-ink-subtle">{ts(`iocTypes.${i.type}`)}</span>
-                      <span className="min-w-0 break-all">{i.type === "sha256" || i.type === "filename" ? i.value : defang(i.value)}</span>
+                      <span dir="ltr" className="min-w-0 break-all">{i.type === "sha256" || i.type === "filename" ? i.value : defang(i.value)}</span>
                     </li>
                   ))}
                 </ul>

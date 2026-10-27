@@ -6,8 +6,7 @@ import { getTranslations } from "next-intl/server";
 import { and, count, eq, inArray, isNotNull } from "drizzle-orm";
 import { BookOpenCheck } from "lucide-react";
 import { db, t } from "@/server/db";
-import { allowed, requireViewer, type Viewer } from "@/server/auth/viewer";
-import { isPrivileged } from "@/server/auth/permissions";
+import { allowed, requireViewer, twoFactorGap, type Viewer } from "@/server/auth/viewer";
 import type { Permission } from "@/server/auth/permissions";
 import type { Feature } from "@/lib/tenant-defaults";
 import { AdminMobileMenu, AdminNav, type AdminNavGroup } from "@/components/shell/admin-nav";
@@ -91,7 +90,7 @@ async function badges(v: Viewer): Promise<Record<string, number>> {
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const v = await requireViewer();
   if (!allowed(v, "admin.access")) notFound();
-  if (v.tenant.settings.identity.requireAdmin2fa && isPrivileged(v.user.role) && !v.user.totpEnabled) redirect("/profile?required=1");
+  if (twoFactorGap(v)) redirect("/profile?required=1");
   const [tr, tc, counts, notes, jar] = await Promise.all([
     getTranslations("admin"),
     getTranslations("common"),
@@ -134,12 +133,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   );
 
   return (
-    <div className="min-h-dvh bg-canvas lg:pl-68">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-68 flex-col overflow-y-auto border-r border-line bg-surface px-3 pt-5 pb-4 lg:flex">
+    <div className="min-h-dvh bg-canvas lg:ps-68">
+      <aside className="fixed inset-y-0 start-0 z-30 hidden w-68 flex-col overflow-y-auto border-e border-line bg-surface px-3 pt-5 pb-4 lg:flex">
         {/* Product lockup in the sidebar (as in the learner rail); the organisation's own logo sits in the header. */}
         <div className="mb-6 px-2">
           <BrandMark href="/admin" byline />
-          <p className="mt-3 ml-11.5 inline-flex rounded-pill bg-brand-50 px-2.5 py-0.5 text-tab-sm font-semibold text-brand-700">{tr("console")}</p>
+          <p className="mt-3 ms-11.5 inline-flex rounded-pill bg-brand-50 px-2.5 py-0.5 text-tab-sm font-semibold text-brand-700">{tr("console")}</p>
         </div>
         <Suspense>
           <AdminNav groups={groups} collapsedInitial={collapsed} />

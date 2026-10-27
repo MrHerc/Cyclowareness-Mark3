@@ -1,0 +1,459 @@
+{
+  "id": "parcel-fee",
+  "title": "Плата за посилку",
+  "minutes": 3,
+  "scenes": [
+    {
+      "type": "tutor",
+      "id": "pf-tutor",
+      "beats": [
+        {
+          "id": "pf-b1",
+          "say": "Вітаю! Сьогодні ми побачимо, як крихітне посилання на оплату обертається великою втратою.",
+          "mood": "talk",
+          "gesture": "wave",
+          "visual": {
+            "kind": "illustration",
+            "id": "phone-lock"
+          }
+        },
+        {
+          "id": "pf-b2",
+          "say": "Плата — лише один манат двадцять. Але шахраєві потрібна не ця плата, а дані вашої картки.",
+          "mood": "alert",
+          "gesture": "point-left",
+          "visual": {
+            "kind": "artifact",
+            "artifact": {
+              "kind": "sms",
+              "brandRef": "w2d-tezkuryer-fake",
+              "sender": [
+                {
+                  "text": "+994 51 000 83 17"
+                }
+              ],
+              "time": "10:47",
+              "messages": [
+                [
+                  {
+                    "text": "TezKuryer: вашу посилку затримано на митниці. "
+                  },
+                  {
+                    "text": "Сплатіть збір 1,20 AZN: ",
+                    "spot": "fee"
+                  },
+                  {
+                    "text": "tezkuryer-gomruk.example.net/odenis",
+                    "link": {
+                      "label": "tezkuryer-gomruk.example.net/odenis",
+                      "href": "https://tezkuryer-gomruk.example.net/odenis"
+                    }
+                  }
+                ]
+              ]
+            }
+          },
+          "highlight": "fee"
+        },
+        {
+          "id": "pf-b3",
+          "say": "Посилка, штраф чи виплата — хоч би що це було, ніколи не платіть за посиланням з SMS.",
+          "mood": "think",
+          "gesture": "shake",
+          "visual": {
+            "kind": "illustration",
+            "id": "hook"
+          }
+        },
+        {
+          "id": "pf-b4",
+          "say": "Натомість самі відкрийте офіційний застосунок чи портал і перевірте там.",
+          "mood": "happy",
+          "gesture": "shield-up",
+          "visual": {
+            "kind": "illustration",
+            "id": "shield"
+          }
+        }
+      ]
+    },
+    {
+      "type": "hotspot",
+      "id": "pf-hotspot",
+      "prompt": "Знайдіть ознаки шахрайства в цьому SMS.",
+      "artifact": {
+        "kind": "sms",
+        "brandRef": "w2d-tezkuryer-fake",
+        "sender": [
+          {
+            "text": "+994 51 000 83 17",
+            "spot": "sender"
+          }
+        ],
+        "time": "10:47",
+        "messages": [
+          [
+            {
+              "text": "TezKuryer: вашу посилку TZ48120577AZ затримано на митниці. Потрібно сплатити "
+            },
+            {
+              "text": "митний збір 1,20 AZN",
+              "spot": "small-fee"
+            },
+            {
+              "text": "."
+            }
+          ],
+          [
+            {
+              "text": "Оплатіть тут: "
+            },
+            {
+              "text": "tezkuryer-gomruk.example.net/odenis",
+              "spot": "link",
+              "link": {
+                "label": "tezkuryer-gomruk.example.net/odenis",
+                "href": "https://tezkuryer-gomruk.example.net/odenis"
+              }
+            }
+          ],
+          [
+            {
+              "text": "Якщо не сплатити протягом 24 годин, посилку повернуть відправникові.",
+              "spot": "deadline"
+            }
+          ]
+        ]
+      },
+      "spots": [
+        {
+          "id": "sender",
+          "label": "Звичайний мобільний номер",
+          "explain": "SMS від компаній зазвичай надходять під назвою. Але й назву можна підробити, тож ніколи не покладайтеся лише на цю ознаку."
+        },
+        {
+          "id": "small-fee",
+          "label": "Крихітна сума",
+          "explain": "Крихітна сума присипляє пильність. Справжня мета — номер вашої картки, код на звороті та SMS-код."
+        },
+        {
+          "id": "link",
+          "label": "Фальшива адреса",
+          "explain": "Це не офіційний сайт кур’єрської служби: до назви додали зайві слова. Не торкайтеся посилання, самі відкрийте офіційний застосунок."
+        },
+        {
+          "id": "deadline",
+          "label": "Поспіх",
+          "explain": "Термін потрібен, щоб ви не встигли подумати. Справжня кур’єрська служба дає час на перевірку."
+        }
+      ],
+      "minToFind": 3
+    },
+    {
+      "type": "simulation",
+      "id": "pf-sim",
+      "environment": "phone",
+      "title": "Повідомлення протягом дня",
+      "intro": "Протягом дня на ваш телефон надходить кілька повідомлень. Виберіть правильну реакцію на кожне.",
+      "steps": [
+        {
+          "id": "redeliver-sms",
+          "label": "10:47 Нове SMS",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "w2d-tezkuryer-fake",
+            "sender": [
+              {
+                "text": "+994 51 000 83 17"
+              }
+            ],
+            "time": "10:47",
+            "messages": [
+              [
+                {
+                  "text": "TezKuryer: наш кур’єр не зміг вас знайти. Сплатіть 0,90 AZN за повторну доставку: "
+                },
+                {
+                  "text": "tezkuryer-catdirilma.example.net/odenis",
+                  "link": {
+                    "label": "tezkuryer-catdirilma.example.net/odenis",
+                    "href": "https://tezkuryer-catdirilma.example.net/odenis"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Знайома назва кур’єрської служби й невелика сума.",
+          "actions": [
+            {
+              "id": "open-link",
+              "label": "Відкрити посилання",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Сторінка схожа на сайт кур’єрської служби, але адреса фальшива. Тепер подивіться, що вона просить.",
+              "next": "bank-code"
+            },
+            {
+              "id": "report",
+              "label": "Повідомити про спам",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Правильно. Повідомте про це SMS як про спам, а потім перевірте посилку в офіційному застосунку.",
+              "next": "real-app"
+            },
+            {
+              "id": "delete",
+              "label": "Видалити",
+              "kind": "delete",
+              "outcome": "safe",
+              "feedback": "Добре. Якщо ви чекаєте на посилку, перевірте її в офіційному застосунку.",
+              "next": "real-app"
+            }
+          ]
+        },
+        {
+          "id": "bank-code",
+          "label": "Сторінка попросила дані картки й SMS-код",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "sahilbank",
+            "sender": [
+              {
+                "text": "SahilBank"
+              }
+            ],
+            "time": "10:49",
+            "messages": [
+              [
+                {
+                  "text": "Код: 518204. Платіж 412,00 AZN, TZK GLOBAL PAY. Нікому не повідомляйте цей код."
+                }
+              ]
+            ]
+          },
+          "say": "Ваш банк надіслав код. Погляньте на суму.",
+          "actions": [
+            {
+              "id": "type-code",
+              "label": "Ввести код на сайті",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Цим кодом ви підтверджуєте платіж на чотириста дванадцять манатів, а не на один. Негайно зателефонуйте в банк за номером на звороті картки."
+            },
+            {
+              "id": "call-bank",
+              "label": "Зателефонувати в банк за номером на картці",
+              "kind": "call-back",
+              "outcome": "safe",
+              "feedback": "Правильно. Сума біля коду набагато більша, ніж писала сторінка, тож негайно заблокуйте картку."
+            },
+            {
+              "id": "ignore",
+              "label": "Нікуди не вводити код",
+              "kind": "ignore",
+              "outcome": "safe",
+              "feedback": "Добре, платіж не пройшов. Але дані вашої картки вже на тому сайті, тож зателефонуйте в банк і заблокуйте картку."
+            }
+          ]
+        },
+        {
+          "id": "real-app",
+          "label": "Офіційний застосунок TezKuryer",
+          "artifact": {
+            "kind": "notification",
+            "brandRef": "w2d-tezkuryer",
+            "app": "TezKuryer",
+            "title": [
+              {
+                "text": "TZ77015342AZ: у дорозі"
+              }
+            ],
+            "body": [
+              {
+                "text": "Доставка 4 жовтня. Додаткова оплата не потрібна."
+              }
+            ],
+            "time": "11:05"
+          },
+          "say": "Це сповіщення надійшло з офіційного застосунку.",
+          "actions": [
+            {
+              "id": "open",
+              "label": "Відкрити в застосунку",
+              "kind": "open",
+              "outcome": "safe",
+              "feedback": "Правильно. Офіційний застосунок не показує жодної додаткової плати, отже, SMS було фальшивим."
+            },
+            {
+              "id": "later",
+              "label": "Подивитися пізніше",
+              "kind": "ignore",
+              "outcome": "safe",
+              "feedback": "Це нормально. Якби треба було щось сплатити, ви побачили б це й в офіційному застосунку."
+            }
+          ]
+        },
+        {
+          "id": "fine-sms",
+          "label": "13:20 Нове SMS",
+          "artifact": {
+            "kind": "sms",
+            "brandRef": "w2d-yol-nezaret-fake",
+            "sender": [
+              {
+                "text": "YolNezaret"
+              }
+            ],
+            "time": "13:20",
+            "messages": [
+              [
+                {
+                  "text": "Вам нараховано штраф 80 AZN за перевищення швидкості. Сплатіть сьогодні зі знижкою 50 %:"
+                },
+                {
+                  "text": "yolnezaret-cerime.example.net/endirim",
+                  "link": {
+                    "label": "yolnezaret-cerime.example.net/endirim",
+                    "href": "https://yolnezaret-cerime.example.net/endirim"
+                  }
+                }
+              ]
+            ]
+          },
+          "say": "Тепер штраф. Зверніть увагу на знижку.",
+          "actions": [
+            {
+              "id": "pay",
+              "label": "Сплатити зі знижкою",
+              "kind": "click-link",
+              "outcome": "compromised",
+              "feedback": "Знижка потрібна, щоб вас поквапити. Сторінка за посиланням збирає дані карток."
+            },
+            {
+              "id": "verify",
+              "label": "Перевірю штрафи на порталі напряму",
+              "kind": "verify",
+              "outcome": "safe",
+              "feedback": "Правильно. Якщо штраф справжній, він буде на офіційному порталі."
+            },
+            {
+              "id": "report",
+              "label": "Повідомити про спам",
+              "kind": "report",
+              "outcome": "safe",
+              "feedback": "Добре. Якщо сумніваєтеся, зателефонуйте в поліцію за номером 102 і запитайте."
+            }
+          ]
+        },
+        {
+          "id": "aunt-chat",
+          "label": "16:02 Тітка Сабіна",
+          "artifact": {
+            "kind": "chat",
+            "app": "whatsapp",
+            "contact": [
+              {
+                "text": "Тітка Сабіна"
+              }
+            ],
+            "messages": [
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Сусідка надіслала це посилання, там дають допомогу сім’ям, сьогодні останній день."
+                  }
+                ],
+                "time": "16:01"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "ailedestek-qeydiyyat.example.net",
+                    "link": {
+                      "label": "ailedestek-qeydiyyat.example.net",
+                      "href": "https://ailedestek-qeydiyyat.example.net"
+                    }
+                  }
+                ],
+                "time": "16:01"
+              },
+              {
+                "from": "them",
+                "body": [
+                  {
+                    "text": "Мені вводити дані своєї картки?"
+                  }
+                ],
+                "time": "16:02"
+              }
+            ]
+          },
+          "say": "Родичка просить поради.",
+          "actions": [
+            {
+              "id": "advise-stop",
+              "label": "Не треба, давайте разом перевіримо на офіційному порталі",
+              "kind": "reply",
+              "outcome": "safe",
+              "feedback": "Чудово. Для державних виплат ніколи не треба реєструватися за посиланням, а перевірити їх можна на офіційному порталі."
+            },
+            {
+              "id": "advise-go",
+              "label": "Поспішайте, сьогодні останній день",
+              "kind": "reply",
+              "outcome": "compromised",
+              "feedback": "Хитрість з «останнім днем» спрацювала. Сторінка викраде дані її картки, тож їй треба негайно зателефонувати в банк."
+            },
+            {
+              "id": "open-it",
+              "label": "Спершу я відкрию посилання",
+              "kind": "click-link",
+              "outcome": "risky",
+              "feedback": "Відкривати посилання для перевірки теж ризиковано. До того ж це не адреса офіційного порталу."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "id": "pf-choice",
+      "question": {
+        "prompt": "Ви вже ввели дані картки на фальшивій сторінці. Що робити насамперед?",
+        "options": [
+          {
+            "id": "call-bank",
+            "label": "Зателефонувати в банк за номером на звороті картки й заблокувати її",
+            "correct": true,
+            "feedback": "Правильно. Що швидше картку заблокують, то менше ви втратите."
+          },
+          {
+            "id": "wait",
+            "label": "Почекати й подивитися, чи зникнуть гроші з рахунку",
+            "correct": false,
+            "feedback": "Очікування дає шахраєві час. Коли гроші вже зникнуть, може бути запізно."
+          },
+          {
+            "id": "reply-sms",
+            "label": "Відповісти на SMS і попросити повернути гроші",
+            "correct": false,
+            "feedback": "Шахрай нічого не поверне, натомість попросить новий код. Припиніть спілкування."
+          }
+        ]
+      },
+      "explain": "Потім повідомте поліцію за номером 102 і збережіть повідомлення як доказ."
+    },
+    {
+      "type": "recap",
+      "id": "pf-recap",
+      "points": [
+        "Посилка, штраф чи виплата — ніколи не платіть за посиланням з SMS.",
+        "Щоб перевірити, самі відкрийте офіційний застосунок чи портал.",
+        "Ввели дані картки? Негайно зателефонуйте в банк, а потім у поліцію за номером 102."
+      ],
+      "mood": "celebrate"
+    }
+  ]
+}

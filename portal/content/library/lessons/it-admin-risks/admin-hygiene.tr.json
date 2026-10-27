@@ -1,0 +1,433 @@
+{
+ "id": "admin-hygiene",
+ "title": "Yönetici hesabı hijyeni",
+ "minutes": 4,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "intro",
+   "beats": [
+    {
+     "id": "b1",
+     "say": "Yönetici hesabı, saldırganların en çok istediği anahtardır. Tek bir yönetici hesabıyla tüm ağa ulaşabilirler.",
+     "mood": "think",
+     "visual": {
+      "kind": "illustration",
+      "id": "key"
+     }
+    },
+    {
+     "id": "b2",
+     "say": "Günlük işler için normal bir hesap, yönetim işleri için ayrı bir hesap kullanın. Yönetici hesabıyla asla e-posta okumayın ve internette gezinmeyin.",
+     "mood": "talk",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    },
+    {
+     "id": "b3",
+     "say": "Parolaları ve anahtarları koda, sohbetlere ve destek taleplerine yazmayın. Orada yıllarca kalırlar. Bunun yerine bir gizli bilgi kasası kullanın.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "app": "telegram",
+       "contact": [
+        {
+         "text": "Altyapı ekibi · 46 üye"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Test için veritabanına şöyle bağlanın: "
+          },
+          {
+           "text": "DB_PASSWORD=Pr0d!Baza2026",
+           "spot": "secret"
+          }
+         ],
+         "time": "23:14"
+        }
+       ]
+      }
+     },
+     "highlight": "secret"
+    },
+    {
+     "id": "b4",
+     "say": "Destek ekibinden olduğunu söyleyen sahte arayanlar çoğu zaman bir uzaktan kontrol aracı kurmanızı ister. Sonra sistemi sizin elinizle açarlar.",
+     "mood": "alert",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "call",
+       "caller": [
+        {
+         "text": "Tedarikçi desteği"
+        }
+       ],
+       "number": [
+        {
+         "text": "+994 12 000 01 23"
+        }
+       ],
+       "label": "Bilinmeyen"
+      }
+     }
+    },
+    {
+     "id": "b5",
+     "say": "Yönetim panelleri, uzaktan erişim ve bulut konsolları için oltalamaya dayanıklı çok faktörlü kimlik doğrulamayı, örneğin fiziksel bir güvenlik anahtarını kullanın.",
+     "mood": "happy",
+     "visual": {
+      "kind": "illustration",
+      "id": "mfa-phone"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "admin-phish",
+   "prompt": "Sistem yöneticilerini hedef alan oltalama (phishing) e-postasının işaretlerini bulun.",
+   "artifact": {
+    "kind": "email",
+    "from": {
+     "name": [
+      {
+       "text": "Bulut Konsolu Bildirimi"
+      }
+     ],
+     "address": [
+      {
+       "text": "alerts@"
+      },
+      {
+       "text": "cloudconsole-admin.example.info",
+       "spot": "domain"
+      }
+     ]
+    },
+    "to": "admin@idare.example",
+    "subject": [
+     {
+      "text": "Kritik: Yönetici hesabınız 2 saat içinde askıya alınacak",
+      "spot": "urgency"
+     }
+    ],
+    "time": "06:12",
+    "body": [
+     [
+      {
+       "text": "Sayın sistem yöneticisi,"
+      }
+     ],
+     [
+      {
+       "text": "Kiracınız için çok faktörlü kimlik doğrulama kaydını yenileyiniz."
+      }
+     ],
+     [
+      {
+       "text": "Konsola giriş yapınız: "
+      },
+      {
+       "text": "console-login.example.info/admin",
+       "spot": "link"
+      }
+     ],
+     [
+      {
+       "text": "Ardından onay kodunu sizi arayacak destek temsilcisine okuyunuz.",
+       "spot": "code-share"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Yanlış alan adı",
+     "explain": "Hizmet sağlayıcının bildirimleri kendi alan adından gelir. Konsolu her zaman kendi yer işaretinizden açın."
+    },
+    {
+     "id": "urgency",
+     "label": "Askıya alma tehdidi",
+     "explain": "İki saatlik süre, kontrol etmenize zaman bırakmamak için verilmiştir."
+    },
+    {
+     "id": "link",
+     "label": "Sahte giriş sayfası",
+     "explain": "Bu sayfa parolanızı ve kodunuzu anında saldırgana aktarabilir. Sıradan kodlar bunu engellemez."
+    },
+    {
+     "id": "code-share",
+     "label": "Kodu birine okumak",
+     "explain": "Gerçek destek ekibi onay kodunuzu asla sormaz. Kodu söylemek, hesabı teslim etmek demektir."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "choice",
+   "id": "remote-support",
+   "question": {
+    "prompt": "Tedarikçinin destek ekibi arıyor ve bir sunucuya uzaktan erişim istiyor. Ne yaparsınız?",
+    "options": [
+     {
+      "id": "call-back",
+      "label": "Telefonu kapatıp sözleşmedeki numarayı ararım",
+      "correct": true,
+      "feedback": "Doğru. Bildiğiniz bir kanal üzerinden doğrulayın, ardından erişimi yalnızca onaylı araçla verin."
+     },
+     {
+      "id": "install",
+      "label": "Söyledikleri aracı kurup kodu okurum",
+      "correct": false,
+      "feedback": "Bu, arayan kişiye sistemde tam erişim verir. Uzaktan kontrol araçları saldırılarda tam olarak bu şekilde kötüye kullanılır."
+     },
+     {
+      "id": "watch",
+      "label": "İzin veririm ama ekranı izlerim",
+      "correct": false,
+      "feedback": "İzlemek yeterli değildir. Bir arka kapı yerleştirmek saniyeler sürer."
+     }
+    ]
+   },
+   "explain": "Beklenmedik bir uzaktan erişim isteği her zaman bilinen bir kanaldan doğrulanır ve erişim yalnızca onaylı araçla verilir."
+  },
+  {
+   "type": "swipe",
+   "id": "secrets",
+   "prompt": "Bu güvenli bir yöntem mi?",
+   "cards": [
+    {
+     "id": "ticket-password",
+     "artifact": {
+      "kind": "chat",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Destek talebi 4821"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Sonraki vardiya görsün diye sunucu parolasını yorumlara yazdım."
+         }
+        ],
+        "time": "02:30"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Destek taleplerini birçok kişi görür ve talepler arşivde kalır. Parolayı yenileyin ve kasaya taşıyın."
+    },
+    {
+     "id": "vault-share",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "DevOps grubu"
+       }
+      ],
+      "messages": [
+       {
+        "from": "me",
+        "body": [
+         {
+          "text": "Anahtarı gizli bilgi kasasına ekledim ve size okuma yetkisi verdim."
+         }
+        ],
+        "time": "11:20"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Anahtarın kendisi sohbette yok, yalnızca kasada erişim verilmiş. Doğru yol budur."
+    },
+    {
+     "id": "env-in-repo",
+     "artifact": {
+      "kind": "url",
+      "url": [
+       {
+        "text": "https://git.idare.example/infra/deploy/-/blob/main/.env"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Kod deposuna .env dosyası gönderilmiş (commit). Anahtarlar geçmişte kalır, bu yüzden dosyayı silmek yetmez. Anahtarları hemen yenileyin."
+    },
+    {
+     "id": "keys-issued",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Güvenlik ekibi"
+        }
+       ],
+       "address": [
+        {
+         "text": "security@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Yönetici hesapları için güvenlik anahtarları"
+       }
+      ],
+      "time": "15:00",
+      "body": [
+       [
+        {
+         "text": "Pazartesiden itibaren yönetim paneline giriş için fiziksel anahtar gerekecektir. Anahtarınızı 305 numaralı odadan bizzat teslim alın."
+        }
+       ]
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Bağlantı yok, indirilecek ya da yazılacak bir şey yok, anahtar elden teslim ediliyor. Bu değişiklik sizi daha güvenli kılar."
+    },
+    {
+     "id": "shared-admin",
+     "artifact": {
+      "kind": "chat",
+      "app": "whatsapp",
+      "contact": [
+       {
+        "text": "Kamran (ağ ekibi)"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Tatile çıkıyorum, yönetici parolam bu, gerekirse kullan."
+         }
+        ],
+        "time": "18:55"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Paylaşılan bir yönetici hesabında kimin ne yaptığı anlaşılamaz. Yerine bakacak kişiye kendi hesabında geçici yetkiler verilmelidir."
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "right-account",
+   "prompt": "Her görevi doğru hesapla eşleştirin.",
+   "pairs": [
+    {
+     "id": "mail",
+     "left": "E-posta okumak",
+     "right": "Normal günlük hesap"
+    },
+    {
+     "id": "config",
+     "left": "Sunucu yapılandırması",
+     "right": "Ayrı yönetici hesabı"
+    },
+    {
+     "id": "script",
+     "left": "Otomatik betik",
+     "right": "En az yetkiye sahip hizmet hesabı"
+    },
+    {
+     "id": "emergency",
+     "left": "Acil durum erişimi",
+     "right": "Kasada saklanan, izlenen hesap"
+    }
+   ],
+   "explain": "Her göreve yalnızca ihtiyaç duyduğu yetkileri verin. Yönetici hesabı ne kadar az kullanılırsa hedef o kadar küçülür."
+  },
+  {
+   "type": "scenario",
+   "id": "night-prompt",
+   "title": "Gece gelen onay isteği",
+   "start": "prompt",
+   "nodes": [
+    {
+     "id": "prompt",
+     "text": "Saat 02:00. Telefonunuzda yönetici hesabınız için bir giriş onayı isteği görünüyor, oysa siz uyuyordunuz.",
+     "choices": [
+      {
+       "label": "Reddedip güvenlik ekibini uyarırım",
+       "next": "reuse",
+       "feedback": "Doğru. Beklenmedik bir onay isteği, birinin parolanızı bildiği anlamına gelir."
+      },
+      {
+       "label": "Bildirimler dursun diye onaylarım",
+       "outcome": "compromised",
+       "feedback": "Saldırgan artık yönetim panelinde. Buna anlık bildirim bombardımanı (push bombing) saldırısı denir."
+      }
+     ]
+    },
+    {
+     "id": "reuse",
+     "text": "Bu parolayı başka bir yerde kullandınız mı?",
+     "speaker": "Güvenlik ekibi",
+     "voice": "man-3",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Bu parolayı <short pause> başka bir yerde kullandınız mı?",
+     "choices": [
+      {
+       "label": "Evet, kişisel bir hesabımda da. İkisini de değiştireceğim",
+       "next": "harden",
+       "feedback": "Dürüst bir yanıt. Başka sitelerden sızan parolalar çoğu zaman tam da bu şekilde denenir."
+      },
+      {
+       "label": "Utandığım için bir şey söylemem",
+       "outcome": "risky",
+       "feedback": "Ekip sızıntının kaynağını bulamaz. Dürüstlük incelemeyi hızlandırır."
+      }
+     ]
+    },
+    {
+     "id": "harden",
+     "text": "Parola değiştirildi. Sırada ne var?",
+     "choices": [
+      {
+       "label": "Etkin oturumları sonlandırıp hesabı fiziksel anahtara geçiririm",
+       "outcome": "safe",
+       "feedback": "Mükemmel. Oturumları sonlandırmak açık kalan erişimleri keser, fiziksel anahtar da oltalamaya karşı dayanıklıdır."
+      },
+      {
+       "label": "Her şey yolunda, işime dönerim",
+       "outcome": "risky",
+       "feedback": "Açık oturumlar ve erişim belirteçleri (token) hâlâ geçerli olabilir. Onları da kapatın."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "recap",
+   "points": [
+    "Yönetim işleri yönetici hesabıyla, günlük işler normal hesapla yapılır.",
+    "Gizli bilgileri koda ve sohbetlere yazmayın, sızan her şeyi hemen yenileyin.",
+    "Beklenmedik uzaktan erişim isteklerini bilinen bir kanaldan doğrulayın."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

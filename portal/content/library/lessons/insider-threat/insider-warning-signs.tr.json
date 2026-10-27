@@ -1,0 +1,403 @@
+{
+ "id": "insider-warning-signs",
+ "title": "Uyarı işaretleri",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "iw-tutor",
+   "beats": [
+    {
+     "id": "iw-b1",
+     "say": "Bazen kurum içinden biri verileri bilerek dışarı çıkarmak ister. Bu yüzden uyarı işaretlerini bilmek önemlidir.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "iw-b2",
+     "say": "Başkasının parolasını istemek ve kendi işi dışındaki dosyalara ilgi göstermek ciddi uyarı işaretleridir.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "chat",
+       "brandRef": "sohbet",
+       "app": "generic",
+       "contact": [
+        {
+         "text": "Tural Hasanov"
+        }
+       ],
+       "messages": [
+        {
+         "from": "them",
+         "body": [
+          {
+           "text": "Erişimimi kapatmışlar. "
+          },
+          {
+           "text": "Şifrenizi verir misiniz, arşivden birkaç klasör alacağım.",
+           "spot": "ask-pass"
+          }
+         ],
+         "time": "18:47"
+        }
+       ]
+      }
+     },
+     "highlight": "ask-pass"
+    },
+    {
+     "id": "iw-b3",
+     "say": "Ama kendi başınıza araştırma yapmayın, kimseyi suçlamayın ve dedikodu yaymayın. Tek bir işaret suçun kanıtı değildir.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "mask"
+     }
+    },
+    {
+     "id": "iw-b4",
+     "say": "Gördüklerinizi güvenlik ekibine gizlilik içinde bildirin. Gerisini uzmanlar inceler.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "badge-id"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "iw-sim",
+   "environment": "phone",
+   "title": "İş arkadaşlarından gelen mesajlar",
+   "intro": "Akşam oldu ve telefonunuza iş arkadaşlarınızdan mesajlar geliyor. Her birine doğru yanıtı seçin.",
+   "steps": [
+    {
+     "id": "ask-password",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Tural Hasanov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Merhaba, erişimimi yanlışlıkla kapatmışlar."
+         }
+        ],
+        "time": "18:45"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Şifrenizi verir misiniz? Arşivden proje klasörlerini alacağım, yarın geri veririm."
+         }
+        ],
+        "time": "18:47"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "give",
+       "label": "Parolayı gönder",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Parolanızla yapılan her işlem sizin adınıza kaydedilir. Parolanızı iş arkadaşlarınız dahil hiç kimseye vermeyin."
+      },
+      {
+       "id": "refuse",
+       "label": "Parolamı veremem, BT destek ekibine başvurun",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Erişim kapatıldıysa bunu yalnızca BT ekibi ve yöneticiniz çözebilir."
+      }
+     ]
+    },
+    {
+     "id": "ask-usb",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Tural Hasanov"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Peki. O zaman klasörleri bir USB belleğe kopyalayın, akşam gelip alırım."
+         }
+        ],
+        "time": "18:52"
+       },
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Yeni işimde lazım olacak."
+         }
+        ],
+        "time": "18:52"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "copy",
+       "label": "Tamam, kopyalarım",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Kurumunuzun verileri başka bir işe götürülemez. Kopyalarsanız siz de sızıntının bir parçası olursunuz."
+      },
+      {
+       "id": "no",
+       "label": "Hayır, bunu yapamam",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru, sakin ve kısa bir “hayır” yeterli. Şimdi güvenlik ekibine haber verin."
+      }
+     ]
+    },
+    {
+     "id": "group-gossip",
+     "artifact": {
+      "kind": "chat",
+      "brandRef": "sohbet",
+      "app": "generic",
+      "contact": [
+       {
+        "text": "Departman grubu"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Leyla: Tural'ı gece arşivde gördüm. Bilgisayarına bakalım, sonra da herkese anlatalım."
+         }
+        ],
+        "time": "19:10"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "join",
+       "label": "Tamam, bakalım",
+       "kind": "share",
+       "outcome": "risky",
+       "feedback": "Kendi başınıza araştırmak kanıtları bozabilir ve masum birine zarar verebilir."
+      },
+      {
+       "id": "channel",
+       "label": "Grupta konuşmayalım. Gördüklerimizi güvenlik ekibine gizlilik içinde bildirelim",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Doğru. Bilgiler doğru kanala ulaşır, dedikodu da başlamaz."
+      }
+     ]
+    },
+    {
+     "id": "security-reply",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Güvenlik ekibi"
+        }
+       ],
+       "address": [
+        {
+         "text": "tehlukesizlik@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Bildiriminiz kayda alındı"
+       }
+      ],
+      "time": "19:40",
+      "body": [
+       [
+        {
+         "text": "Teşekkür ederiz. Lütfen bu konuyu iş arkadaşlarınızla konuşmayın, gerekirse sizinle iletişime geçeceğiz."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "ok",
+       "label": "Yanıtla: anlaşıldı",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Doğru. Gizlilik hem incelemeyi hem de iş arkadaşınızı korur."
+      },
+      {
+       "id": "spread",
+       "label": "Departman grubuna ilet",
+       "kind": "forward",
+       "outcome": "risky",
+       "feedback": "Bildirimi yaymak incelemeye zarar verir ve iş arkadaşınıza haksız yere zarar verebilir."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "iw-signs",
+   "question": {
+    "prompt": "Hangileri ciddi uyarı işaretleridir?",
+    "options": [
+     {
+      "id": "access",
+      "label": "Kendi işi dışındaki sistemlere erişim istemek",
+      "correct": true,
+      "feedback": "Doğru. Gerekmeyen erişimlere gösterilen ilgi dikkat gerektirir."
+     },
+     {
+      "id": "password",
+      "label": "Başkasının parolasını istemek",
+      "correct": true,
+      "feedback": "Doğru. Gerekli yetkisi olan birinin başkasının parolasına ihtiyacı olmaz."
+     },
+     {
+      "id": "mass-copy",
+      "label": "Çok sayıda dosyayı kişisel bir USB belleğe ya da kişisel e-postaya kopyalamak",
+      "correct": true,
+      "feedback": "Doğru. Verilerin kurum dışına çıkması en açık işarettir."
+     },
+     {
+      "id": "late",
+      "label": "Ara sıra geç saate kadar çalışmak",
+      "correct": false,
+      "feedback": "Bu tek başına normaldir: birçok kişi geç saate kadar çalışır. Tek bir işaret, birini suçlamak için yeterli bir neden değildir."
+     },
+     {
+      "id": "questions",
+      "label": "Toplantılarda çok soru sormak",
+      "correct": false,
+      "feedback": "Bu, işe duyulan ilgidir, tehdit değil."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Uyarı işareti bir suçlama değil, bildirmek için bir nedendir. Kararı uzmanlar verir."
+  },
+  {
+   "type": "scenario",
+   "id": "iw-scenario",
+   "title": "Ne gördünüz?",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Kamal bir haftadır her akşam gizli proje dosyalarını kişisel bir USB belleğe kopyalıyor. Bir keresinde de “Burada kimse bana değer vermiyor” demişti.",
+     "choices": [
+      {
+       "label": "Gördüklerimi güvenlik ekibine gizlilik içinde bildiririm",
+       "next": "n2",
+       "feedback": "Doğru. Siz yalnızca gördüklerinizi iletirsiniz, sonuca uzmanlar varır."
+      },
+      {
+       "label": "Doğrudan kendisine sorarım: dosyaları neden alıyorsunuz?",
+       "outcome": "risky",
+       "feedback": "Suçlama çatışmaya yol açar ve izlerin silinmesine neden olabilir. Bu işi uzmanlara bırakın."
+      },
+      {
+       "label": "Akşam masasını kendim ararım",
+       "outcome": "risky",
+       "feedback": "Kendi başınıza arama yapmak kurallara aykırı olabilir ve kanıtları bozabilir."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Teşekkürler. Lütfen ne gördüğünüzü, ne zaman ve nerede gördüğünüzü yazın.",
+     "speaker": "Güvenlik ekibi",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Teşekkürler. <breath> Lütfen ne gördüğünüzü, ne zaman ve nerede gördüğünüzü yazın.",
+     "choices": [
+      {
+       "label": "Yalnızca gördüklerimi tarih ve saatleriyle yazarım",
+       "outcome": "safe",
+       "feedback": "Harika. Kesin ve somut bilgiler adil bir incelemenin temelidir."
+      },
+      {
+       "label": "Karakteri hakkındaki düşüncelerimi de eklerim",
+       "outcome": "risky",
+       "feedback": "Tahminler haksız bir sonuca yol açabilir. Yalnızca gördüklerinizi yazın."
+      },
+      {
+       "label": "İş arkadaşlarıma ondan uzak durmalarını söylerim",
+       "outcome": "risky",
+       "feedback": "Bu dedikodudur ve iş arkadaşınıza haksız yere zarar verebilir. Bunu yalnızca güvenlik ekibi bilmeli."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "iw-order",
+   "prompt": "Şüpheli bir davranış fark ettiniz. Adımları doğru sıraya koyun.",
+   "items": [
+    {
+     "id": "calm",
+     "label": "Sakin olun ve kimseyi suçlamayın"
+    },
+    {
+     "id": "note",
+     "label": "Gördüklerinizi tarih ve saatiyle not edin"
+    },
+    {
+     "id": "report",
+     "label": "Güvenlik ekibine gizlilik içinde bildirin"
+    },
+    {
+     "id": "quiet",
+     "label": "Sonrasında konuyu başkalarıyla konuşmayın"
+    }
+   ],
+   "explain": "Siz gördüklerinizi iletirsiniz, inceleme ve karar uzmanlara aittir. Kurumunuz başka bir kanal belirlediyse onu kullanın."
+  },
+  {
+   "type": "recap",
+   "id": "iw-recap",
+   "points": [
+    "Parolanızı ya da iş verilerini asla başkasına vermeyin",
+    "Kimseyi suçlamayın ve kendi başınıza araştırma yapmayın",
+    "Yalnızca gördüklerinizi güvenlik ekibine gizlilik içinde bildirin"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

@@ -1,0 +1,383 @@
+{
+ "id": "check-the-page",
+ "title": "Prüfen Sie die Seite",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "cp-tutor",
+   "beats": [
+    {
+     "id": "cp-b1",
+     "say": "Eine gefälschte Zahlungsseite kann eine exakte Kopie der echten sein.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "browser"
+     }
+    },
+    {
+     "id": "cp-b2",
+     "say": "Logo, Farben und Schaltflächen sind gleich. Der Unterschied liegt in der Adressleiste und darin, was die Seite von Ihnen verlangt.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "login",
+       "brandRef": "e-xidmet-fake",
+       "brand": "e-Xidmət Portalı",
+       "url": [
+        {
+         "text": "https://"
+        },
+        {
+         "text": "e-xidmet-cerime.example.net",
+         "spot": "domain"
+        },
+        {
+         "text": "/odenis"
+        }
+       ],
+       "fields": [
+        "Kartennummer",
+        "Ablaufdatum",
+        "CVV",
+        "SMS-Code"
+       ],
+       "button": "Bezahlen: 40 AZN"
+      }
+     },
+     "highlight": "domain"
+    },
+    {
+     "id": "cp-b3",
+     "say": "Auch das Schloss-Symbol beweist nichts: Die meisten gefälschten Websites haben eines.",
+     "mood": "think",
+     "gesture": "shrug",
+     "visual": {
+      "kind": "illustration",
+      "id": "lock"
+     }
+    },
+    {
+     "id": "cp-b4",
+     "say": "Am sichersten ist es, das Portal über Ihr Lesezeichen zu öffnen oder die Adresse selbst einzutippen.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "cp-swipe",
+   "prompt": "Ist diese Seite echt oder gefälscht?",
+   "cards": [
+    {
+     "id": "real-fines",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet",
+      "brand": "e-Xidmət Portalı",
+      "url": [
+       {
+        "text": "https://e-xidmet.example/cerimeler"
+       }
+      ],
+      "fields": [
+       "Persönliche ID-Nummer",
+       "Passwort"
+      ],
+      "button": "Anmelden"
+     },
+     "verdict": "safe",
+     "explain": "Das ist die eigene Domain des Portals, und Sie haben sie selbst geöffnet. Genau hier prüfen Sie Bußgelder."
+    },
+    {
+     "id": "fake-discount",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet-fake",
+      "brand": "e-Xidmət Portalı",
+      "url": [
+       {
+        "text": "https://e-xidmet-endirim.example.net/cerime"
+       }
+      ],
+      "fields": [
+       "Kartennummer",
+       "Ablaufdatum",
+       "CVV",
+       "SMS-Code"
+      ],
+      "button": "Mit 50 % Rabatt bezahlen"
+     },
+     "verdict": "threat",
+     "explain": "Die Domain ist eine andere, und die Seite will alles auf einmal: Karte, Sicherheitscode und SMS-Code. Das ist ein Formular zum Datendiebstahl."
+    },
+    {
+     "id": "app-notice",
+     "artifact": {
+      "kind": "notification",
+      "brandRef": "e-xidmet",
+      "app": "e-Xidmət",
+      "title": [
+       {
+        "text": "Neue Mitteilung"
+       }
+      ],
+      "body": [
+       {
+        "text": "Auf Ihren Namen ist 1 Bußgeld eingetragen. Details im Bereich „Bußgelder“ der App."
+       }
+      ],
+      "time": "09:15"
+     },
+     "verdict": "safe",
+     "explain": "Die Mitteilung erscheint in der offiziellen App und enthält keinen Link. Prüfen und bezahlen Sie das Bußgeld direkt dort in der App."
+    },
+    {
+     "id": "fake-benefit",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet-fake",
+      "brand": "Familienzuschuss",
+      "url": [
+       {
+        "text": "https://ailedestek-qeydiyyat.example.net"
+       }
+      ],
+      "fields": [
+       "Vor- und Nachname",
+       "Persönliche ID-Nummer",
+       "Kartennummer",
+       "CVV"
+      ],
+      "button": "Zuschuss erhalten"
+     },
+     "verdict": "threat",
+     "explain": "Um Geld zu erhalten, brauchen Sie nie den Code auf der Rückseite Ihrer Karte. Für staatliche Zuschüsse muss man sich nicht über einen Link registrieren."
+    },
+    {
+     "id": "fake-gateway",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "w2d-manatpay-fake",
+      "brand": "ManatPay",
+      "url": [
+       {
+        "text": "https://manatpay-secure.example.net/3ds"
+       }
+      ],
+      "fields": [
+       "Kartennummer",
+       "CVV",
+       "SMS-Code",
+       "Karten-PIN"
+      ],
+      "button": "Bestätigen"
+     },
+     "verdict": "threat",
+     "explain": "Keine Zahlungsseite fragt jemals nach Ihrer Karten-PIN. Die PIN brauchen Sie nur am Geldautomaten und am Kartenterminal."
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "cp-sim",
+   "environment": "browser",
+   "title": "Der Bußgeld-Link",
+   "intro": "Jemand aus Ihrem Freundeskreis hat Ihnen einen Link zur Zahlung eines Bußgelds geschickt, und Sie haben ihn geöffnet. Treffen Sie bei jedem Schritt im Browser die richtige Entscheidung.",
+   "steps": [
+    {
+     "id": "fake-fine-page",
+     "label": "Offenes Bußgeld: 80 AZN. Heute 50 % Rabatt",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "e-xidmet-fake",
+      "url": [
+       {
+        "text": "https://",
+        "reveal": "e-xidmet-cerime.example.net"
+       },
+       {
+        "text": "e-xidmet-cerime.example.net"
+       },
+       {
+        "text": "/odenis"
+       }
+      ]
+     },
+     "say": "Sehen Sie sich die Adressleiste an.",
+     "actions": [
+      {
+       "id": "pay",
+       "label": "Mit Rabatt bezahlen",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Der Rabatt soll Sie unter Zeitdruck setzen. Sehen Sie sich jetzt an, was die Seite verlangt."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig, das ist nicht die eigene Domain des Portals. Öffnen Sie das Portal jetzt selbst.",
+       "next": "real-portal"
+      }
+     ]
+    },
+    {
+     "id": "card-form",
+     "artifact": {
+      "kind": "login",
+      "brandRef": "e-xidmet-fake",
+      "brand": "e-Xidmət Portalı",
+      "url": [
+       {
+        "text": "https://e-xidmet-cerime.example.net",
+        "reveal": "e-xidmet-cerime.example.net"
+       }
+      ],
+      "fields": [
+       "Kartennummer",
+       "Ablaufdatum",
+       "CVV",
+       "SMS-Code"
+      ],
+      "button": "Bezahlen: 40 AZN"
+     },
+     "say": "Die Seite will die Kartendaten und den SMS-Code auf einmal.",
+     "actions": [
+      {
+       "id": "submit",
+       "label": "Bezahlen: 40 AZN",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "Ihre Kartendaten sind bei Kriminellen gelandet. Rufen Sie sofort Ihre Bank unter der Nummer auf Ihrer Karte an."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Gute Entscheidung. Sie haben nichts eingegeben. Prüfen Sie das Bußgeld jetzt im offiziellen Portal."
+      }
+     ]
+    },
+    {
+     "id": "real-portal",
+     "label": "Bußgelder: keine offenen Bußgelder",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "e-xidmet",
+      "url": [
+       {
+        "text": "https://e-xidmet.example/cerimeler",
+        "reveal": "e-xidmet.example"
+       }
+      ]
+     },
+     "say": "Sie haben das Portal über Ihr Lesezeichen geöffnet.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Bußgelder ansehen",
+       "kind": "open",
+       "outcome": "safe",
+       "feedback": "Richtig. Das offizielle Portal zeigt kein Bußgeld an, der Link war also gefälscht."
+      },
+      {
+       "id": "tell-friend",
+       "label": "Die Person informieren, die den Link geschickt hat",
+       "kind": "share",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Sagen Sie der Person, die den Link geschickt hat, dass sie dort nichts eingeben soll."
+      }
+     ]
+    },
+    {
+     "id": "benefit-page",
+     "label": "Familienzuschuss: Registrierung endet heute",
+     "artifact": {
+      "kind": "url",
+      "brandRef": "e-xidmet-fake",
+      "url": [
+       {
+        "text": "https://ailedestek-qeydiyyat.example.net",
+        "reveal": "ailedestek-qeydiyyat.example.net"
+       }
+      ]
+     },
+     "say": "Diesmal hat Ihnen eine Nachbarin einen Link zu einem Zuschuss geschickt.",
+     "actions": [
+      {
+       "id": "register",
+       "label": "Registrieren",
+       "kind": "click-link",
+       "outcome": "compromised",
+       "feedback": "Dieses Formular sammelt Kartendaten. Für staatliche Zuschüsse muss man sich nie über einen Link registrieren."
+      },
+      {
+       "id": "close",
+       "label": "Tab schließen",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Richtig. Prüfen Sie jeden Zuschuss nur im offiziellen Portal."
+      },
+      {
+       "id": "report",
+       "label": "Gefälschte Website melden",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Sehr gut. Ihre Meldung hilft, die gefälschte Website auch für andere sperren zu lassen."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "match",
+   "id": "cp-match",
+   "prompt": "Ordnen Sie zu: Was verlangt die Seite, und was bedeutet das?",
+   "pairs": [
+    {
+     "id": "pin",
+     "left": "Karten-PIN",
+     "right": "Danach fragt keine Zahlungsseite jemals"
+    },
+    {
+     "id": "sms-code",
+     "left": "SMS-Code Ihrer Bank",
+     "right": "Bestätigt eine Zahlung: Lesen Sie zuerst den Betrag"
+    },
+    {
+     "id": "benefit-cvv",
+     "left": "Code von der Kartenrückseite, um einen Zuschuss zu erhalten",
+     "right": "Zum Empfangen von Geld nicht nötig"
+    },
+    {
+     "id": "discount",
+     "left": "Ein Rabatt, wenn Sie heute zahlen",
+     "right": "Drängt Sie, ohne Prüfung zu zahlen"
+    }
+   ],
+   "explain": "Wenn Sie unsicher sind, zahlen Sie nicht. Prüfen Sie selbst im offiziellen Portal nach oder rufen Sie die Polizei unter 102 an."
+  },
+  {
+   "type": "recap",
+   "id": "cp-recap",
+   "points": [
+    "Lesen Sie die Adressleiste: Logo und Schloss-Symbol beweisen nichts.",
+    "Eine Seite, die nach Ihrer PIN fragt oder für einen Zuschuss den Code von der Kartenrückseite verlangt, ist gefälscht.",
+    "Im Zweifel: ETX 1654 oder Polizei 102."
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

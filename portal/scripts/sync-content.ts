@@ -21,7 +21,7 @@ async function main() {
         })
       : await run(handle.db);
   await handle.close();
-  console.log(`Library synced (${handle.driver}): ${lib.modules} modules, ${lib.lessons} lessons (texts: en ${lib.locales.en}, az ${lib.locales.az}, ru ${lib.locales.ru}), ${paths} paths.`);
+  console.log(`Library synced (${handle.driver}): ${lib.modules} modules, ${lib.lessons} lessons (texts: ${Object.entries(lib.locales).map(([l, n]) => `${l} ${n}`).join(", ")}), ${paths} paths.`);
 }
 
 main().catch((error) => {

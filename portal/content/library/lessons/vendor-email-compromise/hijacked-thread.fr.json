@@ -1,0 +1,709 @@
+{
+ "id": "hijacked-thread",
+ "title": "Une conversation détournée",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "ht-tutor",
+   "beats": [
+    {
+     "id": "ht-b1",
+     "say": "Quand un escroc pénètre dans la messagerie d’un partenaire, il répond dans votre ancienne conversation. L’objet et la signature vous semblent familiers.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "inbox"
+     }
+    },
+    {
+     "id": "ht-b2",
+     "say": "Une archive protégée par un mot de passe est un signal d’alerte. Le mot de passe empêche l’antivirus d’analyser le fichier.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "kur-tikinti",
+       "from": {
+        "name": [
+         {
+          "text": "Elchin Babayev"
+         }
+        ],
+        "address": [
+         {
+          "text": "layihe@kur-tikinti.example"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "RE : Contrat 47/2026"
+        }
+       ],
+       "time": "14:10",
+       "body": [
+        [
+         {
+          "text": "Cher partenaire,"
+         }
+        ],
+        [
+         {
+          "text": "Le contrat définitif se trouve dans l’archive. "
+         },
+         {
+          "text": "Mot de passe de l’archive : 4417",
+          "spot": "zip-pass"
+         }
+        ],
+        [
+         {
+          "text": "Si vous ne signez pas aujourd’hui, le prix changera."
+         }
+        ]
+       ],
+       "attachments": [
+        {
+         "name": [
+          {
+           "text": "Contrat_final.zip"
+          }
+         ],
+         "size": "1,2 Mo"
+        }
+       ]
+      }
+     },
+     "highlight": "zip-pass"
+    },
+    {
+     "id": "ht-b3",
+     "say": "Même dans une conversation familière, ne vous précipitez pas sur une pièce jointe inattendue ou une demande urgente.",
+     "mood": "think",
+     "gesture": "shake",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "ht-b4",
+     "say": "En cas de doute, appelez le partenaire à un numéro que vous connaissez et demandez-lui s’il a bien envoyé ce fichier.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "ht-hotspot",
+   "prompt": "Trouvez ce qui a changé dans cette réponse.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "kur-tikinti",
+    "from": {
+     "name": [
+      {
+       "text": "Elchin Babayev"
+      }
+     ],
+     "address": [
+      {
+       "text": "layihe@kur-tikinti.example"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "RE : RE : Contrat 47/2026"
+     }
+    ],
+    "time": "15:02",
+    "body": [
+     [
+      {
+       "text": "Cher partenaire,",
+       "spot": "greeting"
+      }
+     ],
+     [
+      {
+       "text": "Vous trouverez ci-joint le contrat définitif et l’échéancier de paiement. "
+      },
+      {
+       "text": "Connectez-vous avec votre adresse e-mail professionnelle pour l’ouvrir.",
+       "spot": "login"
+      }
+     ],
+     [
+      {
+       "text": "Signez-le aujourd’hui avant 15:00.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "> Bonjour, je vous envoie la version révisée lundi, rien ne presse. Elchin"
+      }
+     ]
+    ],
+    "attachments": [
+     {
+      "name": [
+       {
+        "text": "Contrat_47_signature.html",
+        "spot": "html"
+       }
+      ],
+      "size": "12 Ko"
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "greeting",
+     "label": "Ton différent",
+     "explain": "Avant, il écrivait « Bonjour », maintenant « Cher partenaire ». Un changement de ton soudain laisse penser que quelqu’un d’autre écrit."
+    },
+    {
+     "id": "html",
+     "label": "Pièce jointe HTML",
+     "explain": "Les contrats arrivent en PDF ou en Word. Une pièce jointe HTML ouvre généralement une fausse page de connexion."
+    },
+    {
+     "id": "login",
+     "label": "Demande de connexion",
+     "explain": "Ouvrir une pièce jointe ne demande jamais votre mot de passe. Un fichier qui vous le demande cherche à le voler."
+    },
+    {
+     "id": "urgency",
+     "label": "Urgence soudaine",
+     "explain": "Le message précédent disait « rien ne presse ». Une échéance soudaine est un outil d’escroc."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "ht-sim-inbox",
+   "environment": "inbox",
+   "title": "Conversation du projet",
+   "intro": "Vous échangez depuis longtemps avec Kur Tikinti dans la même conversation. Examinez les nouvelles réponses : lesquelles sont authentiques, lesquelles viennent d’une messagerie piratée ?",
+   "steps": [
+    {
+     "id": "thread-genuine",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE : Contrat 47/2026"
+       }
+      ],
+      "time": "10:05",
+      "body": [
+       [
+        {
+         "text": "Bonjour, nous avons tenu compte de vos remarques, vous trouverez la version révisée en pièce jointe."
+        }
+       ],
+       [
+        {
+         "text": "Appelez-moi si vous avez des questions. Elchin"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Contrat_47_révisé.pdf"
+         }
+        ],
+        "size": "340 Ko"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir la pièce jointe",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "Un PDF attendu, le ton habituel, aucune pression. C’est un e-mail de travail normal."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Il n’y a aucun signal d’alerte ici. Le fichier est attendu et correspond à la conversation."
+      }
+     ]
+    },
+    {
+     "id": "thread-zip",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE : Contrat 47/2026 : urgent"
+       }
+      ],
+      "time": "14:10",
+      "body": [
+       [
+        {
+         "text": "Cher partenaire,"
+        }
+       ],
+       [
+        {
+         "text": "Le contrat définitif se trouve dans l’archive. "
+        },
+        {
+         "text": "Mot de passe de l’archive : 4417",
+         "spot": "zip-pass"
+        }
+       ],
+       [
+        {
+         "text": "Si vous ne signez pas aujourd’hui, le prix changera."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Contrat_final.zip"
+         }
+        ],
+        "size": "1,2 Mo"
+       }
+      ]
+     },
+     "say": "Regardez l’archive et le mot de passe.",
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir la pièce jointe",
+       "kind": "open-attachment",
+       "outcome": "compromised",
+       "feedback": "Un logiciel malveillant peut se cacher dans une archive protégée par un mot de passe, car l’antivirus ne peut pas en analyser le contenu."
+      },
+      {
+       "id": "verify",
+       "label": "Appeler Elchin à un numéro connu",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Très bien. Si Elchin ne l’a pas envoyé, sa messagerie est piratée et il doit le savoir."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact : urgence soudaine, archive protégée et ton inhabituel. Votre signalement protège aussi l’équipe."
+      },
+      {
+       "id": "reply",
+       "label": "Répondre : c’est bien vous ?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "La réponse arrive dans la messagerie piratée, et l’escroc vous répond que oui. Appelez plutôt."
+      }
+     ]
+    },
+    {
+     "id": "thread-html",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE : Échéancier de paiement"
+       }
+      ],
+      "time": "14:35",
+      "body": [
+       [
+        {
+         "text": "L’échéancier se trouve dans un fichier protégé. Ouvrez-le et connectez-vous avec votre adresse e-mail professionnelle."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Échéancier_paiement.html"
+         }
+        ],
+        "size": "9 Ko"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir la pièce jointe",
+       "kind": "open-attachment",
+       "outcome": "risky",
+       "feedback": "Le fichier HTML ouvre une fausse page de connexion dans le navigateur. Vous n’avez encore rien saisi : fermez-la."
+      },
+      {
+       "id": "login",
+       "label": "Se connecter",
+       "kind": "enter-credentials",
+       "outcome": "compromised",
+       "feedback": "L’escroc a maintenant votre mot de passe. Modifiez-le tout de suite et prévenez l’équipe sécurité."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Un échéancier de paiement ne demande aucun mot de passe, et une pièce jointe HTML est un piège classique."
+      }
+     ]
+    },
+    {
+     "id": "thread-account",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "kur-tikinti",
+      "from": {
+       "name": [
+        {
+         "text": "Elchin Babayev"
+        }
+       ],
+       "address": [
+        {
+         "text": "layihe@kur-tikinti.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE : Versement de l’avance"
+       }
+      ],
+      "time": "15:20",
+      "body": [
+       [
+        {
+         "text": "Cette fois, versez l’avance sur le compte de notre société partenaire, coordonnées en pièce jointe."
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Coordonnées_bancaires.pdf"
+         }
+        ],
+        "size": "64 Ko"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "verify",
+       "label": "Appeler un numéro connu pour vérifier",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Une demande de paiement à une autre société ne se confirme que par téléphone."
+      },
+      {
+       "id": "accept",
+       "label": "Répondre : nous acceptons ces coordonnées",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "L’avance partirait chez l’escroc. Une conversation familière ne prouve pas qu’un nouveau compte est légitime."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bonne démarche. Deux e-mails suspects dans une même conversation, c’est un signal sérieux."
+      }
+     ]
+    },
+    {
+     "id": "legal-genuine",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "idare",
+      "from": {
+       "name": [
+        {
+         "text": "Service juridique"
+        }
+       ],
+       "address": [
+        {
+         "text": "huquq@idare.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Nos remarques sur le contrat 47"
+       }
+      ],
+      "time": "16:00",
+      "body": [
+       [
+        {
+         "text": "Bonjour, nous proposons de modifier l’article 5. Parlons-en à la réunion de demain."
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "reply",
+       "label": "Répondre",
+       "kind": "reply",
+       "outcome": "safe",
+       "feedback": "Une adresse interne, ni pièce jointe ni lien, aucune demande. C’est un e-mail normal."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "Cet e-mail ne présente aucun signal d’alerte. Réservez les signalements aux e-mails suspects."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "swipe",
+   "id": "ht-swipe",
+   "prompt": "Sans danger ou menace ?",
+   "cards": [
+    {
+     "id": "pdf-expected",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Contrat_47_révisé.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "340 Ko",
+      "source": [
+       {
+        "text": "Elchin Babayev, réponse attendue"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Un document attendu, un format normal et un expéditeur connu. Vous pouvez l’ouvrir."
+    },
+    {
+     "id": "zip-pass",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Ordre_de_virement.zip"
+       }
+      ],
+      "type": "zip",
+      "size": "1,1 Mo",
+      "source": [
+       {
+        "text": "layihe@kur-tikinti.example, mot de passe : 4417"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une archive protégée par un mot de passe échappe à l’antivirus. Appelez l’expéditeur pour vérifier."
+    },
+    {
+     "id": "html-sign",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Contrat_signature.html"
+       }
+      ],
+      "type": "html",
+      "size": "11 Ko",
+      "source": [
+       {
+        "text": "RE : Contrat 47/2026"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Un contrat n’est jamais un fichier HTML. Ce type de fichier ouvre une fausse page de connexion."
+    },
+    {
+     "id": "act-internal",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "idare",
+      "name": [
+       {
+        "text": "PV_remise_septembre.pdf"
+       }
+      ],
+      "type": "pdf",
+      "size": "210 Ko",
+      "source": [
+       {
+        "text": "huquq@idare.example, convenu hier"
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Il vient d’un service interne et a été convenu à l’avance. Aucun signal d’alerte."
+    },
+    {
+     "id": "double-ext",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "kur-tikinti",
+      "name": [
+       {
+        "text": "Facture_47.pdf.exe"
+       }
+      ],
+      "type": "exe",
+      "size": "2,3 Mo",
+      "source": [
+       {
+        "text": "RE : Contrat 47/2026"
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Le vrai type est .exe, c’est-à-dire un programme. Une facture n’est jamais un programme."
+    }
+   ]
+  },
+  {
+   "type": "scenario",
+   "id": "ht-scenario",
+   "title": "Vous avez ouvert l’archive",
+   "start": "n1",
+   "nodes": [
+    {
+     "id": "n1",
+     "text": "Vous avez ouvert l’archive protégée. Elle ne contenait pas de contrat, seulement un fichier étrange, et l’écran est devenu noir un instant.",
+     "choices": [
+      {
+       "label": "Se déconnecter du réseau et appeler l’équipe sécurité",
+       "next": "n2",
+       "feedback": "Exact. La déconnexion stoppe la propagation, et l’appel mobilise l’équipe."
+      },
+      {
+       "label": "Éteindre l’ordinateur immédiatement",
+       "next": "n2",
+       "feedback": "L’extinction peut effacer des preuves en mémoire. Sauf consigne contraire de votre procédure, laissez l’ordinateur allumé et déconnectez-le du réseau."
+      },
+      {
+       "label": "N’en parler à personne, il ne s’est sans doute rien passé",
+       "outcome": "compromised",
+       "feedback": "Un logiciel malveillant agit en silence et peut se propager sur le réseau. Signaler vite une erreur n’a rien de honteux : c’est ce qui sauve la situation."
+      }
+     ]
+    },
+    {
+     "id": "n2",
+     "text": "Merci. Vous avez toujours l’e-mail dans votre boîte de réception ? Et vous avez prévenu Kur Tikinti ?",
+     "speaker": "Équipe sécurité",
+     "voice": "woman-2",
+     "channel": "phone",
+     "manner": "natural",
+     "spoken": "Merci. <breath> Vous avez toujours l’e-mail dans votre boîte de réception ? Et vous avez prévenu Kur Tikinti ?",
+     "choices": [
+      {
+       "label": "J’ai gardé l’e-mail, et j’appelle Elchin à un numéro connu",
+       "outcome": "safe",
+       "feedback": "Très bien. L’e-mail est une preuve, et le partenaire doit apprendre que sa messagerie a été piratée."
+      },
+      {
+       "label": "J’ai supprimé l’e-mail pour ne laisser aucune trace",
+       "outcome": "risky",
+       "feedback": "L’e-mail est nécessaire à l’enquête. La prochaine fois, gardez-le et suivez les consignes de l’équipe sécurité."
+      },
+      {
+       "label": "Je réponds à Elchin dans la même conversation",
+       "outcome": "risky",
+       "feedback": "L’escroc lit cette messagerie. Prévenez le partenaire par téléphone."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "recap",
+   "id": "ht-recap",
+   "points": [
+    "Une conversation familière peut, elle aussi, être détournée",
+    "Avant d’ouvrir une archive protégée ou un fichier HTML, appelez pour vérifier",
+    "Vous l’avez ouvert ? Déconnectez l’appareil du réseau et signalez-le immédiatement"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

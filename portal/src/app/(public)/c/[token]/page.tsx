@@ -6,7 +6,7 @@ import { ShieldCheck } from "lucide-react";
 import { db, t } from "@/server/db";
 import { getViewer } from "@/server/auth/viewer";
 import { appUrl } from "@/server/env";
-import { DEFAULT_CERTIFICATE_TEXT, withDefaults } from "@/lib/tenant-defaults";
+import { DEFAULT_CERTIFICATE_TEXT, DEFAULT_PATH_CERTIFICATE_TEXT, withDefaults } from "@/lib/tenant-defaults";
 import { pick } from "@/i18n/config";
 import { brandStyle } from "@/lib/color";
 import { PrintButton } from "./print-button";
@@ -15,13 +15,6 @@ export async function generateMetadata(): Promise<Metadata> {
   const tr = await getTranslations("learner.certificate");
   return { title: tr("title"), robots: { index: false, follow: false }, referrer: "no-referrer" };
 }
-
-/** Default wording of a learning-path certificate (DEFAULT_CERTIFICATE_TEXT speaks of a module). */
-const DEFAULT_PATH_CERTIFICATE_TEXT: Record<string, string> = {
-  az: "{date} tarixində {name} «{module}» təlim yolunu uğurla tamamladı və kibergigiyena qaydalarına əməl edəcəyini təsdiqlədi.",
-  en: "On {date}, {name} successfully completed the learning path “{module}” and confirmed that they will follow the rules of cyber hygiene.",
-  ru: "{date} {name} успешно завершил(а) траекторию обучения «{module}» и подтвердил(а), что будет соблюдать правила кибергигиены.",
-};
 
 export default async function CertificatePage({ params }: PageProps<"/c/[token]">) {
   const { token } = await params;

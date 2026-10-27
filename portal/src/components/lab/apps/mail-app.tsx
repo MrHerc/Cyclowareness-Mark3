@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft, CheckCircle2, FileCode2, FileText, Info, Paperclip, Reply, ShieldAlert, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { dirOf } from "@/i18n/config";
 
 export type MailMsg = {
   id: string;
@@ -182,7 +183,8 @@ function Reader({ msg, view, setView, reported, onEvent, onBack }: { msg: MailMs
           <p className="mt-2 text-tab-sm text-ink-subtle">{t("replyNote")}</p>
         </div>
       ) : (
-        <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+        // The message is in the learner's language: it reads in that direction inside the left-to-right VM.
+        <div dir={dirOf(locale)} className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
           <h3 className="text-body font-bold break-words">{msg.subject}</h3>
           <div className="mt-2 flex items-start gap-2.5">
             <span className={cn("grid size-9 shrink-0 place-items-center rounded-full text-tab font-bold text-white", msg.tone)} aria-hidden>
@@ -190,10 +192,13 @@ function Reader({ msg, view, setView, reported, onEvent, onBack }: { msg: MailMs
             </span>
             <div className="min-w-0 text-tab">
               <p className="font-semibold text-ink">
-                {msg.fromName} <span className="font-normal break-all text-ink-subtle">&lt;{msg.fromAddr}&gt;</span>
+                {msg.fromName}{" "}
+                <span dir="ltr" className="font-normal break-all text-ink-subtle">
+                  &lt;{msg.fromAddr}&gt;
+                </span>
               </p>
               <p className="text-ink-subtle">
-                {t("to")}: {msg.to} · {msg.time}
+                {t("to")}: <bdi>{msg.to}</bdi> · {msg.time}
               </p>
             </div>
           </div>
@@ -205,7 +210,7 @@ function Reader({ msg, view, setView, reported, onEvent, onBack }: { msg: MailMs
                   <p>
                     <button
                       type="button"
-                      className="text-left font-semibold break-all text-[#1d4ed8] underline decoration-1 underline-offset-2 hover:decoration-2 focus-visible:outline-2 focus-visible:outline-brand-600"
+                      className="text-start font-semibold break-all text-[#1d4ed8] underline decoration-1 underline-offset-2 hover:decoration-2 focus-visible:outline-2 focus-visible:outline-brand-600"
                       aria-describedby="mail-status"
                       onMouseEnter={() => {
                         setStatus(msg.link!.href);
@@ -255,10 +260,13 @@ function Reader({ msg, view, setView, reported, onEvent, onBack }: { msg: MailMs
             <div className="mt-4">
               <p className="text-tab-sm font-semibold text-ink-subtle">{t("attachment")}</p>
               <div className="mt-1.5 inline-flex max-w-full items-stretch overflow-hidden rounded-md border border-line bg-surface">
-                <button type="button" onClick={() => setPrompt("ask")} className="flex min-w-0 items-center gap-2 px-3 py-2 text-left hover:bg-sunken focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-600 pointer-coarse:min-h-11">
+                <button type="button" onClick={() => setPrompt("ask")} className="flex min-w-0 items-center gap-2 px-3 py-2 text-start hover:bg-sunken focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-600 pointer-coarse:min-h-11">
                   <FileText className="size-5 shrink-0 text-risk-600" aria-hidden />
                   <span className="min-w-0">
-                    <span className="block max-w-[12rem] truncate text-tab font-semibold whitespace-pre">{msg.attachment.shown}</span>
+                    {/* Cut at the end as on a left-to-right desktop, or the padded name would show its real extension. */}
+                    <span dir="ltr" className="block max-w-[12rem] truncate text-tab font-semibold whitespace-pre">
+                      {msg.attachment.shown}
+                    </span>
                     <span className="block text-tab-sm text-ink-subtle">{msg.attachment.size}</span>
                   </span>
                 </button>
@@ -270,7 +278,7 @@ function Reader({ msg, view, setView, reported, onEvent, onBack }: { msg: MailMs
                     setDetails(!details);
                     if (!details) onEvent("attachInfo");
                   }}
-                  className="grid w-10 shrink-0 place-items-center border-l border-line text-ink-muted hover:bg-sunken focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-600 pointer-coarse:w-11 [&_svg]:size-4"
+                  className="grid w-10 shrink-0 place-items-center border-s border-line text-ink-muted hover:bg-sunken focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-600 pointer-coarse:w-11 [&_svg]:size-4"
                 >
                   <Info />
                 </button>

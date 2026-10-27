@@ -1,0 +1,719 @@
+{
+ "id": "vendor-bank-change",
+ "title": "Nouvelles coordonnées bancaires",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "vb-tutor",
+   "beats": [
+    {
+     "id": "vb-b1",
+     "say": "Bonjour ! Aujourd’hui, nous apprenons à repérer les fausses demandes de paiement envoyées au nom d’un fournisseur connu.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "handshake"
+     }
+    },
+    {
+     "id": "vb-b2",
+     "say": "Voici la phrase la plus dangereuse : nos coordonnées bancaires ont changé, réglez la prochaine facture sur le nouveau compte.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "email",
+       "brandRef": "ofistechizat-fake",
+       "from": {
+        "name": [
+         {
+          "text": "Comptabilité OfisTechizat LLC"
+         }
+        ],
+        "address": [
+         {
+          "text": "muhasibat@ofistechizat-az.example.net"
+         }
+        ]
+       },
+       "subject": [
+        {
+         "text": "Changement de nos coordonnées bancaires"
+        }
+       ],
+       "time": "10:42",
+       "body": [
+        [
+         {
+          "text": "Cher partenaire,"
+         }
+        ],
+        [
+         {
+          "text": "À la suite d’un audit, nous avons transféré notre compte chez UlduzBank."
+         }
+        ],
+        [
+         {
+          "text": "Merci de régler la facture de septembre (14 860 manats) sur le nouveau compte : ",
+          "spot": "new-iban"
+         },
+         {
+          "text": "AZ00ULDZ00000000400520007731",
+          "spot": "new-iban"
+         }
+        ]
+       ]
+      }
+     },
+     "highlight": "new-iban"
+    },
+    {
+     "id": "vb-b3",
+     "say": "Un tel e-mail peut même venir de la vraie adresse du fournisseur, car sa messagerie peut avoir été piratée.",
+     "mood": "think",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "hook"
+     }
+    },
+    {
+     "id": "vb-b4",
+     "say": "La règle est simple : appelez un numéro que vous connaissez déjà, jamais celui qui figure dans l’e-mail.",
+     "mood": "happy",
+     "gesture": "shield-up",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "vb-hotspot",
+   "prompt": "Trouvez les signaux d’alerte dans cet e-mail.",
+   "artifact": {
+    "kind": "email",
+    "brandRef": "ofistechizat-fake",
+    "from": {
+     "name": [
+      {
+       "text": "Comptabilité OfisTechizat LLC"
+      }
+     ],
+     "address": [
+      {
+       "text": "muhasibat@ofistechizat-az.example.net",
+       "spot": "domain"
+      }
+     ]
+    },
+    "subject": [
+     {
+      "text": "Changement de nos coordonnées bancaires"
+     }
+    ],
+    "time": "10:42",
+    "body": [
+     [
+      {
+       "text": "Cher partenaire,"
+      }
+     ],
+     [
+      {
+       "text": "À la suite d’un audit, nous avons transféré notre compte chez UlduzBank."
+      }
+     ],
+     [
+      {
+       "text": "Merci de régler la facture de septembre (14 860 manats) sur le nouveau compte : ",
+       "spot": "new-iban"
+      },
+      {
+       "text": "AZ00ULDZ00000000400520007731",
+       "spot": "new-iban"
+      }
+     ],
+     [
+      {
+       "text": "Le paiement doit être effectué aujourd’hui avant 16:00, l’ancien compte est en cours de clôture.",
+       "spot": "urgency"
+      }
+     ],
+     [
+      {
+       "text": "Pour toute question, appelez uniquement ce numéro : +994 50 000 72 19",
+       "spot": "phone"
+      }
+     ]
+    ]
+   },
+   "spots": [
+    {
+     "id": "domain",
+     "label": "Domaine différent",
+     "explain": "L’adresse du fournisseur était ofistechizat.example. Le « -az » ajouté et la terminaison différente en font un domaine trompeur."
+    },
+    {
+     "id": "new-iban",
+     "label": "Nouveau numéro de compte",
+     "explain": "Changer les coordonnées bancaires, c’est tout le but de cette arnaque. L’argent envoyé sur ce compte est difficile à récupérer."
+    },
+    {
+     "id": "urgency",
+     "label": "Pression du temps",
+     "explain": "Un délai très court vous pousse à payer sans vérifier. Un vrai partenaire vous laisse le temps de contrôler."
+    },
+    {
+     "id": "phone",
+     "label": "Numéro indiqué dans l’e-mail",
+     "explain": "Si vous appelez ce numéro, c’est l’escroc qui répond. Prenez plutôt le numéro qui figure dans le contrat."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "simulation",
+   "id": "vb-sim-inbox",
+   "environment": "inbox",
+   "title": "Boîte de réception de la comptabilité",
+   "intro": "Vous gérez les paiements. Ouvrez quatre e-mails et choisissez la bonne action pour chacun.",
+   "steps": [
+    {
+     "id": "invoice-normal",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat",
+      "from": {
+       "name": [
+        {
+         "text": "OfisTechizat LLC"
+        }
+       ],
+       "address": [
+        {
+         "text": "satis@ofistechizat.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Facture de septembre"
+       }
+      ],
+      "time": "09:15",
+      "body": [
+       [
+        {
+         "text": "Bonjour, veuillez trouver ci-joint la facture de septembre."
+        }
+       ],
+       [
+        {
+         "text": "Paiement comme d’habitude sur le compte indiqué dans notre contrat. Cordialement, Sabina Karimova"
+        }
+       ]
+      ],
+      "attachments": [
+       {
+        "name": [
+         {
+          "text": "Facture_2026_09.pdf"
+         }
+        ],
+        "size": "180 Ko"
+       }
+      ]
+     },
+     "actions": [
+      {
+       "id": "open",
+       "label": "Ouvrir la pièce jointe",
+       "kind": "open-attachment",
+       "outcome": "safe",
+       "feedback": "Adresse connue, facture PDF attendue, et le compte ne change pas : c’est un e-mail normal."
+      },
+      {
+       "id": "safe",
+       "label": "Marquer comme fiable",
+       "kind": "mark-safe",
+       "outcome": "safe",
+       "feedback": "Exact. Ici, pas de nouveau compte ni de pression du temps."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "risky",
+       "feedback": "La prudence a du bon, mais il n’y a aucun signal d’alerte ici. Vous pouvez régler une facture attendue sur le compte du contrat."
+      }
+     ]
+    },
+    {
+     "id": "bank-change-fake",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat-fake",
+      "from": {
+       "name": [
+        {
+         "text": "Comptabilité OfisTechizat LLC"
+        }
+       ],
+       "address": [
+        {
+         "text": "muhasibat@ofistechizat-az.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Changement de nos coordonnées bancaires"
+       }
+      ],
+      "time": "10:42",
+      "body": [
+       [
+        {
+         "text": "Cher partenaire,"
+        }
+       ],
+       [
+        {
+         "text": "À la suite d’un audit, nous avons transféré notre compte chez UlduzBank."
+        }
+       ],
+       [
+        {
+         "text": "Merci de régler la facture de septembre (14 860 manats) sur le nouveau compte : ",
+         "spot": "new-iban"
+        },
+        {
+         "text": "AZ00ULDZ00000000400520007731",
+         "spot": "new-iban"
+        }
+       ],
+       [
+        {
+         "text": "Le paiement doit être effectué aujourd’hui avant 16:00, l’ancien compte est en cours de clôture.",
+         "spot": "urgency"
+        }
+       ],
+       [
+        {
+         "text": "Pour toute question, appelez uniquement ce numéro : +994 50 000 72 19",
+         "spot": "phone"
+        }
+       ]
+      ]
+     },
+     "say": "Regardez le domaine de l’expéditeur.",
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact : domaine trompeur, nouveau compte et délai imposé. Pas de bouton ? Transférez l’e-mail à la Sécurité informatique."
+      },
+      {
+       "id": "confirm",
+       "label": "Répondre : nous acceptons le nouveau compte",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "Le paiement partirait chez l’escroc. N’acceptez jamais de nouvelles coordonnées bancaires sur la seule foi d’un e-mail."
+      },
+      {
+       "id": "ask",
+       "label": "Répondre : c’est bien vrai ?",
+       "kind": "reply",
+       "outcome": "risky",
+       "feedback": "L’escroc répondra que oui. Seul un numéro que vous connaissez déjà permet de vérifier."
+      }
+     ]
+    },
+    {
+     "id": "bank-change-real-box",
+     "artifact": {
+      "kind": "email",
+      "brandRef": "ofistechizat",
+      "from": {
+       "name": [
+        {
+         "text": "Sabina Karimova"
+        }
+       ],
+       "address": [
+        {
+         "text": "satis@ofistechizat.example"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "RE : Facture de septembre"
+       }
+      ],
+      "time": "11:20",
+      "body": [
+       [
+        {
+         "text": "Toutes nos excuses, nous avons oublié de vous en informer."
+        }
+       ],
+       [
+        {
+         "text": "Merci de régler cette facture sur notre nouveau compte : AZ00ULDZ00000000400520007731"
+        }
+       ],
+       [
+        {
+         "text": "Pour confirmer, appelez-moi à ce numéro : +994 55 000 31 84"
+        }
+       ]
+      ]
+     },
+     "say": "L’adresse est authentique. Pourtant, la prudence reste de mise.",
+     "actions": [
+      {
+       "id": "verify",
+       "label": "Appeler le numéro du contrat",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Exact. Une messagerie peut être piratée, mais le numéro de votre contrat vous met en relation avec le vrai fournisseur."
+      },
+      {
+       "id": "call-mail",
+       "label": "Appeler le numéro de l’e-mail",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Ce numéro appartient à l’escroc, qui vous confirmera tout. Fiez-vous à vos propres dossiers."
+      },
+      {
+       "id": "safe",
+       "label": "Marquer comme fiable",
+       "kind": "mark-safe",
+       "outcome": "compromised",
+       "feedback": "L’adresse est authentique, mais la messagerie a été piratée. Vérifiez toujours de nouvelles coordonnées bancaires par un autre moyen."
+      },
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Bonne démarche. L’équipe sécurité peut aussi prévenir le fournisseur."
+      }
+     ]
+    },
+    {
+     "id": "boss-urgent",
+     "artifact": {
+      "kind": "email",
+      "from": {
+       "name": [
+        {
+         "text": "Anar Huseynov"
+        }
+       ],
+       "address": [
+        {
+         "text": "anar.huseynov@idare-mail.example.net"
+        }
+       ]
+      },
+      "subject": [
+       {
+        "text": "Urgent : avance Kur Tikinti"
+       }
+      ],
+      "time": "12:05",
+      "body": [
+       [
+        {
+         "text": "Versez aujourd’hui l’avance de Kur Tikinti sur leur nouveau compte, ils envoient les coordonnées demain."
+        }
+       ],
+       [
+        {
+         "text": "Je suis en réunion, ne m’appelez pas. Anar"
+        }
+       ]
+      ]
+     },
+     "actions": [
+      {
+       "id": "report",
+       "label": "Signaler comme hameçonnage",
+       "kind": "report",
+       "outcome": "safe",
+       "feedback": "Exact. Le nom est bien celui de votre responsable, mais le domaine n’est pas idare.example, et le « ne m’appelez pas » est un signal d’alerte."
+      },
+      {
+       "id": "verify",
+       "label": "Appeler votre responsable à un numéro connu",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Très bien. Même si votre responsable est en réunion, une vérification d’une minute évite une grosse perte."
+      },
+      {
+       "id": "pay",
+       "label": "Répondre : nous payons aujourd’hui",
+       "kind": "reply",
+       "outcome": "compromised",
+       "feedback": "L’argent partirait chez l’escroc. La pression et le secret sont justement des raisons de bloquer le paiement."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "vb-sim-call",
+   "environment": "call",
+   "title": "Appel du fournisseur",
+   "intro": "Peu après, un appel arrive au nom du fournisseur. Lisez ce que dit l’appelant et choisissez votre réponse.",
+   "steps": [
+    {
+     "id": "ring",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-2"
+     },
+     "actions": [
+      {
+       "id": "answer",
+       "label": "Répondre",
+       "kind": "answer",
+       "outcome": "safe",
+       "feedback": "Répondre n’a rien de dangereux. C’est ce que vous direz ensuite qui compte."
+      },
+      {
+       "id": "decline",
+       "label": "Refuser",
+       "kind": "decline",
+       "outcome": "safe",
+       "feedback": "C’est bien aussi. Plus tard, appelez vous-même le fournisseur au numéro du contrat.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pitch",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-2"
+     },
+     "say": "Bonjour, Zaur Guliyev, de chez OfisTechizat. Vous avez bien reçu nos nouvelles coordonnées ? Si vous ne payez pas aujourd’hui, votre commande sera bloquée.",
+     "spoken": "Bonjour, <breath> Zaur Guliyev, de chez OfisTechizat. Vous avez bien reçu nos nouvelles coordonnées ? Si vous ne payez pas aujourd’hui, euh, votre commande sera bloquée.",
+     "actions": [
+      {
+       "id": "agree",
+       "label": "D’accord, nous payons sur le nouveau compte aujourd’hui",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "L’appel fait partie du piège : il est là pour appuyer l’e-mail. Le numéro de l’appelant ne prouve rien."
+      },
+      {
+       "id": "own-check",
+       "label": "Nous allons vérifier ce changement par nos propres moyens",
+       "kind": "keep-private",
+       "outcome": "safe",
+       "feedback": "Exact. Un vrai fournisseur comprend très bien qu’on vérifie."
+      },
+      {
+       "id": "hang",
+       "label": "Raccrocher",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Bon choix. Appelez maintenant vous-même le numéro du contrat.",
+       "next": "after"
+      }
+     ]
+    },
+    {
+     "id": "pressure",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-2"
+     },
+     "say": "Votre responsable est d’accord, je lui ai parlé. Envoyez-moi une photo de l’ordre de virement, que je puisse le vérifier.",
+     "spoken": "Votre responsable est d’accord, je lui ai parlé. <breath> Envoyez-moi une photo de l’ordre de virement, que je puisse le vérifier.",
+     "actions": [
+      {
+       "id": "send",
+       "label": "J’envoie la photo",
+       "kind": "share",
+       "outcome": "compromised",
+       "feedback": "Un ordre de virement contient des données de compte et de signature. Les escrocs s’en servent pour fabriquer de faux documents."
+      },
+      {
+       "id": "verify",
+       "label": "J’appelle moi-même mon responsable",
+       "kind": "verify",
+       "outcome": "safe",
+       "feedback": "Très bien. Seul votre responsable peut confirmer qu’il a vraiment donné son accord."
+      },
+      {
+       "id": "hang",
+       "label": "Raccrocher",
+       "kind": "hang-up",
+       "outcome": "safe",
+       "feedback": "Exact. Quand la pression monte, mettre fin à l’appel est la meilleure réponse."
+      }
+     ]
+    },
+    {
+     "id": "after",
+     "label": "L’appel est terminé. Et maintenant ?",
+     "artifact": {
+      "kind": "call",
+      "brandRef": "ofistechizat-fake",
+      "caller": [
+       {
+        "text": "OfisTəchizat MMC"
+       }
+      ],
+      "number": [
+       {
+        "text": "+994 55 000 31 84"
+       }
+      ],
+      "label": "Mobile",
+      "voice": "man-2"
+     },
+     "actions": [
+      {
+       "id": "contract",
+       "label": "Appeler le numéro du contrat",
+       "kind": "call-back",
+       "outcome": "safe",
+       "feedback": "Exact. Le vrai fournisseur vous dira que rien n’a changé, et vous signalerez l’arnaque."
+      },
+      {
+       "id": "redial",
+       "label": "Rappeler le numéro qui a appelé",
+       "kind": "call-back",
+       "outcome": "risky",
+       "feedback": "Ce numéro mène à l’escroc. Ne vérifiez qu’avec un numéro tiré de vos propres dossiers."
+      },
+      {
+       "id": "ignore",
+       "label": "Ne rien faire",
+       "kind": "ignore",
+       "outcome": "risky",
+       "feedback": "L’escroc tentera sa chance auprès d’un autre collègue. Prévenez l’équipe sécurité."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "order",
+   "id": "vb-order",
+   "prompt": "Remettez les étapes dans l’ordre quand de nouvelles coordonnées bancaires arrivent.",
+   "items": [
+    {
+     "id": "pause",
+     "label": "Suspendre le paiement"
+    },
+    {
+     "id": "known-number",
+     "label": "Prendre le numéro dans le contrat ou dans les échanges précédents"
+    },
+    {
+     "id": "call",
+     "label": "Appeler et poser la question du changement"
+    },
+    {
+     "id": "second",
+     "label": "Faire valider par un deuxième collègue"
+    },
+    {
+     "id": "update",
+     "label": "Seulement ensuite, mettre à jour les coordonnées"
+    }
+   ],
+   "explain": "Les coordonnées bancaires ne changent qu’après un appel de vérification à un numéro connu et la validation d’un deuxième collègue."
+  },
+  {
+   "type": "choice",
+   "id": "vb-choice",
+   "question": {
+    "prompt": "Vous avez déjà envoyé l’argent sur le nouveau compte. Que faire en premier ?",
+    "options": [
+     {
+      "id": "call-bank",
+      "label": "Appeler immédiatement ma banque pour bloquer le virement, et prévenir l’équipe sécurité",
+      "correct": true,
+      "feedback": "Exact. Plus la banque est prévenue tôt, plus les chances de bloquer l’argent sont grandes."
+     },
+     {
+      "id": "wait",
+      "label": "Attendre la réponse du fournisseur",
+      "correct": false,
+      "feedback": "Chaque heure éloigne un peu plus l’argent. Attendre, c’est perdre du temps."
+     },
+     {
+      "id": "email-again",
+      "label": "Écrire à la même adresse pour demander le remboursement",
+      "correct": false,
+      "feedback": "L’escroc lit cette messagerie. Seule la banque peut bloquer l’argent."
+     }
+    ]
+   },
+   "explain": "Après un virement frauduleux, chaque minute compte : d’abord la banque, ensuite l’équipe sécurité. Gardez les e-mails comme preuves."
+  },
+  {
+   "type": "recap",
+   "id": "vb-recap",
+   "points": [
+    "Quand les coordonnées bancaires changent, suspendez le paiement",
+    "Appelez un numéro que vous connaissez, pas celui de l’e-mail",
+    "Le virement est parti ? Appelez immédiatement la banque et l’équipe sécurité"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}

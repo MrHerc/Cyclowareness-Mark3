@@ -1,0 +1,601 @@
+{
+ "id": "app-permissions",
+ "title": "Autorisations des applications",
+ "minutes": 3,
+ "scenes": [
+  {
+   "type": "tutor",
+   "id": "a-tutor",
+   "beats": [
+    {
+     "id": "a-b1",
+     "say": "Votre téléphone contient vos e-mails professionnels, vos messages et votre banque. Quand vous installez une application, vérifiez ce que vous autorisez.",
+     "mood": "talk",
+     "gesture": "wave",
+     "visual": {
+      "kind": "illustration",
+      "id": "phone-lock"
+     }
+    },
+    {
+     "id": "a-b3",
+     "say": "Pourquoi une application de lampe torche lirait-elle vos messages ? Avec cette autorisation, elle peut aussi voir vos codes bancaires.",
+     "mood": "alert",
+     "gesture": "point-left",
+     "visual": {
+      "kind": "artifact",
+      "artifact": {
+       "kind": "permission",
+       "brandRef": "fener-pro",
+       "app": "Torch Pro",
+       "permissions": [
+        {
+         "label": [
+          {
+           "text": "Lampe torche"
+          }
+         ],
+         "needed": true
+        },
+        {
+         "label": [
+          {
+           "text": "Contacts",
+           "spot": "contacts"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "SMS",
+           "spot": "sms"
+          }
+         ],
+         "needed": false
+        },
+        {
+         "label": [
+          {
+           "text": "Position précise",
+           "spot": "location"
+          }
+         ],
+         "needed": false
+        }
+       ]
+      }
+     },
+     "highlight": "sms",
+     "checkpoint": {
+      "prompt": "Une calculatrice demande l’accès à vos contacts. Que faites-vous ?",
+      "options": [
+       {
+        "id": "allow",
+        "label": "J’autorise",
+        "correct": false,
+        "feedback": "Une calculatrice n’a pas besoin de vos contacts. C’est peut-être une tentative pour collecter vos données."
+       },
+       {
+        "id": "deny",
+        "label": "Je refuse et je supprime l’application",
+        "correct": true,
+        "feedback": "Exact. Une application qui demande un accès dont elle n’a pas besoin, mieux vaut la supprimer."
+       }
+      ]
+     }
+    },
+    {
+     "id": "a-b4",
+     "say": "L’accessibilité est l’autorisation la plus puissante : avec elle, une application lit votre écran et appuie à votre place. Ne l’accordez qu’à très peu d’applications.",
+     "mood": "alert",
+     "gesture": "lean-in",
+     "visual": {
+      "kind": "illustration",
+      "id": "eye"
+     }
+    },
+    {
+     "id": "a-b5",
+     "say": "Règle simple : une autorisation doit correspondre à la fonction de l’application. Une application de cartes a besoin de votre position, pas une calculatrice.",
+     "mood": "happy",
+     "gesture": "recite",
+     "visual": {
+      "kind": "illustration",
+      "id": "shield"
+     }
+    }
+   ]
+  },
+  {
+   "type": "simulation",
+   "id": "app-install",
+   "environment": "phone",
+   "title": "Un éditeur photo gratuit",
+   "intro": "Vous cherchez un éditeur photo. Regardez ce qu’affiche votre téléphone et décidez à chaque étape.",
+   "steps": [
+    {
+     "id": "offer",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Groupe Bons plans"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "FotoRedaktor Plus Pro est payant dans la boutique, ici vous l’avez gratuitement : "
+         },
+         {
+          "text": "fotoredaktor-pro.test/app.apk",
+          "link": {
+           "label": "fotoredaktor-pro.test/app.apk",
+           "href": "https://fotoredaktor-pro.test/app.apk"
+          }
+         }
+        ],
+        "time": "13:05"
+       }
+      ]
+     },
+     "say": "Quelqu’un a partagé le fichier d’une application gratuite dans un groupe.",
+     "actions": [
+      {
+       "id": "download",
+       "label": "Télécharger le fichier",
+       "kind": "click-link",
+       "outcome": "risky",
+       "feedback": "Une application payante proposée gratuitement, c’est un appât bien connu. Ce genre de fichier cache souvent un logiciel malveillant."
+      },
+      {
+       "id": "block",
+       "label": "Bloquer et signaler",
+       "kind": "block",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. N’installez des applications que depuis la boutique officielle de votre téléphone.",
+       "next": "store-app"
+      }
+     ]
+    },
+    {
+     "id": "unknown-source",
+     "artifact": {
+      "kind": "dialog",
+      "tone": "system",
+      "title": [
+       {
+        "text": "Source inconnue"
+       }
+      ],
+      "body": [
+       [
+        {
+         "text": "Pour votre sécurité, votre téléphone n’est pas autorisé à installer des applications inconnues provenant de cette source."
+        }
+       ]
+      ],
+      "buttons": [
+       "Paramètres",
+       "Annuler"
+      ]
+     },
+     "actions": [
+      {
+       "id": "settings",
+       "label": "Autoriser dans les paramètres",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Cette protection existe justement pour ce genre de fichier. La désactiver ouvre votre téléphone aux applications malveillantes."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. L’installation depuis des sources inconnues doit rester désactivée."
+      }
+     ]
+    },
+    {
+     "id": "fake-apk",
+     "artifact": {
+      "kind": "file",
+      "brandRef": "fotoredaktor-plus-fake",
+      "name": [
+       {
+        "text": "FotoRedaktor_Plus_Pro.apk"
+       }
+      ],
+      "type": "apk",
+      "size": "18 Mo",
+      "source": [
+       {
+        "text": "Telegram : Groupe Bons plans"
+       }
+      ]
+     },
+     "say": "L’icône a l’air familière. Lisez attentivement le nom.",
+     "actions": [
+      {
+       "id": "install",
+       "label": "Installer",
+       "kind": "install",
+       "outcome": "compromised",
+       "feedback": "C’est un clone de l’application de la boutique : le nom diffère d’un espace. Il peut lire vos codes SMS."
+      },
+      {
+       "id": "cancel",
+       "label": "Annuler",
+       "kind": "cancel",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. N’installez jamais un fichier .apk reçu par message ; cherchez l’application dans la boutique officielle."
+      }
+     ]
+    },
+    {
+     "id": "store-app",
+     "label": "Application installée depuis la boutique officielle",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "fotoredaktor-plus",
+      "app": "Foto Redaktor Plus",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Photos et vidéos"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Contacts"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "SMS"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Même l’application de la boutique demande trop.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Autoriser",
+       "kind": "allow",
+       "outcome": "risky",
+       "feedback": "Un éditeur photo n’a besoin ni de vos contacts ni de vos SMS. L’accès aux SMS permet à une application de lire vos codes bancaires."
+      },
+      {
+       "id": "deny",
+       "label": "Ne pas autoriser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. N’accordez que ce dont la fonction a besoin : ici, uniquement les photos."
+      }
+     ]
+    },
+    {
+     "id": "fake-antivirus",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "qoruyucu-fake",
+      "app": "Qoruyucu Antivirus",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Accessibilité : contrôler l’écran"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "say": "Un antivirus veut contrôler votre écran.",
+     "actions": [
+      {
+       "id": "allow",
+       "label": "Autoriser",
+       "kind": "allow",
+       "outcome": "compromised",
+       "feedback": "Avec cet accès, une application lit l’écran et appuie à votre place. C’est exactement ce que demandent les chevaux de Troie bancaires."
+      },
+      {
+       "id": "deny",
+       "label": "Ne pas autoriser",
+       "kind": "deny",
+       "outcome": "safe",
+       "feedback": "Bon réflexe. Une application qui réclame le contrôle de l’écran au nom de l’antivirus, supprimez-la et signalez-la."
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "type": "hotspot",
+   "id": "a-hotspot",
+   "prompt": "Trouvez les autorisations dont cette application n’a pas besoin.",
+   "artifact": {
+    "kind": "permission",
+    "brandRef": "fotoredaktor-plus",
+    "app": "Foto Redaktor Plus",
+    "permissions": [
+     {
+      "label": [
+       {
+        "text": "Photos et vidéos",
+        "reveal": "Lit les photos et les vidéos enregistrées sur ce téléphone"
+       }
+      ],
+      "needed": true
+     },
+     {
+      "label": [
+       {
+        "text": "Appareil photo",
+        "reveal": "Prend des photos et enregistre des vidéos"
+       }
+      ],
+      "needed": true
+     },
+     {
+      "label": [
+       {
+        "text": "Contacts",
+        "spot": "contacts",
+        "reveal": "Lit votre liste de contacts : noms, numéros, adresses e-mail"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Envoyer et lire des SMS",
+        "spot": "sms",
+        "reveal": "Lit tous les SMS du téléphone et en envoie de nouveaux"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Accessibilité : contrôler l’écran",
+        "spot": "accessibility",
+        "reveal": "Voit tout ce qui s’affiche à l’écran et appuie à votre place dans d’autres applications"
+       }
+      ],
+      "needed": false
+     },
+     {
+      "label": [
+       {
+        "text": "Journal d’appels",
+        "spot": "call-log",
+        "reveal": "Lit la liste de vos appels : qui, quand et pendant combien de temps"
+       }
+      ],
+      "needed": false
+     }
+    ]
+   },
+   "spots": [
+    {
+     "id": "contacts",
+     "label": "Contacts",
+     "explain": "Retoucher des photos ne nécessite pas vos contacts."
+    },
+    {
+     "id": "sms",
+     "label": "Accès aux SMS",
+     "explain": "Avec l’accès aux SMS, une application peut lire vos codes bancaires et vos codes de connexion."
+    },
+    {
+     "id": "accessibility",
+     "label": "Contrôle de l’écran",
+     "explain": "Cet accès permet à une application de lire l’écran et d’appuyer à votre place. C’est exactement ce que réclament les applications malveillantes."
+    },
+    {
+     "id": "call-log",
+     "label": "Journal d’appels",
+     "explain": "Un éditeur photo n’a aucune raison de savoir qui vous appelez."
+    }
+   ],
+   "minToFind": 3
+  },
+  {
+   "type": "swipe",
+   "id": "a-swipe",
+   "prompt": "Sans danger ou menace ?",
+   "cards": [
+    {
+     "id": "bank-apk",
+     "artifact": {
+      "kind": "sms",
+      "brandRef": "sahilbank-fake",
+      "sender": [
+       {
+        "text": "+994 55 000 11 22"
+       }
+      ],
+      "time": "13:02",
+      "messages": [
+       [
+        {
+         "text": "SahilBank a une nouvelle application. Téléchargez-la ici : "
+        },
+        {
+         "text": "sahilbank-app.test/SahilBank.apk"
+        }
+       ]
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une application bancaire se trouve dans la boutique officielle. Un fichier d’installation envoyé par lien peut être malveillant."
+    },
+    {
+     "id": "map-location",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "xerite-app",
+      "app": "Cartes",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Position (uniquement pendant l’utilisation de l’application)"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Une application de cartes a besoin de votre position pour vous guider. L’autoriser seulement pendant l’utilisation est un choix judicieux."
+    },
+    {
+     "id": "torch-mic",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "fener-pro",
+      "app": "Lampe torche",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Contacts"
+         }
+        ],
+        "needed": false
+       },
+       {
+        "label": [
+         {
+          "text": "Micro"
+         }
+        ],
+        "needed": false
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Une lampe torche n’a besoin ni de vos contacts ni du micro."
+    },
+    {
+     "id": "video-call",
+     "artifact": {
+      "kind": "permission",
+      "brandRef": "videozeng-app",
+      "app": "Appel vidéo",
+      "permissions": [
+       {
+        "label": [
+         {
+          "text": "Appareil photo"
+         }
+        ],
+        "needed": true
+       },
+       {
+        "label": [
+         {
+          "text": "Micro"
+         }
+        ],
+        "needed": true
+       }
+      ]
+     },
+     "verdict": "safe",
+     "explain": "Un appel vidéo a vraiment besoin de l’appareil photo et du micro."
+    },
+    {
+     "id": "discount-apk",
+     "artifact": {
+      "kind": "chat",
+      "app": "telegram",
+      "contact": [
+       {
+        "text": "Canal Promos"
+       }
+      ],
+      "messages": [
+       {
+        "from": "them",
+        "body": [
+         {
+          "text": "Installez l’application de réductions à partir de ce fichier. Autorisez les sources inconnues dans les paramètres."
+         }
+        ]
+       }
+      ]
+     },
+     "verdict": "threat",
+     "explain": "Autoriser les sources inconnues affaiblit la protection de votre téléphone. Ne faites pas confiance à un message qui vous le demande."
+    }
+   ]
+  },
+  {
+   "type": "choice",
+   "id": "a-choice-store",
+   "question": {
+    "prompt": "Où installer des applications en toute sécurité ?",
+    "options": [
+     {
+      "id": "official-store",
+      "label": "La boutique d’applications officielle de votre téléphone",
+      "correct": true,
+      "feedback": "Exact. La boutique officielle contrôle les applications et réduit fortement le risque."
+     },
+     {
+      "id": "sms-link",
+      "label": "Un lien reçu par message",
+      "correct": false,
+      "feedback": "Un lien reçu par message peut mener à une fausse application."
+     },
+     {
+      "id": "cracked",
+      "label": "Une version piratée gratuite trouvée sur un forum",
+      "correct": false,
+      "feedback": "Les versions piratées contiennent souvent des logiciels malveillants."
+     },
+     {
+      "id": "work-portal",
+      "label": "Le catalogue d’applications approuvé par votre organisation",
+      "correct": true,
+      "feedback": "Exact. Un catalogue géré par votre organisation est aussi une source officielle."
+     }
+    ],
+    "multi": true
+   },
+   "explain": "Une boutique officielle n’est pas une garantie absolue, mais elle réduit beaucoup le risque. Regardez aussi les avis et les autorisations demandées."
+  },
+  {
+   "type": "recap",
+   "id": "a-recap",
+   "points": [
+    "N’installez des applications que depuis la boutique officielle",
+    "Une autorisation doit correspondre à la fonction de l’application",
+    "Redoublez de prudence avec l’accès aux SMS et à l’accessibilité"
+   ],
+   "mood": "celebrate"
+  }
+ ]
+}
