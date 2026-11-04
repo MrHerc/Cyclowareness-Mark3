@@ -2,10 +2,11 @@
 name: cyclowareness-experience
 description: >
   Deep reference for the Cyclowareness portal's learner experience, rebuilt from the lost cylosof.com:
-  the Rive mascot "AI Sel", the motion and animation system (the original admin panel and learner app
+  the mascot "AI Sel" (the storybook cat; the Rive robot is kept), the motion and light system (the original admin panel and learner app
   animations, the full/calm/still motion preference), and the complete training system (lesson JSON
-  format, the 11 scene types, en/az/ru lesson translations, the player, voice narration with karaoke
-  highlighting, the AI tutor, illustrations, artifacts and brands, the 53-module catalog, content sync,
+  format, the 11 scene types, lesson translations in ten languages (az en ru tr ro ka uk de fr ar) and
+  their glossaries, the player (syllabus, captions and AI subtitles, transcript, shortcuts), voice
+  narration with karaoke highlighting (ElevenLabs clips, Web Speech fallback), the AI tutor, illustrations, artifacts and brands, the 53-module catalog, content sync,
   Studio authoring and approvals, learning paths, assignments and reminders, progress, XP, streaks,
   league, risk score, certificates and attestations). Use this skill for ANY task in this repo that
   touches the mascot, animations, lessons, lesson translations, trainings, modules, narration, voice,
@@ -33,10 +34,10 @@ will keep sending tasks in this area; most of them close one of the gaps listed 
 
 | Task is about | Read first | Spec to compare with |
 |---|---|---|
-| Mascot: moods, gestures, idle acts, pointing, reactions, placement, Rive inputs, `.riv` swaps | [references/mascot.md](references/mascot.md) | `docs/audit/06-lesson-engine.md` §3, `02-learner-app.md` |
-| Anything that moves: tokens, keyframes, skeletons, count-ups, charts, transitions, reduced motion, "animate it like the original" | [references/animations.md](references/animations.md) | `docs/audit/01-design-tokens.md` "Hərəkət" |
-| Lesson content format, az/ru lesson translations, scene types, player, narration/TTS/karaoke and the voice language rule, AI Sel tutor, illustrations, artifacts, brands, timers, recap, attestation in the player | [references/lesson-engine.md](references/lesson-engine.md) | `docs/audit/06-lesson-engine.md`, `02-learner-app.md` §4 |
-| Catalog, modules, content sync, Studio, materials, approvals, paths, assignments, reminders, XP, streak, league, risk, certificates, policies | [references/training-pipeline.md](references/training-pipeline.md) | `docs/audit/04-training-catalog.md`, `03-admin-panel.md` |
+| Mascot: moods, gestures, idle acts, the cat's acts and `auto`, the Home play card, pointing, reactions, placement, Rive inputs, `.riv` swaps | [references/mascot.md](references/mascot.md) | `docs/audit/06-lesson-engine.md` §3, `02-learner-app.md` |
+| Anything that moves or glows: tokens, keyframes, light layers (aurora, sweep, spotlight, burst), skeletons, count-ups, charts, transitions, Full/Calm/Still and reduced motion, "animate it like the original" | [references/animations.md](references/animations.md) | `docs/audit/01-design-tokens.md` "Hərəkət" |
+| Lesson content format, lesson translations in ten languages and the glossaries, scene types, player (syllabus, captions, AI subtitles, transcript, shortcuts), narration/TTS clips/karaoke and the voice language rule, AI Sel tutor, illustrations, artifacts, brands, timers, recap, attestation in the player | [references/lesson-engine.md](references/lesson-engine.md) | `docs/audit/06-lesson-engine.md`, `02-learner-app.md` §4 |
+| Catalog, modules and the module page, content sync, Studio, materials, approvals, paths and their labs, assignments, reminders, XP, streak, league, risk, certificates, policies | [references/training-pipeline.md](references/training-pipeline.md) | `docs/audit/04-training-catalog.md`, `03-admin-panel.md` |
 
 Each reference has the same shape: what the original did, the current implementation (file map and
 APIs with exact identifiers), conventions and gotchas, recipes for likely tasks, and the gaps still
@@ -47,19 +48,24 @@ risk score) needs both references.
 ## Ground rules that apply to every task here
 
 - `docs/audit/` is the spec of the original. Never edit it. Quote it when you explain a decision.
-- Three UI languages, az/en/ru, in `portal/messages/{az,en,ru}/*.json`. Every new string goes into
-  all three, translated by meaning, not word for word; keys without dots; ICU braces escaped with
-  quotes; `tests/i18n.test.ts` checks parity. Edit these JSON files with the Edit tool (shell heredocs
-  corrupt backslashes and Unicode). Landing copy is in `portal/content/landing/*.json` for ten
-  languages and `tests/landing.test.ts` fails on a missing key.
-- Lesson content lives in `portal/content/library/`: three files per lesson, `<lesson>.en.json` (the
-  original) and the translations `<lesson>.az.json` / `<lesson>.ru.json`, which keep every id, spot,
+- Ten UI languages, az en ru tr ro ka uk de fr ar (`LOCALES` in `portal/src/i18n/config.ts`; ar is
+  right to left, ADR-025), in `portal/messages/{locale}/*.json`. Every new string goes into all ten,
+  translated by meaning, not word for word, with the language's glossary
+  (`references/glossaries/<lang>.md` for the seven newer ones; az/ru in lesson-engine.md recipe 6.3);
+  keys without dots; ICU braces escaped with quotes; `tests/i18n.test.ts` checks parity. Edit these JSON
+  files with the Edit tool (shell heredocs corrupt backslashes and Unicode). Landing copy is in
+  `portal/content/landing/*.json` for the same ten languages and `tests/landing.test.ts` fails on a
+  missing key. Layout uses logical CSS only (`ms-`, `pe-`, `start-`, `text-start`);
+  `tests/rtl-logical.test.ts` fails on a physical class outside its allow-list.
+- Lesson content lives in `portal/content/library/`: ten files per lesson, `<lesson>.en.json` (the
+  original) and the translations `<lesson>.{az,ru,tr,ro,ka,uk,de,fr,ar}.json`, which keep every id, spot,
   `brandRef`, link, address and answer and change only learner-facing text (rules in lesson-engine.md
-  §5, how to translate in recipe 6.3); az/ru titles are in
-  `i18n.az.json` / `i18n.ru.json`. A change to an English lesson needs the same change in both
-  translations. After any content change run `tests/content.test.ts` (it counts English files only:
-  53 modules, 106 lessons, 14 multi-answer scenes; update the counts when they legitimately change),
-  `tests/content-locales.test.ts` and `npx tsx scripts/check-lesson-locales.ts --coverage`.
+  §5, how to translate in recipe 6.3); translated titles are in `i18n.{locale}.json`. The stories stay
+  in the Azerbaijani company world in every language (ADR-026). A change to an English lesson needs the
+  same change in all nine translations. After any content change run `tests/content.test.ts` (it counts
+  English files only: 53 modules, 106 lessons, 14 multi-answer scenes; update the counts when they
+  legitimately change), `tests/content-locales.test.ts` and
+  `npx tsx scripts/check-lesson-locales.ts --coverage` (954 of 954).
 - The tutor is called **AI Sel** everywhere (UI strings, landing, legal texts, every language);
   Azerbaijani text writes AI itself as «Sİ». The vendor brand is
   **Safarov Industries** and is never translated. The product is **Cyclowareness**; only `docs/audit`
@@ -72,12 +78,13 @@ risk score) needs both references.
   and `src/components/site/teachable-locale.tsx`; a new provider that can be az needs it) lazily loads
   the `@formatjs/intl-numberformat` polyfill on az pages in browsers that lack the data
   (`src/i18n/az-numbers.ts`; the chunk `src/i18n/az-numbers-polyfill.ts` replaces `Intl.NumberFormat`
-  for every language and loads en/az/ru data; `tests/az-numbers.test.ts`). Format on the server when you can, with
+  for every language and loads the data of all ten; `tests/az-numbers.test.ts`). Format on the server when you can, with
   `getFormatter`, or `getAppFormatter()` (`src/i18n/server-format.ts`) for a relative time so az reads
   «… əvvəl» / «… sonra» as on the client. ADR-017, ADR-024. Every "day" in the pipeline is `Asia/Baku`.
 - Respect the learner's motion preference (`users.motion` = `full | calm | still`, exposed as
   `<html data-motion>`) and `prefers-reduced-motion` in every animation, including the mascot. CSS
-  animations are covered globally; JS timers, rAF and Rive must check it themselves (animations.md §3).
+  animations are covered globally; JS timers, rAF and the mascot must check it themselves, with
+  `useMotion()` / `readMotion()` from `src/lib/motion.ts` (animations.md §3, §8).
 - Respect plan features from `PLAN_FEATURES` in `src/lib/tenant-defaults.ts` (`learning`, `league`,
   `certificates`, `policies`, `paths`, `ai_tutor`, `tutor_voice`, `studio`, `approvals`, ...): a UI
   that ignores a disabled feature is a bug. Timers and the daily goal are tenant *settings*
@@ -91,11 +98,13 @@ risk score) needs both references.
   from scratch (`rm -rf drizzle && npx drizzle-kit generate --name init`) and reseeding while nothing
   is deployed; never hand-edit the SQL. Content changes reach the database through
   `npm run content:sync` (`scripts/sync-content.ts`, a full overwrite of library rows) or the seed.
-- Narration today is the browser's Web Speech API behind `useNarrator().speak()` (ADR-007); the
-  original played pre-generated clips keyed by sentence text with word timings. Any voice work must
-  keep the `speak()` contract and the language rule: a text is read only by a voice of its own
-  language, otherwise it stays silent; for lesson text and tutor answers `<VoiceNotice>` says why
-  (lesson-engine.md §3.4, recipe 6.6).
+- Narration goes through `useNarrator().speak()`: a text with a pre-generated ElevenLabs clip plays
+  the clip with its word timings (ADR-028; `scripts/generate-narration.ts`, none generated yet), every
+  other text is read by the browser's Web Speech API (ADR-007). Any voice work must keep the `speak()`
+  contract and the language rule: a text is read only by a voice of its own language, otherwise it
+  stays silent; for lesson text and tutor answers `<VoiceNotice>` says why (lesson-engine.md §3.4,
+  recipe 6.6). A new `speak()` call in a scene must be added to the three spoken-text lists
+  (lesson-engine.md §3.11, "Keep in step").
 - Commit only when the user asks. Never push. The servers on port 3100 (`demo`) and 3200 (`final`) in
   `.claude/launch.json` are production builds of separate copies under the scratchpad, each with its own
   `content/` and database: they are the user's presentation copies. Do not stop, rebuild or sync them
@@ -110,7 +119,8 @@ risk score) needs both references.
    spec file and the screenshot the reference cites, and state in one line what the original did.
 2. Locate the code from the file map; confirm the files still exist (the map can drift).
 3. Implement with the conventions above. Keep changes surgical; the portal is production-bound and
-   sold globally, so every string, date and layout must work in az, en and ru at 375 px.
+   sold globally, so every string, date and layout must work in all ten languages at 375 px, Arabic
+   right to left included.
 4. Verify, in this order, from `portal/`:
 
 ```bash
@@ -126,7 +136,8 @@ npx vitest run
 ```
 
    For UI work also load the page on the dev server (`preview_start "portal"`, port 3000) as a learner
-   and as an admin, in az and ru as well as en, and at 375 px width; the original was mobile-first.
+   and as an admin, in az and ru as well as en, in ar (right to left) and in a long-word language such as
+   de or ka, and at 375 px width; the original was mobile-first.
    For mascot or motion work also check Profile → Motion set to Still and the OS reduced-motion setting.
 5. When the task settles a design question, add an ADR to `docs/build/DECISIONS.md` and a line to
    `docs/build/PROGRESS.md`; if it needs the user's decision (provider keys, legal text, content in
@@ -137,23 +148,25 @@ npx vitest run
 
 Details and suggested approaches are in each reference's last section.
 
-- **Voice**: no pre-generated TTS clips or word-timing manifest; Web Speech instead, so voice quality
-  per language depends on the device (no Azerbaijani voice in Chrome on Windows: az lessons are silent
-  there with a notice pointing to Edge) and the mascot's mouth is a boolean (`talking`), not amplitude.
-  Needs a provider decision (OPEN-QUESTIONS 2). lesson-engine.md §7, recipe 6.6; mascot.md §5.
-- **Lesson languages**: all 106 lessons exist in en/az/ru (212 of 212 translations pass
-  `scripts/check-lesson-locales.ts --coverage`) and are served in the learner's language (ADR-023),
-  but az/ru were translated from English in this rebuild, not taken from the original (OPEN-QUESTIONS
-  6, closed on 2026-10-26, still recommends a native speaker's final read before release). Still
+- **Voice**: the clip pipeline exists but no clip is generated yet (the ElevenLabs key and a native
+  speaker's voice choice per language are open, OPEN-QUESTIONS 2; ~321 USD for ten languages), so Web
+  Speech reads everything and voice quality depends on the device (no Azerbaijani voice in Chrome on
+  Windows: az lessons are silent there with a notice pointing to Edge); the mascot's mouth is a boolean
+  (`talking`), not amplitude. lesson-engine.md §7, recipe 6.6; mascot.md §5.
+- **Lesson languages**: all 106 lessons exist in the ten UI languages (954 translations pass
+  `scripts/check-lesson-locales.ts --coverage`) and are served in the learner's language (ADR-023,
+  ADR-026), but every translation was made from English in this rebuild by agents, not taken from the
+  original, and no native speaker has read the seven new languages yet (OPEN-QUESTIONS 6, 7, 22). Still
   open: studio and AI-trainer lessons are single-language, nothing checks that a fictional name under
-  `app`/`brand` keeps one form (two lessons mix forms today), a new UI language touches many files and
-  right-to-left scripts (Arabic) are unsupported. lesson-engine.md §7, recipe 6.3.
+  `app`/`brand` keeps one form, AI subtitles are unreviewed machine translation and untested against
+  the live model. lesson-engine.md §7, recipe 6.3.
 - **Illustrations**: the 29 ids render as Lucide icon compositions; the spec says the two-tone SVG
   scenes must be redrawn. lesson-engine.md recipe 6.4.
 - **Mascot pointing and staging**: only tutor beats with a `highlight` aim at a spot; intro/recap
   moods, scenario node visuals, beat `stage`, several Rive inputs and moods are unused. mascot.md §5.
-- **Animations**: the landing "stage" keyframes, lens travel, simulation frame glow, chart draw-in,
-  fill-on-load, celebration particles and a `calm` level in JS are missing. animations.md §7.
+- **Animations**: the light/motion foundation (ADR-032, animations.md §8) added the area-chart draw-in,
+  the ring fill, the XP burst and a `calm` level in JS (`useMotion`); the landing "stage" keyframes,
+  lens travel and the simulation frame glow are still missing. animations.md §7.
 - **Studio depth**: the Studio form makes one four-scene micro-lesson per module, the AI trainer up to
   three lessons per draft; no editing after save, no versions, no hand authoring of rich scene types;
   library modules cannot be customised per tenant from the UI. training-pipeline.md §3.3, §9.

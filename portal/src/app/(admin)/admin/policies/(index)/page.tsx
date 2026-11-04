@@ -19,7 +19,7 @@ export default async function PoliciesPage({ searchParams }: PageProps<"/admin/p
   const v = await requirePermission("policies.read");
   const sp = await searchParams;
   const tab = sp.tab === "archived" || sp.tab === "all" ? sp.tab : "active";
-  const [tr, format] = await Promise.all([getTranslations("admin.policies"), getFormatter()]);
+  const [tr, tc, format] = await Promise.all([getTranslations("admin.policies"), getTranslations("common"), getFormatter()]);
   const [policies, versions, people] = await Promise.all([
     db().select().from(t.policies).where(eq(t.policies.tenantId, v.tenant.id)).orderBy(desc(t.policies.createdAt)),
     db()
@@ -69,7 +69,7 @@ export default async function PoliciesPage({ searchParams }: PageProps<"/admin/p
                     <div className="flex w-60 items-center gap-2">
                       <span className="shrink-0 text-tab text-ink-muted">{tr("signedOf", { signed, total })}</span>
                       <ProgressBar decorative value={total ? (signed / total) * 100 : 0} size="sm" />
-                      <span className="text-tab font-bold">{total ? Math.round((signed / total) * 100) : 0}%</span>
+                      <span className="text-tab font-bold">{tc("units.percent", { value: format.number(total ? Math.round((signed / total) * 100) : 0) })}</span>
                     </div>
                   ) : null}
                   <ChevronRight className="size-5 text-ink-subtle" />

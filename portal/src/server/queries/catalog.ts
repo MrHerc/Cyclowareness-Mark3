@@ -32,21 +32,24 @@ export type CatalogModule = {
 };
 
 /**
+ * The modules a person can open: the published ones of the library and of their organisation, and with `drafts`
+ * the organisation's own unpublished ones (studio authors previewing them). The catalog (so the lesson page) and both
+ * subtitle routes use it, so they agree on what is reachable.
+ */
+export function reachableModules(v: Viewer, drafts: boolean) {
+  return or(
+    and(or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id)), eq(t.modules.status, "published")),
+    drafts ? and(eq(t.modules.tenantId, v.tenant.id), eq(t.modules.status, "draft")) : undefined,
+  );
+}
+
+/**
  * Every published module this person can see, with their progress. Cached per request.
  * `drafts` adds the organisation's own unpublished lessons (studio authors previewing them).
  */
 export const getCatalog = cache(async (v: Viewer, locale: string, drafts = false): Promise<CatalogModule[]> => {
   const [mods, lessons, mp, lp, assigned] = await Promise.all([
-    db()
-      .select()
-      .from(t.modules)
-      .where(
-        or(
-          and(or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id)), eq(t.modules.status, "published")),
-          drafts ? and(eq(t.modules.tenantId, v.tenant.id), eq(t.modules.status, "draft")) : undefined,
-        ),
-      )
-      .orderBy(asc(t.modules.sortOrder)),
+    db().select().from(t.modules).where(reachableModules(v, drafts)).orderBy(asc(t.modules.sortOrder)),
     db().select().from(t.lessons).orderBy(asc(t.lessons.position)),
     db().select().from(t.moduleProgress).where(eq(t.moduleProgress.userId, v.user.id)),
     db().select({ lessonId: t.lessonProgress.lessonId, completedAt: t.lessonProgress.completedAt }).from(t.lessonProgress).where(eq(t.lessonProgress.userId, v.user.id)),

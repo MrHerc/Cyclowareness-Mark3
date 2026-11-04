@@ -2,6 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 import { bakuParts } from "@/lib/baku-clock";
+import { useMotion } from "@/lib/motion";
 
 /** A media query as a value; false on the server, where the lab shows its boot screen anyway. */
 export function useMedia(query: string): boolean {
@@ -18,17 +19,7 @@ export function useMedia(query: string): boolean {
 
 /** Still motion: the learner's Still preference or the OS reduced-motion setting (animations.md §3). */
 export function useStill(): boolean {
-  const reduced = useMedia("(prefers-reduced-motion: reduce)");
-  const still = useSyncExternalStore(
-    (cb) => {
-      const o = new MutationObserver(cb);
-      o.observe(document.documentElement, { attributes: true, attributeFilter: ["data-motion"] });
-      return () => o.disconnect();
-    },
-    () => document.documentElement.dataset.motion === "still",
-    () => false,
-  );
-  return reduced || still;
+  return useMotion() === "still";
 }
 
 function subscribeTick(cb: () => void) {

@@ -1,6 +1,6 @@
 /**
  * FormatJS's Intl.NumberFormat with the data of every interface language: the chunk that
- * `azNumbersReady` (az-numbers.ts) loads in a browser without Azerbaijani number data. The polyfill
+ * `azNumbersReady` (az-numbers.ts) loads in a browser without Azerbaijani or Georgian number data. The polyfill
  * replaces Intl.NumberFormat for every language, so the others need their data too (a page can switch
  * its language or embed another one, see TeachableLocale). English goes first because the first
  * locale registered becomes the fallback for any other. Import order is evaluation order.

@@ -1,11 +1,14 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { Battery, Camera, CheckCircle2, Cloud, FileDown, Mail, MessageSquare, Phone, PhoneOff, QrCode, RotateCcw, Server, Signal, XCircle } from "lucide-react";
 import { requestDemoAction, type DemoField, type DemoState, type DemoValues } from "@/server/actions/site";
 import { LOCALE_NAMES, langAttrs, type SiteLocale } from "@/i18n/config";
 import { EMPLOYEE_RANGES, type AdminScene, type DeployScene, type DemoScene, type InboxScene, type LanguagesScene, type Line, type PhoneScene, type TutorScene } from "@/lib/landing";
+import { ScrollRegion } from "@/components/ui/scroll-region";
 import { cn } from "@/lib/cn";
+import { useClientFormat } from "@/lib/client-format";
 import { Marked } from "./marked";
 import { useGuide } from "./guide";
 
@@ -31,7 +34,8 @@ const GLYPHS: Record<string, string[]> = {
 /** Dot-matrix clock: lit dots glow, unlit dots stay faintly visible. */
 function DotClock({ value }: { value: string }) {
   return (
-    <span className="flex items-center gap-2">
+    // A clock reads left to right in every language; in Arabic the digits and each glyph's grid would flip.
+    <span dir="ltr" className="flex items-center gap-2">
       <span aria-hidden className="flex gap-2">
         {[...value].map((ch, k) => {
           const rows = GLYPHS[ch];
@@ -77,8 +81,11 @@ function PhoneFrame({
 }) {
   return (
     <div role="group" aria-label={label} data-spot={spot} data-perch={perch} className={cn("relative rounded-[2.25rem] bg-surface p-2.5 shadow-overlay ring-1 ring-line", className)}>
-      <div className="relative flex min-h-[30rem] flex-col overflow-hidden rounded-[1.8rem] bg-[#1d1a4e] text-white">
+      <div className="relative isolate flex min-h-[30rem] flex-col overflow-hidden rounded-[1.8rem] bg-[#1d1a4e] text-white">
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,rgba(255,255,255,0.07)_1px,transparent_0)] [background-size:14px_14px]" />
+        {/* Glass: one soft sheen crosses the screen as the phone appears, over the content as a reflection would
+            (above the frosted message card too, so its backdrop blur never has to redraw the moving light). */}
+        <div aria-hidden className="light-sweep light-on-brand z-20 [--sweep-delay:0.8s]" />
         <div className="relative flex items-center justify-between px-6 pt-5">
           <DotClock value={clock} />
           <span className="flex items-center gap-1.5 text-white/70">
@@ -94,6 +101,9 @@ function PhoneFrame({
 }
 
 const CHANNEL_ICON = { email: Mail, sms: MessageSquare, qr: Camera } as const;
+
+// The second glow behind the hero phone drifts on its own slower, reversed cycle.
+const DRIFT_BACK = { animationDuration: "31s", animationDirection: "reverse", animationDelay: "-12s" } as const;
 
 /* ───────── 1 · inbox quiz ───────── */
 
@@ -163,7 +173,13 @@ export function InboxGame({
 
   return (
     <div className="grid gap-5">
-      <div className="relative mx-auto w-full max-w-[26rem]">
+      <div className="relative isolate mx-auto w-full max-w-[26rem]">
+        {/* Light behind the phone: two brand glows drifting slowly (resting under Calm and Still); an accent one read as a smudge. Both
+            fade out inside the hero's padding, so the hero's clipped edge never cuts a glow into a line. */}
+        <div aria-hidden className="pointer-events-none absolute -inset-x-16 -top-6 -bottom-12 -z-10 print:hidden sm:-inset-x-28">
+          <span className="absolute inset-0 animate-aurora bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--brand)_24%,transparent),color-mix(in_oklab,var(--brand)_8%,transparent)_60%,transparent)]" />
+          <span className="absolute -start-4 -bottom-4 size-80 animate-aurora rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--brand)_12%,transparent),transparent)]" style={DRIFT_BACK} />
+        </div>
         <span aria-hidden className="absolute -top-2.5 -start-2.5 size-3 border-t border-s border-ink-subtle/50" />
         <span aria-hidden className="absolute -top-2.5 -end-2.5 size-3 border-t border-e border-ink-subtle/50" />
         <span aria-hidden className="absolute -bottom-2.5 -start-2.5 size-3 border-b border-s border-ink-subtle/50" />
@@ -209,7 +225,15 @@ export function InboxGame({
               </div>
             </div>
           ) : step === "card" ? (
-            <div className="flex flex-1 flex-col gap-4 px-4 pt-4 pb-5">
+            <div className="relative isolate flex flex-1 flex-col gap-4 px-4 pt-4 pb-5">
+              {/* A right answer: the stage glint blooms behind the message once (unseen under Still). */}
+              {answer !== null && answer === card.isPhish ? (
+                <span
+                  key={i}
+                  aria-hidden
+                  className="pointer-events-none absolute inset-x-0 top-[6%] -z-10 mx-auto aspect-square w-[95%] scale-110 animate-glow rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--brand-on)_30%,transparent),transparent)] opacity-0 transition-[scale] duration-[1.4s] ease-(--ease-out-quart) starting:scale-[.35] print:hidden"
+                />
+              ) : null}
               <p className="flex items-center justify-between text-tab font-semibold text-white/60">
                 <span className="inline-flex items-center gap-1.5">
                   {(() => {
@@ -340,7 +364,7 @@ export function PhoneCall({ scene, beats, clock, screenLabel, skipLabel }: { sce
       className="mx-auto w-full max-w-[22rem]"
     >
       <div className="flex flex-1 flex-col items-center gap-4 px-6 pt-8 pb-8 text-center">
-        <span className={cn("grid size-24 place-items-center rounded-full bg-white/12 font-display text-[2.4rem] font-bold ring-1 ring-white/20", state === "ringing" && "motion-safe:animate-pulse")}>N</span>
+        <span className={cn("grid size-24 place-items-center rounded-full bg-white/12 font-display text-[2.4rem] font-bold ring-1 ring-white/20", state === "ringing" && "motion-full:animate-pulse")}>N</span>
         <div>
           <p className="text-tab font-semibold text-white/60">{state === "ringing" ? scene.ringing : scene.callerLabel}</p>
           <p className="text-title-sm font-bold">{scene.callerName}</p>
@@ -358,7 +382,7 @@ export function PhoneCall({ scene, beats, clock, screenLabel, skipLabel }: { sce
                 {scene.decline}
               </button>
               <button type="button" onClick={answer} className="grid justify-items-center gap-1.5 text-tab font-semibold">
-                <span className="grid size-16 place-items-center rounded-full bg-safe-500 hover:bg-safe-600 motion-safe:animate-bounce">
+                <span className="grid size-16 place-items-center rounded-full bg-safe-500 hover:bg-safe-600 motion-full:animate-bounce">
                   <Phone className="size-7" />
                 </span>
                 {scene.answer}
@@ -477,6 +501,8 @@ const SAMPLE = {
 
 export function AdminDemo({ scene, beats, you }: { scene: AdminScene; beats: Beats; you: { clicked: number; reported: number; learned: number } | null }) {
   const guide = useGuide();
+  const fmt = useClientFormat();
+  const tc = useTranslations("common");
   const rows = [
     ...scene.departments.map((d) => ({ id: d.id, name: d.name, v: SAMPLE[d.id] ?? { clicked: 20, reported: 50, learned: 70 }, me: false })),
     { id: "you", name: scene.you, v: you ?? { clicked: 0, reported: 0, learned: 0 }, me: true },
@@ -485,37 +511,40 @@ export function AdminDemo({ scene, beats, you }: { scene: AdminScene; beats: Bea
   const tone = { clicked: "bg-risk-500", reported: "bg-safe-500", learned: "bg-brand-500" };
   return (
     <div data-perch="admin" className="mx-auto w-full max-w-2xl overflow-hidden rounded-3xl bg-surface shadow-overlay ring-1 ring-line">
-      <table className="w-full text-start text-caption">
-        <thead className="bg-sunken text-tab text-ink-muted">
-          <tr>
-            <th className="px-4 py-3 font-semibold" />
-            {cols.map((c) => (
-              <th key={c} className="px-3 py-3 font-semibold">
-                {scene.columns[c]}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-line">
-          {rows.map((r) => (
-            <tr key={r.id} className={cn(r.me && "bg-reward-50")}>
-              <th scope="row" className={cn("px-4 py-3 font-semibold", r.me && "text-reward-ink")}>
-                {r.name}
-              </th>
+      {/* Phones: one-word column headings in ru, uk, ro or ka are wider than the card; scroll them rather than clip a column. */}
+      <ScrollRegion label={scene.headline}>
+        <table className="w-full text-start text-caption">
+          <thead className="bg-sunken text-tab text-ink-muted">
+            <tr>
+              <th className="px-4 py-3 font-semibold" />
               {cols.map((c) => (
-                <td key={c} className="px-3 py-3">
-                  <span className="flex items-center gap-2">
-                    <span className="h-2 flex-1 overflow-hidden rounded-pill bg-sunken">
-                      <span className={cn("block h-full rounded-pill transition-[width] duration-(--duration-slow)", tone[c])} style={{ width: `${r.v[c]}%` }} />
-                    </span>
-                    <span className="w-9 text-end tabular-nums">{r.v[c]}%</span>
-                  </span>
-                </td>
+                <th key={c} className="px-3 py-3 font-semibold">
+                  {scene.columns[c]}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-line">
+            {rows.map((r) => (
+              <tr key={r.id} className={cn(r.me && "bg-reward-50")}>
+                <th scope="row" className={cn("px-4 py-3 font-semibold", r.me && "text-reward-ink")}>
+                  {r.name}
+                </th>
+                {cols.map((c) => (
+                  <td key={c} className="px-3 py-3">
+                    <span className="flex items-center gap-2">
+                      <span className="h-2 flex-1 overflow-hidden rounded-pill bg-sunken">
+                        <span className={cn("block h-full rounded-pill transition-[width] duration-(--duration-slow)", tone[c])} style={{ width: `${r.v[c]}%` }} />
+                      </span>
+                      <span className="min-w-9 shrink-0 text-end tabular-nums">{tc("units.percent", { value: fmt.number(r.v[c]) })}</span>
+                    </span>
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </ScrollRegion>
       <div className="flex justify-end border-t border-line p-3">
         <button
           type="button"
@@ -733,7 +762,7 @@ export function DemoForm({
           {scene.errors[state.error]}
         </p>
       ) : null}
-      <button type="submit" disabled={pending} className="h-12 rounded-pill bg-brand-600 font-bold text-brand-on shadow-raised hover:bg-brand-700 disabled:opacity-60">
+      <button type="submit" disabled={pending} className="h-12 rounded-pill bg-brand-600 font-bold text-brand-on relative shadow-raised transition-colors duration-(--duration-base) ease-(--ease-out-quart) after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 after:shadow-[0_14px_34px_-12px_color-mix(in_oklab,var(--brand)_70%,transparent)] after:transition-opacity after:duration-(--duration-base) hover:bg-brand-700 hover:after:opacity-100 disabled:opacity-60">
         {pending ? scene.sending : scene.submit}
       </button>
     </form>

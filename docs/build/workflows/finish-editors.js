@@ -1,0 +1,115 @@
+export const meta = {
+  name: 'finish-editors',
+  description: 'Finish the independent native editor passes that a usage limit cut off, for one language, then a final terminology consistency check (Opus)',
+  phases: [
+    { title: 'Edit', detail: 'an independent native editor per unfinished item' },
+    { title: 'Consistency', detail: 'final terminology sweep and checker' },
+  ],
+}
+
+// A usage limit ends an agent with no result: wait and retry instead of failing the stage (limits reset within about 5 hours).
+async function retrying(prompt, opts) {
+  for (let attempt = 1; attempt <= 40; attempt++) {
+    const r = await agent(prompt, opts)
+    if (r) return r
+    log(`${opts.label}: no result (attempt ${attempt}), retrying in 10 minutes`)
+    await new Promise((done) => setTimeout(done, 10 * 60 * 1000))
+  }
+  return null
+}
+const P = 'C:/Users/Safar/Desktop/Cyclowareness- Vol2/portal', LANG = args.lang, NAME = args.langName
+const SP = 'C:/Users/Safar/AppData/Local/Temp/claude/C--Users-Safar-Desktop-Cyclowareness--Vol2/66e61158-c161-4119-a251-69c6013bc3e9/scratchpad'
+const BATCHES = [["phishing-email/spot-the-phish", "phishing-email/links-attachments", "phishing-email/ceo-fraud", "passwords-mfa/passphrases", "passwords-mfa/password-manager", "passwords-mfa/mfa", "social-engineering/phone-call-tricks", "social-engineering/sms-messenger-scams", "social-engineering/in-person-pretexting"], ["mobile-wifi/app-permissions", "mobile-wifi/public-wifi", "mobile-wifi/lost-phone", "quishing/qr-traps", "deepfake-scams/voice-clones", "deepfake-scams/fake-video-call", "deepfake-scams/ai-fakes"], ["malware-ransomware/stop-the-spread", "malware-ransomware/invoice-trap", "malware-ransomware/fake-updates", "safe-browsing/web-traps", "usb-media/unknown-usb", "personal-data/data-in-care", "data-sharing/classify-and-share", "data-sharing/links-cloud", "data-sharing/wrong-recipient"], ["physical-security/office-guard", "physical-security/badge-sense", "physical-security/left-and-found", "remote-work/work-anywhere", "social-media/share-smart", "secure-messaging/chat-safely", "software-updates/update-safely"], ["incident-reporting/report-fast", "incident-reporting/first-minutes", "incident-reporting/after-mistake", "travel-security/safe-trip", "cloud-accounts/share-with-care", "executive-threats/lead-securely", "executive-threats/whaling-board", "executive-threats/deepfake-voice", "it-admin-risks/admin-hygiene"], ["official-information/classification-labels", "official-information/sharing-official-documents", "official-information/outsider-requests", "authority-scams/fake-legal-notices", "authority-scams/fake-prosecutor-call", "e-signature-misuse/pin-and-codes", "e-signature-misuse/unexpected-signing", "ai-tools-safety/what-not-to-paste", "ai-tools-safety/ai-lures-fake-apps"], ["vendor-email-compromise/vendor-bank-change", "vendor-email-compromise/hijacked-thread", "dangerous-attachments/disguised-files", "dangerous-attachments/enable-content-traps", "insider-threat/accidental-insider", "insider-threat/insider-warning-signs", "meeting-security/safe-video-calls", "meeting-security/deepfake-meeting"], ["work-phone-mdm/phone-rules", "work-phone-mdm/lost-phone", "documents-printing/print-scan", "documents-printing/dispose-clean-desk", "events-delegations/conferences", "events-delegations/event-wifi-charging", "fake-official-accounts/spot-the-impostor", "fake-official-accounts/stop-fake-news"], ["password-managers-work/why-a-manager", "password-managers-work/autofill-right-site", "clicked-now-what/first-15-minutes", "clicked-now-what/opened-file-sent-wrong", "tech-support-scams/popup-panic", "tech-support-scams/the-support-call", "fake-captcha-commands/robot-check-trap", "fake-captcha-commands/the-copied-command"], ["messenger-hijack/code-by-mistake", "messenger-hijack/device-and-votes", "sim-swap-otp/number-goes-dark", "sim-swap-otp/sim-renewal-call", "infostealers/free-installer", "infostealers/stolen-session", "app-consent-phishing/consent-screen", "app-consent-phishing/meeting-code"], ["fake-login-windows/drag-test", "fake-login-windows/shared-doc-login", "browser-extensions/store-picks", "browser-extensions/update-turns", "search-ads-lookalikes/search-results", "search-ads-lookalikes/lookalike-domains", "fake-payment-links/parcel-fee", "fake-payment-links/check-the-page"], ["task-job-scams/task-trap", "task-job-scams/recruiter-mail", "investment-scams/adviser-call", "investment-scams/fake-dashboard", "online-shopping-scams/fake-shops", "online-shopping-scams/selling-safely", "romance-scams/weeks-of-chat", "romance-scams/hospital-call"], ["extortion-emails/bluff-letter", "extortion-emails/calm-response", "payroll-diversion/new-card-email", "payroll-diversion/fake-salary-portal", "smart-cameras-iot/camera-panel", "smart-cameras-iot/home-network", "backups-recovery/which-copy-survived", "backups-recovery/phone-backup"]]
+
+const WORLD = `PROJECT: Cyclowareness (vendor Safarov Industries), a security-awareness training portal (LMS) for company employees, built in Azerbaijan and sold globally. It ships in az, en, ru and is being localised into ${NAME} (${LANG}) as a full interface and lesson language. A senior native ${NAME} localisation team works on it: translate meaning, not words; natural, clear, warm, professional ${NAME} that reads as if written in ${NAME} from the start; never literal calques; correct grammar, spelling, script and typography. Use web search when you are unsure of established ${NAME} usage.
+GLOSSARY, STYLE RULES AND CHARACTER NAMES (${NAME}, mandatory, one concept = one term): read ${SP}/glossaries/${LANG}.md FIRST and follow it exactly; it was written by a terminologist and checked by an independent native reviewer.
+NEVER TRANSLATE: Cyclowareness, Safarov Industries, AI Sel (the tutor), fictional brand and product names (NeyroSöhbət, İşPoçt, BuludXidmət …), email addresses, domains, URLs, phone numbers, IBANs, codes, file extensions.
+WRITING FILES: create or edit files only with the Write/Edit tools (UTF-8, final newline). Never write JSON or Markdown through a shell heredoc (it corrupts backslashes and Unicode). Touch only the files named in your task: other agents are working on code and other languages in the same tree right now.`
+
+const UI_RULES = `UI MESSAGE FILES: ${P}/messages/en/<ns>.json are next-intl message catalogues in ICU MessageFormat. Write ${P}/messages/${LANG}/<ns>.json with EXACTLY the same nested keys (never add, drop or rename a key; keep arrays the same length; keep key order). Read the en file and, for meaning and context, the az and ru files (${P}/messages/az, ${P}/messages/ru), and look up how a string is used in the code when it is ambiguous (grep the key in ${P}/src).
+- Keep every ICU placeholder {name} exactly; keep rich-text tags such as <b>…</b>, <link>…</link>, <strong>…</strong> and their names; translate the words inside.
+- Plurals: write the plural categories ${NAME} needs per CLDR (${args.plurals}), always including other, with # where the English uses it. Selects keep their selector values (male/female/other, roles, statuses) exactly.
+- Apostrophes: in ICU an ASCII apostrophe next to { } # | starts a quoted literal; write the typographic apostrophe ’ (U+2019) in text instead of ' wherever the language needs one. Never escape with quotes unless the en string does.
+- UI text is short: buttons and labels as concise as the en ones (a button must still fit), headings natural, error messages helpful and polite, consistent verbs for the same action across the UI (Save, Cancel, Continue, Report …).
+- Keep language names in common.languages as the names of the languages in ${NAME}; a language's own name is used elsewhere (do not change that logic).
+- Product voice: friendly expert, encouraging the learner; admins get precise, professional wording.
+CHECK: node "${SP}/check-messages.mjs" ${LANG} <ns…> (run from anywhere) must print ok for your files; fix until it does.`
+
+const LESSON_RULES = `LESSONS: JSON files ${P}/content/library/lessons/<module>/<lesson>.en.json (format: ${P}/src/lib/content/types.ts; how the player shows and reads them: ${P}/../.claude/skills/cyclowareness-experience/references/lesson-engine.md sections 1–3). Professional az and ru versions exist next to each file. Write <lesson>.${LANG}.json next to each English file. The English file is the source of truth; look at .ru.json/.az.json only to see how spans were split, never copy their wording.
+WHAT A TRANSLATION IS: the same JSON with only learner-facing text translated. The checker ${P}/scripts/check-lesson-locales.ts enforces this (rules in ${P}/src/lib/content/locale-parity.ts): only string values under the keys say, spoken, title, text, label, prompt, feedback, explain, intro, points, tips, buttons, button, fields, left, right, speaker, reveal, size, value, body, subject, name, app (except the identifiers whatsapp/telegram/generic/chat), to, brand may differ; every id, spot, brandRef, href, kind, type, outcome, verdict, correct flag, next, start, mood, gesture, voice, channel, character, environment, time, from, manner, tone, visual id and every number must stay byte-identical, arrays keep their length, and anything that looks like an address, domain or URL stays unchanged even under a translatable key.
+- The reader is a ${NAME}-speaking employee; the stories stay set in the same fictional company world (names, fictional brands and amounts in AZN stay; names are written per the names table).
+- say lines are read aloud by a neural text-to-speech voice and highlighted word by word: natural spoken sentences that sound good aloud, punctuation that gives natural intonation, no abbreviations a voice would misread.
+- spoken: translate the words and keep the delivery tags (<breath>, <short pause>, <cough>, <sigh>, <throat-clearing> …) at natural positions; translate hesitation fillers to the ${NAME} equivalent.
+- Rich text is an array of spans {text, spot?, link?, reveal?}. Keep the same number of spans and the same spot/link/reveal attributes; distribute the translated sentence across the spans so the joined text reads naturally and each span that has a spot still contains exactly the phrase that spot is about (the urgency phrase, the deadline, the fee, the new IBAN …). A plain span may become just a space or punctuation if the word order requires it. Never move a spot to a different element.
+- Phishing emails, SMS, chats, calls and screens must read like realistic messages an attacker would send in ${NAME}, keeping every red flag the lesson teaches (urgency, threats, odd sender, lookalike domain, fee, request for a code …).
+- File names may be localised (e.g. a payslip file name) but extensions and tricks such as .pdf.exe stay exactly; keep each file name consistent wherever it appears.
+- Lesson title: use exactly the lesson title from ${P}/content/library/i18n.${LANG}.json (key "<module>/<lesson>"); refer to modules by the names in that file.
+- Correct answers must stay correct in meaning: the feedback of a correct option must still praise the right reasoning, and nothing in the translation may hint at a different answer.
+- Never edit the .en/.az/.ru files or the i18n files.
+CHECK: run from ${P}: npx tsx scripts/check-lesson-locales.ts <your files> and fix until every file prints ok.`
+
+const DOC_RULES = (what) => `${what}
+- Keep the Markdown structure byte-compatible: the first-line edition comment (<!-- version: …; effective: … -->) unchanged, the same number of ## sections in the same order, every numbered clause (1.1., 1.2. …) with the same number at the start of the line, the same lists and links (translate link text, keep URLs), the same emphasis.
+- Legal register: precise, formal ${NAME} legal language as a ${NAME}-qualified lawyer would write a translation; do not add, drop or soften any obligation, right, deadline, amount, party or definition; keep defined terms consistent; company names, addresses, registry numbers and statute names stay as in the source (add a ${NAME} rendering in parentheses only where a reader needs it).
+- Do not fix or change the content even if you think something is wrong; report it in notes instead.`
+
+const ITEMS = [
+  { key: 'ui-admin', kind: 'ui', ns: ['admin'] },
+  { key: 'ui-learner', kind: 'ui', ns: ['learner', 'player', 'common', 'site', 'auth'] },
+  { key: 'ui-ops', kind: 'ui', ns: ['secops', 'security', 'settings'] },
+  { key: 'legal', kind: 'doc', task: DOC_RULES(`LEGAL TEXTS: translate ${P}/content/legal/terms.en.md and ${P}/content/legal/privacy.en.md into ${P}/content/legal/terms.${LANG}.md and ${P}/content/legal/privacy.${LANG}.md. The binding text is Azerbaijani (${P}/content/legal/*.az.md; the page shows a notice that the translation is for information and the Azerbaijani text prevails); translate from English, compare with the az text where the English is ambiguous.`) + `\nCHECK: node -e "const fs=require('fs');const s=f=>{const t=fs.readFileSync(f,'utf8').replace(/\\r/g,'');return JSON.stringify([/^<!--\\s*version:[^>]*-->/.exec(t)?.[0],(t.match(/^## .+$/gm)||[]).length,t.match(/^\\d+\\.\\d+\\./gm)])};for(const d of ['terms','privacy'])console.log(d,s('${P}/content/legal/'+d+'.az.md')===s('${P}/content/legal/'+d+'.${LANG}.md')?'ok':'SHAPE MISMATCH')" must print ok for both.` },
+  { key: 'policies', kind: 'doc', task: DOC_RULES(`POLICIES: translate ${P}/content/policies/acceptable-use.en.md and ${P}/content/policies/passwords.en.md into ${P}/content/policies/acceptable-use.${LANG}.md and ${P}/content/policies/passwords.${LANG}.md (sample company policies employees read and sign off in the portal; see how the az/ru versions mirror the en structure). Policy register: clear, binding workplace-policy language.`) },
+  ...(LANG === 'ar' ? [{ key: 'landing', kind: 'landing' }] : []),
+  ...BATCHES.map((b, i) => ({ key: `lessons-${i + 1}`, kind: 'lessons', lessons: b })),
+]
+
+const SCHEMA = { type: 'object', properties: { summary: { type: 'string' }, files: { type: 'array', items: { type: 'string' } }, notes: { type: 'array', items: { type: 'string' } } }, required: ['summary', 'files', 'notes'] }
+
+function translatorTask(it) {
+  if (it.kind === 'ui') return `${UI_RULES}\n\nYOUR TASK (translator): namespaces ${it.ns.join(', ')}. For each, read the en file fully (and az/ru for context), then write ${P}/messages/${LANG}/<ns>.json. If the file already exists (an interrupted run), complete and fix it instead of starting over. Run the check. Return summary, files, notes (ambiguous strings, terms you chose that are not in the glossary).`
+  if (it.kind === 'doc') return `${it.task}\n\nYOUR TASK (translator): write the two files. If one exists already (an interrupted run), complete and fix it. Return summary, files, notes.`
+  if (it.kind === 'landing') return `LANDING PAGE: ${P}/content/landing/en.json is the public marketing site copy (a guided tour of the product). Write ${P}/content/landing/${LANG}.json with exactly the same keys and structure, persuasive, natural marketing ${NAME} for ${args.market} decision makers (CISO, HR, CEO), consistent with the glossary. Read ${P}/content/landing/de.json or fr.json to see how other languages adapted it, and ${P}/tests/landing.test.ts for the rules. CHECK: node -e "const a=require('${P}/content/landing/en.json'),b=require('${P}/content/landing/${LANG}.json');const f=(o,p='')=>Object.entries(o).flatMap(([k,v])=>v&&typeof v==='object'?f(v,p+k+'.'):[p+k]);const x=f(a).sort().join(),y=f(b).sort().join();console.log(x===y?'keys ok':'KEY MISMATCH')"\n\nYOUR TASK (translator): write the file. Return summary, files, notes.`
+  return `${LESSON_RULES}\n\nYOUR TASK (translator): lessons (module/lesson): ${it.lessons.join(', ')}. For each: read the English file fully, then write the ${LANG} version. If a ${LANG} file already exists (an interrupted run), review and complete it instead of starting over. Return summary, files, notes (tricky spans, terms, localised file names).`
+}
+
+function editorTask(it, tr) {
+  const notes = tr ? tr.notes.join(' | ').slice(0, 1500) : '(the translator failed: produce any missing file yourself)'
+  const common = `YOU ARE THE INDEPENDENT NATIVE EDITOR (a second pair of eyes; you verify, you do not trust the translator). Translator's notes: ${notes}.`
+  if (it.kind === 'ui') return `${UI_RULES}\n\n${common} Namespaces ${it.ns.join(', ')}: compare every ${LANG} string with the en (and az/ru) string and fix in place: mistranslations, omissions, strings whose meaning depends on UI context you did not check (grep the key in ${P}/src when unsure), literal or unnatural phrasing, wrong register, inconsistent terms or verbs against the glossary and across files, grammar, spelling, script and typography, plural forms, too-long button labels. Run the check until ok. Return summary (kinds of fixes, roughly how many), files, notes.`
+  if (it.kind === 'doc') return `${it.task}\n\n${common} Compare the ${LANG} files clause by clause with the English (and az) source and fix: omissions, changed obligations or meanings, terminology, register, grammar, typography, structure. Return summary, files, notes (anything a lawyer must look at).`
+  if (it.kind === 'landing') return `${translatorTask(it).split('YOUR TASK')[0]}\n${common} Compare with en.json line by line and polish to native marketing quality; fix meaning, tone, consistency, typography. Run the check. Return summary, files, notes.`
+  return `${LESSON_RULES}\n\n${common} Lessons: ${it.lessons.join(', ')}. For every lesson open the English file and the ${LANG} file side by side and edit the ${LANG} file in place (Edit tool for small fixes, Write for a full rewrite): mistranslations and omissions, anything that changes which answer is right, literal or unnatural phrasing, calques, wrong register, inconsistent terms against the glossary, grammar, spelling, script and typography per the style rules, sentences that sound bad when read aloud, spot spans that no longer hold their phrase, realism of the phishing artefacts. Run the checker until every file is ok. Return summary, files, notes (anything still doubtful).`
+}
+
+const TODO = ITEMS.filter((it) => args.items.includes(it.key))
+const NOTE = 'no translator notes for this pass: the files exist and pass the checker; an earlier editor pass on this item did not finish, so do the full independent review now'
+const results = await parallel(TODO.map((it) => () =>
+  retrying(`${WORLD}
+
+${editorTask(it, { notes: [NOTE] })}`, { label: `ed2:${LANG}:${it.key}`, phase: 'Edit', schema: SCHEMA }).then((ed) => ({ key: it.key, kind: it.kind, ed }))))
+const done = results.filter(Boolean)
+log(`${LANG}: ${done.filter((r) => r.ed).length} of ${TODO.length} editor passes finished`)
+const notesOf = (kind) => done.filter((r) => r.kind === kind && r.ed).map((r) => `[${r.key}] ${r.ed.notes.join(' | ')}`).join(' || ').slice(0, 5000)
+
+phase('Consistency')
+const hasUi = TODO.some((it) => it.kind === 'ui' || it.kind === 'doc' || it.kind === 'landing')
+const [lessonPass, uiPass] = await parallel([
+  () => retrying(`${WORLD}
+
+${LESSON_RULES}
+
+YOU ARE THE FINAL CONSISTENCY CHECKER for all ${LANG} lessons. An earlier consistency pass already unified the terminology; since then independent editors reviewed these items: ${TODO.map((it) => it.key).join(', ')}. Their notes:
+${notesOf('lessons')}
+1) Sweep all ${LANG} lesson files again for variants of the glossary terms, character names, localised file names and button labels for the same action, and unify anything the editors introduced. 2) Spot-read 5 lessons the editors changed, end to end. 3) Run from ${P}: npx tsx scripts/check-lesson-locales.ts $(ls content/library/lessons/*/*.${LANG}.json) and fix until all pass. Return summary, files, notes.`,
+    { label: `consistency2:${LANG}:lessons`, phase: 'Consistency', schema: SCHEMA }),
+  () => hasUi ? retrying(`${WORLD}
+
+${UI_RULES}
+
+YOU ARE THE FINAL UI CONSISTENCY CHECKER for ${LANG}. Editors just reviewed: ${TODO.filter((it) => it.kind !== 'lessons').map((it) => it.key).join(', ')}. Their notes:
+${notesOf('ui')}
+${notesOf('doc')}
+Make sure the same concept and action use the same words across all ${P}/messages/${LANG}/*.json (and the legal/policy/landing files if they were edited), fix variants, and run node "${SP}/check-messages.mjs" ${LANG} until all ok. Return summary, files, notes.`,
+    { label: `consistency2:${LANG}:ui`, phase: 'Consistency', schema: SCHEMA }) : Promise.resolve(null),
+])
+return { lang: LANG, items: done.map((r) => ({ key: r.key, summary: r.ed ? r.ed.summary.slice(0, 300) : 'failed' })), lessonPass, uiPass }

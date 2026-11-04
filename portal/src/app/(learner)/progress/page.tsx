@@ -39,7 +39,8 @@ export default async function ProgressPage() {
       <h1 className="text-headline font-bold">{t("title")}</h1>
 
       <div className="grid gap-4 lg:grid-cols-[minmax(16rem,1fr)_2fr]">
-        <section className="flex flex-col items-center justify-center rounded-2xl bg-brand-600 p-8 text-center text-brand-on shadow-raised">
+        <section className="light-on-brand relative isolate flex flex-col items-center justify-center overflow-hidden rounded-2xl bg-brand-600 p-8 text-center text-brand-on shadow-raised">
+          <div aria-hidden className="aurora" />
           <Ring value={lvl.progress} size={140} stroke={12} tone="white" label={`${t("level")} ${lvl.level}`}>
             <span className="text-display leading-none font-bold">{lvl.level}</span>
           </Ring>
@@ -95,7 +96,7 @@ export default async function ProgressPage() {
                     <p className="truncate text-body-sm font-semibold">{m.title}</p>
                     <div className="mt-2 flex items-center gap-2">
                       <ProgressBar decorative value={m.percent} tone={m.status === "completed" ? "safe" : "reward"} size="sm" />
-                      <span className="text-tab font-bold tabular-nums">{m.percent}%</span>
+                      <span className="text-tab font-bold tabular-nums">{tc("units.percent", { value: format.number(m.percent) })}</span>
                     </div>
                   </div>
                 </Link>
@@ -132,9 +133,16 @@ export default async function ProgressPage() {
               const Icon = BADGE_ICON[b];
               const earned = badges.includes(b);
               return (
-                <li key={b} className={cn("flex flex-col items-center rounded-xl p-4 text-center", earned ? "bg-reward-100/60" : "bg-sunken opacity-70")}>
-                  <span className={cn("grid size-14 place-items-center rounded-full", earned ? "bg-reward-500 text-(--accent-on) shadow-raised" : "bg-surface text-ink-disabled")}>
+                <li key={b} className={cn("flex flex-col items-center rounded-xl p-4 text-center", earned ? "group bg-reward-100/60" : "bg-sunken opacity-70")}>
+                  <span className={cn("relative grid size-14 place-items-center rounded-full", earned ? "bg-reward-500 text-(--accent-on) shadow-raised" : "bg-surface text-ink-disabled")}>
+                    {earned ? <span aria-hidden className="glow-ring rounded-full [--light:var(--accent)]" /> : null}
                     <Icon className="size-7" />
+                    {/* Earned: a shine crosses the medal when the tile is hovered (one pass, not under Still). */}
+                    {earned ? (
+                      <span aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden rounded-full print:hidden">
+                        <span className="absolute inset-0 bg-[linear-gradient(calc(105deg*var(--sweep,1)),transparent_30%,color-mix(in_oklab,var(--accent)_15%,white_55%)_50%,transparent_70%)] opacity-0 motion-ok:group-hover:animate-sweep" />
+                      </span>
+                    ) : null}
                   </span>
                   <p className="mt-2.5 text-caption font-bold">{t(`badge.${b}`)}</p>
                   <p className="mt-0.5 text-tab text-ink-muted">{t(`badge.${b}_body`)}</p>

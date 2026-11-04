@@ -63,8 +63,19 @@ export default async function AdminLeague() {
       ) : (
         <ol className="grid grid-cols-[minmax(0,1fr)] gap-4">
           {rows.map((r) => (
-            <li key={r.id} className={cn("flex items-center gap-3 rounded-2xl border bg-surface p-4 shadow-raised sm:gap-8 sm:p-7", r.place === 1 ? "border-reward-400 ring-4 ring-reward-200" : "border-line")}>
-              <span className={cn("grid size-12 shrink-0 place-items-center rounded-full font-display text-title font-bold sm:size-20 sm:text-headline", r.place === 1 ? "bg-reward-500 text-(--accent-on)" : r.place <= 3 ? "bg-brand-600 text-brand-on" : "bg-sunken text-ink-muted")}>{r.place}</span>
+            <li
+              key={r.id}
+              className={cn(
+                "relative isolate flex items-center gap-3 rounded-2xl border bg-surface p-4 sm:gap-8 sm:p-7",
+                r.place === 1 ? "border-reward-400 shadow-[0_2px_4px_#16123a0d,0_24px_56px_-22px_color-mix(in_oklab,var(--accent)_60%,transparent)] ring-4 ring-reward-200 [--light:var(--accent)]" : "border-line shadow-raised",
+              )}
+            >
+              {/* The leader in light: one pass across the row as the board opens, and a halo that breathes round the medal. */}
+              {r.place === 1 ? <span aria-hidden className="light-sweep [--sweep-delay:0.5s]" /> : null}
+              <span className={cn("relative grid size-12 shrink-0 place-items-center rounded-full font-display text-title font-bold sm:size-20 sm:text-headline", r.place === 1 ? "bg-reward-500 text-(--accent-on)" : r.place <= 3 ? "bg-brand-600 text-brand-on" : "bg-sunken text-ink-muted")}>
+                {r.place === 1 ? <span aria-hidden className="glow-ring animate-breathe" /> : null}
+                {r.place}
+              </span>
               <div className="min-w-0 flex-1">
                 <p className="break-words font-display text-title-sm font-bold sm:truncate sm:text-headline" title={r.name}>
                   {r.name}

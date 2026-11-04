@@ -14,7 +14,8 @@ import { AreaChart, StackBar } from "@/components/ui/charts";
 import { PageHeader, SortHeader } from "@/components/ui/layout";
 import { Avatar } from "@/components/ui/avatar";
 import { ModuleIcon } from "@/components/learner/module-icon";
-import { CountUp, DepartmentFilter, RemindButton, SetupGuide } from "@/components/admin/overview-client";
+import { DepartmentFilter, RemindButton, SetupGuide } from "@/components/admin/overview-client";
+import { CountUp } from "@/components/ui/count-up";
 import { QuickActions, type QuickActionKey } from "@/components/admin/quick-actions";
 import { riskBand } from "@/lib/domain/risk";
 import { daysLeftInMonth } from "@/lib/domain/league";
@@ -125,8 +126,11 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
         </div>
       ) : null}
 
-      <section className="grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-line bg-line shadow-xs sm:grid-cols-2 xl:grid-cols-5">
-        <div className="bg-surface p-5">
+      <section className="relative grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-line bg-line shadow-xs sm:grid-cols-2 xl:grid-cols-5">
+        {/* A brand light along the top edge; once the numbers have counted up, a light crosses each tile in turn. */}
+        <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-10 h-4 [background:linear-gradient(90deg,transparent,var(--brand),transparent)_top/100%_1px_no-repeat,radial-gradient(50%_100%_at_50%_0%,color-mix(in_oklab,var(--brand)_14%,transparent),transparent)] print:hidden" />
+        <div className="relative isolate bg-surface p-5">
+          <span aria-hidden className="light-sweep after-count [--sweep-delay:0s]" />
           <p className="text-caption font-semibold text-ink-muted">{tr("avgRisk")}</p>
           <p className="mt-2 text-numeral font-bold tabular-nums">
             <CountUp value={k.avgRisk} />
@@ -140,10 +144,11 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
             </p>
           ) : null}
         </div>
-        <div className="bg-surface p-5">
+        <div className="relative isolate bg-surface p-5">
+          <span aria-hidden className="light-sweep after-count [--sweep-delay:0.08s]" />
           <p className="text-caption font-semibold text-ink-muted">{tr("completion")}</p>
           <p className="mt-2 text-numeral font-bold tabular-nums">
-            <CountUp value={k.completion} suffix="%" />
+            <CountUp value={k.completion} percent />
           </p>
           {k.completionFrom !== null ? (
             <p className="mt-2 text-tab">
@@ -151,23 +156,26 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
             </p>
           ) : null}
         </div>
-        <div className="bg-surface p-5">
+        <div className="relative isolate bg-surface p-5">
+          <span aria-hidden className="light-sweep after-count [--sweep-delay:0.16s]" />
           <p className="text-caption font-semibold text-ink-muted">{tr("learners")}</p>
           <p className="mt-2 text-numeral font-bold tabular-nums">
             <CountUp value={k.learners} />
           </p>
         </div>
-        <div className="bg-surface p-5">
+        <div className="relative isolate bg-surface p-5">
+          <span aria-hidden className="light-sweep after-count [--sweep-delay:0.24s]" />
           <p className="text-caption font-semibold text-ink-muted">{tr("active7")}</p>
           <p className="mt-2 text-numeral font-bold tabular-nums">
             <CountUp value={k.active7} />
           </p>
           <p className="mt-2 text-tab text-ink-subtle">{tr("activeShare", { value: k.learners ? Math.round((k.active7 / k.learners) * 100) : 0 })}</p>
         </div>
-        <div className="bg-surface p-5 sm:col-span-2 xl:col-span-1">
+        <div className="relative isolate bg-surface p-5 sm:col-span-2 xl:col-span-1">
+          <span aria-hidden className="light-sweep after-count [--sweep-delay:0.32s]" />
           <p className="text-caption font-semibold text-ink-muted">{tr("reportRate")}</p>
           <p className="mt-2 text-numeral font-bold tabular-nums">
-            <CountUp value={k.reportRate} suffix="%" />
+            <CountUp value={k.reportRate} percent />
           </p>
           {k.reportFrom !== null ? (
             <p className="mt-2 text-tab">
@@ -204,13 +212,13 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
           <Card>
             <CardHeader title={tr("completionChart")} description={tr("completionChartSub")} />
             <CardBody>
-              <AreaChart points={d.charts.map((c) => ({ label: dayLabel(c.day), value: c.completion }))} yTicks={[0, 50, 100]} suffix="%" caption={tr("completionChart")} headers={[tc("chart.date"), tc("chart.value")]} />
+              <AreaChart points={d.charts.map((c) => ({ label: dayLabel(c.day), value: c.completion }))} yTicks={[0, 50, 100]} percent caption={tr("completionChart")} headers={[tc("chart.date"), tc("chart.value")]} />
             </CardBody>
           </Card>
           <Card>
             <CardHeader title={tr("reportChart")} description={tr("reportChartSub")} />
             <CardBody>
-              <AreaChart points={d.charts.map((c) => ({ label: dayLabel(c.day), value: c.reportRate }))} yTicks={[0, 50, 100]} suffix="%" caption={tr("reportChart")} headers={[tc("chart.date"), tc("chart.value")]} />
+              <AreaChart points={d.charts.map((c) => ({ label: dayLabel(c.day), value: c.reportRate }))} yTicks={[0, 50, 100]} percent caption={tr("reportChart")} headers={[tc("chart.date"), tc("chart.value")]} />
             </CardBody>
           </Card>
         </section>
@@ -259,7 +267,7 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
                       {tc(`risk.${b}`)}
                     </span>
                     <span className="font-bold tabular-nums">
-                      {d.bands[b]} <span className="font-normal text-ink-subtle">{pct(d.bands[b])}%</span>
+                      {d.bands[b]} <span className="font-normal text-ink-subtle">{tc("units.percent", { value: format.number(pct(d.bands[b])) })}</span>
                     </span>
                   </Link>
                 ))}
@@ -323,10 +331,10 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-2">
                         <ProgressBar decorative value={r.completion} size="sm" className="w-24" />
-                        <span className="tabular-nums">{r.completion}%</span>
+                        <span className="tabular-nums">{tc("units.percent", { value: format.number(r.completion) })}</span>
                       </div>
                     </td>
-                    <td className="px-3 py-3 tabular-nums">{r.reportRate}%</td>
+                    <td className="px-3 py-3 tabular-nums">{tc("units.percent", { value: format.number(r.reportRate) })}</td>
                     <td className="py-3 ps-3 text-end">
                       <Pill tone={riskBand(r.risk) === "low" ? "safe" : riskBand(r.risk) === "medium" ? "warn" : "risk"}>{r.risk}</Pill>
                     </td>
@@ -387,7 +395,7 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
                         <span className="text-ink-subtle">—</span>
                       )}
                     </td>
-                    <td className="py-3 ps-3 text-end tabular-nums">{m.score !== null ? `${m.score}%` : "—"}</td>
+                    <td className="py-3 ps-3 text-end tabular-nums">{m.score !== null ? tc("units.percent", { value: format.number(m.score) }) : "—"}</td>
                   </tr>
                 ))}
               </tbody>

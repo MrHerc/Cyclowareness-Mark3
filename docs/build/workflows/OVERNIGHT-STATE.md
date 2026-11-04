@@ -46,3 +46,24 @@ Next scripts ready: scratchpad/player-and-mascot.js (after Phase A + merges), sc
 - 18:20 ar run ended: 106/106 lessons pass, lesson consistency done (UI pass too); 14 editors (landing, ui-learner, lessons 2-13) left for Sunday: resume wf_9f8275a7-ddd then (updated script).
 - 18:50 Phase A COMPLETE (8/8; typecheck 0, build ok; Codex CLI 0.164 crashes 0xC0000005 so only ECC reviewed; 14 findings fixed). featws MERGED into main (38 taken, 10 merged, 5 conflicts resolved by hand). Gap fixes done by me: 7 language names in ro/ka/uk/de/ar (common, player, secops), fr auth smsText nbsp, ar landing 'it' sample + FAQ. Waiting for mascot-pages (w5w9gftjg); its in-progress home-mascot keys cause 7 transient tsc errors.
 - 19:45 gap fill done (31 keys x 7 langs); full suite 76 files / 2583 tests pass; typecheck 0, eslint 0; db reset+seed with 10x106 lessons; dev server :3000 up; ar RTL home/module/path screenshots OK. Local commit next (no push).
+
+## RESUMED 2026-11-03 14:10 (user: "finish the rest, agents on Opus, finalize the portal functionality")
+- Weekly limit fresh (0%, plan Ultra). Codex CLI updated 0.164 -> 0.166 but still crashes (exit 139 even on `codex doctor`): Codex review replaced by an independent agent-skills:code-reviewer (Opus).
+- lightws partial work DISCARDED (stale base); light polish now runs in the main tree.
+- Running (all Opus, no model overrides; scripts wait and retry through 5-hour limits):
+  - finish-editors.js (editors-only for unfinished items + final consistency): ar wf_ace4251e-b93 (15), fr wf_597e12a3-a74 (12), uk wf_f7228ffb-76f (12), ro wf_33902179-22c (11), de wf_db01186c-2c6 (7), ka wf_47849a48-1fb (2), tr wf_57d4c223-c2e (2). Item lists: scratchpad/editors-todo.json.
+  - experience-finish.js wf_8f5ab87d-5d2: foundation -> light learner + light admin/landing + player -> critique -> refine -> integrate + gap-fill 7 langs -> 3 reviews -> fix.
+- Dev server :3000 running (preview "portal") for agent screenshots.
+- Next after both: functional e2e sweep in 10 languages + fixes, clean-copy build (sync-clean.py) on :3200, ADRs/PROGRESS/OPEN-QUESTIONS/skill docs, commit, push origin (merge origin/main README commit, no force).
+- 17:30 user: on a 5-hour limit, wait and continue after the reset, never terminate agents (already so: retrying() 10-minute waits x40 in every running script; watchdog cron d097fb59).
+- 18:20 tr COMPLETE (editors+final consistency). ka COMPLETE (106 pass, 33 files unified). tr lab button unified to 'Oltalama olarak bildir'.
+- 04 09:50 ro COMPLETE (13/13: 11 editors + both final consistency passes; 106 pass).
+- 04 10:00 ar COMPLETE (17/17: 15 editors incl. landing + both final passes; 106 pass).
+- 04 10:15 uk COMPLETE (13/13; 106 pass; 33 files unified).
+- 04 10:20 fr COMPLETE (13/13; 106 pass; 19 files unified).
+- 04 10:30 de COMPLETE (9/9; 106 pass). ALL 7 LANGUAGES' editor passes done.
+- 04 12:00 experience-finish COMPLETE (11/11): light foundation+learner+admin/landing, full player (syllabus/volume/speed/captions 10+AI/transcript/shortcuts/clips), critique 7.5 -> refine, gap fill 244 strings, 3 reviews -> 14 issues, 12 fixed; full suite 81 files / 2621 tests pass. Known: field.tsx Select arrow class never generated (no dropdown arrow anywhere); ka 'uppercase' -> Mtavruli (add :lang(ka){text-transform:none}); AI subtitles untested live (no ANTHROPIC key); completeLessonAction has no server-side scene check (pre-existing). NEXT: finalize-portal.js (e2e sweep 4 finders -> fixers -> verify) + docs agent, then clean build :3200, commit, push.
+- 04 12:15 launched finalize-portal.js wf_b0024a88-f29 (task wsy7krlhe): 4 finders + docs -> 2 fixers -> verifier. After it: commit, clean build :3200, push.
+- 04 18:10 finalize-portal COMPLETE (8/8): 10 defects found (2 high: ka Intl fallback in Chromium -> ka-format.ts + polyfill), all fixed; docs ADR-026..033, PROGRESS cycle 10, OPEN-QUESTIONS 22-25, skill refs, README; verify: 82 files / 2697 tests, 954/954 lessons, 180/180 screenshots in 10 langs. Launched final-polish (wf_383da6ec-815, task w6svhqynd): locale-aware percents + :lang(ka) no uppercase. THEN: stop :3000, db:reset (seed notifications fix), restart :3000, commit, sync-clean + build :3200, push.
+- 04 20:45 final-polish: attempts 1-7 failed with transient API server_error (not limits); retrying() keeps going, attempt 8 running. User: fix failures, continue in parallel -> started clean copy sync + npm install + db:reset + build in background (task bad31n9b2) to catch build errors early; final rebuild after final-polish.
+- 04 21:30 final-polish COMPLETE (attempt 8; 7 transient network failures). Orphan dev server (PID 27100) stopped; main + clean DB reseeded; clean build passes; :3000 dev and :3200 prod (launch-final.mjs recreated) up; prod smoke OK. Committing + pushing.

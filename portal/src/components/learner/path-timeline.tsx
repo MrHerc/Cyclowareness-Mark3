@@ -41,17 +41,22 @@ export function PathTimeline({ items, today }: { items: PathItem[]; today: strin
     <div>
       <ol className="relative grid gap-3">
         <span aria-hidden className="absolute top-6 bottom-6 start-[1.4rem] border-s-2 border-dashed border-line-strong" />
-        {shown.map((m) => {
+        {shown.map((m, i) => {
           const Icon = moduleIcon(m.slug, m.category);
           const done = m.status === "completed";
           return (
             <li key={m.slug} className="relative flex gap-4">
+              {/* The spine lights up from a finished or current node down to the next one; the rest stays dashed. */}
+              {i < shown.length - 1 && (done || m.current) ? (
+                <span aria-hidden className={cn("absolute start-[1.4rem] top-14 -bottom-6 w-0.5 rounded-pill bg-gradient-to-b", done ? "from-safe-500 to-safe-500/40" : "from-reward-500 to-transparent")} />
+              ) : null}
               <span
                 className={cn(
                   "relative z-10 mt-3 grid size-11 shrink-0 place-items-center rounded-full border-2",
                   done ? "border-safe-500 bg-safe-500 text-white" : m.current ? "border-reward-500 bg-reward-500 text-(--accent-on)" : "border-line-strong bg-surface text-ink-subtle",
                 )}
               >
+                {m.current && !done ? <span aria-hidden className="glow-ring animate-breathe rounded-full [--light:var(--accent)]" /> : null}
                 {done ? <Check className="size-5" strokeWidth={3} /> : <Icon className="size-5" />}
               </span>
               <Link

@@ -150,7 +150,7 @@ export default async function ModulePage({ params, searchParams }: PageProps<"/l
               <div className="flex items-center gap-3">
                 <ProgressBar value={m.percent} tone="reward" label={tl("moduleProgress", { title: m.title })} />
                 <span aria-hidden className="text-caption font-bold tabular-nums">
-                  {m.percent}%
+                  {tc("units.percent", { value: format.number(m.percent) })}
                 </span>
               </div>
               <p className="mt-1.5 text-tab text-ink-subtle">{tr("lessonsDone", { done, total: m.lessons.length })}</p>

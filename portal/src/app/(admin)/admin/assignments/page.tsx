@@ -119,7 +119,7 @@ export default async function AssignmentsPage() {
                   <div className="flex w-56 items-center gap-2">
                     <span className="shrink-0 text-tab text-ink-muted">{tr("completedOf", { done, total: who.length })}</span>
                     <ProgressBar decorative value={pct} size="sm" />
-                    <span className="text-tab font-bold">{pct}%</span>
+                    <span className="text-tab font-bold">{tc("units.percent", { value: format.number(pct) })}</span>
                   </div>
                   {canWrite ? <AssignmentRowActions id={a.id} dueKind={a.dueKind} dueDate={a.dueDate} dueDays={a.dueDays} /> : null}
                 </Card>

@@ -29,7 +29,7 @@ export default async function CampaignsPage({ searchParams }: PageProps<"/admin/
   const sp = await searchParams;
   const status = STATUSES.includes(sp.status as (typeof STATUSES)[number]) ? (sp.status as (typeof STATUSES)[number]) : "all";
   const locale = await getLocale();
-  const [tr, format] = await Promise.all([getTranslations("admin.campaigns"), getFormatter()]);
+  const [tr, tc, format] = await Promise.all([getTranslations("admin.campaigns"), getTranslations("common"), getFormatter()]);
   const [campaigns, departments, users] = await Promise.all([
     db().select().from(t.campaigns).where(eq(t.campaigns.tenantId, v.tenant.id)).orderBy(desc(t.campaigns.createdAt)),
     getDepartments(v.tenant.id),
@@ -66,7 +66,7 @@ export default async function CampaignsPage({ searchParams }: PageProps<"/admin/
           <CardBody className="grid gap-6 md:grid-cols-[16rem_1fr]">
             <div>
               <p className="text-caption font-semibold text-ink-muted">{tr("reportRate")}</p>
-              <p className="mt-1 text-display font-bold text-safe-700 tabular-nums">{pct(total.reported)}%</p>
+              <p className="mt-1 text-display font-bold text-safe-700 tabular-nums">{tc("units.percent", { value: format.number(pct(total.reported)) })}</p>
               <p className="mt-2 text-caption text-ink-muted">{tr("reportedOf", { reported: total.reported, sent: total.sent })}</p>
               <p className="text-tab text-ink-subtle">{tr("acrossCampaigns", { count: withResults.length })}</p>
             </div>
@@ -124,7 +124,7 @@ export default async function CampaignsPage({ searchParams }: PageProps<"/admin/
                             <dt className="text-tab text-ink-subtle">{tr(k === "clicked" ? "col.clicked" : `col.${k}`)}</dt>
                             <dd>
                               <span className={k === "clicked" ? "text-body-sm font-bold text-risk-600" : k === "reported" ? "text-body-sm font-bold text-safe-700" : "text-body-sm font-bold"}>{s[k]}</span>
-                              {k !== "sent" ? <span className="ms-1 text-tab text-ink-muted">{share}%</span> : null}
+                              {k !== "sent" ? <span className="ms-1 text-tab text-ink-muted">{tc("units.percent", { value: format.number(share) })}</span> : null}
                               <ProgressBar decorative size="sm" value={k === "sent" ? 100 : share} tone={k === "clicked" ? "risk" : k === "reported" ? "safe" : "brand"} className="mt-1.5" />
                             </dd>
                           </div>

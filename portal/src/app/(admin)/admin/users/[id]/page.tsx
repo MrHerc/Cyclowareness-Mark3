@@ -257,7 +257,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
         <div className="grid grid-cols-[minmax(0,1fr)] content-start gap-4">
           <Card>
             <CardHeader title={tr("answers")} description={tr("answersSub")} />
-            <CardBody className="pt-3">{firstTry !== null ? <p className="text-numeral font-bold">{`${firstTry}%`}</p> : <p className="text-caption text-ink-muted">{tr("noAnswers")}</p>}</CardBody>
+            <CardBody className="pt-3">{firstTry !== null ? <p className="text-numeral font-bold">{tc("units.percent", { value: format.number(firstTry) })}</p> : <p className="text-caption text-ink-muted">{tr("noAnswers")}</p>}</CardBody>
           </Card>
           <Card>
             <CardHeader title={tr("simulations")} />
@@ -316,7 +316,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
                 <div key={w.category}>
                   <div className="flex justify-between text-caption">
                     <span>{tc(`categories.${w.category as "email"}`)}</span>
-                    <b>{w.rate}%</b>
+                    <b>{tc("units.percent", { value: format.number(w.rate) })}</b>
                   </div>
                   <ProgressBar decorative value={w.rate} size="sm" tone={w.rate < 60 ? "risk" : w.rate < 80 ? "warn" : "safe"} className="mt-1" />
                 </div>
@@ -381,7 +381,7 @@ export default async function PersonPage({ params }: PageProps<"/admin/users/[id
                     {pick(m.title, locale)}
                   </Link>
                   <Pill tone={status.tone}>{status.label}</Pill>
-                  <span className="w-11 shrink-0 text-end tabular-nums">{p?.percent ?? 0}%</span>
+                  <span className="w-12 shrink-0 text-end tabular-nums">{tc("units.percent", { value: format.number(p?.percent ?? 0) })}</span>
                 </div>
               );
             })}

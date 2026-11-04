@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { pickVoice, voiceAvailability } from "@/components/player/narrator";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { pickVoice, voiceAvailability, wordClock } from "@/components/player/narrator";
 
 const v = (name: string, lang: string, localService = false) => ({ name, lang, localService });
 
@@ -82,5 +82,64 @@ describe("pickVoice", () => {
     const voices = [v("Microsoft Banu Online (Natural) - Azerbaijani (Latin, Azerbaijan)", "az-AZ")];
     expect(pickVoice(voices, "az", "child").pitch).toBeGreaterThan(1);
     expect(pickVoice(voices, "az", "older-man")).toMatchObject({ pitch: 0.82, rateMul: 0.92 });
+  });
+});
+
+describe("wordClock (estimated word timing)", () => {
+  afterEach(() => vi.useRealTimers());
+  const clock = (count: number, perWord: number, stale = () => false) => {
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "performance"] });
+    const seen: number[] = [];
+    const ids: ReturnType<typeof setTimeout>[] = [];
+    const c = wordClock(count, perWord, (i) => seen.push(i), stale, (fn, ms) => void ids.push(setTimeout(fn, ms)), () => ids.splice(0).forEach(clearTimeout));
+    return { c, seen };
+  };
+
+  it("reads word i at i × perWord ms of speech, the words before the 600 ms check right at it", () => {
+    const { seen } = clock(4, 400);
+    vi.advanceTimersByTime(590);
+    expect(seen).toEqual([]);
+    vi.advanceTimersByTime(20);
+    expect(seen).toEqual([1]);
+    vi.advanceTimersByTime(200);
+    expect(seen).toEqual([1, 2]);
+    vi.advanceTimersByTime(400);
+    expect(seen).toEqual([1, 2, 3]);
+  });
+
+  it("holds while paused and goes on from the same word", () => {
+    const { c, seen } = clock(5, 400);
+    vi.advanceTimersByTime(900);
+    c.hold();
+    c.hold();
+    vi.advanceTimersByTime(5000);
+    expect(seen).toEqual([1, 2]);
+    c.go();
+    // The words passed come again at once, so the highlight stays on word 2; word 3 follows 300 ms of speech later.
+    vi.advanceTimersByTime(250);
+    expect(seen.at(-1)).toBe(2);
+    vi.advanceTimersByTime(100);
+    expect(seen.at(-1)).toBe(3);
+  });
+
+  it("keeps the rest of the 600 ms check when paused before it", () => {
+    const { c, seen } = clock(3, 100);
+    vi.advanceTimersByTime(200);
+    c.hold();
+    vi.advanceTimersByTime(1000);
+    c.go();
+    vi.advanceTimersByTime(390);
+    expect(seen).toEqual([]);
+    vi.advanceTimersByTime(20);
+    expect(seen).toEqual([1, 2]);
+  });
+
+  it("stops when the engine sends boundaries or the text is replaced", () => {
+    let stale = false;
+    const { seen } = clock(4, 400, () => stale);
+    vi.advanceTimersByTime(700);
+    stale = true;
+    vi.advanceTimersByTime(2000);
+    expect(seen).toEqual([1]);
   });
 });

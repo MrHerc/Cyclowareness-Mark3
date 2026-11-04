@@ -13,17 +13,20 @@ and how the Cyclowareness portal (`portal/`) implements each of it. Paths below 
 5. [Conventions and gotchas](#5-conventions-and-gotchas)
 6. [Recipes](#6-recipes)
 7. [Gaps vs the original](#7-gaps-vs-the-original)
+8. [Light and motion foundation (2026-11-04)](#8-light-and-motion-foundation-2026-11-04)
 
 Stack facts first, because they shape everything else:
 
 - **No JS animation library.** `package.json` has no framer-motion / motion; the only animation
-  dependency is `@rive-app/react-canvas` for the mascot. All other motion is CSS (Tailwind v4
+  dependency is `@rive-app/react-canvas` for the Rive mascot (kept for a switch back; the live cat is
+  a Canvas 2D engine, mascot.md §6). All other motion is CSS (Tailwind v4
   utilities, `@keyframes` in `src/app/globals.css`, a few inline `style` transforms) plus small
   `requestAnimationFrame` / `setTimeout` helpers. `docs/audit/README.md` (table "Animasiya") says the
   original used Rive + CSS keyframes + Motion (Framer) for page and element transitions; the portal
   deliberately does the same with CSS only.
 - The spec's motion section is `docs/audit/01-design-tokens.md` → "Hərəkət (motion)". It is copied
-  1:1 into `globals.css` (ADR-010 in `docs/build/DECISIONS.md`); there is no ADR about motion itself.
+  1:1 into `globals.css` (ADR-010 in `docs/build/DECISIONS.md`). The light/motion foundation built on it
+  on 2026-11-04 is ADR-032 and §8 below; read §8 before adding anything that moves or glows.
 
 ## 1. Original animation catalogue
 
@@ -162,6 +165,7 @@ How Tailwind v4 exposes them:
 | `--animate-blink` | `animate-blink` | Spec token; **no usages** (the Rive file has its own `Blink` layer) |
 | `--animate-reveal` | `animate-reveal` | Portal addition: the blur-to-clear page/scene reveal the spec describes |
 | `--animate-rise` | `animate-rise` | Portal addition: popovers, sheets, toasts, list items (`0.42s`) |
+| `--animate-sweep`, `-sheen`, `-glow`, `-breathe`, `-aurora`, `-burst`, `-fly-up` | `animate-sweep` … | The light tokens (2026-11-04), §8 |
 | `--ease-out-expo` etc. | `ease-(--ease-out-expo)` | Tailwind would also generate `ease-out-expo`; the codebase uses the `(--var)` form everywhere, keep to it |
 | Tailwind built-ins | `animate-spin`, `animate-pulse`, `animate-bounce`, `animate-ping` | Spinners, live dots, match-wrong flash, landing ring/bounce |
 
@@ -216,7 +220,10 @@ html[data-motion="still"] *, html[data-motion="still"] *::before, html[data-moti
   transition-duration: 1ms !important;
 }
 html[data-motion="calm"] { --duration-reveal: 0.36s; --duration-slow: 0.3s; }
-html[data-motion="calm"] .animate-float, html[data-motion="calm"] .animate-blink { animation: none; }
+html[data-motion="calm"] .animate-float, .animate-blink, .animate-sheen, .animate-breathe, .animate-aurora,
+  .aurora::before, .aurora::after { animation: none; }            /* each selector prefixed in the file */
+html[data-motion="calm"] :is(.burst, .animate-fly-up) { display: none; }
+html[data-motion="still"] .spotlight { display: none; }            /* and under the OS media query */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
 }
@@ -224,21 +231,27 @@ html[data-motion="calm"] .animate-float, html[data-motion="calm"] .animate-blink
 
 So: `still` and the OS setting collapse every CSS animation and transition to one frame (the
 `both` fill mode of `reveal`/`rise` lands them on their end state; shimmer runs once and stops);
-`calm` shortens the two long durations (reveal .72 s → .36 s, slow .42 s → .3 s) and switches off the perpetual float/blink loops, and nothing else.
+`calm` shortens the two long durations (reveal .72 s → .36 s, slow .42 s → .3 s), switches off the
+perpetual loops (float, blink, sheen, breathe, aurora) and hides the bursts and fly-ups; one-shot sweeps
+and glows still play. Still also hides the pointer spotlight.
 
-**JS readers.** CSS cannot stop timers, Rive or `requestAnimationFrame`, so these read the attribute
-or the media query themselves; all of them treat `still` and `prefers-reduced-motion` identically and
-ignore `calm`:
+**JS readers.** CSS cannot stop timers, the mascot or `requestAnimationFrame`, so these read the
+attribute or the media query themselves; all of them treat `still` and `prefers-reduced-motion`
+identically. The shared reader is `src/lib/motion.ts` (§8): `useMotion()` (live, server snapshot Full),
+`readMotion()` (in handlers and effects) and `motionLevel()`; unlike the older readers it also reports
+`calm`. Rows written before 2026-11-04 are kept, with their changes noted:
 
 | Component | How it reads | What it changes |
 |---|---|---|
-| `CountUp` (`src/components/admin/overview-client.tsx`) | `document.documentElement.dataset.motion === "still" \|\| matchMedia(...)` inside the effect | `p = still ? 1 : …` → a single frame at the final number |
+| `CountUp` (`src/components/ui/count-up.tsx` since 2026-11-04) | `readMotion() === "still"` inside the effect | `p = still ? 1 : …` → a single frame at the final number; at the end it marks its tile `data-counted` (starts the tile's light sweep) |
+| `Burst`, `flyToXp`, `Spotlight` (`src/components/ui/light.tsx`) | `useMotion()` / `readMotion()`; `matchMedia("(pointer: fine)")` | Burst renders nothing and flyToXp does nothing unless Full; Spotlight listens only for mouse and pen (CSS hides it under Still) |
+| Lab VM (`useStill()` in `src/components/lab/vm/hooks.ts`) | `useMotion() === "still"` | the VM's own motion off under Still |
 | `Mascot` (`src/components/mascot/mascot.tsx`) | `useSyncExternalStore(subscribeMotion, readStill, () => false)` (media-query `change` events) plus the explicit `still` prop | `still` → `rive.pause()`; `calm` (the store) → no idle acts, no travel walk, no one-shot `fire` triggers |
 | `LessonPlayer` (`player.tsx`) | `motion` prop from the server → `SceneEnv.still` | passes `still` to every `Mascot` in scenes; nothing else in the player reads it |
-| `HomeMascot` (`src/components/learner/home-mascot.tsx`) | `still` prop | skips the apple (45 s) and nap (180 s) idle timers |
+| `HomeMascot` (`src/components/learner/home-mascot.tsx`) | its own copy of the reader (`useSyncExternalStore`, the same three levels) seeded by the `motion` prop | the toys, laser and dash only under Full; the cat's `auto` acts follow the engine's Calm/Still rules (mascot.md §6.6) |
 | `Tour` (`src/components/learner/tour.tsx`) | `still` prop, plus `matchMedia` for scrolling | `scrollIntoView({ behavior: reduced ? "auto" : "smooth" })`; no gestures when `still` |
 | `LandingTour` (`src/components/site/landing-tour.tsx`) | `matchMedia` only (public page, no viewer) | scroll behavior `auto` under reduced motion |
-| `motion-safe:` / `motion-reduce:` Tailwind variants (`site/scenes.tsx` 324, 340; `admin/ops/page.tsx` 42) | the OS media query only | **do not** react to `data-motion` |
+| `motion-ok:` / `motion-full:` custom variants (`globals.css`; used in `admin/ops/page.tsx`, `progress/page.tsx`, `player.tsx`, `site/scenes.tsx`, `ui/progress.tsx`) | the OS media query **and** `<html data-motion>` | `motion-ok:` anything but Still, `motion-full:` Full only. They replaced the old `motion-safe:` uses, which listened to the OS only |
 
 The server render always carries the stored value, so there is no flash of motion on hydration; the
 Rive store's server snapshot is `false` (full motion) and corrects itself on the client.
@@ -255,9 +268,9 @@ approximate (they drift); search the symbol.
 | A3 | `src/components/admin/account-menu.tsx`: `animate-rise` popover `bottom-full`; outside-click and Escape close it | CSS |
 | A4 | `src/components/ui/skeleton.tsx` (`bg-sunken rounded-xl` + `before:animate-shimmer before:bg-gradient-to-r … via-white/70`). Route skeletons: `src/app/(admin)/admin/users/[id]/loading.tsx`, `src/app/(learner)/learn/(catalog)/loading.tsx`, `src/app/(learner)/learn/[slug]/loading.tsx` (each wraps in `role="status" aria-busy="true"` with an sr-only `common.loading`). **No admin-wide `loading.tsx`**: the comment in `admin-nav.tsx` explains a Suspense boundary there would stream HTTP 200 before `notFound()` runs | CSS |
 | A5 | Learner: `src/app/(learner)/template.tsx` (`<div className="animate-reveal">`, re-mounts per navigation). Admin: `animate-reveal` on `<main>` in `src/app/(admin)/admin/layout.tsx` — plays once per layout mount, **not** per navigation. Auth: `src/app/(auth)/layout.tsx` card. Player phases and scenes: `player.tsx` (`key={scene.id} … animate-reveal`) | CSS |
-| O1 | `CountUp` in `overview-client.tsx`: rAF loop, 900 ms, cubic ease-out `1 - (1-p)^3`, `Math.round`, printed with `useClientFormat().number` (grouped in the UI language); used by the five tiles in `src/app/(admin)/admin/(overview)/page.tsx` (`text-numeral tabular-nums`) | JS |
-| O2 | `src/components/ui/charts.tsx` `AreaChart` (server-rendered SVG, gradient area, last-value pill, sr-only `HiddenTable`, optional `riskStrip` and `guides={[34,66]}`). **No draw-in animation.** Also `BarChart`, `Sparkline`, `Heatmap`, `StackBar`, `Funnel` — all static | none |
-| O3 | `Ring` (`ui/progress.tsx`) in `SetupGuide`; stroke-dashoffset transition fires only when `value` changes, so no fill-on-load | CSS (change only) |
+| O1 | `CountUp` (`src/components/ui/count-up.tsx`, moved there 2026-11-04): rAF loop, 900 ms, cubic ease-out `1 - (1-p)^3`, `Math.round`, printed with `useClientFormat().number` (grouped in the UI language); used by the five tiles in `src/app/(admin)/admin/(overview)/page.tsx` (`text-numeral tabular-nums`); at the end it marks the tile `data-counted`, which starts the tile's `.light-sweep.after-count` (§8) | JS + CSS |
+| O2 | `src/components/ui/charts.tsx` `AreaChart` (server-rendered SVG, gradient area, last-value pill, sr-only `HiddenTable`, optional `riskStrip` and `guides={[34,66]}`). Since 2026-11-04 it draws in once with a clip rect (`scale`, 1.1 s; the server markup is the final chart, Still is one frame) and the latest point glows (an HTML dot with a `.glow-ring`). `BarChart`, `Sparkline`, `Heatmap`, `StackBar`, `Funnel` stay static | CSS |
+| O3 | `Ring` (`ui/progress.tsx`) in `SetupGuide`; since 2026-11-04 it fills from empty once on mount (`stroke-dashoffset`), then transitions on value changes | CSS |
 | O4 | `ProgressBar` / `StackBar` / `Funnel` with inline `width:%`; `ProgressBar` has the width transition, the others none | CSS (change only) |
 | O5 | `Sparkline`, `BarChart`, `Heatmap` in `src/app/(admin)/admin/users/[id]/page.tsx` | none |
 | L1 | `ui/scroll-region.tsx` for horizontal scroll; tables have no row-hover transition (rows use plain `hover:bg-sunken/60` or `/40` where present) | CSS |
@@ -270,7 +283,7 @@ approximate (they drift); search the symbol.
 | F4 | `src/components/ui/dialog.tsx`: native `<dialog>` + `showModal()`, `open:animate-rise`, `backdrop:bg-ink/40 backdrop:backdrop-blur-sm`, `shadow-overlay`, `rounded-2xl`. Lesson options use it (`player.tsx`, `size="sm"`) | CSS |
 | F5 | `src/components/ui/toast.tsx`: module store + `useSyncExternalStore`, `animate-rise`, auto-dismiss after 4200 ms, max 4, `z-80`, bottom offset above the tab bar. No exit animation, no confetti | CSS/JS |
 | F6 | `src/components/shell/protection.tsx` `Protection`: `data-content-shield fixed inset-0 z-90 … bg-canvas/80 backdrop-blur-2xl`, logo `size-20 animate-float`; shown on `blur`/`visibilitychange` | CSS |
-| H1 | `src/components/learner/home-mascot.tsx`: `<Mascot className="size-full animate-float" …>` inside a button; tap cycles `REACTIONS` (happy/wave, excited/hop, proud/shield-up, laughing/cheer, curious/ponder) via `gestureKey`; idle `act` apple at 45 s, nap at 180 s, `wake` on hover/click; opens `TutorPanel` | CSS + Rive |
+| H1 | `src/components/learner/home-mascot.tsx`: the "Play with Sel" card (since 2026-10-27): the cat in a button on a track, tap cycles `REACTIONS` (happy/wave, excited/hop, proud/shield-up, laughing/cheer, curious/ponder) via `gestureKey` and opens `TutorPanel`; idle life from the engine's `auto` acts; toys, laser and a dash across the card under Full only (mascot.md §6.6) | Canvas cat + WAAPI |
 | H2 | `src/app/(learner)/layout.tsx` streak/XP pills: `hover:bg-sunken` only; flame gets `fill-reward-400` when streak > 0 | none |
 | H3 | `Ring` in `src/app/(learner)/app/page.tsx` (Home, route `/app`; daily goal, `size=112`) and `progress/page.tsx` (level, `tone="white"`) | CSS (change only) |
 | H4 | `ProgressBar tone="white"` on the Continue card (`(learner)/app/page.tsx`) | CSS (change only) |
@@ -286,8 +299,8 @@ approximate (they drift); search the symbol.
 | P7 | `SwipeScene` (`scenes.tsx`): pointer capture, inline `transform: translateX(drag) rotate(drag/30deg)`, snap-back `transition: transform .25s var(--ease-out-expo)` once released, decide at ±90 px, THREAT/SAFE badge while dragging, next card peeks behind (`-bottom-3 bg-surface/70`), card enters with `animate-rise` | JS + CSS |
 | P8 | Hotspot: found spot card `animate-rise`, progress dots; tappable spans `hover:bg-warn-50`. Match: wrong pair `animate-pulse border-risk-500` for 600 ms + `vibrate()`. Order: wrong item `border-warn-500 bg-warn-50` (`transition-colors`). Scenario: chat bubbles `animate-rise`, speaker avatar `ring-4 ring-safe-500/60 transition-shadow` while narrated. Call artifact (`artifacts.tsx`): `SpeakingBars` (`animate-pulse`, inline `animationDelay k*120ms`, `animationDuration 0.9s`, height `transition-[height]`), answer button `animate-pulse` | CSS + haptics |
 | P9 | `useCountdown` (`scenes.tsx`): `setInterval` 1 s, `TimerPill` turns `bg-risk-50 text-risk-700` at ≤ 5 s; no bar or ring animation | JS |
-| P10 | `RecapScene`: `<Mascot mood="celebrate" gesture="cheer" fire={{ name: "bounce", key: 0 }}>`, points `animate-rise` with inline `animationDelay: k*90ms` stagger. `DoneScreen` (`player.tsx`): `animate-reveal`, mascot `celebrate`/`cheer`, XP pill; no confetti | CSS + Rive |
-| P11 | `src/components/mascot/mascot.tsx` + `mapping.ts` (`MOOD_INDEX`, `GESTURE_INDEX`, `ACT_INDEX`, `TOPIC_INDEX`, …): `useRive` with artboard `Mascot`, state machine `Main`, wasm from `/rive/rive.wasm` (`public/rive/`), pointer move → `lookX/lookY`, pointer down → `poke` with `pokeZone` | Rive |
+| P10 | `RecapScene`: `<Mascot mood="celebrate" gesture="cheer" fire={{ name: "bounce", key: 0 }}>`, points `animate-rise` with inline `animationDelay: k*90ms` stagger. `DoneScreen` (`player.tsx`): `animate-reveal`, mascot `celebrate`/`cheer`, XP pill with `<Burst>` and an `animate-fly-up` chip under Full (since 2026-11-04) | CSS + mascot |
+| P11 | `src/components/mascot/mascot.tsx` + `mapping.ts` (`MOOD_INDEX`, `GESTURE_INDEX`, `ACT_INDEX`, `TOPIC_INDEX`, …): `useRive` with artboard `Mascot`, state machine `Main`, wasm from `/rive/rive.wasm` (`public/rive/`), pointer move → `lookX/lookY`, pointer down → `poke` with `pokeZone`. That is the kept Rive robot; the live mascot is the cat (`cat-mascot.tsx`, `cat/engine.js`, one shared rAF loop, offscreen cats paused; mascot.md §6) | Canvas (Rive kept) |
 | P12 | `OptionsMotion` (`player.tsx`) and `Preferences` (`profile-client.tsx`) both use `Segmented`; see §3 | — |
 | S1 | `src/components/site/landing-tour.tsx` + `guide.tsx` (`GuideProvider`): attract queue (`attractFirstSeconds`, random gap between `attractMinGapSeconds`/`attractMaxGapSeconds`, `attractMaxLines`), nudge after `nudgeSeconds`, `NAP_MS = 120_000` on the hero (portal addition); moves map to Rive (`MOVE_GESTURE` for lean-in/ponder/wave gestures, the nudge is said with `{ move: "tap" }`, `guide.move("touch")` on hover/tap, `fire`) | JS + Rive |
 | S2 | `landing-tour.tsx`: 7 segments `h-1.5 transition-colors` (`bg-brand-600` current, `bg-brand-200` seen), caption words `transition-colors` driven by `guide.caption.word` (Web Speech boundaries, reading-time fallback `max(1600, chars*55)` ms in quiet mode) | CSS + JS |
@@ -319,13 +332,22 @@ Haptics (not in the spec's motion section but part of the feedback loop): `src/l
   `both` fill). Count-ups sit in `tabular-nums` so widths do not jitter. Skeletons match the final
   block sizes (`h-32`, `h-72`, `h-[30rem]` …) so content does not jump when it streams in. Keep new
   animations to `transform`/`opacity`; the codebase sets no `will-change` anywhere.
-- **Still/reduced is global CSS.** Any CSS animation you add is covered automatically. Anything in
-  JS (timers, rAF, Rive, `scrollIntoView`) must check `document.documentElement.dataset.motion ===
-  "still" || matchMedia("(prefers-reduced-motion: reduce)").matches` itself. `calm` only exists in CSS
-  today; JS code treats it as `full`.
-- **`motion-safe:` / `motion-reduce:` variants** listen to the OS only, not to `data-motion`. Prefer
-  a plain class (the global `still` rule catches it) or an explicit `html[data-motion="still"] …`
-  override in `globals.css`.
+- **Deliberate exceptions** (reviewed; do not flag them again):
+  - One-shot draw-ins of small SVGs repaint for their single run on mount: the `AreaChart` clip rect
+    (`scale`, 1.1 s, `ui/charts.tsx`) and the `Ring` fill from empty (`stroke-dashoffset`, `ui/progress.tsx`).
+    Neither loops, and Still makes both a single frame.
+  - Semantic glows keep their semantic colour instead of the tenant's `--brand`/`--accent`: a correct answer
+    or success glows `--color-safe-500` (`FeedbackSheet`, correct `ChoiceOptions`, the success toast line),
+    the league trophy halo `--color-laurel-500` (the trophy's own gold). A rebrand must not turn "correct"
+    into the tenant's colour; every other glow mixes from `--brand`, `--accent` or `--brand-on`.
+- **Still/reduced is global CSS.** Any CSS animation you add is covered automatically, provided its
+  100% keyframe is the resting state (Still runs each animation once, for 1 ms, and stops on its end
+  frame). Anything in JS (timers, rAF, the mascot, `scrollIntoView`) must check it itself: `useMotion()`
+  or `readMotion()` from `src/lib/motion.ts`, which also give `calm`. Calm in JS: no particles, no
+  fly-ups, no toys (`Burst`, `flyToXp`, the Home card).
+- **`motion-safe:` / `motion-reduce:` variants** listen to the OS only, not to `data-motion`; none are
+  left in `src`. Use `motion-ok:` (not Still) or `motion-full:` (Full only), or a plain class that the
+  global `still` rule catches.
 - **Inline styles vs `still`.** `animation-duration`/`transition-duration` are overridden with
   `!important`, so inline `transition: transform .25s …` (swipe) collapses correctly; inline
   `animationDelay` (recap stagger, speaking bars) is not, which is harmless because the duration is 1 ms.
@@ -347,10 +369,10 @@ Haptics (not in the spec's motion section but part of the feedback loop): `src/l
   Chromium has no `az` date data or number symbols, so use `useClientFormat()` / `<RelativeTime>`
   (ADR-017; its `number` for digits, as `CountUp` does), never `Intl` or `toLocaleString` in client
   code. The notifications popover already does this.
-- **i18n.** Motion labels live in `messages/{az,en,ru}/learner.json` (`profile.motion`,
+- **i18n.** Motion labels live in `messages/{locale}/learner.json` for the ten languages (`profile.motion`,
   `motionBody`, `motionFull`, `motionCalm`, `motionStill`) and `messages/*/player.json` (`motion`);
   loading text in `common.json` (`loading`), the shield label in `common.json` (`shield`). Edit these
-  JSON files with the Edit tool only; `tests/i18n.test.ts` checks key parity across the three locales.
+  JSON files with the Edit tool only; `tests/i18n.test.ts` checks key parity across the ten locales.
 
 ## 6. Recipes
 
@@ -364,12 +386,12 @@ Haptics (not in the spec's motion section but part of the feedback loop): `src/l
    `transform`, `opacity` or `filter`.
 3. Loop animations (like `float`): also add them to the `html[data-motion="calm"] …` rule so `calm`
    switches them off.
-4. JS-driven motion: read `const still = document.documentElement.dataset.motion === "still" ||
-   window.matchMedia("(prefers-reduced-motion: reduce)").matches;` inside the effect (pattern:
-   `CountUp`) or through `useSyncExternalStore` when it must update live (pattern: `mascot.tsx`
-   `subscribeMotion`/`readStill`). Skip or shorten the work when `still`.
-5. Verify: `npm run typecheck`, `npx eslint src tests --max-warnings=0`, `npx vitest run`; then the
-   dev server with Motion = Full / Calm / Still.
+4. JS-driven motion: `readMotion()` inside the effect or handler (pattern: `CountUp`, `flyToXp`) or
+   `useMotion()` when the render depends on it (pattern: `Burst`), both from `src/lib/motion.ts`. Skip
+   the work under `still`; under `calm` drop loops, particles and anything playful.
+5. Light (a glow, a sweep, an aurora, a spotlight): use the §8 layers and tokens instead of new CSS.
+6. Verify: `npm run typecheck`, `npx eslint src tests scripts --max-warnings=0`, `npx vitest run`; then the
+   dev server with Motion = Full / Calm / Still, and in ar (the sweep runs right to left).
 
 ### 6.2 Add a skeleton for a new page
 
@@ -385,8 +407,9 @@ Haptics (not in the spec's motion section but part of the feedback loop): `src/l
 
 ### 6.3 Animate a new chart or KPI
 
-- KPI number: wrap the value in `<CountUp value={n} suffix="%" />` (`src/components/admin/overview-client.tsx`)
-  inside a `tabular-nums` element. It is a client component; the page can stay a server component.
+- KPI number: wrap the value in `<CountUp value={n} suffix="%" />` (`src/components/ui/count-up.tsx`)
+  inside a `tabular-nums` element; put `<span aria-hidden className="light-sweep after-count" />` in the
+  tile (an `isolate` box) and its sweep waits for the count. It is a client component; the page can stay a server component.
 - Bars/rings: `ProgressBar` and `Ring` (`ui/progress.tsx`) already transition on value changes. For
   a fill-on-load, render the component with `value={0}` on the server and set the real value in an
   effect inside a small client wrapper (one frame when `still`), or add a keyframe that scales from
@@ -426,8 +449,8 @@ Haptics (not in the spec's motion section but part of the feedback loop): `src/l
 1. CSS loop (`animate-*` infinite): add its class to `html[data-motion="calm"] .animate-float, …` in
    `globals.css`. `still` is already covered.
 2. JS timer or rAF: add the `still` check (6.1 step 4) and, if `calm` should matter, read
-   `dataset.motion === "calm"` and shorten the duration (e.g. CountUp 900 → 400 ms). Today nothing in
-   JS reads `calm`; if you add it, note it in `docs/build/DECISIONS.md`.
+   `calm` through `useMotion()`/`readMotion()` and shorten or drop the work (ADR-032 sets the rules:
+   loops, particles and play go, one-shot light stays).
 3. Rive: pass `still={…}` (pauses the runtime) and let the store-driven `calm` flag disable idle acts
    and one-shot triggers. For a stronger `calm`, set `mood` only and drop `gesture` (as `Tour` does when `still`).
 4. `motion-safe:`/`motion-reduce:` usages: replace with plain classes so `data-motion="still"` applies.
@@ -440,13 +463,76 @@ Haptics (not in the spec's motion section but part of the feedback loop): `src/l
 | Lens travel (P6) | Magnifier "goes to" the suspicious detail with an animation | Ring and tooltip pop in at the spot (`animate-rise`); no movement between details | Keep one `position: fixed` magnifier element, move it with `transition: transform var(--duration-slow) var(--ease-out-expo)` to the next spot's `getBoundingClientRect()`; instant under `still` |
 | Simulation frame glow (P6) | Frame "glows" safe-coloured after a correct decision | Static `TONE_RING` ring + `transition-shadow` | Add a one-shot keyframe on `box-shadow` (or a `ring` opacity pulse) in `@theme`; attach with `key` on the result |
 | Admin page transitions (A5) | Blur-to-clear reveal is spec'd for learner pages; admin not stated | One reveal per layout mount; navigations swap content instantly | Optional `src/app/(admin)/admin/template.tsx` (recipe 6.4) |
-| Chart draw-in (O2) | Not stated by the spec (verify against `admin-overview-03-charts.jpg`) | Static SVG | Recipe 6.3 if wanted |
-| Fill-on-load for bars/rings (O3, O4, H3, H4) | Not stated | Transition only on value change | Recipe 6.3 (server renders final state; client wrapper animates from 0 once) |
-| Confetti / celebrate layer (F5, P10) | `z-80` overlay "could be a toast/confetti layer" (verify); `recap` has `mood: celebrate` | Mascot celebrate + bounce, no particles | If confirmed, a CSS-only particle burst (a fixed `z-80` layer, ~20 spans with `transform` keyframes) rendered once on `DoneScreen`; skip entirely under `still` and `calm` |
-| `calm` in JS | "Animation intensity" segment | `calm` shortens two CSS durations and stops float/blink; JS timers, CountUp, tour scrolling and Rive ignore it | Recipe 6.6 step 2; decide and record in an ADR |
-| `motion-safe:` variants vs preference | Full/Calm/Still is per user | Three usages respond to the OS only | Replace with plain classes or a `@custom-variant` keyed on `html:not([data-motion="still"])` |
+| Chart draw-in (O2) | Not stated by the spec (verify against `admin-overview-03-charts.jpg`) | Done 2026-11-04: `AreaChart` draws in with a clip rect (`scale`, 1.1 s; the server markup is the final chart) and its latest point glows | — |
+| Fill-on-load for bars/rings (O3, O4, H3, H4) | Not stated | `Ring` fills from empty once on mount (2026-11-04); `ProgressBar` still only on value change, with an optional moving sheen (`shimmer` prop, Full only) | Recipe 6.3 for the bar |
+| Confetti / celebrate layer (F5, P10) | `z-80` overlay "could be a toast/confetti layer" (verify); `recap` has `mood: celebrate` | Since 2026-11-04 `DoneScreen` bursts 12 particles from the XP pill and a chip flies up (Full only) | A full-screen layer only if the original is confirmed to have one |
+| `calm` in JS | "Animation intensity" segment | Closed 2026-11-04 (ADR-032): `useMotion()` reports it; Burst, flyToXp, the Home toys and the cat's acts honour it. CountUp and tour scrolling still treat it as Full | Extend where a JS animation is long or playful |
+| `motion-safe:` variants vs preference | Full/Calm/Still is per user | Closed 2026-11-04: `motion-ok:` / `motion-full:` custom variants replaced them | — |
 | Dialog/sheet/toast exit | Not stated | Enter only (`animate-rise`), close is instant | Leave as is unless the user asks; recipe 6.4 last bullet |
 | Skeleton coverage (A4) | Shown on admin person page | Three routes only; admin list pages rely on `PendingMark` | Add `<Suspense>` sections inside heavy admin pages (overview charts, reports) rather than route-level `loading.tsx` |
 | Hotspot pulse | Not in the spec | Spots have hover colour only | Only if the user asks: `animate-pulse` on undiscovered spots after a hint, off under `still` |
 | `blink` token | Mascot blinks (`blink 4.8s`) | Token defined, class unused — Rive's `Blink` layer blinks instead | Nothing to do; remove the token only if a cleanup task asks |
 | Timer visual (P9) | Not stated beyond the countdown | Text pill turns red at ≤ 5 s | Optional `Ring` around the pill driven by `left/total` |
+
+## 8. Light and motion foundation (2026-11-04)
+
+ADR-032. The owner asked for light and lively motion across the portal; the foundation keeps
+Full / Calm / Still and the OS setting intact. Everything is in `src/app/globals.css`,
+`src/lib/motion.ts` and `src/components/ui/light.tsx`; tests: `tests/motion.test.ts`,
+`tests/learner-light.test.ts`, `tests/admin-light.test.ts` (class presence and the rules below).
+
+**Tokens** (`@theme`; every 100% keyframe is the resting state, because Still runs each animation once):
+
+| Token | What | Calm | Still |
+|---|---|---|---|
+| `animate-sweep` | one band of light across the box in the reading direction (`--sweep`: 1 in LTR, -1 in RTL), then gone | plays | one frame (invisible end state) |
+| `animate-sheen` | the same band, looping (progress bar `shimmer`, landing) | off | one frame |
+| `animate-glow` | a one-shot flash of a `.glow-ring` | plays | one frame |
+| `animate-breathe` | a slow pulse of the current item's halo (path timeline, league, Home, player progress edge) | off (rests at the halo's own opacity) | one frame |
+| `animate-aurora` | two soft blobs drifting behind a hero (by transform only, no blur filter) | off | one frame |
+| `animate-burst` | particles flying out of a centre | hidden | one frame |
+| `animate-fly-up` | a chip rising and fading (XP on the done screen) | hidden | one frame |
+
+**Layers** (`@layer components`; an empty `aria-hidden` element inside the lit box, which needs
+`isolate` and its own background, because `.aurora`, `.light-sweep` and `.spotlight` sit at
+`z-index: -1`; all are hidden in print):
+
+- `.aurora`: a hero wash plus the two blobs (Home, Progress, the learner league, the sign-in brand
+  panel, landing scenes).
+- `.light-sweep`: one pass on mount, delayed by `--sweep-delay` (default 0.25 s); a new `key` replays
+  it. With `.after-count` it waits until `<CountUp>` marks the tile `data-counted` (admin overview
+  tiles, both leagues, landing).
+- `.spotlight`: a soft disc that follows the pointer through `--mx`/`--my`, set by `<Spotlight />`
+  (mouse and pen only; hidden under Still and reduced motion). Physical `top`/`left` on purpose: the
+  offsets are viewport coordinates (catalog cards, lab cards).
+- `.glow-ring`: a halo just outside its parent; static, with `animate-breathe` for the current item or
+  `animate-glow` for a one-shot flash (league podium, path timeline, Progress, chart points, `Ring`,
+  correct answers).
+- `.burst`: `<Burst />`, 12 particles in fixed directions (no `Math.random` in render), Full only.
+- Colour: `--light` (default `--brand`) and `--light-2` (default `--accent`); `.light-on-brand` switches a
+  brand-filled surface to a faint wash of `--brand-on`, weak enough to keep brand-on text at 4.5:1.
+  Semantic glows keep their colour: a correct answer or success glows `--color-safe-500`, the league
+  trophy `--color-laurel-500` (§5, "Deliberate exceptions").
+
+**Variants.** `motion-ok:` = OS `no-preference` and `<html data-motion>` not `still`; `motion-full:` =
+also not `calm`. Use them for anything that loops or plays (`motion-full:after:animate-sheen`,
+`motion-full:animate-ping`); Tailwind's own `motion-safe:` listens to the OS only.
+
+**JS.** `src/lib/motion.ts`: `motionLevel(dataMotion, reduced)` (pure; reduced motion counts as Still,
+anything unknown as Full), `readMotion()` (now, for handlers and effects), `useMotion()` (live through
+`useSyncExternalStore`: `matchMedia` change events and a `MutationObserver` on `data-motion`; the
+server snapshot is Full, and the CSS rules hold Calm and Still back until the client takes over).
+`src/components/ui/light.tsx`: `Burst`, `Spotlight`, and `flyToXp(source)`, which flies a copy of an XP
+pill into the header XP pill (`[data-tour="xp"]`) and bumps it, Full only; it has no caller yet.
+`CountUp` moved to `src/components/ui/count-up.tsx`.
+
+**Rules for new work.**
+1. Reach for a token or a layer before writing CSS; keep to `transform` and `opacity` (the AreaChart clip
+   and the `Ring` fill are the reviewed exceptions, §5).
+2. Loops and play are Full only (`motion-full:` or `useMotion() === "full"`); one-shot light may play
+   under Calm; Still gets the end state, never a missing element the layout depends on.
+3. Direction: a sweep or drift reads `--sweep`; a JS position uses logical properties
+   (`inset-inline-start`) or reads `dir` (the Home laser dot does).
+4. Decorative only: every light element is `aria-hidden`, never carries information, and is hidden in
+   print.
+5. Verify in Full, Calm and Still, with the OS setting on, and in ar.

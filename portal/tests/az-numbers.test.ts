@@ -35,6 +35,15 @@ describe("lacksAzNumbers (should the polyfill load?)", () => {
     expect(lacksAzNumbers(TurkishFallback)).toBe(true);
   });
 
+  it("is true when only Georgian is missing (Chromium has no ka data at all)", () => {
+    class NoGeorgian extends Native {
+      constructor(locale: string) {
+        super(locale === "ka" ? "en-US" : locale);
+      }
+    }
+    expect(lacksAzNumbers(NoGeorgian)).toBe(true);
+  });
+
   it("never loads anything on the server", () => {
     expect(azNumbersReady()).toBeNull();
   });
@@ -45,6 +54,7 @@ const MESSAGES: Record<string, string[]> = {
   az: ["{count, plural, other {# şablon}}", "{kb, number} KB", "5 ulduzdan {value, number}"],
   en: ["{count, plural, one {# template} other {# templates}}", "{kb, number} KB"],
   ru: ["{count, plural, one {# шаблон} few {# шаблона} many {# шаблонов} other {# шаблона}}", "{kb, number} КБ"],
+  ka: ["{count, plural, one {# შაბლონი} other {# შაბლონი}}", "{kb, number} კბ"],
 };
 const VALUES = [7, 1234, 1234.5, 1_000_000, 21];
 const OPTIONS: Intl.NumberFormatOptions[] = [{}, { minimumFractionDigits: 1, maximumFractionDigits: 1 }, { maximumFractionDigits: 1 }, { style: "percent" }];
@@ -76,13 +86,14 @@ describe("the polyfill in a browser without az data", () => {
     vi.resetModules();
   });
 
-  it("loads once, then formats az, en and ru messages exactly like the server", async () => {
+  it("loads once, then formats az, en, ru and ka messages exactly like the server", async () => {
     const server = render();
     expect(server).toContain("1.234,5 şablon");
+    expect(server).toContain("1234,5 შაბლონი");
 
     class Chromium extends Native {
       constructor(locales?: string | string[], options?: Intl.NumberFormatOptions) {
-        super(String(locales).startsWith("az") ? "en-US" : locales, options);
+        super(/^(az|ka)/.test(String(locales)) ? "en-US" : locales, options);
       }
     }
     Object.defineProperty(Intl, "NumberFormat", { value: Chromium, configurable: true, writable: true });

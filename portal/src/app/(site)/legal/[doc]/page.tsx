@@ -69,7 +69,8 @@ export default async function LegalPage({ params, searchParams }: PageProps<"/le
               {tr("version", { version: d.version, date: format.dateTime(new Date(`${d.effective}T12:00:00`), { day: "2-digit", month: "2-digit", year: "numeric" }) })}
             </p>
           ) : null}
-          <h1 {...langAttrs(d.lang)} className="font-display text-headline font-bold">
+          {/* A word longer than a phone's line (Georgian "კონფიდენციალურობის") wraps instead of widening the page. */}
+          <h1 {...langAttrs(d.lang)} className="font-display text-headline font-bold wrap-break-word">
             {title}
           </h1>
           {intro ? (

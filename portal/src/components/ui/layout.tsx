@@ -53,7 +53,11 @@ export function PageHeader({
 export function EmptyState({ icon, title, body, action, className }: { icon?: ReactNode; title: ReactNode; body?: ReactNode; action?: ReactNode; className?: string }) {
   return (
     <div className={cn("flex flex-col items-center px-6 py-12 text-center", className)}>
-      {icon ? <span className="mb-4 grid size-16 place-items-center rounded-full bg-sunken text-ink-subtle [&_svg]:size-7">{icon}</span> : null}
+      {icon ? (
+        <span className="mb-4 grid size-16 place-items-center rounded-full bg-sunken text-ink-subtle shadow-[0_0_0_0.5rem_color-mix(in_oklab,var(--brand)_5%,transparent),0_0_2.5rem_0.75rem_color-mix(in_oklab,var(--brand)_12%,transparent)] print:shadow-none [&_svg]:size-7">
+          {icon}
+        </span>
+      ) : null}
       <p className="text-title-sm font-semibold text-ink">{title}</p>
       {body ? <p className="mt-1.5 max-w-sm text-body-sm text-ink-muted">{body}</p> : null}
       {action ? <div className="mt-5">{action}</div> : null}

@@ -11,6 +11,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { getTableName, is, sql } from "drizzle-orm";
+import { createTranslator } from "next-intl";
 import { PgTable } from "drizzle-orm/pg-core";
 import { createDb, type DB } from "../src/server/db/client";
 import * as t from "../src/server/db/schema";
@@ -21,10 +22,11 @@ import { audit } from "../src/server/services/audit";
 import { hashPassword } from "../src/server/auth/password";
 import { analyzeFile, analyzeUrl } from "../src/server/sandbox/analyze";
 import { TEMPLATE_BY_KEY, clickRiskTitle } from "../src/lib/campaigns/templates";
-import type { Locale } from "../src/i18n/config";
-import { DEFAULT_ATTESTATION, defaultSettings } from "../src/lib/tenant-defaults";
+import { pick, type Locale } from "../src/i18n/config";
+import { messagesFor } from "../src/i18n/translator";
+import { DEFAULT_ATTESTATION, DEFAULT_TEMPLATES, defaultSettings } from "../src/lib/tenant-defaults";
 import { departmentKey } from "../src/lib/departments";
-import { encodeRiskTitle } from "../src/lib/risk-title";
+import { encodeRiskTitle, riskTitle } from "../src/lib/risk-title";
 import { REPORT_BONUS_XP, LAB_XP, dayKey } from "../src/lib/domain/gamification";
 import { DEMO_DOMAIN, DEPARTMENTS, PEOPLE, emailFor, mulberry32, type DeptKey, type SeedPerson } from "./seed-data";
 
@@ -825,10 +827,17 @@ async function main() {
   }
 
   /* ───────── notifications & audit trail ───────── */
+  // In each recipient's language, worded like notifyUsers: the template's subject, then the due date.
+  const pwMfaTitle = modRows.find((m) => m.slug === "passwords-mfa")!.title;
+  const pwMfaDue = new Date(`${iso(new Date(NOW.getTime() + 12 * DAY))}T12:00:00Z`);
   for (const p of active.slice(0, 20)) {
-    await db.insert(t.notifications).values({ tenantId, userId: p.id, kind: "assignment", title: "Yeni təlim: Parollar və təhlükəsiz giriş", body: "Son tarix 12 gün sonradır.", href: "/learn/passwords-mfa", createdAt: assignedAt });
+    const lang = p.locale ?? "az";
+    const due = createTranslator({ ...(await messagesFor(lang)), namespace: "common.time" })("due", { date: new Intl.DateTimeFormat(lang, { dateStyle: "long", timeZone: "UTC" }).format(pwMfaDue) });
+    await db.insert(t.notifications).values({ tenantId, userId: p.id, kind: "assignment", title: DEFAULT_TEMPLATES.assignment[lang].subject.replace("{{module}}", pick(pwMfaTitle, lang)), body: due, href: "/learn/passwords-mfa", createdAt: assignedAt });
   }
-  await db.insert(t.notifications).values({ tenantId, userId: learner.id, kind: "risk", title: "Yeni açıq risk", body: "E-poçt ünvanınız sızıntıda aşkarlanıb.", href: "/security", createdAt: daysAgo(3) });
+  const learnerLang = learner.locale ?? "az";
+  const riskKind = createTranslator({ ...(await messagesFor(learnerLang)), namespace: "security.kind" })("breach");
+  await db.insert(t.notifications).values({ tenantId, userId: learner.id, kind: "risk", title: riskKind, body: riskTitle(breachTitle, learnerLang), href: "/security", createdAt: daysAgo(3) });
   await audit(db, { tenantId, actorId: admin.id, action: "settings.branding", at: daysAgo(55) });
   await audit(db, { tenantId, actorId: admin.id, action: "people.imported", meta: { count: people.length - 1 }, at: daysAgo(50) });
   for (const a of await db.select().from(t.assignments)) {

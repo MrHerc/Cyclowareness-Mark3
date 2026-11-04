@@ -9,7 +9,8 @@ import type { PlayerAnswer } from "./scenes";
  * the learner starts from the beginning.
  */
 export type SavedLesson =
-  | { kind: "playing"; index: number; inner: number; answers: PlayerAnswer[]; elapsedMs: number }
+  /** `maxIndex`: the furthest scene reached; the learner may jump back to any scene up to it, never past it. */
+  | { kind: "playing"; index: number; maxIndex: number; inner: number; answers: PlayerAnswer[]; elapsedMs: number }
   | { kind: "done"; result: LessonResult; token: string | null };
 
 const VERSION = 1;
@@ -86,6 +87,9 @@ export function parseLesson(raw: string | null, sceneIds: string[], answerIds: R
   if (o.kind === "playing") {
     const index = o.index;
     if (!Number.isInteger(index) || (index as number) < 0 || (index as number) >= sceneIds.length) return null;
+    // Saved before maxIndex existed: the scene shown was the furthest one.
+    const maxIndex = o.maxIndex === undefined ? index : o.maxIndex;
+    if (!Number.isInteger(maxIndex) || (maxIndex as number) < (index as number) || (maxIndex as number) >= sceneIds.length) return null;
     if (typeof o.inner !== "number" || !(o.inner >= 0 && o.inner < 1)) return null;
     if (typeof o.elapsedMs !== "number" || !Number.isFinite(o.elapsedMs) || o.elapsedMs < 0) return null;
     if (!Array.isArray(o.answers)) return null;
@@ -93,7 +97,7 @@ export function parseLesson(raw: string | null, sceneIds: string[], answerIds: R
       .map(answerOf)
       .filter((a): a is PlayerAnswer => !!a && answerIds.has(a.sceneId))
       .slice(0, MAX_ANSWERS);
-    return { kind: "playing", index: index as number, inner: o.inner, answers, elapsedMs: Math.min(o.elapsedMs, MAX_ELAPSED_MS) };
+    return { kind: "playing", index: index as number, maxIndex: maxIndex as number, inner: o.inner, answers, elapsedMs: Math.min(o.elapsedMs, MAX_ELAPSED_MS) };
   }
   if (o.kind === "done") {
     const result = resultOf(o.result);

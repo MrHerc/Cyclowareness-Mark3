@@ -209,7 +209,7 @@ export default async function SecurityPage() {
                     <div className="grid gap-3">
                       <div className="flex items-center gap-3 text-caption">
                         <span className="min-w-0 flex-1 font-semibold break-words text-ink">{m.title}</span>
-                        <span className="font-bold tabular-nums">{m.percent}%</span>
+                        <span className="font-bold tabular-nums">{tc("units.percent", { value: format.number(m.percent) })}</span>
                       </div>
                       <ProgressBar decorative value={m.percent} size="sm" />
                       {m.status === "completed" ? <p className="text-caption text-ink-muted">{tr("retakeHint")}</p> : null}

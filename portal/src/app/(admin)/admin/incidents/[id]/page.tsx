@@ -171,7 +171,7 @@ export default async function IncidentPage({ params }: PageProps<"/admin/inciden
                                   "—"
                                 ) : (
                                   <span className={inc.minScore && score < inc.minScore ? "font-semibold text-risk-600" : "font-semibold text-safe-700"} title={inc.minScore ? (score < inc.minScore ? tr("belowMark") : tr("passed")) : undefined}>
-                                    {score}%
+                                    {tc("units.percent", { value: format.number(score) })}
                                   </span>
                                 )}
                               </td>

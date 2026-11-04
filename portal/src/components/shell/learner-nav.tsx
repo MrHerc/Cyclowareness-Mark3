@@ -30,6 +30,10 @@ const TABS: Item[] = [
   { href: "/profile", key: "profile", icon: User },
 ];
 
+// The active pill's light: a hairline of brand and a soft brand shadow under it (static, so no motion setting applies).
+const ACTIVE_GLOW =
+  "shadow-[inset_0_0_0_1px_color-mix(in_oklab,var(--brand)_14%,transparent),0_0.5rem_1.25rem_-0.75rem_color-mix(in_oklab,var(--brand)_60%,transparent)]";
+
 function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
@@ -65,7 +69,7 @@ export function RailNav({ showAdmin, hidden = [] }: { showAdmin: boolean; hidden
           aria-current={active ? "page" : undefined}
           className={cn(
             "flex h-11 items-center gap-3 rounded-pill px-4 text-body-sm font-semibold transition-colors",
-            active ? "bg-brand-50 text-brand-700" : "text-ink-muted hover:bg-sunken hover:text-ink",
+            active ? ["bg-brand-50 text-brand-700", ACTIVE_GLOW] : "text-ink-muted hover:bg-sunken hover:text-ink",
           )}
         >
           <i.icon className={cn("size-5 shrink-0", active ? "text-brand-600" : "text-ink-subtle")} strokeWidth={active ? 2.25 : 2} />
@@ -107,7 +111,7 @@ export function TabBar({ hidden = [] }: { hidden?: string[] }) {
           return (
             <li key={i.href}>
               <Link href={i.href} data-tour={`nav-${i.key}`} aria-current={active ? "page" : undefined} className="flex h-full flex-col items-center justify-center gap-1">
-                <span className={cn("grid h-8 w-14 place-items-center rounded-pill transition-colors", active && "bg-brand-50")}>
+                <span className={cn("grid h-8 w-14 place-items-center rounded-pill transition-colors", active && ["bg-brand-50", ACTIVE_GLOW])}>
                   <TabIcon icon={i.icon} active={active} />
                 </span>
                 <span className={cn("text-tab-sm font-semibold", active ? "text-brand-700" : "text-ink-muted")}>{t(i.key)}</span>

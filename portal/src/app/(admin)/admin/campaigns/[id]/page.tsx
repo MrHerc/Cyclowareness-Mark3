@@ -86,7 +86,7 @@ export default async function CampaignPage({ params }: PageProps<"/admin/campaig
           <CardHeader title={tr("results")} description={tr("resultsSub")} />
           <CardBody className="grid gap-4 pt-3">
             <p className="text-caption text-ink-muted">
-              {tr("reportRate")}: <b className="text-title text-safe-700">{pct(s.reported)}%</b>
+              {tr("reportRate")}: <b className="text-title text-safe-700">{tc("units.percent", { value: format.number(pct(s.reported)) })}</b>
             </p>
             <Funnel
               steps={[

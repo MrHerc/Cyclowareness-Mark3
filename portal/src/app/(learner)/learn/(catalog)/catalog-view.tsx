@@ -7,6 +7,7 @@ import { Check, ChevronRight, Clock, Compass, Layers, Search, Zap } from "lucide
 import { Segmented } from "@/components/ui/field";
 import { Pill } from "@/components/ui/pill";
 import { ModuleIcon } from "@/components/learner/module-icon";
+import { Spotlight } from "@/components/ui/light";
 import { CATEGORIES, type Category } from "@/lib/domain/catalog";
 import { cn } from "@/lib/cn";
 
@@ -117,7 +118,8 @@ export function CatalogView({ modules }: { modules: CatalogCard[] }) {
         <ul className="grid items-start gap-3 md:grid-cols-2">
           {list.map((m) => (
             <li key={m.slug}>
-              <Link href={`/learn/${m.slug}`} className="group flex items-center gap-4 rounded-xl border border-line bg-surface p-5 shadow-xs transition-shadow hover:shadow-raised">
+              <Link href={`/learn/${m.slug}`} className="group relative isolate flex items-center gap-4 rounded-xl border border-line bg-surface p-5 shadow-xs transition-shadow hover:shadow-raised">
+                <Spotlight />
                 <ModuleIcon slug={m.slug} category={m.category} size="lg" />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">

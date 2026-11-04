@@ -229,12 +229,19 @@ function Tour({ copy, guide: timing, lang, countries, privacyLabel }: { copy: La
       >
         <div aria-hidden className="pointer-events-none absolute inset-0 [background-image:linear-gradient(to_right,var(--color-line)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-line)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:radial-gradient(ellipse_at_70%_60%,black,transparent_70%)] opacity-60" />
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 origin-bottom [transform:perspective(600px)_rotateX(60deg)] [background-image:linear-gradient(to_right,var(--color-line)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-line)_1px,transparent_1px)] [background-size:56px_56px] [mask-image:linear-gradient(to_top,black,transparent)] opacity-60" />
+        {/* A soft band of light crosses the floor toward the viewer now and then (full motion only; it rests unseen), fading
+            at both edges so no hard line shows. The band is
+            turned a quarter so the sheen's sideways pass runs into depth; it is sized from the floor (cqw/cqh) and
+            left to right on purpose, the same in every language. */}
+        <div aria-hidden dir="ltr" className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 origin-bottom overflow-hidden [container-type:size] [transform:perspective(600px)_rotateX(60deg)] [mask-image:linear-gradient(to_top,black,transparent)] print:hidden">
+          <span className="absolute start-1/2 top-1/2 h-[100cqw] w-[100cqh] -translate-1/2 rotate-90 animate-sheen opacity-0 bg-[linear-gradient(90deg,transparent_70%,color-mix(in_oklab,var(--brand)_14%,transparent)_90%,transparent)]" style={{ animationDuration: "7s" }} />
+        </div>
         <div className="relative mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div className="order-2 grid gap-6 lg:order-1">
             <h1 className="sr-only">{copy.hero.question}</h1>
             <p className="max-w-md text-lead text-ink-muted">{copy.hero.sub}</p>
             <div className="flex flex-wrap gap-3">
-              <button type="button" onClick={() => scrollTo("demo")} className="h-12 rounded-pill bg-brand-600 px-6 font-bold text-brand-on shadow-raised hover:bg-brand-700">
+              <button type="button" onClick={() => scrollTo("demo")} className="h-12 rounded-pill bg-brand-600 px-6 font-bold text-brand-on relative shadow-raised transition-colors duration-(--duration-base) ease-(--ease-out-quart) after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:opacity-0 after:shadow-[0_14px_34px_-12px_color-mix(in_oklab,var(--brand)_70%,transparent)] after:transition-opacity after:duration-(--duration-base) hover:bg-brand-700 hover:after:opacity-100">
                 {copy.hero.demo}
               </button>
               <button type="button" onClick={() => scrollTo("phone")} className="inline-flex h-12 items-center gap-2 rounded-pill px-5 font-semibold text-ink-muted ring-1 ring-line hover:bg-sunken hover:text-ink">

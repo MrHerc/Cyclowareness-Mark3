@@ -26,8 +26,8 @@ export const LOCALE_NAMES: Record<Locale, string> = {
 
 export const LOCALE_COOKIE = "locale";
 
-/** Languages written right to left. */
-export const RTL_LOCALES: ReadonlySet<string> = new Set(["ar"]);
+/** Languages written right to left: the interface's Arabic, and the AI subtitle languages fa, he, ps and ur. */
+export const RTL_LOCALES: ReadonlySet<string> = new Set(["ar", "fa", "he", "ps", "ur"]);
 
 /** Text direction of a locale or BCP-47 tag ("ar", "ar-SA"). */
 export function dirOf(locale: string): "rtl" | "ltr" {

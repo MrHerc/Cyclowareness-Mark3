@@ -23,8 +23,8 @@ const EN_WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const two = (n: number) => String(n).padStart(2, "0");
 
 const fieldFormatters = new Map<string, Intl.DateTimeFormat>();
-/** Calendar fields of `d` in `timeZone` (the runtime's zone when undefined). */
-function fieldsIn(d: Date, timeZone: string | undefined) {
+/** Calendar fields of `d` in `timeZone` (the runtime's zone when undefined). Also used by ka-format.ts. */
+export function fieldsIn(d: Date, timeZone: string | undefined) {
   const key = timeZone ?? "";
   let f = fieldFormatters.get(key);
   if (!f) {

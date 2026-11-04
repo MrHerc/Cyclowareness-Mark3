@@ -113,8 +113,8 @@ export default async function HomePage() {
         ) : null}
 
         {current ? (
-          <section data-tour="continue" className="relative scroll-mt-[calc(var(--topbar-height)+1rem)] overflow-hidden rounded-2xl bg-brand-600 p-6 text-brand-on shadow-raised sm:p-8">
-            <div aria-hidden className="pointer-events-none absolute -top-24 -end-24 size-72 rounded-full bg-white/8" />
+          <section data-tour="continue" className="light-on-brand relative isolate scroll-mt-[calc(var(--topbar-height)+1rem)] overflow-hidden rounded-2xl bg-brand-600 p-6 text-brand-on shadow-raised sm:p-8">
+            <div aria-hidden className="aurora" />
             <div className="relative flex items-center gap-6">
               <div className="min-w-0 flex-1">
                 <Pill className="bg-white/18 text-white">
@@ -140,7 +140,7 @@ export default async function HomePage() {
                 <div className="mt-5 flex items-center gap-3">
                   <ProgressBar value={current.percent} tone="white" className="max-w-xs" label={t("moduleProgress", { title: current.title })} />
                   <span aria-hidden className="text-caption font-bold tabular-nums">
-                    {current.percent}%
+                    {tc("units.percent", { value: format.number(current.percent) })}
                   </span>
                 </div>
                 <ButtonLink
@@ -237,8 +237,10 @@ export default async function HomePage() {
           </div>
         </Card>
         <Card className="flex items-center gap-4 p-5">
-          <span className="grid size-28 shrink-0 place-items-center rounded-full bg-reward-100">
-            <Flame className={cn("size-14", streak ? "fill-reward-400 text-reward-600" : "text-ink-subtle")} strokeWidth={1.75} />
+          <span className="relative grid size-28 shrink-0 place-items-center rounded-full bg-reward-100">
+            {/* A live streak keeps a warm glow behind the flame that breathes (still under Calm and Still). */}
+            {streak ? <span aria-hidden className="pointer-events-none absolute inset-2 animate-breathe rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--accent)_45%,transparent),transparent)] opacity-60 print:hidden" /> : null}
+            <Flame className={cn("relative size-14", streak ? "fill-reward-400 text-reward-600" : "text-ink-subtle")} strokeWidth={1.75} />
           </span>
           <div>
             <p className="text-numeral font-bold tabular-nums">{streak}</p>

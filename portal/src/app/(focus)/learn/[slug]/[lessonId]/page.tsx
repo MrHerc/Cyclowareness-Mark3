@@ -12,7 +12,9 @@ import type { Brand, Scene } from "@/lib/content/types";
 import { pickLessonContent } from "@/lib/content/lesson-locale";
 import { CATEGORY_TOPIC } from "@/lib/domain/catalog";
 import { DEFAULT_ATTESTATION } from "@/lib/tenant-defaults";
-import { pick } from "@/i18n/config";
+import { LOCALES, pick } from "@/i18n/config";
+import { subtitleLanguageOptions } from "@/lib/content/subtitle-languages";
+import { loadCaptionsAction } from "./actions";
 
 let brandCache: Record<string, Brand> | null = null;
 function allBrands(): Record<string, Brand> {
@@ -69,8 +71,13 @@ export default async function LessonPage({ params }: PageProps<"/learn/[slug]/[l
       slug={m.slug}
       moduleTitle={m.title}
       topic={CATEGORY_TOPIC[m.category]}
-      lesson={{ key: lesson.key, title: lesson.title, minutes: lesson.minutes, scenes }}
+      lesson={{ id: lesson.id, key: lesson.key, title: lesson.title, minutes: lesson.minutes, scenes }}
+      syllabus={m.lessons.map((l) => ({ key: l.key, title: l.title, minutes: l.minutes, completed: l.completed }))}
       contentLocale={fallback.locale}
+      captionLocales={LOCALES.filter((l) => l !== fallback.locale && contents.some((c) => c.locale === l))}
+      // Named on the server, where every language has its display names (Chromium lacks Azerbaijani's).
+      moreLanguages={v.tenant.features.has("ai_tutor") ? subtitleLanguageOptions(locale) : []}
+      loadCaptions={loadCaptionsAction}
       clips={clips}
       completedBefore={lesson.completed}
       next={next ? { key: next.key, title: next.title } : null}

@@ -1,3 +1,15 @@
+# ✅ TAMAMLANDI (2026-11-04): 10 dil və təcrübə işi, aşağıdakı hissə artıq tarixçədir
+
+Dayandırılmış workflow-ların hamısı bitib: bərpa addımlarını yenidən icra etməyin, köhnə run id-lərini davam etdirməyin. Hazırki vəziyyət:
+- 7 yeni dilin (tr, ka, ro, ar, uk, fr, de) redaktor və yekun vahidləşdirmə keçidləri bitib, hər dildə 106/106 dərs yoxlayıcıdan keçir (ADR-026).
+- İşıq və hərəkət, pleyer (mündəricat, səs səviyyəsi, sürət, altyazılar, dərsin mətni, qısayollar, kliplərin qoşulması) və 7 dilə 244 sətirlik boşluq doldurması `docs/build/workflows/experience-finish.js` ilə edilib. Bazası köhnəlmiş `lightws` işi atıldı, işıq əsas ağacda yenidən quruldu.
+- Codex CLI 0.166-da da çökür, kod baxışlarını ECC və agent-skills rəyçiləri edib (OPEN-QUESTIONS 24).
+- `tsc` 0, `eslint` 0, vitest 81 fayl / 2621 test. Baza 10 × 106 dərslə seed olunub.
+- Sənədlər: DECISIONS ADR-025 … ADR-033, PROGRESS dövrə 10, OPEN-QUESTIONS 1, 2, 7, 8, 9, 20–25, skill istinadları.
+- Qalan: yekun brauzer yoxlaması (`finalize-portal.js`), sonra commit və `origin`-ə push (istifadəçinin 2026-10-27 göstərişi; `origin/main`-dəki README commit-i birləşdirilir, force push edilmir). Bu addımları əsas sessiya edir.
+
+---
+
 # ⏸ DAVAM ETMƏK ÜÇÜN: 10 dil və təcrübə işi (2026-10-27-də həftəlik limitə görə dayandırılıb)
 
 Həftəlik limit bazar günü, 2026-11-01-də saat 22:00-da (Bakı vaxtı) yenilənir. Bundan sonra soruşmadan qaldığın yerdən davam et. Bitəndə commit et və `origin`-ə push et: https://github.com/MrHerc/Cyclowareness-Mark3. `origin/main`-də yalnız README commit-i var; onu birləşdir, heç vaxt force push etmə.

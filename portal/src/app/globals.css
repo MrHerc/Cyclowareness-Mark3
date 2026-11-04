@@ -4,6 +4,22 @@
    e-mail and phone inputs). :dir() follows the nearest dir attribute. */
 @custom-variant rtl (&:where(:dir(rtl)));
 @custom-variant ltr (&:where(:dir(ltr)));
+/* motion-safe: listens to the OS only; these also follow the viewer's <html data-motion>.
+   motion-ok: anything but Still; motion-full: Full only (Calm drops loops). */
+@custom-variant motion-ok {
+  @media (prefers-reduced-motion: no-preference) {
+    &:where(html:not([data-motion="still"]) *) {
+      @slot;
+    }
+  }
+}
+@custom-variant motion-full {
+  @media (prefers-reduced-motion: no-preference) {
+    &:where(html:not([data-motion="still"], [data-motion="calm"]) *) {
+      @slot;
+    }
+  }
+}
 
 /* Design tokens: docs/audit/01-design-tokens.md (Cyclowareness, 1:1). */
 
@@ -136,6 +152,14 @@
   --animate-blink: blink 4.8s linear infinite;
   --animate-reveal: reveal var(--duration-reveal) var(--ease-out-expo) both;
   --animate-rise: rise var(--duration-slow) var(--ease-out-expo) both;
+  /* Light. Every 100% frame is the resting state, because Still runs each animation once and stops there. */
+  --animate-sweep: sweep 1.6s var(--ease-in-out-smooth) both;
+  --animate-sheen: sweep 4.8s var(--ease-in-out-smooth) infinite;
+  --animate-glow: glow 1.4s var(--ease-out-quart) both;
+  --animate-breathe: breathe 2.8s var(--ease-in-out-smooth) infinite;
+  --animate-aurora: aurora 24s var(--ease-in-out-smooth) infinite;
+  --animate-burst: burst 0.9s var(--ease-out-expo) both;
+  --animate-fly-up: fly-up 1.1s var(--ease-out-quart) both;
 
   --z-80: 80;
   --z-90: 90;
@@ -160,6 +184,37 @@
   @keyframes rise {
     0% { opacity: 0; transform: translateY(12px); }
     100% { opacity: 1; transform: none; }
+  }
+  /* A band crossing once in the reading direction, then resting past the far edge. */
+  @keyframes sweep {
+    0% { opacity: 0; transform: translate(calc(-100% * var(--sweep, 1))); }
+    12% { opacity: 1; }
+    60%, 100% { opacity: 0; transform: translate(calc(100% * var(--sweep, 1))); }
+  }
+  @keyframes glow {
+    0% { opacity: 0; }
+    30% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  /* Rests at .glow-ring's own opacity, so Calm (no loop) and Still look the same. */
+  @keyframes breathe {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.06); }
+  }
+  @keyframes aurora {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(calc(14% * var(--sweep, 1)), 10%) scale(1.12); }
+    66% { transform: translate(calc(-8% * var(--sweep, 1)), -6%) scale(0.92); }
+  }
+  @keyframes burst {
+    0% { opacity: 1; transform: translate(0, 0) scale(0.3); }
+    70% { opacity: 1; }
+    100% { opacity: 0; transform: translate(var(--bx, 0), var(--by, 0)) scale(1); }
+  }
+  @keyframes fly-up {
+    0% { opacity: 0; transform: translateY(0.5rem) scale(0.9); }
+    20% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-2rem) scale(1); }
   }
 }
 
@@ -227,6 +282,153 @@
   }
 }
 
+/* Decorative light layers: an empty aria-hidden element inside the lit box. They take their colour from
+   --light (default the brand) and --light-2 (default the accent); .light-on-brand switches a brand-filled
+   surface to a faint wash of its readable colour (weak enough to keep brand-on text at 4.5:1). .aurora, .light-sweep and .spotlight sit at z-index -1, under the content
+   and over the background, so the lit box needs `isolate` (a stacking context) and its own background. */
+@layer components {
+  /* Both blobs are washes of the readable colour here: the accent over the brand mixes to a muddy mauve. */
+  .light-on-brand {
+    --light: color-mix(in oklab, var(--brand-on) 38%, transparent);
+    --light-2: color-mix(in oklab, var(--brand-on) 22%, transparent);
+  }
+  .aurora {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    contain: paint;
+    border-radius: inherit;
+    pointer-events: none;
+    background: radial-gradient(60% 55% at 50% 0%, color-mix(in oklab, var(--light, var(--brand)) 10%, transparent), transparent);
+  }
+  /* Two blobs, soft by their gradient (no blur filter), drifting by transform only. */
+  .aurora::before,
+  .aurora::after {
+    content: "";
+    position: absolute;
+    width: 80%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, color-mix(in oklab, var(--light, var(--brand)) 24%, transparent), transparent);
+    animation: var(--animate-aurora);
+  }
+  .aurora::before {
+    inset-block-start: -40%;
+    inset-inline-start: -25%;
+  }
+  .aurora::after {
+    inset-block-end: -45%;
+    inset-inline-end: -25%;
+    background: radial-gradient(closest-side, color-mix(in oklab, var(--light-2, var(--accent)) 24%, transparent), transparent);
+    animation-delay: -12s;
+    animation-direction: reverse;
+  }
+  /* One pass of light on mount; a new `key` replays it. --sweep-delay waits for the box to settle. */
+  .light-sweep {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+  }
+  .light-sweep::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background: linear-gradient(calc(105deg * var(--sweep, 1)), transparent 30%, color-mix(in oklab, var(--light, var(--brand)) 30%, transparent) 50%, transparent 70%);
+    animation: var(--animate-sweep);
+    animation-delay: var(--sweep-delay, 0.25s);
+  }
+  /* A tile whose number counts up waits for the count to settle (<CountUp> marks the tile data-counted). */
+  .light-sweep.after-count::before {
+    animation-play-state: paused;
+  }
+  [data-counted] > .light-sweep.after-count::before {
+    animation-play-state: running;
+  }
+  /* A soft disc the pointer drags through --mx/--my (set by <Spotlight>; mouse and pen only). It moves by
+     transform, so a pointer move recomposites instead of repainting the card. Physical top/left on purpose:
+     the offsets are viewport coordinates. */
+  .spotlight {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-out-quart);
+  }
+  .spotlight::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40rem;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, color-mix(in oklab, var(--light, var(--brand)) 12%, transparent), transparent 70%);
+    transform: translate(calc(var(--mx, 0px) - 50%), calc(var(--my, 0px) - 50%));
+  }
+  @media (pointer: fine) {
+    :hover > .spotlight {
+      opacity: 1;
+    }
+    :hover > .spotlight::before {
+      will-change: transform;
+    }
+  }
+  /* A halo just outside its parent (no overflow-hidden there): static as is, `animate-breathe` for the
+     current item, `animate-glow` for a one-shot flash. */
+  .glow-ring {
+    position: absolute;
+    inset: -3px;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0.6;
+    box-shadow:
+      0 0 0 2px color-mix(in oklab, var(--light, var(--brand)) 45%, transparent),
+      0 0 1.25rem 0.125rem color-mix(in oklab, var(--light, var(--brand)) 40%, transparent);
+  }
+  /* <Burst>: particles fly out from the centre of the nearest positioned box. */
+  .burst {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+  }
+  .burst > span {
+    grid-area: 1 / 1;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 999px;
+    background: var(--brand);
+    animation: var(--animate-burst);
+  }
+  .burst > span:nth-child(3n + 2) {
+    background: var(--accent);
+  }
+  .burst > span:nth-child(3n) {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 2px;
+    background: color-mix(in oklab, var(--brand), var(--accent));
+  }
+  @media print {
+    .aurora,
+    .light-sweep,
+    .spotlight,
+    .glow-ring,
+    .burst {
+      display: none;
+    }
+  }
+}
+
 /* Arabic letters join, so the tokens' negative tracking and tracking-* would break words apart, and the tight
    display line-heights clip its marks. Unlayered so it wins over the utilities; monospace (codes, the OTP field)
    keeps its spacing. */
@@ -238,6 +440,12 @@
   --text-title-sm--line-height: 1.4;
   --text-tab--line-height: 1.4;
   --text-tab-sm--line-height: 1.4;
+}
+
+/* Georgian has no capitals in running text: Firefox and Safari turn uppercase/capitalize into Mtavruli, which the
+   glossary forbids. Unlayered so it wins over the utilities. */
+:lang(ka):is(.uppercase, .capitalize) {
+  text-transform: none;
 }
 
 /* Lucide has no RTL variants: icons that point along the reading direction mirror. On the icon itself, so
@@ -253,9 +461,26 @@
     .lucide-reply,
     .lucide-log-out,
     .lucide-move-right,
-    .lucide-corner-down-right
+    .lucide-corner-down-right,
+    .lucide-skip-forward,
+    .lucide-skip-back
   ):dir(rtl) {
   transform: scaleX(-1);
+}
+
+/* Native control icons as data URIs. Here, not in class names: Tailwind's scanner cannot read a URI full of
+   spaces and quotes inside a JS string. The select chevron sits at the inline end. */
+@utility select-chevron {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b6788' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 1rem;
+  background-position: right var(--chevron-inset, 0.85rem) center;
+  &:where(:dir(rtl)) {
+    background-position: left var(--chevron-inset, 0.85rem) center;
+  }
+}
+@utility check-tick {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E");
 }
 
 /* Motion preference: "calm" and "still" set on <html data-motion>. */
@@ -271,14 +496,30 @@ html[data-motion="calm"] {
   --duration-slow: 0.3s;
 }
 html[data-motion="calm"] .animate-float,
-html[data-motion="calm"] .animate-blink {
+html[data-motion="calm"] .animate-blink,
+html[data-motion="calm"] .animate-sheen,
+html[data-motion="calm"] .animate-breathe,
+html[data-motion="calm"] .animate-aurora,
+html[data-motion="calm"] .aurora::before,
+html[data-motion="calm"] .aurora::after {
   animation: none;
+}
+/* Bursts and fly-ups check the preference in JS too; this covers the server render before hydration. */
+html[data-motion="calm"] :is(.burst, .animate-fly-up) {
+  display: none;
+}
+/* The spotlight follows the pointer, which is movement: Still has none. */
+html[data-motion="still"] .spotlight {
+  display: none;
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
+  }
+  .spotlight {
+    display: none;
   }
 }
 

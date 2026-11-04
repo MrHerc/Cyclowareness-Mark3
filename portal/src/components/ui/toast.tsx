@@ -43,12 +43,15 @@ export function Toaster() {
           key={t.id}
           role={t.tone === "error" ? "alert" : "status"}
           className={cn(
-            "pointer-events-auto flex w-full max-w-md animate-rise items-start gap-3 rounded-lg border px-4 py-3 text-body-sm shadow-overlay",
+            "pointer-events-auto relative flex w-full max-w-md animate-rise items-start gap-3 overflow-hidden rounded-lg border px-4 py-3 text-body-sm shadow-overlay",
             t.tone === "success" && "border-safe-100 bg-surface text-ink",
             t.tone === "error" && "border-risk-100 bg-risk-50 text-risk-700",
             t.tone === "info" && "border-line bg-surface text-ink",
           )}
         >
+          {t.tone === "success" ? (
+            <span aria-hidden className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gradient-to-r from-transparent via-safe-500 to-transparent shadow-[0_0_0.75rem_0.125rem_color-mix(in_oklab,var(--color-safe-500)_45%,transparent)] print:hidden" />
+          ) : null}
           {t.tone === "success" ? <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-safe-600" /> : t.tone === "error" ? <AlertTriangle className="mt-0.5 size-5 shrink-0" /> : <Info className="mt-0.5 size-5 shrink-0 text-brand-600" />}
           <p className="flex-1">{t.message}</p>
           <button type="button" onClick={() => dismiss(t.id)} className="text-ink-subtle hover:text-ink" aria-label={tc("close")}>

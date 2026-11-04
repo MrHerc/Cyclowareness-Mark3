@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { BookOpen, Fish, Languages } from "lucide-react";
 import { BrandMark, VENDOR } from "@/components/brand";
 import { Mascot } from "@/components/mascot/mascot";
+import { LOCALES } from "@/i18n/config";
 import { readLibrary } from "@/server/services/library";
 
 const DOTS = {
@@ -9,6 +10,8 @@ const DOTS = {
   backgroundSize: "22px 22px",
   maskImage: "radial-gradient(120% 90% at 30% 0%, black, transparent 75%)",
 } as const;
+// The second glow drifts on its own slower, reversed cycle, so the two never move in step.
+const DRIFT_BACK = { animationDuration: "31s", animationDirection: "reverse", animationDelay: "-12s" } as const;
 
 // The library's module count, read once per server process (content/library ships with the server).
 let modules: number | undefined;
@@ -26,16 +29,17 @@ export async function BrandPanel() {
   const t = await getTranslations("auth.panel");
   const facts = [
     { Icon: BookOpen, text: t("modules", { count: moduleCount() }) },
-    { Icon: Languages, text: t("languages") },
+    { Icon: Languages, text: t("languages", { count: LOCALES.length }) },
     { Icon: Fish, text: t("phishing") },
   ];
   return (
     <aside className="relative isolate overflow-clip bg-linear-160 from-brand-500 via-brand-600 to-brand-700 text-white">
-      {/* Backdrop: a dot grid that fades out, two soft glows and the rings the cat sits in. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+      {/* Backdrop: a dot grid that fades out, two soft glows and the rings the cat sits in. The glows are radial
+          falloffs (no blur filter) that drift slowly in full motion and rest under Calm and Still. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 print:hidden">
         <div className="absolute inset-0" style={DOTS} />
-        <div className="absolute -top-24 -start-24 size-96 rounded-full bg-white/14 blur-3xl" />
-        <div className="absolute -end-32 -bottom-40 size-[28rem] rounded-full bg-brand-900/35 blur-3xl" />
+        <div className="absolute -top-56 -start-56 size-[40rem] animate-aurora rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--brand-on)_14%,transparent)_40%,transparent)]" />
+        <div className="absolute -end-64 -bottom-72 size-[44rem] animate-aurora rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-brand-900)_35%,transparent)_40%,transparent)]" style={DRIFT_BACK} />
       </div>
 
       {/* The panel grows with a tall form; its content stays in view while the page scrolls (overflow-clip keeps sticky working). */}

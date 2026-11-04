@@ -101,8 +101,8 @@ Source: `docs/audit/` (read-only, never edit; ADR-016 in `docs/build/DECISIONS.m
 |---|---|---|
 | `modules.json` | array of `ModuleFile` (below) | `syncLibrary` |
 | `lessons/<slug>/<lessonId>.en.json` | `{ id, title, minutes, scenes[] }`, validated by `lessonFileSchema` | `syncLibrary` |
-| `lessons/<slug>/<lessonId>.az.json`, `.ru.json` | the same lesson translated; must keep the English structure (`localeParityErrors`, lesson-engine.md §5); all 106 lessons have both | `syncLibrary` (`readLibraryLesson`) |
-| `i18n.az.json`, `i18n.ru.json` | `{ modules: { [slug]: [title, subtitle] }, lessons: { "slug/lessonId": title } }` | `syncLibrary` (titles only) |
+| `lessons/<slug>/<lessonId>.<locale>.json` (az ru tr ro ka uk de fr ar) | the same lesson translated; must keep the English structure (`localeParityErrors`, lesson-engine.md §5); all 106 lessons have all nine (954 files) | `syncLibrary` (`readLibraryLesson`) |
+| `i18n.<locale>.json` (the same nine) | `{ modules: { [slug]: [title, subtitle] }, lessons: { "slug/lessonId": title } }` | `syncLibrary` (titles only) |
 | `paths.json` | array of `PathFile` (below) | `syncPaths` |
 | `brands.json` | `{ [id]: { id, name, kind, color, glyph, monogram?, fake?, imitates? } }` | read at request time by the player (see lesson-engine.md) |
 
@@ -127,7 +127,8 @@ Source: `docs/audit/` (read-only, never edit; ADR-016 in `docs/build/DECISIONS.m
 }
 ```
 
-`paths.json` entry (five global paths: `core`, `new-hire`, `finance-bec`, `technical`, `leaders`):
+`paths.json` entry (five global paths: `core`, `new-hire`, `finance-bec`, `technical`, `leaders`; texts in
+all ten UI languages, shortened here to three):
 
 ```json
 {
@@ -138,7 +139,8 @@ Source: `docs/audit/` (read-only, never edit; ADR-016 in `docs/build/DECISIONS.m
   "audience": { "az": "…", "en": "All employees", "ru": "…" },
   "recurrence": { "az": "…", "en": "Every year", "ru": "…" },
   "standards": ["ISO/IEC 27001:2022 A.6.3", "NIST CSF 2.0 PR.AT-01", "CIS Control 14"],
-  "modules": ["phishing-email", "passwords-mfa", "social-engineering", "safe-browsing", "personal-data", "incident-reporting"]
+  "modules": ["phishing-email", "passwords-mfa", "social-engineering", "safe-browsing", "personal-data", "incident-reporting"],
+  "labs": ["inbox-triage", "phishing-anatomy", "password-forge", "mfa-fatigue", "link-detective", "fake-signin"]
 }
 ```
 
@@ -171,9 +173,9 @@ const [existing] = await db.select({ id: t.modules.id }).from(t.modules)
   .where(and(eq(t.modules.slug, m.slug), isNull(t.modules.tenantId)));
 if (existing) await db.update(t.modules).set(values).where(eq(t.modules.id, existing.id));
 else [{ id: moduleId }] = await db.insert(t.modules).values(values).returning({ id: t.modules.id });
-// per lesson: readLibraryLesson(slug, id) → { en, translations: { az?, ru? } } (schema, integrity, parity);
+// per lesson: readLibraryLesson(slug, id) → { en, translations: { az?, ru?, tr?, … } } (schema, integrity, parity);
 // match (moduleId, key); update title/minutes/position or insert;
-for (const locale of ["en", ...LESSON_TRANSLATIONS] as const) {          // LESSON_TRANSLATIONS = ["az", "ru"]
+for (const locale of ["en", ...LESSON_TRANSLATIONS] as const) {          // LESSON_TRANSLATIONS = LOCALES without "en"
   const lesson = texts[locale];
   if (!lesson) { await db.delete(t.lessonContents).where(/* lessonId + locale */); continue; }   // file removed
   await db.insert(t.lessonContents)
@@ -181,25 +183,25 @@ for (const locale of ["en", ...LESSON_TRANSLATIONS] as const) {          // LESS
     .onConflictDoUpdate({ target: [t.lessonContents.lessonId, t.lessonContents.locale],
                           set: { scenes: lesson.scenes, updatedAt: new Date() } });
 }
-// returns { modules, lessons, locales: { en, az, ru } }, logged as "texts: en 106, az 106, ru 106"
+// returns { modules, lessons, locales: { az, en, ru, tr, … } }, logged as "texts: az 106, en 106, ru 106, …, ar 106"
 ```
 
 - Matching keys: global module = `(slug, tenant_id IS NULL)`; lesson = `(module_id, key)`;
   content = `(lesson_id, locale)`. Ids are stable across runs, so `lesson_progress`,
   `module_progress`, `assignments`, `attestations`, `certificates` keep pointing at the same rows.
-- Titles: `{ en: m.title, az: i18n.az.modules[slug][0] ?? en, ru: … }`; lesson titles from
-  `i18n.*.lessons["slug/id"]`.
+- Titles: `{ en: m.title, az: i18n.az.modules[slug][0] ?? en, ru: …, … }` for every translation
+  locale; lesson titles from `i18n.*.lessons["slug/id"]`.
 - **No content hashes or revision numbers.** Every run rewrites `lesson_contents.scenes` for
   every language file present (bumping `updated_at`), deletes the row of a translation whose file is
   gone, and overwrites module `title/subtitle/xp/minutes/sort_order/status`. Idempotency is "same
   input → same rows". Readers pick a row with `pickLessonContent` (viewer's language, then `en`, then
   the only row of a single-language studio/AI-trainer lesson; lesson-engine.md §2.2).
 - An unknown category label or an invalid lesson file (English, or a translation that breaks the
-  parity rules) throws and aborts the import; `syncPaths` throws on unknown slugs, then upserts
-  `(key, tenant_id IS NULL)`.
+  parity rules) throws and aborts the import; `syncPaths` throws on unknown module slugs and unknown
+  lab ids (`isLabId`), then upserts `(key, tenant_id IS NULL)` with `labIds: p.labs ?? []`.
 
 `tests/content.test.ts` runs the same validation over the 106 English files, asserts 53/106 counts
-(`.en.json` only), 14 multi-answer choice scenes, and AZ+RU titles for every module and lesson;
+(`.en.json` only), 14 multi-answer choice scenes, and titles in every translation locale for every module and lesson;
 `tests/content-locales.test.ts` checks every translation present, and
 `npx tsx scripts/check-lesson-locales.ts --coverage` also fails on a missing one. Run only those files:
 `npx vitest run tests/content.test.ts tests/content-locales.test.ts` (from `portal/`).
@@ -224,7 +226,8 @@ export const modules = pgTable("modules", {
   `lessons_module_key_idx (module_id, key)`.
 - `lesson_contents`: PK `(lesson_id, locale)`, `scenes jsonb`, `updated_at`.
 - `learning_paths`: `id, tenant_id (null = global), key, title/description/audience/recurrence
-  jsonb, mandatory, standards jsonb, module_slugs jsonb, created_at`; unique
+  jsonb, mandatory, standards jsonb, module_slugs jsonb, lab_ids jsonb (default `[]`, since 2026-10-27),
+  created_at`; unique
   `learning_paths_key_tenant_idx (key, tenant_id) NULLS NOT DISTINCT`. Paths reference modules
   **by slug**, not id, so a tenant copy of a module slides into a path automatically.
 - Both `NULLS NOT DISTINCT` constraints are in `drizzle/0000_init.sql` (lines ~232 and ~360).
@@ -442,8 +445,8 @@ using `FIXED_MESSAGES.policy_reminder`, with the policy title in each person's l
 in a collapsible "Translations (optional)" section, one fieldset per other language the tenant has
 switched on (`settings.locales`), prefilled from the current version; a language left empty shows its
 readers the base text with a notice. The base text is the tenant's default language (AZ in the demo); seed
-policies come from `content/policies/acceptable-use.{az,en,ru}.md` and `passwords.{az,en,ru}.md`
-(`scripts/seed.ts`: az is the base, en and ru are translations, a `.ru.md` only when the file exists;
+policies come from `content/policies/acceptable-use.{locale}.md` and `passwords.{locale}.md`, ten languages each
+(`scripts/seed.ts`: az is the base, the others are translations, each only when its file exists;
 seed versions carry no `base` copy, so `policyBaseLocale` falls back to the tenant default).
 `acceptable-use.az.md`, `acceptable-use.ru.md` and `passwords.ru.md` are translations; a legal review
 is recommended (OPEN-QUESTIONS 9).
@@ -469,16 +472,30 @@ in `messages/*/admin.json`. Webhook/syslog event `attestation.completed` is emit
 
 - Global paths come from `paths.json` (§2). Tenant paths: `src/app/(admin)/admin/paths/page.tsx`
   with `PathEditor` (`src/components/secops/studio.tsx`): `title, description, audience,
-  recurrence, standards` (comma list, max 12), `mandatory`, ordered module picker.
+  recurrence, standards` (comma list, max 12), `mandatory`, ordered module picker, then the practice
+  labs (shown only when the tenant has the `lab` feature; a path keeps the labs it has).
   `savePathAction` (`paths.write`) stores texts under the tenant `defaultLocale` key only, key
   `own-<slug>-<base36>`, and keeps only slugs visible to the tenant. Library paths can be
   **duplicated** (`id: null`) but not edited; own paths are editable and deletable, except
   `deletePathAction` refuses (`in_use`) once a path certificate exists (NO ACTION FK).
 - Learner side: `getPaths` (`src/server/queries/paths.ts`) joins each path's slugs onto the
   viewer's catalog, counts `done`, flags `assigned` (any assignment targets the path *and* the
-  viewer is a target of one of its modules) and attaches a path `certificateToken`. Pages
+  viewer is a target of one of its modules), attaches a path `certificateToken` and, with the `lab`
+  feature, the path's `labs` (`PathLab`: `id, best, passed, unlocked, after`). Pages
   `src/app/(learner)/paths/(index)/page.tsx` and `paths/[key]/page.tsx` (feature `paths`), i18n
   `learner.paths.*`.
+- **Labs after the lessons** (ADR-027, since 2026-10-27). `learning_paths.lab_ids` lists practice labs
+  shown after the path's modules (lessons first, then practice). Rules in `src/lib/domain/labs.ts`
+  (pure, `tests/paths.test.ts`, `tests/paths-query.test.ts`): `LAB_IDS` (the four games
+  `inbox-triage, link-detective, password-forge, mfa-fatigue`, then the VM labs `phishing-anatomy,
+  process-hunt, fake-signin`), `LAB_MODULES` (the modules each lab practises), `labWaitsFor(lab,
+  pathSlugs, statusBySlug)`: the lab's own modules that are in the path, or every path module when it
+  practises none of them, minus those whose lessons are done (`lessonsDone`: `awaiting_attestation` or
+  `completed`); `labUnlocked` = nothing left. A lab counts as passed from `LAB_PASS = 0.7` of its
+  maximum on the best attempt (`labBestShares`); a lab passed before its lessons is not shown locked.
+  This is a display rule only: `/lab` stays a free practice area and no server path refuses a lab.
+  Labs never count toward the path's `done`, its completion or its certificate (certificates still
+  follow the modules only).
 - Standards (`paths.json` `standards`, a tenant path's comma list) are stored once for every language
   as written (`NIS2 Art. 21(2)(g)`, `ISO/IEC 27001:2022 A.8.2`). The admin paths page and both learner
   path pages show them through `localizeStandard(ref, locale)` (`src/lib/standards.ts`,
@@ -711,11 +728,11 @@ the ranking `TREND_DAYS = 7` earlier; reporting counts simulations sent in `REPO
 | Surface | Route / file | Data | Notes |
 |---|---|---|---|
 | Learn catalog | `src/app/(learner)/learn/(catalog)/page.tsx` + `catalog-view.tsx` | `getCatalog`, `yourPath` | Client filters: search, `view ∈ path | catalog`, `audience ∈ everyone | leaders | it` (`m.audiences.includes`), category chips from `CATEGORIES`. `pathRank` tiers: for-you & not started → 0, in progress/awaiting → 1000, rest → 2000, plus personal path order; `catalogRank = sortOrder`. Pills: `completed`, `awaiting`, `complete {percent}`, `forYou`, `custom` (non-library). i18n `learner.learn.*` |
-| Module page | `src/app/(learner)/learn/[slug]/page.tsx`, `module.ts`, `module-actions.tsx` | `moduleForPage` (404 for unknown slug), `nextLesson` | Lesson list with the orange marker on `lastLessonKey` (else next), stat tiles, progress bar, `Start / Continue / Review` → `/learn/<slug>/<key>`, `Start over` link, `AttestCard` (dialog, opens with `?confirm=1`, text from settings) → `attestModuleAction`, certificate block + `CertificateLink`, `RateModule` (anonymous `feedback` row, 20/hour). Due pill turns `risk` when overdue. i18n `learner.module.*`, `learner.attest.*` |
+| Module page | `src/app/(learner)/learn/[slug]/page.tsx`, `module.ts`, `module-actions.tsx` | `moduleForPage` (404 for unknown slug), `nextLesson`, the recap points of every stored language (`jsonb_path_query_array` over `lesson_contents`, not the whole scenes), `getPaths`, `labBestShares` | Rebuilt 2026-10-27 (ADR-027). Main column: «What you will learn» (`learningPoints` in `src/lib/content/learning-points.ts`: up to 5 recap points, in the viewer's language with its `lang`), the lesson list with the orange marker on `lastLessonKey` (else next), «Practise it» (`labsForModule(slug)` with the `lab` feature; locked until the module's lessons are done, `practiceLocked`; best score shown), «In learning paths» (the viewer's paths containing the module, `assigned` pill). Aside: stat tiles, progress bar, `Start / Continue / Review` → `/learn/<slug>/<key>`, `Start over` link, `AttestCard` (dialog, opens with `?confirm=1`, text from settings) → `attestModuleAction`, certificate block + `CertificateLink`, `RateModule` (anonymous `feedback` row, 20/hour). Path context: arriving with `?from=/paths/<key>` (`safePath`) links back to that path and on to its next module; without it the next module comes from a path assigned to the viewer. Due pill turns `risk` when overdue. i18n `learner.module.*` (`learn`, `practice`, `practiceHint`, `practiceLocked`, `inPaths`, `nextInPath`…), `learner.attest.*` |
 | Home | `src/app/(learner)/app/page.tsx` (route `/app`) | `getCatalog`, `continueModule`, `yourPath`, `getPolicies`, `myLeagueRow`, `todayXp`, `openRiskCount` | Policies-to-sign card (`/policies/<id>?from=%2F`), awaiting-attestation banner (`?confirm=1`), Continue hero (`continueModule`: most recently started in-progress/awaiting, else first unfinished path item), open-risks link, league row, **Your path** via `PathTimeline` (`src/components/learner/path-timeline.tsx`, `VISIBLE = 4`, "Show all"), daily goal ring, streak, XP/level, risk score. i18n `learner.home.*` |
 | Your path order | `yourPath` in `src/server/queries/catalog.ts` | | assigned (by due date, then `sortOrder`) → recommended (`forYou` = assigned to everyone/department/person; today identical to `assigned`) → remaining `everyone` modules |
 | Progress | `src/app/(learner)/progress/page.tsx` | `getCatalog`, `xpByDay`, `badgesFor` | Level ring, XP, streak + freezes, risk card → `/security`, started modules sorted by percent, `completedOf` over the whole catalog, 30-day XP bar chart + heatmap, 8 badges. i18n `learner.progress.*` |
-| Paths | `src/app/(learner)/paths/(index)/page.tsx`, `paths/[key]/page.tsx` | `getPaths` | Feature `paths`; roadmap with current node, audience/recurrence, standards chips (`localizeStandard`, §4.1), path certificate card |
+| Paths | `src/app/(learner)/paths/(index)/page.tsx`, `paths/[key]/page.tsx` | `getPaths` | Feature `paths`; roadmap with current node (modules, then the path's labs with locked / open / passed state and the modules they wait for, §4.1), audience/recurrence, standards chips (`localizeStandard`, §4.1), path certificate card |
 | Policy reader | `src/app/(focus)/policies/[id]/page.tsx`, `sign-form.tsx` | latest published version, own sign-off | `(focus)` layout (no shell), `?from=` back link (must start with `/`), `policyTextFor` (`src/lib/policy-text.ts`) shows the reader's language, else the base text with its own `lang` and the `player.policy.otherLanguage` notice, TOC from H2s, `SignForm` posts `signPolicyAction` (checkbox `agree`, password unless the account has no local hash, rate limit 10 / 15 min, only the newest published version is signable) |
 | Profile | `src/app/(learner)/profile/page.tsx` | certificates join modules/paths | "My certificates" list → `/c/<token>` |
 | Icons | `src/components/learner/module-icon.tsx` | | `moduleIcon(slug, category)` = `BY_SLUG[slug] ?? BY_CATEGORY[category] ?? Mail` (lucide), `ModuleIcon` (sm/md/lg tile), `ModuleArt` (hero illustration, `tone onBrand | light`) |
@@ -738,7 +755,7 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
   `npm run db:generate`. Commit SQL and `drizzle/meta` together; a local database created from the
   previous init cannot be upgraded by `db:migrate`, so stop `next dev` and run `db:reset`.
 - **`content:sync` is a full overwrite** for library rows: module metadata, lesson titles,
-  positions and the en/az/ru scenes. Do not hand-edit library rows in the database. Tenant studio
+  positions and the scenes of every language. Do not hand-edit library rows in the database. Tenant studio
   rows (`origin != "library"`, slug prefix `own-` or, for AI-trainer output, `ai-`) are never
   touched by sync.
 - **Per-tenant override by slug** exists in every reader (`tenantId` row wins), but no UI creates
@@ -754,9 +771,10 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
   `T23:59:59+04:00` (Baku) in jobs; `after_joining` adds days (UTC) to the person's start:
   `users.created_at`, or `activated_at` when that is later.
 - **Time zone:** every "day" (`dayKey`, XP by day, snapshots, due) is `Asia/Baku`.
-- **i18n:** `messages/{az,en,ru}/{learner,admin,secops,settings,common}.json`; keys without dots,
+- **i18n:** `messages/{locale}/{learner,admin,secops,settings,common}.json` for the ten UI languages; keys without dots,
   ICU braces escaped with quotes, `tests/i18n.test.ts` checks parity and placeholders. Edit the
-  JSON with the Edit tool (never regenerate whole files); add every key to all three locales.
+  JSON with the Edit tool (never regenerate whole files); add every key to all ten locales, using the
+  language's glossary (`references/glossaries/`).
   Training groups: `learner.home/learn/module/attest/progress/paths/policy/certificate`,
   `admin.assignments/policies/reports/auditActions`, `secops.studio/approvals/paths`,
   `settings.attestation/certificate/learning`, `common.categories/audiences/difficulty/units`.
@@ -789,9 +807,10 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
    catalog order (`sortOrder`).
 2. Create `content/library/lessons/<slug>/<lessonId>.en.json` per lesson (`{ id, title, minutes,
    scenes }`; scene DSL in `references/lesson-engine.md`; must satisfy `lessonFileSchema` and
-   `lessonIntegrityErrors`), plus `<lessonId>.az.json` and `<lessonId>.ru.json` translations next to
-   it (lesson-engine.md recipe 6.3; without them az/ru learners get the English text).
-3. Add `i18n.az.json` and `i18n.ru.json` entries: `modules[slug] = [title, subtitle]` and
+   `lessonIntegrityErrors`), plus one `<lessonId>.<locale>.json` translation per other UI language next
+   to it (lesson-engine.md recipe 6.3; without one, learners in that language get the English text and
+   `--coverage` fails).
+3. Add entries to every `i18n.<locale>.json`: `modules[slug] = [title, subtitle]` and
    `lessons["slug/lessonId"] = title` (the content test fails without them).
 4. Optionally add the slug to a path in `content/library/paths.json`.
 5. If the module needs its own icon, add it to `BY_SLUG` in
@@ -806,13 +825,15 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
 
 ### 8.2 Add or modify a learning path
 
-- Global: edit `content/library/paths.json` (new `key`, three-language `title/description/
-  audience/recurrence`, `standards` written once for every language (§4.1), ordered `modules` slugs that exist in `modules.json`), then
-  `npm run content:sync`. `syncPaths` throws on unknown slugs.
+- Global: edit `content/library/paths.json` (new `key`, `title/description/audience/recurrence` in all
+  ten UI languages, `standards` written once for every language (§4.1), ordered `modules` slugs that
+  exist in `modules.json`, optional `labs` from `LAB_IDS` in the order they should appear after the
+  modules), then `npm run content:sync`. `syncPaths` throws on unknown slugs and unknown lab ids.
+  A new lab needs its id in `LAB_IDS`, its modules in `LAB_MODULES` and its XP in `LAB_XP` (`src/lib/domain/gamification.ts`).
 - Tenant: Admin → Paths → New (or Duplicate a library path), `savePathAction`. Texts are stored in
   the tenant default locale only.
-- Tests: `tests/assignment-since.test.ts` exercises path-less assignments; there is no path-sync
-  test — add one next to `tests/content.test.ts` if you change `syncPaths`.
+- Tests: `tests/paths.test.ts` (the lab rules and the shipped `paths.json`), `tests/paths-query.test.ts`
+  (`getPaths` with labs), `tests/assignment-since.test.ts` (path-less assignments).
 
 ### 8.3 Change XP, level or "pass" rules
 
@@ -888,10 +909,10 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
 
 - **SCORM / xAPI export:** none (OPEN-QUESTIONS item 11). Lessons exist only as the portal's JSON
   DSL in `lesson_contents`; there is no package export or LMS launch.
-- **AZ/RU lesson content:** all 106 library lessons ship in en, az and ru (one `lesson_contents` row
-  per language), but the az/ru texts were translated from English in this rebuild, not taken from
-  the original (OPEN-QUESTIONS item 6, closed on 2026-10-26; a native speaker's final read before
-  release is still recommended). Studio lessons and AI-trainer drafts still have one language each
+- **Lesson languages:** all 106 library lessons ship in the ten UI languages (one `lesson_contents`
+  row per language), but every translation was made from English in this rebuild by agents, not
+  taken from the original (OPEN-QUESTIONS items 6 and 7; a native speaker's final read before release
+  is still recommended, ADR-026). Studio lessons and AI-trainer drafts still have one language each
   (lesson-engine.md §7).
 - **PDF:** certificates and the compliance pack are browser-print pages (ADR-006,
   OPEN-QUESTIONS item 15); scheduled report mails carry a sign-in link, not an attachment.

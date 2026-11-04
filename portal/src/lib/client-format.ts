@@ -2,12 +2,14 @@
 
 import { type DateTimeFormatOptions, type NumberFormatOptions, useFormatter, useLocale, useTimeZone } from "next-intl";
 import { type AzDateOptions, formatAzDate, formatAzNumber, formatAzRelative, relativeUnit } from "./az-format";
+import { formatKaDate, formatKaRelative } from "./ka-format";
 
 /**
  * Date, time and relative-time formatting for client components. Azerbaijani is formatted by
  * `az-format.ts` (Chromium has no `az` ICU data and would print "2026 M10 14" / "-6 h", which also
- * mismatches the server on hydration); every other locale goes through next-intl. Both use the
- * app's configured time zone. Server components keep `getFormatter` — Node has the data.
+ * mismatches the server on hydration), Georgian dates by `ka-format.ts` (Chromium has no `ka` data
+ * and prints English); every other locale goes through next-intl. All use the app's configured
+ * time zone. Server components keep `getFormatter` — Node has the data.
  */
 
 export type ClientDateOptions = AzDateOptions;
@@ -30,6 +32,15 @@ export function useClientFormat(): ClientFormat {
   const locale = useLocale();
   const timeZone = useTimeZone();
   const format = useFormatter();
+  const secondsFrom = (date: Date | string | number, now?: Date | number) => (new Date(date).getTime() - (now === undefined ? Date.now() : new Date(now).getTime())) / 1000;
+  if (locale === "ka") {
+    return {
+      // Georgian numbers come from the polyfill that <AzNumbersGate> loads, like the ones in messages.
+      number: (n, options) => format.number(n, options),
+      dateTime: (date, options = { dateStyle: "medium" }) => formatKaDate(new Date(date), options, timeZone),
+      relativeTime: (date, now) => formatKaRelative(...relativeUnit(secondsFrom(date, now))),
+    };
+  }
   if (locale !== "az") {
     // Arabic keeps Western digits like the server (Node's CLDR), also in a browser whose older CLDR defaults "ar" to Arabic-Indic ones.
     const nu = locale === "ar" ? ({ numberingSystem: "latn" } as const) : {};
@@ -42,9 +53,6 @@ export function useClientFormat(): ClientFormat {
   return {
     number: (n, options) => formatAzNumber(n, options),
     dateTime: (date, options = { dateStyle: "medium" }) => formatAzDate(new Date(date), options, timeZone),
-    relativeTime: (date, now) => {
-      const diff = (new Date(date).getTime() - (now === undefined ? Date.now() : new Date(now).getTime())) / 1000;
-      return formatAzRelative(...relativeUnit(diff));
-    },
+    relativeTime: (date, now) => formatAzRelative(...relativeUnit(secondsFrom(date, now))),
   };
 }

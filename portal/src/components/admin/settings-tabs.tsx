@@ -346,7 +346,7 @@ export function BrandingTab({
                 <span className="h-1.5 flex-1 rounded-pill bg-white/30">
                   <span className="block h-full w-2/5 rounded-pill bg-white" />
                 </span>
-                <span className="text-tab font-semibold tabular-nums">40%</span>
+                <span className="text-tab font-semibold tabular-nums">{tc("units.percent", { value: 40 })}</span>
               </div>
               <span className="mt-3 inline-block rounded-pill px-3 py-1 text-tab font-bold" style={{ background: accent, color: readableOn(accent) }}>
                 {t("sampleContinue")}

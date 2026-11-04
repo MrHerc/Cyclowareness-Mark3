@@ -5,7 +5,11 @@ Reference for everything a learner meets between `Start` and `I confirm` in
 scene types, beats, artifacts, brands, mascot), `docs/audit/02-learner-app.md` sections 4 and 9
 (player UI, gamification), `docs/audit/00-overview.md` (TTS, flags). Code: `portal/src/components/player/`,
 `portal/src/lib/content/`, `portal/src/app/(focus)/learn/[slug]/[lessonId]/page.tsx`,
-`portal/src/app/api/tutor/route.ts`, `portal/src/server/tutor.ts`, `portal/src/server/services/progress.ts`.
+`portal/src/app/api/tutor/route.ts`, `portal/src/server/tutor.ts`, `portal/src/server/services/progress.ts`;
+narration and subtitles (since 2026-10-27): `portal/src/lib/tts/`, `portal/scripts/generate-narration.ts`,
+`portal/src/server/narration.ts`, `portal/src/server/subtitles.ts`, `portal/src/app/api/subtitles/route.ts`.
+Decisions: ADR-023 (lesson files per language), ADR-025/026 (ten languages, translation process),
+ADR-028 (ElevenLabs clips), ADR-029 (AI subtitles), ADR-030 (player structure) in `docs/build/DECISIONS.md`.
 All paths below are relative to the repo root unless they start with `src/`, `content/`, `tests/`,
 `messages/` or `scripts/`, which are under `portal/`.
 
@@ -37,6 +41,7 @@ All paths below are relative to the repo root unless they start with `src/`, `co
    - 3.8 [i18n key groups](#38-i18n-key-groups)
    - 3.9 [Completion, XP, streak, risk, attestation, certificate](#39-completion-xp-streak-risk-attestation-certificate)
    - 3.10 [Teachable moment](#310-teachable-moment)
+   - 3.11 [Captions, AI subtitles and transcript](#311-captions-ai-subtitles-and-transcript)
 4. [AI Sel tutor](#4-ai-sel-tutor)
 5. [Conventions and gotchas](#5-conventions-and-gotchas)
 6. [Recipes](#6-recipes)
@@ -45,7 +50,7 @@ All paths below are relative to the repo root unless they start with `src/`, `co
    - 6.3 [Translate a lesson, or add a lesson language](#63-translate-a-lesson-or-add-a-lesson-language)
    - 6.4 [Add an illustration](#64-add-an-illustration)
    - 6.5 [Add a brand or an artifact kind](#65-add-a-brand-or-an-artifact-kind)
-   - 6.6 [Switch narration to pre-generated TTS](#66-switch-narration-to-pre-generated-tts)
+   - 6.6 [Generate the natural narration (pre-generated TTS)](#66-generate-the-natural-narration-pre-generated-tts)
    - 6.7 [Tune timers](#67-tune-timers)
    - 6.8 [Add a tutor capability](#68-add-a-tutor-capability)
    - 6.9 [Triage: the tutor answers or reads in the wrong language](#69-triage-the-tutor-answers-or-reads-in-the-wrong-language)
@@ -303,10 +308,13 @@ type although 22 library nodes carry one (passes through validation, ignored by 
 |---|---|
 | `modules.json` | 53 modules, array of `ModuleFile` (category labels `Email, Accounts, Social engineering, Devices, AI threats, Physical security, Data, Workplace, Incidents`; difficulty Easy 21 / Medium 29 / Hard 3) |
 | `lessons/{module-slug}/{lesson-id}.en.json` | the original: one `LessonFile` per lesson, 106 files |
-| `lessons/{module-slug}/{lesson-id}.az.json`, `.ru.json` | translations of the English file next to them, 106 of each (all 212 present and passing `--coverage` on 2026-10-26) |
-| `i18n.az.json`, `i18n.ru.json` | `{ modules: { slug: [title, subtitle] }, lessons: { "slug/lesson-id": title } }`: the 53 + 106 translated titles the catalog shows |
+| `lessons/{module-slug}/{lesson-id}.{locale}.json`, locale ∈ `az ru tr ro ka uk de fr ar` | translations of the English file next to them, 106 of each language (az/ru since 2026-10-26, the seven others since 2026-11-04; all 954 pass `--coverage`) |
+| `i18n.{locale}.json` (the same nine) | `{ modules: { slug: [title, subtitle] }, lessons: { "slug/lesson-id": title } }`: the 53 + 106 translated titles the catalog shows |
 | `brands.json` | the 169-brand registry keyed by id (56 fake, 51 with monogram, 48 distinct Lucide glyphs) |
-| `paths.json` | learning paths (az/en/ru titles, standards, module slugs); covered by the training-pipeline reference |
+| `paths.json` | learning paths (titles in the ten languages, standards, module slugs, `labs`); covered by the training-pipeline reference |
+
+Outside `content/library/`: `content/narration/{locale}/{module}__{lesson}.json` holds the narration
+manifests and `public/generated/tts/{locale}/{sha256}.mp3` the clips (recipe 6.6; none generated yet).
 
 The lesson file is the original's `lesson` object only (`id, title, minutes, scenes`); the page props
 wrapper (`module, nextLesson, locale, userId, narration, timeLimitsEnabled, ...`) is assembled at
@@ -320,21 +328,22 @@ A translation is the English file with only the learner-facing text changed: the
 spot ids are therefore the same in every language, so recorded answers (`answers.scene_id/item_id`),
 the saved position (`resume.ts` compares scene id lists) and highlights do not depend on the language:
 a learner who switches language mid-lesson keeps the position. The translation's `title` equals the
-lesson's entry in `i18n.{locale}.json` (true for all 212 files), but only `scenes` is stored; the
-catalog and player show the title from the i18n file.
+lesson's entry in `i18n.{locale}.json` (true for the 212 az/ru files; not checked by a test for the
+others), but only `scenes` is stored; the catalog and player show the title from the i18n file.
 
 How content reaches the database (summary; the training-pipeline reference has the detail):
-`src/server/services/library.ts` `syncLibrary(db)` reads `modules.json`, `i18n.az.json`, `i18n.ru.json`
-(`readLibrary()`), then calls `readLibraryLesson(slug, id)` for every lesson: it reads `{id}.en.json`
-(required) and each `{id}.{locale}.json` of `LESSON_TRANSLATIONS = ["az", "ru"]` that exists, and passes
+`src/server/services/library.ts` `syncLibrary(db)` reads `modules.json` and `i18n.{locale}.json` for every
+locale of `LESSON_TRANSLATIONS` (= `LOCALES` without `en`, so a new UI language is picked up here by
+itself) (`readLibrary()`), then calls `readLibraryLesson(slug, id)` for every lesson: it reads `{id}.en.json`
+(required) and each `{id}.{locale}.json` of `LESSON_TRANSLATIONS` that exists, and passes
 each through `checkedLesson()` (`lessonFileSchema`, `lessonIntegrityErrors` and, for a translation,
 `localeParityErrors(english, raw)`). A failing file aborts the import with `"{slug}/{id}: …"` (English)
 or `"{slug}/{id}.{locale}: …"` (a translation; the first 10 parity errors). It upserts `modules` (by
-`slug`, global rows with `tenant_id` null), `lessons` (by `module_id + key`, titles `{en, az, ru}` from
-the i18n files) and one `lesson_contents` row per language present (primary key `lesson_id + locale`,
-columns `scenes` jsonb and `updated_at`); the row of a translation whose file was removed is deleted
-(the files are the source). It returns `{ modules, lessons, locales: { en, az, ru } }`, logged as
-`texts: en 106, az 106, ru 106`. It runs from `npm run content:sync` (`scripts/sync-content.ts`, under a
+`slug`, global rows with `tenant_id` null), `lessons` (by `module_id + key`, titles in all ten languages
+from the i18n files, English where one is missing) and one `lesson_contents` row per language present
+(primary key `lesson_id + locale`, columns `scenes` jsonb and `updated_at`); the row of a translation
+whose file was removed is deleted (the files are the source). It returns `{ modules, lessons, locales }`
+with a count per language, logged as `texts: az 106, en 106, ru 106, …, ar 106`. It runs from `npm run content:sync` (`scripts/sync-content.ts`, under a
 Postgres advisory lock; stop `next dev` first on PGlite), from `scripts/seed.ts` and on every production
 server start (`src/instrumentation.ts` → `bootstrap()` in `src/server/bootstrap.ts`); `next dev` does not
 import. Studio-authored lessons exist only in the database, with one row in the language the author chose.
@@ -399,10 +408,11 @@ import with `"{slug}/{id}: ..."`, a translation with `"{slug}/{id}.{locale}: ...
 
 | Topic | Original | Portal | Why / where decided |
 |---|---|---|---|
-| Narration | pre-generated clips, word timings in props | browser Web Speech API, timings from `onboundary` or estimated | ADR-007 (`docs/build/DECISIONS.md`): works without a key; a provider can replace `speak()` later |
+| Narration | pre-generated clips, word timings in props | the same idea: ElevenLabs clips per spoken text with word timings (`scripts/generate-narration.ts`, manifests read by the server, handed to the player as `clips`); every text without a clip is read by the browser's Web Speech API (timings from `onboundary` or estimated). No clip is generated yet (no key or voices) | ADR-007, ADR-028 (`docs/build/DECISIONS.md`); recipe 6.6 |
 | Lesson file | full page props with `narration` | `LessonFile` only; props assembled per request | ADR-015: content in files, DB sync |
-| Locales | lesson text served in the profile language (`locale` prop) | `.en.json` plus `.az.json` / `.ru.json` per lesson, one `lesson_contents` row each; `pickLessonContent` serves the viewer's language, then EN | the audit holds only the EN files and the original's own AZ/RU texts were never extracted, so AZ/RU were translated from EN in this rebuild and their wording is not the original's; ADR-023 (OPEN-QUESTIONS #6, closed 2026-10-26 with these translations instead of an extraction from the live tenant) |
-| Voice language | one clip set per locale (`/generated/tts/{locale}/…`) | a browser voice of the text's language, or silence with `<VoiceNotice>` when the device has none (section 3.4) | Web Speech has no Azerbaijani voice in Chrome on most systems, and `narrator.ts` never reads a text with a voice of another language; ADR-023 |
+| Locales | lesson text served in the profile language (`locale` prop) | `.en.json` plus one file per other UI language (az ru tr ro ka uk de fr ar), one `lesson_contents` row each; `pickLessonContent` serves the viewer's language, then EN | the audit holds only the EN files and the original's own AZ/RU texts were never extracted, so every translation was made from EN in this rebuild and its wording is not the original's; ADR-023, ADR-026 (OPEN-QUESTIONS #6 and #7) |
+| Voice language | one clip set per locale (`/generated/tts/{locale}/…`) | the lesson's clip in its language when one exists, else a browser voice of the text's language, else silence with `<VoiceNotice>` (section 3.4) | Web Speech has no Azerbaijani voice in Chrome on most systems, and `narrator.ts` never reads a text with a voice of another language; ADR-023, ADR-028 |
+| Subtitles, transcript, syllabus | not recorded in the audit | captions in the narration's language, in another stored language or AI-translated (65 more languages), a transcript drawer, a syllabus aside/drawer, shortcuts (section 3.11) | owner request 2026-10-27; ADR-029, ADR-030 |
 | `choice.multi`, `choice.visual` | not in the spec | optional extensions in the type and schema (0 library uses of either; 14 scenes have >1 correct option) | Studio and multi-answer support |
 | `wifi` artifact | absent from the spec table, present in 4 lessons | 12th kind in the type, schema and renderer | data needed it |
 | Illustrations | two-tone SVG scenes | Lucide compositions | spec: "must be redrawn"; placeholder |
@@ -417,15 +427,20 @@ import with `"{slug}/{id}: ..."`, a translation with `"{slug}/{id}.{locale}: ...
 ```
 (focus)/learn/[slug]/[lessonId]/page.tsx   server: viewer, catalog, lesson_contents, settings
 └─ <LessonPlayer>                           src/components/player/player.tsx  ("use client")
-   ├─ <BrandsProvider brands>               artifacts.tsx context
-   ├─ header: Leave (X) · progressbar · Ask · speed · sound · more
+   ├─ <BrandsProvider brands> + <CaptionsProvider>   artifacts.tsx, captions.tsx contexts
+   ├─ header: Leave (X) · syllabus (below lg) · progressbar · Ask · narration group
+   │          [play/pause · sound (volume slider from xl) · SpeedSelect (md+) · captions · transcript (sm+) · fullscreen (lg+)] · more
+   ├─ <SyllabusAside>  (lg+, open or a rail; syllabus.tsx)   the module's lessons + the current lesson's parts
    ├─ phase "intro"   : <Mascot> + title + pills + Start/Continue/Start over/Review again + sound hint
    ├─ phase "playing" : one of TutorScene | IntroScene | SimulationScene | ChoiceScene | HotspotScene |
    │                    SwipeScene | MatchScene | OrderScene | ScenarioScene | PasswordScene | RecapScene   (scenes.tsx)
    │                    each gets { scene, env: SceneEnv } and uses <ArtifactView> (artifacts.tsx),
    │                    <RichText>/<ArtifactModeProvider> (rich.tsx), <Illustration>/<Stat>, <BrandAvatar>, <Mascot>
-   ├─ phase "done"    : <DoneScreen> (XP pill, attestation card, certificate link, next lesson, back, home)
-   ├─ <Dialog "Lesson options"> : <OptionsMotion> (Segmented full/calm/still) + <ProblemForm>
+   │                    + <CaptionBar> (scene slot or the page's sticky bar, section 3.11)
+   ├─ phase "done"    : <DoneScreen> (XP pill with <Burst> and a fly-up chip in Full motion, attestation card, certificate link, next lesson, back, home)
+   ├─ <Dialog "Lesson options"> : volume, speed, captions switch + <SubtitleSelect>, transcript and shortcuts buttons,
+   │                              letter-shortcuts switch, <OptionsMotion> (Segmented full/calm/still), <ProblemSection>
+   ├─ <Drawer start> syllabus (below lg) · <Drawer end> <Transcript> · <Dialog> <ShortcutList>   (drawer.tsx, media-controls.tsx)
    └─ <TutorPanel>              : tutor-panel.tsx (section 4)
 ```
 
@@ -438,24 +453,38 @@ const contents = await db().select({ scenes: t.lessonContents.scenes, locale: t.
 const fallback = pickLessonContent(contents, locale);   // src/lib/content/lesson-locale.ts; notFound() when none
 const timed = settings.learning.timeLimits && m.difficulty !== "Easy" && v.user.timerPref !== "off";
 const timeLimitSeconds = timed ? (v.user.timerPref === "more" ? 60 : 30) : null;
-<LessonPlayer viewerId slug moduleTitle topic={CATEGORY_TOPIC[m.category]} lesson={{ key, title, minutes, scenes }}
-  contentLocale={fallback.locale} completedBefore next brands={brandsFor(scenes)} timeLimitSeconds
+// Studio modules have no generated clips, even one that reuses a library slug.
+const clips = m.origin === "library" ? loadNarrationClips(`${m.slug}/${lesson.key}`, fallback.locale) : null;  // src/server/narration.ts
+<LessonPlayer viewerId slug moduleTitle topic={CATEGORY_TOPIC[m.category]} lesson={{ id, key, title, minutes, scenes }}
+  syllabus={m.lessons.map((l) => ({ key, title, minutes, completed }))} contentLocale={fallback.locale}
+  captionLocales={LOCALES.filter((l) => l !== fallback.locale && contents.some((c) => c.locale === l))}
+  moreLanguages={v.tenant.features.has("ai_tutor") ? subtitleLanguageOptions(locale) : []}   // named on the server
+  loadCaptions={loadCaptionsAction} clips={clips}
+  completedBefore next brands={brandsFor(scenes)} timeLimitSeconds
   soundOn={v.user.soundOn} motion={v.user.motion} tutorEnabled={v.tenant.features.has("ai_tutor")}
   tutorVoice={v.tenant.features.has("tutor_voice")} attestationText={settings.attestationText[locale] ?? pick(DEFAULT_ATTESTATION, locale)} />
 ```
 
-`PlayerProps` (player.tsx): `viewerId, slug, moduleTitle, topic, lesson{key,title,minutes,scenes},
-contentLocale, completedBefore, next{key,title}|null, brands, timeLimitSeconds, soundOn,
-motion: "full"|"calm"|"still", tutorEnabled, tutorVoice?, attestationText`. `topic` is the mascot's Rive
+`PlayerProps` (player.tsx): `viewerId, slug, moduleTitle, topic, lesson{id,key,title,minutes,scenes},
+syllabus: SyllabusLesson[], contentLocale, captionLocales, moreLanguages: SubtitleLanguageOption[],
+loadCaptions, clips?: NarrationClips | null, completedBefore, next{key,title}|null, brands,
+timeLimitSeconds, soundOn, motion: "full"|"calm"|"still", tutorEnabled, tutorVoice?, attestationText`.
+`loadCaptionsAction` lives next to the page (`[lessonId]/actions.ts`, with `caption-map.ts`). `topic` is the mascot's Rive
 `topic` input, from `CATEGORY_TOPIC` in `src/lib/domain/catalog.ts` (`email, identity, social, devices,
 ai-threats, physical, data, work, incident`).
 
 ### 3.2 State: phase, scene index, answers, resume
 
-In `LessonPlayer`: `phase: "intro" | "playing" | "done"`, `index` (scene), `inner` (0–1 progress inside
-the scene, reported by `TutorScene`), `resumeInner`, `soundOn`, `speed` (external store), `motion`,
-`optionsOpen`, `tutorOpen`, `saving`, `result: LessonResult | null`, refs `answers: PlayerAnswer[]` and
+In `LessonPlayer`: `phase: "intro" | "playing" | "done"`, `index` (scene), `maxIndex` (the furthest scene
+reached: the syllabus reopens any part up to it and the "next" shortcut steps forward only up to it,
+never past it), `inner` (0–1 progress
+inside the scene, reported by `TutorScene`), `resumeInner`, `soundOn`, `motion`, `optionsOpen`,
+`tutorOpen`, `syllabusDrawer`, `transcriptOpen`, `shortcutsOpen`, `saving`, `result: LessonResult | null`,
+the per-browser prefs `speed`, `volume`, `captionsOn`, caption language, `syllabusOpen` and
+`letterShortcuts` (external stores in `controls.ts`, section 3.5), refs `answers: PlayerAnswer[]` and
 `started` (timestamp). Progress bar value: `(index + min(inner, 0.95)) / scenes.length`.
+`maxIndex` is client state only: `completeLessonAction` does not check on the server which scenes were
+seen (ADR-030, OPEN-QUESTIONS 25).
 
 `SceneEnv` handed to every scene (scenes.tsx):
 
@@ -481,7 +510,7 @@ Resume (`src/components/player/resume.ts`): the position and the final result ar
 
 ```ts
 export type SavedLesson =
-  | { kind: "playing"; index: number; inner: number; answers: PlayerAnswer[]; elapsedMs: number }
+  | { kind: "playing"; index: number; maxIndex: number; inner: number; answers: PlayerAnswer[]; elapsedMs: number }
   | { kind: "done"; result: LessonResult; token: string | null };
 export function serializeLesson(state: SavedLesson, sceneIds: string[]): string  // adds { v: 1, scenes: sceneIds }
 export function parseLesson(raw: string | null, sceneIds: string[], answerIds: ReadonlySet<string>): SavedLesson | null
@@ -489,7 +518,8 @@ export function answerIdsOf(scenes: Scene[]): Set<string>      // scene ids + "t
 export function tutorAnswerId(sceneId: string, beatId: string): string  // `${sceneId}:${beatId}`
 ```
 
-`parseLesson` rejects another version, a different scene list, out-of-range `index`, `inner` outside
+`parseLesson` reads a state saved before `maxIndex` existed with `maxIndex = index`, and rejects a
+`maxIndex` below `index` or out of range. It also rejects another version, a different scene list, out-of-range `index`, `inner` outside
 `[0,1)` and an unknown `moduleStatus`; it drops (without rejecting the state) malformed answers, answers
 with an unknown `outcome` and answers whose id is not in `answerIds`; it caps answers at 400 and elapsed
 time at 4 h.
@@ -599,28 +629,38 @@ player's `finish()`. `scene.mood` is not read.
 
 ### 3.4 Narration hook API and karaoke
 
-`src/components/player/narrator.ts` (ADR-007). The hook and its `speak()` contract, which a pre-generated
-TTS provider must honour:
+`src/components/player/narrator.ts` (ADR-007, ADR-028). The hook and its `speak()` contract:
 
 ```ts
 export type Voice = "tutor" | "man" | "man-2" | "man-3" | "woman" | "woman-2" | "young-woman" | "young-man" | "young-man-2" | "older-man" | "older-woman" | "child";
-export function speechText(text: string): string   // strips <breath>, <short pause> ... tags
-export function wordsOf(text: string): string[]     // the karaoke word list (split on whitespace)
+// Re-exported from src/lib/tts/text.ts, shared with the clip generator and the manifests:
+export function speechText(text: string): string   // strips <breath>, <short pause> ... tags, collapses spaces
+export function wordsOf(text: string): string[]     // the karaoke word list (split on whitespace, every script)
 
 export type VoiceAvailability = "unknown" | "available" | "missing";
 export function voiceAvailability(voices: readonly { lang: string }[], lang: string): VoiceAvailability
 export function useVoiceAvailability(lang: string): VoiceAvailability   // useSyncExternalStore on "voiceschanged"; server snapshot "unknown"
 
-export function useNarrator({ enabled, rate, lang = "en" }: { enabled: boolean; rate: number; lang?: string }) {
+export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }:
+  { enabled: boolean; rate: number; lang?: string; clips?: NarrationClips | null; volume?: number }) {
   /** Speaks text. onWord(i) fires as each word starts; onEnd when finished.
    *  With sound off nothing is spoken and onEnd is not called (the learner continues manually).
    *  Without a voice for the language nothing is spoken either: the whole text shows, onEnd is not
-   *  called and onError("language-unavailable") is, as after an engine failure. */
+   *  called and onError("language-unavailable") is, as after an engine failure.
+   *  A text with a clip plays it (in the clip's voice, whatever `voice` asks); a clip that cannot be
+   *  loaded falls back to the engine, and a browser that refuses to play gives onError("not-allowed"). */
   const speak = (text: string, opts: { voice?: Voice; lang?: string; onWord?: (i: number) => void; onEnd?: () => void; onError?: (error: string) => void } = {}) => { ... };
-  /** voice: useVoiceAvailability(lang) for the hook's own language. */
+  /** voice: "available" when the lesson has clips, else useVoiceAvailability(lang) for the hook's own language. */
   return { speak, stop, pause, resume, speaking, paused, supported, voice };
 }
 ```
+
+Clips (when `clips` has `speechText(text)` and the text is in the hook's language): one shared
+`HTMLAudioElement` plays `clip.url` at `playbackRate = rate` and `volume`, a speed or volume change
+applies to the playing clip at once (an utterance keeps the values it started with), and `onWord(i)`
+follows the playback position frame by frame (`wordAt(clip.words, currentTime)`); `ended` gives
+`onWord(words.length)` then `onEnd`; `pause`/`resume` map to the element; `stop()` detaches the clip.
+Everything below is the Web Speech path that every text without a clip takes.
 
 Behaviour: `speak` first calls `stop()` (bumps a token so stale callbacks are ignored, clears timers and
 a pending voice wait, resumes a paused engine before `cancel()`) and computes the character offset of
@@ -632,7 +672,8 @@ the requested `Voice` (`pickVoice`: **only voices of that language**, compared b
 `sameLanguage()` so `az`, `az-AZ` and Android's `az_AZ` match; ranks names matching
 natural/neural/online/premium/enhanced and non-local voices first, then gender regexes `FEMALE`/`MALE`;
 `tutor` is female with pitch 1.05; `child` 1.45, `young-*` 1.12, `older-*` 0.82 and rate × 0.92), sets
-`u.lang` from the voice, or from `LANG_TAG` (`az-AZ`, `en-US`, `ru-RU`) when the list stayed empty and
+`u.lang` from the voice, or from `LANG_TAG` (`az-AZ`, `en-US`, `ru-RU`, `tr-TR`, `ro-RO`, `ka-GE`,
+`uk-UA`, `de-DE`, `fr-FR`, `ar-SA`) when the list stayed empty and
 the engine chooses, `u.rate = clamp(rate × rateMul, 0.5, 2)`. `onboundary`
 (word events) maps `charIndex` to the word index and calls `onWord(i)`; if no boundary arrives within
 600 ms of `onstart`, timers estimate one word every `60_000 / (165 × u.rate)` ms. `onend` → `onWord(words.length)`
@@ -665,8 +706,8 @@ Android voice lists. Where it applies:
   string without a voice simply gets `onError` (whole text, no auto-advance).
 - `VoiceNotice` (`src/components/player/voice-notice.tsx`): one `role="status"` line with an `Info` icon,
   `player.voiceMissing` ("This browser has no {language} voice, so the text is not read aloud. Microsoft
-  Edge has natural Azerbaijani and Russian voices.") with `{language}` = `player.voiceLanguage.{az|en|ru}`
-  (a language outside `LOCALES` falls back to the `en` entry).
+  Edge has natural {language} voices.") with `{language}` = `player.voiceLanguage.{locale}` (ten entries;
+  a language outside `LOCALES` falls back to the `en` entry). A lesson with clips never shows it.
 - Tutor panel: an AI answer (`x-tutor-mode` `ai` or `cache`) is in the UI language, an offline answer
   quotes the lesson and is in its language (the `contentLocale` prop, default the UI language). The
   panel keeps that as `answerLang`, calls `speak(full, answerLang)`, marks the answer `lang={answerLang}`
@@ -686,16 +727,23 @@ Karaoke (`Karaoke` in scenes.tsx): title variant marks `i < word` as `text-ink`,
 `bg-brand-100 text-ink`, later words `text-ink-subtle` (the original's colours); body variant bolds read
 words. Artifact highlight: `ArtifactModeProvider { highlight: beat.highlight }` makes `SpanView` (rich.tsx)
 add `bg-risk-100 text-risk-700 ring-2` to the span whose `spot` matches. The player creates one narrator,
-`useNarrator({ enabled: soundOn, rate: speed, lang: p.contentLocale })`, and lends it to the tutor panel
-as `speak={(text, lang) => narrator.speak(text, { lang })}`.
+`useNarrator({ enabled: soundOn, rate: speed, lang: p.contentLocale, clips: p.clips, volume })`, and lends
+it to the tutor panel as `speak={(text, lang) => narrator.speak(text, { lang })}`. Every line a scene
+reads also goes to the captions' line store (section 3.11), so captions and the transcript follow it.
 
 ### 3.5 Speed, sound, motion, haptics
 
-- Speed: `SPEEDS = [1, 1.25, 1.5, 0.75]`, cycled by the `{speed}×` button, stored in `localStorage`
-  `cy:speed` and read through `useSyncExternalStore` with a server snapshot of `1`.
-- Sound: `soundOn` state seeded from `v.user.soundOn`; toggling stops narration and persists with
-  `setPreferencesAction({ soundOn })` (`src/server/actions/preferences.ts`). The intro shows
-  `player.soundHint` ("Turn the sound on to hear AI Sel") as a button when sound is off.
+- Per-browser preferences (`src/components/player/controls.ts`, `localPref` + `usePref`: `localStorage`
+  read through `useSyncExternalStore` with the default as the server snapshot, an in-memory value when
+  storage is blocked; `tests/player-controls.test.ts`): `speedPref` `cy:speed` (`SPEEDS = [0.75, 1, 1.25,
+  1.5, 1.75, 2]`, the `SpeedSelect` in the header from md and in the options dialog), `volumePref`
+  `cy:volume` (0–1, `VolumeControl`: a slider in the header from xl and in the dialog), `captionsPref`
+  `cy:captions`, `captionLangPref` `cy:caption-lang` (`""` = the narration's own language),
+  `syllabusPref` `cy:syllabus` (aside open or a rail), `letterShortcutsPref` `cy:shortcuts`.
+- Sound: `soundOn` state seeded from `v.user.soundOn` (a server preference, unlike volume); toggling stops
+  narration and persists with `setPreferencesAction({ soundOn })` (`src/server/actions/preferences.ts`).
+  The intro shows `player.soundHint` ("Turn the sound on to hear AI Sel") as a button when sound is off.
+- Fullscreen: `FullscreenToggle` (header, lg+), `player.fullscreen` / `exitFullscreen`.
 - Motion: the options dialog's `Segmented` (`learner.profile.motionFull/Calm/Still`) sets state,
   `document.documentElement.dataset.motion = m` and `setPreferencesAction({ motion })`; scenes receive
   `env.still` and pass it to every `<Mascot still>`.
@@ -727,18 +775,34 @@ are untimed. There is no `time_limits` feature flag in `PLAN_FEATURES`; the swit
   previous, replay, pause, play, lens*`, `order.up/down`).
 - Swipe cards use pointer events with `touch-pan-y` and `setPointerCapture`; the two buttons are the
   keyboard path. Bottom action rows are `sticky bottom-0` with `--safe-bottom` padding.
+- Page shortcuts (`shortcutOf`, `leavesKeyAlone`, `isCharacterKey` in `controls.ts`; one `keydown`
+  listener in `player.tsx`): Space play/pause, the arrows previous/next in the reading direction (in a
+  right-to-left page the left arrow goes forward; "next" only up to `maxIndex`), `M` sound, `C` captions,
+  `T` transcript, `S` syllabus, `?` the shortcut list (`ShortcutList`, labels `player.keys.*`). A letter
+  is the one on the key cap, or the key's QWERTY position on a non-Latin layout (Cyrillic, Arabic,
+  Georgian). Keys typed into fields, sliders, menus, radio groups, tab lists and dialogs (the tutor, the
+  drawers) stay theirs, and Space never takes over a focused button. The letter shortcuts can be turned
+  off in the options dialog (`player.letterShortcuts`, WCAG 2.1.4 for speech-input users); Space and the
+  arrows stay.
+- Drawers (`drawer.tsx`) are native modal `<dialog>`s: focus trap, Escape, inert page and focus return come
+  with the platform; they slide in from their side in the reading direction, instantly under Still.
 
 ### 3.8 i18n key groups
 
-`messages/{az,en,ru}/player.json` (142 leaf keys each on 2026-10-25, arrays counted once; parity enforced
-by `tests/i18n.test.ts`). Top-level keys: `leave, ask, askLabel, speed, soundOff, soundOn, more, options,
+`messages/{locale}/player.json` for the ten UI languages (204 leaf keys each on 2026-11-04, arrays counted
+once; parity enforced by `tests/i18n.test.ts`). Top-level keys: `leave, ask, askLabel, speed, soundOff, soundOn, more, options,
 motion, reportProblem, start, review, startOver, completed, soundHint, voiceMissing, previous, replay,
-pause, play, next, answer, check, continue, skip, progress, step, wellDone, doneAfterTries, goodMove,
+pause, play, next, answer, check, continue, skip, progress, step, narration, volume, speedLabel, captions,
+captionLanguage, captionSame, captionStored, captionMore, captionLoading, captionLimited,
+captionUnavailable, captionError, captionRetry, captionAiNote, transcript, transcriptEmpty, fullscreen,
+exitFullscreen, shortcuts, letterShortcuts, letterShortcutsHint, keySpace, wellDone, doneAfterTries, goodMove,
 notQuite, risky, compromised, correctAnswer, multiHint, multiMissed, multiExtra, quote, timeLeft, timeUp,
 lens, lensNext, lensActually, lensClose`. Groups:
-`voiceLanguage {az, en, ru}` (the language name in the grammatical form `voiceMissing` needs: az
+`voiceLanguage {az, en, ru, tr, ro, ka, uk, de, fr, ar}` (the language name in the grammatical form `voiceMissing` needs: az
 "Azərbaycan dilində", ru "азербайджанском" for "на {language} языке"; a new language needs an entry in
-every UI language), `hotspot {found, tap, missed, done}`, `swipe {threat, safe, left, question, itsThreat, itsSafe}`,
+every UI language), `keys {toggle, previous, next, mute, captions, transcript, syllabus, help}`,
+`syllabus {title, open, collapse, expand, lessonsDone, parts, locked}`, `sceneType {…the 11 types}`,
+`hotspot {found, tap, missed, done}`, `swipe {threat, safe, left, question, itsThreat, itsSafe}`,
 `match {pick, matched}`, `order {hint, up, down, wrong}`, `password {label, placeholder, strength,
 levels[], reached, notStored}`, `scenario {you, onLine, speaking, inPerson, videoCall, ended, unknownSpeaker}`,
 `simulation {handled, handledEmails, begin, mailApp, mailbox, inbox, sent, drafts, spam, archive, trash,
@@ -747,7 +811,7 @@ searchMail, selectEmail, to, toMe, attachments, incoming, mobile, outcomes {safe
 certificate, home}`, `tutor {title, placeholder, empty, send, listen, listening, thinking, suggestions[],
 privacy, offline, error}`, `artifact {from, subject, open, signIn, emailField, passwordField, allow, deny,
 decline, accept, networks, secured, open_network, scanToOpen, permissionsTitle, voiceMessage, fileSource}`,
-and `policy {otherLanguage, language {az, en, ru}, signed}`, which the policy reader
+and `policy {otherLanguage, language {ten entries}, signed}`, which the policy reader
 (`src/app/(focus)/policies/[id]/page.tsx`) reads, not the player. The player also reads `common.units.min`,
 `learner.profile.motion*`, `learner.attest.{checkbox, submit, done, error}` (the card heading is
 `player.done.confirm`), `learner.problem.{title, description, message, messageError, submit, sent}` and,
@@ -783,7 +847,7 @@ Server actions in `src/server/actions/learning.ts`, services in `src/server/serv
   serial `SLUG-2026-000042`, `publicToken`), closes the module's open risks; the action also emits
   `attestation.completed`, issues path certificates when every module of a path is done, recomputes risk and
   returns `{ ok, token }`. The done screen then links `/c/{token}` (`src/app/(public)/c/[token]`) and saves
-  the token in the resume state. Default text: `DEFAULT_ATTESTATION` (az/en/ru) in
+  the token in the resume state. Default text: `DEFAULT_ATTESTATION` (all ten languages) in
   `src/lib/tenant-defaults.ts`, overridable per tenant in `settings.attestationText[locale]`.
 - Done screen (`player.done.*`): mascot `celebrate`, `+{xp} XP` or `noXp` (a replay), the attestation card,
   `Certificate`, `Next lesson: {title}` (hidden while attestation is pending), `Back to module`, `Home`.
@@ -794,9 +858,54 @@ Server actions in `src/server/actions/learning.ts`, services in `src/server/serv
 Not part of the lesson player. `src/components/site/teachable.tsx` `<TeachableMoment>` is the page a
 learner lands on after clicking a simulated phishing link (`src/app/(public)/t/[token]`) or scanning a QR
 trap (`src/app/(public)/q/[token]`); campaign templates carry the module slug the learner is sent to
-afterwards (`moduleSlug` in `src/lib/campaigns/templates.ts`). `qr_trap` is listed in `PLAN_FEATURES`
-(professional plan) but no code path checks it, and there is no `teachable_moment` entry at all even though
-the original listed both as flags.
+afterwards (`moduleSlug` in `src/lib/campaigns/templates.ts`). `qr_trap` (professional plan) gates QR
+templates in the campaign wizard, on save and at every launch (since the 2026-10-27 hardening, ADR-033);
+there is no `teachable_moment` entry at all even though the original listed it as a flag.
+
+### 3.11 Captions, AI subtitles and transcript
+
+ADR-029, ADR-030. Files: `src/components/player/captions.tsx`, `media-controls.tsx` (`SubtitleSelect`,
+`Transcript`), `controls.ts` (`transcriptOf`), `src/app/(focus)/learn/[slug]/[lessonId]/actions.ts` +
+`caption-map.ts`, `src/app/api/subtitles/route.ts`, `src/server/subtitles.ts`,
+`src/lib/content/subtitle-languages.ts`.
+
+- **The line.** Every text the player passes to `speak()` is also written to a tiny external store
+  (`createLineStore`: text, language, word reached, word count), so a word change re-renders only the
+  caption bar and the transcript. `<CaptionBar>` shows the current line above the scene's bottom row
+  (`slot`), otherwise as a sticky bar at the bottom of the page.
+- **Which language.** `captionLangPref` `""` means the narration's own language: the line itself, filled
+  word by word, shown only while a voice reads (silent, the scene already shows that text). A stored
+  language (`captionLocales`: the lesson's other `lesson_contents` rows) comes from
+  `loadCaptionsAction(lessonId, locale)`: `captionMap(narrated, other)` pairs the two rows' `spokenTexts`
+  in order (translations keep every id and array length; an entry whose shape differs is left out) and
+  maps each string exactly as spoken to its translation; rate limit `captions:{userId}` 60 / 10 min. Any
+  other language goes to `POST /api/subtitles` (body `{ lessonId, target }`, `target` ∈ the 65
+  `SUBTITLE_LANGUAGES`; the ten shipped languages are never sent to the model). A translation has no word
+  timings, so it fills by the share of words read. `SubtitleSelect` groups the stored languages and
+  `player.captionMore` ("More languages (translated by AI)", only with the `ai_tutor` feature;
+  `moreLanguages` is named on the server because Chromium lacks some display names).
+- **The AI route.** Same origin, signed in, `ai_tutor` feature, the lesson reachable for the viewer, the
+  text this viewer hears (`pickLessonContent` for the interface language). `subtitleSourceLines` = the
+  distinct audible parts; the cache id = sha256 of lesson, source locale, target and a hash of the lines,
+  so a changed text is a new `ai_cache` row and one translation serves every learner. Cached or already
+  running (`translateOnce`, per process) costs nothing; otherwise, with `ANTHROPIC_API_KEY`, one streamed
+  call to `ANTHROPIC_TUTOR_MODEL` with the `save_subtitles` tool, checked by `validTranslation` (one line
+  per source line, none empty or far longer). Limits: requests 60 / 10 min per person; model calls 6 /
+  10 min and 30 / day per person, 300 / day per organisation; over 30,000 source characters `too_long`.
+  Errors: 429 → `captionLimited`, 503 (no key) or 404 → `captionUnavailable`, else `captionError` with
+  retry. The client caches every map per `lessonId:contentLocale:lang` and waits 600 ms before a request
+  (`CAPTION_SETTLE_MS`), so scrolling the picker does not fire one per language.
+- **Direction.** Captions and transcript lines take `langAttrs(lang)`; `RTL_LOCALES` also covers the AI
+  languages fa, he, ps and ur.
+- **Transcript.** `transcriptOf(scenes)`: what every scene reads on its own (no answer feedback), each line
+  exactly as passed to `speak()`; the drawer lists the lines reached so far (all once the lesson is done),
+  marks the current one, shows the chosen caption language under each and replays a line when a voice is
+  available.
+- **Keep in step.** Three lists mirror the `speak()` call sites in `scenes.tsx`: `spokenTexts` in
+  `src/lib/tts/spoken.ts` (clips; includes the UI strings `multiHint`/`hotspot.done`), `spokenTexts` in
+  `src/server/subtitles.ts` (captions; lesson text only, with each composed string's parts) and
+  `transcriptOf` in `controls.ts`. A new spoken text in a scene needs all three, and
+  `tests/tts.test.ts`, `tests/subtitles.test.ts` and `tests/player-controls.test.ts` show the shapes.
 
 ---
 
@@ -831,7 +940,7 @@ language's voice (section 3.4).
 - **Route**: `POST /api/tutor` (`src/app/api/tutor/route.ts`), body
   `{ slug, lessonKey, sceneId?, question, locale }` validated by `tutorRequestSchema`
   (`src/server/tutor.ts`: `slug`/`lessonKey` kebab-case ≤ 100, `sceneId` ≤ 100 without control characters
-  (nullable), `question` trimmed 2–500 chars without control characters, `locale` ∈ az/en/ru), body capped at `TUTOR_BODY_LIMIT = 8 KiB` (`readBodyCapped`, 413 beyond).
+  (nullable), `question` trimmed 2–500 chars without control characters, `locale` ∈ `LOCALES`, the ten UI languages), body capped at `TUTOR_BODY_LIMIT = 8 KiB` (`readBodyCapped`, 413 beyond).
   Checks: same-origin `Origin` vs `Host` (403), signed-in viewer (401), tenant feature `ai_tutor` (404),
   `rateLimit("tutor:{userId}", 20, 10 min)` (429). The module is the tenant's copy or the global one;
   drafts only for `studio.write`. Lesson scenes: `pickLessonContent(rows, locale)` over the lesson's
@@ -919,7 +1028,7 @@ language's voice (section 3.4).
   lazy polyfill (SKILL.md ground rules). The player currently formats no dates; keep it that way, go
   through these helpers, or format on the server as the certificate (`src/app/(public)/c/[token]/page.tsx`)
   and progress pages do with `getFormatter()` (`getAppFormatter()` for a relative time).
-- **Messages JSON**: edit `messages/{az,en,ru}/*.json` with the Edit tool (shell heredocs corrupt Unicode
+- **Messages JSON**: edit `messages/{locale}/*.json` (ten languages) with the Edit tool (shell heredocs corrupt Unicode
   and backslashes); keys contain no dots; ICU braces are escaped with quotes; every key exists in all three
   locales with the same placeholders (`tests/i18n.test.ts`). `player.tutor.suggestions` and
   `player.password.levels` are arrays read with `t.raw()`.
@@ -990,11 +1099,12 @@ language's voice (section 3.4).
   `--coverage`, on a missing file. `syncLibrary` applies the same checks and stops at the first bad file
   (on PostgreSQL the import's transaction rolls back; on PGlite `content:sync` runs without one, so the
   rows written before it stay).
-- **Change the English, change all three**: parity catches a structural change (a new beat, option or
-  span) in the English file until both translations follow, but not a reworded sentence; reword the
-  az/ru text by hand in the same change. Nothing records which English version a translation follows:
-  list the reworded strings with `git diff -- content/library/lessons/<module>/<lesson>.en.json` (from
-  `portal/`) and update the same JSON paths in the `.az.json` and `.ru.json`.
+- **Change the English, change all three** (the heading predates the seven new languages: now all ten
+  files): parity catches a structural change (a new beat, option or span) in the English file until all
+  nine translations follow, but not a reworded sentence; reword each translation by hand in the same
+  change. Nothing records which English version a translation follows: list the reworded strings with
+  `git diff -- content/library/lessons/<module>/<lesson>.en.json` (from `portal/`) and update the same
+  JSON paths in every `.{locale}.json`. A reworded spoken text also needs its clip regenerated (recipe 6.6).
 - **A new text key needs `TRANSLATABLE`**: a scene or artifact field that learners read must be added to
   the set, otherwise every translation is forced to keep the English value; adding a key makes it
   translatable everywhere in the tree, so do not add one that also names an identifier.
@@ -1093,39 +1203,52 @@ language's voice (section 3.4).
    explanations) so AI Sel can see it.
 6. `src/components/player/resume.ts`: extend `answerIdsOf()` only if the scene records answers under ids
    other than its own `sceneId`.
-7. i18n: new strings in `messages/{az,en,ru}/player.json` under a new group.
+7. i18n: new strings in `messages/{locale}/player.json` (all ten) under a new group.
 8. Tests: a fixture lesson in `tests/content.test.ts` or a dedicated test with `lessonFileSchema`;
    `tests/player-resume.test.ts` if ids changed; run `tests/i18n.test.ts`.
 9. Studio (if authors should create it) is covered by the training-pipeline reference.
 
 ### 6.3 Translate a lesson, or add a lesson language
 
-Every library lesson has an az and a ru file (212 of 212, all passing `--coverage` on 2026-10-26; the
-translation work is finished). They were translated from the
-EN files in this rebuild: the original's own az/ru lesson text was never captured (the audit has only
-`.en.json`; OPEN-QUESTIONS #6 was closed on 2026-10-26 with these translations instead of an
-extraction from the live tenant, and recommends a native speaker's final read before release). A task
-here is usually a re-translation after an English change, a wording fix, or a new language.
+Every library lesson exists in all ten UI languages: `{lesson}.en.json` (the original) and one file each
+for az, ru, tr, ro, ka, uk, de, fr and ar (954 translations, all passing `--coverage` on 2026-11-04; az/ru
+since 2026-10-26, ADR-023; the seven others since 2026-11-04, ADR-026). They were translated from the EN
+files in this rebuild by agents (translator, independent native editor, consistency passes): the
+original's own az/ru lesson text was never captured (the audit has only `.en.json`), and no human native
+speaker has read the seven new languages yet (OPEN-QUESTIONS #6, #7). A task here is usually a
+re-translation after an English change, a wording fix, or a new language.
 
-**One lesson, az or ru**
+**Glossaries.** One file per language in
+`.claude/skills/cyclowareness-experience/references/glossaries/{tr,ro,ka,uk,de,fr,ar}.md`, written by a
+terminologist and checked by an independent native reviewer: the terms (one concept, one term), the
+style rules (form of address, quotes, numbers and dates, typography, letters, plurals), the character-name
+table, and the reviewers' notes (what they changed, kept and left open; OPEN-QUESTIONS #22 lists the open
+tr/ro/uk choices). The az and ru glossaries are in step 3 below. Read the language's glossary before you
+touch any of its text, and record a term there when you settle one.
 
-1. Read the English file end to end and the terms the portal already uses:
+**One lesson, any language**
+
+1. Read the English file end to end and the terms the portal already uses: the glossary,
    `messages/{locale}/player.json`, `learner.json` and `content/library/i18n.{locale}.json`. The
    translation's `title` is exactly `i18n.{locale}.json` → `lessons["{module}/{lesson}"]`; modules are
    named as in that file. For a re-translation after an English edit, start from the `git diff` of the
-   `.en.json` (section 5, "Change the English, change all three").
-2. Write `content/library/lessons/{module}/{lesson}.{az|ru}.json` with the Write tool as a copy of the
+   `.en.json` and make the same change in all nine translations (section 5, "Change the English, change
+   all three", now applies to all ten files).
+2. Write `content/library/lessons/{module}/{lesson}.{locale}.json` with the Write tool as a copy of the
    English JSON (UTF-8, two-space indent, final newline), or Edit an existing one in place. Change only the
-   translatable strings (section 5). The rules the translators and editors of the 212 files worked to:
+   translatable strings (section 5). The rules the translators and editors worked to:
    - `say` is read aloud and highlighted word by word: natural spoken sentences that sound good aloud.
      `spoken` keeps its delivery tags (`<breath>`, `<short pause>`, `<sigh>` …) at natural places, with
-     hesitation fillers of the target language.
+     hesitation fillers of the target language. `spoken` is also where a phonetic spelling goes when a
+     voice mispronounces a name (ro voices read «Elchin» as «Elkin»); never change the visible text for it.
    - Rich text keeps the same number of spans with the same `spot`/`link`/`reveal`; distribute the
      sentence so every span with a `spot` still holds exactly the phrase the spot is about (the urgency
      phrase, the deadline, the fee, the new IBAN); a plain span may shrink to punctuation when the word
      order needs it; never move a spot to another element.
    - Emails, SMS, chats, calls and screens read like a realistic attack on an employee in Azerbaijan in
-     that language and keep every red flag the lesson teaches.
+     that language and keep every red flag the lesson teaches: the stories stay in the Azerbaijani company
+     world in every language (Safarov Industries, manat/AZN, +994 numbers, Azerbaijani institutions;
+     ADR-026).
    - Translated like any label (section 5): `app` on a notification, permission or chat ("Settings" →
      «Ayarlar», «Настройки»), except the identifiers `whatsapp`, `telegram`, `generic` and `chat`; the
      e-mail's To line `to` ("you", a person's name), keeping every address in it; a login page's `brand`
@@ -1146,7 +1269,13 @@ here is usually a re-translation after an English change, a wording fix, or a ne
      comma, ё where standard, no Latin letters inside Russian words, people's names in Cyrillic in the
      text (Лейла, Тураль, Камран) but unchanged in addresses and identifiers. A bare decimal value such as
      `12.5` must stay as it is (section 5).
-3. Glossary (given to every translator and editor of the 212 files):
+   - The other seven: the glossary's style rules and names table. Examples: tr writes Azerbaijani names
+     the way Turkish media do («Reşad Memmedov») and uses «parola», never «şifre», in teaching text; ro
+     writes ș ț with the comma below (never the cedilla, which is also the code point of Azerbaijani ş)
+     and names in their ASCII English form («Rashad Mammadov»); uk uses «ви» in lower case and no
+     ы/э/ъ/ё; ar uses Western digits 0-9 only, Modern Standard Arabic as Saudi services write it, and
+     gender-neutral constructions.
+3. Glossary for az and ru (given to every translator and editor of the 212 az/ru files):
    - az: fişinq; fişinq məktubu; SMS fişinqi; telefon fişinqi; QR fişinqi; parol; parol ifadəsi; parol
      meneceri; iki addımlı doğrulama; çoxfaktorlu autentifikasiya (MFA); birdəfəlik kod; autentifikator
      tətbiqi; e-poçt / məktub; gələnlər qutusu; göndərən; qoşma; link; bildirmək; təhlükəsizlik komandası;
@@ -1162,107 +1291,98 @@ here is usually a re-translation after an English change, a wording fix, or a ne
      браузер; расширение; обновление; резервная копия; флешка; QR-код; социальная инженерия;
      мошенничество / мошенник; утечка данных; персональные данные; учётная запись; войти; страница входа;
      приложение; устройство.
-   - Decisions applied across all 212 files: az «İT dəstəyi», «bildirmək», «fleş kart», «qoşma»,
+   - Decisions applied across all 212 az/ru files: az «İT dəstəyi», «bildirmək», «fleş kart», «qoşma»,
      «genişlənmə», and «İki addımlı doğrulama» as the `passwords-mfa/mfa` title; ru
      «служба безопасности», «ИТ-поддержка», «ПИН-код», and «учётная запись» except for a messenger
      or social-network account, which is «аккаунт».
-4. Check: `npx tsx scripts/check-lesson-locales.ts content/library/lessons/{module}/{lesson}.az.json
-   content/library/lessons/{module}/{lesson}.ru.json` until both print `ok`, then
-   `npx vitest run tests/content-locales.test.ts`. The checker cannot judge wording: read the result side by
-   side with the English, or give it to a second, native editor.
+4. Check: `npx tsx scripts/check-lesson-locales.ts content/library/lessons/{module}/{lesson}.{locale}.json …`
+   (one or more files) until each prints `ok`, then `npx vitest run tests/content-locales.test.ts`. The
+   checker cannot judge wording: read the result side by side with the English, or give it to a second,
+   native editor.
 5. Load and look: stop the :3000 dev server, `npm run content:sync`, start it again (recipe 6.1 step 6;
-   never the 3100/3200 copies without the user's go-ahead); open the lesson with the
-   profile language set to az, then ru, sound on. In a browser without an Azerbaijani voice (Chrome on
-   Windows) the az lesson shows `VoiceNotice` and stays silent; the notice points to Edge. Ask AI Sel
-   something in that language (the offline answer quotes the translation). Answers cached for the old
-   text stay in `tutor_cache` (section 4, Cache, says how to clear them).
+   never the 3100/3200 copies without the user's go-ahead); open the lesson with the profile language set
+   to that language, sound on, and in ar check the right-to-left layout. In a browser without a voice for
+   the language (Azerbaijani in Chrome on Windows) the lesson shows `VoiceNotice` and stays silent unless
+   it has clips. Ask AI Sel something in that language (the offline answer quotes the translation).
+   Answers cached for the old text stay in `tutor_cache` (section 4, Cache, says how to clear them). A
+   changed text has no clip until `scripts/generate-narration.ts --only {module}/{lesson} --locales {locale}`
+   runs again (recipe 6.6); AI subtitles of the old text are not reused (their cache id hashes the text).
 
-A few lessons after an English change are quicker by hand with the steps above; the workflow below is
+A few lessons after an English change are quicker by hand with the steps above; the workflows below are
 for a whole language or a large batch.
 
-**Many lessons (how the 212 files were made)**: a Workflow script, `translate-lessons.js`, not in the
-repo: the 2026-10 copy and its `lesson-batches.json` are in the scratchpad of the session that ran them
-(`C:/Users/Safar/AppData/Local/Temp/claude/C--Users-Safar-Desktop-Cyclowareness--Vol2/66e61158-c161-4119-a251-69c6013bc3e9/scratchpad/`),
-which is temporary, so a new session rebuilds the script from this description.
-`docs/build/RESUME.md` is history (it opens with «✅ TAMAMLANDI (2026-10-26)»): the resume plan written
-when the run was interrupted on 2026-10-21 (210 of 212 files then, editor passes still open), with the
-glossaries copied in step 3. That work is
-finished (all 212 files present and passing `--coverage`, the glossary decisions of step 3 applied):
-do not run its steps or resume its workflow runs, and check the current state with `--coverage`. The
-shared prompt sends every agent to sections 1 to 3 of this file, so keep the format described there
-current. Args `{ portal, lang, langName, glossary, batches }`, `batches` = 13 groups of
-`"module/lesson"` keys (9, 7, 9, 7, 9, 9, then seven groups of 8).
-Per batch a pipeline of two agents: a translator (reads each English file, writes the translation or
-completes one left by an interrupted run, runs the checker on its files) and an independent native editor
-(English and translation side by side: mistranslations and omissions, anything that changes which answer
-is right, literal phrasing, register, glossary terms, letters, sentences that sound bad aloud, spots that
-lost their phrase, realism of the artefacts; runs the checker). Then one consistency editor per language:
-translates any missing file, unifies glossary variants across all files, reads ten lessons from different
-modules end to end, runs the checker over everything. Every agent gets the rules of steps 1 to 3 and may
-not touch `.en.json`, i18n files or code. One workflow per language; at the end `--coverage` must report
-`212 of 212`. Before reusing it for another language: the editor prompt's letter and typography rules
-are a two-way ternary (`LANG === 'az' ? 'ə ğ ı İ ö ü ç ş; …' : 'ё where standard, …'`), so any other
-language would get the Russian rules: give it its own rule. The shared prompt frames every artefact as
-an attack on an employee in Azerbaijan; decide with the user whether that setting fits the new market.
-The agents read `content/library/i18n.{xx}.json` and `messages/{xx}/player.json` and `learner.json`, so
-those must exist first (steps 1 and 3 below).
+**Many lessons (how the 954 files were made).** Workflow scripts; copies are in `docs/build/workflows/`.
+- az and ru (2026-10-21 → 26): `translate-lessons.js` (not copied to the repo; it stayed in the scratchpad
+  of the session that ran it). Per batch of 7–9 lessons a translator and an independent native editor,
+  then one consistency editor per language. `docs/build/RESUME.md` keeps that run's resume plan as
+  history; do not run its steps.
+- tr, ro, ka, uk, de, fr, ar (2026-10-27 → 11-04): `localize-language.js`, one run per language, args
+  `{ lang, langName, market, plurals }` (`plurals` = the CLDR categories the language needs). Items: the
+  UI namespaces in chunks, the legal texts, the policies, the landing (ar only), and the 106 lessons in 13
+  batches (9, 7, 9, 7, 9, 9, then seven groups of 8). Per item a translator, then an independent editor
+  who reads the English side by side; then two consistency passes (lesson terminology, UI terminology).
+  `finish-editors.js` reruns only the editor passes a usage limit cut off (args `{ lang, langName,
+  plurals, items }`) plus a final consistency sweep. Every agent is wrapped in `retrying()` (a usage
+  limit ends an agent without a result: wait 10 minutes, up to 40 tries), may not touch `.en.json` or
+  code, and runs the checker on its files.
+- Before reusing them: both scripts hard-code the portal path and the 2026-10 session's scratchpad (`SP`),
+  and read the glossary from `${SP}/glossaries/{lang}.md`: point that at the skill's `glossaries/` folder
+  (same files). Write the new language's glossary first (a terminologist, then an independent native
+  reviewer), and make sure `messages/{lang}/` and `content/library/i18n.{lang}.json` exist (steps 1 and 3
+  below), because the agents read them. The shared prompt frames every artefact as an attack on an
+  employee in Azerbaijan (ADR-026); decide with the user whether that fits the new market.
 
-**A new lesson language** (for example `uk` or `tr`, which the landing already speaks). Lesson text is
-served only in a UI language, so the interface comes first:
+**A new UI and lesson language.** Lesson text is served only in a UI language, so the interface comes
+first. Ask the user before adding one (ADR-025 replaced Italian with Arabic on request).
 
-1. UI: `LOCALES` in `src/i18n/config.ts` (the app resolves only these; grep `LOCALES` for the forms and
-   actions that list them, such as `src/components/language-switcher.tsx`), every namespace in
-   `messages/{xx}/` (`tests/i18n.test.ts` iterates `LOCALES`), and an `{xx}` entry in every per-language
-   name map of every UI language: `common.languages`, `player.voiceLanguage` (in the form `voiceMissing`
-   needs there), `player.policy.language`, `secops.aiTrainer.contentLanguageName`. `LOCALE_NAMES` in
-   the same file already names the ten `SITE_LOCALES`; a language outside them (Arabic, Persian) also
-   needs `SITE_LOCALES`, `LOCALE_NAMES` and `content/landing/{xx}.json` (`tests/landing.test.ts`).
-   `UI_ALIAS` in the same file sends browser languages without an interface to one (`tr` → az; `uk`,
-   `be`, `kk`, `ky`, `uz` → ru): remove the new language from it. The comment on `LOCALES` names the
-   lesson files (`<lesson>.{en,az,ru}.json`); extend it. Ask the user before adding a language
-   (OPEN-QUESTIONS #7).
-2. Code-side per-language maps: `pick()` (`src/i18n/config.ts`) silently falls back to `en`, so no test
-   fails on a missing entry. `grep -rnE "[{ ]az: " src` and give every hit an `{xx}` entry:
-   `DEFAULT_ATTESTATION` (the player's done screen shows `pick(DEFAULT_ATTESTATION, locale)`),
-   `DEFAULT_CERTIFICATE_TEXT`, `DEFAULT_TEMPLATES`, `DEFAULT_TEMPLATES_NO_DUE`, `FIXED_MESSAGES`,
-   `EMAIL_BUTTON_LABEL` and `EMAIL_BUTTON_BY_KIND` in `src/lib/tenant-defaults.ts`; `DEFAULT_PATH_CERTIFICATE_TEXT` in `src/app/(public)/c/[token]/page.tsx`;
-   `REFRESHER_TITLE` in `src/server/jobs.ts`; `clickTitle`, `BLOCKED_TITLE` and `BLOCKED_REASON` in
-   `src/server/services/campaigns.ts` (risk titles are stored in every language, `src/lib/risk-title.ts`);
-   `TEMPLATE_SAMPLE` in `src/app/api/admin/people/[kind]/route.ts`; `ARTICLE` in `src/lib/standards.ts`
-   (without an entry a path standard keeps `Art.`); `PREVIEW_VARS` in
-   `src/components/admin/settings-tabs.tsx`; `TEXT` in `src/app/global-error.tsx` (typed by `Locale`,
-   so `npm run typecheck` catches it); the `L10n` campaign templates (`src/lib/campaigns/templates.ts`)
-   and the `L` lab games (`src/server/lab/games.ts`); the az/en/ru titles in `content/library/paths.json`.
-   Manager alerts and report mails (`src/server/jobs.ts`) and the password-reset mail
-   (`src/server/actions/auth.ts`) take their text from the messages (`messagesFor` in
-   `src/i18n/translator.ts`, `getTranslations({ locale })`), so step 1 covers them. Not found by the
-   grep: `src/i18n/az-numbers-polyfill.ts` loads FormatJS number data for en, az and ru only, and the
-   polyfill replaces `Intl.NumberFormat` for every language, so add `locale-data/{xx}.js` there.
-   Then `defaultSettings().locales` (`["az", "en", "ru"]`) for new tenants; existing tenants enable the
-   language in Settings → Languages (stored `settings.locales`), otherwise Studio and the AI trainer do
-   not offer it.
-3. Library: `LESSON_TRANSLATIONS` in `src/server/services/library.ts` with its `locales` counter
-   (`{ en: 0, az: 0, ru: 0 }`) and the log lines in `scripts/sync-content.ts`, `scripts/seed.ts` and
-   `src/server/bootstrap.ts`; `readLibrary()` reads only `i18n.az.json` / `i18n.ru.json` and
-   `syncLibrary` builds `{ en, az, ru }` titles, so add `i18n.{xx}.json` and its reads; `scripts/check-lesson-locales.ts` (the
-   `/\.(az|ru)\.json$/` pattern and the `["az", "ru"]` coverage loop); the `(en|az|ru)` file-name rule in
-   `tests/content-locales.test.ts`; the az/ru title test in `tests/content.test.ts`.
-4. Tutor and AI: `tutorRequestSchema.locale`, `TUTOR_LANGUAGE` and `LANGUAGE_STYLE` (the language's
-   terms, form of address and quotes; a missing entry gets the English one) in `src/server/tutor.ts`;
-   whether `fold()` needs the language's case quirks (Turkish has the same `İ`/`ı` pair, already
-   folded); `TRAINING_LOCALES` in `src/server/ai-verify.ts`. `TUTOR_LANGUAGE` and `languageStyle()`
-   also set the language of Studio drafts (`draftLesson`), AI-trainer generation (`trainingBrief`) and
-   the AI reviewer's messages in `src/server/ai.ts`.
+1. UI: `LOCALES` in `src/i18n/config.ts` (the app resolves only these; `SITE_LOCALES` is the same list,
+   so the language also needs `content/landing/{xx}.json`, `tests/landing.test.ts`), `LOCALE_NAMES`,
+   every namespace in `messages/{xx}/` (`tests/i18n.test.ts` iterates `LOCALES`; the release used
+   `node <scratchpad>/check-messages.mjs {xx}` (copy in `docs/build/workflows/`) for keys, ICU and
+   placeholders), and an `{xx}` entry in every per-language name map of every UI language:
+   `common.languages`, `player.voiceLanguage` (in the form `voiceMissing` needs there),
+   `player.policy.language`, `secops.aiTrainer.contentLanguageName`. `UI_ALIAS` in the same file sends
+   browser languages without an interface to one (`be`, `kk`, `ky`, `uz` → ru): remove the new language
+   from it if it is there. A right-to-left language also goes into `RTL_LOCALES` (step 7).
+2. Code-side per-language maps: `pick()` (`src/i18n/config.ts`) silently falls back to `en`, but
+   `tests/in-code-locales.test.ts` now fails on a missing entry for every map it imports
+   (`DEFAULT_ATTESTATION`, `DEFAULT_CERTIFICATE_TEXT`, `DEFAULT_PATH_CERTIFICATE_TEXT`,
+   `DEFAULT_TEMPLATES`, `DEFAULT_TEMPLATES_NO_DUE`, `EMAIL_BUTTON_LABEL`, `EMAIL_BUTTON_BY_KIND`,
+   `FIXED_MESSAGES` in `src/lib/tenant-defaults.ts`; the campaign `TEMPLATES` and click risk titles in
+   `src/lib/campaigns/templates.ts`; `riskTitles` in `src/lib/risk-title.ts`; `localizeStandard` in
+   `src/lib/standards.ts`; the lab games `INBOX`, `LINKS`, `MFA` in `src/server/lab/games.ts`;
+   `TUTOR_LANGUAGE`, `LANGUAGE_STYLE` and `tutorRequestSchema` in `src/server/tutor.ts`). Still grep
+   `grep -rnE "[{ ]az: " src` for maps outside the test (`REFRESHER_TITLE` in `src/server/jobs.ts`,
+   `BLOCKED_TITLE` and `BLOCKED_REASON` in `src/server/services/campaigns.ts`, `ROLE_NAMES` in
+   `src/server/actions/people.ts`, `TEMPLATE_SAMPLE` in `src/app/api/admin/people/[kind]/route.ts`,
+   `PREVIEW_VARS` in `src/components/admin/settings-tabs.tsx`, `TEXT` in `src/app/global-error.tsx`;
+   the ones typed by `Locale` make `npm run typecheck` fail),
+   the titles in `content/library/paths.json`, and add `locale-data/{xx}.js` to
+   `src/i18n/az-numbers-polyfill.ts` (it replaces `Intl.NumberFormat` for every language).
+   `defaultSettings().locales` is `[...LOCALES]`, so new tenants get it; existing tenants enable it in
+   Settings → Languages.
+3. Library: `LESSON_TRANSLATIONS`, the checker, `tests/content-locales.test.ts` and the title test in
+   `tests/content.test.ts` all follow `LOCALES`, so the code needs no change; the content does:
+   `content/library/i18n.{xx}.json` (every module and lesson title) and the 106 `{lesson}.{xx}.json`
+   files, plus `content/legal/{privacy,terms}.{xx}.md` and `content/policies/*.{xx}.md`.
+4. Tutor and AI: `TUTOR_LANGUAGE` and `LANGUAGE_STYLE` (the language's terms, form of address and quotes)
+   in `src/server/tutor.ts`; whether `fold()` needs the language's case quirks (Turkish `İ`/`ı` is
+   already folded); `TRAINING_LOCALES` in `src/server/ai-verify.ts` is `LOCALES`. These also set the
+   language of Studio drafts, AI-trainer generation and the AI reviewer's messages in `src/server/ai.ts`.
 5. Voice: `LANG_TAG` in `narrator.ts` and in `tutor-panel.tsx` (speech recognition); check which
-   browsers list a voice for the language and change `player.voiceMissing` (it names Edge and its
-   Azerbaijani and Russian voices) if that is not the right advice.
-6. Translate all lessons with the workflow above (after the changes its notes list) and a glossary for
-   the language, then `--coverage`.
-7. Right-to-left languages (Arabic, Persian, Hebrew) need more: `<html>` in `src/app/layout.tsx` sets only
-   `lang`, never `dir`; components use physical classes (`ml-`, `pl-`, `left-`, `text-left`: about 240
-   uses against 15 logical `ms-`/`ps-`/`start-` ones in `src/**/*.tsx` on 2026-10-25); the player has
-   direction built in (swipe left = threat, the mascot's `point-left`/`point-right` and aim angles, `‹`
-   for previous). Plan `dir="rtl"`, logical classes and a mirrored player before shipping one.
+   browsers list a voice for the language and whether `player.voiceMissing` gives the right advice. For
+   clips: check that `eleven_v3` reads the language, have a native speaker pick a voice
+   (`ELEVENLABS_VOICE_{XX}`), then recipe 6.6 (the generator iterates `LOCALES`).
+6. Translate everything with the workflow above and a glossary for the language, then `--coverage`
+   (106 more files), `npm run typecheck`, the lint and `npx vitest run`.
+7. Right-to-left (Arabic is the one so far; ADR-025): `dirOf` / `langAttrs` read `RTL_LOCALES`, `<html dir>`
+   follows the page language, components use logical classes only (`ms-`, `pe-`, `start-`, `text-start`,
+   `border-s`; `tests/rtl-logical.test.ts` fails on a physical one outside its allow-list), charts and
+   their trend arrows mirror, the mascot keeps its drawing and mirrors only its facing and points
+   (`mirrorForRtl`), the keyboard arrows and the swipe sign follow the reading direction, and code, URLs, addresses, phone
+   numbers, IBANs and OTPs stay left to right (`dir="ltr"` or `<bdi>`). A new script also needs its font
+   (`next/font/google` in `src/app/layout.tsx`, not preloaded, like Noto Sans Georgian and Arabic) and a
+   look at `/og/{xx}` (Satori does not shape Arabic, so `/og/ar` shows the English card).
 
 ### 6.4 Add an illustration
 
@@ -1285,49 +1405,69 @@ the file at request time (cached in `brandCache` for the process).
 Artifact kind: add the type to `Artifact` in `types.ts`, the literal to the `artifact` enum in `validate.ts`,
 a `XxxView` plus a `case` in `ArtifactView` in `artifacts.tsx` (use `RichText` for text so `spot`,
 `highlight`, hotspot and Lens modes work; `useBrand(a.brandRef)` + `BrandAvatar` for the brand), labels
-in `player.artifact.*` (three locales), and, if the simulation should open something inside it, honour
+in `player.artifact.*` (all ten locales), and, if the simulation should open something inside it, honour
 `onLink`/`onAttachment` from `useArtifactMode()`.
 
-### 6.6 Switch narration to pre-generated TTS
+### 6.6 Generate the natural narration (pre-generated TTS)
 
-ADR-007 planned this; OPEN-QUESTIONS #2 asks which provider (ElevenLabs or Azure Speech) and which
-Azerbaijani voice. Everything in the UI goes through `useNarrator().speak()`, so:
+Built on 2026-10-27 (ADR-028); no clip has been generated yet, because the ElevenLabs key and the voice of
+each language are still open (OPEN-QUESTIONS #2). Until then every text is read by Web Speech.
 
-1. Build step: a script (e.g. `scripts/generate-tts.ts`) that walks every lesson file (all locales), collects
-   every `say`, `spoken`, `intro`, prompt, feedback, explain, recap point and chat/scenario line the scenes
-   speak (mirror the `speak()` call sites in scenes.tsx and the feedback texts composed there), plus the
-   interface strings scenes read in the UI language (`player.multiHint`, `player.hotspot.done`) for
-   every UI locale. Some spoken texts are composed in scenes.tsx: `IntroScene` speaks `{title}. {body}`,
-   `RecapScene` the points joined with `". "`, and a multi-answer `ChoiceScene` speaks
-   `{prompt} {multiHint}.` as one utterance when the lesson and UI languages match but the prompt and
-   `{multiHint}.` as two utterances when they differ (`speakPrompt`), so a text-keyed manifest needs
-   both forms. It hashes the
-   cleaned text + locale + voice, calls the provider with word timestamps, writes
-   `public/generated/tts/{locale}/{hash}.m4a` and a manifest in the original format:
-   `Record<text, { url, durationMs, words: { w, startMs, endMs }[] }>` (section 1.6). Store the manifest
-   per lesson (e.g. next to the scenes in `lesson_contents` or as `content/library/narration/{locale}/{lesson}.json`)
-   and expose `narrationClipCount`/`narrationTotalMs` like the original props.
-2. Serve it: `page.tsx` loads the lesson's manifest and passes `narration` to `LessonPlayer`.
-3. Provider: in `narrator.ts` keep the same return shape `{ speak, stop, pause, resume, speaking, paused,
-   supported }` and the same `speak(text, { voice, lang, onWord, onEnd, onError })` semantics. When
-   `narration[speechText(text)]` exists, play the clip with an `HTMLAudioElement` at `playbackRate = rate`,
-   drive `onWord(i)` from `words[i].startMs / rate` with `timeupdate` or timers, call `onEnd` on `ended`,
-   fall back to Web Speech otherwise. `pause`/`resume` map to the audio element; `stop()` must still bump
-   the token so stale callbacks are ignored. Report `voice: "available"` when the lesson's clips exist for
-   its language, since the player treats `"missing"` as sound off and shows `VoiceNotice` (section 3.4);
-   the Web Speech fallback keeps the language rule.
-4. Keep the sound-off contract (`onWord(words.length)` immediately, no `onEnd`), the 700 ms auto-advance in
-   `TutorScene` and `FeedbackCard`, and the `Voice` names (map them to provider voice ids per locale).
-5. Tests: a unit test for the word-index mapping from timings, and a content test that every spoken text
-   of every lesson has a manifest entry (missing clips are the regression the original avoided by keying on
-   the text; check the az/ru files too). Keep `tests/content.test.ts` and `tests/tutor.test.ts` green
-   (both iterate the English file of every library lesson) and `tests/player-resume.test.ts` if the saved
-   state gains a field.
+The pieces:
+- `src/lib/tts/text.ts`: `speechText`, `wordsOf`, `wordOffsets`, shared by the player, the generator and
+  the manifests (a manifest is keyed by `speechText`).
+- `src/lib/tts/spoken.ts`: `spokenTexts(scenes, ui)`, every string the player passes to `speak()` when the
+  lesson is read in the interface's own language, in lesson order, without repeats: the intro's
+  `{title}. {body}`, the recap points joined with `". "`, every pick a choose-all question can be checked
+  with (its explained feedback then `explain`; single picks only above 8 options), the multi-answer prompt
+  with `player.multiHint` in one utterance, the hotspot's `player.hotspot.done`, simulation `say` as well
+  as `spoken` (the tip's replay reads `say`). It mirrors `scenes.tsx`: a new `speak()` call there needs a
+  line here (and in the subtitles' and transcript's lists, section 3.11).
+- `src/lib/tts/key.ts`: `TTS_MODEL = "eleven_v3"` (the model that reads all ten languages, az and ka
+  included), `TTS_REVISION`, `clipKey(locale, model, voice, text, revision)` = sha256.
+- `src/lib/tts/clips.ts`: `clipUrl` (`/generated/tts/{locale}/{key}.mp3`), `isClipUrl`, `manifestName`
+  (`module/lesson` → `module__lesson.json`), `wordTimings(text, alignment)` (per-character timings to one
+  entry per `wordsOf` word, tolerant of a dropped or added character, times only forward), `wordAt`.
+- `scripts/generate-narration.ts`: walks `content/library/lessons`, calls
+  `POST https://api.elevenlabs.io/v1/text-to-speech/{voice}/with-timestamps` (`mp3_44100_128`,
+  `language_code`, a seed from the key), retries 429/5xx and timeouts with backoff, stops the run on
+  401/403, writes each clip through a `.part` file and each lesson's manifest after the lesson.
+- `src/server/narration.ts`: `loadNarrationClips("{module}/{lesson}", locale)` reads and validates a
+  manifest (zod, `isClipUrl`), keeps only clips whose file exists; production reads each manifest once,
+  development rereads it. Only library lesson keys and UI languages reach the file system; studio
+  lessons never have clips. The lesson page passes the result to the player as `clips`.
+- `next.config.ts`: `/generated/tts/*` is served `Cache-Control: public, max-age=31536000, immutable`.
+- Tests: `tests/tts.test.ts` (keys, timings, spoken texts), `tests/narration.test.ts` (manifest reading),
+  `tests/narrator-voice.test.ts`.
+
+Steps:
+
+1. Put `ELEVENLABS_API_KEY` and the voices in `portal/.env.local` only (never the compose `.env`, whose
+   `env_file` would hand the key to the container): `ELEVENLABS_VOICE_ID` for every language and
+   `ELEVENLABS_VOICE_{XX}` per language (`AZ`, `KA`, `AR`…). A voice id is letters and digits only. No
+   voice is built in: ElevenLabs retires its default voices on 2026-12-31, and a native speaker of each
+   language should choose from the Voice Library.
+2. Estimate: `npx tsx --env-file=.env.local scripts/generate-narration.ts --dry-run` (no key needed). On
+   2026-11-04: 37,724 clips and 4.01 million characters for the ten languages, about 321 USD at
+   0.08 USD per 1,000 characters (26 to 38 USD per language; de and fr are the longest, ar the shortest).
+3. Sample: `--locales az --only phishing-email/spot-the-phish`, then open that lesson with sound on and
+   listen with the native speaker (pronunciation of names, pace, the karaoke timing). A name read wrongly
+   is fixed in the lesson's `spoken` text, not in the visible text.
+4. Generate: `--locales az,ru,… --concurrency 4` (1 to 16). Clips already on disk are reused, so a rerun
+   pays only for new or changed text; failed clips are listed and retried on the next run.
+5. To remake a clip whose text did not change (a bad take), raise `TTS_REVISION` and rerun: every clip then
+   gets a new name and seed, so this costs a full run of the languages generated. A new voice for a
+   language regenerates that language's clips.
+6. Ship: `public/generated/tts/` and `content/narration/` must be in the image, so run the generator
+   before `docker build`. In development new manifests are picked up without a restart.
+7. Check in the player: a lesson with clips reads in the clip's voice whatever the browser has (no
+   `VoiceNotice`), speed and volume change the playing clip at once, and texts without a clip (a changed
+   sentence, an interface hint in another language) still go to Web Speech.
 
 ### 6.7 Tune timers
 
 - Seconds: `page.tsx` (`60` for `more`, `30` otherwise) and the Profile copy
-  `learner.profile.timerStandardBody` / `timerMoreBody` in three locales.
+  `learner.profile.timerStandardBody` / `timerMoreBody` in all ten locales.
 - Which modules: the `m.difficulty !== "Easy"` test in `page.tsx`; the tenant switch is
   `settings.learning.timeLimits` (admin Settings → Learning); the learner switch is `users.timer_pref`.
 - Which scenes: only `ChoiceScene` calls `useCountdown(env.timer, …)`. To time tutor checkpoints, swipe or
@@ -1343,12 +1483,12 @@ Azerbaijani voice. Everything in the UI goes through `useNarrator().speak()`, so
   and must stay the same for every question on a lesson), and include it in the cache id only if it
   changes the answer.
 - New behaviour (e.g. a "Why is it fake?" quick action): add the string to `player.tutor.suggestions`
-  in three locales; the chips call `ask(s)` directly.
+  in all ten locales; the chips call `ask(s)` directly.
 - Tool use or longer answers: change `max_tokens`/`system` in `tutorRequest()` (`src/server/tutor.ts`); keep the plain-text streaming
   contract and `x-tutor-mode` header the panel relies on, or update the panel's reader.
-- Voice output quality: `TutorPanel` speaks through the same narrator (`speak(text, answerLang)`), so the TTS
-  provider from 6.6 applies automatically once `speak()` handles texts without a manifest entry (the
-  tutor's answers are dynamic, so they stay on the fallback path unless the provider is called live).
+- Voice output quality: `TutorPanel` speaks through the same narrator (`speak(text, answerLang)`), but the
+  tutor's answers are dynamic, so they never match a clip and always use Web Speech; a live provider call
+  for answers would be a new decision (cost per answer, key on the server).
 - Rate limit and cache knobs: `rateLimit("tutor:{userId}", 20, 10 * 60_000)` in the route; cache rows in
   `tutor_cache` (a cache-clearing admin action would emit the declared `tutor.cache_removed` audit event).
 
@@ -1392,17 +1532,19 @@ Walk the chain from the request to the voice (detail in sections 3.4 and 4):
 
 ## 7. Gaps vs the original
 
-1. **Pre-generated TTS**: no `/generated/tts/**` clips, no manifest, no `narrationClipCount`/
-   `narrationTotalMs`; narration is the browser's speech engine, so voice quality per language depends on
-   the device, and karaoke timing is estimated when the engine sends no word boundaries (ADR-007,
-   OPEN-QUESTIONS #2). Where the device has no voice for the lesson's language (Azerbaijani in Chrome on
-   Windows) the lesson is silent with `VoiceNotice`, so az learners on such devices get no narration and
-   no auto-advance at all. Recipe 6.6.
-2. **Lesson languages**: az and ru lesson text exists for all 106 lessons and is served in the learner's
-   language (section 2.2, ADR-023), so it is no longer a gap as such; but it was translated from EN in this
-   rebuild by AI agents (translator, native editor, consistency pass), so its wording is not the
-   original's (never captured) and no human linguist has reviewed it yet: OPEN-QUESTIONS #6, closed on
-   2026-10-26, recommends a native speaker's final read before release. Still open:
+1. **Pre-generated TTS**: the pipeline exists (recipe 6.6, ADR-028) but no clip has been generated (no
+   ElevenLabs key or voices, OPEN-QUESTIONS #2), and there are no `narrationClipCount`/`narrationTotalMs`
+   props. Until then narration is the browser's speech engine, so voice quality per language depends on
+   the device, and karaoke timing is estimated when the engine sends no word boundaries. Where the device
+   has no voice for the lesson's language (Azerbaijani in Chrome on Windows) the lesson is silent with
+   `VoiceNotice`, so az learners on such devices get no narration and no auto-advance at all. Tutor
+   answers will stay on Web Speech even with clips (recipe 6.8).
+2. **Lesson languages**: lesson text exists in all ten UI languages for all 106 lessons and is served in
+   the learner's language (section 2.2, ADR-023, ADR-026), so it is no longer a gap as such; but it was
+   translated from EN in this rebuild by agents (translator, independent editor, consistency passes), so
+   its wording is not the original's (never captured) and no human linguist has reviewed it yet:
+   OPEN-QUESTIONS #6 and #7 recommend a native speaker's final read before release (#22 lists the open
+   tr/ro/uk term choices). Still open:
    - Voice per device: the az text is read only where the browser lists an Azerbaijani voice (Microsoft
      Edge, which `player.voiceMissing` recommends); Chrome on Windows stays silent with `VoiceNotice`
      (gap 1). Which other browsers and phones have one is not recorded.
@@ -1420,10 +1562,13 @@ Walk the chain from the request to the voice (detail in sections 3.4 and 4):
      voice, in the player and on Home.
    - Nothing ties a tutor cache row to the lesson text: after a re-translation old `tutor_cache`
      answers stay until their rows are deleted (section 4).
-   - The UI has three languages; the landing's other seven (`SITE_LOCALES`) have no app or lesson text
-     (OPEN-QUESTIONS #7), a new language touches the files listed in recipe 6.3, and right-to-left scripts
-     (Arabic, Persian, Hebrew) need `dir` support, logical CSS and a mirrored player first.
-   - `tests/tutor.test.ts` sweeps only the English lessons; `offlineAnswer` over the az/ru files is
+   - The `app`/`brand` name check above was written for the az/ru files; the seven new languages were
+     unified by their consistency passes, but no check enforces it there either.
+   - A new UI language touches the files listed in recipe 6.3; right-to-left works for Arabic (ADR-025),
+     another RTL language needs its font and a look at its layout.
+   - AI subtitles (section 3.11) are unchecked machine translations, flagged as such in the picker; they
+     have not run against the live model yet (no `ANTHROPIC_API_KEY`).
+   - `tests/tutor.test.ts` sweeps only the English lessons; `offlineAnswer` over the translated files is
      covered by small fixtures only.
 3. **Illustrations**: the 29 ids render as Lucide icon compositions, not the original two-tone scenes
    the spec says must be redrawn.
@@ -1448,7 +1593,8 @@ Walk the chain from the request to the voice (detail in sections 3.4 and 4):
     path depends on the browser exposing `SpeechRecognition`/`webkitSpeechRecognition` (`canListen` in
     `tutor-panel.tsx`); without it the mic button is hidden and typing is the only path.
 11. **Present and matching**: options dialog (`Motion` + `Report a problem`), `Review again`, `Completed`
-    pill, sound hint, speed cycle, `Leave lesson`, checkpoint beats, `stat` visuals, Lens, swipe, match,
+    pill, sound hint, speed (now a select), `Leave lesson`, checkpoint beats, `stat` visuals, Lens, swipe, match,
     order, password, recap, attestation, certificate link, resume after reload, and lesson text in the
-    learner's language (az/en/ru). The `wifi` artifact and
-    `choice.multi`/`choice.visual` are extensions beyond the spec.
+    learner's language (all ten). The `wifi` artifact, `choice.multi`/`choice.visual`, and the syllabus,
+    volume, captions/AI subtitles, transcript and keyboard shortcuts (section 3.11, ADR-030) are
+    extensions beyond the spec.

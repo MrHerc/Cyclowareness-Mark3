@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 import { wordAt, type NarrationClips } from "@/lib/tts/clips";
 import { speechText, wordOffsets, wordsOf } from "@/lib/tts/text";
 
@@ -95,6 +95,40 @@ export function pickVoice<V extends VoiceLike>(voices: readonly V[], lang: strin
 /** BCP 47 tags for the utterance when the engine lists no voices at all and picks one itself. */
 const LANG_TAG: Record<string, string> = { az: "az-AZ", en: "en-US", ru: "ru-RU", tr: "tr-TR", ro: "ro-RO", ka: "ka-GE", uk: "uk-UA", de: "de-DE", fr: "fr-FR", ar: "ar-SA" };
 
+/**
+ * Word times estimated from the speech rate, for an engine that sends no word boundaries: onWord(i) at i × perWord ms
+ * of speech, once a check 600 ms in finds none (`stale`: boundaries came, or the text was replaced). hold() and go()
+ * stop and continue it where it was, for pause and resume; its timeouts go through `after` and `clear`.
+ */
+export function wordClock(count: number, perWord: number, onWord: (i: number) => void, stale: () => boolean, after: (fn: () => void, ms: number) => void, clear: () => void) {
+  let read = 0; // ms of speech before the current run
+  let since = 0;
+  let held = false;
+  const run = () => {
+    since = performance.now();
+    const wait = Math.max(0, 600 - read);
+    after(() => {
+      if (stale()) return;
+      // Words already passed fire at once, in order, so the highlight lands on the current one.
+      for (let i = 1; i < count; i++) after(() => !stale() && onWord(i), i * perWord - read - wait);
+    }, wait);
+  };
+  run();
+  return {
+    hold() {
+      if (held) return;
+      held = true;
+      read += performance.now() - since;
+      clear();
+    },
+    go() {
+      if (!held) return;
+      held = false;
+      run();
+    },
+  };
+}
+
 const clampRate = (rate: number) => Math.max(0.5, Math.min(2, rate));
 const clampVolume = (volume: number) => Math.max(0, Math.min(1, volume));
 
@@ -107,6 +141,13 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
   const [paused, setPaused] = useState(false);
   const timers = useRef<number[]>([]);
   const token = useRef(0);
+  // The settings as of the last render: speak() reads them when it runs, so a line chained from an older render's onEnd gets the current ones.
+  const live = useRef({ enabled, rate, volume });
+  useLayoutEffect(() => {
+    live.current = { enabled, rate, volume };
+  });
+  // The estimated word timing of the utterance being read (an engine without word boundaries): pause() holds it, resume() goes on.
+  const timing = useRef<{ hold: () => void; go: () => void } | null>(null);
   // A speak() waiting for the voice list to load (see VOICE_WAIT_MS).
   const waiting = useRef<(() => void) | null>(null);
   // One audio element for every clip; `endClip` detaches the playing clip (listeners, frame loop).
@@ -130,6 +171,7 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
   const stop = useCallback(() => {
     token.current++;
     clearTimers();
+    timing.current = null;
     endClip.current?.();
     if (supported) {
       clearWaiting();
@@ -163,6 +205,7 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
   const speak = useCallback(
     (text: string, opts: { voice?: Voice; lang?: string; onWord?: (i: number) => void; onEnd?: () => void; onError?: (error: string) => void } = {}) => {
       stop();
+      const { enabled, rate, volume } = live.current;
       const my = ++token.current;
       const clean = speechText(text);
       const words = wordsOf(clean);
@@ -202,16 +245,14 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
           if (my !== token.current) return;
           setSpeaking(true);
           opts.onWord?.(0);
-          // Estimated timing when the engine sends no word boundaries.
-          const id = window.setTimeout(() => {
-            if (gotBoundary || my !== token.current) return;
-            const perWord = 60_000 / (165 * u.rate);
-            words.forEach((_, i) => {
-              if (i === 0) return;
-              timers.current.push(window.setTimeout(() => my === token.current && opts.onWord?.(i), i * perWord - 600));
-            });
-          }, 600);
-          timers.current.push(id);
+          timing.current = wordClock(
+            words.length,
+            60_000 / (165 * u.rate),
+            (i) => opts.onWord?.(i),
+            () => gotBoundary || my !== token.current,
+            (fn, ms) => void timers.current.push(window.setTimeout(fn, ms)),
+            clearTimers,
+          );
         };
         const done = () => {
           if (my !== token.current) return;
@@ -321,7 +362,7 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
         if (name !== "AbortError") fail(name === "NotAllowedError" ? "not-allowed" : "network", name !== "NotAllowedError");
       });
     },
-    [enabled, supported, rate, lang, stop, clips, volume],
+    [supported, lang, stop, clips],
   );
 
   const pause = useCallback(() => {
@@ -333,6 +374,7 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
     // Pausing an idle engine would leave it paused for the next utterance.
     if (!supported || !window.speechSynthesis.speaking) return;
     window.speechSynthesis.pause();
+    timing.current?.hold();
     setPaused(true);
   }, [supported]);
   const resume = useCallback(() => {
@@ -343,6 +385,7 @@ export function useNarrator({ enabled, rate, lang = "en", clips, volume = 1 }: {
     }
     if (!supported) return;
     window.speechSynthesis.resume();
+    timing.current?.go();
     setPaused(false);
   }, [supported]);
 

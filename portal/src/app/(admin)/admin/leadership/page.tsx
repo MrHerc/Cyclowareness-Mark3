@@ -111,7 +111,7 @@ export default async function LeadershipPage() {
               <CardBody className="grid grid-cols-1 gap-2.5">
                 <div className="flex items-baseline justify-between">
                   <span className="text-body-sm font-semibold">{x.label}</span>
-                  <span className="text-title font-bold tabular-nums">{x.value}%</span>
+                  <span className="text-title font-bold tabular-nums">{tc("units.percent", { value: format.number(x.value) })}</span>
                 </div>
                 <ProgressBar value={x.value} tone={x.tone} label={x.label} />
               </CardBody>
@@ -166,7 +166,7 @@ export default async function LeadershipPage() {
                         <tr key={r.id}>
                           <td className="py-2.5 font-semibold">{r.name}</td>
                           <td className="py-2.5 text-end tabular-nums">{r.learners}</td>
-                          <td className="py-2.5 text-end tabular-nums">{r.completion}%</td>
+                          <td className="py-2.5 text-end tabular-nums">{tc("units.percent", { value: format.number(r.completion) })}</td>
                           <td className="py-2.5 text-end">
                             <Pill tone={b === "high" ? "risk" : b === "medium" ? "warn" : "safe"} className="tabular-nums">
                               {r.risk}

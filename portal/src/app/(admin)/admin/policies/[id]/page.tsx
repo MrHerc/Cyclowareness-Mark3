@@ -106,7 +106,7 @@ export default async function PolicyAdminPage({ params, searchParams }: PageProp
                     <div className="mt-3 flex items-center gap-2">
                       <span className="shrink-0 text-tab text-ink-muted">{tr("signedOf", { signed, total: people.length })}</span>
                       <ProgressBar decorative value={pct} size="sm" />
-                      <span className="shrink-0 text-tab font-bold tabular-nums">{pct}%</span>
+                      <span className="shrink-0 text-tab font-bold tabular-nums">{tc("units.percent", { value: format.number(pct) })}</span>
                     </div>
                     <div className="mt-3 flex gap-2">
                       {ver.id === readable?.id ? (

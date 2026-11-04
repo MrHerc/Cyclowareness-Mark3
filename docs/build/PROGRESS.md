@@ -34,6 +34,17 @@ Vəziyyət: 2026-10-19. Portal `portal/` qovluğundadır, lokalda tam işləyir 
 - **Əlavələr.** az rəqəm polyfill-i, rusca AUP və parol siyasəti, standart istinadlarında «maddə» və «ст.», ev tutoru dərsin dilini bilir (ADR-023, ADR-024).
 - **Yoxlama.** `check-lesson-locales --coverage` 212/212, `tsc` 0, `eslint` 0, vitest 53 fayl və 1069 test. Seed nəticəsi: «texts: en 106, az 106, ru 106». 3200 portunda (təmiz surət, production build) az, en və ru işçiləri üçün ana səhifə, yollar, dərs və təhlükəsizlik səhifəsi 375 və 1366 px-də yoxlandı: `<html lang>` düzgündür, üfüqi sürüşmə və səhifə xətası yoxdur, az/ru səhifələrində ingiliscə qalıq tapılmadı. Rus dilində dərs səhnəsi, tutor cavabı və siyasət mətni ayrıca yoxlandı.
 
+10. **10 dil, sağdan sola ərəb dili və təcrübə işi (2026-10-27 → 11-04).**
+
+- **Dillər.** İnterfeys və ictimai sayt 10 dildədir: az, en, ru, tr, ro, ka, uk, de, fr, ar. İtalyan dili çıxarıldı, ərəb dili Səudiyyə üçündür və sağdan sola yazılır (ADR-025): `dirOf`/`langAttrs`, bütün komponentlərdə məntiqi CSS və `tests/rtl-logical.test.ts`, gürcü və ərəb Noto Sans şriftləri. Yeni 7 dildə interfeys, koddakı mətnlər, hüquqi mətnlər, siyasətlər, ərəbcə landing və 106 dərsin hamısı hazırlandı. Proses: lüğət (terminoloq və doğma rəyçi), hər iş vahidi üçün tərcüməçi və müstəqil redaktor, iki vahidləşdirmə keçidi (ADR-026). Yoxlayıcı 954/954; sonda 7 dildə 244 əskik sətir dolduruldu.
+- **Təhlükəsizlik.** Altı sahə üzrə audit 38 tapıntı verdi. Atomik 2FA və OTP limitləri, super_admin qoruması, ReDoS, SSRF və DNS rebinding, outbox redaksiyası və s. düzəldildi, o an 1152 test keçirdi (ADR-033).
+- **Təlim.** Yollarda laboratoriyalar dərslərdən sonra gəlir (`lab_ids`, açılma qaydası, sertifikata daxil deyil), modul səhifəsi yenidən quruldu (ADR-027).
+- **Səs və altyazılar.** ElevenLabs klip boru xətti, ehtiyat kimi Web Speech (ADR-028; kliplər hələ yaradılmayıb). Kitabxanada olmayan 65 dil üçün `ai_cache` ilə Sİ altyazıları (ADR-029).
+- **Pleyer.** Mündəricat, səs səviyyəsi, sürət, 10 dildə və Sİ ilə altyazılar, dərsin mətni, qısayollar, tam ekran (ADR-030).
+- **Maskot.** Nağıl üslubunda pişik, yeni hərəkətlər, dekorativ yerlərdə `auto`, ev səhifəsində «Sel ilə oyna» (ADR-031).
+- **İşıq və hərəkət.** Tokenlər, `motion-ok`/`motion-full`, `useMotion`, `Burst`, `Spotlight`, Calm və Still qaydaları; learner, admin və landing səhifələri işıqlandırıldı (ADR-032). Tənqidçi 7,5/10 verdi, ardınca təkmilləşdirmə edildi. Üç müstəqil rəy 14 məsələ tapdı, 12-si düzəldildi, qalanları yekun dövrəyə (`finalize-portal.js`) verildi.
+- **Yoxlama.** `tsc` 0, `eslint --max-warnings=0` 0, vitest 81 fayl / 2621 test. Baza 10 × 106 dərslə yenidən seed olundu. Codex CLI bu kompüterdə çökdüyü üçün kod baxışlarını ECC və agent-skills rəyçiləri etdi (OPEN-QUESTIONS 24). Bu qeyd yazılanda 10 dildə uçdan-uca brauzer yoxlaması (`finalize-portal.js`) davam edirdi; commit və push hələ edilməyib.
+
 ## Yoxlanılıb (brauzerdə, lokal)
 - Giriş, ev səhifəsi (content shield, su nişanı), onboarding turu (spotlight, klaviatura), dərs pleyeri (tutor, hotspot, simulyasiya, çoxcavablı sual, rəy vərəqi).
 - Admin icmalı, tənzimləmələr, əməliyyat mərkəzi, dövrələr, qəbul → dövrə + insident, təsdiq → təlim, studiya → qaralama → önizləmə, şəxs səhifəsi (QR, sparkline).
@@ -49,4 +60,6 @@ Vəziyyət: 2026-10-19. Portal `portal/` qovluğundadır, lokalda tam işləyir 
 
 ## Hələ yoxlanılmayıb
 - Real SMTP/SMS/Anthropic/SSO provayderi ilə iş (açar və IdP yoxdur).
+- ElevenLabs klipləri (açar və səs seçimi yoxdur, OPEN-QUESTIONS 2) və canlı Sİ altyazıları (`ANTHROPIC_API_KEY` yoxdur).
+- Yeni 7 dildə doğma insanın baxışı (OPEN-QUESTIONS 7) və hüquqi mətnlərin hüquqşünas baxışı (OPEN-QUESTIONS 8).
 - Docker image-in real qurulması (Docker bu maşında yoxlanılmayıb).

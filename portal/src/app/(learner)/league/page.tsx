@@ -51,7 +51,12 @@ export default async function LeaguePage() {
                   const first = r.place === 1;
                   return (
                     <div key={r.id} className="flex flex-col items-center text-center">
-                      {first ? <Trophy className="mb-2 size-9 fill-laurel-500 text-laurel-600" /> : null}
+                      {first ? (
+                        <span className="relative mb-2 grid place-items-center">
+                          <span aria-hidden className="pointer-events-none absolute -inset-4 animate-breathe rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--color-laurel-500)_55%,transparent),transparent)] opacity-60 print:hidden" />
+                          <Trophy className="relative size-9 fill-laurel-500 text-laurel-600" />
+                        </span>
+                      ) : null}
                       <p className={cn("line-clamp-2 text-caption font-semibold sm:text-body-sm", r.id === mine?.id && "text-reward-ink")}>{r.name}</p>
                       <span className="inline-flex items-center gap-1.5">
                         <span className="text-numeral font-bold tabular-nums">{r.points}</span>
@@ -59,11 +64,12 @@ export default async function LeaguePage() {
                       </span>
                       <div
                         className={cn(
-                          "mt-2 flex w-full items-start justify-center rounded-t-xl pt-3 text-title font-bold",
-                          first ? "h-36 bg-brand-600 text-brand-on" : r.place === 2 ? "h-28 bg-brand-100 text-brand-700" : "h-20 bg-brand-100 text-brand-700",
-                          r.id === mine?.id && "ring-4 ring-reward-400",
+                          "relative mt-2 flex w-full items-start justify-center rounded-t-xl pt-3 text-title font-bold",
+                          first ? "light-on-brand isolate h-36 bg-brand-600 text-brand-on" : r.place === 2 ? "h-28 bg-brand-100 text-brand-700" : "h-20 bg-brand-100 text-brand-700",
+                          r.id === mine?.id && "ring-4 ring-reward-400 ring-inset",
                         )}
                       >
+                        {first ? <span aria-hidden className="light-sweep [--light:color-mix(in_oklab,var(--brand-on)_50%,transparent)] [--sweep-delay:0.6s]" /> : null}
                         {r.place}
                       </div>
                     </div>
@@ -81,12 +87,13 @@ export default async function LeaguePage() {
                   {rows.slice(3).map((r) => {
                     const me = r.id === mine?.id;
                     return (
-                      <li key={r.id} className={cn("flex items-center gap-4 rounded-xl border bg-surface p-4 shadow-xs", me ? "border-reward-400 ring-2 ring-reward-200" : "border-line")}>
+                      <li key={r.id} className={cn("relative flex items-center gap-4 rounded-xl border bg-surface p-4 shadow-xs", me ? "border-reward-400 ring-2 ring-reward-200" : "border-line")}>
+                        {me ? <span aria-hidden className="glow-ring [--light:var(--accent)]" /> : null}
                         <span className={cn("grid size-10 shrink-0 place-items-center rounded-full font-bold", me ? "bg-reward-500 text-(--accent-on)" : "bg-sunken text-ink-muted")}>{r.place}</span>
                         <div className="min-w-0 flex-1">
                           <p className="truncate text-body-sm font-semibold">{r.name}</p>
                           <p className="text-tab text-ink-subtle">{me ? t("yourDepartment") : tc("units.learners", { count: r.learners })}</p>
-                          <ProgressBar decorative value={r.points} tone={me ? "reward" : "brand"} size="sm" className="mt-2" />
+                          <ProgressBar decorative value={r.points} tone={me ? "reward" : "brand"} shimmer={me} size="sm" className="mt-2" />
                         </div>
                         <span className="text-title-sm font-bold tabular-nums">{r.points}</span>
                         <TrendMark trend={r.trend} label={t(`trend_${r.trend}`)} />

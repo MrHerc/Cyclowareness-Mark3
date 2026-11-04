@@ -72,7 +72,10 @@ export default async function LearnerLayout({ children }: { children: React.Reac
             title={freezes ? tp("freezesHint") : undefined}
             className="inline-flex h-10 items-center gap-1.5 rounded-pill border border-line bg-surface px-3 text-caption font-bold text-ink tabular-nums hover:bg-sunken pointer-coarse:h-11"
           >
-            <Flame className={streak ? "size-4.5 fill-reward-400 text-reward-600" : "size-4.5 text-ink-subtle"} />
+            <span className="relative grid place-items-center">
+              {streak ? <span aria-hidden className="pointer-events-none absolute -inset-1.5 rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--accent)_40%,transparent),transparent)] opacity-60 print:hidden" /> : null}
+              <Flame className={streak ? "relative size-4.5 fill-reward-400 text-reward-600" : "size-4.5 text-ink-subtle"} />
+            </span>
             {streak}
             {freezes ? (
               <span className="hidden items-center gap-0.5 border-s border-line ps-1.5 text-brand-700 sm:inline-flex">

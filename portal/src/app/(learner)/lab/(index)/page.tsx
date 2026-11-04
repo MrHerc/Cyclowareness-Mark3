@@ -9,6 +9,7 @@ import { LAB_MAX, VM_LAB_IDS, VM_LABS } from "@/components/lab/model/labs";
 import { LAB_ICON as ICON, LAB_TINT as TINT } from "@/components/learner/lab-visual";
 import { Notice, PageHeader } from "@/components/ui/layout";
 import { Pill } from "@/components/ui/pill";
+import { Spotlight } from "@/components/ui/light";
 
 export async function generateMetadata() {
   const tr = await getTranslations("learner.lab");
@@ -39,7 +40,8 @@ export default async function LabPage() {
           const b = bestMap.get(g);
           return (
             <li key={g}>
-              <Link href={`/lab/${g}`} className={`group flex h-full flex-col rounded-xl border border-line bg-gradient-to-br ${from} to-surface to-45% p-5 shadow-xs transition-shadow hover:shadow-raised`}>
+              <Link href={`/lab/${g}`} className={`group relative isolate flex h-full flex-col rounded-xl border border-line bg-gradient-to-br ${from} to-surface to-45% p-5 shadow-xs transition-shadow hover:shadow-raised`}>
+                <Spotlight />
                 <div className="flex items-start gap-3">
                   <span className={`grid size-12 shrink-0 place-items-center rounded-md text-white shadow-raised ${chip}`}>
                     <Icon className="size-6" />
@@ -76,7 +78,8 @@ export default async function LabPage() {
           const b = bestShare.get(g);
           return (
             <li key={g}>
-              <Link href={`/lab/${g}`} className={`group flex h-full flex-col rounded-xl border border-line bg-gradient-to-br ${from} to-surface to-45% p-5 shadow-xs transition-shadow hover:shadow-raised`}>
+              <Link href={`/lab/${g}`} className={`group relative isolate flex h-full flex-col rounded-xl border border-line bg-gradient-to-br ${from} to-surface to-45% p-5 shadow-xs transition-shadow hover:shadow-raised`}>
+                <Spotlight />
                 <div className="flex items-start gap-3">
                   <span className={`grid size-12 shrink-0 place-items-center rounded-md text-white shadow-raised ${chip}`}>
                     <Icon className="size-6" />

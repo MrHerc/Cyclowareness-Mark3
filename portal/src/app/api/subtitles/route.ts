@@ -1,8 +1,9 @@
-import { and, eq, isNull, or } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { getLocale } from "next-intl/server";
 import { z } from "zod";
 import { db, t } from "@/server/db";
 import { allowed, getViewer } from "@/server/auth/viewer";
+import { reachableModules } from "@/server/queries/catalog";
 import { rateLimit } from "@/server/rate-limit";
 import { sameOrigin } from "@/server/request";
 import { readBodyCapped } from "@/server/request-body";
@@ -52,14 +53,8 @@ export async function POST(request: Request) {
     .from(t.lessonContents)
     .innerJoin(t.lessons, eq(t.lessons.id, t.lessonContents.lessonId))
     .innerJoin(t.modules, eq(t.modules.id, t.lessons.moduleId))
-    .where(
-      and(
-        eq(t.lessonContents.lessonId, lessonId),
-        or(isNull(t.modules.tenantId), eq(t.modules.tenantId, v.tenant.id)),
-        // Drafts are reachable only by studio authors previewing them.
-        allowed(v, "studio.write") ? undefined : eq(t.modules.status, "published"),
-      ),
-    );
+    // The lessons the lesson page opens: drafts only for studio authors of their own organisation.
+    .where(and(eq(t.lessonContents.lessonId, lessonId), reachableModules(v, allowed(v, "studio.write"))));
   // The same text the player narrates for this person (src/app/(focus)/learn/[slug]/[lessonId]/page.tsx).
   const row = pickLessonContent(contents, await getLocale());
   if (!row) return refused("not_found", 404);

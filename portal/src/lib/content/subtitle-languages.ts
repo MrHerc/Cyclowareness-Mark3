@@ -1,3 +1,5 @@
+import { dirOf } from "../../i18n/config";
+
 /**
  * Languages a learner can get AI-translated subtitles in (POST /api/subtitles): ISO 639-1 codes of
  * widely spoken languages. The languages the library ships (az en ru tr ro ka uk de fr ar) are left
@@ -15,9 +17,6 @@ export const SUBTITLE_LANGUAGES = [
 ] as const;
 export type SubtitleLanguage = (typeof SUBTITLE_LANGUAGES)[number];
 
-/** Written right to left: the caption needs dir="rtl". */
-const RTL: ReadonlySet<string> = new Set(["fa", "he", "ps", "ur"]);
-
 export function isSubtitleLanguage(value: unknown): value is SubtitleLanguage {
   return typeof value === "string" && (SUBTITLE_LANGUAGES as readonly string[]).includes(value);
 }
@@ -32,6 +31,7 @@ export function subtitleLanguageOptions(displayLocale: string): SubtitleLanguage
     code,
     name: names.of(code) ?? code,
     native: new Intl.DisplayNames([code, "en"], { type: "language" }).of(code) ?? code,
-    dir: RTL.has(code) ? ("rtl" as const) : ("ltr" as const),
+    // Captions and the transcript take it from langAttrs too (src/i18n/config.ts knows these languages).
+    dir: dirOf(code),
   })).sort((a, b) => collator.compare(a.name, b.name));
 }

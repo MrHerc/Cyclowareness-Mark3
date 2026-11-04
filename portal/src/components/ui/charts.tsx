@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useFormatter, useTranslations } from "next-intl";
 import { cn } from "@/lib/cn";
 
@@ -40,7 +40,7 @@ export function AreaChart({
   guides = [],
   yTicks,
   riskStrip = false,
-  suffix = "",
+  percent = false,
   caption,
   headers,
   height = 168,
@@ -53,13 +53,16 @@ export function AreaChart({
   /** Y-axis labels shown in the left gutter (default: min, middle, max). */
   yTicks?: number[];
   riskStrip?: boolean;
-  suffix?: string;
+  /** Axis and latest-value labels are percentages, signed as the UI language writes them. */
+  percent?: boolean;
   caption: string;
   headers: [string, string];
   height?: number;
   tone?: "brand" | "safe" | "risk";
 }) {
   const format = useFormatter();
+  const tc = useTranslations("common");
+  const label = (v: number) => (percent ? tc("units.percent", { value: format.number(v) }) : format.number(v));
   const W = 600;
   const H = 200;
   const pad = 6;
@@ -80,8 +83,7 @@ export function AreaChart({
         <div aria-hidden className="absolute inset-y-0 start-0 w-8">
           {ticks.map((v) => (
             <span key={v} className="absolute end-1.5 -translate-y-1/2 text-end text-tab-sm text-ink-subtle tabular-nums" style={{ top: `${(y(v) / H) * 100}%` }}>
-              {format.number(v)}
-              {suffix}
+              {label(v)}
             </span>
           ))}
         </div>
@@ -93,20 +95,39 @@ export function AreaChart({
                 <stop offset="0%" stopColor={stroke} stopOpacity="0.22" />
                 <stop offset="100%" stopColor={stroke} stopOpacity="0" />
               </linearGradient>
+              {/* Draw-in: the line and its area unroll along the time axis once, from the SVG's own origin (x 0);
+                  the server markup is the final chart, and Still makes the transition a single frame. A clip repaints
+                  each frame: a deliberate exception to transform/opacity for this one run (animations.md §5). */}
+              <clipPath id={`${gid}-draw`}>
+                <rect x="-8" y="-8" width={W + 16} height={H + 16} className="transition-[scale] duration-[1.1s] ease-(--ease-in-out-smooth) starting:scale-x-0" />
+              </clipPath>
             </defs>
             {guides.map((g) => (
               <line key={g} x1="0" x2={W} y1={y(g)} y2={y(g)} stroke="var(--color-line-strong)" strokeDasharray="4 6" vectorEffect="non-scaling-stroke" />
             ))}
-            <path d={area} fill={`url(#${gid})`} />
-            <path d={line} fill="none" stroke={stroke} strokeWidth="2.5" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
+            <g clipPath={`url(#${gid}-draw)`}>
+              <path d={area} fill={`url(#${gid})`} />
+              <path d={line} fill="none" stroke={stroke} strokeWidth="2.5" vectorEffect="non-scaling-stroke" strokeLinejoin="round" strokeLinecap="round" />
+            </g>
           </svg>
           {last ? (
+            // The latest point glows: an HTML dot (the stretched SVG would draw an ellipse) centred on the axis end,
+            // flashing once as the line reaches it.
             <span
-              className="absolute end-0 -translate-y-1/2 rounded-pill bg-ink px-2 py-0.5 text-tab-sm font-bold text-white tabular-nums"
+              aria-hidden
+              className="absolute end-0 size-2.5 translate-x-1/2 -translate-y-1/2 rounded-full shadow-[0_0_0_2px_var(--color-surface),0_0_0_6px_color-mix(in_oklab,var(--glow)_16%,transparent),0_0_14px_2px_color-mix(in_oklab,var(--glow)_40%,transparent)] rtl:-translate-x-1/2"
+              style={{ top: `${(y(last.value) / H) * 100}%`, background: stroke, "--glow": stroke, "--light": stroke } as CSSProperties}
+            >
+              <span className="glow-ring animate-glow" style={{ animationDelay: "0.9s" }} />
+            </span>
+          ) : null}
+          {last ? (
+            // Above the latest point, clear of the line's last segment; below it when the point is near the top.
+            <span
+              className={cn("absolute end-0 rounded-pill bg-ink px-2 py-0.5 text-tab-sm font-bold text-white tabular-nums", y(last.value) / H < 0.15 ? "translate-y-3" : "-translate-y-[calc(100%+0.5rem)]")}
               style={{ top: `${(y(last.value) / H) * 100}%` }}
             >
-              {format.number(last.value)}
-              {suffix}
+              {label(last.value)}
             </span>
           ) : null}
         </div>

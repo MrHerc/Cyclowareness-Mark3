@@ -10,6 +10,7 @@ import type { DB } from "../src/server/db/client";
 import { plain, type Scene } from "../src/lib/content/types";
 import { TRANSLATABLE } from "../src/lib/content/locale-parity";
 import { SUBTITLE_LANGUAGES, isSubtitleLanguage, subtitleLanguageOptions } from "../src/lib/content/subtitle-languages";
+import { langAttrs } from "../src/i18n/config";
 
 const state = vi.hoisted(() => ({
   viewer: null as null | { user: { id: string }; tenant: { id: string; features: Set<string> } },
@@ -45,12 +46,13 @@ const pglite = new PGlite();
 const db = drizzle(pglite, { schema: t }) as unknown as DB;
 vi.mock("../src/server/db", async () => ({ db: () => db, t: await import("../src/server/db/schema") }));
 vi.mock("../src/server/env", () => ({ env: state.env, appUrl: () => state.env.APP_URL }));
-vi.mock("../src/server/auth/viewer", () => ({ getViewer: async () => state.viewer, allowed: () => state.studio }));
+vi.mock("../src/server/auth/viewer", () => ({ getViewer: async () => state.viewer, actionViewer: async () => state.viewer, allowed: () => state.studio }));
 vi.mock("next-intl/server", () => ({ getLocale: async () => state.locale }));
 vi.mock("../src/server/rate-limit", () => ({ rateLimit: limit }));
 
 const { spokenTexts, subtitleSourceLines, subtitleCacheId, subtitleMap, validTranslation, subtitleSystemPrompt } = await import("../src/server/subtitles");
 const { POST } = await import("../src/app/api/subtitles/route");
+const { loadCaptionsAction } = await import("../src/app/(focus)/learn/[slug]/[lessonId]/actions");
 
 const root = path.join(__dirname, "..", "content", "library");
 const lessonScenes = (slug: string, id: string, locale = "en") => (JSON.parse(readFileSync(path.join(root, "lessons", slug, `${id}.${locale}.json`), "utf8")) as { scenes: Scene[] }).scenes;
@@ -211,7 +213,10 @@ describe("subtitle languages", () => {
     const options = subtitleLanguageOptions("en");
     expect(options).toHaveLength(SUBTITLE_LANGUAGES.length);
     expect(options.find((o) => o.code === "es")).toEqual({ code: "es", name: "Spanish", native: "español", dir: "ltr" });
-    expect(options.find((o) => o.code === "he")?.dir).toBe("rtl");
+    expect(options.filter((o) => o.dir === "rtl").map((o) => o.code).sort()).toEqual(["fa", "he", "ps", "ur"]);
+    // The caption bar and the transcript set lang and dir through langAttrs.
+    for (const code of ["fa", "he", "ps", "ur"]) expect(langAttrs(code)).toEqual({ lang: code, dir: "rtl" });
+    expect(langAttrs("es").dir).toBe("ltr");
     expect(options.map((o) => o.name)).toEqual([...options.map((o) => o.name)].sort((a, b) => a.localeCompare(b, "en")));
     expect(subtitleLanguageOptions("ru").find((o) => o.code === "es")?.name).toBe("испанский");
   });
@@ -224,6 +229,7 @@ describe("POST /api/subtitles", () => {
   let library = "";
   let foreign = "";
   let draft = "";
+  let libraryDraft = "";
   const enScenes = lessonScenes("app-consent-phishing", "consent-screen");
   const azScenes = lessonScenes("app-consent-phishing", "consent-screen", "az");
 
@@ -246,29 +252,32 @@ describe("POST /api/subtitles", () => {
       ])
       .returning();
     const mod = { category: "phishing", audiences: [], title: { en: "M" }, subtitle: { en: "" }, minutes: 5, xp: 10, difficulty: "Easy" as const };
-    const [lib, globex, unpublished] = await db
+    const [lib, globex, unpublished, unpublishedLibrary] = await db
       .insert(t.modules)
       .values([
         { ...mod, slug: "app-consent-phishing", tenantId: null },
         { ...mod, slug: "globex-own", tenantId: other },
         { ...mod, slug: "acme-draft", tenantId: own, status: "draft" },
+        { ...mod, slug: "library-draft", tenantId: null, status: "draft" },
       ])
       .returning();
     const lesson = { key: "l1", title: { en: "L" }, minutes: 5, position: 1 };
-    [{ id: library }, { id: foreign }, { id: draft }] = await db
+    [{ id: library }, { id: foreign }, { id: draft }, { id: libraryDraft }] = await db
       .insert(t.lessons)
       .values([
         { ...lesson, moduleId: lib.id },
         { ...lesson, moduleId: globex.id },
         { ...lesson, moduleId: unpublished.id },
+        { ...lesson, moduleId: unpublishedLibrary.id },
       ])
       .returning();
-    await db.insert(t.lessonContents).values([
-      { lessonId: library, locale: "en", scenes: enScenes },
-      { lessonId: library, locale: "az", scenes: azScenes },
-      { lessonId: foreign, locale: "en", scenes: enScenes },
-      { lessonId: draft, locale: "en", scenes: enScenes },
-    ]);
+    // Every lesson has a stored Azerbaijani row, so only the access rule can keep its subtitles away.
+    await db.insert(t.lessonContents).values(
+      [library, foreign, draft, libraryDraft].flatMap((lessonId) => [
+        { lessonId, locale: "en", scenes: enScenes },
+        { lessonId, locale: "az", scenes: azScenes },
+      ]),
+    );
     // Starting the embedded database and applying the migrations takes a while.
   }, 180_000);
 
@@ -375,6 +384,24 @@ describe("POST /api/subtitles", () => {
     state.studio = true;
     expect((await post({ lessonId: draft, target: "es" })).status).toBe(200);
     expect((await post({ lessonId: foreign, target: "es" })).status).toBe(404);
+    // A studio author previews their own organisation's drafts only, as on the lesson page.
+    expect((await post({ lessonId: libraryDraft, target: "es" })).status).toBe(404);
+  });
+
+  it("gives stored subtitles only for a lesson the person can open", async () => {
+    const map = await loadCaptionsAction(library, "az");
+    expect(map?.[sceneOf(enScenes, "recap").points.join(". ")]).toBe(sceneOf(azScenes, "recap").points.join(". "));
+    expect(limit).toHaveBeenCalledWith(`captions:${USER}`, 60, 10 * 60_000);
+    for (const lessonId of [foreign, draft, libraryDraft]) expect(await loadCaptionsAction(lessonId, "az"), lessonId).toBeNull();
+    state.studio = true;
+    expect(await loadCaptionsAction(draft, "az")).not.toBeNull();
+    expect(await loadCaptionsAction(foreign, "az")).toBeNull();
+    expect(await loadCaptionsAction(libraryDraft, "az")).toBeNull();
+    // The narrated row itself, an unknown locale and a spent limit give nothing either.
+    expect(await loadCaptionsAction(library, "en")).toBeNull();
+    expect(await loadCaptionsAction(library, "xx")).toBeNull();
+    limit.mockResolvedValueOnce({ ok: false, retryAfterMs: 1000 });
+    expect(await loadCaptionsAction(library, "az")).toBeNull();
   });
 
   it("needs the same origin, a signed-in person and the AI tutor feature", async () => {

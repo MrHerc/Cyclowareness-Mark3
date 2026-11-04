@@ -40,7 +40,7 @@ export default async function OpsCenterPage() {
       {d.live.some((i) => i.live) ? (
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-risk-100 bg-risk-50 px-5 py-3.5" role="status">
           <span className="relative grid size-3 place-items-center">
-            <span className="absolute size-3 animate-ping rounded-full bg-risk-500 opacity-60 motion-reduce:hidden" />
+            <span className="absolute hidden size-3 rounded-full bg-risk-500 opacity-60 motion-full:block motion-full:animate-ping" />
             <span className="size-2.5 rounded-full bg-risk-600" />
           </span>
           {d.live
@@ -144,7 +144,7 @@ export default async function OpsCenterPage() {
                       <span className={cn("size-2.5 rounded-full", k === "malicious" ? "bg-risk-500" : k === "suspicious" ? "bg-warn-500" : "bg-safe-500")} />
                       <span className="flex-1">{tv(`verdict.${k}`)}</span>
                       <b className="tabular-nums">{d.sandbox[k]}</b>
-                      <span className="w-10 text-end text-ink-subtle tabular-nums">{sandboxTotal ? Math.round((d.sandbox[k] / sandboxTotal) * 100) : 0}%</span>
+                      <span className="w-12 text-end text-ink-subtle tabular-nums">{tc("units.percent", { value: format.number(sandboxTotal ? Math.round((d.sandbox[k] / sandboxTotal) * 100) : 0) })}</span>
                     </li>
                   ))}
                 </ul>

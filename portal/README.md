@@ -1,6 +1,6 @@
 # Cyclowareness portal
 
-The Cyclowareness security-awareness portal by Safarov Industries: the learner and admin interface (lessons with the Rive mascot, league, certificates, policies, phishing simulations) plus security operations (operations centre, threat intake and approvals, incident risk, sandbox, labs, leadership view, support desk). It was rebuilt from an earlier product, following the audit in `../docs/audit/`. Built with Next.js 16 (App Router, webpack), React 19, TypeScript strict, Tailwind CSS v4, Drizzle ORM and PostgreSQL; locally it runs on an embedded database with no services to install.
+The Cyclowareness security-awareness portal by Safarov Industries: the learner and admin interface (lessons with the AI Sel mascot, league, certificates, policies, phishing simulations), in ten interface languages including right-to-left Arabic plus security operations (operations centre, threat intake and approvals, incident risk, sandbox, labs, leadership view, support desk). It was rebuilt from an earlier product, following the audit in `../docs/audit/`. Built with Next.js 16 (App Router, webpack), React 19, TypeScript strict, Tailwind CSS v4, Drizzle ORM and PostgreSQL; locally it runs on an embedded database with no services to install.
 
 ## Tez başlanğıc
 
@@ -22,6 +22,7 @@ Demo hesablar: `admin@safarovindustries.com` (tenant admin), `learner@safarovind
 - [Environment variables](#environment-variables)
 - [Project layout](#project-layout)
 - [Production with Docker](#production-with-docker)
+- [Languages](#languages)
 - [Narration voice](#narration-voice)
 - [Operations notes](#operations-notes)
 - [Tests and checks](#tests-and-checks)
@@ -103,9 +104,9 @@ Copy `.env.example` to `.env.local` (development) or provide the values to the c
 | `DATABASE_POOL_MAX` | `10` | node-postgres pool size, 2–100 (only with `DATABASE_URL`; the job runner holds one connection for its lock) |
 | `ALLOW_EMBEDDED_DB` | `0` | `1` lets a production server use the embedded database when `DATABASE_URL` is missing. Single-process demos only; without it the server refuses to start |
 | `BOOTSTRAP_OPERATOR_EMAIL` | empty | First start of a new installation: creates the platform organisation and its operator (status invited) and prints a one-time invitation link to the server log. Ignored once an operator exists |
-| `ANTHROPIC_API_KEY` | empty | AI tutor and AI course generation. Without a key the tutor answers from the lesson content only and course generation is off |
+| `ANTHROPIC_API_KEY` | empty | AI tutor, AI course generation and AI-translated lesson captions. Without a key the tutor answers from the lesson content only, course generation is off and the AI caption languages report that no captions are available (the ten shipped languages still work) |
 | `ANTHROPIC_MODEL` | `claude-opus-5-5` | Model for AI course generation in the studio |
-| `ANTHROPIC_TUTOR_MODEL` | `claude-haiku-5-5` | Model for the AI tutor only. The tutor request turns thinking off at medium effort and caches the system prompt and lesson context; a model that rejects disabled thinking (`claude-opus-5-5`, `claude-sonnet-5-5`) or effort (`claude-haiku-4-5`) makes every answer fall back to the lesson text |
+| `ANTHROPIC_TUTOR_MODEL` | `claude-haiku-5-5` | Model for the AI tutor and the AI captions. The tutor request turns thinking off at medium effort and caches the system prompt and lesson context; a model that rejects disabled thinking (`claude-opus-5-5`, `claude-sonnet-5-5`) or effort (`claude-haiku-4-5`) makes every answer fall back to the lesson text |
 | `ELEVENLABS_API_KEY`, `ELEVENLABS_VOICE_ID`, `ELEVENLABS_VOICE_<LOCALE>` | empty | Natural lesson narration, read only by `scripts/generate-narration.ts` (see [Narration voice](#narration-voice)); the server only serves the generated files. Set them in `.env.local` only, never in the compose `.env`, whose `env_file` would hand the key to the container |
 | `SMS_PROVIDER` | empty | Text messages for phone sign-in and SMS simulations. `webhook` posts `{to, text}` to `SMS_WEBHOOK_URL`. Empty: logged to the console in development, reported as unavailable in production |
 | `SMS_WEBHOOK_URL` | empty | Endpoint for the `webhook` provider (required with it; the server refuses to start without) |
@@ -129,14 +130,14 @@ The standalone server also honours `PORT` and `HOSTNAME` (the Docker image sets 
 portal/
 ├─ src/
 │  ├─ app/                    App Router. Route groups share layouts, not URL segments
-│  │  ├─ (site)/              public site: /[lang] landing tour (az en ru tr ro ka uk de fr it), /legal/[doc]
+│  │  ├─ (site)/              public site: /[lang] landing tour (az en ru tr ro ka uk de fr ar), /legal/[doc]
 │  │  ├─ (auth)/              /sign-in and /account/* (password reset, invitations, 2FA)
 │  │  ├─ (learner)/           learner shell: Home, learn, paths, league, progress, profile, lab, security, sessions, help
 │  │  ├─ (focus)/             full-screen lesson player (/learn/[slug]/[lessonId]) and policy reader (/policies)
 │  │  ├─ (admin)/             /admin console (sidebar shell) and /super operator console
 │  │  ├─ (public)/            token routes without a session: /c certificates, /q QR traps, /t tracking links
 │  │  ├─ (print)/             printable compliance pack and reports
-│  │  ├─ api/                 JSON and file endpoints: admin exports, assets, me/export, qr, sandbox, super, t, tutor
+│  │  ├─ api/                 JSON and file endpoints: admin exports, assets, me/export, qr, sandbox, subtitles, super, t, tutor
 │  │  ├─ start/               PWA start URL (session -> Home, otherwise /sign-in)
 │  │  └─ layout.tsx, error.tsx, not-found.tsx, manifest.ts, robots.ts, sitemap.ts, offline/
 │  ├─ server/                 server-only code
@@ -145,28 +146,29 @@ portal/
 │  │  ├─ actions/, queries/   Server Actions and read models used by the pages
 │  │  ├─ services/            domain services (library sync, progress, risk, campaigns, audit, notify, secops, ...)
 │  │  ├─ jobs.ts              the minute tick: campaigns, mail retries, webhooks/syslog, reminders, risk snapshots, reports
-│  │  ├─ mail.ts, sms.ts, tutor.ts, ai.ts, sandbox/, reports/, lab/
+│  │  ├─ mail.ts, sms.ts, tutor.ts, ai.ts, narration.ts, subtitles.ts, sandbox/, reports/, lab/
 │  │  └─ env.ts, crypto.ts, rate-limit.ts, request.ts, tracking.ts, landing.ts
 │  ├─ components/             UI by area: shell, ui, learner, player, mascot, admin, secops, sandbox, site, support
-│  ├─ lib/                    pure shared logic: domain rules, content validation, campaign templates, markdown, csv, colours
-│  ├─ i18n/                   next-intl: az (default), en, ru for the app; 10 languages for the public site
+│  ├─ lib/                    pure shared logic: domain rules, content validation, campaign templates, markdown, csv, colours, tts/, motion
+│  ├─ i18n/                   next-intl: the ten languages (az default) for the app and the public site; dirOf/langAttrs
 │  ├─ proxy.ts                runs before every page: CSP nonce, public-site language, optimistic sign-in redirect
 │  └─ instrumentation.ts      starts the job runner with the Node.js server
 ├─ content/                   read from disk at runtime via process.cwd(); must ship next to the server
 │  ├─ landing/{lang}.json     landing copy and mascot lines, 10 languages
-│  ├─ legal/{doc}.{lang}.md   privacy policy and terms (az; other languages are added as files)
-│  ├─ library/                modules.json, paths.json, brands.json, i18n.az/ru.json, lessons/{module}/{id}.en.json (53 modules, 106 lessons)
-│  └─ policies/*.md           policy texts loaded by the seed
-├─ messages/{az,en,ru}/       UI strings in 9 namespaces (bundled at build time)
+│  ├─ legal/{doc}.{lang}.md   privacy policy and terms, ten languages
+│  ├─ library/                modules.json, paths.json, brands.json, i18n.{lang}.json, lessons/{module}/{id}.{lang}.json (53 modules, 106 lessons, 10 languages)
+│  ├─ narration/{lang}/       narration manifests (word timings) written by scripts/generate-narration.ts, read by the server only
+│  └─ policies/*.{lang}.md    policy texts loaded by the seed, ten languages
+├─ messages/{lang}/           UI strings for the ten languages, 9 namespaces each (bundled at build time)
 ├─ drizzle/                   SQL migrations and drizzle-kit metadata
-├─ public/                    icons, brand/, rive/ (mascot + wasm), sw.js, favicon
-├─ scripts/                   migrate.ts, seed.ts, seed-data.ts, sync-content.ts (development); migrate.mjs, docker-entrypoint.sh (container); start-standalone.mjs, jobs.ts (other hosts, worker)
+├─ public/                    icons, brand/, rive/ (Rive mascot + wasm), generated/tts/{lang}/ (narration clips), sw.js, favicon
+├─ scripts/                   migrate.ts, seed.ts, seed-data.ts, sync-content.ts, check-lesson-locales.ts, generate-narration.ts (development); migrate.mjs, docker-entrypoint.sh (container); start-standalone.mjs, jobs.ts (other hosts, worker)
 ├─ tests/                     Vitest (content library, i18n, ...)
 ├─ Dockerfile, docker-compose.yml, .dockerignore
 └─ .data/pg/                  local PGlite database (do not commit)
 ```
 
-Fonts come from `next/font/google` (Geologica and Noto Sans Georgian) and are downloaded at build time; the build machine needs network access.
+Fonts come from `next/font/google` (Geologica, Noto Sans Georgian and Noto Sans Arabic) and are downloaded at build time; the build machine needs network access.
 
 ## Production with Docker
 
@@ -250,6 +252,30 @@ npm start                                                # copies public/, .next
 
 with the same environment as the container (`DATABASE_URL`, `APP_SECRET`, `APP_URL`, ...). The standalone build never contains the local `.data/` database: the database path is kept out of the build's file tracing, `outputFileTracingExcludes` drops it as well, and the `postbuild` script removes `.next/standalone/.data` if anything still got there. `outputFileTracingRoot` pins the layout to `.next/standalone/server.js` even when a folder above the app has its own lockfile. A production server without `DATABASE_URL` refuses to start rather than open an embedded database. Serverless platforms (for example Vercel) would need `JOBS_ENABLED=0` and `npm run jobs -- --once` from an external scheduler every minute. See the [Next.js deployment documentation](https://nextjs.org/docs/app/getting-started/deploying) for platform specifics.
 
+## Languages
+
+The whole portal (public site, learner app, admin console, emails, certificates, legal texts, policies and all 106 lessons) is in ten languages:
+
+| Code | Language | Notes |
+|---|---|---|
+| `az` | Azerbaijani | default; the base language of seed data and policies |
+| `en` | English | the original lesson files (`*.en.json`) |
+| `ru` | Russian | |
+| `tr` | Turkish | |
+| `ro` | Romanian | |
+| `ka` | Georgian | Noto Sans Georgian, loaded only on pages that show Georgian |
+| `uk` | Ukrainian | |
+| `de` | German | |
+| `fr` | French | |
+| `ar` | Arabic (Saudi Arabia) | right to left; formatted as `ar` (Western digits 0-9, Gregorian calendar), `ar-SA` only as the speech tag; Noto Sans Arabic |
+
+- **Where the language comes from.** A signed-in person gets their profile language (among the languages the organisation switched on in Settings → Languages), otherwise the `locale` cookie, otherwise the browser's language; an unsupported browser language falls back to English outside Azerbaijan (`be`, `kk`, `ky`, `uz` read Russian). Emails and notifications go out in the recipient's language. The list is `LOCALES` in `src/i18n/config.ts`.
+- **Right to left.** `dirOf()` / `langAttrs()` (`src/i18n/config.ts`) set `dir` on `<html>` and on any element whose content language differs from the page. Layout uses logical Tailwind classes only (`ms-`, `pe-`, `start-`, `text-start`); `tests/rtl-logical.test.ts` fails on a physical one outside its short allow-list. Code, URLs, addresses, phone numbers and IBANs stay left to right.
+- **Interface strings** live in `messages/{locale}/*.json` (9 namespaces each). A new string goes into all ten files, translated by meaning; keys contain no dots; `tests/i18n.test.ts` checks key parity and ICU placeholders. Texts kept in code (campaign templates, lab games, certificate and attestation defaults, risk titles) are covered by `tests/in-code-locales.test.ts`.
+- **Lessons** are one file per language next to the English original: `content/library/lessons/{module}/{lesson}.{locale}.json`, with the translated catalogue titles in `content/library/i18n.{locale}.json`. A translation keeps every id, answer, address and link and changes only learner-facing text; check with `npx tsx scripts/check-lesson-locales.ts --coverage` (954 of 954 translations) and load them with `npm run content:sync`. The stories stay in the fictional Azerbaijani company world in every language. Glossaries and the translation recipe: `../.claude/skills/cyclowareness-experience/references/glossaries/` and `lesson-engine.md` recipe 6.3.
+- **Lesson captions in more languages.** In the lesson player, captions can show any of the ten languages from the stored translations, and, with the `ai_tutor` feature and `ANTHROPIC_API_KEY`, 65 further languages translated by AI (`POST /api/subtitles`, cached in the `ai_cache` table and shared by every learner; marked as machine translated).
+- **Not yet reviewed by people.** The translations were made and edited by AI agents; have a native speaker read each language, and a lawyer the legal texts, before a release in that market (`../docs/build/OPEN-QUESTIONS.md` 7, 8).
+
 ## Narration voice
 
 Lessons are read aloud with word-by-word highlighting. A sentence with a pre-generated clip plays in a natural ElevenLabs voice (`eleven_v3`, the model that reads all ten languages, Azerbaijani and Georgian included) with exact word timings; every other sentence, and every lesson without clips, is read by the browser's own voice (Web Speech), and nothing is read when the browser has no voice for the language.
@@ -261,8 +287,15 @@ npx tsx --env-file=.env.local scripts/generate-narration.ts --locales az,ru --on
 
 - **Output.** One clip per spoken sentence and language in `public/generated/tts/<locale>/<sha256>.mp3` (served with `Cache-Control: immutable`; the name hashes language, model, voice, text and `TTS_REVISION` in `src/lib/tts/key.ts`, so changed text is a new file; to remake a clip whose text did not change, such as a bad take, raise `TTS_REVISION` and rerun: every clip then gets a new name and seed, so this costs a full run of the languages generated) and one manifest per lesson in `content/narration/<locale>/<module>__<lesson>.json` with the word timings. Manifests are read by the server and handed to the player of a signed-in learner; they are never public files, because they contain the lesson text. Run the script before building the image so both folders ship with it.
 - **Reruns are cheap.** Clips already on disk are reused; only new or changed sentences are sent. Failed clips are listed and retried on the next run (429 and 5xx answers are retried with backoff; a wrong key or a used-up quota stops the run).
-- **Cost.** The dry run prints the exact figure. The library has about 375,000 spoken characters per language (choose-all questions count every feedback combination), so about 3.8 million characters for ten languages: roughly 300 USD at about 0.08 USD per 1,000 characters; the ElevenLabs plan decides the real price.
-- **Voices.** ElevenLabs is retiring its default voices on 2026-12-31, so no voice is built in: set `ELEVENLABS_VOICE_ID` (every language) and optionally `ELEVENLABS_VOICE_<LOCALE>` (`ELEVENLABS_VOICE_AZ`, `_KA`, `_AR`...). Have a native speaker choose the Azerbaijani, Georgian and Arabic voices from the Voice Library and listen to a sample lesson (`--only`) before generating the rest. Changing a voice regenerates that language's clips.
+- **Cost.** The dry run prints the exact figure. On 2026-11-04 it gave 37,724 clips and 4.01 million characters for the ten languages (from about 324,000 for Arabic to 470,000 for German per language; choose-all questions count every feedback combination): about 321 USD at about 0.08 USD per 1,000 characters, 26 to 38 USD per language. The ElevenLabs plan decides the real price.
+- **Voices.** ElevenLabs is retiring its default voices on 2026-12-31, so no voice is built in: set `ELEVENLABS_VOICE_ID` (every language) and optionally `ELEVENLABS_VOICE_<LOCALE>` (`ELEVENLABS_VOICE_AZ`, `_KA`, `_AR`...). Have a native speaker of each language choose its voice from the Voice Library (Azerbaijani, Georgian and Arabic first) and listen to a sample lesson (`--only`) before generating the rest. Changing a voice regenerates that language's clips.
+
+To generate the narration:
+
+1. Put `ELEVENLABS_API_KEY` and the voice ids in `.env.local`.
+2. `--dry-run` for the cost, then one sample lesson per language, for example `--locales az --only phishing-email/spot-the-phish`, and listen to it in the lesson player with sound on (a name read wrongly is fixed in the lesson's `spoken` text, not in what learners see).
+3. Generate the languages you need: `--locales az,ru,tr,ro,ka,uk,de,fr,ar,en --concurrency 4`. Rerun after any lesson text change; only new or changed sentences are sent.
+4. Ship `public/generated/tts/` and `content/narration/` with the build (`docker build` copies both). In development the player picks up new clips without a restart.
 
 ## Operations notes
 
@@ -288,12 +321,14 @@ npm test                                   # all Vitest suites
 npx vitest run tests/content.test.ts       # one file
 npm run typecheck
 npm run lint
+npx tsx scripts/check-lesson-locales.ts --coverage   # every lesson translation: schema, parity, addresses
 ```
 
-`vitest.config.ts` aliases `@` to `src`, stubs `server-only` and uses the node environment. The content suite validates all 106 lessons against the schema in `src/lib/content/validate.ts`.
+`vitest.config.ts` aliases `@` to `src`, stubs `server-only` and uses the node environment. The content suite validates all 106 lessons against the schema in `src/lib/content/validate.ts`; `tests/content-locales.test.ts` checks every translation against its English file, `tests/i18n.test.ts` the ten message catalogues and `tests/rtl-logical.test.ts` the logical CSS.
 
 ## Documentation
 
 - `../docs/audit/` — the audit of the earlier portal that this rebuild follows: overview and routes, design tokens, learner app, admin panel, training catalogue (53 modules, 106 lessons), landing, lesson engine and mascot, screenshots, extracted content.
-- `../docs/build/PLAN.md` — architecture decisions and the build phases of the hybrid portal.
+- `../docs/build/PLAN.md` — the build phases of the hybrid portal; `DECISIONS.md` (ADRs, including the ten languages, translation, narration, captions, player, mascot, light/motion and security hardening), `PROGRESS.md`, `OPEN-QUESTIONS.md` (what still needs the owner's decision or a key).
+- `../.claude/skills/cyclowareness-experience/` — the working reference for the mascot, motion, lessons, translations and the training pipeline, with the per-language glossaries.
 - Next.js itself: [documentation](https://nextjs.org/docs) and the version-specific guides shipped in `node_modules/next/dist/docs/` (this Next.js version has breaking changes compared with older tutorials; `AGENTS.md` says the same).

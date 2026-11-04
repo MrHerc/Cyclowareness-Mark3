@@ -44,6 +44,7 @@ import { ArtifactModeProvider, hasLink, lensTargets, cleanSpeech, langProps, use
 import { Illustration, Stat } from "./illustrations";
 import { wordsOf, type Voice } from "./narrator";
 import { tutorAnswerId } from "./resume";
+import { CaptionBar } from "./captions";
 import { checkPassword } from "@/lib/password-strength";
 import { vibrate } from "@/lib/haptics";
 import { Button } from "@/components/ui/button";
@@ -216,12 +217,14 @@ export function FeedbackSheet(props: FeedbackProps) {
   const { tone } = props;
   return (
     <div className="fixed inset-x-0 bottom-0 z-50 animate-rise pb-(--safe-bottom)">
+      <CaptionBar slot className="mb-3" />
       <div
         className={cn(
-          "mx-auto max-w-3xl rounded-t-2xl border-t px-5 pt-5 pb-6 shadow-overlay sm:px-8",
+          "relative mx-auto max-w-3xl rounded-t-2xl border-t px-5 pt-5 pb-6 shadow-overlay sm:px-8",
           tone === "safe" ? "border-safe-100 bg-safe-50" : tone === "warn" ? "border-warn-100 bg-warn-50" : "border-risk-100 bg-risk-50",
         )}
       >
+        {tone === "safe" ? <span aria-hidden className="glow-ring animate-glow [--light:var(--color-safe-500)]" /> : null}
         <FeedbackCard {...props} />
       </div>
     </div>
@@ -326,7 +329,7 @@ function ChoiceOptions({
             disabled={checked}
             onClick={() => onPick(o.id)}
             className={cn(
-              "flex items-center gap-4 rounded-pill border-2 bg-surface px-4 py-3.5 text-start text-body-sm font-semibold transition-all",
+              "relative flex items-center gap-4 rounded-pill border-2 bg-surface px-4 py-3.5 text-start text-body-sm font-semibold transition-all",
               state === "idle" && "border-line hover:border-brand-300",
               state === "picked" && "border-brand-600 bg-brand-50",
               state === "correct" && "border-safe-500 bg-safe-50",
@@ -344,6 +347,7 @@ function ChoiceOptions({
               {state === "correct" || (state === "picked" && multi) ? <Check className="size-4" strokeWidth={3} /> : state === "wrong" ? <X className="size-4" strokeWidth={3} /> : k + 1}
             </span>
             {o.label}
+            {state === "correct" ? <span aria-hidden className="glow-ring animate-glow [--light:var(--color-safe-500)]" /> : null}
           </button>
         );
       })}
@@ -501,7 +505,8 @@ export function TutorScene({ scene, env, onBack }: { scene: Extract<Scene, { typ
       {checked && pickedOpt ? (
         <FeedbackSheet tone={pickedOpt.correct ? "safe" : "risk"} title={pickedOpt.correct ? t("wellDone") : t("notQuite")} text={pickedOpt.feedback} continueLabel={t("continue")} onContinue={advance} env={env} />
       ) : (
-        <div className="sticky bottom-0 mt-8 flex items-center justify-center gap-2 bg-gradient-to-t from-canvas via-canvas/95 to-transparent pt-6 pb-[calc(var(--safe-bottom)+1rem)]">
+        <div className="sticky bottom-0 mt-8 flex flex-wrap items-center justify-center gap-2 bg-gradient-to-t from-canvas via-canvas/95 to-transparent pt-6 pb-[calc(var(--safe-bottom)+1rem)]">
+          <CaptionBar slot className="mb-1 basis-full" />
           {asking && checkpoint ? (
             <>
               <Button variant="secondary" size="icon" aria-label={t("previous")} onClick={unask}>
@@ -892,9 +897,13 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
       ) : null}
 
       {inbox ? (
-        mailClient
+        <div className="relative rounded-2xl">
+          {mailClient}
+          <span aria-hidden className="glow-ring animate-glow" />
+        </div>
       ) : tab ? (
-        <div className={cn("rounded-2xl p-4 sm:p-8", scene.environment === "desktop" ? "bg-gradient-to-br from-brand-600 to-brand-900" : "bg-sunken")}>
+        <div className={cn("relative rounded-2xl p-4 sm:p-8", scene.environment === "desktop" ? "bg-gradient-to-br from-brand-600 to-brand-900" : "bg-sunken")}>
+          <span aria-hidden className="glow-ring animate-glow" />
           <div className="mx-auto max-w-2xl">
             {contextLine}
             {artifactNode}
@@ -925,6 +934,7 @@ export function SimulationScene({ scene, env }: { scene: Extract<Scene, { type: 
 
       {step && !inbox ? (
         <div className="sticky bottom-0 flex flex-wrap justify-center gap-2.5 bg-gradient-to-t from-canvas via-canvas/95 to-transparent pt-4 pb-[calc(var(--safe-bottom)+1rem)]">
+          <CaptionBar slot className="basis-full" />
           {actions.map((a) => {
             const AIcon = ACTION_ICON[a.kind];
             return (
@@ -958,14 +968,12 @@ export function ChoiceScene({ scene, env }: { scene: Extract<Scene, { type: "cho
   const correctIds = useMemo(() => new Set(opts.filter((o) => o.correct).map((o) => o.id)), [opts]);
   const multi = !!scene.multi || correctIds.size > 1;
   const contentLang = useContentLang();
-  // The choose-all hint is an interface string: read after the prompt, by a voice of the interface
-  // language when the lesson text is in another one.
+  // The choose-all hint is an interface string: read after the prompt, by a voice of the interface language.
+  // Two utterances, so the prompt keeps its recorded clip and its subtitles.
   const speakPrompt = () => {
     const prompt = scene.question.prompt;
-    const hint = `${t("multiHint")}.`;
     if (!multi) env.narrator.speak(prompt);
-    else if (!contentLang) env.narrator.speak(`${prompt} ${hint}`);
-    else env.narrator.speak(prompt, { onEnd: () => env.narrator.speak(hint, { lang: env.uiLocale }) });
+    else env.narrator.speak(prompt, { onEnd: () => env.narrator.speak(`${t("multiHint")}.`, { lang: env.uiLocale }) });
   };
 
   useEffect(() => {
@@ -1028,7 +1036,8 @@ export function ChoiceScene({ scene, env }: { scene: Extract<Scene, { type: "cho
         <div className="mx-auto w-full max-w-2xl py-4">{question}</div>
       )}
       {!checked ? (
-        <div className="sticky bottom-0 mt-8 flex items-center justify-center gap-2 bg-gradient-to-t from-canvas via-canvas/95 to-transparent pt-6 pb-[calc(var(--safe-bottom)+1rem)]">
+        <div className="sticky bottom-0 mt-8 flex flex-wrap items-center justify-center gap-2 bg-gradient-to-t from-canvas via-canvas/95 to-transparent pt-6 pb-[calc(var(--safe-bottom)+1rem)]">
+          <CaptionBar slot className="mb-1 basis-full" />
           <Button variant="secondary" size="icon" aria-label={t("replay")} onClick={speakPrompt}>
             <RotateCcw />
           </Button>
