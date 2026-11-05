@@ -78,7 +78,7 @@ async function waitFor(url, timeoutMs, cookie = "") {
 
 /* 1. Requirements */
 const [major] = process.versions.node.split(".").map(Number);
-if (major < 22) fail(`Node.js 22 or newer is needed (this is ${process.versions.node}).`);
+if (major < 24) fail(`Node.js 24 is needed (this is ${process.versions.node}).`);
 if (!Number.isInteger(port) || port < 1 || port > 65535) fail(`Not a port: ${option("port")}`);
 if (!(await portFree(port))) {
   fail(
