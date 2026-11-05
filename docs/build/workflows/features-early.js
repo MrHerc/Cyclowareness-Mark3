@@ -19,13 +19,13 @@ async function retrying(prompt, opts) {
   }
   return null
 }
-const SP = 'C:/Users/Safar/AppData/Local/Temp/claude/C--Users-Safar-Desktop-Cyclowareness--Vol2/66e61158-c161-4119-a251-69c6013bc3e9/scratchpad'
+const SP = '<scratchpad>'
 const R = `${SP}/featws`
 const P = `${R}/portal`
 const LOG = `${SP}/features-early`
 
 const COMMON = `NOTE: an earlier run of exactly this task was cut off by a usage limit; its partial edits may already be in the files. Inspect the current state first (git diff, the files you own) and continue from there instead of redoing or duplicating work.
-WORKSPACE: ${R} is an ISOLATED COPY of the repository (node_modules is a junction to the real one). Other agents are converting the real tree to 10 languages and right-to-left right now; your changes will be 3-way merged into it afterwards. Work ONLY inside ${R}; never touch C:/Users/Safar/Desktop/Cyclowareness- Vol2. Keep diffs focused so the merge stays clean: do not reformat or reorder code you do not change.
+WORKSPACE: ${R} is an ISOLATED COPY of the repository (node_modules is a junction to the real one). Other agents are converting the real tree to 10 languages and right-to-left right now; your changes will be 3-way merged into it afterwards. Work ONLY inside ${R}; never touch <repo>. Keep diffs focused so the merge stays clean: do not reformat or reorder code you do not change.
 PROJECT: Cyclowareness (vendor Safarov Industries), a multi-tenant security-awareness SaaS (LMS) sold to banks and government bodies; it must be secure itself. App: ${P} (Next.js 16 App Router with webpack, React 19, TypeScript strict, Tailwind 4.3, next-intl, Drizzle + PGlite locally). Read ${R}/CLAUDE.md and ${P}/AGENTS.md first.
 CONTEXT: the portal is becoming 10-language (az en ru tr ro ka uk de fr ar; ar is right-to-left). Use logical CSS only (ms/me/ps/pe/start/end/text-start/border-s/rounded-s…), never physical left/right classes; mirror directional icons with the existing CSS rule or rtl: variants; dir="ltr" for codes/URLs. Add UI strings to messages/en, az and ru only (keys without dots, valid ICU; another step translates the 7 other languages later). Never write "Aİ" in Azerbaijani.
 ALREADY DONE in the schema (src/server/db/schema.ts, migration regenerated): learning_paths.lab_ids jsonb not null default [] (Drizzle field labIds), and a table ai_cache (aiCache: id text pk = sha256 of kind and inputs, kind "subtitles", lessonId -> lessons.id cascade, locale, payload jsonb, model, createdAt). Do not change the schema further without a very good reason; if you must, regenerate with: rm -rf drizzle && npx drizzle-kit generate --name init (from ${P}).

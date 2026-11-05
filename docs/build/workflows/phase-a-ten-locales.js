@@ -20,7 +20,7 @@ async function retrying(prompt, opts) {
   }
   return null
 }
-const R = 'C:/Users/Safar/Desktop/Cyclowareness- Vol2'
+const R = '<repo>'
 const P = `${R}/portal`
 const SP = args.scratchpad
 const LOG = `${SP}/phase-a`

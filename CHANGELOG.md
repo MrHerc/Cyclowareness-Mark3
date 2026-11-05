@@ -3,7 +3,11 @@
 All notable changes to this project are recorded here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
-## [Unreleased]
+## [Unreleased] - 2026-11-05 closure run
+
+Entries for this run's work packages are added here as they merge.
+
+## Phase 0 - CI, tests and ten fixes (merged 2026-11-05, unreleased)
 
 ### Added
 
@@ -47,9 +51,12 @@ All notable changes to this project are recorded here. The format follows
   test: `tests/campaign-flows.test.ts`)
 - **A simulation link opened twice at the same moment recorded two clicks.** Each request opened
   its own "phishing click" risk, sent its own integration event and counted twice against the
-  person. The click, and likewise the fake sign-in, is now claimed by one conditional update, so
-  it is recorded once. (`portal/src/server/services/campaigns.ts`, test:
-  `tests/campaign-flows.test.ts`)
+  person. The click is now claimed by one conditional update, so it is recorded once
+  (`recordClick` in `portal/src/server/services/campaigns.ts`, test: `tests/campaign-flows.test.ts`)
+- **A fake sign-in form sent twice at the same moment raised the risk twice.** Each request
+  escalated the person's risk and sent its own integration event. The submission is now claimed by
+  one conditional update, as the click is, so it is recorded once (`recordSubmit` in
+  `portal/src/server/services/campaigns.ts`, test: `tests/campaign-flows.test.ts`)
 - **The device limit could leave one session too many.** When a new sign-in pushed a person over
   the organisation's device limit, the oldest sessions were removed, skipping the new one if it
   sorted among them. The new session's last-seen time comes from the database clock and the

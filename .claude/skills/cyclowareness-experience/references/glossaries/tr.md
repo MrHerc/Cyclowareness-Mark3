@@ -112,7 +112,7 @@ Non-person names stay exactly as written: AI Sel, SahilBank, Nordvale Council, N
 
 ## Reviewer notes
 - Your question about what running this skill in parallel costs is not answered here. This step only reviewed the Turkish terms and estimated no cost.
-- Edited C:/Users/Safar/Desktop/Cyclowareness- Vol2/portal/content/library/i18n.tr.json in place (14 string replacements). The file is still valid JSON with one-space indent and a final newline, and the key-parity check prints `keys ok`. The file is untracked (new) and nothing is committed.
+- Edited <repo>/portal/content/library/i18n.tr.json in place (14 string replacements). The file is still valid JSON with one-space indent and a final newline, and the key-parity check prints `keys ok`. The file is untracked (new) and nothing is committed.
 - Changed 'Oltalamayı yakalayın' to 'Oltalamayı fark edin' (spot-the-phish). 'Spot' means fark etmek. 'Yakalamak' (catch) is odd with 'oltalama', which is the fishing act itself, not the catch.
 - Changed 'Telefondaki hileler' to 'Telefon aramalarındaki hileler' (phone-call-tricks). The old title read as tricks inside the phone device.
 - Changed 'Sahte görüntülü arama' to 'Sahte görüntülü görüşme' (fake-video-call). The glossary had two terms for video call; it is now one term, matching 'Güvenli görüntülü görüşmeler'.

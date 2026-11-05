@@ -105,8 +105,8 @@ risk score) needs both references.
   stays silent; for lesson text and tutor answers `<VoiceNotice>` says why (lesson-engine.md §3.4,
   recipe 6.6). A new `speak()` call in a scene must be added to the three spoken-text lists
   (lesson-engine.md §3.11, "Keep in step").
-- Commit only when the user asks. Never push. The servers on port 3100 (`demo`) and 3200 (`final`) in
-  `.claude/launch.json` are production builds of separate copies under the scratchpad, each with its own
+- Commit only when the user asks. Never push. The servers on port 3100 (`demo`) and 3200 (`final`), launch
+  entries the owner keeps only in their local `.claude/launch.json` (not committed), are production builds of separate copies under the scratchpad, each with its own
   `content/` and database: they are the user's presentation copies. Do not stop, rebuild or sync them
   unless the user says so. `npm run content:sync` in `portal/` reaches only the :3000 dev database, so
   tell the user when a presentation copy needs a refresh.

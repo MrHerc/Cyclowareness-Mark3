@@ -1325,8 +1325,8 @@ for a whole language or a large batch.
   plurals, items }`) plus a final consistency sweep. Every agent is wrapped in `retrying()` (a usage
   limit ends an agent without a result: wait 10 minutes, up to 40 tries), may not touch `.en.json` or
   code, and runs the checker on its files.
-- Before reusing them: both scripts hard-code the portal path and the 2026-10 session's scratchpad (`SP`),
-  and read the glossary from `${SP}/glossaries/{lang}.md`: point that at the skill's `glossaries/` folder
+- Before reusing them: replace the placeholders `<repo>` (the portal path) and `<scratchpad>` (`SP`, the
+  running session's scratchpad) in both scripts; they read the glossary from `${SP}/glossaries/{lang}.md`: point that at the skill's `glossaries/` folder
   (same files). Write the new language's glossary first (a terminologist, then an independent native
   reviewer), and make sure `messages/{lang}/` and `content/library/i18n.{lang}.json` exist (steps 1 and 3
   below), because the agents read them. The shared prompt frames every artefact as an attack on an

@@ -45,7 +45,7 @@ Roles: `learner`, `department_head`, `executive`, `analyst`, `campaign_manager`,
 
 ## Quick start
 
-Requirements: Node.js 22 or newer and npm. No database server is needed locally; the app uses an embedded PostgreSQL (PGlite) in `.data/pg`.
+Requirements: Node.js 24 (the version of the Docker image and CI) and npm. No database server is needed locally; the app uses an embedded PostgreSQL (PGlite) in `.data/pg`.
 
 ```bash
 npm install

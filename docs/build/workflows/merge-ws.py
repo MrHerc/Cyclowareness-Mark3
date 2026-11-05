@@ -7,7 +7,7 @@ For every file that differs between workspace and base (excluding node_modules, 
 """
 import filecmp, os, shutil, subprocess, sys
 
-MAIN = r"C:\Users\Safar\Desktop\Cyclowareness- Vol2"
+MAIN = r"<repo>"
 SKIP = {"node_modules", ".next", ".data", "graphify-out", ".git"}
 ws, base = sys.argv[1], sys.argv[2]
 dry = "--dry-run" in sys.argv

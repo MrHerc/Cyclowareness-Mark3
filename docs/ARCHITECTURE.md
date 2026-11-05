@@ -193,7 +193,7 @@ The authentication layer is the project's own code; it does not use an auth libr
 | Lockout | Failed attempts per account and client address within 15 minutes (`login_attempts`) |
 | Account links | Invitation and password-reset tokens, stored as hashes; invitations last 14 days |
 | Single sign-on | OpenID Connect authorization code flow with PKCE (S256), state and nonce (`src/server/auth/oidc.ts`) |
-| Domain proof | A DNS TXT record `cyclowareness-verify=…`, re-checked daily, with a 7-day grace period when it disappears |
+| Domain proof | A DNS TXT record `cyclowareness-verify=…`, re-checked daily, with a 7-day grace period when it disappears. A proof the platform operator forced without the record (`identity.domainProofForced`) is never re-checked |
 
 Single sign-on details:
 
@@ -207,7 +207,7 @@ SAML and LDAP settings can be saved, with their secrets encrypted, but no SAML e
 
 ## 6. Data model
 
-The schema is `src/server/db/schema.ts`: 51 tables, created by one migration, `drizzle/0000_init.sql`. Until the first release that migration is regenerated instead of adding new ones.
+The schema is `src/server/db/schema.ts`: 52 tables, created by the migrations `drizzle/0000_init.sql`, `0001_live_drill.sql` and `0002_drill_risk_trail.sql`. From ADR-034 on, migrations are additive: every schema change is a new migration, and a pushed one is never edited or regenerated.
 
 | Area | Tables |
 |---|---|
@@ -215,7 +215,7 @@ The schema is `src/server/db/schema.ts`: 51 tables, created by one migration, `d
 | Content library | `modules`, `lessons`, `lesson_contents`, `learning_paths` |
 | Learning | `assignments`, `module_progress`, `lesson_progress`, `answers`, `xp_events`, `attestations`, `certificates`, `policies`, `policy_versions`, `policy_signoffs`, `live_sessions`, `session_registrations`, `lab_attempts` |
 | Risk and security operations | `behavior_risks`, `risk_snapshots`, `user_risk_snapshots`, `threat_reports`, `sandbox_analyses`, `incidents`, `loops`, `loop_events`, `materials`, `material_decisions`, `intel_items` |
-| Phishing simulations | `campaigns`, `campaign_recipients` |
+| Phishing simulations | `campaigns`, `campaign_recipients`, `drill_runs` |
 | Support and feedback | `problem_reports`, `support_tickets`, `ticket_messages`, `feedback` |
 | Platform operator | `demo_requests` |
 | Delivery and background work | `outbox`, `report_schedules`, `webhook_deliveries`, `tutor_cache`, `ai_cache`, `assets` |
@@ -307,13 +307,14 @@ The sum is capped between 0 and 100. Bands are low (0 to 33), medium (34 to 66) 
 2. A launch is refused with a reason when:
    - the audience is empty,
    - the channel has no provider in production,
+   - the channel is voice, because no telephony adapter exists,
    - the plan does not include the template.
 3. Every recipient gets a random tracking token.
 4. Delivery depends on the channel:
    - **Email** goes through the outbox and is sent by the job runner, with the template's display name and the organisation's own address.
    - **SMS** is sent by the job runner.
    - **USB** produces a CSV kit with one beacon file per drive.
-   - **Voice** creates recipient rows only. No telephony adapter places calls yet.
+   - **Voice** never gets this far: the launch is refused.
 
 **Tracking.**
 
@@ -327,6 +328,8 @@ The sum is capped between 0 and 100. Bands are low (0 to 33), medium (34 to 66) 
 **Reporting.** An employee reports a suspicious message from the app, and every report is stored in `threat_reports`. When it matches a simulation sent to that person in the last 30 days, from a running or completed campaign, the recipient is marked as having reported it and the report is stored as triaged. Otherwise it enters threat intake as new. Every report earns a small XP bonus, up to a daily cap.
 
 **Scheduling.** Scheduled campaigns launch from the job runner, on Baku time. A scheduled launch that cannot start goes back to draft once, with the reason and a notice to the campaign managers.
+
+**Live drill** (`src/server/services/drill.ts`, operator feature `live_drill`, page `/admin/drill`). A drill is an email or SMS campaign whose recipients' behaviour is planned up front (`src/lib/drill/plan.ts`) and played back in compressed time through the same services real recipients go through: the open, the click, the fake sign-in, the report, the training the click assigns and the risk score. Nothing is sent. There is no timer: the dashboard polls the drill once a second and each poll applies the events that are due, one request at a time under a lease kept in `drill_runs`. An organisation can start 20 drills per hour.
 
 ## 10. Security operations
 
@@ -369,7 +372,7 @@ The steps of one tick, in order (`runJobs` in `src/server/jobs.ts`):
 2. **mail**: send queued mail.
 3. **sms**: send queued SMS.
 4. **events**: deliver webhooks and syslog messages.
-5. **domains**: re-check proven domains once a day.
+5. **domains**: re-check proven domains once a day, except organisations whose proof the platform operator forced (`identity.domainProofForced`), which are never re-checked.
 6. **cleanup**: apply the retention rules once a day.
 7. For each organisation:
    - the daily risk snapshot,
@@ -486,7 +489,7 @@ The embedded PGlite database is single-process and for development only.
 
 These are open in the code at this commit. Most are also tracked in [`docs/build/OPEN-QUESTIONS.md`](build/OPEN-QUESTIONS.md).
 
-- **Voice simulations.** Voice campaigns record recipients but place no calls. No telephony adapter exists.
+- **Voice simulations.** Voice campaigns refuse to launch. No telephony adapter exists.
 - **SAML and LDAP.** Settings are stored, but there is no SAML exchange and no directory synchronisation.
 - **SSO account matching.** SSO accounts are matched by email only. The provider's `sub` is not bound to the account.
 - **SSO domain proof.** The SSO callback creates new learners for the saved domain without re-checking that the domain proof is still valid.

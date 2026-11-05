@@ -81,7 +81,7 @@ flowchart LR
 
 - **People.** People and departments in a hierarchy, CSV import, invitation links and roles.
 - **Assignments.** Due dates, automatic reminders, manager alerts, and monthly refreshers for people at or above the risk threshold.
-- **Phishing simulations.** Twelve templates for email, SMS, QR code, USB drop and voice call; the two voice-call templates still need a telephony adapter to place calls. Scheduling, an open, click, submit and report funnel, and a teachable moment after each click.
+- **Phishing simulations.** Twelve templates for email, SMS, QR code, USB drop and voice call; voice-call campaigns refuse to launch until a telephony adapter exists. Scheduling, an open, click, submit and report funnel, and a teachable moment after each click.
 - **Policies.** Versions and translations, with a sign-off export for auditors.
 - **Studio.** Content creators draft new courses with AI, or from the closest library module when no AI key is set. They review each draft and publish it themselves.
 - **Reports.** Eight report types as CSV or XLSX, scheduled report emails, and printable reports and a compliance pack.
@@ -182,7 +182,7 @@ Then open http://localhost:3000/sign-in?next=/admin/drill and follow [docs/DEMO.
 
 ### Local development
 
-You need Node.js 22 or newer and npm. You do not need a database server: an embedded PostgreSQL stores data in `portal/.data/pg`.
+You need Node.js 24 (the version of the Docker image and CI) and npm. You do not need a database server: an embedded PostgreSQL stores data in `portal/.data/pg`.
 
 ```bash
 cd portal
@@ -279,7 +279,7 @@ cd portal && npx tsx scripts/check-lesson-locales.ts --coverage
 - an image build on the release machine;
 - a native-speaker review of seven of the ten languages, and a legal review of the privacy policy and terms. According to [docs/build/DECISIONS.md](docs/build/DECISIONS.md), these texts were translated and edited by AI agents.
 
-**Release history.** The product has not had its first release. The database schema is a single initial migration, regenerated until then.
+**Release history.** The product has not had its first release. The database schema has been versioned since 2026-11-05: `portal/drizzle/0000_init.sql` is frozen and every schema change is a new, additive migration (ADR-034).
 
 ## Roadmap
 
@@ -338,4 +338,4 @@ The items below are open at this commit. They come from the code and from [docs/
 
 ## Licence
 
-The repository contains no licence file, so it grants no right to use, copy or modify the code. Contact Safarov Industries before any use.
+The code and content are proprietary: [LICENSE](LICENSE) reserves all rights and grants no licence to use, copy or modify them. Contact Safarov Industries before any use. Contributions follow [CONTRIBUTING.md](CONTRIBUTING.md), and vulnerabilities are reported as described in [SECURITY.md](SECURITY.md).

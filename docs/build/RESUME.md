@@ -28,7 +28,7 @@ Həftəlik limit bazar günü, 2026-11-01-də saat 22:00-da (Bakı vaxtı) yenil
 
 **Qalan işlər (sıra ilə):**
 1. Dayandırılmış workflow-ları eyni `scriptPath`, `resumeFromRunId` və `args` ilə davam etdir. Bu, yalnız həmin Claude sessiyasında işləyir.
-   - Skriptlər sessiyanın scratchpad qovluğundadır: `%TEMP%\claude\C--Users-Safar-Desktop-Cyclowareness--Vol2\66e61158-c161-4119-a251-69c6013bc3e9\scratchpad`.
+   - Skriptlər sessiyanın scratchpad qovluğundadır: `<scratchpad>`.
    - Vəziyyət `OVERNIGHT-STATE.md` faylındadır.
    - Davam etdiriləcək dillər (`localize-language.js`): fr `wf_a783af65-3e3`, uk `wf_edb26592-7a5`, ro `wf_75b21604-d0d`, ka `wf_b1c11145-0d6`, de `wf_1bde0a71-fa5`, ar `wf_9f8275a7-ddd`. Bunlarda yalnız yoxlayıcı redaktorlar qalıb.
    - İşıq effektləri (`light-polish.js`, `wf_466adfa7-ee3`, iş sahəsi `lightws`) hələ bitməyib.
@@ -65,7 +65,7 @@ Qərarlar: DECISIONS ADR-023, ADR-024. Gediş: PROGRESS dövrə 9.
 - **Redaktə (ikinci göz):**
   - az: redaktə olunub 2, 4, 6 qrupları; qalıb 1, 3, 5, 7, 8, 9, 10, 11, 12, 13 və sonda terminologiya vəhdəti.
   - ru: redaktə olunub 1–6; qalıb 7–13 və sonda terminologiya vəhdəti.
-  - Qruplar: `C:\Users\Safar\AppData\Local\Temp\claude\C--Users-Safar-Desktop-Cyclowareness--Vol2\66e61158-c161-4119-a251-69c6013bc3e9\scratchpad\lesson-batches.json` (13 qrup, sıra ilə).
+  - Qruplar: `<scratchpad>\lesson-batches.json` (13 qrup, sıra ilə).
 - **İnterfeys agenti yarıda dayandırıldı.** Hardcoded mətnlərin tapılması və son əlavə olunan az/ru açarlarının redaktəsi başlanmışdı (son etdiyi: rus dilində «служба безопасности» termininin vahidləşdirilməsi). Ağac sağlamdır: tsc 0, i18n və content-locales testləri keçir.
 - Heç nə commit olunmayıb (son commit `final-pass-2026-10-21` budağında 851d4fa).
 

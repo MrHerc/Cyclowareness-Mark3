@@ -19,13 +19,13 @@ async function retrying(prompt, opts) {
   }
   return null
 }
-const SP = 'C:/Users/Safar/AppData/Local/Temp/claude/C--Users-Safar-Desktop-Cyclowareness--Vol2/66e61158-c161-4119-a251-69c6013bc3e9/scratchpad'
+const SP = '<scratchpad>'
 const R = `${SP}/mascot-ws`
 const P = `${R}/portal`
 const OUT = `${SP}/cat-v2`
 
 const COMMON = `NOTE: an earlier run of exactly this task was cut off by a usage limit; its partial edits may already be in the files. Inspect the current state first (git diff, the files you own) and continue from there instead of redoing or duplicating work.
-WORKSPACE: ${R} is an ISOLATED COPY of the repository made for the mascot work only (node_modules is a junction to the real one); the real tree is being converted by other agents and your mascot files will be copied back afterwards. Work only inside ${R}; never touch C:/Users/Safar/Desktop/Cyclowareness- Vol2.
+WORKSPACE: ${R} is an ISOLATED COPY of the repository made for the mascot work only (node_modules is a junction to the real one); the real tree is being converted by other agents and your mascot files will be copied back afterwards. Work only inside ${R}; never touch <repo>.
 PROJECT: Cyclowareness, a security-awareness LMS. Its mascot "AI Sel" is a cat drawn procedurally on Canvas 2D: ${P}/src/components/mascot/cat/engine.js (2139 lines, typed by engine.d.ts), cat/props.ts, mapping.ts, cat-mascot.tsx (the React wrapper). Design history and the owner's photo of their own cat (the model): ${R}/design/mascot-cat/ (README.md, reference.jpg, sheets, cat-shoot.mjs frame shooter, source/ = an older design copy).
 READ FIRST: ${SP}/maps/mascot.md (a precise map of the rig, behaviours, scheduler, motion handling, call sites and an honest quality assessment, written an hour ago) and ${R}/.claude/skills/cyclowareness-experience/references/mascot.md and animations.md.
 THE OWNER'S REQUEST (translated): "In the portal the mascot must do many different animations, for example sleeping, running, playing with a mouse, with a laser and so on; make the cat's joints more beautiful, specifically a cozy, realistic cat like one in a fairy tale, and let the cat show many of its cat traits."
