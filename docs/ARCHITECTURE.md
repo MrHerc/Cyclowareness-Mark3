@@ -80,7 +80,7 @@ Each external service is optional. Without one, the related feature falls back t
 
 | Service | Without it |
 |---|---|
-| Anthropic API key | The tutor answers from the lesson text, studio drafting is off, AI subtitles report that none are available |
+| Anthropic API key | The tutor answers from the lesson text, the studio builds drafts from the closest library module instead of AI, AI subtitles report that none are available |
 | Organisation SMTP | Mail is kept in the outbox with status `logged`, visible to administrators |
 | SMS provider | Development logs the message; production reports SMS as unavailable |
 | Identity provider | People sign in with a password, or with a phone code if they are learners |
@@ -94,7 +94,7 @@ Each external service is optional. Without one, the related feature falls back t
 | `src/proxy.ts` | Runs before every request: security headers, language of the public site, optimistic sign-in redirect |
 | `src/instrumentation.ts` | Server start: validates the environment, imports content, starts the job runner |
 | `src/server/auth/` | Sessions, passwords, TOTP, account links, OIDC, permissions, the viewer |
-| `src/server/actions/` | Server Actions, the only write path from the interface |
+| `src/server/actions/` | Server Actions, which carry the interface's writes |
 | `src/server/queries/` | Read models used by pages |
 | `src/server/services/` | Domain logic shared by actions, jobs and the seed |
 | `src/server/db/` | Drizzle schema and the two database drivers |
@@ -138,12 +138,13 @@ sequenceDiagram
 
 - **The proxy check is optimistic.** It looks only for the session cookie (`src/lib/app-paths.ts`). The real check happens in the data access layer, `src/server/auth/viewer.ts`, which every page, action and route handler calls.
 - **Reads** happen in server components through `src/server/queries/`. Only the data a page needs reaches the browser.
-- **Writes** go through Server Actions. Each one starts with `actionViewer(permission)`, which throws when the person is signed out, lacks the permission or still has to set up two-step verification. Changes are written to the audit log (`src/server/services/audit.ts`), and the page refreshes.
+- **Writes** go through Server Actions. An action for a signed-in person starts with `actionViewer(permission)`, which throws when the person is signed out, lacks the permission or still has to set up two-step verification. Administrative changes are written to the audit log (`src/server/services/audit.ts`), and the page refreshes.
+- **Writes outside that path.** The sign-in and demo-request actions run before anyone is signed in and apply their own rate limits. The invitation-link download is a route handler. The tracking pages `/t` and `/q` record clicks.
 - **Route handlers** under `/api` serve downloads, the tutor stream and integrations. Their access rules are in [API.md](API.md).
 
 ## 4. Tenancy and access control
 
-**Tenants.** An organisation is a row in `tenants`. It holds the plan, branding, a `settings` JSON document, per-tenant feature overrides and the proven email domain. Every tenant-owned table has a `tenant_id` column with a cascading foreign key. Library modules have `tenant_id` null and are shared by every tenant; modules made in the studio belong to one tenant.
+**Tenants.** An organisation is a row in `tenants`. It holds the plan, branding, a `settings` JSON document, per-tenant feature overrides and the proven email domain. Organisation data carries a `tenant_id` column with a cascading foreign key, either on the row itself or on its parent row. A campaign recipient, for example, belongs to its campaign, and lesson progress to its user. Library modules and learning paths have `tenant_id` null and are shared by every tenant; modules and paths made in the console belong to one tenant. Platform mail in the outbox has no tenant.
 
 **Roles.** There are eight roles (`src/server/db/schema.ts`).
 
@@ -174,7 +175,7 @@ sequenceDiagram
 
 - The platform operator always needs it.
 - Every console role needs it when the organisation's "require two-step verification" rule is on. New organisations have it on.
-- `tenant_admin`, `super_admin`, `analyst` and `campaign_manager` always sign in with a password and a second step, never with SSO or a phone code.
+- `tenant_admin`, `super_admin`, `analyst` and `campaign_manager` always sign in with a password, never with SSO or a phone code. Their second step follows the two rules above.
 - No console role can sign in with a text-message code.
 
 ## 5. Authentication
@@ -199,7 +200,7 @@ Single sign-on details:
 - Provider endpoints must use HTTPS and, in production, resolve to public addresses.
 - Discovery documents are cached for five minutes, so an anonymous visit does not always reach the provider.
 - The standard `email` claim counts only when `email_verified` is `true`.
-- New learners are created on first sign-in only when the organisation allows it and the address is on its proven domain.
+- New learners are created on first sign-in only when the organisation allows it and the address is on the organisation's saved domain. The sign-in page offers SSO only while the domain proof is valid, but the callback compares the address with the saved domain without re-checking the proof.
 - Accounts are matched by email address.
 
 SAML and LDAP settings can be saved, with their secrets encrypted, but no SAML exchange and no directory synchronisation are implemented.
@@ -221,7 +222,7 @@ The schema is `src/server/db/schema.ts`: 51 tables, created by one migration, `d
 
 Conventions:
 
-- **Keys and time.** Primary keys are random UUIDs. Every timestamp is `timestamptz`.
+- **Keys and time.** Most tables have random UUID primary keys. Sessions, account tokens and the AI caches are keyed by a hash, watermark codes by the code itself, and progress, translation and rate-limit tables by composite keys. Every timestamp is `timestamptz`.
 - **Localised text.** Text shown in several languages is stored as a JSON map of locale to text, such as module titles and certificate wording.
 - **Numbered records.** Threat reports, sandbox analyses, incidents and support tickets get a per-tenant number with a unique `(tenant_id, number)` index. A concurrent insert that loses the race retries with the next number (`insertNumbered` in `src/server/services/threats.ts`).
 - **Settings.** Organisation settings live in `tenants.settings` as JSON (`TenantSettings`). Secrets inside it are encrypted with AES-256-GCM under a key derived from `APP_SECRET` (`src/server/crypto.ts`).
@@ -253,10 +254,10 @@ flowchart LR
 
 - **Lesson format.** A lesson is a list of scenes. The schema allows 11 scene types: `tutor`, `intro`, `simulation`, `choice`, `hotspot`, `swipe`, `match`, `order`, `scenario`, `password` and `recap`. Scenes show 12 kinds of artifact, such as an email, chat, SMS, login page, phone call, QR code or Wi-Fi prompt.
 - **Translations.** A translation may change only learner-facing text. Ids, answers, addresses and links must match the English file (`src/lib/content/locale-parity.ts`). The check script verifies all 954 translations.
-- **Import.** The production server imports the library on every start, in one transaction under a PostgreSQL advisory lock (`src/server/bootstrap.ts`). `npm run content:sync` and the seed do the same. Modules and lessons are matched by slug and key, so progress and assignments survive an import. Studio lessons are never touched.
+- **Import.** The production server imports the library on every start, in one transaction under a PostgreSQL advisory lock (`src/server/bootstrap.ts`). `npm run content:sync` does the same. Modules and lessons are matched by slug and key, so progress and assignments survive an import. Studio lessons are never touched. The demo seed is different: it empties every table first, then imports.
 - **Language at run time.** `pickLessonContent` serves the learner's language, then English, then any stored language.
-- **Read at request time.** Landing copy, legal texts and brands are read from disk on each request.
-- **Narration.** `scripts/generate-narration.ts` creates one ElevenLabs clip per spoken sentence, with word timings, before the build. Manifests are served only to the signed-in learner of that lesson. Sentences without a clip are read by the browser's speech engine. The repository contains no clips yet.
+- **Read from disk at run time.** Landing copy and legal texts are read on each request. The brand list is read once per server process.
+- **Narration.** `scripts/generate-narration.ts`, run by hand before building the image, creates one ElevenLabs clip per spoken string and language, with word timings. Manifests are served only to the signed-in learner of that lesson. Sentences without a clip are read by the browser's speech engine. The repository contains no clips yet.
 - **Studio lessons.** A studio lesson, written by hand or drafted by AI, exists only in the database and starts as a draft.
 
 ## 8. Learning, progress and risk
@@ -323,7 +324,7 @@ The sum is capped between 0 and 100. Bands are low (0 to 33), medium (34 to 66) 
 - **Fake sign-in.** The form's inputs have no names, so nothing typed leaves the browser. Only the fact of submission is stored.
 - **Cancelled campaigns** record nothing more.
 
-**Reporting.** An employee reports a suspicious message from the app. If it matches a running simulation, the recipient is marked as having reported it and earns a small XP bonus with a daily cap. Otherwise the report enters threat intake.
+**Reporting.** An employee reports a suspicious message from the app, and every report is stored in `threat_reports`. When it matches a simulation sent to that person in the last 30 days, from a running or completed campaign, the recipient is marked as having reported it and the report is stored as triaged. Otherwise it enters threat intake as new. Every report earns a small XP bonus, up to a daily cap.
 
 **Scheduling.** Scheduled campaigns launch from the job runner, on Baku time. A scheduled launch that cannot start goes back to draft once, with the reason and a notice to the campaign managers.
 
@@ -332,7 +333,7 @@ The sum is capped between 0 and 100. Bands are low (0 to 33), medium (34 to 66) 
 | Function | What the code does |
 |---|---|
 | Threat intake | Employees report messages, calls, links, files or in-person attempts. Analysts triage, dismiss, sandbox the URL, or convert the report into a closed loop or an incident |
-| Closed loops | A loop follows one threat through seven stages: intake, analysis, conversion, approval, targeting, training, feedback. Stages only move forward, and every move is logged in `loop_events` (`src/server/services/secops.ts`) |
+| Closed loops | A loop follows one threat through seven stages: intake, analysis, conversion, approval, targeting, training, feedback. Stages only move forward, and every move is logged in `loop_events` (`src/server/services/secops.ts`). Analysts start loops from a threat report or an intelligence item; a sandbox result reaches a loop by being escalated into a threat report. The schema also allows sandbox, incident and simulation sources, which only the demo seed uses |
 | Approvals | Training material from AI, a template or an analyst waits for approval. A material can require a second approval. Only approved material reaches employees; approval moves its loop to the training stage, and a rejection sends nothing |
 | Incidents | Severity, status, indicators of compromise, MITRE ATT&CK technique ids, a confidential flag, and an optional training module with target people, due date and pass score. Auto-training assigns that module to the targets |
 | Sandbox | Static analysis of URLs and uploaded files up to 10 MB: URL heuristics, file type detection, ZIP and Office archive inspection, macros, entropy, indicator extraction and MITRE mapping. Nothing is executed or fetched, and file bytes are never stored, only the SHA-256 (`src/server/sandbox/analyze.ts`). Results export as STIX 2.1 |
@@ -347,12 +348,12 @@ All model calls use the Anthropic SDK (`@anthropic-ai/sdk`). The models are envi
 | Feature | Model setting, default | Sent to the model | Stored | Without a key |
 |---|---|---|---|---|
 | Tutor in the lesson player (`/api/tutor`) | `ANTHROPIC_TUTOR_MODEL`, `claude-haiku-5-5` | The lesson's text (at most 9,000 characters), the current scene and the question (2 to 500 characters) | `tutor_cache`, by language, lesson, scene and normalised question; only complete answers | An answer assembled from the lesson text |
-| Studio course drafts | `ANTHROPIC_MODEL`, `claude-opus-5-5` | The author's brief and parameters | A draft lesson, after schema checks, safety rules and an AI review pass (`src/server/ai-verify.ts`) | Drafting is off |
+| Studio course drafts | `ANTHROPIC_MODEL`, `claude-opus-5-5` | The author's brief and parameters | A draft lesson, after schema checks, safety rules and an AI review pass (`src/server/ai-verify.ts`) | AI drafting is off. The studio can still assemble a draft from the closest library module, with the AI review step skipped |
 | Subtitles in 65 more languages (`/api/subtitles`) | `ANTHROPIC_TUTOR_MODEL` | The lines the player speaks for that lesson | `ai_cache`, shared by every learner, keyed by a hash of the source text | The player reports that no subtitles are available |
 
 - **Gating.** The tutor and AI subtitles need the `ai_tutor` plan feature. The studio needs `studio`.
 - **Limits.** Per-person and per-organisation rate limits bound the cost (see [API.md](API.md#rate-limits)).
-- **Human review.** AI subtitles are labelled as machine translated. AI drafts always pass through human approval.
+- **Human review.** AI subtitles are labelled as machine translated. AI drafts are saved as drafts, and they reach learners only when a person with studio rights publishes them.
 
 ## 12. Background jobs
 
@@ -381,7 +382,7 @@ Delivery rules:
 
 - **Time budget.** Each delivery step stops after 20 seconds per tick.
 - **Unreachable servers.** A server that cannot be reached is skipped for the rest of the tick, without using up the attempts of its other messages. One dead server cannot hold up other organisations.
-- **Mail retries.** Mail is retried 1, 2, 5, 15, 60, 240, 720 and 1,440 minutes after it was queued, then marked failed.
+- **Mail retries.** A message gets up to eight attempts, due 1, 2, 5, 15, 60, 240, 720 and 1,440 minutes after it was queued. Mail that is not deferred makes its first attempt at once. After the last attempt the message is marked failed and can be resent from Settings.
 - **Event retries.** Webhook and syslog deliveries get up to six attempts, with growing delays.
 - **Retention.** Once a day the runner deletes:
   - sign-in attempts older than two days,
@@ -398,7 +399,10 @@ Delivery rules:
 Tenant administrators configure SMTP servers, webhook addresses, syslog servers and the OIDC issuer. In a multi-tenant deployment these must not let a customer probe the platform's own network. `src/server/net-guard.ts` enforces that:
 
 - **Two checks.** A destination is resolved and checked when it is saved, and again right before every connection.
-- **Refused addresses.** Loopback, private, link-local, carrier-grade NAT, documentation, multicast and reserved addresses are refused, in IPv4 and in every IPv6 spelling. So are `.local` and `.internal` names.
+- **Refused addresses.**
+  - IPv4: loopback, private, link-local, carrier-grade NAT, documentation, multicast and reserved ranges.
+  - IPv6: unspecified, loopback, unique-local, link-local, site-local and multicast addresses, the local-use NAT64 prefix, and any IPv6 form that embeds a blocked IPv4 address.
+  - Names: `localhost`, and anything ending in `.localhost`, `.local` or `.internal`.
 - **Pinned connections.** The connection goes to the addresses the check approved, which defeats DNS rebinding.
 - **Allowed ports.**
 
@@ -451,7 +455,7 @@ flowchart LR
   WK["worker container<br/>optional profile"] --> PGS
 ```
 
-**Image.** `portal/Dockerfile` builds in three stages, `deps`, `builder` and `runner`, on `node:24-trixie-slim`. The runner:
+**Image.** `portal/Dockerfile` builds from a shared `base` stage on `node:24-trixie-slim`, through three further stages: `deps`, `builder` and `runner`. The runner:
 
 - runs as the non-root `node` user,
 - contains the standalone server, static assets, `public/`, `drizzle/` and `content/`,
@@ -485,6 +489,7 @@ These are open in the code at this commit. Most are also tracked in [`docs/build
 - **Voice simulations.** Voice campaigns record recipients but place no calls. No telephony adapter exists.
 - **SAML and LDAP.** Settings are stored, but there is no SAML exchange and no directory synchronisation.
 - **SSO account matching.** SSO accounts are matched by email only. The provider's `sub` is not bound to the account.
+- **SSO domain proof.** The SSO callback creates new learners for the saved domain without re-checking that the domain proof is still valid.
 - **Lesson completion.** The server does not verify that a learner passed through every scene before marking a lesson complete.
 - **Threat intelligence.** There is no feed ingestion; items are created by the seed.
 - **PDF reports.** PDFs come from the browser's print dialog; there is no server-side PDF. Scheduled report emails carry a sign-in link to the CSV or XLSX download, not an attachment.
