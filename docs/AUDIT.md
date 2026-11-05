@@ -37,12 +37,12 @@ Severity scale used throughout: **Critical** (blocks a sale, a deployment or a f
 | Outdated packages | `npm outdated` | 15 behind latest; notable: `@anthropic-ai/sdk` 0.135 → 1.5 (major), `next` 16.4.3 → 16.4.5 (patch) |
 | Production build | `npm run build` | See section 2.3 |
 | Docker image | `docker build` | **Not executed** (no Docker daemon in the audit environment) |
-| Browser / end-to-end | — | **Not executed**; no end-to-end suite exists in the repository (see finding T-01) |
+| Browser / end-to-end | — | **Not executed**; no end-to-end suite exists in the repository (see finding T-02) |
 | Live integrations (SMTP, SMS, OIDC provider, Anthropic, ElevenLabs) | — | **Not executed**; none of these has ever been exercised against a real provider by the team either (`docs/build/PROGRESS.md`, "Hələ yoxlanılmayıb") |
 
 ### 2.3 Build
 
-The production build result is recorded in section 9 (finding B-01) once the background build finishes; the build needs outbound access to Google Fonts (`next/font/google` in `portal/src/app/layout.tsx:3`), which is itself a supply-chain and air-gap consideration for on-premise customers.
+`npm run build` (`next build --webpack`) **passes with no warnings**: 67 routes, all dynamic except the ten pre-rendered Open Graph images; the `postbuild` guard confirms no pre-rendered file embeds the build-time fallback URL. Standalone output is 139 MB plus 5.8 MB of static assets. The build needs outbound access to Google Fonts ([`layout.tsx:3`](../portal/src/app/layout.tsx#L3)), which matters for air-gapped on-premise customers (finding D-08).
 
 ### 2.4 Independent review passes
 
@@ -138,3 +138,292 @@ Strict CSP with nonces and `strict-dynamic`, HSTS, frame denial, Permissions-Pol
 ### 4.6 Build provenance
 
 The whole codebase (~56k lines, 106 lessons × 10 languages, 33 ADRs) was produced between 2026-10-19 and 2026-11-04 by one founder orchestrating AI coding agents (the agent workflow scripts are committed in `docs/build/workflows/`, the resume notes in `docs/build/RESUME.md` and `OVERNIGHT-STATE.md`). Code quality is unusually consistent for that pace, but the team, process and institutional knowledge behind it are a single person plus tooling (see finding O-01).
+
+---
+
+## 5. Strengths (what an investor is buying)
+
+The findings in section 6 should be read against an unusually strong base for a pre-revenue, single-founder product:
+
+1. **Feature completeness.** Learner app, admin console, security-operations layer, operator console and public site are all implemented end to end, not mocked; 67 pages, 126 Server Actions and a minute-tick job runner cover the full lifecycle from invitation to certificate.
+2. **Disciplined authorisation.** An independent review of all 18 action files, 7 query modules, 12 services, 15 route handlers and 52 admin/learner pages found **no cross-tenant read or write and no role escalation**. Tenant predicates sit in the `WHERE` clause of essentially every id-keyed query; department-head scoping is applied on every surface including CSV/XLSX/PDF exports.
+3. **Security engineering above seed-stage norms** (section 4.5): strict nonce CSP, Argon2id, hashed sessions with absolute lifetime, mandatory admin 2FA by default, atomic lockouts, DB-backed rate limits, SSRF guard with DNS pinning on every tenant-configured destination, encrypted secrets, signed webhooks, CSV-formula and ReDoS hardening, outbox redaction of one-time links, anonymising deletion.
+4. **Code hygiene.** TypeScript strict with 0 errors, ESLint with 0 warnings, Zod validation on every structured input, 0 `console.log` in application code, explanatory comments on almost every non-obvious decision, 33 written architecture decision records.
+5. **Server-trusted where it was designed to be.** Practice labs keep their answer keys on the server and replay the learner's event log through the lab's own state machine (`portal/src/server/lab/games.ts`, `vm-action.ts`); this is the right model and shows the team knows how to keep trust server-side.
+6. **Internationalisation as a moat.** Ten languages including right-to-left Arabic, enforced by tests (key parity, ICU placeholders, logical CSS, in-code text tables); 1,060 validated lesson files; no untranslated UI string was found in JSX.
+7. **Accessibility foundations.** Native `<dialog>` primitives, roving-tabindex answer groups, keyboard alternatives to every drag gesture, switchable letter shortcuts (WCAG 2.1.4), 44 px touch targets enforced by a test, Full/Calm/Still motion modes that honour OS reduced-motion.
+8. **Deployable artefact.** A clean production build, a hardened multi-stage Docker image (non-root, healthcheck, no capabilities), migrations in the entrypoint, an advisory-locked job runner safe for several replicas, and fail-fast environment validation.
+9. **AI used with guard rails.** PII-free tutor context, prompt caching, per-user/day/tenant cost caps, offline fallbacks, and a three-step verification (schema, safety rules, AI review) before any AI-written training reaches a human approver.
+10. **Clear product vision beyond compliance training**: the closed loop from reported threat to incident to targeted training to closed behaviour risk is a credible "human risk management" positioning.
+
+---
+
+## 6. Findings by area
+
+Each finding gives its ID, severity, the files where it was observed, the evidence, the impact and the recommendation. The consolidated register is in section 7. IDs are referenced from [`ROADMAP.md`](ROADMAP.md).
+
+### 6.1 Security
+
+#### S-01 · High · Training evidence and risk inputs are asserted by the browser
+- **Where:** [`learning.ts` L91–L148](../portal/src/server/actions/learning.ts#L91-L148) (`completeLessonAction`), [`progress.ts` L53–L148 and L207–L228](../portal/src/server/services/progress.ts#L53-L148) (`completeLesson`, `attestModule`), caller [`player.tsx` L255](../portal/src/components/player/player.tsx#L255), risk inputs [`risk.ts` L55–L71](../portal/src/server/services/risk.ts#L55-L71).
+- **Evidence:** the server receives `answers[]` whose `correct`, `firstTry` and `outcome` are set by the browser, plus a client-supplied `seconds` (0 is accepted). It checks only that the module and lesson exist, then awards first-time XP, advances the module to `awaiting_attestation` at 100 % and, on `attestModuleAction`, stores the attestation ("I went through this module myself…"), issues a certificate with a public verification link and closes the learner's open behaviour risks, including phishing-click risks. The "furthest scene reached" gate lives only in `sessionStorage` (ADR-030). Nine scene types report `firstTry: true` unconditionally ([`scenes.tsx` L447, L670, L1001, …](../portal/src/components/player/scenes.tsx#L447)). The team has recorded the gap (`docs/build/OPEN-QUESTIONS.md` item 25).
+- **Impact:** any employee can generate compliance evidence and clear their own risk flags from the browser console in seconds, and lower their personal risk score with all-correct answers. Client-reported completion is common in SCORM-based LMSs, but this product sells evidence and risk scoring to regulated buyers, whose security reviews will ask exactly this question.
+- **Recommendation:** follow the labs model: open a server-side attempt when a lesson starts, record scene progress server-side, score answers on the server from `lesson_contents`, enforce a minimum dwell time, and mark evidence produced before the fix as "self-reported" in compliance exports.
+
+#### S-02 · Medium · SSO accounts are linked by email address only
+- **Where:** [`sso/callback/[tenant]/route.ts` L75–L104](../portal/src/app/api/sso/callback/%5Btenant%5D/route.ts#L75-L104).
+- **Evidence:** the user is found by `users.email`; the identity provider's `iss`/`sub` pair is never stored or compared. When an administrator names a custom `emailClaim`, the `email_verified` check is skipped by design.
+- **Impact:** an identity provider that lets users change the mapped claim, or a mail alias reassigned to someone else, lets that person sign in as another learner of the same organisation (privileged roles and other organisations are refused). Acknowledged in ADR-033 "open items".
+- **Recommendation:** bind `iss`+`sub` at first SSO sign-in and require it afterwards; treat a changed email as a relinking event an administrator approves; allow only claims the IdP marks as verified.
+
+#### S-03 · Medium · Tenant isolation has a single layer
+- **Where:** [`schema.ts`](../portal/src/server/db/schema.ts) (51 tables, `tenant_id` on every tenant-owned table), [`0000_init.sql`](../portal/drizzle/0000_init.sql) (0 row-level-security policies).
+- **Evidence:** isolation is enforced by application predicates only. The review found them correct everywhere today (section 5, item 2), but there is no automated cross-tenant test and no database-level backstop.
+- **Impact:** one missed predicate in a future change becomes a cross-customer data breach; banks and agencies commonly ask for defence in depth here.
+- **Recommendation:** PostgreSQL RLS with a per-transaction `app.tenant_id`, or at minimum a generated test suite that calls every action and route with another tenant's ids.
+
+#### S-04 · High · Demo seed publishes a shared password, including for the platform operator
+- **Where:** [`seed.ts` L56](../portal/scripts/seed.ts#L56), [L109–L117](../portal/scripts/seed.ts#L109-L117), [L127](../portal/scripts/seed.ts#L127); [`.env.example`](../portal/.env.example); [`docker-compose.yml`](../portal/docker-compose.yml) `seed` service; `README.md` demo-account table.
+- **Evidence:** every seeded account, including `operator@cyclowareness.com` with role `super_admin`, gets `Portal-Demo-2026!`, which is printed in `.env.example` and the README. The demo tenant switches mandatory admin 2FA off. The operator role always requires 2FA, but because the seeded operator has none yet, whoever knows the password is sent to enrol their own authenticator ([`profile.ts` L24–L34](../portal/src/server/actions/profile.ts#L24-L34) needs only the password).
+- **Impact:** any seeded instance reachable from the internet (demo, sales or presentation copies; `CLAUDE.md` mentions one on port 3100) can be taken over at platform-operator level: every tenant, plan switches and admin reset links. The seed also truncates every table when `ALLOW_SEED=1`, which the compose service sets unconditionally.
+- **Recommendation:** generate a random seed password and print it once; never seed a `super_admin`; refuse to seed when `NODE_ENV=production`; add a non-empty-database check before truncating.
+
+#### S-05 · Medium · 11 MB request bodies are accepted by every Server Action
+- **Where:** [`next.config.ts` L37](../portal/next.config.ts#L37).
+- **Evidence:** the limit exists for the sandbox file upload but applies globally, including to unauthenticated actions (sign-in, password reset, demo form). Acknowledged in ADR-033 and `OPEN-QUESTIONS.md` item 23.
+- **Impact:** cheap memory-pressure amplification against the public sign-in and landing pages.
+- **Recommendation:** 1 MB default; move the sandbox upload to a dedicated route handler with a streaming cap (the pattern already exists in [`request-body.ts`](../portal/src/server/request-body.ts)).
+
+#### S-06 · Medium · Account-takeover tooling without step-up authentication
+- **Where:** [`people.ts` L183–L191 and L239–L250](../portal/src/server/actions/people.ts#L183-L250) (`createLinkAction`, `resetTwoFactorAction`); [`platform.ts` L136–L147](../portal/src/server/actions/platform.ts#L136-L147) (`adminLinkAction`).
+- **Evidence:** a tenant administrator can clear a fellow administrator's authenticator and mint a one-hour password-reset link for them; the platform operator can mint a reset link for any administrator of any organisation. Both are audited, neither needs re-authentication, a second approver or prior notice to the target.
+- **Impact:** insider and session-hijack risk; enterprise buyers expect "break-glass" governance for support access.
+- **Recommendation:** step-up (password + TOTP) on these actions, notify the target and the other administrators, require a second administrator for peer administrators, and replace the operator link with a consented, time-boxed support-access grant.
+
+#### S-07 · Medium · One application secret, no key versioning or rotation
+- **Where:** [`crypto.ts` L8–L17](../portal/src/server/crypto.ts#L8-L17), [`domain-proof.ts` L22–L24](../portal/src/server/auth/domain-proof.ts#L22-L24), [`totp.ts` L42–L44](../portal/src/server/auth/totp.ts#L42-L44).
+- **Evidence:** `APP_SECRET` derives the AES-GCM key for every stored secret (SMTP, SSO, LDAP, webhook, TOTP), the backup-code HMAC and each tenant's DNS proof value. Ciphertexts carry a `v1` prefix but no key id.
+- **Impact:** a leaked secret cannot be rotated without re-entering every integration secret, re-enrolling every authenticator and re-publishing every customer's DNS TXT record (proofs lapse after 7 days); losing it is a data-loss event (README "APP_SECRET is data").
+- **Recommendation:** envelope encryption with a key id per ciphertext and a key ring (or a KMS); derive domain-proof values from a separate, stable key.
+
+#### S-08 · Low · Cross-tenant account-existence oracle for tenant administrators
+- **Where:** [`people.ts` L70–L122 and L475–L545](../portal/src/server/actions/people.ts#L475-L545).
+- **Evidence:** addresses and phone numbers are unique across the platform, and the CSV import's "check" mode reports `exists`/`phoneTaken` per row for up to 5,000 rows, writes nothing and is not rate limited.
+- **Impact:** a tenant administrator can learn which addresses hold accounts at other customers.
+- **Recommendation:** rate-limit previews and report addresses outside the tenant with a generic reason.
+
+#### S-09 · Low · TOTP codes can be replayed inside their validity window
+- **Where:** [`totp.ts` L21–L25](../portal/src/server/auth/totp.ts#L21-L25).
+- **Evidence:** the last accepted time step is not stored, so an observed code works again for up to about 90 seconds (the 5-guess lockout still applies).
+- **Recommendation:** store the last used step per user and reject reuse.
+
+#### S-10 · Low · AI tutor answers are cached across organisations by question text
+- **Where:** [`api/tutor/route.ts` L64–L70 and L116–L121](../portal/src/app/api/tutor/route.ts#L64-L121).
+- **Evidence:** the cache key is locale + lesson + scene + normalised question, without the tenant; library lessons are shared, so an answer produced for one organisation is served to all.
+- **Impact:** a prompt-injected or embarrassing answer obtained once is replayed to anyone asking the identical question, in every organisation.
+- **Recommendation:** scope the cache per tenant or moderate answers before caching; add an operator purge view.
+
+#### S-11 · Low · Smaller hardening items
+- Inline styles are allowed by the CSP ([`proxy.ts` L48](../portal/src/proxy.ts#L48)); scripts are correctly locked down.
+- `tenants.domain` has no uniqueness constraint and sign-in routing picks the first verified tenant ([`schema.ts` L135](../portal/src/server/db/schema.ts#L135), [`auth.ts` L210–L236](../portal/src/server/actions/auth.ts#L210-L236)).
+- `startLessonAction` stores an unvalidated, unbounded `lessonKey` ([`learning.ts` L84–L89](../portal/src/server/actions/learning.ts#L84-L89)).
+- The policy sign-off CSV, which includes every employee's sign-off IP address, is available to the `content_creator` role ([`signoffs/route.ts`](../portal/src/app/api/admin/policies/%5Bid%5D/signoffs/route.ts)).
+- `npm audit`: 8 moderate advisories, all in development-only lint tooling (`minimatch` through `typescript-eslint`).
+
+### 6.2 Code quality
+
+#### Q-01 · Medium · Oversized modules in the product core, without component tests
+- **Where:** [`scenes.tsx`](../portal/src/components/player/scenes.tsx) (1,685 lines: 11 scene components, 44 `useState`, 21 `useEffect`, 17 `react-hooks/exhaustive-deps` suppressions; `SimulationScene` alone is ~350 lines across five simulated environments), [`player.tsx`](../portal/src/components/player/player.tsx) (698 lines, 21 `useState`, a `SceneEnv` object rebuilt on every render, which is why scenes suppress effect dependencies), [`settings-tabs.tsx`](../portal/src/components/admin/settings-tabs.tsx) (1,761 lines: ten settings tabs, validation feedback applied by querying the DOM, an `as never` cast on templates), [`templates.ts`](../portal/src/lib/campaigns/templates.ts) (1,062 lines of ten-language phishing templates in TypeScript, bundled into the client-side campaign wizard).
+- **Impact:** the lesson player is the product; stale-closure effects plus zero component tests mean behaviour changes there are the riskiest edits in the codebase.
+- **Recommendation:** split one file per scene and per settings tab, pass a memoised scene context, move campaign templates to content JSON, and add component tests (Testing Library) for every scene type before refactoring.
+
+#### Q-02 · Medium · 3,182-line vendored mascot engine outside lint and type checking
+- **Where:** [`cat/engine.js`](../portal/src/components/mascot/cat/engine.js), excluded at [`eslint.config.mjs` L17](../portal/eslint.config.mjs#L17), typed only at its surface by `engine.d.ts`; statically imported by `cat-mascot.tsx`, so it ships on the public landing page and the sign-in page.
+- **Evidence:** the file header says it is now the single source of the cat, while the ESLint comment says design changes must be re-ported from `design/mascot-cat/source/`, which still holds a 136 KB fork.
+- **Impact:** single-author animation code with contradictory maintenance rules, on every first page load; regressions are visible only by eye.
+- **Recommendation:** pick one source of truth, convert it to TypeScript incrementally, lazy-load it with `next/dynamic`, and add visual regression snapshots.
+
+#### Q-03 · Medium · Inconsistent error handling and non-transactional multi-step writes
+- **Where:** client: [`settings-tabs.tsx` L95–L113](../portal/src/components/admin/settings-tabs.tsx#L95-L113), [`people-client.tsx` L161–L181](../portal/src/components/admin/people-client.tsx#L161-L181), [`studio.tsx` L72–L76](../portal/src/components/secops/studio.tsx#L72-L76); only one error boundary ([`app/error.tsx`](../portal/src/app/error.tsx)). Server: [`campaigns.ts` L71–L107](../portal/src/server/services/campaigns.ts#L71-L107) (`launchCampaign`), [`progress.ts` L207–L228](../portal/src/server/services/progress.ts#L207-L228) (`attestModule`), [`workspace.ts` L184–L260](../portal/src/server/actions/workspace.ts#L184-L260) (`createAssignmentAction`); [`schema.ts` L476–L503](../portal/src/server/db/schema.ts#L476-L503).
+- **Evidence:** two form patterns coexist (`useActionState` in 11 files, `useTransition` + direct call in 36) with about 15 different result shapes; only 4 client files catch a rejected action, so bulk actions and settings saves fail silently on a network or server error; a render error anywhere replaces everything below the root layout. On the server only 10 call sites use transactions: a campaign is set to `running` before its recipients are inserted one by one, and an attestation, the module status and the certificate are three separate writes; `attestations` and `certificates` have no unique key per user and module, so two concurrent attest calls can issue two certificates.
+- **Impact:** partial states after failures (a running campaign with half its recipients and no way to relaunch), duplicate evidence, and silent failures for administrators.
+- **Recommendation:** one `ActionResult` type and a shared client helper with toast + retry; segment-level `error.tsx` files; wrap multi-step writes in transactions; add unique indexes on `(user_id, module_id)` for attestations and module certificates.
+
+#### Q-04 · Medium · Lesson format is unversioned and loosely validated at the edges
+- **Where:** [`types.ts` L86–L87](../portal/src/lib/content/types.ts#L86-L87), [`validate.ts`](../portal/src/lib/content/validate.ts), [`scenes.tsx` L377](../portal/src/components/player/scenes.tsx#L377), reads cast without validation at [`api/tutor/route.ts` L62](../portal/src/app/api/tutor/route.ts#L62) and [`api/subtitles/route.ts` L62](../portal/src/app/api/subtitles/route.ts#L62).
+- **Evidence:** no schema version anywhere in the content files; 8 of 11 scene schemas use `.passthrough()`; tutor `checkpoint` and `stage` are typed `unknown`, are not validated, and are cast and dereferenced by the player (11 English lessons use checkpoints); stored `lesson_contents.scenes` are cast to `Scene[]` on read.
+- **Impact:** a malformed checkpoint passes tests, the import and the AI schema check, then crashes the player for every learner of that lesson; a future format change cannot be detected or migrated per file.
+- **Recommendation:** add `formatVersion` to every lesson, validate checkpoints and remove `passthrough`, validate on read for studio and AI content.
+
+#### Q-05 · Low · Smaller code-quality items
+- Product texts in ten languages live in TypeScript maps across many modules (campaign templates, lab games, refresher and blocked-campaign notices in [`jobs.ts` L571](../portal/src/server/jobs.ts#L571) and [`campaigns.ts` L176–L199](../portal/src/server/services/campaigns.ts#L176-L199), tutor language styles), so adding an eleventh language touches code in many places (a test enforces completeness).
+- 38 ESLint suppressions (23 `exhaustive-deps`, 15 `no-img-element`), 11 `as unknown as` and 8 `as never` casts.
+- A test-only branch in production code: rate limits use process memory under Vitest ([`rate-limit.ts` L40–L56](../portal/src/server/rate-limit.ts#L40-L56)).
+- Two known shortcuts are marked in code: SMTP connects to the first vetted address only ([`mail.ts` L122](../portal/src/server/mail.ts#L122)), and AI subtitles can be generated twice across replicas ([`subtitles.ts` L212](../portal/src/server/subtitles.ts#L212)).
+
+### 6.3 Technical debt, scalability and performance
+
+#### D-01 · High · The migration history is regenerated from scratch
+- **Where:** [`drizzle/`](../portal/drizzle) (one migration), README "Until the first release there is one migration", ADR-019.
+- **Evidence:** every schema change so far deleted and regenerated `0000_init.sql` and required `db:reset`. The container entrypoint applies migrations on every start ([`docker-entrypoint.sh`](../portal/scripts/docker-entrypoint.sh)); a regenerated init carries a newer timestamp, so on an existing database it would be re-applied, fail on existing tables and leave the container in a restart loop. Migrations have never been applied to a real PostgreSQL in tests (only PGlite).
+- **Impact:** harmless today, a production outage the first time the habit continues after a customer goes live.
+- **Recommendation:** freeze `0000_init.sql` now; additive migrations only; CI applies all migrations to PostgreSQL 16 and runs the smoke tests on top.
+
+#### D-02 · High · Every organisation runs on Baku time
+- **Where:** 22 files, e.g. [`time.ts`](../portal/src/lib/time.ts), [`baku-clock.ts`](../portal/src/lib/baku-clock.ts), [`gamification.ts` L28](../portal/src/lib/domain/gamification.ts#L28), [`jobs.ts` L42](../portal/src/server/jobs.ts#L42), [`xlsx.ts` L30–L33](../portal/src/server/reports/xlsx.ts#L30-L33), [`i18n/request.ts`](../portal/src/i18n/request.ts); ADR-021.
+- **Evidence:** due dates end at `23:59:59+04:00`, streak and daily-XP days, scheduled reports (08:00 Baku), CSV and XLSX times, certificate years and the interface's `timeZone` are all fixed to UTC+4 without daylight saving.
+- **Impact:** for the stated target markets (Saudi Arabia UTC+3; Germany, France, Romania, Ukraine with daylight saving) due dates, reminders, streaks and reports are off by one to three hours and cross day boundaries.
+- **Recommendation:** an IANA `timeZone` in tenant settings (default `Asia/Baku`), routed through the existing helpers.
+
+#### D-03 · Medium · Background work and risk recomputation will not scale linearly
+- **Where:** [`jobs.ts` L44–L70](../portal/src/server/jobs.ts#L44-L70), [`risk.ts` L117–L124](../portal/src/server/services/risk.ts#L117-L124), [`workspace.ts` L274 and L285](../portal/src/server/actions/workspace.ts#L274), [`campaigns.ts` L71–L107](../portal/src/server/services/campaigns.ts#L71-L107).
+- **Evidence:** every 60 seconds, for every tenant and in one serial tick, reminders, manager alerts and refreshers each resolve the tenant's full assignment graph. `recomputeRisk` issues one `UPDATE` per person; changing or removing an assignment recomputes the whole tenant inside the administrator's request; a campaign launch inserts two rows per recipient sequentially inside the request. No load test exists.
+- **Impact:** fine for the 35-person demo; request timeouts and overrunning ticks are likely at tens of thousands of learners or a few dozen tenants.
+- **Recommendation:** run per-tenant work hourly/daily with a `job_runs` ledger, batch risk updates in one statement, move launches and whole-tenant recomputes to the job queue, and load-test with k6 at 10 tenants × 5,000 users.
+
+#### D-04 · Medium · Avoidable page weight
+- **Where:** [`layout.tsx` L50](../portal/src/app/layout.tsx#L50) with [`i18n/messages.ts` L26–L33](../portal/src/i18n/messages.ts#L26-L33); `cat-mascot.tsx` (static import of the engine); [`profile.ts` L78–L87](../portal/src/server/actions/profile.ts#L78-L87) with [`people-client.tsx` L238](../portal/src/components/admin/people-client.tsx#L238).
+- **Evidence:** `NextIntlClientProvider` has no `messages` prop, so next-intl serialises all nine namespaces (162 KB for English, 338 KB for Georgian) into every full page load, including admin and SecOps strings on the sign-in page; the 234 KB mascot engine is bundled on every surface; profile photos are stored as base64 data URLs of up to 300 KB in the `users` row, loaded with every session lookup and inlined for every person on the People page.
+- **Recommendation:** pass per-route namespaces (the pattern already exists in `teachable-locale.tsx`), lazy-load the mascot, move avatars to object storage or the existing `assets` table with cached URLs.
+
+#### D-05 · Medium · One email address can belong to only one organisation
+- **Where:** [`schema.ts` L198](../portal/src/server/db/schema.ts#L198) (`users_email_idx` on `email` alone), [`people.ts` L121–L122](../portal/src/server/actions/people.ts#L121-L122).
+- **Impact:** no consultants, group-company staff or managed-service partners across tenants; a tenant can squat addresses of a company that has not yet proven its domain; blocks a reseller/MSSP channel, which the pricing model counts on (25 % partner share).
+- **Recommendation:** separate global identities from tenant memberships before the first partner deal.
+
+#### D-06 · Medium · The content library is imported at every start and a single bad file stops the server
+- **Where:** [`bootstrap.ts` L90–L112](../portal/src/server/bootstrap.ts#L90-L112), [`library.ts` L67–L101](../portal/src/server/services/library.ts#L67-L101), [`instrumentation.ts` L21–L28](../portal/src/instrumentation.ts#L21-L28).
+- **Evidence:** 1,060 lesson files are read, validated and upserted in one advisory-locked transaction on each production start; any schema, integrity or parity error exits the process. Content changes require a new image.
+- **Impact:** safe for data (atomic), but a typo in one translation becomes a crash loop at deploy, and start-up time grows with the library.
+- **Recommendation:** validate content in CI (it already can), import only when a content hash changes, and skip-and-alert on a single bad lesson instead of exiting.
+
+#### D-07 · Low · Dependency currency
+- 15 packages behind their latest release, including `@anthropic-ai/sdk` 0.135 → 1.5 (major) and `next` 16.4.3 → 16.4.5; no Renovate or Dependabot; no `engines` field or `.nvmrc` (README says Node 22+, the Docker image uses Node 24).
+
+#### D-08 · Low · Development-environment coupling
+- [`.claude/launch.json`](../.claude/launch.json) and the agent workflow scripts in [`docs/build/workflows`](build/workflows) contain absolute Windows paths of the founder's machine; webpack is forced because Turbopack crashed on that machine (ADR-003); the build downloads Google Fonts, which fails in air-gapped on-premise builds.
+
+#### D-09 · Low · Dead weight in the repository and image
+- [`public/rive`](../portal/public/rive) ships 4.1 MB (two wasm runtimes and `mascot.riv`) for the inactive Rive mascot, plus the `@rive-app/react-canvas` dependency; `design/` holds about 10 MB of PNG sheets; [`public/fonts/DejaVuSans.ttf`](../portal/public/fonts) (740 KB) serves only the Open Graph route.
+
+#### D-10 · Low · Platform-wide lookups per request
+- All modules and lessons of every tenant are read as lookup maps on the admin overview and catalogue ([`queries/admin.ts` L111–L115](../portal/src/server/queries/admin.ts#L111-L115), [`queries/catalog.ts`](../portal/src/server/queries/catalog.ts)); correct today because only tenant-derived ids are looked up, but O(platform) per request and one refactor away from a leak.
+
+### 6.4 Testing and delivery
+
+#### T-01 · High · No continuous integration
+- **Evidence:** no `.github/workflows`, GitLab, Jenkins, CircleCI or pre-commit configuration exists; the [`Dockerfile`](../portal/Dockerfile) builds without running tests; checks run only when someone runs them by hand. Eight commits of 7k–387k inserted lines each mean the history cannot be reviewed commit by commit either.
+- **Impact:** nothing prevents a broken build, a failing test or a broken migration from reaching an image.
+- **Recommendation:** GitHub Actions on every pull request (section 1.2 of the roadmap), branch protection and required checks.
+
+#### T-02 · High · No integration or end-to-end tests of the running application
+- **Evidence:** the suite is unit-level: of 2,697 tests, about 1,760 (65 %) are generated translation and content-parity checks; 89 run against an in-memory PGlite with the real migration; 45 exercise Server Actions through hand-written database fakes; none starts the app, drives a browser, or uses node-postgres against PostgreSQL. Untested paths include the SSO start and callback routes, the job runner (`runJobs`, webhook delivery, scheduled launches), 13 of 16 route handlers, every page and every admin client component. The "browser verification in ten languages" in `docs/build/PROGRESS.md` was performed by one-off agent sessions on the founder's machine and is not reproducible from the repository.
+- **Impact:** regressions in the flows customers pay for are found by customers.
+- **Recommendation:** integration tests on real PostgreSQL (testcontainers) for the critical flows and a Playwright smoke suite, both in CI.
+
+#### T-03 · Medium · The headline test count overstates behavioural coverage
+- **Where:** [`tests/content-locales.test.ts`](../portal/tests/content-locales.test.ts), [`tests/in-code-locales.test.ts`](../portal/tests/in-code-locales.test.ts), [`tests/auth-actions-session.test.ts`](../portal/tests/auth-actions-session.test.ts), [`tests/demo-action.test.ts`](../portal/tests/demo-action.test.ts).
+- **Evidence:** 834 `it`/`test` declarations expand to 2,697 cases through loops; there is no coverage measurement; some fakes depend on the exact order of queries; one demo-form test passes while the action throws internally; a missing translation file does not fail Vitest (only the manual checker reports coverage). The behavioural tests that do exist are precise and well targeted at concurrency, lockouts, SSRF and ReDoS.
+- **Recommendation:** report behavioural and content tests separately, add coverage reporting with a floor, and replace order-coupled fakes with PGlite-backed tests.
+
+### 6.5 Missing components and product readiness
+
+#### M-01 · High · Never exercised against real providers or a real deployment
+- **Evidence:** by the team's own record ([`PROGRESS.md` L61](build/PROGRESS.md)) the product has not sent real email, SMS or calls, has not signed anyone in through a real identity provider, has not called the Anthropic API for the tutor, subtitles or studio, has not generated narration, and the Docker image has not been built. There is no staging or production environment and no customer.
+- **Impact:** the core simulation channel (email) and enterprise sign-in are unproven in practice; deliverability, provider quirks and operational issues are all still ahead.
+- **Recommendation:** a staging environment with real SMTP, one SMS gateway, Entra ID and Keycloak, and the Anthropic key, before the first pilot.
+
+#### M-02 · High · Plans include features that are not built, and some settings do nothing
+- **Where:** [`tenant-defaults.ts` L286–L291](../portal/src/lib/tenant-defaults.ts#L286-L291), [`settings.ts` L178–L214](../portal/src/server/actions/settings.ts#L178-L214), [`campaigns.ts` L43 and L89–L104](../portal/src/server/services/campaigns.ts#L89-L104), [`sso/start/route.ts` L17](../portal/src/app/api/sso/start/route.ts#L17), [`sms.ts`](../portal/src/server/sms.ts).
+- **Evidence:** the Professional plan lists `sso`, `ldap` and `sms_voice`. Only OpenID Connect is implemented: SAML fields are stored but no SAML flow exists; LDAP settings (including a bind password and certificate pin) are saved but no LDAP client exists; voice campaigns have no telephony code, and once `VOICE_PROVIDER` is set to any value they record every recipient as "sent" without placing a call; SMS supports only a generic webhook; the "Android screen block" protection setting has no Android app to act on. There is no SCIM.
+- **Impact:** a customer buying Professional for directory sync or voice phishing gets settings screens and delivery records for features that do not exist; this is a misrepresentation and refund risk.
+- **Recommendation:** hide unbuilt options and remove them from plan descriptions until implemented; make voice campaigns refuse to launch without a real adapter.
+
+#### M-03 · High · Seven of ten languages, including the legal texts, have not been reviewed by people
+- **Evidence:** the interface, 742 lesson files and the legal texts in tr, ro, ka, uk, de, fr and ar were translated and edited by AI agents; native review and legal review are open (`OPEN-QUESTIONS.md` items 7, 8 and 22).
+- **Impact:** errors in a new market undermine a product whose credibility rests on precise security guidance; legal texts in an unreviewed translation may not be enforceable.
+- **Recommendation:** launch with az, en and ru; add each further language only after native and legal review.
+
+#### M-04 · Medium · Natural-voice narration has not been generated
+- **Evidence:** the ElevenLabs pipeline exists but no clips or manifests are in the repository (ADR-028, about USD 321 for all ten languages); without them lessons rely on the browser's voice, and Chrome on Windows has no Azerbaijani voice, so the home-market language is silent there.
+- **Recommendation:** generate az, en and ru after native voice selection; document the pre-build step in CI.
+
+#### M-05 · Medium · No billing, seat metering or self-serve trial
+- **Evidence:** plans and overrides are set by hand in the operator console; nothing counts seats, invoices, takes payment or expires a trial.
+- **Recommendation:** seat counting per tenant first (needed for invoicing pilots), payment provider for the self-serve Essentials plan later.
+
+#### M-06 · Medium · No "Report phishing" button in the mail client
+- **Evidence:** reporting is 40 % of the league score and the entry point of the SecOps loop, but learners must type a report into a web form; the original product had an `outlook_addin` flag (`docs/audit/00-overview.md`). Reports of simulations are matched only when the learner pastes the tracking link.
+- **Recommendation:** an Outlook/Gmail add-in, or a per-tenant inbound address that files a report and matches the simulation token from the forwarded message.
+
+#### M-07 · Medium · No interoperability with customers' existing systems
+- **Evidence:** no SCORM/xAPI export for LMSs (`OPEN-QUESTIONS.md` item 11), no SCIM provisioning, no LDAP sync (M-02), no public REST API; integrations are outbound only (webhooks and syslog).
+- **Recommendation:** SCIM 2.0 and a read-only reporting API first; SCORM/xAPI on demand from pilots.
+
+#### M-08 · Medium · No product analytics or usage telemetry
+- **Evidence:** nothing measures activation, weekly active learners, lesson drop-off or campaign funnels across tenants.
+- **Impact:** pilots will not produce investor-grade evidence of engagement or outcome.
+- **Recommendation:** self-hosted, privacy-respecting analytics (PostHog or Plausible) plus an operator metrics page.
+
+#### M-09 · Medium · Simulation accuracy and deliverability
+- **Where:** [`tracking.ts` L12–L18](../portal/src/server/tracking.ts#L12-L18), [`campaigns.ts` L128–L157](../portal/src/server/services/campaigns.ts#L128-L157), `OPEN-QUESTIONS.md` item 18.
+- **Evidence:** a click is recorded on a plain GET of `/t/{token}` and mail-security scanners are recognised only by user-agent keywords; a scanner that detonates links with a browser user agent creates a "phishing click" risk against an innocent employee. Simulations are sent from the organisation's own proven domain with only the display name changed; there are no look-alike sending domains, SPF/DKIM guidance or allow-listing instructions for Microsoft 365 and Google Workspace.
+- **Impact:** false positives in the risk score and simulations that are either blocked or unrealistic.
+- **Recommendation:** require a human interaction (JavaScript beacon or a second request) before counting a click; dedicated simulation domains with documented allow-listing.
+
+#### M-10 · Medium · Customers can author only a minimal lesson type
+- **Where:** [`secops.ts` L486–L510](../portal/src/server/actions/secops.ts#L486-L510).
+- **Evidence:** Studio lessons are a fixed four-scene template (intro, tutor, one single-answer question, recap) in one language, without narration or edit history; the interactive scene types that differentiate the product (simulation, hotspot, swipe, scenario) are available only to the AI trainer and to library lessons shipped in the image.
+- **Recommendation:** a structured editor for at least choice, swipe and hotspot scenes, with translation and versioning.
+
+#### M-11 · Low · Smaller product gaps
+- PDFs come from the browser's print dialog; scheduled reports email a link, not an attachment (ADR-006).
+- The "sandbox" is static heuristics without detonation (ADR-009); the name may over-promise to security buyers.
+- No native mobile app (PWA only; `OPEN-QUESTIONS.md` item 17).
+- The operator console has no landing-page CMS (`OPEN-QUESTIONS.md` item 19).
+
+### 6.6 Operations, organisation, legal and intellectual property
+
+#### O-01 · High · Key-person risk and an AI-generated codebase without human review
+- **Evidence:** one author in the Git history; about 56,000 lines of application code, 1,060 lesson files and 33 ADRs were produced in 17 days by AI agents orchestrated by the founder (scripts in [`docs/build/workflows`](build/workflows), state in [`RESUME.md`](build/RESUME.md) and [`OVERNIGHT-STATE.md`](build/workflows/OVERNIGHT-STATE.md)); code review was done by further AI reviewers (`OPEN-QUESTIONS.md` item 24). Much of the working knowledge sits in a Claude Code skill (`.claude/skills/cyclowareness-experience`).
+- **Impact:** the quality is real, but no second human has read most of the code; onboarding, accountability for security decisions and continuity all depend on one person and their tooling.
+- **Recommendation:** hire or contract a senior engineer to own review and operations; adopt pull requests with mandatory human review from now on.
+
+#### O-02 · Medium · Engineering documentation is mostly in Azerbaijani
+- **Evidence:** `PLAN.md`, `PROGRESS.md`, `DECISIONS.md` (33 ADRs), `OPEN-QUESTIONS.md`, `RESUME.md`, the original-product spec in `docs/audit` and half of the portal README's opening are in Azerbaijani; the root [`README.md`](../README.md) is a single title line.
+- **Impact:** slows international hiring, external auditors and investors' technical advisers.
+- **Recommendation:** English summaries of the ADRs and an English architecture overview (this audit's section 4 can seed it).
+
+#### O-03 · High · No observability
+- **Evidence:** logging is unstructured `console.*` with no request or tenant id; no error tracking, metrics, tracing or alerting; [`/api/health`](../portal/src/app/api/health/route.ts) checks only the database, not the job runner, mail backlog or webhook backlog.
+- **Impact:** in production the first signal of a stuck job runner or a failing mail server would be a customer complaint.
+- **Recommendation:** structured logs, Sentry or OpenTelemetry, backlog and tick-duration metrics, and a job-runner heartbeat in the health check.
+
+#### O-04 · High · No backup, restore or disaster-recovery procedure
+- **Evidence:** the compose stack keeps data in a named volume; there is no backup job, restore runbook or recovery objective; `APP_SECRET` must be backed up with the database or every stored secret and authenticator is lost (S-07).
+- **Recommendation:** nightly dumps plus WAL archiving, a tested restore, documented RPO/RTO, and secret escrow.
+
+#### O-05 · Medium · No customer-facing operating documentation
+- **Evidence:** there is no administrator guide, integration guide for webhooks and syslog, security whitepaper, SLA, support policy or status page; support exists only as an in-app ticket desk inside each tenant.
+- **Recommendation:** produce these before the first paid contract (roadmap 3.6).
+
+#### O-06 · Low · Repository hygiene
+- No `LICENSE`, `SECURITY.md`, `CONTRIBUTING.md` or `CODEOWNERS`; a government agency's tenant logo and screenshots of its demo tenant are committed under [`docs/audit`](audit) ([`tenant-logo-rida.png`](audit/assets/tenant-logo-rida.png)).
+
+#### L-01 · Critical · Legal texts name the wrong AI processor and lack the provider's identity
+- **Where:** all 20 files in [`portal/content/legal`](../portal/content/legal), e.g. [`privacy.en.md` L8, L57, L70, L79, L163–L164](../portal/content/legal/privacy.en.md#L57), [`terms.en.md` L8, L43, L58, L93](../portal/content/legal/terms.en.md#L93).
+- **Evidence:** the privacy policy and terms state that AI Sel's answers are generated by Google Gemini through Google Cloud Vertex AI and processed in Google data centres; the code sends lesson text and questions to Anthropic (tutor, subtitles, studio) and, for narration, to ElevenLabs. The provider's legal name, registration number, address and privacy contact are `[to be provided]`. The policy also describes data the demo form does not collect (role, source, test score) and promises deletion of demo requests after 24 months, which no job implements. There is no data processing agreement template or sub-processor list.
+- **Impact:** a customer cannot sign a contract or a DPA on these texts; going live with them would misstate international data transfers to every user. Flagged by the team (`OPEN-QUESTIONS.md` items 8 and 20) but unresolved.
+- **Recommendation:** correct processors and transfers, fill the provider identity, align the stated retention with the code, add a DPA and sub-processor list, and have counsel review the launch languages.
+
+#### L-02 · Critical · Intellectual-property chain of title is undocumented
+- **Where:** [`docs/audit/README.md`](audit/README.md), [`portal/content/library/lessons`](../portal/content/library/lessons), [`public/rive/mascot.riv`](../portal/public/rive/mascot.riv), [`types.ts` L3](../portal/src/lib/content/types.ts#L3).
+- **Evidence:** the specification states that everything in `docs/audit` was extracted from the live cylosof.com portal through a demo tenant of a government agency. The scenes of all 106 English lessons shipped in `portal/content/library` are identical to the extracted originals (verified file by file; only the file wrapper differs), `mascot.riv` is byte-identical to the extracted asset, and the design tokens, landing copy and legal texts were carried over. The project skill describes cylosof.com as the founder's own earlier product, but the repository contains no assignment, licence or ownership record, and no `LICENSE` file.
+- **Impact:** if any part of the cylosof.com content, mascot or design belonged to a company, an employer, a co-founder or a contractor, the core training library would be encumbered; investors will not close without this resolved. This is a documentation gap that is resolved by proof of ownership, not by code.
+- **Recommendation:** collect evidence of ownership (company records, IP assignment from any contributors to cylosof.com, contractor agreements for content and the original mascot), record it in the data room, and add a proprietary `LICENSE` notice.
+
+#### L-03 · Medium · Data retention and residency are not configurable
+- **Where:** [`jobs.ts` L351–L376](../portal/src/server/jobs.ts#L351-L376).
+- **Evidence:** the daily clean-up deletes sessions, sign-in attempts, old mail and deliveries, but answers, XP events, audit entries, behaviour risks, lesson progress and demo requests are kept indefinitely; there is no per-tenant retention setting and no hosting-region choice (`OPEN-QUESTIONS.md` item 12).
+- **Impact:** GDPR storage-limitation and customer data-residency requirements (EU, Saudi PDPL) cannot be met contractually.
+- **Recommendation:** per-tenant retention policies enforced by the clean-up job, and documented regional deployments.
