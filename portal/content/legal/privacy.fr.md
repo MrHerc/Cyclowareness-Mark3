@@ -1,4 +1,4 @@
-<!-- version: 2; effective: 2026-10-08 -->
+<!-- version: 3; effective: 2026-11-05 -->
 # Politique de confidentialité
 
 Quelles données personnelles sont traitées sur la plateforme, dans quel but et sur quelle base juridique, qui en est responsable, ce qui est transmis à AI Sel, où et pendant combien de temps les données sont conservées, comment elles sont protégées et comment vous pouvez exercer vos droits.
@@ -28,14 +28,14 @@ Quelles données personnelles sont traitées sur la plateforme, dans quel but et
 | Attestations et prise de connaissance des politiques | le contenu exact du texte faisant l’objet de votre attestation, la version de la politique, l’horodatage, l’adresse IP | vous et le Service |
 | Certificats | module, date de délivrance, numéro de série, lien de vérification | le Service |
 | Résultats des attaques de formation | scans de QR codes de formation (horodatage, type d’appareil, adresse IP tronquée), actions effectuées lors des simulations d’hameçonnage (phishing) lorsque cette fonction est activée, signalements d’e-mails suspects | le Service |
-| AI Sel | la question que vous saisissez ou votre enregistrement vocal, son texte, la réponse | vous |
+| AI Sel | la question que vous saisissez ou posez oralement (le Service la reçoit sous forme de texte), la réponse | vous |
 | Données de sécurité et données relatives à l’appareil | journal d’audit des connexions et des actions d’administration, adresse IP, type de navigateur et d’appareil (user agent), sessions actives | le Service |
 | E-mails | invitations, liens relatifs au mot de passe, rappels, rapports : destinataire, type, statut de remise | le Service |
 | Enregistrements relatifs à l’exercice des droits | téléchargements de données, demandes d’effacement, décisions et motifs | vous, votre Organisation |
 
 3.1. Le Service ne requiert pas de catégories particulières de données personnelles (données relatives à l’origine raciale ou nationale, à la vie familiale, aux convictions religieuses, à la santé ou aux condamnations pénales) et n’utilise ni votre photo ni votre voix pour vous identifier.
 3.2. Les classements de la ligue comparent des services, et non des personnes, et n’affichent pas les services comptant moins de trois participants actifs.
-3.3. Site public. Si vous consultez la page publique du Service sans compte, les choix que vous y faites (rôle, taille de l’organisation, mode calme, indices masqués) sont conservés uniquement dans votre propre navigateur (stockage local et stockage de session) et ne sont pas transmis au Prestataire. Vous pouvez les effacer au moyen du lien « Oublier mes choix » figurant sur la page ou en supprimant les données du site dans votre navigateur. Si vous envoyez le formulaire de demande de démonstration, le Prestataire conserve les données que vous saisissez (nom, adresse e-mail professionnelle, organisation, tranche d’effectif, pays, message facultatif), le rôle que vous avez sélectionné, la source par laquelle vous avez accédé au formulaire et le niveau du score obtenu à votre test. Ces données sont utilisées pour répondre à votre demande sur la base du consentement que vous donnez en cochant la case prévue à cet effet, et le Prestataire en est le propriétaire. Sauf si une autre durée est définie dans l’installation du Prestataire, les données sont supprimées au bout de 24 mois, ou plus tôt sur demande de votre part envoyée à l’adresse [à compléter]. Elles ne sont jamais transmises à AI Sel, à des services d’intelligence artificielle ni à des outils d’analyse.
+3.3. Site public. Si vous consultez la page publique du Service sans compte, les choix que vous y faites (rôle, taille de l’organisation, mode calme, indices masqués) sont conservés uniquement dans votre propre navigateur (stockage local et stockage de session) et ne sont pas transmis au Prestataire. Vous pouvez les effacer au moyen du lien « Oublier mes choix » figurant sur la page ou en supprimant les données du site dans votre navigateur. Si vous envoyez le formulaire de demande de démonstration, le Prestataire conserve les données que vous saisissez (nom, adresse e-mail professionnelle, organisation, tranche d’effectif, pays, message facultatif), ainsi que la langue de l’interface, l’heure de la demande et la version de la présente Politique à laquelle vous avez consenti. Ces données sont utilisées pour répondre à votre demande sur la base du consentement que vous donnez en cochant la case prévue à cet effet, et le Prestataire en est le propriétaire. Sauf si une autre durée est définie dans l’installation du Prestataire, les données sont supprimées au bout de 24 mois, ou plus tôt sur demande de votre part envoyée à l’adresse [à compléter]. Elles ne sont jamais transmises à AI Sel, à des services d’intelligence artificielle ni à des outils d’analyse.
 
 ## 4. Finalités et bases juridiques
 
@@ -54,11 +54,11 @@ Quelles données personnelles sont traitées sur la plateforme, dans quel but et
 
 ## 5. AI Sel (assistant IA)
 
-5.1. Lorsque vous posez une question à AI Sel (l’assistant IA), le Service transmet uniquement la question, le contenu de la leçon en cours, la langue de l’interface et des identifiants techniques au service Google Cloud Vertex AI. Votre nom, votre adresse e-mail, votre fonction et le nom de votre Organisation ne sont jamais transmis.
-5.2. Avant l’envoi, le Service masque dans la question les adresses e-mail, les numéros de téléphone, les numéros de carte, les IBAN et les longues suites de chiffres. Le masquage automatique ne pouvant pas tout détecter, n’incluez ni données personnelles ni informations confidentielles dans vos questions.
-5.3. Une question orale est transmise à Google sous forme d’enregistrement vocal afin d’être convertie en texte ; la voix elle-même peut permettre d’identifier la personne. Après la conversion en texte, l’enregistrement n’est pas conservé dans le Service.
-5.4. Afin qu’une même question puisse de nouveau recevoir une réponse sans qu’une nouvelle requête soit envoyée, le texte masqué de la question et la réponse sont conservés sans aucun lien avec votre compte. Le fichier audio de la réponse est généré une seule fois, puis réutilisé.
-5.5. Conformément à ses conditions, Google n’utilise pas ces données pour entraîner des modèles d’intelligence artificielle sans l’autorisation du client. Google peut conserver les requêtes pendant une durée limitée afin de détecter les abus, comme le prévoient ses conditions.
+5.1. Lorsque vous posez une question à AI Sel (l’assistant IA), le Service transmet uniquement la question, le texte de la leçon en cours et la langue de l’interface à l’API d’Anthropic (Anthropic PBC, États-Unis), qui génère la réponse. Votre nom, votre adresse e-mail, votre fonction et le nom de votre Organisation ne sont jamais transmis. Les sous-titres traduits par l’IA et les brouillons de leçons du Studio de formation sont produits par le même service à partir du texte de la leçon et, pour les brouillons, du sujet saisi par l’auteur du contenu ; ils ne contiennent aucune donnée relative aux apprenants.
+5.2. Le Service ne filtre pas la question et n’en masque aucun élément : elle est transmise telle que vous l’avez saisie ou telle que votre navigateur l’a convertie en texte. N’incluez pas de données personnelles, de mots de passe ni d’informations confidentielles dans vos questions. AI Sel a pour consigne de ne jamais demander ni répéter de mots de passe, de codes ou de données personnelles.
+5.3. Une question orale est convertie en texte par la reconnaissance vocale intégrée à votre navigateur. L’entreprise qui fournit ce moteur de reconnaissance vocale dépend du navigateur ; certains navigateurs envoient à cette fin l’enregistrement aux serveurs de leur éditeur, selon les conditions de celui-ci. Le Service ne reçoit que le texte obtenu, jamais l’enregistrement.
+5.4. Afin qu’une même question puisse de nouveau recevoir une réponse sans qu’une nouvelle requête soit envoyée, le texte de la question et la réponse sont conservés avec la leçon et votre Organisation, mais sans aucun lien avec votre compte. La réponse d’AI Sel et toute phrase de leçon sans narration produite à l’avance sont lues par la voix de synthèse de votre navigateur ou de votre appareil (certains navigateurs utilisent pour cela un service vocal en ligne). La narration des leçons est produite à l’avance à partir du texte de la leçon par un service de synthèse vocale (actuellement ElevenLabs, ou un moteur open source exploité par le Prestataire) ; celui-ci ne reçoit aucune donnée personnelle et rien ne lui est transmis pendant que vous apprenez.
+5.5. Anthropic traite ces requêtes conformément à ses conditions commerciales, en vertu desquelles elle n’utilise pas les données de ses clients pour entraîner ses modèles. Anthropic peut conserver les requêtes pendant une durée limitée afin de détecter les abus, comme le prévoient ses conditions.
 5.6. Votre Organisation peut désactiver AI Sel ou les questions orales.
 
 ## 6. Qui peut voir vos données
@@ -67,7 +67,9 @@ Quelles données personnelles sont traitées sur la plateforme, dans quel but et
 6.2. Les systèmes connectés par votre Organisation : son serveur de messagerie (les e-mails du Service sont envoyés par l’intermédiaire du serveur de messagerie de l’Organisation), son fournisseur d’identité ou son annuaire (pour la connexion et la synchronisation des employés), ainsi que les systèmes SIEM ou ITSM susceptibles de recevoir des événements de sécurité, y compris votre identifiant d’utilisateur, votre adresse e-mail et votre service.
 6.3. Les sous-traitants ultérieurs du Prestataire (Version cloud) :
 - UpCloud (UpCloud Ltd, Finlande, et ses filiales) : serveurs, stockage de fichiers et sauvegardes dans un centre de données situé à Londres (Royaume-Uni) ;
-- Google Cloud (Google LLC et ses sociétés affiliées) : Vertex AI pour les réponses d’AI Sel, la conversion des questions orales en texte et la synthèse vocale, conformément à la section 5.
+- Anthropic (Anthropic PBC, États-Unis) : l’API d’Anthropic pour les réponses d’AI Sel, les sous-titres traduits par l’IA et les brouillons de leçons du Studio de formation, conformément à la section 5 ;
+- ElevenLabs (États-Unis) : synthèse vocale de la narration des leçons à partir du seul texte des leçons, conformément au point 5.4 ; ElevenLabs ne reçoit aucune donnée personnelle ;
+- si votre Organisation utilise des SMS (codes de connexion à usage unique ou attaques de formation par SMS) : l’opérateur SMS désigné dans le contrat relatif au traitement des données personnelles, qui reçoit le numéro de téléphone et le texte du message.
 6.4. Page publique des certificats : lorsque votre Organisation active la vérification publique, toute personne disposant du lien vers votre certificat voit votre nom, le module, la date, l’Organisation et le numéro de série. Aucune autre information vous concernant n’est affichée.
 6.5. Organismes publics : uniquement lorsque la législation l’exige et dans les limites qu’elle fixe.
 6.6. Les notifications de supervision des serveurs utilisées par le Prestataire ne contiennent pas de données personnelles.
@@ -76,7 +78,7 @@ Quelles données personnelles sont traitées sur la plateforme, dans quel but et
 ## 7. Lieu de stockage des données et transferts transfrontaliers
 
 7.1. Dans la Version cloud, les données sont stockées sur des serveurs situés à Londres (Royaume-Uni). Pour les Organisations établies en Azerbaïdjan, il s’agit d’un transfert transfrontalier au sens de l’article 14 de la loi « sur les données personnelles ». Le Royaume-Uni, comme l’Azerbaïdjan, est partie à la Convention du Conseil de l’Europe pour la protection des personnes à l’égard du traitement automatisé des données à caractère personnel (Convention 108) et protège les données personnelles en vertu du UK GDPR. La Commission européenne a reconnu que le Royaume-Uni assure un niveau de protection adéquat ; cette décision a été renouvelée en décembre 2025.
-7.2. Les requêtes transmises à Google Vertex AI peuvent être traitées dans des centres de données de Google situés dans différents pays. Elles ne contiennent ni noms, ni adresses e-mail, ni fonctions (section 5). Le traitement effectué par Google est régi par son Cloud Data Processing Addendum (avenant relatif au traitement des données dans le cloud) ; ce document intègre les clauses contractuelles types de la Commission européenne pour les transferts hors de l’Union européenne.
+7.2. Les requêtes transmises à Anthropic sont traitées aux États-Unis. Elles ne contiennent ni noms, ni adresses e-mail, ni fonctions (section 5). Le traitement effectué par Anthropic est régi par son Data Processing Addendum (avenant relatif au traitement des données) ; ce document intègre les clauses contractuelles types de la Commission européenne pour les transferts hors de l’Union européenne. ElevenLabs, également établie aux États-Unis, ne reçoit que le texte des leçons et aucune donnée personnelle.
 7.3. Si votre Organisation est tenue de stocker les données dans un pays déterminé, elle peut utiliser la Version locale ou convenir d’un autre lieu d’hébergement dans son contrat.
 
 ## 8. Durée de conservation des données
@@ -85,6 +87,8 @@ Quelles données personnelles sont traitées sur la plateforme, dans quel but et
 - Session de connexion : prend fin après 8 heures d’inactivité, sauf si une autre valeur est définie dans l’installation de l’Organisation.
 - Étapes de double authentification et d’authentification unique : 10 minutes. Liens de téléchargement : 5 minutes.
 - Compteurs d’utilisation d’AI Sel : 24 heures.
+- Questions et réponses conservées d’AI Sel (sans lien avec un compte) : tant que le compte de votre Organisation existe dans le Service.
+- Demandes de démonstration envoyées depuis le site public : 24 mois, sauf suppression anticipée (point 3.3).
 - Enregistrements de remise des e-mails : 90 jours après l’achèvement de la remise.
 - Rapports de synchronisation de l’annuaire : 180 jours.
 - Journal d’audit : ne peut être ni modifié ni supprimé au moyen du Service ; il est conservé pendant toute la durée du contrat de l’Organisation puis, au-delà, pendant la durée prévue par le contrat ou exigée par la législation.
@@ -162,4 +166,4 @@ Quelles données personnelles sont traitées sur la plateforme, dans quel but et
 
 16.1. [à compléter], numéro d’immatriculation [à compléter], adresse [à compléter].
 16.2. Pour toute question ou demande relative à la confidentialité : [à compléter].
-16.3. La présente Politique est publiée en azerbaïdjanais, en anglais et en russe. En cas de divergence entre les textes, le texte azerbaïdjanais prévaut.
+16.3. La présente Politique est publiée en azerbaïdjanais, en anglais, en russe, en turc, en roumain, en géorgien, en ukrainien, en allemand, en français et en arabe. En cas de divergence entre les textes, le texte azerbaïdjanais prévaut.

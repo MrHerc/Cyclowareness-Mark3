@@ -1,4 +1,4 @@
-<!-- version: 2; effective: 2026-10-08 -->
+<!-- version: 3; effective: 2026-11-05 -->
 # Məxfilik Siyasəti
 
 Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi əsasla işləndiyi, kimin cavabdeh olduğu, AI Sel-ə nə göndərildiyi, məlumatların harada və nə qədər saxlanıldığı, necə qorunduğu və hüquqlarınızı necə həyata keçirə biləcəyiniz.
@@ -28,14 +28,14 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 | Təsdiqlər və siyasətlərlə tanışlıq | təsdiq etdiyiniz mətnin dəqiq məzmunu, siyasətin versiyası, vaxt, IP ünvanı | siz və Xidmət |
 | Sertifikatlar | modul, verilmə tarixi, seriya nömrəsi, yoxlama keçidi | Xidmət |
 | Təlim hücumlarının nəticələri | təlim QR kodlarının skan edilməsi (vaxt, qurğu növü, qısaldılmış IP ünvanı), aktiv edildikdə saxta fişinqdə edilən hərəkətlər, şübhəli məktublar barədə bildirişlər | Xidmət |
-| AI Sel | yazdığınız sual və ya səs yazınız, onun mətni, cavab | siz |
+| AI Sel | yazdığınız və ya səsli verdiyiniz sual (Xidmət onu mətn kimi alır), cavab | siz |
 | Təhlükəsizlik və qurğu məlumatları | girişlərin və inzibati hərəkətlərin audit jurnalı, IP ünvanı, brauzer və qurğu növü (user agent), aktiv sessiyalar | Xidmət |
 | Məktublar | dəvətlər, parol keçidləri, xatırlatmalar, hesabatlar: alıcı, növ, çatdırılma statusu | Xidmət |
 | Hüquqların həyata keçirilməsi ilə bağlı qeydlər | məlumatların endirilməsi, silinmə sorğuları, qərarlar və səbəblər | siz, Təşkilatınız |
 
 3.1. Xidmət xüsusi kateqoriyalı fərdi məlumatlar (irqi və ya milli mənsubiyyət, ailə həyatı, dini etiqad, səhhət və ya məhkumluq barədə məlumatlar) tələb etmir və şəklinizdən və ya səsinizdən kimliyinizi müəyyən etmək üçün istifadə etmir.
 3.2. Liqa cədvəlləri ayrı-ayrı şəxsləri deyil, şöbələri müqayisə edir və üçdən az aktiv iştirakçısı olan şöbələri göstərmir.
-3.3. Açıq sayt. Xidmətin açıq səhifəsinə hesabsız baxırsınızsa, orada etdiyiniz seçimlər (rol, təşkilatın ölçüsü, sakit rejim, bağlanmış ipucları) yalnız sizin öz brauzerinizdə (yerli yaddaş və sessiya yaddaşı) saxlanılır və Təminatçıya göndərilmir. Onları səhifədəki "Seçimlərimi unut" keçidi ilə və ya brauzerdə sayt məlumatlarını silməklə təmizləyə bilərsiniz. Demo sorğusu formasını göndərsəniz, Təminatçı daxil etdiyiniz məlumatları (ad, iş e-poçtu, təşkilat, əməkdaş sayı aralığı, ölkə, istəyə bağlı mesaj), seçdiyiniz rolu, sizi formaya nəyin gətirdiyini və sınaq xalınızın səviyyəsini saxlayır. Bu məlumatlar qeyd xanasını işarələməklə verdiyiniz razılığa əsasən sorğunuza cavab vermək üçün istifadə olunur, Təminatçı isə onların sahibidir. Təminatçının quraşdırmasında başqa müddət müəyyən edilməyibsə, məlumatlar 24 aydan sonra, və ya sonradan göstəriləcək ünvanına sorğunuz əsasında daha tez silinir. Onlar heç vaxt AI Sel-ə, süni intellekt xidmətlərinə və ya analitikaya göndərilmir.
+3.3. Açıq sayt. Xidmətin açıq səhifəsinə hesabsız baxırsınızsa, orada etdiyiniz seçimlər (rol, təşkilatın ölçüsü, sakit rejim, bağlanmış ipucları) yalnız sizin öz brauzerinizdə (yerli yaddaş və sessiya yaddaşı) saxlanılır və Təminatçıya göndərilmir. Onları səhifədəki "Seçimlərimi unut" keçidi ilə və ya brauzerdə sayt məlumatlarını silməklə təmizləyə bilərsiniz. Demo sorğusu formasını göndərsəniz, Təminatçı daxil etdiyiniz məlumatları (ad, iş e-poçtu, təşkilat, əməkdaş sayı aralığı, ölkə, istəyə bağlı mesaj), həmçinin interfeys dilini, sorğunun vaxtını və razılıq verdiyiniz bu Siyasətin versiyasını saxlayır. Bu məlumatlar qeyd xanasını işarələməklə verdiyiniz razılığa əsasən sorğunuza cavab vermək üçün istifadə olunur, Təminatçı isə onların sahibidir. Təminatçının quraşdırmasında başqa müddət müəyyən edilməyibsə, məlumatlar 24 aydan sonra, və ya sonradan göstəriləcək ünvanına sorğunuz əsasında daha tez silinir. Onlar heç vaxt AI Sel-ə, süni intellekt xidmətlərinə və ya analitikaya göndərilmir.
 
 ## 4. Məqsədlər və hüquqi əsaslar
 
@@ -54,11 +54,11 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 
 ## 5. AI Sel (Sİ köməkçisi)
 
-5.1. AI Sel-ə (Sİ köməkçisinə) sual verdikdə Xidmət Google Cloud Vertex AI xidmətinə yalnız sualı, cari dərsin məzmununu, interfeys dilini və texniki identifikatorları göndərir. Adınız, elektron poçt ünvanınız, vəzifəniz və Təşkilatınızın adı heç vaxt göndərilmir.
-5.2. Göndərməzdən əvvəl Xidmət sualdakı elektron poçt ünvanlarını, telefon nömrələrini, kart nömrələrini, IBAN-ları və uzun rəqəm ardıcıllıqlarını gizlədir. Avtomatik gizlətmə hər şeyi aşkar edə bilməz, ona görə suallarınıza fərdi məlumat və ya məxfi məlumat daxil etməyin.
-5.3. Səsli sual mətnə çevrilmək üçün Google-a səs yazısı kimi göndərilir; səsin özü şəxsin kimliyini müəyyən etməyə imkan verə bilər. Mətnə çevrildikdən sonra yazı Xidmətdə saxlanılmır.
-5.4. Eyni suala yeni sorğu göndərmədən yenidən cavab vermək üçün gizlədilmiş sual mətni və cavab hesabınızla heç bir əlaqə olmadan saxlanılır. Cavabın səs faylı bir dəfə yaradılır və təkrar istifadə olunur.
-5.5. Öz şərtlərinə əsasən Google bu məlumatlardan müştərinin icazəsi olmadan süni intellekt modellərini öyrətmək üçün istifadə etmir. Google sui-istifadəni aşkar etmək üçün sorğuları öz şərtlərində təsvir olunduğu kimi məhdud müddət saxlaya bilər.
+5.1. AI Sel-ə (Sİ köməkçisinə) sual verdikdə Xidmət Anthropic API xidmətinə (Anthropic PBC, ABŞ) yalnız sualı, cari dərsin mətnini və interfeys dilini göndərir; cavabı həmin xidmət yaradır. Adınız, elektron poçt ünvanınız, vəzifəniz və Təşkilatınızın adı heç vaxt göndərilmir. Sİ ilə tərcümə olunan altyazılar və Təlim studiyasındakı dərs qaralamaları da həmin xidmət tərəfindən dərsin mətni, qaralamalar üçün isə həm də məzmun müəllifinin daxil etdiyi mövzu əsasında hazırlanır; onlarda əməkdaşlar haqqında heç bir məlumat yoxdur.
+5.2. Xidmət sualı süzgəcdən keçirmir və onda heç nəyi gizlətmir: sual sizin yazdığınız və ya brauzerinizin mətnə çevirdiyi şəkildə göndərilir. Suallarınıza fərdi məlumat, parol və ya məxfi məlumat daxil etməyin. AI Sel-ə heç vaxt parol, kod və ya fərdi məlumat istəməmək və onları təkrarlamamaq tapşırılıb.
+5.3. Səsli sual brauzerinizə daxil edilmiş nitqtanıma funksiyası ilə mətnə çevrilir. Bu nitq mühərrikini hansı şirkətin təqdim etməsi brauzerdən asılıdır; bəzi brauzerlər bu məqsədlə səs yazısını öz istehsalçısının serverlərinə həmin istehsalçının şərtləri ilə göndərir. Xidmət yalnız alınan mətni qəbul edir, səs yazısını heç vaxt almır.
+5.4. Eyni suala yeni sorğu göndərmədən yenidən cavab vermək üçün sual mətni və cavab dərslə və Təşkilatınızla birlikdə, lakin hesabınızla heç bir əlaqə olmadan saxlanılır. AI Sel-in cavabını və əvvəlcədən hazırlanmış səsləndirməsi olmayan dərs cümlələrini brauzerinizin və ya cihazınızın nitq səsi oxuyur (bəzi brauzerlər bunun üçün onlayn səs xidmətindən istifadə edir). Dərslərin səsləndirilməsi əvvəlcədən dərsin mətni əsasında mətni nitqə çevirən xidmət (hazırda ElevenLabs və ya Təminatçının özünün işlətdiyi açıq mənbəli mühərrik) tərəfindən hazırlanır; ona heç bir fərdi məlumat ötürülmür və siz öyrənərkən ona heç nə göndərilmir.
+5.5. Anthropic bu sorğuları öz kommersiya şərtləri əsasında işləyir; bu şərtlərə görə o, müştəri məlumatlarından öz modellərini öyrətmək üçün istifadə etmir. Anthropic sui-istifadəni aşkar etmək üçün sorğuları öz şərtlərində təsvir olunduğu kimi məhdud müddət saxlaya bilər.
 5.6. Təşkilatınız AI Sel-i və ya səsli sualları söndürə bilər.
 
 ## 6. Məlumatlarınızı kim görə bilər
@@ -67,7 +67,9 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 6.2. Təşkilatınızın qoşduğu sistemlər: onun poçt serveri (Xidmətin məktubları Təşkilatın poçt serveri vasitəsilə göndərilir), identifikasiya provayderi və ya kataloqu (sistemə giriş və işçilərin sinxronlaşdırılması üçün), habelə istifadəçi identifikatorunuz, elektron poçt ünvanınız və şöbəniz daxil olmaqla təhlükəsizlik hadisələrini qəbul edə bilən SIEM və ya ITSM sistemləri.
 6.3. Təminatçının subprosessorları (Bulud versiyası):
 - UpCloud (UpCloud Ltd, Finlandiya, və onun törəmə şirkətləri): London, United Kingdom ərazisindəki data mərkəzində serverlər, fayl yaddaşı və ehtiyat nüsxələr;
-- Google Cloud (Google LLC və onun affilləşmiş şəxsləri): 5-ci bölməyə uyğun olaraq AI Sel-in cavabları, səsli sualların mətnə çevrilməsi və nitq sintezi üçün Vertex AI.
+- Anthropic (Anthropic PBC, ABŞ): 5-ci bölməyə uyğun olaraq AI Sel-in cavabları, Sİ ilə tərcümə olunan altyazılar və Təlim studiyasındakı dərs qaralamaları üçün Anthropic API;
+- ElevenLabs (ABŞ): 5.4-cü bəndə uyğun olaraq dərslərin səsləndirilməsi üçün yalnız dərsin mətni əsasında nitq sintezi; ona heç bir fərdi məlumat ötürülmür;
+- Təşkilatınız SMS-dən istifadə edirsə (birdəfəlik giriş kodları və ya SMS ilə təlim hücumları): fərdi məlumatların işlənilməsi haqqında müqavilədə göstərilən SMS operatoru; o, telefon nömrəsini və mesajın mətnini alır.
 6.4. Sertifikatın açıq səhifəsi: Təşkilatınız açıq yoxlamanı aktiv etdikdə sertifikatınızın keçidinə malik hər kəs adınızı, modulu, tarixi, Təşkilatı və seriya nömrəsini görür. Sizin barənizdə başqa heç nə göstərilmir.
 6.5. Dövlət orqanları: yalnız qanunvericilik tələb etdikdə və onun hüdudlarında.
 6.6. Təminatçının istifadə etdiyi server monitorinqi bildirişlərində fərdi məlumat yoxdur.
@@ -76,7 +78,7 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 ## 7. Məlumatların saxlanıldığı yer və transsərhəd ötürülmə
 
 7.1. Bulud versiyasında məlumatlar London, United Kingdom ərazisindəki serverlərdə saxlanılır. Azərbaycandakı Təşkilatlar üçün bu, "Fərdi məlumatlar haqqında" Qanunun 14-cü maddəsi mənasında transsərhəd ötürülmədir. Birləşmiş Krallıq, Azərbaycan kimi, Avropa Şurasının "Fərdi məlumatların avtomatlaşdırılmış işlənilməsi zamanı şəxslərin müdafiəsi haqqında" Konvensiyasının (108 saylı Konvensiya) iştirakçısıdır və fərdi məlumatları UK GDPR əsasında qoruyur. Avropa Komissiyası Birləşmiş Krallığın adekvat müdafiə səviyyəsini təmin etdiyini tanıyıb; həmin qərar 2025-ci ilin dekabrında yenilənib.
-7.2. Google Vertex AI-a göndərilən sorğular müxtəlif ölkələrdəki Google data mərkəzlərində işlənə bilər. Onlarda ad, elektron poçt ünvanı və vəzifə yoxdur (5-ci bölmə). Google tərəfindən işlənilmə onun Cloud Data Processing Addendum sənədi ilə tənzimlənir; bu sənədə Avropa İttifaqından kənara ötürülmə üçün Avropa Komissiyasının standart müqavilə şərtləri daxildir.
+7.2. Anthropic-ə göndərilən sorğular ABŞ-da işlənir. Onlarda ad, elektron poçt ünvanı və vəzifə yoxdur (5-ci bölmə). Anthropic tərəfindən işlənilmə onun Data Processing Addendum (məlumatların işlənilməsinə dair əlavə) sənədi ilə tənzimlənir; bu sənədə Avropa İttifaqından kənara ötürülmə üçün Avropa Komissiyasının standart müqavilə şərtləri daxildir. ElevenLabs da ABŞ-dadır və yalnız dərslərin mətnini alır, fərdi məlumat almır.
 7.3. Təşkilatınız məlumatları müəyyən ölkədə saxlamağa borcludursa, Lokal versiyadan istifadə edə və ya müqaviləsində başqa hostinq yeri razılaşdıra bilər.
 
 ## 8. Məlumatlar nə qədər saxlanılır
@@ -85,6 +87,8 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 - Giriş sessiyası: Təşkilatın quraşdırmasında başqa dəyər müəyyən edilməyibsə, 8 saat fəaliyyət olmadıqda bitir.
 - İkiaddımlı giriş və vahid giriş mərhələləri: 10 dəqiqə. Endirmə keçidləri: 5 dəqiqə.
 - AI Sel-dən istifadə sayğacları: 24 saat.
+- AI Sel-in saxlanılan sualları və cavabları (heç bir hesabla əlaqəsi olmadan): Təşkilatınızın Xidmətdəki hesabı mövcud olduğu müddətdə.
+- Açıq saytdan gələn demo sorğuları: daha tez silinmədikdə 24 ay (3.3-cü bənd).
 - Məktubların çatdırılma qeydləri: çatdırılma başa çatdıqdan sonra 90 gün.
 - Kataloq sinxronlaşdırması hesabatları: 180 gün.
 - Audit jurnalı: Xidmət vasitəsilə dəyişdirilə və silinə bilməz; Təşkilatın müqaviləsi qüvvədə olduğu müddətdə və ondan sonra müqavilədə müəyyən edilmiş və ya qanunvericiliyin tələb etdiyi müddətdə saxlanılır.
@@ -162,4 +166,4 @@ Platformada hansı fərdi məlumatların, hansı məqsədlə və hansı hüquqi 
 
 16.1. sonradan göstəriləcək, qeydiyyat nömrəsi sonradan göstəriləcək, ünvan sonradan göstəriləcək.
 16.2. Məxfiliklə bağlı suallar və sorğular üçün: sonradan göstəriləcək.
-16.3. Bu Siyasət Azərbaycan, ingilis və rus dillərində dərc olunur. Mətnlər arasında fərq olduqda Azərbaycan dilindəki mətn üstün tutulur.
+16.3. Bu Siyasət Azərbaycan, ingilis, rus, türk, rumın, gürcü, ukrayna, alman, fransız və ərəb dillərində dərc olunur. Mətnlər arasında fərq olduqda Azərbaycan dilindəki mətn üstün tutulur.

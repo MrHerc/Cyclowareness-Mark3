@@ -25,6 +25,7 @@ Demo hesablar: `admin@safarovindustries.com` (tenant admin), `learner@safarovind
 - [Project layout](#project-layout)
 - [Production with Docker](#production-with-docker)
 - [Languages](#languages)
+- [Legal texts](#legal-texts)
 - [Narration voice](#narration-voice)
 - [Operations notes](#operations-notes)
 - [Tests and checks](#tests-and-checks)
@@ -278,6 +279,13 @@ The whole portal (public site, learner app, admin console, emails, certificates,
 - **Lesson captions in more languages.** In the lesson player, captions can show any of the ten languages from the stored translations, and, with the `ai_tutor` feature and `ANTHROPIC_API_KEY`, 65 further languages translated by AI (`POST /api/subtitles`, cached in the `ai_cache` table and shared by every learner; marked as machine translated).
 - **Time zone per organisation.** Settings → Languages → Time zone (`TenantSettings.timeZone`, an IANA name such as `Europe/Berlin`, the picker lists `Intl.supportedValuesOf("timeZone")` plus `UTC`, with `Europe/Kyiv` for ICU's old `Europe/Kiev`; any named zone the runtime can format is accepted, so a saved alias survives an ICU rename, and numeric offsets are refused; `Asia/Baku` when never set, `DEFAULT_TIME_ZONE` in `src/lib/day.ts`). It decides "today" for overdue and streak and daily-XP days, the end of a due day (23:59:59 there), when scheduled reports go out (08:00 there), the times in CSV and XLSX exports, certificate years, campaign and live-session times as entered and shown, and the zone next-intl formats every page in (`src/i18n/request.ts`). Daylight saving comes from Intl (`offsetAt`/`zonedTime` in `src/lib/time.ts`), never from fixed offsets. Changing the zone moves "today" for everyone at once, so a streak can gain or lose a day on the switch.
 - **Not yet reviewed by people.** The translations were made and edited by AI agents; have a native speaker read each language, and a lawyer the legal texts, before a release in that market (`../docs/build/OPEN-QUESTIONS.md` 7, 8).
+
+## Legal texts
+
+The Privacy Policy and the Terms of Use are `content/legal/{privacy,terms}.{lang}.md` in all ten languages, served at `/legal/privacy` and `/legal/terms`; the Azerbaijani text is binding, and `tests/legal-content.test.ts` keeps every translation on the same edition and clause numbers. The header comment `<!-- version: N; effective: YYYY-MM-DD -->` is shown on the page; when the privacy edition changes, set the same date as `consentVersion` in `content/landing/{lang}.json`, so each demo request records the edition it consented to. The Provider's identity is still `[to be provided]`. For counsel and customers:
+
+- `../docs/legal/SUBPROCESSORS.md` — who processes what, for which purpose and where (Anthropic, ElevenLabs, hosting, mail, text messages), with the code that backs each line.
+- `../docs/legal/DPA-template.md` (English) and `../docs/legal/DPA-template.az.md` (Azerbaijani) — a controller–processor data processing agreement skeleton with annexes; a template for counsel, not a signed or reviewed text.
 
 ## Narration voice
 

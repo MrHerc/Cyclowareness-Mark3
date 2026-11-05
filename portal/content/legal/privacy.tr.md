@@ -1,4 +1,4 @@
-<!-- version: 2; effective: 2026-10-08 -->
+<!-- version: 3; effective: 2026-11-05 -->
 # Gizlilik Politikası
 
 Platformda hangi kişisel verilerin, hangi amaçla ve hangi hukuki dayanakla işlendiği, kimin sorumlu olduğu, AI Sel'e neler gönderildiği, verilerin nerede ve ne kadar süre saklandığı, nasıl korunduğu ve haklarınızı nasıl kullanabileceğiniz.
@@ -28,14 +28,14 @@ Platformda hangi kişisel verilerin, hangi amaçla ve hangi hukuki dayanakla iş
 | Onaylar ve politikaların okunması | onayladığınız metnin tam içeriği, politikanın sürümü, zaman, IP adresi | siz ve Hizmet |
 | Sertifikalar | modül, düzenlenme tarihi, seri numarası, doğrulama bağlantısı | Hizmet |
 | Eğitim amaçlı saldırıların sonuçları | eğitim QR kodlarının okutulması (zaman, cihaz türü, kısaltılmış IP adresi), etkinleştirilmişse oltalama simülasyonunda yapılan işlemler, şüpheli e-posta bildirimleri | Hizmet |
-| AI Sel | yazdığınız soru veya ses kaydınız, bunun metni, yanıt | siz |
+| AI Sel | yazdığınız veya sesli sorduğunuz soru (Hizmet bunu metin olarak alır), yanıt | siz |
 | Güvenlik ve cihaz verileri | girişlerin ve yönetim işlemlerinin denetim günlüğü, IP adresi, tarayıcı ve cihaz türü (user agent), etkin oturumlar | Hizmet |
 | E-postalar | davetler, parola bağlantıları, hatırlatmalar, raporlar: alıcı, tür, teslim durumu | Hizmet |
 | Hakların kullanılmasına ilişkin kayıtlar | veri indirmeleri, silme talepleri, kararlar ve gerekçeler | siz, Kuruluşunuz |
 
 3.1. Hizmet, özel nitelikli kişisel verileri (ırk veya millî kökene, aile hayatına, dinî inanca, sağlığa ya da ceza mahkûmiyetine ilişkin veriler) talep etmez ve kimliğinizi belirlemek için fotoğrafınızı veya sesinizi kullanmaz.
 3.2. Lig tabloları kişileri değil departmanları karşılaştırır ve üçten az aktif katılımcısı olan departmanları göstermez.
-3.3. Herkese açık web sitesi. Hizmetin herkese açık sayfasını hesap olmadan görüntülerseniz, orada yaptığınız seçimler (rol, kuruluş büyüklüğü, sessiz mod, kapatılan ipuçları) yalnızca kendi tarayıcınızda (yerel depolama ve oturum depolaması) saklanır ve Sağlayıcıya gönderilmez. Bunları sayfadaki “Seçimlerimi unut” bağlantısıyla veya tarayıcınızdaki site verilerini silerek temizleyebilirsiniz. Demo talep formunu gönderirseniz Sağlayıcı; girdiğiniz verileri (ad, iş e-postası, kuruluş, çalışan sayısı aralığı, ülke, isteğe bağlı mesaj), seçtiğiniz rolü, sizi forma neyin yönlendirdiğini ve test puanınızın düzeyini saklar. Bu veriler, onay kutusunu işaretleyerek verdiğiniz rızaya dayanılarak talebinize yanıt vermek için kullanılır ve bu verilerin maliki Sağlayıcıdır. Sağlayıcının kurulumunda farklı bir süre belirlenmemişse veriler 24 ay sonra veya [daha sonra belirtilecektir] adresine yapacağınız talep üzerine daha erken silinir. Bu veriler hiçbir zaman AI Sel'e, yapay zekâ hizmetlerine veya analitik hizmetlerine gönderilmez.
+3.3. Herkese açık web sitesi. Hizmetin herkese açık sayfasını hesap olmadan görüntülerseniz, orada yaptığınız seçimler (rol, kuruluş büyüklüğü, sessiz mod, kapatılan ipuçları) yalnızca kendi tarayıcınızda (yerel depolama ve oturum depolaması) saklanır ve Sağlayıcıya gönderilmez. Bunları sayfadaki “Seçimlerimi unut” bağlantısıyla veya tarayıcınızdaki site verilerini silerek temizleyebilirsiniz. Demo talep formunu gönderirseniz Sağlayıcı; girdiğiniz verileri (ad, iş e-postası, kuruluş, çalışan sayısı aralığı, ülke, isteğe bağlı mesaj) ile birlikte arayüz dilini, talebin zamanını ve onay verdiğiniz bu Politikanın sürümünü saklar. Bu veriler, onay kutusunu işaretleyerek verdiğiniz rızaya dayanılarak talebinize yanıt vermek için kullanılır ve bu verilerin maliki Sağlayıcıdır. Sağlayıcının kurulumunda farklı bir süre belirlenmemişse veriler 24 ay sonra veya [daha sonra belirtilecektir] adresine yapacağınız talep üzerine daha erken silinir. Bu veriler hiçbir zaman AI Sel'e, yapay zekâ hizmetlerine veya analitik hizmetlerine gönderilmez.
 
 ## 4. Amaçlar ve hukuki dayanaklar
 
@@ -54,11 +54,11 @@ Platformda hangi kişisel verilerin, hangi amaçla ve hangi hukuki dayanakla iş
 
 ## 5. AI Sel (yapay zekâ asistanı)
 
-5.1. AI Sel'e (yapay zekâ asistanına) bir soru sorduğunuzda Hizmet, Google Cloud Vertex AI hizmetine yalnızca soruyu, mevcut dersin içeriğini, arayüz dilini ve teknik tanımlayıcıları gönderir. Adınız, e-posta adresiniz, unvanınız ve Kuruluşunuzun adı hiçbir zaman gönderilmez.
-5.2. Hizmet, göndermeden önce sorudaki e-posta adreslerini, telefon numaralarını, kart numaralarını, IBAN'ları ve uzun rakam dizilerini maskeler. Otomatik maskeleme her şeyi tespit edemez; bu nedenle sorularınıza kişisel veri veya gizli bilgi eklemeyin.
-5.3. Sesli bir soru, metne dönüştürülmesi için Google'a ses kaydı olarak gönderilir; sesin kendisi kişinin kimliğinin belirlenmesine imkân verebilir. Metne dönüştürüldükten sonra kayıt Hizmette saklanmaz.
-5.4. Aynı soruya yeni bir istek göndermeden yeniden yanıt verilebilmesi için maskelenmiş soru metni ve yanıt, hesabınızla hiçbir bağlantı kurulmadan saklanır. Yanıtın ses dosyası bir kez oluşturulur ve yeniden kullanılır.
-5.5. Google, kendi koşulları uyarınca bu verileri müşterinin izni olmadan yapay zekâ modellerini eğitmek için kullanmaz. Google, kötüye kullanımı tespit etmek amacıyla, koşullarında açıklandığı şekilde istekleri sınırlı bir süre saklayabilir.
+5.1. AI Sel'e (yapay zekâ asistanına) bir soru sorduğunuzda Hizmet, Anthropic API'ye (Anthropic PBC, ABD) yalnızca soruyu, mevcut dersin metnini ve arayüz dilini gönderir; yanıtı bu hizmet üretir. Adınız, e-posta adresiniz, unvanınız ve Kuruluşunuzun adı hiçbir zaman gönderilmez. Yapay zekâ ile çevrilen altyazılar ve Eğitim stüdyosundaki ders taslakları da aynı hizmet tarafından ders metninden, taslaklar için ayrıca içerik yazarının girdiği konudan hazırlanır; bunlar öğrenenlere ilişkin hiçbir veri içermez.
+5.2. Hizmet soruyu filtrelemez ve sorudaki hiçbir şeyi maskelemez: soru, sizin yazdığınız veya tarayıcınızın metne dönüştürdüğü biçimde gönderilir. Sorularınıza kişisel veri, parola veya gizli bilgi eklemeyin. AI Sel'e parolaları, kodları veya kişisel verileri hiçbir zaman istememesi ve tekrarlamaması talimatı verilmiştir.
+5.3. Sesli bir soru, tarayıcınızda yerleşik konuşma tanıma özelliğiyle metne dönüştürülür. Bu konuşma motorunu hangi şirketin sağladığı tarayıcıya bağlıdır; bazı tarayıcılar bu amaçla ses kaydını, üreticinin koşulları uyarınca üreticinin sunucularına gönderir. Hizmet yalnızca ortaya çıkan metni alır, ses kaydını hiçbir zaman almaz.
+5.4. Aynı soruya yeni bir istek göndermeden yeniden yanıt verilebilmesi için soru metni ve yanıt, ders ve Kuruluşunuzla birlikte ancak hesabınızla hiçbir bağlantı kurulmadan saklanır. AI Sel'in yanıtı ve önceden hazırlanmış seslendirmesi olmayan ders cümleleri, tarayıcınızın veya cihazınızın konuşma sesiyle okunur (bazı tarayıcılar bunun için çevrimiçi bir ses hizmeti kullanır). Derslerin seslendirmesi, ders metninden önceden bir metinden konuşmaya dönüştürme hizmeti (şu anda ElevenLabs veya Sağlayıcının kendisinin işlettiği açık kaynaklı bir motor) tarafından hazırlanır; bu hizmete hiçbir kişisel veri aktarılmaz ve siz öğrenirken ona hiçbir şey gönderilmez.
+5.5. Anthropic bu istekleri, müşteri verilerini kendi modellerini eğitmek için kullanmadığı ticari koşulları uyarınca işler. Anthropic, kötüye kullanımı tespit etmek amacıyla, koşullarında açıklandığı şekilde istekleri sınırlı bir süre saklayabilir.
 5.6. Kuruluşunuz AI Sel'i veya sesli soruları devre dışı bırakabilir.
 
 ## 6. Verilerinizi kimler görebilir
@@ -67,7 +67,9 @@ Platformda hangi kişisel verilerin, hangi amaçla ve hangi hukuki dayanakla iş
 6.2. Kuruluşunuzun bağladığı sistemler: Kuruluşun e-posta sunucusu (Hizmetin e-postaları Kuruluşun e-posta sunucusu üzerinden gönderilir), kimlik sağlayıcısı veya dizini (giriş ve çalışanların eşitlenmesi için) ve kullanıcı tanımlayıcınız, e-posta adresiniz ve departmanınız dâhil güvenlik olay kayıtlarını alabilen SIEM veya ITSM sistemleri.
 6.3. Sağlayıcının alt veri işleyenleri (Bulut Sürümü):
 - UpCloud (Finlandiya merkezli UpCloud Ltd ve bağlı ortaklıkları): Birleşik Krallık'ın Londra şehrinde bulunan bir veri merkezinde sunucular, dosya depolama ve yedek kopyalar;
-- Google Cloud (Google LLC ve bağlı şirketleri): 5. bölüm uyarınca AI Sel'in yanıtları, sesli soruların metne dönüştürülmesi ve konuşma sentezi için Vertex AI.
+- Anthropic (Anthropic PBC, ABD): 5. bölüm uyarınca AI Sel'in yanıtları, yapay zekâ ile çevrilen altyazılar ve Eğitim stüdyosundaki ders taslakları için Anthropic API;
+- ElevenLabs (ABD): 5.4. madde uyarınca derslerin seslendirilmesi için yalnızca ders metninden konuşma sentezi; bu hizmete hiçbir kişisel veri aktarılmaz;
+- Kuruluşunuz SMS kullanıyorsa (tek kullanımlık giriş kodları veya eğitim amaçlı SMS saldırıları): kişisel verilerin işlenmesi hakkındaki sözleşmede belirtilen SMS operatörü; bu operatör telefon numarasını ve mesaj metnini alır.
 6.4. Herkese açık sertifika sayfası: Kuruluşunuz herkese açık doğrulamayı etkinleştirirse sertifikanızın bağlantısına sahip olan herkes adınızı, modülü, tarihi, Kuruluşu ve seri numarasını görür. Hakkınızda başka hiçbir bilgi gösterilmez.
 6.5. Devlet kurumları: yalnızca mevzuatın gerektirdiği durumlarda ve mevzuatın belirlediği sınırlar içinde.
 6.6. Sağlayıcının kullandığı sunucu izleme bildirimleri kişisel veri içermez.
@@ -76,7 +78,7 @@ Platformda hangi kişisel verilerin, hangi amaçla ve hangi hukuki dayanakla iş
 ## 7. Verilerin saklandığı yer ve sınır ötesi aktarım
 
 7.1. Bulut Sürümünde veriler Birleşik Krallık'ın Londra şehrinde bulunan sunucularda saklanır. Azerbaycan'daki Kuruluşlar için bu, “Kişisel Veriler Hakkında” Kanunun 14. maddesi anlamında sınır ötesi bir aktarımdır. Birleşik Krallık, Azerbaycan gibi, Avrupa Konseyinin Kişisel Verilerin Otomatik İşleme Tabi Tutulması Karşısında Bireylerin Korunması Sözleşmesine (108 sayılı Sözleşme) taraftır ve kişisel verileri UK GDPR kapsamında korur. Avrupa Komisyonu, Birleşik Krallık'ın yeterli düzeyde koruma sağladığını tanımıştır; bu karar Aralık 2025'te yenilenmiştir.
-7.2. Google Vertex AI hizmetine gönderilen istekler, farklı ülkelerdeki Google veri merkezlerinde işlenebilir. Bu istekler ad, e-posta adresi veya unvan içermez (5. bölüm). Google tarafından yapılan işleme, Google'ın Cloud Data Processing Addendum belgesine tabidir; bu belge, Avrupa Birliği dışına yapılan aktarımlar için Avrupa Komisyonunun standart sözleşme hükümlerini içerir.
+7.2. Anthropic'e gönderilen istekler ABD'de işlenir. Bu istekler ad, e-posta adresi veya unvan içermez (5. bölüm). Anthropic tarafından yapılan işleme, Anthropic'in Data Processing Addendum (veri işleme eki) belgesine tabidir; bu belge, Avrupa Birliği dışına yapılan aktarımlar için Avrupa Komisyonunun standart sözleşme hükümlerini içerir. Yine ABD'de bulunan ElevenLabs yalnızca ders metnini alır, kişisel veri almaz.
 7.3. Kuruluşunuz verileri belirli bir ülkede saklamakla yükümlüyse Kurum İçi Sürümü kullanabilir veya sözleşmesinde farklı bir barındırma yeri üzerinde anlaşabilir.
 
 ## 8. Veriler ne kadar süre saklanır
@@ -85,6 +87,8 @@ Platformda hangi kişisel verilerin, hangi amaçla ve hangi hukuki dayanakla iş
 - Giriş oturumu: Kuruluşun kurulumunda farklı bir değer belirlenmemişse 8 saat hareketsizlikten sonra sona erer.
 - İki adımlı doğrulama ve tek oturum açma adımları: 10 dakika. İndirme bağlantıları: 5 dakika.
 - AI Sel kullanım sayaçları: 24 saat.
+- AI Sel'in saklanan soruları ve yanıtları (hiçbir hesapla bağlantısı olmadan): Kuruluşunuzun Hizmetteki hesabı var olduğu sürece.
+- Herkese açık web sitesinden gelen demo talepleri: daha önce silinmedikçe 24 ay (3.3. madde).
 - E-posta teslim kayıtları: teslimin tamamlanmasından sonra 90 gün.
 - Dizin eşitleme raporları: 180 gün.
 - Denetim günlüğü: Hizmet üzerinden değiştirilemez veya silinemez; Kuruluşun sözleşmesi yürürlükte olduğu sürece ve sonrasında sözleşmede belirlenen veya mevzuatın gerektirdiği süre boyunca saklanır.
@@ -162,4 +166,4 @@ Platformda hangi kişisel verilerin, hangi amaçla ve hangi hukuki dayanakla iş
 
 16.1. [daha sonra belirtilecektir], sicil numarası [daha sonra belirtilecektir], adres [daha sonra belirtilecektir].
 16.2. Gizlilikle ilgili sorular ve talepler için: [daha sonra belirtilecektir].
-16.3. Bu Politika Azerbaycan Türkçesi, İngilizce ve Rusça olarak yayımlanır. Metinler arasında farklılık bulunması durumunda Azerbaycan Türkçesindeki metin esas alınır.
+16.3. Bu Politika Azerbaycan Türkçesi, İngilizce, Rusça, Türkçe, Rumence, Gürcüce, Ukraynaca, Almanca, Fransızca ve Arapça olarak yayımlanır. Metinler arasında farklılık bulunması durumunda Azerbaycan Türkçesindeki metin esas alınır.

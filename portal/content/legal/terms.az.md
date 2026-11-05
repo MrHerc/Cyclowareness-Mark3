@@ -1,4 +1,4 @@
-<!-- version: 1; effective: 2026-10-04 -->
+<!-- version: 2; effective: 2026-11-05 -->
 # İstifadə Şərtləri
 
 Platformadan istifadə qaydaları: tərəflər, hesabların təhlükəsizliyi, məqbul istifadə, saxta fişinq və QR təlimləri, Təşkilatın vəzifələri, əqli mülkiyyət, AI Sel-in hədləri, məsuliyyət, tətbiq olunan hüquq və əlaqə. İmzalanmış müştəri müqaviləsi bu Şərtlərdən üstündür.
@@ -90,9 +90,9 @@ Platformadan istifadə qaydaları: tərəflər, hesabların təhlükəsizliyi, m
 
 ## 10. AI Sel (Sİ köməkçisi)
 
-10.1. AI Sel cari dərslə bağlı yazılı və ya səsli suallara cavab verir. Bulud versiyasında cavablar Google Cloud Vertex AI vasitəsilə Google Gemini modelləri tərəfindən yaradılır.
+10.1. AI Sel cari dərslə bağlı yazılı və ya səsli suallara cavab verir. Bulud versiyasında cavablar Anthropic API (Anthropic PBC, ABŞ) vasitəsilə Claude modelləri tərəfindən yaradılır. Səsli sual İstifadəçinin brauzeri tərəfindən mətnə çevrilir; Xidmət yalnız mətni alır. Dərslərin səsləndirilməsi əvvəlcədən dərsin mətni əsasında mətni nitqə çevirən xidmət (hazırda ElevenLabs və ya Təminatçının özünün işlətdiyi açıq mənbəli mühərrik) tərəfindən hazırlanır və fərdi məlumatlarla bağlı deyil.
 10.2. AI Sel-in cavabları qeyri-dəqiq, natamam və ya köhnəlmiş ola bilər. Onlar yalnız təlim üçündür və hüquqi, texniki və ya digər peşəkar məsləhət deyil. Real insident zamanı Təşkilatın insidentlərə cavab qaydasına əməl edin və onun informasiya təhlükəsizliyi əməkdaşları ilə əlaqə saxlayın.
-10.3. AI Sel-ə fərdi məlumat, parol və ya məxfi məlumat daxil etməyin. Xidmət sualı göndərməzdən əvvəl elektron poçt ünvanlarını, telefon nömrələrini, kart və hesab nömrələrini gizlədir, lakin avtomatik gizlətmə hər şeyi aşkar edə bilməz.
+10.3. AI Sel-ə fərdi məlumat, parol və ya məxfi məlumat daxil etməyin. Sual modelə yazıldığı kimi göndərilir; Xidmət onda heç nəyi gizlətmir və onu süzgəcdən keçirmir.
 10.4. AI Sel kibergigiyenadan kənar suallara cavab vermir, saatlıq hədlərə malikdir və Təşkilat onu səsli suallarla birlikdə söndürə bilər.
 10.5. Eyni suala süni intellekt modelinə yeni sorğu göndərmədən yenidən cavab vermək üçün suallar və cavablar saxlanılır. Onlar sual verən şəxsin adı və hesabı ilə əlaqələndirilmədən saxlanılır.
 
@@ -159,7 +159,7 @@ Platformadan istifadə qaydaları: tərəflər, hesabların təhlükəsizliyi, m
 
 ## 19. Yekun müddəalar
 
-19.1. Bu Şərtlər Azərbaycan, ingilis və rus dillərində dərc olunur. Mətnlər arasında fərq olduqda Azərbaycan dilindəki mətn üstün tutulur.
+19.1. Bu Şərtlər Azərbaycan, ingilis, rus, türk, rumın, gürcü, ukrayna, alman, fransız və ərəb dillərində dərc olunur. Mətnlər arasında fərq olduqda Azərbaycan dilindəki mətn üstün tutulur.
 19.2. Hər hansı müddəa etibarsız hesab edildikdə digər müddəalar qüvvədə qalır, etibarsız müddəa isə məqsədinə ən yaxın olan etibarlı müddəa ilə əvəz edilir.
 19.3. Təminatçı podratçılar cəlb edə bilər və onlara görə cavabdeh olaraq qalır. Fərdi məlumatları işləyən podratçılar Məxfilik Siyasətində və Məlumat müqaviləsində göstərilir.
 19.4. Təşkilat bu Şərtlərdən irəli gələn hüquqlarını Təminatçının razılığı olmadan başqasına verə bilməz. Təminatçı yenidən təşkil olunduqda və ya fəaliyyətini başqasına verdikdə, Təşkilata bildiriş göndərməklə bu hüquqları ötürə bilər.

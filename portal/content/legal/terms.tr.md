@@ -1,4 +1,4 @@
-<!-- version: 1; effective: 2026-10-04 -->
+<!-- version: 2; effective: 2026-11-05 -->
 # Kullanım Koşulları
 
 Platformun kullanım kuralları: taraflar, hesap güvenliği, kabul edilebilir kullanım, oltalama simülasyonu ve QR kod eğitimleri, Kuruluşun yükümlülükleri, fikrî mülkiyet, AI Sel'in sınırları, sorumluluk, uygulanacak hukuk ve iletişim bilgileri. İmzalanmış bir müşteri sözleşmesi bu Koşullara göre önceliklidir.
@@ -90,9 +90,9 @@ Platformun kullanım kuralları: taraflar, hesap güvenliği, kabul edilebilir k
 
 ## 10. AI Sel (yapay zekâ asistanı)
 
-10.1. AI Sel, mevcut dersle ilgili yazılı veya sesli sorulara yanıt verir. Bulut Sürümünde yanıtlar, Google Cloud Vertex AI aracılığıyla Google Gemini modelleri tarafından üretilir.
+10.1. AI Sel, mevcut dersle ilgili yazılı veya sesli sorulara yanıt verir. Bulut Sürümünde yanıtlar, Anthropic API (Anthropic PBC, ABD) aracılığıyla Claude modelleri tarafından üretilir. Sesli bir soru Kullanıcının tarayıcısı tarafından metne dönüştürülür; Hizmet yalnızca metni alır. Derslerin seslendirmesi, ders metninden önceden bir metinden konuşmaya dönüştürme hizmeti (şu anda ElevenLabs veya Sağlayıcının kendisinin işlettiği açık kaynaklı bir motor) tarafından hazırlanır ve kişisel veri içermez.
 10.2. AI Sel'in yanıtları yanlış, eksik veya güncelliğini yitirmiş olabilir. Bu yanıtlar yalnızca eğitim amaçlıdır; hukuki, teknik veya başka bir mesleki tavsiye niteliği taşımaz. Gerçek bir güvenlik olayı sırasında Kuruluşun güvenlik olaylarına müdahale prosedürünü izleyin ve Kuruluşun bilgi güvenliği personeliyle iletişime geçin.
-10.3. AI Sel'e kişisel veri, parola veya gizli bilgi girmeyin. Hizmet, soruyu göndermeden önce e-posta adreslerini, telefon numaralarını, kart ve hesap numaralarını maskeler; ancak otomatik maskeleme her şeyi tespit edemez.
+10.3. AI Sel'e kişisel veri, parola veya gizli bilgi girmeyin. Soru, modele yazıldığı haliyle gönderilir; Hizmet soruyu maskelemez ve filtrelemez.
 10.4. AI Sel siber hijyen dışındaki sorulara yanıt vermez ve saatlik sınırlara tabidir; Kuruluş, AI Sel'i sesli sorularla birlikte devre dışı bırakabilir.
 10.5. Aynı soruya yapay zekâ modeline yeni bir istek göndermeden yeniden yanıt verilebilmesi için sorular ve yanıtlar saklanır. Bunlar, soruyu soran kişinin adı veya hesabıyla ilişkilendirilmeden saklanır.
 
@@ -159,7 +159,7 @@ Platformun kullanım kuralları: taraflar, hesap güvenliği, kabul edilebilir k
 
 ## 19. Son hükümler
 
-19.1. Bu Koşullar Azerbaycan Türkçesi, İngilizce ve Rusça olarak yayımlanır. Metinler arasında farklılık bulunması durumunda Azerbaycan Türkçesindeki metin esas alınır.
+19.1. Bu Koşullar Azerbaycan Türkçesi, İngilizce, Rusça, Türkçe, Rumence, Gürcüce, Ukraynaca, Almanca, Fransızca ve Arapça olarak yayımlanır. Metinler arasında farklılık bulunması durumunda Azerbaycan Türkçesindeki metin esas alınır.
 19.2. Herhangi bir hükmün geçersiz sayılması durumunda diğer hükümler yürürlükte kalır ve geçersiz hüküm, amacına en yakın geçerli hükümle değiştirilir.
 19.3. Sağlayıcı yükleniciler görevlendirebilir ve onlardan sorumlu olmaya devam eder. Kişisel verileri işleyen yükleniciler Gizlilik Politikasında ve Veri Sözleşmesinde listelenir.
 19.4. Kuruluş, bu Koşullardan doğan haklarını Sağlayıcının onayı olmadan başka bir kişiye devredemez. Sağlayıcının yeniden yapılandırılması veya işletmesinin başka bir kişiye devredilmesi durumunda Sağlayıcı, Kuruluşa bildirim göndererek bu Koşullardan doğan haklarını devredebilir.
