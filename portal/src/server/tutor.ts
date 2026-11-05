@@ -4,6 +4,7 @@ import { z } from "zod";
 import type { Scene } from "../lib/content/types";
 import { plain } from "../lib/content/types";
 import { LOCALES, type Locale } from "../i18n/config";
+import { sha256Hex } from "./crypto";
 
 /** Library and studio slugs and lesson keys are lowercase kebab-case (see library.ts, secops.ts). */
 const KEY = /^[a-z0-9-]{1,100}$/;
@@ -30,6 +31,15 @@ export const tutorRequestSchema = z.object({
 
 /** Largest accepted tutor request body; a 500-character question plus ids fits well inside it. */
 export const TUTOR_BODY_LIMIT = 8 * 1024;
+
+/**
+ * The tutor_cache row of an answer. Answers grounded in a translation are cached apart from those
+ * grounded in the English text, and the hash of the lesson text makes a re-translated or edited lesson a new row.
+ */
+export function tutorCacheId(locale: string, lessonId: string, sceneId: string | null | undefined, question: string, contentLocale: string, scenes: unknown): string {
+  const normalised = question.toLowerCase().replace(/\s+/g, " ").replace(/[?!.]+$/, "");
+  return sha256Hex(`${locale}|${lessonId}|${sceneId ?? ""}|${normalised}${contentLocale === "en" ? "" : `|${contentLocale}`}|${sha256Hex(JSON.stringify(scenes))}`);
+}
 
 /**
  * Compact, PII-free lesson context for the tutor (no names, emails or job titles of the learner): the

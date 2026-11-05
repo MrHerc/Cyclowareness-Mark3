@@ -55,6 +55,13 @@ describe("SMS simulations", () => {
     expect((await recipients(campaign.id)).every((r) => r.sentAt === null)).toBe(true);
   });
 
+  it("tell a second launch that the campaign is already launched, without new recipients", async () => {
+    const { campaign } = await launchSms();
+    const before = (await recipients(campaign.id)).length;
+    expect(await launchCampaign(db, campaign.id, null)).toEqual({ ok: false, reason: "launched" });
+    expect(await recipients(campaign.id)).toHaveLength(before);
+  });
+
   it("are sent by the job step, each once, with the tracking link", async () => {
     const { campaign } = await launchSms();
     expect(await sendQueuedSms(db)).toBe(3);

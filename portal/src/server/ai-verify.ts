@@ -101,6 +101,8 @@ function integrityIssue(lesson: LessonFile, li: number, e: string): Issue {
   if (m) return { severity: "blocking", message: e, where: sceneAt(m[1]), code: "nextMissing", params: { next: m[2] } };
   m = /^([^:/]+): no correct option$/.exec(e);
   if (m) return { severity: "blocking", message: e, where: sceneAt(m[1]), code: "noCorrectOption" };
+  m = /^([^:/]+)\/[^:]+: checkpoint without correct option$/.exec(e);
+  if (m) return { severity: "blocking", message: e, where: sceneAt(m[1]), code: "noCorrectOption" };
   m = /^([^:/]+): minToFind > spots$/.exec(e);
   if (m) return { severity: "blocking", message: e, where: sceneAt(m[1]), code: "minToFindTooHigh" };
   // The English detail stays in `message` for the model; the Studio shows the translated sentence alone.

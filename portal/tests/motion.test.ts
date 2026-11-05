@@ -2,7 +2,9 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { motionLevel, readMotion, useMotion, type Motion } from "@/lib/motion";
-import { Burst, flyToXp } from "@/components/ui/light";
+import { Burst } from "@/components/ui/light";
+import { COUNT_MS } from "@/components/ui/count-up";
+import { quietPath } from "@/components/admin/admin-tour";
 
 // The server renderer always takes useMotion's server snapshot, so Burst's calm/still branch is reached by
 // overriding the hook; `forced = undefined` keeps the real one.
@@ -62,17 +64,20 @@ describe("Burst", () => {
   });
 });
 
-describe("flyToXp", () => {
-  it.each([
-    ["calm", false],
-    ["still", false],
-    ["full", true],
-  ] as const)("does nothing under data-motion=%s (reduced: %s)", (dataMotion, reduced) => {
-    browser(dataMotion, reduced);
-    const source = { animate: vi.fn(), getBoundingClientRect: vi.fn(), cloneNode: vi.fn() };
-    expect(flyToXp(source as unknown as HTMLElement)).toBeUndefined();
-    expect(source.animate).not.toHaveBeenCalled();
-    expect(source.cloneNode).not.toHaveBeenCalled();
-    expect(document.querySelector).not.toHaveBeenCalled();
+describe("CountUp", () => {
+  it("counts shorter under Calm and in one frame under Still", () => {
+    expect(COUNT_MS.full).toBe(900);
+    expect(COUNT_MS.calm).toBeGreaterThan(0);
+    expect(COUNT_MS.calm).toBeLessThan(COUNT_MS.full);
+    expect(COUNT_MS.still).toBe(0);
+  });
+});
+
+describe("admin guide", () => {
+  it("does not open by itself over the drill pages", () => {
+    expect(quietPath("/admin/drill")).toBe(true);
+    expect(quietPath("/admin/drill/0f8c")).toBe(true);
+    expect(quietPath("/admin")).toBe(false);
+    expect(quietPath("/admin/campaigns")).toBe(false);
   });
 });

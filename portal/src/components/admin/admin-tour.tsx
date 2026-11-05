@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useId, useLayoutEffect, useRef, useState, type KeyboardEvent } from "react";
+import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { ChevronLeft, ChevronRight, Compass, X } from "lucide-react";
 import { Mascot } from "@/components/mascot/mascot";
 import type { MascotGesture, MascotMood } from "@/components/mascot/mapping";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/cn";
+import { useMotion } from "@/lib/motion";
 
 type StepKey = "welcome" | "menu" | "training" | "phishing" | "secops" | "insights" | "settings" | "quick" | "setup" | "guide";
 type Step = {
@@ -57,6 +59,9 @@ function available(): Step[] {
   return STEPS.filter((s) => !s.anchor || findAnchor(s.anchor));
 }
 
+/** The drill dashboard is presented live, so the first-visit guide does not open over it (the Guide button still does). */
+export const quietPath = (pathname: string) => pathname.startsWith("/admin/drill");
+
 /** The header button that replays the guide. */
 export function AdminGuideButton() {
   const t = useTranslations("admin.tour");
@@ -94,6 +99,8 @@ export function AdminTour({ still = false }: { still?: boolean }) {
   const returnFocus = useRef<HTMLElement | null>(null);
   // The cat points at the spotlighted item: the angle is kept with its stop, so a new stop starts without one.
   const [aim, setAim] = useState<{ key: StepKey; angle: number } | null>(null);
+  const motion = useMotion();
+  const quiet = quietPath(usePathname());
 
   useEffect(() => {
     const start = () => {
@@ -104,7 +111,7 @@ export function AdminTour({ still = false }: { still?: boolean }) {
     window.addEventListener(OPEN_EVENT, start);
     let timer: ReturnType<typeof setTimeout> | undefined;
     try {
-      if (!localStorage.getItem(DONE_KEY)) timer = setTimeout(start, START_DELAY);
+      if (!quiet && !localStorage.getItem(DONE_KEY)) timer = setTimeout(start, START_DELAY);
     } catch {
       // No storage: the guide could not remember being seen, so it waits for the Guide button.
     }
@@ -112,14 +119,15 @@ export function AdminTour({ still = false }: { still?: boolean }) {
       window.removeEventListener(OPEN_EVENT, start);
       clearTimeout(timer);
     };
-  }, []);
+  }, [quiet]);
 
   const step = steps ? steps[index] : undefined;
 
   // Spotlight and bubble follow the anchor; measured again on resize and scroll.
   useLayoutEffect(() => {
     if (!step) return;
-    const reduced = still || document.documentElement.dataset.motion === "still" || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Calm scrolls without the smooth glide, like Still.
+    const reduced = still || motion !== "full";
     const place = () => {
       const spot = spotRef.current;
       const bubble = bubbleRef.current;
@@ -182,7 +190,7 @@ export function AdminTour({ still = false }: { still?: boolean }) {
       window.removeEventListener("resize", place);
       window.removeEventListener("scroll", place, { capture: true });
     };
-  }, [step, still]);
+  }, [step, still, motion]);
 
   if (!step || !steps) return null;
 

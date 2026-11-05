@@ -9,12 +9,15 @@ const visual = z.union([
   z.object({ kind: z.literal("stat"), value: z.string(), label: z.string() }),
 ]);
 const outcome = z.enum(["safe", "risky", "compromised"]);
+const option = z.object({ id: z.string(), label: z.string(), correct: z.boolean(), feedback: z.string() });
+// The player dereferences a checkpoint's options, so a malformed one must fail here, not for every learner.
+export const checkpointSchema = z.object({ prompt: z.string(), options: z.array(option).min(2) });
 
 const scene = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("tutor"),
     id: z.string(),
-    beats: z.array(z.object({ id: z.string(), say: z.string().min(1), mood: z.string(), gesture: z.string().optional(), visual: visual.optional(), highlight: z.string().optional() }).passthrough()).min(1),
+    beats: z.array(z.object({ id: z.string(), say: z.string().min(1), mood: z.string(), gesture: z.string().optional(), visual: visual.optional(), highlight: z.string().optional(), checkpoint: checkpointSchema.optional(), stage: z.string().optional() }).passthrough()).min(1),
   }),
   z.object({ type: z.literal("intro"), id: z.string(), title: z.string(), body: z.string() }).passthrough(),
   z.object({
@@ -34,7 +37,7 @@ const scene = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("choice"),
     id: z.string(),
-    question: z.object({ prompt: z.string(), options: z.array(z.object({ id: z.string(), label: z.string(), correct: z.boolean(), feedback: z.string() })).min(2) }),
+    question: z.object({ prompt: z.string(), options: z.array(option).min(2) }),
     multi: z.boolean().optional(),
     visual: visual.optional(),
   }).passthrough(),
@@ -73,6 +76,7 @@ export function lessonIntegrityErrors(lesson: z.infer<typeof lessonFileSchema>):
       const ids = new Set(s.steps.map((st) => st.id));
       for (const st of s.steps) for (const a of st.actions) if (a.next && !ids.has(a.next)) errors.push(`${s.id}/${st.id}: next ${a.next} missing`);
     }
+    if (s.type === "tutor") for (const b of s.beats) if (b.checkpoint && !b.checkpoint.options.some((o) => o.correct)) errors.push(`${s.id}/${b.id}: checkpoint without correct option`);
     if (s.type === "choice" && !s.question.options.some((o) => o.correct)) errors.push(`${s.id}: no correct option`);
     if (s.type === "hotspot" && s.minToFind > s.spots.length) errors.push(`${s.id}: minToFind > spots`);
   }

@@ -60,7 +60,9 @@ const brandingSchema = z.object({
     .string()
     .trim()
     .max(253)
-    .regex(/^([a-z0-9-]+\.)+[a-z]{2,}$|^$/i)
+    // Stored in the ASCII form tenants.domain holds, so mail.ts can match an internationalised proven domain.
+    .refine((v) => v === "" || normaliseHost(v) !== null)
+    .transform((v) => (v ? normaliseHost(v)! : v))
     .optional(),
 });
 

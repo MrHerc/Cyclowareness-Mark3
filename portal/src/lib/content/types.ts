@@ -3,6 +3,9 @@
  * Mirrors the shape served by the original Cyclowareness lesson player.
  */
 
+import type { z } from "zod";
+import type { checkpointSchema } from "./validate";
+
 export type Span = { text: string; spot?: string; reveal?: string; link?: { label: string; href: string } };
 export type Rich = string | Span[] | Span[][];
 
@@ -76,6 +79,8 @@ export type Visual =
   | { kind: "artifact"; artifact: Artifact }
   | { kind: "stat"; value: string; label: string };
 
+export type Checkpoint = z.infer<typeof checkpointSchema>;
+
 export type Beat = {
   id: string;
   say: string;
@@ -83,8 +88,8 @@ export type Beat = {
   gesture?: Gesture;
   visual?: Visual;
   highlight?: string;
-  checkpoint?: unknown;
-  stage?: unknown;
+  checkpoint?: Checkpoint;
+  stage?: string;
 };
 
 export type Outcome = "safe" | "risky" | "compromised";

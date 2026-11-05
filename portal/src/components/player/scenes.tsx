@@ -375,7 +375,7 @@ export function TutorScene({ scene, env, onBack }: { scene: Extract<Scene, { typ
   const [checked, setChecked] = useState(false);
   const beat: Beat = scene.beats[i];
   const last = i === scene.beats.length - 1;
-  const checkpoint = beat.checkpoint as { prompt: string; options: { id: string; label: string; correct: boolean; feedback: string }[] } | undefined;
+  const checkpoint = beat.checkpoint;
   const questionId = `${beat.id}-q`;
   const pickedOpt = checkpoint?.options.find((o) => o.id === picked);
   const pickedSet = useMemo(() => new Set(picked ? [picked] : []), [picked]);

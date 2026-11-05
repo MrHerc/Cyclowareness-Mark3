@@ -9,6 +9,7 @@ import type { MascotGesture, MascotMood } from "@/components/mascot/mapping";
 import { Button } from "@/components/ui/button";
 import { markTourDoneAction } from "@/server/actions/profile";
 import { cn } from "@/lib/cn";
+import { useMotion } from "@/lib/motion";
 
 type StepKey = "welcome" | "home" | "learn" | "league" | "progress" | "profile" | "streak" | "xp" | "continue" | "path";
 type Step = {
@@ -71,6 +72,7 @@ export function Tour({ org, goal, league, still = false }: { org: string; /** Th
   const mascotRef = useRef<HTMLDivElement>(null);
   // The mascot points at the spotlighted item: the angle is kept with its stop, so a new stop starts without one.
   const [aim, setAim] = useState<{ key: StepKey; angle: number } | null>(null);
+  const motion = useMotion();
 
   // Starts after the page reveal; restarts from the top when the person comes back to Home mid-tour.
   useEffect(() => {
@@ -87,7 +89,8 @@ export function Tour({ org, goal, league, still = false }: { org: string; /** Th
   // Spotlight and bubble follow the anchor; measured again on resize and scroll.
   useLayoutEffect(() => {
     if (!step) return;
-    const reduced = still || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Calm scrolls without the smooth glide, like Still.
+    const reduced = still || motion !== "full";
     const place = () => {
       const spot = spotRef.current;
       const bubble = bubbleRef.current;
@@ -150,7 +153,7 @@ export function Tour({ org, goal, league, still = false }: { org: string; /** Th
       window.removeEventListener("resize", place);
       window.removeEventListener("scroll", place, { capture: true });
     };
-  }, [step, still]);
+  }, [step, still, motion]);
 
   if (!step || !steps) return null;
 
