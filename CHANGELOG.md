@@ -39,3 +39,14 @@ All notable changes to this project are recorded here. The format follows
   remainder went to the second-to-last lesson, and a gap in the positions lost XP (99 of 100). The
   split now uses the lesson's place among its siblings. (`portal/src/server/services/progress.ts`,
   test: `tests/learner-progress.test.ts`)
+- **Pressing Launch twice sent the phishing simulation twice.** `launchCampaign` checked the
+  campaign's status and then set it to running, so two requests at the same moment (a double
+  click, or the scheduler firing while someone launches by hand) both created recipients and
+  queued a second email to every person. Only the request whose conditional update moves the
+  campaign out of draft or scheduled now sends it. (`portal/src/server/services/campaigns.ts`,
+  test: `tests/campaign-flows.test.ts`)
+- **A simulation link opened twice at the same moment recorded two clicks.** Each request opened
+  its own "phishing click" risk, sent its own integration event and counted twice against the
+  person. The click, and likewise the fake sign-in, is now claimed by one conditional update, so
+  it is recorded once. (`portal/src/server/services/campaigns.ts`, test:
+  `tests/campaign-flows.test.ts`)
