@@ -64,10 +64,10 @@ A malformed or `null` Origin is refused with `403`.
 
 **Validation.**
 
-- Ids in paths must be UUIDs, and tokens must match `^[a-z2-7]{10,40}$`. Anything else returns `404`.
+- Ids in paths must be UUIDs, and tokens must match `^[a-z2-7]{10,40}$`. Anything else returns `404`, except the open-tracking pixel, which always answers with its image.
 - JSON bodies are read with a byte cap before parsing. An oversized body returns `413`.
 
-**Caching.** Downloads and personal answers carry `Cache-Control: no-store`.
+**Caching.** Exports, reports and personal answers carry `Cache-Control: no-store`.
 
 **Errors.** Most endpoints return a short plain-text body with the status. `/api/subtitles` returns JSON, `{"error": "<code>"}`.
 
@@ -160,7 +160,7 @@ The callback then:
 3. Reads the email claim.
 4. Signs the person in, as described in [section 9](#9-single-sign-on-contract).
 
-On success it sets the session cookie and redirects to `/app`, or to the two-step code page when the person uses TOTP. A request with a missing or mismatched state goes back to `/sign-in?error=sso`. A refusal after the state check also writes a `sso.sign_in_refused` audit entry with the reason.
+On success it sets the session cookie and redirects to `/app`, or to the two-step code page when the person uses TOTP. A missing or mismatched state, or an incomplete OIDC configuration, goes back to `/sign-in?error=sso` without an audit entry. A failed code exchange, or a person who may not sign in, writes a `sso.sign_in_refused` audit entry with the reason before the same redirect. A test run writes `sso.tested` instead and returns to Settings.
 
 ### POST /api/tutor
 
@@ -428,12 +428,12 @@ These are the events the code emits (`src/server/services`, `src/server/actions`
 | `qr.scanned` | A recipient scans a simulation QR code | `campaign`, `userId` |
 | `simulation.risky` | A recipient submits a fake sign-in form | `campaign`, `userId`, `stage` (`"submitted"`) |
 | `simulation.risky` | A learner makes risky choices in a lesson simulation | `module`, `lesson`, `choices` (count) |
-| `simulation.reported` | An employee reports a message that matches a running simulation | `number`, `channel`, `simulation` (`true`) |
+| `simulation.reported` | An employee reports a message that matches a simulation sent to them in the last 30 days | `number`, `channel`, `simulation` (`true`) |
 | `threat.reported` | An employee reports a real suspicious message, call, link or file | `number`, `channel`, `simulation` (`false`) |
 | `attestation.completed` | A learner confirms a module and receives its certificate | `module`, `userId` |
 | `issue.reported` | A learner reports a problem with a lesson | `context` |
 | `incident.created` | An incident is opened | `number` (`IR-…`), `title`, `severity`, `source`, `iocs`, `mitre`; a confidential incident sends only `number`, `severity` and `confidential: true` |
-| `sandbox.malicious` | A sandbox analysis returns a malicious verdict | `number` (`SB-…`), `kind`, `iocs`; `sha256` too when an employee submitted it |
+| `sandbox.malicious` | A sandbox analysis returns a malicious verdict | `number` (`SB-…`), `kind`, `iocs`; plus `sha256` when the object was submitted on the sandbox page rather than checked from a threat report |
 | `admin.audit` | Only the test event from Settings | `test`, `by` |
 
 `userId` is the person's UUID in Cyclowareness, not their email.
@@ -517,8 +517,8 @@ Cyclowareness acts as an OpenID Connect relying party (`src/server/auth/oidc.ts`
 
 - When the standard `email` claim is used, `email_verified` must be `true`.
 - The person is found by email. An account that belongs to another organisation is refused.
-- `tenant_admin`, `super_admin`, `analyst` and `campaign_manager` accounts are refused, because they always sign in with a password and a second step.
-- An unknown person is created as a learner only when automatic creation is on and the address is on the organisation's proven domain.
+- `tenant_admin`, `super_admin`, `analyst` and `campaign_manager` accounts are refused, because they always sign in with a password.
+- An unknown person is created as a learner only when automatic creation is on and the address is on the organisation's saved domain. The callback does not re-check that the domain proof is still valid.
 - An invited person becomes active on their first SSO sign-in.
 - Claims used: `email` or the configured claim, `email_verified`, `name`, `given_name`, `family_name` and `locale`.
 
