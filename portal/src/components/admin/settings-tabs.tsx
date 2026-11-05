@@ -12,7 +12,6 @@ import {
   BookOpen,
   CalendarClock,
   Copy,
-  FileUp,
   Flame,
   ImageUp,
   Italic,
@@ -472,7 +471,8 @@ export function IdentityTab({
     maxDevices: identity.maxDevices,
     ssoEnabled: identity.ssoEnabled,
     sso: {
-      protocol: identity.sso?.protocol ?? "oidc",
+      // Only OpenID Connect is connected: a stored "saml" moves to it on the next save.
+      protocol: "oidc" as "oidc" | "saml",
       issuer: identity.sso?.issuer ?? "",
       clientId: identity.sso?.clientId ?? "",
       clientSecret: "",
@@ -500,7 +500,6 @@ export function IdentityTab({
   });
   const sso = s.sso;
   const ldap = s.ldap;
-  const pemFile = useRef<HTMLInputElement>(null);
   const copy = (v: string) => navigator.clipboard.writeText(v).then(() => toast(tc("copied")));
   const [checked, setChecked] = useState<boolean | null>(null);
   const checkSettings = () => {
@@ -516,15 +515,8 @@ export function IdentityTab({
     setS({ ...s, sso: { ...sso, ...patch } });
     if ("issuer" in patch || "clientId" in patch) setChecked(null);
   };
-  const setLdap = (patch: Partial<typeof ldap>) => setS({ ...s, ldap: { ...ldap, ...patch } });
   // A stored secret is not kept for a different server (saveIdentityAction): say so before saving.
   const ssoReenter = !!identity.sso?.hasClientSecret && !sso.clientSecret && endpointKey(identity.sso.issuer) !== endpointKey(sso.issuer);
-  const ldapReenter = !!identity.ldap?.hasPassword && !ldap.password && endpointKey(identity.ldap.url) !== endpointKey(ldap.url);
-  const ldapHeading = (n: number, title: string) => (
-    <h3 className="text-body-sm font-semibold text-ink">
-      <Step n={n}>{title}</Step>
-    </h3>
-  );
   return (
     <div className="grid gap-5">
       <Card>
@@ -538,18 +530,8 @@ export function IdentityTab({
       <Card>
         <CardHeader title={<Step n={1}>{t("step1Title")}</Step>} description={t("step1Body")} />
         <CardBody className="grid gap-2">
-          <Segmented
-            name="protocol"
-            ariaLabel={t("protocol")}
-            className="w-fit"
-            value={sso.protocol}
-            onChange={(v) => setSso({ protocol: v as "oidc" | "saml" })}
-            options={[
-              { value: "oidc", label: "OpenID Connect" },
-              { value: "saml", label: "SAML 2.0" },
-            ]}
-          />
-          {sso.protocol === "oidc" ? <p className="text-caption text-ink-muted">{t("oidcHint")}</p> : null}
+          <p className="text-caption text-ink-muted">{t("oidcHint")}</p>
+          {identity.sso?.protocol === "saml" ? <Notice tone="warn">{t("samlNotConnected")}</Notice> : null}
         </CardBody>
       </Card>
       <Card>
@@ -577,27 +559,6 @@ export function IdentityTab({
           <Field label={t("clientSecret")} htmlFor="i-secret" hint={ssoReenter ? t("secretReenter") : identity.sso?.hasClientSecret ? t("secretSet") : t("secretHint")}>
             <Input id="i-secret" type="password" autoComplete="new-password" value={sso.clientSecret} onChange={(e) => setSso({ clientSecret: e.target.value })} />
           </Field>
-          {sso.protocol === "saml" ? (
-            <>
-              <Field label={t("samlEntryPoint")} htmlFor="i-saml-url" hint={t("samlEntryPointHint")} className="sm:col-span-2">
-                <Input id="i-saml-url" dir="ltr" value={sso.samlEntryPoint} onChange={(e) => setSso({ samlEntryPoint: e.target.value })} placeholder="https://login.example.az/saml/sso" />
-              </Field>
-              <Field label={t("samlCertificate")} htmlFor="i-saml-cert" hint={t("samlCertificateHint")} className="sm:col-span-2">
-                <Textarea
-                  id="i-saml-cert"
-                  value={sso.samlCertificate}
-                  onChange={(e) => setSso({ samlCertificate: e.target.value })}
-                  className="min-h-32 font-mono text-caption"
-                  placeholder="-----BEGIN CERTIFICATE-----"
-                  maxLength={10_000}
-                  spellCheck={false}
-                />
-              </Field>
-              <Notice tone="info" className="sm:col-span-2">
-                {t("samlNote")}
-              </Notice>
-            </>
-          ) : null}
         </CardBody>
       </Card>
       <Card>
@@ -616,18 +577,12 @@ export function IdentityTab({
             <Button variant="secondary" onClick={checkSettings}>
               {t("checkSettings")}
             </Button>
-            {sso.protocol === "oidc" ? (
-              <ButtonAnchor href={`${signInLink}&test=1`} variant="secondary" aria-describedby="i-test-hint">
-                {t("openTest")}
-              </ButtonAnchor>
-            ) : (
-              <Button variant="secondary" disabled aria-describedby="i-test-hint">
-                {t("openTest")}
-              </Button>
-            )}
+            <ButtonAnchor href={`${signInLink}&test=1`} variant="secondary" aria-describedby="i-test-hint">
+              {t("openTest")}
+            </ButtonAnchor>
           </div>
           <p id="i-test-hint" className="text-caption text-ink-subtle">
-            {sso.protocol === "oidc" ? t("testSignInHint") : t("samlNotConnected")}
+            {t("testSignInHint")}
           </p>
           <div role="status" className="grid gap-2">
             {checked !== null ? <Notice tone={checked ? "safe" : "risk"}>{checked ? t("checkOk") : t("checkFailed")}</Notice> : null}
@@ -647,117 +602,6 @@ export function IdentityTab({
               </Button>
             </div>
           </Field>
-        </CardBody>
-      </Card>
-      <Card>
-        <CardHeader title={t("ldapTitle")} description={t("ldapBody")} />
-        <CardBody className="grid gap-6">
-          <section className="grid gap-4">
-            {ldapHeading(1, t("ldapStep1"))}
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label={t("server")} htmlFor="l-url" className="sm:col-span-2">
-                <Input id="l-url" dir="ltr" value={ldap.url} onChange={(e) => setLdap({ url: e.target.value })} placeholder="ldaps://dc01.example.local:636" />
-              </Field>
-              <Field label={t("bindDn")} htmlFor="l-dn">
-                <Input id="l-dn" dir="ltr" value={ldap.bindDn} onChange={(e) => setLdap({ bindDn: e.target.value })} />
-              </Field>
-              <Field label={t("bindPassword")} htmlFor="l-pw" hint={ldapReenter ? t("secretReenter") : identity.ldap?.hasPassword ? t("secretSet") : t("secretHint")}>
-                <Input id="l-pw" type="password" autoComplete="new-password" value={ldap.password} onChange={(e) => setLdap({ password: e.target.value })} />
-              </Field>
-              <Field label={t("caCertificate")} htmlFor="l-ca" hint={t("caCertificateHint")} className="sm:col-span-2">
-                <div className="grid gap-2">
-                  <Textarea
-                    id="l-ca"
-                    value={ldap.caCertificate}
-                    onChange={(e) => setLdap({ caCertificate: e.target.value })}
-                    className="min-h-32 font-mono text-caption"
-                    placeholder="-----BEGIN CERTIFICATE-----"
-                    maxLength={20_000}
-                    spellCheck={false}
-                  />
-                  <input
-                    ref={pemFile}
-                    type="file"
-                    accept=".pem,.crt,.cer"
-                    className="sr-only"
-                    aria-label={t("uploadPem")}
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) f.text().then((text) => setLdap({ caCertificate: text.trim() }));
-                      e.target.value = "";
-                    }}
-                  />
-                  <Button variant="secondary" size="sm" className="w-fit" icon={<FileUp />} onClick={() => pemFile.current?.click()}>
-                    {t("uploadPem")}
-                  </Button>
-                </div>
-              </Field>
-              <Field label={t("certificatePin")} htmlFor="l-pin" hint={t("certificatePinHint")} className="sm:col-span-2">
-                <Input id="l-pin" value={ldap.certificatePin} onChange={(e) => setLdap({ certificatePin: e.target.value })} className="font-mono text-caption" placeholder="sha256:3A5F…" spellCheck={false} />
-              </Field>
-            </div>
-            <Button variant="secondary" className="w-fit" disabled>
-              {t("testConnection")}
-            </Button>
-          </section>
-          <Divider />
-          <section className="grid gap-4">
-            {ldapHeading(2, t("ldapStep2"))}
-            <Field label={t("searchBase")} htmlFor="l-base">
-              <Input id="l-base" dir="ltr" value={ldap.searchBase} onChange={(e) => setLdap({ searchBase: e.target.value })} placeholder="OU=Staff,DC=example,DC=local" />
-            </Field>
-            <Field label={t("filter")} htmlFor="l-filter">
-              <Input id="l-filter" value={ldap.filter} onChange={(e) => setLdap({ filter: e.target.value })} className="font-mono text-caption" />
-            </Field>
-          </section>
-          <Divider />
-          <section className="grid gap-4">
-            {ldapHeading(3, t("ldapStep3"))}
-            <div className="grid gap-1.5">
-              <span className="text-caption font-semibold text-ink">{t("deptSource")}</span>
-              <Segmented
-                name="deptSource"
-                ariaLabel={t("deptSource")}
-                className="w-fit"
-                value={ldap.departmentSource}
-                onChange={(v) => setLdap({ departmentSource: v as "attribute" })}
-                options={(["attribute", "ou", "groups"] as const).map((x) => ({ value: x, label: t(`deptSources.${x}`) }))}
-              />
-            </div>
-            <Field label={t("deptAttribute")} htmlFor="l-attr">
-              <Input id="l-attr" className="max-w-sm" value={ldap.departmentAttribute} onChange={(e) => setLdap({ departmentAttribute: e.target.value })} placeholder="department" />
-            </Field>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Checkbox label={t("syncManagers")} checked={ldap.syncManagers} onChange={(e) => setLdap({ syncManagers: e.target.checked })} />
-              <Checkbox label={t("syncLanguage")} checked={ldap.syncLanguage} onChange={(e) => setLdap({ syncLanguage: e.target.checked })} />
-            </div>
-          </section>
-          <Divider />
-          <section className="grid gap-4">
-            {ldapHeading(4, t("ldapStep4"))}
-            <Field label={t("schedule")} htmlFor="l-sched">
-              <Select id="l-sched" className="max-w-xs" value={ldap.schedule} onChange={(e) => setLdap({ schedule: e.target.value as "off" })}>
-                {(["off", "nightly", "6h", "12h", "24h"] as const).map((x) => (
-                  <option key={x} value={x}>
-                    {t(`schedules.${x}`)}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Checkbox label={t("passwordSignIn")} checked={ldap.passwordSignIn} onChange={(e) => setLdap({ passwordSignIn: e.target.checked })} />
-              <Checkbox label={t("matchByEmail")} checked={ldap.matchByEmail} onChange={(e) => setLdap({ matchByEmail: e.target.checked })} />
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button variant="secondary" disabled>
-                {t("runPreview")}
-              </Button>
-              <Button variant="secondary" disabled>
-                {t("syncNow")}
-              </Button>
-            </div>
-            <Notice tone="info">{t("connectorNote")}</Notice>
-          </section>
         </CardBody>
       </Card>
       <Card>
@@ -796,16 +640,6 @@ export function IdentityTab({
               "sso.clientId": "i-client",
               "sso.clientSecret": "i-secret",
               "sso.emailClaim": "i-claim",
-              "sso.samlEntryPoint": "i-saml-url",
-              "sso.samlCertificate": "i-saml-cert",
-              "ldap.url": "l-url",
-              "ldap.bindDn": "l-dn",
-              "ldap.password": "l-pw",
-              "ldap.caCertificate": "l-ca",
-              "ldap.certificatePin": "l-pin",
-              "ldap.searchBase": "l-base",
-              "ldap.filter": "l-filter",
-              "ldap.departmentAttribute": "l-attr",
             },
           )
         }
@@ -1555,7 +1389,6 @@ export function ProtectionTab({ protection }: { protection: TenantSettings["prot
         />
         <CardBody className="grid gap-6">
           <Switch label={t("copying")} description={t("copyingBody")} checked={s.contentProtection} onChange={(e) => setS({ ...s, contentProtection: e.target.checked })} />
-          <Switch label={t("android")} description={t("androidBody")} checked={s.androidScreenBlock} onChange={(e) => setS({ ...s, androidScreenBlock: e.target.checked })} />
           <Switch label={t("watermark")} description={t("watermarkBody")} checked={s.watermark} onChange={(e) => setS({ ...s, watermark: e.target.checked })} />
         </CardBody>
       </Card>

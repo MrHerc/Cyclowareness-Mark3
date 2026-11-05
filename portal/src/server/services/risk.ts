@@ -2,10 +2,12 @@
  * Recomputes human risk scores from evidence (training, simulations, open risks, answers)
  * and records the daily organisation snapshot used by the trend charts.
  */
-import { and, eq, gte, inArray, isNotNull, ne, sql } from "drizzle-orm";
+import { and, eq, gte, inArray, isNotNull, lt, ne, sql } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
 import { resolveAssignments } from "./assignments";
+import { emitEvent } from "./events";
+import { withDefaults } from "../../lib/tenant-defaults";
 import { riskScore, type RiskBreakdown, type Severity } from "../../lib/domain/risk";
 import { dayKey } from "../../lib/domain/gamification";
 import { tenantTimeZone } from "./tenants";
@@ -118,8 +120,17 @@ export async function computeTenantRisk(db: DB, tenantId: string, now = new Date
 /** Persists fresh scores. Call after any event that can move a score. */
 export async function recomputeRisk(db: DB, tenantId: string, userIds?: string[], now = new Date()): Promise<RiskEvidence> {
   const evidence = await computeTenantRisk(db, tenantId, now, userIds);
+  if (!evidence.size) return evidence;
+  const [tenant] = await db.select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, tenantId));
+  const threshold = withDefaults(tenant?.settings).learning.riskThreshold;
   for (const [userId, b] of evidence) {
-    await db.update(t.users).set({ riskScore: b.score }).where(eq(t.users.id, userId));
+    // The write itself reports the crossing (stored score below, new one at or above), so two recomputes at once emit once.
+    const crossed =
+      b.score >= threshold
+        ? await db.update(t.users).set({ riskScore: b.score }).where(and(eq(t.users.id, userId), lt(t.users.riskScore, threshold))).returning({ id: t.users.id })
+        : [];
+    if (crossed.length) await emitEvent(db, tenantId, "risk.threshold_crossed", { userId, score: b.score, threshold });
+    else await db.update(t.users).set({ riskScore: b.score }).where(eq(t.users.id, userId));
   }
   return evidence;
 }

@@ -227,8 +227,7 @@ export async function setupState(v: Viewer) {
     { key: "assign", done: Number(asg.n) > 0, href: "/admin/assignments" },
     { key: "policy", done: Number(pol.n) > 0, href: "/admin/policies" },
     { key: "twofa", done: s.identity.requireAdmin2fa, href: "/admin/settings?tab=identity", skippable: true },
-    { key: "directory", done: !!s.identity.ldap?.url, href: "/admin/settings?tab=identity", skippable: true, optional: true },
-  ] as { key: "departments" | "people" | "email" | "logo" | "assign" | "policy" | "twofa" | "directory"; done: boolean; href: string; skippable?: boolean; optional?: boolean }[];
+  ] as { key: "departments" | "people" | "email" | "logo" | "assign" | "policy" | "twofa"; done: boolean; href: string; skippable?: boolean; optional?: boolean }[];
 }
 
 export async function recentAudit(tenantId: string, limit = 10) {
