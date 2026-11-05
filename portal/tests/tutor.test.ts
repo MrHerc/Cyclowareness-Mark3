@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { TUTOR_BODY_LIMIT, lessonContext, offlineAnswer, tutorRequest, tutorRequestSchema } from "../src/server/tutor";
+import { TUTOR_BODY_LIMIT, lessonContext, offlineAnswer, tutorCacheId, tutorRequest, tutorRequestSchema } from "../src/server/tutor";
 import type { Scene } from "../src/lib/content/types";
 import { readBodyCapped } from "../src/server/request-body";
 
@@ -42,6 +42,20 @@ function streamed(parts: string[]): Request {
   });
   return new Request("http://localhost/api/tutor", { method: "POST", body, duplex: "half" } as RequestInit);
 }
+
+describe("tutorCacheId", () => {
+  it("changes when the lesson text the answer came from changes, and not for the case of the question", () => {
+    const scenes: Scene[] = [{ type: "tutor", id: "t", beats: [{ id: "b", say: "Check the sender.", mood: "talk" }] }];
+    const id = tutorCacheId("az", "lesson-1", "t", "Why?", "az", scenes);
+    expect(id).toMatch(/^[0-9a-f]{64}$/);
+    expect(tutorCacheId("az", "lesson-1", "t", "WHY?", "az", structuredClone(scenes))).toBe(id);
+    const retranslated = structuredClone(scenes);
+    if (retranslated[0].type === "tutor") retranslated[0].beats[0].say = "Göndərəni yoxlayın.";
+    expect(tutorCacheId("az", "lesson-1", "t", "Why?", "az", retranslated)).not.toBe(id);
+    expect(tutorCacheId("az", "lesson-1", "t", "Why?", "en", scenes)).not.toBe(id);
+    expect(tutorCacheId("az", "lesson-2", "t", "Why?", "az", scenes)).not.toBe(id);
+  });
+});
 
 describe("readBodyCapped", () => {
   it("returns the body when it fits, including multi-byte text split across chunks", async () => {

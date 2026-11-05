@@ -263,7 +263,8 @@ const INDICATOR_SCAN_CHARS = 200_000;
  * scanned a bounded number of times; a pattern that starts with the local part re-scans a long run
  * from every position (quadratic: one upload of "aaaa…" froze the server).
  */
-const EMAIL = /@(?<=([a-z0-9._%+-]+)@)[a-z0-9.-]+\.[a-z]{2,}/gi;
+// xn-- first: [a-z]{2,} would end an address under an internationalised TLD at "…@example.xn".
+const EMAIL = /@(?<=([a-z0-9._%+-]+)@)[a-z0-9.-]+\.(?:xn--[a-z0-9-]+|[a-z]{2,})/gi;
 
 /** Text up to the next ">" after each `open`, each tag being one match, scanned once. */
 function tagText(text: string, open: string, re: RegExp): RegExpMatchArray | null {

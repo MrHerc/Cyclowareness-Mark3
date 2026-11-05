@@ -1000,7 +1000,7 @@ export const webhookDeliveries = pgTable(
 );
 
 export const tutorCache = pgTable("tutor_cache", {
-  id: text("id").primaryKey(), // sha256 of locale, lesson, scene and the normalised question
+  id: text("id").primaryKey(), // sha256 of locale, lesson, scene, the normalised question and a hash of the lesson text (tutorCacheId)
   tenantId: tenantRef(),
   lessonId: uuid("lesson_id").notNull(),
   question: text("question").notNull(),

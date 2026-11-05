@@ -29,7 +29,7 @@ export async function campaignAudience(db: DB, c: { tenantId: string; audience: 
   return users.filter((u) => u.departmentId && scope.has(u.departmentId));
 }
 
-export type LaunchBlock = "mail" | "sms" | "voice" | "empty" | "plan";
+export type LaunchBlock = "mail" | "sms" | "voice" | "empty" | "plan" | "launched";
 
 /** Whether a channel can deliver right now. Development simulates delivery and logs it. */
 export async function launchBlocker(db: DB, tenantId: string, channel: CampaignTemplate["channel"], audienceSize: number): Promise<LaunchBlock | null> {
@@ -70,7 +70,9 @@ function emailHtml(tpl: CampaignTemplate, locale: string, token: string): { subj
 /** Creates recipients and queues the simulation (the job runner sends mail and SMS). Returns the number of people it goes to. */
 export async function launchCampaign(db: DB, campaignId: string, actorId: string | null): Promise<{ ok: true; count: number } | { ok: false; reason: LaunchBlock }> {
   const [c] = await db.select().from(t.campaigns).where(eq(t.campaigns.id, campaignId));
-  if (!c || (c.status !== "draft" && c.status !== "scheduled")) return { ok: false, reason: "empty" };
+  if (!c) return { ok: false, reason: "empty" };
+  // A second Launch click (or the scheduler getting there first) is told so, not that the audience is empty.
+  if (c.status !== "draft" && c.status !== "scheduled") return { ok: false, reason: "launched" };
   const tpl = TEMPLATE_BY_KEY.get(c.templateKey);
   if (!tpl) return { ok: false, reason: "empty" };
   // Checked at every launch, scheduled ones included: a downgrade or an operator override may have switched the channel off since saving.
@@ -186,16 +188,16 @@ const BLOCKED_TITLE: Record<string, (name: string) => string> = {
   ar: (name) => `لم تبدأ الحملة «${name}» في موعدها المجدول وأعيدت إلى المسودات.`,
 } satisfies Record<Locale, (name: string) => string>;
 const BLOCKED_REASON: Record<string, Record<LaunchBlock, string>> = {
-  az: { empty: "Auditoriyada aktiv əməkdaş yoxdur.", mail: "E-poçt göndərişi qurulmayıb (Tənzimləmələr → E-poçt).", sms: "SMS provayderi qurulmayıb.", voice: "Səsli zənglər üçün telefoniya provayderi lazımdır.", plan: "Bu kanal və ya şablon təşkilatınızın planına daxil deyil." },
-  en: { empty: "The audience has no active people.", mail: "Email sending is not set up (Settings → Email).", sms: "No SMS provider is configured.", voice: "Voice calls need a telephony provider.", plan: "This channel or template is not part of your organisation's plan." },
-  ru: { empty: "В аудитории нет активных сотрудников.", mail: "Отправка почты не настроена (Настройки → Почта).", sms: "Не настроен SMS-провайдер.", voice: "Для звонков нужен провайдер телефонии.", plan: "Этот канал или шаблон не входит в тариф вашей организации." },
-  tr: { empty: "Hedef kitlede aktif çalışan yok.", mail: "E-posta gönderimi ayarlanmamış (Ayarlar → E-posta).", sms: "SMS sağlayıcısı yapılandırılmamış.", voice: "Sesli aramalar için bir telefon hizmeti sağlayıcısı gerekir.", plan: "Bu kanal veya şablon kuruluşunuzun planına dahil değil." },
-  ro: { empty: "Publicul țintă nu are persoane active.", mail: "Trimiterea e-mailurilor nu este configurată (Setări → E-mail).", sms: "Nu este configurat niciun furnizor de SMS.", voice: "Apelurile vocale necesită un furnizor de telefonie.", plan: "Acest canal sau șablon nu este inclus în planul organizației dumneavoastră." },
-  ka: { empty: "აუდიტორიაში აქტიური თანამშრომელი არ არის.", mail: "ელფოსტით გაგზავნა არ არის გამართული (პარამეტრები → ელფოსტა).", sms: "SMS-პროვაიდერი არ არის გამართული.", voice: "ზარებისთვის საჭიროა სატელეფონო პროვაიდერი.", plan: "ეს არხი ან შაბლონი თქვენი ორგანიზაციის პაკეტში არ შედის." },
-  uk: { empty: "В аудиторії немає активних працівників.", mail: "Надсилання пошти не налаштовано (Налаштування → Пошта).", sms: "SMS-провайдера не налаштовано.", voice: "Для дзвінків потрібен провайдер телефонії.", plan: "Цей канал або шаблон не входить до тарифу вашої організації." },
-  de: { empty: "Die Zielgruppe enthält keine aktiven Personen.", mail: "Der E-Mail-Versand ist nicht eingerichtet (Einstellungen → E-Mail).", sms: "Es ist kein SMS-Anbieter konfiguriert.", voice: "Für Anrufe ist ein Telefonie-Anbieter erforderlich.", plan: "Dieser Kanal oder diese Vorlage ist nicht im Tarif Ihrer Organisation enthalten." },
-  fr: { empty: "Le public cible ne compte aucune personne active.", mail: "L’envoi d’e-mails n’est pas configuré (Paramètres → E-mail).", sms: "Aucun fournisseur SMS n’est configuré.", voice: "Les appels vocaux nécessitent un fournisseur de téléphonie.", plan: "Ce canal ou ce modèle ne fait pas partie de l’offre de votre organisation." },
-  ar: { empty: "لا يوجد موظفون نشطون في الجمهور المستهدف.", mail: "لم يتم إعداد إرسال البريد الإلكتروني (الإعدادات ← البريد الإلكتروني).", sms: "لم يتم إعداد مزود خدمة الرسائل النصية.", voice: "تتطلب المكالمات الصوتية مزود خدمة اتصالات هاتفية.", plan: "هذه القناة أو هذا القالب غير مشمول في باقة جهتك." },
+  az: { empty: "Auditoriyada aktiv əməkdaş yoxdur.", mail: "E-poçt göndərişi qurulmayıb (Tənzimləmələr → E-poçt).", sms: "SMS provayderi qurulmayıb.", voice: "Səsli zənglər üçün telefoniya provayderi lazımdır.", plan: "Bu kanal və ya şablon təşkilatınızın planına daxil deyil.", launched: "Kampaniya artıq başladılıb." },
+  en: { empty: "The audience has no active people.", mail: "Email sending is not set up (Settings → Email).", sms: "No SMS provider is configured.", voice: "Voice calls need a telephony provider.", plan: "This channel or template is not part of your organisation's plan.", launched: "The campaign has already been launched." },
+  ru: { empty: "В аудитории нет активных сотрудников.", mail: "Отправка почты не настроена (Настройки → Почта).", sms: "Не настроен SMS-провайдер.", voice: "Для звонков нужен провайдер телефонии.", plan: "Этот канал или шаблон не входит в тариф вашей организации.", launched: "Кампания уже запущена." },
+  tr: { empty: "Hedef kitlede aktif çalışan yok.", mail: "E-posta gönderimi ayarlanmamış (Ayarlar → E-posta).", sms: "SMS sağlayıcısı yapılandırılmamış.", voice: "Sesli aramalar için bir telefon hizmeti sağlayıcısı gerekir.", plan: "Bu kanal veya şablon kuruluşunuzun planına dahil değil.", launched: "Kampanya zaten başlatıldı." },
+  ro: { empty: "Publicul țintă nu are persoane active.", mail: "Trimiterea e-mailurilor nu este configurată (Setări → E-mail).", sms: "Nu este configurat niciun furnizor de SMS.", voice: "Apelurile vocale necesită un furnizor de telefonie.", plan: "Acest canal sau șablon nu este inclus în planul organizației dumneavoastră.", launched: "Campania a fost deja lansată." },
+  ka: { empty: "აუდიტორიაში აქტიური თანამშრომელი არ არის.", mail: "ელფოსტით გაგზავნა არ არის გამართული (პარამეტრები → ელფოსტა).", sms: "SMS-პროვაიდერი არ არის გამართული.", voice: "ზარებისთვის საჭიროა სატელეფონო პროვაიდერი.", plan: "ეს არხი ან შაბლონი თქვენი ორგანიზაციის პაკეტში არ შედის.", launched: "კამპანია უკვე გაშვებულია." },
+  uk: { empty: "В аудиторії немає активних працівників.", mail: "Надсилання пошти не налаштовано (Налаштування → Пошта).", sms: "SMS-провайдера не налаштовано.", voice: "Для дзвінків потрібен провайдер телефонії.", plan: "Цей канал або шаблон не входить до тарифу вашої організації.", launched: "Кампанію вже запущено." },
+  de: { empty: "Die Zielgruppe enthält keine aktiven Personen.", mail: "Der E-Mail-Versand ist nicht eingerichtet (Einstellungen → E-Mail).", sms: "Es ist kein SMS-Anbieter konfiguriert.", voice: "Für Anrufe ist ein Telefonie-Anbieter erforderlich.", plan: "Dieser Kanal oder diese Vorlage ist nicht im Tarif Ihrer Organisation enthalten.", launched: "Die Kampagne wurde bereits gestartet." },
+  fr: { empty: "Le public cible ne compte aucune personne active.", mail: "L’envoi d’e-mails n’est pas configuré (Paramètres → E-mail).", sms: "Aucun fournisseur SMS n’est configuré.", voice: "Les appels vocaux nécessitent un fournisseur de téléphonie.", plan: "Ce canal ou ce modèle ne fait pas partie de l’offre de votre organisation.", launched: "La campagne a déjà été lancée." },
+  ar: { empty: "لا يوجد موظفون نشطون في الجمهور المستهدف.", mail: "لم يتم إعداد إرسال البريد الإلكتروني (الإعدادات ← البريد الإلكتروني).", sms: "لم يتم إعداد مزود خدمة الرسائل النصية.", voice: "تتطلب المكالمات الصوتية مزود خدمة اتصالات هاتفية.", plan: "هذه القناة أو هذا القالب غير مشمول في باقة جهتك.", launched: "تم إطلاق الحملة بالفعل." },
 } satisfies Record<Locale, Record<LaunchBlock, string>>;
 
 /**

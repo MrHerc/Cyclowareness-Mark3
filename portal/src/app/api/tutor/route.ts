@@ -3,10 +3,9 @@ import { and, eq, isNull, or } from "drizzle-orm";
 import { db, t } from "@/server/db";
 import { allowed, getViewer } from "@/server/auth/viewer";
 import { rateLimit } from "@/server/rate-limit";
-import { sha256Hex } from "@/server/crypto";
 import { sameOrigin } from "@/server/request";
 import { readBodyCapped } from "@/server/request-body";
-import { TUTOR_BODY_LIMIT, lessonContext, offlineAnswer, tutorRequest, tutorRequestSchema } from "@/server/tutor";
+import { TUTOR_BODY_LIMIT, lessonContext, offlineAnswer, tutorCacheId, tutorRequest, tutorRequestSchema } from "@/server/tutor";
 import { env } from "@/server/env";
 import { pick } from "@/i18n/config";
 import type { Scene } from "@/lib/content/types";
@@ -61,10 +60,7 @@ export async function POST(request: Request) {
   if (!row) return new Response("Not found", { status: 404 });
   const scenes = row.scenes as Scene[];
 
-  const normalised = question.toLowerCase().replace(/\s+/g, " ").replace(/[?!.]+$/, "");
-  // Answers grounded in a translation are cached apart from those grounded in the English text; the
-  // ids of the latter stay as they were.
-  const cacheId = sha256Hex(`${locale}|${row.id}|${sceneId ?? ""}|${normalised}${row.locale === "en" ? "" : `|${row.locale}`}`);
+  const cacheId = tutorCacheId(locale, row.id, sceneId, question, row.locale, row.scenes);
   const [cached] = await db().select().from(t.tutorCache).where(eq(t.tutorCache.id, cacheId));
   const headers = { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" };
   if (cached) return new Response(cached.answer, { headers: { ...headers, "x-tutor-mode": "cache" } });

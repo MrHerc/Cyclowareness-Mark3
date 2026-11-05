@@ -243,8 +243,8 @@ identically. The shared reader is `src/lib/motion.ts` (§8): `useMotion()` (live
 
 | Component | How it reads | What it changes |
 |---|---|---|
-| `CountUp` (`src/components/ui/count-up.tsx` since 2026-11-04) | `readMotion() === "still"` inside the effect | `p = still ? 1 : …` → a single frame at the final number; at the end it marks its tile `data-counted` (starts the tile's light sweep) |
-| `Burst`, `flyToXp`, `Spotlight` (`src/components/ui/light.tsx`) | `useMotion()` / `readMotion()`; `matchMedia("(pointer: fine)")` | Burst renders nothing and flyToXp does nothing unless Full; Spotlight listens only for mouse and pen (CSS hides it under Still) |
+| `CountUp` (`src/components/ui/count-up.tsx` since 2026-11-04) | `useMotion()`, `COUNT_MS[motion]` | 900 ms under Full, 300 ms under Calm, a single frame at the final number under Still; at the end it marks its tile `data-counted` (starts the tile's light sweep) |
+| `Burst`, `Spotlight` (`src/components/ui/light.tsx`) | `useMotion()`; `matchMedia("(pointer: fine)")` | Burst renders nothing unless Full; Spotlight listens only for mouse and pen (CSS hides it under Still) |
 | Lab VM (`useStill()` in `src/components/lab/vm/hooks.ts`) | `useMotion() === "still"` | the VM's own motion off under Still |
 | `Mascot` (`src/components/mascot/mascot.tsx`) | `useSyncExternalStore(subscribeMotion, readStill, () => false)` (media-query `change` events) plus the explicit `still` prop | `still` → `rive.pause()`; `calm` (the store) → no idle acts, no travel walk, no one-shot `fire` triggers |
 | `LessonPlayer` (`player.tsx`) | `motion` prop from the server → `SceneEnv.still` | passes `still` to every `Mascot` in scenes; nothing else in the player reads it |
@@ -344,7 +344,7 @@ Haptics (not in the spec's motion section but part of the feedback loop): `src/l
   100% keyframe is the resting state (Still runs each animation once, for 1 ms, and stops on its end
   frame). Anything in JS (timers, rAF, the mascot, `scrollIntoView`) must check it itself: `useMotion()`
   or `readMotion()` from `src/lib/motion.ts`, which also give `calm`. Calm in JS: no particles, no
-  fly-ups, no toys (`Burst`, `flyToXp`, the Home card).
+  fly-ups, no toys (`Burst`, the Home card), shorter counts (`CountUp`) and no smooth tour scrolling.
 - **`motion-safe:` / `motion-reduce:` variants** listen to the OS only, not to `data-motion`; none are
   left in `src`. Use `motion-ok:` (not Still) or `motion-full:` (Full only), or a plain class that the
   global `still` rule catches.
@@ -386,8 +386,8 @@ Haptics (not in the spec's motion section but part of the feedback loop): `src/l
    `transform`, `opacity` or `filter`.
 3. Loop animations (like `float`): also add them to the `html[data-motion="calm"] …` rule so `calm`
    switches them off.
-4. JS-driven motion: `readMotion()` inside the effect or handler (pattern: `CountUp`, `flyToXp`) or
-   `useMotion()` when the render depends on it (pattern: `Burst`), both from `src/lib/motion.ts`. Skip
+4. JS-driven motion: `readMotion()` inside a handler or `useMotion()` when the render or an effect
+   depends on it (patterns: `Burst`, `CountUp`, the tours), both from `src/lib/motion.ts`. Skip
    the work under `still`; under `calm` drop loops, particles and anything playful.
 5. Light (a glow, a sweep, an aurora, a spotlight): use the §8 layers and tokens instead of new CSS.
 6. Verify: `npm run typecheck`, `npx eslint src tests scripts --max-warnings=0`, `npx vitest run`; then the
@@ -466,7 +466,7 @@ Haptics (not in the spec's motion section but part of the feedback loop): `src/l
 | Chart draw-in (O2) | Not stated by the spec (verify against `admin-overview-03-charts.jpg`) | Done 2026-11-04: `AreaChart` draws in with a clip rect (`scale`, 1.1 s; the server markup is the final chart) and its latest point glows | — |
 | Fill-on-load for bars/rings (O3, O4, H3, H4) | Not stated | `Ring` fills from empty once on mount (2026-11-04); `ProgressBar` still only on value change, with an optional moving sheen (`shimmer` prop, Full only) | Recipe 6.3 for the bar |
 | Confetti / celebrate layer (F5, P10) | `z-80` overlay "could be a toast/confetti layer" (verify); `recap` has `mood: celebrate` | Since 2026-11-04 `DoneScreen` bursts 12 particles from the XP pill and a chip flies up (Full only) | A full-screen layer only if the original is confirmed to have one |
-| `calm` in JS | "Animation intensity" segment | Closed 2026-11-04 (ADR-032): `useMotion()` reports it; Burst, flyToXp, the Home toys and the cat's acts honour it. CountUp and tour scrolling still treat it as Full | Extend where a JS animation is long or playful |
+| `calm` in JS | "Animation intensity" segment | Closed 2026-11-04 (ADR-032): `useMotion()` reports it; Burst, the Home toys and the cat's acts honour it; since 2026-11-05 CountUp counts for 300 ms and both tours scroll without the smooth glide (flyToXp, which had no caller, was removed) | Extend where a JS animation is long or playful |
 | `motion-safe:` variants vs preference | Full/Calm/Still is per user | Closed 2026-11-04: `motion-ok:` / `motion-full:` custom variants replaced them | — |
 | Dialog/sheet/toast exit | Not stated | Enter only (`animate-rise`), close is instant | Leave as is unless the user asks; recipe 6.4 last bullet |
 | Skeleton coverage (A4) | Shown on admin person page | Three routes only; admin list pages rely on `PendingMark` | Add `<Suspense>` sections inside heavy admin pages (overview charts, reports) rather than route-level `loading.tsx` |
@@ -522,8 +522,7 @@ also not `calm`. Use them for anything that loops or plays (`motion-full:after:a
 anything unknown as Full), `readMotion()` (now, for handlers and effects), `useMotion()` (live through
 `useSyncExternalStore`: `matchMedia` change events and a `MutationObserver` on `data-motion`; the
 server snapshot is Full, and the CSS rules hold Calm and Still back until the client takes over).
-`src/components/ui/light.tsx`: `Burst`, `Spotlight`, and `flyToXp(source)`, which flies a copy of an XP
-pill into the header XP pill (`[data-tour="xp"]`) and bumps it, Full only; it has no caller yet.
+`src/components/ui/light.tsx`: `Burst` and `Spotlight` (`flyToXp`, which never had a caller, was removed 2026-11-05).
 `CountUp` moved to `src/components/ui/count-up.tsx`.
 
 **Rules for new work.**

@@ -284,7 +284,7 @@ function classifyIoc(value: string): t.Ioc | null {
   if (!v) return null;
   if (/^[a-f0-9]{64}$/i.test(v)) return { type: "sha256", value: v.toLowerCase() };
   if (/^\d{1,3}(\.\d{1,3}){3}$/.test(v)) return { type: "ip", value: v };
-  if (/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(v)) return { type: "email", value: v.toLowerCase() };
+  if (/^[^@\s]+@[^@\s]+\.(?:xn--[a-z0-9-]+|[a-z]{2,})$/i.test(v)) return { type: "email", value: v.toLowerCase() };
   if (/^https?:\/\//i.test(v)) return { type: "url", value: v.slice(0, 2000) };
   if (/^[a-z0-9-]+(\.[a-z0-9-]+)+$/i.test(v) && !/\.(exe|dll|js|vbs|lnk|docm|xlsm|zip|iso|html?|pdf|docx?|xlsx?|yml|yaml|json|ps1|bat|cmd)$/i.test(v)) return { type: "domain", value: v.toLowerCase() };
   return { type: "filename", value: v.slice(0, 300) };

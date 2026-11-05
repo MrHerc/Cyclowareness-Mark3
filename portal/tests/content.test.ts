@@ -25,6 +25,25 @@ describe("content library", () => {
     }
   }
 
+  it("refuses a malformed tutor checkpoint and one without a correct option", () => {
+    const lesson = (checkpoint: unknown, stage?: unknown) => ({
+      id: "l",
+      title: "L",
+      minutes: 1,
+      scenes: [{ type: "tutor", id: "t", beats: [{ id: "b", say: "Hi", mood: "talk", checkpoint, stage }] }],
+    });
+    const options = [
+      { id: "a", label: "A", correct: false, feedback: "No" },
+      { id: "b", label: "B", correct: true, feedback: "Yes" },
+    ];
+    expect(lessonFileSchema.safeParse(lesson({ prompt: "Q?" })).success).toBe(false);
+    expect(lessonFileSchema.safeParse(lesson({ prompt: "Q?", options: [{ id: "a", label: "A" }, { id: "b", label: "B" }] })).success).toBe(false);
+    expect(lessonFileSchema.safeParse(lesson({ prompt: "Q?", options }, 3)).success).toBe(false);
+    expect(lessonIntegrityErrors(lessonFileSchema.parse(lesson({ prompt: "Q?", options }, "back")))).toEqual([]);
+    const noneCorrect = lessonFileSchema.parse(lesson({ prompt: "Q?", options: options.map((o) => ({ ...o, correct: false })) }));
+    expect(lessonIntegrityErrors(noneCorrect)).toEqual(["t/b: checkpoint without correct option"]);
+  });
+
   it("has 14 multi-answer choice scenes (more than one correct option, or multi: true)", () => {
     const multi: string[] = [];
     for (const m of modules) {
