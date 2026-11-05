@@ -32,10 +32,16 @@ export async function createSession(p: {
   await db().insert(t.sessions).values({ id, userId: p.userId, tenantId: p.tenantId, expiresAt, twoFactorVerified: p.twoFactorVerified, ip: p.ip, userAgent: p.userAgent });
 
   if (p.maxDevices && p.maxDevices > 0) {
-    const all = await db().select({ id: t.sessions.id }).from(t.sessions).where(eq(t.sessions.userId, p.userId)).orderBy(asc(t.sessions.lastSeenAt));
-    const excess = all.length - p.maxDevices;
-    for (const s of all.slice(0, Math.max(0, excess))) {
-      if (s.id === id) continue;
+    // The new session always stays; the least recently used of the others go until the limit holds. Taking
+    // it out first matters: its last-seen time is the database's clock, the others' that of the app server
+    // that last saw them, so with the clocks out of step it can sort among the oldest.
+    const others = await db()
+      .select({ id: t.sessions.id })
+      .from(t.sessions)
+      .where(and(eq(t.sessions.userId, p.userId), ne(t.sessions.id, id)))
+      .orderBy(asc(t.sessions.lastSeenAt));
+    const excess = others.length + 1 - p.maxDevices;
+    for (const s of others.slice(0, Math.max(0, excess))) {
       await db().delete(t.sessions).where(eq(t.sessions.id, s.id));
       await audit(db(), { tenantId: p.tenantId, actorId: p.userId, action: "auth.device_limit", ip: p.ip });
     }

@@ -50,3 +50,9 @@ All notable changes to this project are recorded here. The format follows
   person. The click, and likewise the fake sign-in, is now claimed by one conditional update, so
   it is recorded once. (`portal/src/server/services/campaigns.ts`, test:
   `tests/campaign-flows.test.ts`)
+- **The device limit could leave one session too many.** When a new sign-in pushed a person over
+  the organisation's device limit, the oldest sessions were removed, skipping the new one if it
+  sorted among them. The new session's last-seen time comes from the database clock and the
+  others' from the app server, so with the clocks out of step the new one could be "oldest" and
+  nothing was removed. The new session is now left out before the oldest of the others are signed
+  out. (`portal/src/server/auth/session.ts`, test: `tests/sessions-viewer.test.ts`)
