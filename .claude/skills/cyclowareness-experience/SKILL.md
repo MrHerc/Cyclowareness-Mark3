@@ -94,9 +94,9 @@ risk score) needs both references.
   the server first. No `Date.now()`, `Math.random()`, `window` or locale formatting in render paths;
   read browser state through `useSyncExternalStore` with a server snapshot (patterns in the references).
 - Database: PGlite locally is single-process. Stop the dev server before `npm run db:reset`,
-  `db:migrate`, `db:seed` or `content:sync`. Schema changes mean regenerating `drizzle/0000_init.sql`
-  from scratch (`rm -rf drizzle && npx drizzle-kit generate --name init`) and reseeding while nothing
-  is deployed; never hand-edit the SQL. Content changes reach the database through
+  `db:migrate`, `db:seed` or `content:sync`. Schema changes are additive migrations: `npm run db:generate` writes
+  `drizzle/000N_<name>.sql` (`0000_init.sql` is frozen since ADR-034, 2026-11-05) and `db:migrate`
+  upgrades an existing database; never hand-edit a pushed migration. Content changes reach the database through
   `npm run content:sync` (`scripts/sync-content.ts`, a full overwrite of library rows) or the seed.
 - Narration goes through `useNarrator().speak()`: a text with a pre-generated ElevenLabs clip plays
   the clip with its word timings (ADR-028; `scripts/generate-narration.ts`, none generated yet), every

@@ -747,13 +747,12 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
   `db:migrate`, `db:seed`, `db:reset`, `content:sync` (README "PGlite is single-process";
   ADR-004). The dev server on :3000 and the presentation copies on :3100/:3200 must not be
   restarted by a reference-writing task.
-- **Schema changes and `drizzle/`.** The repo ships one migration, `drizzle/0000_init.sql` +
-  `drizzle/meta`; `tests/assignment-since.test.ts` migrates a throw-away PGlite from that folder.
-  Project rule (README "Until the first release there is one migration"): until the first
-  production deployment, schema changes regenerate `drizzle/0000_init.sql` from scratch
-  (`rm -rf drizzle && npx drizzle-kit generate --name init`); after that, additive migrations via
-  `npm run db:generate`. Commit SQL and `drizzle/meta` together; a local database created from the
-  previous init cannot be upgraded by `db:migrate`, so stop `next dev` and run `db:reset`.
+- **Schema changes and `drizzle/`.** `drizzle/0000_init.sql` is frozen (ADR-034, 2026-11-05) and
+  every schema change is an additive `drizzle/000N_<name>.sql` written by `npm run db:generate`
+  (the live drill added `0001_live_drill.sql` and `0002_drill_risk_trail.sql`). Commit the SQL and
+  `drizzle/meta` together; never edit a pushed migration. `tests/helpers/db.ts` and
+  `tests/assignment-since.test.ts` migrate a throw-away PGlite from that folder, so every migration
+  must apply cleanly in order. Upgrade a local database with `db:migrate` (stop `next dev` first).
 - **`content:sync` is a full overwrite** for library rows: module metadata, lesson titles,
   positions and the scenes of every language. Do not hand-edit library rows in the database. Tenant studio
   rows (`origin != "library"`, slug prefix `own-` or, for AI-trainer output, `ai-`) are never
@@ -845,12 +844,12 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
   `src/server/services/progress.ts`; the `awaiting_attestation` status is read by Home, catalog,
   module page and `remindAwaitingAction`.
 - A real pass mark would need a new column on `lessons` or `modules`, a check in
-  `completeLessonAction` using the submitted `answers`, and a regenerated migration.
+  `completeLessonAction` using the submitted `answers`, and an additive migration.
 - Risk weights: `src/lib/domain/risk.ts` + `tests/domain.test.ts` (every weight is pinned).
 
 ### 8.4 Add a studio material type (new `origin`)
 
-1. `materials.origin` enum in `src/server/db/schema.ts`; regenerate the migration.
+1. `materials.origin` enum in `src/server/db/schema.ts`; add a migration (`npm run db:generate`).
 2. Creation path: a branch in `createMaterialAction` or a new action in
    `src/server/actions/secops.ts` (permission `studio.write`, audit `material.created`).
 3. Pill tones in `src/app/(admin)/admin/studio/page.tsx` and `approvals/page.tsx`; i18n
@@ -859,7 +858,7 @@ Shared helper: `pick(map, locale)` (`src/i18n/config.ts`) → `locale → en →
 ### 8.5 Add an approval step
 
 1. Extend `MATERIAL_STATUS` (and `material_decisions.decision` if needed) in
-   `src/server/db/schema.ts`; regenerate the migration.
+   `src/server/db/schema.ts`; add a migration (`npm run db:generate`).
 2. Update the state machine in `decideMaterialAction` (`src/server/actions/secops.ts`), keeping
    the "different actor" rule and the audit meta (`step`).
 3. Add the tab to `TABS` in `src/app/(admin)/admin/approvals/page.tsx`, the `?tab=` mapping in
