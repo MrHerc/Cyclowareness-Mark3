@@ -24,3 +24,18 @@ All notable changes to this project are recorded here. The format follows
   product is sold in, whether typed in Unicode or in their ASCII (`xn--`) form. They are now
   accepted and stored in their ASCII form. (`portal/src/server/auth/domain-proof.ts`, test:
   `tests/password-domain.test.ts`)
+- **A lesson completion sent twice awarded its XP twice.** `completeLesson` read the lesson's
+  progress and then wrote it, so two requests at the same moment (a double submit, a network
+  retry) both saw the lesson as new. The first completion is now claimed by one conditional
+  statement, so only one request awards the XP. (`portal/src/server/services/progress.ts`, test:
+  `tests/learner-progress.test.ts`)
+- **An attestation sent twice stored two attestations and issued two certificates.** The module
+  is now moved out of "awaiting attestation" by a conditional update, and only the request that
+  does so stores the attestation and issues the certificate. The completion and its attestation
+  text are written in one transaction, so compliance evidence never shows one without the other.
+  (`portal/src/server/services/progress.ts`, test: `tests/learner-progress.test.ts`)
+- **The lesson XP split went wrong for Studio and SecOps modules.** The split used the stored
+  lesson position as the lesson's index, but those modules number their lessons from 1, so the
+  remainder went to the second-to-last lesson, and a gap in the positions lost XP (99 of 100). The
+  split now uses the lesson's place among its siblings. (`portal/src/server/services/progress.ts`,
+  test: `tests/learner-progress.test.ts`)

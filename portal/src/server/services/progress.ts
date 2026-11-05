@@ -3,7 +3,7 @@
  * Every function takes the database explicitly so the seed can replay history with past dates.
  */
 import { encodeBase32LowerCaseNoPadding } from "@oslojs/encoding";
-import { and, asc, count, eq, inArray, lte, sql } from "drizzle-orm";
+import { and, asc, count, eq, inArray, isNull, lte, sql } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
 import { dayKey, lessonXp, nextStreak } from "../../lib/domain/gamification";
@@ -63,27 +63,31 @@ export async function completeLesson(
   const [mod] = await db.select({ xp: t.modules.xp }).from(t.modules).where(eq(t.modules.id, lesson.moduleId));
   const siblings = await db.select({ id: t.lessons.id }).from(t.lessons).where(eq(t.lessons.moduleId, lesson.moduleId)).orderBy(asc(t.lessons.position));
 
-  const [existing] = await db
-    .select()
-    .from(t.lessonProgress)
-    .where(and(eq(t.lessonProgress.userId, p.userId), eq(t.lessonProgress.lessonId, p.lessonId)));
-  const firstTime = !existing?.completedAt;
-  const xp = firstTime ? lessonXp(mod.xp, siblings.length, lesson.position) : 0;
+  // The first completion is claimed by a single statement: the row is created, or an uncompleted one
+  // completed, and only that statement returns it. Two requests at the same moment (a double submit, a
+  // retry) therefore cannot both see the lesson as new and award its XP twice.
+  const thisLesson = and(eq(t.lessonProgress.userId, p.userId), eq(t.lessonProgress.lessonId, p.lessonId));
+  const claimed = await db
+    .insert(t.lessonProgress)
+    .values({ userId: p.userId, lessonId: p.lessonId, completedAt: at, lastCompletedAt: at, xpAwarded: 0, attempts: 0, secondsSpent: 0 })
+    .onConflictDoUpdate({ target: [t.lessonProgress.userId, t.lessonProgress.lessonId], set: { completedAt: at }, where: isNull(t.lessonProgress.completedAt) })
+    .returning({ userId: t.lessonProgress.userId });
+  const firstTime = claimed.length > 0;
+  // The lesson's place among its siblings, not its stored position: Studio lessons are numbered from 1
+  // and positions can have gaps, and the remainder of the split must still go to the last lesson.
+  const index = siblings.findIndex((s) => s.id === lesson.id);
+  const xp = firstTime ? lessonXp(mod.xp, siblings.length, index) : 0;
 
   await db
-    .insert(t.lessonProgress)
-    .values({ userId: p.userId, lessonId: p.lessonId, completedAt: at, lastCompletedAt: at, xpAwarded: xp, attempts: 1, secondsSpent: p.secondsSpent ?? 0 })
-    .onConflictDoUpdate({
-      target: [t.lessonProgress.userId, t.lessonProgress.lessonId],
-      set: {
-        completedAt: sql`coalesce(${t.lessonProgress.completedAt}, ${at.toISOString()}::timestamptz)`,
-        // Replayed history (seed) can arrive out of order; keep the latest completion.
-        lastCompletedAt: sql`greatest(coalesce(${t.lessonProgress.lastCompletedAt}, ${at.toISOString()}::timestamptz), ${at.toISOString()}::timestamptz)`,
-        xpAwarded: sql`${t.lessonProgress.xpAwarded} + ${xp}`,
-        attempts: sql`${t.lessonProgress.attempts} + 1`,
-        secondsSpent: sql`${t.lessonProgress.secondsSpent} + ${p.secondsSpent ?? 0}`,
-      },
-    });
+    .update(t.lessonProgress)
+    .set({
+      // Replayed history (seed) can arrive out of order; keep the latest completion.
+      lastCompletedAt: sql`greatest(coalesce(${t.lessonProgress.lastCompletedAt}, ${at.toISOString()}::timestamptz), ${at.toISOString()}::timestamptz)`,
+      xpAwarded: sql`${t.lessonProgress.xpAwarded} + ${xp}`,
+      attempts: sql`${t.lessonProgress.attempts} + 1`,
+      secondsSpent: sql`${t.lessonProgress.secondsSpent} + ${p.secondsSpent ?? 0}`,
+    })
+    .where(thisLesson);
   if (xp > 0) await awardXp(db, { tenantId: p.tenantId, userId: p.userId, amount: xp, reason: "lesson", ref: p.lessonId, at });
 
   const [{ done }] = await db
@@ -209,16 +213,21 @@ export async function attestModule(
   p: { tenantId: string; userId: string; moduleId: string; text: string; locale: string; at?: Date },
 ): Promise<{ publicToken: string } | null> {
   const at = p.at ?? new Date();
-  const [mp] = await db
-    .select({ status: t.moduleProgress.status })
-    .from(t.moduleProgress)
-    .where(and(eq(t.moduleProgress.userId, p.userId), eq(t.moduleProgress.moduleId, p.moduleId)));
-  if (!mp || mp.status !== "awaiting_attestation") return null;
-  await db.insert(t.attestations).values({ tenantId: p.tenantId, userId: p.userId, moduleId: p.moduleId, text: p.text, locale: p.locale, at });
-  await db
-    .update(t.moduleProgress)
-    .set({ status: "completed", completedAt: at, percent: 100 })
-    .where(and(eq(t.moduleProgress.userId, p.userId), eq(t.moduleProgress.moduleId, p.moduleId)));
+  // Only the request that moves the module out of "awaiting attestation" goes on, so a confirmation sent
+  // twice (a double click, a retry) stores one attestation and issues one certificate. The completion and
+  // its attestation text are written together: compliance evidence never shows one without the other.
+  const claimed = await db.transaction(async (tx) => {
+    const [row] = await tx
+      .update(t.moduleProgress)
+      .set({ status: "completed", completedAt: at, percent: 100 })
+      .where(and(eq(t.moduleProgress.userId, p.userId), eq(t.moduleProgress.moduleId, p.moduleId), eq(t.moduleProgress.status, "awaiting_attestation")))
+      .returning({ userId: t.moduleProgress.userId });
+    if (!row) return false;
+    await tx.insert(t.attestations).values({ tenantId: p.tenantId, userId: p.userId, moduleId: p.moduleId, text: p.text, locale: p.locale, at });
+    return true;
+  });
+  if (!claimed) return null;
+  // Outside the transaction: its retry on a duplicate serial would fail inside an aborted one.
   const cert = await issueCertificate(db, { tenantId: p.tenantId, userId: p.userId, moduleId: p.moduleId, at });
   await db
     .update(t.behaviorRisks)
