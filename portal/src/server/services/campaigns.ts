@@ -84,7 +84,14 @@ export async function launchCampaign(db: DB, campaignId: string, actorId: string
     return { ok: false, reason: block };
   }
   const now = new Date();
-  await db.update(t.campaigns).set({ status: "running", launchedAt: now }).where(eq(t.campaigns.id, c.id));
+  // Only the request that moves the campaign out of draft or scheduled sends it: a second click on
+  // Launch, or the scheduler firing while someone launches by hand, must not send everyone a second copy.
+  const [claimed] = await db
+    .update(t.campaigns)
+    .set({ status: "running", launchedAt: now })
+    .where(and(eq(t.campaigns.id, c.id), inArray(t.campaigns.status, ["draft", "scheduled"])))
+    .returning({ id: t.campaigns.id });
+  if (!claimed) return { ok: false, reason: "empty" };
   let count = 0;
   for (const u of audience) {
     const token = randomToken(16);
@@ -136,9 +143,18 @@ export async function recordClick(db: DB, token: string, via: "link" | "qr") {
   const tpl = TEMPLATE_BY_KEY.get(row.c.templateKey);
   if (!tpl) return null;
   const cancelled = row.c.status === "cancelled";
-  if (!row.r.clickedAt && !cancelled) {
-    const now = new Date();
-    await db.update(t.campaignRecipients).set({ clickedAt: now, openedAt: row.r.openedAt ?? now }).where(eq(t.campaignRecipients.id, row.r.id));
+  const now = new Date();
+  // The click is claimed by one conditional update, so two requests at the same moment (a double tap, a
+  // browser retry) record one click, one risk and one event.
+  const [claimed] =
+    !row.r.clickedAt && !cancelled
+      ? await db
+          .update(t.campaignRecipients)
+          .set({ clickedAt: now, openedAt: sql`coalesce(${t.campaignRecipients.openedAt}, ${now.toISOString()}::timestamptz)` })
+          .where(and(eq(t.campaignRecipients.id, row.r.id), isNull(t.campaignRecipients.clickedAt)))
+          .returning({ id: t.campaignRecipients.id })
+      : [];
+  if (claimed) {
     const [mod] = await db.select({ id: t.modules.id }).from(t.modules).where(and(eq(t.modules.slug, tpl.moduleSlug), isNull(t.modules.tenantId)));
     await db.insert(t.behaviorRisks).values({
       tenantId: row.c.tenantId,
@@ -164,7 +180,13 @@ export async function recordSubmit(db: DB, token: string) {
     .innerJoin(t.campaigns, eq(t.campaigns.id, t.campaignRecipients.campaignId))
     .where(eq(t.campaignRecipients.token, token));
   if (!row || row.r.submittedAt || row.c.status === "cancelled") return;
-  await db.update(t.campaignRecipients).set({ submittedAt: new Date() }).where(eq(t.campaignRecipients.id, row.r.id));
+  // Claimed once, as the click is: a form sent twice raises the risk and emits the event once.
+  const [claimed] = await db
+    .update(t.campaignRecipients)
+    .set({ submittedAt: new Date() })
+    .where(and(eq(t.campaignRecipients.id, row.r.id), isNull(t.campaignRecipients.submittedAt)))
+    .returning({ id: t.campaignRecipients.id });
+  if (!claimed) return;
   await db
     .update(t.behaviorRisks)
     .set({ severity: "high" })
