@@ -23,7 +23,7 @@ export function LanguageSwitcher({ className, locales = LOCALES }: { className?:
   return (
     <label
       className={cn(
-        "relative inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-pill border border-line bg-surface px-3 text-caption font-semibold whitespace-nowrap text-ink hover:bg-sunken has-[select:focus-visible]:outline-2 has-[select:focus-visible]:outline-offset-2 has-[select:focus-visible]:outline-brand-600 has-[select:disabled]:opacity-60 sm:pe-4 pointer-coarse:h-11",
+        "relative inline-flex h-9 shrink-0 cursor-pointer items-center gap-1.5 rounded-pill border border-line bg-surface px-2.5 text-caption font-semibold whitespace-nowrap text-ink hover:bg-sunken has-[select:focus-visible]:outline-2 has-[select:focus-visible]:outline-offset-2 has-[select:focus-visible]:outline-brand-600 has-[select:disabled]:opacity-60 sm:px-3 sm:pe-4 pointer-coarse:h-11",
         className,
       )}
     >

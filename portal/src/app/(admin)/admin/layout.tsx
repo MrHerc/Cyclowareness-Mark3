@@ -13,6 +13,7 @@ import { AdminMobileMenu, AdminNav, type AdminNavGroup } from "@/components/shel
 import { NotificationsButton } from "@/components/shell/notifications";
 import { AccountMenu } from "@/components/admin/account-menu";
 import { AdminGuideButton, AdminTour } from "@/components/admin/admin-tour";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { BrandMark, TenantMark, isVendorLogo } from "@/components/brand";
 import { Avatar } from "@/components/ui/avatar";
 import { textLinkClass } from "@/components/ui/button";
@@ -161,6 +162,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         ) : (
           <TenantMark name={v.tenant.name} logoUrl={v.tenant.branding.logoUrl} className="min-w-0 flex-1" />
         )}
+        <LanguageSwitcher locales={v.tenant.settings.locales} className="h-10" />
         <AdminGuideButton />
         <NotificationsButton items={notes.map((n) => ({ id: n.id, title: n.title, body: n.body, href: n.href, createdAt: n.createdAt.toISOString(), read: !!n.readAt }))} />
       </header>

@@ -11,6 +11,7 @@ import { BrandMark, TenantMark, isVendorLogo } from "@/components/brand";
 import { Avatar } from "@/components/ui/avatar";
 import { ReportButton } from "@/components/learner/report-button";
 import { Tour } from "@/components/learner/tour";
+import { LanguageSwitcher } from "@/components/language-switcher";
 import { dayKey, liveStreak } from "@/lib/domain/gamification";
 
 export default async function LearnerLayout({ children }: { children: React.ReactNode }) {
@@ -52,7 +53,8 @@ export default async function LearnerLayout({ children }: { children: React.Reac
       <header className="sticky top-0 z-20 border-b border-line/70 pt-(--safe-top)">
         {/* The blur sits on a layer, not the header: backdrop-filter would make the header the box every fixed popover inside it is placed in. */}
         <div aria-hidden className="absolute inset-0 -z-10 bg-canvas/85 backdrop-blur-xl" />
-        <div className="mx-auto flex h-(--topbar-height) max-w-(--container-content) items-center gap-2 px-4 sm:gap-3 sm:px-6 lg:px-10">
+        {/* gap-1.5 below sm: with the language picker, six pills must fit a 320 px phone. */}
+        <div className="mx-auto flex h-(--topbar-height) max-w-(--container-content) items-center gap-1.5 px-4 sm:gap-3 sm:px-6 lg:px-10">
           {/* The vendor's own wordmark already sits in the rail lockup; below the rail breakpoint the product mark takes its place. */}
           {isVendorLogo(v.tenant.branding.logoUrl) ? (
             <span className="flex min-w-0 flex-1">
@@ -61,6 +63,7 @@ export default async function LearnerLayout({ children }: { children: React.Reac
           ) : (
             <TenantMark name={v.tenant.name} logoUrl={v.tenant.branding.logoUrl} className="min-w-0 flex-1" />
           )}
+          <LanguageSwitcher locales={v.tenant.settings.locales} className="h-10" />
           <ReportButton className="pointer-coarse:h-11 pointer-coarse:min-w-11 pointer-coarse:justify-center" />
           <NotificationsButton
             items={notes.map((n) => ({ id: n.id, title: n.title, body: n.body, href: n.href, createdAt: n.createdAt.toISOString(), read: !!n.readAt }))}
