@@ -116,3 +116,16 @@ describe("deleting a person", () => {
     expect((await row(ids.learner)).email).toBe(`deleted+${ids.learner}@invalid.local`);
   });
 });
+
+describe("unlinking single sign-on", () => {
+  it("clears the bound provider identity and records it", async () => {
+    const { audit } = await import("../src/server/services/audit");
+    actor = { id: ids.admin, role: "tenant_admin" };
+    const [u] = await db.insert(t.users).values({ tenantId, email: "sso@platform.test", name: "Sso", ssoSubject: "https://idp.test sub-1" }).returning();
+    expect(await people.unlinkSsoAction(u.id)).toEqual({ ok: true });
+    expect((await db.select({ s: t.users.ssoSubject }).from(t.users).where(eq(t.users.id, u.id)))[0].s).toBeNull();
+    expect(audit).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ action: "sso.unlinked", targetId: u.id }));
+    // Nothing to unlink: no entry, no success.
+    expect(await people.unlinkSsoAction(u.id)).toEqual({ ok: false });
+  });
+});

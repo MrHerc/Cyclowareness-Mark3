@@ -1,6 +1,14 @@
 /** RFC 4180 CSV parsing and writing (quotes, embedded commas and newlines, ; or , delimiter). */
 import { bakuParts } from "./baku-clock";
 
+/**
+ * A people import travels as a Server Action argument, under Next's 1 MB request body limit, and the body carries the
+ * file JSON-escaped (quotes and line breaks doubled): the cap is measured on that form, with room for the rest of the
+ * request. The 5,000-row cap still applies.
+ */
+export const IMPORT_MAX_BYTES = 900_000;
+export const importTooBig = (csv: string) => new Blob([JSON.stringify(csv)]).size > IMPORT_MAX_BYTES;
+
 export function parseCsv(input: string): string[][] {
   const text = input.replace(/^﻿/, "");
   const firstLine = text.split(/\r?\n/, 1)[0] ?? "";

@@ -1,5 +1,8 @@
-import { createTOTPKeyURI, verifyTOTPWithGracePeriod } from "@oslojs/otp";
+import { timingSafeEqual } from "node:crypto";
+import { createTOTPKeyURI, generateHOTP } from "@oslojs/otp";
 import { decodeBase32IgnorePadding, encodeBase32UpperCaseNoPadding } from "@oslojs/encoding";
+import { and, eq, sql } from "drizzle-orm";
+import { db, t } from "../db";
 import { decryptSecret, encryptSecret, hmac, sha256Hex } from "../crypto";
 import { env } from "../env";
 
@@ -17,11 +20,31 @@ export function totpUri(issuer: string, account: string, base32: string): string
   return createTOTPKeyURI(issuer, account, decodeBase32IgnorePadding(base32), TOTP_PERIOD, TOTP_DIGITS);
 }
 
-/** Accepts the current code and one step either side (clock drift). */
-export function verifyTotp(encryptedKey: string | null, code: string): boolean {
+/** The time step (current, or one either side for clock drift) whose code this is, else null. */
+export function totpStep(encryptedKey: string | null, code: string, now = Date.now()): number | null {
   const base32 = decryptSecret(encryptedKey);
-  if (!base32 || !/^\d{6}$/.test(code)) return false;
-  return verifyTOTPWithGracePeriod(decodeBase32IgnorePadding(base32), TOTP_PERIOD, TOTP_DIGITS, code, TOTP_PERIOD);
+  if (!base32 || !/^\d{6}$/.test(code)) return null;
+  const key = decodeBase32IgnorePadding(base32);
+  const current = Math.floor(now / 1000 / TOTP_PERIOD);
+  for (const step of [current - 1, current, current + 1]) {
+    if (timingSafeEqual(Buffer.from(generateHOTP(key, BigInt(step), TOTP_DIGITS)), Buffer.from(code))) return step;
+  }
+  return null;
+}
+
+/**
+ * Accepts a code once: the matched step is recorded in one conditional update, so the same code (or an older one)
+ * is refused afterwards, even when two requests carry it at the same time.
+ */
+export async function verifyTotpOnce(userId: string, encryptedKey: string | null, code: string): Promise<boolean> {
+  const step = totpStep(encryptedKey, code);
+  if (step === null) return false;
+  const taken = await db()
+    .update(t.users)
+    .set({ totpLastStep: step })
+    .where(and(eq(t.users.id, userId), sql`(${t.users.totpLastStep} is null or ${t.users.totpLastStep} < ${step})`))
+    .returning({ id: t.users.id });
+  return taken.length > 0;
 }
 
 /** Ten single-use backup codes, shown once; only their hashes are stored. */

@@ -19,7 +19,8 @@ import { coveringAssignments, departmentClosure, gainsCoverage, resolveAssignmen
 import { recomputeRisk } from "../services/risk";
 import { scopeDepartmentIds } from "../queries/admin";
 import { clientIp } from "../request";
-import { parseCsv } from "../../lib/csv";
+import { rateLimit } from "../rate-limit";
+import { importTooBig, parseCsv } from "../../lib/csv";
 import { cleanPhone, PHONE_PATTERN } from "../../lib/phone";
 import { departmentKey } from "../../lib/departments";
 import { LOCALES, LOCALE_NAMES, type Locale } from "../../i18n/config";
@@ -66,11 +67,18 @@ const personSchema = z.object({
 /** `fields`: the inputs the server rejected (zod paths), so the form marks exactly those. */
 export type PersonState = { ok?: boolean; error?: string; name?: string; fields?: string[] } | undefined;
 
-/** Phone numbers sign people in, so a number can belong to one account only (across organisations). */
-async function phoneTaken(phone: string, exceptUserId?: string): Promise<boolean> {
-  const rows = await db().select({ id: t.users.id }).from(t.users).where(and(eq(t.users.phone, phone), ne(t.users.status, "deleted"))).limit(2);
-  return rows.some((r) => r.id !== exceptUserId);
+/**
+ * Phone numbers sign people in, so a number can belong to one account only (across organisations): the organisation
+ * of the live account that holds it, else null. An administrator is told which account only within their own
+ * organisation; a number held elsewhere is just "cannot be added" (no cross-organisation existence oracle).
+ */
+async function phoneHolder(phone: string, exceptUserId?: string): Promise<string | null> {
+  const rows = await db().select({ id: t.users.id, tenantId: t.users.tenantId }).from(t.users).where(and(eq(t.users.phone, phone), ne(t.users.status, "deleted"))).limit(2);
+  return rows.find((r) => r.id !== exceptUserId)?.tenantId ?? null;
 }
+
+/** The problem to report for a taken address or number: its own account within the organisation, a neutral reason outside it. */
+const takenBy = <T extends string>(holderTenantId: string, v: Viewer, own: T): T | "cannotAdd" => (holderTenantId === v.tenant.id ? own : "cannotAdd");
 
 /** Domains other organisations have proven: their addresses cannot be claimed here (that would block them from adding their own people). */
 async function foreignVerifiedDomains(tenantId: string): Promise<Set<string>> {
@@ -84,27 +92,27 @@ async function foreignVerifiedDomains(tenantId: string): Promise<Set<string>> {
 /** Values go to the database in batches of this size (an import holds up to 5,000 rows). */
 const LOOKUP_BATCH = 500;
 
-/** Which of these addresses already belong to an account: any organisation, deleted ones included, as the unique index spans them all. */
-async function takenEmails(emails: string[]): Promise<Set<string>> {
+/** Which of these addresses already belong to an account, and in which organisation: any one, deleted accounts included, as the unique index spans them all. */
+async function takenEmails(emails: string[]): Promise<Map<string, string>> {
   const wanted = [...new Set(emails.filter(Boolean))];
-  const taken = new Set<string>();
+  const taken = new Map<string, string>();
   for (let i = 0; i < wanted.length; i += LOOKUP_BATCH) {
-    const rows = await db().select({ email: t.users.email }).from(t.users).where(inArray(t.users.email, wanted.slice(i, i + LOOKUP_BATCH)));
-    for (const r of rows) taken.add(r.email);
+    const rows = await db().select({ email: t.users.email, tenantId: t.users.tenantId }).from(t.users).where(inArray(t.users.email, wanted.slice(i, i + LOOKUP_BATCH)));
+    for (const r of rows) taken.set(r.email, r.tenantId);
   }
   return taken;
 }
 
-/** Which of these numbers already belong to a live account (see phoneTaken). */
-async function takenPhones(phones: string[]): Promise<Set<string>> {
+/** Which of these numbers already belong to a live account, and in which organisation (see phoneHolder). */
+async function takenPhones(phones: string[]): Promise<Map<string, string>> {
   const wanted = [...new Set(phones.filter(Boolean))];
-  const taken = new Set<string>();
+  const taken = new Map<string, string>();
   for (let i = 0; i < wanted.length; i += LOOKUP_BATCH) {
     const rows = await db()
-      .select({ phone: t.users.phone })
+      .select({ phone: t.users.phone, tenantId: t.users.tenantId })
       .from(t.users)
       .where(and(inArray(t.users.phone, wanted.slice(i, i + LOOKUP_BATCH)), ne(t.users.status, "deleted")));
-    for (const r of rows) taken.add(r.phone!);
+    for (const r of rows) taken.set(r.phone!, r.tenantId);
   }
   return taken;
 }
@@ -118,10 +126,14 @@ export async function addPersonAction(_: PersonState, form: FormData): Promise<P
     return { error: fields.length === 1 && fields[0] === "phone" ? "invalidPhone" : "invalid", fields };
   }
   if (p.data.role === "tenant_admin" && v.user.role !== "tenant_admin" && v.user.role !== "super_admin") return { error: "invalid" };
-  const [exists] = await db().select({ id: t.users.id }).from(t.users).where(eq(t.users.email, p.data.email));
-  if (exists) return { error: "emailTaken" };
+  // Each answer tells whether an address exists somewhere, so an administrator gets a bounded number of tries.
+  if (!(await rateLimit(`people-add:${v.user.id}`, 60, 60 * 60_000)).ok) return { error: "rateLimited" };
+  // Checked before any lookup: an address on another organisation's proven domain gets the same answer whether or not it exists.
   if ((await foreignVerifiedDomains(v.tenant.id)).has(emailDomain(p.data.email) ?? "")) return { error: "foreignDomain" };
-  if (p.data.phone && (await phoneTaken(p.data.phone))) return { error: "phoneTaken" };
+  const [exists] = await db().select({ tenantId: t.users.tenantId }).from(t.users).where(eq(t.users.email, p.data.email));
+  if (exists) return { error: takenBy(exists.tenantId, v, "emailTaken") };
+  const holder = p.data.phone ? await phoneHolder(p.data.phone) : null;
+  if (holder) return { error: takenBy(holder, v, "phoneTaken") };
   if (p.data.departmentId) {
     const [dept] = await db().select({ id: t.departments.id }).from(t.departments).where(and(eq(t.departments.id, p.data.departmentId), eq(t.departments.tenantId, v.tenant.id)));
     if (!dept) return { error: "invalid", fields: ["departmentId"] };
@@ -198,7 +210,7 @@ const updateSchema = z.object({
 });
 
 /** `error` and `fields` as for adding a person, so the dialog marks the rejected input. */
-export type UpdatePersonResult = { ok: boolean; error?: "invalid" | "invalidPhone" | "phoneTaken"; fields?: string[] };
+export type UpdatePersonResult = { ok: boolean; error?: "invalid" | "invalidPhone" | "phoneTaken" | "cannotAdd" | "rateLimited"; fields?: string[] };
 
 export async function updatePersonAction(userId: string, input: z.input<typeof updateSchema>): Promise<UpdatePersonResult> {
   const v = await actionViewer("people.write");
@@ -209,7 +221,10 @@ export async function updatePersonAction(userId: string, input: z.input<typeof u
     const fields = [...new Set(p.error.issues.map((i) => String(i.path[0] ?? "")).filter(Boolean))];
     return { ok: false, error: fields.length === 1 && fields[0] === "phone" ? "invalidPhone" : "invalid", fields };
   }
-  if (p.data.phone && (await phoneTaken(p.data.phone, u.id))) return { ok: false, error: "phoneTaken", fields: ["phone"] };
+  // A new number is looked up across organisations, like an addition: it counts against the same per-administrator limit.
+  if (p.data.phone && p.data.phone !== u.phone && !(await rateLimit(`people-add:${v.user.id}`, 60, 60 * 60_000)).ok) return { ok: false, error: "rateLimited" };
+  const holder = p.data.phone ? await phoneHolder(p.data.phone, u.id) : null;
+  if (holder) return { ok: false, error: takenBy(holder, v, "phoneTaken"), fields: ["phone"] };
   try {
     await db().update(t.users).set({ name: p.data.name, jobTitle: p.data.jobTitle || null, phone: p.data.phone || null, locale: p.data.locale }).where(eq(t.users.id, u.id));
   } catch (error) {
@@ -245,6 +260,17 @@ export async function resetTwoFactorAction(userId: string): Promise<{ ok: boolea
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "auth.2fa_reset", targetType: "user", targetId: u.id, ip: await clientIp() });
   const tr = await getTranslations({ locale: u.locale, namespace: "admin.person" });
   await db().insert(t.notifications).values({ tenantId: v.tenant.id, userId: u.id, kind: "security", title: tr("twoFactorResetTitle"), body: tr("twoFactorResetBody"), href: "/profile" });
+  refresh();
+  return { ok: true };
+}
+
+/** Clears the provider identity bound at the first SSO sign-in (sso_subject); the next sign-in binds the account anew (a person re-created at the identity provider). */
+export async function unlinkSsoAction(userId: string): Promise<{ ok: boolean }> {
+  const v = await actionViewer("people.write");
+  const u = await target(v, userId);
+  if (!u?.ssoSubject) return { ok: false };
+  await db().update(t.users).set({ ssoSubject: null }).where(eq(t.users.id, u.id));
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "sso.unlinked", targetType: "user", targetId: u.id, ip: await clientIp() });
   refresh();
   return { ok: true };
 }
@@ -316,7 +342,7 @@ async function anonymise(v: Viewer, u: { id: string; email: string }, action: "p
   await db().transaction(async (tx) => {
     await tx
       .update(t.users)
-      .set({ name: "—", email: `deleted+${userId}@invalid.local`, phone: null, jobTitle: null, avatarUrl: null, passwordHash: null, totpSecret: null, totpEnabled: false, totpRecovery: null, status: "deleted", deletionRequestedAt: null, managerId: null })
+      .set({ name: "—", email: `deleted+${userId}@invalid.local`, phone: null, jobTitle: null, avatarUrl: null, passwordHash: null, ssoSubject: null, totpSecret: null, totpEnabled: false, totpRecovery: null, status: "deleted", deletionRequestedAt: null, managerId: null })
       .where(eq(t.users.id, userId));
     // Nobody is managed or headed by a deleted person: manager alerts would otherwise go nowhere.
     await tx.update(t.departments).set({ headUserId: null }).where(and(eq(t.departments.headUserId, userId), eq(t.departments.tenantId, v.tenant.id)));
@@ -477,7 +503,10 @@ const IMPORT_TEXT_MAX = 120;
 /** CSV import in two steps: "check" validates everything, "commit" writes only a clean file. */
 export async function importPeopleAction(csv: string, commit: boolean): Promise<ImportPreview> {
   const v = await actionViewer("people.write");
-  if (csv.length > 5_000_000) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "tooMany" };
+  // A check reports which of up to 5,000 addresses exist somewhere, so an administrator gets a bounded number of them
+  // (the commit of a checked file is not another probe).
+  if (!commit && !(await rateLimit(`people-import:${v.user.id}`, 20, 60 * 60_000)).ok) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "rateLimited" };
+  if (importTooBig(csv)) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "tooBig" };
   const table = parseCsv(csv);
   if (table.length < 2) return { ok: false, rows: 0, problems: [{ line: 1, problem: "header" }], newDepartments: [] };
   const header = table[0].map((h) => {
@@ -530,8 +559,9 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
     if (!name) problems.push({ line, problem: "name" });
     if (!z.email().max(254).safeParse(email).success) problems.push({ line, problem: "email" });
     else if (seen.has(email)) problems.push({ line, problem: "duplicate" });
-    else if (existing.has(email)) problems.push({ line, problem: "exists" });
+    // Another organisation's proven domain answers the same whether or not the address exists.
     else if (foreign.has(emailDomain(email) ?? "")) problems.push({ line, problem: "foreignDomain" });
+    else if (existing.has(email)) problems.push({ line, problem: takenBy(existing.get(email)!, v, "exists") });
     seen.add(email);
     // Own keys only: "constructor" or "__proto__" in the file must not match what every object inherits.
     const role = roleRaw ? (Object.hasOwn(ROLE_ALIASES, roleRaw) ? ROLE_ALIASES[roleRaw] : undefined) : "learner";
@@ -540,8 +570,8 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
     const phone = cleanPhone(get("phone"));
     if (phone && !PHONE_PATTERN.test(phone)) problems.push({ line, problem: "phone" });
     else if (phone) {
-      if (phones.has(phone)) problems.push({ line, problem: "phoneTaken" });
-      phones.add(phone);
+      if (phones.has(phone)) problems.push({ line, problem: takenBy(phones.get(phone)!, v, "phoneTaken") });
+      phones.set(phone, v.tenant.id);
     }
     const key = departmentKey(department);
     if (department && (deptMatches.get(key)?.length ?? 0) > 1) problems.push({ line, problem: "departmentAmbiguous" });

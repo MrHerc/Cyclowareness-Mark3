@@ -14,6 +14,7 @@ import { env } from "../env";
 import { resendableMail, sendTestEmail } from "../mail";
 import { destinationProblem } from "../net-guard";
 import { clientIp } from "../request";
+import { rateLimit } from "../rate-limit";
 import { LOCALES, isLocale } from "../../i18n/config";
 import { isHexColor } from "../../lib/color";
 import { WEBHOOK_EVENTS, withDefaults } from "../../lib/tenant-defaults";
@@ -115,10 +116,12 @@ export async function domainProofRecordAction(): Promise<{ record: string }> {
  * re-check has failed for a week (or for good, when the operator forced the proof).
  * `kept` tells the form that the current proof is still in place.
  */
-export async function verifyDomainAction(domain: string): Promise<{ ok: boolean; verified: boolean; found: boolean; kept: boolean; verifiedOn?: string }> {
+export async function verifyDomainAction(domain: string): Promise<{ ok: boolean; verified: boolean; found: boolean; kept: boolean; verifiedOn?: string; error?: "rateLimited" }> {
   const v = await actionViewer("settings.write");
   const host = normaliseHost(domain);
   if (!host) return { ok: false, verified: false, found: false, kept: false };
+  // Two DNS lookups per check: a few an hour per organisation.
+  if (!(await rateLimit(`domain-check:${v.tenant.id}`, 20, 60 * 60_000)).ok) return { ok: false, verified: false, found: false, kept: false, error: "rateLimited" };
   const found = await domainProofFound(host, domainProofRecord(v.tenant.id, env.secret));
   const now = new Date();
   // The DNS lookup is done; the row is read and written under a lock so a concurrent settings save is not lost.
@@ -328,6 +331,8 @@ export async function saveEmailAction(input: z.infer<typeof emailSchema>): Promi
 export async function testEmailAction(to: string): Promise<{ ok: boolean; error?: string }> {
   const v = await actionViewer("settings.write");
   if (!z.email().safeParse(to).success) return { ok: false, error: "invalid_address" };
+  // Each test is a message to any address through the organisation's mail server: a few an hour per organisation.
+  if (!(await rateLimit(`test-email:${v.tenant.id}`, 20, 60 * 60_000)).ok) return { ok: false, error: "rateLimited" };
   // The test uses the stored server as if sending were enabled; nothing is written until it succeeds.
   const [row] = await db().select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, v.tenant.id));
   // In the language of the admin who sends it (they usually send it to themselves).

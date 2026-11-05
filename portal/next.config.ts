@@ -32,10 +32,10 @@ const nextConfig: NextConfig = {
   outputFileTracingExcludes: { "**": ["./.data/**/*"] },
   outputFileTracingIncludes: { "**": ["./content/**/*"] },
   serverExternalPackages: ["@electric-sql/pglite", "@node-rs/argon2", "pg", "nodemailer"],
-  experimental: {
-    // Sandbox uploads are up to 10 MB.
-    serverActions: { bodySizeLimit: "11mb" },
-  },
+  // Server Actions keep Next's default 1 MB body limit; sandbox files go through /api/sandbox/upload. The proxy
+  // (src/proxy.ts) buffers every request body up to this size and truncates beyond it, so it must hold a 10 MiB
+  // file plus its multipart framing (the route's own BODY_LIMIT); Server Actions are not affected by it.
+  experimental: { proxyClientMaxBodySize: "11mb" },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },

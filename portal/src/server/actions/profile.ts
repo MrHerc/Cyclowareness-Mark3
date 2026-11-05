@@ -6,8 +6,8 @@ import { refresh } from "next/cache";
 import QRCode from "qrcode";
 import { db, t } from "../db";
 import { actionViewer, getSession } from "../auth/viewer";
-import { verifyPassword } from "../auth/password";
-import { newBackupCodes, newTotpKey, totpUri, verifyTotp } from "../auth/totp";
+import { hashPassword, passwordProblem, verifyPassword } from "../auth/password";
+import { newBackupCodes, newTotpKey, totpUri, verifyTotpOnce } from "../auth/totp";
 import { invalidateUserSessions } from "../auth/session";
 import { twoFactorRequired } from "../auth/permissions";
 import { audit } from "../services/audit";
@@ -38,7 +38,7 @@ export async function confirmTotpAction(code: string): Promise<{ ok: false; erro
   const v = await actionViewer();
   const [u] = await db().select({ secret: t.users.totpSecret, enabled: t.users.totpEnabled }).from(t.users).where(eq(t.users.id, v.user.id));
   if (!u?.secret || u.enabled) return { ok: false, error: "generic" };
-  if (!verifyTotp(u.secret, code.replace(/\s/g, ""))) return { ok: false, error: "wrongCode" };
+  if (!(await verifyTotpOnce(v.user.id, u.secret, code.replace(/\s/g, "")))) return { ok: false, error: "wrongCode" };
   const backup = newBackupCodes();
   await db().update(t.users).set({ totpEnabled: true, totpRecovery: backup.hashes }).where(eq(t.users.id, v.user.id));
   // The current session already proved the second factor; every other one (perhaps someone else's) has to sign in again.
@@ -46,6 +46,22 @@ export async function confirmTotpAction(code: string): Promise<{ ok: false; erro
   await invalidateUserSessions(v.user.id, v.sessionId);
   await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "auth.2fa_on", ip: await clientIp() });
   return { ok: true, codes: backup.codes };
+}
+
+/** Profile → Security: a signed-in person replaces their password (the same rules as setting it from a link). */
+export async function changePasswordAction(current: string, next: string, confirm: string): Promise<{ ok: boolean; error?: string }> {
+  const v = await actionViewer();
+  if (!(await checkPassword(v.user.id, current))) return { ok: false, error: "wrongPassword" };
+  if (!next) return { ok: false, error: "required" };
+  if (next !== confirm) return { ok: false, error: "mismatch" };
+  if (next.toLowerCase() === v.user.email) return { ok: false, error: "sameAsEmail" };
+  const problem = passwordProblem(next, [v.user.email, v.user.name]);
+  if (problem) return { ok: false, error: problem === "short" ? "tooShort" : problem === "long" ? "tooLong" : "weak" };
+  await db().update(t.users).set({ passwordHash: await hashPassword(next) }).where(eq(t.users.id, v.user.id));
+  // Whoever knew the old password is signed out everywhere else.
+  await invalidateUserSessions(v.user.id, v.sessionId);
+  await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "auth.password_set", ip: await clientIp(), meta: { kind: "change" } });
+  return { ok: true };
 }
 
 export async function disableTotpAction(password: string): Promise<{ ok: boolean; error?: string }> {

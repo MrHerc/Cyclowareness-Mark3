@@ -20,6 +20,7 @@ import { toast } from "@/components/ui/toast";
 import { riskBand } from "@/lib/domain/risk";
 import { DEFAULT_LOCALE, LOCALES, LOCALE_NAMES, isLocale } from "@/i18n/config";
 import { cn } from "@/lib/cn";
+import { importTooBig } from "@/lib/csv";
 
 export type PeopleRow = {
   id: string;
@@ -310,7 +311,8 @@ export function AddPerson({ departments, defaultLocale, locales }: { departments
   const phoneError = state?.error === "phoneTaken" ? t("phoneTaken") : fields.includes("phone") ? t("invalidPhone") : null;
   const nameError = fields.includes("name") ? tc("errors.invalid") : null;
   const deptError = fields.includes("departmentId") ? t("invalidDepartment") : null;
-  const formError = state?.error === "generic" ? tc("errors.generic") : state?.error && !state.ok && !emailError && !phoneError && !nameError && !deptError ? tc("errors.invalid") : null;
+  const formError =
+    state?.error === "generic" ? tc("errors.generic") : state?.error === "rateLimited" ? tc("errors.rateLimited") : state?.error === "cannotAdd" ? t("cannotAdd") : state?.error && !state.ok && !emailError && !phoneError && !nameError && !deptError ? tc("errors.invalid") : null;
   const invalid = (error: unknown, id: string) => (error ? { "aria-invalid": true, "aria-describedby": `${id}-error` } : {});
   return (
     <>
@@ -435,7 +437,10 @@ export function ImportPeople() {
                   const f = e.target.files?.[0];
                   if (!f) return;
                   setFileName(f.name);
-                  setCsv(await f.text());
+                  const text = await f.text();
+                  // Refused here: a larger file would not reach the action (Next's request body limit).
+                  if (importTooBig(text)) setPreview({ ok: false, rows: 0, problems: [], newDepartments: [], error: "tooBig" });
+                  else setCsv(text);
                 }}
               />
               <FileUp className="size-8 text-brand-600" />
@@ -450,6 +455,8 @@ export function ImportPeople() {
         ) : step === 2 && preview ? (
           <div className="grid gap-4">
             {preview.error === "tooMany" ? <p className="text-body-sm text-risk-600">{t("importErrors.tooMany")}</p> : null}
+            {preview.error === "tooBig" ? <p className="text-body-sm text-risk-600">{t("importErrors.tooBig")}</p> : null}
+            {preview.error === "rateLimited" ? <p className="text-body-sm text-risk-600">{tc("errors.rateLimited")}</p> : null}
             <div className="flex flex-wrap gap-2">
               <Pill tone="safe">{t("importRows", { count: preview.rows - new Set(preview.problems.map((p) => p.line)).size })}</Pill>
               {preview.problems.length ? <Pill tone="risk">{t("importProblems", { count: preview.problems.length })}</Pill> : null}

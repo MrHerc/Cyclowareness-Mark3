@@ -20,6 +20,7 @@ export const AUDIT_ACTIONS = [
   "sso.tested",
   "sso.sign_in_refused",
   "sso.person_created",
+  "sso.unlinked",
   "person.added",
   "person.changed",
   "person.role_changed",

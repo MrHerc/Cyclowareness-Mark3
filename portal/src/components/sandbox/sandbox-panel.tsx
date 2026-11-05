@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Check, FileSearch, FlaskConical, Link2, Send, ShieldAlert, ShieldCheck, ShieldX, Upload } from "lucide-react";
 import { analyzeAction, escalateAnalysisAction, type SandboxState } from "@/server/actions/security";
@@ -105,15 +106,22 @@ export function AnalysisResult({
 }
 
 // A rejected analysis (server unreachable, a deploy in between) becomes the generic error on its form instead of
-// replacing the sandbox panel with the error boundary.
+// replacing the sandbox panel with the error boundary. Files go to the upload route (Server Actions take 1 MB at most).
 function submitAnalysis(prev: SandboxState, data: FormData): Promise<SandboxState> {
-  return analyzeAction(prev, data).catch((): SandboxState => ({ error: "generic" }));
+  const sent =
+    data.get("kind") === "file"
+      ? fetch("/api/sandbox/upload", { method: "POST", body: data }).then((res): Promise<SandboxState> => (res.status === 413 ? Promise.resolve({ error: "tooBig" }) : res.ok ? res.json() : Promise.resolve({ error: "generic" })))
+      : analyzeAction(prev, data);
+  return sent.catch((): SandboxState => ({ error: "generic" }));
 }
 
 export function SandboxPanel({ analyst = false }: { analyst?: boolean }) {
   const t = useTranslations("security.sandbox");
   const tc = useTranslations("common");
-  const [fileState, fileAction, filePending] = useActionState<SandboxState, FormData>(submitAnalysis, undefined);
+  const router = useRouter();
+  // The route handler does not refresh the page as the action does, so the stored analysis appears in the list below.
+  const submitFile = (prev: SandboxState, data: FormData) => submitAnalysis(prev, data).then((s) => (s?.analysis && router.refresh(), s));
+  const [fileState, fileAction, filePending] = useActionState<SandboxState, FormData>(submitFile, undefined);
   const [urlState, urlAction, urlPending] = useActionState<SandboxState, FormData>(submitAnalysis, undefined);
   const [, startSubmit] = useTransition();
   const [last, setLast] = useState<"file" | "url" | null>(null);
