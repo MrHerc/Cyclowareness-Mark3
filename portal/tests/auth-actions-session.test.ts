@@ -55,7 +55,7 @@ describe("sign-in once the session exists", () => {
     h.selects.push([{ n: 0 }], [user], [], []);
     await expect(signInAction(undefined, form({ email: user.email, password: "correct horse", next: "/learn" }))).rejects.toMatchObject(redirectTo("/learn"));
     expect(h.setSessionCookie).toHaveBeenCalledOnce();
-    expect(log).toHaveBeenCalledWith("[auth] audit write failed", "Error", "", expect.stringMatching(/^\s+at /));
+    expect(log).toHaveBeenCalledWith(expect.stringContaining("[auth] audit write failed error=Error at=at "));
     log.mockRestore();
   });
 
@@ -67,7 +67,7 @@ describe("sign-in once the session exists", () => {
     h.selects.push([{ n: 0 }], [user], [], [token], []);
     await expect(verifyPhoneCodeAction(undefined, form({ phone: user.phone, code: "123456", next: "/learn" }))).rejects.toMatchObject(redirectTo("/learn"));
     expect(h.setSessionCookie).toHaveBeenCalledOnce();
-    expect(log).toHaveBeenCalledWith("[auth] audit write failed", "Error", "", expect.stringMatching(/^\s+at /));
+    expect(log).toHaveBeenCalledWith(expect.stringContaining("[auth] audit write failed error=Error at=at "));
     log.mockRestore();
   });
 });

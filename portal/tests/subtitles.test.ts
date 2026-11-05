@@ -478,7 +478,7 @@ describe("POST /api/subtitles", () => {
       // Each failure is logged, by its error class only: never the message, which can carry a key or the lesson text.
       const logged = warn.mock.calls.map((c) => c.join(" "));
       expect(logged).toHaveLength(answers.length);
-      expect(logged.at(-1)).toBe("[subtitles] translation into sv failed: Error");
+      expect(logged.at(-1)).toMatch(/ WARN \[subtitles\] translation into sv failed: Error$/);
       expect(logged.join(" ")).not.toMatch(/sk-ant|overloaded|529/);
     } finally {
       warn.mockRestore();

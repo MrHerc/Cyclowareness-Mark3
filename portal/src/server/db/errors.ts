@@ -1,3 +1,5 @@
+import { log, type LogFields } from "../log";
+
 /**
  * PostgreSQL error inspection that works for node-postgres and PGlite errors, also when drizzle
  * wraps them (DrizzleQueryError keeps the driver error as `cause`).
@@ -33,8 +35,9 @@ export function isUniqueViolation(error: unknown, constraint?: string): boolean 
  * Logs a failure without its message: a failed query's message repeats the query and its parameters (a reset link, a password
  * hash, personal data). The log gets the error's name, its driver or system code, and where it was thrown (stack frames only).
  */
-export function logFailure(what: string, error: unknown): void {
+export function logFailure(what: string, error: unknown, fields: LogFields = {}): void {
   const e = error as { name?: unknown; code?: unknown; cause?: { code?: unknown }; stack?: unknown } | null;
-  const at = typeof e?.stack === "string" ? e.stack.split("\n").filter((line) => /^\s+at /.test(line)).slice(0, 5).join("\n") : "";
-  console.error(what, String(e?.name ?? "error"), String(driverError(error)?.code ?? e?.cause?.code ?? e?.code ?? ""), ...(at ? [at] : []));
+  const at = typeof e?.stack === "string" ? e.stack.split("\n").filter((line) => /^\s+at /.test(line)).slice(0, 5).map((line) => line.trim()).join(" | ") : "";
+  const code = String(driverError(error)?.code ?? e?.cause?.code ?? e?.code ?? "");
+  log.error(what, { ...fields, error: String(e?.name ?? "error"), code: code || undefined, at: at || undefined });
 }

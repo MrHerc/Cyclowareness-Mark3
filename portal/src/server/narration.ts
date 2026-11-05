@@ -5,6 +5,7 @@ import { z } from "zod";
 import { isLocale } from "@/i18n/config";
 import { NARRATION_DIR, isClipUrl, manifestName, type NarrationClips } from "@/lib/tts/clips";
 import { readLibrary } from "./services/library";
+import { log } from "./log";
 
 /**
  * Pre-generated narration of library lessons (scripts/generate-narration.ts). The manifests stay on the
@@ -31,12 +32,12 @@ export function readNarrationManifest(file: string, locale: string, publicDir: s
   try {
     raw = JSON.parse(fs.readFileSync(file, "utf8"));
   } catch (e) {
-    if ((e as NodeJS.ErrnoException).code !== "ENOENT") console.warn(`[narration] ${path.basename(file)} is unreadable; the browser voice reads this lesson`);
+    if ((e as NodeJS.ErrnoException).code !== "ENOENT") log.warn(`[narration] ${path.basename(file)} is unreadable; the browser voice reads this lesson`);
     return null;
   }
   const parsed = manifestSchema(locale).safeParse(raw);
   if (!parsed.success) {
-    console.warn(`[narration] ${path.basename(file)} is not a valid manifest; the browser voice reads this lesson`);
+    log.warn(`[narration] ${path.basename(file)} is not a valid manifest; the browser voice reads this lesson`);
     return null;
   }
   const clips = Object.fromEntries(Object.entries(parsed.data).filter(([, clip]) => fs.existsSync(path.join(publicDir, clip.url))));

@@ -9,6 +9,7 @@ import path from "node:path";
 import { and, eq, isNull } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
+import { log } from "../log";
 import type { z } from "zod";
 import { lessonFileSchema, lessonIntegrityErrors } from "../../lib/content/validate";
 import { localeParityErrors } from "../../lib/content/locale-parity";
@@ -45,7 +46,7 @@ function readTitles(locale: TranslationLocale): I18n {
   const file = path.join(LIB, `i18n.${locale}.json`);
   const name = path.relative(process.cwd(), file);
   if (!fs.existsSync(file)) {
-    console.warn(`[library] ${name} is missing: ${locale} module and lesson titles fall back to English.`);
+    log.warn(`[library] ${name} is missing: ${locale} module and lesson titles fall back to English.`);
     return { modules: {}, lessons: {} };
   }
   try {

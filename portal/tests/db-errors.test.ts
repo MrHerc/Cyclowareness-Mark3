@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { isForeignKeyViolation, isUniqueViolation, logFailure } from "../src/server/db/errors";
+import { formatLog } from "../src/server/log";
 
 describe("isUniqueViolation", () => {
   const pg = Object.assign(new Error('duplicate key value violates unique constraint "threat_reports_number_idx"'), { code: "23505", constraint: "threat_reports_number_idx" });
@@ -38,12 +39,29 @@ describe("logFailure", () => {
     const pg = Object.assign(new Error("duplicate key"), { code: "23505" });
     const wrapped = Object.assign(new Error("Failed query: insert into outbox values ($1)\nparams: https://x.test/account/reset/SECRET"), { name: "DrizzleQueryError", cause: pg });
     const log = vi.spyOn(console, "error").mockImplementation(() => {});
-    logFailure("[test] failed", wrapped);
+    vi.stubEnv("NODE_ENV", "production");
+    logFailure("[test] failed", wrapped, { tenantId: "t1" });
+    vi.unstubAllEnvs();
     const calls = [...log.mock.calls];
     log.mockRestore();
-    const [what, name, code, at] = calls[0];
-    expect([what, name, code]).toEqual(["[test] failed", "DrizzleQueryError", "23505"]);
-    expect(at).toMatch(/^\s+at /);
+    expect(calls).toHaveLength(1);
+    const line = JSON.parse(String(calls[0][0]));
+    expect(line).toMatchObject({ level: "error", msg: "[test] failed", tenantId: "t1", error: "DrizzleQueryError", code: "23505" });
+    expect(line.at).toMatch(/^at /);
     expect(JSON.stringify(calls)).not.toMatch(/SECRET|params|Failed query/);
+  });
+});
+
+describe("formatLog", () => {
+  const now = new Date("2026-11-05T10:00:00.000Z");
+
+  it("writes one JSON object per event in production", () => {
+    const line = formatLog("warn", "[jobs] mail failed", { tenantId: "t1", userId: undefined, attempts: 2 }, false, now);
+    expect(line).not.toContain("\n");
+    expect(JSON.parse(line)).toEqual({ ts: "2026-11-05T10:00:00.000Z", level: "warn", msg: "[jobs] mail failed", tenantId: "t1", attempts: 2 });
+  });
+
+  it("keeps the line readable in development and leaves out empty fields", () => {
+    expect(formatLog("info", "[bootstrap] ready", { tenantId: "t1", userId: undefined, n: 3 }, true, now)).toBe("2026-11-05T10:00:00.000Z INFO [bootstrap] ready tenantId=t1 n=3");
   });
 });

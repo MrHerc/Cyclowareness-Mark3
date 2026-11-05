@@ -5,13 +5,14 @@
  * fake sign-in (recordSubmit), the Report button (submitThreatReport), the training the click assigned
  * (completeLesson, attestModule) and the risk score (recomputeRisk). Nothing is sent: no mail, no SMS.
  *
- * There is no timer: whoever polls the drill (the dashboard, once a second) applies the events that are
- * due. One request at a time does so, under a lease row lock, so two open dashboards never apply the
+ * There is no timer: whoever polls the drill (the dashboard, once a second, and the job runner once a
+ * minute, so a drill nobody watches still ends) applies the events that are due. One request at a time does so, under a lease row lock, so two open dashboards never apply the
  * same event twice; each applied event is recorded before the next one starts.
  */
 import { and, asc, desc, eq, inArray, isNull, lt, or, sql } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
+import { logFailure } from "../db/errors";
 import { campaignAudience } from "./campaigns";
 import { recordClick, recordOpen, recordSubmit } from "./campaigns";
 import { randomToken, attestModule, completeLesson } from "./progress";
@@ -236,7 +237,7 @@ export async function advanceDrill(db: DB, tenantId: string, drillId: string, no
             if (ctx) await applyEvent(db, ctx, e);
           } catch (error) {
             // One failed step (a deleted person, a removed module) must not stop the rest of the drill.
-            console.error(`[drill] ${run.id}: ${e.kind} for ${e.recipientId} failed`, error);
+            logFailure(`[drill] ${e.kind} step failed`, error, { tenantId: run.tenantId, drillId: run.id, recipientId: e.recipientId });
           }
           const [kept] = await db
             .update(t.drillRuns)

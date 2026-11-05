@@ -9,6 +9,7 @@ import { normaliseHost } from "./auth/domain-proof";
 import { dirOf } from "../i18n/config";
 import { destinationProblem, vetDestination } from "./net-guard";
 import { env } from "./env";
+import { log } from "./log";
 import { parseEmailMarkup } from "../lib/email-markup";
 import { EMAIL_BUTTON_LABEL, withDefaults } from "../lib/tenant-defaults";
 import { TEMPLATE_BY_KEY, templateText } from "../lib/campaigns/templates";
@@ -234,7 +235,7 @@ async function deliverRow(db: DB, id: string, opts: { fromName?: string; transpo
   }
   if (transport === "not_configured") {
     await db.update(t.outbox).set({ status: "logged" }).where(eq(t.outbox.id, id));
-    if (!env.isProd) console.info(`[mail:logged] to=${m.to} subject="${m.subject}"`);
+    if (!env.isProd) log.info(`[mail:logged] to=${m.to} subject="${m.subject}"`, { tenantId: m.tenantId ?? undefined });
     return { status: "logged", stop: false };
   }
   if (transport === "blocked_destination") {
@@ -253,7 +254,7 @@ async function deliverRow(db: DB, id: string, opts: { fromName?: string; transpo
     return { status: "sent", stop: false };
   } catch (error) {
     // The raw server answer goes to the log; the outbox keeps a code the console can translate.
-    console.error(`[mail] delivery of ${m.id} failed`, String((error as Error)?.message ?? error).slice(0, 500));
+    log.error(`[mail] delivery of ${m.id} failed`, { tenantId: m.tenantId ?? undefined, error: String((error as Error)?.message ?? error).slice(0, 500) });
     return recordFailure(db, m, classifySmtpError(error), stopsServer(error));
   }
 }

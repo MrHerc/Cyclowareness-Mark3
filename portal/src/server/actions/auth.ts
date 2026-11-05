@@ -10,6 +10,7 @@ import { safePath } from "../../lib/safe-path";
 import { cleanPhone, PHONE_PATTERN } from "../../lib/phone";
 import { db, t } from "../db";
 import { logFailure } from "../db/errors";
+import { log } from "../log";
 import type { Role } from "../db/schema";
 import { hashPassword, passwordProblem, verifyPassword } from "../auth/password";
 import { clearSessionCookie, createSession, invalidateSession, invalidateUserSessions, readSessionToken, sessionIdFromToken, setSessionCookie } from "../auth/session";
@@ -374,7 +375,7 @@ async function sendPhoneCode(phone: string, ip: string | null): Promise<string |
   const ts = await getTranslations({ locale: isLocale(user.locale) ? user.locale : DEFAULT_LOCALE, namespace: "auth.phone" });
   const res = await sendSms(phone, ts("smsText", { code }));
   if (!res.ok) {
-    console.error("[auth] sign-in code not sent:", res.error);
+    log.error("[auth] sign-in code not sent", { tenantId: user.tenantId, userId: user.id, error: res.error });
     return undefined;
   }
   await auditDone({ tenantId: user.tenantId, actorId: user.id, action: "auth.sign_in", ip, meta: { method: "phone", stage: "code_sent" } });

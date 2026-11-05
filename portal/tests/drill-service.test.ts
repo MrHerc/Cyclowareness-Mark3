@@ -11,6 +11,7 @@ import { advanceDrill, drillHistory, drillView, skipDrill, startDrill } from "..
 import { sendQueuedSms } from "../src/server/services/campaigns";
 import { submitThreatReport } from "../src/server/services/threats";
 import { drillProgress } from "../src/lib/drill/plan";
+import { runJobs } from "../src/server/jobs";
 
 const pglite = new PGlite();
 const db = drizzle(pglite, { schema: t }) as unknown as DB;
@@ -141,6 +142,36 @@ describe("live drill", () => {
     const again = (await advanceDrill(db, tenantId, done.id))!;
     expect(again.appliedUntil).toBe(again.events.length);
     expect(await count()).toBe(before);
+  }, 120_000);
+
+  it("awards no second XP or certificate when a training step is replayed after a crash", async () => {
+    const started = await startDrill(db, { tenantId, actorId: adminId, templateKey: "payslip", audience: "all", departmentId: null, speed: "quick", campaignName: "Train replay" });
+    if (!started.ok) throw new Error(started.reason);
+    const done = (await skipDrill(db, tenantId, started.id))!;
+    const trainAt = done.events.findIndex((e) => e.kind === "train");
+    expect(trainAt).toBeGreaterThanOrEqual(0);
+    const counts = async () => ({
+      certificates: (await db.select().from(t.certificates).where(eq(t.certificates.tenantId, tenantId))).length,
+      xp: (await db.select().from(t.xpEvents).where(eq(t.xpEvents.tenantId, tenantId))).length,
+    });
+    const before = await counts();
+    await db.update(t.drillRuns).set({ appliedUntil: trainAt, finishedAt: null, leaseUntil: null }).where(eq(t.drillRuns.id, done.id));
+    const again = (await advanceDrill(db, tenantId, done.id))!;
+    expect(again.appliedUntil).toBe(again.events.length);
+    expect(await counts()).toEqual(before);
+  }, 120_000);
+
+  it("is played to its end by the job runner when no dashboard polls it", async () => {
+    const started = await startDrill(db, { tenantId, actorId: adminId, templateKey: "invoice", audience: "all", departmentId: null, speed: "quick", campaignName: "Unwatched" });
+    if (!started.ok) throw new Error(started.reason);
+    const [run0] = await db.select().from(t.drillRuns).where(eq(t.drillRuns.id, started.id));
+    const out = await runJobs(db, new Date(run0.startedAt.getTime() + run0.durationMs + 10));
+    expect(out.drills).toBeGreaterThanOrEqual(1);
+    const [run] = await db.select().from(t.drillRuns).where(eq(t.drillRuns.id, started.id));
+    expect(run.appliedUntil).toBe(run.events.length);
+    expect(run.finishedAt).not.toBeNull();
+    const [campaign] = await db.select().from(t.campaigns).where(eq(t.campaigns.id, run.campaignId));
+    expect(campaign.status).toBe("completed");
   }, 120_000);
 
   it("matches a report to the exact tracking link when two drills use the same lure", async () => {
