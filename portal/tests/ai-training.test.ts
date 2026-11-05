@@ -137,7 +137,10 @@ describe("issue codes for the Studio", () => {
     const d = good();
     d.lessons[0].scenes.push({ type: "scenario", id: "sc", title: "T", start: "nope", nodes: [{ id: "n1", text: "Hi" }] });
     d.lessons[0].scenes.push({ type: "recap", id: "recap", points: ["Again"] });
+    const tutor = d.lessons[0].scenes[1] as Extract<TrainingDraft["lessons"][0]["scenes"][0], { type: "tutor" }>;
+    tutor.beats[0].checkpoint = { prompt: "Which?", options: [{ id: "a", label: "A", correct: false, feedback: "No." }, { id: "b", label: "B", correct: false, feedback: "No." }] };
     const codes = schemaCheck(d).issues;
+    expect(codes).toContainEqual(expect.objectContaining({ code: "noCorrectOption", where: "lessons.0.scenes.1" }));
     expect(codes).toContainEqual(expect.objectContaining({ code: "startMissing", params: { node: "nope" }, where: "lessons.0.scenes.5" }));
     expect(codes).toContainEqual(expect.objectContaining({ code: "duplicateSceneId", params: { id: "recap" } }));
   });
