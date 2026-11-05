@@ -76,10 +76,10 @@ Two published values still need action:
 
 **Remediation (done).**
 - `.github/workflows/security.yml` runs on pushes to `main`, every pull request, weekly and on demand, with read-only permissions. It runs `npm audit` (production dependencies fail at moderate, all dependencies at high), `npm audit signatures`, GitHub's dependency review on pull requests, and gitleaks over the whole history with redacted output.
-- Every action is pinned to a commit SHA, and the gitleaks binary is verified against its release checksums before it runs.
+- Every action in both workflows (`security.yml` and `ci.yml`) is pinned to a commit SHA, and the gitleaks binary is verified against its release checksums before it runs. The pinned SHAs were checked against the release tags with `git ls-remote` on 2026-11-05 (checkout v7.0.1, setup-node v7.1.0, dependency-review-action v4.9.0, upload-artifact v4.6.2, cache v6.1.0).
 - `.gitleaks.toml` keeps the default rules and allows only the public placeholders listed in it.
 - `.github/dependabot.yml` proposes weekly grouped updates for npm, GitHub Actions, the Dockerfile base image and the compose images. Node and PostgreSQL majors are excluded because they need a planned upgrade.
-- Also turn on, in the repository settings: Dependabot alerts and security updates, secret scanning with push protection (free for public repositories), and a branch protection rule that requires the Security workflow.
+- Also turn on, in the repository settings: Dependabot alerts and security updates, secret scanning with push protection (free for public repositories), and a branch protection rule that requires the Security and CI workflows.
 
 ### L-1 Vulnerable `minimatch` in the ESLint toolchain (Low)
 
@@ -236,12 +236,13 @@ The LDAP URL, bind DN and filter in Settings (`settings.ts:192`) are saved witho
 - The demo instances run the code in this repository. The owner's local demo launcher is outside the repository and was not reviewed.
 - gitleaks could not be run in the review environment, which blocks downloading external binaries. The history was scanned with equivalent patterns instead, and the first CI run is the first gitleaks run. If it reports a false positive, add the value to `.gitleaks.toml` only after confirming it is not a secret.
 - `npm audit signatures` could not reach the Sigstore trust root from the review environment. It runs in CI.
+- Neither workflow has run on GitHub yet, and GitHub validates the `cooldown` and `docker-compose` keys of `.github/dependabot.yml` only on the default branch. After the first merge to `main`: run Security once with workflow_dispatch and read the three job logs; check Insights → Dependency graph → Dependabot for a configuration error (if a key is refused, remove the `cooldown` blocks or the `docker-compose` entry); then mark the jobs of both workflows as required checks.
 - Severity reflects a multi-tenant SaaS deployment with untrusted tenant administrators.
 
 ## Next steps, in order
 
 1. Rotate the demo passwords on every reachable seeded instance (H-1).
-2. Turn on secret scanning with push protection, Dependabot alerts and security updates, and require the Security workflow on `main` (M-1).
+2. Turn on secret scanning with push protection, Dependabot alerts and security updates, and require the Security and CI workflows on `main` (M-1).
 3. Email people when an administrator resets their two-step verification or creates a reset link for them (L-7).
 4. Add password change in Profile → Security (L-8).
 5. Add rate limits to the import preview, the add dialog, domain verification and test email (L-5, L-9).

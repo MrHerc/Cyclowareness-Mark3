@@ -325,7 +325,13 @@ npx vitest run tests/content.test.ts       # one file
 npm run typecheck
 npm run lint
 npx tsx scripts/check-lesson-locales.ts --coverage   # every lesson translation: schema, parity, addresses
+npx vitest run --coverage                  # with the line-coverage floor of vitest.config.ts (report in coverage/)
+npx playwright install chromium            # once: the browser for the smoke suite
+npm run e2e                                # browser smoke suite (e2e/), English and Arabic
+CI=1 npm run e2e                           # the same against the production build (run `npm run build` first)
 ```
+
+`npm run e2e` (`playwright test`) starts its own server on port 3400 (`E2E_PORT` changes it) through `e2e/server.mjs`: like `npm run demo` it rebuilds the demo organisation in the embedded database `.data/pg`, so stop `npm run dev` in the same folder first. It signs in with `SEED_PASSWORD` from the environment, else from `.env.local`, else from `.env.example`. The journeys: a learner opens Home, a module and a lesson scene; the admin opens the console, People and the campaign wizard; the operator is sent to set up two-step verification before `/super`. Failed tests keep a trace in `test-results/` (`npx playwright show-trace <file>`). CI runs the same suite against the production build in the `e2e` job, applies the migrations twice to PostgreSQL 16, checks that `drizzle/` matches the schema and builds the Docker image.
 
 `vitest.config.ts` aliases `@` to `src`, stubs `server-only` and uses the node environment. The content suite validates all 106 lessons against the schema in `src/lib/content/validate.ts`; `tests/content-locales.test.ts` checks every translation against its English file, `tests/i18n.test.ts` the ten message catalogues and `tests/rtl-logical.test.ts` the logical CSS.
 
