@@ -14,7 +14,37 @@ Severity scale used throughout: **Critical** (blocks a sale, a deployment or a f
 
 ## 1. Executive summary
 
-*(See section 9 for the full findings register. This summary is written last and reflects all findings below.)*
+**Verdict.** Cyclowareness is a substantial, well-engineered product built in about two and a half weeks by one founder directing AI coding agents. Feature scope is closer to a Series-A product than a seed MVP: a ten-language learner app with 106 interactive lessons, an admin console, phishing simulations, a security-operations layer that turns reported threats into targeted training, and a platform operator console. The code is strict, linted, consistently validated, and, according to an independent review of every action, query and route, free of cross-tenant data access. **The risks are not in what was built but in what has not yet happened:** the platform has never been deployed, never sent a real email or signed anyone in through a real identity provider, has no CI, no end-to-end tests, no observability or backups, one engineer, legal texts that name the wrong AI provider, and no documented ownership of the training content and mascot carried over from the founder's earlier product. All of these are closable within 90 days (see [`ROADMAP.md`](ROADMAP.md)); none requires re-architecting.
+
+| Area | Assessment | Basis |
+|---|---|---|
+| Product scope and UX | **Strong** | Complete learner, admin, SecOps and operator surfaces; 10 languages with RTL; accessibility foundations (section 3, section 5) |
+| Architecture | **Sound for an MVP** | Modular Next.js monolith on PostgreSQL, advisory-locked job runner, Docker packaging; Baku-only time zone and per-minute whole-tenant jobs need work before scale (D-02, D-03) |
+| Code quality | **Good** | Strict TypeScript, 0 lint warnings, Zod everywhere; hot spots in the lesson player and settings screens (Q-01 to Q-04) |
+| Application security | **Good, one integrity gap** | Strong controls (section 4.5); training evidence is browser-asserted (S-01); demo seed exposes a shared operator password (S-04) |
+| Tenant isolation | **Strong, single layer** | No cross-tenant read or write found; no database-level backstop (S-03) |
+| Testing and delivery | **Weak** | 2,697 passing unit tests, 65 % of them content-parity checks; no CI, no integration or end-to-end tests (T-01 to T-03) |
+| Operational readiness | **Weak** | Never deployed or run against real providers; no observability, backups or recovery plan (M-01, O-03, O-04) |
+| Team and process | **Key-person risk** | One author, AI-generated code without human review, documentation mostly in Azerbaijani (O-01, O-02) |
+| Legal and IP | **Blocking until documented** | Legal texts misstate the AI processor and lack the provider identity (L-01); ownership of content and mascot copied from cylosof.com is undocumented (L-02) |
+
+**Findings by severity** (49 in total, register in section 7):
+
+| Critical | High | Medium | Low |
+|---|---|---|---|
+| 2 | 12 | 24 | 11 |
+
+**No Critical finding is a code defect.** The two Critical items are paperwork: correct the legal texts and document the chain of title.
+
+**What to fix first** (detail and effort in the roadmap):
+
+1. Document ownership of the inherited content and mascot, and correct the legal texts and processor list (L-02, L-01).
+2. Make training evidence server-verified, as the practice labs already are (S-01).
+3. Add CI with integration tests on PostgreSQL and a Playwright smoke suite; freeze the migration baseline (T-01, T-02, D-01).
+4. Stand up staging against real mail, SMS, identity and AI providers; add observability and backups (M-01, O-03, O-04).
+5. Align the plans with what is built and add a tenant time zone before selling outside Azerbaijan (M-02, D-02).
+
+**Investment view.** The technical asset is real and above seed-stage norms, and the founder's AI-assisted throughput is itself a capability worth noting. Underwrite it on three conditions: chain-of-title evidence before closing, a second senior engineer hired within the first 30 days, and the 90-day roadmap's exit criteria (live design partners with measured outcomes) as a milestone for the next tranche.
 
 ## 2. Scope, method and verification results
 
@@ -46,7 +76,7 @@ Severity scale used throughout: **Critical** (blocks a sale, a deployment or a f
 
 ### 2.4 Independent review passes
 
-Besides the author's own line-by-line reading of the server layer, three focused review passes were run and their verified results folded into section 9: (a) tenant isolation and authorisation across every Server Action, query and route handler; (b) test-suite quality and the demo seed; (c) client-side code quality, accessibility, performance and the content pipeline.
+Besides the author's own line-by-line reading of the server layer, three focused review passes were run and their verified results folded into section 6: (a) tenant isolation and authorisation across every Server Action, query and route handler; (b) test-suite quality and the demo seed; (c) client-side code quality, accessibility, performance and the content pipeline.
 
 ---
 
@@ -312,7 +342,7 @@ Each finding gives its ID, severity, the files where it was observed, the eviden
 ### 6.4 Testing and delivery
 
 #### T-01 · High · No continuous integration
-- **Evidence:** no `.github/workflows`, GitLab, Jenkins, CircleCI or pre-commit configuration exists; the [`Dockerfile`](../portal/Dockerfile) builds without running tests; checks run only when someone runs them by hand. Eight commits of 7k–387k inserted lines each mean the history cannot be reviewed commit by commit either.
+- **Evidence:** no `.github/workflows`, GitLab, Jenkins, CircleCI or pre-commit configuration exists; the [`Dockerfile`](../portal/Dockerfile) builds without running tests; checks run only when someone runs them by hand. The history has eight commits, the largest adding 387,000 lines at once, so changes cannot be reviewed commit by commit either.
 - **Impact:** nothing prevents a broken build, a failing test or a broken migration from reaching an image.
 - **Recommendation:** GitHub Actions on every pull request (section 1.2 of the roadmap), branch protection and required checks.
 
@@ -385,7 +415,7 @@ Each finding gives its ID, severity, the files where it was observed, the eviden
 ### 6.6 Operations, organisation, legal and intellectual property
 
 #### O-01 · High · Key-person risk and an AI-generated codebase without human review
-- **Evidence:** one author in the Git history; about 56,000 lines of application code, 1,060 lesson files and 33 ADRs were produced in 17 days by AI agents orchestrated by the founder (scripts in [`docs/build/workflows`](build/workflows), state in [`RESUME.md`](build/RESUME.md) and [`OVERNIGHT-STATE.md`](build/workflows/OVERNIGHT-STATE.md)); code review was done by further AI reviewers (`OPEN-QUESTIONS.md` item 24). Much of the working knowledge sits in a Claude Code skill (`.claude/skills/cyclowareness-experience`).
+- **Evidence:** one author in the Git history; about 56,000 lines of application code, 1,060 lesson files and 33 ADRs were produced in about two and a half weeks (2026-10-19 to 2026-11-04) by AI agents orchestrated by the founder (scripts in [`docs/build/workflows`](build/workflows), state in [`RESUME.md`](build/RESUME.md) and [`OVERNIGHT-STATE.md`](build/workflows/OVERNIGHT-STATE.md)); code review was done by further AI reviewers (`OPEN-QUESTIONS.md` item 24). Much of the working knowledge sits in a Claude Code skill (`.claude/skills/cyclowareness-experience`).
 - **Impact:** the quality is real, but no second human has read most of the code; onboarding, accountability for security decisions and continuity all depend on one person and their tooling.
 - **Recommendation:** hire or contract a senior engineer to own review and operations; adopt pull requests with mandatory human review from now on.
 
@@ -427,3 +457,91 @@ Each finding gives its ID, severity, the files where it was observed, the eviden
 - **Evidence:** the daily clean-up deletes sessions, sign-in attempts, old mail and deliveries, but answers, XP events, audit entries, behaviour risks, lesson progress and demo requests are kept indefinitely; there is no per-tenant retention setting and no hosting-region choice (`OPEN-QUESTIONS.md` item 12).
 - **Impact:** GDPR storage-limitation and customer data-residency requirements (EU, Saudi PDPL) cannot be met contractually.
 - **Recommendation:** per-tenant retention policies enforced by the clean-up job, and documented regional deployments.
+
+---
+
+## 7. Findings register
+
+Sorted by severity, then by area. "Roadmap" names the work item in [`ROADMAP.md`](ROADMAP.md) that closes the finding.
+
+| ID | Severity | Area | Finding | Primary location | Roadmap |
+|---|---|---|---|---|---|
+| L-01 | Critical | Legal | Legal texts name Google Vertex AI instead of Anthropic/ElevenLabs; provider identity `[to be provided]`; no DPA | [`content/legal`](../portal/content/legal) | 1.1 |
+| L-02 | Critical | IP | Chain of title for lessons, mascot and design inherited from cylosof.com is undocumented | [`docs/audit/README.md`](audit/README.md), [`content/library`](../portal/content/library) | 1.1 |
+| S-01 | High | Security | Lesson completion, answers, attestation and certificates are asserted by the browser | [`learning.ts`](../portal/src/server/actions/learning.ts#L91-L148) | 1.2 |
+| S-04 | High | Security | Demo seed gives a published shared password to every account, including `super_admin` | [`seed.ts`](../portal/scripts/seed.ts#L56) | 1.3 |
+| D-01 | High | Tech debt | Migration history regenerated from scratch; would crash-loop an upgraded production database | [`drizzle/`](../portal/drizzle) | 1.5 |
+| D-02 | High | Tech debt | All dates, reminders and reports fixed to Baku time (UTC+4, no DST) | [`time.ts`](../portal/src/lib/time.ts) | 2.1 |
+| T-01 | High | Delivery | No continuous integration of any kind | repository root | 1.4 |
+| T-02 | High | Testing | No integration or end-to-end tests; SSO routes, jobs, pages and PostgreSQL untested | [`tests/`](../portal/tests) | 1.4 |
+| M-01 | High | Readiness | Never run against real email, SMS, identity or AI providers; never deployed | [`PROGRESS.md`](build/PROGRESS.md) | 1.6 |
+| M-02 | High | Product | Plans include SAML, LDAP and voice, which are not built; voice campaigns record fake "sent" | [`tenant-defaults.ts`](../portal/src/lib/tenant-defaults.ts#L286-L291) | 2.2 |
+| M-03 | High | Product | Seven languages and the legal texts translated by AI without human review | [`messages/`](../portal/messages) | 2.8 |
+| O-01 | High | Organisation | One author; AI-generated code without human review | Git history | 1.8, 3.7 |
+| O-03 | High | Operations | No structured logging, error tracking, metrics or alerting | [`api/health`](../portal/src/app/api/health/route.ts) | 1.7 |
+| O-04 | High | Operations | No backup, restore or disaster-recovery procedure | [`docker-compose.yml`](../portal/docker-compose.yml) | 2.6 |
+| S-02 | Medium | Security | SSO accounts linked by email only; no `iss`/`sub` binding | [`sso/callback`](../portal/src/app/api/sso/callback/%5Btenant%5D/route.ts#L75-L104) | 2.3 |
+| S-03 | Medium | Security | Tenant isolation enforced only in application code; no RLS or cross-tenant tests | [`schema.ts`](../portal/src/server/db/schema.ts) | 2.4 |
+| S-05 | Medium | Security | 11 MB body limit applies to every Server Action, including anonymous ones | [`next.config.ts`](../portal/next.config.ts#L37) | 1.9 |
+| S-06 | Medium | Security | Admin and operator account-takeover tools without step-up or consent | [`people.ts`](../portal/src/server/actions/people.ts#L183-L250) | 2.9 |
+| S-07 | Medium | Security | Single `APP_SECRET`, no key id or rotation path | [`crypto.ts`](../portal/src/server/crypto.ts#L8-L17) | 2.6 |
+| Q-01 | Medium | Code quality | Oversized player and settings modules with effect suppressions and no component tests | [`scenes.tsx`](../portal/src/components/player/scenes.tsx) | 3.5 |
+| Q-02 | Medium | Code quality | 3,182-line vendored mascot engine outside lint, bundled on every page | [`engine.js`](../portal/src/components/mascot/cat/engine.js) | 3.5 |
+| Q-03 | Medium | Code quality | Inconsistent client error handling; multi-step writes without transactions; duplicate certificates possible | [`campaigns.ts`](../portal/src/server/services/campaigns.ts#L71-L107) | 1.2, 3.5 |
+| Q-04 | Medium | Code quality | Lesson format unversioned; tutor checkpoints unvalidated yet dereferenced | [`types.ts`](../portal/src/lib/content/types.ts#L86-L87) | 1.4 |
+| D-03 | Medium | Scalability | Per-minute whole-tenant jobs and per-user risk updates inside requests | [`jobs.ts`](../portal/src/server/jobs.ts#L44-L70) | 2.5 |
+| D-04 | Medium | Performance | Full message catalogue, mascot engine and base64 avatars on every page | [`layout.tsx`](../portal/src/app/layout.tsx#L50) | 2.5 |
+| D-05 | Medium | Tech debt | Email unique across the platform; blocks multi-organisation users and partner channel | [`schema.ts`](../portal/src/server/db/schema.ts#L198) | 3.2 |
+| D-06 | Medium | Tech debt | Library imported at every start; one bad lesson file stops the server | [`bootstrap.ts`](../portal/src/server/bootstrap.ts#L90-L112) | 1.4 |
+| T-03 | Medium | Testing | Test count dominated by generated parity checks; no coverage; brittle fakes | [`tests/`](../portal/tests) | 1.4 |
+| M-04 | Medium | Product | Natural-voice narration not generated; Azerbaijani silent on Chrome/Windows | [`generate-narration.ts`](../portal/scripts/generate-narration.ts) | 2.8 |
+| M-05 | Medium | Product | No billing, seat metering or self-serve trial | — | 3.2 |
+| M-06 | Medium | Product | No "Report phishing" mail add-in or inbound report address | — | 3.3 |
+| M-07 | Medium | Product | No SCIM, SCORM/xAPI or public API | — | 3.4 |
+| M-08 | Medium | Product | No product analytics or usage telemetry | — | 2.10 |
+| M-09 | Medium | Product | Click tracking prone to scanner false positives; simulation sending domains undefined | [`tracking.ts`](../portal/src/server/tracking.ts#L12-L18) | 2.7 |
+| M-10 | Medium | Product | Customer authoring limited to one fixed four-scene, single-language template | [`secops.ts`](../portal/src/server/actions/secops.ts#L486-L510) | 3.4 |
+| O-02 | Medium | Organisation | Engineering documentation mostly in Azerbaijani | [`docs/build`](build) | 1.8 |
+| O-05 | Medium | Operations | No admin guide, integration guide, SLA, support policy or status page | — | 3.6 |
+| L-03 | Medium | Legal | No configurable retention or hosting region; several tables kept forever | [`jobs.ts`](../portal/src/server/jobs.ts#L351-L376) | 2.6 |
+| S-08 | Low | Security | Cross-tenant account-existence oracle in CSV import preview | [`people.ts`](../portal/src/server/actions/people.ts#L475-L545) | 2.4 |
+| S-09 | Low | Security | TOTP codes replayable within their window | [`totp.ts`](../portal/src/server/auth/totp.ts#L21-L25) | 2.3 |
+| S-10 | Low | Security | Tutor answer cache shared across organisations | [`api/tutor`](../portal/src/app/api/tutor/route.ts#L64-L70) | 2.7 |
+| S-11 | Low | Security | Inline-style CSP, non-unique tenant domain, unvalidated `lessonKey`, sign-off IPs visible to content creators, dev-only audit advisories | section 6.1 | 2.4 |
+| Q-05 | Low | Code quality | Ten-language texts in code, lint suppressions and casts, test-only branch, two marked shortcuts | section 6.2 | 3.5 |
+| D-07 | Low | Tech debt | 15 outdated dependencies, no automated updates, no `engines` | [`package.json`](../portal/package.json) | 1.4 |
+| D-08 | Low | Tech debt | Founder-machine paths in config and scripts; build needs Google Fonts | [`.claude/launch.json`](../.claude/launch.json) | 1.8 |
+| D-09 | Low | Tech debt | 4.1 MB unused Rive assets, 10 MB design PNGs in the repository | [`public/rive`](../portal/public/rive) | 3.5 |
+| D-10 | Low | Tech debt | Platform-wide module and lesson lookups per request | [`queries/admin.ts`](../portal/src/server/queries/admin.ts#L111-L115) | 2.5 |
+| M-11 | Low | Product | Print-to-PDF only, static-only sandbox naming, no native app, no landing CMS | section 6.5 | 3.4 |
+| O-06 | Low | Organisation | No LICENSE, SECURITY.md or CODEOWNERS; third-party logo and screenshots committed | [`docs/audit`](audit) | 1.8 |
+
+---
+
+## 8. Appendix: measured facts
+
+| Measure | Value |
+|---|---|
+| Application code (`portal/src`) | 468 files, ~55,900 lines (app 14,254; components 24,437; server 13,339; lib 3,447; i18n 259) |
+| Routes | 67 pages, 51 layouts, 50 loading skeletons, 1 error boundary, 17 route handlers, 126 exported Server Actions in 20 `"use server"` files |
+| Client components | 94 files with `"use client"` |
+| Database | 51 tables, 53 indexes, 1 migration (`0000_init.sql`, 776 lines), 0 row-level-security policies |
+| Content | 53 modules, 106 lessons × 10 languages = 1,060 lesson files (18 MB), 5 learning paths, 169 brands, legal texts and 2 policies in 10 languages |
+| Interface strings | 9 namespaces × 10 languages (2.3 MB) |
+| Tests | 83 files, ~10,100 lines; 834 test declarations expanding to 2,697 cases; 82 files / 2,697 tests pass in 36 s |
+| Static checks | `tsc --noEmit` 0 errors; ESLint 0 warnings with `--max-warnings=0`; 38 inline lint suppressions |
+| Dependencies | 23 runtime, 15 development; `npm audit`: 0 critical, 0 high, 8 moderate (dev-only); 15 outdated |
+| Build | Passes; standalone output 139 MB + 5.8 MB static assets |
+| Repository | 8 commits (2026-10-19 to 2026-11-04), 1 author; 19.8 MB packed; no CI configuration, no LICENSE |
+| Documentation | 33 ADRs, progress log, 25 open questions (mostly Azerbaijani); original-product spec with 57 screenshots |
+
+Commands used to reproduce the checks, from the repository root:
+
+```bash
+npm --prefix portal ci
+npm --prefix portal run typecheck
+cd portal && npx eslint src tests scripts --max-warnings=0
+cd portal && npx vitest run
+cd portal && npm audit && npm outdated
+npm --prefix portal run build
+```
