@@ -158,3 +158,23 @@ describe("Add person", () => {
     expect(await addPersonAction(undefined, form("tural@acme.test"))).toEqual({ error: "emailTaken" });
   });
 });
+
+describe("CSV import field lengths", () => {
+  it("cuts name, job title and department at the dialogs' 120 characters", async () => {
+    const long = "x".repeat(5000);
+    const csv = toCsv(["name", "email", "department", "job_title"], [[`Long ${long}`, "long.fields@acme.test", `Dept ${long}`, `Title ${long}`]]);
+    expect(await importPeopleAction(csv, true)).toMatchObject({ ok: true, imported: 1 });
+    const [u] = await db.select({ name: t.users.name, jobTitle: t.users.jobTitle, departmentId: t.users.departmentId }).from(t.users).where(eq(t.users.email, "long.fields@acme.test"));
+    expect(u.name).toHaveLength(120);
+    expect(u.jobTitle).toHaveLength(120);
+    const [d] = await db.select({ name: t.departments.name }).from(t.departments).where(eq(t.departments.id, u.departmentId!));
+    expect(d.name).toHaveLength(120);
+  });
+
+  it("refuses an address longer than 254 characters as an invalid email", async () => {
+    const email = `${"a".repeat(60)}.${"b".repeat(60)}@${"c".repeat(60)}.${"d".repeat(60)}.${"e".repeat(20)}.test`;
+    expect(email.length).toBeGreaterThan(254);
+    const csv = toCsv(["name", "email"], [["Too Long", email]]);
+    expect(await importPeopleAction(csv, false)).toMatchObject({ ok: false, problems: [{ line: 2, problem: "email" }] });
+  });
+});

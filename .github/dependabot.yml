@@ -1,0 +1,82 @@
+# Dependency update pull requests. Security updates (for advisories) are opened as soon as
+# GitHub learns of an advisory, whatever the schedule below, once "Dependabot security updates"
+# is on in Settings > Code security.
+version: 2
+updates:
+  # The portal (Next.js app): portal/package.json and portal/package-lock.json.
+  - package-ecosystem: npm
+    directory: /portal
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:17"
+      timezone: Asia/Baku
+    # A version newer than a few days has had little time to be checked for a compromised
+    # release; security updates are not delayed by this.
+    cooldown:
+      default-days: 5
+      semver-major-days: 14
+    open-pull-requests-limit: 10
+    labels: [dependencies]
+    commit-message:
+      prefix: "deps"
+      include: scope
+    groups:
+      # next and eslint-config-next are released together and must stay on the same version.
+      nextjs:
+        patterns: ["next", "eslint-config-next", "@next/*"]
+      react:
+        patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
+      production-minor-and-patch:
+        dependency-type: production
+        update-types: [minor, patch]
+      development-minor-and-patch:
+        dependency-type: development
+        update-types: [minor, patch]
+
+  # Actions used by the workflows in .github/workflows (pinned to commit SHAs).
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:17"
+      timezone: Asia/Baku
+    labels: [dependencies]
+    commit-message:
+      prefix: "ci"
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # Base image of portal/Dockerfile (node:24-trixie-slim). A new Node major is a deliberate
+  # upgrade, not a weekly bump.
+  - package-ecosystem: docker
+    directory: /portal
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:17"
+      timezone: Asia/Baku
+    labels: [dependencies]
+    commit-message:
+      prefix: "docker"
+    ignore:
+      - dependency-name: node
+        update-types: ["version-update:semver-major"]
+
+  # Images of portal/docker-compose.yml. A PostgreSQL major upgrade needs a dump and restore
+  # (or pg_upgrade) of the data volume, so only minor updates are proposed.
+  - package-ecosystem: docker-compose
+    directory: /portal
+    schedule:
+      interval: weekly
+      day: monday
+      time: "05:17"
+      timezone: Asia/Baku
+    labels: [dependencies]
+    commit-message:
+      prefix: "docker"
+    ignore:
+      - dependency-name: postgres
+        update-types: ["version-update:semver-major"]

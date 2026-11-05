@@ -471,6 +471,9 @@ class ImportConflict extends Error {
   }
 }
 
+/** Longest name, job title and department name an import keeps: the limit of the add and edit dialogs. */
+const IMPORT_TEXT_MAX = 120;
+
 /** CSV import in two steps: "check" validates everything, "commit" writes only a clean file. */
 export async function importPeopleAction(csv: string, commit: boolean): Promise<ImportPreview> {
   const v = await actionViewer("people.write");
@@ -486,6 +489,9 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
   if (table.length > 5001) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "tooMany" };
 
   const cell = (r: string[], n: string) => (col(n) >= 0 ? (r[col(n)] ?? "").trim() : "");
+  // The add and edit dialogs allow 120 characters for these; a longer cell is cut, so one row cannot put megabytes
+  // into every people list, certificate and export.
+  const short = (value: string) => value.slice(0, IMPORT_TEXT_MAX);
   const body = table.slice(1);
   // Only the file's own addresses and numbers are looked up (not every account on the platform).
   const [departments, existing, phones, foreign] = await Promise.all([
@@ -513,16 +519,16 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
   body.forEach((r, i) => {
     const line = i + 2;
     const get = (n: string) => cell(r, n);
-    const name = get("name");
+    const name = short(get("name"));
     const email = get("email").toLowerCase();
     const roleRaw = fold(get("role"));
     // Optional: a language the organisation has switched on; empty means the organisation's default.
     const languageRaw = get("language");
     const language = languageRaw ? LANGUAGE_ALIASES[fold(languageRaw)] : undefined;
     if (languageRaw && (!language || !v.tenant.settings.locales.includes(language))) problems.push({ line, problem: "language" });
-    const department = get("department");
+    const department = short(get("department"));
     if (!name) problems.push({ line, problem: "name" });
-    if (!z.email().safeParse(email).success) problems.push({ line, problem: "email" });
+    if (!z.email().max(254).safeParse(email).success) problems.push({ line, problem: "email" });
     else if (seen.has(email)) problems.push({ line, problem: "duplicate" });
     else if (existing.has(email)) problems.push({ line, problem: "exists" });
     else if (foreign.has(emailDomain(email) ?? "")) problems.push({ line, problem: "foreignDomain" });
@@ -540,7 +546,7 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
     const key = departmentKey(department);
     if (department && (deptMatches.get(key)?.length ?? 0) > 1) problems.push({ line, problem: "departmentAmbiguous" });
     else if (department && !deptByName.has(key) && !newDepartments.has(key)) newDepartments.set(key, { name: department, line });
-    rows.push({ line, name, email, department, jobTitle: get("job_title"), role: role ?? "learner", manager: get("manager_email").toLowerCase(), phone, locale: language ?? v.tenant.settings.defaultLocale });
+    rows.push({ line, name, email, department, jobTitle: short(get("job_title")), role: role ?? "learner", manager: get("manager_email").toLowerCase().slice(0, 254), phone, locale: language ?? v.tenant.settings.defaultLocale });
   });
   if (!commit || problems.length) return { ok: problems.length === 0, rows: rows.length, problems: problems.slice(0, 200), newDepartments: newDepartmentNames() };
 

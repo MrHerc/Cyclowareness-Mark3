@@ -11,7 +11,8 @@ import { formatAzDate } from "../../lib/az-format";
 import { messagesFor } from "../../i18n/translator";
 
 function fill(template: string, vars: Record<string, string>): string {
-  return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k: string) => vars[k] ?? "");
+  // Own keys only: {{constructor}} in an admin's template must not print what every object inherits.
+  return template.replace(/\{\{\s*(\w+)\s*\}\}/g, (_, k: string) => (Object.hasOwn(vars, k) ? vars[k] : undefined) ?? "");
 }
 
 /** A due day ("2026-10-30") written for the recipient: "30 oktyabr 2026", "October 30, 2026", "30 октября 2026 г.". */
