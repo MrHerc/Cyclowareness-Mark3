@@ -10,6 +10,7 @@ import { Pill } from "@/components/ui/pill";
 import { BarChart, StackBar } from "@/components/ui/charts";
 import { PageHeader, Stat } from "@/components/ui/layout";
 import { cn } from "@/lib/cn";
+import { dayAt } from "@/lib/time";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.nav");
@@ -117,13 +118,13 @@ export default async function OpsCenterPage() {
               <CardBody>
                 <BarChart
                   tone="brand"
-                  points={d.reportsByDay.map((p) => ({ label: format.dateTime(new Date(`${p.day}T12:00:00`), { day: "numeric", month: "short" }), value: p.value }))}
+                  points={d.reportsByDay.map((p) => ({ label: format.dateTime(dayAt(p.day, v.tenant.settings.timeZone), { day: "numeric", month: "short" }), value: p.value }))}
                   caption={tr("reportsChart")}
                   headers={[tr("reportsHeaders.date"), tr("reportsHeaders.value")]}
                 />
                 <div className="mt-2 flex justify-between text-tab text-ink-subtle">
-                  <span>{format.dateTime(new Date(`${d.reportsByDay[0].day}T12:00:00`), { day: "numeric", month: "short" })}</span>
-                  <span>{format.dateTime(new Date(`${d.reportsByDay[13].day}T12:00:00`), { day: "numeric", month: "short" })}</span>
+                  <span>{format.dateTime(dayAt(d.reportsByDay[0].day, v.tenant.settings.timeZone), { day: "numeric", month: "short" })}</span>
+                  <span>{format.dateTime(dayAt(d.reportsByDay[13].day, v.tenant.settings.timeZone), { day: "numeric", month: "short" })}</span>
                 </div>
               </CardBody>
             </Card>

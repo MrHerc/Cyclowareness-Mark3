@@ -236,11 +236,18 @@ export function defaultSettings(locale = "az"): TenantSettings {
   };
 }
 
-/** The IANA time zones this runtime knows (Settings → Languages lists them). */
-export const TIME_ZONES: readonly string[] = Intl.supportedValuesOf("timeZone");
+/** The IANA time zones Settings → Languages offers; ICU lists Kyiv by its old name and leaves out UTC. */
+export const TIME_ZONES: readonly string[] = ["UTC", ...Intl.supportedValuesOf("timeZone").map((z) => (z === "Europe/Kiev" ? "Europe/Kyiv" : z))];
 
+/** Any named zone the runtime can format, so a saved alias never falls back to Baku when ICU renames it. Offsets such as "+03:00" are refused: Postgres reads them with the opposite sign. */
 export function isTimeZone(v: unknown): v is string {
-  return typeof v === "string" && TIME_ZONES.includes(v);
+  if (typeof v !== "string" || !/^[A-Za-z]/.test(v)) return false;
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: v });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 type Group = Record<string, unknown>;

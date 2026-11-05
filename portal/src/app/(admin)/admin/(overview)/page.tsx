@@ -21,6 +21,7 @@ import { riskBand } from "@/lib/domain/risk";
 import { daysLeftInMonth } from "@/lib/domain/league";
 import type { Category } from "@/lib/domain/catalog";
 import { cn } from "@/lib/cn";
+import { dayAt } from "@/lib/time";
 
 export async function generateMetadata() {
   const tr = await getTranslations("admin.nav");
@@ -90,7 +91,7 @@ export default async function AdminOverview({ searchParams }: PageProps<"/admin"
     next.set(`${table}d`, activeKey === key ? (activeDir === "asc" ? "desc" : "asc") : key === "name" || key === "title" ? "asc" : "desc");
     return `?${next.toString()}`;
   };
-  const dayLabel = (day: string) => format.dateTime(new Date(`${day}T12:00:00`), { month: "short", day: "numeric" });
+  const dayLabel = (day: string) => format.dateTime(dayAt(day, v.tenant.settings.timeZone), { month: "short", day: "numeric" });
   const insights = [
     d.bands.high ? tr("insight.highRisk", { count: d.bands.high }) : null,
     k.reportRate < 50 && k.reportRate > 0 ? tr("insight.lowReport", { value: k.reportRate }) : null,

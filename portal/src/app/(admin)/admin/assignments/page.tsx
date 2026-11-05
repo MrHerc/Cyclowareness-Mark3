@@ -12,6 +12,7 @@ import { ModuleIcon } from "@/components/learner/module-icon";
 import { AssignDialog } from "@/components/admin/assign-dialog";
 import { AssignmentRowActions } from "@/components/admin/assignment-row-actions";
 import type { Category } from "@/lib/domain/catalog";
+import { dayAt } from "@/lib/time";
 import { pick } from "@/i18n/config";
 
 export async function generateMetadata() {
@@ -109,7 +110,7 @@ export default async function AssignmentsPage() {
                       <span className="inline-flex items-center gap-1">
                         <CalendarDays className="size-3.5" />
                         {a.dueKind === "fixed" && a.dueDate
-                          ? tr("due", { date: format.dateTime(new Date(`${a.dueDate}T12:00:00`), { dateStyle: "medium" }) })
+                          ? tr("due", { date: format.dateTime(dayAt(a.dueDate, v.tenant.settings.timeZone), { dateStyle: "medium" }) })
                           : a.dueKind === "after_joining"
                             ? tr("afterJoining", { days: a.dueDays ?? 0 })
                             : tr("noDue")}

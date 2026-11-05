@@ -12,7 +12,7 @@ import { fromZonedParts, zonedParts } from "@/lib/baku-clock";
 import { toCsv } from "@/lib/csv";
 import { dayKey } from "@/lib/domain/gamification";
 import { DEFAULT_TIME_ZONE } from "@/lib/day";
-import { isTimeZone, withDefaults } from "@/lib/tenant-defaults";
+import { TIME_ZONES, isTimeZone, withDefaults } from "@/lib/tenant-defaults";
 import { toXlsx } from "@/server/reports/xlsx";
 
 vi.mock("../src/server/env", async (original) => ({ ...(await original<typeof import("../src/server/env")>()), appUrl: () => "https://app.test" }));
@@ -108,6 +108,15 @@ describe("tenant setting", () => {
     expect(isTimeZone(RIYADH)).toBe(true);
     expect(isTimeZone("+03:00")).toBe(false);
   });
+
+  it("keeps any zone the runtime can format, so a renamed alias never falls back to Baku", () => {
+    expect(withDefaults({ timeZone: "Europe/Kyiv" }).timeZone).toBe("Europe/Kyiv");
+    expect(withDefaults({ timeZone: "Europe/Kiev" }).timeZone).toBe("Europe/Kiev");
+    expect(withDefaults({ timeZone: "UTC" }).timeZone).toBe("UTC");
+    expect(TIME_ZONES).toContain("Europe/Kyiv");
+    expect(TIME_ZONES).not.toContain("Europe/Kiev");
+    expect(TIME_ZONES).toContain("UTC");
+  });
 });
 
 /** The text of one file in a ZIP made by toXlsx (local headers only: stored or deflated). */
@@ -200,5 +209,12 @@ describe("saveTimeZoneAction", () => {
     expect(s.timeZone).toBe(RIYADH);
     expect(s.defaultLocale).toBe("ar");
     expect(audit).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ tenantId: row.id, action: "settings.timezone", meta: { from: DEFAULT_TIME_ZONE, to: RIYADH } }));
+  });
+
+  it("writes no audit entry when the zone is unchanged (the Languages tab saves it with every language change)", async () => {
+    audit.mockClear();
+    viewer = { user: { id: "00000000-0000-4000-8000-000000000001" }, tenant: { id: berlin, settings: { timeZone: BERLIN } } };
+    expect(await saveTimeZoneAction(BERLIN)).toEqual({ ok: true });
+    expect(audit).not.toHaveBeenCalled();
   });
 });

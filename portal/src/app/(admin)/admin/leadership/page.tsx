@@ -14,7 +14,7 @@ import { PageHeader } from "@/components/ui/layout";
 import { ScrollRegion } from "@/components/ui/scroll-region";
 import { PrintButton } from "@/components/admin/print-toolbar";
 import { riskBand } from "@/lib/domain/risk";
-import { requestNow } from "@/lib/time";
+import { dayAt, requestNow } from "@/lib/time";
 import { cn } from "@/lib/cn";
 import { riskTitle } from "@/lib/risk-title";
 
@@ -98,7 +98,7 @@ export default async function LeadershipPage() {
           <CardBody>
             <AreaChart
               riskStrip
-              points={d.charts.map((c) => ({ label: format.dateTime(new Date(`${c.day}T12:00:00`), { day: "numeric", month: "short" }), value: c.avgRisk }))}
+              points={d.charts.map((c) => ({ label: format.dateTime(dayAt(c.day, v.tenant.settings.timeZone), { day: "numeric", month: "short" }), value: c.avgRisk }))}
               caption={tr("riskTrend")}
               headers={[tr("riskHeaders.date"), tr("riskHeaders.value")]}
               guides={[33, 66]}

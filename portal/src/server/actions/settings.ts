@@ -171,6 +171,8 @@ export async function saveTimeZoneAction(timeZone: string): Promise<SaveResult> 
   const v = await actionViewer("settings.write");
   if (!isTimeZone(timeZone)) return { ok: false, field: "timeZone" };
   const from = v.tenant.settings.timeZone;
+  // The Languages tab saves both together: an unchanged zone writes no "Time zone changed" audit entry.
+  if (timeZone === from) return { ok: true };
   await saveSettings(v, (s) => ({ ...s, timeZone }), "settings.timezone", { from, to: timeZone });
   return { ok: true };
 }
