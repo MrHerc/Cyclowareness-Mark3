@@ -86,6 +86,9 @@ export async function completeLesson(
       xpAwarded: sql`${t.lessonProgress.xpAwarded} + ${xp}`,
       attempts: sql`${t.lessonProgress.attempts} + 1`,
       secondsSpent: sql`${t.lessonProgress.secondsSpent} + ${p.secondsSpent ?? 0}`,
+      // The attempt is used up: the next one starts again from startLesson.
+      startedAt: null,
+      reached: 0,
     })
     .where(thisLesson);
   if (xp > 0) await awardXp(db, { tenantId: p.tenantId, userId: p.userId, amount: xp, reason: "lesson", ref: p.lessonId, at });
@@ -151,6 +154,31 @@ export async function completeLesson(
   return { xpAwarded: xp, firstTime, moduleStatus: status, percent };
 }
 
+/**
+ * Opens an attempt at a lesson: its start is recorded once, until a completion uses it up. A start
+ * older than four hours is a sitting that ended: the clock restarts, so a lesson opened days ahead
+ * neither satisfies the dwell nor counts as time trained.
+ */
+export async function startLesson(db: DB, p: { userId: string; lessonId: string; at?: Date }) {
+  const at = p.at ?? new Date();
+  const now = sql`${at.toISOString()}::timestamptz`;
+  await db
+    .insert(t.lessonProgress)
+    .values({ userId: p.userId, lessonId: p.lessonId, startedAt: at })
+    .onConflictDoUpdate({
+      target: [t.lessonProgress.userId, t.lessonProgress.lessonId],
+      set: { startedAt: sql`case when ${t.lessonProgress.startedAt} > ${now} - interval '4 hours' then ${t.lessonProgress.startedAt} else ${now} end` },
+    });
+}
+
+/** The furthest scene the player showed in the current attempt; it only moves forward. */
+export async function reachScene(db: DB, p: { userId: string; lessonId: string; index: number }) {
+  await db
+    .update(t.lessonProgress)
+    .set({ reached: sql`greatest(${t.lessonProgress.reached}, ${p.index})` })
+    .where(and(eq(t.lessonProgress.userId, p.userId), eq(t.lessonProgress.lessonId, p.lessonId)));
+}
+
 /** Marks the start of a module (Home "Continue" card) without completing anything. */
 export async function touchModule(db: DB, p: { userId: string; moduleId: string; lessonKey: string; at?: Date }) {
   await db
@@ -183,23 +211,28 @@ export async function issueCertificate(
 ): Promise<{ serial: string; publicToken: string }> {
   const at = p.at ?? new Date();
   // Two certificates issued at the same moment read the same highest serial; the unique index
-  // refuses the second, which then takes the next one. Other errors are not retried.
+  // refuses the second, which then takes the next one. Other errors (a second certificate for the
+  // same module or path) are not retried. Each try is its own savepoint, so a refused insert does
+  // not abort a transaction this runs in (attestModule).
   for (let attempt = 0; ; attempt++) {
     const serial = await nextSerial(db, p.tenantId, at);
     const publicToken = randomToken(16);
     try {
-      await db.insert(t.certificates).values({
-        tenantId: p.tenantId,
-        userId: p.userId,
-        moduleId: p.moduleId ?? null,
-        pathId: p.pathId ?? null,
-        serial,
-        publicToken,
-        issuedAt: at,
-      });
+      await db.transaction((tx) =>
+        tx.insert(t.certificates).values({
+          tenantId: p.tenantId,
+          userId: p.userId,
+          moduleId: p.moduleId ?? null,
+          pathId: p.pathId ?? null,
+          serial,
+          publicToken,
+          evidence: "server_verified",
+          issuedAt: at,
+        }),
+      );
       return { serial, publicToken };
     } catch (error) {
-      if (attempt >= 7 || !isUniqueViolation(error)) throw error;
+      if (attempt >= 7 || !isUniqueViolation(error, "certificates_serial_unique")) throw error;
     }
   }
 }
@@ -214,24 +247,22 @@ export async function attestModule(
 ): Promise<{ publicToken: string } | null> {
   const at = p.at ?? new Date();
   // Only the request that moves the module out of "awaiting attestation" goes on, so a confirmation sent
-  // twice (a double click, a retry) stores one attestation and issues one certificate. The completion and
-  // its attestation text are written together: compliance evidence never shows one without the other.
-  const claimed = await db.transaction(async (tx) => {
+  // twice (a double click, a retry) stores one attestation and issues one certificate. The completion, its
+  // attestation text and the certificate are written together: compliance evidence never shows one without
+  // the others, and the unique keys per person and module back the claim.
+  return db.transaction(async (tx) => {
     const [row] = await tx
       .update(t.moduleProgress)
       .set({ status: "completed", completedAt: at, percent: 100 })
       .where(and(eq(t.moduleProgress.userId, p.userId), eq(t.moduleProgress.moduleId, p.moduleId), eq(t.moduleProgress.status, "awaiting_attestation")))
       .returning({ userId: t.moduleProgress.userId });
-    if (!row) return false;
-    await tx.insert(t.attestations).values({ tenantId: p.tenantId, userId: p.userId, moduleId: p.moduleId, text: p.text, locale: p.locale, at });
-    return true;
+    if (!row) return null;
+    await tx.insert(t.attestations).values({ tenantId: p.tenantId, userId: p.userId, moduleId: p.moduleId, text: p.text, locale: p.locale, evidence: "server_verified", at });
+    const cert = await issueCertificate(tx, { tenantId: p.tenantId, userId: p.userId, moduleId: p.moduleId, at });
+    await tx
+      .update(t.behaviorRisks)
+      .set({ status: "closed", closedAt: at })
+      .where(and(eq(t.behaviorRisks.userId, p.userId), eq(t.behaviorRisks.moduleId, p.moduleId), eq(t.behaviorRisks.status, "open")));
+    return { publicToken: cert.publicToken };
   });
-  if (!claimed) return null;
-  // Outside the transaction: its retry on a duplicate serial would fail inside an aborted one.
-  const cert = await issueCertificate(db, { tenantId: p.tenantId, userId: p.userId, moduleId: p.moduleId, at });
-  await db
-    .update(t.behaviorRisks)
-    .set({ status: "closed", closedAt: at })
-    .where(and(eq(t.behaviorRisks.userId, p.userId), eq(t.behaviorRisks.moduleId, p.moduleId), eq(t.behaviorRisks.status, "open")));
-  return { publicToken: cert.publicToken };
 }

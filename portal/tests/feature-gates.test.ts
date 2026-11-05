@@ -110,7 +110,7 @@ describe("rate limits on learner actions", () => {
 
   it("limits lesson completions per person", async () => {
     limit.mockResolvedValue({ ok: false, retryAfterMs: 1 });
-    expect(await learning.completeLessonAction({ slug: "phishing", lessonKey: "l1", seconds: 60, answers: [] })).toEqual({ ok: false, xp: 0 });
+    expect(await learning.completeLessonAction({ slug: "phishing", lessonKey: "l1", answers: [] })).toEqual({ ok: false, xp: 0 });
     expect(limit).toHaveBeenCalledWith("lesson-complete:00000000-0000-4000-8000-000000000001", 60, 10 * 60_000);
     expect(touched).not.toHaveBeenCalled();
   });

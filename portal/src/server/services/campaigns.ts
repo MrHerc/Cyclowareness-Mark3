@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, inArray, isNotNull, isNull, lte, ne, notExists, or, sql } from "drizzle-orm";
+import { and, asc, eq, gte, inArray, isNotNull, isNull, lte, ne, notExists, notInArray, or, sql } from "drizzle-orm";
 import type { DB } from "../db/client";
 import * as t from "../db/schema";
 import { departmentClosure } from "./assignments";
@@ -250,6 +250,19 @@ async function returnToDraft(db: DB, campaignId: string, reason: LaunchBlock) {
 }
 
 /** Background: launch scheduled campaigns that are due and close campaigns after 14 days. */
+/**
+ * Ends a campaign by hand. One conditional update, so two administrators acting at the same moment
+ * (one cancelling, one completing) leave exactly one end state, and a cancel never reopens a campaign.
+ */
+export async function setCampaignStatus(db: DB, tenantId: string, campaignId: string, status: "cancelled" | "completed"): Promise<boolean> {
+  const rows = await db
+    .update(t.campaigns)
+    .set({ status, ...(status === "completed" ? { completedAt: new Date() } : {}) })
+    .where(and(eq(t.campaigns.id, campaignId), eq(t.campaigns.tenantId, tenantId), notInArray(t.campaigns.status, ["completed", "cancelled"])))
+    .returning({ id: t.campaigns.id });
+  return rows.length > 0;
+}
+
 export async function campaignTick(db: DB) {
   const due = await db.select({ id: t.campaigns.id }).from(t.campaigns).where(and(eq(t.campaigns.status, "scheduled"), lte(t.campaigns.scheduledAt, new Date())));
   for (const c of due) {

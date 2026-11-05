@@ -46,6 +46,7 @@ export const AUDIT_ACTIONS = [
   "assignment.due_changed",
   "assignment.removed",
   "attestation.reminder",
+  "learning.completion_refused",
   "campaign.created",
   "campaign.changed",
   "campaign.launched",

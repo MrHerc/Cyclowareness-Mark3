@@ -8,8 +8,8 @@ const ids = new Set(scenes);
 
 describe("lesson resume state", () => {
   it("round-trips a lesson in progress", () => {
-    const raw = serializeLesson({ kind: "playing", index: 2, maxIndex: 3, inner: 0.5, answers: [{ sceneId: "mail", correct: true, firstTry: true, outcome: "safe" }], elapsedMs: 42_000 }, scenes);
-    expect(parseLesson(raw, scenes, ids)).toEqual({ kind: "playing", index: 2, maxIndex: 3, inner: 0.5, answers: [{ sceneId: "mail", correct: true, firstTry: true, outcome: "safe" }], elapsedMs: 42_000 });
+    const raw = serializeLesson({ kind: "playing", index: 2, maxIndex: 3, inner: 0.5, answers: [{ sceneId: "mail", itemId: "m1", picked: ["report"] }], elapsedMs: 42_000 }, scenes);
+    expect(parseLesson(raw, scenes, ids)).toEqual({ kind: "playing", index: 2, maxIndex: 3, inner: 0.5, answers: [{ sceneId: "mail", itemId: "m1", picked: ["report"] }], elapsedMs: 42_000 });
   });
 
   it("round-trips a finished lesson with its result", () => {
@@ -21,25 +21,25 @@ describe("lesson resume state", () => {
     const raw = serializeLesson({ kind: "playing", index: 1, maxIndex: 1, inner: 0, answers: [], elapsedMs: 0 }, scenes);
     expect(parseLesson(raw, ["intro", "mail", "recap"], ids)).toBeNull();
     expect(parseLesson(raw, ["intro", "quiz", "mail", "recap"], ids)).toBeNull();
-    expect(parseLesson(raw.replace('"v":1', '"v":0'), scenes, ids)).toBeNull();
+    expect(parseLesson(raw.replace('"v":2', '"v":1'), scenes, ids)).toBeNull();
     expect(parseLesson("{not json", scenes, ids)).toBeNull();
     expect(parseLesson(null, scenes, ids)).toBeNull();
-    expect(parseLesson(JSON.stringify({ v: 1, scenes, kind: "playing", index: 4, inner: 0, answers: [], elapsedMs: 0 }), scenes, ids)).toBeNull();
-    expect(parseLesson(JSON.stringify({ v: 1, scenes, kind: "playing", index: 1, inner: 1.5, answers: [], elapsedMs: 0 }), scenes, ids)).toBeNull();
-    expect(parseLesson(JSON.stringify({ v: 1, scenes, kind: "done", result: { ok: false, xp: 0 }, token: null }), scenes, ids)).toBeNull();
+    expect(parseLesson(JSON.stringify({ v: 2, scenes, kind: "playing", index: 4, inner: 0, answers: [], elapsedMs: 0 }), scenes, ids)).toBeNull();
+    expect(parseLesson(JSON.stringify({ v: 2, scenes, kind: "playing", index: 1, inner: 1.5, answers: [], elapsedMs: 0 }), scenes, ids)).toBeNull();
+    expect(parseLesson(JSON.stringify({ v: 2, scenes, kind: "done", result: { ok: false, xp: 0 }, token: null }), scenes, ids)).toBeNull();
   });
 
   it("drops malformed or unknown answers and caps the elapsed time", () => {
     const raw = JSON.stringify({
-      v: 1,
+      v: 2,
       scenes,
       kind: "playing",
       index: 1,
       inner: 0.25,
       elapsedMs: 10 * 3600_000,
-      answers: [{ sceneId: "mail", itemId: "a", correct: false, firstTry: false, extra: "x" }, { sceneId: "gone", correct: true, firstTry: true }, { sceneId: "quiz", correct: "yes", firstTry: true }, { sceneId: "quiz", correct: true, firstTry: true, outcome: "great" }],
+      answers: [{ sceneId: "mail", itemId: "a", picked: ["open"], extra: "x" }, { sceneId: "gone", picked: [] }, { sceneId: "quiz", picked: "a" }, { sceneId: "quiz", picked: [{ id: "a" }] }, { sceneId: "quiz", picked: Array.from({ length: 41 }, () => "a") }],
     });
-    expect(parseLesson(raw, scenes, ids)).toEqual({ kind: "playing", index: 1, maxIndex: 1, inner: 0.25, answers: [{ sceneId: "mail", itemId: "a", correct: false, firstTry: false }], elapsedMs: 4 * 3600_000 });
+    expect(parseLesson(raw, scenes, ids)).toEqual({ kind: "playing", index: 1, maxIndex: 1, inner: 0.25, answers: [{ sceneId: "mail", itemId: "a", picked: ["open"] }], elapsedMs: 4 * 3600_000 });
   });
 
   it("keeps tutor checkpoint answers, which are recorded per beat", () => {
@@ -49,13 +49,13 @@ describe("lesson resume state", () => {
     ];
     const answerIds = answerIdsOf(lesson);
     expect([...answerIds].sort()).toEqual(["one-vault", "one-vault:main", "one-vault:never-share", "recap"]);
-    const checkpoint = { sceneId: tutorAnswerId("one-vault", "never-share"), correct: false, firstTry: true };
-    const raw = serializeLesson({ kind: "playing", index: 1, maxIndex: 1, inner: 0, answers: [checkpoint, { sceneId: "one-vault:removed-beat", correct: true, firstTry: true }], elapsedMs: 1000 }, ["one-vault", "recap"]);
+    const checkpoint = { sceneId: tutorAnswerId("one-vault", "never-share"), picked: ["x"] };
+    const raw = serializeLesson({ kind: "playing", index: 1, maxIndex: 1, inner: 0, answers: [checkpoint, { sceneId: "one-vault:removed-beat", picked: ["y"] }], elapsedMs: 1000 }, ["one-vault", "recap"]);
     expect(parseLesson(raw, ["one-vault", "recap"], answerIds)).toEqual({ kind: "playing", index: 1, maxIndex: 1, inner: 0, answers: [checkpoint], elapsedMs: 1000 });
   });
 
   it("keeps the furthest scene reached, never before the current one or past the last", () => {
-    const at = (fields: Record<string, unknown>) => parseLesson(JSON.stringify({ v: 1, scenes, kind: "playing", index: 1, inner: 0, answers: [], elapsedMs: 0, ...fields }), scenes, ids);
+    const at = (fields: Record<string, unknown>) => parseLesson(JSON.stringify({ v: 2, scenes, kind: "playing", index: 1, inner: 0, answers: [], elapsedMs: 0, ...fields }), scenes, ids);
     expect(at({ maxIndex: 3 })).toMatchObject({ index: 1, maxIndex: 3 });
     // A state saved before maxIndex existed: the scene it shows was the furthest one.
     expect(at({})).toMatchObject({ index: 1, maxIndex: 1 });

@@ -5,15 +5,20 @@ import { refresh } from "next/cache";
 import { getLocale, getTranslations } from "next-intl/server";
 import { z } from "zod";
 import { db, t } from "../db";
+import { isUniqueViolation } from "../db/errors";
 import { actionViewer, allowed, type Viewer } from "../auth/viewer";
 import { rateLimit } from "../rate-limit";
 import { queueEmail, renderEmailHtml } from "../mail";
 import { appUrl } from "../env";
-import { attestModule, completeLesson, issueCertificate, touchModule } from "../services/progress";
+import { attestModule, completeLesson, issueCertificate, reachScene, startLesson, touchModule } from "../services/progress";
 import { recomputeRisk } from "../services/risk";
 import { emitEvent } from "../services/events";
+import { audit } from "../services/audit";
 import { DEFAULT_ATTESTATION } from "../../lib/tenant-defaults";
 import { pick } from "../../i18n/config";
+import { pickLessonContent } from "../../lib/content/lesson-locale";
+import { minDwellMs, scoreLesson } from "../../lib/content/scoring";
+import type { Scene } from "../../lib/content/types";
 
 /** Learners only reach published modules; studio authors may also act on their drafts (preview). */
 async function moduleBySlug(v: Viewer, slug: string) {
@@ -58,11 +63,12 @@ async function issuePathCertificates(tenantId: string, userId: string, slug: str
     .where(and(eq(t.moduleProgress.userId, userId), eq(t.moduleProgress.status, "completed")));
   const doneSet = new Set(done.map((d) => d.slug));
   for (const p of paths.filter((x) => x.slugs.includes(slug) && x.slugs.every((s) => doneSet.has(s)))) {
-    const [existing] = await db()
-      .select({ id: t.certificates.id })
-      .from(t.certificates)
-      .where(and(eq(t.certificates.userId, userId), eq(t.certificates.pathId, p.id)));
-    if (!existing) await issueCertificate(db(), { tenantId, userId, pathId: p.id });
+    // Two modules of the path attested at the same moment both get here: the unique key keeps one certificate.
+    try {
+      await issueCertificate(db(), { tenantId, userId, pathId: p.id });
+    } catch (error) {
+      if (!isUniqueViolation(error, "certificates_user_path_idx")) throw error;
+    }
   }
 }
 
@@ -80,34 +86,60 @@ export async function rateModuleAction(input: { slug: string; rating: number; co
   return { ok: true };
 }
 
-/** Records that a lesson was opened (Home "Continue" points here). */
-export async function startLessonAction(slug: string, lessonKey: string): Promise<void> {
-  const v = await actionViewer();
+/** The module and the lesson the player names, if the viewer may act on them. */
+async function lessonOf(v: Viewer, slug: string, lessonKey: string) {
   const mod = await moduleBySlug(v, slug);
-  if (!mod) return;
-  await touchModule(db(), { userId: v.user.id, moduleId: mod.id, lessonKey });
+  if (!mod) return null;
+  const lessons = await db().select().from(t.lessons).where(eq(t.lessons.moduleId, mod.id));
+  const lesson = lessons.find((l) => l.key === lessonKey);
+  return lesson ? { mod, lessons, lesson } : null;
 }
 
-const answerSchema = z.object({
+/** Records that a lesson was opened (Home "Continue" points here) and when this attempt began. */
+export async function startLessonAction(slug: string, lessonKey: string): Promise<void> {
+  const v = await actionViewer();
+  const found = await lessonOf(v, slug, lessonKey);
+  if (!found) return;
+  await touchModule(db(), { userId: v.user.id, moduleId: found.mod.id, lessonKey });
+  await startLesson(db(), { userId: v.user.id, lessonId: found.lesson.id });
+}
+
+/** The player reports each scene it shows; the server keeps the furthest one of the attempt. */
+export async function reachSceneAction(slug: string, lessonKey: string, index: number): Promise<void> {
+  const v = await actionViewer();
+  if (!Number.isInteger(index) || index < 0 || index > 999) return;
+  if (!(await rateLimit(`lesson-reach:${v.user.id}`, 600, 10 * 60_000)).ok) return;
+  const found = await lessonOf(v, slug, lessonKey);
+  if (!found) return;
+  await reachScene(db(), { userId: v.user.id, lessonId: found.lesson.id, index });
+}
+
+const submissionSchema = z.object({
   sceneId: z.string().max(80),
   itemId: z.string().max(80).optional(),
-  correct: z.boolean(),
-  firstTry: z.boolean(),
-  outcome: z.enum(["safe", "risky", "compromised"]).optional(),
+  picked: z.array(z.string().max(80)).max(40),
 });
 
 const completeSchema = z.object({
   slug: z.string().max(100),
   lessonKey: z.string().max(100),
-  seconds: z.number().int().min(0).max(4 * 3600),
-  answers: z.array(answerSchema).max(400),
+  answers: z.array(submissionSchema).max(400),
 });
 
-export type LessonResult = { ok: boolean; xp: number; moduleStatus?: "in_progress" | "awaiting_attestation" | "completed"; nextKey?: string | null };
+export type LessonResult = {
+  ok: boolean;
+  xp: number;
+  moduleStatus?: "in_progress" | "awaiting_attestation" | "completed";
+  nextKey?: string | null;
+  /** The attempt could not be verified (not started here or already used up, too fast, scenes skipped, answers missing). */
+  error?: "unverified";
+};
 
 /**
- * Called once at the end of a lesson with the learner's answers. Answers feed the weak-areas
- * report and the risk score; XP is awarded only the first time a lesson is completed.
+ * Called once at the end of a lesson with what the learner picked in each scored scene. The attempt
+ * counts only when it was started here, lasted long enough, showed every scene and answered every
+ * scored one; the answers are scored from the lesson's content and feed the weak-areas report and the
+ * risk score. XP is awarded only the first time a lesson is completed.
  */
 export async function completeLessonAction(input: z.infer<typeof completeSchema>): Promise<LessonResult> {
   const v = await actionViewer();
@@ -115,32 +147,54 @@ export async function completeLessonAction(input: z.infer<typeof completeSchema>
   if (!p.success) return { ok: false, xp: 0 };
   // Each call stores up to 400 answers and recomputes the risk score: far more than anyone finishes lessons.
   if (!(await rateLimit(`lesson-complete:${v.user.id}`, 60, 10 * 60_000)).ok) return { ok: false, xp: 0 };
-  const mod = await moduleBySlug(v, p.data.slug);
-  if (!mod) return { ok: false, xp: 0 };
-  const lessons = await db().select().from(t.lessons).where(eq(t.lessons.moduleId, mod.id));
-  const lesson = lessons.find((l) => l.key === p.data.lessonKey);
-  if (!lesson) return { ok: false, xp: 0 };
+  const found = await lessonOf(v, p.data.slug, p.data.lessonKey);
+  if (!found) return { ok: false, xp: 0 };
+  const { mod, lessons, lesson } = found;
+  // A Studio author's preview of a draft plays to the end but earns nothing.
+  if (mod.status !== "published") return { ok: true, xp: 0 };
 
-  if (p.data.answers.length) {
+  const now = Date.now();
+  const [attempt] = await db()
+    .select({ startedAt: t.lessonProgress.startedAt, reached: t.lessonProgress.reached })
+    .from(t.lessonProgress)
+    .where(and(eq(t.lessonProgress.userId, v.user.id), eq(t.lessonProgress.lessonId, lesson.id)));
+  const contents = await db().select({ scenes: t.lessonContents.scenes, locale: t.lessonContents.locale }).from(t.lessonContents).where(eq(t.lessonContents.lessonId, lesson.id));
+  // Scene ids are the same in every language of a lesson, so any stored text scores the attempt.
+  const scenes = (pickLessonContent(contents, await getLocale())?.scenes ?? null) as Scene[] | null;
+  const started = attempt?.startedAt?.getTime() ?? 0;
+  const scored = scenes ? scoreLesson(scenes, p.data.answers) : { ok: false as const, reason: "invalid" as const };
+  const reason = !started
+    ? "not_started"
+    : now - started < minDwellMs(lesson.minutes)
+      ? "too_fast"
+      : scenes && attempt!.reached < scenes.length - 1
+        ? "unreached"
+        : scored.ok
+          ? null
+          : scored.reason;
+  if (reason !== null || !scored.ok) {
+    await audit(db(), { tenantId: v.tenant.id, actorId: v.user.id, action: "learning.completion_refused", targetType: "lesson", targetId: lesson.id, meta: { module: mod.slug, lesson: lesson.key, reason } });
+    return { ok: false, xp: 0, error: "unverified" };
+  }
+  // The attempt is used up by one statement before anything is written: the same completion sent
+  // twice at once would otherwise store its answer rows twice (they feed the risk score).
+  const consumed = await db()
+    .update(t.lessonProgress)
+    .set({ startedAt: null, reached: 0 })
+    .where(and(eq(t.lessonProgress.userId, v.user.id), eq(t.lessonProgress.lessonId, lesson.id), eq(t.lessonProgress.startedAt, attempt!.startedAt!)))
+    .returning({ userId: t.lessonProgress.userId });
+  if (!consumed.length) return { ok: false, xp: 0, error: "unverified" };
+
+  if (scored.answers.length) {
     await db()
       .insert(t.answers)
-      .values(
-        p.data.answers.map((a) => ({
-          tenantId: v.tenant.id,
-          userId: v.user.id,
-          lessonId: lesson.id,
-          sceneId: a.sceneId,
-          itemId: a.itemId ?? null,
-          correct: a.correct,
-          firstTry: a.firstTry,
-          outcome: a.outcome ?? null,
-          category: mod.category,
-        })),
-      );
-    const risky = p.data.answers.filter((a) => a.outcome && a.outcome !== "safe").length;
+      .values(scored.answers.map((a) => ({ tenantId: v.tenant.id, userId: v.user.id, lessonId: lesson.id, ...a, category: mod.category })));
+    const risky = scored.answers.filter((a) => a.outcome && a.outcome !== "safe").length;
     if (risky) await emitEvent(db(), v.tenant.id, "simulation.risky", { module: mod.slug, lesson: lesson.key, choices: risky });
   }
-  const res = await completeLesson(db(), { tenantId: v.tenant.id, userId: v.user.id, lessonId: lesson.id, secondsSpent: p.data.seconds });
+  // Time trained: at most three times the lesson's nominal length, so a lesson left open adds no more.
+  const secondsSpent = Math.min(lesson.minutes * 180, Math.round((now - started) / 1000));
+  const res = await completeLesson(db(), { tenantId: v.tenant.id, userId: v.user.id, lessonId: lesson.id, secondsSpent });
   await recomputeRisk(db(), v.tenant.id, [v.user.id]);
   const sorted = lessons.sort((a, b) => a.position - b.position);
   const next = sorted.find((l) => l.position > lesson.position);

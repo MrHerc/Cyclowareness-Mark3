@@ -36,8 +36,8 @@ export async function GET(request: Request) {
     db().select().from(t.lessonProgress).where(eq(t.lessonProgress.userId, uid)),
     db().select({ lessonId: t.answers.lessonId, sceneId: t.answers.sceneId, correct: t.answers.correct, firstTry: t.answers.firstTry, outcome: t.answers.outcome, at: t.answers.at }).from(t.answers).where(eq(t.answers.userId, uid)),
     db().select({ amount: t.xpEvents.amount, reason: t.xpEvents.reason, at: t.xpEvents.at }).from(t.xpEvents).where(eq(t.xpEvents.userId, uid)),
-    db().select({ moduleId: t.attestations.moduleId, text: t.attestations.text, locale: t.attestations.locale, at: t.attestations.at }).from(t.attestations).where(eq(t.attestations.userId, uid)),
-    db().select({ serial: t.certificates.serial, issuedAt: t.certificates.issuedAt }).from(t.certificates).where(eq(t.certificates.userId, uid)),
+    db().select({ moduleId: t.attestations.moduleId, text: t.attestations.text, locale: t.attestations.locale, evidence: t.attestations.evidence, at: t.attestations.at }).from(t.attestations).where(eq(t.attestations.userId, uid)),
+    db().select({ serial: t.certificates.serial, evidence: t.certificates.evidence, issuedAt: t.certificates.issuedAt }).from(t.certificates).where(eq(t.certificates.userId, uid)),
     db().select({ versionId: t.policySignoffs.versionId, ip: t.policySignoffs.ip, signedAt: t.policySignoffs.signedAt }).from(t.policySignoffs).where(eq(t.policySignoffs.userId, uid)),
     db()
       .select({ number: t.threatReports.number, channel: t.threatReports.channel, subject: t.threatReports.subject, details: t.threatReports.details, url: t.threatReports.url, status: t.threatReports.status, createdAt: t.threatReports.createdAt })

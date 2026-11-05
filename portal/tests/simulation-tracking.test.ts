@@ -105,6 +105,9 @@ describe("risk linked to the training module", () => {
     await db.delete(t.behaviorRisks);
     await db.delete(t.moduleProgress);
     await db.delete(t.lessonProgress);
+    // One attestation and certificate per person and module: the previous test's must go with its progress.
+    await db.delete(t.certificates);
+    await db.delete(t.attestations);
   });
 
   async function finishModule() {
@@ -169,9 +172,9 @@ describe("risk linked to the training module", () => {
 describe("certificate serials", () => {
   it("number by the Baku year, so a certificate from the first hours of 1 January starts the new year", async () => {
     // 31 December 21:30 UTC is 1 January 01:30 in Baku.
-    const first = await issueCertificate(db, { tenantId, userId, moduleId, at: new Date("2026-12-31T21:30:00Z") });
+    const first = await issueCertificate(db, { tenantId, userId, at: new Date("2026-12-31T21:30:00Z") });
     const [row] = await db.select({ serial: t.certificates.serial }).from(t.certificates).where(eq(t.certificates.publicToken, first.publicToken));
     expect(row.serial).toBe("ACME-2027-000001");
-    expect((await issueCertificate(db, { tenantId, userId, moduleId, at: new Date("2026-12-31T19:30:00Z") })).serial).toMatch(/^ACME-2026-/);
+    expect((await issueCertificate(db, { tenantId, userId, at: new Date("2026-12-31T19:30:00Z") })).serial).toMatch(/^ACME-2026-/);
   });
 });

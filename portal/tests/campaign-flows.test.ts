@@ -150,6 +150,28 @@ describe("launchCampaign", () => {
   });
 });
 
+describe("setCampaignStatus", () => {
+  it("ends a campaign once: a cancel and a complete sent at the same time leave exactly one end state", async () => {
+    const { tenant } = await org({ people: 1 });
+    const campaign = await draft(tenant.id);
+    await c.launchCampaign(db, campaign.id, null);
+    const results = await Promise.all([c.setCampaignStatus(db, tenant.id, campaign.id, "cancelled"), c.setCampaignStatus(db, tenant.id, campaign.id, "completed")]);
+    expect(results.filter(Boolean)).toHaveLength(1);
+    const [row] = await db.select().from(t.campaigns).where(eq(t.campaigns.id, campaign.id));
+    expect(row.status).toBe(results[0] ? "cancelled" : "completed");
+    expect(await c.setCampaignStatus(db, tenant.id, campaign.id, "completed")).toBe(false);
+    expect((await db.select().from(t.campaigns).where(eq(t.campaigns.id, campaign.id)))[0].status).toBe(row.status);
+  });
+
+  it("knows nothing of another organisation's campaign", async () => {
+    const { tenant } = await org({ people: 1 });
+    const other = await org({ people: 1 });
+    const campaign = await draft(tenant.id);
+    expect(await c.setCampaignStatus(db, other.tenant.id, campaign.id, "cancelled")).toBe(false);
+    expect((await db.select().from(t.campaigns).where(eq(t.campaigns.id, campaign.id)))[0].status).toBe("draft");
+  });
+});
+
 describe("campaignTick", () => {
   it("launches due campaigns, returns blocked ones to draft with a notice, and closes campaigns after 14 days", async () => {
     const tenant = await addTenant(db, { plan: "enterprise_hrm", settings: settings() });

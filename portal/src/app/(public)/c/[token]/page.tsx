@@ -34,7 +34,7 @@ export default async function CertificatePage({ params }: PageProps<"/c/[token]"
   if (!settings.certificate.publicLink && !own) notFound();
 
   const locale = await getLocale();
-  const [tr, format] = await Promise.all([getTranslations("learner.certificate"), getFormatter()]);
+  const [tr, tc, format] = await Promise.all([getTranslations("learner.certificate"), getTranslations("common"), getFormatter()]);
   const c = settings.certificate;
   // The organisation's own wording in the page's language, else the default one of that language.
   const title = c.title?.[locale]?.trim() || tr("title");
@@ -72,7 +72,7 @@ export default async function CertificatePage({ params }: PageProps<"/c/[token]"
             <p className="mt-6 inline-flex rounded-pill bg-brand-50 px-4 py-2 text-body-sm font-semibold text-brand-700">
               {row.moduleTitle ? tr("module") : tr("path")}: {subject}
             </p>
-            <dl className="mt-10 grid gap-6 border-t border-line pt-6 sm:grid-cols-3">
+            <dl className="mt-10 grid gap-6 border-t border-line pt-6 sm:grid-cols-2 lg:grid-cols-4">
               <div>
                 <dt className="text-tab-sm font-bold tracking-wide text-ink-subtle uppercase">{tr("issued")}</dt>
                 <dd className="mt-1 text-body-sm font-semibold">{date}</dd>
@@ -84,6 +84,10 @@ export default async function CertificatePage({ params }: PageProps<"/c/[token]"
               <div>
                 <dt className="text-tab-sm font-bold tracking-wide text-ink-subtle uppercase">{tr("verify")}</dt>
                 <dd className="mt-1 font-mono text-tab break-all text-ink-muted">{verifyUrl.replace(/^https?:\/\//, "")}</dd>
+              </div>
+              <div>
+                <dt className="text-tab-sm font-bold tracking-wide text-ink-subtle uppercase">{tr("evidence")}</dt>
+                <dd className="mt-1 text-body-sm font-semibold">{tc(`evidence.${row.cert.evidence}`)}</dd>
               </div>
             </dl>
             {c.signerName ? (

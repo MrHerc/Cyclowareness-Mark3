@@ -155,9 +155,10 @@ describe("buildReport", () => {
     await db.insert(t.attestations).values({ tenantId: o.tenant.id, userId: o.anna.id, moduleId: mod.id, text: "Mən təsdiq edirəm.", locale: "az" });
     await db.insert(t.moduleProgress).values({ userId: o.bob.id, moduleId: mod.id, status: "awaiting_attestation", percent: 100 });
     const r = await buildReport(as(o.tenant.id, o.admin), "confirmations", {}, "en");
-    expect(r.rows.map((x) => [x[0], x[3], x[4], x[6], x[7]])).toEqual([
-      ["Anna", "Policy basics", "Completed", "Azərbaycanca", "Mən təsdiq edirəm."],
-      ["Bob", "Policy basics", "Awaiting confirmation", "", ""],
+    expect(r.headers.at(-1)).toBe("Evidence");
+    expect(r.rows.map((x) => [x[0], x[3], x[4], x[6], x[7], x[8]])).toEqual([
+      ["Anna", "Policy basics", "Completed", "Azərbaycanca", "Mən təsdiq edirəm.", "Self-reported"],
+      ["Bob", "Policy basics", "Awaiting confirmation", "", "", ""],
     ]);
   });
 

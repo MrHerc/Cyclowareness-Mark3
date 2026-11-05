@@ -172,14 +172,14 @@ export async function buildReport(v: Viewer, kind: ReportKind, f: ReportFilters,
       const rows: Cell[][] = [
         ...att.filter((a) => within(a.at, r)).map((a) => {
           const u = uById.get(a.userId)!;
-          return [u.name, u.email, dept(u), pick(modById.get(a.moduleId)?.title, locale), c("done"), a.at, LOCALE_NAMES[a.locale as Locale] ?? a.locale, a.text] as Cell[];
+          return [u.name, u.email, dept(u), pick(modById.get(a.moduleId)?.title, locale), c("done"), a.at, LOCALE_NAMES[a.locale as Locale] ?? a.locale, a.text, tc(`evidence.${a.evidence}`)] as Cell[];
         }),
         ...waiting.map((w) => {
           const u = uById.get(w.userId)!;
-          return [u.name, u.email, dept(u), pick(modById.get(w.moduleId)?.title, locale), c("awaiting"), null, "", ""] as Cell[];
+          return [u.name, u.email, dept(u), pick(modById.get(w.moduleId)?.title, locale), c("awaiting"), null, "", "", ""] as Cell[];
         }),
       ];
-      return { title, headers: [c("person"), c("email"), c("department"), c("module"), c("status"), c("confirmedAt"), c("language"), c("text")], rows };
+      return { title, headers: [c("person"), c("email"), c("department"), c("module"), c("status"), c("confirmedAt"), c("language"), c("text"), c("evidence")], rows };
     }
 
     case "simulations": {
