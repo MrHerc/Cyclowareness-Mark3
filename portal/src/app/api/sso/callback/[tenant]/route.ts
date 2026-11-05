@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull, or } from "drizzle-orm";
 import { z } from "zod";
 import { db, t } from "@/server/db";
 import { appUrl, env } from "@/server/env";
@@ -8,7 +8,7 @@ import { getSession } from "@/server/auth/viewer";
 import { isPrivileged } from "@/server/auth/permissions";
 import { emailDomain } from "@/server/auth/sso-routing";
 import { createSession, setSessionCookie } from "@/server/auth/session";
-import { SSO_STATE_COOKIE, discover, exchangeCode, openState, verifyIdToken } from "@/server/auth/oidc";
+import { SSO_STATE_COOKIE, discover, exchangeCode, openState, trimSlash, verifyIdToken } from "@/server/auth/oidc";
 import { decryptSecret } from "@/server/crypto";
 import { audit } from "@/server/services/audit";
 import { clientIp, ipRateKey, userAgent } from "@/server/request";
@@ -75,7 +75,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
     });
     const claims = await verifyIdToken(provider, idToken, { clientId: sso.clientId, nonce: state.nonce });
     if (typeof claims.sub !== "string" || !claims.sub || claims.sub.length > 255) throw new Error("no_subject");
-    subject = `${sso.issuer} ${claims.sub}`;
+    subject = `${trimSlash(sso.issuer)} ${claims.sub}`;
     const claimName = sso.emailClaim?.trim() || "email";
     // The standard claim counts only when the provider vouches for it (email_verified). Naming another claim in Settings
     // is the organisation's explicit trust in it and skips that check; the subject binding below still ties the account
@@ -125,12 +125,16 @@ export async function GET(request: Request, { params }: { params: Promise<{ tena
     // Created active, so this is also its activation (setStatusAction tells never-activated accounts apart by it).
     [user] = await db().insert(t.users).values({ tenantId: tenant.id, email, name, role: "learner", status: "active", locale, ssoSubject: subject, activatedAt: new Date() }).returning();
     await audit(db(), { tenantId: tenant.id, actorId: user.id, action: "sso.person_created", targetType: "user", targetId: user.id, ip });
-  } else if (user.status === "invited") {
-    // The organisation's identity provider vouches for the person, so the invitation is complete.
-    await db().update(t.users).set({ status: "active", activatedAt: new Date(), ssoSubject: subject }).where(eq(t.users.id, user.id));
-  } else if (!user.ssoSubject) {
-    // First single sign-on of an existing account: bound to this provider identity from now on.
-    await db().update(t.users).set({ ssoSubject: subject }).where(eq(t.users.id, user.id));
+  } else if (user.status === "invited" || !user.ssoSubject) {
+    // First single sign-on of an existing account (it completes an invitation: the organisation's provider vouches for
+    // the person): bound to this provider identity from now on. Conditional, so two first sign-ins racing with different
+    // subjects cannot both bind; the loser is refused like any other subject change.
+    const bound = await db()
+      .update(t.users)
+      .set({ ssoSubject: subject, ...(user.status === "invited" ? { status: "active" as const, activatedAt: new Date() } : {}) })
+      .where(and(eq(t.users.id, user.id), or(isNull(t.users.ssoSubject), eq(t.users.ssoSubject, subject))))
+      .returning({ id: t.users.id });
+    if (bound.length === 0) return refuse("subject_changed", user.id);
   }
 
   const { token, expiresAt } = await createSession({

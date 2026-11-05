@@ -37,7 +37,6 @@ const db = () => h.db as DB;
 const ISSUER = "https://idp.sso.test";
 const SUB = (sub: string) => `${ISSUER} ${sub}`;
 let proven: string;
-let unproven: string;
 
 /** Where the route redirected (NEXT_REDIRECT carries the target in its digest). */
 const redirectOf = (run: Promise<unknown>) =>
@@ -65,7 +64,7 @@ beforeAll(async () => {
   settings.identity = { ...settings.identity, ssoEnabled: true, sso: { protocol: "oidc", issuer: ISSUER, clientId: "portal", autoCreate: true } };
   const branding = { primary: "#4f46e5", accent: "#ff7a1a" };
   [{ id: proven }] = await db().insert(t.tenants).values({ slug: "proven", name: "Proven", plan: "professional", branding, settings, domain: "proven.test", domainVerifiedAt: new Date() }).returning();
-  [{ id: unproven }] = await db().insert(t.tenants).values({ slug: "unproven", name: "Unproven", plan: "professional", branding, settings, domain: "unproven.test", domainVerifiedAt: null }).returning();
+  await db().insert(t.tenants).values({ slug: "unproven", name: "Unproven", plan: "professional", branding, settings, domain: "unproven.test", domainVerifiedAt: null });
 }, 180_000);
 
 beforeEach(() => {
@@ -94,6 +93,11 @@ describe("SSO callback", () => {
     const [created] = await db().select().from(t.users).where(eq(t.users.email, "aysel@proven.test"));
     expect(created).toMatchObject({ tenantId: proven, status: "active", ssoSubject: SUB("p-1") });
     expect(await signIn("proven", { sub: "p-1", email: "aysel@proven.test" })).toBe("/app");
+    // The binding is on the issuer without its trailing slash, so re-saving it either way keeps everyone bound.
+    const [row] = await db().select({ settings: t.tenants.settings }).from(t.tenants).where(eq(t.tenants.id, proven));
+    await db().update(t.tenants).set({ settings: { ...row.settings, identity: { ...row.settings.identity, sso: { ...row.settings.identity.sso!, issuer: `${ISSUER}/` } } } }).where(eq(t.tenants.id, proven));
+    expect(await signIn("proven", { sub: "p-1", email: "aysel@proven.test" })).toBe("/app");
+    await db().update(t.tenants).set({ settings: row.settings }).where(eq(t.tenants.id, proven));
     expect(await signIn("proven", { sub: "p-2", email: "aysel@proven.test" })).toBe("/sign-in?error=sso");
     expect(lastRefusal()).toBe("subject_changed");
     expect(await signIn("proven", { email: "aysel@proven.test" })).toBe("/sign-in?error=sso");
@@ -108,6 +112,29 @@ describe("SSO callback", () => {
     await db().update(t.users).set({ ssoSubject: null }).where(eq(t.users.email, "rauf@proven.test"));
     expect(await signIn("proven", { sub: "p-4", email: "rauf@proven.test" })).toBe("/app");
     expect(await subject()).toBe(SUB("p-4"));
+  });
+
+  it("completes an invitation and binds the subject in one conditional write", async () => {
+    await db().insert(t.users).values({ tenantId: proven, email: "sabina@proven.test", name: "Sabina", status: "invited" });
+    expect(await signIn("proven", { sub: "p-6", email: "sabina@proven.test" })).toBe("/app");
+    const [u] = await db().select().from(t.users).where(eq(t.users.email, "sabina@proven.test"));
+    expect(u).toMatchObject({ status: "active", ssoSubject: SUB("p-6") });
+    expect(u.activatedAt).not.toBeNull();
+    // Another subject bound meanwhile (a racing first sign-in): the conditional update writes nothing and refuses.
+    await db().insert(t.users).values({ tenantId: proven, email: "kamran@proven.test", name: "Kamran" });
+    const update = db().update.bind(db());
+    vi.spyOn(db(), "update").mockImplementationOnce(((table: typeof t.users) => ({
+      set: (values: Partial<typeof t.users.$inferInsert>) => ({
+        where: (clause: never) => ({
+          returning: async (fields: { id: typeof t.users.id }) => {
+            await update(table).set({ ssoSubject: SUB("p-8") }).where(eq(t.users.email, "kamran@proven.test"));
+            return update(table).set(values).where(clause).returning(fields);
+          },
+        }),
+      }),
+    })) as never);
+    expect(await signIn("proven", { sub: "p-7", email: "kamran@proven.test" })).toBe("/sign-in?error=sso");
+    expect(lastRefusal()).toBe("subject_changed");
   });
 
   it("needs a verified standard email claim, but trusts a claim the organisation named", async () => {

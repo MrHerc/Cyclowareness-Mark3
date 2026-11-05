@@ -20,7 +20,7 @@ import { recomputeRisk } from "../services/risk";
 import { scopeDepartmentIds } from "../queries/admin";
 import { clientIp } from "../request";
 import { rateLimit } from "../rate-limit";
-import { parseCsv } from "../../lib/csv";
+import { importTooBig, parseCsv } from "../../lib/csv";
 import { cleanPhone, PHONE_PATTERN } from "../../lib/phone";
 import { departmentKey } from "../../lib/departments";
 import { LOCALES, LOCALE_NAMES, type Locale } from "../../i18n/config";
@@ -128,9 +128,10 @@ export async function addPersonAction(_: PersonState, form: FormData): Promise<P
   if (p.data.role === "tenant_admin" && v.user.role !== "tenant_admin" && v.user.role !== "super_admin") return { error: "invalid" };
   // Each answer tells whether an address exists somewhere, so an administrator gets a bounded number of tries.
   if (!(await rateLimit(`people-add:${v.user.id}`, 60, 60 * 60_000)).ok) return { error: "rateLimited" };
+  // Checked before any lookup: an address on another organisation's proven domain gets the same answer whether or not it exists.
+  if ((await foreignVerifiedDomains(v.tenant.id)).has(emailDomain(p.data.email) ?? "")) return { error: "foreignDomain" };
   const [exists] = await db().select({ tenantId: t.users.tenantId }).from(t.users).where(eq(t.users.email, p.data.email));
   if (exists) return { error: takenBy(exists.tenantId, v, "emailTaken") };
-  if ((await foreignVerifiedDomains(v.tenant.id)).has(emailDomain(p.data.email) ?? "")) return { error: "foreignDomain" };
   const holder = p.data.phone ? await phoneHolder(p.data.phone) : null;
   if (holder) return { error: takenBy(holder, v, "phoneTaken") };
   if (p.data.departmentId) {
@@ -209,7 +210,7 @@ const updateSchema = z.object({
 });
 
 /** `error` and `fields` as for adding a person, so the dialog marks the rejected input. */
-export type UpdatePersonResult = { ok: boolean; error?: "invalid" | "invalidPhone" | "phoneTaken" | "cannotAdd"; fields?: string[] };
+export type UpdatePersonResult = { ok: boolean; error?: "invalid" | "invalidPhone" | "phoneTaken" | "cannotAdd" | "rateLimited"; fields?: string[] };
 
 export async function updatePersonAction(userId: string, input: z.input<typeof updateSchema>): Promise<UpdatePersonResult> {
   const v = await actionViewer("people.write");
@@ -220,6 +221,8 @@ export async function updatePersonAction(userId: string, input: z.input<typeof u
     const fields = [...new Set(p.error.issues.map((i) => String(i.path[0] ?? "")).filter(Boolean))];
     return { ok: false, error: fields.length === 1 && fields[0] === "phone" ? "invalidPhone" : "invalid", fields };
   }
+  // A new number is looked up across organisations, like an addition: it counts against the same per-administrator limit.
+  if (p.data.phone && p.data.phone !== u.phone && !(await rateLimit(`people-add:${v.user.id}`, 60, 60 * 60_000)).ok) return { ok: false, error: "rateLimited" };
   const holder = p.data.phone ? await phoneHolder(p.data.phone, u.id) : null;
   if (holder) return { ok: false, error: takenBy(holder, v, "phoneTaken"), fields: ["phone"] };
   try {
@@ -497,9 +500,10 @@ class ImportConflict extends Error {
 /** CSV import in two steps: "check" validates everything, "commit" writes only a clean file. */
 export async function importPeopleAction(csv: string, commit: boolean): Promise<ImportPreview> {
   const v = await actionViewer("people.write");
-  // A check reports which of up to 5,000 addresses exist somewhere, so an administrator gets a bounded number of them.
-  if (!(await rateLimit(`people-import:${v.user.id}`, 20, 60 * 60_000)).ok) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "rateLimited" };
-  if (csv.length > 5_000_000) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "tooMany" };
+  // A check reports which of up to 5,000 addresses exist somewhere, so an administrator gets a bounded number of them
+  // (the commit of a checked file is not another probe).
+  if (!commit && !(await rateLimit(`people-import:${v.user.id}`, 20, 60 * 60_000)).ok) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "rateLimited" };
+  if (importTooBig(csv)) return { ok: false, rows: 0, problems: [], newDepartments: [], error: "tooBig" };
   const table = parseCsv(csv);
   if (table.length < 2) return { ok: false, rows: 0, problems: [{ line: 1, problem: "header" }], newDepartments: [] };
   const header = table[0].map((h) => {
@@ -549,8 +553,9 @@ export async function importPeopleAction(csv: string, commit: boolean): Promise<
     if (!name) problems.push({ line, problem: "name" });
     if (!z.email().safeParse(email).success) problems.push({ line, problem: "email" });
     else if (seen.has(email)) problems.push({ line, problem: "duplicate" });
-    else if (existing.has(email)) problems.push({ line, problem: takenBy(existing.get(email)!, v, "exists") });
+    // Another organisation's proven domain answers the same whether or not the address exists.
     else if (foreign.has(emailDomain(email) ?? "")) problems.push({ line, problem: "foreignDomain" });
+    else if (existing.has(email)) problems.push({ line, problem: takenBy(existing.get(email)!, v, "exists") });
     seen.add(email);
     // Own keys only: "constructor" or "__proto__" in the file must not match what every object inherits.
     const role = roleRaw ? (Object.hasOwn(ROLE_ALIASES, roleRaw) ? ROLE_ALIASES[roleRaw] : undefined) : "learner";

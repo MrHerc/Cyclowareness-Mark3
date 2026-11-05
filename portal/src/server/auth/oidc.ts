@@ -9,7 +9,8 @@ import { guardedRequest } from "../net-guard";
  */
 export type OidcProvider = { issuer: string; authorizationEndpoint: string; tokenEndpoint: string; jwksUri: string; secretPost: boolean };
 
-const trimSlash = (s: string) => s.replace(/\/+$/, "");
+/** Issuers compare without trailing slashes (the discovery document may spell it either way); the subject binding uses the same form. */
+export const trimSlash = (s: string) => s.replace(/\/+$/, "");
 
 /** Discovery documents, token answers and key sets are small; a provider that sends more is refused. */
 export const OIDC_MAX_RESPONSE_BYTES = 256 * 1024;

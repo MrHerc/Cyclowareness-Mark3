@@ -111,7 +111,7 @@ export function PersonActions({
               const phoneProblem = res.error === "phoneTaken" ? tp("phoneTaken") : res.error === "cannotAdd" ? tp("cannotAdd") : res.fields?.includes("phone") ? tp("invalidPhone") : null;
               setPhoneError(res.ok ? null : phoneProblem);
               if (res.ok) done();
-              else if (!phoneProblem || (res.fields?.length ?? 0) > 1) toast(tc("errors.invalid"), "error");
+              else if (!phoneProblem || (res.fields?.length ?? 0) > 1) toast(res.error === "rateLimited" ? tc("errors.rateLimited") : tc("errors.invalid"), "error");
             });
           }}
         >

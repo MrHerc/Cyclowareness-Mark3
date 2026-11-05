@@ -37,7 +37,7 @@ vi.mock("../src/server/auth/viewer", () => ({
   }),
 }));
 
-const { addPersonAction, importPeopleAction } = await import("../src/server/actions/people");
+const { addPersonAction, importPeopleAction, updatePersonAction } = await import("../src/server/actions/people");
 
 beforeAll(async () => {
   await migrate(drizzle(pglite), { migrationsFolder: path.join(__dirname, "..", "drizzle") });
@@ -191,11 +191,32 @@ describe("Existence oracle and limits", () => {
     expect(await addPersonAction(undefined, add({ email: "e@acme.test", phone: "+994501234588" }))).toEqual({ error: "phoneTaken" });
   });
 
-  it("limits checks and additions per administrator", async () => {
+  it("answers an address on another organisation's proven domain the same whether or not it exists", async () => {
+    const [bank] = await db.insert(t.tenants).values({ slug: "bankb", name: "Bank B", branding: {} as never, settings: {} as never, domain: "bankb.test", domainVerifiedAt: new Date() }).returning();
+    await db.insert(t.users).values({ tenantId: bank.id, email: "known@bankb.test", name: "Known" });
+    const csv = toCsv(["name", "email"], [["A", "known@bankb.test"], ["B", "unknown@bankb.test"]]);
+    expect((await importPeopleAction(csv, false)).problems).toEqual([
+      { line: 2, problem: "foreignDomain" },
+      { line: 3, problem: "foreignDomain" },
+    ]);
+    expect(await addPersonAction(undefined, add({ email: "known@bankb.test" }))).toEqual({ error: "foreignDomain" });
+    expect(await addPersonAction(undefined, add({ email: "unknown@bankb.test" }))).toEqual({ error: "foreignDomain" });
+  });
+
+  it("refuses a file the action could not receive", async () => {
+    expect(await importPeopleAction(`name,email\n${"x".repeat(900_000)}`, false)).toMatchObject({ ok: false, error: "tooBig" });
+  });
+
+  it("limits checks, additions and number changes per administrator; the commit of a checked file is free", async () => {
     const { rateLimit } = await import("../src/server/rate-limit");
     for (let i = 0; i < 20; i++) await rateLimit("people-import:00000000-0000-4000-8000-000000000001", 1000, 60 * 60_000);
     expect(await importPeopleAction("name,email\nX,x@acme.test", false)).toMatchObject({ ok: false, error: "rateLimited" });
+    expect(await importPeopleAction("name,email\nX,x@acme.test", true)).toMatchObject({ ok: true, imported: 1 });
     for (let i = 0; i < 60; i++) await rateLimit("people-add:00000000-0000-4000-8000-000000000001", 1000, 60 * 60_000);
-    expect(await addPersonAction(undefined, add({ email: "x@acme.test" }))).toEqual({ error: "rateLimited" });
+    expect(await addPersonAction(undefined, add({ email: "y@acme.test" }))).toEqual({ error: "rateLimited" });
+    const [ours] = await db.select({ id: t.users.id }).from(t.users).where(eq(t.users.email, "ours@acme.test"));
+    expect(await updatePersonAction(ours.id, { name: "Ours", locale: "en", phone: "+994501234577" })).toEqual({ ok: false, error: "rateLimited" });
+    // The number is unchanged, so nothing is looked up.
+    expect(await updatePersonAction(ours.id, { name: "Ours", locale: "en", phone: "+994501234588" })).toEqual({ ok: true });
   });
 });
